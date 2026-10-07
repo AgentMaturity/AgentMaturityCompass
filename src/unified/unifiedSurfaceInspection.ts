@@ -243,18 +243,25 @@ function inspectComply(workspace: string, agentId: string): UnifiedSurfaceModule
       evidenceRefs: [signature.path, signature.sigPath],
     });
   }
-  const averageCoverage = reports.reduce((sum, report) => sum + report.coverage.score, 0) / reports.length;
+  // Unevaluated and errored frameworks stay in the average at 0; any failed category fails Comply.
+  const evaluated = reports.filter((report) => report.coverage.score !== null).length;
+  const averageCoverage = evaluated > 0
+    ? reports.reduce((sum, report) => sum + (report.coverage.score ?? 0), 0) / frameworks.length
+    : null;
   const satisfied = reports.reduce((sum, report) => sum + report.coverage.satisfied, 0);
   const partial = reports.reduce((sum, report) => sum + report.coverage.partial, 0);
-  const score = averageCoverage * 100;
+  const failed = reports.reduce((sum, report) => sum + report.categories.filter((row) => row.result === "fail").length, 0);
   return result({
     name: "Comply",
-    status: satisfied + partial > 0 ? "success" : "skipped",
-    score,
-    summary: `${reports.length}/${frameworks.length} signed-framework reports generated; average evidence coverage ${(averageCoverage * 100).toFixed(1)}% (${satisfied} satisfied, ${partial} partial).`,
+    status: failed > 0 ? "failed" : satisfied > 0 ? "success" : "skipped",
+    score: averageCoverage === null ? 0 : averageCoverage * 100,
+    summary: `${reports.length}/${frameworks.length} signed-framework reports generated; ` + (averageCoverage === null
+      ? "not evaluated: no category had control-bound evidence."
+      : `average evidence coverage ${(averageCoverage * 100).toFixed(1)}% over ${frameworks.length} framework(s), ${evaluated} evaluated (${satisfied} satisfied, ${partial} partial, ${failed} failed).`),
     issues: [
       ...issues,
-      ...(satisfied + partial === 0 ? ["framework mappings exist, but current evidence satisfies no mapped control"] : []),
+      ...(failed > 0 ? [`${failed} compliance category(ies) failed a requirement (denied audit or failing assurance run)`] : []),
+      ...(satisfied === 0 ? ["framework mappings exist, but current evidence satisfies no mapped control"] : []),
     ],
     upgradePath: "Use `amc comply report --framework <framework>` and collect the report's needed evidence; AMC does not infer legal compliance.",
     evidenceRefs: [signature.path, signature.sigPath, ...reports.map((report) => report.reportId)],

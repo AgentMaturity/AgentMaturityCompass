@@ -55,11 +55,13 @@ export function complianceFleetReportCli(params: {
   generatedTs: number;
   agents: Array<{
     agentId: string;
-    score: number;
+    /** Null when no category was evaluated for this agent. */
+    score: number | null;
     satisfied: number;
     partial: number;
     missing: number;
     unknown: number;
+    notEvaluated: number;
     configTrusted: boolean;
   }>;
 } {
@@ -81,6 +83,7 @@ export function complianceFleetReportCli(params: {
         partial: report.coverage.partial,
         missing: report.coverage.missing,
         unknown: report.coverage.unknown,
+        notEvaluated: report.coverage.notEvaluated,
         configTrusted: report.configTrusted
       };
     })

@@ -75,7 +75,7 @@ Payment unlocks access, never a better result or a higher trust tier. The envelo
 
 ### Uppercase statuses
 
-The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`; they come from candidate 37c1466b and are not on main yet) and the compliance category statuses (`SATISFIED`, `PARTIAL`, `MISSING`, `UNKNOWN`). `PARTIAL` is not a result: missing evidence means not evaluated.
+The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`; they come from candidate 37c1466b and are not on main yet) and the compliance category statuses (`SATISFIED`, `PARTIAL`, `MISSING`, `NOT_EVALUATED`, `UNKNOWN`). The adapter reads a stored status alone, and in 1.x compliance reports `PARTIAL` and `MISSING` could come from missing evidence, so it maps them to not evaluated. Since P0-17 the compliance engine also writes a `result` field on every category, and there `PARTIAL` and `MISSING` mean a requirement failed (`result: fail`). A consumer of a 2.0 compliance report reads `result` rather than mapping the status; making the adapter prefer `result` is follow-up work for P0-22 and P0-23.
 
 | Status | Result | Evidence |
 | --- | --- | --- |

@@ -37,7 +37,8 @@ const certificationStatuses: Record<"PASS" | "FAIL" | "NOT_EVALUATED", [string, 
 };
 const complianceStatuses: Record<ComplianceCategoryStatus, [string, string | undefined]> = {
   SATISFIED: ["pass", undefined], PARTIAL: ["not_evaluated", "incomplete"],
-  MISSING: ["not_evaluated", "incomplete"], UNKNOWN: ["not_evaluated", "incomplete"]
+  MISSING: ["not_evaluated", "incomplete"], UNKNOWN: ["not_evaluated", "incomplete"],
+  NOT_EVALUATED: ["not_evaluated", undefined]
 };
 
 describe("tier adapters", () => {

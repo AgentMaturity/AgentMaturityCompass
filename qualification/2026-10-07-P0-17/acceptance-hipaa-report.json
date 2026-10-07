@@ -1,0 +1,222 @@
+{
+  "reportId": "ab5eaa9c-1d53-41b8-bc0c-0716a90b8ba5",
+  "ts": 1791338601237,
+  "workspace": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/tmp.vldq4XeKjg",
+  "framework": "HIPAA",
+  "agentId": "default",
+  "windowStartTs": 1790129001237,
+  "windowEndTs": 1791338601237,
+  "configTrusted": false,
+  "configReason": "compliance maps missing",
+  "trustTierCoverage": {
+    "observed": 0,
+    "attested": 0,
+    "selfReported": 0
+  },
+  "coverage": {
+    "satisfied": 0,
+    "partial": 0,
+    "missing": 0,
+    "unknown": 0,
+    "notEvaluated": 10,
+    "evaluated": 0,
+    "score": null
+  },
+  "categories": [
+    {
+      "id": "hipaa_administrative_safeguards",
+      "framework": "HIPAA",
+      "category": "§164.308 Administrative Safeguards",
+      "description": "Risk analysis, workforce security, information access management, security awareness training, security incident procedures, contingency planning, and evaluation.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_technical_safeguards",
+      "framework": "HIPAA",
+      "category": "§164.312 Technical Safeguards",
+      "description": "Access control, audit controls, integrity controls, person or entity authentication, and transmission security for electronic PHI.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_physical_safeguards",
+      "framework": "HIPAA",
+      "category": "§164.310 Physical Safeguards",
+      "description": "Facility access controls, workstation use and security, and device and media controls for systems handling PHI.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_organizational_requirements",
+      "framework": "HIPAA",
+      "category": "§164.314 Organizational Requirements",
+      "description": "Business associate contracts and group health plan requirements for AI systems processing PHI on behalf of covered entities.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_policies_documentation",
+      "framework": "HIPAA",
+      "category": "§164.316 Policies and Documentation",
+      "description": "Documentation of policies and procedures, retention requirements, and availability of documentation.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_privacy_rule",
+      "framework": "HIPAA",
+      "category": "§164.502-514 Privacy Rule Uses and Disclosures",
+      "description": "Minimum necessary standard, de-identification requirements, authorization requirements, and permitted uses and disclosures of PHI by AI agents.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_access_to_phi",
+      "framework": "HIPAA",
+      "category": "§164.524 Access to PHI",
+      "description": "Individual right of access to inspect and obtain a copy of PHI, including AI-generated health records and inferences.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_accounting_disclosures",
+      "framework": "HIPAA",
+      "category": "§164.528 Accounting of Disclosures",
+      "description": "Maintain an accounting of disclosures of PHI by AI agents, including automated disclosures and inter-system data sharing.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_administrative_requirements",
+      "framework": "HIPAA",
+      "category": "§164.530 Administrative Requirements",
+      "description": "Privacy officer designation, training, safeguards, complaint procedures, and sanctions for AI system operators.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    },
+    {
+      "id": "hipaa_breach_notification",
+      "framework": "HIPAA",
+      "category": "Breach Notification Rule §164.400-414",
+      "description": "Breach discovery, notification to individuals and HHS, and content of breach notifications for AI-related PHI incidents.",
+      "status": "NOT_EVALUATED",
+      "result": "not_evaluated",
+      "evidence": "untrusted",
+      "notEvaluatedReasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "reasons": [
+        "Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."
+      ],
+      "evidenceRefs": [],
+      "neededToSatisfy": [
+        "Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"
+      ]
+    }
+  ],
+  "nonClaims": [
+    "This report provides evidence-backed signals only; it is not legal advice.",
+    "Controls without control-bound AMC runtime evidence in the window are NOT_EVALUATED; absence of evidence is never a pass.",
+    "Owner attestations must be explicitly signed and are not inferred automatically."
+  ]
+}

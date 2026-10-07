@@ -6,6 +6,8 @@ They map deterministic AMC evidence checks to control families and framework-lik
 
 This is an engineering crosswalk, not legal advice.
 
+These are the audit-binder maps (`amc audit map`). The `amc compliance report` maps (`.amc/compliance-maps.yaml`) bind evidence differently: an event counts only when its `meta.controlIds` names the control (or a declared audit type matches), it belongs to the reported agent, it comes from AMC runtime and it falls inside the window; anything else leaves the category NOT_EVALUATED. See [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated).
+
 ## Structure
 
 An audit map defines:

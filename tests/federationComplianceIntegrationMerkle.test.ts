@@ -62,7 +62,7 @@ async function pickFreePort(): Promise<number> {
   return addr.port;
 }
 
-function writeAuditEvidence(workspace: string, auditType: string): void {
+function writeAuditEvidence(workspace: string, auditType: string, controlIds?: string[]): void {
   const ledger = openLedger(workspace);
   const sessionId = `test-${Date.now()}`;
   try {
@@ -82,7 +82,8 @@ function writeAuditEvidence(workspace: string, auditType: string): void {
       meta: {
         trustTier: "OBSERVED",
         agentId: "default",
-        auditType
+        auditType,
+        ...(controlIds ? { controlIds } : {})
       },
       receipt: {
         kind: "guard_check",
@@ -117,7 +118,7 @@ function signYamlWithAuditor(workspace: string, path: string): void {
 }
 
 describe("compliance + merkle + federation + integrations", () => {
-  test("compliance maps are signed and SATISFIED only when deterministic evidence exists", () => {
+  test("compliance maps are signed and SATISFIED only when control-bound evidence exists", () => {
     const workspace = newWorkspace();
     const created = initComplianceMaps(workspace);
     expect(created.path).toContain(".amc/compliance-maps.yaml");
@@ -132,10 +133,20 @@ describe("compliance + merkle + federation + integrations", () => {
     });
     const beforeMap = before.categories.find((row) => row.id === "nist_map");
     expect(beforeMap).toBeDefined();
-    expect(beforeMap?.status).not.toBe("SATISFIED");
+    expect(beforeMap?.status).toBe("NOT_EVALUATED");
 
+    // P0-17: an arbitrary audit type is a coincidental event, not evidence for nist_map. The old
+    // assertion (SATISFIED here) encoded that bug.
     writeAuditEvidence(workspace, "NIST_MAP_SIGNAL");
+    const coincidental = generateComplianceReport({
+      workspace,
+      framework: "NIST_AI_RMF",
+      window: "14d",
+      agentId: "default"
+    });
+    expect(coincidental.categories.find((row) => row.id === "nist_map")?.status).toBe("NOT_EVALUATED");
 
+    writeAuditEvidence(workspace, "NIST_MAP_SIGNAL", ["nist_map"]);
     const after = generateComplianceReport({
       workspace,
       framework: "NIST_AI_RMF",

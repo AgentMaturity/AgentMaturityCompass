@@ -7,6 +7,8 @@ import { unifiedRun } from "../src/unified/unifiedRun.js";
 import { initWorkspace } from "../src/workspace.js";
 import { actionPolicyPath } from "../src/governor/actionPolicyEngine.js";
 import { passportExportsDir } from "../src/passport/passportStore.js";
+import { generateComplianceReport, initComplianceMaps } from "../src/compliance/complianceEngine.js";
+import { openLedger } from "../src/ledger/ledger.js";
 
 const workspaces: string[] = [];
 
@@ -58,6 +60,58 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(enforce?.status).toBe("failed");
     expect(enforce?.score).toBe(0);
     expect(enforce?.issues.join(" ")).toMatch(/signature|integrity|invalid/i);
+  });
+
+  test("Comply is not evaluated without control-bound evidence and keeps unevaluated frameworks in its average", async () => {
+    const root = workspace();
+    initComplianceMaps(root);
+    const comply = async () => (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" }))
+      .find((module) => module.name === "Comply");
+
+    const before = await comply();
+    expect(before?.status).toBe("skipped");
+    expect(before?.score).toBe(0);
+    expect(before?.summary).toContain("not evaluated: no category had control-bound evidence");
+
+    const ledger = openLedger(root);
+    try {
+      ledger.startSession({ sessionId: "comply-bound", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      ledger.appendEvidence({
+        sessionId: "comply-bound", runtime: "unknown", eventType: "audit", payload: JSON.stringify({ auditType: "FIXTURE_SIGNAL" }),
+        payloadExt: "json", inline: true, meta: { trustTier: "OBSERVED", agentId: "default", controlIds: ["soc2_availability"] }
+      });
+    } finally {
+      ledger.close();
+    }
+    const after = await comply();
+    expect(after?.status).toBe("success");
+    expect(after?.score).toBeGreaterThan(0);
+    expect(after?.summary).toContain("over 3 framework(s), 1 evaluated (1 satisfied, 0 partial, 0 failed)");
+    // SOC2 alone was evaluated; NIST AI RMF and ISO 42001 count 0, so Comply is a third of SOC2's coverage.
+    const soc2 = generateComplianceReport({ workspace: root, agentId: "default", window: "30d", framework: "SOC2" });
+    expect(after?.score).toBe(Math.round(((soc2.coverage.score ?? 0) * 100) / 3));
+  });
+
+  test("Comply fails when a category fails a requirement, instead of reading as pending", async () => {
+    const root = workspace();
+    initComplianceMaps(root);
+    const ledger = openLedger(root);
+    try {
+      ledger.startSession({ sessionId: "comply-denied", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      for (const auditType of ["TRACE_CORRELATION_LOW", "DRIFT_REGRESSION_DETECTED", "MISSING_CONSENT", "POLICY_VIOLATION"]) {
+        ledger.appendEvidence({
+          sessionId: "comply-denied", runtime: "unknown", eventType: "audit", payload: JSON.stringify({ auditType }),
+          payloadExt: "json", inline: true, meta: { trustTier: "OBSERVED", agentId: "default", auditType }
+        });
+      }
+    } finally {
+      ledger.close();
+    }
+    const comply = (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" }))
+      .find((module) => module.name === "Comply");
+    expect(comply?.status).toBe("failed");
+    expect(comply?.score).toBe(0);
+    expect(comply?.issues.join(" ")).toMatch(/compliance category\(ies\) failed a requirement/);
   });
 
   test("verifies Vault ledger integrity instead of treating directory existence as proof", async () => {
