@@ -1,6 +1,6 @@
 # Claim Kinds and Status Dimensions
 
-Every AMC result carries a claim kind and five status dimensions. One shared service, `evaluateClaimEligibility` in `src/claims/eligibility/`, decides them from the result's provenance and evidence, and `renderClaimLabel` prints them with the same words on every surface. CLI, MCP, API, Studio and reports keep their current output until each adopts the service.
+Every AMC result carries a claim kind and five status dimensions. One shared service, `evaluateClaimEligibility` in `src/claims/eligibility/`, decides them from the result's provenance and evidence, and `renderClaimLabel` prints them with the same words on every surface. MCP, the API and Studio use it since P0-23 (see [Surfaces](#surfaces)); the CLI and reports keep their current output until they adopt it.
 
 AMC output is evidence of conformity. It is not a certificate.
 
@@ -101,6 +101,7 @@ The industry-pack audit types `INDUSTRY_EVIDENCE_MISSING` and `INDUSTRY_EVIDENCE
 - `envelopeForSyntheticExample`: always `synthetic_example` with no level.
 - `envelopeForPathPresence`: a found path proposes a pass, then rule 5 applies.
 - `envelopeForLegacyResult`: maps the stored uppercase status, then rule 2 applies.
+- `envelopeForUnboundResult`: a surface result that no adapter binds to evidence yet. The result is `not_evaluated` with no level, and the first reason is `RESULT_NOT_BOUND` ("this result is not yet bound to claim-eligible evidence"), so the label never suggests the producer recorded nothing. The kind is `self_reported` unless the method is synthetic.
 
 ## Rendering
 
@@ -110,4 +111,18 @@ The industry-pack audit types `INDUSTRY_EVIDENCE_MISSING` and `INDUSTRY_EVIDENCE
 Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: unresolved
 ```
 
-`formatClaimLabel(label, surface)` for `cli`, `mcp`, `api`, `studio` and `report` changes markup only, never words. `renderClaimLegend("text" | "markdown" | "html")` explains the four kinds, the five dimensions and "not evaluated". `REASON_TEXT` holds the one fixed sentence for each reason code.
+`claimFields(envelope)` returns `{ claimKind, statusDimensions, claimLabel }`, where `claimLabel` is the label line; MCP, the API and Studio attach exactly these fields. `formatClaimLabel(label, surface)` for `cli`, `mcp`, `api`, `studio` and `report` changes markup only, never words. `renderClaimLegend("text" | "markdown" | "html")` explains the four kinds, the five dimensions and "not evaluated". `REASON_TEXT` holds the one fixed sentence for each reason code.
+
+## Surfaces
+
+### MCP
+
+All ten tools in `src/mcp/amcMcpServer.ts` return the result text, then a second text block with the claim line and `Claim kinds: see docs/CLAIM_KINDS.md`, and set `structuredContent` to the claim fields (`src/mcp/mcpClaimOutput.ts`). Agent tools use the agent's latest diagnostic run when this workspace's auditor key sealed it, and are not evaluated otherwise. The sector-pack tool uses the regulated self-assessment envelope. The compliance tool is a regulated result that is not evaluated. `amc_list_evidence` labels each event with `claimKindFromTrustTier` of its effective trust tier. See [MCP_SERVER.md](MCP_SERVER.md).
+
+### API
+
+`src/api/resultRouteRegistry.ts` lists the `/api/v1/` routes that return results, each with its producer, its shape (`single` or `list`) and its claim source. The dispatcher binds the matched route to the response and `apiSuccess` adds the claim fields beside a single result, or a `claim` object on each list item. A sealed diagnostic run carries its own envelope; every other listed result uses `envelopeForUnboundResult`. OpenAPI publishes `ClaimKind`, `StatusDimensions` and `ClaimResult`, generated from the zod schemas above. See [API_SURFACES.md](API_SURFACES.md).
+
+### Studio
+
+`src/studio/studioClaimOutput.ts` lists the Studio routes that feed result pages; Studio's JSON helper adds the claim fields to their 2xx bodies. The console shows each claim in a strip above the page (`src/console/assets/components/claimBadge.js`): the kind and result in a pill, the five dimensions in its tooltip, and a link to the legend, which the dashboard, transparency, compliance, assurance, passport and industry-packs pages show open. "Not evaluated" is a neutral pill with its reason, never 0 and never a failure. Pack-gate responses add `entitlementNote`, and claim fields are the same with or without entitlement.
