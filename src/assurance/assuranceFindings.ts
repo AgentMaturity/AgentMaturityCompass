@@ -13,7 +13,7 @@ export function findingsFromScenarioResults(params: {
 }): AssuranceFindingsDoc {
   const findings: AssuranceFinding[] = [];
   for (const scenario of params.scenarios) {
-    if (scenario.passed) {
+    if (scenario.passed || scenario.inconclusive) {
       continue;
     }
     findings.push(
