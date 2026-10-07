@@ -45,6 +45,11 @@ export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
 
 export type ControlStatus = "PASS" | "ADEQUATE" | "GAP";
 
+/** Markdown wording for a status computed from a self-declared level: never a bare PASS (truth rule). */
+const CONTROL_STATUS_TEXT: Record<ControlStatus, string> = {
+  PASS: "at target (self-reported)", ADEQUATE: "adequate (self-reported)", GAP: "gap (self-reported)"
+};
+
 export interface CrosswalkEntry {
   framework: AuditFramework;
   control: string;
@@ -470,7 +475,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   const overall = audit.overall;
   lines.push(`- Overall (self-reported): ${overall.percentage}% · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
   lines.push(`- Self-reported level L${overall.level}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
-  lines.push(`- Controls: ${audit.overall.controlCount} — PASS ${audit.overall.passCount} · ADEQUATE ${audit.overall.adequateCount} · GAP ${audit.overall.gapCount}`);
+  lines.push(`- Controls (self-reported answers): ${audit.overall.controlCount} — at target ${audit.overall.passCount} · adequate ${audit.overall.adequateCount} · gap ${audit.overall.gapCount}`);
   lines.push(audit.signature
     ? `- Signature: auditor key ${audit.signature.keyFingerprint}. Verify with: \`amc audit binder verify <file> --pubkey <recorded-auditor.pub>\``
     : `- Checksum only — not signed (\`sha256:${audit.receiptHash}\`)`);
@@ -486,7 +491,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");
-    lines.push(`### ${c.id} — ${c.dimension} · ${c.status} (L${c.level})`);
+    lines.push(`### ${c.id} — ${c.dimension} · ${CONTROL_STATUS_TEXT[c.status]} (L${c.level})`);
     lines.push(formatClaimLabel(renderClaimLabel(controlClaim(audit, c)), "report"));
     lines.push("");
     lines.push(c.text);

@@ -6,14 +6,15 @@ regulator, customer, or your own risk team*.
 
 For every control in an Industry Pack the audit produces:
 
-- **A level score and a PASS / ADEQUATE / GAP verdict** against the pack's own
-  L1/L3/L5 anchors.
+- **A level and a status** against the pack's own L1/L3/L5 anchors: at target
+  (`PASS` in JSON), adequate or gap. Both come from self-declared answers, so the
+  Markdown labels them self-reported and they are never a regulatory pass.
 - **A multi-framework crosswalk** — each control is mapped to public control
   anchors in **EU AI Act**, **NIST AI RMF**, **ISO/IEC 42001**, and **SOC 2**,
   plus the sector regulation itself. One assessment lines up with several
   audits at once.
 - **The evidence an auditor expects** for that control.
-- **A concrete remediation for anything short of PASS** — a generated policy
+- **A concrete remediation for anything short of target** — a generated policy
   stub, guardrail, or evidence-collection recipe, with the pack's L3 descriptor
   as the acceptance criterion the agent must meet.
 
