@@ -38,6 +38,20 @@
       "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd"
     },
     {
+      "path": "src/assurance/assuranceCertificates.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assuranceCertificates.ts.landed",
+      "sha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008"
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228"
+    },
+    {
       "path": "src/assurance/assuranceStore.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
@@ -92,6 +106,13 @@
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
       "archivePath": "unused-code/plan-edits/P0-09/src/passport/passportCli.ts.landed",
       "sha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8"
+    },
+    {
+      "path": "src/passport/passportCollector.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
+      "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd"
     },
     {
       "path": "src/plugins/pluginPackage.ts",
