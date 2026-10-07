@@ -83,7 +83,8 @@ describe("station operating profiles", () => {
       for (const { path, entry } of entries) {
         expect(typeof entry.source.title === "string" && entry.source.title.length > 0, `${path} title`).toBe(true);
         expect(typeof entry.source.url === "string" && entry.source.url.length > 0, `${path} url`).toBe(true);
-        expect(entry.source.retrievedAt, `${path} retrievedAt`).toBe("2026-10-03");
+        // SR 26-2 was read under P0-24 on 2026-10-07; every other source on 2026-10-03.
+        expect(entry.source.retrievedAt, `${path} retrievedAt`).toBe(entry.source.id === "frb_sr_26_2" ? "2026-10-07" : "2026-10-03");
         expect(typeof entry.source.verified, `${path} verified flag`).toBe("boolean");
         if (entry.source.verified === false) {
           expect(typeof entry.source.reason === "string" && entry.source.reason.length > 0, `${path} unverified reason`).toBe(true);
@@ -203,8 +204,13 @@ describe("station operating profiles", () => {
   test("every unverified source says why the primary text was not read", () => {
     const sources = listProfileSources();
     expect(sources.length).toBeGreaterThan(30);
+    // SR 26-2 (17 April 2026) superseded SR 11-7; the wealth profile cites it for model validation only.
+    expect(sources.map((source) => source.id)).not.toContain("frb_sr_11_7");
+    const wealth = buildOperatingProfile({ station: "wealth" });
+    expect(wealth.auditSampling.method.source.id).toBe("frb_sr_26_2");
+    expect(wealth.auditSampling.method.source.title).toContain("17 April 2026");
     for (const source of sources) {
-      expect(source.retrievedAt).toBe("2026-10-03");
+      expect(source.retrievedAt).toBe(source.id === "frb_sr_26_2" ? "2026-10-07" : "2026-10-03");
       if (!source.verified) expect(source.reason?.length ?? 0, source.id).toBeGreaterThan(10);
     }
   });

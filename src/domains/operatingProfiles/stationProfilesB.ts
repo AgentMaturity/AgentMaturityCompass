@@ -3,6 +3,7 @@ import { approval, clock, sourced, yearsToDays } from "./profileDataHelpers.js";
 import type { StationOperatingProfileData } from "./operatingProfileTypes.js";
 
 const CHOICE = "Numeric value is an AMC operating choice; the cited rule sets the duty, not the number.";
+const D08 = "Flagged for expert review (D-08).";
 
 export const GOVERNANCE_PROFILE: StationOperatingProfileData = {
   station: "governance",
@@ -109,14 +110,14 @@ export const WEALTH_PROFILE: StationOperatingProfileData = {
     rules: sourced({ piiLeakage: true, secretExposure: true, promptInjection: true, destructiveAction: true }, S.cfr17_240_17a4, "Records integrity and customer data protection.")
   },
   approvals: {
-    FINANCIAL: sourced(approval(2, true, ["OWNER", "AUDITOR"], 10), S.frb_sr_11_7, "Effective challenge: independent review of model-driven financial actions (body unverified; title/date read)."),
+    FINANCIAL: sourced(approval(2, true, ["OWNER", "AUDITOR"], 10), S.amc_operating_choice, `Owner and auditor approve every agent-initiated financial action. SR 26-2 covers the models the agent calls, not the agent, so it sets no approval count here. ${D08}`),
     WRITE_HIGH: sourced(approval(2, true, ["APPROVER", "OWNER"], 15), S.sox_302_404, "Segregation of duties for changes affecting financial records (unverified: not fetched)."),
     DATA_EXPORT: sourced(approval(2, true, ["OWNER", "AUDITOR"], 10), S.sec_reg_sp_248_30, "Customer-information safeguards (unverified: not fetched)."),
-    DEPLOY: sourced(approval(2, true, ["APPROVER", "OWNER"], 15), S.frb_sr_11_7, "Model changes are validated before use (body unverified).")
+    DEPLOY: sourced(approval(2, true, ["APPROVER", "OWNER"], 15), S.amc_operating_choice, `AMC default for deployments. When a deployment changes a traditional model the agent calls, SR 26-2 section V validation applies to that model separately. ${D08}`)
   },
   budgets: {
     dailyMaxToolExecutes: {
-      FINANCIAL: sourced(0, S.frb_sr_11_7, `No autonomous financial executions; every one is approved (body unverified). ${CHOICE}`),
+      FINANCIAL: sourced(0, S.amc_operating_choice, `No autonomous financial executions; every one is approved. ${D08} ${CHOICE}`),
       DATA_EXPORT: sourced(1, S.sec_reg_sp_248_30, `One ticketed export per day (unverified source). ${CHOICE}`),
       SECURITY: sourced(0, S.amc_operating_choice, `No autonomous security-class executions. ${CHOICE}`),
       WRITE_HIGH: sourced(5, S.amc_operating_choice, `AMC default ceiling. ${CHOICE}`)
@@ -128,13 +129,13 @@ export const WEALTH_PROFILE: StationOperatingProfileData = {
   },
   auditSampling: {
     ratePercent: sourced(10, S.cfr31_1020_320, `Suspicious-activity monitoring supports the 30-day SAR clock. ${CHOICE}`),
-    method: sourced("risk_weighted_random", S.frb_sr_11_7, "Weight toward model-driven decisions for independent validation (body unverified)."),
+    method: sourced("risk_weighted_random", S.frb_sr_26_2, `Weight the sample toward decisions that rest on the traditional or non-generative models the agent calls, whose validation and monitoring SR 26-2 section V covers; the agent itself is outside SR 26-2 (footnote 3). ${D08}`),
     cadence: sourced("weekly", S.amc_operating_choice, `Weekly cadence. ${CHOICE}`)
   },
   humanOversight: {
-    requiredReviewerRoles: sourced(["APPROVER", "OWNER"], S.frb_sr_11_7, "Effective challenge by qualified, independent staff (body unverified)."),
+    requiredReviewerRoles: sourced(["APPROVER", "OWNER"], S.amc_operating_choice, `Approver and owner review the agent's consequential actions. SR 26-2 effective challenge applies to the models the agent calls, not to the agent. ${D08}`),
     requireDistinctReviewers: sourced(true, S.sox_302_404, "Segregation of duties (unverified: not fetched)."),
-    overridePath: sourced("Kill switch halts trading or payment actions; suitability and fiduciary review precede any FINANCIAL execution.", S.frb_sr_11_7, "Independent validation and effective challenge (body unverified).")
+    overridePath: sourced("Kill switch halts trading or payment actions; suitability and fiduciary review precede any FINANCIAL execution.", S.amc_operating_choice, `No source read sets an override path for an agent; this is an AMC operating choice. ${D08}`)
   },
   incidentReportingClocks: [
     clock({ id: "occ-53-36h", trigger: "Notification incident at a banking organization", authority: "OCC", value: 36, unit: "hours", source: S.cfr12_53_3, basis: "53.3: as soon as possible and no later than 36 hours." }),

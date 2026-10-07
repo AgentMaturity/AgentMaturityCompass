@@ -203,13 +203,17 @@ export const SOURCES = {
     "https://www.nist.gov/cyberframework",
     "Resource center page: CSF 2.0 released February 2024; core functions not listed on the page"
   ),
-  frb_sr_11_7: unverified(
-    "frb_sr_11_7",
-    "Federal Reserve SR 11-7 Supervisory Guidance on Model Risk Management",
-    "https://www.federalreserve.gov/boarddocs/srletters/2011/sr1107.htm",
-    "SR 11-7, 4 April 2011 (title and date page read); independent validation and effective challenge",
-    "attachment body not readable from this harness 2026-10-03; only the letter's title/date page was read"
-  ),
+  // From catalogue record us-sr-26-2 (src/domains/packs/catalogueUs.ts): the letter page and attachment
+  // SR2602a1.pdf were read on 2026-10-07 under P0-24. SR 26-2 covers the traditional and
+  // non-generative, non-agentic models an agent calls; it does not regulate the agent (footnote 3).
+  frb_sr_26_2: {
+    id: "frb_sr_26_2",
+    title: "Federal Reserve SR 26-2 Revised Guidance on Model Risk Management (17 April 2026, with the OCC and FDIC)",
+    url: "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm",
+    reference: "SR 26-2, 17 April 2026, attachment SR2602a1.pdf: footnote 3 puts generative and agentic AI models outside the guidance; section V (Model Validation and Monitoring) covers conceptual soundness and outcomes analysis of the models in scope",
+    retrievedAt: "2026-10-07",
+    verified: true
+  },
   eu_ai_act_art73: unverified(
     "eu_ai_act_art73",
     "Regulation (EU) 2024/1689 (AI Act) Article 73 Reporting of serious incidents",
