@@ -4,9 +4,12 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
+import { initUsersConfig } from "../src/auth/authApi.js";
 import { initIntegrationsConfig } from "../src/integrations/integrationStore.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { outcomesAttestCli, outcomesInitCli } from "../src/outcomes/outcomeCli.js";
+import { outcomeTrustTier } from "../src/outcomes/outcomeScoring.js";
+import type { OutcomeEvent } from "../src/types.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { getVaultSecret } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -63,6 +66,15 @@ describe("outcome ingestion trust tier", () => {
     expect(row?.meta.attestation).toMatchObject({ kind: "self_attested" });
   });
 
+  test("scoring reads 1.x webhook, manual and imported rows as SELF_REPORTED, whatever tier they stored", () => {
+    const row = (source: OutcomeEvent["source"], trust_tier: OutcomeEvent["trust_tier"]) => ({ source, trust_tier }) as OutcomeEvent;
+    expect(outcomeTrustTier(row("webhook", "OBSERVED"))).toBe("SELF_REPORTED");
+    expect(outcomeTrustTier(row("manual", "ATTESTED"))).toBe("SELF_REPORTED");
+    expect(outcomeTrustTier(row("import", "OBSERVED"))).toBe("SELF_REPORTED");
+    expect(outcomeTrustTier(row("toolhub", "ATTESTED"))).toBe("SELF_REPORTED");
+    expect(outcomeTrustTier(row("toolhub", "OBSERVED"))).toBe("OBSERVED");
+  });
+
   test("Studio operator and webhook ingestion return and store SELF_REPORTED", async () => {
     const dir = workspace();
     initIntegrationsConfig(dir);
@@ -93,5 +105,24 @@ describe("outcome ingestion trust tier", () => {
     expect(rows.find((row) => row.metric_id === "webhook.signal")?.meta.attestation).toEqual({ kind: "external_report" });
     expect(rows.filter((row) => row.metric_id === "feedback.rating").map((row) => (row.meta.attestation as { kind: string }).kind).sort())
       .toEqual(["external_report", "self_attested"]);
+  }, 60_000);
+
+  test("Studio truthguard validation by a signed-in person is SELF_REPORTED, never ATTESTED", async () => {
+    const dir = workspace();
+    initUsersConfig({ workspace: dir, username: "owner", password: "owner-test-pass" });
+    const studio = await startStudioApiServer({ workspace: dir, host: "127.0.0.1", port: await freePort(), token: "truthguard-trust-token" });
+    try {
+      const login = await fetch(`${studio.url}/auth/login`, { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ username: "owner", password: "owner-test-pass" }) });
+      expect(login.status).toBe(200);
+      const cookie = login.headers.getSetCookie().map((value) => value.split(";")[0]).join("; ");
+      const output = { v: 1, answer: "The build passed.", claims: [], unknowns: [], nextActions: [] };
+      // The route used to label this ATTESTED, which the provenance write guard refuses (a 500 for every non-agent role).
+      const validated = await post(`${studio.url}/truthguard/validate`, JSON.stringify({ output }), { cookie });
+      expect(validated.status, JSON.stringify(validated.json)).toBe(200);
+      expect(validated.json.trustTier).toBe("SELF_REPORTED");
+    } finally {
+      await studio.close();
+    }
   }, 60_000);
 });

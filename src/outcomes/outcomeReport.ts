@@ -11,7 +11,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
-import { computeMetric, scoreCategory, type ComputedMetric } from "./outcomeScoring.js";
+import { computeMetric, outcomeTrustTier, scoreCategory, type ComputedMetric } from "./outcomeScoring.js";
 import { loadOutcomeContract, verifyOutcomeContractSignature } from "./outcomeContractEngine.js";
 
 export interface RunOutcomeReportInput {
@@ -24,18 +24,6 @@ export interface RunOutcomeReportInput {
 function reportsDir(workspace: string, agentId: string): string {
   const paths = getAgentPaths(workspace, agentId);
   return join(paths.rootDir, "outcomes", "reports");
-}
-
-function parseTrustTier(metaJson: string): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
-  try {
-    const parsed = JSON.parse(metaJson) as Record<string, unknown>;
-    if (parsed.trustTier === "OBSERVED" || parsed.trustTier === "ATTESTED" || parsed.trustTier === "SELF_REPORTED") {
-      return parsed.trustTier;
-    }
-  } catch {
-    // ignore
-  }
-  return "OBSERVED";
 }
 
 function parseAuditType(metaJson: string): string {
@@ -184,7 +172,7 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
           metric_id: "feedback.rating",
           value: JSON.stringify(0),
           unit: null,
-          trust_tier: parseTrustTier(event.meta_json),
+          trust_tier: "SELF_REPORTED" as const, // imported review rows: never observed by AMC (P0-18)
           source: "import" as const,
           meta_json: event.meta_json,
           prev_event_hash: "",
@@ -247,7 +235,7 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
   }
 
   const totalOutcomeEvents = outcomeEvents.length;
-  const observed = outcomeEvents.filter((event) => event.trust_tier === "OBSERVED").length;
+  const observed = outcomeEvents.filter((event) => outcomeTrustTier(event) === "OBSERVED").length;
   const observedCoverageRatio = totalOutcomeEvents > 0 ? Number((observed / totalOutcomeEvents).toFixed(4)) : 0;
 
   const reportId = `out_${Date.now()}_${randomUUID().slice(0, 8)}`;

@@ -2,9 +2,12 @@ import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
+import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { ed25519KeyId } from "../src/trust/index.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { initWorkspace } from "../src/workspace.js";
+import { workspaceKeyPem } from "./helpers/trustContext.js";
 
 /**
  * P0-18 step 5: the ledger refuses a tier the producer cannot have. Only AMC's runtime writes OBSERVED, and ATTESTED
@@ -58,6 +61,32 @@ describe("the ledger derives allowed tiers from provenance", () => {
     expect(() => append(dir, { source: "operator", trustTier: "OBSERVED" })).toThrow(/not allowed for manual/);
     expect(() => append(dir, { provenance: "dogfood", trustTier: "OBSERVED" })).toThrow(/not allowed for synthetic/);
     expect(() => append(dir, { source: "eval_import", trustTier: "OBSERVED" }, true)).toThrow(/not allowed for import/);
+  });
+
+  test("ATTESTED with the workspace's own monitor or auditor key is refused", () => {
+    const dir = workspace();
+    for (const role of ["auditor", "monitor"] as const) {
+      const digest = sha256Hex("bundle");
+      const own = { keyId: ed25519KeyId(workspaceKeyPem(dir, role))!, sigB64: signHexDigest(digest, getPrivateKeyPem(dir, role)), digestSha256: digest };
+      expect(() => append(dir, { source: "attested_ingest", trustTier: "ATTESTED", attestation: own }), role)
+        .toThrow("trust tier ATTESTED is not allowed with the workspace's own key; tiers derive from provenance (docs/EVIDENCE_TRUST.md)");
+    }
+  });
+
+  test("the outcome ledger refuses OBSERVED except from ToolHub, and ATTESTED from every source", () => {
+    const dir = workspace();
+    const ledger = openLedger(dir);
+    try {
+      const outcome = (source: "toolhub" | "webhook" | "manual" | "import", trustTier: "OBSERVED" | "ATTESTED" | "SELF_REPORTED") =>
+        () => ledger.appendOutcomeEvent({ agentId: "default", category: "Functional", metricId: "m", value: 1, source, trustTier });
+      expect(outcome("webhook", "OBSERVED")).toThrow("trust tier OBSERVED is not allowed for webhook outcomes; tiers derive from provenance (docs/EVIDENCE_TRUST.md)");
+      expect(outcome("manual", "ATTESTED")).toThrow(/ATTESTED is not allowed for manual outcomes/);
+      expect(outcome("toolhub", "ATTESTED")).toThrow(/ATTESTED is not allowed for toolhub outcomes/);
+      expect(outcome("toolhub", "OBSERVED")).not.toThrow();
+      expect(outcome("webhook", "SELF_REPORTED")).not.toThrow();
+    } finally {
+      ledger.close();
+    }
   });
 
   test("SELF_REPORTED, runtime OBSERVED and an attested row with its record are accepted", () => {

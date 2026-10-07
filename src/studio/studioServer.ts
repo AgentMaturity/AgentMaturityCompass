@@ -6090,12 +6090,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           output: typeof parsed.output === "undefined" ? parsed : parsed.output
         });
-        const trustTier =
-          auth.roles.has("AGENT") && !validation.context.evidenceBound
-            ? "SELF_REPORTED"
-            : auth.roles.has("AGENT")
-              ? "OBSERVED"
-              : "ATTESTED";
+        // P0-18: only an agent's evidence-bound output is observed; a person validating text vouches for nothing.
+        const trustTier = auth.roles.has("AGENT") && validation.context.evidenceBound ? "OBSERVED" : "SELF_REPORTED";
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "OUTPUT_VALIDATED",
