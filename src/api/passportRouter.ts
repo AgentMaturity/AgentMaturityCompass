@@ -154,8 +154,14 @@ export async function handlePassportRoute(
       const body = await import("./apiHelpers.js").then(m => m.bodyJson<{ token?: Record<string, unknown>; secret?: string }>(req));
       if (!body.token || !body.secret) { apiError(res, 400, "token and secret required"); return true; }
       const { verifyTrustToken } = await import("../passport/trustInterchange.js");
+      const { loadTrustContext, unsignedArtifactReport } = await import("../trust/index.js");
+      const { sha256Hex } = await import("../utils/hash.js");
       const result = verifyTrustToken(body.token as unknown as Parameters<typeof verifyTrustToken>[0], body.secret);
-      apiSuccess(res, result);
+      // P0-51: the token is an HMAC under a secret the caller supplies, so a match proves only that the caller knows
+      // that secret. It names no signer the server's trust can admit, so it is never valid; `integrityValid` is the HMAC.
+      const report = unsignedArtifactReport({ kind: "trust-token", path: "<request body>", sha256: sha256Hex(JSON.stringify(body.token)) },
+        loadTrustContext(), result.reasons, "signature");
+      apiSuccess(res, { ...result, valid: false, integrityValid: result.valid, report });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : "Trust token verification failed");
     }
