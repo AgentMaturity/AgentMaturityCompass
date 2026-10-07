@@ -3,7 +3,7 @@
  * the built package and compares the ratcheted findings with
  * scripts/citations-baseline.json; tests pass fixtures directly.
  *
- * CIT001 superseded-as-live  ratcheted (P0-24 flips it to zero tolerance)
+ * CIT001 superseded-as-live  zero tolerance (P0-24 corrected the last findings)
  * CIT002 framework-id        malformed id: zero tolerance; not in a filled table or a broken pair: ratcheted
  * CIT003 pack-reference      zero tolerance
  * CIT004 record-incomplete   ratcheted (P1-09 fills the records)
@@ -18,7 +18,7 @@ import { SUPERSEDED_INSTRUMENTS } from "./supersededInstruments.js";
 export type CitationRuleId = "CIT001" | "CIT002" | "CIT003" | "CIT004" | "CIT005";
 
 export const CITATION_RULES: Readonly<Record<CitationRuleId, { name: string; zeroTolerance: boolean; burnDownIssue: string }>> = {
-  CIT001: { name: "superseded-as-live", zeroTolerance: false, burnDownIssue: "P0-24" },
+  CIT001: { name: "superseded-as-live", zeroTolerance: true, burnDownIssue: "P0-24" },
   CIT002: { name: "framework-id", zeroTolerance: false, burnDownIssue: "P0-24" },
   CIT003: { name: "pack-reference", zeroTolerance: true, burnDownIssue: "P0-25" },
   CIT004: { name: "record-incomplete", zeroTolerance: false, burnDownIssue: "P1-09" },

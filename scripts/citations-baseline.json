@@ -1,50 +1,46 @@
 {
   "rules": {
     "CIT001": {
-      "zeroTolerance": false,
+      "zeroTolerance": true,
       "issue": "P0-24",
-      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
-      "counts": {
-        "src/domains/domainRegistry.ts": 2,
-        "src/domains/industryPacks.ts": 3,
-        "src/score/domainPacks.ts": 5
-      }
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
+      "counts": {}
     },
     "CIT002": {
       "zeroTolerance": false,
       "issue": "P0-24",
-      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {
         "src/domains/industryPackAudit.ts": 2,
-        "src/score/crossFrameworkMapping.ts": 2
+        "src/score/crossFrameworkMapping.ts": 1
       }
     },
     "CIT003": {
       "zeroTolerance": true,
       "issue": "P0-25",
-      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {}
     },
     "CIT004": {
       "zeroTolerance": false,
       "issue": "P1-09",
-      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {
-        "src/domains/domainRegistry.ts": 16,
-        "src/domains/industryPacks.ts": 316,
+        "src/domains/domainRegistry.ts": 14,
+        "src/domains/industryPacks.ts": 310,
         "src/domains/packs/catalogueEu.ts": 79,
         "src/domains/packs/catalogueIntl.ts": 146,
         "src/domains/packs/catalogueUs.ts": 42,
-        "src/score/domainPacks.ts": 33
+        "src/score/domainPacks.ts": 29
       }
     },
     "CIT005": {
       "zeroTolerance": true,
       "issue": "P0-25",
-      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {}
     }
   },
-  "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+  "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
   "updatedAt": "2026-10-07"
 }

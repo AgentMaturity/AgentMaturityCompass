@@ -25,7 +25,7 @@ const ISSUE_KEY = /^P\d-\d{2}$/;
 
 /** Mirrors CITATION_RULES in src/compliance/citations/lint.ts (tests/citations/checkCitationsCli.test.ts pins the match). */
 export const RULES = {
-  CIT001: { name: "superseded-as-live", zeroTolerance: false, issue: "P0-24" },
+  CIT001: { name: "superseded-as-live", zeroTolerance: true, issue: "P0-24" },
   CIT002: { name: "framework-id", zeroTolerance: false, issue: "P0-24" },
   CIT003: { name: "pack-reference", zeroTolerance: true, issue: "P0-25" },
   CIT004: { name: "record-incomplete", zeroTolerance: false, issue: "P1-09" },
