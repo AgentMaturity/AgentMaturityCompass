@@ -4,6 +4,8 @@
  * meaning; a breaking change goes to v2/. See spec/README.md and spec/ACCEPTANCE_RULES.md.
  */
 import { z } from "zod";
+import { catalogLockSchema } from "../catalog/lockfile.js";
+import { controlRecordSchema, packManifestSchema } from "../catalog/schema.js";
 import { claimEnvelopeSchema } from "../claims/eligibility/schemas.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { externalEvidenceProfileSchema } from "../standard/externalEvidenceProfile.js";
@@ -38,7 +40,11 @@ export const CONTRACTS = {
   "scoped-attestation": { title: "AMC Scoped Attestation", schema: scopedAttestationV1Schema },
   "trust-list": { title: "AMC Signed Trust List", schema: signedTrustListSchema },
   "verifier-report": { title: "AMC Verifier Report", schema: verifierReportSchema },
-  "signature-envelope": { title: "AMC Signature Envelope", schema: signatureEnvelopeSchema }
+  "signature-envelope": { title: "AMC Signature Envelope", schema: signatureEnvelopeSchema },
+  // Regulated Control Catalog (P1-09); refinements are in docs/catalog/CONTROL_RECORD.md.
+  "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
+  "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
+  "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema }
 } as const;
 export type ContractName = keyof typeof CONTRACTS;
 
