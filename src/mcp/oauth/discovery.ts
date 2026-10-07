@@ -18,25 +18,27 @@ export class NativeMcpOAuthRefused extends Error {
 const refuse = (message: string, code?: "AUTH_REQUIRED" | "REFUSED"): never => { throw new NativeMcpOAuthRefused(message, code); };
 
 /**
- * Where OAuth requests for one MCP endpoint may go. Metadata from the server names every OAuth URL, so a public MCP
- * server must not make AMC call hosts on the operator's private network: non-public addresses are allowed only when
- * the MCP endpoint itself is on one (an internal deployment) or is literal loopback HTTP (development).
+ * Where OAuth requests for one MCP endpoint may go. Metadata from the server names every OAuth URL, so the server must
+ * not be able to make AMC call hosts on the operator's private network. Non-public addresses are allowed only for
+ * literal loopback HTTP (development) or when the operator set `auth.allowPrivateNetwork` in the signed config. The
+ * remote endpoint's own DNS never decides this.
  */
 export interface NativeMcpOAuthNetwork { readonly development: boolean; readonly allowNonPublic: boolean }
 
+/** True when a target must be refused: any non-public address, no address, or a failed lookup (fail closed). */
 async function resolvesNonPublic(hostname: string): Promise<boolean> {
   const host = hostname.replace(/^\[|\]$/g, "");
   try {
     const addresses = await lookup(host, { all: true, verbatim: true });
     return addresses.length === 0 || addresses.some(({ address }) => isNonPublicAddress(address));
   } catch {
-    return true; // A host that does not resolve is treated as non-public: refused unless the endpoint is internal.
+    return true;
   }
 }
 
-export async function nativeMcpOAuthNetwork(endpoint: URL): Promise<NativeMcpOAuthNetwork> {
+export function nativeMcpOAuthNetwork(endpoint: URL, options: { readonly allowPrivateNetwork?: boolean } = {}): NativeMcpOAuthNetwork {
   const development = isLoopbackHttp(endpoint);
-  return { development, allowNonPublic: development || await resolvesNonPublic(endpoint.hostname) };
+  return { development, allowNonPublic: development || options.allowPrivateNetwork === true };
 }
 
 export interface NativeMcpOAuthChallenge {
@@ -102,7 +104,7 @@ export function parseNativeMcpBearerChallenge(header: string | null): NativeMcpO
 export async function nativeMcpOAuthFetch(url: URL, init: RequestInit, timeoutMs: number, network: NativeMcpOAuthNetwork): Promise<{ status: number; body?: unknown; headers: Headers }> {
   // ponytail: checked before fetch, which resolves again; pin the connection (as the shell egress proxy does) if DNS rebinding matters here.
   if (!network.allowNonPublic && await resolvesNonPublic(url.hostname)) {
-    return refuse("MCP OAuth metadata named a host on a private or non-public address while the MCP server is public; it was refused.");
+    return refuse("MCP OAuth metadata named a host on a private or non-public address (or one that does not resolve); it was refused. Set auth.allowPrivateNetwork for an internal deployment.");
   }
   let response: Response;
   try {
