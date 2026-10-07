@@ -33,7 +33,7 @@ export interface ComplianceCoverageMatrix {
   ts: number;
   window: string;
   frameworks: FrameworkCoverage[];
-  /** Mean of the evaluated frameworks' scores; null when none was evaluated. */
+  /** Mean over every requested framework, a null framework score counting 0; null when none was evaluated. */
   overallScore: number | null;
   /** Failed categories (MISSING, PARTIAL). */
   gaps: ComplianceGap[];
@@ -134,9 +134,9 @@ export function generateCoverageMatrix(params: {
     }
   }
 
-  const scores = results.flatMap((r) => (r.score === null ? [] : [r.score]));
-  const overallScore = scores.length > 0
-    ? Number((scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(4))
+  // Not-evaluated and errored frameworks stay in the denominator at 0 (as categories do in coverageScorer).
+  const overallScore = results.some((r) => r.score !== null)
+    ? Number((results.reduce((sum, r) => sum + (r.score ?? 0), 0) / results.length).toFixed(4))
     : null;
 
   return {

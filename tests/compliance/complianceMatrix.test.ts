@@ -140,6 +140,18 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
     }
   });
 
+  test("a not-evaluated framework stays in the overall denominator at 0 and cannot inflate it", () => {
+    const ws = newWorkspace();
+    initComplianceMaps(ws, {
+      complianceMaps: { version: 1, mappings: [mapping("fx_ok", "SOC2", [EVENT]), mapping("fx_eu_none", "EU_AI_ACT", [PACK])] }
+    } as ComplianceMapsFile);
+    audit(ws, "FIXTURE_SIGNAL", ["fx_ok"]);
+    const matrix = generateCoverageMatrix({ workspace: ws, window: "14d", frameworks: ["SOC2", "EU_AI_ACT"] });
+    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([1, null]);
+    expect(matrix.overallScore).toBe(0.5);
+    expect(renderCoverageHeatmap(matrix)).toContain("Overall: 50.0%");
+  });
+
   test("a framework whose report cannot be generated is not scored", () => {
     const ws = newWorkspace();
     const matrix = generateCoverageMatrix({ workspace: ws, window: "not-a-window", frameworks: ["SOC2"] });
