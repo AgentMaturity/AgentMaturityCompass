@@ -1,9 +1,10 @@
 import { createServer } from "node:http";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { generateKeyPairSync, sign } from "node:crypto";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
@@ -19,7 +20,10 @@ import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import { initTransparencyLog, appendTransparencyEntry } from "../src/transparency/logChain.js";
-import { workspaceKeyTrust } from "./helpers/trustContext.js";
+import { operatorTrustHome, workspaceKeyTrust } from "./helpers/trustContext.js";
+import { verifyAll } from "../src/verify/verifyAll.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 const roots: string[] = [];
 
@@ -222,6 +226,45 @@ describe("public benchmark registry", () => {
       benchRef: `${published.benchId}@${published.version}`
     });
     expect(imported.benchId).toBe(published.benchId);
+
+    // P0-09: verify all takes an imported bench's signer from the cached index the pinned registry signed, never from
+    // the unsigned meta.json, so a re-signed copy with a matching meta.json edit fails.
+    const benchCheck = async () => (await verifyAll({ workspace: ws, trust: workspaceKeyTrust(ws, { allowUnanchored: true }) }))
+      .checks.find((row) => row.id === "bench-artifacts");
+    expect((await benchCheck())?.status).toBe("PASS");
+    const attacker = generateKeyPairSync("ed25519");
+    const attackerPem = attacker.publicKey.export({ type: "spki", format: "pem" }).toString();
+    const top = mkdtempSync(join(tmpdir(), "amc-bench-import-forge-"));
+    roots.push(top);
+    expect(spawnSync("tar", ["-xzf", imported.filePath, "-C", top]).status).toBe(0);
+    const benchPath = join(top, "amc-bench", "bench.json");
+    const bench = JSON.parse(readFileSync(benchPath, "utf8")) as Record<string, unknown>;
+    writeFileSync(benchPath, canonicalize({ ...bench, generatedTs: Number(bench.generatedTs) + 1 }));
+    const digest = sha256Hex(readFileSync(benchPath));
+    writeFileSync(join(top, "amc-bench", "bench.sig"), JSON.stringify({ digestSha256: digest,
+      signature: sign(null, Buffer.from(digest, "hex"), attacker.privateKey).toString("base64"), signedTs: Date.now(), signer: "auditor" }));
+    writeFileSync(join(top, "amc-bench", "signer.pub"), attackerPem);
+    expect(spawnSync("tar", ["-czf", imported.filePath, "-C", top, "amc-bench"]).status).toBe(0);
+    const metaPath = join(dirname(imported.filePath), "meta.json");
+    writeFileSync(metaPath, JSON.stringify({ ...JSON.parse(readFileSync(metaPath, "utf8")) as object, signerFingerprint: sha256Hex(attackerPem) }));
+    const forged = await benchCheck();
+    expect(forged?.status).toBe("FAIL");
+    expect(forged?.details.join("\n")).toContain("not-pinned");
+
+    // The registry key vouches only while admitted: the operator's distrust beats the pinned fingerprint.
+    const ref = `${published.benchId}@${published.version}`;
+    vi.stubEnv("AMC_HOME", operatorTrustHome([], [{ keyId: init.fingerprint, distrustedFrom: null, reason: "key-compromise", note: "test", source: "operator" }]));
+    roots.push(process.env.AMC_HOME!);
+    try {
+      await expect(importBenchFromRegistry({ workspace: ws, registryId: "local-bench", benchRef: ref })).rejects.toThrow("registry key not admitted: distrusted");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+
+    // The registries config pins the registry, so an edit without the auditor's signature is refused.
+    const registriesPath = join(ws, ".amc", "bench", "imports", "registries.yaml");
+    writeFileSync(registriesPath, `${readFileSync(registriesPath, "utf8")}\n# edited without re-signing\n`);
+    await expect(importBenchFromRegistry({ workspace: ws, registryId: "local-bench", benchRef: ref })).rejects.toThrow("bench registries config signature invalid");
   });
 
   test("publishing requires quorum approvals and comparer is deterministic", () => {

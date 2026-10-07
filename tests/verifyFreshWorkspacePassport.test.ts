@@ -8,6 +8,7 @@ import { verifyAll, verifyAllTopReasons } from "../src/verify/verifyAll.js";
 import { ed25519KeyId } from "../src/trust/index.js";
 import { pinnedTrust, workspaceKeyPem, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { tinyReleaseBundle, type TinyReleaseBundle } from "./helpers/tinyReleaseBundle.js";
+import { createBackup } from "../src/ops/backup/backupEngine.js";
 import { distrustEntry } from "./trust/trustFixtures.js";
 
 describe("verify all on a fresh workspace (first-run passport boundary)", () => {
@@ -99,6 +100,40 @@ describe("verify all and the operator's trust (P0-09)", () => {
     expect(root?.details[0]).toContain("monitor key distrusted: ");
     expect(root?.details[0]).toContain("verify all test");
     expect(report.criticalFail).toBe(true);
+  });
+
+  describe("backups", () => {
+    /** A backup signed by another workspace's auditor key, placed in this workspace: integrity intact, signer not admitted. */
+    function foreignBackup(): string {
+      const other = mkdtempSync(join(tmpdir(), "amc-verify-foreign-"));
+      releaseRoots.push(other);
+      initWorkspace({ workspacePath: other, trustBoundaryMode: "isolated" });
+      mkdirSync(join(dir, "backups"), { recursive: true });
+      const file = join(dir, "backups", "foreign.amcbackup");
+      writeFileSync(file, readFileSync(createBackup({ workspace: other, outFile: join(other, "ws.amcbackup") }).outFile));
+      return readFileSync(join(other, ".amc", "keys", "auditor_ed25519.pub"), "utf8");
+    }
+
+    test("fails, never skips, a backup whose signer is not admitted, naming the key, with or without a passphrase", async () => {
+      vi.stubEnv("AMC_BACKUP_PASSPHRASE", "verify-all-backup-passphrase");
+      const keyId = ed25519KeyId(foreignBackup())!;
+      for (const passphrase of ["verify-all-backup-passphrase", undefined]) {
+        vi.stubEnv("AMC_BACKUP_PASSPHRASE", passphrase);
+        const row = check(await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) }), "backup-manifests");
+        expect(row?.status, String(passphrase)).toBe("FAIL");
+        expect(row?.details[0]).toContain(`manifest.sig (artifact-seal): not-pinned`);
+        expect(row?.details[0]).toContain(`key ${keyId} is not pinned`);
+      }
+    });
+
+    test("passes this workspace's own backup, and skips it only when the passphrase is missing", async () => {
+      vi.stubEnv("AMC_BACKUP_PASSPHRASE", "verify-all-backup-passphrase");
+      mkdirSync(join(dir, "backups"), { recursive: true });
+      createBackup({ workspace: dir, outFile: join(dir, "backups", "own.amcbackup") });
+      expect(check(await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) }), "backup-manifests")?.status).toBe("PASS");
+      vi.stubEnv("AMC_BACKUP_PASSPHRASE", undefined);
+      expect(check(await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) }), "backup-manifests")?.status).toBe("SKIP");
+    });
   });
 
   describe("release bundles", () => {

@@ -45,10 +45,10 @@ import { promptLatestPackPath } from "../../src/prompt/promptPolicyStore.js";
 import { federateInitCli } from "../../src/federation/federationCli.js";
 import { exportFederationPackage } from "../../src/federation/federationSync.js";
 import { ensureFederationPublisherKey } from "../../src/federation/federationIdentity.js";
-import { pluginKeygen, pluginPack } from "../../src/plugins/pluginPackage.js";
+import { installedPluginTrust, pluginKeygen, pluginPack, verifyPluginPackage } from "../../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry } from "../../src/plugins/pluginRegistry.js";
 import { browseRegistry, resolveRegistryPackage } from "../../src/plugins/pluginRegistryClient.js";
-import { pinnedTrust } from "../helpers/trustContext.js";
+import { operatorTrustHome, pinnedTrust } from "../helpers/trustContext.js";
 
 /**
  * P0-09 forgery suite: one describe per verifier in the PR 2 and PR 3 rows of the issue table. Each builds a real
@@ -616,6 +616,30 @@ describe("API verify routes use the server's trust context and refuse request-su
     });
   }
 
+  test("POST /api/v1/plugins/print refuses a body that carries pubkeyPath and returns the verifier report", async () => {
+    const refused = await route(handleToolsRoute as Handler, "/api/v1/plugins/print", { file: plugin.file, pubkeyPath: plugin.publisherPub }, evidence.workspace);
+    expect(refused.status).toBe(400);
+    expect(refused.json.error).toContain('request field "pubkeyPath" is refused');
+    const out = await route(handleToolsRoute as Handler, "/api/v1/plugins/print", { file: plugin.file }, evidence.workspace);
+    const verification = (out.json.data as unknown as { verification: { ok: boolean; report: { issuerAdmission: { status: string; signatures: Array<{ status: string }> } } } }).verification;
+    expect(verification.ok).toBe(false);
+    expect(verification.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
+  });
+
+  test("POST /api/v1/benchmarks/import returns the verifier report of each benchmark it admitted", async () => {
+    const previous = process.env.AMC_HOME;
+    process.env.AMC_HOME = operatorTrustHome([{ publicKeyPem: readFileSync(evidence.auditorPub, "utf8"), purposes: ["artifact-seal"] }]);
+    roots.push(process.env.AMC_HOME);
+    try {
+      const out = await route(handleBenchmarkRoute as Handler, "/api/v1/benchmarks/import", { path: benchmark }, dir("amc-forgery-import-ws-"));
+      expect(out.status).toBe(200);
+      const imported = (out.json.data as unknown as { imported: Array<{ report: { trusted: boolean } }> }).imported;
+      expect(imported.map(row => row.report.trusted)).toEqual([true]);
+    } finally {
+      process.env.AMC_HOME = previous;
+    }
+  });
+
   test("Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer", async () => {
     const probe = createServer();
     await new Promise<void>(done => probe.listen(0, "127.0.0.1", () => done()));
@@ -749,6 +773,18 @@ describe("verifyBackup (amc backup verify)", () => {
     forged: forge,
     pin: () => ["--pubkey", evidence.auditorPub]
   });
+
+  test("backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr", () => {
+    const to = join(dir("amc-forgery-restore-"), "restored");
+    const result = amc(evidence.workspace, ["backup", "restore", backup, "--to", to, "--allow-unpinned"]);
+    expect(result.status, result.output).toBe(2);
+    expect(result.stdout).toContain("Backup restored to");
+    expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.stderr).toBe(true);
+    const pinned = amc(evidence.workspace, ["backup", "restore", backup, "--to", join(dir("amc-forgery-restore-"), "restored"), "--pubkey", evidence.auditorPub]);
+    expect(pinned.status, pinned.output).toBe(0);
+    // A backup has no ledger to anchor, so restore offers no --allow-unanchored.
+    expect(amc(evidence.workspace, ["backup", "restore", "--help"]).stdout).not.toContain("--allow-unanchored");
+  });
 });
 
 /** A minimal plugin source tree for pluginPack. */
@@ -797,6 +833,23 @@ describe("verifyPluginPackage (amc plugin verify)", () => {
     genuine: () => plugin.file,
     forged: forge,
     pin: () => ["--pubkey", plugin.publisherPub]
+  });
+
+  test("an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it", () => {
+    const publisher = readFileSync(plugin.publisherPub, "utf8");
+    const keyId = sha(publisher);
+    expect(verifyPluginPackage({ file: plugin.file, trust: installedPluginTrust(evidence.workspace, keyId) }).ok).toBe(true);
+    const previous = process.env.AMC_HOME;
+    process.env.AMC_HOME = operatorTrustHome([], [distrusted(keyId)]);
+    roots.push(process.env.AMC_HOME);
+    try {
+      const verified = verifyPluginPackage({ file: plugin.file, trust: installedPluginTrust(evidence.workspace, keyId) });
+      expect(verified.ok).toBe(false);
+      expect(verified.report.issuerAdmission.signatures[0]?.status).toBe("distrusted");
+    } finally {
+      if (previous === undefined) delete process.env.AMC_HOME;
+      else process.env.AMC_HOME = previous;
+    }
   });
 });
 

@@ -8,7 +8,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { extractPluginPackage, printPluginPackage, pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
-import { initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
+import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
 import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
@@ -292,6 +292,12 @@ describe("plugin marketplace", () => {
         action: "install"
       })
     ).rejects.toThrow(/publisher fingerprint mismatch/i);
+
+    // P0-09: the registries config pins the registry key, so browsing needs its auditor signature too.
+    expect((await browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).plugins).toHaveLength(1);
+    const registriesPath = join(ws, ".amc", "plugins", "registries.yaml");
+    writeFileSync(registriesPath, `${readUtf8(registriesPath)}\n# edited without re-signing\n`);
+    await expect(browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).rejects.toThrow("plugin registries signature invalid");
   });
 
   test("workspace install is dual-control and tamper breaks readiness", async () => {

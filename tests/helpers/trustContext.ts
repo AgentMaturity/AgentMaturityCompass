@@ -2,7 +2,7 @@ import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ed25519KeyId, signTrustList, type KeyPurpose, type TrustContext } from "../../src/trust/index.js";
+import { ed25519KeyId, signTrustList, type DistrustEntry, type KeyPurpose, type TrustContext } from "../../src/trust/index.js";
 
 /**
  * Verifier trust for tests (P0-09). Verifiers no longer trust the keys an artifact carries, so a test states which
@@ -53,10 +53,10 @@ export function keyHistoryTrust(auditorPem: string, monitorPem: string): TrustCo
 }
 
 /**
- * An operator's AMC home with a signed trust list that pins these keys, for API routes that build their context
- * from the server's AMC home (P0-09 step 11). The caller owns and removes the returned directory.
+ * An operator's AMC home with a signed trust list that pins these keys and distrusts those entries, for API routes and
+ * workspace-self checks that read the AMC home (P0-09). The caller owns and removes the returned directory.
  */
-export function operatorTrustHome(pins: readonly TestPin[]): string {
+export function operatorTrustHome(pins: readonly TestPin[], distrust: readonly DistrustEntry[] = []): string {
   const home = mkdtempSync(join(tmpdir(), "amc-operator-home-"));
   const root = generateKeyPairSync("ed25519");
   const rootPem = root.publicKey.export({ format: "pem", type: "spki" }).toString();
@@ -68,7 +68,7 @@ export function operatorTrustHome(pins: readonly TestPin[]): string {
       keyId: ed25519KeyId(pin.publicKeyPem)!, algorithm: "ed25519" as const, publicKeyPem: pin.publicKeyPem, purposes: [...pin.purposes],
       subject: "test operator pin", validFrom: new Date(now - 3_600_000).toISOString(), validTo: null, source: "operator"
     })),
-    distrust: []
+    distrust: [...distrust]
   }, root.privateKey.export({ format: "pem", type: "pkcs8" }).toString());
   mkdirSync(join(home, "trust"), { recursive: true, mode: 0o700 });
   writeFileSync(join(home, "trust", "amc-trust-list.json"), JSON.stringify(signed), { mode: 0o600 });
