@@ -14,16 +14,7 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "fs.edit", actionClass: "WRITE_LOW" },
   { name: "glob", actionClass: "READ_ONLY" },
   { name: "grep", actionClass: "READ_ONLY" },
-  { name: "bash", actionClass: "WRITE_HIGH" },
-  // P1-43 (AMC-1549). Listing here is identity, not permission: each is denied
-  // until a signed tools policy lists it, and each body still refuses until
-  // that policy grants origins (web_*) or the caller composes its dependency
-  // (ask_user: an answerer; web_search: a provider).
-  { name: "web_fetch", actionClass: "NETWORK_EXTERNAL" },
-  { name: "web_search", actionClass: "NETWORK_EXTERNAL" },
-  { name: "ask_user", actionClass: "READ_ONLY" },
-  { name: "todo", actionClass: "READ_ONLY" },
-  { name: "plan", actionClass: "READ_ONLY" }
+  { name: "bash", actionClass: "WRITE_HIGH" }
 ].map(capability => Object.freeze(capability as NativeToolCapability)));
 
 /** These become executable only when a caller also supplies the delegation capability. */

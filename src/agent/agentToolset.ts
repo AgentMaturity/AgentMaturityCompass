@@ -10,6 +10,13 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
+import { webFetchTool } from "../tools/builtin/webFetchTool.js";
+import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
+import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
+import { todoTool } from "../tools/builtin/todoTool.js";
+import { planTool } from "../tools/builtin/planTool.js";
+import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
+import type { ToolExecution } from "../tools/toolTypes.js";
 import {
   budgetGuard,
   networkEgressGuard,
@@ -61,6 +68,10 @@ export interface AgentToolsetOptions {
    * every run in a chain shares `governedAs` by design.
    */
   readonly subagents?: SubagentCapability;
+  /** Human answerer for `ask_user` (P1-43). Absent: every ask_user call refuses. */
+  readonly askUser?: AskUserAnswerer;
+  /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
+  readonly webSearchProvider?: WebSearchProvider;
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
   /**
    * The session tool evidence belongs to. REQUIRED, and deliberately so.
@@ -283,6 +294,22 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       return unconfined.body(execution);
     } });
   }
+  // P1-43 (AMC-1549): registered, and denied until a signed tools policy lists
+  // them. Their receipts take the shell receipts' path (recordAudit); a failed
+  // write fails the call. Who, where and which call come from the execution and
+  // the session read per call, never from the tool.
+  const recordNative: NativeReceiptRecorder = (execution, receipt) => recordAudit({
+    schemaVersion: "2026-10-07", ...receipt, tool: execution.name, sessionId: options.sessionId, agentId: execution.agentId,
+    callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
+  });
+  // The session getter is rebound by fork/resume after construction, so these
+  // read it per call rather than capturing it now.
+  const currentSessionId = (): string => options.sessionId;
+  registry.define(webFetchTool({ record: recordNative }));
+  registry.define(webSearchTool({ record: recordNative, ...(options.webSearchProvider ? { provider: options.webSearchProvider } : {}) }));
+  registry.define(askUserTool({ sessionId: currentSessionId, record: recordNative, ...(options.askUser ? { answerer: options.askUser } : {}) }));
+  registry.define(todoTool({ sessionId: currentSessionId, record: recordNative }));
+  registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
@@ -301,8 +328,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // CLI binds the native writer after constructing the toolset; forks can
   // replace it. Resolve the current session only when the guard executes.
   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
-  registry.guard("network-egress", networkEgressGuard(workspace));
-  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest));
+  // web_search's destination is its composed provider's declared origin, never
+  // a url the model passes; both host checks read that. Unconfigured, it names
+  // no url and network-egress denies it.
+  const governedArguments = (execution: ToolExecution): Readonly<Record<string, unknown>> =>
+    execution.name === "web_search" ? { ...execution.arguments, url: options.webSearchProvider?.origin } : execution.arguments;
+  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments));
+  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest, governedArguments));
   registry.guard("native-tool-identity", execution => {
     const identity = nativeIdentities.get(execution.name);
     if (!identity) return undefined; // Late reviewed extensions retain their own mount and policy guards.
