@@ -7,7 +7,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import {
-  NATIVE_MCP_AUTHORIZE_HINT, NativeMcpOAuthRefused, discoverNativeMcpAuthorizationServer, discoverNativeMcpProtectedResource, isLoopbackHttp,
+  NATIVE_MCP_AUTHORIZE_HINT, NativeMcpOAuthRefused, discoverNativeMcpAuthorizationServer, discoverNativeMcpProtectedResource, isLoopbackHttp, nativeMcpOAuthNetwork, type NativeMcpOAuthNetwork,
   nativeMcpOAuthChallenge, nativeMcpOAuthFetch, nativeMcpOAuthUrl, nativeMcpScopes,
   type NativeMcpAuthorizationServer, type NativeMcpProtectedResource
 } from "./discovery.js";
@@ -44,18 +44,22 @@ export function nativeMcpOAuthReceipt(grant: NativeMcpOAuthGrant): NativeMcpOAut
   return { issuer: grant.issuer, scopes: [...grant.scopes], tokenExpiresAt: grant.expiresAt ?? null };
 }
 
-interface Discovered { readonly resource: NativeMcpProtectedResource; readonly server: NativeMcpAuthorizationServer; readonly challengeScopes?: readonly string[] }
+interface Discovered {
+  readonly resource: NativeMcpProtectedResource; readonly server: NativeMcpAuthorizationServer; readonly network: NativeMcpOAuthNetwork;
+  readonly challengeScopes?: readonly string[];
+}
 async function discover(endpoint: URL, timeoutMs: number): Promise<Discovered> {
+  const network = await nativeMcpOAuthNetwork(endpoint);
   const challenge = await nativeMcpOAuthChallenge(endpoint, timeoutMs);
-  const resource = await discoverNativeMcpProtectedResource(endpoint, challenge, timeoutMs);
-  const server = await discoverNativeMcpAuthorizationServer(resource.authorizationServer, isLoopbackHttp(endpoint), timeoutMs);
-  return { resource, server, ...(challenge.scopes ? { challengeScopes: challenge.scopes } : {}) };
+  const resource = await discoverNativeMcpProtectedResource(endpoint, challenge, timeoutMs, network);
+  const server = await discoverNativeMcpAuthorizationServer(resource.authorizationServer, network, timeoutMs);
+  return { resource, server, network, ...(challenge.scopes ? { challengeScopes: challenge.scopes } : {}) };
 }
 
 /** OAuth 2.1 §3.2.3 token response; only Bearer tokens that fit one header line are accepted. */
-async function tokenRequest(server: NativeMcpAuthorizationServer, form: Record<string, string>, development: boolean, timeoutMs: number) {
-  const { status, body } = await nativeMcpOAuthFetch(nativeMcpOAuthUrl(server.tokenEndpoint, development), { method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" }, body: new URLSearchParams(form).toString() }, timeoutMs);
+async function tokenRequest(server: NativeMcpAuthorizationServer, form: Record<string, string>, network: NativeMcpOAuthNetwork, timeoutMs: number) {
+  const { status, body } = await nativeMcpOAuthFetch(nativeMcpOAuthUrl(server.tokenEndpoint, network.development), { method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" }, body: new URLSearchParams(form).toString() }, timeoutMs, network);
   const token = body as Record<string, unknown> | undefined;
   if (status !== 200 || !token || typeof token !== "object") return refuse(`MCP OAuth token endpoint refused the request (HTTP ${status}); nothing was stored.`, "AUTH_REQUIRED");
   const { access_token: accessToken, token_type: tokenType, refresh_token: refreshToken, expires_in: expiresIn } = token;
@@ -70,7 +74,7 @@ async function tokenRequest(server: NativeMcpAuthorizationServer, form: Record<s
 }
 
 /** client-registration §priority: pre-registered, then CIMD when advertised, then opt-in DCR. */
-async function clientIdFor(config: NativeMcpOAuthConfig, server: NativeMcpAuthorizationServer, redirectUri: string, development: boolean, timeoutMs: number): Promise<string> {
+async function clientIdFor(config: NativeMcpOAuthConfig, server: NativeMcpAuthorizationServer, redirectUri: string, network: NativeMcpOAuthNetwork, timeoutMs: number): Promise<string> {
   if (config.clientId) return config.clientId;
   if (config.clientIdMetadataUrl && server.clientIdMetadataDocumentSupported) return config.clientIdMetadataUrl;
   if (!config.allowDynamicRegistration) {
@@ -78,10 +82,10 @@ async function clientIdFor(config: NativeMcpOAuthConfig, server: NativeMcpAuthor
   }
   if (!server.registrationEndpoint) return refuse("The MCP authorization server offers no dynamic client registration endpoint.");
   // client-registration §Dynamic Client Registration: a CLI is a native application.
-  const { status, body } = await nativeMcpOAuthFetch(nativeMcpOAuthUrl(server.registrationEndpoint, development), { method: "POST",
+  const { status, body } = await nativeMcpOAuthFetch(nativeMcpOAuthUrl(server.registrationEndpoint, network.development), { method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ client_name: "AMC governed MCP client", redirect_uris: [redirectUri], application_type: "native",
-      grant_types: ["authorization_code", "refresh_token"], response_types: ["code"], token_endpoint_auth_method: "none" }) }, timeoutMs);
+      grant_types: ["authorization_code", "refresh_token"], response_types: ["code"], token_endpoint_auth_method: "none" }) }, timeoutMs, network);
   const registered = body as Record<string, unknown> | undefined;
   if ((status !== 200 && status !== 201) || typeof registered?.client_id !== "string" || !registered.client_id) {
     return refuse(`MCP OAuth dynamic client registration was refused (HTTP ${status}).`);
@@ -143,12 +147,12 @@ export async function authorizeNativeMcpOAuth(options: {
 }): Promise<NativeMcpOAuthReceipt> {
   const { endpoint, config, timeoutMs } = options;
   const development = isLoopbackHttp(endpoint);
-  const { resource, server, challengeScopes } = await discover(endpoint, timeoutMs);
+  const { resource, server, network, challengeScopes } = await discover(endpoint, timeoutMs);
   // authorization §Scope Selection Strategy: the challenge, else scopes_supported; plus operator scopes and step-up scopes.
   const scopes = union(config.scopes, challengeScopes ?? resource.scopesSupported, options.extraScopes);
   const callback = await loopbackCallback(config.redirectPort ?? 0, options.signal);
   try {
-    const clientId = await clientIdFor(config, server, callback.redirectUri, development, timeoutMs);
+    const clientId = await clientIdFor(config, server, callback.redirectUri, network, timeoutMs);
     const verifier = base64url(randomBytes(32));
     const state = base64url(randomBytes(16));
     const url = nativeMcpOAuthUrl(server.authorizationEndpoint, development);
@@ -158,7 +162,7 @@ export async function authorizeNativeMcpOAuth(options: {
     options.onAuthorizationUrl(url.href);
     const code = validateNativeMcpAuthorizationResponse(await callback.wait(), state, server);
     const token = await tokenRequest(server, { grant_type: "authorization_code", code, redirect_uri: callback.redirectUri,
-      client_id: clientId, code_verifier: verifier, resource: resource.resource }, development, timeoutMs);
+      client_id: clientId, code_verifier: verifier, resource: resource.resource }, network, timeoutMs);
     const grant: NativeMcpOAuthGrant = { v: 1, issuer: server.issuer, resource: resource.resource, clientId,
       scopes: token.scopes ?? scopes, accessToken: token.accessToken,
       ...(token.refreshToken ? { refreshToken: token.refreshToken } : {}), ...(token.expiresAt ? { expiresAt: token.expiresAt } : {}) };
@@ -179,7 +183,7 @@ export async function resolveNativeMcpOAuth(options: {
   readonly timeoutMs: number;
 }): Promise<{ readonly accessToken: string; readonly receipt: NativeMcpOAuthReceipt }> {
   const { endpoint, config, store, timeoutMs } = options;
-  const { resource, server } = await discover(endpoint, timeoutMs);
+  const { resource, server, network } = await discover(endpoint, timeoutMs);
   let grant = await store.load(server.issuer, resource.resource);
   if (!grant || (config.clientId !== undefined && grant.clientId !== config.clientId)) {
     return refuse(`MCP OAuth authorization is required (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
@@ -187,7 +191,7 @@ export async function resolveNativeMcpOAuth(options: {
   if (grant.expiresAt !== undefined && Date.parse(grant.expiresAt) - REFRESH_MARGIN_MS <= Date.now()) {
     if (!grant.refreshToken) return refuse(`MCP OAuth access token expired (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
     const token = await tokenRequest(server, { grant_type: "refresh_token", refresh_token: grant.refreshToken,
-      client_id: grant.clientId, resource: resource.resource }, isLoopbackHttp(endpoint), timeoutMs);
+      client_id: grant.clientId, resource: resource.resource }, network, timeoutMs);
     // Refresh tokens rotate for public clients; keep the old one only when none was issued.
     grant = { ...grant, accessToken: token.accessToken, scopes: token.scopes ?? grant.scopes,
       ...(token.refreshToken ? { refreshToken: token.refreshToken } : {}), ...(token.expiresAt ? { expiresAt: token.expiresAt } : {}) };
