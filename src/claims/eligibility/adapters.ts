@@ -94,7 +94,8 @@ export function envelopeForDiagnosticReport(report: DiagnosticReportClaimInput, 
     // The report carries coverage fractions, not counts; the rules only need empty versus not empty.
     evidence: {
       ...evidence(coverage.observed + coverage.attested + coverage.selfReported > 0 ? 1 : 0,
-        coverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"], report.windowEndTs),
+        // An INVALID or UNSIGNED run vouches for nothing it recorded: its rows cannot make the claim observed.
+        report.status === "VALID" && coverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"], report.windowEndTs),
       contradictory: report.contradictionCount > 0,
       signatureValid: report.status === "VALID"
     },
