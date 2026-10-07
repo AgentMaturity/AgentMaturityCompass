@@ -8,13 +8,16 @@ export const NATIVE_MCP_RECONNECT_LIMITS = Object.freeze({
 
 export type NativeMcpHttpFailureCode = "REFUSED" | "AUTH_REQUIRED" | "SESSION_EXPIRED"
   | "SESSION_CHANGED" | "RETRY_EXHAUSTED" | "CANCELLED" | "TIMED_OUT"
-  | "STREAM_NOT_RESUMABLE" | "PROTOCOL_ERROR" | "BOUND_EXCEEDED" | "CLOSED" | "NOT_DISPATCHED";
+  | "STREAM_NOT_RESUMABLE" | "PROTOCOL_ERROR" | "BOUND_EXCEEDED" | "CLOSED" | "NOT_DISPATCHED"
+  | "TOOL_OUTCOME_UNKNOWN";
 
 /** Only fixed local diagnostics belong in this error, never network error text. */
 export class NativeMcpHttpRefused extends Error {
   constructor(
     message = "MCP HTTP connection refused; review the pinned endpoint and reconnect explicitly.",
-    readonly code: NativeMcpHttpFailureCode = "REFUSED"
+    readonly code: NativeMcpHttpFailureCode = "REFUSED",
+    /** Validated OAuth scope tokens from an insufficient_scope challenge, for step-up only. */
+    readonly requiredScopes?: readonly string[]
   ) { super(message); this.name = "NativeMcpHttpRefused"; }
 }
 

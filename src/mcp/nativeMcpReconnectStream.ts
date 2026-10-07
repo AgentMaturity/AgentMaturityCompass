@@ -7,7 +7,7 @@ import {
 interface SseFrame { id?: string; event: string; data: string }
 
 /** Keep incomplete UTF-8, lines and events private until an entire SSE frame arrives. */
-class SseFrames {
+export class SseFrames {
   private readonly decoder = new TextDecoder("utf-8", { fatal: true });
   private line = "";
   private skipLf = false;
