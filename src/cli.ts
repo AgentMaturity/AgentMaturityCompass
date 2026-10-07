@@ -106,8 +106,18 @@ import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingP
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
-import { getPrivateKeyPem, signHexDigest } from "./crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
+import {
+  RECORDABLE_TRIGGERS,
+  clockListing,
+  loadIncidentClocks,
+  parseIsoTimestamp,
+  parseStation,
+  recordIncidentClockEvent
+} from "./incidents/incidentClockEvents.js";
+import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
+import { oversightRecordPath, readOversightRecords, recordWorkspaceOversight } from "./incidents/oversightRecord.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
@@ -7907,9 +7917,12 @@ incident
 
 incident
   .command("show <id>")
-  .description("Show incident details")
-  .action((id: string) => {
-    const ledger = openLedger(process.cwd());
+  .description("Show incident details, or write its regulator evidence packet with --packet")
+  .option("--packet <dir>", "write <id>.packet.json and <id>.packet.md (needs --station)")
+  .option("--station <station>", "station whose regulatory clocks the packet lists")
+  .action((id: string, opts: { packet?: string; station?: string }) => {
+    const workspace = process.cwd();
+    const ledger = openLedger(workspace);
     try {
       const store = createIncidentStore(ledger.db);
       store.initTables();
@@ -7921,6 +7934,24 @@ incident
       }
       const transitions = store.getIncidentTransitions(id);
       const edges = store.getCausalEdges(id);
+      if (opts.packet) {
+        if (!opts.station) throw new Error("--packet needs --station <station>");
+        const station = parseStation(opts.station);
+        const generatedTs = Date.now();
+        const { clocks } = loadIncidentClocks(store, id, station, generatedTs, getPublicKeyHistory(workspace, "monitor"));
+        const packet = buildEvidencePacket({
+          incident: found, station, generatedTs, clocks, transitions, causalEdges: edges,
+          oversightRecords: readOversightRecords(oversightRecordPath(workspace, id)),
+          oversightPublicKeys: getPublicKeyHistory(workspace, "auditor")
+        });
+        const dir = resolve(workspace, opts.packet);
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(join(dir, `${id}.packet.json`), `${JSON.stringify(packet, null, 2)}\n`, "utf8");
+        writeFileSync(join(dir, `${id}.packet.md`), renderEvidencePacketMarkdown(packet), "utf8");
+        console.log(join(dir, `${id}.packet.json`));
+        console.log(join(dir, `${id}.packet.md`));
+        return;
+      }
       const state = transitions.length > 0 ? transitions[transitions.length - 1]!.toState : found.state;
       console.log(JSON.stringify({ ...found, state, transitions, causalEdges: edges }, null, 2));
     } finally {
@@ -8080,6 +8111,97 @@ incident
       });
 
       console.log(chalk.green(`Incident closed: ${id}`));
+    } finally {
+      ledger.close();
+    }
+  });
+
+incident
+  .command("clocks <id>")
+  .description("List an incident's regulatory reporting clocks for a station, or record a trigger or a submitted notice")
+  .requiredOption("--station <station>", "station whose clocks apply (health, wealth, technology, ...)")
+  .option("--now <iso>", "evaluation time (default: now)")
+  .option("--trigger <trigger>", `record that a trigger happened: ${RECORDABLE_TRIGGERS.join("|")}`)
+  .option("--notified <clockId>", "record that the notice for this clock was submitted")
+  .option("--at <iso>", "when the trigger happened or the notice was submitted (an operator claim)")
+  .option("--json", "print JSON")
+  .action((id: string, opts: { station: string; now?: string; trigger?: string; notified?: string; at?: string; json?: boolean }) => {
+    const workspace = process.cwd();
+    const station = parseStation(opts.station);
+    if (opts.trigger && opts.notified) throw new Error("use either --trigger or --notified, not both");
+    if ((opts.trigger || opts.notified) && !opts.at) throw new Error("--trigger and --notified need --at <iso>");
+    if (opts.at && !opts.trigger && !opts.notified) throw new Error("--at needs --trigger or --notified");
+    const ledger = openLedger(workspace);
+    try {
+      const store = createIncidentStore(ledger.db);
+      store.initTables();
+      if (!store.getIncident(id)) {
+        console.log(chalk.red(`Incident not found: ${id}`));
+        process.exit(1);
+        return;
+      }
+      const publicKeys = getPublicKeyHistory(workspace, "monitor");
+      if (opts.trigger || opts.notified) {
+        const event = recordIncidentClockEvent(store, {
+          incidentId: id, station,
+          kind: opts.trigger ? "TRIGGER" : "NOTIFIED",
+          triggerOrClockId: (opts.trigger ?? opts.notified)!,
+          ts: parseIsoTimestamp(opts.at!, "--at"),
+          recordedBy: "cli",
+          privateKeyPem: getPrivateKeyPem(workspace, "monitor"),
+          publicKeys
+        });
+        if (!opts.json) console.log(chalk.green(`Recorded ${event.kind} ${event.triggerOrClockId}: ${event.eventId}`));
+      }
+      const nowTs = opts.now ? parseIsoTimestamp(opts.now, "--now") : Date.now();
+      const listing = clockListing(loadIncidentClocks(store, id, station, nowTs, publicKeys), station, nowTs);
+      if (opts.json) {
+        console.log(JSON.stringify(listing, null, 2));
+        return;
+      }
+      console.log(`Incident ${listing.incidentId} · station ${station} · now ${listing.now}`);
+      for (const clock of listing.clocks) {
+        const triggerAt = clock.triggerTs === null ? "not recorded" : new Date(clock.triggerTs).toISOString();
+        console.log(`  ${clock.status.padEnd(14)} ${clock.clockId}  due ${clock.dueAt ?? "—"}  ${clock.trigger} ${triggerAt}${clock.source.verified ? "" : "  [source unverified]"}`);
+      }
+      console.log(listing.events.length === 0 ? "No clock events recorded." : "Clock events:");
+      for (const event of listing.events) {
+        console.log(`  ${event.eventId}  ${event.kind} ${event.triggerOrClockId} at ${event.at} (recorded ${event.recordedAt} by ${event.recordedBy})`);
+      }
+      for (const note of listing.notes) console.log(chalk.gray(`- ${note}`));
+    } finally {
+      ledger.close();
+    }
+  });
+
+incident
+  .command("oversight <id>")
+  .description("Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer)")
+  .requiredOption("--decision <decision>", "ACKNOWLEDGED|ESCALATED|REPORT_REQUIRED|NO_REPORT_REQUIRED|CLOSED")
+  .requiredOption("--reviewer <id>", "reviewer id, stored as stated")
+  .requiredOption("--rationale <text>", "why the reviewer decided this")
+  .option("--clock <clockId...>", "clock ids the decision covers")
+  .action((id: string, opts: { decision: string; reviewer: string; rationale: string; clock?: string[] }) => {
+    const workspace = process.cwd();
+    const ledger = openLedger(workspace);
+    try {
+      const store = createIncidentStore(ledger.db);
+      store.initTables();
+      const found = store.getIncident(id);
+      if (!found) {
+        console.log(chalk.red(`Incident not found: ${id}`));
+        process.exit(1);
+        return;
+      }
+      const record = recordWorkspaceOversight({
+        workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
+        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getPrivateKeyPem(workspace, "auditor"),
+        publicKeys: getPublicKeyHistory(workspace, "auditor")
+      });
+      console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
+      console.log(`recordHash=${record.recordHash}`);
+      console.log(`file=${oversightRecordPath(workspace, id)}`);
+      console.log(chalk.gray("Signed with this workspace's auditor key and chained to the file's verified records: a local audit trail of which workspace wrote it, not proof of who reviewed."));
     } finally {
       ledger.close();
     }
