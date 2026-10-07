@@ -130,7 +130,7 @@ describe("first-run protocol against the built CLI", () => {
     expect(firewallAfter?.message).toContain("block");
     expect(firewallAfter?.message).toContain("revision 2");
     expect(after.checks.find((row) => row.id === "vault")?.status).toBe("PASS");
-  });
+  }, 90_000); // Five built-CLI runs, ~12 s alone; hit the 30 s default twice while other suites shared the machine.
 
   testWithDist?.("init --minimal without a passphrase says how to keep signing possible", () => {
     const workspace = freshWorkspace();
