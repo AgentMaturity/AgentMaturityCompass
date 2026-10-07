@@ -12,16 +12,21 @@
         { "path": "src/agent/agentToolset.ts", "symbol": "agentToolset" },
         { "path": "src/actions/authorize.ts", "symbol": "bindAuthorization" },
         { "path": "src/actions/authorize.ts", "symbol": "recheckAuthorization" },
-        { "path": "src/tools/toolEvidence.ts", "symbol": "toolEvidenceFor" }
+        { "path": "src/tools/toolEvidence.ts", "symbol": "toolEvidenceFor" },
+        { "path": "src/tools/guards/compiledPolicyGuard.ts", "symbol": "compiledPolicyGuard" },
+        { "path": "src/catalog/compiler/activate.ts", "symbol": "loadActiveCompiledPolicy" },
+        { "path": "src/policy/effectivePolicyReceipt.ts", "symbol": "writeEffectivePolicyReceipt" }
       ],
-      "evidence": "Tool evidence rows: audit TOOL_CALL_ALLOWED, TOOL_CALL_DENIED or TOOL_CALL_FAILED, a metric row and a stdout descriptor, written by the composed recorder; for an authorized call each carries authorizationId and authorizationDigest, and one AUTHORIZATION_RECORD row holds the record",
+      "evidence": "Tool evidence rows: audit TOOL_CALL_ALLOWED, TOOL_CALL_DENIED or TOOL_CALL_FAILED, a metric row and a stdout descriptor, written by the composed recorder; for an authorized call each carries authorizationId and authorizationDigest, and one AUTHORIZATION_RECORD row holds the record; one EFFECTIVE_POLICY audit row and a signed .amc/effective-policy/<receiptId>.json per native session and guard set (compiled policy digest and revision, controls with enforcement and boundary, guard labels, guardrails, downgrades), cited in every authorization record's evidenceRefs",
       "status": "enforced",
       "bypasses": [
         "A recorder that throws after the body ran is swallowed in ToolPipeline.execute; the effect stands and its row is missing",
-        "Exceptions and break-glass are not part of the authorization record (P2-24); tenant, deployment and control ids stay unregistered (P1-12)",
-        "domainRules written by applyDomainToAgent (src/domains/domainApply.ts) are read by no guard"
+        "Exceptions and break-glass are not part of the authorization record (P2-24); tenant and deployment ids stay unregistered because the compiled plan does not carry them",
+        "A workspace with no active compiled plan runs without one; its receipts record the downgrade no_compiled_policy",
+        "Egress and deletion rules of a compiled plan are carried on the policy object and not enforced (P2-01); receipts label them enforcement none",
+        "The kernel tool service (src/kernel/services/toolServices.ts) enforces the compiled policy but writes no effective-policy receipt; it has no session writer"
       ],
-      "owners": ["P1-02", "P1-03", "P1-12"],
+      "owners": ["P1-02", "P1-03", "P1-12", "P2-01", "P2-24"],
       "asi": ["ASI01", "ASI02"]
     },
     {

@@ -27,16 +27,30 @@ Compatibility sidecars use the `2026-07-10` schema. Their signed digest includes
 
 The control signer is intentionally fixed after genesis. AMC rejects a different signer rather than silently trusting key-history edits; this control plane does not claim automatic signer rotation. Plan a reviewed rebootstrap or use a stable NOTARY signer when key rotation is required.
 
-## Runtime bindings
+## Runtime bindings and enforcement
 
-| Guardrail ID | Runtime binding | Mutable here |
-| --- | --- | --- |
-| `prompt-injection-detection` | `runtime-firewall.rules.promptInjection` | Yes |
-| `data-exfiltration-guard` | `runtime-firewall.rules.secretExposure` | Yes |
-| `context-window-guard` | `runtime-firewall.rules.payloadAnomaly` | Yes |
-| Remaining 11 catalog rows | None | No |
+Every guardrail reports `enforcement` (`enforced`, `observed`, `advisory` or `none`) and `boundary`, the point that enforces it. `boundary` is null exactly when `enforcement` is `none`.
 
-Catalog-only rows remain visible for product planning and profile transparency, but CLI, API, and Dashboard reject attempts to activate them. AMC does not treat PII detection as output redaction, decision logging as complete audit enforcement, or an approval module as a bound guardrail unless the runtime data path actually connects them.
+| Guardrail ID | Enforcement | Boundary | Mutable here |
+| --- | --- | --- | --- |
+| `prompt-injection-detection` | `enforced` when its rule is effective, trusted and the firewall is in block mode; `observed` in observe or warn mode; else `none` | `runtime-firewall.rules.promptInjection` | Yes |
+| `data-exfiltration-guard` | as above | `runtime-firewall.rules.secretExposure` | Yes |
+| `context-window-guard` | as above | `runtime-firewall.rules.payloadAnomaly` | Yes |
+| `tool-call-allowlist` | `enforced` in every native session | `tool-pipeline:guard:tool-allowlist` | No |
+| `cost-budget-limit` | `enforced` in every native session | `tool-pipeline:guard:budgets` | No |
+| `human-approval-gate` | `none` in the workspace listing; `enforced` in a session whose effective-policy receipt lists a compiled approval rule | `approvals` (in that session) | No |
+| `audit-trail-enforcer` | `none` until P1-03 lands the tool-pipeline journal | none | No |
+| `pii-redaction` | `none`: catalog reference; not enforced by AMC (P2-02 owns redaction) | none | No |
+| `output-toxicity-filter` | `none`: catalog reference; not enforced by AMC | none | No |
+| `hallucination-detector` | `none`: catalog reference; not enforced by AMC | none | No |
+| `rate-limiter` | `none`: catalog reference; not enforced by AMC | none | No |
+| `model-version-pin` | `none`: catalog reference; not enforced by AMC | none | No |
+| `compliance-boundary` | `none`: catalog reference; not enforced by AMC | none | No |
+| `credential-rotation` | `none`: catalog reference; not enforced by AMC | none | No |
+
+Only the three Runtime Firewall rows can be requested here. The tool-pipeline rows are enforced by guards every native session composes, over their own signed configs (`.amc/tools.yaml`, budgets), so guardrail control state cannot turn them on or off. The catalog rows remain visible for product planning and profile transparency, but CLI, API, and Dashboard reject attempts to activate them. AMC does not treat PII detection as output redaction, decision logging as complete audit enforcement, or an approval module as a bound guardrail unless the runtime data path actually connects them.
+
+Each native session also records the guardrails as it ran them in its effective-policy receipt (`EFFECTIVE_POLICY` audit row and a signed `.amc/effective-policy/<receiptId>.json`): a tool-pipeline row is `enforced` only when that session composed its guard. See [COMPILER.md](../catalog/COMPILER.md#activation-and-enforcement).
 
 ## Requested versus effective
 
@@ -47,7 +61,8 @@ Every bound status returns:
 - `binding`: the exact backing rule.
 - `mutable`: whether this interface can change the request.
 - `trusted`: whether the artifacts establishing effective status verified.
-- `source`: guardrail state, Runtime Firewall policy, both, or neither.
+- `source`: guardrail state, Runtime Firewall policy, both, or neither; `tool-pipeline` or `catalog-only` for the rows this interface cannot change.
+- `enforcement` and `boundary`: whether AMC enforces the guardrail, and where.
 - `reason`: a human-readable precedence or failure explanation.
 
 Guardrail state is additive. A request can turn on a bound rule. Removing that request cannot turn off a rule required by the separately signed Runtime Firewall policy.
@@ -62,7 +77,7 @@ amc guardrails profile healthcare
 amc guardrails profile financial
 ```
 
-Profiles persist only their runtime-bound subset. The command reports every catalog-only exclusion instead of claiming the full profile is effective.
+Profiles persist only their runtime-bound subset. The command lists every other guardrail in the profile with `(not enforced)`, or with `(enforced at <boundary>)` for the tool-pipeline rows, instead of claiming the full profile is effective. No profile can request a guardrail whose enforcement is `none`.
 
 ## Integrity behavior
 

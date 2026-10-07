@@ -122,7 +122,7 @@ Evidence older than 90 days loses trust: `OBSERVED_HARDENED` becomes `OBSERVED`,
 
 ### No opt-out
 
-`STRICT_EVIDENCE_BINDING` no longer exists as an opt-out. Setting it prints `STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level` once per run and changes nothing.
+`STRICT_EVIDENCE_BINDING` no longer exists as an opt-out. Setting it prints `STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level` once per run and changes nothing. Because no value can turn binding off, no profile, regulated or not, has a strict-binding downgrade to refuse or record: every native session's effective-policy receipt (P1-12) states `strictEvidenceBinding: { enabled: true, source: "default" }`.
 
 ### Reachability
 
@@ -2250,6 +2250,9 @@ Tag evidence with `meta.questionId` or `meta.questionIds` to bind it to a
 question at L1. Above L1, `2026.10.08-r226` binds rows only through the
 question's evidence map. The `STRICT_EVIDENCE_BINDING=false` fallback was
 removed in r226; setting the variable now only prints a deprecation warning.
+Each native session's effective-policy receipt (P1-12) records strict binding as
+enabled from the default, so a session can never carry a strict-binding
+downgrade.
 
 ## 4. Scoring Pipeline
 
