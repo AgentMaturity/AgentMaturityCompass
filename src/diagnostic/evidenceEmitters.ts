@@ -1,5 +1,6 @@
 import type { ClaimKind } from "../claims/eligibility/types.js";
-import type { EvidenceEventType } from "../types.js";
+import { producerOfMeta, type EvidenceProducer } from "../claims/evidenceProvenance.js";
+import type { EvidenceEventType, TrustTier } from "../types.js";
 
 /**
  * The emitters whose rows may count toward a maturity level (P1-07).
@@ -10,9 +11,13 @@ import type { EvidenceEventType } from "../types.js";
  * `scripts/check-gate-reachability.mjs` (`npm run check:gates`) proves both, and fails when an evaluated gate asks
  * for a row no entry produces.
  *
- * A row matches an entry by its shape: same event type, and the same `meta.auditType` or `meta.metricKey` when the
- * entry names one. The row's trust tier still comes from provenance (P0-18): an imported row reads SELF_REPORTED
- * whichever entry it matches, so the `claimKind` here is what the emitter can claim at best, never an upgrade.
+ * A row is admitted for an entry only when its shape matches (same event type, and the same `meta.auditType` or
+ * `meta.metricKey` when the entry names one) AND its provenance matches: the producer derived from the row (P0-18
+ * `producerOfMeta`) must be the entry's `producer`, and its effective trust tier (P0-18 `effectiveTrustTier`, as
+ * parsed by `parseEvidenceEventWith`) must be the tier the entry's `claimKind` writes. Shape alone admits nothing.
+ *
+ * Which question a row evidences above L1 is never read from the row: ./evidenceMaps/ names the emitters per
+ * question and level (P1-07 security review).
  *
  * The dogfood seeder (src/dogfood/) is never an entry. Importers are `self_reported`.
  */
@@ -24,26 +29,30 @@ export interface EmitterEntry {
   eventType: EvidenceEventType;
   auditType?: string;
   metricKey?: string;
+  /** A meta field the emitter writes only for the rows this entry stands for (for example a declared scope). */
+  requiresMeta?: string;
   claimKind: ClaimKind;
+  /** Who writes the row, as P0-18 derives it from the row's provenance. */
+  producer: Exclude<EvidenceProducer, "synthetic">;
   levelUse: EmitterLevelUse[];
 }
 
 export const EVIDENCE_EMITTERS: readonly EmitterEntry[] = [
   // A governed tool call (src/tools/toolEvidence.ts). Rows carry `questionIds` from LIVE_PROJECTION_RULES.
-  { id: "tool-call-allowed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_ALLOWED", claimKind: "observed", levelUse: ["L1", "L2"] },
-  { id: "tool-call-denied", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_DENIED", claimKind: "observed", levelUse: ["L1", "L2"] },
-  { id: "tool-call-failed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_FAILED", claimKind: "observed", levelUse: ["L1"] },
-  { id: "tool-call-outcome", module: "src/tools/toolEvidence.ts", eventType: "metric", metricKey: "tool_call_outcome", claimKind: "observed", levelUse: ["L1", "L2"] },
-  { id: "tool-output-digest", module: "src/tools/toolEvidence.ts", eventType: "stdout", claimKind: "observed", levelUse: ["L1"] },
-  // A scope-declared delegation (src/diagnostic/spineEvidenceProjection.ts). Rows carry `questionIds` from SPINE_PROJECTION_RULES.
-  { id: "delegation-settled", module: "src/diagnostic/spineEvidenceProjection.ts", eventType: "audit", auditType: "DELEGATION_SETTLED", claimKind: "observed", levelUse: ["L1", "L2"] },
-  { id: "delegate-report-digest", module: "src/diagnostic/spineEvidenceProjection.ts", eventType: "stdout", claimKind: "observed", levelUse: ["L1"] },
+  { id: "tool-call-allowed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_ALLOWED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+  { id: "tool-call-denied", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_DENIED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+  { id: "tool-call-failed", module: "src/tools/toolEvidence.ts", eventType: "audit", auditType: "TOOL_CALL_FAILED", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },
+  { id: "tool-call-outcome", module: "src/tools/toolEvidence.ts", eventType: "metric", metricKey: "tool_call_outcome", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+  { id: "tool-output-digest", module: "src/tools/toolEvidence.ts", eventType: "stdout", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },
+  // A scope-declared delegation (src/diagnostic/spineEvidenceProjection.ts): only it writes `meta.delegationScope`.
+  { id: "delegation-settled", module: "src/diagnostic/spineEvidenceProjection.ts", eventType: "audit", auditType: "DELEGATION_SETTLED", requiresMeta: "delegationScope", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1", "L2"] },
+  { id: "delegate-report-digest", module: "src/diagnostic/spineEvidenceProjection.ts", eventType: "stdout", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },
   // Signed artifact provenance (`amc artifact sign`).
-  { id: "artifact-provenance", module: "src/artifact/artifactProvenance.ts", eventType: "artifact", claimKind: "observed", levelUse: ["L1"] },
+  { id: "artifact-provenance", module: "src/artifact/artifactProvenance.ts", eventType: "artifact", claimKind: "observed", producer: "amc-runtime", levelUse: ["L1"] },
   // External eval imports: self-reported by provenance (meta.source eval_import), so L1 at most.
-  { id: "eval-import-case", module: "src/eval/evalImporters.ts", eventType: "test", claimKind: "self_reported", levelUse: ["L1"] },
-  { id: "eval-import-score", module: "src/eval/evalImporters.ts", eventType: "metric", metricKey: "external_eval_score", claimKind: "self_reported", levelUse: ["L1"] },
-  { id: "eval-import-calibration", module: "src/eval/evalImporters.ts", eventType: "metric", metricKey: "confidence_calibration_error", claimKind: "self_reported", levelUse: ["L1"] }
+  { id: "eval-import-case", module: "src/eval/evalImporters.ts", eventType: "test", claimKind: "self_reported", producer: "import", levelUse: ["L1"] },
+  { id: "eval-import-score", module: "src/eval/evalImporters.ts", eventType: "metric", metricKey: "external_eval_score", claimKind: "self_reported", producer: "import", levelUse: ["L1"] },
+  { id: "eval-import-calibration", module: "src/eval/evalImporters.ts", eventType: "metric", metricKey: "confidence_calibration_error", claimKind: "self_reported", producer: "import", levelUse: ["L1"] }
 ];
 
 /**
@@ -102,17 +111,24 @@ export function emitterById(id: string): EmitterEntry | undefined {
   return EMITTERS_BY_ID.get(id);
 }
 
-/** True when the row has the shape this emitter writes. */
-export function emitterMatches(
-  entry: EmitterEntry,
-  event: { event_type: string; meta: Record<string, unknown> }
-): boolean {
+type AdmissionRow = { event_type: string; meta: Record<string, unknown>; trustTier: TrustTier };
+
+const TIERS_BY_CLAIM: Partial<Record<ClaimKind, ReadonlySet<TrustTier>>> = {
+  observed: new Set<TrustTier>(["OBSERVED", "OBSERVED_HARDENED"]),
+  self_reported: new Set<TrustTier>(["SELF_REPORTED"])
+};
+
+/** True when the row has this emitter's shape AND provenance. `trustTier` must be the effective tier (P0-18). */
+export function emitterAdmits(entry: EmitterEntry, event: AdmissionRow): boolean {
   return event.event_type === entry.eventType
     && (entry.auditType === undefined || event.meta.auditType === entry.auditType)
-    && (entry.metricKey === undefined || event.meta.metricKey === entry.metricKey);
+    && (entry.metricKey === undefined || event.meta.metricKey === entry.metricKey)
+    && (entry.requiresMeta === undefined || Object.hasOwn(event.meta, entry.requiresMeta))
+    && producerOfMeta(event.meta) === entry.producer
+    && TIERS_BY_CLAIM[entry.claimKind]?.has(event.trustTier) === true;
 }
 
-/** True when some registered emitter writes rows of this shape. Only such rows count toward L1 and above. */
-export function fromRegisteredEmitter(event: { event_type: string; meta: Record<string, unknown> }): boolean {
-  return EVIDENCE_EMITTERS.some((entry) => emitterMatches(entry, event));
+/** True when some registered emitter admits the row. Only such rows count toward L1 and above. */
+export function fromRegisteredEmitter(event: AdmissionRow): boolean {
+  return EVIDENCE_EMITTERS.some((entry) => emitterAdmits(entry, event));
 }

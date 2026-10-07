@@ -3,8 +3,10 @@
  *
  * A map is a methodology claim, so each one says `because`, quoting the question's own `evidenceGateHints`, the way
  * src/diagnostic/liveEvidenceProjection.ts does. `l2` and `l3` list `EmitterEntry.id`s from ../evidenceEmitters.ts;
- * the level passes when every listed emitter has an `observed` row tagged to the question in the window, on top of
- * the gate's event, session and day minimums. An empty list means that level is not evaluable on runtime evidence.
+ * the level passes when every listed emitter has an `observed` row in the window, admitted by provenance, on top of
+ * the gate's event, session and day minimums. The map IS the binding above L1: a row's own `questionIds` tag is
+ * ignored there, so a writer cannot choose which questions its rows lift. An empty list means that level is not
+ * evaluable on runtime evidence.
  *
  * A question with no map is not evaluable above L1. NOT_YET_EVIDENCEABLE records, for a mapped question, what its
  * missing levels still need, so the next reader does not re-derive (or invent) the same binding.
@@ -21,8 +23,9 @@ export const EVIDENCE_MAPS: readonly EvidenceMap[] = [
     questionId: "AMC-5.29",
     l2: ["tool-call-allowed", "tool-call-denied"],
     l3: [],
-    because: "AMC-5.29 asks for 'denied/allowed tool-call receipts'. A call the tool allowlist evaluated writes one "
-      + "or the other, and both together show the allowlist is configured and refuses."
+    because: "AMC-5.29 asks for 'denied/allowed tool-call receipts'. The native toolset composes the tool allowlist "
+      + "for every governed call (src/agent/agentToolset.ts), so each call writes one receipt or the other, and both "
+      + "together show the allowlist is configured and that a guard refuses."
   },
   {
     questionId: "AMC-SCI-2",

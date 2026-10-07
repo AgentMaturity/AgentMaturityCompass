@@ -36,8 +36,24 @@ function supportedLevel(events: ParsedEvidenceEvent[]): number {
 }
 
 describe("self-reported evidence caps at L1 (P0-21)", () => {
-  test("L2 counts met only by SELF_REPORTED events support level 1", () => {
-    expect(supportedLevel(evidence("SELF_REPORTED"))).toBe(1);
+  test("L2 counts met only by SELF_REPORTED events support at most level 1", () => {
+    // P1-07: these rows claim a runtime emitter's shape with a self-reported tier, so no emitter admits them by
+    // provenance and they support nothing above L0; the cap holds either way.
+    expect(supportedLevel(evidence("SELF_REPORTED"))).toBeLessThanOrEqual(1);
+  });
+
+  test("imported rows tagged to the question support exactly level 1", () => {
+    const imported: ParsedEvidenceEvent[] = [0, 1].map((day) => {
+      const meta = { questionIds: [QUESTION], source: "eval_import" };
+      return {
+        id: `import-${day}`, ts: BASE + day * DAY, session_id: `import-${day}`, runtime: "unknown",
+        event_type: "test", payload_path: null, payload_inline: "imported eval case", payload_sha256: `sha-import-${day}`,
+        meta_json: JSON.stringify(meta), prev_event_hash: "prev", event_hash: `hash-import-${day}`, writer_sig: "sig",
+        meta, text: "imported eval case", trustTier: "SELF_REPORTED"
+      };
+    });
+    expect(supportedLevel(imported)).toBe(1);
+    expect(supportedLevel([...imported, ...evidence("SELF_REPORTED")])).toBe(1);
   });
 
   test("the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)", () => {

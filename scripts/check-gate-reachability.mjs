@@ -4,7 +4,7 @@
  *
  * Fails when:
  *  - a registry entry's module is missing, lacks the literal it claims to write, lives in the dogfood seeder, is
- *    synthetic, or is an importer that is not self_reported;
+ *    synthetic, is an importer that is not self_reported, or declares a producer its claim kind cannot have;
  *  - a literal `auditType` emission in src/ has neither a registry entry nor a NON_MATURITY_AUDIT_MODULES line;
  *  - an evidence map names an unknown question or an unregistered, non-observed or wrong-level emitter;
  *  - an evaluated gate names an event type, audit type or metric key no admissible emitter writes, carries a
@@ -40,12 +40,21 @@ for (const entry of EVIDENCE_EMITTERS) {
   ids.add(entry.id);
   if (entry.module.startsWith("src/dogfood/")) fail(`${entry.id}: the dogfood seeder is never an emitter`);
   if (entry.claimKind === "synthetic_example") fail(`${entry.id}: synthetic emitters cannot evidence a level`);
-  if (/import|ingest/i.test(entry.module) && entry.claimKind !== "self_reported") fail(`${entry.id}: importers are self_reported`);
+  if (/import|ingest/i.test(entry.module) && (entry.claimKind !== "self_reported" || entry.producer !== "import")) {
+    fail(`${entry.id}: importers are self_reported with producer import`);
+  }
+  // Admission checks provenance (P0-18): an observed row can only come from AMC runtime.
+  if (entry.claimKind === "observed" && entry.producer !== "amc-runtime") fail(`${entry.id}: observed emitters are produced by amc-runtime`);
+  if (!["amc-runtime", "import", "manual", "external-report"].includes(entry.producer)) fail(`${entry.id}: producer ${entry.producer} is not admissible`);
   if (entry.levelUse.length === 0) fail(`${entry.id}: levelUse is empty`);
   const path = join(root, entry.module);
   const literal = `"${entry.auditType ?? entry.metricKey ?? entry.eventType}"`;
   if (!existsSync(path)) fail(`${entry.id}: module ${entry.module} does not exist`);
-  else if (!readFileSync(path, "utf8").includes(literal)) fail(`${entry.id}: ${entry.module} never writes ${literal}`);
+  else {
+    const source = readFileSync(path, "utf8");
+    if (!source.includes(literal)) fail(`${entry.id}: ${entry.module} never writes ${literal}`);
+    if (entry.requiresMeta && !source.includes(entry.requiresMeta)) fail(`${entry.id}: ${entry.module} never writes meta ${entry.requiresMeta}`);
+  }
 }
 
 // 2. Every literal audit emission is registered or classified as non-maturity.

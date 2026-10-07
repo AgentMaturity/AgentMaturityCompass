@@ -267,7 +267,7 @@ export function selectRelevantEvents(
   }
   if (!warnings.has("strict-binding")) {
     console.warn(
-      `[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
+      `[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
     );
     warnings.add("strict-binding");
   }
@@ -653,17 +653,20 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const assuranceMissingQuestions = new Set<string>();
     const relevanceWarnings = new Set<string>();
     const eventsByQuestionId = buildQuestionEventIndex(events);
+    const eventsById = new Map<string, ParsedEvidenceEvent>(events.map((event) => [event.id, event]));
 
     for (const question of activeQuestions) {
       const relevant = selectRelevantEvents(question.id, events, 0, relevanceWarnings, eventsByQuestionId);
       // P1-07: levels are cumulative. The highest n for which gates L1..Ln all pass; L4 and L5 are not evaluated.
-      const { level: supportedLevel, perLevel } = evaluateLevels(question, relevant);
+      // Every in-scope row: L2 and L3 bind through the evidence map, not through the row's own tag.
+      const { level: supportedLevel, perLevel } = evaluateLevels(question, events, relevant);
+      const matchedGate = question.gates.find((gate) => gate.level === supportedLevel);
       let supportedMaxLevel: number = supportedLevel;
       const matchedGateLevel = supportedLevel;
-      const matchedIds = perLevel[supportedLevel]!.matchedEventIds.slice(0, 64);
-      const gateMinDays = question.gates[supportedLevel]!.minDistinctDays;
-      const gateEvidenceTypes = question.gates[supportedLevel]!.requiredEvidenceTypes;
-      const failedGateReasons = perLevel.slice(supportedLevel + 1).reverse().map((row) => row.reason);
+      const matchedIds = (perLevel.find((row) => row.level === supportedLevel)?.matchedEventIds ?? []).slice(0, 64);
+      const gateMinDays = matchedGate?.minDistinctDays ?? 0;
+      const gateEvidenceTypes = matchedGate?.requiredEvidenceTypes ?? [];
+      const failedGateReasons = perLevel.filter((row) => row.level > supportedLevel).reverse().map((row) => row.reason);
       let missingLlmCapApplied = false;
 
       supportedMaxLevel = applyGlobalCherryPickDefense(supportedMaxLevel, relevant);
@@ -994,9 +997,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       questionScores.push(questionScore);
 
       const matchedIdSet = new Set(matchedIds);
-      const relevantById = new Map<string, ParsedEvidenceEvent>(relevant.map((event) => [event.id, event]));
       const acceptedEvidence = matchedIds
-        .map((eventId) => relevantById.get(eventId))
+        .map((eventId) => eventsById.get(eventId))
         .filter((event): event is ParsedEvidenceEvent => Boolean(event));
       const rejectedEvidence = relevant
         .filter((event) => !matchedIdSet.has(event.id))
