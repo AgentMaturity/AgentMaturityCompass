@@ -1474,6 +1474,7 @@ Connect to an explicitly configured stdio or Streamable HTTP MCP server, report 
 | `--credentials-home <dir>` | - |
 | `--credentials-file <path>` | - |
 | `--json` | - |
+| `--authorize` | - |
 
 #### `amc agent-loop providers`
 
