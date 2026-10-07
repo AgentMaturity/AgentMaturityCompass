@@ -1,4 +1,4 @@
-import { generateKeyPairSync, sign, verify } from "node:crypto";
+import { generateKeyPairSync, sign } from "node:crypto";
 import { setVaultSecret, getVaultSecret, unlockVault, vaultStatus } from "../vault/vault.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -43,10 +43,3 @@ export function signFederationDigest(workspace: string, digestHex: string): stri
   return sign(null, Buffer.from(digestHex, "hex"), privateKeyPem).toString("base64");
 }
 
-export function verifyFederationDigest(digestHex: string, signatureB64: string, publicKeyPem: string): boolean {
-  try {
-    return verify(null, Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
-  } catch {
-    return false;
-  }
-}
