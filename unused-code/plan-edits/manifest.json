@@ -38,6 +38,13 @@
       "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd"
     },
     {
+      "path": "src/api/exportRouter.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/api/exportRouter.ts.landed",
+      "sha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc"
+    },
+    {
       "path": "src/api/index.ts",
       "issue": "P0-23",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
@@ -232,6 +239,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+    },
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/apiRouterResponseParity.test.ts.landed",
+      "sha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a"
     },
     {
       "path": "tests/privateModuleHelperVisibility.test.ts",
