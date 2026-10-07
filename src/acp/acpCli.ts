@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
+import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
 /**
  * `amc acp` (plan P7.1a).
@@ -40,6 +41,9 @@ export function registerAcpCommands(program: Command): void {
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
+    .option("--context-window <tokens>", "Declared model context window; enables automatic compaction between steps")
+    .option("--compact-threshold <fraction>", "Measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--no-auto-summary", "Prune old tool output only; never run a model-written summary step")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
     .action((opts: {
@@ -64,12 +68,17 @@ export function registerAcpCommands(program: Command): void {
       thinking?: string;
       reasoningEffort?: string;
       maxSteps?: string;
+      contextWindow?: string;
+      compactThreshold?: string;
+      autoSummary?: boolean;
       agentId: string;
       systemPrompt: string;
     }) => {
       let handle;
       try {
+        const compaction = compactionFromFlags(opts);
         handle = startAcpStdio({
+          ...(compaction === undefined ? {} : { compaction }),
           workspace: process.cwd(),
           agentId: opts.agentId,
           providerId: opts.provider,

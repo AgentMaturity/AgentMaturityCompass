@@ -31,6 +31,9 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly thinking?: string;
   readonly reasoningEffort?: string;
   readonly maxSteps?: string;
+  readonly contextWindow?: string;
+  readonly compactThreshold?: string;
+  readonly autoSummary?: boolean;
   readonly session?: string;
   readonly forkFrom?: string;
 }
@@ -248,6 +251,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
       ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
       ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
+      // Each turn's child run validates these; they are forwarded verbatim, never defaulted here.
+      ...(options.contextWindow === undefined ? [] : ["--context-window", options.contextWindow]),
+      ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
+      ...(options.autoSummary === false ? ["--no-auto-summary"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
         ...validation.checks.flatMap(check => ["--validate", check.id])])];

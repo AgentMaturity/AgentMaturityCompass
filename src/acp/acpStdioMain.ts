@@ -6,6 +6,8 @@ import { AdapterRegistry, type LlmRouteConfig } from "../llm/adapter/adapterRegi
 import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
 import { stubProviderTransport, STUB_PROVIDER_ID } from "../agent/stubProvider.js";
 import type { AgentSessionInit } from "../agent/agentSession.js";
+import { resolveCompactionConfig } from "../agent/compaction/promptPressure.js";
+import type { CompactionConfig } from "../agent/loopTypes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../setup/nativeMcpConfig.js";
@@ -112,6 +114,8 @@ export interface AcpStdioInit {
   readonly thinking?: string;
   readonly reasoningEffort?: string;
   readonly maxSteps?: number;
+  /** Operator-declared automatic compaction, fixed at startup like the step bound. */
+  readonly compaction?: Partial<CompactionConfig>;
   /** Operator composition only: must implement authenticated inherited model context. */
   readonly forkSessionFactory?: AcpForkSessionFactory;
   /** Defaults to the real streams; injected by tests. */
@@ -153,6 +157,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
   const requestParams = paramsFor(route.providerId, maxTokens, init);
+  const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
   const actionClass = init.approveTools?.trim().toUpperCase();
   const riskTier = (init.approveRisk ?? "high").trim().toLowerCase();
   if ((actionClass !== undefined && !isActionClass(actionClass)) || !["low", "medium", "high", "critical"].includes(riskTier) || (init.approveRisk !== undefined && actionClass === undefined)) throw new Error("ACP approval settings require a valid action class and risk tier.");
@@ -218,12 +223,12 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       harnessVersion: amcVersion,
       compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
         ...(route.providerId === "deepseek" ? { params: requestParams } : {}),
-        ...(validation === undefined ? {} : { validation }),
+        ...(validation === undefined ? {} : { validation }), ...(compaction === undefined ? {} : { compaction }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      tools, maxSteps, ...shellOptIn, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(validation === undefined ? {} : { validation })
     });
 
