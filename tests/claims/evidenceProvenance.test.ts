@@ -169,6 +169,19 @@ describe("countAttestedOnce", () => {
       .toEqual([observed, observed, unbound, unbound]);
   });
 
+  test("an attested event counts once whichever bundle or key attests it", () => {
+    const other = testKey();
+    const both = context({ lists: [trustList([ATTESTER, other].map((key) => listEntry(key, { purposes: ["independent-attestation"] })))] });
+    const tierOfBoth = (event: ReturnType<typeof row>) => effectiveTrustTier(event, { trustList: both });
+    // The same key signs a later, wider bundle (the session gained an event), and a second attester signs the first one.
+    const wider = [...BUNDLE, { id: "orig-3", sha256: sha256Hex("user: later"), ts: 3, ...SUBJECT }];
+    const first = at(5);
+    const reSigned = at(6, attestedMeta(attestation(ATTESTER, bundleDigest(wider), wider)));
+    const coSigned = at(7, attestedMeta(attestation(other)));
+    expect([first, reSigned, coSigned].map(tierOfBoth)).toEqual(["ATTESTED", "ATTESTED", "ATTESTED"]);
+    expect(countAttestedOnce([coSigned, reSigned, first], tierOfBoth, { startTs: 0, endTs: 10 })).toEqual([first]);
+  });
+
   test("an attested event counts only in a window that holds its attested time", () => {
     // orig-1 was attested at ts 1; a copy appended at ts 5 does not carry it into a window that starts later.
     expect(countAttestedOnce([at(5)], tierOf, { startTs: 2, endTs: 10 })).toEqual([]);

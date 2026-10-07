@@ -97,7 +97,27 @@ describe("ingest attestation", () => {
     const signature = { keyId: attester.keyId, sigB64: signHexDigest(bundleHash, attester.privateKeyPem) };
     expect(attest(workspace, sessionId, { attesterSignature: signature, trust: pinned(attester) }).trustTier).toBe("ATTESTED");
     expect(() => attest(workspace, sessionId, { attesterSignature: signature, trust: pinned(attester) }))
-      .toThrow(`ingest session ${sessionId} is already attested by key ${attester.keyId} over bundle ${bundleHash}`);
+      .toThrow(`ingest session ${sessionId} is already attested by key ${attester.keyId}`);
+    expect(attestedRows(workspace, sessionId).filter((meta) => meta.trustTier === "ATTESTED").length).toBe(2);
+  });
+
+  test("a key that attested a session's events cannot attest them again under a new bundle hash", () => {
+    const { workspace, sessionId, bundleHash } = ingested();
+    const attester = testKey();
+    const signed = (digest: string) => ({ attesterSignature: { keyId: attester.keyId, sigB64: signHexDigest(digest, attester.privateKeyPem) },
+      trust: pinned(attester) });
+    expect(attest(workspace, sessionId, signed(bundleHash)).trustTier).toBe("ATTESTED");
+    // Evidence appended to the attested session changes the bundle hash the attester would sign next.
+    const ledger = openLedger(workspace);
+    try {
+      ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "review", payload: "user: more", payloadExt: "txt",
+        meta: { source: "generic_text", ingestSessionId: sessionId } });
+    } finally {
+      ledger.close();
+    }
+    const widened = ingestBundleHash(workspace, sessionId);
+    expect(widened).not.toBe(bundleHash);
+    expect(() => attest(workspace, sessionId, signed(widened))).toThrow(`ingest session ${sessionId} is already attested by key ${attester.keyId}`);
     expect(attestedRows(workspace, sessionId).filter((meta) => meta.trustTier === "ATTESTED").length).toBe(2);
   });
 
@@ -199,6 +219,21 @@ describe("an attested event counts for its subject, once, in its own window", ()
     expect(before.diagnostic.attested).toBeGreaterThan(0);
     const replay = append(workspace, sessionId, meta);
     expect(effectiveTrustTier(replay, readerTrustFor(workspace))).toBe("ATTESTED");
+    expect(compliance(workspace, agentId)).toEqual(before.compliance);
+    expect(await diagnostic(workspace, agentId)).toEqual(before.diagnostic);
+  }, 120_000);
+
+  test("a copy under a later bundle signed by the same key counts once in the compliance engine and the diagnostic", async () => {
+    const { workspace, sessionId, attester, meta } = attestedSession();
+    const agentId = String(meta.agentId);
+    const before = { compliance: compliance(workspace, agentId), diagnostic: await diagnostic(workspace, agentId) };
+    // The attester signs a wider bundle once the session gains an event; the earlier event's copy carries the new digest.
+    const bundle: BundleEntry[] = [...(meta.attestation as { bundle: BundleEntry[] }).bundle,
+      { id: "event-added-later", sha256: sha256Hex("user: more"), ts: Date.now(), agentId, sessionId }];
+    const digestSha256 = bundleDigest(bundle);
+    const reSigned = append(workspace, sessionId, { ...meta,
+      attestation: { kind: "third_party", keyId: attester.keyId, sigB64: signHexDigest(digestSha256, attester.privateKeyPem), digestSha256, bundle } });
+    expect(effectiveTrustTier(reSigned, readerTrustFor(workspace))).toBe("ATTESTED");
     expect(compliance(workspace, agentId)).toEqual(before.compliance);
     expect(await diagnostic(workspace, agentId)).toEqual(before.diagnostic);
   }, 120_000);
