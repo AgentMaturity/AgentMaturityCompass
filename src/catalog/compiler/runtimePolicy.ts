@@ -3,7 +3,7 @@
  * deletion executor. Only the parameters in PARAMETERS exist; any other name, a wrong type, a different strictness or a
  * point the binding does not list fails closed. `proposedSignedConfigs` start from the same defaults and zod schemas as
  * F1's operating-profile builders, so their shapes match what the signing commands accept. Nothing here writes a file;
- * activating the policy is P1-12's.
+ * activation is in activate.ts (P1-12).
  */
 import { defaultApprovalPolicy, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
 import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
@@ -50,8 +50,11 @@ const GUARD_OF: Readonly<Record<string, string>> = {
   "toolPipeline.requireAgentLease": "identity-binding",
   "toolPipeline.requirePrincipal": "identity-binding"
 };
-/** Guards the native tool pipeline registers today (src/agent/agentToolset.ts); identity-binding arrives with P1-12. */
-const REGISTERED_GUARDS: ReadonlySet<string> = new Set(["prompt-injection", "runtime-firewall", "budgets", "network-egress", "tool-allowlist", "native-tool-identity"]);
+/**
+ * Guards the native tool pipeline registers (src/agent/agentToolset.ts). identity-binding is enforced inside the
+ * `compiled-policy` guard (src/tools/guards/compiledPolicyGuard.ts, P1-12).
+ */
+const REGISTERED_GUARDS: ReadonlySet<string> = new Set(["prompt-injection", "runtime-firewall", "budgets", "network-egress", "tool-allowlist", "native-tool-identity", "identity-binding"]);
 
 /** Checks every parameter of every control in the catalog, applicable or not: a catalog defect is a defect. */
 export function checkParameters(cat: LoadedCatalog): void {

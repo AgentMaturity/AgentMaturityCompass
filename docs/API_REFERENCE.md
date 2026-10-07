@@ -2659,6 +2659,7 @@ Compile a deployment profile against the catalog into a signed, experimental con
 | `--out <dir>` | - |
 | `--request-review` | - |
 | `--allow-weakening` | - |
+| `--activate <approvalRequestId>` | - |
 | `--json` | - |
 
 #### `amc cert generate`
