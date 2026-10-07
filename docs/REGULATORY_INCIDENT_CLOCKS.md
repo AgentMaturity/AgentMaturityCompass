@@ -1,12 +1,63 @@
 # Regulatory Incident Clocks, Human-Oversight Records and Evidence Packets
 
-Track F4 of the 2026-10-03 regulated-platform program. This document describes
-the clock table in `src/incidents/regulatoryClocksTable.ts`, the clock
-arithmetic in `src/incidents/regulatoryClocks.ts`, the signed human-oversight
-record in `src/incidents/oversightRecord.ts`, and the regulator evidence packet
-in `src/incidents/evidencePacket.ts`. All four are additive modules over the
-existing incident types (`src/incidents/incidentTypes.ts`); nothing in the
-incident store changed.
+Track F4 of the 2026-10-03 regulated-platform program, landed by P1-17. This
+document describes the clock table in `src/incidents/regulatoryClocksTable.ts`,
+the clock arithmetic in `src/incidents/regulatoryClocks.ts`, the signed
+human-oversight record in `src/incidents/oversightRecord.ts`, the regulator
+evidence packet in `src/incidents/evidencePacket.ts`, and the signed clock
+events in `src/incidents/incidentClockEvents.ts` that connect them to stored
+incidents through the CLI, the API (and so Studio) and one MCP tool.
+
+**AMC computes and records deadlines; it does not file notices.** People file
+them. Every duration is agent-drafted and experimental until a named expert
+signs off (D-08), and nothing here is legal advice.
+
+## Entry points (P1-17)
+
+| Surface | Command or route | What it does |
+|---|---|---|
+| CLI | `amc incident clocks <id> --station <station> [--now <iso>] [--json]` | Lists the station's clocks for a stored incident |
+| CLI | `amc incident clocks <id> --station <station> --trigger <TRIGGER> --at <iso>` | Records that a trigger happened, then lists |
+| CLI | `amc incident clocks <id> --station <station> --notified <clockId> --at <iso>` | Records that a notice was submitted, then lists |
+| CLI | `amc incident oversight <id> --decision <decision> --reviewer <id> --rationale <text> [--clock <clockId>...]` | Appends a chained oversight record signed with the workspace auditor key |
+| CLI | `amc incident show <id> --packet <dir> --station <station>` | Writes `<id>.packet.json` and `<id>.packet.md` |
+| API | `GET /api/v1/incidents/:id/clocks?station=&now=` | The `--json` listing |
+| API | `POST /api/v1/incidents/:id/clock-events` `{ station, trigger \| notified, at }` | Records a trigger or a notice (201) |
+| API | `POST /api/v1/incidents/:id/oversight` `{ decision, reviewerId, rationale, clockIds? }` | Appends an oversight record (201) |
+| MCP | `amc_incident_clocks { incidentId, station, now?, workspace? }` | Read-only listing |
+
+The API routes sit under the protected `/api/v1/incidents` prefix, so Studio
+reaches them through its API delegation. They answer 400 on a bad station,
+trigger, clock id, decision or timestamp and 404 on an unknown incident.
+Timestamps must be ISO 8601 with a zone (`2026-03-02T10:00:00Z`), so a
+deadline never depends on the host's local time.
+
+### Clock events
+
+Table `incident_clock_events` (created by `initIncidentTables`, append-only)
+holds `incident_id, event_id, kind (TRIGGER | NOTIFIED), trigger_or_clock_id,
+station, ts, recorded_ts, recorded_by, signature`. `ts` is the operator's
+claim; `recorded_ts` is set by AMC from the server clock when the row is
+signed and `recorded_by` names the surface (`cli` or `api`). Rows are signed
+with the workspace monitor key, like `amc incident create`. AMC refuses an
+event dated before the incident, more than 5 minutes after `recorded_ts`, with
+a trigger or clock the station does not have, a second notice for a clock, or
+one that would put a notice before its trigger. `loadIncidentClocks` checks
+every row's signature and the same guards again and refuses a failing row by
+its event id. For triggers the earliest claimed time wins, so a later row can
+only bring a deadline forward; for notices the first-recorded row wins, so a
+later row claiming an earlier notice cannot turn a missed deadline into a met
+one. Events are kept per station.
+
+### What the signatures prove
+
+Clock events verify against the workspace's own monitor key history and
+oversight records against its own auditor key history. That makes both a
+**local audit trail**: they expose an edited, deleted, reordered or inserted
+row by anyone without those keys, and they show which workspace wrote each
+row. They do not prove that a claimed time is true or who reviewed: a holder
+of the workspace keys can write any claim, and the reviewer id is stored as
+stated (binding reviewers to authenticated identities is P1-20).
 
 ## What this gives an on-call operator
 
@@ -14,13 +65,15 @@ incident store changed.
    to (`Domain`: health, wealth, technology, …), `attachRegulatoryClocks` lists
    the regulation-derived reporting deadlines that are candidates for that
    station, each with a computed due date and a status.
-2. **Due / overdue state without a wall clock.** Every computation takes an
-   explicit `nowTs`; nothing calls `Date.now()`. Statuses: `NOT_STARTED`
+2. **Due / overdue state without a wall clock.** The clock arithmetic takes
+   an explicit `nowTs` and never calls `Date.now()`; the CLI, API and MCP tool
+   pass the current time unless `--now` / `now` is given. Statuses: `NOT_STARTED`
    (trigger not recorded), `PENDING`, `DUE_SOON` (within 24 h), `OVERDUE`,
    `SATISFIED`, `SATISFIED_LATE`.
 3. **A signed human-oversight record** — who reviewed, when, what they decided
    — that cannot be dated before the incident, bound to the incident hash,
-   chained by `prevRecordHash`, and verifiable against the monitor public keys.
+   chained by `prevRecordHash`, and verifiable against the workspace auditor
+   key history.
 4. **An evidence packet** (JSON + Markdown) assembled only from supplied
    incident data, transitions, causal edges, clocks, oversight records and
    receipt references. Anything absent is listed under `missing` with a
@@ -187,8 +240,11 @@ register source is older than its policy window. Do not import from
 
 ```ts
 createOversightRecord({ incident, reviewerId, reviewedTs, decision, rationale,
-                        clockIds?, prevRecordHash?, privateKeyPem }) → HumanOversightRecord
+                        clockIds?, prevRecordHash?, privateKeyPem, now? }) → HumanOversightRecord
 verifyOversightRecord(record, incident, publicKeys) → { ok, errors[] }
+verifyOversightChain(records, incident, publicKeys) → { ok, errors[] }
+recordWorkspaceOversight({ workspace, incident, reviewerId, decision, rationale, clockIds,
+                           reviewedTs, privateKeyPem, publicKeys }) → HumanOversightRecord
 appendOversightRecord(filePath, record); readOversightRecords(filePath)
 oversightRecordPath(workspace, incidentId) → <workspace>/.amc/incidents/oversight/<id>.jsonl
 ```
@@ -209,6 +265,18 @@ Guards, each mutation-verified in the F4 track (receipt commit `ed9b45a2`):
 - Hash mismatch, signature failure, incident-hash mismatch and unknown
   decision each produce their own error string.
 
+P1-17 additions:
+
+- Each record carries `recordedTs`, set from the server clock when it is
+  signed and inside the hashed payload, beside the operator-stated
+  `reviewedTs`. A `reviewedTs` more than 5 minutes after `recordedTs` is
+  refused at creation and fails verification.
+- `verifyOversightChain` checks a whole file: every record, a null first
+  `prevRecordHash`, each later one equal to its predecessor's `recordHash`,
+  and non-decreasing `reviewedTs`. `recordWorkspaceOversight` (used by the CLI
+  and the API) refuses to append to a file that fails it, so a forged or
+  edited record is never endorsed, and the evidence packet runs it too.
+
 ## Evidence packet
 
 ```ts
@@ -218,12 +286,18 @@ renderEvidencePacketMarkdown(packet) → string
 ```
 
 `missing` items and when they appear: `human-oversight-record` (none supplied,
-or none verified), `oversight-verification-keys` (records without keys),
+or none verified), `oversight-chain` (the supplied records fail
+`verifyOversightChain`; every record is then reported unverified),
+`oversight-verification-keys` (records without keys),
 `ledger-receipts` (none), `receipt-signature-verification` (any receipt not
 `verified: true`), `state-transitions`, `causal-edges`, `timeline-events`,
 `root-cause-claims`, `postmortem`, `resolution-timestamp`. `overdueClockIds`
 lists clocks in `OVERDUE` state at `generatedTs`. `packetSha256` is the SHA-256
-of the canonicalised packet body.
+of the canonicalised packet body. `amc incident show <id> --packet <dir>
+--station <station>` builds the packet from the stored incident, its
+transitions and causal edges, the station's clocks from verified clock events
+and the workspace oversight file; receipts and timeline events are not
+supplied there yet, so they are listed as missing.
 
 ## Running the checks
 
@@ -236,6 +310,6 @@ The tests use a fixed trigger of 2026-03-02T10:00:00Z and never call
 
 ## Exports
 
-`src/incidents/index.ts` exports the three modules (P1-17 applied the F4
-ready-to-wire block). The F4 track receipt is commit `ed9b45a2` on the public
+`src/incidents/index.ts` exports the four modules (P1-17 applied the F4
+ready-to-wire block and added `incidentClockEvents.ts`). The F4 track receipt is commit `ed9b45a2` on the public
 branch `worktree-wf_fc54d4b0-c89-4`; the code was cherry-picked from `ff857211`.
