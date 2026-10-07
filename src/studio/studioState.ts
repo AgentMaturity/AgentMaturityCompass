@@ -205,9 +205,9 @@ export function agentTokenGrantFromActionPolicy(workspace: string): AgentTokenGr
 }
 
 /**
- * A lease's own scopes bound the token. leaseScopeSchema (src/leases/leaseSchema.ts)
- * is a closed enum with no per-action-class execute scope, so when the lease
- * grants toolhub:execute the classes come from the signed action policy.
+ * A lease's own scopes bound the token. When the lease grants toolhub:execute the
+ * classes come from the signed action policy, narrowed to the lease's own
+ * `executeActionClasses` when it names them (src/leases/leaseSchema.ts).
  */
 export function agentTokenGrantFromLease(workspace: string, lease: LeasePayload): AgentTokenGrant {
   const scopes = AGENT_TOKEN_SCOPES.filter((scope) => lease.scopes.includes(scope));
@@ -222,14 +222,17 @@ export function agentTokenGrantFromLease(workspace: string, lease: LeasePayload)
   const source = policyGrant.grantedBy as { kind: "action-policy"; path: string; sigPath: string };
   return {
     scopes,
-    executeActionClasses: policyGrant.executeActionClasses,
+    executeActionClasses: lease.executeActionClasses === undefined ? policyGrant.executeActionClasses
+      : policyGrant.executeActionClasses.filter((actionClass) => lease.executeActionClasses?.includes(actionClass)),
     grantedBy: {
       kind: "lease",
       leaseId: lease.leaseId,
       executeClassesFrom: "action-policy",
       path: source.path,
       sigPath: source.sigPath,
-      reason: "leaseScopeSchema is a closed enum with no per-action-class execute scope; execute classes come from the signed action policy at issuance"
+      reason: lease.executeActionClasses === undefined
+        ? "the lease names no execute classes; execute classes come from the signed action policy at issuance"
+        : "execute classes are the signed action policy's at issuance, narrowed to the lease's executeActionClasses"
     }
   };
 }

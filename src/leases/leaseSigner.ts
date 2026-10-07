@@ -1,6 +1,7 @@
 import { randomUUID, sign } from "node:crypto";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
+import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
 
 function toBase64Url(bytes: Buffer): string {
@@ -19,6 +20,8 @@ export interface IssueLeaseInput {
   maxRequestsPerMinute: number;
   maxCostUsdPerDay: number | null;
   workOrderId?: string | null;
+  /** Narrows toolhub:execute to these classes; omitted, the lease covers every class policy allows. */
+  executeActionClasses?: ActionClass[];
 }
 
 export function issueLeaseToken(input: IssueLeaseInput): { token: string; payload: LeasePayload } {
@@ -32,6 +35,7 @@ export function issueLeaseToken(input: IssueLeaseInput): { token: string; payloa
     agentId: input.agentId,
     workOrderId: input.workOrderId ?? null,
     scopes: input.scopes,
+    ...(input.executeActionClasses === undefined ? {} : { executeActionClasses: input.executeActionClasses }),
     routeAllowlist: input.routeAllowlist,
     modelAllowlist: input.modelAllowlist,
     maxTokensPerMinute: input.maxTokensPerMinute,
