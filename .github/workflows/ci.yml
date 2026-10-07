@@ -73,6 +73,11 @@ jobs:
       - name: No fabricated results
         run: npm run check:no-fabrication
 
+      # P0-11: every enforcement point, test and owner the channel map cites
+      # exists (docs/security/THREAT_MODEL.md).
+      - name: Threat model channel map
+        run: npm run check:threat-model
+
       - name: Acceptance runner process cleanup
         timeout-minutes: 1
         run: node --test scripts/lib/ownedProcessCommand.test.mjs

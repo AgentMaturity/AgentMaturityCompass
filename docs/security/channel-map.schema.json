@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AMC channel map and failure policy (P0-11)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "verifiedAt", "commit", "channels", "failurePolicy"],
+  "properties": {
+    "version": { "const": 1 },
+    "verifiedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "enforcementPoints", "evidence", "status", "bypasses", "owners", "asi"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "enforcementPoints": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "symbol"],
+              "properties": {
+                "path": { "$ref": "#/$defs/repoPath" },
+                "symbol": { "type": "string", "minLength": 1 }
+              }
+            }
+          },
+          "evidence": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["enforced", "observed", "advisory", "none"] },
+          "bypasses": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "owners": { "type": "array", "items": { "$ref": "#/$defs/owner" } },
+          "asi": { "type": "array", "items": { "$ref": "#/$defs/asi" } }
+        }
+      }
+    },
+    "failurePolicy": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "failure", "behaviour", "evidenceState", "tests", "owners"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "failure": { "type": "string", "minLength": 1 },
+          "behaviour": { "type": "string", "minLength": 1 },
+          "evidenceState": { "type": "string", "minLength": 1 },
+          "tests": { "type": "array", "items": { "$ref": "#/$defs/repoPath" } },
+          "owners": { "type": "array", "items": { "$ref": "#/$defs/owner" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "repoPath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$" },
+    "owner": { "type": "string", "pattern": "^(P[0-3]-\\d{2}|D-\\d{2}|GATE-G[0-3])$" },
+    "asi": { "type": "string", "pattern": "^ASI(0[1-9]|10)$" }
+  }
+}

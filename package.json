@@ -69,6 +69,7 @@
     "check:counts": "node scripts/gen-counts.mjs --check",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
+    "check:threat-model": "node scripts/check-threat-model.mjs",
     "check:qualification": "node scripts/check-qualification-receipts.mjs",
     "check:regulatory-currency": "node scripts/check-regulatory-currency.mjs",
     "trust-list": "node scripts/trust-list.mjs",
