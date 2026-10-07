@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpath
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { signHexDigest } from "../../src/crypto/keys.js";
+import { getPrivateKeyPem, signHexDigest } from "../../src/crypto/keys.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { initWorkspace } from "../../src/workspace.js";
@@ -293,5 +293,55 @@ describe("an override whose signature does not verify is never honoured", () => 
     const report = generatePolicyCanaryReport(AGENT, ws);
     expect(report.activeOverrides).toBe(0);
     expect(report.invalidOverrides).toBe(1);
+  });
+});
+
+describe("an override signature is bound to its purpose", () => {
+  // `amc fix-signatures` signs sha256(raw file bytes) with the auditor key, so an
+  // attacker who writes canonicalize(body) into a config file gets a signature
+  // over exactly the override hash. That signature must not count.
+  it("refuses an auditor signature made over the bare override hash", () => {
+    const ws = keyed();
+    const unsigned = handWritten();
+    const entry = { ...unsigned, signature: signHexDigest(unsigned.override_hash, getPrivateKeyPem(ws, "auditor")) };
+    writeEntry(ws, entry);
+    expect(invalidCode(ws, entry)).toBe("SIGNATURE_INVALID");
+    expect(isOverrideActive(ws, AGENT)).toBe(false);
+  });
+
+  it("refuses a canary record carrying an auditor signature over the bare digest", () => {
+    const ws = keyed();
+    const override = activateEmergencyOverride(CANARY_PARAMS, ws);
+    resetPolicyCanaryState();
+    const { overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs } = override;
+    const digest = sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs }));
+    const file = join(canaryDir(ws), `${overrideId}.json`);
+    const stored = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+    writeFileSync(file, JSON.stringify({ ...stored, override_signature: signHexDigest(digest, getPrivateKeyPem(ws, "auditor")) }));
+    const report = generatePolicyCanaryReport(AGENT, ws);
+    expect(report.activeOverrides).toBe(0);
+    expect(report.invalidOverrides).toBe(1);
+  });
+
+  it("refuses to record an override when the vault key does not match the workspace auditor key", () => {
+    const ws = keyed();
+    const foreign = generateKeyPairSync("ed25519").publicKey.export({ type: "spki", format: "pem" }).toString();
+    writeFileSync(join(ws, ".amc", "keys", "auditor_ed25519.pub"), foreign);
+    expect(errorCode(() => activateOverride(ws, PARAMS))).toBe("BREAK_GLASS_UNSIGNED");
+    expect(filesIn(overridesDir(ws))).toEqual([]);
+    expect(errorCode(() => activateEmergencyOverride(CANARY_PARAMS, ws))).toBe("BREAK_GLASS_UNSIGNED");
+    expect(filesIn(canaryDir(ws))).toEqual([]);
+  });
+});
+
+describe("an override is not honoured without a usable auditor public key", () => {
+  it.each([
+    ["corrupt", (pub: string) => writeFileSync(pub, "not a key")],
+    ["missing", (pub: string) => rmSync(pub)]
+  ])("reports SIGNATURE_INVALID when the public key is %s", (_label, damage) => {
+    const ws = keyed();
+    const entry = activateOverride(ws, PARAMS);
+    damage(join(ws, ".amc", "keys", "auditor_ed25519.pub"));
+    expect(invalidCode(ws, entry)).toBe("SIGNATURE_INVALID");
   });
 });
