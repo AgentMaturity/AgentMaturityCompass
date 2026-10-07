@@ -1160,7 +1160,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "atlas_prompt_injection",
     framework: "MITRE_ATLAS",
     category: "Initial Access",
-    description: "Adversary injects malicious prompts to manipulate LLM behavior and bypass safety controls (AML.T0048).",
+    description: "Adversary injects malicious prompts to manipulate LLM behavior and bypass safety controls (AML.T0051).",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -1208,7 +1208,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "atlas_llm_jailbreak",
     framework: "MITRE_ATLAS",
     category: "Evasion",
-    description: "Adversary bypasses LLM safety guardrails through crafted multi-turn or encoded prompts (AML.T0051).",
+    description: "Adversary bypasses LLM safety guardrails through crafted multi-turn or encoded prompts (AML.T0054).",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -1232,7 +1232,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "atlas_data_exfiltration",
     framework: "MITRE_ATLAS",
     category: "Exfiltration",
-    description: "Adversary extracts training data, model parameters, or sensitive info via inference API (AML.T0025, AML.T0054).",
+    description: "Adversary extracts training data, model parameters, or sensitive info via inference API (AML.T0025, AML.T0057).",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",

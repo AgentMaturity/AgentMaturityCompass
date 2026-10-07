@@ -72,8 +72,10 @@ describe("score crossFrameworkMapping", () => {
       passedQIDs: ["AMC-3.3.1"],
       activeModules: []
     });
-    expect(report.coveredControls).toContain("AML.T0048");
+    // P0-24: ATLAS AML.T0051 is LLM Prompt Injection and AML.T0054 is LLM Jailbreak (ATLAS v2026.09 data).
     expect(report.coveredControls).toContain("AML.T0051");
+    expect(report.coveredControls).toContain("AML.T0054");
+    expect(report.coveredControls).not.toContain("AML.T0048");
   });
 
   test("OWASP API coverage via security question", () => {
