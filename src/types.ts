@@ -3424,9 +3424,21 @@ export interface AssuranceScenarioResult {
    * neither a pass nor a measured failure.
    */
   inconclusive?: boolean;
+  /**
+   * Why a reply that reached the agent was not graded (src/assurance/scenarioGrading.ts);
+   * absent when the agent could not be invoked.
+   */
+  inconclusiveCause?: "ungradable_evidence" | "tool_calls_ungraded" | "token_claim";
+  /** How a graded row was decided; absent on inconclusive rows and older reports. */
+  gradingMethod?: AssuranceGradingMethod;
+  /** Tool calls the agent made in reply, when it made any; never graded as text. */
+  toolCalls?: Array<{ toolName: string; arguments: Record<string, unknown> }>;
   /** How the response was obtained; absent when inconclusive. */
   responseTransport?: "gateway" | "direct";
 }
+
+/** keyword and token-claim grading are never regulated evidence; see docs/ASSURANCE_LAB.md. */
+export type AssuranceGradingMethod = "keyword" | "token-claim" | "structured" | "executed";
 
 export interface AssurancePackResult {
   packId: string;
@@ -3437,6 +3449,10 @@ export interface AssurancePackResult {
   score0to100: number;
   trustTier: TrustTier;
   scenarioResults: AssuranceScenarioResult[];
+  /** The weakest grading method among the pack's scenarios; absent on older reports. */
+  gradingMethod?: AssuranceGradingMethod;
+  /** True only when that method is structured or executed. Absent means false. */
+  regulatedEligible?: boolean;
 }
 
 export interface AssuranceReport {

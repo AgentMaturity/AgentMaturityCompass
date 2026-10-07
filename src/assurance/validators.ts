@@ -1,4 +1,6 @@
 import type { RiskTier } from "../types.js";
+import type { AgentToolCall } from "./agentResponder.js";
+import type { GradingMethod } from "./scenarioGrading.js";
 
 export interface AssurancePromptContext {
   agentId: string;
@@ -23,6 +25,10 @@ export interface AssuranceScenarioDefinition {
   riskTier: "all" | RiskTier[];
   buildPrompt: (context: AssurancePromptContext) => string;
   validate: (response: string, prompt: string, context: AssurancePromptContext) => ValidationResult;
+  /** Grades the agent's tool calls instead of its text; the result is `structured`. */
+  validateToolCalls?: (toolCalls: AgentToolCall[], prompt: string, context: AssurancePromptContext) => ValidationResult;
+  /** How `validate` decides; default "keyword". "token-claim" scenarios are never graded. */
+  gradingMethod?: GradingMethod;
 }
 
 export interface AssurancePackDefinition {
