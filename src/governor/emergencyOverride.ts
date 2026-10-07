@@ -2,7 +2,8 @@
  * Emergency Override Mode
  *
  * Signed, TTL-limited bypass of governance controls.
- * Requires owner signature + explicit reason.
+ * Requires a verifiable auditor signature + explicit reason; an override whose
+ * signature does not verify is reported as INVALID_SIGNATURE and never honoured.
  * Mandatory postmortem artifact within 48h of override expiry.
  */
 
@@ -10,7 +11,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signOverrideDigest, verifyOverrideDigest, type OverrideSignatureCheck } from "./overrideSignature.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { readdirSync } from "node:fs";
 
@@ -51,7 +52,7 @@ export interface OverrideAction {
 export interface OverrideAlert {
   overrideId: string;
   agentId: string;
-  alertType: "ACTIVE" | "EXPIRING_SOON" | "POSTMORTEM_DUE" | "POSTMORTEM_OVERDUE";
+  alertType: "ACTIVE" | "EXPIRING_SOON" | "POSTMORTEM_DUE" | "POSTMORTEM_OVERDUE" | "INVALID_SIGNATURE";
   message: string;
   ts: number;
 }
@@ -142,10 +143,8 @@ export function activateOverride(
   };
 
   const overrideHash = sha256Hex(canonicalize(body));
-  let signature = "unsigned";
-  try {
-    signature = signHexDigest(overrideHash, getPrivateKeyPem(workspace, "auditor"));
-  } catch { /* no key */ }
+  // Throws before anything is written: unsigned overrides are never recorded.
+  const signature = signOverrideDigest(workspace, overrideHash);
 
   const entry: EmergencyOverrideEntry = {
     ...body,
@@ -168,7 +167,7 @@ export function logOverrideAction(
   details: string,
 ): OverrideAction | null {
   const entry = loadOverride(workspace, overrideId);
-  if (!entry || !entry.active) return null;
+  if (!entry || !entry.active || !verifyOverrideEntry(workspace, entry).valid) return null;
 
   const action: OverrideAction = {
     actionId: `oa_${randomUUID().slice(0, 8)}`,
@@ -206,11 +205,41 @@ function loadOverride(workspace: string, overrideId: string): EmergencyOverrideE
 }
 
 /**
- * Get active overrides for an agent, expiring inactive ones.
+ * Checks an override against its activation-time body. `active`,
+ * `postmortemFiled` and `postmortemArtifactPath` change after signing, so the
+ * hash is recomputed with their activation values, not over the current file.
+ */
+export function verifyOverrideEntry(workspace: string, entry: EmergencyOverrideEntry): OverrideSignatureCheck {
+  const body = {
+    overrideId: entry.overrideId,
+    agentId: entry.agentId,
+    reason: entry.reason,
+    ttlMs: entry.ttlMs,
+    mode: entry.mode,
+    startedTs: entry.startedTs,
+    expiresTs: entry.expiresTs,
+    active: true,
+    postmortemRequired: true,
+    postmortemDueTs: entry.postmortemDueTs,
+    postmortemFiled: false,
+    postmortemArtifactPath: null,
+    prev_override_hash: entry.prev_override_hash,
+  };
+  if (sha256Hex(canonicalize(body)) !== entry.override_hash) {
+    return { valid: false, code: "HASH_MISMATCH", reason: "the override does not match the hash recorded at activation" };
+  }
+  return verifyOverrideDigest(workspace, entry.override_hash, entry.signature);
+}
+
+/**
+ * Get active overrides for an agent, expiring inactive ones. Only overrides
+ * whose signature verifies count.
  */
 export function getActiveOverrides(workspace: string, agentId: string): EmergencyOverrideEntry[] {
   const now = Date.now();
-  const all = loadAllOverrides(workspace).filter((o) => o.agentId === agentId);
+  const all = loadAllOverrides(workspace).filter(
+    (o) => o.agentId === agentId && verifyOverrideEntry(workspace, o).valid,
+  );
 
   // Auto-expire
   for (const o of all) {
@@ -239,6 +268,17 @@ export function getOverrideAlerts(workspace: string, agentId: string): OverrideA
   const alerts: OverrideAlert[] = [];
 
   for (const o of all) {
+    const check = verifyOverrideEntry(workspace, o);
+    if (!check.valid) {
+      alerts.push({
+        overrideId: o.overrideId,
+        agentId,
+        alertType: "INVALID_SIGNATURE",
+        message: `Override ${o.overrideId} is not honoured: ${check.code} (${check.reason}). Overrides recorded without a key by AMC 1.2.0 or earlier are invalid; re-issue it with a signing key if it is still needed.`,
+        ts: now,
+      });
+      continue;
+    }
     if (o.active && now <= o.expiresTs) {
       alerts.push({
         overrideId: o.overrideId,

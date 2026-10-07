@@ -28,6 +28,7 @@ import {
   getActiveOverrides,
   filePostmortem,
   getOverridesMissingPostmortem,
+  getInvalidOverrides,
   resetCanaryRegisters
 } from "./canaryRegisters.js";
 
@@ -170,6 +171,8 @@ export interface PolicyCanaryReport {
   canaryStats: CanaryStats | null;
   rollbackPacks: number;
   activeOverrides: number;
+  /** Overrides whose signature does not verify; never counted as active. */
+  invalidOverrides: number;
   activeDebtEntries: number;
   expiredDebtEntries: number;
   sloStatus: GovernanceSLO | null;
@@ -659,6 +662,7 @@ export function generatePolicyCanaryReport(agentId: string, workspace?: string):
     canaryStats: stats,
     rollbackPacks: packs.length,
     activeOverrides: activeOverrides.length,
+    invalidOverrides: getInvalidOverrides(agentId, workspace).length,
     activeDebtEntries: activeDebt.length,
     expiredDebtEntries: expiredDebt.length,
     sloStatus: slo,
@@ -699,6 +703,7 @@ export function renderPolicyCanaryMarkdown(report: PolicyCanaryReport): string {
   lines.push("## Governance");
   lines.push(`- Rollback packs: ${report.rollbackPacks}`);
   lines.push(`- Active overrides: ${report.activeOverrides}`);
+  lines.push(`- Invalid overrides (not honoured): ${report.invalidOverrides}`);
   lines.push(`- Active policy debt: ${report.activeDebtEntries}`);
   lines.push(`- Expired policy debt: ${report.expiredDebtEntries}`);
   lines.push(`- SLO met: ${report.sloMet}`);
