@@ -260,14 +260,29 @@ function evaluateAssurancePack(
   if (!pack) {
     const forged = assurance.unverifiable.some((row) => row.packIds.includes(requirement.packId));
     return forged
-      ? { outcome: "not_evaluated", evidence: "untrusted", reason: `Assurance report for '${requirement.packId}' failed hash/seal verification`, refs: [], needed }
+      ? { outcome: "not_evaluated", evidence: "untrusted", reason: `Assurance report for '${requirement.packId}' failed hash, seal or run integrity verification`, refs: [], needed }
       : { outcome: "not_evaluated", evidence: "incomplete", reason: `No sealed assurance run for '${requirement.packId}' in window`, refs: [], needed };
+  }
+  // Inconclusive scenarios never reached the agent: a pack that measured nothing, or passed on part of its scenarios, proves nothing.
+  const total = pack.scenarioResults.length;
+  const inconclusive = pack.scenarioResults.filter((scenario) => scenario.inconclusive === true).length;
+  if (inconclusive === total) {
+    return { outcome: "not_evaluated", evidence: "incomplete", reason: `Assurance pack '${requirement.packId}' measured no scenario`, refs: [], needed };
   }
   const succeededCount = pack.scenarioResults.reduce(
     (sum, scenario) => sum + scenario.auditEventTypes.filter((type) => type.endsWith("_SUCCEEDED")).length,
     0
   );
   const pass = pack.score0to100 >= requirement.minScore && succeededCount <= requirement.maxSucceeded;
+  if (pass && inconclusive > 0) {
+    return {
+      outcome: "not_evaluated",
+      evidence: "incomplete",
+      reason: `Assurance pack '${requirement.packId}': ${inconclusive} of ${total} scenarios inconclusive; a partial measurement cannot pass`,
+      refs: [],
+      needed
+    };
+  }
   return {
     outcome: pass ? "pass" : "fail",
     evidence: "sufficient",

@@ -147,7 +147,7 @@ describe("verifiedAssuranceByPack", () => {
     const now = Date.now();
     const base = {
       assuranceRunId: name, agentId: "default", ts: now, windowStartTs: now - 1000, windowEndTs: now,
-      evidenceStatus: "MEASURED", packResults: [{ packId: name, score0to100: 90, scenarioResults: [] }],
+      status: "VALID", verificationPassed: true, evidenceStatus: "MEASURED", packResults: [{ packId: name, score0to100: 90, scenarioResults: [] }],
       reportJsonSha256: "", runSealSig: "", ...fields
     };
     const hash = sha256Hex(canonicalize(base));
@@ -172,6 +172,17 @@ describe("verifiedAssuranceByPack", () => {
     expect([...out.packs.keys()]).toEqual(["sealed"]);
     expect(out.packs.get("sealed")?.score0to100).toBe(90);
     expect(out.unverifiable.map((row) => row.packIds)).toEqual([[], ["unsealed"]]);
+  });
+
+  test("a sealed report the runner marked INVALID (ledger integrity failed) is unverifiable, not evidence", () => {
+    const ws = workspace();
+    const now = Date.now();
+    write(ws, "invalid", { status: "INVALID", verificationPassed: false }, true);
+    write(ws, "unverified", { verificationPassed: false }, true);
+    write(ws, "no-status", { status: undefined, verificationPassed: undefined }, true);
+    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: now + 1000 });
+    expect(out.packs.size).toBe(0);
+    expect(out.unverifiable.map((row) => row.packIds)).toEqual([["invalid"], ["no-status"], ["unverified"]]);
   });
 
   test("an agent without a reports folder has no verified packs", () => {

@@ -54,7 +54,7 @@ export function subjectRole(event: EvidenceEvent, agentId: string, scope: Bindin
 
 export interface VerifiedAssurance {
   packs: Map<string, AssurancePackResult>;
-  /** In-window reports (or unreadable files) whose hash or seal did not verify; they count for nothing. */
+  /** In-window reports (or unreadable files) whose hash, seal or ledger integrity did not verify; they count for nothing. */
   unverifiable: Array<{ file: string; packIds: string[] }>;
 }
 
@@ -69,7 +69,8 @@ function readReport(file: string): Partial<AssuranceReport> | null {
 
 /**
  * The window logic of `latestAssuranceByPack`, but a report counts only when its seal verifies
- * (`sealedRunReportVerifies`) and it measured something (not INSUFFICIENT_EVIDENCE).
+ * (`sealedRunReportVerifies`), the run itself verified (status VALID, verificationPassed) and it
+ * measured something (not INSUFFICIENT_EVIDENCE).
  */
 export function verifiedAssuranceByPack(params: {
   workspace: string;
@@ -91,7 +92,9 @@ export function verifiedAssuranceByPack(params: {
     if (report.agentId !== params.agentId || typeof report.ts !== "number"
       || report.ts < params.windowStartTs || report.ts > params.windowEndTs) continue;
     const packResults = Array.isArray(report.packResults) ? report.packResults : [];
-    if (!sealedRunReportVerifies(params.workspace, report as Record<string, unknown>)) {
+    // A seal proves who wrote the report, not that the run was sound: the runner seals INVALID runs too.
+    if (!sealedRunReportVerifies(params.workspace, report as Record<string, unknown>)
+      || report.status !== "VALID" || report.verificationPassed !== true) {
       out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)) });
       continue;
     }

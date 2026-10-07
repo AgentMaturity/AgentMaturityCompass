@@ -117,7 +117,10 @@ function assuranceReportsDir(workspace: string, agentId: string): string {
   return dir;
 }
 
-function assuranceReport(agentId: string, now: number, score: number) {
+type ScenarioRow = { auditEventTypes: string[]; inconclusive?: boolean };
+const ONE_MEASURED: ScenarioRow[] = [{ auditEventTypes: ["TOOL_GOVERNANCE_SUCCEEDED"] }];
+
+function assuranceReport(agentId: string, now: number, score: number, scenarioResults: ScenarioRow[] = ONE_MEASURED) {
   return {
     assuranceRunId: `run-${randomUUID()}`,
     agentId,
@@ -131,7 +134,7 @@ function assuranceReport(agentId: string, now: number, score: number) {
     sessionId: "session-fixture",
     evidenceStatus: "MEASURED",
     packResults: [
-      { packId: "toolGovernance", score0to100: score, scenarioResults: [{ auditEventTypes: ["TOOL_GOVERNANCE_SUCCEEDED"] }] }
+      { packId: "toolGovernance", score0to100: score, scenarioResults }
     ],
     overallScore0to100: score,
     integrityIndex: 1,
@@ -142,8 +145,8 @@ function assuranceReport(agentId: string, now: number, score: number) {
 }
 
 /** Seal the way the assurance runner does: hash the canonical report with empty seal fields, sign as auditor. */
-function writeSealedAssuranceReport(workspace: string, agentId: string, score: number): void {
-  const base = assuranceReport(agentId, Date.now(), score);
+function writeSealedAssuranceReport(workspace: string, agentId: string, score: number, scenarioResults?: ScenarioRow[]): void {
+  const base = assuranceReport(agentId, Date.now(), score, scenarioResults);
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
   const sig = ledger.signRunHash(hash);
@@ -185,6 +188,17 @@ describe("compliance fails closed (P0-17)", () => {
     expect(row.status).toBe("SATISFIED");
     expect(row.result).toBe("pass");
     expect(row.evidence).toBe("sufficient");
+  });
+
+  test("imported review rows carrying agent A's id are not agent activity for requires_no_audit", () => {
+    const workspace = newWorkspace();
+    initComplianceMaps(workspace, FIXTURE_MAPS);
+    appendEvent(workspace, { eventType: "review", meta: { agentId: AGENT_A, source: "chatgpt" } });
+    appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A, source: "eval_import" } });
+    const row = category(workspace, AGENT_A, "fx_no_audit");
+    expect({ status: row.status, result: row.result, evidence: row.evidence })
+      .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
+    expect(row.notEvaluatedReasons.join(" ")).toContain("absence of violations proves nothing");
   });
 
   test("no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing", () => {
@@ -301,6 +315,27 @@ describe("compliance fails closed (P0-17)", () => {
     const row = category(workspace, AGENT_A, "fx_pack");
     expect(row.result).toBe("fail");
     expect(row.status).toBe("MISSING");
+  });
+
+  test("a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED", () => {
+    const workspace = newWorkspace();
+    initComplianceMaps(workspace, FIXTURE_MAPS);
+    const inconclusive = { auditEventTypes: [], inconclusive: true };
+    writeSealedAssuranceReport(workspace, AGENT_A, 0, [inconclusive, inconclusive]);
+    const row = category(workspace, AGENT_A, "fx_pack");
+    expect({ status: row.status, result: row.result, evidence: row.evidence })
+      .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
+  });
+
+  test("a passing pack score with inconclusive scenarios is NOT_EVALUATED, not a pass on a partial measurement", () => {
+    const workspace = newWorkspace();
+    initComplianceMaps(workspace, FIXTURE_MAPS);
+    const inconclusive = { auditEventTypes: [], inconclusive: true };
+    writeSealedAssuranceReport(workspace, AGENT_A, 100, [...ONE_MEASURED, inconclusive, inconclusive, inconclusive]);
+    const row = category(workspace, AGENT_A, "fx_pack");
+    expect({ status: row.status, result: row.result, evidence: row.evidence })
+      .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
+    expect(row.notEvaluatedReasons.join(" ")).toContain("3 of 4 scenarios inconclusive");
   });
 
   test("bound runtime OBSERVED events, a sealed passing run and no violations: SATISFIED", () => {

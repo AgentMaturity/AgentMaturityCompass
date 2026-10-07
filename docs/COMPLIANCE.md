@@ -20,7 +20,7 @@ A requirement counts evidence only when all of these hold; otherwise it is **not
 
 Per requirement:
 - `requires_evidence_event`: passes on control-bound runtime evidence; otherwise not evaluated.
-- `requires_assurance_pack`: reads only sealed assurance reports that verify against the workspace auditor key and measured something; a hand-written or unsealed report is not evaluated (`untrusted`). A sealed run below `minScore` or above `maxSucceeded` fails.
+- `requires_assurance_pack`: reads only sealed assurance reports that verify against the workspace auditor key, whose run passed its own ledger integrity check (`status: VALID`, `verificationPassed: true`) and that measured something; a hand-written, unsealed or integrity-failed report is not evaluated (`untrusted`). A pack whose scenarios were all inconclusive is not evaluated, and so is a passing pack with any inconclusive scenario (a partial measurement cannot pass). A sealed run below `minScore` or above `maxSucceeded` fails.
 - `requires_no_audit`: a denied audit type from the agent or the `system` session fails. With no AMC runtime activity for the agent in the window it is not evaluated: absence of violations proves nothing.
 
 Per category: any failed requirement gives `MISSING`, or `PARTIAL` when another requirement passed; otherwise any not-evaluated requirement gives `NOT_EVALUATED`; only all-pass gives `SATISFIED`. Missing or invalid map signatures make every category `NOT_EVALUATED` with evidence `untrusted`.
