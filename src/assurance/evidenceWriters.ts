@@ -3,6 +3,8 @@ import type { Ledger } from "../ledger/ledger.js";
 import { hashBinaryOrPath } from "../ledger/ledger.js";
 import type { RuntimeName, TrustTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import type { AgentToolCall } from "./agentResponder.js";
 
 export function startAssuranceSession(params: {
   ledger: Ledger;
@@ -43,6 +45,41 @@ export function startAssuranceSession(params: {
   });
 
   return sessionId;
+}
+
+/**
+ * Seals an assurance session its run abandoned by throwing (P0-27 F1). Whole-ledger verification requires a seal on
+ * every non-agent session, so one aborted scan made every later `agent-loop verify` in the workspace fail. Records
+ * ASSURANCE_RUN_ABORTED with the error class, then seals. Never masks the run's error: returns it for the caller to
+ * rethrow, and a failure here rides along as its `cause`. A session the run already sealed is left alone.
+ */
+export function sealAbortedAssuranceSession(params: {
+  ledger: Ledger;
+  sessionId: string;
+  runId: string;
+  agentId: string;
+  error: unknown;
+}): unknown {
+  const { ledger, sessionId } = params;
+  try {
+    const session = ledger.db.prepare("SELECT session_seal_sig FROM sessions WHERE session_id = ?").get(sessionId) as
+      | { session_seal_sig: string | null }
+      | undefined;
+    if (!session || session.session_seal_sig) return params.error;
+    const meta = {
+      auditType: "ASSURANCE_RUN_ABORTED",
+      severity: "HIGH",
+      runId: params.runId,
+      agentId: params.agentId,
+      reason: params.error instanceof Error ? params.error.name : "non-Error thrown"
+    };
+    ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta });
+    ledger.sealSession(sessionId);
+  } catch (sealError) {
+    if (params.error instanceof Error && params.error.cause === undefined) params.error.cause = sealError;
+    else console.error(`[assurance] could not seal aborted session ${sessionId}: ${sealError instanceof Error ? sealError.message : String(sealError)}`);
+  }
+  return params.error;
 }
 
 
@@ -103,13 +140,18 @@ export function writeScenarioResponse(params: {
   packId: string;
   scenarioId: string;
   response: string;
+  /** Tool calls the agent made; the digest then covers canonical `{ text, toolCalls }`. */
+  toolCalls?: AgentToolCall[];
   agentId: string;
 }): string {
+  const toolCallCount = params.toolCalls?.length ?? 0;
+  // A reply without tool calls keeps the plain-text digest older records carry.
+  const recorded = toolCallCount > 0 ? canonicalize({ text: params.response, toolCalls: params.toolCalls }) : params.response;
   return params.ledger.appendEvidence({
     sessionId: params.sessionId,
     runtime: params.runtime,
     eventType: "stdout",
-    payload: redactedScenarioPayload(params.response),
+    payload: redactedScenarioPayload(recorded),
     payloadExt: "json",
     meta: {
       source: "assurance",
@@ -117,7 +159,8 @@ export function writeScenarioResponse(params: {
       scenarioId: params.scenarioId,
       direction: "agent_to_assurance",
       agentId: params.agentId,
-      trustTier: params.trustTier
+      trustTier: params.trustTier,
+      toolCallCount
     }
   });
 }

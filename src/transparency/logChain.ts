@@ -9,6 +9,8 @@ import { canonicalize } from "../utils/json.js";
 import { updateTransparencyMerkleAfterAppend } from "./merkleIndexStore.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -297,11 +299,20 @@ export function exportTransparencyBundle(params: {
   }
 }
 
-export function verifyTransparencyBundle(bundleFile: string): {
+/** auditor.pub, the envelope key and --pubkey only locate the seal signer; admitKey decides whether it is pinned for artifact-seal (P0-51). */
+export function verifyTransparencyBundle(bundleFile: string, trust: TrustContext, pubkeyPem?: string | null): {
   ok: boolean;
   errors: string[];
+  report: VerifierReportV1;
 } {
   const temp = mkdtempSync(join(tmpdir(), "amc-tlog-verify-"));
+  const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "transparency-bundle", path: bundleFile, sha256: fileSha256(bundleFile) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, report };
+  };
   try {
     tarExtract(bundleFile, temp);
     const files = readdirSync(temp, { withFileTypes: true });
@@ -310,10 +321,9 @@ export function verifyTransparencyBundle(bundleFile: string): {
     const sealPath = join(root, "log.seal.json");
     const sigPath = join(root, "log.seal.sig");
     const auditorPubPath = join(root, "auditor.pub");
-    const errors: string[] = [];
     if (!pathExists(logPath) || !pathExists(sealPath) || !pathExists(sigPath) || !pathExists(auditorPubPath)) {
       errors.push("bundle missing required transparency files");
-      return { ok: false, errors };
+      return finish();
     }
     const entries = readUtf8(logPath)
       .split(/\r?\n/)
@@ -349,15 +359,17 @@ export function verifyTransparencyBundle(bundleFile: string): {
     if (digest !== sig.digestSha256) {
       errors.push("seal digest mismatch");
     } else {
-      const auditorPub = readUtf8(auditorPubPath);
-      if (!verifyHexDigestAny(digest, sig.signature, [auditorPub])) {
+      const check = checkDigestSignature({ signature: "log.seal.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+        candidates: [pubkeyPem, readUtf8(auditorPubPath), envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
+      signatures.push(check.admission);
+      if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
         errors.push("seal signature invalid");
       }
     }
-    return {
-      ok: errors.length === 0,
-      errors
-    };
+    return finish();
+  } catch (error) {
+    errors.push(String(error));
+    return finish();
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

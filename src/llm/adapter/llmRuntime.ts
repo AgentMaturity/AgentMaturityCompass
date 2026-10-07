@@ -58,6 +58,7 @@ import type { HttpResponse, HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
+import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js";
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
 
@@ -307,7 +308,9 @@ export class LlmRuntime {
     try {
       reserveNativeModelBudget(this.init.session, prepared.headerEventId);
     } catch (error) {
-      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: LLM_FAILURE_CODE.QUOTA }, kind: "error", httpStatus: null, cause: "budget_refused" }));
+      // Evidence that fails verification is not exhausted quota: label it so an operator checks the ledger, not the provider.
+      const integrity = error instanceof BudgetEvidenceIntegrityError;
+      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : LLM_FAILURE_CODE.QUOTA }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
     }
 
     let response: HttpResponse;

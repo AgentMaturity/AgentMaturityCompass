@@ -22,6 +22,8 @@ export interface StartFakeAgentOptions {
   reply?: (prompt: string) => string;
   /** When set, the server responds with this HTTP status instead of a reply. */
   failWithStatus?: number;
+  /** When set, the agent answers with these tool calls and no text (`content: null`). */
+  toolCalls?: (prompt: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
 }
 
 /**
@@ -67,13 +69,24 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
       }
       prompts.push(prompt);
 
+      const message = options.toolCalls
+        ? {
+            role: "assistant",
+            content: null,
+            tool_calls: options.toolCalls(prompt).map((call, index) => ({
+              id: `call_${index}`,
+              type: "function",
+              function: { name: call.name, arguments: JSON.stringify(call.arguments) }
+            }))
+          }
+        : { role: "assistant", content: reply(prompt) };
       res.statusCode = 200;
       res.setHeader("content-type", "application/json");
       res.end(
         JSON.stringify({
           id: "fake-completion",
           model: "fake-model",
-          choices: [{ index: 0, message: { role: "assistant", content: reply(prompt) }, finish_reason: "stop" }],
+          choices: [{ index: 0, message, finish_reason: options.toolCalls ? "tool_calls" : "stop" }],
           usage: { prompt_tokens: 10, completion_tokens: 20 }
         })
       );

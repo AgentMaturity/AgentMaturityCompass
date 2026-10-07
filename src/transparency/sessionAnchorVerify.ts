@@ -53,6 +53,8 @@ export interface SessionAnchorVerification {
   readonly anchoredMerkleRoot: string | null;
   /** Number of leaves the signed root covers, for reporting the log's size at anchor time. */
   readonly leafCount: number | null;
+  /** The auditor key the bundle carries, for the caller's issuer admission (P0-51); it never vouches for itself. */
+  readonly auditorPublicKeyPem: string | null;
 }
 
 export interface SessionAnchorVerifyParams {
@@ -223,7 +225,8 @@ export function verifySessionAnchorProof(params: SessionAnchorVerifyParams): Ses
       sessionId: null,
       sessionMerkleRoot: null,
       anchoredMerkleRoot: null,
-      leafCount: null
+      leafCount: null,
+      auditorPublicKeyPem: null
     };
   }
   if (!/^[0-9a-f]{64}$/i.test(params.expectedAuditorKeyFingerprint)) {
@@ -243,7 +246,8 @@ export function verifySessionAnchorProof(params: SessionAnchorVerifyParams): Ses
     sessionId: proof.descriptor.sessionId,
     sessionMerkleRoot: proof.descriptor.sessionMerkleRoot,
     anchoredMerkleRoot: proof.inclusion.merkleRoot,
-    leafCount
+    leafCount,
+    auditorPublicKeyPem: proof.auditorPublicKeyPem
   };
 }
 
@@ -262,7 +266,8 @@ export function verifySessionAnchorProofFile(params: {
       sessionId: null,
       sessionMerkleRoot: null,
       anchoredMerkleRoot: null,
-      leafCount: null
+      leafCount: null,
+      auditorPublicKeyPem: null
     };
   }
   return verifySessionAnchorProof({

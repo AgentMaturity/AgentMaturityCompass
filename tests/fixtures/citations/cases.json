@@ -30,7 +30,7 @@
       "input": {
         "textRefs": [{ "file": "src/score/domainPacks.ts", "location": "question FIN-1", "text": "SR 11-7 — Model Risk Management", "mustResolve": true }]
       },
-      "expect": [{ "rule": "CIT001", "zeroTolerance": false }]
+      "expect": [{ "rule": "CIT001", "zeroTolerance": true }]
     },
     {
       "name": "SR 11-7 record repealed with supersededBy us-sr-26-2",

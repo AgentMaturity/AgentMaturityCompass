@@ -41,7 +41,8 @@ import {
   auditSchedulerStatusForApi
 } from "../audit/auditApi.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
-import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
+import { auditBindersExportsDir, verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { auditSchedulerTick } from "../audit/auditScheduler.js";
 import { emitAuditSse } from "../audit/auditSse.js";
 import {
@@ -106,6 +107,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { bindStudioResultRoute, ENTITLEMENT_NOTE, withClaimBody } from "./studioClaimOutput.js";
 import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
@@ -443,7 +445,7 @@ async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<str
 function json(res: ServerResponse, status: number, payload: unknown): void {
   res.statusCode = status;
   res.setHeader("content-type", "application/json");
-  res.end(JSON.stringify(payload));
+  res.end(JSON.stringify(withClaimBody(res, status, payload)));
 }
 
 function ipToInt(ip: string): number | null {
@@ -1707,6 +1709,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const pathname = url.pathname;
       const method = (req.method ?? "GET").toUpperCase();
       metricRoute = normalizeMetricRoute(pathname);
+      bindStudioResultRoute(res, method, pathname, options.workspace);
 
       if (pathname === "/auth/login") {
         if (!authLimiter(`auth:${clientIp}`)) {
@@ -2220,10 +2223,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or vault-backed webhook token" });
           return;
         }
+        // An operator session or a webhook token authenticates the sender; the events stay SELF_REPORTED (P0-18).
         const out = ingestValueWebhookForApi({
           workspace: options.workspace,
-          payload: parsed,
-          sourceTrust: canIngestAsOperator || tokenValid ? "ATTESTED" : "SELF_REPORTED"
+          payload: parsed
         });
         emitValueSse({
           hub: orgSse,
@@ -4516,17 +4519,25 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const binderId = decodeURIComponent(auditVerifyMatch[1] ?? "");
         const fileQuery = url.searchParams.get("file");
-        const file = fileQuery
-          ? fileQuery
-          : (() => {
-              const row = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId);
-              return row?.file ?? "";
-            })();
-        if (!file) {
+        let file = "";
+        if (fileQuery) {
+          // P0-20: a request names a file only inside the binder exports directory (AMC has no other directory it
+          // writes binders or industry-pack audits to); anything else is refused unread.
+          try {
+            file = containedPath(auditBindersExportsDir(options.workspace), "the audit binder exports directory", fileQuery);
+          } catch {
+            json(res, 400, { error: "file must be inside the audit binder exports directory" });
+            return;
+          }
+        } else {
+          file = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId)?.file ?? "";
+        }
+        if (!file || !pathExists(file)) {
           json(res, 404, { error: "binder export not found" });
           return;
         }
-        // P0-09: the server operator's trust context decides, never the workspace's own keys.
+        // P0-09: the server operator's trust context decides, never the workspace's own keys. No public-key path is
+        // taken from a request.
         const verify = auditBinderVerifyForApi({ file, workspace: options.workspace, trust: loadTrustContext() });
         json(res, verify.ok ? 200 : 422, verify);
         return;
@@ -4858,6 +4869,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "csv and kpiId are required" });
           return;
         }
+        if (parsed.attest !== undefined) {
+          json(res, 400, { error: "attest was removed in 2.0.0: imported value events are SELF_REPORTED (see docs/EVIDENCE_TRUST.md)" });
+          return;
+        }
         const out = importValueCsvForApi({
           workspace: options.workspace,
           scopeType:
@@ -4866,8 +4881,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               : "WORKSPACE",
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
           kpiId: parsed.kpiId,
-          csvText: parsed.csv,
-          attest: parsed.attest === true
+          csvText: parsed.csv
         });
         emitValueSse({
           hub: orgSse,
@@ -8183,7 +8197,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "file is required" });
           return;
         }
-        json(res, 200, verifyTransparencyProofBundle(parsed.file));
+        // P0-51: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const refused = requestTrustOverride(parsed);
+        if (refused) {
+          json(res, 400, { error: refused });
+          return;
+        }
+        json(res, 200, verifyTransparencyProofBundle(parsed.file, loadTrustContext()));
         return;
       }
 
@@ -8491,7 +8511,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         json(res, 200, {
-          entitlement: getIndustryPackEntitlement(options.workspace)
+          entitlement: getIndustryPackEntitlement(options.workspace), entitlementNote: ENTITLEMENT_NOTE
         });
         return;
       }
@@ -8503,7 +8523,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         if (!entitlement.checkoutAvailable) {
-          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement });
+          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement, entitlementNote: ENTITLEMENT_NOTE });
           return;
         }
         const parsed = req.method === "POST"
@@ -8522,7 +8542,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         });
         json(res, 200, {
           checkoutUrl,
-          entitlement
+          entitlement, entitlementNote: ENTITLEMENT_NOTE
         });
         return;
       }
@@ -8558,7 +8578,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             subscriptionId: entitlement.subscriptionId
           }
         });
-        json(res, 200, { entitlement });
+        json(res, 200, { entitlement, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 
@@ -8574,7 +8594,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { verifyIndustryPackLicenseKey } = await import("../domains/industryPackEntitlement.js");
         const verification = verifyIndustryPackLicenseKey(parsed.licenseKey);
-        json(res, verification.valid ? 200 : 422, verification);
+        json(res, verification.valid ? 200 : 422, { ...verification, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 
@@ -8586,7 +8606,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         json(res, 200, {
-          entitlement,
+          entitlement, entitlementNote: ENTITLEMENT_NOTE,
           packs: listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement))
         });
         return;
@@ -8604,7 +8624,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 402, {
             error: "industry_packs_locked",
             message: formatIndustryPackPaywallMessage(entitlement),
-            entitlement
+            entitlement, entitlementNote: ENTITLEMENT_NOTE
           });
           return;
         }
@@ -8614,7 +8634,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "industry pack not found" });
           return;
         }
-        json(res, 200, { pack, entitlement });
+        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 

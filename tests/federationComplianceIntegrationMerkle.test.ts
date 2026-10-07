@@ -191,7 +191,10 @@ describe("compliance + merkle + federation + integrations", () => {
       outFile: proofFile
     });
     expect(proof.outFile).toBe(proofFile);
-    expect(verifyTransparencyProofBundle(proofFile).ok).toBe(true);
+    // The operator pins the auditor key it recorded at vault creation; the bundled auditor.pub never vouches (P0-51).
+    const auditorTrust = pinnedTrust([{ publicKeyPem: workspaceKeyPem(workspace, "auditor"), purposes: ["artifact-seal"] }]);
+    expect(verifyTransparencyProofBundle(proofFile, auditorTrust).ok).toBe(true);
+    expect(verifyTransparencyProofBundle(proofFile, pinnedTrust([])).report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-proof-tamper-"));
     try {
@@ -205,7 +208,7 @@ describe("compliance + merkle + federation + integrations", () => {
       if (repack.status !== 0) {
         throw new Error(repack.stderr || repack.stdout || "failed to re-pack");
       }
-      const verified = verifyTransparencyProofBundle(tamperedFile);
+      const verified = verifyTransparencyProofBundle(tamperedFile, auditorTrust);
       expect(verified.ok).toBe(false);
     } finally {
       rmSync(tamperDir, { recursive: true, force: true });

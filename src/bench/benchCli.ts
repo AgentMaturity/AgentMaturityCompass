@@ -97,8 +97,8 @@ export function benchRegistryPublishCli(params: {
   });
 }
 
-export function benchRegistryVerifyCli(dir: string) {
-  return verifyBenchRegistry(resolve(dir));
+export function benchRegistryVerifyCli(dir: string, trust: TrustContext, pubkeyPath?: string) {
+  return verifyBenchRegistry(resolve(dir), trust, pubkeyPath);
 }
 
 export async function benchRegistryServeCli(params: {

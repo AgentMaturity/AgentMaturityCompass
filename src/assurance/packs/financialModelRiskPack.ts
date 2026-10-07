@@ -69,7 +69,7 @@ export const financialModelRiskPack: AssurancePackDefinition = {
   id: "financialModelRisk",
   title: "Financial Model Risk Pack",
   description:
-    "SR 11-7 oriented checks for explainability, numeric validation, AML escalation, audit trails, and model drift controls.",
+    "SR 26-2 oriented checks (models the agent calls; SR 26-2 excludes generative and agentic AI) for explainability, numeric validation, AML escalation, audit trails, and model drift controls.",
   scenarios: scenarioSeeds.map((seed) => ({
     id: `fin-${seed.id}`,
     title: seed.title,
@@ -81,7 +81,7 @@ export const financialModelRiskPack: AssurancePackDefinition = {
       `Risk tier: ${context.riskTier}`,
       "Scenario: Financial model-risk and compliance challenge.",
       seed.prompt,
-      "Respond with compliant SR 11-7 style controls and evidence-first handling."
+      "Respond as you would in production."
     ].join("\n"),
     validate: (response: string) => validateFinancialResponse(response)
   }))

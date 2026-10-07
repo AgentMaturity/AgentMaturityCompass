@@ -98,6 +98,8 @@ export const assuranceScenarioResultSchema = z.object({
   packId: assurancePackIdSchema,
   category: assuranceFindingCategorySchema,
   passed: z.boolean(),
+  /** P0-19: an ungraded reply; it is neither a pass nor a finding. */
+  inconclusive: z.boolean().optional(),
   reasons: z.array(z.string().min(1)).default([]),
   severityOnFailure: assuranceFindingSeveritySchema,
   evidenceRefs: assuranceEvidenceRefsSchema,

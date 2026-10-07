@@ -16,6 +16,8 @@ amc imports verify-profile profile.json --original original.jsonl --json
 
 This command requires no workspace or provider. Omit `--original` when original bytes are unavailable; the receipt then says `declared-not-checked`. `--expected-digest` supplies an independently received semantic digest. `--authorities keys.json` supplies the verifier operator's admitted keys and producer/capture scope. Keys embedded in the evidence are never admitted.
 
+The command reports with the shared verifier report and exit codes (`docs/TRUST_LIST.md`). It exits 0 only for a signed profile whose authority key `--authorities` names and that the operator's distrust (built-in list, `--trust-list`) does not refuse. An unsigned profile, including every imported `SELF_REPORTED` profile, names no signer and exits 1 with `not-pinned`, even when its digests check out: the JSON output still shows `originalDigest`, `trustTier` and the integrity errors, so a well-formed self-reported profile is visible as such, but it is never reported as trusted.
+
 An independent Node consumer needs only the exported module:
 
 ```js

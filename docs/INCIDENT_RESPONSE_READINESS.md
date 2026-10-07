@@ -33,8 +33,8 @@ amc notary status
 # verify core attestation artifacts
 amc bundle verify .amc/agents/<agentId>/bundles/latest.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 amc assurance cert verify .amc/assurance/certificates/latest.amccert
-amc bom verify --in ./amc-bom.json --sig ./amc-bom.json.sig --pubkey .amc/keys/auditor_ed25519.pub
-amc transparency merkle verify-proof .amc/transparency/proofs/<entryHash>.amcproof
+amc bom verify --in ./amc-bom.json --sig ./amc-bom.json.sig --pubkey <recorded-auditor.pub>
+amc transparency merkle verify-proof .amc/transparency/proofs/<entryHash>.amcproof --pubkey <recorded-auditor.pub>
 
 # controlled external disclosure (if requested)
 amc audit request list

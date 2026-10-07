@@ -11,18 +11,12 @@ export interface ParsedEvidenceEvent extends EvidenceEvent {
   trustTier: TrustTier;
 }
 
+/**
+ * Evidence older than EVIDENCE_STALE_AFTER_MS loses weight. A hardened observation is still an observation; anything
+ * else falls to SELF_REPORTED. A stale observation never becomes ATTESTED: nobody attested it (P0-18 follow-up).
+ */
 function degradeTrustTierForStaleness(trustTier: TrustTier): TrustTier {
-  switch (trustTier) {
-    case "OBSERVED_HARDENED":
-      return "OBSERVED";
-    case "OBSERVED":
-      return "ATTESTED";
-    case "ATTESTED":
-      return "SELF_REPORTED";
-    case "SELF_REPORTED":
-    default:
-      return "SELF_REPORTED";
-  }
+  return trustTier === "OBSERVED_HARDENED" ? "OBSERVED" : "SELF_REPORTED";
 }
 
 export function parseEvidenceEvent(event: EvidenceEvent): ParsedEvidenceEvent {

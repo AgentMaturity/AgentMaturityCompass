@@ -1,4 +1,5 @@
-import { apiGet, apiPost, whoami } from "./api.js";
+import { apiGet, apiPost, whoami, onClaims } from "./api.js";
+import { installClaimStrip } from "./components/claimBadge.js";
 
 function esc(value) {
   return String(value ?? "")
@@ -104,4 +105,5 @@ async function main() {
   wireActions();
 }
 
+installClaimStrip(document.body.dataset.page, onClaims);
 void main();

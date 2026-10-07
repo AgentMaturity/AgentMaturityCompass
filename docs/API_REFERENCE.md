@@ -116,7 +116,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 97 | `amc audit binder export-execute` | Execute previously approved external binder export |
 | 98 | `amc audit binder export-request` | Create dual-control approval request for external binder sharing |
 | 99 | `amc audit binder list` | List exported binders and cached workspace binder |
-| 100 | `amc audit binder verify` | Verify .amcaudit file |
+| 100 | `amc audit binder verify` | Verify an .amcaudit binder or a signed industry-pack audit (.json) |
 | 101 | `amc audit export` | Export enterprise audit logs for Splunk, Datadog, CloudTrail, or Azure Monitor |
 | 102 | `amc audit init` | Initialize signed audit policy and compliance maps |
 | 103 | `amc audit map` | Audit compliance map operations |
@@ -1921,7 +1921,7 @@ Create dual-control approval request for external binder sharing
 
 #### `amc audit binder verify`
 
-Verify .amcaudit file
+Verify an .amcaudit binder or a signed industry-pack audit (.json)
 
 
 | Option | Description |
@@ -2195,6 +2195,12 @@ Apply bench registries config from JSON file
 | Option | Description |
 |--------|-------------|
 | `--dir <dir>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc bench search`
 
@@ -2362,7 +2368,12 @@ Re-encrypt blob batch from one key version to another
 |--------|-------------|
 | `--in <file>` | - |
 | `--sig <file>` | - |
-| `--pubkey <file>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc bootstrap`
 
@@ -3679,6 +3690,7 @@ Alias: `amc sector apply`
 | `--responses <path>` | - |
 | `--framework <id>` | - |
 | `--audit-bundle <path>` | - |
+| `--no-sign` | - |
 | `--json` | - |
 
 #### `amc domain assess`
@@ -3830,6 +3842,11 @@ Alias: `amc sector pack verify`
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 | `--json` | - |
 
 #### `amc domain report`
@@ -4147,6 +4164,19 @@ Generate a TLA+ specification for the AMC safety model
 |--------|-------------|
 | `--properties <list>` | - |
 | `--output <path>` | - |
+
+#### `amc enforce verify-certificate`
+
+Verify the integrity of a proof certificate (pass JSON as string)
+
+
+| Option | Description |
+|--------|-------------|
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc enterprise audit-export`
 
@@ -5606,6 +5636,10 @@ Independently verify an external-evidence profile without opening a workspace
 | `--original <path>` | - |
 | `--expected-digest <sha256>` | - |
 | `--json` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 
 #### `amc improve`
 
@@ -6784,6 +6818,20 @@ Show notary backend and log status
 |--------|-------------|
 | `--notary-dir <dir>` | - |
 
+#### `amc notary verify-attest`
+
+Verify a .amcattest bundle offline
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
 #### `amc observe anomalies`
 
 Detect observability anomalies (evidence rate drops, trust regressions, score volatility)
@@ -7366,6 +7414,19 @@ Verify .amcpass artifact offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
+#### `amc passport verify-token`
+
+Verify an AMC Trust Token (pass JSON string)
+
+
+| Option | Description |
+|--------|-------------|
 | `--trust-list <file>` | - |
 | `--trust-root <sha256>` | - |
 | `--allow-unpinned` | - |
@@ -9031,6 +9092,10 @@ Verify a session inclusion proof offline — needs only the bundle and a pinned 
 |--------|-------------|
 | `--expect-auditor-key <sha256>` | - |
 | `--json` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 
 #### `amc sessions list`
 
@@ -9698,6 +9763,20 @@ Export signed inclusion proof bundle for entry hash
 | `--entry-hash <hash>` | - |
 | `--out <file>` | - |
 
+#### `amc transparency merkle verify-proof`
+
+Verify signed inclusion proof bundle
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
 #### `amc transparency report`
 
 Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is
@@ -9719,6 +9798,20 @@ Tail transparency entries
 | Option | Description |
 |--------|-------------|
 | `--n <count>` | - |
+
+#### `amc transparency verify-bundle`
+
+Verify exported transparency bundle
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc trust enable-notary`
 
@@ -9882,7 +9975,6 @@ Import numeric KPI points from CSV (ts,value)
 | `--scope <scope>` | - |
 | `--id <id>` | - |
 | `--kpi <kpiId>` | - |
-| `--attested` | - |
 
 #### `amc value ingest`
 
@@ -9892,7 +9984,6 @@ Ingest value webhook payload JSON
 | Option | Description |
 |--------|-------------|
 | `--file <path>` | - |
-| `--attested` | - |
 
 #### `amc value policy apply`
 
@@ -10946,7 +11037,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `decision-explainability`
 - **File:** `financialModelRiskPack.ts`
 - **Category:** financial_model_risk
-- **Description:** SR 11-7 oriented checks for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
+- **Description:** SR 26-2 oriented checks (models the agent calls; SR 26-2 excludes generative and agentic AI) for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
 - **Assertions:** `decision-explainability`, `numeric-accuracy`, `aml-trigger`, `audit-trail`, `model-drift`, `financialModelRisk`
 
 #### financialSOX
@@ -11847,6 +11938,8 @@ export const assuranceScenarioResultSchema = z.object({
   packId: assurancePackIdSchema,
   category: assuranceFindingCategorySchema,
   passed: z.boolean(),
+  /** P0-19: an ungraded reply; it is neither a pass nor a finding. */
+  inconclusive: z.boolean().optional(),
   reasons: z.array(z.string().min(1)).default([]),
   severityOnFailure: assuranceFindingSeveritySchema,
   evidenceRefs: assuranceEvidenceRefsSchema,

@@ -212,7 +212,7 @@ amc notary attest --out /tmp/current.amcattest
 ### `amc notary verify-attest`
 Verify an attestation artifact.
 ```bash
-amc notary verify-attest /tmp/current.amcattest
+amc notary verify-attest /tmp/current.amcattest --pubkey <recorded-notary.pub>
 ```
 
 ### `amc trust enable-notary`
@@ -305,7 +305,7 @@ amc transparency init
 amc transparency verify
 amc transparency tail --n 50
 amc transparency export --out transparency.amctlog
-amc transparency verify-bundle transparency.amctlog
+amc transparency verify-bundle transparency.amctlog --pubkey <recorded-auditor.pub>
 ```
 
 ### `amc transparency merkle rebuild|root|prove|verify-proof`
@@ -314,7 +314,7 @@ Merkle tree for inclusion proofs.
 amc transparency merkle rebuild
 amc transparency merkle root
 amc transparency merkle prove --entry-hash <hash> --out ./proof.amcproof
-amc transparency merkle verify-proof ./proof.amcproof
+amc transparency merkle verify-proof ./proof.amcproof --pubkey <recorded-auditor.pub>
 ```
 
 ---

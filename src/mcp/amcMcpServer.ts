@@ -28,11 +28,14 @@ import {
   renderTransparencyReportMarkdown,
   renderTransparencyReportJson,
 } from "../transparency/transparencyReport.js";
-import { INDUSTRY_PACKS, scoreIndustryPack, type IndustryPackId } from "../domains/industryPacks.js";
+import { claimFields, claimKindFromTrustTier, claimKindLabel, type ClaimKind } from "../claims/eligibility/index.js";
+import { effectiveTrustTier } from "../claims/evidenceProvenance.js";
+import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/industryPacks.js";
+import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
 import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
 import { parseWindowToMs } from "../utils/time.js";
-import { resolveAgentId } from "../fleet/paths.js";
+import { agentRunClaim, unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
 // ---------------------------------------------------------------------------
 // Simple in-process rate limiter
@@ -110,8 +113,8 @@ export const MCP_TOOL_METADATA = [
   { name: "amc_get_recommendations", description: "Get actionable recommendations for improving agent maturity (read-only)", input: "{ agentId: string, workspace?: string }" },
 ];
 
-export async function startMcpServer(workspace?: string): Promise<void> {
-  if (workspace) process.chdir(workspace);
+/** Registers the 10 tools and the agent resource without a transport, so tests can connect in memory. */
+export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer {
   const server = new McpServer({
     name: "amc",
     version: PKG_VERSION,
@@ -131,28 +134,16 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
-        const agents = listAgents(ws);
+        const agents = listAgents(ws).map((a) => ({ agentId: a.id, ...claimFields(agentRunClaim(ws, a.id)) }));
+        const listing = unboundClaim("mcp:amc_list_agents", "runtime_observation");
         if (agents.length === 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "No AMC agents registered in this workspace. Run `amc init` to get started.",
-              },
-            ],
-          };
+          return withClaim("No AMC agents registered in this workspace. Run `amc init` to get started.", listing, { agents });
         }
-        const rows = agents.map((a) => `- ${a.id}`).join("\n");
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Found ${agents.length} agent(s):\n${rows}\n\nRun amc_transparency_report for full trust details on any agent.`,
-            },
-          ],
-        };
+        const rows = agents.map((a) => `- ${a.agentId} (latest run: ${claimKindLabel(a.claimKind)})`).join("\n");
+        return withClaim(`Found ${agents.length} agent(s):\n${rows}\n\nRun amc_transparency_report for full trust details on any agent.`,
+          listing, { agents });
       } catch (err) {
         return {
           content: [
@@ -179,7 +170,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const report = generateTransparencyReport(agentId, ws);
         const dims = report.dimensions
@@ -204,7 +195,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           .filter(Boolean)
           .join("\n");
 
-        return { content: [{ type: "text", text }] };
+        return withClaim(text, agentRunClaim(ws, agentId));
       } catch (err) {
         return {
           content: [
@@ -234,20 +225,14 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const report = generateTransparencyReport(agentId, ws);
         const priorities = report.topPriorities;
 
         if (priorities.length === 0) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Agent "${agentId}" has no immediate improvement priorities — either fully assessed or no run data yet.\n\nRun: amc guide --agent ${agentId}`,
-              },
-            ],
-          };
+          return withClaim(`Agent "${agentId}" has no immediate improvement priorities — either fully assessed or no run data yet.\n\nRun: amc guide --agent ${agentId}`,
+            agentRunClaim(ws, agentId));
         }
 
         const items = priorities
@@ -257,14 +242,8 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           )
           .join("\n\n");
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: `## AMC Improvement Guide: ${agentId}\n\nCurrent: ${report.identity.maturityLabel} (${report.identity.trustScore}/100)\n\n${items}\n\nFull guide: \`amc guide --agent ${agentId}\``,
-            },
-          ],
-        };
+        return withClaim(`## AMC Improvement Guide: ${agentId}\n\nCurrent: ${report.identity.maturityLabel} (${report.identity.trustScore}/100)\n\n${items}\n\nFull guide: \`amc guide --agent ${agentId}\``,
+          agentRunClaim(ws, agentId));
       } catch (err) {
         return {
           content: [
@@ -297,7 +276,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, frameworks, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       const fwList = frameworks?.length
         ? frameworks.join(", ")
         : "EU_AI_ACT, ISO_42001, NIST_AI_RMF, SOC2, ISO_27001";
@@ -308,25 +287,21 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           ? `amc guide --agent ${agentId} --compliance ${frameworks.join(",")}`
           : `amc guide --agent ${agentId} --compliance`;
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `## AMC Compliance Check: ${agentId}`,
-                ``,
-                `**Frameworks:** ${fwList}`,
-                `**Critical Gaps:** ${report.compliance.criticalGaps}`,
-                `**High Gaps:** ${report.compliance.highGaps}`,
-                ``,
-                `For detailed gap analysis with article references:`,
-                `\`${cmd}\``,
-                ``,
-                `Current trust level: ${report.identity.maturityLabel} — compliance gaps are calculated from dimension scores below target level.`,
-              ].join("\n"),
-            },
-          ],
-        };
+        return withClaim(
+          [
+            `## AMC Compliance Check: ${agentId}`,
+            ``,
+            `**Frameworks:** ${fwList}`,
+            `**Critical Gaps:** ${report.compliance.criticalGaps}`,
+            `**High Gaps:** ${report.compliance.highGaps}`,
+            ``,
+            `For detailed gap analysis with article references:`,
+            `\`${cmd}\``,
+            ``,
+            `Current trust level: ${report.identity.maturityLabel} — compliance gaps are calculated from dimension scores below target level.`,
+          ].join("\n"),
+          // A framework mapping is a regulated result, and these gaps come from scores, not bound evidence.
+          unboundClaim(`compliance:${agentId}`, "runtime_observation", true));
       } catch (err) {
         return {
           content: [
@@ -357,7 +332,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, format, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const report = generateTransparencyReport(agentId, ws);
         const fmt = format === "json" ? "json" : "markdown";
@@ -366,7 +341,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
             ? renderTransparencyReportJson(report)
             : renderTransparencyReportMarkdown(report);
 
-        return { content: [{ type: "text", text }] };
+        return withClaim(text, agentRunClaim(ws, agentId));
       } catch (err) {
         return {
           content: [
@@ -401,7 +376,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ packId, responses }) => {
       enforceRateLimit();
-      const entitlement = getIndustryPackEntitlement(process.cwd());
+      const entitlement = getIndustryPackEntitlement(defaultWorkspace);
       if (!entitlement.active) {
         return {
           content: [
@@ -413,7 +388,8 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           isError: true,
         };
       }
-      if (!INDUSTRY_PACKS[packId as IndustryPackId]) {
+      const pack = getPackById(packId);
+      if (!pack) {
         const available = Object.keys(INDUSTRY_PACKS).join(", ");
         return {
           content: [
@@ -427,37 +403,33 @@ export async function startMcpServer(workspace?: string): Promise<void> {
       }
 
       try {
-        const result = scoreIndustryPack(packId as IndustryPackId, responses);
+        const result = scoreIndustryPack(pack.id, responses);
+        const envelope = packSelfAssessmentEnvelope(pack, responses, Date.now());
         const gapList =
           result.complianceGaps.length > 0
             ? result.complianceGaps.slice(0, 5).map((g) => `  ⚠️ ${g}`).join("\n")
             : "  ✅ No compliance gaps";
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: [
-                `## AMC Sector Pack Score: ${result.packName}`,
-                ``,
-                `**Station:** ${result.stationId}`,
-                `**Score:** ${result.percentage}%`,
-                `**Maturity Level:** L${result.level}`,
-                `Self-assessment: ${result.selfAssessment.complete ? "complete" : `incomplete (${result.selfAssessment.answered}/${result.selfAssessment.total} answered)`} (self-reported; not a certification)`,
-                `**Risk Tier:** ${result.riskTier}`,
-                ``,
-                `**Compliance Gaps (questions below L3):**`,
-                gapList,
-                ``,
-                result.complianceGaps.length > 5
-                  ? `  ...and ${result.complianceGaps.length - 5} more gaps`
-                  : "",
-              ]
-                .filter((l) => l !== "")
-                .join("\n"),
-            },
-          ],
-        };
+        return withClaim(
+          [
+            `## AMC Sector Pack Score: ${result.packName}`,
+            ``,
+            `**Station:** ${result.stationId}`,
+            `**Score:** ${result.percentage}%`,
+            `**Maturity Level:** L${result.level}`,
+            `Self-assessment: ${result.selfAssessment.complete ? "complete" : `incomplete (${result.selfAssessment.answered}/${result.selfAssessment.total} answered)`} (self-reported; not a certification)`,
+            `**Risk Tier:** ${result.riskTier}`,
+            ``,
+            `**Compliance Gaps (questions below L3):**`,
+            gapList,
+            ``,
+            result.complianceGaps.length > 5
+              ? `  ...and ${result.complianceGaps.length - 5} more gaps`
+              : "",
+          ]
+            .filter((l) => l !== "")
+            .join("\n"),
+          envelope);
       } catch (err) {
         return {
           content: [
@@ -485,7 +457,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, window, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const report = generateTransparencyReport(agentId, ws);
         const dims = report.dimensions
@@ -509,7 +481,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           `Window: ${window ?? "14d"}`,
         ].join("\n");
 
-        return { content: [{ type: "text", text }] };
+        return withClaim(text, agentRunClaim(ws, agentId));
       } catch (err) {
         return {
           content: [{ type: "text", text: `Score failed: ${(err as Error).message}` }],
@@ -535,7 +507,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ window, limit, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const windowStr = window ?? "14d";
         const maxEvents = Math.min(limit ?? 50, 200);
@@ -546,23 +518,24 @@ export async function startMcpServer(workspace?: string): Promise<void> {
         const ledger = openLedger(ws);
         try {
           const events = ledger.getEventsBetween(startTs, now);
-          const limited = events.slice(0, maxEvents);
-          const rows = limited.map((e) =>
-            `- [${new Date(e.ts).toISOString()}] ${e.event_type} id=${e.id.slice(0, 8)}… session=${e.session_id.slice(0, 8)}…`
+          const limited = events.slice(0, maxEvents).map((e) => {
+            const tier = effectiveTrustTier(e, { trustList: null });
+            const claimKind: ClaimKind = tier === null ? "synthetic_example" : claimKindFromTrustTier(tier).claimKind;
+            return { event: e, claimKind };
+          });
+          const rows = limited.map(({ event: e, claimKind }) =>
+            `- [${new Date(e.ts).toISOString()}] ${e.event_type} id=${e.id.slice(0, 8)}… session=${e.session_id.slice(0, 8)}… claim: ${claimKindLabel(claimKind)}`
           ).join("\n");
 
-          return {
-            content: [{
-              type: "text",
-              text: [
-                `## Evidence Events (${windowStr})`,
-                ``,
-                `Total: ${events.length} events (showing ${limited.length})`,
-                ``,
-                rows || "(No events in window)",
-              ].join("\n"),
-            }],
-          };
+          return withClaim([
+            `## Evidence Events (${windowStr})`,
+            ``,
+            `Total: ${events.length} events (showing ${limited.length})`,
+            ``,
+            rows || "(No events in window)",
+          ].join("\n"),
+            unboundClaim("mcp:amc_list_evidence", "runtime_observation"),
+            { events: limited.map(({ event, claimKind }) => ({ id: event.id, eventType: event.event_type, claimKind })) });
         } finally {
           ledger.close();
         }
@@ -590,7 +563,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const ledger = openLedger(ws);
         try {
@@ -601,31 +574,23 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           });
 
           if (agentRuns.length === 0) {
-            return {
-              content: [{
-                type: "text",
-                text: `No diagnostic runs found for agent "${agentId}". Run \`amc quickscore\` first.`,
-              }],
-            };
+            return withClaim(`No diagnostic runs found for agent "${agentId}". Run \`amc quickscore\` first.`,
+              unboundClaim(`diagnostic:${agentId}`, "runtime_observation"));
           }
 
           const latest = agentRuns[0]!;
-          return {
-            content: [{
-              type: "text",
-              text: [
-                `## Latest Diagnostic Run`,
-                ``,
-                `Run ID: ${latest.run_id}`,
-                `Date: ${new Date(latest.ts).toISOString()}`,
-                `Status: ${latest.status}`,
-                `Window: ${new Date(latest.window_start_ts).toISOString()} → ${new Date(latest.window_end_ts).toISOString()}`,
-                `Report Hash: ${latest.report_json_sha256.slice(0, 16)}…`,
-                ``,
-                `Run \`amc quickscore\` for a full interactive diagnostic.`,
-              ].join("\n"),
-            }],
-          };
+          return withClaim([
+            `## Latest Diagnostic Run`,
+            ``,
+            `Run ID: ${latest.run_id}`,
+            `Date: ${new Date(latest.ts).toISOString()}`,
+            `Status: ${latest.status}`,
+            `Window: ${new Date(latest.window_start_ts).toISOString()} → ${new Date(latest.window_end_ts).toISOString()}`,
+            `Report Hash: ${latest.report_json_sha256.slice(0, 16)}…`,
+            ``,
+            `Run \`amc quickscore\` for a full interactive diagnostic.`,
+          ].join("\n"),
+            agentRunClaim(ws, agentId, latest.run_id));
         } finally {
           ledger.close();
         }
@@ -653,7 +618,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     },
     async ({ agentId, workspace }) => {
       enforceRateLimit();
-      const ws = validateWorkspace(workspace ?? process.cwd());
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
       try {
         const report = generateTransparencyReport(agentId, ws);
         const priorities = report.topPriorities;
@@ -685,7 +650,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           `- Run \`amc benchmark run --agent ${agentId}\` for performance baseline`,
         ].filter(Boolean).join("\n");
 
-        return { content: [{ type: "text", text }] };
+        return withClaim(text, agentRunClaim(ws, agentId));
       } catch (err) {
         return {
           content: [{ type: "text", text: `Recommendations failed: ${(err as Error).message}` }],
@@ -702,7 +667,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     "agent-transparency",
     new ResourceTemplate("amc://agent/{agentId}", { list: undefined }),
     async (uri, { agentId }) => {
-      const ws = process.cwd();
+      const ws = defaultWorkspace;
       const id = Array.isArray(agentId) ? agentId[0] : agentId;
       try {
         const report = generateTransparencyReport(String(id), ws);
@@ -729,9 +694,12 @@ export async function startMcpServer(workspace?: string): Promise<void> {
     }
   );
 
-  // -------------------------------------------------------------------------
-  // Start
-  // -------------------------------------------------------------------------
+  return server;
+}
+
+export async function startMcpServer(workspace?: string): Promise<void> {
+  if (workspace) process.chdir(workspace);
+  const server = createAmcMcpServer(process.cwd());
   const transport = new StdioServerTransport();
   await server.connect(transport);
 

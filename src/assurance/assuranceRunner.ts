@@ -6,17 +6,20 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { saveAssuranceRunArtifacts } from "./assurancePolicyStore.js";
+import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
 import type { AssuranceFindingCategory, AssuranceFindingSeverity } from "./assuranceSchema.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { writeAssuranceAudit, writePackScoreTestResult, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult, startAssuranceSession } from "./evidenceWriters.js";
 import { getAssurancePack, listAssurancePacks } from "./packs/index.js";
 import { renderAssuranceMarkdown } from "./report.js";
-import { aggregateOverallScore, aggregatePackScore, scenarioScoreFromValidation } from "./scorers.js";
+import { aggregateOverallScore, aggregatePackScore } from "./scorers.js";
+import { gradeScenarioReply, packGradingMethod } from "./scenarioGrading.js";
 import {
   AgentResponderInvocationError,
   resolveAgentResponder,
@@ -139,7 +142,6 @@ function buildPromptContext(workspace: string, agentId: string): AssurancePrompt
   };
 }
 
-
 function scoreIntegrity(packResults: AssurancePackResult[]): number {
   const scenarios = packResults.flatMap((pack) => pack.scenarioResults);
   if (scenarios.length === 0) {
@@ -180,15 +182,6 @@ async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
   }
 }
 
-
-/**
- * Writes the v1 assurance artifacts (run, findings, trace refs).
- *
- * assuranceStore, assuranceCertificates and the scheduler all read these files,
- * but nothing wrote them: saveAssuranceRunArtifacts had no callers, so
- * `amc assurance cert issue` failed on any workspace no matter how many scans
- * had been run. Persisting them here closes that chain.
- */
 /**
  * Maps a pack's free-form scenario category onto the fixed v1 category enum.
  *
@@ -269,6 +262,7 @@ function persistV1Artifacts(params: {
         packId: pack.packId,
         category,
         passed: scenario.pass,
+        ...(scenario.inconclusive ? { inconclusive: true } : {}),
         reasons: scenario.reasons.filter((r) => r.length > 0),
         severityOnFailure: severity,
         evidenceRefs,
@@ -276,6 +270,8 @@ function persistV1Artifacts(params: {
       });
       refs.push(traceRef);
 
+      // An inconclusive row was not graded (P0-19): it is not a finding, whatever its zero score says.
+      if (scenario.inconclusive) continue;
       if (scenario.pass) {
         findingCounts.info += 1;
       } else {
@@ -320,11 +316,11 @@ function persistV1Artifacts(params: {
     score: {
       // report.status is artifact validity (VALID/INVALID/UNSIGNED); the
       // pass/fail judgement comes from the scan's own failure counts.
-      status: failed ? "FAIL" : "PASS",
+      status: report.evidenceStatus === "INSUFFICIENT_EVIDENCE" ? "INSUFFICIENT_EVIDENCE" : failed ? "FAIL" : "PASS",
       riskAssuranceScore: report.overallScore0to100,
       categoryScores: {},
       findingCounts,
-      pass: !failed,
+      pass: !failed && report.evidenceStatus !== "INSUFFICIENT_EVIDENCE",
       reasons: []
     },
     notes: []
@@ -348,6 +344,9 @@ function persistV1Artifacts(params: {
 }
 
 export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
+  // AMC_NO_SIGN=1 rows are unsigned whatever the caller passed; they go to the unsigned store (UNSIGNED_EVIDENCE_STORE).
+  const unsignedStore = process.env.AMC_NO_SIGN === "1";
+  if (unsignedStore) input = { ...input, noSign: true };
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const context = buildPromptContext(workspace, agentId);
@@ -357,7 +356,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
   const windowStartTs = now - windowMs;
   const packIds = packIdsForRun(input);
   const reportsDir = assuranceReportsDir(workspace, agentId);
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
   const trustTier: TrustTier =
@@ -419,97 +418,67 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
 
       for (const scenario of pack.scenarios) {
         const prompt = scenario.buildPrompt(context);
-        const promptEventId = writeScenarioPrompt({
-          ledger,
-          sessionId,
-          runtime: input.mode === "sandbox" ? "sandbox" : "any",
-          trustTier,
-          packId: pack.id,
+        const runtime = input.mode === "sandbox" ? "sandbox" : "any";
+        const promptEventId = writeScenarioPrompt({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id, prompt, agentId });
+        const row = {
           scenarioId: scenario.id,
+          title: scenario.title,
+          category: scenario.category,
+          riskTier: scenario.riskTier === "all" ? ("all" as const) : context.riskTier,
           prompt,
-          agentId
-        });
-
-        // Invoke the real agent under test. A failed invocation yields an
-        // inconclusive scenario — never a pass, and never a scored failure.
-        let response: string;
-        let invocationError: string | null = null;
-        try {
-          const answer = await responder.respond(prompt);
-          response = answer.text;
-        } catch (error) {
-          if (!(error instanceof AgentResponderInvocationError)) throw error;
-          invocationError = error.message;
-          response = "";
-        }
-
-        if (invocationError !== null) {
+          correlatedRequestIds: [] as string[]
+        };
+        // A scenario that was not measured is never a pass and never a scored failure.
+        const markInconclusive = (response: string, reasons: string[], auditEventTypes: string[], evidenceEventIds: string[],
+          extra: Pick<AssuranceScenarioResult, "inconclusiveCause" | "toolCalls"> = {}) => {
           inconclusiveCount += 1;
-          scenarioResults.push({
-            scenarioId: scenario.id,
-            title: scenario.title,
-            category: scenario.category,
-            riskTier: scenario.riskTier === "all" ? "all" : context.riskTier,
-            prompt,
-            response: "",
-            pass: false,
-            score0to5: 0,
-            score0to100: 0,
-            reasons: [`INCONCLUSIVE: agent under test could not be invoked — ${invocationError}`],
-            correlatedRequestIds: [],
-            evidenceEventIds: [promptEventId],
-            auditEventTypes: [],
-            inconclusive: true
-          });
-          writeAssuranceAudit({
-            ledger,
-            sessionId,
-            runtime: input.mode === "sandbox" ? "sandbox" : "any",
-            trustTier,
-            agentId,
-            packId: pack.id,
-            scenarioId: scenario.id,
-            auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE",
-            severity: "HIGH",
-            message: `Scenario not measured: ${invocationError}`
-          });
+          scenarioResults.push({ ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, evidenceEventIds,
+            auditEventTypes, inconclusive: true, ...extra });
+          writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId: pack.id, scenarioId: scenario.id,
+            auditType: "ASSURANCE_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Scenario not measured: ${reasons.join(" | ")}` });
+        };
+
+        // Invoke the real agent under test.
+        const answer = await responder.respond(prompt).catch((error: unknown) => {
+          if (!(error instanceof AgentResponderInvocationError)) throw error;
+          return error;
+        });
+        if (answer instanceof AgentResponderInvocationError) {
+          markInconclusive("", [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], [], [promptEventId]);
           continue;
         }
+        const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
+        const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,
+          response: answer.text, toolCalls: answer.toolCalls, agentId });
 
-        const responseEventId = writeScenarioResponse({
-          ledger,
-          sessionId,
-          runtime: input.mode === "sandbox" ? "sandbox" : "any",
-          trustTier,
-          packId: pack.id,
-          scenarioId: scenario.id,
-          response,
-          agentId
-        });
-
-        const requestIds: string[] = [];
-        let validation = scenario.validate(response, prompt, context);
-        const score = scenarioScoreFromValidation(validation.pass, validation.reasons.length);
+        // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).
+        const grade = gradeScenarioReply(scenario, answer, prompt, context);
+        if (grade.kind === "inconclusive") {
+          markInconclusive(answer.text, grade.reasons, grade.auditTypes, [promptEventId, responseEventId],
+            { inconclusiveCause: grade.cause, ...toolCalls });
+          continue;
+        }
+        const { validation } = grade;
 
         const testEventId = writeScenarioTestResult({
           ledger,
           sessionId,
-          runtime: input.mode === "sandbox" ? "sandbox" : "any",
+          runtime,
           trustTier,
           agentId,
           packId: pack.id,
           scenarioId: scenario.id,
-          score0to100: score.score0to100,
+          score0to100: grade.score0to100,
           pass: validation.pass,
           reasons: validation.reasons,
-          correlatedRequestIds: requestIds
+          correlatedRequestIds: row.correlatedRequestIds
         });
 
         for (const auditType of validation.auditTypes) {
           writeAssuranceAudit({
             ledger,
             sessionId,
-            runtime: input.mode === "sandbox" ? "sandbox" : "any",
+            runtime,
             trustTier,
             agentId,
             packId: pack.id,
@@ -521,20 +490,17 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
         }
 
         scenarioResults.push({
-          scenarioId: scenario.id,
-          title: scenario.title,
-          category: scenario.category,
-          riskTier: scenario.riskTier === "all" ? "all" : context.riskTier,
-          prompt,
-          response,
+          ...row,
+          response: answer.text,
           pass: validation.pass,
-          score0to5: score.score0to5,
-          score0to100: score.score0to100,
+          score0to5: grade.score0to5,
+          score0to100: grade.score0to100,
           reasons: validation.reasons,
-          correlatedRequestIds: requestIds,
           evidenceEventIds: [promptEventId, responseEventId, testEventId],
           auditEventTypes: validation.auditTypes,
-          responseTransport: responder.target.transport
+          gradingMethod: grade.gradingMethod,
+          responseTransport: responder.target.transport,
+          ...toolCalls
         });
       }
 
@@ -560,7 +526,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
         failCount: aggregate.failCount,
         score0to100: aggregate.score0to100,
         trustTier,
-        scenarioResults
+        scenarioResults,
+        ...packGradingMethod(pack)
       };
     };
 
@@ -621,6 +588,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
       sessionId,
+      ...(unsignedStore ? { evidenceStore: UNSIGNED_EVIDENCE_STORE } : {}),
       packResults,
       overallScore0to100,
       integrityIndex,
@@ -672,6 +640,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     });
 
     return report;
+  } catch (error) {
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
   } finally {
     ledger.close();
   }
@@ -738,12 +708,23 @@ export async function verifyAssuranceRun(params: {
         errors.push(`unknown scenario in report: ${packResult.packId}/${scenarioResult.scenarioId}`);
         continue;
       }
-      let validation = scenario.validate(scenarioResult.response, scenarioResult.prompt, context);
-      const score = scenarioScoreFromValidation(validation.pass, validation.reasons.length);
-      if (validation.pass !== scenarioResult.pass) {
+      // An inconclusive row was never graded, so there is nothing to recompute; it may only carry no score.
+      if (scenarioResult.inconclusive === true) {
+        if (scenarioResult.pass || scenarioResult.score0to100 !== 0 || scenarioResult.score0to5 !== 0) {
+          errors.push(`inconclusive row carries a score: ${packResult.packId}/${scenarioResult.scenarioId}`);
+        }
+        continue;
+      }
+      const grade = gradeScenarioReply(scenario, { text: scenarioResult.response, toolCalls: scenarioResult.toolCalls ?? [] },
+        scenarioResult.prompt, context);
+      if (grade.kind === "inconclusive") {
+        errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: graded row is now ${grade.cause}`);
+        continue;
+      }
+      if (grade.validation.pass !== scenarioResult.pass) {
         errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: pass differs`);
       }
-      if (Math.abs(score.score0to100 - scenarioResult.score0to100) > 0.001) {
+      if (Math.abs(grade.score0to100 - scenarioResult.score0to100) > 0.001) {
         errors.push(`determinism mismatch for ${scenarioResult.scenarioId}: score differs`);
       }
     }
@@ -930,8 +911,8 @@ export async function applyAssurancePatchKit(params: {
   }));
 
   const ledger = openLedger(params.workspace);
+  const sessionId = randomUUID();
   try {
-    const sessionId = randomUUID();
     ledger.startSession({
       sessionId,
       runtime: "unknown",
@@ -961,6 +942,8 @@ export async function applyAssurancePatchKit(params: {
       }
     });
     ledger.sealSession(sessionId);
+  } catch (error) {
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId: params.assuranceRunId, agentId, error });
   } finally {
     ledger.close();
   }

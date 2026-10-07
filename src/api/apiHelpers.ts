@@ -4,6 +4,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { ZodError, type ZodType } from "zod";
+import type { ClaimFields } from "../claims/eligibility/index.js";
 
 const MAX_JSON_BODY_BYTES = 1_048_576;
 const DANGEROUS_JSON_KEYS = new Set(["__proto__", "constructor", "prototype"]);
@@ -137,9 +138,18 @@ export function pathParam(pathname: string, template: string): Record<string, st
 
 /* ── Response helpers ────────────────────────────────────────────── */
 
+type ResultLabeller = (data: unknown) => { data: unknown; claim?: ClaimFields };
+const resultLabellers = new WeakMap<ServerResponse, ResultLabeller>();
+
+/** Set by the dispatcher for routes in resultRouteRegistry.ts, so every success on them carries a claim. */
+export function labelResultsOn(res: ServerResponse, labeller: ResultLabeller): void {
+  resultLabellers.set(res, labeller);
+}
+
 export function apiSuccess(res: ServerResponse, data: unknown, status = 200): void {
+  const labelled = resultLabellers.get(res)?.(data) ?? { data };
   res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ ok: true, data }));
+  res.end(JSON.stringify({ ok: true, data: labelled.data, ...labelled.claim }));
 }
 
 export function apiError(res: ServerResponse, status: number, message: string): void {

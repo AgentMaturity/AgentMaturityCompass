@@ -1,8 +1,8 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
 import { ensureFederationPublisherKey, signFederationDigest } from "./federationIdentity.js";
 import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
@@ -13,7 +13,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { containedPath, safeIdSchema } from "../utils/pathSafety.js";
 import { generateTransparencyInclusionProof, currentTransparencyMerkleRoot, ensureTransparencyMerkleInitialized, exportTransparencyProofBundle } from "../transparency/merkleIndexStore.js";
-import { ingestBenchmarks } from "../benchmarks/benchImport.js";
+import { admitBenchmark, ingestBenchmarks } from "../benchmarks/benchImport.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 
@@ -375,6 +375,43 @@ function admittedInboxName(workspace: string, report: VerifierReportV1): string 
   return peerId !== undefined && safeIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
 }
 
+const STAGING_PREFIX = ".staging-";
+
+/** A top-level `.amcbench` under artifacts/benchmarks/, the files the import ingests. */
+function isPackageBenchmark(path: string): boolean {
+  const name = path.startsWith("artifacts/benchmarks/") ? path.slice("artifacts/benchmarks/".length) : "";
+  return name.endsWith(".amcbench") && !name.includes("/");
+}
+
+/**
+ * A manifestId is imported once (a re-import would overwrite what was imported), and a package older than one already
+ * imported from the same admitted publisher is refused as a rollback. An imported package whose manifest cannot be read
+ * blocks further imports from that publisher rather than being ignored.
+ */
+function refuseReplayOrRollback(publisherInbox: string, manifest: FederationManifest): void {
+  if (!pathExists(publisherInbox)) return;
+  for (const entry of readdirSync(publisherInbox, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith(STAGING_PREFIX)) continue;
+    if (entry.name === manifest.manifestId) {
+      throw new Error(`federation package ${manifest.manifestId} was already imported from this publisher; it is not imported again`);
+    }
+    const priorFile = join(publisherInbox, entry.name, "manifest.json");
+    let prior: FederationManifest | null = null;
+    try {
+      prior = federationManifestSchema.parse(JSON.parse(readUtf8(priorFile)) as unknown);
+    } catch {
+      prior = null;
+    }
+    if (!prior) {
+      throw new Error(`cannot read the manifest of imported federation package ${entry.name}; refusing to import until it is restored or removed`);
+    }
+    if (prior.createdTs > manifest.createdTs) {
+      throw new Error(`federation package ${manifest.manifestId} (created ${new Date(manifest.createdTs).toISOString()}) is older than `
+        + `${prior.manifestId} (created ${new Date(prior.createdTs).toISOString()}) already imported from this publisher; refused as a rollback`);
+    }
+  }
+}
+
 /** The bytes at `src`, refused unless they hash to what verification admitted for `path`. */
 function admittedBytes({ src, path, sha256 }: { src: string; path: string; sha256: string }): Buffer {
   const bytes = pathExists(src) ? readFileSync(src) : null;
@@ -407,22 +444,33 @@ export function importFederationPackage(params: {
     const root = resolveExtractedRoot(temp, PACKAGE_ENVELOPE);
     const importedPath = containedPath(federationInboxDir(params.workspace), "the federation inbox",
       admittedInboxName(params.workspace, verify.report), verify.manifest.manifestId);
+    refuseReplayOrRollback(dirname(importedPath), verify.manifest);
     // Everything copied: the manifest's files and the envelope, each with the sha256 verification admitted.
     const copies = [...verify.manifest.files, ...verify.envelope].map(({ path, sha256 }) => ({
       path,
       sha256,
-      src: containedPath(root, "the package root", path),
-      dst: containedPath(importedPath, "the imported package directory", path)
+      src: containedPath(root, "the package root", path)
     }));
     // The bundle was extracted once to verify and is extracted again here. Before writing anything, refuse unless every
     // byte about to be copied is still what verification admitted (a bundle replaced in between must not be imported).
     for (const copy of copies) {
       admittedBytes(copy);
     }
-    ensureDir(importedPath);
-    for (const copy of copies) {
-      ensureDir(dirname(copy.dst));
-      writeFileAtomic(copy.dst, admittedBytes(copy), 0o644);
+    // Every benchmark signer is checked before anything is written, so a refused package leaves nothing behind.
+    for (const copy of copies.filter(({ path }) => isPackageBenchmark(path))) {
+      admitBenchmark(params.workspace, copy.src, trust);
+    }
+    // Staged next to its final place and renamed in one step: the inbox never holds a partial package.
+    const staging = containedPath(dirname(importedPath), "the federation inbox", `${STAGING_PREFIX}${randomBytes(6).toString("hex")}`);
+    try {
+      for (const copy of copies) {
+        const dst = containedPath(staging, "the staged package directory", copy.path);
+        ensureDir(dirname(dst));
+        writeFileAtomic(dst, admittedBytes(copy), 0o644);
+      }
+      renameSync(staging, importedPath);
+    } finally {
+      rmSync(staging, { recursive: true, force: true });
     }
 
     const benchDir = join(importedPath, "artifacts", "benchmarks");

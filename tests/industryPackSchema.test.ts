@@ -32,7 +32,8 @@ interface PackCurrencyFieldsV1 {
 }
 
 const packs = listIndustryPacks();
-const AS_OF = new Date("2026-10-03T00:00:00Z");
+// P0-24 records were read on 2026-10-07; an earlier AS_OF would see them as future-dated.
+const AS_OF = new Date("2026-10-07T00:00:00Z");
 const V1_STATUSES = ["in-force", "applies-from", "proposed", "repealed", "unverified"];
 
 describe("industry pack schema", () => {
@@ -63,6 +64,13 @@ describe("industry pack schema", () => {
     const mature = scoreIndustryPack(pack.id, Object.fromEntries(pack.questions.map((q) => [q.id, 5])));
     expect(mature.percentage).toBe(100);
     expect(mature.questionResults).toHaveLength(pack.questions.length);
+  });
+
+  test("getPackById refuses inherited property names (P0-23)", () => {
+    for (const id of ["__proto__", "constructor", "toString", "hasOwnProperty"]) {
+      expect(industryPacksModule.getPackById(id), id).toBeUndefined();
+    }
+    expect(industryPacksModule.getPackById("clinical-trials")?.id).toBe("clinical-trials");
   });
 
   test("the status enum is exactly the PackCurrencyFields v1 enum", () => {

@@ -343,7 +343,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         if (target === null) { io.error("There is no recorded session yet."); continue; }
         const report = await execute(text === "/inspect" ? ["session", "show", "--", target] : ["agent-loop", "verify", "--", target]);
         if (report.stdout.trim()) io.log(report.stdout.trimEnd());
-        if (report.code !== 0 || report.truncated) { io.error("The inspection command failed or its output exceeded the display limit."); io.fail(); }
+        // /verify runs agent-loop verify with the operator's trust (AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT);
+        // a refusal there includes an unpinned monitor key, so say "not verified", not that the command broke (P0-51).
+        if (report.code !== 0 || report.truncated) {
+          io.error(text === "/verify" && !report.truncated
+            ? "Not verified: the report above is failed or untrusted. No verified result is claimed."
+            : "The inspection command failed or its output exceeded the display limit.");
+          io.fail();
+        }
         continue;
       }
       let prompt = entered;

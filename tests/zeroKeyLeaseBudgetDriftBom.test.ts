@@ -22,6 +22,7 @@ import { runGovernorCheck } from "../src/governor/governorCli.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { generateBom } from "../src/bom/bomGenerator.js";
 import { signBomFile, verifyBomSignature } from "../src/bom/bomVerifier.js";
+import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 
@@ -609,18 +610,24 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
       inputFile: generated.outFile,
       outputSigFile: "amc-bom.json.sig"
     });
+    // The operator pins the auditor key it recorded at vault creation; the workspace key alone never vouches (P0-51).
+    const trust = workspaceKeyTrust(workspace);
     const verified = verifyBomSignature({
       workspace,
       inputFile: generated.outFile,
-      sigFile: signed.sigFile
+      sigFile: signed.sigFile,
+      trust
     });
     expect(verified.ok).toBe(true);
+    expect(verifyBomSignature({ workspace, inputFile: generated.outFile, sigFile: signed.sigFile, trust: pinnedTrust([]) })
+      .report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
 
     writeFileSync(generated.outFile, `${readFileSync(generated.outFile, "utf8")}\n# tamper`);
     const afterTamper = verifyBomSignature({
       workspace,
       inputFile: generated.outFile,
-      sigFile: signed.sigFile
+      sigFile: signed.sigFile,
+      trust
     });
     expect(afterTamper.ok).toBe(false);
   });

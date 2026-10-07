@@ -140,10 +140,10 @@ const MITRE_ATLAS_CONTROLS: FrameworkControl[] = [
   { id: 'AML.T0040', name: 'ML Model Inference API Access', description: 'Adversary gains access to ML model inference endpoint', amcQIDs: ['AMC-1.5', 'AMC-1.8'], amcModules: ['enforce', 'rbac'], automatable: true },
   { id: 'AML.T0043', name: 'Craft Adversarial Data', description: 'Adversary creates adversarial examples to exploit model weaknesses', amcQIDs: ['AMC-2.1', 'AMC-4.5'], amcModules: ['shield', 'assurance'], automatable: true },
   { id: 'AML.T0047', name: 'ML-Enabled Product Abuse', description: 'Adversary misuses ML product for unintended harmful purposes', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['governor', 'enforce'], automatable: true },
-  { id: 'AML.T0048', name: 'Prompt Injection', description: 'Adversary injects malicious prompts to manipulate LLM behavior', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4'], amcModules: ['shield', 'enforce'], automatable: true },
-  { id: 'AML.T0051', name: 'LLM Jailbreak', description: 'Adversary bypasses LLM safety guardrails through crafted prompts', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4', 'AMC-4.5'], amcModules: ['shield', 'assurance'], automatable: true },
+  { id: 'AML.T0051', name: 'Prompt Injection', description: 'Adversary injects malicious prompts to manipulate LLM behavior', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4'], amcModules: ['shield', 'enforce'], automatable: true },
   { id: 'AML.T0052', name: 'Phishing via LLM', description: 'Adversary uses LLM to generate convincing phishing content', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['enforce', 'governor'], automatable: true },
-  { id: 'AML.T0054', name: 'LLM Data Leakage', description: 'LLM inadvertently reveals training data or sensitive information', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['shield', 'dlp', 'enforce'], automatable: true },
+  { id: 'AML.T0054', name: 'LLM Jailbreak', description: 'Adversary bypasses LLM safety guardrails through crafted prompts', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4', 'AMC-4.5'], amcModules: ['shield', 'assurance'], automatable: true },
+  { id: 'AML.T0057', name: 'LLM Data Leakage', description: 'LLM inadvertently reveals training data or sensitive information', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['shield', 'dlp', 'enforce'], automatable: true },
 ];
 
 // OWASP API Security Top 10 (2023) control mapping

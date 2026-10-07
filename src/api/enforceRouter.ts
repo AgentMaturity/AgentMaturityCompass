@@ -459,8 +459,14 @@ export async function handleEnforceRoute(
         certificate: z.record(z.string(), z.unknown()),
       }));
       const { verifyCertificate } = await import('../enforce/formalVerification.js');
+      const { loadTrustContext, unsignedArtifactReport } = await import('../trust/index.js');
+      const { sha256Hex } = await import('../utils/hash.js');
       const result = verifyCertificate(body.certificate as unknown as Parameters<typeof verifyCertificate>[0]);
-      apiSuccess(res, result);
+      // P0-51: a proof certificate carries an unkeyed hash and names no signer, so it is never valid as an authentic
+      // artifact; `integrityValid` is the hash check alone.
+      const report = unsignedArtifactReport({ kind: 'proof-certificate', path: '<request body>', sha256: sha256Hex(JSON.stringify(body.certificate)) },
+        loadTrustContext(), result.issues, 'certificateHash');
+      apiSuccess(res, { ...result, valid: false, integrityValid: result.valid, report });
     } catch (err) {
       apiRequestError(res, err, 'Certificate verification failed', 500);
     }

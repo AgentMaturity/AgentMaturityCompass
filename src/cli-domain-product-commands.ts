@@ -1,5 +1,8 @@
 import chalk from "chalk";
 import type { Command } from "commander";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
@@ -91,27 +94,17 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
-  sectorPack
+  withTrustFlags(sectorPack
     .command("verify")
     .description("Verify an Industry Packs license key")
-    .requiredOption("--key <licenseKey>", "License key from checkout")
-    .option("--json", "Output as JSON")
-    .action(async (opts: { key: string; json?: boolean }) => {
-      const { verifyIndustryPackLicenseKey } = await import("./domains/industryPackEntitlement.js");
-      const result = verifyIndustryPackLicenseKey(opts.key);
-      if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
-        return;
-      }
-      if (result.valid) {
-        console.log(chalk.green("Industry Packs license is valid."));
-        if (result.payload?.expiresAt) {
-          console.log(chalk.gray(`Expires: ${result.payload.expiresAt}`));
-        }
-        return;
-      }
-      console.error(chalk.red(`Industry Packs license is invalid: ${result.reason ?? "verification failed"}`));
-      process.exit(1);
+    .requiredOption("--key <licenseKey>", "License key from checkout"),
+  { pubkey: "pin the Ed25519 license public key (artifact-seal)", json: true })
+    .action(async (opts: { key: string } & TrustFlags) => {
+      const { verifyIndustryPackLicenseReport } = await import("./domains/industryPackEntitlement.js");
+      const result = verifyIndustryPackLicenseReport(opts.key, trustFromFlags(opts, ["artifact-seal"]),
+        opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+      finishVerify("Industry Packs license", result.report, { json: opts.json, result,
+        details: result.payload?.expiresAt ? [`Expires: ${result.payload.expiresAt}`] : [] });
     });
 
   sectorPack

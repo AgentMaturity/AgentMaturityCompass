@@ -160,9 +160,9 @@ describe("anti-gaming: conservative trust parsing", () => {
     expect(parsed.trustTier).toBe("SELF_REPORTED");
   });
 
-  test("stale OBSERVED evidence degrades to ATTESTED", () => {
+  test("stale OBSERVED evidence degrades to SELF_REPORTED, never to ATTESTED", () => {
     const parsed = makeParsedEvent({ trustTier: "OBSERVED", ts: Date.now() - 95 * DAY_MS });
-    expect(parsed.trustTier).toBe("ATTESTED");
+    expect(parsed.trustTier).toBe("SELF_REPORTED");
   });
 
   test("stale OBSERVED_HARDENED evidence degrades to OBSERVED", () => {

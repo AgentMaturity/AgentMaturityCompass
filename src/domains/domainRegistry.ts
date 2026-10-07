@@ -91,13 +91,13 @@ export const DOMAIN_REGISTRY: Record<Domain, DomainMetadata> = {
     aliases: ["public-sector", "government", "civic", "citizen-services"],
     sectorTags: ["public-services", "elections", "civic-identity", "public-private-partnerships"],
     recommendedIndustryPacks: ["digital-citizens-rights", "dance-of-democracy", "petition-to-law", "citizen-services", "public-private-collaboration"],
-    regulatoryBasis: ["NIST AI RMF", "EU AI Act", "FedRAMP", "FISMA", "OMB M-24-10", "GDPR"],
+    regulatoryBasis: ["NIST AI RMF", "EU AI Act", "FedRAMP", "FISMA", "OMB M-25-21", "GDPR"],
     riskLevel: "very-high",
     euAIActCategory: "high-risk",
     questionCount: 6,
     assurancePacks: ["governanceNISTRMF"],
     primaryModules: ["W3", "E15", "W1", "W7", "E34"],
-    complianceFrameworks: ["NIST AI RMF", "FedRAMP", "FISMA", "OMB M-24-10", "GDPR", "EU AI Act"]
+    complianceFrameworks: ["NIST AI RMF", "FedRAMP", "FISMA", "OMB M-25-21", "GDPR", "EU AI Act"]
   },
   technology: {
     id: "technology",
@@ -121,13 +121,13 @@ export const DOMAIN_REGISTRY: Record<Domain, DomainMetadata> = {
     aliases: ["financial", "finance", "fintech", "banking", "payments", "insurance", "crypto"],
     sectorTags: ["wealth-management", "payments", "lending", "aml", "market-abuse", "model-risk"],
     recommendedIndustryPacks: ["digital-payments", "no-poverty", "blockchain"],
-    regulatoryBasis: ["SR 11-7", "BSA/AML", "SEC Rule 17a-4", "UDAAP/ECOA", "MiFID II", "CFTC", "FINRA", "Dodd-Frank", "FCA SYSC", "GDPR"],
+    regulatoryBasis: ["SR 26-2", "BSA/AML", "SEC Rule 17a-4", "UDAAP/ECOA", "MiFID II", "CFTC", "FINRA", "Dodd-Frank", "FCA SYSC", "GDPR"],
     riskLevel: "very-high",
     euAIActCategory: "high-risk",
     questionCount: 14,
     assurancePacks: ["wealthManagementMiFID", "financialModelRisk"],
     primaryModules: ["E20", "E23", "E5", "V8", "S15", "W3"],
-    complianceFrameworks: ["SR 11-7", "BSA/AML", "SEC 17a-4", "ECOA", "MiFID II", "FINRA 2111", "SEC Reg BI", "CFTC 1.73", "GDPR", "CCPA"]
+    complianceFrameworks: ["SR 26-2", "BSA/AML", "SEC 17a-4", "ECOA", "MiFID II", "FINRA 2111", "SEC Reg BI", "CFTC 1.73", "GDPR", "CCPA"]
   }
 };
 

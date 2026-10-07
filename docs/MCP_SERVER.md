@@ -98,6 +98,27 @@ File: `.kiro/mcp.json`
 
 ## Available Tools
 
+### Claim labels
+
+Every successful tool result carries a claim label from the shared service in `src/claims/eligibility` (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). The result text comes first; a second text block holds the canonical claim line and a pointer to the legend, so JSON output stays parseable:
+
+```
+Claim: Self-reported · Result: not evaluated (this result is not yet bound to claim-eligible evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable
+Claim kinds: see docs/CLAIM_KINDS.md
+```
+
+The same fields are in `structuredContent`: `{ claimKind, statusDimensions, claimLabel }`. Some clients ignore `structuredContent` without an output schema, so the text line is the guaranteed label. Errors (`isError`) carry no claim.
+
+| Tool | Claim source |
+| --- | --- |
+| `amc_quickscore`, `amc_get_guide`, `amc_transparency_report`, `amc_score_agent`, `amc_get_recommendations` | The agent's latest diagnostic run when this workspace's auditor key sealed it (`envelopeForDiagnosticReport`); otherwise not evaluated |
+| `amc_query_diagnostic` | The run it shows, on the same terms |
+| `amc_check_compliance` | A regulated result that is not evaluated: the gaps come from dimension scores, not from evidence bound to a control |
+| `amc_score_sector_pack` | The regulated self-assessment envelope: self-reported, never a pass, at most level 1 |
+| `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
+
+AMC output is evidence of conformity. No tool prints "certified".
+
 ### `amc_list_agents`
 List all AMC-registered agents in the workspace.
 
@@ -137,6 +158,9 @@ Dimensions:
 
 Top Priority: Improve Evidence & Auditability from L2 to L3
   → `amc guide --agent my-agent`
+
+Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable
+Claim kinds: see docs/CLAIM_KINDS.md
 ```
 
 ---
@@ -186,7 +210,7 @@ Input:  { packId: string, responses: Record<questionId, integer 1-5> }
 Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
 
-Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)).
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
 
 Available pack IDs (40 total across 7 stations):
 

@@ -1,6 +1,7 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
-import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, setAdminToken, whoami } from "./api.js";
+import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
+import { installClaimStrip } from "./components/claimBadge.js";
 import { renderBars, renderLine } from "./charts.js";
 import { renderQrLike } from "./qr.js";
 import { renderPluginTable } from "./components/pluginTable.js";
@@ -3940,5 +3941,6 @@ window.addEventListener("offline", () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   void installPwa();
+  installClaimStrip(page, onClaims);
   await renderPage();
 });

@@ -94,4 +94,15 @@ describe("schemas", () => {
     expect(statusDimensionsSchema.safeParse({ ...envelope.statusDimensions, score: 5 }).success).toBe(false);
     expect(claimKindSchema.safeParse("compliant").success).toBe(false);
   });
+
+  test("the Studio console badge prints the server's label and the same legend (P0-23)", async () => {
+    const { claimBadge, claimLegendHtml } = await import("../../src/console/assets/components/claimBadge.js");
+    expect(claimLegendHtml()).toBe(renderClaimLegend("html"));
+    const notEvaluated = envelopeForSelfAssessment({ producer: "test", regulated: true, answers: [5], now: NOW });
+    const badge = claimBadge({ ...notEvaluated, claimLabel: renderClaimLabel(notEvaluated).line });
+    expect(badge).toContain(`Self-reported · not evaluated (${REASON_TEXT.SELF_REPORTED_NO_POSITIVE_STATUS})`);
+    expect(badge).toContain('class="claim-badge pill"');
+    expect(badge).toContain('href="#claim-legend"');
+    expect(badge).not.toMatch(/>0</);
+  });
 });

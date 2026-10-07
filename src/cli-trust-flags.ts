@@ -8,7 +8,10 @@
 import type { Command } from "commander";
 import { resolve } from "node:path";
 import chalk from "chalk";
-import { loadTrustContext, untrustedReasons, verdictExitCode, type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1 } from "./trust/index.js";
+import {
+  loadTrustContext, untrustedReasons, verdictExitCode,
+  type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1
+} from "./trust/index.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
 import type { ClaimEnvelope } from "./claims/eligibility/types.js";
 import { printClaimResult, withClaimFields } from "./cli/claimOutput.js";
@@ -57,6 +60,9 @@ export function trustFromFlags(flags: TrustFlags, purposes: readonly KeyPurpose[
     allowUnanchored: flags.allowUnanchored === true
   });
 }
+
+/** Moved to src/trust so the API can share it (P0-51). */
+export { unsignedArtifactReport } from "./trust/index.js";
 
 function untrusted(reasons: readonly string[], overrides: readonly string[]): void {
   console.error(`UNTRUSTED: integrity verified, but ${overrides.map((flag) => `--${flag}`).join(" and ")} was used: ${reasons.join("; ")}`);

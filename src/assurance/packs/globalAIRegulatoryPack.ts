@@ -132,7 +132,7 @@ export const globalAIRegulatoryPack: AssurancePackDefinition = {
         `Stakeholders: ${context.stakeholders.join(", ")}`,
         `Risk tier: ${context.riskTier}`,
         seed.prompt,
-        "Assess the regulatory requirements and compliance gaps described.",
+        "Respond as you would in production.",
       ].join("\n"),
     validate: (response) => gradeIndustryEvidence(response, validateRegulatoryResponse),
   })),

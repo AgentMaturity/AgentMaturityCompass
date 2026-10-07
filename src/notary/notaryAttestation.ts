@@ -11,6 +11,8 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import type { NotarySigner } from "./notarySigner.js";
 import { notaryAttestPayloadSchema, notaryAttestResponseSchema } from "./notaryApiTypes.js";
 import { amcVersion } from "../version.js";
+import { buildVerifierReport, checkSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 
 function hashDirectory(root: string): string {
   if (!pathExists(root)) {
@@ -117,11 +119,20 @@ export function exportNotaryAttestationBundle(params: {
   }
 }
 
-export function verifyNotaryAttestationBundle(file: string): {
+/** notary.pub and --pubkey only locate the signer; admitKey decides whether it is pinned for notary (P0-51). */
+export function verifyNotaryAttestationBundle(file: string, trust: TrustContext, pubkeyPem?: string | null): {
   ok: boolean;
   errors: string[];
+  report: VerifierReportV1;
 } {
   const rootTmp = mkdtempSync(join(tmpdir(), "amc-attest-verify-"));
+  const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "notary-attestation", path: resolve(file), sha256: fileSha256(resolve(file)) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, report };
+  };
   try {
     runTarExtract(resolve(file), rootTmp);
     const dirCandidates = readdirSync(rootTmp, { withFileTypes: true }).filter((entry) => entry.isDirectory());
@@ -129,16 +140,18 @@ export function verifyNotaryAttestationBundle(file: string): {
     const jsonPath = join(root, "attest.json");
     const sigPath = join(root, "attest.sig");
     const pubPath = join(root, "notary.pub");
-    const errors: string[] = [];
     if (!pathExists(jsonPath) || !pathExists(sigPath) || !pathExists(pubPath)) {
-      return { ok: false, errors: ["bundle missing attest.json/attest.sig/notary.pub"] };
+      errors.push("bundle missing attest.json/attest.sig/notary.pub");
+      return finish();
     }
     try {
       const payload = notaryAttestPayloadSchema.parse(JSON.parse(readUtf8(jsonPath)) as unknown);
       const sig = readUtf8(sigPath).trim();
       const pub = readUtf8(pubPath);
-      const ok = verify(null, Buffer.from(canonicalize(payload), "utf8"), pub, Buffer.from(sig, "base64"));
-      if (!ok) {
+      const check = checkSignature({ signature: "attest.sig", purpose: "notary", context: trust, claimedSignedAt: payload.ts,
+        candidates: [pubkeyPem, pub], verify: (pem) => verify(null, Buffer.from(canonicalize(payload), "utf8"), pem, Buffer.from(sig, "base64")) });
+      signatures.push(check.admission);
+      if (!check.verified) {
         errors.push("attestation signature invalid");
       }
       const fpr = sha256Hex(Buffer.from(pub, "utf8"));
@@ -148,10 +161,7 @@ export function verifyNotaryAttestationBundle(file: string): {
     } catch (error) {
       errors.push(String(error));
     }
-    return {
-      ok: errors.length === 0,
-      errors
-    };
+    return finish();
   } finally {
     rmSync(rootTmp, { recursive: true, force: true });
   }

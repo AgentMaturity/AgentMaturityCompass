@@ -8,7 +8,7 @@ export {
 export { loadTrustContext, withPins, workspaceSelfTrust, type LoadTrustContextOptions, type TrustContext, type TrustPin } from "./trustContext.js";
 export { admitKey, issuerAdmissionSchema, type AdmitKeyInput, type IssuerAdmission } from "./admission.js";
 export {
-  buildVerifierReport, untrustedReasons, verdictExitCode, verifierReportSchema, type VerifierReportInput, type VerifierReportV1
+  buildVerifierReport, unsignedArtifactReport, untrustedReasons, verdictExitCode, verifierReportSchema, type VerifierReportInput, type VerifierReportV1
 } from "./verifierReport.js";
 export { checkDigestSignature, checkSignature, envelopePublicKey, type SignatureCheck, type SignatureCheckInput } from "./signatureCheck.js";
 export { requestTrustOverride } from "./requestTrust.js";

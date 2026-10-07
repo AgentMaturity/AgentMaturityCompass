@@ -114,10 +114,9 @@
       "evidence": "Signed request/header and settlement rows; budget reservation rows",
       "status": "enforced",
       "bypasses": [
-        "A budget-integrity failure is reported to the caller as LLM_FAILURE_CODE.QUOTA",
         "No residency check on the route: bridgeResidencyHook (src/ops/productionWiring.ts) compares caller-supplied regions and nothing calls it"
       ],
-      "owners": ["P0-27", "P2-01"],
+      "owners": ["P2-01"],
       "asi": ["ASI04", "ASI08"]
     },
     {

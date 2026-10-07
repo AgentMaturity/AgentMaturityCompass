@@ -6,14 +6,12 @@ export function importValueCsv(params: {
   scopeId: string;
   kpiId: string;
   csvText: string;
-  attested: boolean;
 }) {
   return importValueCsvForApi({
     workspace: params.workspace,
     scopeType: params.scopeType,
     scopeId: params.scopeId,
     kpiId: params.kpiId,
-    csvText: params.csvText,
-    attest: params.attested
+    csvText: params.csvText
   });
 }

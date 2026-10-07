@@ -54,8 +54,10 @@ CLI:
 amc domain pack access
 amc domain pack checkout # fails closed unless a verified checkout provider is configured
 amc domain pack activate --key <license-key>
-amc domain pack verify --key <license-key>
+amc domain pack verify --key <license-key> --pubkey <license-public-key.pem>
 ```
+
+`domain pack verify` counts only an Ed25519 license signature from a key pinned by `--pubkey`, a signed trust list or `AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY`, and exits 0, 1 or 2 like every verify command. A license signed with `AMC_INDUSTRY_PACKS_LICENSE_SECRET` or a legacy allowlisted key names no signer, so `verify` refuses it; `activate` still accepts them.
 
 For a future production checkout, an operator must first verify a real payment link, then set `AMC_INDUSTRY_PACKS_CHECKOUT_URL` and configure the API with `AMC_INDUSTRY_PACKS_LICENSE_SECRET` plus `AMC_INDUSTRY_PACKS_ADMIN_TOKEN`. Payment webhooks or a checkout adapter can then call `POST /api/industry-packs/license/issue` to generate a signed activation key after a paid subscription event. None of that configuration exists on the static public website today.
 

@@ -23,7 +23,7 @@ Examples:
 - `amc transparency verify`
 - `amc transparency tail --n 50`
 - `amc transparency export --out transparency.amctlog`
-- `amc transparency verify-bundle transparency.amctlog`
+- `amc transparency verify-bundle transparency.amctlog --pubkey <recorded-auditor.pub>` (the bundled `auditor.pub` never vouches for the seal; without a pin it exits 1)
 
 ## Enforcement
 If chain or seal verification fails:

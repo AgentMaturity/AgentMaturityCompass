@@ -15,10 +15,10 @@ export interface DomainEvidence {
   reasons: string[];
 }
 
-export function loadDomainEvidence(workspace: string, agentId: string, now = Date.now()): DomainEvidence {
+export function loadDomainEvidence(workspace: string, agentId: string, now = Date.now(), runId = "latest"): DomainEvidence {
   let resolved: ReturnType<typeof resolveRunReport>;
   try {
-    resolved = resolveRunReport(workspace, "latest", agentId);
+    resolved = resolveRunReport(workspace, runId, agentId);
   } catch {
     return { runId: null, baseScores: null, envelope: null,
       reasons: ["no diagnostic run for this agent; run `amc quickscore` to evaluate the base part"] };

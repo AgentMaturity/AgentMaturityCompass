@@ -20,7 +20,7 @@ import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import { initTransparencyLog, appendTransparencyEntry } from "../src/transparency/logChain.js";
-import { operatorTrustHome, workspaceKeyTrust } from "./helpers/trustContext.js";
+import { operatorTrustHome, pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { verifyAll } from "../src/verify/verifyAll.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -189,8 +189,10 @@ describe("public benchmark registry", () => {
       benchFile: created.outFile,
       registryKeyPath: init.keyPath
     });
-    const verified = verifyBenchRegistry(registryDir);
+    // The operator pins the registry key it recorded at init; registry.pub alone never vouches (P0-51).
+    const verified = verifyBenchRegistry(registryDir, pinnedTrust([{ publicKeyPem: readFileSync(init.pubPath, "utf8"), purposes: ["artifact-seal"] }]));
     expect(verified.ok).toBe(true);
+    expect(verifyBenchRegistry(registryDir, pinnedTrust([])).report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
 
     const port = await pickPort();
     const server = await serveBenchRegistry({ dir: registryDir, host: "127.0.0.1", port });

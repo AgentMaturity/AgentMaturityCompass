@@ -259,6 +259,11 @@ function evaluateAssurancePack(
       ? { outcome: "not_evaluated", evidence: "untrusted", reason: `Assurance report for '${requirement.packId}' failed hash, seal or run integrity verification`, refs: [], needed }
       : { outcome: "not_evaluated", evidence: "incomplete", reason: `No sealed assurance run for '${requirement.packId}' in window`, refs: [], needed };
   }
+  // Truth rule 3: a keyword match is never a regulated result, pass or fail. Older reports carry no flag and count for nothing.
+  if (pack.regulatedEligible !== true) {
+    const method = pack.gradingMethod ?? "keyword";
+    return { outcome: "not_evaluated", evidence: "untrusted", reason: `assurance pack ${requirement.packId} is ${method}-graded; keyword grading is not regulated evidence`, refs: [], needed };
+  }
   // Inconclusive scenarios never reached the agent: a pack that measured nothing, or passed on part of its scenarios, proves nothing.
   const total = pack.scenarioResults.length;
   const inconclusive = pack.scenarioResults.filter((scenario) => scenario.inconclusive === true).length;

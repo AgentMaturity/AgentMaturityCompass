@@ -21,8 +21,10 @@ amc bench registry publish \
   --dir ./bench-registry \
   --file .amc/bench/exports/workspace/workspace/latest.amcbench \
   --registry-key ./bench-registry/registry.key
-amc bench registry verify --dir ./bench-registry
+amc bench registry verify --dir ./bench-registry --pubkey <recorded-registry.pub>
 ```
+
+`bench registry verify` admits the index signer only when `--pubkey` or a signed trust list pins it for `artifact-seal`; the `registry.pub` in the directory never vouches for itself. Pin the copy you recorded at `init`. Without a pin it exits 1; `--allow-unpinned` gives an integrity-only exit 2 with `UNTRUSTED:` on stderr.
 
 Serve locally/LAN:
 

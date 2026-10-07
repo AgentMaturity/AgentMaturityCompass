@@ -12,6 +12,10 @@ import type {
 /** Date of the October 2026 regulatory-currency review. */
 const REVIEWED = "2026-10-03";
 
+/** P0-24 citation corrections: the date their sources were read, and the note every P0-24 record carries until a named expert signs it (D-08). */
+export const P024_READ = "2026-10-07";
+export const P024_NOTE = "experimental: P0-24 correction, awaiting expert sign-off.";
+
 type Extra = Partial<Omit<RegulatoryInstrument, "id" | "citation" | "aliases">>;
 
 const OP_NOTE =

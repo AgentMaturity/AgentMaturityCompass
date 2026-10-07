@@ -23,3 +23,12 @@ export function containedPath(root: string, label: string, ...parts: string[]): 
   }
   return full;
 }
+
+/**
+ * Whether `path` is `root` or lies under it, by whole path segments: a child named `..cache` is inside, `../x` is
+ * not. Both are compared as given, so pass physical (realpath) forms when symlinks matter.
+ */
+export function isWithin(root: string, path: string): boolean {
+  const rel = relative(root, path);
+  return rel === "" || (!isAbsolute(rel) && rel !== ".." && !rel.startsWith(`..${sep}`));
+}
