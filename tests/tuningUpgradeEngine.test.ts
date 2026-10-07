@@ -37,9 +37,9 @@ const workspaces: string[] = [];
 let answers: string[] = [];
 let savedAgentEnv: string | undefined;
 
-const AMC_1_1 = questionBank.find((question) => question.id === "AMC-1.1");
-if (!AMC_1_1) {
-  throw new Error("fixture assumption broken: the question bank no longer contains AMC-1.1");
+const AMC_5_29 = questionBank.find((question) => question.id === "AMC-5.29");
+if (!AMC_5_29) {
+  throw new Error("fixture assumption broken: the question bank no longer contains AMC-5.29");
 }
 
 beforeEach(() => {
@@ -217,7 +217,9 @@ describe("generateUpgradePlan", () => {
       gap: 3
     });
     expect(task.reason).toContain("Gap 3 on Agent Charter & Scope");
-    expect(task.reason).toContain("mission: Ship verified outcomes");
+    // P1-07: AMC-1.1 has no evidence map, so L2 is not evaluated; the task says why and promises nothing.
+    expect(task.reason).toContain("Not evaluated: L2 not evaluable on runtime evidence");
+    expect(task.acceptanceCriteria).toEqual([]);
   });
 
   it("targets level 5 for every unfinished question in excellence mode", () => {
@@ -283,32 +285,36 @@ describe("generateUpgradePlan", () => {
     expect(cultureIds("critical")).toEqual(["AMC-3.3.2", "AMC-3.2.3", "AMC-3.1.1"]);
   });
 
-  it("derives acceptance criteria from the next level's gate, not the final target's", () => {
-    const gates = AMC_1_1.gates;
-
-    const nextStep = at(at(generateUpgradePlan(
-      report([score("AMC-1.1", 1)]),
-      { type: "target", profile: targetProfile({ "AMC-1.1": 4 }) },
+  it("derives acceptance criteria from the next level's rebuilt gate, and names a level AMC cannot evaluate", () => {
+    const gates = AMC_5_29.gates;
+    const planFor = (current: number, target: number) => at(at(generateUpgradePlan(
+      report([score("AMC-5.29", current)]),
+      { type: "target", profile: targetProfile({ "AMC-5.29": target }) },
       graph("med")
-    ).phases, 0).tasks, 0);
+    ).phases, 3).tasks, 0);
 
-    expect(nextStep.acceptanceCriteria[0]).toBe("supportedMaxLevel for AMC-1.1 >= 2");
+    // P1-07: AMC-5.29's evidence map makes L2 evaluable, so the next step is built from its rebuilt L2 gate.
+    const nextStep = planFor(1, 2);
+    expect(nextStep.acceptanceCriteria[0]).toBe("supportedMaxLevel for AMC-5.29 >= 2");
     expect(nextStep.requiredEvidence[0]).toBe(
       `Minimum viable evidence to unlock L2: L2: events>=${at(gates, 2).minEvents}, sessions>=${at(gates, 2).minSessions}, days>=${at(gates, 2).minDistinctDays}, evidence=${at(gates, 2).requiredEvidenceTypes.join(",")}`
     );
-    expect(nextStep.requiredEvidence[0]).not.toContain(`events>=${at(gates, 4).minEvents}`);
-    expect(nextStep.requiredEvidence[1]).toBe("No additional mustInclude constraints for next gate.");
+    expect(nextStep.requiredEvidence[1]).toBe("Must include signals: audit:TOOL_CALL_ALLOWED, audit:TOOL_CALL_DENIED");
+    expect(nextStep.requiredEvidence.join(" ")).not.toContain("Not evaluated");
 
-    const finalStep = at(at(generateUpgradePlan(
-      report([score("AMC-1.1", 3)]),
-      { type: "target", profile: targetProfile({ "AMC-1.1": 4 }) },
-      graph("med")
-    ).phases, 0).tasks, 0);
+    // A target past L2 keeps the L2 step and says L3 is not evaluated, never L4's old requirements.
+    const towardL4 = planFor(1, 4);
+    expect(towardL4.acceptanceCriteria[0]).toBe("supportedMaxLevel for AMC-5.29 >= 2");
+    expect(towardL4.requiredEvidence.at(-1)).toContain("Not evaluated: L3 not evaluable on runtime evidence: needs");
+    expect(towardL4.requiredEvidence.join(" ")).not.toContain(`events>=${at(gates, 4).minEvents}`);
 
-    expect(finalStep.acceptanceCriteria[0]).toBe("supportedMaxLevel for AMC-1.1 >= 4");
-    expect(finalStep.requiredEvidence[1]).toBe(
-      "Must include signals: meta:questionId, audit:ALIGNMENT_CHECK_PASS, audit:RISK_CALIBRATION, text:risk tier, text:tradeoff"
-    );
+    // When the next level itself is not evaluated, the task promises nothing and lists none of that gate's old signals.
+    const blocked = planFor(2, 4);
+    expect(blocked.reason).toContain("Not evaluated: L3 not evaluable on runtime evidence");
+    expect(blocked.reason).toContain("No action raises this question to L3");
+    expect({ implementation: blocked.implementation, acceptanceCriteria: blocked.acceptanceCriteria, requiredEvidence: blocked.requiredEvidence })
+      .toEqual({ implementation: [], acceptanceCriteria: [], requiredEvidence: [] });
+    expect(JSON.stringify(blocked)).not.toContain("ALIGNMENT_CHECK_PASS");
   });
 });
 
@@ -377,6 +383,9 @@ describe("runUpgradeWizard", () => {
     expect(markdown).toContain("# Upgrade Plan (excellence)");
     expect(markdown).toContain("- AMC-1.1: current 1, target 5, gap 4");
     expect(markdown).toContain("- AMC-3.1.1: current 0, target 5, gap 5");
+    // P1-07: AMC-1.1's L2 is not evaluated, so its task gives the reason and no Implement/Accept/Evidence lines.
+    expect(markdown).toContain("Not evaluated: L2 not evaluable on runtime evidence");
+    expect(markdown).not.toContain("supportedMaxLevel for AMC-1.1");
     expect(markdown).toContain("## Owner Tasks");
     expect(markdown).toContain("## Agent Tasks");
   });

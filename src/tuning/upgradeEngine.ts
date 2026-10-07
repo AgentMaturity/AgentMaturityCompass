@@ -1,4 +1,5 @@
 import type { ContextGraph } from "../context/contextGraph.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import type { DiagnosticReport, TargetProfile, UpgradePlan, UpgradeTask } from "../types.js";
 
@@ -34,6 +35,11 @@ function taskForRow(
   const question = questionBank.find((q) => q.id === row.questionId);
   const title = question?.title ?? row.questionId;
   const nextLevel = Math.min(row.target, row.current + 1);
+  const notEvaluated = notEvaluatedLevel(question, row.current, row.target);
+  if (notEvaluated?.level === nextLevel) {
+    // P1-07: AMC cannot evaluate the next level, so the task says why instead of listing that gate's old requirements.
+    return { ...row, reason: `Gap ${row.gap} on ${title}; ${notEvaluated.notice}`, implementation: [], acceptanceCriteria: [], requiredEvidence: [] };
+  }
   const nextGate = question?.gates[nextLevel];
   const gateSummary = nextGate
     ? `L${nextLevel}: events>=${nextGate.minEvents}, sessions>=${nextGate.minSessions}, days>=${nextGate.minDistinctDays}, evidence=${nextGate.requiredEvidenceTypes.join(",") || "none"}`
@@ -70,7 +76,8 @@ function taskForRow(
     requiredEvidence: [
       `Minimum viable evidence to unlock L${nextLevel}: ${gateSummary}`,
       gateMustInclude.length > 0 ? `Must include signals: ${gateMustInclude.join(", ")}` : "No additional mustInclude constraints for next gate.",
-      `Collect observed multi-session evidence and rerun amc verify + amc run`
+      `Collect observed multi-session evidence and rerun amc verify + amc run`,
+      ...(notEvaluated ? [notEvaluated.notice] : [])
     ]
   };
 }
@@ -207,7 +214,12 @@ export function generateTuningPack(run: DiagnosticReport, target: TargetProfile)
   const largestGaps = run.questionScores
     .map((score) => ({
       questionId: score.questionId,
-      gap: (target.mapping[score.questionId] ?? 0) - score.finalLevel
+      gap: (target.mapping[score.questionId] ?? 0) - score.finalLevel,
+      notEvaluated: notEvaluatedLevel(
+        questionBank.find((q) => q.id === score.questionId),
+        score.finalLevel,
+        target.mapping[score.questionId] ?? 0
+      )
     }))
     .filter((row) => row.gap > 0)
     .sort((a, b) => b.gap - a.gap)
@@ -225,7 +237,7 @@ export function generateTuningPack(run: DiagnosticReport, target: TargetProfile)
     ].join("\n"),
     promptAddendum: [
       "## Tuning Priorities",
-      ...largestGaps.map((row) => `- ${row.questionId}: close gap ${row.gap} with evidence-linked behavior.`)
+      ...largestGaps.map((row) => `- ${row.questionId}: ${row.notEvaluated?.notice ?? `close gap ${row.gap} with evidence-linked behavior.`}`)
     ].join("\n"),
     evalHarness: [
       "suites:",

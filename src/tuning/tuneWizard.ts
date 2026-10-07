@@ -242,9 +242,10 @@ export async function runUpgradeWizardForAgent(
     for (const task of phase.tasks) {
       lines.push(`- ${task.questionId}: current ${task.current}, target ${task.target}, gap ${task.gap}`);
       lines.push(`  - Why: ${task.reason}`);
-      lines.push(`  - Implement: ${task.implementation.join(" | ")}`);
-      lines.push(`  - Accept: ${task.acceptanceCriteria.join(" | ")}`);
-      lines.push(`  - Evidence: ${task.requiredEvidence.join(" | ")}`);
+      // A task whose next level AMC cannot evaluate carries only its reason (P1-07).
+      if (task.implementation.length > 0) lines.push(`  - Implement: ${task.implementation.join(" | ")}`);
+      if (task.acceptanceCriteria.length > 0) lines.push(`  - Accept: ${task.acceptanceCriteria.join(" | ")}`);
+      if (task.requiredEvidence.length > 0) lines.push(`  - Evidence: ${task.requiredEvidence.join(" | ")}`);
     }
     lines.push("");
   }
