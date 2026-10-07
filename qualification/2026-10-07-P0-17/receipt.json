@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-17",
+  "date": "2026-10-07",
+  "commit": "68b51edf0a7c3990987e46dfd20d29027e88e942",
+  "branch": "rtd/p0-17-compliance-fail-closed",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 668
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 24942
+    },
+    {
+      "cmd": "npx vitest run tests/compliance tests/federationComplianceIntegrationMerkle.test.ts",
+      "exit": 0,
+      "durationMs": 5651
+    },
+    {
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-17/affected-tests.txt)",
+      "exit": 0,
+      "durationMs": 12351
+    },
+    {
+      "cmd": "npm run typecheck && npm run typecheck:tests && npm run lint",
+      "exit": 0,
+      "durationMs": 51155
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 356
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1115
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 288
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 242
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1374
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 30178
+    },
+    {
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-17/affected-tests.txt) --coverage --coverage.enabled=true --coverage.reporter=json-summary --coverage.reportsDirectory=<scratchpad>/p017-cov --coverage.include=src/compliance/complianceEngine.ts --coverage.include=src/compliance/evidenceBinding.ts --coverage.include=src/claims/evidenceProvenance.ts --coverage.include=src/compliance/coverageScorer.ts --coverage.include=src/compliance/mappingSchema.ts --coverage.include=src/compliance/complianceReport.ts --coverage.include=src/compliance/complianceCli.ts --coverage.include=src/compliance/complianceMatrix.ts --coverage.include=src/unified/unifiedSurfaceInspection.ts --coverage.include=src/api/complianceRouter.ts ",
+      "exit": 0,
+      "durationMs": 15687
+    },
+    {
+      "cmd": "W=$(mktemp -d) && cd $W && AMC_VAULT_PASSPHRASE=p017-acceptance node <scratchpad>/amc-p0-17/dist/cli.js init --trust-boundary isolated --minimal >/dev/null && AMC_VAULT_PASSPHRASE=p017-acceptance node <scratchpad>/amc-p0-17/dist/cli.js compliance report --framework HIPAA --window 14d --out r.json && cp r.json <scratchpad>/p017-acceptance-r.json",
+      "exit": 0,
+      "durationMs": 1600
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21227
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 28868
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 897
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 360
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 290
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1416
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 270
+    }
+  ],
+  "tests": {
+    "total": 7697,
+    "passed": 7697,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "5650badeb8b48bbed9208f5d86f409c6780861573d00084c463963f4f2a11188"
+    },
+    {
+      "path": "affected-tests.txt",
+      "sha256": "cee49a25912151da9afe6a18554155cb6e904b372b6630ace665f2ae0e3b8f0b"
+    },
+    {
+      "path": "red-run.log",
+      "sha256": "055923f93f050fec621283686edfac8768a97b3a8ad5bc545177ec97b00dec44"
+    },
+    {
+      "path": "mutations.log",
+      "sha256": "6b305ce4c1e046ae225e0f76f1ef8f7cb9a628dec6dfffd6002f7beabe9c4079"
+    },
+    {
+      "path": "coverage.txt",
+      "sha256": "828e9981c906a4d724f73fd87d722ad8aad03c886495551f6ad2f06761c18779"
+    },
+    {
+      "path": "acceptance-hipaa-report.json",
+      "sha256": "c4644c33070fc48065e67578199f2364f6066d139f70d9c2be5d8e2ef0bd2304"
+    }
+  ],
+  "notes": "P0-17 on base 6b899a60. tests sums three vitest runs that overlap in files: the issue's focused set (tests/compliance plus the federation test, 78), every affected test file (29 files, 506; the coverage run repeats it and is not counted again) and the restoration-parity plus plan-edit-manifest run (7,113). red-run.log is 19 failed, 36 passed with the src of 6b899a60; mutations.log holds the four mutation checks with byte-identical restores; coverage.txt is focused per-file coverage with no file below its floor; acceptance-hipaa-report.json is the fresh-workspace HIPAA report (all NOT_EVALUATED, score null). The full npm test, whole-suite coverage, per-file floors, performance, check:clean-source, check:packed-install and the release gate are run by the orchestrator and are not part of this receipt."
+}

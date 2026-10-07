@@ -1,0 +1,38 @@
+## M1 system session is positive credit for every scope
+-  if (event.session_id === "system") return scope === "workspace" ? "positive" : "violation-only";
++  if (event.session_id === "system") return "positive";
+      Tests  3 failed | 75 passed (78)
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound positive event in session system: agent-scoped NOT_EVALUATED, workspace-scoped SATISFIED
+ FAIL  tests/compliance/evidenceBinding.test.ts > subjectRole > meta {"agentId":"a"} in system with scope agent -> violation-only
+ FAIL  tests/compliance/evidenceBinding.test.ts > subjectRole > meta {} in system with scope agent -> violation-only
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+restored: byte-identical sha256 aadf4f524182858b1b31843e1ca3f3a81ad8d6d77ec5008f7da0db51466f7a58
+
+## M2 requires_no_audit passes without activity
+-  if (activity.length === 0) {
++  if (activity.length < 0) {
+      Tests  2 failed | 76 passed (78)
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+restored: byte-identical sha256 5ae3c5352ace39217216384c627401a2a4212a31380088ab3f74b929510c3467
+
+## M3 isBoundToControl always true
++  return true;
+      Tests  5 failed | 73 passed (78)
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a failing requirement next to a passing one is PARTIAL; PARTIAL never comes from not evaluated
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > an event bound to soc2_availability does not satisfy nist_map
+ FAIL  tests/compliance/evidenceBinding.test.ts > isBoundToControl > binds an audit event through the requirement's auditTypes only
+ FAIL  tests/compliance/evidenceBinding.test.ts > isBoundToControl > binds through meta.controlIds naming the mapping
+ FAIL  tests/federationComplianceIntegrationMerkle.test.ts > compliance + merkle + federation + integrations > compliance maps are signed and SATISFIED only when control-bound evidence exists
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+restored: byte-identical sha256 aadf4f524182858b1b31843e1ca3f3a81ad8d6d77ec5008f7da0db51466f7a58
+
+## M4 import producer admitted
+-  const runtime = bound.filter((event) => evidenceProducer(event) === "amc-runtime");
++  const runtime = bound.filter((event) => ["amc-runtime", "import"].includes(evidenceProducer(event)));
+      Tests  1 failed | 77 passed (78)
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound event from eval_import is NOT_EVALUATED with untrusted evidence
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+restored: byte-identical sha256 5ae3c5352ace39217216384c627401a2a4212a31380088ab3f74b929510c3467
+

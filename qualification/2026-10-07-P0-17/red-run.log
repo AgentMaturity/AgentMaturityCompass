@@ -1,0 +1,378 @@
+
+ RUN  v4.1.11 <scratchpad>/amc-p0-17
+
+ ❯ tests/compliance/coverageScorer.test.ts (2 tests | 2 failed) 8ms
+     × score is null when nothing was evaluated 3ms
+     × NOT_EVALUATED and UNKNOWN earn 0 and stay in the denominator 1ms
+ ❯ tests/federationComplianceIntegrationMerkle.test.ts (4 tests | 1 failed) 1564ms
+     × compliance maps are signed and SATISFIED only when control-bound evidence exists 257ms
+ ❯ tests/compliance/complianceFailClosed.test.ts (16 tests | 16 failed) 2715ms
+     × empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null 255ms
+     × runtime events for agent A and no denied audits: requires_no_audit passes 176ms
+     × no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing 172ms
+     × a bound event for agent B only leaves agent A's category NOT_EVALUATED 165ms
+     × a bound positive event in session system: agent-scoped NOT_EVALUATED, workspace-scoped SATISFIED 163ms
+     × a denied audit type in session system fails agent A's requires_no_audit 160ms
+     × an event bound to soc2_availability does not satisfy nist_map 183ms
+     × a bound event from eval_import is NOT_EVALUATED with untrusted evidence 166ms
+     × bound events below the observed ratio are NOT_EVALUATED with untrusted evidence 166ms
+     × a bound event without meta.agentId is not credited to default 157ms
+     × an event outside the window is not counted 156ms
+     × a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL 173ms
+     × a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted 153ms
+     × a sealed run below minScore fails requires_assurance_pack 150ms
+     × bound runtime OBSERVED events, a sealed passing run and no violations: SATISFIED 157ms
+     × a failing requirement next to a passing one is PARTIAL; PARTIAL never comes from not evaluated 159ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/federationComplianceIntegrationMerkle.test.ts > compliance + merkle + federation + integrations > compliance maps are signed and SATISFIED only when control-bound evidence exists
+AssertionError: expected 'MISSING' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "MISSING"
+
+ ❯ tests/federationComplianceIntegrationMerkle.test.ts:136:31
+    134|     const beforeMap = before.categories.find((row) => row.id === "nist…
+    135|     expect(beforeMap).toBeDefined();
+    136|     expect(beforeMap?.status).toBe("NOT_EVALUATED");
+       |                               ^
+    137|
+    138|     // P0-17: an arbitrary audit type is a coincidental event, not evi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null
+AssertionError: expected { id: 'soc2_security', …(3) } to deeply equal { id: 'soc2_security', …(3) }
+
+- Expected
++ Received
+
+  {
+-   "evidence": "incomplete",
++   "evidence": undefined,
+    "id": "soc2_security",
+-   "result": "not_evaluated",
+-   "status": "NOT_EVALUATED",
++   "result": undefined,
++   "status": "PARTIAL",
+  }
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:166:12
+    164|       for (const row of out.categories) {
+    165|         expect({ id: row.id, status: row.status, result: row.result, e…
+    166|           .toEqual({ id: row.id, status: "NOT_EVALUATED", result: "not…
+       |            ^
+    167|         expect(row.notEvaluatedReasons.length).toBeGreaterThan(0);
+    168|         // Every requirement is unevaluated on an empty ledger, a vacu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > runtime events for agent A and no denied audits: requires_no_audit passes
+AssertionError: expected undefined to be 'pass' // Object.is equality
+
+- Expected:
+"pass"
+
++ Received:
+undefined
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:186:24
+    184|     const row = category(workspace, AGENT_A, "fx_no_audit");
+    185|     expect(row.status).toBe("SATISFIED");
+    186|     expect(row.result).toBe("pass");
+       |                        ^
+    187|     expect(row.evidence).toBe("sufficient");
+    188|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:195:24
+    193|     appendEvent(workspace, { eventType: "metric", meta: { agentId: AGE…
+    194|     const row = category(workspace, AGENT_A, "fx_no_audit");
+    195|     expect(row.status).toBe("NOT_EVALUATED");
+       |                        ^
+    196|     expect(row.notEvaluatedReasons.join(" ")).toContain("absence of vi…
+    197|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound event for agent B only leaves agent A's category NOT_EVALUATED
+AssertionError: expected 'MISSING' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "MISSING"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:203:61
+    201|     initComplianceMaps(workspace, FIXTURE_MAPS);
+    202|     appendEvent(workspace, { meta: { agentId: AGENT_B, controlIds: ["f…
+    203|     expect(category(workspace, AGENT_A, "fx_event").status).toBe("NOT_…
+       |                                                             ^
+    204|     expect(category(workspace, AGENT_B, "fx_event").status).toBe("SATI…
+    205|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound positive event in session system: agent-scoped NOT_EVALUATED, workspace-scoped SATISFIED
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:212:32
+    210|     appendEvent(workspace, { sessionId: "system", meta: { controlIds: …
+    211|     const agentScoped = category(workspace, AGENT_A, "fx_event");
+    212|     expect(agentScoped.status).toBe("NOT_EVALUATED");
+       |                                ^
+    213|     expect(agentScoped.result).toBe("not_evaluated");
+    214|     expect(category(workspace, AGENT_A, "fx_workspace_event").status).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a denied audit type in session system fails agent A's requires_no_audit
+AssertionError: expected undefined to be 'fail' // Object.is equality
+
+- Expected:
+"fail"
+
++ Received:
+undefined
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:222:24
+    220|     appendEvent(workspace, { sessionId: "system", auditType: "DENIED_S…
+    221|     const row = category(workspace, AGENT_A, "fx_no_audit");
+    222|     expect(row.result).toBe("fail");
+       |                        ^
+    223|     expect(row.status).toBe("MISSING");
+    224|     expect(row.evidenceRefs.length).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > an event bound to soc2_availability does not satisfy nist_map
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:232:28
+    230|     appendEvent(workspace, { auditType: "NIST_MAP_SIGNAL", meta: { age…
+    231|     const nistMap = category(workspace, "default", "nist_map", "NIST_A…
+    232|     expect(nistMap.status).toBe("NOT_EVALUATED");
+       |                            ^
+    233|     expect(nistMap.notEvaluatedReasons.join(" ")).toContain("no contro…
+    234|     expect(category(workspace, "default", "soc2_availability", "SOC2")…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound event from eval_import is NOT_EVALUATED with untrusted evidence
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:242:24
+    240|     appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["f…
+    241|     const row = category(workspace, AGENT_A, "fx_event");
+    242|     expect(row.status).toBe("NOT_EVALUATED");
+       |                        ^
+    243|     expect(row.evidence).toBe("untrusted");
+    244|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > bound events below the observed ratio are NOT_EVALUATED with untrusted evidence
+AssertionError: expected 'PARTIAL' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "PARTIAL"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:251:24
+    249|     appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["f…
+    250|     const row = category(workspace, AGENT_A, "fx_event");
+    251|     expect(row.status).toBe("NOT_EVALUATED");
+       |                        ^
+    252|     expect(row.evidence).toBe("untrusted");
+    253|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a bound event without meta.agentId is not credited to default
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:259:63
+    257|     initComplianceMaps(workspace, FIXTURE_MAPS);
+    258|     appendEvent(workspace, { meta: { controlIds: ["fx_event"] } });
+    259|     expect(category(workspace, "default", "fx_event").status).toBe("NO…
+       |                                                               ^
+    260|   });
+    261|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > an event outside the window is not counted
+AssertionError: expected 'MISSING' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "MISSING"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:267:24
+    265|     appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["f…
+    266|     const row = category(workspace, AGENT_A, "fx_event");
+    267|     expect(row.status).toBe("NOT_EVALUATED");
+       |                        ^
+    268|     expect(row.evidence).toBe("incomplete");
+    269|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a tampered maps signature makes every category NOT_EVALUATED and untrusted, never PARTIAL
+AssertionError: expected { status: 'PARTIAL', …(2) } to deeply equal { status: 'NOT_EVALUATED', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "evidence": "untrusted",
+-   "result": "not_evaluated",
+-   "status": "NOT_EVALUATED",
++   "evidence": undefined,
++   "result": undefined,
++   "status": "PARTIAL",
+  }
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:281:12
+    279|       for (const row of out.categories) {
+    280|         expect({ status: row.status, result: row.result, evidence: row…
+    281|           .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated",…
+       |            ^
+    282|       }
+    283|       expect(out.coverage.score).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a hand-written assurance report JSON leaves requires_assurance_pack NOT_EVALUATED and untrusted
+AssertionError: expected 'SATISFIED' to be 'NOT_EVALUATED' // Object.is equality
+
+Expected: "NOT_EVALUATED"
+Received: "SATISFIED"
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:293:24
+    291|     writeFileSync(join(assuranceReportsDir(workspace, AGENT_A), "forge…
+    292|     const row = category(workspace, AGENT_A, "fx_pack");
+    293|     expect(row.status).toBe("NOT_EVALUATED");
+       |                        ^
+    294|     expect(row.evidence).toBe("untrusted");
+    295|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a sealed run below minScore fails requires_assurance_pack
+AssertionError: expected undefined to be 'fail' // Object.is equality
+
+- Expected:
+"fail"
+
++ Received:
+undefined
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:302:24
+    300|     writeSealedAssuranceReport(workspace, AGENT_A, 20);
+    301|     const row = category(workspace, AGENT_A, "fx_pack");
+    302|     expect(row.result).toBe("fail");
+       |                        ^
+    303|     expect(row.status).toBe("MISSING");
+    304|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > bound runtime OBSERVED events, a sealed passing run and no violations: SATISFIED
+AssertionError: expected undefined to be 'pass' // Object.is equality
+
+- Expected:
+"pass"
+
++ Received:
+undefined
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:314:25
+    312|     const row = out.categories.find((entry) => entry.id === "fx_full");
+    313|     expect(row?.status).toBe("SATISFIED");
+    314|     expect(row?.result).toBe("pass");
+       |                         ^
+    315|     expect(row?.evidence).toBe("sufficient");
+    316|     expect(row?.notEvaluatedReasons).toEqual([]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/19]⎯
+
+ FAIL  tests/compliance/complianceFailClosed.test.ts > compliance fails closed (P0-17) > a failing requirement next to a passing one is PARTIAL; PARTIAL never comes from not evaluated
+AssertionError: expected undefined to be 'fail' // Object.is equality
+
+- Expected:
+"fail"
+
++ Received:
+undefined
+
+ ❯ tests/compliance/complianceFailClosed.test.ts:330:26
+    328|     expect(out.categories.find((entry) => entry.id === "fx_full")?.sta…
+    329|     for (const row of out.categories.filter((entry) => entry.status ==…
+    330|       expect(row.result).toBe("fail");
+       |                          ^
+    331|     }
+    332|     expect(out.categories.find((entry) => entry.id === "fx_workspace_e…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/19]⎯
+
+ FAIL  tests/compliance/coverageScorer.test.ts > coverageScore (P0-17) > score is null when nothing was evaluated
+AssertionError: expected +0 to be null
+
+- Expected:
+null
+
++ Received:
+0
+
+ ❯ tests/compliance/coverageScorer.test.ts:24:37
+     22| describe("coverageScore (P0-17)", () => {
+     23|   test("score is null when nothing was evaluated", () => {
+     24|     expect(coverageScore([]).score).toBeNull();
+       |                                     ^
+     25|     const coverage = coverageScore([row("NOT_EVALUATED"), row("NOT_EVA…
+     26|     expect(coverage).toEqual({ satisfied: 0, partial: 0, missing: 0, u…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/19]⎯
+
+ FAIL  tests/compliance/coverageScorer.test.ts > coverageScore (P0-17) > NOT_EVALUATED and UNKNOWN earn 0 and stay in the denominator
+AssertionError: expected 0.625 to be 0.5 // Object.is equality
+
+- Expected
++ Received
+
+- 0.5
++ 0.625
+
+ ❯ tests/compliance/coverageScorer.test.ts:30:75
+     28|
+     29|   test("NOT_EVALUATED and UNKNOWN earn 0 and stay in the denominator",…
+     30|     expect(coverageScore([row("SATISFIED"), row("NOT_EVALUATED")]).sco…
+       |                                                                           ^
+     31|     expect(coverageScore([row("SATISFIED"), row("UNKNOWN")]).score).to…
+     32|     const coverage = coverageScore([row("SATISFIED"), row("PARTIAL"), …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/19]⎯
+
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  19 failed | 36 passed (55)
+   Start at  07:34:29
+   Duration  4.82s (transform 4.26s, setup 88ms, import 5.89s, tests 4.77s, environment 0ms)
+

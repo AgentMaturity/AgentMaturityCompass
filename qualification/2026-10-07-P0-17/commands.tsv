@@ -1,0 +1,19 @@
+pnpm install --frozen-lockfile	0	668
+pnpm run build	0	24942
+npx vitest run tests/compliance tests/federationComplianceIntegrationMerkle.test.ts	0	5651
+npx vitest run $(cat qualification/2026-10-07-P0-17/affected-tests.txt)	0	12351
+npm run typecheck && npm run typecheck:tests && npm run lint	0	51155
+npm run check:counts	0	356
+npm run check:freeze	0	1115
+npm run check:docs-drift	0	288
+npm run check:api-ref	0	242
+npm run check:architecture-boundaries	0	1374
+npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts	0	30178
+npx vitest run $(cat qualification/2026-10-07-P0-17/affected-tests.txt) --coverage --coverage.enabled=true --coverage.reporter=json-summary --coverage.reportsDirectory=<scratchpad>/p017-cov --coverage.include=src/compliance/complianceEngine.ts --coverage.include=src/compliance/evidenceBinding.ts --coverage.include=src/claims/evidenceProvenance.ts --coverage.include=src/compliance/coverageScorer.ts --coverage.include=src/compliance/mappingSchema.ts --coverage.include=src/compliance/complianceReport.ts --coverage.include=src/compliance/complianceCli.ts --coverage.include=src/compliance/complianceMatrix.ts --coverage.include=src/unified/unifiedSurfaceInspection.ts --coverage.include=src/api/complianceRouter.ts 	0	15687
+W=$(mktemp -d) && cd $W && AMC_VAULT_PASSPHRASE=p017-acceptance node <scratchpad>/amc-p0-17/dist/cli.js init --trust-boundary isolated --minimal >/dev/null && AMC_VAULT_PASSPHRASE=p017-acceptance node <scratchpad>/amc-p0-17/dist/cli.js compliance report --framework HIPAA --window 14d --out r.json && cp r.json <scratchpad>/p017-acceptance-r.json	0	1600
+npm run typecheck	0	21227
+npm run typecheck:tests	0	28868
+npm run lint	0	897
+npm run check:counts	0	360
+npm run check:docs-drift	0	290
+npm run check:architecture-boundaries	0	1416
