@@ -11,7 +11,7 @@ export const EVIDENCE_EVENT_TYPES = [
   "step/start", "step/end", "request/header", "request/tools", "request/response", "request/failure", "system/prompt",
   "user/message", "user/attachment", "assistant/block", "tool/call", "tool/result", "tool/spill-commitment",
   "approval/request", "approval/answer", "sandbox/mode", "session/recovery-claim", "session/resume", "session/release",
-  "session/recovered", "loop/inbox", "loop/cancel", "loop/veto", "loop/retry", "loop/compact"
+  "session/recovered", "loop/inbox", "loop/cancel", "loop/veto", "loop/retry", "loop/compact", "time/checkpoint"
 ] as const satisfies readonly EvidenceEventType[];
 // A new EvidenceEventType is a compile error here until it is published.
 true satisfies ([EvidenceEventType] extends [(typeof EVIDENCE_EVENT_TYPES)[number]] ? true : false);

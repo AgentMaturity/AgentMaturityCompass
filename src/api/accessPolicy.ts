@@ -109,6 +109,11 @@ function isWorkOrderVerification(pathname: string): boolean {
   return /^\/api\/v1\/workorders\/[^/]+\/verify$/.test(pathname);
 }
 
+/** P1-17: an oversight record is signed with the auditor key in the reviewer's name. */
+function isIncidentOversight(pathname: string): boolean {
+  return /^\/api\/v1\/incidents\/[^/]+\/oversight$/.test(pathname);
+}
+
 function isPassportRevocation(pathname: string): boolean {
   return /^\/api\/v1\/passport\/[^/]+\/revoke$/.test(pathname);
 }
@@ -142,7 +147,7 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     return { access: "verify", roles: [...VERIFIER_ROLES] };
   }
 
-  if (method === "POST" && ATTESTER_PATHS.has(pathname)) {
+  if (method === "POST" && (ATTESTER_PATHS.has(pathname) || isIncidentOversight(pathname))) {
     return { access: "attest", roles: [...ATTESTER_ROLES] };
   }
 

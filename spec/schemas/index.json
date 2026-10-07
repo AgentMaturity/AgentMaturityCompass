@@ -36,9 +36,19 @@
       "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/catalog-lock.schema.json",
+      "name": "catalog-lock.schema.json",
+      "sha256": "e6046296d2a36de818dc0c90e61fae4129b7d8c93c726273206fe5278d3b4e5a"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
       "name": "claim-envelope.schema.json",
       "sha256": "4f6e86e990419e882a984e1da270180a7f98b18b59d4de362a6222a498201567"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",
+      "name": "control-record.schema.json",
+      "sha256": "571fc4bb269bec1d86291832a0842ac20b3e6d379d68238bf2349d799119e87c"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",
@@ -48,7 +58,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
       "name": "evidence-event.schema.json",
-      "sha256": "16a8040bab690aa4eae406896544aa67edb39d25b7a96995f74cd3536de593b5"
+      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a"
     },
     {
       "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
@@ -59,6 +69,11 @@
       "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
       "name": "legacy-receipt.schema.json",
       "sha256": "ca6d3edac1871d0c24c1bc0a9904a23071376dd4006656f4df79b963df8beca5"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/pack-manifest.schema.json",
+      "name": "pack-manifest.schema.json",
+      "sha256": "3b437f5e203d30f68ce5a89d864af6c0e3d49153d4e80eb4389338e77fe71b79"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
@@ -88,12 +103,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
       "name": "trust-list.schema.json",
-      "sha256": "084837198e5c46360b39dfc00da1829a8c142132aa0b7e2e3d725e813547fa4d"
+      "sha256": "ed3015dbf3a024ecb0d4b85b6187bd02f816fc36d3c97d3bb6b5f8619632e103"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
       "name": "verifier-report.schema.json",
-      "sha256": "0993d1049f672ab4c6a454bbb6a70854c12df49f9107dd7a9f4ff500ffdab17c"
+      "sha256": "ae18f45479b657de84447fc273a9f0ed822dd089038006e8ba8807affe6a1a3d"
     }
   ],
   "version": 1

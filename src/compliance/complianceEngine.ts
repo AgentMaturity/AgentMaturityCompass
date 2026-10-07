@@ -25,6 +25,8 @@ import { coverageScore } from "./coverageScorer.js";
 import { countAttestedOnce, effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
+import { stationsForMapping } from "./stationTags.js";
+import type { Station } from "../domains/stations.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -420,6 +422,8 @@ export function generateComplianceReport(params: {
   agentId?: string;
   window: string;
   framework: ComplianceFramework;
+  /** Keep only mappings whose stations include this one; the kept categories are evaluated exactly as without it. */
+  station?: Station;
   mapsPath?: string;
 }): ComplianceReportJson {
   const workspace = params.workspace;
@@ -430,7 +434,9 @@ export function generateComplianceReport(params: {
   const windowEndTs = now;
   const maps = loadComplianceMaps(workspace, params.mapsPath);
   const verify = verifyComplianceMapsSignature(workspace, params.mapsPath);
-  const mappings = maps.complianceMaps.mappings.filter((row) => row.framework === params.framework);
+  const { station } = params;
+  const mappings = maps.complianceMaps.mappings.filter((row) => row.framework === params.framework
+    && (station === undefined || stationsForMapping(row).includes(station)));
   const ledger = openLedger(workspace);
   try {
     // Events that could matter to this subject at any scope; evidenceBinding decides how each counts.
@@ -471,6 +477,7 @@ export function generateComplianceReport(params: {
       ts: now,
       workspace,
       framework: params.framework,
+      ...(station === undefined ? {} : { station }),
       agentId,
       windowStartTs,
       windowEndTs,

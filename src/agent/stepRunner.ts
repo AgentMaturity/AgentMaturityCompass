@@ -105,7 +105,7 @@ export interface StepResult {
  * nullable to mean the same thing, so the fact survives into the signed row
  * instead of being flattened to a zero on the way.
  */
-function stepUsage(usage: StreamTokenUsage | null): TokenUsage | null {
+export function stepUsage(usage: StreamTokenUsage | null): TokenUsage | null {
   if (usage === null) return null;
   return {
     inputTokens: usage.inputTokens,

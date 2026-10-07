@@ -71,7 +71,7 @@ function arbitraryConfigJson(): string {
 function importInto(inputPath: string) {
   const workspace = scratch("amc-import-ws-");
   mkdirSync(join(workspace, ".amc"), { recursive: true });
-  const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import" });
+  const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import", retainOriginals: false });
   const report = JSON.parse(readFileSync(result.diagnosticReportPath!, "utf8")) as DiagnosticReport;
   const markdown = readFileSync(result.diagnosticMarkdownPath!, "utf8");
   return { workspace, result, report, markdown };

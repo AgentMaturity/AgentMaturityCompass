@@ -25,13 +25,16 @@ export interface NeutralRecordMapping {
   omittedTraceLinks: number;
 }
 export interface NeutralRecordMappingReceipt {
-  schemaVersion: "amc-record-map/1";
+  schemaVersion: "amc-record-map/2";
   digestSha256: string;
   sourceSemanticDigest: string;
   counts: { records: number; mapped: number; retainedOnly: number; malformed: number; unsupported: number;
     mappedTraceLinks: number; unlinkedTraces: number; skippedFilesWithUnknownRecordCount: number };
-  sources: Array<{ path: string; digest: string | null; version: string | number | null; format: string;
-    disposition: "recognized" | "skipped"; recordCount: number | null; reason: string | null }>;
+  /** originalSha256 is the SHA-256 of the exact bytes read (equal to digest); sourceRevision is the pinned revision AMC's parser follows, when it has one. */
+  sources: Array<{ path: string; digest: string | null; originalSha256: string | null; version: string | number | null; sourceRevision: string | null;
+    format: string; disposition: "recognized" | "skipped"; recordCount: number | null; reason: string | null }>;
+  /** What each conversion stage dropped, named by stage; source is null when the loss applies to every source. */
+  losses: Array<{ stage: "redaction" | "projection" | "external-evidence"; source: string | null; detail: string }>;
   records: NeutralRecordMapping[];
   detailCoverage: { complete: boolean; emittedRecords: number; omittedRecords: number; omittedFields: number;
     omittedTraceLinks: number; boundedTextValues: number; limits: typeof LIMITS };
@@ -114,7 +117,7 @@ export function buildNeutralRecordMapping(input: {
     unlinkedTraces: 0, skippedFilesWithUnknownRecordCount: input.unsupported.length };
   const detailCoverage = { complete: true, emittedRecords: 0, omittedRecords: 0, omittedFields: 0,
     omittedTraceLinks: 0, boundedTextValues: 0, limits: LIMITS };
-  const records: NeutralRecordMapping[] = [], sources: NeutralRecordMappingReceipt["sources"] = [];
+  const records: NeutralRecordMapping[] = [], sources: NeutralRecordMappingReceipt["sources"] = [], losses: NeutralRecordMappingReceipt["losses"] = [];
   let detailBytes = 0;
   const text = (value: string): string => {
     if (value.length <= LIMITS.textChars) return value;
@@ -137,9 +140,14 @@ export function buildNeutralRecordMapping(input: {
     const representedLines = new Set(units.map(unit => unit.line).filter(line => line !== null));
     for (const line of malformedLines) if (!representedLines.has(line)) units.push({ value: null, pointer: null, line });
     if (candidate.sourceLineNumbers) units.sort((a, b) => (a.line ?? Infinity) - (b.line ?? Infinity));
-    sources.push({ path: text(source), digest: candidate.candidate.digest,
-      version: candidate.candidate.sourceFormat?.version ?? (amc ? 1 : null), format: format === "generic" ? amc ? "amc-trace" : candidate.candidate.format : format,
+    const sourceFormat = candidate.candidate.sourceFormat;
+    sources.push({ path: text(source), digest: candidate.candidate.digest, originalSha256: candidate.candidate.digest,
+      version: sourceFormat?.version ?? (amc ? 1 : null), sourceRevision: sourceFormat && "sourceRevision" in sourceFormat ? sourceFormat.sourceRevision : null,
+      format: format === "generic" ? amc ? "amc-trace" : candidate.candidate.format : format,
       disposition: "recognized", recordCount: units.length, reason: null });
+    if (candidate.candidate.redactionCount) losses.push({ stage: "redaction", source: text(source),
+      detail: `${candidate.candidate.redactionCount} sensitive-looking value(s) were replaced with [REDACTED] in every persisted projection.` });
+    let unprojected = 0;
     for (const unit of units) {
       const row = record(unit.value) ? unit.value : null;
       let indices: number[] = [], disposition: Disposition = "retained-only", reason = "Retained as redacted source context; no independent trace is projected.";
@@ -161,7 +169,7 @@ export function buildNeutralRecordMapping(input: {
       }
       indices = indices.filter(index => index < candidate.traces.length);
       if (indices.length) { disposition = "mapped"; reason = "Projected by the existing mapper; source claims remain self-reported and unevaluated."; }
-      counts.records++; counts[disposition === "retained-only" ? "retainedOnly" : disposition]++;
+      counts.records++; counts[disposition === "retained-only" ? "retainedOnly" : disposition]++; if (disposition !== "mapped") unprojected++;
       counts.mappedTraceLinks += indices.length; indices.forEach(index => linked.add(index));
       if (records.length >= LIMITS.records || detailBytes >= LIMITS.detailBytes) { detailCoverage.omittedRecords++; continue; }
       const keys = row ? Object.keys(row).sort() : [];
@@ -182,12 +190,15 @@ export function buildNeutralRecordMapping(input: {
       records.push(item); detailBytes += bytes; detailCoverage.omittedFields += fields.omitted; detailCoverage.omittedTraceLinks += item.omittedTraceLinks;
     }
     counts.unlinkedTraces += candidate.traces.length - linked.size;
+    if (unprojected) losses.push({ stage: "projection", source: text(source),
+      detail: `${unprojected} of ${units.length} source record(s) produced no trace; they remain only as redacted context or were rejected.` });
   }
-  for (const skipped of input.unsupported) sources.push({ path: text(input.sourceRelative(skipped.path)),
-    digest: skipped.digest ?? null, version: null, format: skipped.format ?? "unknown", disposition: "skipped", recordCount: null, reason: skipped.reason });
+  if (input.candidates.length) losses.push({ stage: "external-evidence", source: null, detail: "Portable external-evidence profiles keep an operational trace projection only: payload contents, nested metadata, usage, cost and call/result pairing are omitted. Each profile lists its own losses." });
+  for (const skipped of input.unsupported) sources.push({ path: text(input.sourceRelative(skipped.path)), digest: skipped.digest ?? null, originalSha256: skipped.digest ?? null,
+    version: null, sourceRevision: null, format: skipped.format ?? "unknown", disposition: "skipped", recordCount: null, reason: skipped.reason });
   detailCoverage.emittedRecords = records.length;
   detailCoverage.complete = detailCoverage.omittedRecords + detailCoverage.omittedFields + detailCoverage.omittedTraceLinks + detailCoverage.boundedTextValues === 0;
-  const body = { schemaVersion: "amc-record-map/1" as const, sourceSemanticDigest: input.semanticDigest, counts, sources, records, detailCoverage,
+  const body = { schemaVersion: "amc-record-map/2" as const, sourceSemanticDigest: input.semanticDigest, counts, sources, losses, records, detailCoverage,
     semantics: ["Pointers identify retained redacted parsed records; sourceLine is the original 1-based JSONL line where available. A syntax-invalid line has no parsed pointer.",
       "Trace links identify the primary source record. Cross-record context contributions (for example Pi ancestry or DSH call arguments) are not expanded into secondary links.",
       "Wrapper metadata is a separate retained context record. Record counts differ from legacy sourceItems, which can count config fields.",

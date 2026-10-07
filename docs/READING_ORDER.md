@@ -107,6 +107,7 @@ Start: `SECURITY_COMPLIANCE_QUICKSTART`, then `SECURITY_PATH`.
 | AUDIT_BINDER, COMPLIANCE, COMPLIANCE_MAPS, COMPLIANCE_FRAMEWORKS | Binder and maps; COMPLIANCE_FRAMEWORKS **fix first** (Document 2, B-6). |
 | EU_AI_ACT_COMPLIANCE, ISO_42001_ALIGNMENT, GDPR_ARTICLE_COMPLIANCE, MITRE_ATLAS_MAPPING, STANDARDS_MAPPING | Framework mappings, one each. |
 | compliance/eu-ai-act-checklist, compliance/iso-42001-aims-manual, compliance/nist-rmf-profile, compliance/SOC2_TYPE_II_CONTROLS_MAPPING, enterprise-readiness-checklist | The promoted checklists and manuals. |
+| catalog/CONTROL_RECORD | The Regulated Control Catalog record, loader, support gates, digests and lockfile (P1-09; experimental content, evidence of conformity only). |
 
 ### 5. Contributors and maintainers (not promoted; keep in the repo, not in the public collection)
 

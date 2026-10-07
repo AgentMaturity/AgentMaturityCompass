@@ -148,7 +148,8 @@ describe("neutral importer", () => {
         workspace,
         inputPath,
         agentId: "default",
-        mode: "import"
+        mode: "import",
+        retainOriginals: false
       });
 
       expect(result.applied).toBe(true);
@@ -187,7 +188,8 @@ describe("neutral importer", () => {
         workspace,
         inputPath,
         agentId: "default",
-        mode: "import"
+        mode: "import",
+        retainOriginals: false
       });
 
       expect(result.diagnosticReportPath).toBeTruthy();
@@ -241,7 +243,7 @@ describe("neutral importer", () => {
     const inputPath = join(workspace, eventLog ? "source.jsonl" : "source.json");
     writeFileSync(inputPath, `${JSON.stringify(artifact)}\n`);
     try {
-      const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import" });
+      const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import", retainOriginals: false });
       const report = JSON.parse(readFileSync(result.diagnosticReportPath!, "utf8"));
       expect(report.questionScores).toEqual([]);
       expect(report.layerScores).toEqual([]);
@@ -286,7 +288,8 @@ describe("neutral importer", () => {
         workspace,
         inputPath,
         agentId: "default",
-        mode: "import"
+        mode: "import",
+        retainOriginals: false
       });
 
       expect(result.applied).toBe(true);
@@ -334,7 +337,7 @@ describe("neutral importer", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-neutral-import-rollback-"));
     const inputPath = representativeImportDir();
     try {
-      const imported = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import" });
+      const imported = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import", retainOriginals: false });
       expect(imported.importId).toBeTruthy();
       const normalizedPath = imported.normalizedPath!;
       expect(existsSync(normalizedPath)).toBe(true);

@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-01",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "bindingPoint": "tool_pipeline",
+    "tool": "fixture.write",
+    "workspaceId": "ws-a",
+    "agentId": "agent-1",
+    "evidenceWindow": {
+      "receipts": []
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": null
+  }
+}

@@ -31,6 +31,13 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "src/agent/nativeToolCapabilities.ts",
+      "issue": "P1-43",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
+      "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0"
+    },
+    {
       "path": "src/api/benchmarkRouter.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -157,11 +164,25 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/gateway/config.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc"
+    },
+    {
       "path": "src/governor/emergencyOverride.ts",
       "issue": "P0-10",
       "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
       "archivePath": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
+    },
+    {
+      "path": "src/importers/dshSessionImport.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/importers/dshSessionImport.ts.landed",
+      "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4"
     },
     {
       "path": "src/index.ts",
@@ -274,6 +295,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+    },
+    {
+      "path": "src/workspace.ts",
+      "issue": "P1-25",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
     },
     {
       "path": "tests/apiRouterResponseParity.test.ts",

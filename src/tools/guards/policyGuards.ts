@@ -26,6 +26,14 @@ import type { ToolDefinition, ToolExecution, ToolGuard } from "../toolTypes.js";
  */
 
 /**
+ * The arguments a host check reads. Defaults to the call's own; a composition
+ * supplies a destination a tool does not take as an argument (P1-43:
+ * `web_search` reaches its provider's declared origin, never a model-chosen url).
+ */
+export type GovernedArguments = (execution: ToolExecution) => Readonly<Record<string, unknown>>;
+const ownArguments: GovernedArguments = (execution) => execution.arguments;
+
+/**
  * The Runtime Firewall over the call's arguments.
  *
  * After ADR-0011 an unconfigured workspace blocks, so composing this guard in
@@ -85,7 +93,7 @@ export function budgetGuard(workspace: string, sessionId?: string): ToolGuard {
  */
 export function toolhubAllowlistGuard(workspace: string,
   visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined,
-  expectedToolsDigest?: string): ToolGuard {
+  expectedToolsDigest?: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
   return (execution) => {
     // The Code Mode transport is presentation infrastructure, not a
     // capability, and the allowlist has nothing useful to say about it. What
@@ -114,7 +122,7 @@ export function toolhubAllowlistGuard(workspace: string,
     const verdict = validateToolRequest({
       workspace,
       tool: definition,
-      args: execution.arguments as Record<string, unknown>,
+      args: argumentsFor(execution) as Record<string, unknown>,
       nativeSandboxPermit: snapshot.digestSha256
         ? admitNativeSandboxPolicy(visibleDefinition?.(execution), execution, definition, snapshot.digestSha256)
         : undefined
@@ -148,11 +156,11 @@ export function toolhubAllowlistGuard(workspace: string,
  * allowlist, and "we could not tell where this was going" is not a reason to
  * let it go.
  */
-export function networkEgressGuard(workspace: string): ToolGuard {
+export function networkEgressGuard(workspace: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
   return (execution) => {
     if (execution.actionClass !== "NETWORK_EXTERNAL") return undefined;
 
-    const raw = execution.arguments["url"];
+    const raw = argumentsFor(execution)["url"];
     if (typeof raw !== "string" || raw.length === 0) {
       return `${execution.name} is a network tool but named no url to check against the allowlist`;
     }

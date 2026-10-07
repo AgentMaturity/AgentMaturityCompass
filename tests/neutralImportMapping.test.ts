@@ -26,7 +26,7 @@ describe("per-record neutral import mapping", () => {
       { id: "unknown", input: "question", metadata: { password: "fixture-private-password", nested: { authorization: "bearer private-value-1234" } } }
     ]);
     const plan = validateNeutralImport(input), map = plan.normalization!.recordMapping!;
-    expect(map.schemaVersion).toBe("amc-record-map/1");
+    expect(map.schemaVersion).toBe("amc-record-map/2");
     expect(map.counts).toMatchObject({ records: 4, mapped: 3, unsupported: 1, retainedOnly: 0, malformed: 0, mappedTraceLinks: 3, unlinkedTraces: 0 });
     expect(map.records.map(row => row.pointer)).toEqual(["/0", "/1", "/2", "/3"]);
     expect(map.records[0].traces[0]).toMatchObject({ index: 0, traceId: "measured-by-source", sourceTime: Date.parse("2026-09-08T01:02:03.000Z"),
@@ -142,7 +142,7 @@ describe("per-record neutral import mapping", () => {
     expect(second.normalization!.semanticDigest).toBe(first.normalization!.semanticDigest);
     expect(second.normalization!.recordMapping).toEqual(first.normalization!.recordMapping);
     vi.useRealTimers();
-    const result = runNeutralImport({ ...input, mode: "import", expectedSemanticDigest: first.normalization!.semanticDigest });
+    const result = runNeutralImport({ ...input, mode: "import", expectedSemanticDigest: first.normalization!.semanticDigest, retainOriginals: false });
     const normalized = JSON.parse(readFileSync(result.normalizedPath!, "utf8"));
     expect(normalized.plan.normalization.recordMapping).toEqual(first.normalization!.recordMapping);
     json(path, { runId: "changed", spans: [{ input: "different" }] });
