@@ -9,6 +9,8 @@ import {
   buildIndustryPackAudit,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
+  signIndustryPackAudit,
+  type IndustryPackAuditSignature,
 } from "./industryPackAudit.js";
 
 function collectComplianceFrameworks(value: string, previous: string[] = []): string[] {
@@ -17,6 +19,17 @@ function collectComplianceFrameworks(value: string, previous: string[] = []): st
     .map((item) => item.trim())
     .filter((item) => item.length > 0);
   return [...previous, ...next];
+}
+
+/** What a signed write prints: who signed, what the signature does not prove, and how to verify it. */
+function signedBundleLines(path: string, signature: IndustryPackAuditSignature): string[] {
+  const signer = signature.envelope ? ` (${signature.envelope.signer.type}, ${signature.envelope.signer.attestationLevel})` : "";
+  return [
+    chalk.green(`\nSigned industry-pack audit written: ${path}`),
+    `  Signer: auditor key ${signature.keyFingerprint}${signer}`,
+    "  Answers: self-reported. The signature proves who produced this file and that it is unchanged, not that the answers are true.",
+    `  Verify: amc audit binder verify ${path} --pubkey <recorded-auditor.pub>`
+  ];
 }
 
 function loadResponses(path: string): Record<string, number> {
@@ -47,10 +60,11 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
       []
     )
     .option("--file <path>", "Explicit agent config file to update")
-    .option("--audit", "Produce a signed, auditor-ready Industry Pack audit for --pack (paid Industry Packs feature)", false)
+    .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack (paid Industry Packs feature)", false)
     .option("--responses <path>", "JSON file of { questionId: level } responses for the audit (default: L1 baseline)")
     .option("--framework <id>", "Limit the audit crosswalk to one framework (eu_ai_act|nist|iso42001|soc2|sector)")
-    .option("--audit-bundle <path>", "Write the signed audit bundle JSON to this path")
+    .option("--audit-bundle <path>", "Write the audit bundle JSON, signed by the workspace auditor key")
+    .option("--no-sign", "Write --audit-bundle as checksum only, not signed")
     .option("--json", "Output as JSON")
     .action(async (opts: {
       agent: string;
@@ -63,6 +77,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
       responses?: string;
       framework?: string;
       auditBundle?: string;
+      sign: boolean;
       json?: boolean;
     }) => {
       try {
@@ -90,7 +105,18 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
             }
           }
           const responses = opts.responses ? loadResponses(opts.responses) : {};
-          const auditReport = buildIndustryPackAudit({ pack, responses, now: Date.now(), frameworkFilter: framework });
+          let auditReport = buildIndustryPackAudit({ pack, responses, now: Date.now(), frameworkFilter: framework });
+          if (opts.auditBundle && opts.sign) {
+            try {
+              auditReport = signIndustryPackAudit(process.cwd(), auditReport);
+            } catch (error: unknown) {
+              const fix = auditReport.overall.claimKind === "synthetic_example"
+                ? "Pass your answers with --responses" : "Unlock the vault (AMC_VAULT_PASSPHRASE)";
+              console.error(chalk.red(`Cannot sign the industry-pack audit: ${toErrorMessage(error)}. ${fix} or pass --no-sign for a checksum-only bundle.`));
+              process.exit(1);
+              return;
+            }
+          }
           if (opts.auditBundle) {
             writeFileSync(opts.auditBundle, JSON.stringify(auditReport, null, 2));
           }
@@ -100,7 +126,10 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
           }
           console.log(renderIndustryPackAuditMarkdown(auditReport));
           if (opts.auditBundle) {
-            console.log(chalk.green(`\nSigned audit bundle written: ${opts.auditBundle}`));
+            const lines = auditReport.signature
+              ? signedBundleLines(opts.auditBundle, auditReport.signature)
+              : [chalk.yellow(`\nAudit bundle written: ${opts.auditBundle} (checksum only — not signed)`)];
+            console.log(lines.join("\n"));
           }
           return;
         }

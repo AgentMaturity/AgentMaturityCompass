@@ -93,7 +93,7 @@ describe("no certification from self-assessment (P0-21)", () => {
   test("the pack audit reports a self-reported overall with no certified field", () => {
     for (const pack of listIndustryPacks()) {
       const audit = buildIndustryPackAudit({ pack, responses: allFives(pack), now: 1_700_000_000_000 });
-      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/2");
+      expect(audit.schemaVersion).toBe("amc.industry-pack-audit/3");
       expect("certified" in audit.overall, pack.id).toBe(false);
       expect(audit.overall.claimKind).toBe("self_reported");
       expect(audit.overall.eligibleLevel!).toBeLessThanOrEqual(1);
