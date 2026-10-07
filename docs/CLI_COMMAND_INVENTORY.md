@@ -329,7 +329,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict`<br>`--live-probes` | - |
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
-| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--no-sign`<br>`--json` | `sector apply` |
+| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--profile-out <path>`<br>`--sign-profile <path>`<br>`--activate-profile <path>`<br>`--allow-widening`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--no-sign`<br>`--json` | `sector apply` |
 | `amc domain assess` | Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assess` |
 | `amc domain assurance` | Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assurance` |
 | `amc domain gaps` | Show compliance gaps for an agent and domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector gaps` |

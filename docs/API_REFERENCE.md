@@ -3687,6 +3687,10 @@ Alias: `amc sector apply`
 | `--dry-run` | - |
 | `--compliance <frameworks>` | - |
 | `--file <path>` | - |
+| `--profile-out <path>` | - |
+| `--sign-profile <path>` | - |
+| `--activate-profile <path>` | - |
+| `--allow-widening` | - |
 | `--audit` | - |
 | `--responses <path>` | - |
 | `--framework <id>` | - |

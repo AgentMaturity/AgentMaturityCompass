@@ -1,13 +1,41 @@
 export {
   DOMAIN_REGISTRY,
+  INDUSTRY_ASSURANCE_PACK_IDS,
+  INDUSTRY_ASSURANCE_PACK_STATIONS,
   getDomainMetadata,
+  getIndustryAssurancePacksForStation,
   isDomain,
   listDomainIds,
   listDomainMetadata,
+  listIndustryAssurancePackStations,
+  listUnmappedIndustryAssurancePacks,
   parseDomain,
   type Domain,
-  type DomainMetadata
+  type DomainMetadata,
+  type IndustryAssurancePackId,
+  type IndustryAssurancePackStationMapping
 } from "./domainRegistry.js";
+
+export {
+  OPERATING_PROFILE_DIR,
+  OPERATING_PROFILE_SOURCES,
+  OPERATOR_FLOW,
+  STATION_OPERATING_PROFILES,
+  assertOutsideSignedConfigTree,
+  buildOperatingProfile,
+  checkOperatingProfileConsistency,
+  defaultOperatingProfilePath,
+  emitOperatingProfile,
+  listProfileSources,
+  profileRiskTier,
+  type EmitOperatingProfileResult,
+  type IncidentReportingClock,
+  type OperatingProfile,
+  type OperatingProfileConsistency,
+  type ProfileSource,
+  type SourcedSetting,
+  type StationOperatingProfileData
+} from "./operatingProfiles/index.js";
 
 export {
   DOMAIN_MODULE_MAP,

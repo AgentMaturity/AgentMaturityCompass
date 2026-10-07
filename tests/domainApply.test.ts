@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -109,6 +109,86 @@ describe("domain apply", () => {
     expect(second).toBe(first);
     const markerCount = (second.match(/AMC-GUARDRAILS-START/g) ?? []).length;
     expect(markerCount).toBe(1);
+  });
+
+  test("apply emits a sourced operating profile outside .amc and keeps the prior result shape", async () => {
+    const workspace = createWorkspace();
+    const result = await applyDomainToAgent({
+      agentId: "default",
+      domain: "health",
+      workspacePath: workspace
+    });
+
+    // Backward compatibility: every field the CLI printed before 2026-10-03 is still there with the same type
+    // (the assessment is "not evaluated" since P0-15, never a score).
+    expect(typeof result.agentId).toBe("string");
+    expect(typeof result.domain).toBe("string");
+    expect(Array.isArray(result.packsApplied)).toBe(true);
+    expect(typeof result.guardrailsGenerated).toBe("number");
+    expect(typeof result.configFileUpdated).toBe("string");
+    expect(Array.isArray(result.guardrailsEnabled)).toBe(true);
+    expect(Array.isArray(result.complianceFrameworks)).toBe(true);
+    expect(result.assessment.status).toBe("not_evaluated");
+    expect(result.dryRun).toBe(false);
+
+    // The only thing apply writes under .amc/ is what it wrote at 8f57ce63: guardrails.yaml.
+    expect(readdirSync(join(workspace, ".amc")).sort()).toEqual(["guardrails.yaml"]);
+
+    const profilePath = join(workspace, "amc-operating-profiles", "default", "health.operating-profile.json");
+    expect(result.operatingProfile).toEqual({
+      station: "health",
+      riskTier: "critical",
+      path: profilePath,
+      written: true,
+      consistency: { ok: true, violations: [] }
+    });
+    expect(existsSync(profilePath)).toBe(true);
+    const profile = JSON.parse(readFileSync(profilePath, "utf8")) as Record<string, unknown>;
+    for (const section of ["incidentReportingClocks", "retention", "approvals", "toolAllowlist", "budgets", "firewall", "auditSampling", "humanOversight"]) {
+      expect(profile[section], section).toBeDefined();
+    }
+    const clocks = profile.incidentReportingClocks as Array<{ source: { url: string; retrievedAt: string } }>;
+    expect(clocks.length).toBeGreaterThan(0);
+    for (const clock of clocks) {
+      expect(clock.source.url.length).toBeGreaterThan(0);
+      expect(clock.source.retrievedAt).toBe("2026-10-03");
+    }
+    const approvals = profile.approvals as Record<string, { value: { requiredApprovals: number; requireDistinctUsers: boolean }; source: { title: string } }>;
+    expect(approvals.WRITE_HIGH.value.requiredApprovals).toBeGreaterThanOrEqual(2);
+    expect(approvals.WRITE_HIGH.value.requireDistinctUsers).toBe(true);
+    expect(approvals.WRITE_HIGH.source.title.length).toBeGreaterThan(0);
+    const operatorFlow = profile.operatorFlow as string[];
+    expect(operatorFlow.join("\n")).toContain("amc budgets sign");
+    expect(operatorFlow.join("\n")).toContain("amc ops sign");
+  });
+
+  test("apply refuses a profile target under .amc and writes nothing there", async () => {
+    const workspace = createWorkspace();
+    await expect(
+      applyDomainToAgent({
+        agentId: "default",
+        domain: "health",
+        workspacePath: workspace,
+        profileOut: ".amc/operating-profile.json"
+      })
+    ).rejects.toThrow(/Refusing to write an operating profile under/);
+    // Fail fast: the refusal happens before the guardrails or anything under .amc/ are written.
+    expect(existsSync(join(workspace, ".amc"))).toBe(false);
+    expect(existsSync(join(workspace, "AGENTS.md"))).toBe(false);
+  });
+
+  test("dry-run reports the profile path without writing it", async () => {
+    const workspace = createWorkspace();
+    const result = await applyDomainToAgent({
+      agentId: "default",
+      domain: "wealth",
+      dryRun: true,
+      workspacePath: workspace
+    });
+    expect(result.operatingProfile.written).toBe(false);
+    expect(result.operatingProfile.riskTier).toBe("high");
+    expect(existsSync(result.operatingProfile.path)).toBe(false);
+    expect(existsSync(join(workspace, "amc-operating-profiles"))).toBe(false);
   });
 
   test("invalid domain throws helpful error", async () => {
