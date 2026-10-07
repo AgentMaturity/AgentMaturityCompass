@@ -43,7 +43,7 @@ function sealedRunWorkspace(sealed: boolean): string {
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   const now = Date.now();
   const base = {
-    agentId: "default",
+    agentId: "agent-p015",
     runId: "run-observed",
     ts: now,
     windowEndTs: now - 1_000,
@@ -61,7 +61,7 @@ function sealedRunWorkspace(sealed: boolean): string {
     reportJsonSha256: "",
     runSealSig: ""
   };
-  const runPath = join(workspace, ".amc", "agents", "default", "runs", "run-observed.json");
+  const runPath = join(workspace, ".amc", "agents", "agent-p015", "runs", "run-observed.json");
   mkdirSync(dirname(runPath), { recursive: true });
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
@@ -123,7 +123,7 @@ describe("domain assessment without evidence", () => {
 
   test("a sealed run evaluates the base part with the run's claim kind; the domain rubric stays not evaluated", () => {
     const workspace = sealedRunWorkspace(true);
-    const assessment = assessDomainForAgent({ agentId: "default", domain: "health", workspace });
+    const assessment = assessDomainForAgent({ agentId: "agent-p015", domain: "health", workspace });
     expect(assessment.base.status).toBe("evaluated");
     expect(assessment.base.runId).toBe("run-observed");
     expect(assessment.base.claimKind).toBe("observed");
@@ -135,7 +135,7 @@ describe("domain assessment without evidence", () => {
 
   test("an unsealed run file is not evidence for the base part", () => {
     const workspace = sealedRunWorkspace(false);
-    const assessment = assessDomainForAgent({ agentId: "default", domain: "health", workspace });
+    const assessment = assessDomainForAgent({ agentId: "agent-p015", domain: "health", workspace });
     expect(assessment.base.status).toBe("not_evaluated");
     expect(assessment.base.reasons.join(" ")).toMatch(/not sealed/);
   });

@@ -32,7 +32,8 @@ export interface DomainApplyResult {
   configFileUpdated: string | null;
   guardrailsEnabled: string[];
   complianceFrameworks: string[];
-  assessmentScore: { composite: number; level: string; gaps: number };
+  /** Domain assessments are not evaluated without evidence (P0-15), so no gap steers rule selection. */
+  assessment: { status: "not_evaluated"; reasons: string[] };
   dryRun: boolean;
 }
 
@@ -196,8 +197,8 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
   const { domain, packs } = resolveDomainAndPacks(opts);
   const dryRun = opts.dryRun === true;
 
-  const assessment = assessDomainForAgent({ agentId, domain }).result;
-  const gapDimensions = assessment.complianceGaps.map((gap) => gap.dimension);
+  const { status, reasons } = assessDomainForAgent({ agentId, domain, workspace: workspacePath });
+  const gapDimensions: string[] = [];
   const complianceFrameworks = dedupe([
     ...packs.flatMap((pack) => pack.complianceFrameworks),
     ...(opts.compliance ?? [])
@@ -242,11 +243,7 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
       packsApplied: packs.map((pack) => pack.id),
       complianceFrameworks,
       enabledRules: rendered.enabledRules,
-      assessmentScore: {
-        composite: assessment.compositeScore,
-        level: assessment.level,
-        gaps: assessment.complianceGaps.length
-      }
+      assessment: { status, reasons }
     }
   };
 
@@ -262,11 +259,7 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
     configFileUpdated: applyResult.path,
     guardrailsEnabled: rendered.enabledRules,
     complianceFrameworks,
-    assessmentScore: {
-      composite: assessment.compositeScore,
-      level: assessment.level,
-      gaps: assessment.complianceGaps.length
-    },
+    assessment: { status, reasons },
     dryRun
   };
 }

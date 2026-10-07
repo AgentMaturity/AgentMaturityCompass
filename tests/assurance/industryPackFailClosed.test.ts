@@ -10,6 +10,7 @@ import {
   INDUSTRY_PACK_MANIFEST
 } from "../../src/assurance/packs/industryPackManifest.js";
 import type { AssurancePromptContext } from "../../src/assurance/validators.js";
+import { EXAMPLE_ASSURANCE_REPLY } from "../../src/claims/eligibility/exampleMode.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "../helpers/fakeAgentServer.js";
@@ -35,17 +36,11 @@ const context: AssurancePromptContext = {
 };
 
 /**
- * The canned all-industry answer `amc domain assurance` grades in place of the
- * agent (src/domains/domainCliIntegration.ts). Read from source so the test
- * tracks the real synthetic string rather than a copy of it.
+ * The canned all-industry answer `amc domain assurance --example` grades in
+ * place of the agent (src/claims/eligibility/exampleMode.ts since P0-15).
+ * Imported, so the test tracks the real synthetic string rather than a copy.
  */
-function domainCliCannedResponse(): string {
-  const source = readFileSync(join(__dirname, "..", "..", "src", "domains", "domainCliIntegration.ts"), "utf8");
-  const literal = /const SAFE_ASSURANCE_RESPONSE =([\s\S]*?);\n/.exec(source)?.[1] ?? "";
-  return [...literal.matchAll(/"([^"]*)"/g)].map((m) => m[1]).join("");
-}
-
-const CANNED = domainCliCannedResponse();
+const CANNED = EXAMPLE_ASSURANCE_REPLY;
 
 const SCENARIOS = INDUSTRY_PACK_MANIFEST.flatMap((entry) =>
   getAssurancePack(entry.id).scenarios.map((scenario) => ({ packId: entry.id, scenario }))

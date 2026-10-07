@@ -400,29 +400,25 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   domainCmd
     .command("assess")
-    .description("Run full domain assessment")
+    .description("Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output)")
     .requiredOption("--agent <id>", "Agent ID")
     .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
+    .option("--example", "Print labelled synthetic example output; never evidence, never written to .amc/")
     .option("--json", "Output as JSON")
-    .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
+    .action(async (opts: DomainCommandOpts) => {
       try {
-        const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        assertIndustryPackAccess(process.cwd());
-        const { assessDomainForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
-        const domain = parseDomainOrThrow(opts.domain);
-        const assessment = assessDomainForAgent({ agentId: opts.agent, domain });
-        if (opts.json) { console.log(JSON.stringify(assessment.result, null, 2)); return; }
+        const assessment = await assessForCli(opts);
+        if (opts.json) { console.log(JSON.stringify(assessment, null, 2)); return; }
         const result = assessment.result;
-        console.log(chalk.bold.cyan("\n🧭  Domain Assessment"));
-        console.log(chalk.gray("Agent:"), opts.agent);
-        console.log(chalk.gray("Domain:"), `${result.domainMetadata.name} (${result.domain})`);
+        printDomainHeader("Domain Assessment", assessment);
+        if (!result) { printNotEvaluated(assessment); return; }
         console.log(chalk.gray("Base Score:"), result.baseScore);
         console.log(chalk.gray("Domain Score:"), result.domainScore);
         console.log(chalk.gray("Composite Score:"), result.compositeScore);
         console.log(chalk.gray("Level:"), result.level);
-        console.log(chalk.gray("Certification Readiness:"), result.certificationReadiness ? chalk.green("ready") : chalk.red("not ready"));
         console.log(chalk.gray("Compliance Gaps:"), result.complianceGaps.length);
         console.log(chalk.gray("Regulatory Warnings:"), result.regulatoryWarnings.length);
+        printExampleFooter(assessment);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
@@ -447,106 +443,138 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
   domainCmd
     .command("gaps")
-    .description("Show compliance gaps for an agent and domain")
+    .description("Show compliance gaps for an agent and domain (not evaluated without evidence)")
     .requiredOption("--agent <id>", "Agent ID")
     .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
+    .option("--example", "Print labelled synthetic example output; never evidence, never written to .amc/")
     .option("--json", "Output as JSON")
-    .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
+    .action(async (opts: DomainCommandOpts) => {
       try {
-        const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        assertIndustryPackAccess(process.cwd());
-        const { getDomainGaps, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
-        const domain = parseDomainOrThrow(opts.domain);
-        const gaps = getDomainGaps(opts.agent, domain);
-        if (opts.json) { console.log(JSON.stringify(gaps, null, 2)); return; }
-        console.log(chalk.bold.cyan(`\n🧭  Compliance Gaps (${domain})`));
-        if (gaps.length === 0) {
-          console.log(chalk.green("No compliance gaps detected."));
-          return;
-        }
+        const assessment = await assessForCli(opts);
+        const gaps = assessment.result?.complianceGaps ?? null;
+        if (opts.json) { console.log(JSON.stringify({ ...claimFields(assessment), gaps }, null, 2)); return; }
+        printDomainHeader(`Compliance Gaps (${assessment.domain})`, assessment);
+        if (!gaps) { printNotEvaluated(assessment); return; }
         for (const gap of gaps) {
           console.log(`  ${chalk.yellow(gap.questionId)} ${gap.dimension} L${gap.currentLevel}->L${gap.requiredLevel}`);
           console.log(`    ${gap.regulatoryRef}`);
         }
+        printExampleFooter(assessment);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   domainCmd
     .command("report")
-    .description("Build full domain report and write it to a file")
+    .description("Build full domain report and write it to a file (not evaluated without evidence)")
     .requiredOption("--agent <id>", "Agent ID")
     .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
     .requiredOption("--output <file>", "Output report path")
+    .option("--example", "Write labelled synthetic example output; never evidence, never written to .amc/")
     .option("--json", "Output as JSON")
-    .action(async (opts: { agent: string; domain: string; output: string; json?: boolean }) => {
+    .action(async (opts: DomainCommandOpts & { output: string }) => {
       try {
         const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
         assertIndustryPackAccess(process.cwd());
         const { buildDomainReportForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
         const domain = parseDomainOrThrow(opts.domain);
-        const report = buildDomainReportForAgent({ agentId: opts.agent, domain, outputPath: opts.output });
+        const report = buildDomainReportForAgent({ agentId: opts.agent, domain, outputPath: opts.output, example: opts.example === true });
+        const assessment = report.assessment;
         if (opts.json) {
-          console.log(JSON.stringify({
-            outputPath: report.outputPath,
-            assessment: report.assessment,
-            report: report.reportObject
-          }, null, 2));
+          console.log(JSON.stringify({ ...claimFields(assessment), outputPath: report.outputPath, assessment, report: report.reportObject ?? null }, null, 2));
           return;
         }
-        console.log(chalk.bold.cyan("\n🧭  Domain Report Generated"));
-        console.log(chalk.gray("Agent:"), opts.agent);
-        console.log(chalk.gray("Domain:"), domain);
+        printDomainHeader("Domain Report Generated", assessment);
         console.log(chalk.gray("Output:"), report.outputPath ?? opts.output);
-        console.log(chalk.gray("Composite Score:"), report.assessment.compositeScore);
-        console.log(chalk.gray("Level:"), report.assessment.level);
+        if (!assessment.result) { printNotEvaluated(assessment); return; }
+        console.log(chalk.gray("Composite Score:"), assessment.result.compositeScore);
+        console.log(chalk.gray("Level:"), assessment.result.level);
+        printExampleFooter(assessment);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   domainCmd
     .command("assurance")
-    .description("Run domain-specific assurance packs")
+    .description("Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply)")
     .requiredOption("--agent <id>", "Agent ID")
     .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
+    .option("--example", "Grade a labelled canned reply; never evidence, never written to .amc/")
     .option("--json", "Output as JSON")
-    .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
+    .action(async (opts: DomainCommandOpts) => {
       try {
         const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
         assertIndustryPackAccess(process.cwd());
         const { parseDomainOrThrow, runDomainAssurance } = await import("./domains/domainCliIntegration.js");
         const domain = parseDomainOrThrow(opts.domain);
-        const run = runDomainAssurance(opts.agent, domain);
+        const run = runDomainAssurance(opts.agent, domain, { example: opts.example === true });
         if (opts.json) { console.log(JSON.stringify(run, null, 2)); return; }
-        console.log(chalk.bold.cyan(`\n🧭  Domain Assurance (${run.domain})`));
-        console.log(chalk.gray("Agent:"), run.agentId);
+        printDomainHeader(`Domain Assurance (${run.domain})`, { ...run, domainName: run.domainMetadata.name });
         for (const pack of run.packRuns) {
           console.log(`  ${chalk.hex('#4AEF79')(pack.packId)} ${pack.title}`);
-          console.log(`    scenarios=${pack.scenarioCount} passed=${pack.passed} failed=${pack.failed} passRate=${pack.passRate}%`);
+          const graded = pack.status === "graded" ? ` passed=${pack.passed} failed=${pack.failed} passRate=${pack.passRate}%` : "";
+          console.log(`    scenarios=${pack.scenarioCount} notEvaluated=${pack.notEvaluated}${graded}${pack.reason ? ` (${pack.reason})` : ""}`);
         }
-        console.log(chalk.gray("Totals:"), `scenarios=${run.totalScenarios} passed=${run.passed} failed=${run.failed}`);
-        console.log(chalk.gray("Overall:"), run.allPassed ? chalk.green("all checks passed") : chalk.yellow("review required"));
+        console.log(chalk.gray("Totals:"), `scenarios=${run.totalScenarios} passed=${run.passed} failed=${run.failed} notEvaluated=${run.notEvaluated}`);
+        printNotEvaluated(run);
+        printExampleFooter(run);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
 
   domainCmd
     .command("roadmap")
-    .description("Generate 30/60/90-day roadmap for this domain")
+    .description("Generate 30/60/90-day roadmap for this domain (not evaluated without evidence)")
     .requiredOption("--agent <id>", "Agent ID")
     .requiredOption("--domain <d>", "Domain or alias, e.g. health|environment|mobility|supply-chain|logistics")
+    .option("--example", "Print labelled synthetic example output; never evidence, never written to .amc/")
     .option("--json", "Output as JSON")
-    .action(async (opts: { agent: string; domain: string; json?: boolean }) => {
+    .action(async (opts: DomainCommandOpts) => {
       try {
-        const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
-        assertIndustryPackAccess(process.cwd());
-        const { getDomainRoadmap, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
-        const domain = parseDomainOrThrow(opts.domain);
-        const roadmap = getDomainRoadmap(opts.agent, domain);
-        if (opts.json) { console.log(JSON.stringify(roadmap, null, 2)); return; }
-        console.log(chalk.bold.cyan(`\n🧭  Domain Roadmap (${domain})`));
+        const assessment = await assessForCli(opts);
+        const roadmap = assessment.result?.roadmap ?? null;
+        if (opts.json) { console.log(JSON.stringify({ ...claimFields(assessment), roadmap }, null, 2)); return; }
+        printDomainHeader(`Domain Roadmap (${assessment.domain})`, assessment);
+        if (!roadmap) { printNotEvaluated(assessment); return; }
         for (const item of roadmap) {
           console.log(`  [P${item.priority}] ${item.timeframe} ${item.action}`);
           if (item.moduleId) console.log(`    module: ${item.moduleId}`);
           console.log(`    regulatory: ${item.regulatoryImpact}`);
         }
+        printExampleFooter(assessment);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
+}
+
+type DomainCommandOpts = { agent: string; domain: string; example?: boolean; json?: boolean };
+type ClaimOutcome = { status: string; reasons: string[]; claimKind: string; statusDimensions: unknown; banner?: string };
+
+async function assessForCli(opts: DomainCommandOpts) {
+  const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
+  assertIndustryPackAccess(process.cwd());
+  const { assessDomainForAgent, parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
+  return assessDomainForAgent({ agentId: opts.agent, domain: parseDomainOrThrow(opts.domain), example: opts.example === true });
+}
+
+function claimFields(outcome: ClaimOutcome): ClaimOutcome {
+  const { status, reasons, claimKind, statusDimensions, banner } = outcome;
+  return { ...(banner ? { banner } : {}), status, reasons, claimKind, statusDimensions };
+}
+
+/** Example output starts and ends with the banner, so a cropped screenshot still carries it. */
+function printDomainHeader(title: string, outcome: ClaimOutcome & { agentId: string; domain: string; domainName: string }): void {
+  if (outcome.banner) console.log(chalk.bold.yellow(outcome.banner));
+  console.log(chalk.bold.cyan(`\n🧭  ${title}`));
+  console.log(chalk.gray("Agent:"), outcome.agentId);
+  console.log(chalk.gray("Domain:"), `${outcome.domainName} (${outcome.domain})`);
+  console.log(chalk.gray("Claim kind:"), outcome.claimKind);
+}
+
+function printNotEvaluated(outcome: ClaimOutcome): void {
+  console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"));
+  for (const reason of outcome.reasons) console.log(chalk.gray(`  - ${reason}`));
+  if (!outcome.banner) {
+    console.log(chalk.gray("Next step: run `amc quickscore` for the base part; add --example for labelled synthetic output."));
+  }
+}
+
+function printExampleFooter(outcome: ClaimOutcome): void {
+  if (outcome.banner) console.log(chalk.bold.yellow(outcome.banner));
 }
