@@ -554,7 +554,7 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc experiment-architecture\|experiment-architecture-probes` | Architecture experiments |
 | `amc canary-start\|canary-status\|canary-stop\|canary-report` | Policy canary |
 | `amc rollback-create` | Policy rollback pack |
-| `amc emergency-override` | Emergency policy override |
+| `amc emergency-override` | Emergency policy override; refused without a verifiable auditor signature |
 | `amc policy-debt-add\|policy-debt-list` | Policy debt/waivers |
 | `amc governance-drift` | Governance drift detection |
 | `amc cgx-integrity\|cgx-propagation` | Graph integrity/propagation |
@@ -562,6 +562,6 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc passport capabilities-add\|search\|link` | Passport capabilities |
 | `amc policy-canary-start\|policy-canary-report` | Policy canary (observation) |
 | `amc debt-add\|debt-list` | Policy debt entries |
-| `amc governor-override\|governor-override-alerts` | Emergency governance |
+| `amc governor-override\|governor-override-alerts` | Emergency governance; overrides need a verifiable auditor signature, and alerts list unverified ones as `INVALID_SIGNATURE` |
 | `amc blobs` | Encrypted evidence blobs |
 | `amc plugin limits` | Plugin sandbox resource limits |

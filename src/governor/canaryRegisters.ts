@@ -12,11 +12,8 @@ import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
-import {
-  saveWorkspaceRecord,
-  loadWorkspaceRecords,
-  updateWorkspaceRecord
-} from "../storage/workspaceRecordStore.js";
+import { BreakGlassSigningError, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
+import { saveWorkspaceRecord, loadWorkspaceRecords } from "../storage/workspaceRecordStore.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // policyCanary.ts, which imports the values from here.
 import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
@@ -25,10 +22,9 @@ import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
 const ROLLBACK_PACKS_AT = { area: ["governor"], kind: "rollback-packs" };
 const OVERRIDES_AT = { area: ["governor"], kind: "emergency-overrides" };
 
-/** Clears the in-process caches. Used by resetPolicyCanaryState(). */
+/** Clears the in-process rollback-pack cache. Used by resetPolicyCanaryState(). */
 export function resetCanaryRegisters(): void {
   rollbackPacks.length = 0;
-  emergencyOverrides.length = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,15 +104,31 @@ export function getLatestRollbackPack(agentId: string, workspace?: string): Roll
 // Emergency overrides
 // ---------------------------------------------------------------------------
 
-/**
- * In-process cache; see rollbackPacks above. An override that vanished also
- * disappeared from `governance-drift`, so the postmortem it required was never
- * chased.
- */
-const emergencyOverrides: EmergencyOverride[] = [];
+// Overrides live only in the workspace record store. Activation always needs a
+// workspace, and an in-process cache not keyed by workspace leaked one
+// workspace's overrides into another's report, where they failed verification.
+
+/** The signed activation-time fields; postmortem fields change later. */
+function overrideDigest(o: EmergencyOverride): string {
+  const { overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs } = o;
+  return sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs }));
+}
+
+function isVerified(o: EmergencyOverride, workspace?: string): boolean {
+  return workspace !== undefined && verifyOverrideDigest(workspace, overrideDigest(o), o.signature).valid;
+}
 
 /**
- * Activate an emergency override with strict TTL.
+ * The record store replaces `signature` with its own record signature, so the
+ * override's signature is persisted as `override_signature` and restored on load.
+ */
+function persistOverride(workspace: string, o: EmergencyOverride, now: number): void {
+  saveWorkspaceRecord(workspace, OVERRIDES_AT, o.overrideId, { ...o, override_signature: o.signature }, now);
+}
+
+/**
+ * Activate an emergency override with strict TTL. Throws BreakGlassSigningError
+ * unless the workspace auditor key signs it; nothing is recorded on failure.
  */
 export function activateEmergencyOverride(
   params: {
@@ -140,13 +152,10 @@ export function activateEmergencyOverride(
     expiresTs: now + params.ttlMs,
   };
 
-  const digest = sha256Hex(canonicalize(body));
-  let signature = "unsigned";
-  if (workspace) {
-    try {
-      signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-    } catch { /* no key */ }
+  if (workspace === undefined) {
+    throw new BreakGlassSigningError("Emergency override requires a workspace with an auditor signing key");
   }
+  const signature = signOverrideDigest(workspace, sha256Hex(canonicalize(body)));
 
   const override: EmergencyOverride = {
     ...body,
@@ -155,28 +164,35 @@ export function activateEmergencyOverride(
     signature,
   };
 
-  emergencyOverrides.push(override);
-  if (workspace) {
-    saveWorkspaceRecord(workspace, OVERRIDES_AT, override.overrideId, { ...override }, now);
-  }
+  persistOverride(workspace, override, now);
   return override;
 }
 
-/** Live overrides plus any persisted earlier. */
+/** The workspace's stored overrides, verified or not; none without a workspace (not evaluated). */
 function allOverrides(workspace?: string): EmergencyOverride[] {
-  return mergeStored(
-    emergencyOverrides,
-    workspace ? loadWorkspaceRecords<EmergencyOverride>(workspace, OVERRIDES_AT) : [],
-    (o) => o.overrideId
-  );
+  return workspace
+    ? loadWorkspaceRecords<EmergencyOverride & { override_signature?: string }>(workspace, OVERRIDES_AT)
+      .map((o) => ({ ...o, signature: o.override_signature ?? "" }))
+    : [];
+}
+
+/** Overrides whose signature verifies against the workspace auditor key history. */
+function verifiedOverrides(agentId: string, workspace?: string): EmergencyOverride[] {
+  return allOverrides(workspace).filter((o) => o.agentId === agentId && isVerified(o, workspace));
+}
+
+/** Overrides that are never honoured because their signature does not verify. */
+export function getInvalidOverrides(agentId: string, workspace?: string): EmergencyOverride[] {
+  return allOverrides(workspace).filter((o) => o.agentId === agentId && !isVerified(o, workspace));
 }
 
 /**
- * Check if an emergency override is currently active for an agent.
+ * Check if an emergency override is currently active for an agent. Only
+ * verified overrides count, so without a workspace none do.
  */
 export function getActiveOverrides(agentId: string, workspace?: string): EmergencyOverride[] {
   const now = Date.now();
-  return allOverrides(workspace).filter((o) => o.agentId === agentId && o.expiresTs > now);
+  return verifiedOverrides(agentId, workspace).filter((o) => o.expiresTs > now);
 }
 
 /**
@@ -187,18 +203,9 @@ export function filePostmortem(
   artifactId: string,
   workspace?: string,
 ): boolean {
-  const live = emergencyOverrides.find((o) => o.overrideId === overrideId);
-  const override = live ?? allOverrides(workspace).find((o) => o.overrideId === overrideId);
-  if (!override) return false;
-  override.postmortemFiled = true;
-  override.postmortemArtifactId = artifactId;
-  if (live) {
-    live.postmortemFiled = true;
-    live.postmortemArtifactId = artifactId;
-  }
-  if (workspace) {
-    updateWorkspaceRecord(workspace, OVERRIDES_AT, override.overrideId, { ...override }, Date.now());
-  }
+  const override = allOverrides(workspace).find((o) => o.overrideId === overrideId);
+  if (!workspace || !override) return false;
+  persistOverride(workspace, { ...override, postmortemFiled: true, postmortemArtifactId: artifactId }, Date.now());
   return true;
 }
 
@@ -207,7 +214,5 @@ export function filePostmortem(
  */
 export function getOverridesMissingPostmortem(agentId: string, workspace?: string): EmergencyOverride[] {
   const now = Date.now();
-  return allOverrides(workspace).filter(
-    (o) => o.agentId === agentId && o.expiresTs <= now && !o.postmortemFiled,
-  );
+  return verifiedOverrides(agentId, workspace).filter((o) => o.expiresTs <= now && !o.postmortemFiled);
 }

@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { initWorkspace } from "../../src/workspace.js";
 import {
   createRollbackPack,
   getRollbackPacks,
@@ -35,12 +36,17 @@ import {
 describe("canary governance records survive the process", () => {
   let workspace: string;
 
+  // Emergency overrides must be signed (P0-10). This suite used a workspace
+  // without keys, so every override it persisted carried "unsigned".
   beforeEach(() => {
-    workspace = mkdtempSync(join(tmpdir(), "amc-canary-"));
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "canary-persistence-passphrase");
+    workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-canary-")));
+    initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
     resetPolicyCanaryState();
   });
   afterEach(() => {
     resetPolicyCanaryState();
+    vi.unstubAllEnvs();
     rmSync(workspace, { recursive: true, force: true });
   });
 
@@ -86,6 +92,19 @@ describe("canary governance records survive the process", () => {
     expect(filePostmortem(override.overrideId, "artifact-1", workspace)).toBe(true);
     resetPolicyCanaryState();
     expect(getOverridesMissingPostmortem("default", workspace)).toHaveLength(0);
+  });
+
+  it("refuses to persist an override in a workspace without keys", () => {
+    const keyless = mkdtempSync(join(tmpdir(), "amc-canary-keyless-"));
+    try {
+      expect(() => activateEmergencyOverride(
+        { agentId: "default", reason: "outage", actionDescription: "allow deploy", ttlMs: 60_000 },
+        keyless
+      )).toThrow(/Emergency override refused/);
+      expect(existsSync(join(keyless, ".amc", "governor", "emergency-overrides"))).toBe(false);
+    } finally {
+      rmSync(keyless, { recursive: true, force: true });
+    }
   });
 
   it("still works without a workspace, for library callers", () => {
