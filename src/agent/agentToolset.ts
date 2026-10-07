@@ -24,7 +24,7 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
-import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard } from "../tools/guards/compiledPolicyGuard.js";
+import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -476,8 +476,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       const selected = new Set(selectSupportedNativeTools(snapshot, NATIVE_DELEGATION_CAPABILITIES).map(tool => tool.name));
       // Keep bodies registered for recorded refusals of guessed built-in calls.
       // Visibility still honors registry restrictions, late mounts and run_code.
-      const schemas = seam.schemas()?.filter(schema => !nativeIdentities.has(schema.name)
-        || (selected.has(schema.name) && registry.visible(agentId).get(schema.name)?.actionClass === nativeIdentities.get(schema.name)?.actionClass));
+      // P1-12: the plan pinned at start also hides what its visibleTools omit; the compiled-policy guard still denies them.
+      const schemas = seam.schemas()?.filter(schema => (!compiled || compiledPolicyShows(compiled, schema.name)) && (!nativeIdentities.has(schema.name)
+        || (selected.has(schema.name) && registry.visible(agentId).get(schema.name)?.actionClass === nativeIdentities.get(schema.name)?.actionClass)));
       return schemas?.length ? schemas : null;
     } },
     registry,

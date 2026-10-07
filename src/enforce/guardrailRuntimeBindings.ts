@@ -2,9 +2,10 @@ import { AVAILABLE_GUARDRAILS, type GuardrailDefinition } from "./guardrailProfi
 import {
   GUARDRAIL_RUNTIME_BINDINGS,
   isBoundGuardrailName,
-  readGuardrailControlState
+  readGuardrailControlState,
+  type GuardrailControlSnapshot
 } from "./guardrailControlState.js";
-import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
+import { inspectRuntimeFirewallPolicy, type RuntimeFirewallPolicyInspection } from "../runtime/firewall.js";
 
 /** P0-08's enforcement vocabulary. `boundary` is null exactly when enforcement is "none". */
 export type Enforcement = "enforced" | "observed" | "advisory" | "none";
@@ -46,6 +47,14 @@ export function listGuardrailsWithRuntimeStatus(workspace: string): GuardrailRun
   if (firewall.integrity === "invalid") {
     throw new Error(`Runtime Firewall policy integrity check failed: ${firewall.reason}`);
   }
+  return guardrailRuntimeTable(control, firewall);
+}
+
+/**
+ * The 14-row enforcement table over snapshots the caller already read: no lock, no throw, so a read-only projection
+ * derives its rows from the same read it reports integrity from. Callers that need trusted state check integrity first.
+ */
+export function guardrailRuntimeTable(control: GuardrailControlSnapshot, firewall: RuntimeFirewallPolicyInspection): GuardrailRuntimeStatus[] {
   const requested = new Set(control.state?.requestedGuardrails ?? []);
 
   return AVAILABLE_GUARDRAILS.map((guardrail): GuardrailRuntimeStatus => {

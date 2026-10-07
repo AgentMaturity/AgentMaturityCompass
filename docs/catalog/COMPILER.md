@@ -199,7 +199,9 @@ verify refuses the session. With no plan ever activated, the session runs and it
 
 The `compiled-policy` guard runs first in the native pipeline and fails closed:
 
-- a call whose tool is not in `toolPipeline.visibleTools` is denied (`run_code` is exempt; each sub-call is checked);
+- a call whose tool is not in `toolPipeline.visibleTools` is denied (`run_code` is exempt; each sub-call is checked).
+  Native sessions also leave those tools out of the tool list offered to the model, using the plan pinned at
+  start; the guard stays the enforcement point;
 - `identity-binding` (`requireAgentLease`, `requirePrincipal`) reads the authorization record bound for the call:
   no verified lease denies `IDENTITY_UNRESOLVED`, and no authenticated principal (an OS user name is self-reported)
   denies `PRINCIPAL_UNRESOLVED`. Native sessions carry no lease yet, so under a plan with `L0-IDN-01` every native

@@ -18,7 +18,7 @@ import {
   inspectGuardrailControlStateReadOnly,
   type GuardrailRuntimeRuleKey,
 } from "./guardrailControlState.js";
-import { AVAILABLE_GUARDRAILS } from "./guardrailProfiles.js";
+import { guardrailRuntimeTable } from "./guardrailRuntimeBindings.js";
 import { inspectRuntimeFirewallPolicy, type RuntimeFirewallMode } from "../runtime/firewall.js";
 import { scopeTemplateIdsForActionClass, type ScopeTemplateId } from "./scopeTemplates.js";
 import {
@@ -260,15 +260,15 @@ function runtimeFamily(workspace: string): ControlFamilyProjection {
     };
   });
 
-  const bound = new Set(Object.keys(GUARDRAIL_RUNTIME_BINDINGS));
-  const unboundGuardrails = AVAILABLE_GUARDRAILS
-    .filter((guardrail) => !bound.has(guardrail.name))
-    .map((guardrail): UnboundGuardrailProjection => ({
-      name: guardrail.name,
-      category: guardrail.category,
-      description: guardrail.description,
+  // From the enforcement table over the same snapshots: a row with no binding is not an active control here.
+  const unboundGuardrails = guardrailRuntimeTable(guardrails, firewall)
+    .filter((row) => row.binding === null)
+    .map((row): UnboundGuardrailProjection => ({
+      name: row.name,
+      category: row.category,
+      description: row.description,
       status: "unbound",
-      reason: "Catalog reference only; no Runtime Firewall binding exists, so this is not an active control.",
+      reason: row.reason,
     }));
   const reasons = sources.map((item) => `${item.ownerModule}: ${item.reason}`);
   if (unboundGuardrails.length > 0) {

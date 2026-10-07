@@ -58,12 +58,20 @@ function approvalDenial(workspace: string, actionClass: ActionClass, rule: Appro
   }
 }
 
+/**
+ * Whether the policy's `toolPipeline.visibleTools` lists this tool. The guard denies what this refuses; native sessions
+ * also leave it out of the tools offered to the model. The Code Mode transport dispatches sub-calls, and each one is
+ * checked on its own name.
+ */
+export function compiledPolicyShows(policy: ActiveCompiledPolicy, name: string): boolean {
+  return name === RUN_CODE_TOOL || policy.runtimePolicy.toolPipeline.visibleTools.includes(name);
+}
+
 /** Why the pinned policy denies this call, or undefined. */
 export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution): string | undefined {
   const deny = (controlIds: readonly string[], why: string): string => `compiled policy denied this call (control ${named(policy, controlIds)}): ${why}`;
   const pipeline = policy.runtimePolicy.toolPipeline;
-  // The Code Mode transport dispatches sub-calls, and each one is checked on its own name.
-  if (execution.name !== RUN_CODE_TOOL && !pipeline.visibleTools.includes(execution.name)) {
+  if (!compiledPolicyShows(policy, execution.name)) {
     return `compiled policy denied this call (toolPipeline.visibleTools): "${execution.name}" is not a visible tool`;
   }
   for (const guard of pipeline.guards) {
