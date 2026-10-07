@@ -362,7 +362,7 @@ describe("markdown rendering", () => {
     const report = generateResidencyReport("t1", { includeRedactionTests: true });
     const md = renderResidencyReportMarkdown(report);
     expect(md).toContain("# Data Residency Compliance Report");
-    expect(md).toContain("## Compliance Status");
+    expect(md).toContain("## Residency Policy Checks");
     expect(md).toContain("## Residency Policy");
     expect(md).toContain("## Key Custody");
     expect(md).toContain("## Tenant Isolation Checks");
@@ -375,7 +375,8 @@ describe("markdown rendering", () => {
     registerTenant({ tenantId: "t2", workspaceId: "ws-shared", region: "us-east-1" });
     const report = generateResidencyReport("t1");
     const md = renderResidencyReportMarkdown(report);
-    expect(md).toContain("NON-COMPLIANT");
+    expect(md).toMatch(/\d+ violation\(s\) found/);
+    expect(md).not.toMatch(/\bCOMPLIANT\b/);
     expect(md).toContain("### Violations");
   });
 });

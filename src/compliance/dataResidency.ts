@@ -680,8 +680,9 @@ export function renderResidencyReportMarkdown(report: ResidencyComplianceReport)
   lines.push("");
 
   // Compliance status
-  lines.push("## Compliance Status");
-  lines.push(`**${report.compliant ? "COMPLIANT" : "NON-COMPLIANT"}**`);
+  // AMC's own configuration and isolation checks: a result of those checks, not a regulatory compliance determination.
+  lines.push("## Residency Policy Checks");
+  lines.push(`**${report.violations.length === 0 ? "No violations found" : `${report.violations.length} violation(s) found`}** (AMC's configuration checks; not a regulatory compliance determination)`);
   if (report.violations.length > 0) {
     lines.push("");
     lines.push("### Violations");
