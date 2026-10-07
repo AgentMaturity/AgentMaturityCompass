@@ -74,6 +74,8 @@ nativeSandbox:
 
 Create the intended directory first, keep the `WRITE_HIGH` action class and existing argv restrictions, then explicitly run `amc tools sign` and `amc tools verify`. Directory names are exact relative workspace paths, not `/**` patterns. No grant is borrowed from `fs.write` or `fs.edit`. An empty list produces a read-only host workspace.
 
+`kind: os-native` means the same on Linux and also confines the shell with Seatbelt on macOS; `linux-bwrap` stays Linux-only. The optional `readDeny` masks exact workspace paths (a path under the system runtime roots is refused), and `maxProcesses` (default 256) sets RLIMIT_NPROC inside the sandbox to your process count at launch plus that allowance. A signed `egress` allowlist is refused on Linux for now: its relay needs a seccomp change that waits for review of [ADR-008](adr/008-native-shell-containment.md), so the Linux shell keeps all networking denied. See [Sandbox mode](SANDBOX.md#shell-egress-allowlist).
+
 Do not configure shell mounts through `bash.allow.paths`: those rules require a path in each call, while the native shell's public arguments are `command` and `timeoutMs`. Old path rules are not silently migrated or bypassed. The new signed requirement refuses legacy ToolHub, non-Linux and replacement shell implementations. Native admission binds the selected immutable shell and policy digest; a policy change before launch requires a fresh call. [ToolHub's policy reference](TOOLHUB.md) explains the complete signed entry. The installed native CLI at `9d963469` passed the acceptance described below; the earlier backend fixture result remains a separate component receipt.
 
 ## Verify the operating-system prerequisite

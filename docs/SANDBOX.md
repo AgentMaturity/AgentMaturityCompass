@@ -14,18 +14,21 @@ delegated children.
 |---|---|---|
 | Linux with a usable `/usr/bin/bwrap` | Offered, enforced at `linux-bwrap` | Same; the opt-in is ignored |
 | Linux without Bubblewrap | Refused; the message names `/usr/bin/bwrap` | Still refused; AMC never falls back to an unconfined Linux shell |
-| macOS | Refused | Offered **unconfined**, with your full user rights |
+| macOS with a root-owned `/usr/bin/sandbox-exec` | Offered, enforced at `macos-seatbelt` | Same; the opt-in is ignored |
+| macOS without a usable `sandbox-exec` | Refused | Offered **unconfined**, with your full user rights |
 | Windows and other platforms | Refused | Still refused |
 
 A refused shell is not registered at all, so a guessed `bash` call is denied as
 an unknown tool. The other workspace tools are unaffected.
 
-On macOS, AMC cannot confine the shell yet (Seatbelt confinement arrives with
-P1-05). An unconfined shell runs `/bin/sh` as you: it can read files outside the
-workspace, including `~/.ssh`, and it can reach the network. AMC's policy
-guards still evaluate each call and provider keys are stripped from its
-environment, but nothing confines the process. To accept that risk, use one of
-these opt-ins:
+On macOS, AMC confines the shell with Seatbelt (see
+[Native macOS shell](#native-macos-shell-seatbelt)). Only when
+`/usr/bin/sandbox-exec` is missing, or is not a root-owned system binary, is
+the shell refused, and only then does an opt-in apply. An unconfined shell runs
+`/bin/sh` as you: it can read files outside the workspace, including `~/.ssh`,
+and it can reach the network. AMC's policy guards still evaluate each call and
+provider keys are stripped from its environment, but nothing confines the
+process. To accept that risk, use one of these opt-ins:
 
 - `--unsafe-unconfined-shell` on `amc agent-loop run`, `amc agent-loop chat` or
   `amc acp`.
@@ -62,9 +65,19 @@ WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands r
 The session also records one `NATIVE_SHELL_UNCONFINED_ENABLED` audit row
 (`platform`, `optInSource`, `sessionId`). Each unconfined shell call records a
 `NATIVE_SHELL_CONFINEMENT` row with `backend: "none"`, `confined: false`,
-`enforcementLevel: "none"` and `optInSource` before the command runs. Linux
-receipts carry `enforcementLevel: "enforced"` and `boundary: "linux-bwrap"` when
-Bubblewrap confirmed the confinement.
+`enforcementLevel: "none"` and `optInSource` before the command runs. Confined
+receipts carry `enforcementLevel: "enforced"` and `boundary: "linux-bwrap"` or
+`"macos-seatbelt"`. When the backend confirmed the confinement, `enforcement`
+records `boundary`, `hostWrites`, `reads`, `network` (`denied` or
+`proxy-allowlist`), `allowHosts`, `processLimit` and `limitations`.
+
+| | Linux (`linux-bwrap`) | macOS (`macos-seatbelt`) |
+|---|---|---|
+| Writes | Signed `writableDirectories`; private `/tmp` and `/dev` | Signed `writableDirectories`, a private per-call `TMPDIR` (also `HOME`), `/dev/null` |
+| Reads (`reads`) | Runtime roots and the workspace, read-only; `.amc` and workspace `readDeny` paths masked (`workspace-ro-and-runtime`) | Everything your user can read, except the deny-list below (`open-except-denylist`) |
+| Network | Denied: separate network namespace and a seccomp socket filter | Denied, Unix sockets included; with a signed egress allowlist, only AMC's per-call proxy |
+| Processes | RLIMIT_NPROC of your process count at launch plus `maxProcesses` (default 256) | Same |
+| Escape | Process-group kill at the deadline or on cancel | Same |
 
 ## Native Linux shell tools
 
@@ -87,12 +100,16 @@ in the workspace tools configuration. Add this object to the existing reviewed
 
 ```yaml
 nativeSandbox:
-  kind: linux-bwrap
+  kind: os-native        # Bubblewrap on Linux, Seatbelt on macOS; linux-bwrap is Linux-only
   writableDirectories:
     - workspace/output
+  readDeny:              # optional: exact paths the shell may neither read nor write
+    - ~/.config/my-tool
+  maxProcesses: 256      # optional: processes the shell may add to your count at launch
 ```
 
-Each entry names an existing relative directory inside the selected workspace;
+Each entry names an existing relative directory inside the selected workspace
+that does not contain your home directory;
 it is not a glob and has no `/**` suffix. An empty list permits no host writes.
 The explicit requirement refuses use by legacy ToolHub, non-Linux composition
 or a replacement tool body that cannot supply the bound native implementation.
@@ -118,7 +135,11 @@ Network and IPC namespaces are separate, capabilities are dropped, nested user
 namespaces are disabled, and a seccomp filter denies socket creation/connection
 and io_uring entry points, including alternate syscall ABIs. Socket egress is
 denied even if other network tools have a signed host allowlist; use the governed
-network tools for those operations.
+network tools for those operations. A signed `nativeSandbox.egress` is refused
+on Linux: its in-namespace relay needs a seccomp change that waits for review of
+[ADR-008](adr/008-native-shell-containment.md). `readDeny` paths inside the
+workspace are masked; other host paths are not mounted at all, and a `readDeny`
+path under the system runtime roots is refused.
 
 Procfs is intentionally absent so the command cannot reopen launcher-owned
 status descriptors. Programs that depend on process introspection, `/dev/fd`,
@@ -153,6 +174,80 @@ Bubblewrap's official
 [project](https://github.com/containers/bubblewrap) and
 [option reference](https://github.com/containers/bubblewrap/blob/main/bwrap.xml)
 describe the namespace, seccomp, and launcher-status interfaces used here.
+
+## Native macOS shell (Seatbelt)
+
+On macOS the native shell runs `/bin/sh` through `/usr/bin/sandbox-exec` with a
+profile AMC writes per call. Writes are allowed only to the signed
+`writableDirectories`, a private per-call temporary directory (the shell's
+`TMPDIR` and `HOME`) and `/dev/null`. Reads and writes are denied for `~/.ssh`,
+`~/.aws`, `~/.config/gcloud`, `~/.azure`, `~/.gnupg`, `~/.kube`, `~/.docker`,
+`~/.netrc`, `~/.npmrc`, `~/Library/Keychains`, `~/.amc`, the workspace's `.amc`
+and the signed `readDeny` paths. All networking is denied, including Unix
+sockets such as an SSH agent; with a signed egress allowlist the only exception
+is AMC's proxy port on localhost. Every path is resolved first, because Seatbelt
+matches real paths only (`/var` is `/private/var`). Write grants that contain
+preexisting hard links or special files are refused, as on Linux, and the shell
+cannot create hard links. Mach lookups are limited to five system services (the
+temporary-directory helper, logging, notifications, user and group lookups),
+and opening apps (`open`), AppleEvents (`osascript`), launchd jobs
+(`launchctl`, `at`), and signals to or inspection of processes outside the
+shell's own process group are denied, so the shell cannot ask launchd,
+LaunchServices or another app to start a process outside the profile. The
+environment is `PATH`, `HOME`, `TMPDIR`, `LANG` and, with egress, the proxy
+variables; AMC credentials are not passed.
+
+`sandbox-exec` reports nothing when it applies a profile, so AMC measures it:
+before the command starts, a wrapper inside the profile must fail to write a
+probe in the launcher's own directory and succeed in writing a marker in the
+private temporary directory. Without both, the command never ran and the
+receipt says `confined: false`.
+
+Limits. Reads outside the deny-list stay open: the shell can read any other
+file your user can. POSIX shared memory and IOKit are not restricted. Tools
+that need another system service, such as the keychain or certificate trust
+through `trustd`, fail.
+`sandbox-exec` is deprecated by Apple; the profile was checked by hand on macOS
+26.6.2 (25G83, arm64) and no CI job runs it yet. RLIMIT_NPROC counts every
+process of your user, so the process cap is relative to your count at launch.
+
+## Shell egress allowlist
+
+Without `egress`, the native shell has no network. To let it reach named hosts,
+add a signed allowlist to the `bash` entry and run `amc tools sign`:
+
+```yaml
+nativeSandbox:
+  kind: os-native
+  writableDirectories: [workspace/output]
+  egress:
+    allowHosts:
+      - registry.npmjs.org   # exactly this host
+      - .github.com          # any subdomain of github.com, not github.com itself
+      - 10.0.0.12            # an IP literal, required for a private address
+```
+
+Entries are lowercase host names, `.suffix` entries or IP literals; wildcards,
+ports and URLs are refused at signing. Each shell call then starts its own HTTP
+forward proxy (CONNECT and plain HTTP) on 127.0.0.1, protected by a per-call
+token, and passes it as `HTTP_PROXY`, `HTTPS_PROXY` and `ALL_PROXY` (and their
+lowercase forms); the token is scrubbed from output. The proxy refuses a host
+that is not listed without a DNS query, resolves a listed host once, refuses it
+if any address is loopback, link-local (including 169.254.169.254), private,
+CGNAT, documentation, benchmarking, unique-local, multicast or reserved (IPv6
+forms that carry such an IPv4 address included; 6to4 and Teredo always) unless
+that exact IP literal is listed, and
+connects only to an address it checked. Denials answer HTTP 403. Every decision
+writes a `NATIVE_SHELL_EGRESS` audit row (`callId`, `host`, `port`, `decision`,
+`reason`) before it takes effect; a row that cannot be written denies the
+connection.
+
+curl and git over HTTPS read `http_proxy`/`HTTPS_PROXY`, npm and pip read
+`HTTPS_PROXY`, and Node's built-in `fetch` does not read them by default.
+Check other tools' own proxy settings. A tool that ignores the variables, such as git over SSH, cannot
+reach the network. The gateway forward proxy uses the same host decision
+(`decideEgress`). This is available on macOS; on Linux a signed `egress` is
+refused until the relay in ADR-008 is reviewed and built.
 
 ## Command
 

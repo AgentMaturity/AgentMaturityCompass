@@ -29,15 +29,19 @@
         { "path": "src/sandbox/nativeShellGate.ts", "symbol": "nativeShellReadiness" },
         { "path": "src/sandbox/nativeSandboxBinding.ts", "symbol": "createNativeSandboxBash" },
         { "path": "src/sandbox/bwrapBackend.ts", "symbol": "bwrapBackend" },
+        { "path": "src/sandbox/seatbeltNativeShell.ts", "symbol": "seatbeltNativeShell" },
+        { "path": "src/sandbox/processCap.ts", "symbol": "withProcessLimit" },
         { "path": "src/tools/builtin/bashTool.ts", "symbol": "bashTool" }
       ],
-      "evidence": "NATIVE_SHELL_CONFINEMENT audit rows (Linux Bubblewrap only); an unconfined-shell audit row before each opted-in unconfined command",
+      "evidence": "NATIVE_SHELL_CONFINEMENT audit rows naming boundary (linux-bwrap or macos-seatbelt), network and processLimit; NATIVE_SHELL_EGRESS rows for every egress proxy decision; an unconfined-shell audit row before each opted-in unconfined command",
       "status": "enforced",
       "bypasses": [
-        "Outside Linux the shell is absent unless the operator passes the unsafe unconfined-shell opt-in on macOS; that shell runs with the user's full rights and is recorded, not confined",
-        "Shell network egress is not filtered by the egress guard or the gateway proxy"
+        "On macOS without a usable /usr/bin/sandbox-exec the shell is absent unless the operator passes the unsafe unconfined-shell opt-in; that shell runs with the user's full rights and is recorded, not confined",
+        "The macOS Seatbelt profile leaves reads outside its deny-list open; Mach lookups are limited to five system services (temp-directory helper, logging, notifications, user and group lookups), and POSIX shared memory and IOKit are not restricted",
+        "A signed shell egress allowlist is refused on Linux until the ADR-008 relay is reviewed and built",
+        "RLIMIT_NPROC counts all of the user's processes, so the cap is relative to the count at launch; there is no memory or CPU limit"
       ],
-      "owners": ["P1-05", "P2-14"],
+      "owners": ["P1-05", "P1-48", "P2-14"],
       "asi": ["ASI02", "ASI05"]
     },
     {
@@ -61,13 +65,17 @@
       "name": "Network egress",
       "enforcementPoints": [
         { "path": "src/tools/guards/policyGuards.ts", "symbol": "networkEgressGuard" },
+        { "path": "src/enforce/egressAllowlist.ts", "symbol": "decideEgress" },
         { "path": "src/gateway/server.ts", "symbol": "hostAllowed" },
-        { "path": "src/gateway/server.ts", "symbol": "createProxyServer" }
+        { "path": "src/gateway/server.ts", "symbol": "createProxyServer" },
+        { "path": "src/sandbox/egress/shellEgressProxy.ts", "symbol": "startShellEgressProxy" }
       ],
-      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; tool evidence rows for NETWORK_EXTERNAL tools",
+      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; NATIVE_SHELL_EGRESS rows for every shell proxy decision; tool evidence rows for NETWORK_EXTERNAL tools",
       "status": "enforced",
       "bypasses": [
-        "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; shell, MCP servers and extensions open sockets directly",
+        "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; MCP servers and extensions open sockets directly",
+        "The gateway resolves nothing itself, so the decideEgress non-public address rule reaches IP-literal hosts only there; an allowed name can resolve to a private or metadata address (follow-up P1-59, proposed)",
+        "A host allowlist cannot stop domain fronting through a listed host; the shell proxy pins the Host header for plain HTTP only",
         "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system"
       ],
       "owners": ["P1-05", "P1-43"],
