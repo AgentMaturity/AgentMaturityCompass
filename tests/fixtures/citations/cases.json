@@ -1,0 +1,119 @@
+{
+  "_comment": "Test data for tests/citations/lintCitations.test.ts. These records are fixtures, not catalogue entries: they assert nothing about any real instrument. Each case starts from completeRecord, applies recordPatch (null deletes a field) unless record is false, and merges input into an empty lint input. expect lists the exact findings by rule and zeroTolerance.",
+  "completeRecord": {
+    "id": "fixture-guidance",
+    "citation": "Fixture supervisory guidance (test data)",
+    "jurisdiction": "US",
+    "kind": "guidance",
+    "status": "in-force",
+    "lastReviewed": "2026-10-03",
+    "url": "https://www.nist.gov/fixture-record",
+    "retrievedAt": "2026-10-03",
+    "aliases": ["Fixture Guidance"],
+    "instrument": "Fixture supervisory guidance",
+    "clause": "whole instrument",
+    "edition": "2026",
+    "statusType": "supervisory-guidance",
+    "effectiveDate": "2026-01-01",
+    "dateNote": "Fixture: no separate compliance-due date."
+  },
+  "cases": [
+    {
+      "name": "complete record on an official host with statusType supervisory-guidance",
+      "recordPatch": {},
+      "input": {},
+      "expect": []
+    },
+    {
+      "name": "SR 11-7 reference whose record is in-force",
+      "recordPatch": { "id": "fixture-sr-11-7", "aliases": ["SR 11-7"] },
+      "input": {
+        "textRefs": [{ "file": "src/score/domainPacks.ts", "location": "question FIN-1", "text": "SR 11-7 — Model Risk Management", "mustResolve": true }]
+      },
+      "expect": [{ "rule": "CIT001", "zeroTolerance": false }]
+    },
+    {
+      "name": "SR 11-7 record repealed with supersededBy us-sr-26-2",
+      "recordPatch": { "id": "fixture-sr-11-7", "aliases": ["SR 11-7"], "status": "repealed", "supersededBy": "us-sr-26-2" },
+      "input": {
+        "textRefs": [{ "file": "src/score/domainPacks.ts", "location": "question FIN-1", "text": "SR 11-7 — Model Risk Management", "mustResolve": true }]
+      },
+      "expect": []
+    },
+    {
+      "name": "malformed ATLAS id AML.T48",
+      "record": false,
+      "input": {
+        "frameworkIds": [{ "file": "src/score/crossFrameworkMapping.ts", "location": "MITRE_ATLAS", "framework": "atlas", "id": "AML.T48", "label": "Fixture technique" }]
+      },
+      "expect": [{ "rule": "CIT002", "zeroTolerance": true }]
+    },
+    {
+      "name": "prompt injection labelled AML.T0048",
+      "record": false,
+      "input": {
+        "frameworkIds": [{ "file": "src/score/crossFrameworkMapping.ts", "location": "MITRE_ATLAS", "framework": "atlas", "id": "AML.T0048", "label": "Prompt Injection" }]
+      },
+      "expect": [{ "rule": "CIT002", "zeroTolerance": false }]
+    },
+    {
+      "name": "NIST GOVERN 9.9 with a filled reference table",
+      "record": false,
+      "input": {
+        "referenceTables": { "atlas": [], "nistAiRmf": ["GOVERN 1.1", "MAP 2.3"], "iso42001AnnexA": [] },
+        "frameworkIds": [{ "file": "src/domains/industryPackAudit.ts", "location": "anchor nist", "framework": "nist-ai-rmf", "id": "GOVERN 9.9", "label": "Fixture" }]
+      },
+      "expect": [{ "rule": "CIT002", "zeroTolerance": false }]
+    },
+    {
+      "name": "ISO/IEC 42001 A.5 labelled AI policy",
+      "record": false,
+      "input": {
+        "frameworkIds": [{ "file": "src/domains/industryPackAudit.ts", "location": "anchor iso", "framework": "iso-42001", "id": "A.5", "label": "AI policy" }]
+      },
+      "expect": [{ "rule": "CIT002", "zeroTolerance": false }]
+    },
+    {
+      "name": "mapping packId pii_detection_leakage",
+      "record": false,
+      "input": {
+        "knownPackIds": ["pii-detection-leakage", "sandboxBoundary"],
+        "packRefs": [{ "file": "src/compliance/builtInMappings.ts", "location": "mapping hipaa_privacy_rule requires_assurance_pack", "id": "pii_detection_leakage", "match": "exact" }]
+      },
+      "expect": [{ "rule": "CIT003", "zeroTolerance": true }]
+    },
+    {
+      "name": "related.packs host_hardening",
+      "record": false,
+      "input": {
+        "knownPackIds": ["pii-detection-leakage", "sandboxBoundary"],
+        "packRefs": [{ "file": "src/compliance/builtInMappings.ts", "location": "mapping hipaa_physical_safeguards related.packs", "id": "host_hardening", "match": "normalized" }]
+      },
+      "expect": [{ "rule": "CIT003", "zeroTolerance": true }]
+    },
+    {
+      "name": "statusType binding",
+      "recordPatch": { "statusType": "binding" },
+      "input": {},
+      "expect": [{ "rule": "CIT005", "zeroTolerance": true }]
+    },
+    {
+      "name": "superseded record without supersededBy",
+      "recordPatch": { "status": "repealed" },
+      "input": {},
+      "expect": [{ "rule": "CIT005", "zeroTolerance": true }]
+    },
+    {
+      "name": "url on a host outside the shared list",
+      "recordPatch": { "url": "https://www.example.com/fixture-record" },
+      "input": {},
+      "expect": [{ "rule": "CIT004", "zeroTolerance": false }]
+    },
+    {
+      "name": "record with neither retrievedAt nor contentSha256",
+      "recordPatch": { "retrievedAt": null },
+      "input": {},
+      "expect": [{ "rule": "CIT004", "zeroTolerance": false }]
+    }
+  ]
+}
