@@ -2,7 +2,7 @@
 
 ## Threat Model
 
-See also: `docs/THREAT_MODEL.md` for expanded STRIDE coverage, attack-path mapping, and enforceable controls.
+See also: `docs/security/THREAT_MODEL.md` for the threat model, channel map, failure policy and STRIDE per channel.
 
 AMC assumes three actors:
 

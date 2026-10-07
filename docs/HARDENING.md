@@ -5,7 +5,7 @@ This is the short practical entry point for teams who need the secure deployment
 ## Read this with
 
 - `docs/SECURITY.md`
-- `docs/THREAT_MODEL.md`
+- `docs/security/THREAT_MODEL.md`
 - `docs/OPS_HARDENING.md`
 - `docs/DEPLOYMENT.md`
 

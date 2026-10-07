@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-10-07",
+  "commit": "e25cce1a03b17a023d4aadfbcdb71dfe653db87a",
+  "channels": [
+    {
+      "id": "tool-pipeline",
+      "name": "Tool pipeline",
+      "enforcementPoints": [
+        { "path": "src/tools/toolPipeline.ts", "symbol": "ToolPipeline" },
+        { "path": "src/tools/toolPipeline.ts", "symbol": "askApproval" },
+        { "path": "src/agent/agentToolset.ts", "symbol": "agentToolset" },
+        { "path": "src/tools/toolEvidence.ts", "symbol": "toolEvidenceFor" }
+      ],
+      "evidence": "Tool evidence rows: audit TOOL_CALL_ALLOWED, TOOL_CALL_DENIED or TOOL_CALL_FAILED, a metric row and a stdout descriptor, written by the composed recorder",
+      "status": "enforced",
+      "bypasses": [
+        "A recorder that throws after the body ran is swallowed in ToolPipeline.execute; the effect stands and its row is missing",
+        "The approval answer is allow, deny or unavailable; no authorization record binds it to the frozen arguments",
+        "domainRules written by applyDomainToAgent (src/domains/domainApply.ts) are read by no guard"
+      ],
+      "owners": ["P1-02", "P1-03", "P1-12"],
+      "asi": ["ASI01", "ASI02"]
+    },
+    {
+      "id": "native-shell",
+      "name": "Native shell",
+      "enforcementPoints": [
+        { "path": "src/sandbox/nativeShellGate.ts", "symbol": "nativeShellReadiness" },
+        { "path": "src/sandbox/nativeSandboxBinding.ts", "symbol": "createNativeSandboxBash" },
+        { "path": "src/sandbox/bwrapBackend.ts", "symbol": "bwrapBackend" },
+        { "path": "src/tools/builtin/bashTool.ts", "symbol": "bashTool" }
+      ],
+      "evidence": "NATIVE_SHELL_CONFINEMENT audit rows (Linux Bubblewrap only); an unconfined-shell audit row before each opted-in unconfined command",
+      "status": "enforced",
+      "bypasses": [
+        "Outside Linux the shell is absent unless the operator passes the unsafe unconfined-shell opt-in on macOS; that shell runs with the user's full rights and is recorded, not confined",
+        "Shell network egress is not filtered by the egress guard or the gateway proxy"
+      ],
+      "owners": ["P1-05", "P2-14"],
+      "asi": ["ASI02", "ASI05"]
+    },
+    {
+      "id": "fs-tools",
+      "name": "fs tools",
+      "enforcementPoints": [
+        { "path": "src/tools/builtin/fsTools.ts", "symbol": "insideWorkspace" },
+        { "path": "src/tools/builtin/readBeforeEdit.ts", "symbol": "ReadBeforeEditLedger" },
+        { "path": "src/toolhub/toolhubValidators.ts", "symbol": "validateToolRequest" }
+      ],
+      "evidence": "Tool evidence rows",
+      "status": "enforced",
+      "bypasses": [
+        "The shell and unconfined MCP servers reach the same files without these checks"
+      ],
+      "owners": ["P1-36"],
+      "asi": ["ASI02"]
+    },
+    {
+      "id": "network-egress",
+      "name": "Network egress",
+      "enforcementPoints": [
+        { "path": "src/tools/guards/policyGuards.ts", "symbol": "networkEgressGuard" },
+        { "path": "src/gateway/server.ts", "symbol": "hostAllowed" },
+        { "path": "src/gateway/server.ts", "symbol": "createProxyServer" }
+      ],
+      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; tool evidence rows for NETWORK_EXTERNAL tools",
+      "status": "enforced",
+      "bypasses": [
+        "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; shell, MCP servers and extensions open sockets directly",
+        "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system"
+      ],
+      "owners": ["P1-05", "P1-43"],
+      "asi": ["ASI02", "ASI05"]
+    },
+    {
+      "id": "mcp-stdio",
+      "name": "MCP stdio",
+      "enforcementPoints": [
+        { "path": "src/mcp/nativeMcpClient.ts", "symbol": "mountNativeMcpServer" },
+        { "path": "src/mcp/nativeMcpClient.ts", "symbol": "StdioClientTransport" }
+      ],
+      "evidence": "Tool evidence rows for each call; mount refusals",
+      "status": "enforced",
+      "bypasses": [
+        "The server process is spawned unconfined with the user's rights: cwd is the workspace and env is the default environment plus the server's env; only the calls are governed"
+      ],
+      "owners": ["P1-39"],
+      "asi": ["ASI02", "ASI04", "ASI05"]
+    },
+    {
+      "id": "mcp-http",
+      "name": "MCP HTTP",
+      "enforcementPoints": [
+        { "path": "src/mcp/nativeMcpHttpTransport.ts", "symbol": "nativeMcpHttpEndpoint" },
+        { "path": "src/mcp/nativeMcpHttpTransport.ts", "symbol": "NativeMcpHttpTransport" }
+      ],
+      "evidence": "Tool evidence rows",
+      "status": "enforced",
+      "bypasses": [
+        "No OAuth: a server that needs it is refused rather than authenticated"
+      ],
+      "owners": ["P1-39"],
+      "asi": ["ASI02", "ASI04"]
+    },
+    {
+      "id": "provider-calls",
+      "name": "Provider calls",
+      "enforcementPoints": [
+        { "path": "src/llm/adapter/llmRuntime.ts", "symbol": "reserveNativeModelBudget" },
+        { "path": "src/llm/adapter/providerCapabilities.ts", "symbol": "assertRequestCapabilities" },
+        { "path": "src/llm/adapter/adapterRegistry.ts", "symbol": "PinnedRoute" }
+      ],
+      "evidence": "Signed request/header and settlement rows; budget reservation rows",
+      "status": "enforced",
+      "bypasses": [
+        "A budget-integrity failure is reported to the caller as LLM_FAILURE_CODE.QUOTA",
+        "No residency check on the route: bridgeResidencyHook (src/ops/productionWiring.ts) compares caller-supplied regions and nothing calls it"
+      ],
+      "owners": ["P0-27", "P2-01"],
+      "asi": ["ASI04", "ASI08"]
+    },
+    {
+      "id": "imports",
+      "name": "Imports",
+      "enforcementPoints": [
+        { "path": "src/ledger/trustTierValidation.ts", "symbol": "assertTrustTierProvenance" },
+        { "path": "src/importers/piSessionImport.ts", "symbol": "PI_SESSION_SUPPORTED_VERSION" },
+        { "path": "src/importers/dshSessionContract.ts", "symbol": "DSH_IMPORT_LIMITS" },
+        { "path": "src/eval/evalImporters.ts", "symbol": "EVAL_IMPORT_MAX_AGE_MS" },
+        { "path": "src/ingest/ingest.ts", "symbol": "attestIngestSession" }
+      ],
+      "evidence": "Import receipts; imported rows carry SELF_REPORTED unless a pinned third-party attestation binds them",
+      "status": "enforced",
+      "bypasses": [
+        "Imported content is untrusted text that later reaches model context; importers do not preserve original bytes"
+      ],
+      "owners": ["P1-24"],
+      "asi": ["ASI06"]
+    },
+    {
+      "id": "studio",
+      "name": "Studio API and UI",
+      "enforcementPoints": [
+        { "path": "src/studio/studioServer.ts", "symbol": "authenticate" },
+        { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeCsrfTokenForSession" },
+        { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeAllowedBrowserOrigins" }
+      ],
+      "evidence": "Native task events",
+      "status": "enforced",
+      "bypasses": [
+        "Claim kinds are not yet labelled on Studio and API output"
+      ],
+      "owners": ["P0-23", "D-06"],
+      "asi": ["ASI03", "ASI09"]
+    },
+    {
+      "id": "cli",
+      "name": "CLI",
+      "enforcementPoints": [
+        { "path": "src/cli.ts", "symbol": "skipVault" },
+        { "path": "src/vault/vault.ts", "symbol": "unlockVault" }
+      ],
+      "evidence": "Ledger rows for the commands that write them; no per-command record in general",
+      "status": "advisory",
+      "bypasses": [
+        "Authority is local file access plus the vault passphrase; the operator is trusted",
+        "amc init --skip-vault sets AMC_VAULT_PASSPHRASE to \"skip-vault-\" plus Date.now(), a guessable passphrase"
+      ],
+      "owners": ["P0-22"],
+      "asi": ["ASI03", "ASI09"]
+    },
+    {
+      "id": "sdk-acp",
+      "name": "SDK and ACP",
+      "enforcementPoints": [
+        { "path": "src/acp/acpAgentServer.ts", "symbol": "createAcpAgent" },
+        { "path": "src/sdk/nativeAgentClient.ts", "symbol": "AMCNativeClient" }
+      ],
+      "evidence": "The same session spine as the native runtime",
+      "status": "enforced",
+      "bypasses": [
+        "Execution is not yet one API across CLI, TypeScript, Python and Studio"
+      ],
+      "owners": ["P2-13"],
+      "asi": ["ASI02", "ASI07"]
+    },
+    {
+      "id": "extensions",
+      "name": "Extensions",
+      "enforcementPoints": [
+        { "path": "src/extensions/nativeExtensionRuntime.ts", "symbol": "loadNativeExtensions" },
+        { "path": "src/plugins/nativeExecutableRunner.ts", "symbol": "NativeExecutableRunner" }
+      ],
+      "evidence": "Extension load receipts",
+      "status": "enforced",
+      "bypasses": [
+        "Executable extensions run only under Linux Bubblewrap; on other platforms they are refused, not confined"
+      ],
+      "owners": ["P0-31"],
+      "asi": ["ASI04", "ASI05"]
+    },
+    {
+      "id": "managed-hooks",
+      "name": "Managed hooks",
+      "enforcementPoints": [
+        { "path": "src/adapters/managedHookLease.ts", "symbol": "verifyManagedLease" },
+        { "path": "src/bridge/hookControl.ts", "symbol": "evaluateProviderHookControl" }
+      ],
+      "evidence": "Hook control results",
+      "status": "enforced",
+      "bypasses": [
+        "Enforcement holds only while the external harness calls the hook; a harness run without it is not governed"
+      ],
+      "owners": ["P0-30"],
+      "asi": ["ASI02", "ASI10"]
+    },
+    {
+      "id": "notary",
+      "name": "Notary",
+      "enforcementPoints": [
+        { "path": "src/notary/notaryAuth.ts", "symbol": "verifyNotaryRequestAuth" },
+        { "path": "src/notary/notaryServer.ts", "symbol": "startNotaryServer" },
+        { "path": "src/notary/notaryLog.ts", "symbol": "appendNotaryLogEntry" }
+      ],
+      "evidence": "Notary log",
+      "status": "enforced",
+      "bypasses": [
+        "Signing backends are a sealed key file or an operator-supplied external signer command; there is no native KMS, HSM or PKCS#11 provider"
+      ],
+      "owners": ["P0-30", "P2-08"],
+      "asi": ["ASI03"]
+    },
+    {
+      "id": "helm-compose",
+      "name": "Helm and Compose",
+      "enforcementPoints": [
+        { "path": "deploy/helm/amc/templates/secret.yaml", "symbol": "change-me-vault-passphrase" },
+        { "path": "deploy/compose/docker-compose.yml", "symbol": "AMC_VAULT_PASSPHRASE_FILE" }
+      ],
+      "evidence": "None at deploy on main",
+      "status": "none",
+      "bypasses": [
+        "The Helm secret template ships change-me values for the vault, owner and notary secrets",
+        "Compose reads file secrets the operator must create; nothing checks them"
+      ],
+      "owners": ["P0-14", "P0-35"],
+      "asi": ["ASI04"]
+    }
+  ],
+  "failurePolicy": [
+    {
+      "id": "authority-store-unavailable",
+      "failure": "Authority or mandatory evidence store unavailable before a protected effect",
+      "behaviour": "No new protected effects",
+      "evidenceState": "Denied, with the reason",
+      "tests": ["tests/nativeBudgets.test.ts"],
+      "owners": ["P1-03", "P1-04"]
+    },
+    {
+      "id": "recorder-fails-after-effect",
+      "failure": "Evidence recorder fails after the effect happened",
+      "behaviour": "The effect stands; dependent actions wait; reconcile with the system of record",
+      "evidenceState": "Evidence incomplete",
+      "tests": ["tests/toolEvidenceRecording.test.ts"],
+      "owners": ["P1-03", "P1-04"]
+    },
+    {
+      "id": "process-dies-before-receipt",
+      "failure": "Process dies between dispatch and receipt",
+      "behaviour": "No automatic replay; reconcile by idempotency key",
+      "evidenceState": "Outcome unknown until reconciled",
+      "tests": ["tests/sessionRecovery.test.ts"],
+      "owners": ["P1-04", "P2-12"]
+    },
+    {
+      "id": "approval-stale-or-changed",
+      "failure": "Approval stale, revoked, or bound to a different amount or recipient",
+      "behaviour": "Re-evaluate; the old approval cannot authorize the changed effect",
+      "evidenceState": "Denied",
+      "tests": [],
+      "owners": ["P1-02"]
+    },
+    {
+      "id": "residency-route-unsupported",
+      "failure": "Residency route unsupported",
+      "behaviour": "Block the protected export; make no residency claim",
+      "evidenceState": "Not evaluated for residency",
+      "tests": [],
+      "owners": ["P2-01"]
+    },
+    {
+      "id": "legal-hold-unknown",
+      "failure": "Legal hold unknown at deletion",
+      "behaviour": "Deny at the deletion executor",
+      "evidenceState": "Denied",
+      "tests": [],
+      "owners": ["P2-01"]
+    },
+    {
+      "id": "model-or-provider-outage",
+      "failure": "Model or provider outage",
+      "behaviour": "Stop new effects; use a hazard-reviewed safe state where an abrupt stop is unsafe",
+      "evidenceState": "Recorded as an incident",
+      "tests": [],
+      "owners": ["P2-26", "P1-17"]
+    },
+    {
+      "id": "telemetry-exporter-down",
+      "failure": "Telemetry exporter or dashboard down",
+      "behaviour": "Execution continues; mandatory evidence persists locally; dropped telemetry is reported",
+      "evidenceState": "Unaffected",
+      "tests": ["tests/telemetryExporterFailure.test.ts"],
+      "owners": ["P2-18"]
+    }
+  ]
+}

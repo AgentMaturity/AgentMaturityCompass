@@ -9,7 +9,7 @@ Understand whether AMC produces evidence and control surfaces strong enough for 
 ## Start here
 
 1. `docs/SECURITY.md`
-2. `docs/THREAT_MODEL.md`
+2. `docs/security/THREAT_MODEL.md`
 3. `docs/OPS_HARDENING.md`
 4. `docs/EU_AI_ACT_COMPLIANCE.md`
 5. `docs/AUDIT_BINDER.md`
