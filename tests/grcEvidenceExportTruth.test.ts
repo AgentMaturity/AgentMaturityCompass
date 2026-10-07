@@ -79,6 +79,10 @@ describe("GRC export never derives a control result from run arithmetic", () => 
           expect(claimKindSchema.parse(control.claim.claimKind), where).toBe(control.claim.claimKind);
           expect(control.label, where).toBe(renderClaimLabel(control.claim).line);
           if (!sealVerified) expect(control.claim.claimKind, where).not.toBe("observed");
+          // Only a verified seal over a VALID run lets a control's evidence count as trusted.
+          const trusted = sealVerified && status === "VALID";
+          expect(dims.evidence === "untrusted", where).toBe(!trusted);
+          expect(control.claim.reasons.includes("SIGNATURE_INVALID"), where).toBe(!trusted);
         }
         expect(manifest.run.label, where).toBe(renderClaimLabel(manifest.run.claim).line);
         if (!sealVerified) {
@@ -88,6 +92,15 @@ describe("GRC export never derives a control result from run arithmetic", () => 
         cases += 1;
       }
     expect(cases).toBe(READINESS.length * COVERAGE.length * LEVELS.length * SEALS.length * STATUSES.length);
+  });
+
+  test("a sealed run with contradictions marks every control's evidence contradictory", () => {
+    const manifest = buildGrcEvidenceManifest("SOC2", { ...run({}), contradictionCount: 2 }, { sealVerified: true, now: NOW });
+    for (const control of manifest.controls) {
+      expect(control.claim.statusDimensions.evidence).toBe("contradictory");
+      expect(control.claim.reasons).toContain("CONTRADICTORY_EVIDENCE");
+      expect(control.claim.statusDimensions.result).toBe("not_evaluated");
+    }
   });
 
   test("a run without layer scores reports maturityLevel null, never 0", () => {
@@ -196,6 +209,26 @@ describe("amc export grc selects and verifies the run", () => {
     writeRun(ws, dir, run({ runId: "5bbb-middle", ts: 1_700_000_500_000 }), true);
     writeRun(ws, dir, run({ runId: "fccc-oldest", ts: 1_700_000_100_000 }), true);
     expect(exportJson(ws, "default").runId).toBe("0aaa-newest");
+  });
+
+  test("a newer failed run is exported over an older run marked VALID", () => {
+    const ws = workspace();
+    const dir = getAgentPaths(ws, "default").runsDir;
+    writeRun(ws, dir, run({ runId: "old-valid", ts: 1_700_000_100_000 }), true);
+    writeRun(ws, dir, { ...run({ runId: "new-invalid", status: "INVALID", ts: 1_700_000_900_000 }), verificationPassed: false }, true);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    runGrcExportCli({ workspace: ws, agentId: "default", framework: "SOC2", out: "grc.json", sarif: "grc.sarif" });
+    expect((JSON.parse(readFileSync(join(ws, "grc.json"), "utf8")) as { runId: string }).runId).toBe("new-invalid");
+    const sarif = JSON.parse(readFileSync(join(ws, "grc.sarif"), "utf8")) as { runs: Array<{ results: Array<{ ruleId: string; level: string }> }> };
+    expect(sarif.runs[0]!.results).toContainEqual(expect.objectContaining({ ruleId: "AMC-GRC-RUN-UNVERIFIED", level: "error" }));
+  });
+
+  test("an older unsealed file claiming VALID never displaces the newest sealed run", () => {
+    const ws = workspace();
+    const dir = getAgentPaths(ws, "default").runsDir;
+    writeRun(ws, dir, { ...run({ runId: "new-sealed", status: "INVALID", ts: 1_700_000_900_000 }), verificationPassed: false }, true);
+    writeRun(ws, join(ws, ".amc", "runs"), run({ runId: "forged-old", ts: 1_600_000_000_000 }), false);
+    expect(exportJson(ws, "default").runId).toBe("new-sealed");
   });
 
   test("no runs gives the existing error and a non-zero exit", () => {
