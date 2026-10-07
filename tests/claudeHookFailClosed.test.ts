@@ -4,7 +4,9 @@ import { createServer, type RequestListener, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
+import { boundedFetchSignal, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
 import { installHookIntegration, type HookProvider } from "../src/adapters/hookIntegration.js";
+import { runHookForward } from "../src/adapters/hookIntegrationCli.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
@@ -345,4 +347,50 @@ describe("Gemini CLI control hook keeps its outputs and exit codes", () => {
     expect(JSON.parse(run.stdout)).toEqual(GEMINI_DENY);
     expect(run.durationMs).toBeLessThan(timeoutMs - 1000);
   }, 60_000);
+});
+
+describe("in-process forwarder deadline", () => {
+  test("rejects at the deadline even when the work ignores the abort signal", async () => {
+    let aborted = false;
+    await expect(withHookDeadline(50, (signal) => new Promise<never>(() => {
+      signal.addEventListener("abort", () => { aborted = true; });
+    }))).rejects.toBeInstanceOf(HookDeadlineError);
+    expect(aborted).toBe(true);
+    await expect(withHookDeadline(1_000, async () => "done")).resolves.toBe("done");
+    expect(boundedFetchSignal(1_000).aborted).toBe(false);
+    const deadline = new AbortController();
+    const bounded = boundedFetchSignal(60_000, deadline.signal);
+    deadline.abort();
+    expect(bounded.aborted).toBe(true);
+  });
+
+  test("maps every Claude control failure to exit 2 and keeps observe and Gemini failures at exit 1", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "claude-code", "inproc-agent", bridgeBase);
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+
+    const hung = await runHookForward(claude, async () => claudeRead("/private/inproc.txt", "toolu_inproc_01"), workspace, 300);
+    expect(hung).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
+
+    const stalledInput = await runHookForward(claude, () => new Promise<string>(() => {}), workspace, 100);
+    expect(stalledInput.exitCode).toBe(2);
+
+    const empty = await runHookForward(claude, async () => "  ", workspace);
+    expect(empty).toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
+
+    const terminal = await runHookForward(claude, async () => JSON.stringify({
+      hook_event_name: "PostToolUse",
+      tool_name: "Read",
+      tool_use_id: "toolu_inproc_02",
+      tool_response: { content: "private" },
+    }), workspace, 300);
+    expect(terminal.exitCode).toBe(2);
+
+    const observeEmpty = await runHookForward({ ...claude, mode: "observe" }, async () => "", workspace);
+    expect(observeEmpty).toEqual({ stdout: "", stderr: "provider hook input is required on stdin\n", exitCode: 1 });
+
+    const geminiEmpty = await runHookForward({ ...claude, provider: "gemini-cli", tokenFile: ".amc/hooks/gemini-cli.lease" }, async () => "", workspace);
+    expect(geminiEmpty.exitCode).toBe(1);
+  }, 30_000);
 });

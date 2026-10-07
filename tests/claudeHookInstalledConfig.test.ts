@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { claudeHookSettingsFindings, probeInstalledClaudeHook, verifyClaudeControl } from "../src/adapters/claudeHookProbe.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { initWorkspace } from "../src/workspace.js";
@@ -196,7 +197,6 @@ describe("installed Claude Code control configuration", () => {
   }, 90_000);
 
   test("reports a missing command as command_missing and status exits 1", async () => {
-    const { probeInstalledClaudeHook } = await import("../src/adapters/claudeHookProbe.js");
     const workspace = newWorkspace();
     const home = tempDir("amc-claude-home-");
     const linkDir = tempDir("amc-claude-node-");
@@ -234,4 +234,62 @@ describe("installed Claude Code control configuration", () => {
     expect(status.stdout).toContain("Control: NOT VERIFIED");
     expect(status.stdout).toContain("disableAllHooks");
   }, 90_000);
+});
+
+describe("Claude hook probe outcomes", () => {
+  function writeControlHandler(workspace: string, handler: Record<string, unknown>): void {
+    mkdirSync(join(workspace, ".claude"), { recursive: true });
+    writeFileSync(join(workspace, ".claude", "settings.local.json"), `${JSON.stringify({
+      hooks: { PreToolUse: [{ matcher: "*", hooks: [{ type: "command", statusMessage: "AMC Control [amc-control-v1]", ...handler }] }] },
+    }, null, 2)}\n`);
+  }
+
+  function script(dir: string, name: string, code: string): string {
+    const path = join(dir, `${name}.cjs`);
+    writeFileSync(path, code);
+    return path;
+  }
+  const DENY_SCRIPT = `process.stdout.write(${JSON.stringify(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } }))}); process.exitCode = 2;`;
+
+  test("classifies each way the installed handler can fail to block", async () => {
+    const workspace = tempDir("amc-claude-probe-");
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "not_installed" });
+
+    writeControlHandler(workspace, { command: "amc", args: ["connect", "hooks", "forward"], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing" });
+
+    writeControlHandler(workspace, { command: join(workspace, "missing-node"), args: [], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing" });
+
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "allow", "process.exit(0)")], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "not_blocking", exitCode: 0 });
+
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "silent", "process.exit(2)")], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "invalid_output", exitCode: 2 });
+
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "hang", "setTimeout(() => {}, 20000)")], timeout: 1 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "timed_out", exitCode: null });
+
+    writeControlHandler(workspace, { command: workspace, args: [], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "spawn_failed" });
+
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", DENY_SCRIPT)], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: true, reason: "ok", exitCode: 2 });
+  }, 60_000);
+
+  test("reports settings that disable every hook and never verifies with them set", async () => {
+    const workspace = tempDir("amc-claude-settings-");
+    const home = tempDir("amc-claude-home-");
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", DENY_SCRIPT)], timeout: 10 });
+    expect(claudeHookSettingsFindings({ workspace, home }).blockers).toEqual([]);
+    expect((await verifyClaudeControl({ workspace, home })).verified).toBe(true);
+
+    mkdirSync(join(home, ".claude"), { recursive: true });
+    writeFileSync(join(home, ".claude", "settings.json"), JSON.stringify({ disableAllHooks: true }));
+    const findings = claudeHookSettingsFindings({ workspace, home });
+    expect(findings.blockers).toEqual([`disableAllHooks is true in ${join(home, ".claude", "settings.json")}`]);
+    const verification = await verifyClaudeControl({ workspace, home });
+    expect(verification).toMatchObject({ verified: false, summary: "Control: NOT VERIFIED (disableAllHooks)" });
+    expect(verification.probe.ok).toBe(true);
+  }, 60_000);
 });

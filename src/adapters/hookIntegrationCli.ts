@@ -4,6 +4,7 @@ import { stdin } from "node:process";
 import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
 import { unlockVault } from "../vault/vault.js";
 import {
+  HookIntegrationError,
   failClosedProviderControlResponse,
   forwardProviderHookControl,
   forwardProviderHookEvent,
@@ -16,6 +17,9 @@ import {
   type HookProvider
 } from "./hookIntegration.js";
 import { serializeProviderControlResponse } from "../bridge/hookControl.js";
+import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
+import { HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
 
@@ -27,6 +31,81 @@ async function readStdinAll(): Promise<string> {
     stdin.on("end", () => resolve(data));
     if (stdin.isTTY) resolve("");
   });
+}
+
+export interface HookForwardOptions {
+  provider: HookProvider;
+  mode: HookMode;
+  agent: string;
+  tokenFile: string;
+  bridgeUrl: string;
+}
+
+export interface HookForwardOutcome {
+  stdout: string;
+  stderr: string;
+  exitCode: 0 | 1 | 2;
+}
+
+/**
+ * Runs one provider hook delivery under HOOK_FORWARD_DEADLINE_MS. Claude Code control mode turns
+ * every failure into a deny with exit 2, because Claude Code runs the tool after any other
+ * failure; Gemini CLI keeps its earlier outputs and exit codes.
+ */
+export async function runHookForward(
+  opts: HookForwardOptions,
+  readInput: () => Promise<string>,
+  workspace = process.cwd(),
+  deadlineMs = HOOK_FORWARD_DEADLINE_MS,
+): Promise<HookForwardOutcome> {
+  const denyExit = opts.provider === "claude-code" && opts.mode === "control" ? 2 : 0;
+  const deny = (message: string): HookForwardOutcome => ({
+    stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
+    stderr: `${message}\n`,
+    exitCode: denyExit,
+  });
+  // Assigned inside the deadline callback, so the cast stops narrowing to the initial value.
+  let stage = "input" as "empty" | "input" | "control" | "observe";
+  try {
+    return await withHookDeadline(deadlineMs, async (signal) => {
+      const rawInput = await readInput();
+      if (!rawInput.trim()) {
+        stage = "empty";
+        throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input is required on stdin");
+      }
+      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
+      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, signal };
+      if (opts.mode === "control" && inspection.phase === "requested") {
+        stage = "control";
+        const { control } = await forwardProviderHookControl(forward);
+        const denied = control.decision === "deny";
+        return {
+          stdout: `${serializeProviderControlResponse(control.providerResponse)}\n`,
+          stderr: denied && denyExit === 2 ? `AMC policy denied the action: ${redactBridgeText(control.reason)}\n` : "",
+          exitCode: denied ? denyExit : 0,
+        };
+      }
+      stage = "observe";
+      await forwardProviderHookEvent({ ...forward, mode: opts.mode });
+      // Both supported providers treat an empty JSON object as a neutral observation result.
+      return { stdout: "{}\n", stderr: "", exitCode: 0 };
+    });
+  } catch (error) {
+    const timedOut = error instanceof HookDeadlineError;
+    if (denyExit === 2 || (opts.mode === "control" && stage !== "empty" && stage !== "observe")) {
+      if (timedOut) return deny("AMC hook control timed out; action denied.");
+      return deny(stage === "control" || stage === "observe"
+        ? "AMC hook control unavailable; action denied."
+        : "AMC hook control input invalid; action denied.");
+    }
+    return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };
+  }
+}
+
+function printControlVerification(control: ClaudeControlVerification): void {
+  console.log((control.verified ? chalk.green : chalk.red)(control.summary));
+  for (const blocker of control.settingsBlockers) console.log(chalk.red(`Issue: ${blocker}`));
+  for (const note of control.notes) console.log(chalk.yellow(`Note: ${note}`));
 }
 
 function printFileChanges(files: HookFileChange[]): void {
@@ -103,10 +182,13 @@ export function registerHookIntegrationCommands(
     .description("Verify provider config ownership, mode, signed manifest, and hook lease")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
     .option("--json", "emit structured JSON", false)
-    .action((opts: { provider: HookProvider; json: boolean }) => {
+    .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const status = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
+      const control = status.provider === "claude-code" && status.mode === "control"
+        ? await verifyClaudeControl({ workspace: process.cwd() })
+        : null;
       if (opts.json) {
-        console.log(JSON.stringify(status, null, 2));
+        console.log(JSON.stringify(control ? { ...status, control } : status, null, 2));
       } else {
         const color = status.state === "installed" ? chalk.green : status.state === "not-installed" ? chalk.gray : chalk.yellow;
         console.log(color(`AMC hook: ${status.state}`));
@@ -117,8 +199,9 @@ export function registerHookIntegrationCommands(
         console.log(`Lease valid: ${status.leaseValid ? "yes" : "no"}`);
         if (status.expiresTs) console.log(`Expires: ${new Date(status.expiresTs).toISOString()}`);
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
+        if (control) printControlVerification(control);
       }
-      if (!["installed", "not-installed"].includes(status.state)) process.exitCode = 1;
+      if (!["installed", "not-installed"].includes(status.state) || control?.verified === false) process.exitCode = 1;
     });
 
   hooks
@@ -126,7 +209,7 @@ export function registerHookIntegrationCommands(
     .description("Verify signed hook setup and show the latest verified provider event")
     .requiredOption("--provider <provider>", "claude-code|gemini-cli")
     .option("--json", "emit structured JSON", false)
-    .action((opts: { provider: string; json: boolean }) => {
+    .action(async (opts: { provider: string; json: boolean }) => {
       if (!isHookProvider(opts.provider)) {
         const message = "provider must be claude-code or gemini-cli";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
@@ -144,8 +227,11 @@ export function registerHookIntegrationCommands(
         }
       }
       const health = inspectHookHealth({ workspace, provider: opts.provider });
+      const control = health.provider === "claude-code" && health.mode === "control"
+        ? await verifyClaudeControl({ workspace })
+        : null;
       if (opts.json) {
-        console.log(JSON.stringify(health, null, 2));
+        console.log(JSON.stringify(control ? { ...health, control } : health, null, 2));
       } else {
         const color = health.status === "observed"
           ? chalk.hex("#4AEF79")
@@ -163,9 +249,10 @@ export function registerHookIntegrationCommands(
           console.log(`Action: ${health.evidence.lastEvent.actionId}`);
         }
         for (const reason of health.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+        if (control) printControlVerification(control);
         console.log(chalk.gray(`Boundary: ${health.claimBoundary}`));
       }
-      process.exitCode = health.status === "observed" ? 0 : health.status === "fail_closed" ? 2 : 1;
+      process.exitCode = health.status === "fail_closed" ? 2 : health.status === "observed" && control?.verified !== false ? 0 : 1;
     });
 
   hooks
@@ -227,45 +314,11 @@ export function registerHookIntegrationCommands(
     .requiredOption("--agent <agentId>", "agent ID")
     .requiredOption("--token-file <path>", "dedicated hook lease token")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
-    .action(async (opts: { provider: HookProvider; mode: HookMode; agent: string; tokenFile: string; bridgeUrl: string }) => {
-      const rawInput = await readStdinAll();
-      if (!rawInput.trim()) throw new Error("provider hook input is required on stdin");
-      let inspection: ReturnType<typeof inspectProviderHookEvent>;
-      try {
-        inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
-      } catch (error) {
-        if (opts.mode !== "control") throw error;
-        process.stderr.write("AMC hook control input invalid; action denied.\n");
-        process.stdout.write(`${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`);
-        return;
-      }
-      if (opts.mode === "control" && inspection.phase === "requested") {
-        try {
-          const result = await forwardProviderHookControl({
-            workspace: process.cwd(),
-            provider: opts.provider,
-            agentId: opts.agent,
-            tokenFile: opts.tokenFile,
-            bridgeBase: opts.bridgeUrl,
-            rawInput
-          });
-          process.stdout.write(`${serializeProviderControlResponse(result.control.providerResponse)}\n`);
-        } catch {
-          process.stderr.write("AMC hook control unavailable; action denied.\n");
-          process.stdout.write(`${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`);
-        }
-        return;
-      }
-      await forwardProviderHookEvent({
-        workspace: process.cwd(),
-        provider: opts.provider,
-        mode: opts.mode,
-        agentId: opts.agent,
-        tokenFile: opts.tokenFile,
-        bridgeBase: opts.bridgeUrl,
-        rawInput
-      });
-      // Both supported providers treat an empty JSON object as a neutral observation result.
-      process.stdout.write("{}\n");
+    .action(async (opts: HookForwardOptions) => {
+      const outcome = await runHookForward(opts, readStdinAll);
+      stdin.destroy();
+      if (outcome.stderr) process.stderr.write(outcome.stderr);
+      process.stdout.write(outcome.stdout);
+      process.exitCode = outcome.exitCode;
     });
 }
