@@ -189,7 +189,8 @@ export async function reconcile(executionId: string, opts: { readonly workspace:
       reasonCode: mismatches.length === 0 ? `reconciled:${effect}` : `reconciled:contradicted:${mismatches.join(",")}`,
       method: `adapter:${adapter.adapterId}`, evidenceRefs: externalRef === null ? [] : [`external:${externalRef}`],
       outcomeDigest: sha256Hex(canonicalize(observation)),
-      meta: { adapterId: adapter.adapterId, observedAt: observation.observedAt, mismatches, incidentIds } });
+      // The system of record's own time is its claim; the receipt's `at` is AMC's clock.
+      meta: { adapterId: adapter.adapterId, claimedObservedAt: observation.observedAt, mismatches, incidentIds } });
     if (mismatches.length === 0) backoff.delete(key);
     return { executionId, before: head.state, after: receipt.state, effect: receipt.effect, mismatches, observation, receipt,
       nextAttemptAt: mismatches.length === 0 ? null : nextAttempt(key), incidentIds };
