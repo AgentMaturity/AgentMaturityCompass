@@ -122,6 +122,13 @@
       "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d"
     },
     {
+      "path": "src/notary/notaryAttestation.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/notary/notaryAttestation.ts.landed",
+      "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
