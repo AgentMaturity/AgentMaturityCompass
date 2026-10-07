@@ -84,7 +84,7 @@ export function evaluateGate(gate: Gate, allEvents: ParsedEvidenceEvent[]): Gate
       ? gate.acceptedTrustTiers
       : gate.requiredTrustTier
         ? [gate.requiredTrustTier]
-        : ["OBSERVED", "ATTESTED", "SELF_REPORTED"];
+        : ["OBSERVED", "ATTESTED"]; // self-reported evidence never meets a gate that names no tiers
   const accepted = new Set<TrustTier>(acceptedTrustTiers);
   if (accepted.has("OBSERVED")) {
     accepted.add("OBSERVED_HARDENED");
