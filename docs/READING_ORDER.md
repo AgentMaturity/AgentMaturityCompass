@@ -96,7 +96,7 @@ Start: `SECURITY_COMPLIANCE_QUICKSTART`, then `SECURITY_PATH`.
 
 | Guide | Why |
 |---|---|
-| SECURITY, SECURITY_ARCHITECTURE_OVERVIEW, THREAT_MODEL, HARDENING, SECURITY_DEPLOYMENT | The security model, threat model and hardening story in that order. |
+| SECURITY, SECURITY_ARCHITECTURE_OVERVIEW, THREAT_MODEL (`docs/security/THREAT_MODEL.md`), HARDENING, SECURITY_DEPLOYMENT | The security model, threat model and hardening story in that order. |
 | SHIELD_ENFORCE_REFERENCE, RED_TEAMING_GUIDE, ASSURANCE_LAB | Shield/Enforce/Watch CLI, red-teaming from zero, the assurance lab. |
 | VAULT, KEY_HISTORY, ENCRYPTION_AT_REST, HARDWARE_TRUST, NOTARY, ZERO_KEYS | Signing boundary and key custody; NOTARY **fix first** (Document 2, B-4). |
 | SUPPLY_CHAIN, PLUGIN_SUPPLY_CHAIN | Dependency and plugin provenance. |
