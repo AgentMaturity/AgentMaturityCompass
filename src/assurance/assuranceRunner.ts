@@ -10,6 +10,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { saveAssuranceRunArtifacts } from "./assurancePolicyStore.js";
+import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
 import type { AssuranceFindingCategory, AssuranceFindingSeverity } from "./assuranceSchema.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
@@ -672,6 +673,9 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     });
 
     return report;
+  } catch (error) {
+    sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
+    throw error;
   } finally {
     ledger.close();
   }
@@ -930,8 +934,8 @@ export async function applyAssurancePatchKit(params: {
   }));
 
   const ledger = openLedger(params.workspace);
+  const sessionId = randomUUID();
   try {
-    const sessionId = randomUUID();
     ledger.startSession({
       sessionId,
       runtime: "unknown",
@@ -961,6 +965,9 @@ export async function applyAssurancePatchKit(params: {
       }
     });
     ledger.sealSession(sessionId);
+  } catch (error) {
+    sealAbortedAssuranceSession({ ledger, sessionId, runId: params.assuranceRunId, agentId, error });
+    throw error;
   } finally {
     ledger.close();
   }
