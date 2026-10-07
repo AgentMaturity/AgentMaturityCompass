@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { auditFamilyResultSchema } from "./auditMapSchema.js";
+import { conformanceStatusSchema } from "../domains/conformance/conformanceSchema.js";
 
 export const binderScopeSchema = z.object({
   type: z.enum(["WORKSPACE", "NODE", "AGENT"]),
@@ -91,7 +92,16 @@ export const binderJsonSchema = z.object({
       assuranceCadence: z.object({ configuredHours: z.number().nullable(), lastRunTs: z.number().nullable(), nextRunTs: z.number().nullable(), status: z.string() }),
       benchCadence: z.object({ configuredDays: z.number().nullable(), lastRunTs: z.number().nullable(), nextRunTs: z.number().nullable(), status: z.string() })
     }),
-    controls: binderControlsSectionSchema
+    controls: binderControlsSectionSchema,
+    /** P1-16: the agent's newest conformance run that verified under pinned trust; status null when none did. Optional for older binders. */
+    conformanceRun: z.object({
+      status: conformanceStatusSchema.nullable(),
+      conformanceRunId: z.string().min(1).nullable(),
+      station: z.string().min(1).nullable(),
+      counts: z.object({ total: z.number().int(), pass: z.number().int(), fail: z.number().int(), notEvaluated: z.number().int() }).nullable(),
+      reportJsonSha256: z.string().length(64).nullable(),
+      notes: z.array(z.string()).default([])
+    }).optional()
   }),
   proofBindings: z.object({
     transparencyRootSha256: z.string().length(64),
