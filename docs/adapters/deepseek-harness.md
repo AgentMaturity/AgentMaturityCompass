@@ -58,7 +58,7 @@ The 2026-09-08 acceptance built the exact pinned DSH revision with its official 
 
 Three actual DSH v2 logs supplied 51 events and six imported traces. Their session/sequence identities and surface references were preserved; durations remained unknown and imports remained `SELF_REPORTED` / `NOT_EVALUATED`, with empty maturity score sets. These runs had no parent session: nested delegation, fork ancestry, custom plugins, other platforms and live vendor endpoints remain outside this acceptance. The checkout-only receipt is `AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-dsh-capture-acceptance/final-summary.json`.
 
-The neutral importer accepts plaintext v2 JSONL. DSH's default files contain concatenated Zstandard frames; decode the whole file first, retaining the original compressed artifact and its digest. For example:
+The neutral importer accepts plaintext DSH v2 JSONL as written at revision c389f96b. DSH's default files contain concatenated Zstandard frames; AMC refuses `.jsonl.zstd` and `.jsonl.zst` files and never decompresses them. Decode the whole file first and keep the compressed artifact and its digest yourself: AMC retains the decoded bytes it imports, not the compressed file. For example:
 
 ```sh
 zstd -d -c /path/to/session.v2.jsonl.zstd > /reviewed/exported-session.jsonl
@@ -67,5 +67,54 @@ amc import /reviewed/exported-session.jsonl --agent default --expected-digest <r
 ```
 
 Do not substitute a header-only decompression or reconstruct missing events. Importing a DSH log is a separate operator action; launching DSH through AMC never upgrades that file's trust classification.
+
+### Format versions
+
+A first line with `type: "session"` and any DSH-only header key (`createdAt`, `isSeeded`, `delegationDepth`, `seedLength` or `agentPreset`) is treated as DSH whatever its version. Any version other than 2 is refused with an explicit message and is never imported as a generic event log. For example, a v4 header produces:
+
+> DSH session format v4 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.
+
+Other DSH refusals (limits, malformed lines, noncontiguous sequences) are also shown by name in the import plan instead of a generic parse error. A Pi durable-storage header (`kind: "header"` with `v` or `storageVersion`) is refused in the same way: "Pi durable session format v4 is not supported; AMC imports Pi CLI session v3."
+
+**DSH format v4 is refused, not qualified.** Qualifying it needs at least three recorded v4 sessions (a tool call, a tool error and an interruption) from a pinned DSH release with a local scripted provider, and every v4 event type documented at that pin. None have been recorded, and the v4 header shape has not been re-checked against DSH source for this release, so AMC ships the refusal. Re-export such sessions as v2 if your DSH version can, or keep them outside AMC.
+
+### Original bytes and losses
+
+`amc import` stores the exact bytes it read for every recognized file, before parsing or redaction. They are encrypted in the workspace blob store, addressed by SHA-256 and deduplicated through `.amc/imports/originals.jsonl`. A reused index row is trusted only after its blob decrypts to the same SHA-256. The import manifest (`amc imports show <import-id>`) lists each original with its SHA-256, size, media type, format, version, pinned source revision and blob reference.
+
+The import is refused as a whole, before anything is written, with `IMPORT_ORIGINAL_NOT_RETAINABLE: <reason>; raise retention.maxBlobBytes or pass --no-retain-original.` when blob encryption is off in the ops policy, the blob key is unavailable (for example, a locked vault without `AMC_VAULT_PASSPHRASE`), or a file is larger than `retention.maxBlobBytes` (10,485,760 bytes by default, while DSH allows 32 MiB). With `AMC_NO_SIGN=1` set, the original is encrypted with a random workspace key kept beside the blobs (key version 0), a weaker protection than the vault. `--no-retain-original` keeps only the digest: the manifest records `not-retained` and the losses say "Original bytes not retained by operator choice; only the SHA-256 digest is kept." `amc imports rollback` removes the import's other files but keeps retained originals; retention policy governs their deletion.
+
+Recognized session JSONL (DSH or Pi) may be up to 32 MiB, DSH's own limit; with retention on it may not exceed `retention.maxBlobBytes`. Other artifacts keep the 1,500,000-byte cap. Every file is read once, bounded, and that single read is what AMC hashes, parses and retains.
+
+A retained original proves the bytes are unchanged since import. It does not prove the harness told the truth or that the recorded actions happened, and it never makes an import observed: imports stay `SELF_REPORTED` and `NOT_EVALUATED`. Originals can hold secrets or personal data; they are not included in external-evidence profiles. The record map (`amc-record-map/2`) lists per source the original SHA-256, format version and pinned revision, and the losses of each conversion stage (`redaction`, `projection`, `external-evidence`).
+
+## Session-log uploads to DeepSeek
+
+DSH's `session-log-deepseek` plugin uploads session logs to DeepSeek by default. AMC's reading of that plugin's README at DSH commit 5badb150 is below; it has not been re-checked for this release, so confirm it at the DSH version you deploy:
+
+- The plugin adds a `dsh_session_log` field, up to 8 MiB (setting `maxBytes`), to requests sent to the official DeepSeek API.
+- `enabled: false` stops it. The shipped profiles mount the plugin.
+- Re-enabling it resends events recorded while it was off.
+- OpenTelemetry feedback uploads have a separate setting.
+
+A regulated deployment that must keep session logs local can follow this procedure:
+
+1. Set the plugin's `enabled: false` and turn off the feedback upload.
+2. Route DeepSeek traffic only through AMC's gateway, and deny direct egress to DeepSeek hosts in the proxy allowlist.
+3. Turn on the gateway field guard for the DeepSeek route in `.amc/gateway.yaml`, then re-sign the file with `amc fix-signatures`:
+
+   ```yaml
+   routes:
+     - prefix: /deepseek
+       upstream: deepseek
+       stripPrefix: true
+       openaiCompatible: true
+       refuseRequestFields: [dsh_session_log]
+   ```
+
+   A request whose top-level JSON body contains a listed field is refused with HTTP 403 and a signed `REQUEST_FIELD_REFUSED` audit event that records the route, the field names and the request byte count, never the content. Nested keys and non-JSON or compressed bodies are not inspected. A refused field fails the DeepSeek request (DSH keeps its upload cursor), so in practice operators must disable the plugin rather than rely on the guard alone.
+4. Over the deployment window, show zero `REQUEST_FIELD_REFUSED` events, zero direct DeepSeek egress in the proxy evidence, and zero `session-log-deepseek/delivery-accepted` events in imported DSH logs. The importer counts those events and warns when any are present.
+
+The guard is enforced at the AMC gateway, only for traffic that passes through it. Direct egress is covered only where the egress proxy denies it. Neither control proves that DSH never uploaded a session by another path.
 
 See [adapter guides](README.md) and [adapter architecture](../ADAPTERS.md).
