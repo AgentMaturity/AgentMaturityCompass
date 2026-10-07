@@ -657,8 +657,7 @@ For a run-to-run or model-route comparison badge, generate it from the real comp
 
 ```bash
 amc compare <run-a> <run-b> --output compare.json --badge
-amc compare gpt-4o-mini claude-3-haiku --agent support-bot --output model-compare.json --badge
-# writes compare-badge.svg or model-compare-badge.svg beside the report
+# writes compare-badge.svg beside the report; to compare models, run the agent with each model and compare the two runs
 ```
 
 Standalone maturity badges are also available when you only need a README trust marker:

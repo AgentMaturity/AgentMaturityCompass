@@ -115,6 +115,13 @@
       "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
     },
     {
+      "path": "src/demo/prospectDemo.ts",
+      "issue": "P0-15",
+      "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
+      "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
+      "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63"
+    },
+    {
       "path": "src/diagnostic/runner.ts",
       "issue": "P0-18",
       "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",

@@ -6051,7 +6051,7 @@ program
 
 program
   .command("compare-models")
-  .description("Run the same agent evaluation across multiple models and show comparison matrix")
+  .description("Not evaluated: AMC cannot run the agent per model; refuses and points to amc compare <run-a> <run-b>")
   .argument("<models...>", "model names to compare (e.g., gpt-4 claude-3-opus gemini-pro)")
   .option("--agent <agentId>", "agent ID")
   .option("--window <window>", "evidence window", "14d")

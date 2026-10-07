@@ -141,9 +141,9 @@ export function buildProspectDemoPlan(liveResult: DemoResult | null = null): Pro
       {
         minute: "3:15-4:15",
         title: "Compare options",
-        command: "amc compare <run-a> <run-b>",
-        proof: "Diffs two real runs: maturity, integrity and targets.",
-        talkTrack: "Run the agent before and after a change, such as a new model, and AMC compares the two runs it measured."
+        command: "amc compare-models --agent default --iterations 3",
+        proof: "Surfaces model comparison as a demo-ready command instead of leaving it hidden.",
+        talkTrack: "AMC can compare behavior across model choices, not just score one run."
       },
       {
         minute: "4:15-5:00",
@@ -154,7 +154,7 @@ export function buildProspectDemoPlan(liveResult: DemoResult | null = null): Pro
       }
     ],
     compareAndLeaderboard: [
-      "amc compare <run-a> <run-b>",
+      "amc compare-models --agent default --iterations 3",
       "amc leaderboard show",
       "amc leaderboard export --format html --output leaderboard.html"
     ],

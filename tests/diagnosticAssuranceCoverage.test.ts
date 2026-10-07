@@ -41,18 +41,13 @@ afterAll(async () => {
 });
 
 describe("diagnostic and assurance coverage expansion", () => {
-  test("compareModels returns deterministic comparison between two model baselines", async () => {
+  test("compareModels refuses: it cannot run the agent per model, so a comparison would be invented (P0-15)", async () => {
     const ws = workspace();
-    const a = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });
-    const b = await runDiagnostic({ workspace: ws, agentId: "default", window: "7d", targetName: "default", claimMode: "auto" });
-    const cmp = await compareModels(ws, ["gpt-4o-mini@2024-11", "gpt-4o-mini@2025-01"], {
+    await expect(compareModels(ws, ["gpt-4o-mini@2024-11", "gpt-4o-mini@2025-01"], {
       agentId: "default",
       window: "14d",
       targetName: "default"
-    });
-    expect(cmp.models).toHaveLength(2);
-    expect(cmp.comparisonMatrix[0]?.model).toContain("gpt-4o-mini");
-    expect(typeof cmp.comparisonMatrix[0]?.overallScore).toBe("number");
+    })).rejects.toThrow(/Model comparison is not evaluated/);
   });
 
   test("generateReport renders markdown and loadRunReport reloads saved run", async () => {
