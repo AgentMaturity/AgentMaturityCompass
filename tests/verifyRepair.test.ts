@@ -5,10 +5,11 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { closeAllSqlitePools } from "../src/storage/sqlitePool.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { SignedDigest } from "../src/crypto/signing/signerTypes.js";
 import {
-  applyVerifyRepair, planVerifyRepair, RepairRefused, type HoldState, type RepairReceipt
+  applyVerifyRepair, planVerifyRepair, RepairRefused, type HoldState, type RepairPlan, type RepairReceipt
 } from "../src/ledger/verifyRepair.js";
 
 // A plain-object copy of node:fs, so `vi.spyOn` can replace renameSync for the rename-failure case.
@@ -42,6 +43,8 @@ function blobWorkspace(): string {
     ledger.sealSession("s");
   } finally {
     ledger.close();
+    // The writer's pooled connection would keep -wal/-shm live; a repair runs with no writer attached.
+    closeAllSqlitePools();
   }
   mkdirSync(join(workspace, ".amc", "reports"), { recursive: true });
   writeFileSync(join(workspace, ".amc", REPORT), "# a generated report repair must never touch\n");
@@ -130,6 +133,7 @@ describe("planVerifyRepair", () => {
     flipByte(blobFiles(workspace)[0]!);
     const before = snapshot(workspace);
     const plan = planVerifyRepair(workspace);
+    const after = snapshot(workspace);
     expect(plan.chainOk).toBe(false);
     expect(plan.errorCounts.payload_mismatch).toBe(1);
     expect(plan.action).toBe("archive_evidence_store");
@@ -140,7 +144,7 @@ describe("planVerifyRepair", () => {
     for (const blob of blobFiles(workspace)) expect(planned).toContain(`.amc/blobs/${blob.split(/[\\/]/).pop()}`);
     // Nothing outside the evidence store is ever listed.
     expect(planned.every((path) => /^\.amc\/(evidence\.sqlite(-wal|-shm)?|blobs\/.+)$/.test(path))).toBe(true);
-    for (const file of plan.files) expect(file.sha256).toBe(before[file.path]);
+    for (const file of plan.files) expect(file.sha256).toBe(after[file.path]);
     expect(withoutSidecars(snapshot(workspace))).toEqual(withoutSidecars(before));
   });
 
@@ -157,15 +161,16 @@ describe("planVerifyRepair", () => {
 });
 
 describe("applyVerifyRepair", () => {
-  function tampered(): { workspace: string; before: Record<string, string> } {
+  /** A tampered store and its plan. The snapshot is taken after planning: the read-only verifier may leave SQLite sidecars. */
+  function tampered(): { workspace: string; plan: RepairPlan; before: Record<string, string> } {
     const workspace = blobWorkspace();
     flipByte(blobFiles(workspace)[0]!);
-    return { workspace, before: snapshot(workspace) };
+    const plan = planVerifyRepair(workspace);
+    return { workspace, plan, before: snapshot(workspace) };
   }
 
   it("moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     const signed: string[] = [];
     const { quarantineDir, receipt } = applyVerifyRepair(workspace, plan, {
       legalHolds: noHolds, sign: (digest) => { signed.push(digest); return stubSign(digest); }, now: FIXED_NOW
@@ -194,8 +199,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("refuses when the legal hold state is unknown, and moves nothing", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     expectRefused(() => applyVerifyRepair(workspace, plan, {
       legalHolds: () => ({ state: "unknown", reason: "hold register unreadable" }), sign: stubSign
     }), /legal hold state unknown: hold register unreadable/);
@@ -205,8 +209,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("refuses when the hold check itself throws", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     expectRefused(() => applyVerifyRepair(workspace, plan, {
       legalHolds: () => { throw new Error("register offline"); }, sign: stubSign
     }), /legal hold state unknown: register offline/);
@@ -214,8 +217,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("refuses under an active hold and names it", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     expectRefused(() => applyVerifyRepair(workspace, plan, {
       legalHolds: () => ({ state: "active", holdIds: ["hold-litigation-7"] }), sign: stubSign
     }), /hold-litigation-7/);
@@ -235,8 +237,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("refuses before any move when signing fails", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     expectRefused(() => applyVerifyRepair(workspace, plan, {
       legalHolds: noHolds, sign: () => { throw new Error("trust config signature invalid: edited"); }
     }), /trust config signature invalid/);
@@ -245,8 +246,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("refuses when a planned file changed after the plan", () => {
-    const { workspace } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan } = tampered();
     flipByte(blobFiles(workspace)[1]!);
     const changed = snapshot(workspace);
     expectRefused(() => applyVerifyRepair(workspace, plan, { legalHolds: noHolds, sign: stubSign }), /evidence changed since the plan/);
@@ -255,8 +255,7 @@ describe("applyVerifyRepair", () => {
   });
 
   it("puts moved files back when a rename fails part way", () => {
-    const { workspace, before } = tampered();
-    const plan = planVerifyRepair(workspace);
+    const { workspace, plan, before } = tampered();
     expect(plan.files.length).toBeGreaterThanOrEqual(3);
     const realRename = fs.renameSync;
     let intoQuarantine = 0;

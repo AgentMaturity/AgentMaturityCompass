@@ -6,6 +6,7 @@ import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { closeAllSqlitePools } from "../src/storage/sqlitePool.js";
 import { verifySignedDigest } from "../src/crypto/signing/signer.js";
 import { sha256Hex } from "../src/utils/hash.js";
 
@@ -30,6 +31,8 @@ function blobWorkspace(inline = false): string {
   ledger.appendEvidence({ sessionId: "s", runtime: "unknown", eventType: "stdout", payload: "blob-backed evidence two", inline });
   ledger.sealSession("s");
   ledger.close();
+  // The writer's pooled connection would keep -wal/-shm live; a repair runs with no writer attached.
+  closeAllSqlitePools();
   mkdirSync(join(workspace, ".amc", "reports"), { recursive: true });
   writeFileSync(join(workspace, ".amc", "reports", "kept.md"), "# report\n");
   return workspace;
@@ -55,8 +58,12 @@ function snapshot(workspace: string): Record<string, string> {
 function amc(cwd: string, args: string[]) {
   const amcHome = mkdtempSync(join(tmpdir(), "amc-verify-repair-home-"));
   roots.push(amcHome);
-  const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_HOME: amcHome };
+  // The passphrase initWorkspace used under vitest: a locked vault cannot open blobs, which reads as tampering.
+  const env: NodeJS.ProcessEnv = {
+    ...process.env, NO_COLOR: "1", AMC_HOME: amcHome, AMC_VAULT_PASSPHRASE: process.env.AMC_VAULT_PASSPHRASE ?? "amc-test-passphrase"
+  };
   delete env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+  delete env.AMC_VAULT_PASSPHRASE_FILE;
   // stdin is a pipe, never a TTY, so --apply without --yes must refuse rather than prompt.
   const result = spawnSync(process.execPath, [CLI, ...args], { cwd, env, encoding: "utf8", timeout: 60_000, input: "" });
   return { status: result.status, output: `${result.stdout}\n${result.stderr}` };
@@ -108,9 +115,14 @@ describe("amc verify --repair", () => {
     const receiptBytes = readFileSync(receiptPath);
     const receipt = JSON.parse(receiptBytes.toString("utf8")) as { moved: Array<{ from: string; to: string; sha256: string }> };
     expect(receipt.moved.length).toBeGreaterThan(0);
-    for (const row of receipt.moved) {
-      expect(sha256Hex(readFileSync(join(workspace, row.to)))).toBe(before[row.from.replace(/^\.amc\//, "")]);
+    const movedFrom = new Set(receipt.moved.map((row) => row.from.replace(/^\.amc\//, "")));
+    for (const row of receipt.moved) expect(sha256Hex(readFileSync(join(workspace, row.to)))).toBe(row.sha256);
+    // Every pre-repair file is byte-identical in place or at the quarantine path the receipt names.
+    for (const [rel, sha] of Object.entries(before)) {
+      if (movedFrom.has(rel)) expect(receipt.moved.find((row) => row.from === `.amc/${rel}`)?.sha256).toBe(sha);
+      else expect(sha256Hex(readFileSync(join(workspace, ".amc", rel))), rel).toBe(sha);
     }
+    expect(movedFrom.has("evidence.sqlite")).toBe(true);
     // .amc/reports is never moved or modified.
     expect(readFileSync(join(workspace, ".amc", "reports", "kept.md"), "utf8")).toBe("# report\n");
 

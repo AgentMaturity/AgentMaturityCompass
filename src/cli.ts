@@ -194,6 +194,7 @@ import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { printArchivedStoreNote, runVerifyRepair } from "./cli-verify-repair.js";
 import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
@@ -6290,50 +6291,26 @@ program
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
 
 withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
-  .option("--repair", "Auto-clean corrupted blobs and ledger entries, then re-verify", false)
+  .option("--repair", "Diagnose a failed verification and print a recovery plan (changes nothing)", false)
+  .option("--apply", "With --repair: move a failing evidence store to .amc/quarantine/ with a signed receipt", false)
+  .option("--yes", "With --repair --apply: confirm without the typed prompt", false)
   .option("--sign-config", "Sign .amc/amc.config.yaml with the auditor key, then stop", false)
-  .action(async (opts: { repair: boolean; signConfig: boolean } & TrustFlags) => {
+  .action(async (opts: { repair: boolean; apply: boolean; yes: boolean; signConfig: boolean } & TrustFlags) => {
     if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
     if (opts.repair) {
-      const { rmSync, existsSync } = await import("fs");
-      const { join: pathJoin } = await import("path");
-      const blobsDir = pathJoin(process.cwd(), ".amc", "blobs");
-      const reportsDir = pathJoin(process.cwd(), ".amc", "reports");
-      if (existsSync(blobsDir)) {
-        rmSync(blobsDir, { recursive: true, force: true });
-        console.log(chalk.yellow("🔧 Removed corrupted blobs directory"));
-      }
-      if (existsSync(reportsDir)) {
-        rmSync(reportsDir, { recursive: true, force: true });
-        console.log(chalk.yellow("🔧 Removed corrupted reports directory"));
-      }
-      console.log(chalk.gray("  Re-running verification after repair..."));
+      const code = await runVerifyRepair({ apply: opts.apply, yes: opts.yes, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
+      if (code !== 0) process.exit(code);
+      return;
     }
+    if (opts.apply || opts.yes) { console.error("--apply and --yes only work with --repair"); process.exit(2); }
     const trust = trustFromFlags(opts, ["ledger-row"]);
     const result = await verifyLedgerIntegrity(process.cwd(), { trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
     if (result.ok) {
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
+      printArchivedStoreNote(process.cwd());
       const code = ledgerExitCode(result, trust);
       if (code !== 0) process.exit(code);
       return;
-    }
-
-    // If --repair mode and still failing (e.g. blobs missing from ledger events), offer to reset ledger
-    if (opts.repair) {
-      const missingBlobErrors = result.errors.filter(e => e.includes("Missing blob file"));
-      if (missingBlobErrors.length > 0) {
-        const { rmSync, existsSync } = await import("fs");
-        const { join: pathJoin } = await import("path");
-        const ledgerPath = pathJoin(process.cwd(), ".amc", "evidence.sqlite");
-        const ledgerShmPath = ledgerPath + "-shm";
-        const ledgerWalPath = ledgerPath + "-wal";
-        for (const p of [ledgerPath, ledgerShmPath, ledgerWalPath]) {
-          if (existsSync(p)) rmSync(p, { force: true });
-        }
-        console.log(chalk.yellow("🔧 Removed corrupted ledger (blob references invalid). Ledger will rebuild on next run."));
-        console.log(chalk.green("Repair complete. No ledger found (clean state)."));
-        return;
-      }
     }
 
     // Say which of the two failed. "Ledger verification FAILED" over a
@@ -6348,9 +6325,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     const sigErrors = result.errors.filter((e: string) => e.includes("signature invalid"));
     const otherErrors = result.errors.filter((e: string) => !e.includes("signature invalid"));
     if (sigErrors.length > 0 && sigErrors.length === result.errors.length) {
-      console.log(chalk.yellow(`  ${sigErrors.length} events have invalid signatures — likely caused by vault re-initialization.`));
-      console.log(chalk.gray("  This happens when you run 'amc init --force' after collecting evidence."));
-      console.log(chalk.gray("  Fix: run 'amc verify --repair' to clean and rebuild the ledger."));
+      console.log(chalk.yellow(`  ${sigErrors.length} signatures are invalid.`));
+      console.log(chalk.gray("  Every event signature failed. A re-initialized vault and altered evidence look the same here; keep the files and run amc verify --repair to see the options."));
     } else {
       for (const error of result.errors.slice(0, 10)) {
         console.log(`- ${error}`);
@@ -6359,9 +6335,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
         console.log(chalk.gray(`  ... and ${result.errors.length - 10} more errors`));
       }
     }
-    if (!opts.repair) {
-      console.log(chalk.gray("\n  Tip: run with --repair to auto-clean corrupted entries"));
-    }
+    console.log(chalk.gray("\n  Tip: amc verify --repair explains the failure; it changes nothing without --apply."));
+    printArchivedStoreNote(process.cwd());
     process.exit(1);
   });
 
