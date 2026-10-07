@@ -46,7 +46,8 @@ export function updateContextFromOutput(ctx: ReplContext, cmd: string, output: s
   }
 
   // Parse trust label
-  const trustMatch = output.match(/(UNRELIABLE|BASIC|TRUSTED|HIGH TRUST|AUTONOMOUS|CERTIFIED)/i);
+  // "L5=Optimizing" in the printed maturity legend is not a label for this agent.
+  const trustMatch = output.match(/(UNRELIABLE|BASIC|TRUSTED|HIGH TRUST|AUTONOMOUS|(?<!=)OPTIMIZING)/i);
   if (trustMatch?.[1]) {
     ctx.trustLabel = trustMatch[1].toUpperCase();
   }

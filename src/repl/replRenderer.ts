@@ -48,7 +48,8 @@ export function renderBanner(ctx: ReplContext): string {
 
 function trustBadge(label: string): string {
   switch (label) {
-    case "CERTIFIED": return chalk.bgGreen.black(` L5 ${label} `);
+    // L5 carries its methodology name (docs/SCORING_METHODOLOGY.md); AMC certifies nothing.
+    case "OPTIMIZING": return chalk.bgGreen.black(` L5 ${label} `);
     case "AUTONOMOUS": return chalk.bgCyan.black(` L4 ${label} `);
     case "HIGH TRUST": return chalk.bgBlue.white(` L3 ${label} `);
     case "TRUSTED": return chalk.bgYellow.black(` L2 ${label} `);

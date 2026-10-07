@@ -27,20 +27,7 @@
       "reason": "Its src/ markers detect an AMC checkout so path scorers can refuse elsewhere; it does not score."
     }
   ],
-  "pending": [
-    {
-      "file": "src/dashboard/templates/index.html",
-      "rule": "R4",
-      "owner": "P0-22",
-      "reason": "Trust ladder names L5 'Certified'."
-    },
-    {
-      "file": "src/repl/replRenderer.ts",
-      "rule": "R4",
-      "owner": "P0-22",
-      "reason": "REPL renders the L5 label from the CERTIFIED case."
-    }
-  ],
+  "pending": [],
   "pathPresence": [
     "src/score/adaptiveAccessControl.ts",
     "src/score/agentProtocolSecurity.ts",
