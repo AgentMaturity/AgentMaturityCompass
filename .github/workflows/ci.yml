@@ -139,6 +139,11 @@ jobs:
       - name: Generated docs are current
         run: npm run check:question-bank-export
 
+      # P1-07: every evaluated diagnostic gate requirement has a registered,
+      # non-synthetic emitter; prints the per-level reachability table.
+      - name: Diagnostic gate reachability
+        run: npm run check:gates
+
       # Both gates existed as npm scripts that no workflow ran, so docs drift
       # and incident-readiness regressions could merge and ship unchecked.
       # Coverage thresholds were pinned at 0, so the gate could never fail and
