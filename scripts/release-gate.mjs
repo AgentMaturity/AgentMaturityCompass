@@ -179,6 +179,9 @@ export async function releaseGate({
     add("package-lint", () => step("package-lint", "npm", ["run", "check:package"], {
       timeoutMs: 120_000, remediation: "Fix published-package exports, declarations or file selection before release."
     }), ["build"]);
+    add("citations", () => step("citations", "npm", ["run", "check:citations"], {
+      timeoutMs: 120_000, remediation: "Fix citation findings, or update scripts/citations-baseline.json with a reviewed reason."
+    }), ["build"]);
 
     add("packed-install", () => quick
       ? skippedStep("packed-install", "Quick mode skips fresh installed-package and cold evidence verification; run the full release gate.")

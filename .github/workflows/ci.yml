@@ -83,6 +83,9 @@ jobs:
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
 
+      - name: Citation lint (P0-25)
+        run: npm run check:citations
+
       - name: Published package lint
         run: npm run check:package
 
