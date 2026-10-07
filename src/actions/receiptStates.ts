@@ -3,6 +3,7 @@
  * the state receipt appended for every transition. See docs/RECEIPTS.md and docs/adr/012-action-journal.md.
  */
 import { z } from "zod";
+import { authorizationRecordV1Schema } from "../contracts/v1/authorizationRecord.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -11,23 +12,32 @@ import { canonicalize } from "../utils/json.js";
 export const RECEIPT_STATES = ["requested", "authorized", "started", "completed", "denied", "cancelled", "outcome_unknown"] as const;
 export type ReceiptState = (typeof RECEIPT_STATES)[number];
 export type EffectState = "applied" | "not_applied";
+/** Who settled an execution through reconciliation (P1-04): AMC asking the system of record, or an operator's statement. */
+export const RESOLUTIONS = ["adapter", "operator"] as const;
+export type Resolution = (typeof RESOLUTIONS)[number];
 
 export const ALLOWED_TRANSITIONS: Readonly<Record<ReceiptState | "none", readonly ReceiptState[]>> = {
   none: ["requested"],
   requested: ["authorized", "denied", "cancelled"],
   authorized: ["started", "denied", "cancelled"],
   started: ["completed", "outcome_unknown"], // never "cancelled" once dispatched
-  outcome_unknown: ["completed"], // only through reconcile (P1-04), never by replay
+  outcome_unknown: ["completed"], // only through reconciliation (P1-04), never by replay
   completed: [], denied: [], cancelled: []
 };
 
+type TransitionFacts = Pick<ActionReceiptV1, "state" | "evidenceComplete"> & { readonly resolution?: Resolution | null };
+
 /**
- * Whether `next` may follow `previous`. Besides the table, a receipt may repeat its predecessor's state for one
- * reason only: to mark the evidence incomplete (`evidenceComplete` true, then false), for example after the
- * recorder failed. Nothing ever marks evidence complete again in P1-03; reconciliation (P1-04) does.
+ * Whether `next` may follow `previous`. Reconciliation (P1-04, a non-null `resolution`) is the only way out of
+ * `outcome_unknown`, to `completed`, and the only way to mark a `completed` execution's evidence complete again; a
+ * resolution on any other transition is refused. Otherwise a receipt may repeat its predecessor's state for one reason
+ * only: to mark the evidence incomplete (`evidenceComplete` true, then false), for example after the recorder failed.
  */
-export function transitionAllowed(previous: Pick<ActionReceiptV1, "state" | "evidenceComplete"> | null,
-  next: Pick<ActionReceiptV1, "state" | "evidenceComplete">): boolean {
+export function transitionAllowed(previous: TransitionFacts | null, next: TransitionFacts): boolean {
+  const settles = previous?.state === "outcome_unknown" ? next.state === "completed"
+    : previous?.state === "completed" && !previous.evidenceComplete && next.state === "completed" && next.evidenceComplete;
+  const resolved = (next.resolution ?? null) !== null;
+  if (resolved || settles) return resolved && settles;
   if (previous !== null && previous.state === next.state) return previous.evidenceComplete && !next.evidenceComplete;
   return ALLOWED_TRANSITIONS[previous?.state ?? "none"].includes(next.state);
 }
@@ -47,6 +57,8 @@ export const actionIntentV1Schema = z.strictObject({
   adapterId: nonEmpty,
   actionClass: z.enum(ACTION_CLASSES as [ActionClass, ...ActionClass[]]),
   argumentsDigest: sha256,
+  /** The protected facts the authorization record bound (P1-02), so reconciliation can compare what was observed. */
+  bindings: authorizationRecordV1Schema.shape.bindings,
   idempotencyKey: nonEmpty.nullable(),
   parentExecutionId: nonEmpty.nullable(),
   sessionId: nonEmpty.nullable(),
@@ -74,6 +86,10 @@ export const actionReceiptV1Schema = z.strictObject({
   authorizationDigest: sha256.nullable(),
   /** From `started` on. */
   intentDigest: sha256.nullable(),
+  /** AMC's key for this execution (P1-04), the same on every receipt of the chain; null for an unbound call. */
+  idempotencyKey: nonEmpty.nullable(),
+  /** Set only on a reconciliation receipt: `adapter` observed the system of record, `operator` is self-reported. */
+  resolution: z.enum(RESOLUTIONS).nullable(),
   /** `completed` only. */
   outcomeDigest: sha256.nullable(),
   externalRef: z.string().nullable(),
@@ -97,10 +113,20 @@ export class TransitionRefused extends Error {
   }
 }
 
-/** `started` refused because another execution of the same agent is unreconciled. Thrown before anything is written. */
+/** Why `start` refused: this agent has an unreconciled execution, or the same intent is already `outcome_unknown` (P1-04). */
+export type BlockCode = "blocked_by_unreconciled" | "possible_duplicate_of";
+
+/** The denial reason for a block, naming how an operator settles it. */
+export function blockReason(code: BlockCode, blockedBy: string): string {
+  return `${code}:${blockedBy}: ${code === "possible_duplicate_of" ? "the same tool and arguments are already outcome_unknown"
+    : "an earlier action's outcome or evidence is unreconciled"}, and nothing is replayed automatically; settle it with reconcile() `
+    + `or \`amc action resolve ${blockedBy}\``;
+}
+
+/** `started` refused by a block. Thrown before anything is written. */
 export class ActionBlocked extends Error {
-  constructor(readonly executionId: string, readonly blockedBy: string) {
-    super(`blocked_by_unreconciled:${blockedBy}: an earlier action's outcome or evidence is unreconciled, and nothing is replayed automatically`);
+  constructor(readonly executionId: string, readonly blockedBy: string, readonly code: BlockCode = "blocked_by_unreconciled") {
+    super(blockReason(code, blockedBy));
     this.name = "ActionBlocked";
   }
 }

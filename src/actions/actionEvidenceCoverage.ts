@@ -31,6 +31,8 @@ export type ActionEvidenceCoverage =
     readonly calls: number;
     /** Every execution of the call verified, started, and ended `completed` with complete evidence; exactly one. */
     readonly linked: number;
+    /** Settled by an operator's resolution (P1-04): self-reported, so never counted as linked. */
+    readonly operatorResolved: number;
     /** Ended `outcome_unknown`, still `started`, evidence marked incomplete, or more than one execution for the call. */
     readonly unknown: number;
     /** Dispatched with no journaled execution, or with one that never reached `started`. */
@@ -86,7 +88,7 @@ export function actionEvidenceCoverage(workspace: string, sessionId: string): Ac
       for (const row of ledger.db.prepare("SELECT call_id, execution_id FROM action_executions WHERE session_id = ? AND call_id IS NOT NULL")
         .all(sessionId) as Array<{ call_id: string; execution_id: string }>) add(row.call_id, row.execution_id);
     }
-    const counts = { calls: 0, linked: 0, unknown: 0, unlinked: 0, integrityFailures: 0, duplicateExecutions: 0 };
+    const counts = { calls: 0, linked: 0, operatorResolved: 0, unknown: 0, unlinked: 0, integrityFailures: 0, duplicateExecutions: 0 };
     for (const callId of new Set([...dispatched, ...executions.keys()])) {
       const chains = [...(executions.get(callId) ?? [])].map((executionId) => verifyChainIn(ledger, executionId));
       const started = chains.filter((chain) => chain.receipts.some((receipt) => receipt.state === "started"));
@@ -100,7 +102,8 @@ export function actionEvidenceCoverage(workspace: string, sessionId: string): Ac
       } else if (started.length === 0) counts.unlinked += 1;
       else {
         const head = started[0]!.receipts.at(-1)!;
-        if (head.state === "completed" && head.evidenceComplete) counts.linked += 1;
+        if (started[0]!.receipts.some((receipt) => receipt.resolution === "operator")) counts.operatorResolved += 1;
+        else if (head.state === "completed" && head.evidenceComplete) counts.linked += 1;
         else counts.unknown += 1;
       }
     }

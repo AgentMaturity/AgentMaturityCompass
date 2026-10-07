@@ -105,21 +105,27 @@ export function recordProviderOutage(input: { readonly workspace: string; readon
   const agents = readJournal(input.workspace, [] as string[], (db) => (db.prepare(
     "SELECT DISTINCT agent_id FROM action_executions WHERE session_id = ? ORDER BY agent_id").all(input.sessionId) as Array<{ agent_id: string }>)
     .map((row) => row.agent_id));
-  if (agents.length === 0) return [];
-  const ledger = openLedger(input.workspace);
+  return recordActionIncidents(input.workspace, agents, { title: "Model provider outage during a session with journaled actions",
+    description: `The model request failed finally (${input.reason}) in session ${input.sessionId}. Journaled actions in this `
+      + "session keep their receipts; any outcome_unknown among them stays blocked until reconciled. Nothing is replayed.",
+    triggerId: input.outcomeEventId ?? input.sessionId });
+}
+
+/** One signed `WARN` incident per agent about its journaled actions. Returns the incident ids. */
+export function recordActionIncidents(workspace: string, agentIds: readonly string[],
+  text: { readonly title: string; readonly description: string; readonly triggerId: string }): string[] {
+  if (agentIds.length === 0) return [];
+  const ledger = openLedger(workspace);
   try {
     const store = createIncidentStore(ledger.db);
     store.initTables();
-    const key = getPrivateKeyPem(input.workspace, "monitor");
-    return agents.map((agentId) => {
+    const key = getPrivateKeyPem(workspace, "monitor");
+    return agentIds.map((agentId) => {
       const now = Date.now();
-      // ASSURANCE_FAILURE is the nearest trigger the incident table accepts; the outage itself is named in the text.
+      // ASSURANCE_FAILURE is the nearest trigger the incident table accepts; the cause itself is named in the text.
       const partial: Omit<Incident, "incident_hash" | "signature"> = {
         incidentId: `incident_${randomUUID().replace(/-/g, "")}`, agentId, severity: "WARN", state: "OPEN",
-        title: "Model provider outage during a session with journaled actions",
-        description: `The model request failed finally (${input.reason}) in session ${input.sessionId}. Journaled actions in this `
-          + "session keep their receipts; any outcome_unknown among them stays blocked until reconciled. Nothing is replayed.",
-        triggerType: "ASSURANCE_FAILURE", triggerId: input.outcomeEventId ?? input.sessionId, rootCauseClaimIds: [],
+        title: text.title, description: text.description, triggerType: "ASSURANCE_FAILURE", triggerId: text.triggerId, rootCauseClaimIds: [],
         affectedQuestionIds: [], causalEdges: [], timelineEventIds: [], createdTs: now, updatedTs: now, resolvedTs: null,
         postmortemRef: null, prev_incident_hash: store.getLastIncidentHash(agentId)
       };

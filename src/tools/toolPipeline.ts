@@ -4,7 +4,7 @@ import {
   authorizationIntentFor, bindAuthorization, recheckAuthorization,
   type AuthorizationContext, type AuthorizationIntentResult, type BindResult
 } from "../actions/authorize.js";
-import { ActionBlocked, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
+import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -179,6 +179,20 @@ function outcomeDigest(outcome: ToolOutcome): string {
     outputSha256: sha256Hex(outcome.output) }));
 }
 
+/**
+ * The call once its record binds: the record, its execution id and AMC's key (P1-04) on the carrier the signed tool
+ * definition declares. An `argument` carrier overwrites whatever the model passed there; the digest never covered it.
+ */
+function boundExecution(draft: ToolExecution, bound: Extract<BindResult, { ok: true }>): ToolExecution {
+  const { record, effects } = bound;
+  const key = record.idempotencyKey;
+  const carrier = key === null ? undefined : effects?.idempotency;
+  return { ...draft, authorization: { authorizationId: record.authorizationId, digest: bound.digest, record }, executionId: record.executionId,
+    ...(key === null ? {} : { idempotencyKey: key }),
+    ...(carrier?.carrier === "http-header" ? { idempotencyHeader: carrier.name } : {}),
+    ...(carrier?.carrier === "argument" ? { arguments: freezeToolArguments({ ...draft.arguments, [carrier.name]: key }) } : {}) };
+}
+
 function thrownOutcome(error: unknown): ToolOutcome {
   // A thrown tool is a failed call, not a denied one. Reporting it as a
   // denial would credit policy with stopping something policy allowed.
@@ -276,9 +290,7 @@ export class ToolPipeline {
 
     const authorization = await this.enter(draft, input.authority);
     const bound = authorization.bound;
-    const execution: ToolExecution = bound?.ok
-      ? { ...draft, authorization: { authorizationId: bound.record.authorizationId, digest: bound.digest, record: bound.record } }
-      : draft;
+    const execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
     selectedDefinitions.set(execution, definition);
     let outcome: ToolOutcome;
     try {
@@ -428,7 +440,7 @@ export class ToolPipeline {
       journal = open();
       journal.request({ executionId, agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass,
         sessionId: authorization.context?.sessionId ?? null, callId: execution.callId,
-        parentExecutionId: authorization.context?.delegation?.parentExecutionId ?? null });
+        parentExecutionId: authorization.context?.delegation?.parentExecutionId ?? null, idempotencyKey: bound?.ok ? bound.record.idempotencyKey : null });
     } catch (error) {
       return denialOutcome(unavailable(error)); // Failure row 1: nothing requested, nothing dispatched.
     }
@@ -441,9 +453,8 @@ export class ToolPipeline {
         return { ...denialOutcome(denied), action: action(head, false) };
       }
     };
-    const blocked = (blockedBy: string): ToolOutcome => deny({ stage: "authorization", guardLabel: null,
-      reason: `blocked_by_unreconciled:${blockedBy}: an earlier action's outcome or evidence is unreconciled, and nothing is replayed automatically` },
-    `blocked_by_unreconciled:${blockedBy}`);
+    const blocked = (blockedBy: string, code: BlockCode = "blocked_by_unreconciled"): ToolOutcome =>
+      deny({ stage: "authorization", guardLabel: null, reason: blockReason(code, blockedBy) }, `${code}:${blockedBy}`);
     /** The block as it is now: an id that blocks this call, null for none, or a denial when the journal cannot say. */
     const blockingNow = (): string | ToolOutcome | null => {
       try {
@@ -488,7 +499,7 @@ export class ToolPipeline {
     try {
       journal.start(executionId, bound.record);
     } catch (error) {
-      if (error instanceof ActionBlocked) return blocked(error.blockedBy); // Another call went unreconciled meanwhile.
+      if (error instanceof ActionBlocked) return blocked(error.blockedBy, error.code); // Unreconciled meanwhile, or a duplicate intent.
       return deny(unavailable(error), "journal_unavailable"); // The intent is not durable, so nothing is dispatched.
     }
     return this.dispatchJournaled(journal, execution, body, action);

@@ -13,6 +13,7 @@
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
+import type { ReceiptV2 } from "../contracts/v1/receipt.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
@@ -27,7 +28,7 @@ import { DEFAULT_ACTION_STALE_AFTER_MS, recoverUnsettled, type ActionRecoveryRep
 import { authorizationRecordDigest, type AuthorizationRecordV1 } from "./authorizationRecord.js";
 import {
   ActionBlocked, actionIntentV1Schema, actionReceiptV1Schema, JournalUnavailable, ReceiptChainBroken, receiptDigest, transitionAllowed,
-  TransitionRefused, type ActionIntentV1, type ActionReceiptV1, type EffectState, type ReceiptState
+  TransitionRefused, type ActionIntentV1, type ActionReceiptV1, type EffectState, type ReceiptState, type Resolution
 } from "./receiptStates.js";
 
 /** Marks the journal's ledger sessions, one per receipt row: `action-<executionId>-<seq>`. */
@@ -47,6 +48,27 @@ export interface ActionRequest {
   readonly sessionId: string | null;
   readonly callId: string;
   readonly parentExecutionId: string | null;
+  /** AMC's key from the authorization record (P1-04); the unique index refuses its reuse in this workspace. */
+  readonly idempotencyKey: string | null;
+}
+
+/** A reconciliation (P1-04): the head it settles, what the system of record showed or an operator stated, and who. */
+export interface Settlement {
+  /** `receiptDigest` of the head this settles. A chain that moved since it was read is refused. */
+  readonly headDigest: string;
+  readonly resolution: Resolution;
+  readonly effect: EffectState;
+  readonly externalRef: string | null;
+  /** False keeps the execution blocking: what was observed contradicts what was authorized. */
+  readonly evidenceComplete: boolean;
+  readonly reasonCode: string;
+  /** The `v: 2` receipt's `reconciliation.method` and `evidenceRefs`. */
+  readonly method: string;
+  readonly evidenceRefs: readonly string[];
+  /** Digest of the observation or statement; used only when the head is `outcome_unknown`, which has no outcome yet. */
+  readonly outcomeDigest: string;
+  /** Written to the signed evidence row beside the receipt: who stated it, or what the adapter reported. */
+  readonly meta: Readonly<Record<string, unknown>>;
 }
 
 export interface ActionExecutionView {
@@ -62,6 +84,8 @@ export interface ChainVerification {
   readonly ok: boolean;
   readonly errors: readonly string[];
   readonly receipts: readonly ActionReceiptV1[];
+  /** The verified `v: 2` receipt id of each receipt, by `seq`. */
+  readonly receiptIds: ReadonlyMap<number, string>;
 }
 
 export interface UnsettledExecution {
@@ -88,6 +112,8 @@ export interface ActionJournal {
     readonly externalRef: string | null; readonly reasonCode: string }): ActionReceiptV1;
   markUnknown(executionId: string, reasonCode: string): ActionReceiptV1;
   markEvidenceIncomplete(executionId: string, reasonCode: string): ActionReceiptV1;
+  /** Reconciliation (P1-04): `completed` from `outcome_unknown`, or evidence restored on a `completed` execution. */
+  settle(executionId: string, settlement: Settlement): ActionReceiptV1;
   heartbeat(executionId: string): void;
   get(executionId: string): ActionExecutionView | null;
   /**
@@ -113,6 +139,7 @@ interface Change {
   readonly externalRef?: string | null;
   readonly authorizationDigest?: string;
   readonly request?: ActionRequest;
+  readonly settlement?: Settlement;
   /** Builds the intent from the verified head; throwing refuses the transition before anything is written. */
   readonly intent?: (head: ActionReceiptV1) => ActionIntentV1;
   /** A precondition read inside the transaction, against the verified head; throwing refuses before anything is written. */
@@ -144,6 +171,7 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
     { last_receipt_digest: string } | undefined;
   const errors: string[] = [];
   const receipts: ActionReceiptV1[] = [];
+  const receiptIds = new Map<number, string>();
   const workspaceId = workspaceIdFromDirectory(workspace);
   const events = new Set<string>();
   let keys: string[] | null = null;
@@ -159,6 +187,7 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
     if (receipt.executionId !== executionId || receipt.seq !== row.seq) fail("receipt names another execution or position");
     if (receipt.workspaceId !== workspaceId) fail(`receipt names workspace ${receipt.workspaceId}, not ${workspaceId}`);
     if (previous !== null && receipt.agentId !== previous.agentId) fail("receipt names another agent");
+    if (previous !== null && receipt.idempotencyKey !== previous.idempotencyKey) fail("receipt names another idempotency key");
     if (receipt.prevReceiptDigest !== (position === 0 ? null : rows[position - 1]!.receipt_digest)) fail("broken link to the previous receipt");
     if (receipt.previousState !== (previous?.state ?? null) || !transitionAllowed(previous, receipt)) {
       fail(`${previous?.state ?? "none"} -> ${receipt.state} is not an allowed transition`);
@@ -166,33 +195,43 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
     if (events.has(row.evidence_event_id)) fail("evidence row already used by another receipt");
     events.add(row.evidence_event_id);
     keys ??= getPublicKeyHistory(workspace, "monitor");
-    const evidence = evidenceProblem(db, row, receipt, keys);
-    if (evidence !== null) fail(evidence);
+    const evidence = checkEvidence(db, row, receipt, keys);
+    if ("problem" in evidence) fail(evidence.problem);
+    else {
+      receiptIds.set(row.seq, evidence.payload.receipt_id);
+      const from = "reconciliation" in evidence.payload ? evidence.payload.reconciliation?.fromReceiptId : undefined;
+      if (from !== undefined && from !== receiptIds.get(row.seq - 1)) fail("reconciliation names another receipt than the one it follows");
+    }
     receipts.push(receipt);
   });
   if (rows.length > 0 && index?.last_receipt_digest !== rows.at(-1)!.receipt_digest) errors.push("the index row does not name the chain head");
   if (rows.length === 0 && index !== undefined) errors.push("the index row names an execution with no receipts");
-  return { ok: errors.length === 0, errors, receipts };
+  return { ok: errors.length === 0, errors, receipts, receiptIds };
 }
 
-function evidenceProblem(db: Database.Database, row: TransitionRow, receipt: ActionReceiptV1, keys: string[]): string | null {
+type EvidenceCheck = { readonly problem: string } | { readonly payload: ReceiptV2 };
+
+function checkEvidence(db: Database.Database, row: TransitionRow, receipt: ActionReceiptV1, keys: string[]): EvidenceCheck {
+  const problem = (text: string): EvidenceCheck => ({ problem: text });
   const event = db.prepare("SELECT event_type, session_id, payload_inline, payload_sha256, meta_json, event_hash, writer_sig FROM evidence_events WHERE id = ?")
     .get(row.evidence_event_id) as { event_type: string; session_id: string; payload_inline: string | null; payload_sha256: string;
       meta_json: string; event_hash: string; writer_sig: string } | undefined;
-  if (event === undefined) return "evidence row missing";
+  if (event === undefined) return problem("evidence row missing");
   // A pruned payload leaves its digest, which the signed event hash and receipt still bind.
   if (event.event_type !== "audit" || event.payload_sha256 !== row.receipt_digest
-    || (event.payload_inline !== null && event.payload_inline !== row.receipt_json)) return "evidence row does not carry this receipt";
+    || (event.payload_inline !== null && event.payload_inline !== row.receipt_json)) return problem("evidence row does not carry this receipt");
   const meta = (parseJson(event.meta_json) ?? {}) as Record<string, unknown>;
-  if (meta.auditType !== "ACTION_STATE" || meta.executionId !== receipt.executionId || meta.seq !== receipt.seq) return "evidence row is for another receipt";
-  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) return "evidence row signature does not verify";
+  if (meta.auditType !== "ACTION_STATE" || meta.executionId !== receipt.executionId || meta.seq !== receipt.seq) return problem("evidence row is for another receipt");
+  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) return problem("evidence row signature does not verify");
   const signed = typeof meta.receipt === "string" ? verifyReceipt(meta.receipt, keys) : null;
   const payload = signed?.ok ? signed.payload : null;
-  if (payload?.v !== 2) return `signed receipt does not verify${signed?.error ? `: ${signed.error}` : ""}`;
+  if (payload?.v !== 2) return problem(`signed receipt does not verify${signed?.error ? `: ${signed.error}` : ""}`);
+  const reconciled = "reconciliation" in payload && payload.reconciliation !== undefined;
   if (payload.kind !== "action_state" || payload.executionId !== receipt.executionId || payload.state !== receipt.state
     || payload.body_sha256 !== row.receipt_digest || payload.event_hash !== event.event_hash || payload.session_id !== event.session_id
-    || payload.authorizationRecordDigest !== receipt.authorizationDigest) return "signed receipt does not bind this receipt";
-  return null;
+    || payload.authorizationRecordDigest !== receipt.authorizationDigest || payload.idempotencyKey !== receipt.idempotencyKey
+    || reconciled !== (receipt.resolution !== null)) return problem("signed receipt does not bind this receipt");
+  return { payload };
 }
 
 /** Same host: is that process alive? Another host, or no owner recorded: null (unknown here). */
@@ -245,10 +284,10 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
   // ponytail: one small entry per journaled call for the life of the journal; prune settled ones if processes run for weeks.
   const agents = new Map<string, string>();
 
-  const verified = (executionId: string): ActionReceiptV1[] => {
+  const verified = (executionId: string): ChainVerification => {
     const chain = verifyChainIn(ledger, executionId);
     if (!chain.ok) throw new ReceiptChainBroken(executionId, chain.errors);
-    return [...chain.receipts];
+    return chain;
   };
 
   /**
@@ -274,6 +313,20 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     return [...new Set([...blocking, ...(unreconciledInProcess.get(`${workspaceId}\0${agentId}`) ?? [])])].filter((id) => id !== exclude);
   };
 
+  /**
+   * Another execution in this workspace, of any agent, with the same tool and arguments whose outcome is unknown (P1-04).
+   * ponytail: tool and arguments are read from the index row and its intent, so a hand-edited row can hide a duplicate;
+   * the agent's own block above reads the receipts too.
+   */
+  const duplicateOf = (executionId: string, toolName: string, argumentsDigest: string): string | null => {
+    const row = db.prepare(`SELECT e.execution_id AS id FROM action_executions e JOIN action_transitions t ON t.execution_id = e.execution_id
+          AND t.seq = (SELECT MAX(x.seq) FROM action_transitions x WHERE x.execution_id = e.execution_id)
+        WHERE e.workspace_id = ? AND e.execution_id <> ? AND e.tool_name = ? AND json_extract(e.intent_json, '$.argumentsDigest') = ?
+          AND (e.state = 'outcome_unknown' OR json_extract(t.receipt_json, '$.state') = 'outcome_unknown') LIMIT 1`)
+      .get(workspaceId, executionId, toolName, argumentsDigest) as { id: string } | undefined;
+    return row?.id ?? null;
+  };
+
   const block = (executionId: string, agentId: string): void => {
     const key = `${workspaceId}\0${agentId}`;
     unreconciledInProcess.set(key, (unreconciledInProcess.get(key) ?? new Set()).add(executionId));
@@ -295,41 +348,49 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     }
   };
 
-  const append = (executionId: string, change: Change, chain: ActionReceiptV1[]): ActionReceiptV1 => {
-    const head = chain.at(-1) ?? null;
+  const append = (executionId: string, change: Change, chain: ChainVerification): ActionReceiptV1 => {
+    const head = chain.receipts.at(-1) ?? null;
     const to = change.to ?? head?.state;
     if (to === undefined) throw new TransitionRefused(executionId, "none", "requested");
     const evidenceComplete = change.evidenceComplete ?? head?.evidenceComplete ?? true;
-    if (!transitionAllowed(head, { state: to, evidenceComplete })) throw new TransitionRefused(executionId, head?.state ?? "none", to);
-    if (head?.state === "outcome_unknown" && to === "completed") {
-      // P1-04 adds reconcile(); until then nothing settles an unknown outcome, and nothing replays it.
-      throw new TransitionRefused(executionId, head.state, to);
+    const settlement = change.settlement ?? null;
+    // Only a settlement leaves outcome_unknown or restores evidence (transitionAllowed); nothing replays the call.
+    if (!transitionAllowed(head, { state: to, evidenceComplete, resolution: settlement?.resolution ?? null })) {
+      throw new TransitionRefused(executionId, head?.state ?? "none", to);
     }
     if (head !== null) change.guard?.(head);
     const intent = change.intent && head ? change.intent(head) : null;
     const carried = head !== null && head.state === to ? head : null;
     const now = Date.now();
     const receipt: ActionReceiptV1 = actionReceiptV1Schema.parse({
-      schema: "amc.action-receipt/v1", executionId, workspaceId, agentId: change.request?.agentId ?? head?.agentId, seq: chain.length,
+      schema: "amc.action-receipt/v1", executionId, workspaceId, agentId: change.request?.agentId ?? head?.agentId, seq: chain.receipts.length,
       state: to, previousState: head?.state ?? null, reasonCode: change.reasonCode,
       effect: change.effect !== undefined ? change.effect : carried?.effect ?? null, evidenceComplete,
       authorizationDigest: change.authorizationDigest ?? head?.authorizationDigest ?? null,
       intentDigest: intent ? receiptDigest(intent) : head?.intentDigest ?? null,
-      outcomeDigest: change.outcomeDigest !== undefined ? change.outcomeDigest : carried?.outcomeDigest ?? null,
+      idempotencyKey: change.request ? change.request.idempotencyKey : head?.idempotencyKey ?? null,
+      resolution: settlement?.resolution ?? null,
+      outcomeDigest: change.outcomeDigest !== undefined ? change.outcomeDigest : carried?.outcomeDigest ?? settlement?.outcomeDigest ?? null,
       externalRef: change.externalRef !== undefined ? change.externalRef : carried?.externalRef ?? null,
       at: new Date(now).toISOString(), prevReceiptDigest: head === null ? null : receiptDigest(head)
     });
     const bytes = canonicalize(receipt);
     const digest = sha256Hex(bytes);
     if (head === null) insertExecution(executionId, change, now, digest);
-    const action = { executionId, idempotencyKey: null, authorizationRecordDigest: receipt.authorizationDigest, enforcement: ENFORCEMENT,
-      state: receipt.state, ...(receipt.state === "denied" ? { reason: receipt.reasonCode } : {}) } as ActionReceiptMembers;
+    // A settlement names the verified receipt it settles; the contract refuses to sign one without it.
+    const action = { executionId, idempotencyKey: receipt.idempotencyKey, authorizationRecordDigest: receipt.authorizationDigest,
+      enforcement: ENFORCEMENT, state: receipt.state, ...(receipt.state === "denied" ? { reason: receipt.reasonCode } : {}),
+      ...(settlement === null ? {} : { reconciliation: { fromReceiptId: head === null ? undefined : chain.receiptIds.get(head.seq),
+        reconciledAt: receipt.at, method: settlement.method, evidenceRefs: [...settlement.evidenceRefs] } }) } as ActionReceiptMembers;
     const sessionId = `action-${executionId}-${receipt.seq}`;
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: ACTION_JOURNAL_BINARY, binarySha256: "action-journal" });
     const evidence = ledger.appendEvidenceWithReceipt({
       sessionId, runtime: "unknown", eventType: "audit", payload: bytes, inline: true,
-      meta: { trustTier: "OBSERVED", auditType: "ACTION_STATE", executionId, seq: receipt.seq, state: receipt.state,
-        reasonCode: receipt.reasonCode, evidenceComplete, agentId: receipt.agentId,
+      // An operator's resolution is what the operator stated, never something AMC observed.
+      meta: { trustTier: settlement?.resolution === "operator" ? "SELF_REPORTED" : "OBSERVED", auditType: "ACTION_STATE", executionId,
+        seq: receipt.seq, state: receipt.state, reasonCode: receipt.reasonCode, evidenceComplete, agentId: receipt.agentId,
+        ...(settlement === null ? {} : { resolution: settlement.resolution, resolutionDetail: settlement.meta,
+          claimKind: settlement.resolution === "operator" ? "self_reported" : "observed" }),
         // The signed tie from an execution to the native session call it serves, so coverage need not trust the index.
         ...(change.request ? { agentSessionId: change.request.sessionId, callId: change.request.callId } : {}) },
       receipt: { kind: "action_state", agentId: receipt.agentId, providerId: ACTION_JOURNAL_BINARY, model: null, bodySha256: digest, action }
@@ -351,9 +412,9 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     if (request === undefined) throw new TransitionRefused(executionId, "none", change.to ?? "requested");
     // The index row is written first so the transition's foreign key holds; it names the head once the receipt exists.
     db.prepare(`INSERT INTO action_executions (execution_id, workspace_id, agent_id, tool_name, action_class, state, effect,
-        evidence_complete, parent_execution_id, session_id, call_id, owner_pid, owner_host, heartbeat_ts, created_ts, updated_ts,
-        last_receipt_digest) VALUES (?, ?, ?, ?, ?, 'requested', NULL, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(executionId, workspaceId, request.agentId, request.toolName, request.actionClass, request.parentExecutionId,
+        evidence_complete, idempotency_key, parent_execution_id, session_id, call_id, owner_pid, owner_host, heartbeat_ts, created_ts,
+        updated_ts, last_receipt_digest) VALUES (?, ?, ?, ?, ?, 'requested', NULL, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(executionId, workspaceId, request.agentId, request.toolName, request.actionClass, request.idempotencyKey, request.parentExecutionId,
         request.sessionId, request.callId, process.pid, hostname(), now, now, now, digest);
   };
 
@@ -373,14 +434,20 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
       // since the caller last looked. The agent is the one the verified chain names.
       const blocking = blockingFor(head.agentId, executionId);
       if (blocking.length > 0) throw new ActionBlocked(executionId, blocking[0]!);
+      // Never repeat (P1-04): no second dispatch of an intent whose first dispatch has an unknown outcome.
+      const duplicate = duplicateOf(executionId, record.action.toolName, record.action.argumentsDigest);
+      if (duplicate !== null) throw new ActionBlocked(executionId, duplicate, "possible_duplicate_of");
     }, intent: (head) => {
       // The intent comes from the record the chain authorized, checked against the authorized digest, never from a caller.
       const digest = authorizationRecordDigest(record);
-      if (digest !== head.authorizationDigest || record.executionId !== executionId) throw new TransitionRefused(executionId, head.state, "started");
+      if (digest !== head.authorizationDigest || record.executionId !== executionId || record.idempotencyKey !== head.idempotencyKey) {
+        throw new TransitionRefused(executionId, head.state, "started");
+      }
       return actionIntentV1Schema.parse({
         schema: "amc.action-intent/v1", executionId, authorizationId: record.authorizationId, authorizationDigest: digest, workspaceId,
         agentId: record.subject.governedAs, toolName: record.action.toolName, adapterId: record.action.adapterId,
-        actionClass: record.action.actionClass, argumentsDigest: record.action.argumentsDigest, idempotencyKey: record.idempotencyKey,
+        actionClass: record.action.actionClass, argumentsDigest: record.action.argumentsDigest, bindings: record.bindings,
+        idempotencyKey: record.idempotencyKey,
         parentExecutionId: record.delegation.parentExecutionId || null, sessionId: record.session.sessionId || null, callId: record.session.callId,
         owner: { pid: process.pid, hostname: hostname() }, startedAt: new Date().toISOString()
       });
@@ -390,6 +457,14 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     markUnknown: (executionId, reasonCode) => transition(executionId, { to: "outcome_unknown", reasonCode }),
     markEvidenceIncomplete: (executionId, reasonCode) =>
       transition(executionId, { reasonCode: `evidence_incomplete:${reasonCode}`, evidenceComplete: false }),
+    settle: (executionId, settlement) => transition(executionId, { to: "completed", reasonCode: settlement.reasonCode,
+      effect: settlement.effect, externalRef: settlement.externalRef, evidenceComplete: settlement.evidenceComplete, settlement,
+      guard: (head) => {
+        // Settles exactly the head that was read, and never contradicts an effect the body already declared.
+        if (receiptDigest(head) !== settlement.headDigest || (head.effect !== null && head.effect !== settlement.effect)) {
+          throw new TransitionRefused(executionId, head.state, "completed");
+        }
+      } }),
     heartbeat(executionId) {
       try {
         db.prepare("UPDATE action_executions SET heartbeat_ts = ? WHERE execution_id = ? AND state = 'started'").run(Date.now(), executionId);
@@ -398,7 +473,7 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
       }
     },
     get(executionId) {
-      const receipts = verified(executionId);
+      const { receipts } = verified(executionId);
       const head = receipts.at(-1);
       if (head === undefined) return null;
       const row = db.prepare("SELECT intent_json FROM action_executions WHERE execution_id = ?").get(executionId) as { intent_json: string | null };
