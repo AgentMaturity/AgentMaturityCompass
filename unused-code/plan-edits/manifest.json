@@ -73,6 +73,13 @@
       "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
     },
     {
+      "path": "src/governor/emergencyOverride.ts",
+      "issue": "P0-10",
+      "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
+      "archivePath": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
+      "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
+    },
+    {
       "path": "src/index.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
