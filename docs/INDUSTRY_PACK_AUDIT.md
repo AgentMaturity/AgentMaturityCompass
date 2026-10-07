@@ -17,19 +17,28 @@ For every control in an Industry Pack the audit produces:
   stub, guardrail, or evidence-collection recipe, with the pack's L3 descriptor
   as the acceptance criterion the agent must meet.
 
-The whole bundle is **canonicalized and hashed into a tamper-evident receipt**
-(`sha256`). Anyone can recompute the hash over the signed bundle and detect a
-single-byte change — the same signed-evidence guarantee the rest of AMC uses,
-now applied to industry compliance.
+Each answer is **self-reported** (`overall.claimKind: "self_reported"`). Without
+any answer the audit is a `synthetic_example` baseline, which is never signed.
+
+A bundle written with `--audit-bundle` is **signed by the workspace auditor
+key** through the same signing path as audit binders (vault, or notary when the
+trust config says so). It also carries `receiptHash`, an unkeyed `sha256`
+checksum: anyone who edits the file can recompute it, so the checksum alone
+proves nothing about who produced the file. A bundle written with `--no-sign`
+has only the checksum and says so: `checksum only — not signed`.
 
 ## Usage
 
 The audit is part of the paid Industry Packs tier and is entitlement-gated.
 
 ```bash
-# Full audit for a pack (JSON), written to a signed bundle file
+# Full audit for a pack (JSON), written to a bundle signed by the workspace auditor key
 amc domain apply --agent my-agent --pack clinical-trials --audit \
-  --audit-bundle clinical-trials.audit.json --json
+  --responses responses.json --audit-bundle clinical-trials.audit.json --json
+
+# Checksum-only bundle, not signed (no vault needed)
+amc domain apply --agent my-agent --pack clinical-trials --audit \
+  --audit-bundle clinical-trials.audit.json --no-sign
 
 # Auditor-ready Markdown
 amc domain apply --agent my-agent --pack digital-health-record --audit
@@ -45,23 +54,58 @@ amc domain apply --agent my-agent --pack clinical-trials --audit \
 `--responses` is a JSON object of `{ "<questionId>": <level 1-5> }`. Without it
 the audit runs a **baseline at L1**, which is useful on its own: it produces the
 complete "here is everything you would need to prove, and the fix for each gap"
-roadmap for that sector.
+roadmap for that sector. The baseline is a `synthetic_example`, so signing it is
+refused: pass `--responses` or `--no-sign`.
+
+Signing needs the unlocked vault (`AMC_VAULT_PASSPHRASE`). If signing fails, the
+command exits 1 and writes nothing:
+`Cannot sign the industry-pack audit: <reason>. Unlock the vault (AMC_VAULT_PASSPHRASE) or pass --no-sign for a checksum-only bundle.`
+A signed write prints:
+
+```
+Signed industry-pack audit written: clinical-trials.audit.json
+  Signer: auditor key sha256:<key id> (VAULT, SOFTWARE)
+  Answers: self-reported. The signature proves who produced this file and that it is unchanged, not that the answers are true.
+  Verify: amc audit binder verify clinical-trials.audit.json --pubkey <recorded-auditor.pub>
+```
+
+Without `--audit-bundle`, the Markdown preview reads `Checksum only — not signed`.
 
 `--framework` accepts `eu_ai_act`, `nist`, `iso42001`, `soc2`, or `sector`.
 
 ## Verifying a bundle
 
-The bundle carries a `receiptHash` over its canonical form. To verify, recompute
-`sha256(canonicalize(bundle-without-receiptHash))` and compare — if a single
-byte of the score, evidence, crosswalk, or remediation was edited after signing,
-the hashes will not match.
+```bash
+amc audit binder verify clinical-trials.audit.json --pubkey <recorded-auditor.pub>
+```
+
+`amc audit binder verify` recognises a `.json` file whose `schemaVersion` is an
+industry-pack audit and checks it with the pinned issuer trust every AMC
+verifier uses (see [TRUST_LIST.md](TRUST_LIST.md)): the signing key must be
+pinned for `artifact-seal` by `--pubkey` or a signed trust list. The public key
+inside the bundle only locates the signer; it never vouches for the bundle.
+Pin the auditor public key you recorded when the vault was created, not one
+taken from the bundle. On success it prints
+`Industry-pack audit verified: signer sha256:<key id>, checksum ok`; otherwise
+it prints each error and exits 1:
+
+- `UNSIGNED`: a checksum-only bundle (`--no-sign`, or written before signing existed).
+- `CHECKSUM_MISMATCH`: `receiptHash` does not match the body.
+- `DIGEST_MISMATCH` or `SIGNATURE_INVALID`: the bundle changed after signing, even if `receiptHash` was recomputed.
+- An unpinned, distrusted or revoked signer key (`SIGNER_UNTRUSTED` in `--json`).
+
+`--allow-unpinned` gives an integrity-only result with exit code 2, never a
+trusted one. The checksum alone is
+`sha256(canonicalize(bundle without receiptHash and signature))`; recomputing it
+detects accidental edits, not deliberate ones.
 
 ## What it proves — and what it doesn't
 
-- **It proves integrity.** The bundle you verify is exactly what was generated;
-  nobody edited a control, verdict, or citation afterward.
-- **It does not prove your agent is compliant by itself.** A signed bundle of
-  L1 controls is an honest picture of an agent with no evidence yet. The value
+- **A signature proves origin and integrity, not truth.** A verified bundle was
+  produced by the holder of the pinned auditor key and nobody edited a control,
+  verdict, or citation afterward. The answers behind it are still self-reported.
+- **It does not prove your agent meets any regulation.** A bundle of L1
+  controls is an honest picture of an agent with no evidence yet. The value
   is the auditable structure — controls, crosswalk, evidence, and fixes — that
   you close over time as real evidence accrues.
 
@@ -72,4 +116,5 @@ the hashes will not match.
   Criteria) as indicative anchors. It is a mapping aid, not a substitute for a
   qualified assessor's judgment.
 - The audit builder is pure and deterministic: the same inputs always yield the
-  same receipt, so bundles are reproducible and diffable.
+  same checksum, so bundles are reproducible and diffable. The signature adds a
+  signing time, so two signed bundles of the same inputs differ only there.
