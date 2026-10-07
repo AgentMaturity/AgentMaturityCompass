@@ -55,13 +55,25 @@
     return { domains: fallback, packs: [] };
   }
 
+  function resultScore(result) {
+    if (typeof result.score === 'number') return result.score;
+    return typeof result.percentage === 'number' ? result.percentage / 20 : null;
+  }
+
   function renderAssessResult(container, pack, result) {
     if (!container) return;
-    const score = typeof result.score === 'number'
-      ? result.score
-      : typeof result.percentage === 'number'
-        ? result.percentage / 20
-        : 0;
+    const score = resultScore(result);
+    if (result.status === 'not_evaluated' || score === null) {
+      const reasons = Array.isArray(result.reasons) && result.reasons.length ? result.reasons : ['No evidence was returned for this pack.'];
+      container.innerHTML = `
+      <div class="assess-result">
+        <div class="assess-title">Assessment: ${esc(pack.name)}</div>
+        <div class="assess-sub">Result: not evaluated</div>
+        <div class="assess-gaps">${reasons.map((reason) => `<div class="assess-gap"><span>${esc(reason)}</span></div>`).join('')}</div>
+      </div>
+    `;
+      return;
+    }
     const level = result.level || (score >= 4.2 ? 'L5' : score >= 3.6 ? 'L4' : score >= 3 ? 'L3' : score >= 2 ? 'L2' : 'L1');
     const gaps = Array.isArray(result.complianceGaps) ? result.complianceGaps : [];
     const warnings = Array.isArray(result.regulatoryWarnings) ? result.regulatoryWarnings : [];
@@ -93,21 +105,14 @@
     `;
   }
 
-  function localAssess(pack) {
-    const base = {
-      critical: 2.8,
-      'very-high': 3.1,
-      high: 3.4,
-      elevated: 3.8
-    };
-    const score = base[pack.riskTier] || 3.2;
-    const complianceGaps = (pack.regulatoryBasis || []).slice(0, 3).map((ref) => `Need stronger evidence linkage for ${ref}.`);
-    const regulatoryWarnings = (pack.regulatoryBasis || []).slice(0, 2).map((ref) => `Validate controls against ${ref}.`);
+  // P0-15: without an assessment result there is no evidence, so nothing is scored.
+  function localAssess() {
     return {
-      score,
-      level: score >= 4 ? 'L4' : score >= 3 ? 'L3' : 'L2',
-      complianceGaps,
-      regulatoryWarnings
+      status: 'not_evaluated',
+      reasons: [
+        'The dashboard received no domain assessment, so nothing was evaluated.',
+        'Run amc quickscore, then amc domain assess --agent <id> --domain <domain>.'
+      ]
     };
   }
 
@@ -301,15 +306,16 @@
             result = await window.assessDomain(selectedDomain.id, (window.G && window.G.data && window.G.data.agentId) || 'default');
           }
           if (!result || (typeof result !== 'object')) {
-            result = localAssess(pack);
+            result = localAssess();
           }
           if (typeof window.showViewToast === 'function') {
-            const score = typeof result.score === 'number' ? result.score : (typeof result.percentage === 'number' ? result.percentage / 20 : 0);
-            window.showViewToast(`Domain assessed: ${(selectedDomain.name || titleize(selectedDomain.id))} (${score.toFixed(1)}/5)`);
+            const score = resultScore(result);
+            const name = selectedDomain.name || titleize(selectedDomain.id);
+            window.showViewToast(score === null || result.status === 'not_evaluated' ? `Domain not evaluated: ${name}` : `Domain assessed: ${name} (${score.toFixed(1)}/5)`);
           }
           renderAssessResult(document.getElementById('domain-assess-result'), pack, result);
         } catch (err) {
-          const local = localAssess(pack);
+          const local = localAssess();
           renderAssessResult(document.getElementById('domain-assess-result'), pack, local);
           const msg = err instanceof Error ? err.message : String(err);
           if (typeof window.showViewToast === 'function') {

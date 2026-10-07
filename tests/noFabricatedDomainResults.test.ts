@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { generateKeyPairSync } from "node:crypto";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { runInNewContext } from "node:vm";
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 
 /**
@@ -191,5 +192,36 @@ describe("domain CLI commands", () => {
   test("a bad domain is an argument error", () => {
     const result = runCli(tempDir("amc-p015-bad-"), ["domain", "assess", "--agent", "a", "--domain", "not-a-domain"]);
     expect(result.status).toBe(1);
+  });
+});
+
+describe("dashboard Domains view", () => {
+  // The Assess button falls back to localAssess whenever /api/v1/domain/assess is
+  // unavailable (no server route exists), so the fallback must not invent a score.
+  function loadDomainsComponent() {
+    const source = readFileSync(resolve(process.cwd(), "src/dashboard/templates/components/domains.js"), "utf8")
+      .replace("window.buildDomains = buildDomains;", "window.buildDomains = buildDomains; window.__p015 = { localAssess, renderAssessResult };");
+    const window: Record<string, unknown> = {};
+    runInNewContext(source, { window, document: {} });
+    return window.__p015 as {
+      localAssess: (pack: Record<string, unknown>) => Record<string, unknown>;
+      renderAssessResult: (container: { innerHTML: string }, pack: Record<string, unknown>, result: Record<string, unknown>) => void;
+    };
+  }
+
+  test("the local fallback is not evaluated and renders no score, level or gap", () => {
+    const { localAssess, renderAssessResult } = loadDomainsComponent();
+    for (const riskTier of ["critical", "very-high", "high", "elevated", undefined]) {
+      const pack = { name: "Clinical", domain: "health", riskTier, regulatoryBasis: ["HIPAA", "EU AI Act"] };
+      const result = localAssess(pack);
+      expect(result).toMatchObject({ status: "not_evaluated" });
+      expect(result).not.toHaveProperty("score");
+      expect(result).not.toHaveProperty("level");
+      expect(result).not.toHaveProperty("complianceGaps");
+      const container = { innerHTML: "" };
+      renderAssessResult(container, pack, result);
+      expect(container.innerHTML).toMatch(/not evaluated/i);
+      expect(container.innerHTML).not.toMatch(/assess-score|\bL[1-5]\b|compliance gaps|HIPAA/);
+    }
   });
 });
