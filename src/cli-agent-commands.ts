@@ -73,7 +73,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
+  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -159,6 +159,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
+    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
+    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
     .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions, command: Command) => {
@@ -191,6 +194,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "how many model steps one turn may take")
+    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
+    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
@@ -364,6 +370,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       ) {
         return;
       }
+      const compaction = compactionOption(io, opts);
+      if (compaction === null) return;
       const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
       let images: ReturnType<typeof loadNativeImageFiles>;
@@ -697,7 +705,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                   runner: foreignRunner
                 })
               }),
-          config: { maxStepsPerTurn: maxSteps },
+          config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
           ...(validation === undefined ? {} : { validation }),
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a

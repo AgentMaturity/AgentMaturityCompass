@@ -1,4 +1,5 @@
 /** Origin addressing recovered from sweet-merkle; measurements come from authenticated payloads. */
+import { randomBytes } from "node:crypto";
 import type { EvidenceEvent } from "../types.js";
 import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
@@ -6,7 +7,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { readEventPayload } from "./eventPayload.js";
 import { foldSurfaceEntries, surfaceProjection, type SurfaceEntry } from "./surfaceProjection.js";
 import { extractEnvelope, SESSION_GENESIS, type SurfaceRole } from "./sessionTypes.js";
-import { compactionReceipt, selectCompactionEntries, type SurfaceCompactionOp, type SurfaceCompactionReceipt } from "./surfaceCompactionValidation.js";
+import { assertAutomaticProvenance, compactionReceipt, fenceModelSummary, isFencedModelSummary, MODEL_SUMMARY_ROLE, parseCompactionReceipt,
+  selectCompactionEntries, type AutomaticCompaction, type SurfaceCompactionOp, type SurfaceCompactionReceipt } from "./surfaceCompactionValidation.js";
+export type { AutomaticCompaction };
 
 export interface LiveSurfaceEntry {
   readonly originEventId: string; readonly sourceEventId: string; readonly sourceEventHash: string;
@@ -70,10 +73,14 @@ export function validateSurfaceCompactions(workspace: string, events: readonly E
       if (!envelope || envelope.surface.op !== "compact") throw new Error(`compaction ${row.id} has an unsupported surface operation`);
       const receipt = compactionReceipt(row), previous = prior.get(row.session_id);
       if (!previous || receipt.basis.eventId !== previous.id || receipt.basis.eventHash !== previous.event_hash) throw new Error("compaction basis does not name the preceding session event");
+      assertAutomaticProvenance(receipt, rows, row.session_id);
       const legacyCounts = meta(row);
       if (legacyCounts.replacedBytes !== receipt.replacedBytes || legacyCounts.replacementBytes !== receipt.replacementBytes) throw new Error("compaction compatibility counts disagree with measured receipt");
       const replacement = authenticatedBytes(workspace, row, true);
       if (replacement !== null && replacement.byteLength !== receipt.replacementBytes) throw new Error("compaction replacement byte count mismatch");
+      if (receipt.v === 2 && receipt.summarizer !== undefined && replacement !== null && !isFencedModelSummary(replacement.toString("utf8"))) {
+        throw new Error("automatic summary is not inside AMC's model-written fence");
+      }
       for (const source of receipt.sources) {
         const original = rows.get(source.sourceEventId);
         if (!original || original.session_id !== row.session_id) throw new Error("compaction references a future or foreign source event");
@@ -94,13 +101,20 @@ export function validateSurfaceCompactions(workspace: string, events: readonly E
 export function prepareSurfaceCompaction(workspace: string, events: readonly EvidenceEvent[], params: {
   readonly origins: readonly string[]; readonly mode: SurfaceCompactionReceipt["mode"];
   readonly replacement?: string; readonly summaryRole?: "user" | "assistant"; readonly reason: string;
+  /** Present only for automatic compaction; selects receipt v2. Savings are still measured here, never supplied. */
+  readonly automatic?: AutomaticCompaction | undefined;
 }): { readonly surface: SurfaceCompactionOp; readonly payload: Buffer; readonly typeMeta: Record<string, unknown> } {
   if (typeof params.reason !== "string" || !params.reason.trim() || params.reason.length > 2048) throw new Error("compaction requires a bounded reason");
   if (params.summaryRole !== undefined && params.summaryRole !== "user" && params.summaryRole !== "assistant") throw new Error("compaction summary role must be user or assistant");
+  const automatic = params.automatic, modelSummary = automatic?.summarizer !== undefined;
+  if (modelSummary && (params.mode !== "summarize" || params.summaryRole === "user")) throw new Error("an automatic summary is model-written and is never inserted with the user role");
   authenticateSession(workspace, events); validateSurfaceCompactions(workspace, events);
   const head = events.at(-1), envelope = head ? extractEnvelope(head.meta_json) : null;
   if (!head || !envelope) throw new Error("compaction requires an existing session head");
   const entries = foldSurfaceEntries(events), selected = selectCompactionEntries(entries, params.origins, params.mode);
+  if (modelSummary && selected.some(entry => entry.role !== "assistant" && entry.role !== "tool")) {
+    throw new Error("an automatic summary replaces only assistant and tool content; user and system messages stay verbatim");
+  }
   const byId = new Map(events.map(row => [row.id, row]));
   const sources = selected.map(entry => {
     const source = byId.get(entry.sourceEventId);
@@ -110,17 +124,21 @@ export function prepareSurfaceCompaction(workspace: string, events: readonly Evi
   });
   if (params.mode !== "drop" && (typeof params.replacement !== "string" || !params.replacement.trim())) throw new Error("compaction replacement must contain explicit summary text");
   if (params.mode !== "drop" && Buffer.byteLength(params.replacement!, "utf8") > 1_000_000) throw new Error("compaction summary exceeds its byte limit");
-  const payload = Buffer.from(params.mode === "drop" ? "" : params.replacement!, "utf8");
+  const payload = Buffer.from(params.mode === "drop" ? ""
+    : modelSummary ? fenceModelSummary(params.replacement!, randomBytes(6).toString("hex")) : params.replacement!, "utf8");
   const replacedBytes = sources.reduce((sum, source) => sum + source.bytes, 0);
   if (!Number.isSafeInteger(replacedBytes) || payload.byteLength >= replacedBytes || payload.byteLength > 1_000_000) {
     throw new Error(`compaction replacement must be smaller than the ${replacedBytes} measured current payload bytes`);
   }
-  const receipt: SurfaceCompactionReceipt = { v: 1, mode: params.mode, reason: params.reason,
+  const measured = { mode: params.mode, reason: params.reason,
     basis: { sessionId: head.session_id, eventId: head.id, eventHash: head.event_hash, seq: envelope.seq }, sources,
     replacedBytes, replacementBytes: payload.byteLength, savedBytes: replacedBytes - payload.byteLength, measurement: "payload-bytes-not-tokens" };
+  const receipt: SurfaceCompactionReceipt = parseCompactionReceipt(automatic === undefined ? { v: 1, ...measured } : { v: 2, ...measured,
+    trigger: automatic.trigger, ...(automatic.summarizer === undefined ? {} : { summarizer: { ...automatic.summarizer, role: MODEL_SUMMARY_ROLE } }) });
+  assertAutomaticProvenance(receipt, byId, head.session_id);
   const first = selected[0]!;
   const surface: SurfaceCompactionOp = { op: "compact", origins: [...params.origins], replacement: params.mode === "drop" ? null : {
-    role: params.mode === "replace" ? first.role : params.summaryRole ?? (first.role === "user" ? "user" : "assistant"),
+    role: params.mode === "replace" ? first.role : modelSummary ? MODEL_SUMMARY_ROLE : params.summaryRole ?? (first.role === "user" ? "user" : "assistant"),
     part: { kind: params.mode === "replace" ? first.part.kind : "text", sha256: sha256Hex(payload) } } };
   const identity = params.mode === "replace" && first.part.kind === "tool_result" ? meta(byId.get(first.originEventId)!) : {};
   if (params.mode === "replace" && first.part.kind === "tool_result" && (identity.toolCallId !== first.slot.slice("tool_result:".length)

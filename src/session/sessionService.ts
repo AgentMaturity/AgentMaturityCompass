@@ -4,7 +4,7 @@ import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
-import { describeLiveEntries, prepareSurfaceCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
+import { describeLiveEntries, prepareSurfaceCompaction, type AutomaticCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
 
 import { SessionEventWriter } from "./sessionSpine.js";
@@ -255,13 +255,13 @@ export class SessionService extends SessionEventWriter {
     return { ...ref, turn, windowMerkleRoot, sealChainIndex };
   }
 
-  startStep(): StepRef {
+  startStep(kind?: "compaction-summary"): StepRef {
     const turn = this.requireTurn();
     const step = ++this.stepNo;
     this.currentStep = step;
     const ref = this.appendSessionEvent({
       eventType: "step/start",
-      typeMeta: { turn, step },
+      typeMeta: kind === undefined ? { turn, step } : { turn, step, kind },
       surface: { op: "none" },
       turn,
       step
@@ -580,17 +580,17 @@ export class SessionService extends SessionEventWriter {
   compactSurfaceEntry(params: {
     readonly originEventId: string; readonly replacement: string; readonly reason: string;
     /** Deprecated compatibility input. Savings are always measured from stored bytes. */
-    readonly replacedBytes?: number;
+    readonly replacedBytes?: number; readonly automatic?: AutomaticCompaction;
   }): SessionEventRef {
-    return this.commitSurfaceCompaction({ origins: [params.originEventId], mode: "replace", replacement: params.replacement, reason: params.reason });
+    return this.commitSurfaceCompaction({ origins: [params.originEventId], mode: "replace", replacement: params.replacement, reason: params.reason, automatic: params.automatic });
   }
 
   /** Summarize one contiguous live range in a single append, retaining raw evidence. */
   compactSurfaceRange(params: {
     readonly originEventIds: readonly string[]; readonly replacement: string; readonly reason: string;
-    readonly summaryRole?: "user" | "assistant";
+    readonly summaryRole?: "user" | "assistant"; readonly automatic?: AutomaticCompaction;
   }): SessionEventRef {
-    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "summarize", replacement: params.replacement,
+    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "summarize", replacement: params.replacement, automatic: params.automatic,
       reason: params.reason, ...(params.summaryRole === undefined ? {} : { summaryRole: params.summaryRole }) });
   }
 
@@ -599,8 +599,8 @@ export class SessionService extends SessionEventWriter {
   }
 
   /** Complete tool pairs can be removed atomically; partial pairs refuse. */
-  dropSurfaceRange(params: { readonly originEventIds: readonly string[]; readonly reason: string }): SessionEventRef {
-    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "drop", reason: params.reason });
+  dropSurfaceRange(params: { readonly originEventIds: readonly string[]; readonly reason: string; readonly automatic?: AutomaticCompaction }): SessionEventRef {
+    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "drop", reason: params.reason, automatic: params.automatic });
   }
 
   compactToolResult(params: {
