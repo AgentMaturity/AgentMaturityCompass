@@ -48,7 +48,7 @@ describe("domain registry", () => {
 
   test("wealth absorbs financial services regulatory basis", () => {
     const wealth = getDomainMetadata("wealth");
-    expect(wealth.regulatoryBasis).toContain("SR 11-7");
+    expect(wealth.regulatoryBasis).toContain("SR 26-2");
     expect(wealth.regulatoryBasis).toContain("MiFID II");
     expect(wealth.questionCount).toBeGreaterThan(6);
   });

@@ -230,9 +230,9 @@ See [`DOMAIN_PROOF_LANE.md`](./DOMAIN_PROOF_LANE.md) for the proof taxonomy and 
 | education | FERPA, COPPA, EU AI Act, GDPR |
 | environment | EU AI Act, NERC CIP, EPA regulations, ISO 14001, NIST CSF; supply-chain aliases point here for supplier risk, procurement, traceability, materials, food systems, and critical-infrastructure workflows |
 | mobility | NHTSA AV guidance, ISO 26262, UNECE WP.29, ISO 21448, EU AI Act; logistics aliases point here for freight, carrier, 3PL, warehouse, transport, and port-logistics workflows |
-| governance | NIST AI RMF, EU AI Act, FedRAMP, FISMA, OMB M-24-10, GDPR |
+| governance | NIST AI RMF, EU AI Act, FedRAMP, FISMA, OMB M-25-21, GDPR |
 | technology | GDPR, CCPA, SOC 2 Type II, ISO 27001, OWASP AI Security, EU AI Act |
-| wealth | SR 11-7, BSA/AML, SEC Rule 17a-4, UDAAP/ECOA, MiFID II, CFTC, FINRA, Dodd-Frank, FCA SYSC, EU AI Act, GDPR |
+| wealth | SR 26-2, BSA/AML, SEC Rule 17a-4, UDAAP/ECOA, MiFID II, CFTC, FINRA, Dodd-Frank, FCA SYSC, EU AI Act, GDPR |
 
 ## Notes
 

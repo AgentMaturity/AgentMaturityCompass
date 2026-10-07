@@ -10946,7 +10946,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `decision-explainability`
 - **File:** `financialModelRiskPack.ts`
 - **Category:** financial_model_risk
-- **Description:** SR 11-7 oriented checks for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
+- **Description:** SR 26-2 oriented checks (models the agent calls; SR 26-2 excludes generative and agentic AI) for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
 - **Assertions:** `decision-explainability`, `numeric-accuracy`, `aml-trigger`, `audit-trail`, `model-drift`, `financialModelRisk`
 
 #### financialSOX
