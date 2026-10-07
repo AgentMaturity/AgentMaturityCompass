@@ -192,8 +192,9 @@ export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => 
 
 /**
  * The rows a reader counts over [startTs, endTs] (P0-18). A row that reads ATTESTED (`tierOf`) counts once per attested
- * event (attester key, signed digest and original event id), as its earliest copy, and only while the attested event's
- * own time lies in the window, so a copy appended later never carries attested evidence into a later window. Other
+ * event (original event id, payload hash, agent and session), as its earliest copy, whichever key or bundle attests it,
+ * and only while the attested event's own time lies in the window, so a copy appended later never carries attested
+ * evidence into a later window. Other
  * rows, and rows read ATTESTED without a bound attestation (stale OBSERVED in the diagnostic), pass unchanged.
  */
 export function countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent, "ts">>(
@@ -207,7 +208,7 @@ export function countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent, "ts">>
     if (tierOf(row) !== "ATTESTED" || !hasAttestationShape(attestation)) continue;
     const entry = boundEntry(attestation, meta, row);
     if (!entry) continue;
-    const key = `${attestation.keyId}\n${attestation.digestSha256}\n${entry.id}`;
+    const key = `${entry.id}\n${entry.sha256}\n${entry.agentId}\n${entry.sessionId}`;
     attested.set(row, { key, ts: entry.ts });
     const kept = earliest.get(key);
     if (!kept || row.ts < kept.ts) earliest.set(key, row);

@@ -107,7 +107,7 @@ function payloadForEvent(workspace: string, event: EvidenceEvent): Buffer {
   return read.bytes;
 }
 
-type IngestMeta = { source?: unknown; trustTier?: unknown; attestation?: { keyId?: unknown; digestSha256?: unknown } };
+type IngestMeta = { source?: unknown; trustTier?: unknown; originalEventId?: unknown; attestation?: { keyId?: unknown } };
 
 /** The ingest session's review events: the originals, oldest first, and earlier attestation copies. */
 function ingestSessionEvents(ledger: ReturnType<typeof openLedger>, ingestSessionId: string): { sources: EvidenceEvent[]; copies: IngestMeta[] } {
@@ -181,10 +181,12 @@ export function attestIngestSession(params: {
     const verdict = thirdParty
       ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, workspaceOwnKeyIds(workspace))
       : { verified: false, reason: "self-attested: no third-party signature was given" };
-    // One signature attests the bundle once: replaying it would only multiply the same ATTESTED rows.
-    if (verdict.verified && thirdParty && copies.some((meta) => meta.trustTier === "ATTESTED"
-      && meta.attestation?.keyId === thirdParty.keyId && meta.attestation?.digestSha256 === bundleHash)) {
-      throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} over bundle ${bundleHash}`);
+    // A key attests an event once: a replay, or a re-signed wider bundle, would only multiply the same ATTESTED rows.
+    const sourceIds = new Set(sourceEvents.map((event) => event.id));
+    const covered = verdict.verified && thirdParty ? copies.find((meta) => meta.trustTier === "ATTESTED"
+      && meta.attestation?.keyId === thirdParty.keyId && sourceIds.has(meta.originalEventId as string)) : undefined;
+    if (covered && thirdParty) {
+      throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} (event ${String(covered.originalEventId)}); attest new evidence in a new ingest session`);
     }
     const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
     const attestation = verdict.verified && thirdParty
