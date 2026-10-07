@@ -438,7 +438,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json` | - |
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
-| `amc export grc` | Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
+| `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
 | `amc export policy` | Export framework-agnostic North Star policy integration pack | `--target <name>`<br>`--out <dir>`<br>`--agent <agentId>` | - |
 | `amc federate` | Offline federation sync operations | - | - |
 | `amc federate export` | Export offline federation sync package (.amcfed) | `--out <file>` | - |

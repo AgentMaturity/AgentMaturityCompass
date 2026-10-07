@@ -1,10 +1,39 @@
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import chalk from "chalk";
+import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/index.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import type { DiagnosticReport } from "../types.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { buildGrcEvidenceManifest, grcManifestToSarif, type GrcFramework } from "./grcEvidenceExport.js";
 
 const ALLOWED: GrcFramework[] = ["SOC2", "NIST_AI_RMF", "ISO_42001", "EU_AI_ACT"];
+
+/**
+ * The agent's newest run by ts, from its runs folder and the legacy .amc/runs, skipping other agents'
+ * runs. Unlike resolveRunReport("latest") it does not prefer an older run marked VALID: the unverified
+ * status in a run file never decides which run is exported. The seal is checked by the caller.
+ */
+function newestRun(workspace: string, agentId: string): DiagnosticReport {
+  const id = resolveAgentId(workspace, agentId);
+  let newest: DiagnosticReport | null = null;
+  for (const dir of new Set([getAgentPaths(workspace, id).runsDir, join(workspace, ".amc", "runs")])) {
+    if (!pathExists(dir)) continue;
+    for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+      let report: DiagnosticReport;
+      try {
+        report = JSON.parse(readUtf8(join(dir, file))) as DiagnosticReport;
+      } catch {
+        continue; // a corrupt file is not a run
+      }
+      if ((report.agentId && report.agentId !== id) || !Number.isFinite(report.ts)) continue;
+      if (newest === null || report.ts > newest.ts) newest = report;
+    }
+  }
+  if (newest === null) throw new Error("No run reports found. Run `amc` first.");
+  return newest;
+}
 
 export function runGrcExportCli(params: {
   workspace: string;
@@ -18,34 +47,11 @@ export function runGrcExportCli(params: {
   if (!ALLOWED.includes(fw)) {
     throw new Error(`--framework must be one of: ${ALLOWED.join(", ")}`);
   }
-  const runsDir = join(params.workspace, ".amc", "runs");
-  if (!pathExists(runsDir)) {
-    throw new Error("No runs found. Run `amc` first.");
-  }
-  const files = readdirSync(runsDir).filter((f) => f.endsWith(".json")).sort();
-  if (files.length === 0) {
-    throw new Error("No run reports found. Run `amc` first.");
-  }
-  const report = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as Record<string, unknown>;
-  const layerScores = Array.isArray(report.layerScores)
-    ? (report.layerScores as Array<{ layerName: string; avgFinalLevel: number }>)
-    : [];
-  const overallLevel = layerScores.length > 0
-    ? layerScores.reduce((a, l) => a + (l.avgFinalLevel ?? 0), 0) / layerScores.length
-    : 0;
-  const readinessObj = report.evidenceReadiness as { status?: string } | undefined;
-  const manifest = buildGrcEvidenceManifest(fw, {
-    agentId: params.agentId,
-    runId: String(report.runId ?? "unknown"),
-    ts: Number(report.ts ?? 0),
-    status: (report.status as "VALID" | "INVALID" | "UNSIGNED") ?? "UNSIGNED",
-    verificationPassed: Boolean(report.verificationPassed),
-    integrityIndex: Number(report.integrityIndex ?? 0),
-    evidenceCoverage: Number(report.evidenceCoverage ?? 0),
-    overallLevel,
-    layers: layerScores.map((l) => ({ name: l.layerName, level: l.avgFinalLevel })),
-    evidenceReadiness: readinessObj?.status ?? "UNVERIFIED"
-  });
+  // The seal decides what the run may claim; selection never reads the run's own status.
+  const report = newestRun(params.workspace, params.agentId);
+  const sealVerified = sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>);
+  const manifest = buildGrcEvidenceManifest(fw, { ...report, agentId: report.agentId || params.agentId },
+    { sealVerified, now: Date.now() });
   writeFileAtomic(resolve(params.workspace, params.out), JSON.stringify(manifest, null, 2), 0o644);
   if (params.sarif) {
     writeFileAtomic(resolve(params.workspace, params.sarif), JSON.stringify(grcManifestToSarif(manifest), null, 2), 0o644);
@@ -54,12 +60,14 @@ export function runGrcExportCli(params: {
     console.log(JSON.stringify(manifest, null, 2));
     return;
   }
-  console.log(chalk.green(`GRC evidence manifest written: ${params.out}`));
-  console.log(chalk.gray("Framework:"), manifest.framework, chalk.gray("| Claim-eligible:"),
-    manifest.claimEligible ? chalk.green("yes") : chalk.yellow("no (evidence not READY)"));
+  console.log(`Run ${manifest.runId} (agent ${manifest.agentId}) · seal ${sealVerified ? "verified" : "not verified"}`);
+  console.log(formatClaimLabel(renderClaimLabel(manifest.run.claim), "cli"));
+  console.log(chalk.gray("Framework:"), manifest.framework, chalk.gray("(experimental mapping, not expert-reviewed)"));
   for (const c of manifest.controls) {
-    const color = c.status === "PASS" ? chalk.green : c.status === "FAIL" ? chalk.red : chalk.yellow;
-    console.log(`  ${c.controlId} ${color(c.status)} — ${c.title} (${c.amcSurface})`);
+    console.log(`  ${c.controlId} not evaluated — ${c.title}`);
+    console.log(chalk.gray(`    ${formatClaimLabel(renderClaimLabel(c.claim), "cli")}`));
   }
+  console.log(chalk.gray("Controls stay not evaluated until evidence is bound to them (P1-11). See docs/GRC_EXPORT.md."));
+  console.log(chalk.gray("Manifest:"), params.out);
   if (params.sarif) console.log(chalk.gray("SARIF:"), params.sarif);
 }
