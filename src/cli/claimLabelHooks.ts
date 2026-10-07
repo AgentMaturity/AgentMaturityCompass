@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import { claimLabelRecorded, resetClaimLabelRecord } from "./claimOutput.js";
-import { RESULT_COMMAND_PATHS } from "./resultCommandRegistry.js";
+import { RESULT_COMMAND_BY_PATH } from "./resultCommandRegistry.js";
 
 export const UNLABELLED_RESULT_LINE = "Claim: not labelled — treat as self-reported";
 /** EX_SOFTWARE: the command ran, but its output broke the labelling contract. */
@@ -33,7 +33,8 @@ export function installClaimLabelHooks(program: Command): void {
   program.hook("preAction", () => resetClaimLabelRecord());
   program.hook("postAction", (_thisCommand, actionCommand) => {
     const path = commandPath(actionCommand);
-    if (!RESULT_COMMAND_PATHS.has(path) || claimLabelRecorded()) return;
+    const entry = RESULT_COMMAND_BY_PATH.get(path);
+    if (!entry || claimLabelRecorded() || (entry.when && !entry.when(actionCommand.opts()))) return;
     if (process.exitCode !== undefined && process.exitCode !== 0) return;
     if (process.env.AMC_CLAIM_LABELS_STRICT === "1") {
       process.stderr.write(`amc: ${path} printed a result without a claim label\n`);

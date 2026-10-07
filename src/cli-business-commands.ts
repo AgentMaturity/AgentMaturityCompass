@@ -39,7 +39,7 @@ import { formatRiskCurrency, quantifyMaturityRisk } from "./business/riskQuantif
 import { buildPublicLeaderboardBundle, writePublicLeaderboardBundle } from "./benchmarks/publicLeaderboard.js";
 import { writeExecutiveBriefArtifact, type ExecutiveBriefFormat } from "./executive/brief.js";
 import { normalizeCurrency, parseMaturityLevel, parseNonNegativeNumber, parsePositiveInteger } from "./business/cliOptions.js";
-import { aggregateClaim, emitClaimResult, printClaimResult, printLabelledReport, printTitledResult, runClaimEnvelope, unverifiedClaim, withClaimFields } from "./cli/claimOutput.js";
+import { aggregateClaim, emitClaimResult, printClaimResult, printLabelledReport, printTitledResult, runClaimEnvelope, unverifiedClaim, withClaimFields, withClaimFieldsEach } from "./cli/claimOutput.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 
 export function registerBusinessCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
@@ -112,12 +112,8 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           if (l.avgFinalLevel < 1.5) kpis.recommendations.push(`${l.layerName}: Level ${l.avgFinalLevel.toFixed(1)} — prioritize improvement`);
         }
         
-        if (opts.json) {
-          console.log(JSON.stringify(kpis, null, 2));
-          return;
-        }
-        
-        console.log(chalk.bold(`\n📊 Business KPIs for ${agentId}\n`));
+        // Indices derived from the level alone, not measured outcomes: self-reported, not evaluated.
+        if (emitClaimResult(chalk.bold(`\n📊 Business KPIs for ${agentId}\n`), kpis, unverifiedClaim("business:kpi", 1), opts)) return;
         console.log(
           chalk.gray("  Indices below are derived from the maturity level, not from incident or loss data.\n")
         );
@@ -693,7 +689,7 @@ export function registerLeaderboardCommands(program: Command): void {
         
         // Each row carries its run's claim; the board as a whole claims no more than its weakest row.
         if (opts.json) {
-          console.log(JSON.stringify(scores.map((row) => withClaimFields(row, claims.get(row.agentId)!)), null, 2));
+          console.log(JSON.stringify(withClaimFieldsEach(scores, (row) => claims.get(row.agentId)!), null, 2));
           return;
         }
         console.log(chalk.bold(`\n🏆 Agent Maturity Leaderboard (${scores.length} agents)\n`));
@@ -1056,11 +1052,13 @@ export function registerCommsCheckCommands(program: Command): void {
           checkedAt: new Date().toISOString(),
         };
         
+        // Regex patterns over the caller's text: a keyword match, which can flag a violation but never pass a regulated rule.
+        const claim = unverifiedClaim("comms-check", 1, { method: "keyword_match", regulated: true, result: result.passed ? "pass" : "fail" });
         if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
           return;
         }
-        
+        printClaimResult(claim, opts);
         if (violations.length === 0) {
           console.log(chalk.green("✅ Message passed all compliance checks."));
         } else {

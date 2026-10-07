@@ -170,7 +170,10 @@ describe("amc export grc selects and verifies the run", () => {
     vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { lines.push(args.join(" ")); });
     runGrcExportCli({ workspace: ws, agentId: "default", framework: "eu_ai_act", out: "grc.json", sarif: "grc.sarif", json: true });
     const printed = JSON.parse(lines.join("\n")) as { schemaVersion: string; framework: string };
-    expect(printed).toEqual(JSON.parse(readFileSync(join(ws, "grc.json"), "utf8")));
+    // stdout adds the run's claim fields (P0-22) to the manifest written to disk.
+    const written = JSON.parse(readFileSync(join(ws, "grc.json"), "utf8")) as { run: { claim: { claimKind: string; statusDimensions: unknown }; label: string } };
+    expect(printed).toEqual({ ...written, claimKind: written.run.claim.claimKind, statusDimensions: written.run.claim.statusDimensions,
+      claimLabel: written.run.label });
     expect(printed.schemaVersion).toBe("amc.grc-evidence.v2");
     expect(printed.framework).toBe("EU_AI_ACT");
     const sarif = JSON.parse(readFileSync(join(ws, "grc.sarif"), "utf8")) as { runs: Array<{ results: Array<{ ruleId: string }> }> };

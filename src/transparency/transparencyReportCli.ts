@@ -6,6 +6,7 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { Command } from "commander";
 import chalk from "chalk";
+import { printLabelledReport } from "../cli/claimOutput.js";
 import { listAgents } from "../fleet/registry.js";
 import {
   generateTransparencyReport,
@@ -67,6 +68,7 @@ export function registerTransparencyReportCommands(program: Command): void {
                 chalk.green(`✓ ${a.id}`) +
                   chalk.gray(` → ${filename} (trust: ${report.identity.trustScore}/100, ${report.identity.maturityLabel})`)
               );
+              printLabelledReport(`  ${report.claimLabel}`);
             } catch (err) {
               console.error(chalk.red(`✗ ${a.id}: ${(err as Error).message}`));
             }
@@ -100,13 +102,14 @@ export function registerTransparencyReportCommands(program: Command): void {
             const outPath = resolve(opts.out);
             writeFileSync(outPath, content, "utf8");
             console.log(chalk.green(`✓ Report written to ${outPath}`));
+            printLabelledReport(report.claimLabel);
             console.log(
               chalk.cyan(
                 `  Trust Score: ${report.identity.trustScore}/100 · ${report.identity.maturityLabel} · evidence standing: ${report.identity.evidenceStanding}`
               )
             );
           } else {
-            console.log(content);
+            printLabelledReport(content);
           }
         } catch (err) {
           console.error(chalk.red(`Failed to generate report: ${(err as Error).message}`));

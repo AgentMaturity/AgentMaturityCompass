@@ -5,6 +5,7 @@
 
 import type { Command } from "commander";
 import chalk from "chalk";
+import { aggregateClaim, emitClaimResult, runIdClaim } from "./cli/claimOutput.js";
 
 export function registerObservabilityCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const observe = program
@@ -27,11 +28,9 @@ export function registerObservabilityCommands(program: Command, activeAgent: (p:
           agentId,
           maxRuns: parseInt(opts.limit, 10),
         });
-        if (opts.json) {
-          console.log(JSON.stringify(data, null, 2));
-          return;
-        }
-        console.log(chalk.bold(`\n📊 Timeline for agent: ${agentId}\n`));
+        // Each score point is a stored run: the timeline claims no more than its weakest run.
+        const claim = aggregateClaim("observe:timeline", data.scoreSeries.map((point) => runIdClaim(point.runId, agentId)));
+        if (emitClaimResult(chalk.bold(`\n📊 Timeline for agent: ${agentId}\n`), data, claim, opts)) return;
         console.log(`  Score points:    ${data.scoreSeries.length}`);
         console.log(`  Evidence points: ${data.evidenceSeries.length}`);
         console.log(`  Timeline events: ${data.timeline.length}`);

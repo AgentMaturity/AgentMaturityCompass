@@ -94,7 +94,7 @@ describe("--example on the five domain commands", () => {
     expect(lines[0]).toBe(EXAMPLE_BANNER);
     expect(lines.at(-1)).toBe(EXAMPLE_BANNER);
     expect(text.stdout.split(EXAMPLE_BANNER)).toHaveLength(3);
-    expect(text.stdout).toContain("synthetic_example");
+    expect(text.stdout).toContain("Claim: Synthetic example (not evidence)");
 
     const json = runCli(workspace, [...args, "--example", "--json"]);
     expect(json.status, json.stderr).toBe(0);

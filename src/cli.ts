@@ -93,9 +93,14 @@ import {
 import { exportEpisodeRecord, listEpisodeRecords, loadEpisodeRecord, writeEpisodeRecord } from "./lifecycle/episodeRecord.js";
 import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
-import { controlSurfaceClaim, emitClaimResult, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, selfAnswerClaim, unverifiedClaim, withClaimFields } from "./cli/claimOutput.js";
+import {
+  aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
+  printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  unverifiedClaim, withClaimFields, withClaimFieldsEach
+} from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js";
-import { formatClaimLabel, renderClaimLabel } from "./claims/eligibility/render.js";
+import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
 import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingProofs } from "./lifecycle/findingProof.js";
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
@@ -189,7 +194,7 @@ import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket 
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
-import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
+import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
@@ -453,9 +458,9 @@ import {
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { complianceFrameworkFamilies, frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
-import { generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
+import { coverageMatrixClaim, generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
 import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
-import { runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
+import { benchmarkResultClaim, runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
 import {
   federateExportCli,
   federateImportCli,
@@ -2412,14 +2417,16 @@ program
     }
 
     const result = scoreRapidAssessment(answers);
+    const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
 
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
     console.log("");
     console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore})`));
+    printClaimResult(claim, opts);
     console.log("");
     console.log(chalk.bold("  What L3 means for your product:"));
     console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
@@ -6260,10 +6267,13 @@ withTrustFlags(verifyCmd
   .action(async (opts: { json: boolean } & TrustFlags) => {
     const trust = trustFromFlags(opts, ["ledger-row"]);
     const out = await verifyAll({ workspace: process.cwd(), trust });
+    // Integrity checks prove the workspace records are unchanged, not that what they record is true.
+    const claim = artifactClaim("verify:workspace", { recordCount: out.checks.length });
     if (opts.json) {
-      console.log(JSON.stringify(out, null, 2));
+      console.log(JSON.stringify(withClaimFields(out, claim), null, 2));
     } else {
       console.log(`status: ${out.status}`);
+      printClaimResult(claim, {});
       for (const check of out.checks) {
         console.log(`- ${check.id}: ${check.status}${check.critical ? " [CRITICAL]" : ""}`);
         for (const detail of check.details) {
@@ -6825,8 +6835,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runToctouPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 TOCTOU Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 TOCTOU Pack"), result, executedTestClaim("lab:toctou", result.scenariosTested - result.inconclusiveScenarios.length, result.vulnerable ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6845,8 +6854,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runCompoundThreatPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Compound Threat Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Compound Threat Pack"), result, executedTestClaim("lab:compoundThreat", result.patterns.length - result.inconclusiveScenarios.length, result.threatsDetected > 0 ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6865,8 +6873,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runShutdownCompliancePack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Shutdown Compliance Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Shutdown Compliance Pack"), result, executedTestClaim("lab:shutdownCompliance", result.scenarios.length - result.inconclusiveScenarios.length, result.compliant ? "pass" : "fail"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6885,8 +6892,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runAdvancedThreatsPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Advanced Threats Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Advanced Threats Pack"), result, executedTestClaim("lab:advancedThreats", result.scenariosTested, result.failedScenarios.length > 0 ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -8721,6 +8727,8 @@ passport
       outFile: opts.out
     });
     console.log(chalk.green("Passport created"));
+    // Passports carry no AMC version or run of their own: their figures are self-reported.
+    printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
@@ -8733,7 +8741,8 @@ withTrustFlags(passport
   .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const out = passportVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
-    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`] });
+    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`],
+      claim: artifactClaim("passport") });
   });
 
 passport
@@ -8750,11 +8759,13 @@ passport
       file,
       format: format as "json" | "badge"
     });
+    const claim = artifactClaim("passport");
     if (format === "badge") {
       console.log(String(out));
+      printClaimResult(claim, { stderr: true });
       return;
     }
-    console.log(JSON.stringify(out, null, 2));
+    console.log(JSON.stringify(withClaimFields(out as object, claim), null, 2));
   });
 
 passport
@@ -8771,6 +8782,7 @@ passport
       agentId: resolveAgentId(process.cwd(), opts.id)
     });
     console.log(out.badge);
+    printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
   });
 
 passport
@@ -8792,6 +8804,7 @@ passport
       outFile: opts.out
     });
     console.log(chalk.green("Passport exported"));
+    printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
@@ -8816,6 +8829,8 @@ passport
       baseUrl: opts.baseUrl,
       outFile: opts.out
     });
+    const claim = artifactClaim("passport");
+    if (format !== "json") printClaimResult(claim, {});
     if (format === "url") {
       console.log(`publicUrl: ${out.publicUrl}`);
       console.log(`verificationUrl: ${out.verificationUrl}`);
@@ -8833,7 +8848,7 @@ passport
       console.log(`verificationUrl: ${out.verificationUrl}`);
       return;
     }
-    console.log(JSON.stringify(out, null, 2));
+    console.log(JSON.stringify(withClaimFields(out, claim), null, 2));
   });
 
 passport
@@ -8850,6 +8865,7 @@ passport
       agentB: second
     });
     console.log(`Compared at ${new Date(out.comparedTs).toISOString()}`);
+    printClaimResult(artifactClaim("passport:compare", { recordCount: 2 }), {});
     console.log(`Agent ${first}: passport ${out.agents[first]?.passportId ?? "unknown"} (${out.agents[first]?.status ?? "UNKNOWN"})`);
     console.log(`Agent ${second}: passport ${out.agents[second]?.passportId ?? "unknown"} (${out.agents[second]?.status ?? "UNKNOWN"})`);
     const dimLabelWidth = Math.max("dimension".length, ...out.dimensions.map((row) => row.dimension.length));
@@ -10206,6 +10222,7 @@ bundle
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
 
@@ -10215,7 +10232,9 @@ withTrustFlags(bundle
   .argument("<file>"), { pubkey: "pin the auditor public key (artifact-seal)", expectMonitor: true, json: true })
   .action(async (file: string, opts: TrustFlags) => {
     const result = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
-    finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`] });
+    // A trusted bundle's run seal verified with pinned keys; its claim is the run's own, never raised by the signature.
+    const claim = artifactClaim("bundle", { run: result.ok ? inspectEvidenceBundle(resolve(process.cwd(), file)).run : null, sealVerified: result.ok });
+    finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`], claim });
   });
 
 bundle
@@ -10228,7 +10247,7 @@ bundle
     const observedCount = [...trustMap.values()].filter((tier) => tier === "OBSERVED").length;
     console.log(
       JSON.stringify(
-        {
+        withClaimFields({
           runId: inspected.run.runId,
           agentId: inspected.run.agentId,
           integrityIndex: inspected.run.integrityIndex,
@@ -10236,7 +10255,7 @@ bundle
           manifest: inspected.manifest,
           fileCount: inspected.files.length,
           observedEvidenceEvents: observedCount
-        },
+        }, artifactClaim("bundle", { run: inspected.run })),
         null,
         2
       )
@@ -10250,7 +10269,8 @@ bundle
   .argument("<bundleB>")
   .action((bundleA: string, bundleB: string) => {
     const diff = diffEvidenceBundles(resolve(process.cwd(), bundleA), resolve(process.cwd(), bundleB));
-    console.log(JSON.stringify(diff, null, 2));
+    const claims = [bundleA, bundleB].map((file) => artifactClaim("bundle", { run: inspectEvidenceBundle(resolve(process.cwd(), file)).run }));
+    console.log(JSON.stringify(withClaimFields(diff, aggregateClaim("bundle:diff", claims)), null, 2));
   });
 
 evidence
@@ -10332,6 +10352,8 @@ program
       } else {
         console.log(chalk.green("Gate PASSED"));
       }
+      // The gate checks the bundle's run against a policy; the claim stays the run's own.
+      printClaimResult(artifactClaim("bundle", { run: inspectEvidenceBundle(resolve(process.cwd(), opts.bundle)).run }), {});
       return;
     }
     console.log(opts.sign === false ? chalk.yellow("Gate FAILED (UNSIGNED policy)") : chalk.red("Gate FAILED"));
@@ -10412,6 +10434,7 @@ ci
     const questions = getRapidQuestions();
     // In CI we auto-score (non-interactive) — try auto mode first, fall back to zero-state
     let result: { percentage: number; preliminaryLevel: string; totalScore: number; maxScore: number };
+    let claim = unverifiedClaim("ci:check", 0);
     try {
       const agentId = opts.agent ?? activeAgent(program) ?? "default";
       ensureWorkspaceReadyForAgent(process.cwd(), agentId);
@@ -10424,6 +10447,7 @@ ci
         ? Math.round((avgLevel / 5) * 100)
         : 0;
       result = { percentage: pct, preliminaryLevel: `L${overallLevel}`, totalScore: pct, maxScore: 100 };
+      claim = runClaimEnvelope(report);
     } catch {
       // No evidence — score with default answers (L0)
       const answers: Record<string, number> = {};
@@ -10438,10 +10462,11 @@ ci
     const passed = scorePassed && levelPassed;
 
     if (opts.json) {
-      console.log(JSON.stringify({ passed, score: result.percentage, level: result.preliminaryLevel, minScore, minLevel: opts.minLevel }, null, 2));
+      console.log(JSON.stringify(withClaimFields({ passed, score: result.percentage, level: result.preliminaryLevel, minScore, minLevel: opts.minLevel }, claim), null, 2));
     } else {
       const icon = passed ? chalk.green("✅ PASS") : chalk.red("❌ FAIL");
       console.log(chalk.bold(`\n🧭 AMC CI Gate Check`));
+      printClaimResult(claim, opts);
       console.log(`  Score: ${result.percentage}% (min: ${minScore}%)`);
       console.log(`  Level: ${result.preliminaryLevel} (min: ${opts.minLevel})`);
       console.log(`  Result: ${icon}`);
@@ -10450,7 +10475,7 @@ ci
       }
       console.log("");
     }
-    process.exit(passed ? 0 : 1);
+    process.exitCode = passed ? 0 : 1;
   });
 
 ci
@@ -10513,11 +10538,14 @@ ci
         },
       });
 
+      // Attacks that reached the agent are observed; attacks that never reached it are not counted.
+      const claim = executedTestClaim("redteam:ci", result.report.totalScenarios, result.passed ? "pass" : "fail");
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       } else {
         const icon = result.passed ? chalk.green("PASS") : chalk.red("FAIL");
         console.log(chalk.bold("\nAMC CI Red-Team Gate"));
+        printClaimResult(claim, opts);
         console.log(`  Result: ${icon}`);
         console.log(`  Red-team score: ${result.report.overallScore0to100}/100 (min: ${result.thresholds.minScore0to100})`);
         console.log(`  Vulnerabilities: ${result.severityCounts.total} (max: ${result.thresholds.maxVulnerabilities})`);
@@ -10539,7 +10567,7 @@ ci
         }
       }
 
-      process.exit(result.passed ? 0 : 1);
+      process.exitCode = result.passed ? 0 : 1;
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
       process.exit(1);
@@ -10677,6 +10705,7 @@ exportGroup
       outFile: opts.out
     });
     console.log(chalk.green(`Badge exported: ${badge.outFile}`));
+    printClaimResult(runIdClaim(badge.runId, badge.agentId), {});
   });
 
 dashboard
@@ -10910,6 +10939,7 @@ assurance
           windowDays: opts.windowDays ? Number(opts.windowDays) : undefined
         });
         console.log(chalk.green(`Assurance run complete: ${run.run.runId}`));
+        printClaimResult(artifactClaim("assurance:store", { recordCount: run.findings.findings.length }), {});
         console.log(`Status: ${run.run.score.status}`);
         console.log(`RiskAssuranceScore: ${run.run.score.riskAssuranceScore ?? "UNKNOWN"}`);
         console.log(`Findings: ${run.findings.findings.length}`);
@@ -10951,6 +10981,7 @@ assurance
         throw error;
       }
       if (noSign) delete process.env.AMC_NO_SIGN;
+      const claim = assuranceClaim(report, true);
       // SARIF output
       if (opts.format === "sarif") {
         const sarifRules = (report.packResults ?? []).map((p, i) => ({
@@ -10972,7 +11003,8 @@ assurance
           version: "2.1.0",
           runs: [{
             tool: { driver: { name: "AMC Assurance Lab", version: "1.0.0", rules: sarifRules } },
-            results: sarifResults
+            results: sarifResults,
+            properties: withClaimFields({}, claim)
           }]
         };
         console.log(JSON.stringify(sarif, null, 2));
@@ -10980,6 +11012,7 @@ assurance
       }
 
       console.log(chalk.green(`Assurance run complete: ${report.assuranceRunId}`));
+      printClaimResult(claim, {});
       console.log(`Status: ${report.status}`);
       console.log(`TrustTier: ${report.trustTier}`);
       console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
@@ -11035,6 +11068,8 @@ assurance
   .description("List assurance lab runs")
   .action(() => {
     const rows = assuranceRunsCli(process.cwd());
+    // Stored v1 run records are not re-verified here: self-reported.
+    printClaimResult(artifactClaim("assurance:store", { recordCount: rows.length }), {});
     if (rows.length === 0) {
       console.log("No assurance runs.");
       return;
@@ -11051,7 +11086,8 @@ assurance
   .description("Show assurance run artifacts")
   .requiredOption("--run <id>", "run ID")
   .action((opts: { run: string }) => {
-    console.log(JSON.stringify(assuranceShowRunCli({ workspace: process.cwd(), runId: opts.run }), null, 2));
+    const detail = assuranceShowRunCli({ workspace: process.cwd(), runId: opts.run });
+    console.log(JSON.stringify(withClaimFields(detail, artifactClaim("assurance:store")), null, 2));
   });
 
 assurance
@@ -11066,6 +11102,7 @@ assurance
       outFile: opts.out ? resolve(process.cwd(), opts.out) : undefined
     });
     console.log(chalk.green(`Assurance certificate issued: ${issued.outFile}`));
+    printClaimResult(artifactClaim("assurance:certificate"), {});
     console.log(`certId=${issued.cert.certId}`);
   });
 
@@ -11076,7 +11113,7 @@ withTrustFlags(assurance
   .action((file: string, opts: TrustFlags) => {
     const verified = assuranceVerifyCertCli({ file: resolve(process.cwd(), file), trust: trustFromFlags(opts, ["artifact-seal"]),
       ...(opts.pubkey ? { publicKeyPath: resolve(process.cwd(), opts.pubkey) } : {}) });
-    finishVerify("Assurance certificate", verified.report, { json: opts.json, result: verified });
+    finishVerify("Assurance certificate", verified.report, { json: opts.json, result: verified, claim: artifactClaim("assurance:certificate") });
   });
 
 const assuranceScheduler = assurance.command("scheduler").description("Assurance scheduler controls");
@@ -11094,6 +11131,7 @@ assuranceScheduler
   .action(async () => {
     const out = await assuranceSchedulerRunNowCli(process.cwd());
     console.log(chalk.green(`Assurance scheduler run completed: ${out.run.assuranceRunId}`));
+    printClaimResult(artifactClaim("assurance:store"), {});
     console.log(`certIssued=${out.cert ? "yes" : "no"}`);
   });
 
@@ -11192,6 +11230,9 @@ assurance
     });
     if (verified.ok) {
       console.log(chalk.green("Assurance verification PASSED"));
+      // The run's own claim; its verified seal lets an executed test count as observed, never more.
+      const report = loadAssuranceReport({ workspace: process.cwd(), assuranceRunId: opts.assuranceRun, agentId: opts.agent ?? activeAgent(program) });
+      printClaimResult(assuranceClaim(report, false), {});
       return;
     }
     console.log(chalk.red("Assurance verification FAILED"));
@@ -11251,6 +11292,7 @@ program
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Certificate issued: ${issued.outFile}`));
+    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`certId=${issued.certId}`);
   });
 
@@ -11282,6 +11324,7 @@ cert
       preview
     });
     console.log(chalk.green(`Trust certificate generated: ${generated.outputPath}`));
+    printClaimResult(runIdClaim(generated.envelope.payload.scoreSourceRunId, opts.agent), {});
     console.log(`format=${generated.format}`);
     console.log(`status=${generated.signatureStatus}`);
     if (generated.signatureStatus === "UNSIGNED_PREVIEW") {
@@ -11353,7 +11396,8 @@ withTrustFlags(cert
       const { verifyTrustCertificateEnvelope } = await import("./cert/trustCertificate.js");
       const verdict = verifyTrustCertificateEnvelope(envelope as never, trust, certPath);
       finishVerify("Certificate", verdict.report, { json: opts.json, result: verdict,
-        details: [`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`, "type=amc-trust-certificate"] });
+        details: [`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`, "type=amc-trust-certificate"],
+        claim: artifactClaim("trust-certificate") });
       return;
     }
     const result = await verifyCertificate({
@@ -11361,7 +11405,8 @@ withTrustFlags(cert
       revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined,
       trust
     });
-    finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`] });
+    const claim = artifactClaim("certificate", { run: result.ok ? inspectCertificate(certPath).run : null, sealVerified: result.ok });
+    finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`], claim });
   });
 
 cert
@@ -11372,20 +11417,20 @@ cert
     const certPath = resolve(process.cwd(), file);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
-      console.log(JSON.stringify(envelope, null, 2));
+      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate")), null, 2));
       return;
     }
     const inspected = inspectCertificate(certPath);
     console.log(
       JSON.stringify(
-        {
+        withClaimFields({
           certId: inspected.cert.certId,
           agentId: inspected.cert.agentId,
           issuedTs: inspected.cert.issuedTs,
           integrityIndex: inspected.cert.integrityIndex,
           trustLabel: inspected.cert.trustLabel,
           fileCount: inspected.fileCount
-        },
+        }, artifactClaim("certificate", { run: inspected.run })),
         null,
         2
       )
@@ -11535,6 +11580,7 @@ notary
       outFile: opts.out
     });
     console.log(chalk.green(`Attestation written: ${out.outFile}`));
+    printClaimResult(artifactClaim("notary:attestation"), {});
   });
 
 notary
@@ -11545,6 +11591,7 @@ notary
     const result = notaryVerifyAttestCli(file);
     if (result.ok) {
       console.log(chalk.green("Notary attestation verification PASSED"));
+      printClaimResult(artifactClaim("notary:attestation"), {});
       return;
     }
     console.log(chalk.red("Notary attestation verification FAILED"));
@@ -12246,6 +12293,8 @@ transparency
     const result = verifyTransparencyLog(process.cwd());
     if (result.ok) {
       console.log(chalk.green("Transparency log verification PASSED"));
+      // An intact log proves its entries are unchanged, not that what they record is true.
+      printClaimResult(artifactClaim("transparency:log", { recordCount: result.entryCount }), {});
       console.log(`entries=${result.entryCount}`);
       return;
     }
@@ -12287,6 +12336,7 @@ transparency
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file));
     if (verified.ok) {
       console.log(chalk.green("Transparency bundle verification PASSED"));
+      printClaimResult(artifactClaim("transparency:log"), {});
       return;
     }
     console.log(chalk.red("Transparency bundle verification FAILED"));
@@ -12440,11 +12490,13 @@ compliance
       format,
       agentId: opts.agent ?? activeAgent(program)
     });
+    const claim = envelopeForComplianceReport(out.report, out.report.ts);
     if (opts.json) {
-      console.log(JSON.stringify(out.report, null, 2));
+      console.log(JSON.stringify(withClaimFields(out.report, claim), null, 2));
       return;
     }
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
+    printClaimResult(claim, {});
     console.log(`Framework: ${family.displayName}`);
     // P0-17: a percentage is not a status; nothing evaluated prints "not evaluated", never a score.
     const { coverage } = out.report;
@@ -12481,6 +12533,7 @@ compliance
     });
     writeFileAtomic(resolve(process.cwd(), opts.out), JSON.stringify(report, null, 2), 0o644);
     console.log(chalk.green(`Fleet compliance report generated: ${resolve(process.cwd(), opts.out)}`));
+    printClaimResult(aggregateClaim(`compliance:fleet:${framework}`, report.agents.map((agent) => agent.claim)), {});
   });
 
 compliance
@@ -12490,7 +12543,8 @@ compliance
   .argument("<reportB>")
   .action((reportA: string, reportB: string) => {
     const diff = complianceDiffCli(readUtf8(resolve(process.cwd(), reportA)), readUtf8(resolve(process.cwd(), reportB)));
-    console.log(JSON.stringify(diff, null, 2));
+    // Report files read back from disk carry no seal: self-reported.
+    console.log(JSON.stringify(withClaimFields(diff, unverifiedClaim("compliance:diff", diff.categoryDeltas.length, { regulated: true })), null, 2));
   });
 
 compliance
@@ -12519,13 +12573,14 @@ compliance
       frameworks,
     });
 
+    const claim = coverageMatrixClaim(matrix);
     if (opts.json) {
-      console.log(JSON.stringify(matrix, null, 2));
+      console.log(JSON.stringify(withClaimFields(matrix, claim), null, 2));
       return;
     }
 
     if (opts.heatmap) {
-      console.log(renderCoverageHeatmap(matrix));
+      printTitledResult(renderCoverageHeatmap(matrix), claim);
       return;
     }
 
@@ -12533,8 +12588,9 @@ compliance
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Coverage matrix written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
     console.log(chalk.gray(`\nOverall: ${matrix.overallScore === null ? "not evaluated" : `${(matrix.overallScore * 100).toFixed(1)}%`} | Gaps: ${matrix.gaps.length}`));
   });
@@ -12606,9 +12662,11 @@ compliance
     }
 
     const result = classifyEuAiActRisk(capabilities);
+    // Classifies the capabilities the caller declared: self-reported, and a regulated mapping.
+    const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });
 
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -12622,6 +12680,7 @@ compliance
 
     console.log("");
     console.log(chalk.bold("🇪🇺 EU AI Act Risk Classification"));
+    printClaimResult(claim, {});
     console.log("");
     console.log(`Risk Tier: ${chalk.hex(tierColor).bold(result.riskTier)}`);
     console.log(`Articles: ${result.articles.length > 0 ? result.articles.join(", ") : "none"}`);
@@ -12693,20 +12752,23 @@ compliance
     }
 
     const roadmap = generateEuAiActRoadmap(classification);
+    // Planned from a declared or overridden risk tier: self-reported, and a regulated mapping.
+    const claim = unverifiedClaim("compliance:euAiActRoadmap", 1, { regulated: true });
 
     if (opts.json || opts.out) {
-      const output = JSON.stringify(roadmap, null, 2);
       if (opts.out) {
-        writeFileAtomic(resolve(process.cwd(), opts.out), output, 0o644);
+        writeFileAtomic(resolve(process.cwd(), opts.out), JSON.stringify(roadmap, null, 2), 0o644);
         console.log(chalk.green(`EU AI Act compliance roadmap saved to: ${opts.out}`));
+        printClaimResult(claim, {});
       } else {
-        console.log(output);
+        console.log(JSON.stringify(withClaimFields(roadmap, claim), null, 2));
       }
       return;
     }
 
     console.log("");
     console.log(chalk.bold("🇪🇺 EU AI Act Compliance Roadmap"));
+    printClaimResult(claim, {});
     console.log(`Risk Tier: ${chalk.bold(roadmap.riskTier)}`);
     console.log(`Steps: ${roadmap.totalSteps} | Estimated: ${roadmap.estimatedTotalWeeks} weeks`);
     console.log("");
@@ -12984,6 +13046,7 @@ outcomes
       unit: opts.unit
     });
     console.log(chalk.green(`Outcome signal recorded (${out.trustTier}): ${out.outcomeEventId}`));
+    printClaimResult(unverifiedClaim("outcomes:attest", 1), {});
     console.log(`eventHash=${out.eventHash}`);
     console.log(`receiptId=${out.receiptId}`);
   });
@@ -13795,6 +13858,7 @@ loop
       days: Number(opts.days)
     });
     console.log(chalk.green(`Loop run complete for ${result.agentId}`));
+    printClaimResult(runIdClaim(result.runId, result.agentId), {});
     console.log(`runId=${result.runId}`);
     console.log(`assuranceRunId=${result.assuranceRunId ?? "none"}`);
     console.log(`dashboard=${result.dashboardDir}`);
@@ -14091,6 +14155,7 @@ fleet
         outFile: resolve(process.cwd(), resolvedOut)
       });
       console.log(chalk.green(`Fleet compliance report written: ${report.outFile}`));
+      printClaimResult(fleetHealthClaim(buildFleetHealthDashboard({ workspace: process.cwd() })), {});
       console.log(`Agents included: ${report.agentCount}`);
       console.log(`sha256=${report.sha256}`);
       return;
@@ -14104,6 +14169,7 @@ fleet
       outputPath: resolve(process.cwd(), opts.output)
     });
     console.log(chalk.green(`Fleet report written: ${report.reportPath}`));
+    printClaimResult(report.claim, {});
     console.log(`Agents included: ${report.agentCount}`);
   });
 
@@ -14136,11 +14202,16 @@ fleet
         console.error(formatFleetProgressEvent(event));
       } : undefined,
     });
+    // Each agent's run, seal-checked; the fleet claims no more than its weakest run.
+    const claims = new Map(result.diagnosticReports.map((report) => [report.agentId, runClaimEnvelope(report)]));
+    const claim = aggregateClaim("fleet:score", [...claims.values()]);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      const agents = result.agents.map((agent) => withClaimFields(agent, claims.get(agent.agentId) ?? unverifiedClaim(`diagnostic:${agent.agentId}`, 0)));
+      console.log(JSON.stringify(withClaimFields({ ...result, agents }, claim), null, 2));
       return;
     }
     console.log(chalk.green(`Fleet scoring complete: ${result.agents.length}/${result.agentCount} agents scored`));
+    printClaimResult(claim, opts);
     console.log(`SLA: ${(slaMs / 1000).toFixed(0)}s | First result: ${result.agents[0]?.firstResultMs ?? "n/a"}ms | Failures: ${result.failures.length}`);
     console.log(`Mean: ${result.aggregate.fleetMeanScore} | Median: ${result.aggregate.fleetMedianScore} | StdDev: ${result.aggregate.fleetStdDev}`);
     console.log(`Weak links: ${result.weakLinks.length}`);
@@ -14165,7 +14236,7 @@ fleet
       console.log(chalk.yellow(`  ⚠ ${wl.agentId}: score=${wl.overallScore}, risk=${wl.riskLabel}, ${wl.deviationFromMean}σ below mean`));
     }
     if (opts.md) {
-      console.log("\n" + renderFleetScoringMarkdown(result));
+      console.log("\n" + renderFleetScoringMarkdown(result, claims));
     }
     if (opts.out) {
       console.log(chalk.green(`Report written: ${opts.out}`));
@@ -14332,11 +14403,7 @@ fleet
   .option("--json", "print full JSON payload", false)
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
-    if (opts.json) {
-      console.log(JSON.stringify(health, null, 2));
-      return;
-    }
-    console.log(`Fleet baseline integrity: ${health.baselineIntegrityIndex.toFixed(3)}`);
+    if (emitClaimResult(`Fleet baseline integrity: ${health.baselineIntegrityIndex.toFixed(3)}`, health, fleetHealthClaim(health), opts)) return;
     console.log(`Agents: ${health.agentCount} (scored ${health.scoredAgentCount})`);
     console.log(`Average integrity: ${health.averageIntegrityIndex.toFixed(3)}`);
     console.log(`Average overall level: ${health.averageOverallLevel.toFixed(2)}`);
@@ -14357,11 +14424,7 @@ fleet
   .option("--json", "print full JSON payload", false)
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
-    if (opts.json) {
-      console.log(JSON.stringify(health, null, 2));
-      return;
-    }
-    console.log(chalk.bold("\n🌐  Fleet Status"));
+    if (emitClaimResult(chalk.bold("\n🌐  Fleet Status"), health, fleetHealthClaim(health), opts)) return;
     console.log(`  Agents:          ${health.agentCount} total, ${health.scoredAgentCount} scored`);
     console.log(`  Avg score:       L${health.averageOverallLevel.toFixed(1)} (integrity: ${health.averageIntegrityIndex.toFixed(3)})`);
     console.log(`  Baseline:        ${health.baselineIntegrityIndex.toFixed(3)}`);
@@ -14381,11 +14444,12 @@ fleet
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
     const overview = buildFleetExecutiveOverview(health);
+    const claim = fleetHealthClaim(health);
     if (opts.json) {
-      console.log(JSON.stringify(overview, null, 2));
+      console.log(JSON.stringify(withClaimFields(overview, claim), null, 2));
       return;
     }
-    console.log(renderFleetExecutiveOverview(overview));
+    printTitledResult(renderFleetExecutiveOverview(overview), claim);
   });
 
 const fleetPolicy = fleet.command("policy").description("Fleet governance policy operations");
@@ -14483,6 +14547,8 @@ fleetSlo
     const status = fleetSloStatus(process.cwd());
     const color = status.overallStatus === "BREACHED" ? chalk.red : chalk.green;
     console.log(color(`Overall SLO status: ${status.overallStatus}`));
+    // SLOs are computed over each agent's latest run: the status claims no more than the weakest run.
+    printClaimResult(fleetHealthClaim(buildFleetHealthDashboard({ workspace: process.cwd() })), {});
     if (status.statuses.length === 0) {
       console.log("No fleet SLOs defined.");
       return;
@@ -14799,6 +14865,7 @@ fleet
     }
 
     console.log(chalk.green(`Trust composition report (JSON): ${reportPath}`));
+    printClaimResult(aggregateClaim("fleet:trust-composition", reports.map((report) => runClaimEnvelope(report, workspace))), {});
     console.log(`DAG valid: ${trustReport.dagValid ? "YES" : "NO"}`);
     console.log(`Fleet composite score: ${trustReport.fleetCompositeScore.toFixed(3)}`);
     console.log(`Weakest link: ${trustReport.fleetWeakestLink ?? "none"}`);
@@ -15266,6 +15333,7 @@ program
       type: opts.type
     });
     console.log(chalk.green(`Ingested ${ingest.fileCount} file(s)`));
+    printClaimResult(unverifiedClaim("ingest", ingest.fileCount), {});
     console.log(`Ingest session: ${ingest.ingestSessionId}`);
   });
 
@@ -15289,6 +15357,8 @@ program
       trust: loadTrustContext()
     });
     console.log(chalk.green(`Recorded events: ${attested.attestedEventCount} (${attested.trustTier}: ${attested.reason})`));
+    // Even a pinned attestation stays self-reported until it is an independent, pinned review (docs/CLAIM_KINDS.md).
+    printClaimResult(unverifiedClaim("ingest:attest", attested.attestedEventCount), {});
     console.log(`Bundle hash: ${attested.bundleHash}`);
   });
 
@@ -16513,6 +16583,7 @@ transform
       evidenceLinks: opts.evidenceLinks
     });
     console.log(chalk.green(`Transformation attestation created: ${out.attestation.attestationId}`));
+    printClaimResult(unverifiedClaim("transform:attest", 1), {});
     console.log(`Path: ${out.path}`);
   });
 
@@ -16529,6 +16600,7 @@ transform
       process.exit(1);
     }
     console.log(chalk.green(`Attestation verified: ${verify.path}`));
+    printClaimResult(unverifiedClaim("transform:attest", 1), {});
   });
 
 const org = program.command("org").description("Org graph and real-time comparative scorecards");
@@ -16741,6 +16813,7 @@ org
       window: opts.window
     });
     console.log(chalk.green(`Org scorecard recomputed for ${opts.window}`));
+    printClaimResult(latestRunsClaim("org:scorecard", [...new Set(out.scorecard.nodes.flatMap((node) => node.agentIds))]), {});
     console.log(`Latest: ${out.latestPath}`);
     console.log(`Latest sig: ${out.latestSigPath}`);
     console.log(`History: ${out.historyPath}`);
@@ -16989,6 +17062,7 @@ auditBinder
       throw new Error("audit binder create did not produce an export artifact");
     }
     console.log(chalk.green("Audit binder exported"));
+    printClaimResult(artifactClaim("audit:binder"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`binderId: ${out.binder.binderId}`);
@@ -17001,7 +17075,7 @@ withTrustFlags(auditBinder
   .action((file: string, opts: TrustFlags) => {
     const verify = auditBinderVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
     finishVerify("Audit binder", verify.report, { json: opts.json, result: verify,
-      details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`] });
+      details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`], claim: artifactClaim("audit:binder") });
   });
 
 auditBinder
@@ -17198,6 +17272,7 @@ audit
       return;
     }
     console.log(chalk.green("Audit verify passed"));
+    printClaimResult(artifactClaim("audit:workspace"), {});
   });
 
 const bench = program.command("bench").description("Public benchmark registry + ecosystem comparative view");
@@ -17556,7 +17631,7 @@ withTrustFlags(benchmark
   .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const verify = verifyBenchmarkArtifact(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
-    finishVerify("Benchmark", verify.report, { json: opts.json, result: verify });
+    finishVerify("Benchmark", verify.report, { json: opts.json, result: verify, claim: artifactClaim("benchmark") });
   });
 
 benchmark
@@ -17614,8 +17689,12 @@ benchmark
       groupBy: opts.groupBy
     });
     const sortedByOverall = rows.slice().sort((a, b) => b.bench.run.overall - a.bench.run.overall || a.bench.benchId.localeCompare(b.bench.benchId));
+    // Imported benchmarks are their publishers' figures: self-reported.
+    const claim = benchmarkResultClaim("benchmark:report", rows.length, Date.now());
     const lines = [
       "# AMC Benchmark Report",
+      "",
+      formatClaimLabel(renderClaimLabel(claim), "report"),
       "",
       `Imported benchmarks: ${rows.length}`,
       `Group-by: ${opts.groupBy}`,
@@ -17630,12 +17709,14 @@ benchmark
       ...sortedByOverall.slice(0, 10).map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`),
       "",
       "## Full List",
-      ...rows.map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`)
+      ...rows.map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`),
+      "", "## How to read claim kinds", "", renderClaimLegend("markdown")
     ];
     const outFile = resolve(process.cwd(), opts.out);
     ensureDir(dirname(outFile));
     writeFileAtomic(outFile, lines.join("\n"), 0o644);
     console.log(chalk.green(`Benchmark report written: ${outFile}`));
+    printClaimResult(claim, {});
   });
 
 benchmark
@@ -17646,7 +17727,7 @@ benchmark
       workspace: process.cwd(),
       groupBy: opts.groupBy
     });
-    console.log(JSON.stringify(stats, null, 2));
+    console.log(JSON.stringify(withClaimFields(stats, benchmarkResultClaim("benchmark:stats", listImportedBenchmarks(process.cwd()).length, Date.now())), null, 2));
   });
 
 benchmark
@@ -17661,8 +17742,9 @@ benchmark
       agentId: opts.agent,
     });
 
+    const claim = benchmarkResultClaim(`benchmark:${result.agentId}`, result.benchmarkCount, result.ts);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17670,8 +17752,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Benchmark report written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
   });
 
@@ -17689,8 +17772,9 @@ benchmark
       agent2,
     });
 
+    const claim = benchmarkResultClaim(`benchmark:${result.agent1}:${result.agent2}`, result.benchmarkCount, result.ts);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17698,8 +17782,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Benchmark comparison written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
   });
 
@@ -17741,8 +17826,10 @@ benchmark
     });
     const ciGate = buildProviderDriftCiGate(report, { mode: payload.gateMode ?? "ci" });
 
+    // Canary rows come from the caller's file: self-reported receipts, whatever the gate decides.
+    const claim = unverifiedClaim("benchmark:providerDrift", payload.baseline.length + payload.candidate.length, { result: ciGate.passed ? "pass" : "fail" });
     if (opts.json) {
-      console.log(JSON.stringify({ report, watchAlerts, evalPack, ciGate }, null, 2));
+      console.log(JSON.stringify(withClaimFields({ report, watchAlerts, evalPack, ciGate }, claim), null, 2));
       return;
     }
 
@@ -17750,8 +17837,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Provider drift benchmark written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printTitledResult(md, claim);
       if (watchAlerts.length > 0) {
         console.log("");
         console.log(chalk.red(`Watch alerts: ${watchAlerts.length}`));
@@ -17777,8 +17865,10 @@ benchmark
       agentId: opts.agent ?? payload.agentId ?? activeAgent(program) ?? "default",
     });
 
+    // Corpus rows and scores come from the caller's file: self-reported receipts.
+    const claim = unverifiedClaim("benchmark:replayCorpus", payload.rows.length, { result: result.ciReceipt.passed ? "pass" : "fail" });
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17786,8 +17876,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Replay benchmark corpus written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printTitledResult(md, claim);
       if (result.watchAlerts.length > 0) {
         console.log("");
         console.log(chalk.red(`Watch alerts: ${result.watchAlerts.length}`));
@@ -18528,10 +18619,12 @@ program
     const results = lab.simulateExperiment(opts.experiment);
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
+      process.exitCode = 1;
       return;
     }
-    const { EXAMPLE_BANNER } = await import("./claims/eligibility/exampleMode.js");
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(chalk.bold(`\nSimulated ${results.length} probe results:\n`));
     for (const r of results) {
@@ -18636,11 +18729,15 @@ program
   .action(async () => {
     const ir = await import("./audit/insiderRisk.js");
     const scores = ir.computeInsiderRiskScores();
+    // Scores computed from ingested activity AMC did not observe: self-reported.
+    const claim = unverifiedClaim("audit:insiderRisk", scores.length);
     if (scores.length === 0) {
       console.log(chalk.green("No insider risk scores computed (no data ingested)."));
+      printClaimResult(claim, {});
       return;
     }
     console.log(chalk.bold("\nInsider Risk Scores:\n"));
+    printClaimResult(claim, {});
     for (const s of scores) {
       const color = s.riskLevel === "critical" ? chalk.red : s.riskLevel === "high" ? chalk.yellow : chalk.white;
       console.log(color(`  ${s.actorId} — ${s.riskLevel.toUpperCase()} (${(s.overallScore * 100).toFixed(0)}%) — ${s.alertCount} alert(s), ${s.criticalAlertCount} critical`));
@@ -18655,6 +18752,7 @@ program
     const ir = await import("./audit/insiderRisk.js");
     const bundle = ir.exportAttestationBundle(opts.tenant);
     console.log(chalk.bold(`\nAttestation Bundle: ${bundle.bundleId}`));
+    printClaimResult(unverifiedClaim("audit:insiderRiskAttestation", bundle.alerts.length), {});
     console.log(`  Tenant: ${bundle.tenantId}`);
     console.log(`  Alerts: ${bundle.alerts.length}`);
     console.log(`  Approval events: ${bundle.approvalEvents.length}`);
@@ -18950,7 +19048,7 @@ program
   .action(async (opts: { tenant: string; redactionTests: boolean }) => {
     const dr = await import("./compliance/dataResidency.js");
     const report = dr.generateResidencyReport(opts.tenant, { includeRedactionTests: opts.redactionTests }, process.cwd());
-    console.log(dr.renderResidencyReportMarkdown(report));
+    printLabelledReport(dr.renderResidencyReportMarkdown(report));
   });
 
 program
@@ -19511,7 +19609,8 @@ orgCommunity
     const { initCommunityPlatform, scoreCommunityGovernance, renderCommunityGovernanceMarkdown } = await import("./org/communityGovernance.js");
     const config = initCommunityPlatform(opts.platform);
     const report = scoreCommunityGovernance(config);
-    console.log(renderCommunityGovernanceMarkdown(report));
+    // Scores a freshly initialised default configuration, not observed platform behaviour.
+    printTitledResult(renderCommunityGovernanceMarkdown(report), unverifiedClaim("org:communityGovernance", 0));
   });
 
 // ── Agent Discovery ────────────────────────────────────────────────────────
@@ -19544,7 +19643,9 @@ passport
     const { loadDiscoveryRegistry, searchCapabilities } = await import("./passport/agentDiscovery.js");
     const registry = loadDiscoveryRegistry(process.cwd());
     const results = searchCapabilities(registry, { capability: opts.capability, minLevel: Number(opts.minLevel) });
-    console.log(JSON.stringify(results, null, 2));
+    // Capabilities and levels in the discovery registry are what agents declared: self-reported.
+    const claim = unverifiedClaim("passport:discovery", results.length);
+    console.log(JSON.stringify(withClaimFieldsEach(results, () => claim), null, 2));
   });
 
 passport
@@ -19794,13 +19895,12 @@ shield
         previousActions: parseCsvOption(opts.previousActions),
       });
 
-      if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+      // A decision on an action the caller described, not one AMC observed: self-reported.
+      const claim = unverifiedClaim("shield:runtimeAnalyzer", 1, { result: result.allowed ? "pass" : "fail" });
+      if (emitClaimResult(chalk.bold.cyan("\nShield Runtime Analysis"), result, claim, opts)) {
         if (opts.failOnBlock && result.blocked) process.exitCode = 1;
         return;
       }
-
-      console.log(chalk.bold.cyan("\nShield Runtime Analysis"));
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Action:"), opts.action);
       console.log(chalk.gray("Tool:"), opts.tool);
@@ -19872,8 +19972,7 @@ shield
     try {
       const { checkReputation } = await import("./shield/index.js");
       const result = checkReputation(toolId);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🛡️  Tool Reputation"));
+      if (emitClaimResult(chalk.bold.cyan("\n🛡️  Tool Reputation"), result, unverifiedClaim("shield:toolReputation", 0, { method: "keyword_match" }), opts)) return;
       console.log(chalk.gray("Tool:"), toolId);
       console.log(chalk.gray("Score:"), result.score ?? "N/A");
       console.log(chalk.gray("Trusted:"), result.trusted ? chalk.green("yes") : chalk.red("no"));
@@ -20237,8 +20336,7 @@ shield
         sessionId: opts.session,
         workspaceId: opts.workspace ?? process.cwd(),
       });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🛡️  Trust Pipeline"));
+      if (emitClaimResult(chalk.bold.cyan("\n🛡️  Trust Pipeline"), result, unverifiedClaim("shield:trustPipeline", 1, { result: result.allowed ? "pass" : "fail" }), opts)) return;
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Allowed:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Overall Trust Score:"), result.overallTrustScore.toFixed(1));
@@ -21126,6 +21224,8 @@ enforce
     try {
       const { CORE_SAFETY_PROPERTIES, boundedModelCheck, verifyCertificate } = await import("./enforce/formalVerification.js");
       console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Formal Verification"));
+      // Checks AMC's built-in safety model, not the agent: no agent evidence is used.
+      printClaimResult(unverifiedClaim("enforce:formalVerification", 0), {});
       const properties = opts.all || !opts.property
         ? CORE_SAFETY_PROPERTIES
         : CORE_SAFETY_PROPERTIES.filter((p) => p.id === opts.property || p.name === opts.property);
@@ -21189,6 +21289,7 @@ enforce
       const cert = JSON.parse(certificateJson) as import("./enforce/formalVerification.js").ProofCertificate;
       const result = verifyCertificate(cert);
       console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Certificate Verification"));
+      printClaimResult(unverifiedClaim("enforce:proofCertificate", 1, { signatureValid: result.valid }), {});
       console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
       if (result.issues.length > 0) {
         console.log(chalk.gray("Issues:"));
@@ -21212,8 +21313,7 @@ watch
     try {
       const { attestOutput } = await import("./watch/index.js");
       const result = attestOutput(output);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Output Attestation"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n👁️  Output Attestation"), result, unverifiedClaim("watch:outputAttestation", 1), opts)) return;
       console.log(chalk.gray("Output:"), output);
       console.log(chalk.gray("Hash:"), result.hash || "N/A");
       console.log(chalk.gray("Attested:"), chalk.green("yes"));
@@ -21508,8 +21608,7 @@ product
       const { AutonomyDial } = await import("./product/index.js");
       const dial = new AutonomyDial();
       const result = dial.decide(agentId, mode);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n📦  Autonomy Decision"));
+      if (emitClaimResult(chalk.bold.yellow("\n📦  Autonomy Decision"), result, unverifiedClaim("product:autonomyDial", 1), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Mode:"), mode);
       console.log(chalk.gray("Decision:"), JSON.stringify(result, null, 2));
@@ -21950,6 +22049,8 @@ passport
       const token = JSON.parse(tokenJson);
       const result = verifyTrustToken(token, "cli-demo-secret");
       console.log(chalk.bold.cyan("\n🔑  Trust Token Verification"));
+      // The token's claims are whatever its issuer wrote; a valid MAC proves integrity, not truth.
+      printClaimResult(unverifiedClaim("passport:trust-token", Array.isArray(token.claims) ? token.claims.length : 0, { signatureValid: result.valid }), {});
       console.log(chalk.gray("Token ID:"), token.tokenId ?? "N/A");
       console.log(chalk.gray("Valid:"), result.valid ? chalk.green("✓ yes") : chalk.red("✗ no"));
       if (result.reasons.length > 0) {
@@ -21971,8 +22072,7 @@ passport
       const { translateTrustScores, TRUST_TRANSLATIONS } = await import("./passport/trustInterchange.js");
       const scores = { overall: parseFloat(opts.score) };
       const result = translateTrustScores(scores, opts.from, opts.to);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🔑  Trust Score Translation"));
+      if (emitClaimResult(chalk.bold.cyan("\n🔑  Trust Score Translation"), result, unverifiedClaim("passport:translate-score", 1), opts)) return;
       console.log(chalk.gray("From:"), opts.from);
       console.log(chalk.gray("To:"), opts.to);
       console.log(chalk.gray("Input score:"), opts.score);
@@ -24028,6 +24128,7 @@ program
     // Step 3: Results
     console.log(chalk.hex('#4AEF79')("\nStep 3: Your Results\n"));
     console.log(chalk.bold(`  Overall: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    printClaimResult(selfAnswerClaim("score:quickScore", Object.values(answers)), {});
     console.log(renderAsciiRadar(result.layerScores));
 
     if (result.gaps.length > 0) {

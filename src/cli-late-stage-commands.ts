@@ -2,6 +2,8 @@ import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import chalk from "chalk";
+import { printClaimResult, unverifiedClaim, withClaimFields } from "./cli/claimOutput.js";
+import { exampleEnvelope } from "./claims/eligibility/exampleMode.js";
 import { AgentResponderUnavailableError, resolveAgentResponder } from "./assurance/agentResponder.js";
 import inquirer from "inquirer";
 import type { Command } from "commander";
@@ -149,11 +151,12 @@ export function registerLateStageCliCommands({
       : null;
 
     if (opts.json) {
-      console.log(JSON.stringify({ plan, bundle }, null, 2));
+      console.log(JSON.stringify(withClaimFields({ plan, bundle }, exampleEnvelope("demo:prospect")), null, 2));
       return;
     }
 
     console.log(chalk.bold("\nAMC Prospect Demo - 5-minute flow\n"));
+    printClaimResult(exampleEnvelope("demo:prospect"), {});
     console.log(chalk.gray(`  Trust label: ${plan.trustLabel}`));
     console.log(chalk.gray(`  Claim boundary: ${plan.claimBoundary}\n`));
     console.log(renderProspectDemoMarkdown(plan));
@@ -279,11 +282,12 @@ export function registerLateStageCliCommands({
         if (!opts.json) {
           console.log(chalk.bold.yellow(EXAMPLE_BANNER));
           console.log(chalk.bold("\n🎮  AMC Live Demo (no-vault)\n"));
+          printClaimResult(exampleEnvelope("demo:run"), {});
           console.log(chalk.gray("  Starting an ephemeral demo workspace, upstream, and AMC gateway..."));
         }
         const result = await runDemoWithoutUserVault();
 
-        if (opts.json) { console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result }, null, 2)); return; }
+        if (opts.json) { console.log(JSON.stringify(withClaimFields({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result }, exampleEnvelope("demo:run")), null, 2)); return; }
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through an ephemeral AMC gateway`));
@@ -298,6 +302,7 @@ export function registerLateStageCliCommands({
 
       if (!opts.json) console.log(chalk.bold.yellow(EXAMPLE_BANNER));
       console.log(chalk.bold("\n🎮  AMC Live Demo\n"));
+      if (!opts.json) printClaimResult(exampleEnvelope("demo:run"), {});
       console.log(chalk.gray("  Starting demo upstream server..."));
       const upstream = await startDemoUpstream();
       try {
@@ -347,7 +352,7 @@ export function registerLateStageCliCommands({
 
         if (opts.json) {
           // The lease signs the traffic, not its truth: the result stays DEMO_ONLY.
-          console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result, trustLabel: "DEMO_ONLY" }, null, 2));
+          console.log(JSON.stringify(withClaimFields({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result, trustLabel: "DEMO_ONLY" }, exampleEnvelope("demo:run")), null, 2));
         } else {
           console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
           console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
@@ -1134,6 +1139,7 @@ export function registerLateStageCliCommands({
         try {
           const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
           console.log(out.badge);
+          printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
           return;
         } catch {
           // No cached passport — inform user to specify level
@@ -1145,6 +1151,7 @@ export function registerLateStageCliCommands({
           console.log(chalk.gray("  amc badge --format html --level 4 # HTML img tag"));
           console.log(chalk.gray("  amc badge --format url --level 3  # Raw shields.io URL"));
           console.log(chalk.gray("  amc badge --format svg --level 3  # Full SVG output"));
+          process.exitCode = 1;
           return;
         }
       }
@@ -1169,6 +1176,8 @@ export function registerLateStageCliCommands({
           console.log(`[![AMC L${level}](${shieldsUrl})](https://github.com/AgentMaturity/AgentMaturityCompass)`);
           break;
       }
+      // A level or score given on the command line is the caller's own statement. stderr keeps the badge pipeable.
+      printClaimResult(unverifiedClaim("badge", 1), { stderr: true });
     });
 
   /* ── Runtime Observability: watch, monitor, costs, guide, rate, integrations ── */

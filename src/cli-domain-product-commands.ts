@@ -1,6 +1,9 @@
 import chalk from "chalk";
 import type { Command } from "commander";
 import { toErrorMessage } from "./utils/errors.js";
+import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js";
+import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
+import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
 
 type DomainProductCliDeps = {
   product: Command;
@@ -264,9 +267,12 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       }
 
       const result = scoreIndustryPack(opts.pack as PackIdType, responses);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
+      // The same envelope scoreIndustryPack derives its claimKind and eligibleLevel from (src/domains/packSelfAssessment.ts).
+      const claim = selfAnswerClaim(`industry-pack:${pack.id}`, Object.values(responses), true);
+      if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); return; }
 
       console.log(chalk.bold("  Results:"));
+      printClaimResult(claim, opts);
       console.log(`    Pack:       ${result.packId}`);
       console.log(`    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
       const { complete, answered, total } = result.selfAssessment;
@@ -406,7 +412,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
     .action(async (opts: DomainCommandOpts) => {
       try {
         const assessment = await assessForCli(opts);
-        if (opts.json) { console.log(JSON.stringify(assessment, null, 2)); return; }
+        if (opts.json) { console.log(JSON.stringify(withClaimFields(assessment, outcomeClaim(assessment)), null, 2)); return; }
         const result = assessment.result;
         printDomainHeader("Domain Assessment", assessment);
         if (!result) { printNotEvaluated(assessment); return; }
@@ -450,7 +456,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       try {
         const assessment = await assessForCli(opts);
         const gaps = assessment.result?.complianceGaps ?? null;
-        if (opts.json) { console.log(JSON.stringify({ ...claimFields(assessment), gaps }, null, 2)); return; }
+        if (opts.json) { console.log(JSON.stringify(withClaimFields({ ...claimFields(assessment), gaps }, outcomeClaim(assessment)), null, 2)); return; }
         printDomainHeader(`Compliance Gaps (${assessment.domain})`, assessment);
         if (!gaps) { printNotEvaluated(assessment); return; }
         for (const gap of gaps) {
@@ -478,7 +484,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         const report = buildDomainReportForAgent({ agentId: opts.agent, domain, outputPath: opts.output, example: opts.example === true });
         const assessment = report.assessment;
         if (opts.json) {
-          console.log(JSON.stringify({ ...claimFields(assessment), outputPath: report.outputPath, assessment, report: report.reportObject ?? null }, null, 2));
+          console.log(JSON.stringify(withClaimFields({ ...claimFields(assessment), outputPath: report.outputPath, assessment, report: report.reportObject ?? null }, outcomeClaim(assessment)), null, 2));
           return;
         }
         printDomainHeader("Domain Report Generated", assessment);
@@ -504,7 +510,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         const { parseDomainOrThrow, runDomainAssurance } = await import("./domains/domainCliIntegration.js");
         const domain = parseDomainOrThrow(opts.domain);
         const run = runDomainAssurance(opts.agent, domain, { example: opts.example === true });
-        if (opts.json) { console.log(JSON.stringify(run, null, 2)); return; }
+        if (opts.json) { console.log(JSON.stringify(withClaimFields(run, outcomeClaim(run)), null, 2)); return; }
         printDomainHeader(`Domain Assurance (${run.domain})`, { ...run, domainName: run.domainMetadata.name });
         for (const pack of run.packRuns) {
           console.log(`  ${chalk.hex('#4AEF79')(pack.packId)} ${pack.title}`);
@@ -528,7 +534,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
       try {
         const assessment = await assessForCli(opts);
         const roadmap = assessment.result?.roadmap ?? null;
-        if (opts.json) { console.log(JSON.stringify({ ...claimFields(assessment), roadmap }, null, 2)); return; }
+        if (opts.json) { console.log(JSON.stringify(withClaimFields({ ...claimFields(assessment), roadmap }, outcomeClaim(assessment)), null, 2)); return; }
         printDomainHeader(`Domain Roadmap (${assessment.domain})`, assessment);
         if (!roadmap) { printNotEvaluated(assessment); return; }
         for (const item of roadmap) {
@@ -542,7 +548,7 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 }
 
 type DomainCommandOpts = { agent: string; domain: string; example?: boolean; json?: boolean };
-type ClaimOutcome = { status: string; reasons: string[]; claimKind: string; statusDimensions: unknown; banner?: string };
+type ClaimOutcome = { status: string; reasons: string[]; claimKind: ClaimKind; statusDimensions: StatusDimensions; banner?: string };
 
 async function assessForCli(opts: DomainCommandOpts) {
   const { assertIndustryPackAccess } = await import("./domains/industryPackEntitlement.js");
@@ -556,13 +562,18 @@ function claimFields(outcome: ClaimOutcome): ClaimOutcome {
   return { ...(banner ? { banner } : {}), status, reasons, claimKind, statusDimensions };
 }
 
+/** The claim domainCliIntegration already decided (its kind and dimensions). */
+function outcomeClaim(outcome: ClaimOutcome & { domain: string }): ClaimEnvelope {
+  return envelopeFromDimensions(`domain:${outcome.domain}`, outcome.claimKind, outcome.statusDimensions);
+}
+
 /** Example output starts and ends with the banner, so a cropped screenshot still carries it. */
 function printDomainHeader(title: string, outcome: ClaimOutcome & { agentId: string; domain: string; domainName: string }): void {
   if (outcome.banner) console.log(chalk.bold.yellow(outcome.banner));
   console.log(chalk.bold.cyan(`\n🧭  ${title}`));
+  printClaimResult(outcomeClaim(outcome), {});
   console.log(chalk.gray("Agent:"), outcome.agentId);
   console.log(chalk.gray("Domain:"), `${outcome.domainName} (${outcome.domain})`);
-  console.log(chalk.gray("Claim kind:"), outcome.claimKind);
 }
 
 function printNotEvaluated(outcome: ClaimOutcome): void {

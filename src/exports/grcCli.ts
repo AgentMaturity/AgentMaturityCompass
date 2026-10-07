@@ -2,6 +2,7 @@ import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import chalk from "chalk";
 import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/index.js";
+import { printClaimResult, withClaimFields } from "../cli/claimOutput.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
@@ -57,11 +58,11 @@ export function runGrcExportCli(params: {
     writeFileAtomic(resolve(params.workspace, params.sarif), JSON.stringify(grcManifestToSarif(manifest), null, 2), 0o644);
   }
   if (params.json) {
-    console.log(JSON.stringify(manifest, null, 2));
+    console.log(JSON.stringify(withClaimFields(manifest, manifest.run.claim), null, 2));
     return;
   }
   console.log(`Run ${manifest.runId} (agent ${manifest.agentId}) · seal ${sealVerified ? "verified" : "not verified"}`);
-  console.log(formatClaimLabel(renderClaimLabel(manifest.run.claim), "cli"));
+  printClaimResult(manifest.run.claim, {});
   console.log(chalk.gray("Framework:"), manifest.framework, chalk.gray("(experimental mapping, not expert-reviewed)"));
   for (const c of manifest.controls) {
     console.log(`  ${c.controlId} not evaluated — ${c.title}`);

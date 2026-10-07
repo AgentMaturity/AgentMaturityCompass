@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import chalk from "chalk";
+import { printClaimResult, unverifiedClaim, withClaimFields } from "../cli/claimOutput.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { analyzeMcpSecurity } from "./mcpSecurityAnalyzer.js";
 
@@ -9,13 +10,16 @@ export function runMcpAnalyzeCli(params: { pathOrUrl: string; json?: boolean; ou
     writeFileAtomic(resolve(process.cwd(), params.out), JSON.stringify(result, null, 2), 0o644);
     console.log(chalk.green(`MCP security scan saved to: ${params.out}`));
   }
+  // A static scan of configuration files: self-reported, level 1 at most (docs/CLAIM_KINDS.md).
+  const claim = unverifiedClaim("shield:mcpSecurity", 1, { method: "keyword_match" });
   if (params.json) {
-    console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
     return;
   }
   const levelColors: Record<string, string> = { L5: "#4c1", L4: "#2ecc40", L3: "#3d9970", L2: "#ff851b", L1: "#e4811b", L0: "#e05d44" };
   const lc = levelColors[result.securityLevel] ?? "#555";
   console.log(chalk.bold.cyan("\n🛡️  MCP Security Scan"));
+  printClaimResult(claim, params);
   console.log(chalk.gray("Path:"), params.pathOrUrl);
   console.log(chalk.gray("Security Level:"), chalk.hex(lc).bold(`${result.securityLevel} — ${result.riskLabel}`));
   console.log(chalk.gray("Score:"), `${result.securityScore}/100`);

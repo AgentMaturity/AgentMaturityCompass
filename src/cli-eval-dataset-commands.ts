@@ -8,6 +8,7 @@
 
 import type { Command } from "commander";
 import chalk from "chalk";
+import { printClaimResult, runClaimEnvelope, withClaimFields } from "./cli/claimOutput.js";
 
 export function registerEvalDatasetCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const dataset = program
@@ -411,11 +412,13 @@ export function registerLiteScoreCommands(program: Command): void {
           fullReportRunId: report.runId,
         };
         
+        // A subset of the fresh run: it carries the run's claim.
+        const claim = runClaimEnvelope(report);
         if (opts.json) {
-          console.log(JSON.stringify(liteReport, null, 2));
+          console.log(JSON.stringify(withClaimFields(liteReport, claim), null, 2));
           return;
         }
-        
+        printClaimResult(claim, opts);
         console.log(chalk.bold(`  Lite Maturity Level: ${liteLevel}`));
         console.log(`  Lite Integrity Index: ${(liteIndex * 100).toFixed(1)}%`);
         console.log(`  Average Level: ${liteAvg.toFixed(2)} / 5.0`);
