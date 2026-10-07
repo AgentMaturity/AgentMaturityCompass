@@ -25,7 +25,8 @@ export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   LEGACY_1X_UNVERIFIED: "results stored by AMC 1.x were never verified",
   NOT_APPLICABLE: "the control does not apply",
   APPLICABILITY_UNRESOLVED: "no applicability decision is recorded",
-  EVIDENCE_NOT_CLAIM_READY: "the run did not meet AMC's evidence-readiness gate for claims"
+  EVIDENCE_NOT_CLAIM_READY: "the run did not meet AMC's evidence-readiness gate for claims",
+  RESULT_NOT_BOUND: "this result is not yet bound to claim-eligible evidence"
 };
 
 // These explain the kind or the level, never why a result was withheld.
@@ -63,6 +64,14 @@ export function renderClaimLabel(envelope: ClaimEnvelope): ClaimLabel {
   };
   const label = { kindLabel, line: "", dimensions };
   return { ...label, line: fields(label).map(([name, value]) => `${name}: ${value}`).join(" · ") };
+}
+
+/** What MCP, API and Studio attach to a result: the kind, the five dimensions and the label line. */
+export interface ClaimFields { claimKind: ClaimKind; statusDimensions: StatusDimensions; claimLabel: string }
+
+export function claimFields(envelope: ClaimEnvelope): ClaimFields {
+  return { claimKind: envelope.claimKind, statusDimensions: envelope.statusDimensions,
+    claimLabel: renderClaimLabel(envelope).line };
 }
 
 function escapeHtml(text: string): string {

@@ -3,7 +3,7 @@
  * src/score/units.ts, stamped self_reported and capped at L1 by the claim envelope.
  */
 import { envelopeForSelfAssessment } from "../claims/eligibility/adapters.js";
-import type { ClaimKind } from "../claims/eligibility/types.js";
+import type { ClaimEnvelope, ClaimKind } from "../claims/eligibility/types.js";
 import { likert, likertToPercent, percent, percentToLevel, type Likert1to5 } from "../score/units.js";
 import type { IndustryPack } from "./industryPacks.js";
 
@@ -21,14 +21,23 @@ export interface SelfAssessedPack {
   eligibleLevel: number | null;
 }
 
+function givenAnswers(pack: IndustryPack, responses: Record<string, number>): Likert1to5[] {
+  return pack.questions.filter((q) => responses[q.id] !== undefined).map((q) => likert(responses[q.id]!));
+}
+
+/** The claim envelope for self-declared pack answers: a regulated self-assessment. */
+export function packSelfAssessmentEnvelope(pack: IndustryPack, responses: Record<string, number>, now: number): ClaimEnvelope {
+  return envelopeForSelfAssessment({ producer: `industry-pack:${pack.id}`, regulated: true, answers: givenAnswers(pack, responses), now });
+}
+
 /** Validates answers as Likert 1-5 (anything else throws) and scores them through src/score/units.ts. */
 export function selfAssessPack(pack: IndustryPack, responses: Record<string, number>, now: number): SelfAssessedPack {
-  const given = pack.questions.filter((q) => responses[q.id] !== undefined).map((q) => likert(responses[q.id]!));
+  const given = givenAnswers(pack, responses);
   const answers = pack.questions.map((q) => likert(responses[q.id] ?? 1));
   const possible = pack.questions.reduce((sum, q) => sum + q.weight, 0);
   const earned = pack.questions.reduce((sum, q, i) => sum + q.weight * likertToPercent(answers[i]!), 0);
   const percentage = possible > 0 ? Math.round(earned / possible) : 0;
-  const envelope = envelopeForSelfAssessment({ producer: `industry-pack:${pack.id}`, regulated: true, answers: given, now });
+  const envelope = packSelfAssessmentEnvelope(pack, responses, now);
   return {
     answers,
     percentage,
