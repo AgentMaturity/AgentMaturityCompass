@@ -85,6 +85,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Published schemas match the enforced schemas (P1-01)
+        run: npm run check:schemas
+
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
 

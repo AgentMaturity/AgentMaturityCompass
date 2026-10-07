@@ -1,0 +1,32 @@
+{
+  "list": {
+    "type": "amc.trust-list",
+    "version": 1,
+    "listId": "example-operator",
+    "sequence": 1,
+    "issuedAt": "2026-01-01T00:00:00.000Z",
+    "expiresAt": "2027-01-01T00:00:00.000Z",
+    "entries": [
+      {
+        "keyId": "f65a514b49ce2b4bcd646925699d0674b8ef9c294398531f7a00da753fd32efc",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAiwbWVK9w21cVwXO7OTk71wtwJxialx59GCl1fuPKLn4=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "Example Assessor",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": null,
+        "source": "operator"
+      }
+    ],
+    "distrust": []
+  },
+  "signatures": [
+    {
+      "keyId": "f65a514b49ce2b4bcd646925699d0674b8ef9c294398531f7a00da753fd32efc",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAiwbWVK9w21cVwXO7OTk71wtwJxialx59GCl1fuPKLn4=\n-----END PUBLIC KEY-----\n",
+      "signature": "6NQXnbR1Zn6eYUY6HQ60GCMEO+nELn5qi6h1dGhia3iMnYVRH9ok5blCQCgcj2saMvNBCXqGRAA+HkoUxXYvBQ=="
+    }
+  ]
+}

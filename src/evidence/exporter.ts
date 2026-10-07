@@ -2,6 +2,9 @@ import { escapePdfText as escapeSharedPdfText, renderPdfFromLines as renderShare
 import Database from "better-sqlite3";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { claimKindFromTrustTier, type ClaimKind } from "../claims/eligibility/index.js";
+import { effectiveTrustTier } from "../claims/evidenceProvenance.js";
+import { assertContract } from "../contracts/index.js";
 import { openLedger } from "../ledger/ledger.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -17,6 +20,8 @@ export interface EvidenceExportRecord {
   runtime: string;
   eventType: string;
   actorId: string;
+  /** What the row may claim: synthetic rows are examples, only AMC-observed rows are observed. */
+  claimKind: ClaimKind;
   payloadSha256: string;
   prevEventHash: string;
   eventHash: string;
@@ -329,7 +334,8 @@ export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): 
         correctedTs: null
       };
 
-      return {
+      const tier = effectiveTrustTier(row, { trustList: null });
+      const record: EvidenceExportRecord = {
         eventId: row.id,
         ts: row.ts,
         isoTs: new Date(row.ts).toISOString(),
@@ -337,6 +343,7 @@ export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): 
         runtime: row.runtime,
         eventType: row.event_type,
         actorId: extractActorId(meta, row.session_id),
+        claimKind: tier === null ? "synthetic_example" : claimKindFromTrustTier(tier).claimKind,
         payloadSha256: row.payload_sha256,
         prevEventHash: row.prev_event_hash,
         eventHash: row.event_hash,
@@ -353,6 +360,13 @@ export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): 
         rationaleChain: includeRationale ? rationale.chain : [],
         meta
       };
+      // The published contract is the export's own check: a row it does not describe is refused, never written.
+      try {
+        assertContract("evidence-event", record);
+      } catch (error) {
+        throw new Error(`export refused: row ${row.id} ${error instanceof Error ? error.message : String(error)}`);
+      }
+      return record;
     });
 
     const agentId = params.agentId?.trim();

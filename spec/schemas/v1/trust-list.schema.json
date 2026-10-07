@@ -1,0 +1,268 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "list": {
+      "additionalProperties": false,
+      "properties": {
+        "distrust": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "distrustedFrom": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "keyId": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "reason": {
+                "enum": [
+                  "key-compromise",
+                  "exposed-in-public-history",
+                  "superseded",
+                  "unspecified"
+                ],
+                "type": "string"
+              },
+              "reference": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "keyId",
+              "distrustedFrom",
+              "reason",
+              "note",
+              "source"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "entries": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "algorithm": {
+                "const": "ed25519",
+                "type": "string"
+              },
+              "allowKeyHistory": {
+                "type": "boolean"
+              },
+              "authority": {
+                "additionalProperties": false,
+                "properties": {
+                  "captureMethods": {
+                    "items": {
+                      "enum": [
+                        "producer-callback",
+                        "governed-capture"
+                      ],
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "maxTrustTier": {
+                    "enum": [
+                      "ATTESTED",
+                      "OBSERVED"
+                    ],
+                    "type": "string"
+                  },
+                  "producers": {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "producers",
+                  "captureMethods",
+                  "maxTrustTier"
+                ],
+                "type": "object"
+              },
+              "keyId": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "publicKeyPem": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              "purposes": {
+                "items": {
+                  "enum": [
+                    "ledger-row",
+                    "receipt",
+                    "artifact-seal",
+                    "revocation-list",
+                    "config-signature",
+                    "lease",
+                    "session",
+                    "release",
+                    "notary",
+                    "evidence-authority",
+                    "independent-attestation",
+                    "trust-list-root"
+                  ],
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "revocationReason": {
+                "enum": [
+                  "superseded",
+                  "cessation",
+                  "key-compromise",
+                  "unspecified"
+                ],
+                "type": "string"
+              },
+              "revokedAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "source": {
+                "pattern": "^(operator|amc-project|imported:.+)$",
+                "type": "string"
+              },
+              "subject": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "validFrom": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "validTo": {
+                "anyOf": [
+                  {
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "keyId",
+              "algorithm",
+              "publicKeyPem",
+              "purposes",
+              "subject",
+              "validFrom",
+              "validTo",
+              "source"
+            ],
+            "type": "object"
+          },
+          "maxItems": 4096,
+          "type": "array"
+        },
+        "expiresAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "issuedAt": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "listId": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
+          "type": "string"
+        },
+        "sequence": {
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "type": "integer"
+        },
+        "type": {
+          "const": "amc.trust-list",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "type": "number"
+        }
+      },
+      "required": [
+        "type",
+        "version",
+        "listId",
+        "sequence",
+        "issuedAt",
+        "expiresAt",
+        "entries",
+        "distrust"
+      ],
+      "type": "object"
+    },
+    "signatures": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "keyId": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "publicKeyPem": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "type": "string"
+          },
+          "signature": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "keyId",
+          "publicKeyPem",
+          "signature"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "list",
+    "signatures"
+  ],
+  "title": "AMC Signed Trust List",
+  "type": "object"
+}

@@ -1,0 +1,71 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "alg": {
+      "const": "ed25519",
+      "type": "string"
+    },
+    "fingerprint": {
+      "maxLength": 64,
+      "minLength": 64,
+      "type": "string"
+    },
+    "pubkeyB64": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sigB64": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "signedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "signer": {
+      "properties": {
+        "attestationLevel": {
+          "enum": [
+            "SOFTWARE",
+            "HARDWARE"
+          ],
+          "type": "string"
+        },
+        "notaryFingerprint": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "VAULT",
+            "NOTARY"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "attestationLevel"
+      ],
+      "type": "object"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "alg",
+    "pubkeyB64",
+    "fingerprint",
+    "sigB64",
+    "signedTs",
+    "signer"
+  ],
+  "title": "AMC Signature Envelope",
+  "type": "object"
+}

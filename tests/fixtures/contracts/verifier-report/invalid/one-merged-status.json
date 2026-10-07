@@ -1,0 +1,58 @@
+{
+  "type": "amc.verifier-report",
+  "version": 1,
+  "artifact": {
+    "kind": "amccert",
+    "path": "agent.amccert",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "verifier": {
+    "name": "agent-maturity-compass",
+    "version": "2.0.0"
+  },
+  "verifiedAt": "2026-02-01T00:00:00.000Z",
+  "asOf": "2026-02-01T00:00:00.000Z",
+  "integrity": {
+    "status": "pass",
+    "errors": []
+  },
+  "issuerAdmission": {
+    "status": "pass",
+    "signatures": [
+      {
+        "signature": "cert.sig",
+        "purpose": "artifact-seal",
+        "keyId": "f65a514b49ce2b4bcd646925699d0674b8ef9c294398531f7a00da753fd32efc",
+        "status": "admitted",
+        "source": "trust-list",
+        "listId": "example-operator",
+        "timeBasis": null,
+        "detail": null
+      }
+    ]
+  },
+  "anchoring": {
+    "status": "not-applicable",
+    "detail": null
+  },
+  "scope": {
+    "status": "not-evaluated",
+    "reasons": []
+  },
+  "freshness": {
+    "status": "not-evaluated",
+    "reasons": []
+  },
+  "completeness": {
+    "status": "not-evaluated",
+    "reasons": []
+  },
+  "satisfaction": {
+    "status": "not-evaluated",
+    "reasons": []
+  },
+  "trusted": true,
+  "overrides": [],
+  "warnings": [],
+  "status": "PASS"
+}

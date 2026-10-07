@@ -1,0 +1,100 @@
+{
+  "schemas": [
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
+      "name": "amcaudit.schema.json",
+      "sha256": "f77547ee3303b2be16ae1ba3c97b907b9bb46fc24f3e0eadac412edeb151f595"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
+      "name": "amcbench.schema.json",
+      "sha256": "5a55092f837c8cb29b8eef4df6c79dff81e9cbce0c39c40685349989131c1127"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",
+      "name": "amccert.schema.json",
+      "sha256": "48ecf24965fb6bba6c0c1eb1cfe7d3ff22b23bc6f05d2a8f283adc2f5317aa0a"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
+      "name": "amcpass.schema.json",
+      "sha256": "5a558ea9b0b7dc200798481d8b15255c3b22e2165a80b1da668eebc83007188e"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
+      "name": "amcprompt.schema.json",
+      "sha256": "ac9ea37f606dc1c49190865b3d990af6b0137712afc790593a2497fa6e272a4e"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/amcproof.schema.json",
+      "name": "amcproof.schema.json",
+      "sha256": "6a646762e364bf1419853e74a652f7aad37180ee08b7b5c112999f5c0478d8dd"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
+      "name": "authorization-record.schema.json",
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
+      "name": "claim-envelope.schema.json",
+      "sha256": "b31dbc4986ae942e292b1fcb059b92b8dcd9be01430aee1cddba971aeb3575b0"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",
+      "name": "control-result.schema.json",
+      "sha256": "f0c65d000622ab671c15a00f348e6d62e668b3e178a8c6529522fb46620e75b6"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
+      "name": "evidence-event.schema.json",
+      "sha256": "16a8040bab690aa4eae406896544aa67edb39d25b7a96995f74cd3536de593b5"
+    },
+    {
+      "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
+      "name": "external-evidence.schema.json",
+      "sha256": "62a9620f9b866cae338399e1388e46a24ff62cfc7c8d00789a47a64aaab6e023"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
+      "name": "legacy-receipt.schema.json",
+      "sha256": "ca6d3edac1871d0c24c1bc0a9904a23071376dd4006656f4df79b963df8beca5"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
+      "name": "receipt.schema.json",
+      "sha256": "cca6d15e3ac4dc4c78fd99ab32cdb499ba88f5db498c62d7e6be6d25dcbaa7c8"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
+      "name": "registry.bench.schema.json",
+      "sha256": "29de696c9b0e7386cccaa3444d3ed8c6a78ead43ce62c891b46b4b6a1df8aaf0"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/registry.passport.schema.json",
+      "name": "registry.passport.schema.json",
+      "sha256": "14c67aa3f3c81ca4dc1d8460b305e4997bbaaa35cedb231e279756972b4770b9"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
+      "name": "scoped-attestation.schema.json",
+      "sha256": "dcfbf0beade62578c1fe69e83d5ad241e443bcaed1513c43196d6bed2c6da5df"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",
+      "name": "signature-envelope.schema.json",
+      "sha256": "52a074984a9c3aff81c3ded09929b1095479027e202c96660ca9ec74a4eb28b8"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
+      "name": "trust-list.schema.json",
+      "sha256": "084837198e5c46360b39dfc00da1829a8c142132aa0b7e2e3d725e813547fa4d"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
+      "name": "verifier-report.schema.json",
+      "sha256": "0993d1049f672ab4c6a454bbb6a70854c12df49f9107dd7a9f4ff500ffdab17c"
+    }
+  ],
+  "version": 1
+}

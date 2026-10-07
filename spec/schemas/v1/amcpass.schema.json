@@ -1,0 +1,950 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bindings": {
+      "properties": {
+        "bankSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "canonSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "mechanicTargetsSha256": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "notaryFingerprint": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "passportPolicySha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "trustMode": {
+          "enum": [
+            "LOCAL_VAULT",
+            "NOTARY"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "passportPolicySha256",
+        "canonSha256",
+        "bankSha256",
+        "trustMode"
+      ],
+      "type": "object"
+    },
+    "checkpoints": {
+      "properties": {
+        "cgxPackSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "lastAssuranceCert": {
+          "properties": {
+            "issuedTs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "riskAssuranceScore": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "INSUFFICIENT_EVIDENCE"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status"
+          ],
+          "type": "object"
+        },
+        "lastAuditBinder": {
+          "properties": {
+            "generatedTs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "lastBench": {
+          "properties": {
+            "generatedTs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "lastValueSnapshot": {
+          "properties": {
+            "generatedTs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "promptPackSha256": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "cgxPackSha256",
+        "lastAssuranceCert",
+        "lastBench",
+        "lastAuditBinder",
+        "lastValueSnapshot"
+      ],
+      "type": "object"
+    },
+    "expiresTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "generatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "governanceSummary": {
+      "properties": {
+        "approvals": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "leases": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "modelAllowlist": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "pluginsIntegrity": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "promptEnforcement": {
+          "enum": [
+            "ON",
+            "OFF",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "providerAllowlist": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "toolAllowlist": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        },
+        "truthguard": {
+          "enum": [
+            "ENFORCE",
+            "WARN",
+            "OFF",
+            "UNKNOWN"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "promptEnforcement",
+        "truthguard",
+        "providerAllowlist",
+        "modelAllowlist",
+        "toolAllowlist",
+        "approvals",
+        "leases",
+        "pluginsIntegrity"
+      ],
+      "type": "object"
+    },
+    "maturity": {
+      "properties": {
+        "byFiveLayers": {
+          "properties": {
+            "culture": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "leadership": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "resilience": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "skills": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "strategicOps": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "strategicOps",
+            "leadership",
+            "culture",
+            "resilience",
+            "skills"
+          ],
+          "type": "object"
+        },
+        "overall": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questionExplainabilityFailClosed": {
+          "type": "boolean"
+        },
+        "questionExplainabilityHash": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "questionExplainabilityReplayable": {
+          "type": "boolean"
+        },
+        "questionExplainabilitySummary": {
+          "properties": {
+            "acceptedEvidenceCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "failClosed": {
+              "type": "boolean"
+            },
+            "failClosedThresholdCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "rejectedEvidenceCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "rejectedEvidenceReasonCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "replayable": {
+              "type": "boolean"
+            },
+            "reproducibleEvalPackCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "rowCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "rows": {
+              "items": {
+                "properties": {
+                  "acceptedEvidenceIds": {
+                    "items": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "questionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "rejectedEvidenceReasons": {
+                    "items": {
+                      "properties": {
+                        "evidenceId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "reason": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "evidenceId",
+                        "reason"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "repairHint": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "rowHash": {
+                    "maxLength": 64,
+                    "minLength": 64,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "ready",
+                      "fail_closed"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "questionId",
+                  "acceptedEvidenceIds",
+                  "rejectedEvidenceReasons",
+                  "repairHint",
+                  "status",
+                  "rowHash"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "signedEvidenceRowCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sourceRefCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "sourceRefs": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "surfaces": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replayable",
+            "failClosed",
+            "rowCount",
+            "signedEvidenceRowCount",
+            "acceptedEvidenceCount",
+            "rejectedEvidenceCount",
+            "rejectedEvidenceReasonCount",
+            "reproducibleEvalPackCount",
+            "failClosedThresholdCount",
+            "surfaces",
+            "sourceRefs"
+          ],
+          "type": "object"
+        },
+        "questionScores42": {
+          "items": {
+            "properties": {
+              "qIdHash": {
+                "pattern": "^q_[a-f0-9]{8,64}$",
+                "type": "string"
+              },
+              "score": {
+                "maximum": 5,
+                "minimum": 0,
+                "type": "number"
+              }
+            },
+            "required": [
+              "qIdHash",
+              "score"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "OK",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "type": "string"
+        },
+        "unknownQuestionsCount": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "status",
+        "overall",
+        "byFiveLayers",
+        "unknownQuestionsCount"
+      ],
+      "type": "object"
+    },
+    "passportId": {
+      "pattern": "^pass_[A-Za-z0-9_-]{8,}$",
+      "type": "string"
+    },
+    "proofBindings": {
+      "properties": {
+        "calculationManifestSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "includedEventProofIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "merkleRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "transparencyRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        }
+      },
+      "required": [
+        "transparencyRootSha256",
+        "merkleRootSha256",
+        "includedEventProofIds",
+        "calculationManifestSha256"
+      ],
+      "type": "object"
+    },
+    "scope": {
+      "properties": {
+        "idHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "WORKSPACE",
+            "NODE",
+            "AGENT"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "idHash"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "properties": {
+        "label": {
+          "enum": [
+            "VERIFIED",
+            "INFORMATIONAL",
+            "UNTRUSTED"
+          ],
+          "type": "string"
+        },
+        "reasons": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "label",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "strategyFailureRisks": {
+      "properties": {
+        "clarityPathRisk": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "digitalDualityRisk": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "economicSignificanceRisk": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ecosystemFocusRisk": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "riskAssuranceRisk": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ecosystemFocusRisk",
+        "clarityPathRisk",
+        "economicSignificanceRisk",
+        "riskAssuranceRisk",
+        "digitalDualityRisk"
+      ],
+      "type": "object"
+    },
+    "trust": {
+      "properties": {
+        "correlationRatio": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "evidenceCoverage": {
+          "properties": {
+            "attestedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "observedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "selfReportedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "observedShare",
+            "attestedShare",
+            "selfReportedShare"
+          ],
+          "type": "object"
+        },
+        "integrityIndex": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "notary": {
+          "properties": {
+            "attestationAgeMinutes": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "fingerprint": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "enabled"
+          ],
+          "type": "object"
+        },
+        "trustLabel": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "integrityIndex",
+        "correlationRatio",
+        "trustLabel",
+        "evidenceCoverage",
+        "notary"
+      ],
+      "type": "object"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    },
+    "valueDimensions": {
+      "properties": {
+        "brandValue": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "economicValue": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "emotionalValue": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "functionalValue": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lifetimeValue": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "valueScore": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "emotionalValue",
+        "functionalValue",
+        "economicValue",
+        "brandValue",
+        "lifetimeValue",
+        "valueScore"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "v",
+    "passportId",
+    "generatedTs",
+    "scope",
+    "trust",
+    "status",
+    "maturity",
+    "strategyFailureRisks",
+    "valueDimensions",
+    "checkpoints",
+    "governanceSummary",
+    "bindings",
+    "proofBindings"
+  ],
+  "title": "AMC Passport",
+  "type": "object"
+}

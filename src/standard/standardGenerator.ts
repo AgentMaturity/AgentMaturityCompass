@@ -7,20 +7,15 @@ import { signFileWithAuditor, signSerializedPayloadWithAuditor, verifySignedFile
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { benchArtifactSchema } from "../bench/benchSchema.js";
-import { benchRegistryIndexSchema } from "../bench/benchRegistrySchema.js";
-import { promptPackSchema } from "../prompt/promptPackSchema.js";
-import { assuranceCertSchema } from "../assurance/assuranceSchema.js";
-import { binderJsonSchema } from "../audit/binderSchema.js";
-import { passportJsonSchema } from "../passport/passportSchema.js";
-import { domainProofArtifactSchema } from "../domainProof/domainProofArtifact.js";
-import { externalEvidenceProfileSchema, validateExternalEvidenceProfile } from "./externalEvidenceProfile.js";
+import { validateExternalEvidenceProfile } from "./externalEvidenceProfile.js";
+import { publishedSchemas, serializeSchema } from "../contracts/index.js";
 import { inspectBenchArtifact } from "../bench/benchArtifact.js";
 import { inspectPromptPackArtifact } from "../prompt/promptPackArtifact.js";
 import { verifyAssuranceCertificateFile } from "../assurance/assuranceVerifier.js";
 import { verifyAuditBinderFile } from "../audit/binderVerifier.js";
 import { inspectPassportArtifact } from "../passport/passportArtifact.js";
 import {
+  STANDARD_ARTIFACT_SCHEMAS,
   STANDARD_SCHEMA_NAMES,
   standardBundleSignatureSchema,
   standardMetaSchema,
@@ -37,114 +32,11 @@ import {
 
 type SchemaName = (typeof STANDARD_SCHEMA_NAMES)[number];
 
-function schemaByName(name: SchemaName): Record<string, unknown> {
-  if (name === "external-evidence.schema.json") return externalEvidenceProfileSchema;
-  const common = {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-    // The published standard is intentionally permissive so third parties can
-    // extend it. AMC itself validates against stricter internal zod schemas, so
-    // passing this schema does NOT mean an artifact would be accepted by AMC.
-    //
-    // That caveat used to live only in this comment, which no consumer of the
-    // published .schema.json ever sees — and the bundle is signed, so it reads
-    // as an authoritative statement of what AMC requires. It now travels with
-    // the artifact.
-    $comment:
-      "Permissive interchange schema. Validating against this schema does NOT " +
-      "mean AMC would accept the artifact: AMC enforces stricter internal " +
-      "schemas, including field-level constraints this file does not express. " +
-      "Use `amc standard validate` for an authoritative check.",
-    additionalProperties: true
-  };
-  if (name === "amcbench.schema.json") {
-    return {
-      ...common,
-      title: "AMC Bench Artifact",
-      type: "object",
-      required: ["v", "benchId", "generatedTs", "scope", "evidence", "metrics", "proofBindings"]
-    };
-  }
-  if (name === "amcprompt.schema.json") {
-    return {
-      ...common,
-      title: "AMC Prompt Pack",
-      type: "object",
-      required: ["v", "packId", "generatedTs", "templateId", "agent", "bindings", "northstar"]
-    };
-  }
-  if (name === "amccert.schema.json") {
-    return {
-      ...common,
-      title: "AMC Assurance Certificate",
-      type: "object",
-      required: ["v", "certId", "issuedTs", "scope", "runId", "status", "gates", "bindings", "proofBindings"]
-    };
-  }
-  if (name === "amcaudit.schema.json") {
-    return {
-      ...common,
-      title: "AMC Audit Binder",
-      type: "object",
-      required: ["v", "binderId", "generatedTs", "scope", "trust", "sections", "proofBindings"]
-    };
-  }
-  if (name === "amcpass.schema.json") {
-    return {
-      ...common,
-      title: "AMC Passport",
-      type: "object",
-      required: [
-        "v",
-        "passportId",
-        "generatedTs",
-        "scope",
-        "trust",
-        "status",
-        "maturity",
-        "strategyFailureRisks",
-        "valueDimensions",
-        "checkpoints",
-        "governanceSummary",
-        "bindings",
-        "proofBindings"
-      ]
-    };
-  }
-  if (name === "amcproof.schema.json") {
-    return {
-      ...common,
-      title: "AMC Domain Proof Artifact",
-      type: "object",
-      required: [
-        "v",
-        "proofId",
-        "generatedTs",
-        "proofClass",
-        "claimText",
-        "sourceManifestHash",
-        "formalSpecHash",
-        "ruleRefs",
-        "constraintsChecked",
-        "result",
-        "humanReview",
-        "proofBindings"
-      ]
-    };
-  }
-  if (name === "registry.bench.schema.json") {
-    return {
-      ...common,
-      title: "AMC Bench Registry Index",
-      type: "object",
-      required: ["v", "registry", "benches"]
-    };
-  }
-  return {
-    ...common,
-    title: "AMC Passport Registry Index",
-    type: "object",
-    required: ["v", "registry", "passports"]
-  };
+/** The published schema, byte for byte the one in spec/schemas/v1/. */
+function schemaBytes(name: SchemaName): string {
+  const published = publishedSchemas().find((row) => row.name === name);
+  if (!published) throw new Error(`no published schema for ${name}`);
+  return serializeSchema(published.schema);
 }
 
 function schemaFilePath(workspace: string, name: SchemaName): string {
@@ -186,42 +78,7 @@ function validateSchemaPayload(name: SchemaName, payload: unknown): void {
     if (errors.length) throw new Error(errors.join("; "));
     return;
   }
-  if (name === "amcbench.schema.json") {
-    benchArtifactSchema.parse(payload);
-    return;
-  }
-  if (name === "amcprompt.schema.json") {
-    promptPackSchema.parse(payload);
-    return;
-  }
-  if (name === "amccert.schema.json") {
-    assuranceCertSchema.parse(payload);
-    return;
-  }
-  if (name === "amcaudit.schema.json") {
-    binderJsonSchema.parse(payload);
-    return;
-  }
-  if (name === "amcpass.schema.json") {
-    passportJsonSchema.parse(payload);
-    return;
-  }
-  if (name === "amcproof.schema.json") {
-    domainProofArtifactSchema.parse(payload);
-    return;
-  }
-  if (name === "registry.bench.schema.json") {
-    benchRegistryIndexSchema.parse(payload);
-    return;
-  }
-  // registry.passport.schema.json - lightweight local schema.
-  if (!payload || typeof payload !== "object") {
-    throw new Error("registry passport payload must be an object");
-  }
-  const row = payload as Record<string, unknown>;
-  if (row.v !== 1 || typeof row.registry !== "object" || !Array.isArray(row.passports)) {
-    throw new Error("registry passport payload missing required keys");
-  }
+  STANDARD_ARTIFACT_SCHEMAS[name].schema.parse(payload);
 }
 
 function extractPayloadForValidation(name: SchemaName, file: string, workspace: string): unknown {
@@ -266,7 +123,7 @@ export function generateStandardSchemas(workspace: string): {
   for (const name of STANDARD_SCHEMA_NAMES) {
     const path = schemaFilePath(workspace, name);
     ensureDir(join(path, ".."));
-    writeFileAtomic(path, `${canonicalize(schemaByName(name))}\n`, 0o644);
+    writeFileAtomic(path, schemaBytes(name), 0o644);
   }
   const meta = schemaManifest(workspace);
   const metaPath = standardMetaPath(workspace);

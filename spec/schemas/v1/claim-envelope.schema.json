@@ -1,0 +1,271 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claimKind": {
+      "enum": [
+        "synthetic_example",
+        "self_reported",
+        "observed",
+        "independently_reviewed"
+      ],
+      "type": "string"
+    },
+    "eligibleLevel": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "entitlement": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "active"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "evidenceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "legacy": {
+          "additionalProperties": false,
+          "properties": {
+            "originalTier": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "version"
+          ],
+          "type": "object"
+        },
+        "method": {
+          "enum": [
+            "synthetic",
+            "numeric_self_answer",
+            "keyword_match",
+            "unkeyed_checksum",
+            "path_presence",
+            "runtime_observation",
+            "executed_test",
+            "human_review"
+          ],
+          "type": "string"
+        },
+        "producer": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "producer",
+        "method",
+        "evidenceRefs"
+      ],
+      "type": "object"
+    },
+    "reasons": {
+      "items": {
+        "enum": [
+          "SYNTHETIC_VALUES",
+          "SELF_REPORTED_NO_POSITIVE_STATUS",
+          "SELF_REPORTED_LEVEL_CAP",
+          "WEAK_METHOD",
+          "EMPTY_EVIDENCE",
+          "UNBOUND_EVIDENCE",
+          "STALE_EVIDENCE",
+          "CONTRADICTORY_EVIDENCE",
+          "CROSS_SCOPE_EVIDENCE",
+          "SIGNATURE_INVALID",
+          "ISSUER_NOT_PINNED",
+          "REVIEW_NOT_INDEPENDENT",
+          "LEGACY_1X_UNVERIFIED",
+          "NOT_APPLICABLE",
+          "APPLICABILITY_UNRESOLVED",
+          "EVIDENCE_NOT_CLAIM_READY",
+          "RESULT_NOT_BOUND"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "statusDimensions": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "applicable",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "rationale": {
+                  "type": "string"
+                },
+                "state": {
+                  "const": "not_applicable",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state",
+                "rationale"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                },
+                "state": {
+                  "const": "unresolved",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state",
+                "reason"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "enforcement": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "none",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "advisory",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "observed",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "boundary": {
+                  "type": "string"
+                },
+                "state": {
+                  "const": "enforced",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state",
+                "boundary"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "evidence": {
+          "enum": [
+            "sufficient",
+            "incomplete",
+            "stale",
+            "contradictory",
+            "untrusted"
+          ],
+          "type": "string"
+        },
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ],
+          "type": "string"
+        },
+        "review": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "expired"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "applicability",
+        "evidence",
+        "result",
+        "enforcement",
+        "review"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "claimKind",
+    "statusDimensions",
+    "provenance",
+    "eligibleLevel",
+    "reasons"
+  ],
+  "title": "AMC Claim Envelope",
+  "type": "object"
+}

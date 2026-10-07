@@ -1,0 +1,357 @@
+{
+  "$comment": "Shape validation does not establish provenance authority. Use verifyExternalEvidence with independently admitted authority keys. Import signatures cannot elevate source trust.",
+  "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "events": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "maxLength": 16384,
+                  "type": "string"
+                },
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "maxProperties": 256,
+            "propertyNames": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "amount": {
+                    "maxLength": 128,
+                    "pattern": "^\\d+(?:\\.\\d+)?$",
+                    "type": "string"
+                  },
+                  "asOf": {
+                    "format": "date-time",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+                    "type": "string"
+                  },
+                  "currency": {
+                    "pattern": "^[A-Z]{3}$",
+                    "type": "string"
+                  },
+                  "source": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "source",
+                  "asOf"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "durationNs": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "input",
+              "output",
+              "tool-call",
+              "tool-result",
+              "error",
+              "cancel",
+              "metadata"
+            ]
+          },
+          "outcome": {
+            "enum": [
+              "success",
+              "failure",
+              "cancelled",
+              "unknown",
+              null
+            ]
+          },
+          "parentId": {
+            "anyOf": [
+              {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sourceTime": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "toolCallId": {
+            "anyOf": [
+              {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "parentId",
+          "toolCallId",
+          "kind",
+          "outcome",
+          "sourceTime",
+          "durationNs",
+          "cost",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "maxItems": 10000,
+      "type": "array"
+    },
+    "normalization": {
+      "additionalProperties": false,
+      "properties": {
+        "ingestedAt": {
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+          "type": "string"
+        },
+        "losses": {
+          "items": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 256,
+          "type": "array"
+        },
+        "normalizedSha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "normalizer": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "normalizer",
+        "normalizedSha256",
+        "ingestedAt",
+        "losses"
+      ],
+      "type": "object"
+    },
+    "policyRefs": {
+      "items": {
+        "maxLength": 4096,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 256,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "profile": {
+      "const": "amc.external-evidence"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "authorityId": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "captureMethod": {
+          "enum": [
+            "import",
+            "producer-callback",
+            "governed-capture"
+          ]
+        },
+        "trustTier": {
+          "enum": [
+            "SELF_REPORTED",
+            "ATTESTED",
+            "OBSERVED"
+          ]
+        }
+      },
+      "required": [
+        "trustTier",
+        "captureMethod",
+        "authorityId"
+      ],
+      "type": "object"
+    },
+    "session": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "parentSessionId": {
+          "anyOf": [
+            {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "parentSessionId"
+      ],
+      "type": "object"
+    },
+    "signature": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "algorithm": {
+              "const": "ed25519"
+            },
+            "authorityId": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            },
+            "value": {
+              "pattern": "^[A-Za-z0-9+/]{86}==$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "algorithm",
+            "authorityId",
+            "value"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source": {
+      "additionalProperties": false,
+      "properties": {
+        "mediaType": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "originalSha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "producer": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "producer",
+        "version",
+        "originalSha256",
+        "mediaType"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "profile",
+    "version",
+    "source",
+    "session",
+    "provenance",
+    "normalization",
+    "policyRefs",
+    "events",
+    "signature"
+  ],
+  "title": "AMC External Evidence Profile v1",
+  "type": "object"
+}

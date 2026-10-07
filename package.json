@@ -78,6 +78,8 @@
     "check:evidence-paths": "node scripts/evidence-path-check.mjs",
     "gen:api-ref": "node scripts/gen-api-ref.cjs",
     "check:api-ref": "node scripts/gen-api-ref.cjs --check",
+    "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
+    "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "test:coverage": "vitest run --coverage",
     "gen:changelog-page": "node scripts/gen-changelog-page.mjs",

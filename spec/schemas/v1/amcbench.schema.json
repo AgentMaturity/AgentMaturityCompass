@@ -1,0 +1,662 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "benchId": {
+      "pattern": "^bench_[a-zA-Z0-9_-]{8,}$",
+      "type": "string"
+    },
+    "evidence": {
+      "properties": {
+        "correlationRatio": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "evidenceCoverage": {
+          "properties": {
+            "attestedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "observedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            "selfReportedShare": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "observedShare",
+            "attestedShare",
+            "selfReportedShare"
+          ],
+          "type": "object"
+        },
+        "integrityIndex": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "trustLabel": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "type": "string"
+        },
+        "window": {
+          "properties": {
+            "days": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "endTs": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "startTs": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "days",
+            "startTs",
+            "endTs"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "window",
+        "integrityIndex",
+        "correlationRatio",
+        "trustLabel",
+        "evidenceCoverage"
+      ],
+      "type": "object"
+    },
+    "generatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "labels": {
+      "default": {},
+      "properties": {
+        "agentType": {
+          "enum": [
+            "code-agent",
+            "support-agent",
+            "ops-agent",
+            "research-agent",
+            "sales-agent",
+            "other"
+          ],
+          "type": "string"
+        },
+        "deployment": {
+          "enum": [
+            "single",
+            "host",
+            "k8s",
+            "compose"
+          ],
+          "type": "string"
+        },
+        "industry": {
+          "enum": [
+            "software",
+            "fintech",
+            "health",
+            "manufacturing",
+            "other"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "metrics": {
+      "properties": {
+        "forecastSummary": {
+          "properties": {
+            "confidenceLabel": {
+              "enum": [
+                "HIGH",
+                "MEDIUM",
+                "LOW",
+                "NONE"
+              ],
+              "type": "string"
+            },
+            "maturityDeltaShort": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reasons": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "riskDeltaShort": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "OK",
+                "INSUFFICIENT_EVIDENCE"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "maturityDeltaShort",
+            "riskDeltaShort",
+            "confidenceLabel",
+            "reasons"
+          ],
+          "type": "object"
+        },
+        "maturity": {
+          "properties": {
+            "fiveDimensions": {
+              "properties": {
+                "d1": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "d2": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "d3": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "d4": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "d5": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "d1",
+                "d2",
+                "d3",
+                "d4",
+                "d5"
+              ],
+              "type": "object"
+            },
+            "fiveLayers": {
+              "properties": {
+                "culture": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "leadership": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "resilience": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "skills": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "strategicOps": {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "strategicOps",
+                "leadership",
+                "culture",
+                "resilience",
+                "skills"
+              ],
+              "type": "object"
+            },
+            "overall": {
+              "maximum": 5,
+              "minimum": 0,
+              "type": "number"
+            },
+            "questions42": {
+              "items": {
+                "properties": {
+                  "qIdHash": {
+                    "pattern": "^q_[a-f0-9]{8,64}$",
+                    "type": "string"
+                  },
+                  "score": {
+                    "maximum": 5,
+                    "minimum": 0,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "qIdHash",
+                  "score"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "overall",
+            "fiveLayers",
+            "fiveDimensions"
+          ],
+          "type": "object"
+        },
+        "operatingHealth": {
+          "properties": {
+            "approvalsBacklogCount": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "approvalsMedianAgeHours": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "assurance": {
+              "properties": {
+                "exfilAttemptsDetected": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "injectionFailures": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "latestScore": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "latestScore",
+                "injectionFailures",
+                "exfilAttemptsDetected"
+              ],
+              "type": "object"
+            },
+            "budgetExceedEvents": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "freezeEvents": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "notary": {
+              "properties": {
+                "attestationAgeMinutes": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "downEvents": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled",
+                "downEvents",
+                "attestationAgeMinutes"
+              ],
+              "type": "object"
+            },
+            "plugins": {
+              "properties": {
+                "installedCount": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "integrity": {
+                  "enum": [
+                    "PASS",
+                    "FAIL"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "integrity",
+                "installedCount"
+              ],
+              "type": "object"
+            },
+            "toolhubDenialRate": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "approvalsBacklogCount",
+            "approvalsMedianAgeHours",
+            "budgetExceedEvents",
+            "toolhubDenialRate",
+            "freezeEvents",
+            "assurance",
+            "plugins",
+            "notary"
+          ],
+          "type": "object"
+        },
+        "strategyFailureRisks": {
+          "properties": {
+            "clarityPathRisk": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "digitalDualityRisk": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "economicSignificanceRisk": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "ecosystemFocusRisk": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "riskAssuranceRisk": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "ecosystemFocusRisk",
+            "clarityPathRisk",
+            "economicSignificanceRisk",
+            "riskAssuranceRisk",
+            "digitalDualityRisk"
+          ],
+          "type": "object"
+        },
+        "valueDimensions": {
+          "properties": {
+            "brandValue": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "economicValue": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "emotionalValue": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "functionalValue": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "lifetimeValue": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            "valueScore": {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "emotionalValue",
+            "functionalValue",
+            "economicValue",
+            "brandValue",
+            "lifetimeValue"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "maturity",
+        "strategyFailureRisks",
+        "valueDimensions",
+        "operatingHealth",
+        "forecastSummary"
+      ],
+      "type": "object"
+    },
+    "proofBindings": {
+      "properties": {
+        "calculationManifestSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "includedEventKinds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "includedEventProofIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "merkleRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "transparencyRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        }
+      },
+      "required": [
+        "transparencyRootSha256",
+        "merkleRootSha256",
+        "includedEventKinds",
+        "includedEventProofIds",
+        "calculationManifestSha256"
+      ],
+      "type": "object"
+    },
+    "publisher": {
+      "properties": {
+        "attestation": {
+          "properties": {
+            "attestationLevel": {
+              "enum": [
+                "SOFTWARE",
+                "HARDWARE",
+                "NONE"
+              ],
+              "type": "string"
+            },
+            "lastAttestationTs": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "notaryFingerprint": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "trustMode": {
+              "enum": [
+                "LOCAL_VAULT",
+                "NOTARY"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "trustMode",
+            "attestationLevel",
+            "notaryFingerprint",
+            "lastAttestationTs"
+          ],
+          "type": "object"
+        },
+        "hostInstanceHash": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{8,64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "enum": [
+            "ANONYMIZED",
+            "NAMED"
+          ],
+          "type": "string"
+        },
+        "workspaceIdHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "workspaceIdHash",
+        "hostInstanceHash",
+        "attestation"
+      ],
+      "type": "object"
+    },
+    "scope": {
+      "properties": {
+        "idHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "WORKSPACE",
+            "NODE",
+            "AGENT"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "idHash"
+      ],
+      "type": "object"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "benchId",
+    "generatedTs",
+    "scope",
+    "publisher",
+    "evidence",
+    "metrics",
+    "proofBindings"
+  ],
+  "title": "AMC Bench Artifact",
+  "type": "object"
+}

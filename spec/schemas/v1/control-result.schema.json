@@ -1,0 +1,353 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "claimKind": {
+      "enum": [
+        "synthetic_example",
+        "self_reported",
+        "observed",
+        "independently_reviewed"
+      ],
+      "type": "string"
+    },
+    "controlId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "controlVersion": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dimensions": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "applicability": {
+              "additionalProperties": false,
+              "properties": {
+                "state": {
+                  "const": "applicable",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "state"
+              ],
+              "type": "object"
+            },
+            "enforcement": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "none",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "advisory",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "observed",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "boundary": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "enforced",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "boundary"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "evidence": {
+              "const": "sufficient",
+              "type": "string"
+            },
+            "result": {
+              "const": "pass",
+              "type": "string"
+            },
+            "review": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected",
+                "expired"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "result",
+            "applicability",
+            "evidence",
+            "enforcement",
+            "review"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "applicability": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "applicable",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "rationale": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "not_applicable",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "rationale"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "unresolved",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "reason"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "enforcement": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "none",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "advisory",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "observed",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "boundary": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "enforced",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "boundary"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "evidence": {
+              "enum": [
+                "sufficient",
+                "incomplete",
+                "stale",
+                "contradictory",
+                "untrusted"
+              ],
+              "type": "string"
+            },
+            "result": {
+              "enum": [
+                "fail",
+                "not_evaluated"
+              ],
+              "type": "string"
+            },
+            "review": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected",
+                "expired"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "result",
+            "applicability",
+            "evidence",
+            "enforcement",
+            "review"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "entitlement": {
+      "additionalProperties": false,
+      "properties": {
+        "active": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "active"
+      ],
+      "type": "object"
+    },
+    "evaluatedAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "evidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exceptions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "exceptionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "type": "string"
+          },
+          "issuer": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "exceptionId",
+          "issuer",
+          "expiresAt"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "type": {
+      "const": "amc.control-result",
+      "type": "string"
+    },
+    "version": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "type",
+    "version",
+    "controlId",
+    "controlVersion",
+    "evaluatedAt",
+    "dimensions",
+    "claimKind",
+    "evidenceRefs",
+    "exceptions"
+  ],
+  "title": "AMC Control Result",
+  "type": "object"
+}

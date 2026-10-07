@@ -1,0 +1,403 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "agent": {
+      "properties": {
+        "agentIdHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        },
+        "agentType": {
+          "enum": [
+            "code-agent",
+            "support-agent",
+            "ops-agent",
+            "research-agent",
+            "sales-agent",
+            "other"
+          ],
+          "type": "string"
+        },
+        "riskTier": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ],
+          "type": "string"
+        },
+        "workspaceIdHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agentIdHash",
+        "agentType",
+        "riskTier",
+        "workspaceIdHash"
+      ],
+      "type": "object"
+    },
+    "allowlists": {
+      "properties": {
+        "highRiskTools": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "models": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "providers": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "tools": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "providers",
+        "models",
+        "tools",
+        "highRiskTools"
+      ],
+      "type": "object"
+    },
+    "bindings": {
+      "properties": {
+        "bankSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "canonSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "cgxPackSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "mechanicTargetsSha256": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "notaryFingerprint": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "promptPolicySha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "trustMode": {
+          "enum": [
+            "LOCAL_VAULT",
+            "NOTARY"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "cgxPackSha256",
+        "promptPolicySha256",
+        "canonSha256",
+        "bankSha256",
+        "trustMode"
+      ],
+      "type": "object"
+    },
+    "checkpoints": {
+      "properties": {
+        "currentAdvisories": {
+          "items": {
+            "properties": {
+              "advisoryId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "category": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "severity": {
+                "enum": [
+                  "INFO",
+                  "WARN",
+                  "CRITICAL"
+                ],
+                "type": "string"
+              },
+              "summary": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "advisoryId",
+              "severity",
+              "category",
+              "summary"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "topTransformTasks": {
+          "items": {
+            "properties": {
+              "evidenceToVerify": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "taskId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "title": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "why": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "taskId",
+              "title",
+              "why",
+              "evidenceToVerify"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "topTransformTasks",
+        "currentAdvisories"
+      ],
+      "type": "object"
+    },
+    "generatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "northstar": {
+      "properties": {
+        "constraints": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "mission": {
+          "properties": {
+            "sources": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "summary": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary",
+            "sources"
+          ],
+          "type": "object"
+        },
+        "outputContract": {
+          "properties": {
+            "jsonExample": {
+              "properties": {
+                "answer": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "claims": {
+                  "default": [],
+                  "items": {
+                    "properties": {
+                      "evidenceRefs": {
+                        "items": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "text": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "nextActions": {
+                  "default": [],
+                  "items": {
+                    "properties": {
+                      "actionId": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "requiresApproval": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "actionId",
+                      "requiresApproval"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "unknowns": {
+                  "default": [],
+                  "items": {
+                    "properties": {
+                      "text": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "v": {
+                  "const": 1,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "v",
+                "answer"
+              ],
+              "type": "object"
+            },
+            "schemaId": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "schemaId",
+            "jsonExample"
+          ],
+          "type": "object"
+        },
+        "recurrence": {
+          "properties": {
+            "cadenceHours": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "selfReflectionChecklist": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          },
+          "required": [
+            "cadenceHours",
+            "selfReflectionChecklist"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "mission",
+        "constraints",
+        "recurrence",
+        "outputContract"
+      ],
+      "type": "object"
+    },
+    "packId": {
+      "pattern": "^pp_[a-zA-Z0-9_-]{8,}$",
+      "type": "string"
+    },
+    "templateId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "packId",
+    "generatedTs",
+    "templateId",
+    "agent",
+    "bindings",
+    "northstar",
+    "allowlists",
+    "checkpoints"
+  ],
+  "title": "AMC Prompt Pack",
+  "type": "object"
+}
