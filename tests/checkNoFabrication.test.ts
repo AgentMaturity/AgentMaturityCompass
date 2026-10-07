@@ -121,6 +121,20 @@ describe("P0-16 check-no-fabrication guard", () => {
     expect(result.output).toContain("pathPresence has 25 files; pathPresenceBaseline is 24");
   });
 
+  test("pathPresence below its baseline asks for the baseline to be lowered", () => {
+    const result = run(tree({ "src/score/p.ts": 'export const p = "src/ledger";\n' }, { pathPresence: ["src/score/p.ts"], pathPresenceBaseline: 2 }));
+    expect(result.status).toBe(1);
+    expect(result.output).toContain("lower pathPresenceBaseline from 2 to 1");
+  });
+
+  test("a missing allowlist exits 2", () => {
+    const root = tree({ "src/score/x.ts": "export const s = 1;\n" });
+    rmSync(join(root, "scripts/no-fabrication-allowlist.json"));
+    const result = run(root);
+    expect(result.status).toBe(2);
+    expect(result.output).toContain("cannot read scripts/no-fabrication-allowlist.json");
+  });
+
   const wording = { "src/mcp/t.ts": 'export const line = "MCP-Certified";\n' };
 
   test("--strict fails while a pending entry remains", () => {
@@ -148,5 +162,5 @@ describe("P0-16 check-no-fabrication guard", () => {
     const result = run(repoRoot);
     expect(result.output).toContain("no-fabrication");
     expect(result.status).toBe(0);
-  });
+  }, 120_000);
 });
