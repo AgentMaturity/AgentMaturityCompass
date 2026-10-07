@@ -3,7 +3,7 @@ import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitle
 import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { generateReport } from "../src/diagnostic/runner.js";
 import {
   DEFAULT_QUESTION_SET_VERSION,
@@ -13,6 +13,10 @@ import {
 } from "../src/diagnostic/questionSets.js";
 import { getAllQuestions, scoreFullDiagnostic } from "../src/diagnostic/fullDiagnostic.js";
 import type { DiagnosticReport } from "../src/types.js";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 function workspace(): string {
   return mkdtempSync(join(tmpdir(), "amc-question-set-"));
@@ -71,12 +75,13 @@ describe("diagnostic question sets", () => {
     expect(result.maxScore).toBe((defaultQuestionCount + expandedOnly.length) * 5);
   });
 
-  test("industry pack weighting is skipped while paywalled and applied only with entitlement", () => {
+  test("an industry pack weighting request is a no-op whatever the licence state", () => {
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", undefined);
+    vi.stubEnv("AMC_DOMAIN_PACKS_LICENSE_KEY", undefined);
     const locked = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
-      applyIndustryPackWeights: true,
-      env: {}
+      applyIndustryPackWeights: true
     });
     const { privateKey, publicKey } = generateKeyPairSync("ed25519");
     const licenseKey = createIndustryPackLicenseKey({
@@ -85,25 +90,19 @@ describe("diagnostic question sets", () => {
         AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString()
       } as NodeJS.ProcessEnv
     });
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_KEY", licenseKey);
+    vi.stubEnv("AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY", publicKey.export({ type: "spki", format: "pem" }).toString());
     const unlocked = getQuestionSet({
       version: LIFECYCLE_QUESTION_SET_VERSION,
       workspace: workspace(),
-      applyIndustryPackWeights: true,
-      env: {
-        AMC_INDUSTRY_PACKS_LICENSE_KEY: licenseKey,
-        AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString()
-      } as NodeJS.ProcessEnv
+      applyIndustryPackWeights: true
     });
 
+    expect(unlocked).toEqual(locked);
     expect(locked.info.domainPackWeighting?.requested).toBe(true);
     expect(locked.info.domainPackWeighting?.applied).toBe(false);
-    expect(locked.info.domainPackWeighting?.entitlementActive).toBe(false);
     expect(locked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
-
-    expect(unlocked.info.domainPackWeighting?.requested).toBe(true);
-    expect(unlocked.info.domainPackWeighting?.applied).toBe(true);
-    expect(unlocked.info.domainPackWeighting?.entitlementActive).toBe(true);
-    expect(unlocked.questions.some((question) => (question.scoringWeight ?? 1) > 1)).toBe(true);
+    expect(unlocked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
   });
 
   test("markdown reports explain expanded assessment dimensions", () => {
