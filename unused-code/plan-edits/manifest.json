@@ -157,6 +157,13 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/gateway/config.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc"
+    },
+    {
       "path": "src/governor/emergencyOverride.ts",
       "issue": "P0-10",
       "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
