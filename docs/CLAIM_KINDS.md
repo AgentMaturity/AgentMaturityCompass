@@ -187,7 +187,7 @@ Commands that list several results (`leaderboard show`, `fleet score`) end their
 
 ### MCP
 
-All ten tools in `src/mcp/amcMcpServer.ts` return the result text, then a second text block with the claim line and `Claim kinds: see docs/CLAIM_KINDS.md`, and set `structuredContent` to the claim fields (`src/mcp/mcpClaimOutput.ts`). Agent tools use the agent's latest diagnostic run when this workspace's auditor key sealed it, and are not evaluated otherwise. The sector-pack tool uses the regulated self-assessment envelope. The compliance tool is a regulated result that is not evaluated. `amc_list_evidence` labels each event with `claimKindFromTrustTier` of its effective trust tier. See [MCP_SERVER.md](MCP_SERVER.md).
+All eleven tools in `src/mcp/amcMcpServer.ts` return the result text, then a second text block with the claim line and `Claim kinds: see docs/CLAIM_KINDS.md`, and set `structuredContent` to the claim fields (`src/mcp/mcpClaimOutput.ts`). Agent tools use the agent's latest diagnostic run when this workspace's auditor key sealed it, and are not evaluated otherwise. The sector-pack tool uses the regulated self-assessment envelope. The compliance tool is a regulated result that is not evaluated. `amc_list_evidence` labels each event with `claimKindFromTrustTier` of its effective trust tier. `amc_incident_clocks` (P1-17) is a regulated listing that is not evaluated: its deadlines run from operator-recorded times and applicability is unresolved. See [MCP_SERVER.md](MCP_SERVER.md).
 
 ### API
 

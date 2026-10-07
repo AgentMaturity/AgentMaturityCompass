@@ -1,0 +1,12 @@
+cmd	exit	durationMs
+npm run -s build	0	33559
+npm run -s typecheck	0	27702
+npm run -s typecheck:tests	0	35151
+npm run -s lint	0	2966
+npm run -s check:counts	0	492
+npm run -s check:docs-drift	0	291
+npm run -s check:freeze	0	1361
+npm run -s check:citations	0	343
+npm run -s check:architecture-boundaries	0	1430
+npm run -s check:api-ref	0	212
+npm run -s check:no-fabrication	0	1715

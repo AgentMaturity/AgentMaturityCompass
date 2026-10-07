@@ -116,6 +116,7 @@ The same fields are in `structuredContent`: `{ claimKind, statusDimensions, clai
 | `amc_check_compliance` | A regulated result that is not evaluated: the gaps come from dimension scores, not from evidence bound to a control |
 | `amc_score_sector_pack` | The regulated self-assessment envelope: self-reported, never a pass, at most level 1 |
 | `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
+| `amc_incident_clocks` | A regulated listing that is not evaluated: deadlines run from operator-recorded trigger and notice times, and applicability is unresolved |
 
 AMC output is evidence of conformity. No tool prints "certified".
 
@@ -225,6 +226,23 @@ Available pack IDs (40 total across 7 stations):
 | Governance | `digital-citizens-rights`, `dance-of-democracy`, `citizen-services` |
 
 **Example prompt:** *"Score my healthcare agent against the clinical-trials sector pack"*
+
+---
+
+### `amc_incident_clocks`
+List a stored incident's regulatory reporting clocks for a station (P1-17).
+
+```
+Input:  { incidentId: string, station: string, now?: string, workspace?: string }
+        station: health | education | environment | mobility | governance | technology | wealth
+        now: ISO 8601 with a zone (default: now)
+Output: { incidentId, station, now, clocks[], events[], notes[] } — the same listing as
+        `amc incident clocks <id> --station <station> --json`
+```
+
+Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTED`, `PENDING`, `DUE_SOON`, `OVERDUE`, `SATISFIED`, `SATISFIED_LATE`), source and review status. Trigger and notice times come from the signed clock events recorded with `amc incident clocks --trigger|--notified` or `POST /api/v1/incidents/:id/clock-events`; a row whose signature fails is refused by its event id. The tool records nothing. Durations are agent-drafted and experimental until an expert signs off; they are not legal advice, and AMC does not file notices. See [REGULATORY_INCIDENT_CLOCKS.md](REGULATORY_INCIDENT_CLOCKS.md).
+
+**Example prompt:** *"Which regulatory deadlines are open on incident_… for the wealth station?"*
 
 ---
 

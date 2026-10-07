@@ -34,8 +34,9 @@ function tracked(ws: string): string {
 // ---------------------------------------------------------------------------
 
 describe("MCP_TOOL_METADATA", () => {
-  it("exports 10 tools", () => {
-    expect(MCP_TOOL_METADATA).toHaveLength(10);
+  it("exports 11 tools", () => {
+    // P1-17 added amc_incident_clocks; the count change is intended.
+    expect(MCP_TOOL_METADATA).toHaveLength(11);
     const names = MCP_TOOL_METADATA.map((t) => t.name);
     expect(names).toContain("amc_list_agents");
     expect(names).toContain("amc_quickscore");
@@ -47,6 +48,7 @@ describe("MCP_TOOL_METADATA", () => {
     expect(names).toContain("amc_list_evidence");
     expect(names).toContain("amc_query_diagnostic");
     expect(names).toContain("amc_get_recommendations");
+    expect(names).toContain("amc_incident_clocks");
   });
 
   it("all tool names start with amc_", () => {
