@@ -19,7 +19,7 @@ function fixture(rows: unknown[]) {
   return { workspace, inputPath, agentId: "default" };
 }
 function imported(rows: unknown[]) {
-  const result = runNeutralImport({ ...fixture(rows), mode: "import" });
+  const result = runNeutralImport({ ...fixture(rows), mode: "import", retainOriginals: false });
   return {
     result,
     normalized: JSON.parse(readFileSync(result.normalizedPath!, "utf8")),

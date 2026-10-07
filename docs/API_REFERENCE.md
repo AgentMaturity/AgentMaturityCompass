@@ -5603,6 +5603,7 @@ Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchm
 | `--validate` | - |
 | `--json` | - |
 | `--expected-digest <sha256>` | - |
+| `--no-retain-original` | - |
 
 #### `amc imports list`
 

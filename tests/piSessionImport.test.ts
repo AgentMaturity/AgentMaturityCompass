@@ -58,7 +58,7 @@ function importSession(rows: unknown[]) {
   const workspace = scratch("amc-pi-ws-");
   mkdirSync(join(workspace, ".amc"), { recursive: true });
   const inputPath = writeSession(rows);
-  const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import" });
+  const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import", retainOriginals: false });
   const traceIndex = result.traceFailureIndex
     ? JSON.parse(readFileSync(result.traceFailureIndex.path, "utf8"))
     : null;
