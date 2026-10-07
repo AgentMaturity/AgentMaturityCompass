@@ -399,6 +399,12 @@ describe("Claude control probe runs only the handler AMC would install", () => {
       handler.args = ["/bin/sh", "-c", `touch ${marker}`];
     });
     await expectStaleNotRun(workspace, marker);
+
+    const status = await amcStatus(workspace, tempDir("amc-claude-home-"));
+    expect(existsSync(marker), "the forged handler ran").toBe(false);
+    expect(status.status).toBe(1);
+    expect(status.stdout).toContain("Control: NOT VERIFIED (stale)");
+    expect(status.stdout).toContain("amc connect hooks install --provider claude-code --mode control");
   }, 60_000);
 
   test("never spawns a signed handler whose script is not AMC's CLI", async () => {

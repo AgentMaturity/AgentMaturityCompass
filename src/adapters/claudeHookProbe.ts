@@ -2,12 +2,14 @@ import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
-import { getHookIntegrationStatus, HOOK_CONTROL_INTEGRATION_ID } from "./hookIntegration.js";
+import { canonicalize } from "../utils/json.js";
+import { expectedClaudeControlHandler, getHookIntegrationStatus, HOOK_CONTROL_INTEGRATION_ID } from "./hookIntegration.js";
 
 export type ClaudeHookProbeReason =
   | "ok"
   | "not_installed"
   | "command_missing"
+  | "stale"
   | "spawn_failed"
   | "timed_out"
   | "not_blocking"
@@ -33,6 +35,8 @@ interface InstalledCommandHandler {
   command: string;
   args: string[];
   timeoutSeconds: number;
+  matcher: unknown;
+  raw: Record<string, unknown>;
 }
 
 /** Fails input validation in the forwarder, so the probe never reaches policy, Bridge or the ledger. */
@@ -58,7 +62,7 @@ function readJsonObject(path: string): Record<string, unknown> | null {
 function installedControlHandler(workspace: string): InstalledCommandHandler | null {
   const settings = readJsonObject(join(workspace, ".claude", "settings.local.json"));
   const hooks = settings?.hooks as Record<string, unknown> | undefined;
-  const groups = Array.isArray(hooks?.PreToolUse) ? hooks.PreToolUse as Array<{ hooks?: unknown }> : [];
+  const groups = Array.isArray(hooks?.PreToolUse) ? hooks.PreToolUse as Array<{ matcher?: unknown; hooks?: unknown }> : [];
   const statusMessage = `AMC Control [${HOOK_CONTROL_INTEGRATION_ID}]`;
   for (const group of groups) {
     for (const handler of Array.isArray(group?.hooks) ? group.hooks as Array<Record<string, unknown>> : []) {
@@ -67,10 +71,25 @@ function installedControlHandler(workspace: string): InstalledCommandHandler | n
         command: typeof handler.command === "string" ? handler.command : "",
         args: Array.isArray(handler.args) ? handler.args.map(String) : [],
         timeoutSeconds: typeof handler.timeout === "number" && handler.timeout > 0 ? handler.timeout : 60,
+        matcher: group.matcher,
+        raw: handler,
       };
     }
   }
   return null;
+}
+
+/**
+ * True only for the exact handler and matcher this AMC would install for the signed manifest:
+ * its own Node executable, its own CLI script and the forward argv. A signature over the
+ * manifest only shows the workspace's keys wrote it, and those keys can come with the workspace.
+ */
+function isAmcInstalledHandler(workspace: string, handler: InstalledCommandHandler): boolean {
+  try {
+    return handler.matcher === "*" && canonicalize(handler.raw) === canonicalize(expectedClaudeControlHandler(workspace));
+  } catch {
+    return false;
+  }
 }
 
 function denies(stdout: string): boolean {
@@ -86,7 +105,8 @@ function denies(stdout: string): boolean {
 /**
  * Spawns the installed Claude Code PreToolUse control handler in exec form (no shell), as Claude
  * Code does, with a payload the forwarder must reject. Passes only on exit 2 with a deny inside
- * the handler timeout.
+ * the handler timeout. Any handler other than the one this AMC would install is reported stale
+ * and never spawned.
  */
 export function probeInstalledClaudeHook(input: { workspace: string }): Promise<ClaudeHookProbeResult> {
   const workspace = resolve(input.workspace);
@@ -98,6 +118,7 @@ export function probeInstalledClaudeHook(input: { workspace: string }): Promise<
   if (!isAbsolute(handler.command) || !existsSync(handler.command) || script === undefined || !(isAbsolute(script) && existsSync(script))) {
     return Promise.resolve(result("command_missing", null, 0));
   }
+  if (!isAmcInstalledHandler(workspace, handler)) return Promise.resolve(result("stale", null, 0));
   const started = Date.now();
   return new Promise((resolvePromise) => {
     let stdout = "";
@@ -111,6 +132,7 @@ export function probeInstalledClaudeHook(input: { workspace: string }): Promise<
     const child = spawn(handler.command, handler.args, {
       cwd: workspace,
       shell: false,
+      // The caller's own environment, as Claude Code passes its own; only AMC's forwarder gets it.
       env: { ...process.env, CLAUDE_PROJECT_DIR: workspace },
       stdio: ["pipe", "pipe", "ignore"],
     });
@@ -164,7 +186,8 @@ function installState(workspace: string): string {
 /**
  * Control counts as verified only after the installed command ran and denied, and no setting
  * disables hooks. The probe runs only when the provider config still matches the signed manifest
- * (matcher, command and args included), so a drifted or tampered handler is never spawned.
+ * (matcher, command and args included) and the handler is exactly the one this AMC installs, so a
+ * drifted, tampered or foreign handler is never spawned.
  */
 export async function verifyClaudeControl(input: { workspace: string; home?: string }): Promise<ClaudeControlVerification> {
   const state = installState(resolve(input.workspace));
@@ -173,6 +196,9 @@ export async function verifyClaudeControl(input: { workspace: string; home?: str
   const notes = [...settings.notes];
   if (probe?.reason === "command_missing") {
     notes.push(`stale: the installed Node or AMC CLI path no longer exists; re-install with ${REINSTALL_COMMAND}`);
+  }
+  if (probe?.reason === "stale") {
+    notes.push(`stale: the installed handler is not the one this AMC installs for the signed manifest, so it was not run; re-install with ${REINSTALL_COMMAND}`);
   }
   const verified = probe?.ok === true && settings.blockers.length === 0;
   const reason = !probe ? state : !probe.ok ? probe.reason : settings.blockers[0]?.split(" ")[0];

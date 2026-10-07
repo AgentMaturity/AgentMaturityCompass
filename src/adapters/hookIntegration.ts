@@ -587,6 +587,24 @@ function expectedHandler(input: {
   };
 }
 
+/**
+ * The Claude Code control handler this AMC would install for the workspace's signed manifest,
+ * built from the same inputs install validates. Throws when there is no valid control manifest.
+ */
+export function expectedClaudeControlHandler(workspaceInput: string): JsonObject {
+  const workspace = resolve(workspaceInput);
+  const paths = managedPaths(workspace, "claude-code");
+  const manifest = loadSignedManifest(workspace, paths);
+  if (manifest?.mode !== "control") {
+    throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "no signed Claude Code control installation manifest");
+  }
+  validateManifestPaths(workspace, "claude-code", paths, manifest);
+  const bridgeBase = normalizeBridgeBase(manifest.bridgeBase);
+  assertControlBridgeLocal("control", bridgeBase);
+  const agentId = validateAgentId(manifest.agentId);
+  return expectedHandler({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase, tokenPath: paths.token });
+}
+
 function handlerHash(handler: JsonObject): string {
   return sha256Hex(canonicalize(handler));
 }
