@@ -53,7 +53,8 @@ export const signKindValues = [
   "OPS_POLICY",
   "REPAIR_RECEIPT",
   "MIGRATION_RECEIPT",
-  "CONTROL_PLAN"
+  "CONTROL_PLAN",
+  "CONTROL_RESULT"
 ] as const;
 
 export type SignKind = (typeof signKindValues)[number];

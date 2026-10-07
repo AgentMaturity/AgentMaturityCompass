@@ -58,7 +58,8 @@ const recomputedDigest = ({ evaluatedAt: _at, digest: _digest, ...rest }: Contro
  * Parses a results file and refuses it whole, as an integrity failure, unless every result has the P1-11 shape and
  * digest, names a catalog control at the digest this catalog has, was evaluated under this (verified) plan with the
  * plan's applicability, and is internally coherent (synthetic is never a result; a pass needs applicable, sufficient).
- * The digest is unkeyed: it shows a result is unchanged since it was hashed, not who produced it.
+ * A result's digest is unkeyed; the caller passes only a file whose CONTROL_RESULT signature verified over the bytes
+ * this value was parsed from (readSignedControlResults).
  */
 export function parseControlResults(raw: unknown, plan: CompiledPlan, cat: LoadedCatalog): ControlResult[] {
   const parsed = z.array(controlResultSchema).safeParse(raw);
@@ -137,8 +138,11 @@ function finding(r: ControlResult, state: "satisfied" | "not-satisfied") {
 const REMARKS = "AMC control results as evidence of conformity, never a compliance statement. Every observation and finding "
   + "carries the AMC claim kind and five status dimensions as AMC props. A finding is satisfied only for an AMC pass with "
   + "claim kind observed and not-satisfied for a fail; a not-evaluated result, or a pass that is only self-reported, has an "
-  + "observation and no finding. Control results are not signed: the export checked each result's digest, control digest "
-  + "and plan binding, but that digest is unkeyed and does not show who produced the result.";
+  + "observation and no finding. The results file is signed as CONTROL_RESULT: the export verified that signature over "
+  + "the bytes it read (metadata prop results-sha256) against the exporting workspace's auditor keys, a local audit trail "
+  + "and not portable trust, and, where the operator keeps a trust list, required the signer to be pinned in it; it then "
+  + "checked each result's digest, control digest and plan binding. A signature shows who wrote the results, not that "
+  + "they are true.";
 
 function resultLosses(results: ControlResult[]): OscalLoss[] {
   const ids = (rows: ControlResult[]) => [...new Set(rows.map((r) => r.controlId))].sort().join(", ");
@@ -164,8 +168,11 @@ function resultLosses(results: ControlResult[]): OscalLoss[] {
   ];
 }
 
-/** Null document for no results: nothing is evaluated, so nothing is exported as a result. */
-export function toOscalAssessmentResults(results: readonly ControlResult[], plan: CompiledPlan): { document: object | null; losses: OscalLoss[] } {
+/**
+ * Null document for no results: nothing is evaluated, so nothing is exported as a result. `resultsSha256` is the
+ * sha256 of the results file whose CONTROL_RESULT signature the caller verified.
+ */
+export function toOscalAssessmentResults(results: readonly ControlResult[], plan: CompiledPlan, resultsSha256: string): { document: object | null; losses: OscalLoss[] } {
   if (results.length === 0) return { document: null, losses: [] };
   const sorted = [...results].sort((a, b) => (a.controlId === b.controlId ? (a.digest < b.digest ? -1 : 1) : a.controlId < b.controlId ? -1 : 1));
   const windows = [...new Set(sorted.map((r) => `${utc(r.window.start)}|${utc(r.window.end)}`))].sort();
@@ -189,7 +196,7 @@ export function toOscalAssessmentResults(results: readonly ControlResult[], plan
     "assessment-results": {
       uuid: oscalUuid("assessment-results", inputsDigest),
       metadata: oscalMetadata("AMC control results (experimental)", sorted.map((r) => utc(r.evaluatedAt)).sort().at(-1) as string, inputsDigest,
-        [prop("plan-digest", plan.digest)], REMARKS),
+        [prop("plan-digest", plan.digest), prop("results-sha256", resultsSha256)], REMARKS),
       "import-ap": { href: `#${resource.uuid}`, remarks: "AMC has no OSCAL assessment plan. This references the compiled AMC control plan the results were evaluated under, in back-matter." },
       results: oscalResults,
       "back-matter": { resources: [resource] }

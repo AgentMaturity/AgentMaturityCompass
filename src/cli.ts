@@ -10826,7 +10826,7 @@ exportGroup
   .description("Export the control catalog, a compiled plan and its control results as OSCAL 1.2.3, with a loss report (experimental)")
   .requiredOption("--out <dir>", "output directory (never under .amc/)")
   .option("--plan <plan.json>", "compiled plan from amc catalog compile; it and plan.sig.json beside it must verify")
-  .option("--results <file>", "JSON list of P1-11 control results evaluated under --plan")
+  .option("--results <file>", "JSON list of P1-11 control results evaluated under --plan; its CONTROL_RESULT signature <file>.sig must verify")
   .action(async (opts: { out: string; plan?: string; results?: string }) => {
     try {
       const { runOscalExportCli } = await import("./exports/oscal/oscalCli.js");
