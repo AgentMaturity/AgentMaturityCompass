@@ -6,7 +6,7 @@
  * recorded as "unverified".
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
-import { eu, milestones, unverified } from "./catalogueHelpers.js";
+import { P024_NOTE, P024_READ, eu, milestones, unverified, verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
@@ -209,6 +209,14 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("eu-ema-guidelines", "EMA scientific guidelines (incl. IMPD guideline)", "EU", "guidance", ["EMA Scientific Guidelines", "EMA IMPD Guideline"]),
   unverified("eu-ehealth-network", "eHealth Network guidelines", "EU", "guidance", ["eHealth Network Guidelines"]),
   unverified("eu-eqf", "Council Recommendation of 22 May 2017 on the European Qualifications Framework", "EU", "framework", ["EQF"]),
+  verified("eu-ai-act-prohibited-practices-guidelines", "Commission Guidelines on prohibited artificial intelligence practices established by Regulation (EU) 2024/1689 (4 February 2025, non-binding)", "EU", "guidance", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act",
+    ["Commission Guidelines on prohibited AI practices"], {
+      lastReviewed: P024_READ, retrievedAt: P024_READ, instrument: "Commission Guidelines on prohibited artificial intelligence practices (AI Act Art. 5)",
+      clause: "whole instrument", edition: "4 February 2025", statusType: "supervisory-guidance",
+      dateNote: "Published 4 February 2025; non-binding guidance carries no effective or compliance-due date.",
+      note: `Commission page read ${P024_READ}: published 04 February 2025; the guidelines are non-binding, with authoritative interpretation reserved to the CJEU. Cited by GOV-DCR-9. ${P024_NOTE}`,
+    }),
   unverified("eu-microfinance", "EU microfinance citation as written in pack content", "EU", "guidance", ["EU Microfinance Reg"],
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],
