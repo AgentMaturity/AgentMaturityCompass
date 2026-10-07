@@ -44,7 +44,10 @@ const tokenPath = (workspace: string, sequence: number): string => join(checkpoi
 
 interface VerifiedCheckpoint { checkpoint: LedgerCheckpointV1; sha256: string }
 
-/** Every checkpoint, verified whole: contiguous sequences, digests, monitor signatures and previous links. Throws when broken. */
+/**
+ * Every checkpoint, verified whole: contiguous sequences, digests, monitor signatures and previous links. Throws when
+ * broken. ponytail: O(checkpoints) signature checks per call; cache the verified prefix if years of checkpoints pile up.
+ */
 export function readCheckpointChain(workspace: string): VerifiedCheckpoint[] {
   const dir = checkpointsDir(workspace);
   if (!pathExists(dir)) return [];
@@ -75,7 +78,11 @@ function appendCheckpointEvent(workspace: string, meta: { checkpointSequence: nu
   }
 }
 
-/** The head (count and hash, read in one statement) after the ledger prefix up to it verifies. */
+/**
+ * The head (count and hash, read in one statement) after the ledger prefix up to it verifies.
+ * ponytail: re-verifies from genesis each checkpoint (O(events)); start from the previous checkpoint's head if large
+ * ledgers make the scheduler tick slow.
+ */
 function verifiedLedgerHead(workspace: string): { count: number; hash: string } {
   const ledger = openLedger(workspace);
   try {
@@ -97,8 +104,10 @@ async function stampCheckpoint(workspace: string, entry: VerifiedCheckpoint, tru
   const { sequence } = entry.checkpoint;
   const { grant, failures } = await timestampDigest(workspace, entry.sha256, trust);
   if (!grant) return { sequence, status: "pending", failures };
-  writeFileSync(tokenPath(workspace, sequence), grant.tokenDer, { flag: "wx", mode: 0o644 });
+  // Event first: if the token file then fails to land, the checkpoint stays pending and a later tick retries; an
+  // event naming a token nobody stored only bounds nothing.
   appendCheckpointEvent(workspace, { checkpointSequence: sequence, checkpointSha256: entry.sha256, tokenSha256: sha256Hex(grant.tokenDer) });
+  writeFileSync(tokenPath(workspace, sequence), grant.tokenDer, { flag: "wx", mode: 0o644 });
   return { sequence, status: "timestamped", failures };
 }
 
