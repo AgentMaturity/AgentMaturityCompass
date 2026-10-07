@@ -46,3 +46,27 @@ The gate fails if any policy rule fails, including:
 - any level-5 claim backed by non-OBSERVED evidence when required.
 
 Policy signatures are verified before gate evaluation.
+
+## No fabricated results (AMC repository CI)
+
+`npm run check:no-fabrication` (`scripts/check-no-fabrication.mjs`) runs in the `build-test` job as the step "No fabricated results" and as part of `npm run lint`. It parses `src/` with the TypeScript compiler API, so comments, strings and regular expressions are told apart, and fails with `file:line rule message` on:
+
+- **R1 random or hash-derived value.** A call to `Math.random`, `crypto.randomInt`, `randomInt` or `crypto.getRandomValues` under `src/{score,domains,assurance,shield,compliance,diagnostic,claims,exports}`, including `randomInt` or `getRandomValues` imported under another name or reached through a `crypto` namespace or default import. Under the same roots, `%` applied to the result of a call whose name contains `hash`, `digest` or `imul` (a hash reduced to a range) also fails. A random or hash-derived number must never reach a score, level, verdict or status. Known gap: a hash stored in a variable before the `%` is not traced.
+- **R2 fabricated-result identifier.** A declared name (a variable, function, class, property, parameter, type alias, interface, enum, enum member or import binding) starting with `pseudoRandom`, or with `fake`, `mock`, `canned` or `synthetic` followed by `Score`, `Level`, `Result`, `Verdict` or `Response`, anywhere in `src/` except `src/claims/eligibility/exampleMode.ts`, the labelled example mode.
+- **R3 path-presence scoring.** A string literal starting with `src/` anywhere under `src/score/`, or inside an `existsSync` or `statSync` call under the R1 roots. A file existing in AMC's own source tree is not evidence about an agent.
+- **R4 certification wording.** A string or template literal under `src/` (not a comment and not a regular expression) containing the word "certified" or the phrase "certification ready" or "certification readiness". `.html` and `.js` files under `src/console/` and `src/dashboard/` are checked line by line. AMC output is evidence of conformity, never a certification.
+
+Exceptions live in `scripts/no-fabrication-allowlist.json`:
+
+- `permanent` holds reviewed legitimate uses, each with a reason: detection word lists, negations and refusal codes such as "not certified", and pack data naming third-party schemes. The only permanent R3 entry allowed is `src/score/controlSurfaceScope.ts`, which detects an AMC checkout and does not score; any other path scorer must go in `pathPresence`.
+- `pending` holds wording an open issue removes, each naming its owning issue key (for example `P0-21`).
+- `pathPresence` lists the 25 control-surface scorers left after P0-15, which report AMC's own control inventory, until P1-53 retires them. The script freezes those 25 names, so a file outside that set fails even when it takes a retired scorer's place. `pathPresenceBaseline` may only go down: the check fails when the list grows past it, and asks for the baseline to be lowered when the list shrinks.
+
+An entry that no longer matches anything fails as stale, so the list shrinks as issues land.
+
+A legitimate random call or hash reduction carries a marker comment on its own line, or alone on the line directly above. A trailing marker on the line above, or marker text inside a string, does not count:
+
+- `// amc-allow-random: id` for an identifier that never enters a result;
+- `// amc-allow-random: fuzz-input` for a generated attack or test input that a separate evaluator grades.
+
+Reviewers question every new marker and every new allowlist entry: each one is a place where the guard no longer looks. `npm run check:no-fabrication -- --json` prints counts per rule and the marker count so growth shows in review. `npm run check:no-fabrication -- --strict` also fails while any `pending` entry remains; Gate G0 requires it to exit 0.

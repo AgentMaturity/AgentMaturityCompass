@@ -275,7 +275,7 @@ export class CompoundStrategy implements AttackStrategy {
   }
 
   private selectVectors(available: string[], count: number): string[] {
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const shuffled = [...available].sort(() => Math.random() - 0.5); // amc-allow-random: fuzz-input
     return shuffled.slice(0, count);
   }
 

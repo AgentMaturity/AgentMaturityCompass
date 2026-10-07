@@ -202,7 +202,7 @@ export async function issueCertificate(params: {
     throw new Error(`Run file not found: ${runPath}`);
   }
   const run = JSON.parse(readUtf8(runPath)) as DiagnosticReport;
-  assertNotExample(run, "certified");
+  assertNotExample(run, "issued a certificate");
   const policyAbs = resolve(workspace, params.policyPath);
   const policySigAbs = `${policyAbs}.sig`;
   if (!pathExists(policyAbs) || !pathExists(policySigAbs)) {
