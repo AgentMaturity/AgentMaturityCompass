@@ -1,15 +1,18 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
-import { effectiveTrustTier } from "../src/claims/evidenceProvenance.js";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { bundleDigest, effectiveTrustTier, readerTrustFor, type BundleEntry } from "../src/claims/evidenceProvenance.js";
+import { generateComplianceReport, initComplianceMaps } from "../src/compliance/complianceEngine.js";
 import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
+import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { attestIngestSession, ingestBundleHash, ingestEvidence } from "../src/ingest/ingest.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { ed25519KeyId, type KeyPurpose, type TrustContext } from "../src/trust/index.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
-import { workspaceKeyPem } from "./helpers/trustContext.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { operatorTrustHome, workspaceKeyPem } from "./helpers/trustContext.js";
 import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } from "./trust/trustFixtures.js";
 
 /**
@@ -130,4 +133,87 @@ describe("ingest attestation", () => {
     expect(result.trustTier).toBe("SELF_REPORTED");
     expect(result.reason).toMatch(/operator's own/);
   });
+});
+
+/**
+ * P0-18 security follow-up: an ATTESTED row counts only for the subject the attester signed for, once per attested
+ * event, and in the window of the attested event's own time. Copies are written through the ledger API any in-process
+ * writer can use.
+ */
+describe("an attested event counts for its subject, once, in its own window", () => {
+  const PAYLOAD = "user: hello\nassistant: hi";
+  const DAY_MS = 86_400_000;
+  const homes: string[] = [];
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    while (homes.length > 0) rmSync(homes.pop()!, { recursive: true, force: true });
+  });
+
+  /** An ingest session ATTESTED by a third-party key that the operator's AMC home pins for readers. */
+  function attestedSession() {
+    const { workspace, sessionId, bundleHash } = ingested();
+    const attester = testKey();
+    attest(workspace, sessionId, { attesterSignature: { keyId: attester.keyId, sigB64: signHexDigest(bundleHash, attester.privateKeyPem) },
+      trust: pinned(attester) });
+    const home = operatorTrustHome([{ publicKeyPem: attester.publicKeyPem, purposes: ["independent-attestation"] }]);
+    homes.push(home);
+    vi.stubEnv("AMC_HOME", home);
+    const copy = attestedEvents(workspace, sessionId).find((event) => event.event_type === "review")!;
+    return { workspace, sessionId, attester, copy, meta: JSON.parse(copy.meta_json) as Record<string, unknown> };
+  }
+
+  function append(workspace: string, sessionId: string, meta: Record<string, unknown>): EvidenceEvent {
+    const ledger = openLedger(workspace);
+    try {
+      const id = ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "review", payload: PAYLOAD, payloadExt: "txt", meta });
+      return ledger.getEventById(id)!;
+    } finally {
+      ledger.close();
+    }
+  }
+
+  function compliance(workspace: string, agentId: string) {
+    initComplianceMaps(workspace);
+    return generateComplianceReport({ workspace, framework: "SOC2", window: "14d", agentId }).trustTierCoverage;
+  }
+
+  async function diagnostic(workspace: string, agentId: string) {
+    return (await runDiagnostic({ workspace, agentId, window: "14d", claimMode: "auto" })).evidenceTrustCoverage;
+  }
+
+  test("the signed bundle names the agent and session; a copy written for another agent reads SELF_REPORTED", () => {
+    const { workspace, sessionId, copy, meta } = attestedSession();
+    expect(meta.attestation).toMatchObject({ bundle: [expect.objectContaining({ agentId: meta.agentId, sessionId })] });
+    const forB = append(workspace, sessionId, { ...meta, agentId: "agent-b" });
+    const reader = readerTrustFor(workspace);
+    expect(effectiveTrustTier(forB, reader)).toBe("SELF_REPORTED");
+    expect(effectiveTrustTier(copy, reader)).toBe("ATTESTED");
+    expect(compliance(workspace, "agent-b").attested).toBe(0);
+  });
+
+  test("a second copy of the same attested event counts once in the compliance engine and the diagnostic", async () => {
+    const { workspace, sessionId, meta } = attestedSession();
+    const agentId = String(meta.agentId);
+    const before = { compliance: compliance(workspace, agentId), diagnostic: await diagnostic(workspace, agentId) };
+    expect(before.compliance.attested).toBeGreaterThan(0);
+    expect(before.diagnostic.attested).toBeGreaterThan(0);
+    const replay = append(workspace, sessionId, meta);
+    expect(effectiveTrustTier(replay, readerTrustFor(workspace))).toBe("ATTESTED");
+    expect(compliance(workspace, agentId)).toEqual(before.compliance);
+    expect(await diagnostic(workspace, agentId)).toEqual(before.diagnostic);
+  }, 120_000);
+
+  test("a copy appended later than the attested event's time does not count in a later window", async () => {
+    const { workspace, sessionId, attester, meta } = attestedSession();
+    const agentId = String(meta.agentId);
+    const before = { compliance: compliance(workspace, agentId), diagnostic: await diagnostic(workspace, agentId) };
+    // A genuine signature over an event the attester saw 30 days ago, copied into the ledger now.
+    const bundle: BundleEntry[] = [{ id: "event-30-days-ago", sha256: sha256Hex(PAYLOAD), ts: Date.now() - 30 * DAY_MS, agentId, sessionId }];
+    const digestSha256 = bundleDigest(bundle);
+    const late = append(workspace, sessionId, { ...meta, originalEventId: "event-30-days-ago",
+      attestation: { kind: "third_party", keyId: attester.keyId, sigB64: signHexDigest(digestSha256, attester.privateKeyPem), digestSha256, bundle } });
+    expect(effectiveTrustTier(late, readerTrustFor(workspace))).toBe("ATTESTED");
+    expect(compliance(workspace, agentId)).toEqual(before.compliance);
+    expect(await diagnostic(workspace, agentId)).toEqual(before.diagnostic);
+  }, 120_000);
 });

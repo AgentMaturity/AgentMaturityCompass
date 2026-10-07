@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  bundleDigest, effectiveTrustTier, evidenceProducer, readerTrustFor, trustTierByEventId, verifyThirdPartyAttestation,
+  bundleDigest, countAttestedOnce, effectiveTrustTier, evidenceProducer, readerTrustFor, trustTierByEventId, verifyThirdPartyAttestation,
   type ThirdPartyAttestation
 } from "../../src/claims/evidenceProvenance.js";
 import { getPrivateKeyPem, signHexDigest } from "../../src/crypto/keys.js";
@@ -20,21 +20,23 @@ import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } f
  * the source-literal enumeration are pinned in tests/compliance/evidenceBinding.test.ts (P0-17 shares the table).
  */
 const PAYLOAD_SHA = sha256Hex("user: hello");
-const BUNDLE = [{ id: "orig-1", sha256: PAYLOAD_SHA, ts: 1 }, { id: "orig-2", sha256: sha256Hex("user: bye"), ts: 2 }];
+const SUBJECT = { agentId: "agent-a", sessionId: "session-a" };
+const BUNDLE = [{ id: "orig-1", sha256: PAYLOAD_SHA, ts: 1, ...SUBJECT }, { id: "orig-2", sha256: sha256Hex("user: bye"), ts: 2, ...SUBJECT }];
 const DIGEST = bundleDigest(BUNDLE);
 const ATTESTER = testKey();
 
-function row(meta: Record<string, unknown>, payloadSha256 = PAYLOAD_SHA): { meta_json: string; payload_sha256: string } {
-  return { meta_json: JSON.stringify(meta), payload_sha256: payloadSha256 };
+function row(meta: Record<string, unknown>, payloadSha256 = PAYLOAD_SHA): { meta_json: string; payload_sha256: string; session_id: string } {
+  return { meta_json: JSON.stringify(meta), payload_sha256: payloadSha256, session_id: SUBJECT.sessionId };
 }
 
-function attestation(key: TestKey = ATTESTER, digest = DIGEST): ThirdPartyAttestation {
-  return { keyId: key.keyId, sigB64: signHexDigest(digest, key.privateKeyPem), digestSha256: digest, attestedBy: "Example Audit LLP", bundle: BUNDLE };
+function attestation(key: TestKey = ATTESTER, digest = DIGEST, bundle: unknown[] = BUNDLE): ThirdPartyAttestation {
+  return { keyId: key.keyId, sigB64: signHexDigest(digest, key.privateKeyPem), digestSha256: digest, attestedBy: "Example Audit LLP",
+    bundle: bundle as ThirdPartyAttestation["bundle"] };
 }
 
 /** The attested copy of bundle entry orig-1, as attestIngestSession writes it. */
 function attestedMeta(record: ThirdPartyAttestation = attestation()): Record<string, unknown> {
-  return { source: "attested_ingest", trustTier: "ATTESTED", ingestSessionId: "session-a", originalEventId: "orig-1", attestation: record };
+  return { source: "attested_ingest", trustTier: "ATTESTED", agentId: "agent-a", ingestSessionId: "session-a", originalEventId: "orig-1", attestation: record };
 }
 
 function trustFor(key: TestKey, purposes: KeyPurpose[] = ["independent-attestation"], overrides: Parameters<typeof listEntry>[1] = {}): TrustContext {
@@ -111,12 +113,24 @@ describe("effectiveTrustTier", () => {
     ["an eval import row", () => row({ source: "eval_import", trustTier: "ATTESTED", attestation: attestation() })],
     ["a runtime row with no source", () => row({ trustTier: "ATTESTED", attestation: attestation() })],
     ["a row whose record lost its bundle", () => row(attestedMeta({ ...attestation(), bundle: undefined }))],
-    ["a row whose bundle was extended", () => row({ ...attestedMeta({ ...attestation(), bundle: [...BUNDLE, { id: "x", sha256: sha256Hex("fabricated"), ts: 3 }] }),
+    ["a row whose bundle was extended", () => row({ ...attestedMeta({ ...attestation(), bundle: [...BUNDLE, { id: "x", sha256: sha256Hex("fabricated"), ts: 3, ...SUBJECT }] }),
       originalEventId: "x" }, sha256Hex("fabricated"))],
-    ["a row without its payload hash", () => ({ meta_json: JSON.stringify(attestedMeta()) })]
+    ["a row without its payload hash", () => ({ meta_json: JSON.stringify(attestedMeta()), session_id: SUBJECT.sessionId })],
+    // The bundle names the subject the attester signed for (agent and session); a copy for anyone else is not attested.
+    ["another agent's row", () => row({ ...attestedMeta(), agentId: "agent-b" })],
+    ["a row with no agent", () => row({ ...attestedMeta(), agentId: undefined })],
+    ["a row in another session", () => ({ ...row(attestedMeta()), session_id: "session-b" })],
+    ["a row without its session", () => ({ meta_json: JSON.stringify(attestedMeta()), payload_sha256: PAYLOAD_SHA })]
   ];
   test.each(replays)("a copied attestation on %s reads SELF_REPORTED", (_label, make) => {
     expect(effectiveTrustTier(make(), { trustList: trust })).toBe("SELF_REPORTED");
+  });
+
+  test("an old bundle whose entries do not name the agent and session reads SELF_REPORTED (fail closed)", () => {
+    const old = BUNDLE.map(({ id, sha256, ts }) => ({ id, sha256, ts }));
+    const signed = attestation(ATTESTER, bundleDigest(old as never), old);
+    expect(verifyThirdPartyAttestation(signed, trust).verified).toBe(true);
+    expect(effectiveTrustTier(row(attestedMeta(signed)), { trustList: trust })).toBe("SELF_REPORTED");
   });
 
   test("the workspace's own key never reads ATTESTED, even when the operator's trust list pins it", () => {
@@ -135,6 +149,28 @@ describe("effectiveTrustTier", () => {
       rmSync(home, { recursive: true, force: true });
       rmSync(workspace, { recursive: true, force: true });
     }
+  });
+});
+
+describe("countAttestedOnce", () => {
+  const trust = trustFor(ATTESTER);
+  const tierOf = (event: ReturnType<typeof row>) => effectiveTrustTier(event, { trustList: trust });
+  const at = (ts: number, meta: Record<string, unknown> = attestedMeta()) => ({ ...row(meta), ts });
+
+  test("an attested event counts once, as its earliest copy, whatever the row order; other rows pass", () => {
+    const replay = at(6);
+    const first = at(5);
+    const observed = at(7, { trustTier: "OBSERVED" });
+    const unverified = at(8, attestedMeta(attestation(testKey())));
+    expect(countAttestedOnce([replay, first, observed, unverified], tierOf, { startTs: 0, endTs: 10 })).toEqual([first, observed, unverified]);
+    // A row read as ATTESTED without a bound attestation (stale OBSERVED in the diagnostic) is not an attested event.
+    expect(countAttestedOnce([observed, observed], () => "ATTESTED", { startTs: 0, endTs: 10 })).toEqual([observed, observed]);
+  });
+
+  test("an attested event counts only in a window that holds its attested time", () => {
+    // orig-1 was attested at ts 1; a copy appended at ts 5 does not carry it into a window that starts later.
+    expect(countAttestedOnce([at(5)], tierOf, { startTs: 2, endTs: 10 })).toEqual([]);
+    expect(countAttestedOnce([at(5)], tierOf, { startTs: 1, endTs: 10 })).toHaveLength(1);
   });
 });
 
@@ -190,7 +226,7 @@ describe("diagnostic readers", () => {
   });
 
   function raw(meta: Record<string, unknown>, fields: Partial<EvidenceEvent> = {}): EvidenceEvent {
-    return { id: "ev", ts: Date.now(), session_id: "s1", runtime: "unknown", event_type: "artifact", payload_path: "agents/a/report.json",
+    return { id: "ev", ts: Date.now(), session_id: SUBJECT.sessionId, runtime: "unknown", event_type: "artifact", payload_path: "agents/a/report.json",
       payload_inline: null, payload_sha256: PAYLOAD_SHA, meta_json: JSON.stringify(meta), prev_event_hash: "", event_hash: "1".repeat(64),
       writer_sig: "", ...fields } as EvidenceEvent;
   }
