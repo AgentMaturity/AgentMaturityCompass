@@ -607,7 +607,7 @@ describe("supported plugin package public workflows", () => {
     expect(printed.version).toBe("1.0.0");
     expect(printed.artifactCount).toBe(1);
     expect(printed.publisherFingerprint).toBe(verified.publisherFingerprint);
-    expect(printed.verification).toEqual({ ok: true, errors: [] });
+    expect(printed.verification).toEqual({ ok: true, errors: [], report: expect.objectContaining({ trusted: true }) as unknown });
     expect(packed.outFile).toBe(file);
     expect(packed.manifest).toEqual(verified.manifest);
     expect(packed.manifest.signing.pubkeyFingerprint).toBe(keys.fingerprint);
