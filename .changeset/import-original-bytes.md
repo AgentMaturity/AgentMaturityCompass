@@ -8,6 +8,10 @@ DSH session files with any version other than 2, including format v4, are refuse
 
 The record map is now `amc-record-map/2`: each source carries `originalSha256` and `sourceRevision`, and `losses` lists what the redaction, projection and external-evidence stages dropped. External-evidence profiles are unchanged.
 
-Gateway routes accept `refuseRequestFields`. A request whose top-level JSON body has a listed field (for example `dsh_session_log`) is refused with HTTP 403 and a signed `REQUEST_FIELD_REFUSED` audit event with the route, field names and byte count, never the content. This is enforced at the AMC gateway only for traffic that passes through it.
+Gateway routes accept `refuseRequestFields`. The refusal applies to the route's upstream: every route to the same upstream name or host enforces the union. A request whose top-level JSON object has a listed key (for example `dsh_session_log`) is refused with HTTP 403 and a signed `REQUEST_FIELD_REFUSED` audit event with the route, reason, field names and byte count, never the content. This is enforced at the AMC gateway only for traffic that passes through it.
+
+Gateway route prefixes now match on a path-segment boundary: `/openai` serves `/openai` and `/openai/...` but no longer `/openai2/...`.
+
+Security: the field guard fails closed. On a guarded upstream, a non-empty body that is content-encoded, declares a non-UTF-8 charset, starts with a byte-order mark, is not valid UTF-8 JSON or is not a JSON object is refused, and keys are compared after case and Unicode compatibility folding, so an upstream parser cannot read a field the guard missed. The forward proxy refuses HTTP and CONNECT traffic to the host of any guarded upstream (every host when that host is unknown), so a tunnel or a sibling route cannot bypass the guard.
 
 Imports remain self-reported and not evaluated. A retained original shows the bytes are unchanged since import; it does not show the source is true.
