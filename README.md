@@ -204,6 +204,17 @@ amc passport verify agent.amcpass --pubkey ~/amc-pins/auditor.pub
 
 Exit code 0 means trusted, 1 failed (including an unpinned issuer or an unanchored ledger, with the key id to pin), and 2 means `--allow-unpinned` or `--allow-unanchored` gave an integrity-only result. For many keys, use a signed trust list: see [Trust lists](docs/TRUST_LIST.md).
 
+### When verification fails: `amc verify --repair`
+
+Repair never deletes evidence. A failed signature looks the same whether a vault was re-initialized or the evidence was altered, so keep the files.
+
+- `amc verify --repair` reruns verification, counts the errors by kind and prints a plan: the files `--apply` would move and their total size. It changes nothing. Exit 0 when the workspace verifies, 1 when it does not. When only configuration signatures fail, or no ledger exists, there is nothing to archive. Blob payloads also fail authentication while the vault is locked, so unlock it before you archive.
+- `amc verify --repair --apply` asks you to type `archive` (use `--yes` in scripts; without a terminal and without `--yes` it refuses). It moves the evidence store, and nothing else, by rename into `.amc/quarantine/<YYYYMMDDTHHMMSSZ>-<8 hex>/`: `.amc/evidence.sqlite` with its `-wal` and `-shm` files go to `evidence.sqlite*`, `.amc/blobs/**` goes to `blobs/**` and, for a JSONL workspace, `.amc/jsonl/*.jsonl` goes to `jsonl/`. `.amc/reports` and every other file stay where they are.
+- The folder holds `repair-plan.json` (written first, as the intent record), `repair-receipt.json` (every move with its size and SHA-256, the errors that triggered it and the legal-hold check) and `repair-receipt.json.sig`, signed by the auditor key as `REPAIR_RECEIPT`. A signature shows who wrote the receipt and that it is unchanged.
+- Apply refuses with exit 2 and moves nothing when the legal-hold state is unknown or any hold is active, when the monitor key does not match `--expect-monitor` or `AMC_EXPECTED_MONITOR_FINGERPRINT`, when a planned file changed since the plan, or when signing is unavailable. If a rename fails part way (for example `EXDEV` or `EPERM`), it puts back what it moved and refuses.
+- Afterwards `amc verify` and `amc verify --repair` print `Note: N archived evidence store(s) failed verification; latest receipt: <path>`, and warn about a quarantine folder with a plan but no receipt (an interrupted repair).
+- To restore, move each file back to the `from` path in its receipt, then run `amc verify`. Repair cannot recover evidence that is already gone.
+
 ---
 
 ## How AMC Compares

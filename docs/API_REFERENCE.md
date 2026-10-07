@@ -10084,6 +10084,8 @@ Verify integrity across AMC artifacts
 | `--trust-root <sha256>` | - |
 | `--allow-unanchored` | - |
 | `--repair` | - |
+| `--apply` | - |
+| `--yes` | - |
 | `--sign-config` | - |
 
 #### `amc verify all`
