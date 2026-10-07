@@ -8,7 +8,8 @@ import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
-import type { AgentStatus } from "./loopTypes.js";
+import type { AgentStatus, CompactionConfig } from "./loopTypes.js";
+import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
@@ -67,6 +68,8 @@ export interface AgentSessionInit {
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
   readonly maxSteps?: number;
+  /** Automatic compaction; off unless `contextWindowTokens` is declared. */
+  readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
@@ -124,6 +127,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
   if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
   if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
   if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
+  const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
   const sessionId = init.sessionId ?? randomUUID();
   const session = claimant === undefined ? new SessionService(init.workspace) : resumeSession({
     workspace: init.workspace, sessionId, agentId: init.agentId,
@@ -204,7 +208,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       systemPromptEventId,
       tools,
       ...(init.validation === undefined ? {} : { validation: init.validation }),
-      ...(init.maxSteps === undefined ? {} : { config: { maxStepsPerTurn: init.maxSteps } })
+      config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
     });
   } catch (error) {
     // A half-composed session would otherwise be left open and unsealed, which

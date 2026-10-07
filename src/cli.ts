@@ -681,6 +681,8 @@ import { runBootstrap } from "./bootstrap/bootstrap.js";
 import { registerQuickSetupCommand } from "./setup/quickSetupCli.js";
 import { registerFixCommand } from "./guide/fixCli.js";
 import { registerDomainApplyCommand } from "./domains/domainApplyCli.js";
+// Alias-aware (finance -> wealth); the incident commands keep their exact-id parseStation.
+import { STATIONS, parseStation as parseStationOrAlias, type Station } from "./domains/stations.js";
 import { registerReplCommand } from "./repl/replCli.js";
 import { registerApiCommands } from "./api/apiCli.js";
 import {
@@ -11422,6 +11424,7 @@ program
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Certificate issued: ${issued.outFile}`));
+    for (const warning of issued.timestampWarnings) console.log(chalk.yellow(`No RFC 3161 timestamp attached: ${warning}`));
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`certId=${issued.certId}`);
   });
@@ -12550,8 +12553,16 @@ compliance
   .option("--window <window>", "window (e.g. 14d)", "30d")
   .option("--out <path>", "output path (.md or .json)")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .option("--station <station>", `keep only mappings tagged with this station: ${STATIONS.join("|")}`)
   .option("--json", "output JSON to stdout", false)
-  .action(async (opts: { framework?: string; window: string; out?: string; agent?: string; json: boolean }) => {
+  .action(async (opts: { framework?: string; window: string; out?: string; agent?: string; station?: string; json: boolean }) => {
+    let station: Station | undefined;
+    try {
+      station = opts.station === undefined ? undefined : parseStationOrAlias(opts.station);
+    } catch (error) {
+      console.error(chalk.red(toErrorMessage(error)));
+      process.exit(1); return;
+    }
     let frameworkInput = opts.framework;
     if (!frameworkInput) {
       if (process.stdin.isTTY) {
@@ -12599,7 +12610,8 @@ compliance
       window: opts.window,
       outFile: opts.out,
       format,
-      agentId: opts.agent ?? activeAgent(program)
+      agentId: opts.agent ?? activeAgent(program),
+      station
     });
     const claim = envelopeForComplianceReport(out.report, out.report.ts);
     if (opts.json) {
@@ -12609,6 +12621,7 @@ compliance
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
     printClaimResult(claim, {});
     console.log(`Framework: ${family.displayName}`);
+    if (station) console.log(`Station: ${station} (only mappings tagged with this station)`);
     // P0-17: a percentage is not a status; nothing evaluated prints "not evaluated", never a score.
     const { coverage } = out.report;
     const total = out.report.categories.length;

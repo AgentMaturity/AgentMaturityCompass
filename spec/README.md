@@ -27,6 +27,9 @@ true; the acceptance rules cover those checks.
 | `trust-list` | A signed list of pinned keys and their purposes (docs/TRUST_LIST.md) | Read by every verifier |
 | `verifier-report` | The separate results of one verification | Emitted by the verify commands with `--json` |
 | `signature-envelope` | The Ed25519 envelope AMC artifacts carry | Emitted |
+| `control-record` | One Regulated Control Catalog control (docs/catalog/CONTROL_RECORD.md) | Read by `loadCatalog`; content under `catalog/` |
+| `pack-manifest` | One catalog pack: its controls, layer, stations and declared support | Read by `loadCatalog` |
+| `catalog-lock` | The digests that pin one catalog tree | Built by `buildCatalogLock`; P1-10 embeds it in compiled plans |
 | `amcbench`, `amcprompt`, `amccert`, `amcaudit`, `amcpass`, `amcproof`, `registry.bench`, `registry.passport` | The `amc standard` artifacts | Emitted; `amc standard generate` writes these same files |
 | `external-evidence` | The producer-neutral evidence profile (docs/EXTERNAL_EVIDENCE_PROFILE.md) | Hand-written strict schema; its `$id` predates this folder and is unchanged |
 

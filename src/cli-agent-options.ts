@@ -18,7 +18,8 @@ import { createOllamaRoute } from "./llm/providers/ollamaRoute.js";
 import { ollamaParams } from "./llm/providers/ollamaContract.js";
 import { credentialRef } from "./credentials/credentialRef.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderAdapter, stubProviderRoute } from "./agent/stubProvider.js";
-import type { LoopNotification } from "./agent/loopTypes.js";
+import type { CompactionConfig, LoopNotification } from "./agent/loopTypes.js";
+import { compactionFromFlags } from "./agent/compaction/promptPressure.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
@@ -65,6 +66,9 @@ export interface RunOptions {
   thinking?: string;
   reasoningEffort?: string;
   maxSteps?: string;
+  contextWindow?: string;
+  compactThreshold?: string;
+  autoSummary?: boolean;
   tools?: string;
   toolMode?: string;
   unsafeUnconfinedShell?: boolean;
@@ -188,6 +192,16 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
     return null;
   }
   return value;
+}
+
+/** Automatic compaction from the run flags; undefined when off, null after a reported error. */
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">): CompactionConfig | undefined | null {
+  try { return compactionFromFlags(options); }
+  catch (error) {
+    io.error(chalk.red(error instanceof Error ? error.message : "Automatic compaction options were refused."));
+    io.fail();
+    return null;
+  }
 }
 
 /** The default wire params for each supported adapter, and why each one is there. */
@@ -431,6 +445,8 @@ export function renderNotification(notification: LoopNotification): string | nul
           );
     case "turn-end":
       return chalk.bold(`turn ${notification.turn} ended: ${notification.ending.reason}`);
+    case "compaction":
+      return chalk.yellow(`  step ${notification.turn}.${notification.step} automatic compaction: ${notification.message}`);
     case "error":
       return chalk.red(`  native error at turn ${notification.turn}, step ${notification.step}: ${renderNativeFailureGuidance(liveNativeFailureGuidance(notification.error))}`);
     default:

@@ -69,19 +69,44 @@
         { "path": "src/gateway/server.ts", "symbol": "hostAllowed" },
         { "path": "src/gateway/server.ts", "symbol": "createProxyServer" },
         { "path": "src/sandbox/egress/shellEgressProxy.ts", "symbol": "startShellEgressProxy" },
-        { "path": "src/gateway/requestFieldGuard.ts", "symbol": "prepareFieldGuard" }
+        { "path": "src/gateway/requestFieldGuard.ts", "symbol": "prepareFieldGuard" },
+        { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "governedGet" }
       ],
-      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; NATIVE_SHELL_EGRESS rows for every shell proxy decision; tool evidence rows for NETWORK_EXTERNAL tools",
+      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
       "status": "enforced",
       "bypasses": [
         "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; MCP servers and extensions open sockets directly",
         "The gateway resolves nothing itself, so the decideEgress non-public address rule reaches IP-literal hosts only there; an allowed name can resolve to a private or metadata address (follow-up P1-59, proposed)",
         "For an upstream with refuseRequestFields, the gateway forward proxy resolves the target once, refuses any name, subdomain or address shared with a guarded upstream, and connects only to a checked address (P1-24); guarded upstream addresses are resolved once at gateway start, so an address the provider adds later is matched only by name",
         "A host allowlist cannot stop domain fronting through a listed host; the shell proxy pins the Host header for plain HTTP only",
-        "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system"
+        "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system",
+        "There is no workspace-wide egress allowlist for in-process tools: web_fetch and web_search apply decideEgress to their own signed hosts, and the shell's allowlist governs only the shell (P2-13)"
       ],
-      "owners": ["P1-05", "P1-43"],
+      "owners": ["P1-05", "P2-13"],
       "asi": ["ASI02", "ASI05"]
+    },
+    {
+      "id": "native-tool-breadth",
+      "name": "Native web and session tools",
+      "enforcementPoints": [
+        { "path": "src/agent/nativeToolCapabilities.ts", "symbol": "NATIVE_BUILTIN_CAPABILITIES" },
+        { "path": "src/tools/builtin/nativeToolBreadth/originPolicy.ts", "symbol": "loadOriginPolicy" },
+        { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "governedGet" },
+        { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "labelUntrusted" },
+        { "path": "src/tools/builtin/nativeToolBreadth/nativeReceipt.ts", "symbol": "receiptedBody" },
+        { "path": "src/tools/builtin/nativeToolBreadth/sessionListTool.ts", "symbol": "readSessionList" },
+        { "path": "src/tools/builtin/askUserTool.ts", "symbol": "askUserTool" }
+      ],
+      "evidence": "One NATIVE_WEB_FETCH, NATIVE_WEB_SEARCH, NATIVE_ASK_USER, NATIVE_TODO or NATIVE_PLAN call receipt (allow, deny or fail) per executed call, written before content is returned or a record is written; NATIVE_WEB_EGRESS rows before each web connection; tool evidence rows for every call, including guard denials",
+      "status": "enforced",
+      "bypasses": [
+        "No shipped policy lists the five tools, and no answerer or search provider is composed, so they stay denied until an operator signs a tools.yaml that lists them (profiles: P2-13)",
+        "Content from a granted origin is still attacker-controlled; it reaches the model fenced and labelled as untrusted data, which reduces but does not remove prompt injection",
+        "The todo and plan ledger check verifies the chain up to the newest row it finds; deleting the newest rows of an open session together with restoring an older record is caught only when the session writer next appends (STALE_HEAD)",
+        "An ask_user answer proves that a holder of the workspace auditor key answered, not which human; workspace keys give a local audit trail only"
+      ],
+      "owners": ["P2-13"],
+      "asi": ["ASI01", "ASI02", "ASI06"]
     },
     {
       "id": "mcp-stdio",

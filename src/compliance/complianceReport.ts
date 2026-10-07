@@ -53,6 +53,7 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceReport(report, report.ts)), "report"));
   lines.push("");
   lines.push(`- Agent: ${report.agentId}`);
+  if (report.station) lines.push(`- Station: ${report.station} (only mappings tagged with this station)`);
   lines.push(`- Window: ${new Date(report.windowStartTs).toISOString()} -> ${new Date(report.windowEndTs).toISOString()}`);
   lines.push(
     `- Config trusted: ${report.configTrusted ? "YES" : "NO"}${report.configReason ? ` (${report.configReason})` : ""}` +

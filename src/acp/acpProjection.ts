@@ -1,4 +1,5 @@
 import { UNSIGNED } from "../agent/runReport.js";
+import { compactionSummaryRows } from "../agent/compaction/summaryPrompt.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -68,6 +69,8 @@ export function projectSessionUpdates(
       { reason: error instanceof NativeAudioProvenanceError ? error.reason : "evidence-inconsistent" }); }
   }
 
+  // A compaction summary step's prompt and answer are context aids, not conversation.
+  const inSummaryStep = compactionSummaryRows(events);
   for (const event of events.slice(from)) {
     // `UNSIGNED` is IMPORTED, not restated. This file declared its own
     // `"UNSIGNED"` while the ledger writes `"unsigned"`, so this comparison
@@ -78,6 +81,7 @@ export function projectSessionUpdates(
       unsigned += 1;
       continue;
     }
+    if (inSummaryStep(event)) continue;
     if (options.includeUser && (event.event_type === "user/message" || event.event_type === "tool/result"
       || (event.event_type === "assistant/block" && metaOf(event)["blockKind"] === "text"))
       && readEventPayload(workspace, event).status !== "ok") {

@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": minor
+---
+
+Adds the `Station` type, the station-domain map and `--station` filters; results are unchanged. `src/domains/stations.ts` (re-exported from the package) holds the seven stations (`STATIONS`, `STATION_TITLES`, `isStation`, alias-aware `parseStation`), the `StationScope` and `CrossStationProfile` types with `validateStationScope`, and the 19-row Layer 1 map `STATION_DOMAINS`, which covers all 41 sector packs and the 40 domain names on the website's station pages (`stationsForPack`, `domainsForStation`). Compliance mappings accept an optional `stations` list (at least one entry when present); `stationsForMapping`, `FRAMEWORK_STATIONS` and `stationsForInstrument` in `src/compliance/stationTags.ts` derive stations for every built-in mapping and for regulatory-catalogue instruments that a pack, rubric or register entry cites. The framework-to-station rows are agent-encoded from the strategy's register and stay experimental until an expert reviews them.
+
+`amc domain pack list --station <station>` filters packs by station; `--domain` still works but is deprecated and prints a notice to stderr, and giving both exits 1. `amc compliance report --station <station>` keeps only the mappings tagged with that station and adds `"station"` to the JSON report. Studio `GET /industry-packs/list?station=<station>` filters the same way and returns 400 for an unknown station. A station tag never changes a score, level or status.

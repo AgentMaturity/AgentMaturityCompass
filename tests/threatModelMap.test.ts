@@ -52,12 +52,12 @@ describe("check-threat-model", () => {
     expect(output).toContain("names no test and no owner");
   });
 
-  test("the real channel map passes with 15 channels and 8 failure rows", () => {
+  test("the real channel map passes with 16 channels and 8 failure rows", () => {
     const { status, output } = check();
     expect(output).toContain("ok");
     expect(status).toBe(0);
     const map = JSON.parse(readFileSync(MAP, "utf8")) as { channels: unknown[]; failurePolicy: unknown[] };
-    expect(map.channels).toHaveLength(15);
+    expect(map.channels).toHaveLength(16);
     expect(map.failurePolicy).toHaveLength(8);
   });
 

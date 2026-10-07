@@ -166,7 +166,18 @@ export type LoopNotification =
       readonly decision: "retry" | "give-up";
       readonly delayMs: number | null;
     }
-  | { readonly kind: "error"; readonly turn: number; readonly step: number; readonly error: unknown };
+  | { readonly kind: "error"; readonly turn: number; readonly step: number; readonly error: unknown }
+  /**
+   * What automatic compaction did, or why it did not run, at one step boundary.
+   * The signed `loop/compact` receipts named in `eventIds` are the account of record.
+   */
+  | {
+      readonly kind: "compaction";
+      readonly turn: number;
+      readonly step: number;
+      readonly message: string;
+      readonly eventIds: readonly string[];
+    };
 
 /**
  * The loop's extension points.
@@ -240,6 +251,24 @@ export interface AgentLoopConfig {
    * Zero is legal and means "do not wait at all".
    */
   readonly toolAbandonGraceMs: number;
+  /** Automatic context compaction between steps; absent or a null window means off. */
+  readonly compaction?: CompactionConfig;
+}
+
+/** See ./compaction/promptPressure.ts for the defaults and the bounds each field is checked against. */
+export interface CompactionConfig {
+  /** Operator-declared. Never inferred from a model name; null disables automatic compaction. */
+  readonly contextWindowTokens: number | null;
+  /** Fraction of the window, 0.5 to 0.95, at which a boundary compacts. */
+  readonly threshold: number;
+  /** Tool output from this many most recent steps is never pruned. */
+  readonly keepRecentSteps: number;
+  /** Only tool results at least this many payload bytes are pruned. */
+  readonly pruneMinBytes: number;
+  /** Whether a model-written summary may follow when pruning is not enough. */
+  readonly summarize: boolean;
+  /** Boundaries per turn that may compact. */
+  readonly maxPerTurn: number;
 }
 
 export const DEFAULT_AGENT_LOOP_CONFIG: AgentLoopConfig = Object.freeze({

@@ -40,6 +40,7 @@ import { projectNativeValidation } from "./nativeValidationProjection.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
 import { projectNativeRunUsage, renderNativeRunUsage, type NativeRunUsage } from "./nativeRunUsage.js";
 import { projectNativeRunDiagnostics, renderNativeRunDiagnostics, type NativeRunDiagnostic } from "./nativeFailureGuidance.js";
+import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 
 /** The literal a ledger writes in place of a signature under `AMC_NO_SIGN=1`. */
 /** The marker a row carries instead of a signature when signing is off. */
@@ -89,13 +90,17 @@ function sessionEvents(workspace: string, sessionId: string): EvidenceEvent[] {
   return readNativeSessionEvents(workspace, sessionId);
 }
 
-/** Assistant text blocks, read from their payloads. Pruned or missing bytes are named, not skipped. */
+/**
+ * Assistant text blocks, read from their payloads. Pruned or missing bytes are named, not skipped.
+ * An automatic compaction summary is excluded: it is a self-reported context aid, not an answer.
+ */
 function assistantTextOf(workspace: string, events: readonly EvidenceEvent[]): string[] {
   const out: string[] = [];
+  const inSummaryStep = compactionSummaryRows(events);
   for (const event of events) {
     if (event.event_type !== "assistant/block") continue;
     const meta = JSON.parse(event.meta_json) as { blockKind?: unknown };
-    if (meta.blockKind !== "text") continue;
+    if (meta.blockKind !== "text" || inSummaryStep(event)) continue;
     const payload = readEventPayload(workspace, event);
     out.push(
       payload.status === "ok"

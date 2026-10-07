@@ -1,4 +1,4 @@
-import { createPublicKey, sign, verify } from "node:crypto";
+import { createPublicKey, sign, verify, X509Certificate } from "node:crypto";
 import { z } from "zod";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -77,6 +77,22 @@ export const distrustEntrySchema = z.strictObject({
   source: z.string().min(1)
 });
 
+/**
+ * P1-25: an RFC 3161 timestamp authority the operator pins. Tokens verify only through a path to one of these
+ * certificates (a root, an intermediate, or the TSA certificate itself), never through a certificate a token carries.
+ */
+export const timestampAuthoritySchema = z.strictObject({
+  anchorId: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/),
+  name: z.string().min(1),
+  rootCertificatePem: z.string().min(1).max(16 * 1024),
+  policyOids: z.array(z.string().regex(/^[0-2](\.(0|[1-9][0-9]*))+$/)).min(1).optional()
+}).superRefine((authority, ctx) => {
+  const pemCount = authority.rootCertificatePem.match(/-----BEGIN CERTIFICATE-----/g)?.length ?? 0;
+  let parses = false;
+  try { parses = pemCount === 1 && new X509Certificate(authority.rootCertificatePem).raw.length > 0; } catch { /* reported below */ }
+  if (!parses) ctx.addIssue({ code: "custom", message: "rootCertificatePem must be exactly one PEM X.509 certificate" });
+});
+
 export const trustListSchema = z.strictObject({
   type: z.literal("amc.trust-list"),
   version: z.literal(1),
@@ -86,7 +102,10 @@ export const trustListSchema = z.strictObject({
   expiresAt: utcTimeSchema,
   entries: z.array(trustListEntrySchema).max(4096)
     .refine(entries => new Set(entries.map(entry => entry.keyId)).size === entries.length, "duplicate keyId"),
-  distrust: z.array(distrustEntrySchema)
+  distrust: z.array(distrustEntrySchema),
+  timestampAuthorities: z.array(timestampAuthoritySchema).max(64)
+    .refine(authorities => new Set(authorities.map(authority => authority.anchorId)).size === authorities.length, "duplicate anchorId")
+    .optional()
 });
 
 export const signedTrustListSchema = z.strictObject({
@@ -96,6 +115,7 @@ export const signedTrustListSchema = z.strictObject({
 
 export type TrustListEntry = z.infer<typeof trustListEntrySchema>;
 export type DistrustEntry = z.infer<typeof distrustEntrySchema>;
+export type TimestampAuthority = z.infer<typeof timestampAuthoritySchema>;
 export type TrustList = z.infer<typeof trustListSchema>;
 export type SignedTrustList = z.infer<typeof signedTrustListSchema>;
 

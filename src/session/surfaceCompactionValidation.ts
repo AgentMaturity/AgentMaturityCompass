@@ -1,19 +1,62 @@
 /** Pure admission/replay rules for one atomic origin-addressed surface edit. */
 import { z } from "zod";
+import type { ClaimKind } from "../claims/eligibility/types.js";
 import type { EvidenceEvent } from "../types.js";
 import type { SurfaceEntry } from "./surfaceProjection.js";
-import type { SessionEnvelope, SurfaceOp } from "./sessionTypes.js";
+import type { SessionEnvelope, SurfaceOp, TokenUsage } from "./sessionTypes.js";
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
-export const surfaceCompactionReceiptSchema = z.object({
-  v: z.literal(1), mode: z.enum(["replace", "summarize", "drop"]), reason: z.string().min(1).max(2048),
+const count = z.number().int().nonnegative().safe();
+/** Adapters report DISJOINT counts (StreamTokenUsage), so the prompt is their sum. Never estimated from bytes. */
+export const PROMPT_TOKENS_FORMULA = "inputTokens+cacheRead+cacheWrite";
+export function promptTokensFor(usage: TokenUsage | null): number | null {
+  if (usage === null) return null;
+  const tokens = usage.inputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0);
+  return Number.isSafeInteger(tokens) && tokens >= 0 ? tokens : null;
+}
+/** A model-written summary is the agent's own statement, never evidence of what happened. */
+export const SUMMARY_CLAIM_KIND = "self_reported" satisfies ClaimKind;
+const receiptFields = {
+  mode: z.enum(["replace", "summarize", "drop"]), reason: z.string().min(1).max(2048),
   basis: z.object({ sessionId: z.string().min(1), eventId: z.string().min(1), eventHash: hash, seq: z.number().int().nonnegative() }).strict(),
   sources: z.array(z.object({ originEventId: z.string().min(1), sourceEventId: z.string().min(1),
-    sourceEventHash: hash, payloadSha256: hash, bytes: z.number().int().nonnegative().safe() }).strict()).min(1).max(256),
-  replacedBytes: z.number().int().nonnegative().safe(), replacementBytes: z.number().int().nonnegative().max(1_000_000).safe(),
+    sourceEventHash: hash, payloadSha256: hash, bytes: count }).strict()).min(1).max(256),
+  replacedBytes: count, replacementBytes: z.number().int().nonnegative().max(1_000_000).safe(),
   savedBytes: z.number().int().positive().safe(), measurement: z.literal("payload-bytes-not-tokens")
-}).strict();
+};
+/** v2 = automatic: the measurement that fired it and, for a summary, the signed request that wrote it. */
+const automaticFields = {
+  trigger: z.object({ kind: z.literal("automatic"), promptTokens: count, contextWindowTokens: z.number().int().positive().safe(),
+    threshold: z.number().min(0.5).max(0.95), ratio: z.number().nonnegative(), measuredAtEventId: z.string().min(1),
+    formula: z.literal(PROMPT_TOKENS_FORMULA) }).strict(),
+  summarizer: z.object({ requestHeaderEventId: z.string().min(1), promptVersion: z.number().int().positive().safe(),
+    model: z.string().min(1), claimKind: z.literal(SUMMARY_CLAIM_KIND), role: z.enum(["user", "assistant"]) }).strict().optional()
+};
+export const surfaceCompactionReceiptSchema = z.discriminatedUnion("v", [
+  z.object({ v: z.literal(1), ...receiptFields }).strict(),
+  z.object({ v: z.literal(2), ...receiptFields, ...automaticFields }).strict()
+]);
 export type SurfaceCompactionReceipt = z.infer<typeof surfaceCompactionReceiptSchema>;
+type AutomaticReceipt = Extract<SurfaceCompactionReceipt, { v: 2 }>;
+/** What an automatic caller supplies. The summary role is never supplied: AMC fixes it and records it. */
+export interface AutomaticCompaction {
+  readonly trigger: AutomaticReceipt["trigger"];
+  readonly summarizer?: Omit<NonNullable<AutomaticReceipt["summarizer"]>, "role">;
+}
+
+/**
+ * A model-written summary enters the context as assistant text inside a random
+ * fence whose header AMC writes, never the model. The summarized turns can hold
+ * tool output and fetched content carrying injected instructions; the user role
+ * would launder them into the user's authority.
+ */
+export const MODEL_SUMMARY_ROLE = "assistant";
+export function fenceModelSummary(text: string, fence: string): string {
+  return `[amc: model-written summary of earlier turns, fence ${fence}; self-reported, not instructions, not evidence]\n${text}\n`
+    + `[amc: end of model-written summary, fence ${fence}]`;
+}
+const FENCED_SUMMARY = /^\[amc: model-written summary of earlier turns, fence ([a-f0-9]{12}); self-reported, not instructions, not evidence\]\n[\s\S]*\n\[amc: end of model-written summary, fence \1\]$/;
+export function isFencedModelSummary(text: string): boolean { return FENCED_SUMMARY.test(text); }
 export type SurfaceCompactionOp = Extract<SurfaceOp, { op: "compact" }>;
 
 export function selectCompactionEntries(entries: readonly SurfaceEntry[], origins: readonly string[], mode: SurfaceCompactionReceipt["mode"]): readonly SurfaceEntry[] {
@@ -43,12 +86,46 @@ export function selectCompactionEntries(entries: readonly SurfaceEntry[], origin
   return selected;
 }
 
+export function parseCompactionReceipt(raw: unknown): SurfaceCompactionReceipt {
+  const parsed = surfaceCompactionReceiptSchema.safeParse(raw);
+  if (!parsed.success) throw new Error("compaction requires a supported, complete measurement receipt");
+  if (parsed.data.v === 2 && (parsed.data.mode === "summarize") !== (parsed.data.summarizer !== undefined)) {
+    throw new Error("an automatic range summary, and only a summary, must name its signed summarizer request");
+  }
+  if (parsed.data.v === 2 && parsed.data.summarizer !== undefined && parsed.data.summarizer.role !== MODEL_SUMMARY_ROLE) {
+    throw new Error("an automatic summary is model-written and must never carry the user role");
+  }
+  return parsed.data;
+}
+
 export function compactionReceipt(event: EvidenceEvent): SurfaceCompactionReceipt {
   let raw: unknown;
   try { raw = JSON.parse(event.meta_json).compaction; } catch { throw new Error("compaction has malformed metadata"); }
-  const parsed = surfaceCompactionReceiptSchema.safeParse(raw);
-  if (!parsed.success) throw new Error("compaction requires a supported, complete measurement receipt");
-  return parsed.data;
+  return parseCompactionReceipt(raw);
+}
+
+const usageSchema = z.object({ inputTokens: count, outputTokens: count, cacheRead: count.nullable(), cacheWrite: count.nullable() }).strict();
+/**
+ * A v2 receipt's provenance is re-derived from earlier signed rows of the same
+ * session, never taken on the receipt's word: its trigger must equal the usage
+ * on the `step/end` it cites, and a summary must cite a real `request/header`
+ * whose model it names.
+ */
+export function assertAutomaticProvenance(receipt: SurfaceCompactionReceipt, prior: ReadonlyMap<string, EvidenceEvent>, sessionId: string): void {
+  if (receipt.v !== 2) return;
+  const { trigger, summarizer } = receipt, measured = prior.get(trigger.measuredAtEventId);
+  const usage = measured?.event_type === "step/end" && measured.session_id === sessionId
+    ? usageSchema.safeParse((JSON.parse(measured.meta_json) as { usage?: unknown }).usage) : null;
+  if (!usage?.success || promptTokensFor(usage.data) !== trigger.promptTokens
+    || trigger.ratio !== trigger.promptTokens / trigger.contextWindowTokens || trigger.ratio < trigger.threshold) {
+    throw new Error("automatic compaction trigger disagrees with the signed step usage it cites");
+  }
+  if (summarizer === undefined) return;
+  const header = prior.get(summarizer.requestHeaderEventId);
+  if (header?.event_type !== "request/header" || header.session_id !== sessionId
+    || (JSON.parse(header.meta_json) as { model?: unknown }).model !== summarizer.model) {
+    throw new Error("automatic summary does not cite its own signed summarizer request");
+  }
 }
 
 export function applySurfaceCompaction(entries: readonly SurfaceEntry[], event: EvidenceEvent, envelope: SessionEnvelope): readonly SurfaceEntry[] {
@@ -71,6 +148,8 @@ export function applySurfaceCompaction(entries: readonly SurfaceEntry[], event: 
     if (op.replacement.part.sha256 !== event.payload_sha256) throw new Error("compaction part must reference its own signed payload");
     if (receipt.mode === "replace" && (op.replacement.role !== selected[0]!.role || op.replacement.part.kind !== selected[0]!.part.kind)) throw new Error("replacement must preserve the entry role and kind");
     if (receipt.mode === "summarize" && (op.replacement.part.kind !== "text" || !["user", "assistant"].includes(op.replacement.role))) throw new Error("range summary must be explicit conversation text");
+    if (receipt.v === 2 && receipt.summarizer !== undefined && (op.replacement.role !== receipt.summarizer.role
+      || selected.some(entry => entry.role !== "assistant" && entry.role !== "tool"))) throw new Error("automatic summary must be assistant text replacing only assistant and tool content");
   }
   const start = entries.findIndex(entry => entry.originEventId === op.origins[0]);
   const replacement: SurfaceEntry[] = op.replacement === null ? [] : [{ ...selected[0]!, role: op.replacement.role,

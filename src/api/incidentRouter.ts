@@ -47,6 +47,7 @@ async function handleIncidentClockRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace: string,
+  principal: string | undefined,
 ): Promise<boolean> {
   const ledger = openLedger(workspace);
   try {
@@ -79,7 +80,7 @@ async function handleIncidentClockRoute(
         kind: trigger === undefined ? 'NOTIFIED' : 'TRIGGER',
         triggerOrClockId: trigger ?? notified ?? '',
         ts: parseIsoTimestamp(text(body.at), 'at'),
-        recordedBy: 'api',
+        recordedBy: principal ? `api:${principal}` : 'api',
         privateKeyPem: getPrivateKeyPem(workspace, 'monitor'),
         publicKeys: getPublicKeyHistory(workspace, 'monitor'),
       });
@@ -87,6 +88,16 @@ async function handleIncidentClockRoute(
       return true;
     }
 
+    // The record names its reviewer and is signed with the auditor key, so the reviewer is the authenticated
+    // caller (ApiRouteContext.principal), never a body field. A body reviewerId must match it.
+    if (!principal) {
+      apiError(res, 403, 'oversight records need an authenticated reviewer; this request has no principal');
+      return true;
+    }
+    if (body.reviewerId !== undefined && text(body.reviewerId) !== principal) {
+      apiError(res, 403, 'reviewerId must be the authenticated caller');
+      return true;
+    }
     const clockIds = body.clockIds ?? [];
     if (!Array.isArray(clockIds) || clockIds.some((id) => typeof id !== 'string')) {
       throw new IncidentInputError('clockIds must be an array of clock ids');
@@ -94,7 +105,7 @@ async function handleIncidentClockRoute(
     const record = recordWorkspaceOversight({
       workspace,
       incident,
-      reviewerId: text(body.reviewerId),
+      reviewerId: principal,
       decision: text(body.decision),
       rationale: text(body.rationale),
       clockIds: clockIds as string[],
@@ -119,6 +130,7 @@ export async function handleIncidentRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
+  principal?: string,
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/incidents')) return false;
 
@@ -236,7 +248,7 @@ export async function handleIncidentRoute(
 
   const clockParams = pathParam(pathname, '/api/v1/incidents/:id/:action');
   if (clockParams?.id && clockParams.action && CLOCK_ACTION_METHODS[clockParams.action] === method) {
-    return handleIncidentClockRoute(clockParams.id, clockParams.action, req, res, workspace);
+    return handleIncidentClockRoute(clockParams.id, clockParams.action, req, res, workspace, principal);
   }
 
   // Match /:id routes
