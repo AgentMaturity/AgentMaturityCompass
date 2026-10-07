@@ -132,7 +132,7 @@ describe("amc connect hooks CLI", () => {
       tool_use_id: "toolu_cli_outage_01",
       tool_input: { file_path: "/private/never-forwarded.txt" },
     }));
-    expect(forwarded.status).toBe(0);
+    expect(forwarded.status).toBe(2);
     expect(JSON.parse(forwarded.stdout)).toEqual({
       hookSpecificOutput: {
         hookEventName: "PreToolUse",

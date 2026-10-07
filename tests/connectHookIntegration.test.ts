@@ -12,7 +12,7 @@ import {
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { observedAepActionEventSchema } from "../src/bridge/hookIngress.js";
@@ -36,6 +36,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { approvalPolicyPath, approvalPolicySigPath } from "../src/approvals/approvalPolicyEngine.js";
 import { signFileWithAuditor } from "../src/org/orgSigner.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 
 const roots: string[] = [];
 
@@ -173,7 +174,11 @@ describe("AMC provider hook integration", () => {
     expect(config.hooks.PostToolUseFailure).toHaveLength(1);
     expect(config.hooks.PreToolUse).toHaveLength(1);
     const handler = config.hooks.PreToolUse[0]!.hooks[0]!;
-    expect(handler.command).toBe("amc");
+    expect(handler.command).toBe(process.execPath);
+    expect(isAbsolute(handler.command as string)).toBe(true);
+    const handlerArgs = handler.args as string[];
+    expect(isAbsolute(handlerArgs[0]!)).toBe(true);
+    expect(handlerArgs[0]).toMatch(/[\\/]dist[\\/]cli\.js$/);
     expect(handler.args).toEqual(expect.arrayContaining([
       "connect",
       "hooks",
@@ -252,7 +257,7 @@ describe("AMC provider hook integration", () => {
       hooks: { PreToolUse: Array<{ hooks: Array<Record<string, unknown>> }> };
     };
     const owned = config.hooks.PreToolUse.flatMap((group) => group.hooks)
-      .filter((handler) => handler.command === "amc");
+      .filter((handler) => handler.command === process.execPath);
     expect(owned).toHaveLength(1);
   });
 
@@ -277,7 +282,7 @@ describe("AMC provider hook integration", () => {
       hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
     };
     config.hooks.PostToolUse = config.hooks.PostToolUse!.filter((group) =>
-      !group.hooks.some((handler) => handler.command === "amc"),
+      !group.hooks.some((handler) => String(handler.statusMessage).startsWith("AMC Observe")),
     );
     delete config.hooks.PostToolUseFailure;
     const configText = `${JSON.stringify(config, null, 2)}\n`;
@@ -321,6 +326,67 @@ describe("AMC provider hook integration", () => {
     expect(migratedConfig.hooks.PostToolUse!.some((group) =>
       group.hooks.some((handler) => handler.command === "npm test"),
     )).toBe(true);
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
+  });
+
+  test("reinstall migrates a signed command: amc handler and leaves foreign handlers byte-identical", () => {
+    const workspace = newWorkspace();
+    const paths = hookPaths(workspace, "claude-code");
+    const foreign = { matcher: "Bash", hooks: [{ type: "command", command: "amc", args: ["user", "owned"], timeout: 3 }] };
+    writeJson(paths.config, { hooks: { PreToolUse: [foreign] } });
+    const options = {
+      workspace,
+      provider: "claude-code" as const,
+      agentId: "amc-path-agent",
+      bridgeBase: "http://127.0.0.1:3212",
+      mode: "control" as const,
+    };
+    installHookIntegration(options);
+
+    // Rewrite the signed installation into the earlier PATH-lookup handler form.
+    const config = readJson(paths.config) as {
+      hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
+    };
+    for (const groups of Object.values(config.hooks)) {
+      for (const group of groups) {
+        group.hooks = group.hooks.map((handler) => String(handler.statusMessage).startsWith("AMC Control")
+          ? { ...handler, command: "amc", args: (handler.args as string[]).slice(1), timeout: 10 }
+          : handler);
+      }
+    }
+    const legacyText = `${JSON.stringify(config, null, 2)}\n`;
+    writeFileSync(paths.config, legacyText, "utf8");
+    const legacyHandler = config.hooks.PreToolUse!.flatMap((group) => group.hooks)
+      .find((handler) => String(handler.statusMessage).startsWith("AMC Control"))!;
+    expect(legacyHandler.command).toBe("amc");
+    expect((legacyHandler.args as string[])[0]).toBe("connect");
+    const manifest = readJson(paths.manifest) as Record<string, any>;
+    const legacyHash = sha256Hex(canonicalize(legacyHandler));
+    writeJson(paths.manifest, {
+      ...manifest,
+      configSha256: sha256Hex(Buffer.from(legacyText, "utf8")),
+      handlers: manifest.handlers.map((row: Record<string, unknown>) => ({ ...row, handlerSha256: legacyHash })),
+    });
+    signFileWithAuditor(workspace, paths.manifest);
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
+    const foreignBefore = JSON.stringify(config.hooks.PreToolUse![0]);
+
+    const migrated = installHookIntegration(options);
+
+    expect(migrated.changed).toBe(true);
+    const after = readJson(paths.config) as {
+      hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>>;
+    };
+    expect(JSON.stringify(after.hooks.PreToolUse![0])).toBe(foreignBefore);
+    const owned = Object.values(after.hooks).flat().flatMap((group) => group.hooks)
+      .filter((handler) => String(handler.statusMessage).startsWith("AMC Control"));
+    expect(owned).toHaveLength(3);
+    for (const handler of owned) {
+      expect(handler.command).toBe(process.execPath);
+      expect((handler.args as string[])[0]).toMatch(/[\\/]dist[\\/]cli\.js$/);
+    }
+    expect(Object.values(after.hooks).flat().flatMap((group) => group.hooks)
+      .filter((handler) => handler.command === "amc")).toEqual([foreign.hooks[0]]);
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
   });
 
