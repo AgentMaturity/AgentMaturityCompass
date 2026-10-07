@@ -14,4 +14,6 @@ Gateway route prefixes now match on a path-segment boundary: `/openai` serves `/
 
 Security: the field guard fails closed. On a guarded upstream, a non-empty body that is content-encoded, declares a non-UTF-8 charset, starts with a byte-order mark, is not valid UTF-8 JSON or is not a JSON object is refused, and keys are compared after case and Unicode compatibility folding, so an upstream parser cannot read a field the guard missed. The forward proxy refuses HTTP and CONNECT traffic to the host of any guarded upstream (every host when that host is unknown), so a tunnel or a sibling route cannot bypass the guard.
 
+Security: hosts are compared by identity, not spelling. The gateway resolves every upstream once at start when a route refuses fields; routes whose upstreams share a canonical name or any address share the refused fields, and the forward proxy resolves each target once, refuses a guarded name, its subdomains or any guarded address (IP literals, aliases and IPv4-mapped IPv6 included) and connects only to the checked address. A target that does not resolve is refused.
+
 Imports remain self-reported and not evaluated. A retained original shows the bytes are unchanged since import; it does not show the source is true.
