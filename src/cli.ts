@@ -10752,7 +10752,7 @@ exportGroup
 
 exportGroup
   .command("grc")
-  .description("Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF")
+  .description("Export the latest run as labelled GRC evidence (+ SARIF developer findings)")
   .requiredOption("--framework <framework>", "SOC2 | NIST_AI_RMF | ISO_42001 | EU_AI_ACT")
   .requiredOption("--out <file>", "output manifest JSON path")
   .option("--sarif <file>", "also write a SARIF 2.1.0 file for security tooling")
