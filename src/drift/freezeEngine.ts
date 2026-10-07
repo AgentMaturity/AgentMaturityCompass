@@ -158,25 +158,68 @@ export function listIncidents(workspace: string, agentId?: string): FreezeIncide
     .sort((a, b) => b.createdTs - a.createdTs);
 }
 
+/** A freeze is lifted only by a lift record signed by the auditor key for this incident and agent; a bare file lifts nothing. */
 function isLifted(workspace: string, agentId: string, incidentId: string): boolean {
-  return pathExists(incidentLiftPath(workspace, agentId, incidentId));
+  const path = incidentLiftPath(workspace, agentId, incidentId);
+  if (!pathExists(path)) return false;
+  try {
+    const lift = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
+    if (lift.v !== 1 || lift.incidentId !== incidentId || lift.agentId !== agentId
+      || typeof lift.liftedTs !== "number" || typeof lift.reason !== "string" || typeof lift.signature !== "string") return false;
+    const digest = sha256Hex(canonicalize({ v: 1, incidentId, agentId, liftedTs: lift.liftedTs, reason: lift.reason }));
+    return verifyHexDigestAny(digest, lift.signature, getPublicKeyHistory(workspace, "auditor"));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Every class above READ_ONLY. An incident file that cannot be read or whose signature fails holds these until an operator
+ * restores or removes it: tampering with a freeze must never lift it (fail closed).
+ */
+const INTEGRITY_FREEZE_CLASSES: readonly ActionClass[] = [
+  "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"
+];
+
+function unreadableIncidentFiles(workspace: string, agentId: string): string[] {
+  const dir = incidentsDir(workspace, agentId);
+  if (!pathExists(dir)) return [];
+  return readdirSync(dir)
+    .filter((name) => name.endsWith(".json") && !name.endsWith(".lift.json"))
+    .filter((name) => {
+      try {
+        incidentSchema.parse(JSON.parse(readFileSync(join(dir, name), "utf8")) as unknown);
+        return false;
+      } catch {
+        return true;
+      }
+    });
 }
 
 export function activeFreezeStatus(workspace: string, agentId?: string): {
   active: boolean;
   incidentIds: string[];
   actionClasses: ActionClass[];
+  /** Incident files that could not be read or verified; each holds every class above READ_ONLY. */
+  integrityProblems: string[];
 } {
   const resolved = resolveAgentId(workspace, agentId);
   const incidents = listIncidents(workspace, resolved);
-  const active = incidents.filter(
-    (incident) => verifyIncidentSignature(workspace, incident) && incident.freeze.active && !isLifted(workspace, resolved, incident.incidentId)
-  );
-  const actionClasses = [...new Set(active.flatMap((incident) => incident.freeze.actionClasses))] as ActionClass[];
+  const verified = incidents.filter((incident) => verifyIncidentSignature(workspace, incident));
+  const active = verified.filter((incident) => incident.freeze.active && !isLifted(workspace, resolved, incident.incidentId));
+  const integrityProblems = [
+    ...unreadableIncidentFiles(workspace, resolved).map((name) => `unreadable incident file ${name}`),
+    ...incidents.filter((incident) => !verified.includes(incident)).map((incident) => `incident ${incident.incidentId} signature invalid`)
+  ];
+  const actionClasses = [...new Set([
+    ...active.flatMap((incident) => incident.freeze.actionClasses),
+    ...(integrityProblems.length > 0 ? INTEGRITY_FREEZE_CLASSES : [])
+  ])] as ActionClass[];
   return {
-    active: active.length > 0,
-    incidentIds: active.map((incident) => incident.incidentId),
-    actionClasses
+    active: active.length > 0 || integrityProblems.length > 0,
+    incidentIds: [...active.map((incident) => incident.incidentId), ...(integrityProblems.length > 0 ? ["integrity"] : [])],
+    actionClasses,
+    integrityProblems
   };
 }
 
