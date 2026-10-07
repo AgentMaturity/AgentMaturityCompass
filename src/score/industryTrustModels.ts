@@ -11,6 +11,7 @@
 
 import { type MaturityLevel } from "./formalSpec.js";
 import { scoreToLevel, toDisplayScore } from "./scoringScale.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { resolveRunReport } from "../diagnostic/runReportResolution.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -232,10 +233,16 @@ export function computeIndustryAdjustedScore(
   };
 }
 
-/** The latest run's observed-evidence share for an agent, or null when there is no run. */
-export function latestObservedEvidenceShare(workspace: string, agentId?: string): number | null {
+/**
+ * A run's observed-evidence share (the latest run unless `runRef` names one), or
+ * null when there is no run or the run is not sealed by this workspace's auditor
+ * key: an unsealed run file is not evidence.
+ */
+export function latestObservedEvidenceShare(workspace: string, agentId?: string, runRef = "latest"): number | null {
   try {
-    return resolveRunReport(workspace, "latest", agentId).report.evidenceTrustCoverage?.observed ?? null;
+    const { report } = resolveRunReport(workspace, runRef, agentId);
+    if (!sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) return null;
+    return report.evidenceTrustCoverage?.observed ?? null;
   } catch {
     return null;
   }

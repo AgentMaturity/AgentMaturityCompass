@@ -23254,13 +23254,13 @@ score
             attested: run.evidenceTrustCoverage?.attested ?? 0,
             selfReported: run.evidenceTrustCoverage?.selfReported ?? 0
           };
-          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, run.evidenceTrustCoverage?.observed ?? null, nowTs);
+          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, latestObservedEvidenceShare(process.cwd(), resolvedAgentId, run.runId), nowTs);
           let deltaFromPrevious: number | null = null;
           if (index > 0) {
             const previous = runs[index - 1]!;
             const previousRaw = Math.max(0, Math.min(1, previous.integrityIndex ?? 0));
             const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
-            const previousObserved = previous.evidenceTrustCoverage?.observed ?? null;
+            const previousObserved = latestObservedEvidenceShare(process.cwd(), resolvedAgentId, previous.runId);
             const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
             deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
           }
