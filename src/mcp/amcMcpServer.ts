@@ -28,7 +28,7 @@ import {
   renderTransparencyReportMarkdown,
   renderTransparencyReportJson,
 } from "../transparency/transparencyReport.js";
-import { INDUSTRY_PACKS, scoreIndustryPack, type IndustryPackId } from "../domains/industryPacks.js";
+import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/industryPacks.js";
 import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
 import { parseWindowToMs } from "../utils/time.js";
@@ -413,7 +413,8 @@ export async function startMcpServer(workspace?: string): Promise<void> {
           isError: true,
         };
       }
-      if (!INDUSTRY_PACKS[packId as IndustryPackId]) {
+      const pack = getPackById(packId);
+      if (!pack) {
         const available = Object.keys(INDUSTRY_PACKS).join(", ");
         return {
           content: [
@@ -427,7 +428,7 @@ export async function startMcpServer(workspace?: string): Promise<void> {
       }
 
       try {
-        const result = scoreIndustryPack(packId as IndustryPackId, responses);
+        const result = scoreIndustryPack(pack.id, responses);
         const gapList =
           result.complianceGaps.length > 0
             ? result.complianceGaps.slice(0, 5).map((g) => `  ⚠️ ${g}`).join("\n")

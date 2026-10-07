@@ -2506,8 +2506,9 @@ export function getIndustryPack(id: IndustryPackId): IndustryPack {
   return INDUSTRY_PACKS[id];
 }
 
+/** Own keys only: inherited names such as `__proto__` or `constructor` are not pack ids. */
 export function getPackById(packId: string): IndustryPack | undefined {
-  return (INDUSTRY_PACKS as Record<string, IndustryPack | undefined>)[packId];
+  return Object.hasOwn(INDUSTRY_PACKS, packId) ? INDUSTRY_PACKS[packId as IndustryPackId] : undefined;
 }
 
 export interface IndustryPackScoreResult extends Omit<SelfAssessedPack, "answers"> {
