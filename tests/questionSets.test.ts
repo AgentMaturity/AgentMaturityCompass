@@ -8,6 +8,7 @@ import { generateReport } from "../src/diagnostic/runner.js";
 import {
   DEFAULT_QUESTION_SET_VERSION,
   LIFECYCLE_QUESTION_SET_VERSION,
+  allKnownQuestions,
   getQuestionSet,
   listQuestionSets
 } from "../src/diagnostic/questionSets.js";
@@ -103,6 +104,19 @@ describe("diagnostic question sets", () => {
     expect(locked.info.domainPackWeighting?.applied).toBe(false);
     expect(locked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
     expect(unlocked.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
+  });
+
+  test("an unknown question set name is refused, not silently mapped to a default", () => {
+    expect(() => getQuestionSet({ version: "bogus" })).toThrow('Unknown question set "bogus"');
+  });
+
+  test("allKnownQuestions holds every question of both sets exactly once", () => {
+    const all = allKnownQuestions();
+    const ids = all.map((question) => question.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const version of [DEFAULT_QUESTION_SET_VERSION, LIFECYCLE_QUESTION_SET_VERSION]) {
+      for (const question of getQuestionSet({ version }).questions) expect(ids, `${version} ${question.id}`).toContain(question.id);
+    }
   });
 
   test("markdown reports explain expanded assessment dimensions", () => {

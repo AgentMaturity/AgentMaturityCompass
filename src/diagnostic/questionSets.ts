@@ -477,7 +477,3 @@ export function listQuestionSets(): DiagnosticQuestionSetInfo[] {
 export function allKnownQuestions(): DiagnosticQuestion[] {
   return [...questionBank, ...LIFECYCLE_QUESTIONS];
 }
-
-export function resolveQuestionSetVersion(version?: string): DiagnosticQuestionSetVersion {
-  return normalizeVersion(version);
-}
