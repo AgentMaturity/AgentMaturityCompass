@@ -1,6 +1,7 @@
 /**
- * Adapters for results the CLI and reports print (P0-22). Like ../adapters.ts they only shape
- * inputs for evaluateClaimEligibility; every rule stays there. See docs/CLAIM_KINDS.md, "CLI and reports".
+ * Adapters for results the CLI and reports print (P0-22). Like ../adapters.ts they shape inputs for
+ * evaluateClaimEligibility; the three rules they add (a 1.x run is legacy, an unsealed run is never more than
+ * self-reported, a total claims no more than its weakest member) are listed in docs/CLAIM_KINDS.md, "CLI and reports".
  */
 import type { ComplianceCategoryResult, ComplianceReportJson } from "../../../compliance/mappingSchema.js";
 import type { AssuranceReport, DiagnosticReport } from "../../../types.js";

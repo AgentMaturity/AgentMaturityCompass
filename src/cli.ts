@@ -95,7 +95,7 @@ import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
 import {
   aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
-  printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js";
@@ -14244,6 +14244,7 @@ fleet
     if (opts.out) {
       console.log(chalk.green(`Report written: ${opts.out}`));
     }
+    printClaimLegendFooter();
   });
 
 fleetGraph

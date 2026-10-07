@@ -39,7 +39,7 @@ import { formatRiskCurrency, quantifyMaturityRisk } from "./business/riskQuantif
 import { buildPublicLeaderboardBundle, writePublicLeaderboardBundle } from "./benchmarks/publicLeaderboard.js";
 import { writeExecutiveBriefArtifact, type ExecutiveBriefFormat } from "./executive/brief.js";
 import { normalizeCurrency, parseMaturityLevel, parseNonNegativeNumber, parsePositiveInteger } from "./business/cliOptions.js";
-import { aggregateClaim, emitClaimResult, printClaimResult, printLabelledReport, printTitledResult, runClaimEnvelope, unverifiedClaim, withClaimFields, withClaimFieldsEach } from "./cli/claimOutput.js";
+import { aggregateClaim, emitClaimResult, printClaimLegendFooter, printClaimResult, printLabelledReport, printTitledResult, runClaimEnvelope, unverifiedClaim, withClaimFields, withClaimFieldsEach } from "./cli/claimOutput.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 
 export function registerBusinessCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
@@ -704,6 +704,7 @@ export function registerLeaderboardCommands(program: Command): void {
           const ts = new Date(s.ts).toISOString().slice(0, 10);
           console.log(`  ${rank.padEnd(4)} ${s.agentId.padEnd(30)} ${s.level.padEnd(8)} ${scoreBar.padEnd(10)} ${ts}`);
         }
+        printClaimLegendFooter();
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);

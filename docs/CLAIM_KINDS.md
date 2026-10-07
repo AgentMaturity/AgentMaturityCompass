@@ -1,6 +1,6 @@
 # Claim Kinds and Status Dimensions
 
-Every AMC result carries a claim kind and five status dimensions. One shared service, `evaluateClaimEligibility` in `src/claims/eligibility/`, decides them from the result's provenance and evidence, and `renderClaimLabel` prints them with the same words on every surface. CLI, MCP, API, Studio and reports keep their current output until each adopts the service.
+Every AMC result carries a claim kind and five status dimensions. One shared service, `evaluateClaimEligibility` in `src/claims/eligibility/`, decides them from the result's provenance and evidence, and `renderClaimLabel` prints them with the same words on every surface. The CLI and reports print it (see [CLI and reports](#cli-and-reports)); MCP, API and Studio keep their current output until each adopts the service.
 
 AMC output is evidence of conformity. It is not a certificate.
 
@@ -111,3 +111,73 @@ Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass
 ```
 
 `formatClaimLabel(label, surface)` for `cli`, `mcp`, `api`, `studio` and `report` changes markup only, never words. `renderClaimLegend("text" | "markdown" | "html")` explains the four kinds, the five dimensions and "not evaluated". `REASON_TEXT` holds the one fixed sentence for each reason code.
+
+## CLI and reports
+
+Every CLI command that prints a score, level, verdict, compliance status, certificate, passport, bundle verification or attestation is listed in `RESULT_COMMANDS` (`src/cli/resultCommandRegistry.ts`). Each one prints the claim line right after its result title in text mode, and adds `claimKind`, `statusDimensions` and `claimLabel` to its `--json` output. The JSON change is additive: a result's own fields stay as they were, and a JSON array carries the three fields on each row. Formats that cannot take another line (a CSV register, a badge URL or SVG) print the claim line on stderr. `NON_RESULT_COMMANDS` lists every other command whose description names a score, level, compliance, certification, passport, attestation, assurance, bundle, readiness, benchmark, badge or leaderboard, with the reason it prints no result.
+
+`installClaimLabelHooks` adds a `postAction` hook. When a registered command succeeds without a claim label, text output gets the line `Claim: not labelled — treat as self-reported`; with `AMC_CLAIM_LABELS_STRICT=1` the command instead writes `amc: <path> printed a result without a claim label` to stderr and exits 70. A command that refused or failed (non-zero exit) is not checked. `process.exit()` skips the hook, so registered commands set `process.exitCode` instead.
+
+Reports print a claim line, a claim kind per result and a "How to read claim kinds" legend: `amc report` (Markdown and `--html`), `executive brief`, `eval run`, domain and industry-pack audit reports, the transparency report, the compliance report and coverage matrix, the assurance report, fleet scoring and fleet reports, benchmark run and compare, the data residency report and `leaderboard export`.
+
+### Which claim a command prints
+
+| Result | Claim |
+| --- | --- |
+| A diagnostic run, freshly written or read back (`run`, `report`, `quickscore --auto`, `ci check`, `executive brief`, `eval run`, `lite-score`) | `envelopeForStoredRun`: the run's seal is checked against the workspace auditor keys. A run whose seal does not verify is never more than self-reported, and its own `VALID` status does not count. |
+| A run, certificate or bundle stored by AMC 1.x (no `methodology.amcVersion`, or one below 1.2.0) | "Legacy (1.x), self-reported", result not evaluated. |
+| Questionnaire and answer-file results (`quickscore`, `score`, `score tier`, `improve`, `fix`, `quickstart`, `domain pack run`) | `envelopeForSelfAssessment`: self-reported, level 1 at most, never a regulated pass. |
+| The control-surface scorers (`score fail-secure` and the others that check files) | `envelopeForPathPresence`: nothing found is not evaluated; a found file is self-reported at level 1 at most. |
+| Static scans of files or text (`shield posture`, `shield analyze-mcp`, `comms-check`, `shield reputation`) | Self-reported keyword matches: level 1 at most, never a regulated pass. |
+| Records AMC did not observe: caller files and receipts, imports (`eval import`, `import`, `ingest`), provider-drift and replay receipts, attestations, business and passport figures, scorers run on empty input | `envelopeForUnverifiedResult`: self-reported, and not evaluated unless the command renders its own gate verdict. |
+| Tests AMC ran against the agent (`assurance run`, the lab packs, `ci redteam`) | `envelopeForExecutedTest`: observed when at least one scenario reached the agent; a stored run whose seal does not verify is self-reported. |
+| A compliance category | `envelopeForComplianceCategory`: observed only when the engine found its evidence sufficient and every event it counted was OBSERVED (`countedObserved`); otherwise self-reported. It is regulated, so it cannot pass without an applicability decision. |
+| Fleet, organisation, leaderboard and report totals | `envelopeForAggregate`: no more than the weakest member, with the worst evidence and the lowest eligible level. |
+| Verifying a certificate, bundle, passport or attestation | The artifact's own claim: the claim of the run the verifier checked, read from the same bytes, never from a second read of the file. A valid signature proves integrity, never a stronger kind. |
+| `demo run`, `demo prospect`, `demo share`, `mirofish`, `lab-simulate` and any `--example` | Synthetic example. |
+
+No command prints `independently_reviewed` yet: that needs an approved review by an independent reviewer whose key is pinned, and no command records one.
+
+### Samples
+
+Synthetic example (`amc mirofish run`):
+
+```
+SYNTHETIC EXAMPLE — illustrative values, not evidence. Never cite this output.
+Claim: Synthetic example (not evidence) · Result: not evaluated (synthetic example values are not evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable
+```
+
+Self-reported (`amc quickscore --rapid --answers answers.json`, then with `--json`):
+
+```
+AMC Rapid Quickscore
+Claim: Self-reported · Result: pass · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable
+```
+
+```json
+{
+  "claimKind": "self_reported",
+  "statusDimensions": {
+    "applicability": { "state": "applicable" },
+    "evidence": "incomplete",
+    "result": "pass",
+    "enforcement": { "state": "none" },
+    "review": "pending"
+  },
+  "claimLabel": "Claim: Self-reported · Result: pass · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable"
+}
+```
+
+Observed (a sealed, claim-ready run with observed evidence, in `amc report <runId>`):
+
+```
+**Claim:** Observed · **Result:** pass · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable
+```
+
+Legacy (`amc report` on a run stored by AMC 1.1.1):
+
+```
+**Claim:** Legacy (1.x), self-reported · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable
+```
+
+Commands that list several results (`leaderboard show`, `fleet score`) end their text output with `Claim kinds: synthetic example · self-reported · observed · independently reviewed (see docs/CLAIM_KINDS.md)`.
