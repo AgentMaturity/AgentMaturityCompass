@@ -73,6 +73,13 @@
       "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c"
     },
     {
+      "path": "src/bom/bomVerifier.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/bom/bomVerifier.ts.landed",
+      "sha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5"
+    },
+    {
       "path": "src/ci/gate.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
