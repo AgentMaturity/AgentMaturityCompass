@@ -103,15 +103,17 @@ export function valueContractVerifyCli(params: {
   }).signature;
 }
 
+/** What `amc value ingest|import --attested` prints before exiting 2. */
+export const VALUE_ATTESTED_REMOVED =
+  "--attested was removed in 2.0.0: value events from files and webhooks are SELF_REPORTED, because nothing verifies a third-party signature on them. See docs/EVIDENCE_TRUST.md.";
+
 export function valueIngestWebhookCli(params: {
   workspace: string;
   file: string;
-  attest: boolean;
 }) {
   return ingestValueWebhookForApi({
     workspace: params.workspace,
-    payload: parseJsonOrYaml(readUtf8(resolve(params.file))),
-    sourceTrust: params.attest ? "ATTESTED" : "SELF_REPORTED"
+    payload: parseJsonOrYaml(readUtf8(resolve(params.file)))
   });
 }
 
@@ -121,15 +123,13 @@ export function valueImportCsvCli(params: {
   scope: "workspace" | "node" | "agent";
   id: string;
   kpiId: string;
-  attest: boolean;
 }) {
   return importValueCsvForApi({
     workspace: params.workspace,
     scopeType: params.scope.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
     scopeId: params.scope === "workspace" ? "workspace" : params.id,
     kpiId: params.kpiId,
-    csvText: readUtf8(resolve(params.file)),
-    attest: params.attest
+    csvText: readUtf8(resolve(params.file))
   });
 }
 

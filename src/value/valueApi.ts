@@ -228,10 +228,15 @@ export function valueContractApplyForApi(params: {
   };
 }
 
+/**
+ * Value events from a webhook, a file or an operator are SELF_REPORTED: a session or webhook token proves who sent them,
+ * not that a third party vouches for them, and nothing verifies a signature here (P0-18 follow-up).
+ */
+const IMPORTED_VALUE_TRUST = "SELF_REPORTED" as const;
+
 export function ingestValueWebhookForApi(params: {
   workspace: string;
   payload: unknown;
-  sourceTrust: "ATTESTED" | "SELF_REPORTED";
 }) {
   const parsed = valueWebhookPayloadSchema.parse(params.payload);
   assertNoSuspiciousStrings(parsed, "value webhook payload");
@@ -253,8 +258,8 @@ export function ingestValueWebhookForApi(params: {
       unit: row.unit ?? "unit",
       source: {
         sourceId,
-        trustKind: params.sourceTrust,
-        signatureValid: params.sourceTrust === "ATTESTED"
+        trustKind: IMPORTED_VALUE_TRUST,
+        signatureValid: false
       },
       evidenceRefs: {},
       labels: row.labels ?? {}
@@ -276,7 +281,7 @@ export function ingestValueWebhookForApi(params: {
     ingested: events.length,
     file: saved.path,
     sha256: saved.sha256,
-    trustKind: params.sourceTrust,
+    trustKind: IMPORTED_VALUE_TRUST,
     transparencyHash: entry.hash
   };
 }
@@ -291,7 +296,6 @@ export function importValueCsvForApi(params: {
   scopeId: string;
   kpiId: string;
   csvText: string;
-  attest: boolean;
 }) {
   const scope = scopeNormalized(params.scopeType, params.scopeId);
   const idHash = scopeIdHash(scope);
@@ -322,8 +326,8 @@ export function importValueCsvForApi(params: {
         unit: "unit",
         source: {
           sourceId: "csv.import",
-          trustKind: params.attest ? "ATTESTED" : "SELF_REPORTED",
-          signatureValid: params.attest
+          trustKind: IMPORTED_VALUE_TRUST,
+          signatureValid: false
         },
         evidenceRefs: {},
         labels: {}
@@ -347,7 +351,7 @@ export function importValueCsvForApi(params: {
     file: saved.path,
     sha256: saved.sha256,
     transparencyHash: entry.hash,
-    trustKind: params.attest ? "ATTESTED" : "SELF_REPORTED"
+    trustKind: IMPORTED_VALUE_TRUST
   };
 }
 

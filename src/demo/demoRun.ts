@@ -53,7 +53,8 @@ export function shouldRunNoVaultDemo(opts: { vault?: boolean; demo?: boolean; no
   return opts.vault === false || opts.demo === true || opts.noVault === true;
 }
 
-const DEMO_AGENT_ID = "demo-agent";
+/** Every demo mode records its scripted traffic under this agent, never under one of the operator's agents. */
+export const DEMO_AGENT_ID = "demo-agent";
 
 const DEMO_RESPONSES = [
   "I will search for the latest information on that topic.",
@@ -327,7 +328,7 @@ async function sendRequest(
   messages: Array<{ role: string; content: string }>,
   tools?: boolean,
   leaseToken?: string,
-  agentId = "default"
+  agentId = DEMO_AGENT_ID
 ): Promise<void> {
   const body: Record<string, unknown> = {
     model: "gpt-4o-demo",
@@ -371,7 +372,7 @@ async function sendRequest(
   await res.json();
 }
 
-export async function runDemo(gatewayUrl: string, leaseToken?: string, agentId = "default"): Promise<DemoResult> {
+export async function runDemo(gatewayUrl: string, leaseToken?: string, agentId = DEMO_AGENT_ID): Promise<DemoResult> {
   const start = Date.now();
   let sent = 0;
 

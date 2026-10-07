@@ -1162,8 +1162,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc value contract init` | Create and sign value contract template | `--scope <scope>`<br>`--id <id>`<br>`--type <type>`<br>`--deployment <deployment>` | - |
 | `amc value contract print` | Print value contract and signature status | `--scope <scope>`<br>`--id <id>` | - |
 | `amc value contract verify` | Verify value contract signature | `--scope <scope>`<br>`--id <id>` | - |
-| `amc value import` | Import numeric KPI points from CSV (ts,value) | `--csv <path>`<br>`--scope <scope>`<br>`--id <id>`<br>`--kpi <kpiId>`<br>`--attested` | - |
-| `amc value ingest` | Ingest value webhook payload JSON | `--file <path>`<br>`--attested` | - |
+| `amc value import` | Import numeric KPI points from CSV (ts,value) | `--csv <path>`<br>`--scope <scope>`<br>`--id <id>`<br>`--kpi <kpiId>` | - |
+| `amc value ingest` | Ingest value webhook payload JSON | `--file <path>` | - |
 | `amc value init` | Initialize signed value policy, default contract, and scheduler | - | - |
 | `amc value policy` | Value policy operations | - | - |
 | `amc value policy apply` | Apply signed value policy from YAML/JSON file | `--file <path>`<br>`--reason <text>` | - |

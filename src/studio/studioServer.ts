@@ -2220,10 +2220,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or vault-backed webhook token" });
           return;
         }
+        // An operator session or a webhook token authenticates the sender; the events stay SELF_REPORTED (P0-18).
         const out = ingestValueWebhookForApi({
           workspace: options.workspace,
-          payload: parsed,
-          sourceTrust: canIngestAsOperator || tokenValid ? "ATTESTED" : "SELF_REPORTED"
+          payload: parsed
         });
         emitValueSse({
           hub: orgSse,
@@ -4858,6 +4858,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "csv and kpiId are required" });
           return;
         }
+        if (parsed.attest !== undefined) {
+          json(res, 400, { error: "attest was removed in 2.0.0: imported value events are SELF_REPORTED (see docs/EVIDENCE_TRUST.md)" });
+          return;
+        }
         const out = importValueCsvForApi({
           workspace: options.workspace,
           scopeType:
@@ -4866,8 +4870,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               : "WORKSPACE",
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
           kpiId: parsed.kpiId,
-          csvText: parsed.csv,
-          attest: parsed.attest === true
+          csvText: parsed.csv
         });
         emitValueSse({
           hub: orgSse,
