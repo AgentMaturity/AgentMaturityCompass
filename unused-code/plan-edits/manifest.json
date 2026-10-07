@@ -94,6 +94,13 @@
       "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5"
     },
     {
+      "path": "src/federation/federationStore.ts",
+      "issue": "P0-52",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+      "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+    },
+    {
       "path": "src/governor/emergencyOverride.ts",
       "issue": "P0-10",
       "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
