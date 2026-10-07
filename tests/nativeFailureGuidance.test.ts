@@ -49,7 +49,7 @@ describe("native failure guidance and recorded projection", () => {
     expect(text).not.toContain("ALLOW_WITH_WARNING");
     expect(text).not.toContain("synthetic-secret");
   });
-  it.each(["MISSING_CREDENTIAL", "INVALID_CREDENTIAL", "AUTH", "QUOTA", "RATE_LIMIT", "SERVER", "TIMEOUT", "TRANSPORT", "EMPTY_RESPONSE", "ABORTED", "INVALID_REQUEST", "CONTEXT_WINDOW_EXCEEDED", "HTTP_418"])("supplies bounded actionable guidance for %s", code => {
+  it.each(["MISSING_CREDENTIAL", "INVALID_CREDENTIAL", "AUTH", "QUOTA", "RATE_LIMIT", "SERVER", "TIMEOUT", "TRANSPORT", "EMPTY_RESPONSE", "ABORTED", "INVALID_REQUEST", "CONTEXT_WINDOW_EXCEEDED", "AMC_EVIDENCE_INTEGRITY", "HTTP_418"])("supplies bounded actionable guidance for %s", code => {
     const guidance = nativeFailureGuidance(code, 418);
     expect(guidance.code).toBe(code);
     expect(guidance.nextAction.length).toBeGreaterThan(20);

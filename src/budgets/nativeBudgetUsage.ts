@@ -15,6 +15,18 @@ export function budgetMeta(event: EvidenceEvent): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 
+/**
+ * The workspace evidence a budget is computed from failed verification (P0-27 F2). Not a budget refusal and not
+ * provider quota: nothing was refused for spend, the signed chain could not be trusted. Names the first offending row
+ * or session, and says when its signature is the literal "unsigned" that AMC_NO_SIGN=1 writes.
+ */
+export class BudgetEvidenceIntegrityError extends Error {
+  constructor(message: string, at: string, signature?: string | null) {
+    super(`${message} (${at}${signature === "unsigned" ? '; its signature is the literal "unsigned" that AMC_NO_SIGN=1 writes' : ""})`);
+    this.name = "BudgetEvidenceIntegrityError";
+  }
+}
+
 /** Reads both the native backend and legacy/journal rows, never a caller's event body. */
 export function readBudgetEvents(workspace: string, existing?: Ledger): EvidenceEvent[] {
   const ledger = existing ?? openLedger(workspace);
@@ -32,22 +44,22 @@ export function readBudgetEvents(workspace: string, existing?: Ledger): Evidence
       let previous = "GENESIS";
       const sessionHeads = new Map<string, { seq: number; hash: string }>();
       for (const row of source) {
-        if (row.prev_event_hash !== previous) throw new Error("Budget evidence chain is incomplete");
+        if (row.prev_event_hash !== previous) throw new BudgetEvidenceIntegrityError("Budget evidence chain is incomplete", `row ${row.id}`);
         const preimage = canonicalMetadataForHash({ id: row.id, ts: row.ts, sessionId: row.session_id, runtime: row.runtime,
           eventType: row.event_type, payloadPath: row.canonical_payload_path ?? row.payload_path,
           payloadInline: row.canonical_payload_inline ?? row.payload_inline, metaJson: row.meta_json });
         if (sha256Hex(`${row.prev_event_hash}${preimage}${row.payload_sha256}`) !== row.event_hash ||
-            !verifyHexDigestAny(row.event_hash, row.writer_sig, keys)) throw new Error("Budget evidence signature or hash is invalid");
+            !verifyHexDigestAny(row.event_hash, row.writer_sig, keys)) throw new BudgetEvidenceIntegrityError("Budget evidence signature or hash is invalid", `row ${row.id}`, row.writer_sig);
         const envelope = extractEnvelope(row.meta_json);
         const head = sessionHeads.get(row.session_id);
-        if (!envelope && (head || SESSION_ENVELOPE_META_KEY in budgetMeta(row))) throw new Error("Budget evidence session envelope is missing or unsupported");
+        if (!envelope && (head || SESSION_ENVELOPE_META_KEY in budgetMeta(row))) throw new BudgetEvidenceIntegrityError("Budget evidence session envelope is missing or unsupported", `row ${row.id}`);
         if (envelope) {
           if (envelope.sessionId !== row.session_id || envelope.seq !== (head?.seq ?? 0) ||
-              envelope.prevSessionEventHash !== (head?.hash ?? SESSION_GENESIS)) throw new Error("Budget evidence session chain is incomplete");
+              envelope.prevSessionEventHash !== (head?.hash ?? SESSION_GENESIS)) throw new BudgetEvidenceIntegrityError("Budget evidence session chain is incomplete", `row ${row.id}`);
           sessionHeads.set(row.session_id, { seq: envelope.seq + 1, hash: row.event_hash });
         }
         const duplicate = rows.get(row.id);
-        if (duplicate && duplicate.event_hash !== row.event_hash) throw new Error("Conflicting budget evidence ID");
+        if (duplicate && duplicate.event_hash !== row.event_hash) throw new BudgetEvidenceIntegrityError("Conflicting budget evidence ID", `row ${row.id}`);
         rows.set(row.id, row);
         previous = row.event_hash;
       }
@@ -64,10 +76,10 @@ export function readBudgetEvents(workspace: string, existing?: Ledger): Evidence
       const finalHash = finalHashes.get(session.session_id) ?? (journal ? null : sha256Hex("EMPTY_SESSION"));
       if (!session.session_seal_sig || !session.session_final_event_hash ||
           session.session_final_event_hash !== finalHash ||
-          !verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, keys)) throw new Error("Budget evidence session seal is missing or does not match its final event");
+          !verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, keys)) throw new BudgetEvidenceIntegrityError("Budget evidence session seal is missing or does not match its final event", `session ${session.session_id}`, session.session_seal_sig);
       journalSessions.delete(session.session_id);
     }
-    if (journalSessions.size) throw new Error("Budget evidence reservation has no sealed journal session");
+    if (journalSessions.size) throw new BudgetEvidenceIntegrityError("Budget evidence reservation has no sealed journal session", `session ${[...journalSessions][0]}`);
     return [...rows.values()];
   } finally { if (!existing) ledger.close(); }
 }
