@@ -71,11 +71,12 @@ describe("trustTier is validated where it is written", () => {
     expect(() => appendWith(dir, 3)).toThrow(/trustTier/i);
   });
 
-  it("accepts every tier in the union, and rows with no tier at all", () => {
+  it("accepts every tier in the union a runtime row may claim alone, and rows with no tier at all", () => {
     // Absence stays legal: plenty of rows are not evidence about an agent, and
     // forcing a tier onto them would be its own false claim.
     const dir = workspace();
-    for (const tier of ["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"]) {
+    // ATTESTED also needs an attestation record since P0-18 (tests/trustTierWriteGuard.test.ts).
+    for (const tier of ["OBSERVED", "OBSERVED_HARDENED", "SELF_REPORTED"]) {
       expect(() => appendWith(dir, tier), tier).not.toThrow();
     }
     expect(() => appendWith(dir, undefined)).not.toThrow();

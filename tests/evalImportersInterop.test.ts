@@ -310,7 +310,7 @@ describe("format parsing and importer dispatch", () => {
 });
 
 describe("imported evidence quality and status dashboard", () => {
-  test("importEvalResults writes signed metric and failure audit evidence with default ATTESTED trust", () => {
+  test("importEvalResults writes signed metric and failure audit evidence as SELF_REPORTED (P0-18)", () => {
     const workspace = freshWorkspace();
     const file = writeJson(workspace, "langsmith.json", {
       runs: [
@@ -335,7 +335,7 @@ describe("imported evidence quality and status dashboard", () => {
     const rows = readEvalImportRows(workspace);
     expect(rows.some((row) => row.event_type === "metric" && row.meta.metricKey === "external_eval_score")).toBe(true);
     expect(rows.some((row) => row.event_type === "audit" && row.meta.auditType === "EXTERNAL_EVAL_FAILURE")).toBe(true);
-    expect(rows.some((row) => row.event_type === "test" && row.meta.trustTier === "ATTESTED")).toBe(true);
+    expect(rows.every((row) => row.meta.trustTier === "SELF_REPORTED")).toBe(true);
   });
 
   test("importEvalResults emits DeepEval confidence calibration metric evidence", () => {
