@@ -1,0 +1,475 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "authorizationRecordDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "body_sha256": {
+          "type": "string"
+        },
+        "enforcement": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "none",
+                    "advisory",
+                    "observed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "boundary": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "level": {
+                  "const": "enforced",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level",
+                "boundary"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "event_hash": {
+          "type": "string"
+        },
+        "executionId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "enum": [
+            "llm_request",
+            "llm_response",
+            "tool_action",
+            "tool_result",
+            "guard_check",
+            "work_accepted"
+          ],
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "receipt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "requested",
+            "authorized",
+            "started",
+            "outcome_unknown"
+          ],
+          "type": "string"
+        },
+        "ts": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "v": {
+          "const": 2,
+          "type": "number"
+        }
+      },
+      "required": [
+        "v",
+        "kind",
+        "receipt_id",
+        "ts",
+        "agentId",
+        "providerId",
+        "model",
+        "event_hash",
+        "body_sha256",
+        "session_id",
+        "executionId",
+        "idempotencyKey",
+        "authorizationRecordDigest",
+        "enforcement",
+        "state"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "authorizationRecordDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "body_sha256": {
+          "type": "string"
+        },
+        "enforcement": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "none",
+                    "advisory",
+                    "observed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "boundary": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "level": {
+                  "const": "enforced",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level",
+                "boundary"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "event_hash": {
+          "type": "string"
+        },
+        "executionId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "enum": [
+            "llm_request",
+            "llm_response",
+            "tool_action",
+            "tool_result",
+            "guard_check",
+            "work_accepted"
+          ],
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "receipt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reconciliation": {
+          "additionalProperties": false,
+          "properties": {
+            "evidenceRefs": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "fromReceiptId": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "method": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "reconciledAt": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "fromReceiptId",
+            "reconciledAt",
+            "method",
+            "evidenceRefs"
+          ],
+          "type": "object"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "completed",
+            "cancelled"
+          ],
+          "type": "string"
+        },
+        "ts": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "v": {
+          "const": 2,
+          "type": "number"
+        }
+      },
+      "required": [
+        "v",
+        "kind",
+        "receipt_id",
+        "ts",
+        "agentId",
+        "providerId",
+        "model",
+        "event_hash",
+        "body_sha256",
+        "session_id",
+        "executionId",
+        "idempotencyKey",
+        "authorizationRecordDigest",
+        "enforcement",
+        "state"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "type": "string"
+        },
+        "authorizationRecordDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "body_sha256": {
+          "type": "string"
+        },
+        "enforcement": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "level": {
+                  "enum": [
+                    "none",
+                    "advisory",
+                    "observed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "boundary": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "level": {
+                  "const": "enforced",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "level",
+                "boundary"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "event_hash": {
+          "type": "string"
+        },
+        "executionId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "idempotencyKey": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "enum": [
+            "llm_request",
+            "llm_response",
+            "tool_action",
+            "tool_result",
+            "guard_check",
+            "work_accepted"
+          ],
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerId": {
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "receipt_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "state": {
+          "const": "denied",
+          "type": "string"
+        },
+        "ts": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "v": {
+          "const": 2,
+          "type": "number"
+        }
+      },
+      "required": [
+        "v",
+        "kind",
+        "receipt_id",
+        "ts",
+        "agentId",
+        "providerId",
+        "model",
+        "event_hash",
+        "body_sha256",
+        "session_id",
+        "executionId",
+        "idempotencyKey",
+        "authorizationRecordDigest",
+        "enforcement",
+        "state",
+        "reason"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "AMC Receipt"
+}

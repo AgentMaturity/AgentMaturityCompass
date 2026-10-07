@@ -1,0 +1,372 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "anchoring": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "anchored",
+            "unanchored",
+            "not-applicable"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "artifact": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "asOf": {
+      "type": "string"
+    },
+    "completeness": {
+      "additionalProperties": false,
+      "properties": {
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "freshness": {
+      "additionalProperties": false,
+      "properties": {
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "errors"
+      ],
+      "type": "object"
+    },
+    "issuerAdmission": {
+      "additionalProperties": false,
+      "properties": {
+        "signatures": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "detail": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "keyId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "listId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "purpose": {
+                "enum": [
+                  "ledger-row",
+                  "receipt",
+                  "artifact-seal",
+                  "revocation-list",
+                  "config-signature",
+                  "lease",
+                  "session",
+                  "release",
+                  "notary",
+                  "evidence-authority",
+                  "independent-attestation",
+                  "trust-list-root"
+                ],
+                "type": "string"
+              },
+              "signature": {
+                "type": "string"
+              },
+              "source": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "explicit-key",
+                      "trust-list",
+                      "trust-list-history",
+                      "workspace-self"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "admitted",
+                  "not-pinned",
+                  "wrong-purpose",
+                  "not-yet-valid",
+                  "expired",
+                  "revoked",
+                  "distrusted",
+                  "unpinned-allowed"
+                ],
+                "type": "string"
+              },
+              "timeBasis": {
+                "anyOf": [
+                  {
+                    "const": "claimed",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "signature",
+              "purpose",
+              "keyId",
+              "status",
+              "source",
+              "listId",
+              "timeBasis",
+              "detail"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "signatures"
+      ],
+      "type": "object"
+    },
+    "overrides": {
+      "items": {
+        "enum": [
+          "allow-unpinned",
+          "allow-unanchored"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "satisfaction": {
+      "additionalProperties": false,
+      "properties": {
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "fail",
+            "not-evaluated"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "trusted": {
+      "type": "boolean"
+    },
+    "type": {
+      "const": "amc.verifier-report",
+      "type": "string"
+    },
+    "verifiedAt": {
+      "type": "string"
+    },
+    "verifier": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "const": "agent-maturity-compass",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "version": {
+      "const": 1,
+      "type": "number"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "type",
+    "version",
+    "artifact",
+    "verifier",
+    "verifiedAt",
+    "asOf",
+    "integrity",
+    "issuerAdmission",
+    "anchoring",
+    "scope",
+    "freshness",
+    "completeness",
+    "satisfaction",
+    "trusted",
+    "overrides",
+    "warnings"
+  ],
+  "title": "AMC Verifier Report",
+  "type": "object"
+}

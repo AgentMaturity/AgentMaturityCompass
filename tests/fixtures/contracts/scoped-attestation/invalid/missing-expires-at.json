@@ -1,0 +1,38 @@
+{
+  "type": "amc.scoped-attestation",
+  "version": 1,
+  "snapshotDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "deployment": {
+    "deploymentId": "payments-prod",
+    "deploymentDigest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "profile": {
+    "id": "finance-ops",
+    "version": "1.0.0"
+  },
+  "window": {
+    "start": "2026-01-01T00:00:00.000Z",
+    "end": "2026-01-31T00:00:00.000Z"
+  },
+  "exclusions": [
+    {
+      "controlId": "AC-9",
+      "rationale": "no data export tools in this deployment"
+    }
+  ],
+  "controlResultsDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "issuerKeyId": "f65a514b49ce2b4bcd646925699d0674b8ef9c294398531f7a00da753fd32efc",
+  "issuedAt": "2026-02-01T00:00:00.000Z",
+  "signature": {
+    "v": 1,
+    "alg": "ed25519",
+    "pubkeyB64": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQWl3YldWSzl3MjFjVndYTzdPVGs3MXd0d0p4aWFseDU5R0NsMWZ1UEtMbjQ9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=",
+    "fingerprint": "f65a514b49ce2b4bcd646925699d0674b8ef9c294398531f7a00da753fd32efc",
+    "sigB64": "78AZuBXDG1BwEIqHKzOnTDV9zjkP7VaGdI0RGxiTyTi2TmsSBoWo2ZYa9akqpEy3K4lWvAAGu79SXb0ZVWgoDw==",
+    "signedTs": 1769904000000,
+    "signer": {
+      "type": "VAULT",
+      "attestationLevel": "SOFTWARE"
+    }
+  }
+}

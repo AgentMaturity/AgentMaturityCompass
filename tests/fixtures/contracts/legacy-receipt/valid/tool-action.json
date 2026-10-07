@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "kind": "tool_action",
+  "receipt_id": "rcpt-1",
+  "ts": 1767225600000,
+  "agentId": "agent-1",
+  "providerId": "local",
+  "model": null,
+  "event_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "body_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "session_id": "session-1"
+}

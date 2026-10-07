@@ -1,0 +1,243 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "bindings": {
+      "properties": {
+        "assurancePolicySha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "cgxPackSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "notaryFingerprint": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "promptPolicySha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "trustMode": {
+          "enum": [
+            "LOCAL_VAULT",
+            "NOTARY"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "assurancePolicySha256",
+        "cgxPackSha256",
+        "promptPolicySha256",
+        "trustMode"
+      ],
+      "type": "object"
+    },
+    "categoryScores": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "number"
+          },
+          "propertyNames": {
+            "enum": [
+              "INJECTION_RESILIENCE",
+              "SECRET_LEAKAGE",
+              "PII_LEAKAGE",
+              "TOOL_GOVERNANCE",
+              "MODEL_GOVERNANCE",
+              "BUDGET_GOVERNANCE",
+              "APPROVALS_GOVERNANCE",
+              "TRUTHFULNESS",
+              "SANDBOX_BOUNDARY",
+              "ATTESTATION_INTEGRITY",
+              "PLUGIN_INTEGRITY"
+            ],
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "certId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "findingCounts": {
+      "properties": {
+        "critical": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "high": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "info": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "low": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "medium": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "info"
+      ],
+      "type": "object"
+    },
+    "gates": {
+      "properties": {
+        "correlationRatio": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "integrityIndex": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "observedShare": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "integrityIndex",
+        "correlationRatio",
+        "observedShare"
+      ],
+      "type": "object"
+    },
+    "issuedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "proofBindings": {
+      "properties": {
+        "includedEventProofIds": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "merkleRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "transparencyRootSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        }
+      },
+      "required": [
+        "transparencyRootSha256",
+        "merkleRootSha256"
+      ],
+      "type": "object"
+    },
+    "riskAssuranceScore": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scope": {
+      "properties": {
+        "idHash": {
+          "pattern": "^[a-f0-9]{8,64}$",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "WORKSPACE",
+            "NODE",
+            "AGENT"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "idHash"
+      ],
+      "type": "object"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INSUFFICIENT_EVIDENCE"
+      ],
+      "type": "string"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "certId",
+    "issuedTs",
+    "scope",
+    "runId",
+    "status",
+    "findingCounts",
+    "gates",
+    "bindings",
+    "proofBindings"
+  ],
+  "title": "AMC Assurance Certificate",
+  "type": "object"
+}

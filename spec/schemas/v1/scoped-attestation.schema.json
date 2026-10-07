@@ -1,0 +1,198 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "controlResultsDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "deployment": {
+      "additionalProperties": false,
+      "properties": {
+        "deploymentDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "deploymentId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "deploymentId",
+        "deploymentDigest"
+      ],
+      "type": "object"
+    },
+    "exclusions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "controlId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "rationale": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "controlId",
+          "rationale"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "expiresAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "issuedAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "issuerKeyId": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "profile": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "type": "object"
+    },
+    "signature": {
+      "properties": {
+        "alg": {
+          "const": "ed25519",
+          "type": "string"
+        },
+        "fingerprint": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "pubkeyB64": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "sigB64": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "signedTs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "signer": {
+          "properties": {
+            "attestationLevel": {
+              "enum": [
+                "SOFTWARE",
+                "HARDWARE"
+              ],
+              "type": "string"
+            },
+            "notaryFingerprint": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "VAULT",
+                "NOTARY"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "attestationLevel"
+          ],
+          "type": "object"
+        },
+        "v": {
+          "const": 1,
+          "type": "number"
+        }
+      },
+      "required": [
+        "v",
+        "alg",
+        "pubkeyB64",
+        "fingerprint",
+        "sigB64",
+        "signedTs",
+        "signer"
+      ],
+      "type": "object"
+    },
+    "snapshotDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "type": {
+      "const": "amc.scoped-attestation",
+      "type": "string"
+    },
+    "version": {
+      "const": 1,
+      "type": "number"
+    },
+    "window": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "type",
+    "version",
+    "snapshotDigest",
+    "deployment",
+    "profile",
+    "window",
+    "exclusions",
+    "controlResultsDigest",
+    "issuerKeyId",
+    "issuedAt",
+    "expiresAt",
+    "signature"
+  ],
+  "title": "AMC Scoped Attestation",
+  "type": "object"
+}

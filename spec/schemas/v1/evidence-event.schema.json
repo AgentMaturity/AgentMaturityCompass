@@ -1,0 +1,215 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actorId": {
+      "type": "string"
+    },
+    "chainExpectedPrevHash": {
+      "type": "string"
+    },
+    "chainIndex": {
+      "maximum": 9007199254740991,
+      "minimum": -1,
+      "type": "integer"
+    },
+    "chainValid": {
+      "type": "boolean"
+    },
+    "claimKind": {
+      "enum": [
+        "synthetic_example",
+        "self_reported",
+        "observed",
+        "independently_reviewed"
+      ],
+      "type": "string"
+    },
+    "corrected": {
+      "type": "boolean"
+    },
+    "correctedTs": {
+      "anyOf": [
+        {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "correctionIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "correctionStatuses": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "eventHash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "eventId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "eventType": {
+      "enum": [
+        "stdin",
+        "stdout",
+        "stderr",
+        "artifact",
+        "metric",
+        "test",
+        "audit",
+        "review",
+        "llm_request",
+        "llm_response",
+        "output_validated",
+        "gateway",
+        "tool_action",
+        "tool_result",
+        "outcome",
+        "agent_process_started",
+        "agent_stdout",
+        "agent_stderr",
+        "agent_process_exited",
+        "agent_handoff_sent",
+        "agent_handoff_received",
+        "agent_delegation_started",
+        "agent_delegation_completed",
+        "session/open",
+        "session/close",
+        "work/accepted",
+        "turn/start",
+        "turn/end",
+        "turn/seal",
+        "step/start",
+        "step/end",
+        "request/header",
+        "request/tools",
+        "request/response",
+        "request/failure",
+        "system/prompt",
+        "user/message",
+        "user/attachment",
+        "assistant/block",
+        "tool/call",
+        "tool/result",
+        "tool/spill-commitment",
+        "approval/request",
+        "approval/answer",
+        "sandbox/mode",
+        "session/recovery-claim",
+        "session/resume",
+        "session/release",
+        "session/recovered",
+        "loop/inbox",
+        "loop/cancel",
+        "loop/veto",
+        "loop/retry",
+        "loop/compact"
+      ],
+      "type": "string"
+    },
+    "incidentIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "isoTs": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": {},
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "payloadSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "prevEventHash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "const": "GENESIS",
+          "type": "string"
+        }
+      ]
+    },
+    "rationale": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rationaleChain": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "runtime": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "writerSignature": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "eventId",
+    "ts",
+    "isoTs",
+    "sessionId",
+    "runtime",
+    "eventType",
+    "actorId",
+    "claimKind",
+    "payloadSha256",
+    "prevEventHash",
+    "eventHash",
+    "writerSignature",
+    "chainIndex",
+    "chainValid",
+    "chainExpectedPrevHash",
+    "incidentIds",
+    "correctionIds",
+    "correctionStatuses",
+    "corrected",
+    "correctedTs",
+    "rationale",
+    "rationaleChain",
+    "meta"
+  ],
+  "title": "AMC Evidence Event",
+  "type": "object"
+}

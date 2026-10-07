@@ -1,0 +1,24 @@
+{
+  "claimKind": "self_reported",
+  "statusDimensions": {
+    "applicability": {
+      "state": "applicable"
+    },
+    "evidence": "incomplete",
+    "result": "not_evaluated",
+    "enforcement": {
+      "state": "none"
+    },
+    "review": "pending"
+  },
+  "provenance": {
+    "producer": "amc quickscore",
+    "method": "numeric_self_answer",
+    "evidenceRefs": [],
+    "tier": "OBSERVED"
+  },
+  "eligibleLevel": null,
+  "reasons": [
+    "SELF_REPORTED_NO_POSITIVE_STATUS"
+  ]
+}

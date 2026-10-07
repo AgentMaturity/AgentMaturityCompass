@@ -1,0 +1,70 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "agentId": {
+      "type": "string"
+    },
+    "body_sha256": {
+      "type": "string"
+    },
+    "event_hash": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "llm_request",
+        "llm_response",
+        "tool_action",
+        "tool_result",
+        "guard_check",
+        "work_accepted"
+      ],
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "providerId": {
+      "type": "string"
+    },
+    "receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "kind",
+    "receipt_id",
+    "ts",
+    "agentId",
+    "providerId",
+    "model",
+    "event_hash",
+    "body_sha256",
+    "session_id"
+  ],
+  "title": "AMC Receipt Payload (legacy v1)",
+  "type": "object"
+}

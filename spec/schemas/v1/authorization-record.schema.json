@@ -1,0 +1,621 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "additionalProperties": false,
+      "properties": {
+        "actionClass": {
+          "enum": [
+            "READ_ONLY",
+            "WRITE_LOW",
+            "WRITE_HIGH",
+            "DEPLOY",
+            "SECURITY",
+            "FINANCIAL",
+            "NETWORK_EXTERNAL",
+            "DATA_EXPORT",
+            "IDENTITY"
+          ],
+          "type": "string"
+        },
+        "adapterId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "argumentsDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "EXECUTE",
+            "SIMULATE"
+          ],
+          "type": "string"
+        },
+        "normalizer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "toolName": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "toolName",
+        "adapterId",
+        "actionClass",
+        "mode",
+        "argumentsDigest",
+        "normalizer"
+      ],
+      "type": "object"
+    },
+    "agentSuppliedMetadata": {
+      "additionalProperties": {},
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "approvals": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "actionClass": {
+                "enum": [
+                  "READ_ONLY",
+                  "WRITE_LOW",
+                  "WRITE_HIGH",
+                  "DEPLOY",
+                  "SECURITY",
+                  "FINANCIAL",
+                  "NETWORK_EXTERNAL",
+                  "DATA_EXPORT",
+                  "IDENTITY"
+                ],
+                "type": "string"
+              },
+              "approvalRequestId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "approverIds": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "intentHash": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              "requestBindingDigest": {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "approvalRequestId",
+              "requestBindingDigest",
+              "intentHash",
+              "actionClass",
+              "approverIds",
+              "expiresAt"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "exceptions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "exceptionId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string"
+              },
+              "issuer": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "exceptionId",
+              "issuer",
+              "expiresAt"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "approvals",
+        "exceptions"
+      ],
+      "type": "object"
+    },
+    "authorizationId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "bindings": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "currency": {
+                  "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                "value": {
+                  "pattern": "^-?\\d+(\\.\\d+)?$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "value",
+                "currency"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "destination": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recipient": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceVersion": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "amount",
+        "recipient",
+        "destination",
+        "resourceId",
+        "resourceVersion"
+      ],
+      "type": "object"
+    },
+    "control": {
+      "additionalProperties": false,
+      "properties": {
+        "controlId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "controlVersion": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "controlId",
+        "controlVersion"
+      ],
+      "type": "object"
+    },
+    "delegation": {
+      "additionalProperties": false,
+      "properties": {
+        "allowedActionClasses": {
+          "items": {
+            "enum": [
+              "READ_ONLY",
+              "WRITE_LOW",
+              "WRITE_HIGH",
+              "DEPLOY",
+              "SECURITY",
+              "FINANCIAL",
+              "NETWORK_EXTERNAL",
+              "DATA_EXPORT",
+              "IDENTITY"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "depth": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "leaseId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parentExecutionId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "depth",
+        "parentExecutionId",
+        "allowedActionClasses",
+        "leaseId"
+      ],
+      "type": "object"
+    },
+    "evidenceRefs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "executionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "expiresAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "idempotencyKey": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "issuedAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "policy": {
+      "additionalProperties": false,
+      "properties": {
+        "actionPolicyDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "approvalPolicyDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "budgetsDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "compiledPolicyDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "policyRevision": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "toolsConfigDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "compiledPolicyDigest",
+        "policyRevision",
+        "toolsConfigDigest",
+        "actionPolicyDigest",
+        "approvalPolicyDigest",
+        "budgetsDigest"
+      ],
+      "type": "object"
+    },
+    "principal": {
+      "additionalProperties": false,
+      "properties": {
+        "authenticatedVia": {
+          "enum": [
+            "studio-session",
+            "lease",
+            "approval-engine",
+            "cli-os-user"
+          ],
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "service"
+          ],
+          "type": "string"
+        },
+        "principalId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "principalId",
+        "kind",
+        "authenticatedVia"
+      ],
+      "type": "object"
+    },
+    "resource": {
+      "additionalProperties": false,
+      "properties": {
+        "dataClasses": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "purpose": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "purpose",
+        "dataClasses"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "amc.authorization-record/v1",
+      "type": "string"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "deploymentDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "deploymentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tenantId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspaceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspaceId",
+        "tenantId",
+        "deploymentId",
+        "deploymentDigest"
+      ],
+      "type": "object"
+    },
+    "session": {
+      "additionalProperties": false,
+      "properties": {
+        "callId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "parentToken": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rootCallId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "runId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sessionId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sessionId",
+        "runId",
+        "callId",
+        "rootCallId",
+        "parentToken"
+      ],
+      "type": "object"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "agentConfigDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "governedAs": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "runAs": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "governedAs",
+        "runAs",
+        "agentConfigDigest"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "authorizationId",
+    "executionId",
+    "issuedAt",
+    "expiresAt",
+    "scope",
+    "subject",
+    "principal",
+    "delegation",
+    "session",
+    "control",
+    "policy",
+    "action",
+    "resource",
+    "bindings",
+    "authority",
+    "idempotencyKey",
+    "evidenceRefs"
+  ],
+  "title": "AMC Authorization Record",
+  "type": "object"
+}
