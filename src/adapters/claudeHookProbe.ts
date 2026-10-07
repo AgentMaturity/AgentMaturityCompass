@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
-import { HOOK_CONTROL_INTEGRATION_ID } from "./hookIntegration.js";
+import { getHookIntegrationStatus, HOOK_CONTROL_INTEGRATION_ID } from "./hookIntegration.js";
 
 export type ClaudeHookProbeReason =
   | "ok"
@@ -23,7 +23,8 @@ export interface ClaudeHookProbeResult {
 export interface ClaudeControlVerification {
   verified: boolean;
   summary: string;
-  probe: ClaudeHookProbeResult;
+  /** null when the installation is not intact, so nothing was spawned. */
+  probe: ClaudeHookProbeResult | null;
   settingsBlockers: string[];
   notes: string[];
 }
@@ -94,7 +95,7 @@ export function probeInstalledClaudeHook(input: { workspace: string }): Promise<
     ({ ok: reason === "ok", reason, exitCode, durationMs });
   if (!handler) return Promise.resolve(result("not_installed", null, 0));
   const script = handler.args[0];
-  if (!isAbsolute(handler.command) || !existsSync(handler.command) || (script !== undefined && !(isAbsolute(script) && existsSync(script)))) {
+  if (!isAbsolute(handler.command) || !existsSync(handler.command) || script === undefined || !(isAbsolute(script) && existsSync(script))) {
     return Promise.resolve(result("command_missing", null, 0));
   }
   const started = Date.now();
@@ -152,19 +153,32 @@ export function claudeHookSettingsFindings(input: { workspace: string; home?: st
   return { blockers, notes };
 }
 
-/** Control counts as verified only after the installed command ran and denied, and no setting disables hooks. */
+function installState(workspace: string): string {
+  try {
+    return getHookIntegrationStatus({ workspace, provider: "claude-code" }).state;
+  } catch {
+    return "invalid";
+  }
+}
+
+/**
+ * Control counts as verified only after the installed command ran and denied, and no setting
+ * disables hooks. The probe runs only when the provider config still matches the signed manifest
+ * (matcher, command and args included), so a drifted or tampered handler is never spawned.
+ */
 export async function verifyClaudeControl(input: { workspace: string; home?: string }): Promise<ClaudeControlVerification> {
-  const probe = await probeInstalledClaudeHook(input);
+  const state = installState(resolve(input.workspace));
+  const probe = state === "installed" ? await probeInstalledClaudeHook(input) : null;
   const settings = claudeHookSettingsFindings(input);
   const notes = [...settings.notes];
-  if (probe.reason === "command_missing") {
+  if (probe?.reason === "command_missing") {
     notes.push(`stale: the installed Node or AMC CLI path no longer exists; re-install with ${REINSTALL_COMMAND}`);
   }
-  const verified = probe.ok && settings.blockers.length === 0;
-  const reason = !probe.ok ? probe.reason : settings.blockers[0]?.split(" ")[0];
+  const verified = probe?.ok === true && settings.blockers.length === 0;
+  const reason = !probe ? state : !probe.ok ? probe.reason : settings.blockers[0]?.split(" ")[0];
   return {
     verified,
-    summary: verified
+    summary: verified && probe
       ? `Control: verified (probe denied in ${probe.durationMs} ms)`
       : `Control: NOT VERIFIED (${reason})`,
     probe,

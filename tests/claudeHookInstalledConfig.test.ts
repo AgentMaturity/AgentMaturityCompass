@@ -234,6 +234,36 @@ describe("installed Claude Code control configuration", () => {
     expect(status.stdout).toContain("Control: NOT VERIFIED");
     expect(status.stdout).toContain("disableAllHooks");
   }, 90_000);
+
+  test("never runs or verifies a drifted or tampered control handler", async () => {
+    const workspace = newWorkspace();
+    const home = tempDir("amc-claude-home-");
+    installHookIntegration({ workspace, provider: "claude-code", agentId: "drift-agent", bridgeBase: "http://127.0.0.1:3212", mode: "control" });
+    const settingsPath = join(workspace, ".claude", "settings.local.json");
+    const settings = JSON.parse(readFileSync(settingsPath, "utf8")) as {
+      hooks: { PreToolUse: Array<{ matcher: string; hooks: InstalledHandler[] }> };
+    };
+
+    // A narrowed matcher leaves Bash ungated even though the handler itself still denies.
+    settings.hooks.PreToolUse[0]!.matcher = "Read";
+    writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+    const narrowed = await verifyClaudeControl({ workspace, home });
+    expect(narrowed).toMatchObject({ verified: false, summary: "Control: NOT VERIFIED (drifted)", probe: null });
+
+    // A swapped command must not run at all.
+    const marker = join(workspace, "tampered-ran");
+    const tampered = join(workspace, "tampered.cjs");
+    writeFileSync(tampered, `require("node:fs").writeFileSync(${JSON.stringify(marker)}, "x"); process.stdout.write(${JSON.stringify(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } }))}); process.exitCode = 2;`);
+    settings.hooks.PreToolUse[0]!.matcher = "*";
+    settings.hooks.PreToolUse[0]!.hooks[0]!.args = [tampered];
+    writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`);
+    const status = await amcStatus(workspace, home);
+    expect(status.status).toBe(1);
+    expect(status.stdout).toContain("AMC hook: drifted");
+    expect(status.stdout).toContain("Control: NOT VERIFIED (drifted)");
+    expect(status.stdout).not.toContain("Control: verified");
+    expect(existsSync(marker)).toBe(false);
+  }, 90_000);
 });
 
 describe("Claude hook probe outcomes", () => {
@@ -270,7 +300,13 @@ describe("Claude hook probe outcomes", () => {
     writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "hang", "setTimeout(() => {}, 20000)")], timeout: 1 });
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "timed_out", exitCode: null });
 
-    writeControlHandler(workspace, { command: workspace, args: [], timeout: 10 });
+    writeControlHandler(workspace, { command: process.execPath, args: [], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
+
+    writeControlHandler(workspace, { command: process.execPath, timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
+
+    writeControlHandler(workspace, { command: workspace, args: [script(workspace, "deny-unreached", DENY_SCRIPT)], timeout: 10 });
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "spawn_failed" });
 
     writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", DENY_SCRIPT)], timeout: 10 });
@@ -278,9 +314,9 @@ describe("Claude hook probe outcomes", () => {
   }, 60_000);
 
   test("reports settings that disable every hook and never verifies with them set", async () => {
-    const workspace = tempDir("amc-claude-settings-");
+    const workspace = newWorkspace();
     const home = tempDir("amc-claude-home-");
-    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", DENY_SCRIPT)], timeout: 10 });
+    installHookIntegration({ workspace, provider: "claude-code", agentId: "settings-agent", bridgeBase: "http://127.0.0.1:3212", mode: "control" });
     expect(claudeHookSettingsFindings({ workspace, home }).blockers).toEqual([]);
     expect((await verifyClaudeControl({ workspace, home })).verified).toBe(true);
 
@@ -290,6 +326,6 @@ describe("Claude hook probe outcomes", () => {
     expect(findings.blockers).toEqual([`disableAllHooks is true in ${join(home, ".claude", "settings.json")}`]);
     const verification = await verifyClaudeControl({ workspace, home });
     expect(verification).toMatchObject({ verified: false, summary: "Control: NOT VERIFIED (disableAllHooks)" });
-    expect(verification.probe.ok).toBe(true);
+    expect(verification.probe?.ok).toBe(true);
   }, 60_000);
 });
