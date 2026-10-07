@@ -18,6 +18,8 @@ import type { EvidenceEventType } from "../../src/types.js";
  * P0-17 / gap G21: a compliance category may only report a result when evidence
  * belonging to that control, that subject, an admitted producer and the window
  * exists. Everything else is NOT_EVALUATED, never PARTIAL and never a score.
+ * P1-11: no compiled plan records applicability yet, so sufficient evidence is
+ * still not evaluated (applicability unresolved); only a fail is evaluated.
  */
 
 const roots: string[] = [];
@@ -186,14 +188,17 @@ describe("compliance fails closed (P0-17)", () => {
     }
   });
 
-  test("runtime events for agent A and no denied audits: requires_no_audit passes", () => {
+  test("runtime events for agent A and no denied audits: requires_no_audit has sufficient evidence, applicability unresolved", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
     appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A } });
     const row = category(workspace, AGENT_A, "fx_no_audit");
-    expect(row.status).toBe("SATISFIED");
-    expect(row.result).toBe("pass");
+    expect(row.status).toBe("NOT_EVALUATED");
+    expect(row.result).toBe("not_evaluated");
     expect(row.evidence).toBe("sufficient");
+    expect(row.dimensions.applicability.state).toBe("unresolved");
+    expect(row.claimKind).toBe("observed");
+    expect(row.admitted.length).toBe(1);
   });
 
   test("imported review rows carrying agent A's id are not agent activity for requires_no_audit", () => {
@@ -202,8 +207,10 @@ describe("compliance fails closed (P0-17)", () => {
     appendEvent(workspace, { eventType: "review", meta: { agentId: AGENT_A, source: "chatgpt", trustTier: "SELF_REPORTED" } });
     appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A, source: "eval_import", trustTier: "SELF_REPORTED" } });
     const row = category(workspace, AGENT_A, "fx_no_audit");
+    // P1-11: the imports are rejected as unverified producers, so the only evidence there is is untrusted.
     expect({ status: row.status, result: row.result, evidence: row.evidence })
-      .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
+      .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "untrusted" });
+    expect(row.rejected.map((entry) => entry.reason)).toEqual(["producer_unverified", "producer_unverified"]);
     expect(row.notEvaluatedReasons.join(" ")).toContain("absence of violations proves nothing");
   });
 
@@ -233,18 +240,22 @@ describe("compliance fails closed (P0-17)", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
     appendEvent(workspace, { meta: { agentId: AGENT_B, controlIds: ["fx_event"] } });
-    expect(category(workspace, AGENT_A, "fx_event").status).toBe("NOT_EVALUATED");
-    expect(category(workspace, AGENT_B, "fx_event").status).toBe("SATISFIED");
+    expect(category(workspace, AGENT_A, "fx_event").evidence).toBe("incomplete");
+    expect(category(workspace, AGENT_B, "fx_event").evidence).toBe("sufficient");
+    expect(category(workspace, AGENT_B, "fx_event").status).toBe("NOT_EVALUATED");
   });
 
-  test("a bound positive event in session system: agent-scoped NOT_EVALUATED, workspace-scoped SATISFIED", () => {
+  test("a bound positive event in session system: agent-scoped rejected, workspace-scoped admitted", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
     appendEvent(workspace, { sessionId: "system", meta: { controlIds: ["fx_event", "fx_workspace_event"] } });
     const agentScoped = category(workspace, AGENT_A, "fx_event");
     expect(agentScoped.status).toBe("NOT_EVALUATED");
     expect(agentScoped.result).toBe("not_evaluated");
-    expect(category(workspace, AGENT_A, "fx_workspace_event").status).toBe("SATISFIED");
+    expect(agentScoped.rejected.map((entry) => entry.reason)).toEqual(["binding_mismatch"]);
+    const workspaceScoped = category(workspace, AGENT_A, "fx_workspace_event");
+    expect(workspaceScoped.evidence).toBe("sufficient");
+    expect(workspaceScoped.admitted.length).toBe(1);
   });
 
   test("a denied audit type in session system fails agent A's requires_no_audit", () => {
@@ -264,7 +275,7 @@ describe("compliance fails closed (P0-17)", () => {
     const nistMap = category(workspace, "default", "nist_map", "NIST_AI_RMF");
     expect(nistMap.status).toBe("NOT_EVALUATED");
     expect(nistMap.notEvaluatedReasons.join(" ")).toContain("no control-bound evidence for nist_map in window");
-    expect(category(workspace, "default", "soc2_availability", "SOC2").status).toBe("SATISFIED");
+    expect(category(workspace, "default", "soc2_availability", "SOC2").evidence).toBe("sufficient");
   });
 
   test("a bound event from eval_import is NOT_EVALUATED with untrusted evidence", () => {
@@ -370,32 +381,34 @@ describe("compliance fails closed (P0-17)", () => {
     expect(row.notEvaluatedReasons.join(" ")).toContain("3 of 4 scenarios inconclusive");
   });
 
-  test("bound runtime OBSERVED events, a sealed passing run and no violations: SATISFIED", () => {
+  test("bound runtime OBSERVED events, a sealed passing run and no violations: sufficient and observed, but not a pass without applicability", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
     appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["fx_full"] } });
     writeSealedAssuranceReport(workspace, AGENT_A, 88);
     const out = report(workspace, AGENT_A);
     const row = out.categories.find((entry) => entry.id === "fx_full");
-    expect(row?.status).toBe("SATISFIED");
-    expect(row?.result).toBe("pass");
+    expect(row?.status).toBe("NOT_EVALUATED");
+    expect(row?.result).toBe("not_evaluated");
     expect(row?.evidence).toBe("sufficient");
-    expect(row?.notEvaluatedReasons).toEqual([]);
-    expect(out.coverage.evaluated).toBeGreaterThan(0);
-    expect(out.coverage.score).toBeTypeOf("number");
+    expect(row?.claimKind).toBe("observed");
+    expect(row?.dimensions).toMatchObject({ applicability: { state: "unresolved" }, enforcement: { state: "observed" }, review: "pending" });
+    expect(row?.notEvaluatedReasons.join(" ")).toContain("no compiled plan decides this control's applicability yet");
+    expect(out.coverage.evaluated).toBe(0);
+    expect(out.coverage.score).toBeNull();
   });
 
-  test("a failing requirement next to a passing one is PARTIAL; PARTIAL never comes from not evaluated", () => {
+  test("a failing requirement next to a sufficient one fails the category; PARTIAL is never emitted (P1-11)", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
     appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["fx_full"] } });
     appendEvent(workspace, { auditType: "DENIED_SIGNAL", meta: { agentId: AGENT_A } });
     writeSealedAssuranceReport(workspace, AGENT_A, 88);
     const out = report(workspace, AGENT_A);
-    expect(out.categories.find((entry) => entry.id === "fx_full")?.status).toBe("PARTIAL");
-    for (const row of out.categories.filter((entry) => entry.status === "PARTIAL")) {
-      expect(row.result).toBe("fail");
-    }
+    const full = out.categories.find((entry) => entry.id === "fx_full");
+    expect({ status: full?.status, result: full?.result }).toEqual({ status: "MISSING", result: "fail" });
+    expect(out.categories.filter((entry) => entry.status === "PARTIAL")).toEqual([]);
+    expect(out.coverage).toMatchObject({ partial: 0, score: 0 });
     expect(out.categories.find((entry) => entry.id === "fx_workspace_event")?.status).toBe("NOT_EVALUATED");
   });
 });

@@ -17,11 +17,17 @@ import {
   type ClaimMethod,
   type DiagnosticReportClaimInput
 } from "../claims/eligibility/index.js";
+import { envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
+import type { ComplianceReportJson } from "../compliance/mappingSchema.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { pathParam } from "./apiHelpers.js";
 
-/** `diagnostic_report`: the body is a sealed run and carries the run's own claim. A method: no adapter binds the result to evidence yet. */
-export type ClaimSource = "diagnostic_report" | ClaimMethod;
+/**
+ * `diagnostic_report`: the body is a sealed run and carries the run's own claim. `compliance_report`: the body is the
+ * compliance report the handler just generated, and carries its categories' claims (P1-11). A method: no adapter binds
+ * the result to evidence yet.
+ */
+export type ClaimSource = "diagnostic_report" | "compliance_report" | ClaimMethod;
 
 export interface ResultRoute {
   method: "GET" | "POST";
@@ -116,12 +122,21 @@ function isDiagnosticReport(data: unknown): data is DiagnosticReportClaimInput &
     && typeof report.evidenceTrustCoverage === "object" && report.evidenceTrustCoverage !== null;
 }
 
+function isComplianceReport(data: unknown): data is ComplianceReportJson {
+  const report = data as Partial<ComplianceReportJson> | null;
+  return typeof report?.framework === "string" && Array.isArray(report.categories) && report.categories.every((row) =>
+    typeof row?.claimKind === "string" && typeof row.dimensions === "object" && row.dimensions !== null
+    && Array.isArray(row.claimReasons) && Array.isArray(row.admitted));
+}
+
 /** A run counts as evidence only when this workspace's auditor key sealed it (as in P0-15's domain evidence). */
 export function resultEnvelope(route: ResultRoute, data: unknown, workspace: string, now = Date.now()): ClaimEnvelope {
   if (route.source === "diagnostic_report" && isDiagnosticReport(data) && sealedRunReportVerifies(workspace, data)) {
     return envelopeForDiagnosticReport(data, now);
   }
-  const method = route.source === "diagnostic_report" ? "runtime_observation" : route.source;
+  // In-process only: the route's handler passes the report generateComplianceReport returned, never a stored file.
+  if (route.source === "compliance_report" && isComplianceReport(data)) return envelopeForComplianceReport(data, now);
+  const method = route.source === "diagnostic_report" || route.source === "compliance_report" ? "runtime_observation" : route.source;
   return envelopeForUnboundResult({ producer: route.producer, method, regulated: route.regulated, now });
 }
 

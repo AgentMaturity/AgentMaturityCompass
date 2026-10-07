@@ -24,7 +24,8 @@ export const STUDIO_RESULT_ROUTES: readonly ResultRoute[] = [
     ["POST", "assurance/cert/issue"], ["GET", "assurance/cert/latest"], ["POST", "bench/compare"],
     ["GET", "bench/comparison/latest"], ["GET", "benchmarks/stats"]
   ]),
-  ...resultFamily("studio", "/", "runtime_observation", [["GET", "compliance/report"], ["GET", "compliance/fleet"]], true)
+  ...resultFamily("studio", "/", "runtime_observation",
+    [["GET", "compliance/report", { source: "compliance_report" }], ["GET", "compliance/fleet"]], true)
 ];
 
 /** Truth rule 6, on every pack-gate response. */

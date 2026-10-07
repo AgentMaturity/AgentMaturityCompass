@@ -121,35 +121,44 @@ describe("gaps and not-evaluated categories (P0-17)", () => {
     audit(ws, "DENIED_SIGNAL", []);
     const matrix = generateCoverageMatrix({ workspace: ws, window: "14d", frameworks: ["SOC2", "EU_AI_ACT"] });
 
+    // P1-11: a failed requirement fails the category (no PARTIAL), and sufficient evidence without an applicability
+    // decision (fx_ok) is not evaluated, so nothing passes and every evaluated category scores 0.
     expect(matrix.gaps.map((gap) => [gap.category, gap.status, gap.severity])).toEqual([
       ["fx_eu_missing", "MISSING", "critical"],
-      ["fx_missing", "MISSING", "high"],
-      ["fx_partial", "PARTIAL", "medium"]
+      ["fx_partial", "MISSING", "high"],
+      ["fx_missing", "MISSING", "high"]
     ]);
-    expect(matrix.notEvaluated.map((row) => row.category)).toEqual(["fx_none"]);
-    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([0.375, 0]);
-    expect(matrix.overallScore).toBe(0.1875);
+    expect(matrix.notEvaluated.map((row) => row.category)).toEqual(["fx_ok", "fx_none"]);
+    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([0, 0]);
+    expect(matrix.overallScore).toBe(0);
+    const ok = matrix.frameworks[0]?.categories.find((row) => row.id === "fx_ok");
+    expect({ evidence: ok?.dimensions.evidence, applicability: ok?.dimensions.applicability.state, kind: ok?.claimKind })
+      .toEqual({ evidence: "sufficient", applicability: "unresolved", kind: "observed" });
 
     const md = renderCoverageMatrixMarkdown(matrix);
     expect(md).toContain("## Gap Analysis");
     expect(md).toContain("## Not Evaluated");
     expect(md).toContain("| SOC 2");
+    expect(md).toContain("## Framework Claims");
+    expect(md).toContain("**Applicability:** unresolved");
     const heatmap = renderCoverageHeatmap(matrix);
-    for (const line of ["█ fx_ok", "▓ fx_partial", "░ fx_missing", "? fx_none", "Overall: 18.8%"]) {
+    for (const line of ["? fx_ok", "░ fx_partial", "░ fx_missing", "? fx_none", "Overall: 0.0%"]) {
       expect(heatmap).toContain(line);
     }
+    expect(heatmap).not.toContain("▓");
   });
 
-  test("a not-evaluated framework stays in the overall denominator at 0 and cannot inflate it", () => {
+  test("sufficient evidence without an applicability decision scores nothing (P1-11)", () => {
     const ws = newWorkspace();
     initComplianceMaps(ws, {
       complianceMaps: { version: 1, mappings: [mapping("fx_ok", "SOC2", [EVENT]), mapping("fx_eu_none", "EU_AI_ACT", [PACK])] }
     } as ComplianceMapsFile);
     audit(ws, "FIXTURE_SIGNAL", ["fx_ok"]);
     const matrix = generateCoverageMatrix({ workspace: ws, window: "14d", frameworks: ["SOC2", "EU_AI_ACT"] });
-    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([1, null]);
-    expect(matrix.overallScore).toBe(0.5);
-    expect(renderCoverageHeatmap(matrix)).toContain("Overall: 50.0%");
+    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([null, null]);
+    expect(matrix.overallScore).toBeNull();
+    expect(matrix.frameworks[0]?.categories[0]?.dimensions.evidence).toBe("sufficient");
+    expect(renderCoverageHeatmap(matrix)).toContain("Overall: not evaluated");
   });
 
   test("a framework whose report cannot be generated is not scored", () => {

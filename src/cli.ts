@@ -12627,10 +12627,11 @@ compliance
     const { coverage } = out.report;
     const total = out.report.categories.length;
     console.log(coverage.score === null
-      ? `Coverage: not evaluated (0 of ${total} categories had control-bound evidence)`
+      ? `Coverage: not evaluated (0 of ${total} categories passed or failed)`
       : `Coverage: ${(coverage.score * 100).toFixed(1)}% (${coverage.evaluated} of ${total} categories evaluated, ${coverage.satisfied} satisfied)`);
     if (coverage.score === null) {
-      console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window.`));
+      console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window;`));
+      console.log(chalk.gray(`     a pass also needs a compiled plan recording that the control applies.`));
       console.log(chalk.gray(`     Absence of violations is not a pass. Capture evidence first:`));
       console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
       console.log(chalk.gray(`     amc evidence collect`));

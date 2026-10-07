@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { EvidenceEventType } from "../types.js";
-import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
+import type { ClaimKind, ClaimReasonCode, EvidenceState, ResultState, StatusDimensions } from "../claims/eligibility/types.js";
+import type { ControlResult } from "../catalog/evidence/types.js";
 import { questionIds } from "../diagnostic/questionBank.js";
 import { frameworkChoices } from "./frameworks.js";
 import { STATIONS, type Station } from "../domains/stations.js";
@@ -74,7 +75,11 @@ export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceReq
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;
 
-/** UNKNOWN is kept only to read reports written before P0-17; the engine never emits it. */
+/**
+ * PARTIAL and UNKNOWN are kept only to read reports written before P1-11 and P0-17; the engine never emits them. The
+ * engine derives the status from `result` (pass SATISFIED, fail MISSING, not_evaluated NOT_EVALUATED) for one more
+ * minor release; read `dimensions` and `claimKind` instead.
+ */
 export type ComplianceCategoryStatus = "SATISFIED" | "PARTIAL" | "MISSING" | "NOT_EVALUATED" | "UNKNOWN";
 
 export interface ComplianceCategoryResult {
@@ -83,8 +88,14 @@ export interface ComplianceCategoryResult {
   category: string;
   description: string;
   status: ComplianceCategoryStatus;
+  /** Equal to `dimensions.result` and `dimensions.evidence`. */
   result: ResultState;
   evidence: EvidenceState;
+  /** The five status dimensions, from the evidence this report admitted (P1-11). */
+  dimensions: StatusDimensions;
+  /** Derived through P0-08's evaluateClaimEligibility, never declared. */
+  claimKind: ClaimKind;
+  claimReasons: ClaimReasonCode[];
   notEvaluatedReasons: string[];
   reasons: string[];
   evidenceRefs: Array<{
@@ -92,12 +103,10 @@ export interface ComplianceCategoryResult {
     eventHash: string;
     eventType: string;
   }>;
+  /** The first 24 admitted and rejected evidence items across the category's requirements. */
+  admitted: ControlResult["admitted"];
+  rejected: ControlResult["rejected"];
   neededToSatisfy: string[];
-  /**
-   * True only when every requirement passed on control-bound events that all counted as OBSERVED (computed over the
-   * counted set, not the display refs). Absent in reports written before P0-22, which read as self-reported.
-   */
-  countedObserved?: boolean;
 }
 
 export interface ComplianceReportJson {
@@ -119,12 +128,14 @@ export interface ComplianceReportJson {
   };
   coverage: {
     satisfied: number;
+    /** Always 0 since P1-11; kept for one minor release. */
     partial: number;
     missing: number;
+    /** Always 0; kept for one minor release. */
     unknown: number;
     notEvaluated: number;
     evaluated: number;
-    /** Null when no category was evaluated: there is nothing to score. */
+    /** Passes over all categories; null when no category was evaluated: there is nothing to score. */
     score: number | null;
   };
   categories: ComplianceCategoryResult[];
