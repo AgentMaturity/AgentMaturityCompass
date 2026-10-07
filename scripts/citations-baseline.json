@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "CIT001": {
+      "zeroTolerance": false,
+      "issue": "P0-24",
+      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "counts": {
+        "src/domains/domainRegistry.ts": 2,
+        "src/domains/industryPacks.ts": 3,
+        "src/score/domainPacks.ts": 5
+      }
+    },
+    "CIT002": {
+      "zeroTolerance": false,
+      "issue": "P0-24",
+      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "counts": {
+        "src/domains/industryPackAudit.ts": 2,
+        "src/score/crossFrameworkMapping.ts": 2
+      }
+    },
+    "CIT003": {
+      "zeroTolerance": true,
+      "issue": "P0-25",
+      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "counts": {}
+    },
+    "CIT004": {
+      "zeroTolerance": false,
+      "issue": "P1-09",
+      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "counts": {
+        "src/domains/domainRegistry.ts": 16,
+        "src/domains/industryPacks.ts": 316,
+        "src/domains/packs/catalogueEu.ts": 79,
+        "src/domains/packs/catalogueIntl.ts": 146,
+        "src/domains/packs/catalogueUs.ts": 42,
+        "src/score/domainPacks.ts": 33
+      }
+    },
+    "CIT005": {
+      "zeroTolerance": true,
+      "issue": "P0-25",
+      "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+      "counts": {}
+    }
+  },
+  "reason": "Initial P0-25 baseline: CIT001 and CIT002 findings are burned down by P0-24; CIT004 records gain citation fields in P1-09.",
+  "updatedAt": "2026-10-07"
+}

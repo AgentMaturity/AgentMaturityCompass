@@ -2,7 +2,8 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { main } from "../../scripts/check-citations.mjs";
+import { main, RULES } from "../../scripts/check-citations.mjs";
+import { CITATION_RULES } from "../../src/compliance/citations/lint.js";
 
 type Finding = { rule: string; file: string; location: string; message: string; zeroTolerance: boolean };
 const dirs: string[] = [];
@@ -28,6 +29,12 @@ async function run(argv: string[], findings: Finding[], baselinePath: string) {
 }
 
 describe("check-citations CLI", () => {
+  it("uses the linter's rule names, tolerance and burn-down issues", () => {
+    const fromLint = Object.fromEntries(Object.entries(CITATION_RULES).map(([rule, meta]) =>
+      [rule, { name: meta.name, zeroTolerance: meta.zeroTolerance, issue: meta.burnDownIssue }]));
+    expect(RULES).toEqual(fromLint);
+  });
+
   it("exits 1 when a ratcheted count rises above its baseline", async () => {
     const path = baselineFile({ CIT004: { "src/a.ts": 1 } });
     const { code, text } = await run([], [finding("CIT004", false), finding("CIT004", false)], path);
