@@ -125,14 +125,11 @@ const FDA_CONTENT = [
   "Statement explaining any incomplete information and the steps taken to obtain it; supplemental report under 803.56 when it becomes available (803.50(b)(3))"
 ];
 
-const TEXAS_UNREACHABLE =
-  "primary text unreachable 2026-10-03: statutes.capitol.texas.gov returned the site shell without section text for BC.521.htm and GetStatute.aspx?Code=BC&Value=521.053; texasattorneygeneral.gov breach-reporting page returned HTTP 404. Durations below are the engineer's recollection and must be confirmed against the statute before reliance.";
 const TEXAS_SOURCE: ClockSource = {
-  title: "Texas Business and Commerce Code § 521.053 (Notification Required Following Breach of Security of Computerized Data) — Texas Legislature Online",
-  url: "https://statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm",
-  retrievedAt: "2026-10-03T16:36:58Z",
-  verified: false,
-  reason: TEXAS_UNREACHABLE
+  title: "Texas Business and Commerce Code ch. 521, § 521.053 (Notification Required Following Breach of Security of Computerized Data), as amended through Acts 2023, 88th Leg., ch. 246 (S.B. 768), eff. 2023-09-01 — Texas Legislative Council statute file served to statutes.capitol.texas.gov",
+  url: "https://tcss.legis.texas.gov/resources/BC/htm/BC.521.htm",
+  retrievedAt: "2026-10-07T17:14:09Z",
+  verified: true
 };
 
 export const REGULATORY_CLOCK_TABLE: readonly RegulatoryClock[] = [
@@ -433,15 +430,19 @@ export const REGULATORY_CLOCK_TABLE: readonly RegulatoryClock[] = [
     clockId: "tx-bcc-521-053-individual-notice",
     instrument: "Texas Business and Commerce Code § 521.053",
     article: "§ 521.053(b)",
-    authority: "Texas Attorney General (enforcement)",
+    authority: "Texas Attorney General (enforcement, § 521.151)",
     jurisdiction: "US-TX",
     stations: ALL_STATIONS,
     trigger: "BREACH_DETERMINATION",
     deadline: { amount: 60, unit: "calendarDays" },
-    notify: ["Each individual whose sensitive personal information was, or is reasonably believed to have been, acquired by an unauthorized person"],
-    requiredContent: ["UNVERIFIED — confirm required content against § 521.053 before use"],
+    notify: ["Each individual whose sensitive personal information was, or is reasonably believed to have been, acquired by an unauthorized person (§ 521.053(b))"],
+    requiredContent: [
+      "Disclosure of the breach of system security; § 521.053 prescribes no content list for the individual notice",
+      "Written notice to the last known address, electronic notice under 15 U.S.C. 7001, or substitute notice where § 521.053(f) allows it (§ 521.053(e))",
+      "If more than 10,000 persons are notified at one time: notice to each nationwide consumer reporting agency of the timing, distribution and content of the notices, without unreasonable delay (§ 521.053(h))"
+    ],
     condition:
-      "UNVERIFIED — person conducting business in Texas that owns or licenses computerized data including sensitive personal information; recollected deadline: 60th day after determining the breach occurred.",
+      "Person who conducts business in Texas and owns or licenses computerized data that includes sensitive personal information; breach of system security as defined in § 521.053(a); without unreasonable delay and in each case not later than the 60th day after the date on which the person determines that the breach occurred, except for a law-enforcement delay under § 521.053(d) or as necessary to determine the scope of the breach and restore the reasonable integrity of the data system (§ 521.053(b)). Residents of another state with a breach-notice law may be notified under that state's law (§ 521.053(b-1)). The exceptions are not modelled.",
     source: TEXAS_SOURCE
   },
   {
@@ -453,10 +454,17 @@ export const REGULATORY_CLOCK_TABLE: readonly RegulatoryClock[] = [
     stations: ALL_STATIONS,
     trigger: "BREACH_DETERMINATION",
     deadline: { amount: 30, unit: "calendarDays" },
-    notify: ["Texas Attorney General, via the AG's electronic breach-reporting form"],
-    requiredContent: ["UNVERIFIED — confirm required content against § 521.053(i) before use"],
+    notify: ["Texas Attorney General, electronically on the form accessed through the attorney general's website (§ 521.053(i))"],
+    requiredContent: [
+      "Detailed description of the nature and circumstances of the breach or the use of sensitive personal information acquired as a result of it (§ 521.053(i)(1))",
+      "Number of Texas residents affected at the time of notification (§ 521.053(i)(2))",
+      "Number of affected residents sent a disclosure by mail or other direct method at the time of notification (§ 521.053(i)(3))",
+      "Measures taken regarding the breach (§ 521.053(i)(4))",
+      "Measures the person intends to take after the notification (§ 521.053(i)(5))",
+      "Whether law enforcement is engaged in investigating the breach (§ 521.053(i)(6))"
+    ],
     condition:
-      "UNVERIFIED — breach affecting at least 250 Texas residents (recollected threshold); recollected deadline: 30th day after determining the breach occurred.",
+      "Person required to disclose or notify a breach of system security under § 521.053; breach involves at least 250 residents of Texas; as soon as practicable and not later than the 30th day after the date on which the person determines that the breach occurred (§ 521.053(i)). AMC does not check the 250-resident threshold.",
     source: TEXAS_SOURCE
   }
 ];

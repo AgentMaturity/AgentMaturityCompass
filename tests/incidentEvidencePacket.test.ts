@@ -249,9 +249,14 @@ describe("incident evidence packet", () => {
   test("lists unverified clock sources and overdue clocks", () => {
     const incident = fixtureIncident();
     const nowTs = TRIGGER_TS + 61 * DAY_MS;
-    const clocks = attachRegulatoryClocks({ incident, station: "health", nowTs });
+    // P1-17 verified the Texas rows, so no health clock is unverified; mark one here.
+    const clocks = attachRegulatoryClocks({ incident, station: "health", nowTs }).map((clock) =>
+      clock.clockId === "fda-803-53-five-day"
+        ? { ...clock, source: { ...clock.source, verified: false, reason: "primary text unreachable (fixture)" } }
+        : clock
+    );
     const packet = buildEvidencePacket({ incident, station: "health", generatedTs: nowTs, clocks });
-    expect(packet.unverifiedSources.length).toBeGreaterThan(0);
+    expect(packet.unverifiedSources.map((source) => source.clockId)).toEqual(["fda-803-53-five-day"]);
     for (const source of packet.unverifiedSources) {
       expect(source.reason.length).toBeGreaterThan(0);
     }

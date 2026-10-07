@@ -81,8 +81,8 @@ relief and HIPAA 164.412 law-enforcement delay are not modelled; the
 | dora-rts-2025-301-art5-final | Del. Reg. (EU) 2025/301 Art. 5(1)(c) | wealth | INTERMEDIATE_REPORT | 1 month | competent authority | yes |
 | fda-803-50-mdr-30-day | 21 CFR 803.50(a) | health | AWARENESS | 30 calendar days | FDA | yes |
 | fda-803-53-five-day | 21 CFR 803.53 | health | AWARENESS | 5 work days | FDA | yes |
-| tx-bcc-521-053-individual-notice | Tex. Bus. & Com. Code § 521.053(b) | all | BREACH_DETERMINATION | 60 calendar days | affected individuals | **no** |
-| tx-bcc-521-053-attorney-general | Tex. Bus. & Com. Code § 521.053(i) | all | BREACH_DETERMINATION | 30 calendar days | Texas Attorney General | **no** |
+| tx-bcc-521-053-individual-notice | Tex. Bus. & Com. Code § 521.053(b) | all | BREACH_DETERMINATION | 60 calendar days | affected individuals | yes (2026-10-07) |
+| tx-bcc-521-053-attorney-general | Tex. Bus. & Com. Code § 521.053(i) | all | BREACH_DETERMINATION | 30 calendar days (250 or more Texas residents) | Texas Attorney General | yes (2026-10-07) |
 
 "Station(s)" is where the clock is *surfaced*; it is not an applicability
 ruling. 45 CFR 164.404 binds HIPAA covered entities, DORA binds financial
@@ -107,14 +107,15 @@ saved files' modification times (UTC):
 | 45 CFR 164.410 | GPO govinfo CFR 2024 annual edition, Title 45 Vol. 2 | 2026-10-03T16:38:10Z |
 | 21 CFR 803.50 | GPO govinfo CFR 2024 annual edition, Title 21 Vol. 8 (revised 2024-04-01) | 2026-10-03T16:36:55Z |
 | 21 CFR 803.53 | GPO govinfo CFR 2024 annual edition, Title 21 Vol. 8 (revised 2024-04-01) | 2026-10-03T16:36:56Z |
-| Tex. Bus. & Com. Code § 521.053 | `https://statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm` — **site shell only, no section text**; `GetStatute.aspx?Code=BC&Value=521.053` likewise; `texasattorneygeneral.gov` breach page HTTP 404 | 2026-10-03T16:36:58Z |
+| Tex. Bus. & Com. Code § 521.053 | Texas Legislative Council statute file `https://tcss.legis.texas.gov/resources/BC/htm/BC.521.htm`, the file `statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm` loads (the site itself is a script shell); amended through Acts 2023, 88th Leg., ch. 246 (S.B. 768), eff. 2023-09-01 | 2026-10-07T17:14:09Z |
 
 Boundary: the govinfo copies are the 2024 annual CFR edition, not the live
 eCFR point-in-time text; amendments after the annual edition are not reflected.
-The two Texas durations (60 days to individuals, 30 days / 250-resident
-threshold to the Attorney General) are the engineer's recollection and are
-marked `verified: false` with the reason in the table; they must be confirmed
-against the statute before anyone relies on them.
+The two Texas durations were the F4 engineer's recollection on 2026-10-03,
+when only the site shell answered. P1-17 read § 521.053 on 2026-10-07: both
+durations and the 250-resident threshold match the statute, the rows now quote
+it, list the six Attorney General content items of § 521.053(i) and are
+`verified: true`.
 
 ## Sourcing from the S5 regulatory register later
 
