@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { amcVersion } from "../version.js";
-import { issuerAdmissionSchema, type IssuerAdmission } from "./admission.js";
+import { admitKey, issuerAdmissionSchema, type IssuerAdmission } from "./admission.js";
 import type { TrustContext } from "./trustContext.js";
 
 const dimensionStatus = z.enum(["pass", "fail", "not-evaluated"]);
@@ -84,4 +84,14 @@ export function untrustedReasons(report: VerifierReportV1): string[] {
       .map(signature => `${signature.signature} (${signature.purpose}): ${signature.status}${signature.detail ? ` — ${signature.detail}` : ""}`),
     ...(report.anchoring.status === "unanchored" ? [`ledger UNANCHORED: ${report.anchoring.detail ?? "the monitor key is not pinned"}`] : [])
   ];
+}
+
+/**
+ * P0-51: an artifact that names no signer (an unkeyed hash, or an HMAC under a shared secret) has no issuer to admit.
+ * admitKey refuses the missing key as not-pinned whatever the flags, so the report is never trusted and exits 1.
+ */
+export function unsignedArtifactReport(artifact: VerifierReportV1["artifact"], trust: TrustContext, integrityErrors: readonly string[],
+  signature: string): VerifierReportV1 {
+  return buildVerifierReport({ artifact, context: trust, integrityErrors, anchoring: { status: "not-applicable", detail: null },
+    signatures: [admitKey({ publicKeyPem: null, purpose: "artifact-seal", signature, context: trust })] });
 }

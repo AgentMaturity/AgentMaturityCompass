@@ -9,7 +9,7 @@ import type { Command } from "commander";
 import { resolve } from "node:path";
 import chalk from "chalk";
 import {
-  admitKey, buildVerifierReport, loadTrustContext, untrustedReasons, verdictExitCode,
+  loadTrustContext, untrustedReasons, verdictExitCode,
   type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1
 } from "./trust/index.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
@@ -59,15 +59,8 @@ export function trustFromFlags(flags: TrustFlags, purposes: readonly KeyPurpose[
   });
 }
 
-/**
- * P0-51: an artifact that names no signer (an unkeyed hash, or an HMAC under a shared secret) has no issuer to admit.
- * admitKey refuses the missing key as not-pinned whatever the flags, so the report is never trusted and exits 1.
- */
-export function unsignedArtifactReport(artifact: VerifierReportV1["artifact"], trust: TrustContext, integrityErrors: readonly string[],
-  signature: string): VerifierReportV1 {
-  return buildVerifierReport({ artifact, context: trust, integrityErrors, anchoring: { status: "not-applicable", detail: null },
-    signatures: [admitKey({ publicKeyPem: null, purpose: "artifact-seal", signature, context: trust })] });
-}
+/** Moved to src/trust so the API can share it (P0-51). */
+export { unsignedArtifactReport } from "./trust/index.js";
 
 function untrusted(reasons: readonly string[], overrides: readonly string[]): void {
   console.error(`UNTRUSTED: integrity verified, but ${overrides.map((flag) => `--${flag}`).join(" and ")} was used: ${reasons.join("; ")}`);
