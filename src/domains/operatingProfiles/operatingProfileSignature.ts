@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigest } from "../../crypto/keys.js";
+import { assertOwnerMode } from "../../mode/mode.js";
 import { checkDigestSignature, ed25519KeyId, loadTrustContext } from "../../trust/index.js";
 import { isKeyRefused } from "../../trust/signatureCheck.js";
 import { pathExists, writeFileAtomic } from "../../utils/fs.js";
@@ -57,8 +58,10 @@ export function inspectOperatingProfileForSigning(workspace: string, profilePath
  * Signs a reviewed profile with the workspace auditor key and writes `<profilePath>.sig`.
  * A signature records who signed and that the bytes are unchanged; it does not make a value
  * true, and the same workspace key does not show that a second person reviewed it.
+ * Blocked in agent mode, like the other config-signing commands.
  */
 export function signOperatingProfile(workspace: string, profilePath: string): string {
+  assertOwnerMode(resolve(workspace), "domain apply --sign-profile");
   const { sigPath, digestSha256 } = inspectOperatingProfileForSigning(workspace, profilePath);
   const payload: OperatingProfileSignature = {
     digestSha256,

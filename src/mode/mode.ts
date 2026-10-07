@@ -73,6 +73,8 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "fix-signatures",
     "budgets init",
     "budgets reset",
+    "domain apply --sign-profile",
+    "domain apply --activate-profile",
     "alerts init",
     "alerts test",
     "freeze lift",
