@@ -829,6 +829,8 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
   agentId: string | null;
   retainedSpills: { objectsComplete: boolean; plaintextVerified: false; gaps: string[] };
   report: VerifierReportV1;
+  /** The run.json these checks read (a claim label takes the run from here, never from a second read of the file). */
+  run: DiagnosticReport | null;
 }> {
   const extracted = withExtractedBundle(bundleFile);
   const errors: string[] = [];
@@ -1017,7 +1019,8 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
       runId: manifest?.runId ?? run?.runId ?? null,
       agentId: manifest?.agentId ?? run?.agentId ?? null,
       retainedSpills: { objectsComplete: errors.length === 0 && spillGaps.length === 0, plaintextVerified: false, gaps: spillGaps },
-      report
+      report,
+      run
     };
   } finally {
     extracted.cleanup();

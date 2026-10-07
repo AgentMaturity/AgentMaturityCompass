@@ -1,4 +1,14 @@
+import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 import type { ComplianceGap, DomainAssessmentResult, DomainRoadmapItem } from "./domainAssessmentEngine.js";
+
+const LEGEND = ["## How to read claim kinds", "", renderClaimLegend("markdown"), ""].join("\n");
+
+/** Scores computed from the caller's own inputs: self-reported, not evaluated. */
+function callerInputClaim(result: DomainAssessmentResult): ClaimEnvelope {
+  return envelopeForUnverifiedResult({ producer: `domain:${result.domain}`, recordCount: 1, now: Date.now() });
+}
 
 export interface ExecutiveSummary {
   domain: string;
@@ -136,7 +146,8 @@ function renderRegulatoryWarnings(warnings: string[]): string {
   ].join("\n");
 }
 
-export function renderDomainReportMarkdown(result: DomainAssessmentResult): string {
+/** Without `claim` the scores are the caller's own inputs, so the report is labelled self-reported. */
+export function renderDomainReportMarkdown(result: DomainAssessmentResult, claim = callerInputClaim(result)): string {
   const summary: ExecutiveSummary = {
     domain: result.domainMetadata.name,
     level: result.level,
@@ -147,33 +158,41 @@ export function renderDomainReportMarkdown(result: DomainAssessmentResult): stri
 
   const sections = [
     `# AMC Domain Report: ${result.domainMetadata.name}`,
+    "",
+    formatClaimLabel(renderClaimLabel(claim), "report"),
+    "",
     `Generated: ${new Date().toISOString()}`,
     "",
     renderExecutiveSummary(summary),
     renderModuleActivationTable(moduleRows(result)),
     renderComplianceGaps(groupGapsByRegulation(result.complianceGaps)),
     renderRoadmap(result.roadmap),
-    renderRegulatoryWarnings(result.regulatoryWarnings)
+    renderRegulatoryWarnings(result.regulatoryWarnings),
+    LEGEND
   ];
 
   return sections.join("\n");
 }
 
 /** The report for an assessment AMC could not evaluate: the reasons, no scores and no gap verdict. */
-export function renderNotEvaluatedDomainReport(domainName: string, reasons: readonly string[]): string {
+export function renderNotEvaluatedDomainReport(domainName: string, reasons: readonly string[], claim: ClaimEnvelope): string {
   return [
     `# AMC Domain Report: ${domainName}`,
+    "",
+    formatClaimLabel(renderClaimLabel(claim), "report"),
+    "",
     `Generated: ${new Date().toISOString()}`,
     "",
     "## Result: Not evaluated",
     ...reasons.map((reason) => `- ${reason}`),
     "",
     "Next step: run `amc quickscore` to evaluate the base part from observed evidence.",
-    ""
+    "",
+    LEGEND
   ].join("\n");
 }
 
-export function buildDomainReport(result: DomainAssessmentResult): DomainReport {
+export function buildDomainReport(result: DomainAssessmentResult, claim = callerInputClaim(result)): DomainReport {
   return {
     generatedAt: new Date().toISOString(),
     executiveSummary: {
@@ -187,6 +206,6 @@ export function buildDomainReport(result: DomainAssessmentResult): DomainReport 
     complianceGapAnalysis: groupGapsByRegulation(result.complianceGaps),
     roadmap: [...result.roadmap],
     regulatoryWarnings: [...result.regulatoryWarnings],
-    markdown: renderDomainReportMarkdown(result)
+    markdown: renderDomainReportMarkdown(result, claim)
   };
 }

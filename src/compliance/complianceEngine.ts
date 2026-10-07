@@ -191,6 +191,8 @@ interface RequirementOutcome {
   reason: string;
   refs: EvidenceRef[];
   needed: string;
+  /** Set only on a pass whose every counted event (not the display refs) was OBSERVED; the claim kind reads it. */
+  allCountedObserved?: true;
 }
 
 const NOTHING_NEEDED = "No additional evidence required for this requirement";
@@ -203,7 +205,8 @@ function evaluateEvidenceEvent(
   requirement: Extract<ComplianceEvidenceRequirement, { type: "requires_evidence_event" }>,
   mapping: ComplianceMapping,
   events: EvidenceEvent[],
-  isPositive: (event: EvidenceEvent) => boolean
+  isPositive: (event: EvidenceEvent) => boolean,
+  reader: () => ReaderTrust
 ): RequirementOutcome {
   const types = requirement.eventTypes.join(", ");
   const needed = `Capture ${types} events bound to '${mapping.id}' (meta.controlIds) from AMC runtime with OBSERVED trust tier`;
@@ -223,7 +226,7 @@ function evaluateEvidenceEvent(
       needed
     };
   }
-  const observed = runtime.filter((event) => inferTrustTier(event, eventMeta(event)) === "OBSERVED").length;
+  const observed = runtime.filter((event) => inferTrustTier(event, eventMeta(event), reader) === "OBSERVED").length;
   const ratio = observed / runtime.length;
   if (ratio < requirement.minObservedRatio) {
     return {
@@ -239,7 +242,8 @@ function evaluateEvidenceEvent(
     evidence: "sufficient",
     reason: `Found ${runtime.length} control-bound runtime events with observed ratio ${ratio.toFixed(3)}`,
     refs: refsOf(runtime),
-    needed: NOTHING_NEEDED
+    needed: NOTHING_NEEDED,
+    ...(observed === runtime.length ? { allCountedObserved: true as const } : {})
   };
 }
 
@@ -336,12 +340,13 @@ function evaluateRequirement(params: {
   events: EvidenceEvent[];
   agentId: string;
   assurance: VerifiedAssurance;
+  reader: () => ReaderTrust;
 }): RequirementOutcome {
   const scope = params.mapping.binding?.scope ?? "agent";
   const role = (event: EvidenceEvent) => subjectRole(event, params.agentId, scope);
   switch (params.requirement.type) {
     case "requires_evidence_event":
-      return evaluateEvidenceEvent(params.requirement, params.mapping, params.events, (event) => role(event) === "positive");
+      return evaluateEvidenceEvent(params.requirement, params.mapping, params.events, (event) => role(event) === "positive", params.reader);
     case "requires_assurance_pack":
       return evaluateAssurancePack(params.requirement, params.assurance);
     case "requires_no_audit":
@@ -386,7 +391,8 @@ function evaluateMapping(
     notEvaluatedReasons: [...new Set(notEvaluated.map((row) => row.reason))],
     reasons: [...new Set(outcomes.map((row) => row.reason))],
     evidenceRefs: outcomes.flatMap((row) => row.refs).slice(0, 24),
-    neededToSatisfy: [...new Set(outcomes.map((row) => row.needed))]
+    neededToSatisfy: [...new Set(outcomes.map((row) => row.needed))],
+    countedObserved: outcomes.length > 0 && outcomes.every((row) => row.allCountedObserved === true)
   };
 }
 
@@ -404,7 +410,8 @@ function untrustedMapping(mapping: ComplianceMapping, reason: string | null): Co
     notEvaluatedReasons: [message],
     reasons: [message],
     evidenceRefs: [],
-    neededToSatisfy: ["Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"]
+    neededToSatisfy: ["Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"],
+    countedObserved: false
   };
 }
 
@@ -430,9 +437,11 @@ export function generateComplianceReport(params: {
     const events = ledger.getEventsBetween(windowStartTs, windowEndTs)
       .filter((event) => subjectRole(event, agentId, "workspace") !== "none");
     const assurance = verifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs });
+    // One reader for the whole evaluation, so the tiers a category counted are the tiers the coverage reports.
+    const reader = readerTrustFor(workspace);
 
     const categories = mappings.map((mapping) => verify.valid
-      ? evaluateMapping(mapping, (requirement) => evaluateRequirement({ requirement, mapping, events, agentId, assurance }))
+      ? evaluateMapping(mapping, (requirement) => evaluateRequirement({ requirement, mapping, events, agentId, assurance, reader }))
       : untrustedMapping(mapping, verify.reason));
 
     const trustCounts = {
@@ -442,7 +451,6 @@ export function generateComplianceReport(params: {
     };
     // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest, and an
     // attested event counts once, inside the window of its own time.
-    const reader = readerTrustFor(workspace);
     const subjectRows = events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic");
     const tiers = new Map(subjectRows.map((row) => [row, inferTrustTier(row, eventMeta(row), reader)]));
     for (const event of countAttestedOnce(subjectRows, (row) => tiers.get(row), { startTs: windowStartTs, endTs: windowEndTs })) {

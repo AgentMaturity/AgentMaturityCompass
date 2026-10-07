@@ -10,6 +10,8 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { getRapidQuestions } from "../diagnostic/rapidQuickscore.js";
 import { runOneClickFix, type OneClickFixResult } from "./oneClickFix.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
+import { printClaimResult, selfAnswerClaim, withClaimFields } from "../cli/claimOutput.js";
 
 const ACCENT = "#4AEF79";
 
@@ -19,7 +21,7 @@ function severityBadge(severity: string): string {
   return chalk.gray("[medium]  ");
 }
 
-function printPlan(result: OneClickFixResult): void {
+function printPlan(result: OneClickFixResult, claim: ClaimEnvelope): void {
   console.log("");
   console.log(chalk.bold("  Looking at your agent…"));
   console.log(
@@ -33,6 +35,7 @@ function printPlan(result: OneClickFixResult): void {
     chalk.bold(`  Quick score: ${chalk.hex(ACCENT)(result.score.level)} (${result.score.totalScore}/${result.score.maxScore})`) +
       chalk.gray("  — grows as AMC collects real evidence")
   );
+  printClaimResult(claim, {});
   console.log("");
 
   if (result.gaps.length === 0) {
@@ -139,14 +142,16 @@ export function registerFixCommand(program: Command): void {
         };
 
         const plan = runOneClickFix({ ...base, apply: false });
+        // The quick score comes from the answers given (none by default): self-reported, level 1 at most.
+        const claim = selfAnswerClaim("fix:quickScore", Object.values(answers));
 
         if (!opts.json) {
-          printPlan(plan);
+          printPlan(plan, claim);
         }
 
         if (plan.gaps.length === 0 || opts.dryRun) {
           if (opts.json) {
-            console.log(JSON.stringify(plan, null, 2));
+            console.log(JSON.stringify(withClaimFields(plan, claim), null, 2));
           } else if (opts.dryRun && plan.gaps.length > 0) {
             console.log(chalk.gray("  Dry run — nothing written. Re-run without --dry-run to apply."));
             console.log("");
@@ -164,7 +169,7 @@ export function registerFixCommand(program: Command): void {
 
         if (!approved) {
           if (opts.json) {
-            console.log(JSON.stringify(plan, null, 2));
+            console.log(JSON.stringify(withClaimFields(plan, claim), null, 2));
           } else {
             console.log(chalk.gray("  Not applied. Re-run with --yes to apply without asking."));
             console.log("");
@@ -174,7 +179,7 @@ export function registerFixCommand(program: Command): void {
 
         const applied = runOneClickFix({ ...base, apply: true });
         if (opts.json) {
-          console.log(JSON.stringify(applied, null, 2));
+          console.log(JSON.stringify(withClaimFields(applied, claim), null, 2));
           return;
         }
         printApplied(applied);

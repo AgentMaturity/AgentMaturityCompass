@@ -19,10 +19,13 @@ import { readFileSync } from "node:fs";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { envelopeForSelfAssessment } from "../claims/eligibility/adapters.js";
+import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
+import type { ClaimEnvelope, ClaimKind } from "../claims/eligibility/types.js";
 import { binderSignatureSchema } from "../audit/binderSchema.js";
 import { signIndustryPackAuditJson } from "../audit/binderSigner.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
-import type { ClaimKind } from "../claims/eligibility/types.js";
 import {
   buildVerifierReport, checkDigestSignature, ed25519KeyId, envelopePublicKey,
   type IssuerAdmission, type TrustContext, type VerifierReportV1
@@ -322,6 +325,18 @@ export function verifyIndustryPackAuditChecksum(audit: IndustryPackAudit): boole
   return sha256Hex(canonicalize(body)) === receiptHash;
 }
 
+/** Each control's level is a self-answer about a regulated control: self-reported, never a pass. */
+function controlClaim(audit: IndustryPackAudit, control: AuditControl): ClaimEnvelope {
+  return envelopeForSelfAssessment({ producer: `industry-pack:${audit.packId}:${control.id}`, regulated: true,
+    answers: [control.level], now: Date.parse(audit.generatedAt) });
+}
+
+/** The audit as a whole claims no more than its weakest control. */
+export function industryPackAuditClaim(audit: IndustryPackAudit): ClaimEnvelope {
+  return envelopeForAggregate(`industry-pack:${audit.packId}`, audit.controls.map((control) => controlClaim(audit, control)),
+    Date.parse(audit.generatedAt));
+}
+
 /** @deprecated A checksum check only; use verifyIndustryPackAuditChecksum, or verifyIndustryPackAuditSignature for origin. */
 export const verifyIndustryPackAudit = verifyIndustryPackAuditChecksum;
 
@@ -447,6 +462,8 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   const lines: string[] = [];
   lines.push(`# Industry Pack Audit — ${audit.packName}`);
   lines.push("");
+  lines.push(formatClaimLabel(renderClaimLabel(industryPackAuditClaim(audit)), "report"));
+  lines.push("");
   lines.push(`- Pack: \`${audit.packId}\` · Station: ${audit.stationId} · Risk tier: ${audit.riskTier}`);
   lines.push(`- EU AI Act classification: ${audit.euAIActClassification}`);
   lines.push(`- Generated: ${audit.generatedAt}`);
@@ -470,6 +487,8 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   for (const c of audit.controls) {
     lines.push("");
     lines.push(`### ${c.id} — ${c.dimension} · ${c.status} (L${c.level})`);
+    lines.push(formatClaimLabel(renderClaimLabel(controlClaim(audit, c)), "report"));
+    lines.push("");
     lines.push(c.text);
     lines.push(`- Regulation: ${c.regulatoryRef}`);
     lines.push(`- Crosswalk: ${c.crosswalk.map((x) => `${x.framework} ${x.control}`).join(" · ")}`);
@@ -482,6 +501,6 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
       lines.push("```");
     }
   }
-  lines.push("");
+  lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
 }

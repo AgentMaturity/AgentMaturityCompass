@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import type { Command } from "commander";
 import chalk from "chalk";
+import { emitClaimResult, unverifiedClaim } from "./cli/claimOutput.js";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
@@ -50,11 +51,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
           mode,
           expectedSemanticDigest: opts.expectedDigest
         });
-        if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
-          return;
-        }
-        console.log(chalk.bold(`Neutral import ${result.importId}`));
+        // Imported records are what their source reported: self-reported, and no maturity evaluation is performed.
+        if (emitClaimResult(chalk.bold(`Neutral import ${result.importId}`), result, unverifiedClaim("import:neutral", result.plan.candidateCount), opts)) return;
         console.log(`  Mode: ${result.mode}`);
         console.log(`  Status: ${result.plan.status}`);
         console.log(`  Artifacts: ${result.plan.candidateCount}`);

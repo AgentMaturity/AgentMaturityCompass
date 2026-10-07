@@ -38,47 +38,9 @@ import {
 import { formatRiskCurrency, quantifyMaturityRisk } from "./business/riskQuantification.js";
 import { buildPublicLeaderboardBundle, writePublicLeaderboardBundle } from "./benchmarks/publicLeaderboard.js";
 import { writeExecutiveBriefArtifact, type ExecutiveBriefFormat } from "./executive/brief.js";
-
-function parseNonNegativeNumber(value: string | undefined, flagName: string): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new Error(`${flagName} must be a finite number greater than or equal to 0.`);
-  }
-  return parsed;
-}
-
-function normalizeCurrency(value: string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const normalized = value.trim().toUpperCase();
-  if (!/^[A-Z]{3}$/.test(normalized)) {
-    throw new Error("--currency must be a 3-letter ISO currency code such as USD.");
-  }
-  return normalized;
-}
-
-function parsePositiveInteger(value: string | undefined, flagName: string): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed < 1) {
-    throw new Error(`${flagName} must be a positive integer.`);
-  }
-  return parsed;
-}
-
-function parseMaturityLevel(value: string | undefined, flagName: string): number | undefined {
-  const parsed = parseNonNegativeNumber(value, flagName);
-  if (parsed !== undefined && parsed > 5) {
-    throw new Error(`${flagName} must be between 0 and 5.`);
-  }
-  return parsed;
-}
+import { normalizeCurrency, parseMaturityLevel, parseNonNegativeNumber, parsePositiveInteger } from "./business/cliOptions.js";
+import { aggregateClaim, emitClaimResult, printClaimLegendFooter, printClaimResult, printLabelledReport, printTitledResult, runClaimEnvelope, unverifiedClaim, withClaimFields, withClaimFieldsEach } from "./cli/claimOutput.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 
 export function registerBusinessCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const business = program
@@ -150,12 +112,8 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           if (l.avgFinalLevel < 1.5) kpis.recommendations.push(`${l.layerName}: Level ${l.avgFinalLevel.toFixed(1)} — prioritize improvement`);
         }
         
-        if (opts.json) {
-          console.log(JSON.stringify(kpis, null, 2));
-          return;
-        }
-        
-        console.log(chalk.bold(`\n📊 Business KPIs for ${agentId}\n`));
+        // Indices derived from the level alone, not measured outcomes: self-reported, not evaluated.
+        if (emitClaimResult(chalk.bold(`\n📊 Business KPIs for ${agentId}\n`), kpis, unverifiedClaim("business:kpi", 1), opts)) return;
         console.log(
           chalk.gray("  Indices below are derived from the maturity level, not from incident or loss data.\n")
         );
@@ -239,16 +197,13 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           currency: normalizeCurrency(opts.currency)
         });
 
-        if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
-          return;
-        }
-
+        // A planning estimate from default or caller inputs: self-reported, whatever the maturity source.
+        const title = chalk.bold(`\nFinancial Risk Quantification — ${agentId}\n`);
+        if (emitClaimResult(title, result, unverifiedClaim("business:riskQuantification", 1), opts)) return;
         const baselineLoss = formatRiskCurrency(result.baseline.expectedAnnualLoss, result.currency);
         const residualLoss = formatRiskCurrency(result.residual.expectedAnnualLoss, result.currency);
         const lossReduction = formatRiskCurrency(result.residual.expectedAnnualLossReduction, result.currency);
 
-        console.log(chalk.bold(`\nFinancial Risk Quantification — ${agentId}\n`));
         console.log(`  Maturity:                 ${result.maturity.roundedLevel} (${result.maturity.level.toFixed(2)}/5, ${result.maturity.source})`);
         console.log(`  Baseline Frequency:       ${result.baseline.annualIncidentFrequency.toFixed(2)} incidents/year`);
         console.log(`  Average Incident Cost:    ${formatRiskCurrency(result.inputs.averageIncidentCost, result.currency)}`);
@@ -516,6 +471,7 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
             treatmentDueDays
           });
           console.log(chalk.green(`✓ GRC treatment-plan export saved to: ${artifact.path}`));
+          printClaimResult(unverifiedClaim("business:grcTreatmentPlan", artifact.export.summary.agentCount), {});
           console.log(`  Agents: ${artifact.export.summary.agentCount}`);
           console.log(`  Open treatments: ${artifact.export.summary.openTreatmentCount}`);
           console.log(`  Above risk appetite: ${artifact.export.summary.aboveRiskAppetiteCount}`);
@@ -527,12 +483,15 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           title: opts.title,
           treatmentDueDays
         });
+        // The portfolio file is caller-supplied, so the register is self-reported. CSV gets the claim line on stderr.
+        const claim = unverifiedClaim("business:grcTreatmentPlan", grc.summary.agentCount);
         if (format === "json") {
-          console.log(JSON.stringify(grc, null, 2));
+          console.log(JSON.stringify(withClaimFields(grc, claim), null, 2));
         } else if (format === "markdown") {
-          console.log(renderGrcTreatmentPlanMarkdown(grc));
+          printTitledResult(renderGrcTreatmentPlanMarkdown(grc), claim);
         } else {
           process.stdout.write(renderGrcTreatmentPlanCsv(grc));
+          printClaimResult(claim, { stderr: true });
         }
       } catch (e: any) {
         console.error(chalk.red(e.message));
@@ -621,12 +580,8 @@ export function registerBusinessCommands(program: Command, activeAgent: (p: Comm
           netImpact: totalSavings - totalIncidentCost,
         };
         
-        if (opts.json) {
-          console.log(JSON.stringify(report, null, 2));
-          return;
-        }
-        
-        console.log(chalk.bold(`\n💰 Business Impact Report — ${agentId}\n`));
+        // Operator-recorded business events (amc business track): self-reported.
+        if (emitClaimResult(chalk.bold(`\n💰 Business Impact Report — ${agentId}\n`), report, unverifiedClaim("business:impactReport", agentEvents.length), opts)) return;
         console.log(`  Total events:       ${agentEvents.length}`);
         console.log(`  Incidents:          ${incidents.length} ($${totalIncidentCost} cost)`);
         console.log(`  Cost savings:       ${savings.length} ($${totalSavings} saved)`);
@@ -665,6 +620,7 @@ export function registerExecutiveCommands(program: Command, activeAgent: (p: Com
         });
 
         console.log(chalk.green(`✓ Executive brief saved to: ${artifact.path}`));
+        printClaimResult(artifact.claim, {});
         console.log(`  Run: ${artifact.resolved.resolvedRunId} (${artifact.resolved.resolvedBy})`);
         console.log(`  Format: ${artifact.format}`);
         if (artifact.format === "html") {
@@ -696,6 +652,7 @@ export function registerLeaderboardCommands(program: Command): void {
         const agentsDir = join(process.cwd(), ".amc", "agents");
         if (!existsSync(agentsDir)) {
           console.log(chalk.dim("No agents found. Run 'amc quickscore' to generate first score."));
+          printClaimResult(unverifiedClaim("leaderboard", 0), {});
           return;
         }
         
@@ -704,6 +661,7 @@ export function registerLeaderboardCommands(program: Command): void {
           .map(d => d.name);
         
         const scores: Array<{ agentId: string; integrityIndex: number; avgLevel: number; level: string; ts: number }> = [];
+        const claims = new Map<string, ReturnType<typeof runClaimEnvelope>>();
         
         for (const agentId of agents) {
           const runsDir = join(agentsDir, agentId, "runs");
@@ -722,18 +680,20 @@ export function registerLeaderboardCommands(program: Command): void {
               level: `L${Math.round(avgLevel)}`,
               ts: latest.ts,
             });
+            claims.set(agentId, runClaimEnvelope(latest));
           } catch {}
         }
         
         // Sort by integrity index descending
         scores.sort((a, b) => b.integrityIndex - a.integrityIndex);
         
+        // Each row carries its run's claim; the board as a whole claims no more than its weakest row.
         if (opts.json) {
-          console.log(JSON.stringify(scores, null, 2));
+          console.log(JSON.stringify(withClaimFieldsEach(scores, (row) => claims.get(row.agentId)!), null, 2));
           return;
         }
-        
         console.log(chalk.bold(`\n🏆 Agent Maturity Leaderboard (${scores.length} agents)\n`));
+        printClaimResult(aggregateClaim("leaderboard", [...claims.values()]), opts);
         console.log(`  ${"#".padEnd(4)} ${"Agent".padEnd(30)} ${"Level".padEnd(8)} ${"Score".padEnd(10)} Last Scored`);
         console.log(`  ${"─".repeat(4)} ${"─".repeat(30)} ${"─".repeat(8)} ${"─".repeat(10)} ${"─".repeat(20)}`);
         
@@ -744,6 +704,7 @@ export function registerLeaderboardCommands(program: Command): void {
           const ts = new Date(s.ts).toISOString().slice(0, 10);
           console.log(`  ${rank.padEnd(4)} ${s.agentId.padEnd(30)} ${s.level.padEnd(8)} ${scoreBar.padEnd(10)} ${ts}`);
         }
+        printClaimLegendFooter();
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);
@@ -765,6 +726,7 @@ export function registerLeaderboardCommands(program: Command): void {
         const agents = existsSync(agentsDir) ? readdirSync(agentsDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name) : [];
         
         const scores: any[] = [];
+        const claims: ReturnType<typeof runClaimEnvelope>[] = [];
         for (const agentId of agents) {
           const runsDir = join(agentsDir, agentId, "runs");
           if (!existsSync(runsDir)) continue;
@@ -773,33 +735,38 @@ export function registerLeaderboardCommands(program: Command): void {
           try {
             const latest = JSON.parse(readFileSync(join(runsDir, files[files.length - 1]!), "utf-8"));
             const avgLevel = latest.layerScores?.reduce((s: number, l: any) => s + l.avgFinalLevel, 0) / (latest.layerScores?.length || 1) || 0;
-            scores.push({ rank: 0, agentId, integrityIndex: latest.integrityIndex ?? 0, avgLevel, level: `L${Math.round(avgLevel)}`, ts: latest.ts, status: latest.status });
+            const claim = runClaimEnvelope(latest);
+            claims.push(claim);
+            scores.push(withClaimFields({ rank: 0, agentId, integrityIndex: latest.integrityIndex ?? 0, avgLevel, level: `L${Math.round(avgLevel)}`, ts: latest.ts, status: latest.status }, claim));
           } catch {}
         }
         scores.sort((a, b) => b.integrityIndex - a.integrityIndex);
         scores.forEach((s, i) => s.rank = i + 1);
         
+        const claim = aggregateClaim("leaderboard", claims);
         let output = "";
         if (opts.format === "json") {
-          output = JSON.stringify({ generatedAt: new Date().toISOString(), agents: scores }, null, 2);
+          output = JSON.stringify(withClaimFields({ generatedAt: new Date().toISOString(), agents: scores }, claim), null, 2);
         } else if (opts.format === "markdown") {
-          output = `# AMC Maturity Leaderboard\n\nGenerated: ${new Date().toISOString()}\n\n| # | Agent | Level | Score | Status |\n|---|---|---|---|---|\n`;
+          output = `# AMC Maturity Leaderboard\n\n${formatClaimLabel(renderClaimLabel(claim), "report")}\n\nGenerated: ${new Date().toISOString()}\n\n| # | Agent | Level | Score | Status | Claim |\n|---|---|---|---|---|---|\n`;
           for (const s of scores) {
-            output += `| ${s.rank} | ${s.agentId} | ${s.level} | ${(s.integrityIndex * 100).toFixed(1)}% | ${s.status} |\n`;
+            output += `| ${s.rank} | ${s.agentId} | ${s.level} | ${(s.integrityIndex * 100).toFixed(1)}% | ${s.status} | ${s.claimKind} |\n`;
           }
+          output += `\n## How to read claim kinds\n\n${renderClaimLegend("markdown")}\n`;
         } else if (opts.format === "html") {
-          output = `<!DOCTYPE html><html><head><title>AMC Leaderboard</title><style>body{font-family:system-ui;max-width:800px;margin:2em auto}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f4f4f4}tr:nth-child(even){background:#fafafa}</style></head><body><h1>🏆 AMC Maturity Leaderboard</h1><p>Generated: ${new Date().toISOString()}</p><table><tr><th>#</th><th>Agent</th><th>Level</th><th>Score</th><th>Status</th></tr>`;
+          output = `<!DOCTYPE html><html><head><title>AMC Leaderboard</title><style>body{font-family:system-ui;max-width:800px;margin:2em auto}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f4f4f4}tr:nth-child(even){background:#fafafa}</style></head><body><h1>🏆 AMC Maturity Leaderboard</h1><p>${formatClaimLabel(renderClaimLabel(claim), "studio")}</p><p>Generated: ${new Date().toISOString()}</p><table><tr><th>#</th><th>Agent</th><th>Level</th><th>Score</th><th>Status</th><th>Claim</th></tr>`;
           for (const s of scores) {
-            output += `<tr><td>${s.rank}</td><td>${s.agentId}</td><td>${s.level}</td><td>${(s.integrityIndex * 100).toFixed(1)}%</td><td>${s.status}</td></tr>`;
+            output += `<tr><td>${s.rank}</td><td>${s.agentId}</td><td>${s.level}</td><td>${(s.integrityIndex * 100).toFixed(1)}%</td><td>${s.status}</td><td>${s.claimKind}</td></tr>`;
           }
-          output += `</table></body></html>`;
+          output += `</table><h2>How to read claim kinds</h2>${renderClaimLegend("html")}</body></html>`;
         }
         
         if (opts.output) {
           writeFileSync(opts.output, output);
           console.log(chalk.green(`✅ Leaderboard exported to ${opts.output}`));
+          printClaimResult(claim, {});
         } else {
-          console.log(output);
+          printLabelledReport(output);
         }
       } catch (e: any) {
         console.error(chalk.red(e.message));
@@ -864,12 +831,9 @@ export function registerLeaderboardCommands(program: Command): void {
           validation: bundle.publishPlan.validation
         };
 
-        if (opts.json) {
-          console.log(JSON.stringify(summary, null, 2));
-          return;
-        }
-
-        console.log(chalk.bold(`\nPublic Leaderboard Bundle — ${summary.prettyName}\n`));
+        // The dataset republishes stored run results without checking their seals: self-reported.
+        const claim = unverifiedClaim("leaderboard:public-export", summary.records);
+        if (emitClaimResult(chalk.bold(`\nPublic Leaderboard Bundle — ${summary.prettyName}\n`), summary, claim, opts)) return;
         console.log(`  Repo ID:       ${summary.repoId}`);
         console.log(`  Records:       ${summary.records}`);
         console.log(`  Files:         ${summary.files.join(", ")}`);
@@ -1089,11 +1053,13 @@ export function registerCommsCheckCommands(program: Command): void {
           checkedAt: new Date().toISOString(),
         };
         
+        // Regex patterns over the caller's text: a keyword match, which can flag a violation but never pass a regulated rule.
+        const claim = unverifiedClaim("comms-check", 1, { method: "keyword_match", regulated: true, result: result.passed ? "pass" : "fail" });
         if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
           return;
         }
-        
+        printClaimResult(claim, opts);
         if (violations.length === 0) {
           console.log(chalk.green("✅ Message passed all compliance checks."));
         } else {

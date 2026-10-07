@@ -13,6 +13,8 @@ import {
   type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1
 } from "./trust/index.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
+import type { ClaimEnvelope } from "./claims/eligibility/types.js";
+import { printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 
 export interface TrustFlags {
   pubkey?: string;
@@ -66,15 +68,21 @@ function untrusted(reasons: readonly string[], overrides: readonly string[]): vo
   console.error(`UNTRUSTED: integrity verified, but ${overrides.map((flag) => `--${flag}`).join(" and ")} was used: ${reasons.join("; ")}`);
 }
 
-/** Prints a verifier report's verdict and exits with its code. */
-export function finishVerify(label: string, report: VerifierReportV1, opts: { json?: boolean; result?: unknown; details?: string[] }): void {
+/**
+ * Prints a verifier report's verdict and exits with its code. `claim` is the verified artifact's own claim (a valid
+ * signature proves integrity, never a stronger kind): printed after the verdict, or added to the JSON result.
+ */
+export function finishVerify(label: string, report: VerifierReportV1,
+  opts: { json?: boolean; result?: object; details?: string[]; claim?: ClaimEnvelope }): void {
   const code = verdictExitCode(report);
   const reasons = untrustedReasons(report);
   if (opts.json) {
-    console.log(JSON.stringify(opts.result ?? report, null, 2));
+    const result = opts.result ?? report;
+    console.log(JSON.stringify(opts.claim ? withClaimFields(result, opts.claim) : result, null, 2));
   } else {
     console.log(code === 0 ? chalk.green(`${label} verification PASSED`)
       : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`) : chalk.red(`${label} verification FAILED`));
+    if (opts.claim) printClaimResult(opts.claim, {});
     for (const line of code === 0 ? opts.details ?? [] : reasons.map((reason) => `- ${reason}`)) console.log(line);
   }
   if (code === 2) untrusted(reasons, report.overrides);

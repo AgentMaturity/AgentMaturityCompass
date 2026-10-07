@@ -1,12 +1,16 @@
+import { envelopeForAssurancePack, envelopeForAssuranceReport } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { AssuranceReport } from "../types.js";
 
-export function renderAssuranceMarkdown(report: AssuranceReport): string {
+/** `sealVerified` is null for a run rendered in the process that produced it, as the runner does. */
+export function renderAssuranceMarkdown(report: AssuranceReport, sealVerified: boolean | null = null): string {
+  const options = { sealVerified, now: report.ts };
   const packTable = [
-    "| Pack | Score | Pass | Fail | TrustTier |",
-    "|---|---:|---:|---:|---|",
+    "| Pack | Score | Pass | Fail | TrustTier | Claim |",
+    "|---|---:|---:|---:|---|---|",
     ...report.packResults.map(
       (pack) =>
-        `| ${pack.packId} | ${pack.score0to100.toFixed(2)} | ${pack.passCount} | ${pack.failCount} | ${pack.trustTier} |`
+        `| ${pack.packId} | ${pack.score0to100.toFixed(2)} | ${pack.passCount} | ${pack.failCount} | ${pack.trustTier} | ${envelopeForAssurancePack(report.assuranceRunId, pack, options).claimKind} |`
     )
   ].join("\n");
 
@@ -25,6 +29,8 @@ export function renderAssuranceMarkdown(report: AssuranceReport): string {
   return [
     `# AMC Assurance Report (${report.assuranceRunId})`,
     "",
+    formatClaimLabel(renderClaimLabel(envelopeForAssuranceReport(report, options)), "report"),
+    "",
     `- Agent: ${report.agentId}`,
     `- Mode: ${report.mode}`,
     `- Status: ${report.status}`,
@@ -38,6 +44,10 @@ export function renderAssuranceMarkdown(report: AssuranceReport): string {
     "",
     "## Scenario Results",
     scenarioSections,
+    "",
+    "## How to read claim kinds",
+    "",
+    renderClaimLegend("markdown"),
     ""
   ].join("\n");
 }

@@ -6,6 +6,9 @@ import { parseEvidenceEvent } from "../diagnostic/gates.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import type { DiagnosticReport } from "../types.js";
+import { envelopeForAggregate, envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend, type ClaimEnvelope } from "../claims/eligibility/index.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 
 function countModels(events: Array<ReturnType<typeof parseEvidenceEvent>>): Array<{ provider: string; model: string; count: number }> {
   const map = new Map<string, number>();
@@ -32,6 +35,8 @@ function renderFleetMarkdown(params: {
   reports: DiagnosticReport[];
   modelUsageByAgent: Map<string, Array<{ provider: string; model: string; count: number }>>;
   evidenceGaps: string[];
+  claims: ReadonlyMap<string, ClaimEnvelope>;
+  claim: ClaimEnvelope;
 }): string {
   const summaryRows = params.reports
     .map((report) => {
@@ -41,7 +46,7 @@ function renderFleetMarkdown(params: {
         .slice(0, 5)
         .map((row) => `${row.questionId}:${row.gap}`)
         .join(", ");
-      return `| ${report.agentId} | ${overall.toFixed(2)} | ${report.integrityIndex.toFixed(3)} (${report.trustLabel}) | ${topGaps || "-"} |`;
+      return `| ${report.agentId} | ${overall.toFixed(2)} | ${report.integrityIndex.toFixed(3)} (${report.trustLabel}) | ${topGaps || "-"} | ${params.claims.get(report.agentId)?.claimKind ?? "-"} |`;
     })
     .join("\n");
 
@@ -71,11 +76,13 @@ function renderFleetMarkdown(params: {
   return [
     "# AMC Fleet Report",
     "",
+    formatClaimLabel(renderClaimLabel(params.claim), "report"),
+    "",
     `- Window: ${params.window}`,
     "",
     "## Per-Agent Summary",
-    "| Agent | Overall Avg | Integrity | Top 5 Gaps |",
-    "|---|---:|---|---|",
+    "| Agent | Overall Avg | Integrity | Top 5 Gaps | Claim |",
+    "|---|---:|---|---|---|",
     summaryRows,
     "",
     "## Model Usage",
@@ -90,6 +97,10 @@ function renderFleetMarkdown(params: {
     "",
     "## Evidence Gaps (No OBSERVED evidence in window)",
     params.evidenceGaps.length > 0 ? params.evidenceGaps.map((line) => `- ${line}`).join("\n") : "- none",
+    "",
+    "## How to read claim kinds",
+    "",
+    renderClaimLegend("markdown"),
     ""
   ].join("\n");
 }
@@ -101,6 +112,7 @@ export async function generateFleetReport(params: {
 }): Promise<{
   reportPath: string;
   agentCount: number;
+  claim: ClaimEnvelope;
 }> {
   const agents = listAgents(params.workspace).map((row) => row.id);
   const effectiveAgents = agents.length > 0 ? agents : ["default"];
@@ -133,11 +145,17 @@ export async function generateFleetReport(params: {
     }
   }
 
+  // Each run's claim after checking its seal; the fleet claims no more than its weakest run.
+  const claims = new Map(reports.map((report) => [report.agentId, envelopeForStoredRun(report, {
+    sealVerified: sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>), now })]));
+  const claim = envelopeForAggregate("fleet:report", [...claims.values()], now);
   const markdown = renderFleetMarkdown({
     window: params.window,
     reports,
     modelUsageByAgent,
-    evidenceGaps
+    evidenceGaps,
+    claims,
+    claim
   });
 
   const reportPath = params.outputPath ?? join(params.workspace, ".amc", "reports", "fleet.md");
@@ -145,6 +163,7 @@ export async function generateFleetReport(params: {
   writeFileAtomic(reportPath, markdown, 0o644);
   return {
     reportPath,
-    agentCount: effectiveAgents.length
+    agentCount: effectiveAgents.length,
+    claim
   };
 }

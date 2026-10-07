@@ -7,11 +7,13 @@ import { getPackById } from "./industryPacks.js";
 import { assertIndustryPackAccess } from "./industryPackEntitlement.js";
 import {
   buildIndustryPackAudit,
+  industryPackAuditClaim,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
   signIndustryPackAudit,
   type IndustryPackAuditSignature,
 } from "./industryPackAudit.js";
+import { printLabelledReport, withClaimFields } from "../cli/claimOutput.js";
 
 function collectComplianceFrameworks(value: string, previous: string[] = []): string[] {
   const next = value
@@ -121,10 +123,10 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
             writeFileSync(opts.auditBundle, JSON.stringify(auditReport, null, 2));
           }
           if (opts.json) {
-            console.log(JSON.stringify(auditReport, null, 2));
+            console.log(JSON.stringify(withClaimFields(auditReport, industryPackAuditClaim(auditReport)), null, 2));
             return;
           }
-          console.log(renderIndustryPackAuditMarkdown(auditReport));
+          printLabelledReport(renderIndustryPackAuditMarkdown(auditReport));
           if (opts.auditBundle) {
             const lines = auditReport.signature
               ? signedBundleLines(opts.auditBundle, auditReport.signature)

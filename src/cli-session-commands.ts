@@ -11,6 +11,7 @@ import { hostname } from "node:os";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
+import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
@@ -36,12 +37,17 @@ export function registerSessionCommands(program: Command): void {
       const result = await verifyLedgerIntegrity(process.cwd(), {
         trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
       });
+      // An intact ledger proves its rows are unchanged, not that what they record is true: self-reported.
+      const { open: openIds, released: releasedIds, interrupted: interruptedIds, closed: closedIds } = result.sessions;
+      const claim = artifactClaim("ledger:sessions", { recordCount: openIds.length + releasedIds.length + interruptedIds.length + closedIds.length });
+      // exitCode, not exit(): the claim-label hook runs after the action (src/cli/claimLabelHooks.ts).
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
-        process.exit(ledgerExitCode(result, trust));
+        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
+        process.exitCode = ledgerExitCode(result, trust);
         return;
       }
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
+      printClaimResult(claim, {});
       const { open, released, interrupted, closed } = result.sessions;
       console.log("");
       console.log(chalk.bold("Agent sessions"));
@@ -54,7 +60,7 @@ export function registerSessionCommands(program: Command): void {
         // so an operator can decide whether to `session recover` it.
         console.log(chalk.yellow(`    interrupted: ${id}`));
       }
-      process.exit(ledgerExitCode(result, trust));
+      process.exitCode = ledgerExitCode(result, trust);
     });
 
   session

@@ -92,6 +92,15 @@ import {
 } from "./enforce/resourceManifest.js";
 import { exportEpisodeRecord, listEpisodeRecords, loadEpisodeRecord, writeEpisodeRecord } from "./lifecycle/episodeRecord.js";
 import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
+import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
+import {
+  aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
+  printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  unverifiedClaim, withClaimFields, withClaimFieldsEach
+} from "./cli/claimOutput.js";
+import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js";
+import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
 import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingProofs } from "./lifecycle/findingProof.js";
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
@@ -185,7 +194,7 @@ import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket 
 import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { applyArchetype, describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
-import { applyAssurancePatchKit, listAssuranceHistory, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
+import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
@@ -451,9 +460,9 @@ import {
   verifyComplianceMapsCli
 } from "./compliance/complianceCli.js";
 import { complianceFrameworkFamilies, frameworkChoices, getFrameworkFamily, normalizeFrameworkName, type ComplianceFramework } from "./compliance/frameworks.js";
-import { generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
+import { coverageMatrixClaim, generateCoverageMatrix, renderCoverageMatrixMarkdown, renderCoverageHeatmap } from "./compliance/complianceMatrix.js";
 import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
-import { runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
+import { benchmarkResultClaim, runBenchmarkSuite, compareBenchmarks, renderBenchRunMarkdown, renderBenchCompareMarkdown } from "./benchmarks/benchRunner.js";
 import {
   federateExportCli,
   federateImportCli,
@@ -1113,18 +1122,6 @@ async function wrapWithBridgeToken(params: {
   console.log(`session=${wrapSessionId} exit=${exitCode}`);
 
   return exitCode;
-}
-
-function commandPath(command: Command): string {
-  const names: string[] = [];
-  let cursor: Command | null = command;
-  while (cursor && cursor.parent) {
-    if (cursor.name() && cursor.name() !== "amc") {
-      names.unshift(cursor.name());
-    }
-    cursor = cursor.parent;
-  }
-  return names.join(" ").trim();
 }
 
 function openExternalUrl(url: string): boolean {
@@ -2144,6 +2141,7 @@ program.hook("preAction", (_thisCommand, actionCommand) => {
     assertOwnerMode(process.cwd(), path);
   }
 });
+installClaimLabelHooks(program);
 
 async function initializeMinimalStartupWorkspace(opts: {
   profile: "dev" | "ci" | "prod";
@@ -2422,14 +2420,16 @@ program
     }
 
     const result = scoreRapidAssessment(answers);
+    const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
 
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
     console.log("");
     console.log(chalk.bold(`  Current: ${result.preliminaryLevel} (${result.totalScore}/${result.maxScore})`));
+    printClaimResult(claim, opts);
     console.log("");
     console.log(chalk.bold("  What L3 means for your product:"));
     console.log(chalk.gray("  L3 = evidence-backed and reviewable: customers can trust the agent's behavior because key decisions have replayable proof, not just team claims."));
@@ -3109,13 +3109,15 @@ program
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
         ensureWorkspaceReadyForAgent(process.cwd(), agentId);
         const report = await runDiagnostic({ workspace: process.cwd(), window: "30d", agentId });
-        if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
+        const claim = runClaimEnvelope(report);
+        if (opts.json) { console.log(JSON.stringify(withClaimFields(report, claim), null, 2)); return; }
         const statusExplanation = explainDiagnosticReportStatus(report);
         const avgLevel = report.layerScores.length > 0
           ? report.layerScores.reduce((s, l) => s + l.avgFinalLevel, 0) / report.layerScores.length
           : 0;
         const overallLevel = Math.min(5, Math.floor(avgLevel));
         console.log(chalk.bold("\n🧭 AMC Auto-Score — from execution evidence"));
+        printClaimResult(claim, opts);
         console.log(chalk.gray(`Agent: ${agentId} | Artifact: ${report.status} | Evidence: ${statusExplanation.evidenceStatus} | Claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
         console.log(chalk.gray(`Integrity: ${report.integrityIndex.toFixed(3)} | ${statusExplanation.claimBoundary}`));
         console.log("");
@@ -3211,17 +3213,19 @@ program
       }
 
       const result = scoreRapidAssessment(answers);
+      const claim = selfAnswerClaim("diagnostic:rapidQuickscore", Object.values(answers));
       if (opts.json) {
         const jsonResult = providedAnswers
           ? withProvidedAnswersQuickscoreMetadata(result, providedAnswers, { nonInteractive: !process.stdin.isTTY || opts.quiet })
           : !process.stdin.isTTY && result.totalScore === 0
             ? withNonInteractiveQuickscoreNotice(result)
             : result;
-        console.log(JSON.stringify(jsonResult, null, 2));
+        console.log(JSON.stringify(withClaimFields(jsonResult, claim), null, 2));
         return;
       }
 
       console.log(chalk.bold("AMC Rapid Quickscore"));
+      printClaimResult(claim, opts);
       if (providedAnswers && !opts.quiet) {
         console.log(chalk.gray(`Loaded ${providedAnswers.answeredQuestions} answers from --answers (${providedAnswers.source}).`));
       } else if (result.totalScore === 0 && !process.stdin.isTTY) {
@@ -3396,12 +3400,13 @@ program
     }
 
     const result = scoreFullDiagnostic(answers, durationMs);
+    const claim = selfAnswerClaim("diagnostic:fullDiagnostic", Object.values(answers));
 
     if (opts.json) {
       const jsonResult = providedAnswers
         ? withProvidedAnswersQuickscoreMetadata(result, providedAnswers, { nonInteractive: !process.stdin.isTTY || opts.quiet })
         : result;
-      console.log(JSON.stringify(jsonResult, null, 2));
+      console.log(JSON.stringify(withClaimFields(jsonResult, claim), null, 2));
       return;
     }
 
@@ -3414,6 +3419,7 @@ program
     console.log("");
     console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
     console.log(chalk.bold("  🧭 AMC Full Diagnostic Results"));
+    printClaimResult(claim, opts);
     console.log(chalk.bold.hex('#4AEF79')("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
     console.log("");
     console.log(chalk.bold(`  Overall: ${result.overallLevel} (${result.percentage}%)`));
@@ -5352,6 +5358,7 @@ program
           }
         );
         const statusExplanation = explainDiagnosticReportStatus(report);
+        const claim = runClaimEnvelope(report, workspace);
         const resourceManifest = writeEnforceResourceManifest({ workspace, agentId });
         const resourceRef = enforceResourceManifestRef(resourceManifest);
         const decisions = writeDecisionReceipts({
@@ -5411,7 +5418,7 @@ program
           resourceManifests: [resourceRef]
         });
         if (opts.json) {
-          console.log(JSON.stringify({
+          console.log(JSON.stringify(withClaimFields({
             status: report.status,
             artifactStatus: report.status,
             evidenceStatus: statusExplanation.evidenceStatus,
@@ -5434,10 +5441,11 @@ program
             createdAgentContext: state.createdAgentContext,
             signed: !state.vault.noSign && report.status === "VALID",
             vaultReason: state.vault.reason
-          }, null, 2));
+          }, claim), null, 2));
           return;
         }
         console.log(chalk.hex('#4AEF79')(`Run ${report.runId} artifact: ${report.status} | evidence: ${statusExplanation.evidenceStatus} | claims: ${statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED"}`));
+        printClaimResult(claim, opts);
         console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
         if (!statusExplanation.strongClaimsAllowed) {
           console.log(chalk.yellow(`Next evidence step: ${statusExplanation.nextStep}`));
@@ -5467,14 +5475,13 @@ program
         vaultReason: state.vault.reason,
       });
 
-      // Render output
+      // Render output. The grade combines workspace inspections AMC does not verify, so it is self-reported.
+      const claim = unverifiedClaim("unified:run", result.surfaceCoverage.evaluated);
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
-      } else if (opts.ci) {
-        console.log(renderCIAnnotations(result));
-        console.log(renderUnifiedResult(result, { ci: opts.ci }));
+        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       } else {
-        console.log(renderUnifiedResult(result, { ci: opts.ci }));
+        if (opts.ci) console.log(renderCIAnnotations(result));
+        printLabelledReport(renderUnifiedResult(result, { ci: opts.ci, claimLine: formatClaimLabel(renderClaimLabel(claim), "cli") }));
       }
 
       // One-command fix: generate a signed plan to improve the agent
@@ -5534,98 +5541,9 @@ program
     const report = resolved.report;
     const statusExplanation = explainDiagnosticReportStatus(report);
 
-    const escapeReportHtml = (value: string): string =>
-      value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-
-    const renderReportHtml = (): string => {
-      const avgLayerScore = report.layerScores.length > 0
-        ? report.layerScores.reduce((s: number, l: any) => s + l.avgFinalLevel, 0) / report.layerScores.length
-        : 0;
-      const levelNum = Math.min(5, Math.floor(avgLayerScore));
-      const level = `L${levelNum}`;
-      const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
-      const riskColor = levelNum >= 4 ? "#4AEF79" : levelNum >= 3 ? "#f59e0b" : "#ff3355";
-      const date = new Date(report.ts).toISOString().split("T")[0];
-      const layerRows = report.layerScores.map((l: any) => {
-        const lLevel = Math.min(5, Math.floor(l.avgFinalLevel));
-        const lColor = lLevel >= 4 ? "#4AEF79" : lLevel >= 3 ? "#f59e0b" : "#ff3355";
-        return `<tr><td>${escapeReportHtml(String(l.layerName ?? ""))}</td><td style="color:${lColor};font-weight:bold">L${lLevel}</td><td>${Number(l.avgFinalLevel).toFixed(1)}</td><td>${Number(l.questionCount ?? 0)} questions</td></tr>`;
-      }).join("\n");
-      const gapRows = ((report as any).gaps ?? []).slice(0, 10).map((g: any) =>
-        `<tr><td>${escapeReportHtml(String(g.questionId ?? ""))}</td><td>${Number(g.currentLevel ?? 0)}→${Number(g.targetLevel ?? 0)}</td><td>${escapeReportHtml(String(g.narrative ?? ""))}</td></tr>`
-      ).join("\n");
-      const aliasHtml = resolved.alias ? ` &nbsp;|&nbsp; <strong>Alias:</strong> <code>${escapeReportHtml(resolved.alias)}</code>` : "";
-      return `<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AMC Report — ${escapeReportHtml(String(report.agentId ?? "Agent"))}</title>
-<style>
-  :root{--bg:#0a0a0a;--surface:#111111;--surface2:#1a1a1a;--text:#fff;--muted:#a0a0a0;--accent:#4AEF79;--border:rgba(255,255,255,.10)}
-  *{box-sizing:border-box}body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:860px;margin:40px auto;padding:0 20px;color:var(--text);background:var(--bg);line-height:1.6}
-  .brandline{display:flex;justify-content:space-between;gap:16px;margin-bottom:28px;padding:10px 0;border-top:1px solid rgba(74,239,121,.28);border-bottom:1px solid var(--border);font:700 12px 'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--muted)}
-  .wordmark{color:var(--text)}.cursor{color:var(--accent)}
-  h1{color:var(--text);border-bottom:2px solid var(--accent);padding-bottom:12px;letter-spacing:0}
-  h2{color:var(--accent);margin-top:32px;font:700 14px 'Space Mono','SFMono-Regular',Consolas,monospace;text-transform:uppercase;letter-spacing:0}
-  code{font-family:'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--accent)}
-  .score-box{background:var(--surface);border:2px solid ${riskColor};border-radius:8px;padding:24px;text-align:center;margin:24px 0}
-  .score-box .level{font-size:48px;font-weight:bold;color:${riskColor}}
-  .score-box .label{font-size:14px;color:var(--muted);margin-top:4px}
-  table{width:100%;border-collapse:collapse;margin:16px 0}
-  th,td{padding:8px 12px;border:1px solid var(--border);text-align:left}
-  th{background:var(--surface2);font:700 10px 'Space Mono','SFMono-Regular',Consolas,monospace;color:var(--accent);text-transform:uppercase}
-  .risk{display:inline-block;padding:4px 12px;border-radius:4px;font-weight:bold;color:#0a0a0a;background:${riskColor}}
-  .status-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:14px 16px;margin:18px 0}
-  .footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}
-  @media(max-width:640px){body{margin:20px auto}.brandline{flex-direction:column;gap:4px}th,td{padding:7px;font-size:12px}}
-  @media print{:root{--bg:#fff;--surface:#f7f7f7;--surface2:#efefef;--text:#111;--muted:#555;--border:#d1d5db}body{margin:0;padding:20px}.score-box{break-inside:avoid}.brandline{border-top-color:#111}}
-</style></head><body>
-<div class="brandline"><span class="wordmark">amc<span class="cursor">_</span> / report</span><span>Evidence over claims.</span></div>
-<h1>Agent Maturity Compass Report</h1>
-<p><strong>Agent:</strong> ${escapeReportHtml(String(report.agentId ?? "default"))} &nbsp;|&nbsp; <strong>Date:</strong> ${date} &nbsp;|&nbsp; <strong>Run:</strong> <code>${escapeReportHtml(resolved.resolvedRunId)}</code>${aliasHtml}</p>
-<div class="status-note">
-  <strong>Artifact Status:</strong> ${escapeReportHtml(report.status)} — ${escapeReportHtml(statusExplanation.artifactLabel)}<br>
-  <strong>Evidence Readiness:</strong> ${escapeReportHtml(statusExplanation.evidenceStatus)} — ${escapeReportHtml(statusExplanation.readinessLabel)}<br>
-  <strong>Claim Eligible:</strong> ${statusExplanation.strongClaimsAllowed ? "YES" : "NO"}<br>
-  <strong>Claim boundary:</strong> ${escapeReportHtml(statusExplanation.claimBoundary)}<br>
-  <strong>Next evidence step:</strong> ${escapeReportHtml(statusExplanation.nextStep)}<br>
-  <strong>Share boundary:</strong> This static page was generated locally. Publishing, custody, access control, and distribution remain the workspace owner's responsibility.
-</div>
-<div class="score-box">
-  <div class="level">${level}</div>
-  <div class="label">Maturity Level (${avgLayerScore.toFixed(1)}/5 weighted)</div>
-  <div style="margin-top:8px"><span class="risk">${riskLabel} Risk</span></div>
-</div>
-<h2>Dimension Scores</h2>
-<table><thead><tr><th>Dimension</th><th>Level</th><th>Score</th><th>Coverage</th></tr></thead><tbody>
-${layerRows}
-</tbody></table>
-${gapRows ? `<h2>Top Improvement Gaps</h2>
-<table><thead><tr><th>Question</th><th>Gap</th><th>Recommendation</th></tr></thead><tbody>
-${gapRows}
-</tbody></table>` : ""}
-<h2>What This Means</h2>
-<p>${!statusExplanation.strongClaimsAllowed
-  ? "This maturity result is a local baseline, not a deployment or compliance claim. Collect and verify sufficient evidence before relying on it externally."
-  : levelNum >= 3
-    ? "The maturity evidence passes AMC's claim-readiness gate for this scope. Review applicable controls and operating risk before any production decision."
-    : levelNum >= 2
-      ? "The evidence is claim-ready, but material maturity gaps remain. Address them before production deployment."
-      : "The evidence is claim-ready and identifies significant governance gaps. Do not deploy without remediation."}</p>
-<h2>Next Steps</h2>
-<ol>
-  <li>Run <code>amc guide --go</code> to generate framework-specific guardrails</li>
-  <li>Run <code>amc assurance run --all</code> to test against adversarial scenarios</li>
-  <li>Run <code>amc quickscore --eu-ai-act</code> for EU AI Act classification</li>
-</ol>
-<div class="footer">
-  Generated by <a href="https://github.com/AgentMaturity/AgentMaturityCompass">Agent Maturity Compass</a> — The Credit Score for AI Agents<br>
-  Report generated: ${new Date().toISOString()} | Print this page (Ctrl+P) to save as PDF
-</div>
-</body></html>`;
-    };
+    const claim = runClaimEnvelope(report);
+    const renderReportHtml = (): string => renderDiagnosticReportHtml({ report, runId: resolved.resolvedRunId,
+      alias: resolved.alias, statusExplanation, claim });
 
     // HTML export (styled, printable to PDF)
     if (opts.html) {
@@ -5634,6 +5552,7 @@ ${gapRows}
       const outPath = resolve(process.cwd(), opts.html);
       writeFileSync(outPath, html, "utf-8");
       console.log(chalk.green(`✓ HTML report saved: ${outPath}`));
+      printClaimResult(claim, {});
       console.log(chalk.gray("  Open in browser and print (Ctrl+P) to save as PDF"));
       if (!opts.share) {
         return;
@@ -5653,6 +5572,7 @@ ${gapRows}
         publicBaseUrl: opts.publicBaseUrl
       });
       console.log(chalk.green(`✓ Share report written: ${bundle.htmlPath}`));
+      if (!opts.html) printClaimResult(claim, {});
       console.log(chalk.gray(`  Manifest: ${bundle.manifestPath}`));
       console.log(chalk.gray(`  Local URL: ${bundle.manifest.localUrl}`));
       if (bundle.manifest.publicUrl) {
@@ -5676,6 +5596,7 @@ ${gapRows}
       console.log(chalk.bold("\n═══════════════════════════════════════════"));
       console.log(chalk.bold("  AMC Executive Summary"));
       console.log(chalk.bold("═══════════════════════════════════════════\n"));
+      printClaimResult(claim, {});
       console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
       if (resolved.alias) {
         console.log(chalk.gray("  Alias:        "), resolved.alias);
@@ -5719,8 +5640,7 @@ ${gapRows}
       console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
       return;
     }
-    const markdown = generateReport(report, "md") as string;
-    console.log(markdown);
+    printLabelledReport(generateReport(report, "md", claim) as string);
   });
 
 const runAliasCommand = program
@@ -6350,10 +6270,13 @@ withTrustFlags(verifyCmd
   .action(async (opts: { json: boolean } & TrustFlags) => {
     const trust = trustFromFlags(opts, ["ledger-row"]);
     const out = await verifyAll({ workspace: process.cwd(), trust });
+    // Integrity checks prove the workspace records are unchanged, not that what they record is true.
+    const claim = artifactClaim("verify:workspace", { recordCount: out.checks.length });
     if (opts.json) {
-      console.log(JSON.stringify(out, null, 2));
+      console.log(JSON.stringify(withClaimFields(out, claim), null, 2));
     } else {
       console.log(`status: ${out.status}`);
+      printClaimResult(claim, {});
       for (const check of out.checks) {
         console.log(`- ${check.id}: ${check.status}${check.critical ? " [CRITICAL]" : ""}`);
         for (const detail of check.details) {
@@ -6915,8 +6838,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runToctouPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 TOCTOU Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 TOCTOU Pack"), result, executedTestClaim("lab:toctou", result.scenariosTested - result.inconclusiveScenarios.length, result.vulnerable ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6935,8 +6857,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runCompoundThreatPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Compound Threat Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Compound Threat Pack"), result, executedTestClaim("lab:compoundThreat", result.patterns.length - result.inconclusiveScenarios.length, result.threatsDetected > 0 ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6955,8 +6876,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runShutdownCompliancePack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Shutdown Compliance Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Shutdown Compliance Pack"), result, executedTestClaim("lab:shutdownCompliance", result.scenarios.length - result.inconclusiveScenarios.length, result.compliant ? "pass" : "fail"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -6975,8 +6895,7 @@ assurance
       const { resolveLabPackContext } = await import("./lab/packs/labPackContext.js");
       const labCtx = await resolveLabPackContext({ workspace: process.cwd(), agentId: opts.agent });
       const result = await runAdvancedThreatsPack(labCtx);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n🧪 Advanced Threats Pack"));
+      if (emitClaimResult(chalk.bold.yellow("\n🧪 Advanced Threats Pack"), result, executedTestClaim("lab:advancedThreats", result.scenariosTested, result.failedScenarios.length > 0 ? "fail" : "pass"), opts)) return;
       console.log(JSON.stringify(result, null, 2));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
@@ -7114,11 +7033,8 @@ evalCmd
       agentId: opts.agent,
       historical: opts.historical
     });
-    if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
-      return;
-    }
-    console.log(`framework: ${result.format}`);
+    // Imported eval results are what the exporting tool reported: self-reported, never observed by AMC.
+    if (emitClaimResult(`framework: ${result.format}`, result, unverifiedClaim(`eval:import:${result.format}`, result.caseCount), opts)) return;
     console.log(`file: ${result.file}`);
     console.log(`session: ${result.sessionId}`);
     console.log(`cases: ${result.caseCount} (pass=${result.passedCount}, fail=${result.failedCount})`);
@@ -7138,11 +7054,8 @@ evalCmd
       agentId: opts.agent,
       sinceTs
     });
-    if (opts.json) {
-      console.log(JSON.stringify(status, null, 2));
-      return;
-    }
-    console.log(`overall mapped coverage: ${status.mappedQuestionCount}/${status.totalQuestionCount} (${status.overallCoveragePct.toFixed(2)}%)`);
+    const title = `overall mapped coverage: ${status.mappedQuestionCount}/${status.totalQuestionCount} (${status.overallCoveragePct.toFixed(2)}%)`;
+    if (emitClaimResult(title, status, unverifiedClaim("eval:status", status.totalImportedEvents), opts)) return;
     console.log(`imported events: ${status.totalImportedEvents}`);
     console.log(`imported cases: ${status.totalImportedCases}`);
     console.log("");
@@ -7184,7 +7097,7 @@ evalCmd
         ensureWorkspaceReadyForAgent(process.cwd(), agentId);
       }
       const format = inferFormat(opts.output, opts.format !== "terminal" ? opts.format : undefined);
-      const { report, exitCode } = await evalRunCli({
+      const { exitCode, claim } = await evalRunCli({
         workspace: process.cwd(),
         window: opts.window,
         agentId,
@@ -7195,6 +7108,7 @@ evalCmd
       });
       if (opts.output) {
         console.log(chalk.green(`Report written to ${opts.output}`));
+        printClaimResult(claim, {});
       }
       if (exitCode !== 0) {
         process.exit(exitCode);
@@ -8816,6 +8730,8 @@ passport
       outFile: opts.out
     });
     console.log(chalk.green("Passport created"));
+    // Passports carry no AMC version or run of their own: their figures are self-reported.
+    printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
@@ -8828,7 +8744,8 @@ withTrustFlags(passport
   .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const out = passportVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
-    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`] });
+    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`],
+      claim: artifactClaim("passport") });
   });
 
 passport
@@ -8845,11 +8762,13 @@ passport
       file,
       format: format as "json" | "badge"
     });
+    const claim = artifactClaim("passport");
     if (format === "badge") {
       console.log(String(out));
+      printClaimResult(claim, { stderr: true });
       return;
     }
-    console.log(JSON.stringify(out, null, 2));
+    console.log(JSON.stringify(withClaimFields(out as object, claim), null, 2));
   });
 
 passport
@@ -8866,6 +8785,7 @@ passport
       agentId: resolveAgentId(process.cwd(), opts.id)
     });
     console.log(out.badge);
+    printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
   });
 
 passport
@@ -8887,6 +8807,7 @@ passport
       outFile: opts.out
     });
     console.log(chalk.green("Passport exported"));
+    printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`passportId: ${out.passport.passportId}`);
@@ -8911,6 +8832,8 @@ passport
       baseUrl: opts.baseUrl,
       outFile: opts.out
     });
+    const claim = artifactClaim("passport");
+    if (format !== "json") printClaimResult(claim, {});
     if (format === "url") {
       console.log(`publicUrl: ${out.publicUrl}`);
       console.log(`verificationUrl: ${out.verificationUrl}`);
@@ -8928,7 +8851,7 @@ passport
       console.log(`verificationUrl: ${out.verificationUrl}`);
       return;
     }
-    console.log(JSON.stringify(out, null, 2));
+    console.log(JSON.stringify(withClaimFields(out, claim), null, 2));
   });
 
 passport
@@ -8945,6 +8868,7 @@ passport
       agentB: second
     });
     console.log(`Compared at ${new Date(out.comparedTs).toISOString()}`);
+    printClaimResult(artifactClaim("passport:compare", { recordCount: 2 }), {});
     console.log(`Agent ${first}: passport ${out.agents[first]?.passportId ?? "unknown"} (${out.agents[first]?.status ?? "UNKNOWN"})`);
     console.log(`Agent ${second}: passport ${out.agents[second]?.passportId ?? "unknown"} (${out.agents[second]?.status ?? "UNKNOWN"})`);
     const dimLabelWidth = Math.max("dimension".length, ...out.dimensions.map((row) => row.dimension.length));
@@ -10301,6 +10225,7 @@ bundle
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Bundle exported: ${result.outFile}`));
+    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
 
@@ -10309,8 +10234,10 @@ withTrustFlags(bundle
   .description("Verify evidence bundle offline")
   .argument("<file>"), { pubkey: "pin the auditor public key (artifact-seal)", expectMonitor: true, json: true })
   .action(async (file: string, opts: TrustFlags) => {
-    const result = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
-    finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`] });
+    const { run, ...result } = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
+    // The run the verifier checked (not a second read of the file); its claim is the run's own, never raised by the signature.
+    const claim = artifactClaim("bundle", { run, sealVerified: result.ok });
+    finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`], claim });
   });
 
 bundle
@@ -10323,7 +10250,7 @@ bundle
     const observedCount = [...trustMap.values()].filter((tier) => tier === "OBSERVED").length;
     console.log(
       JSON.stringify(
-        {
+        withClaimFields({
           runId: inspected.run.runId,
           agentId: inspected.run.agentId,
           integrityIndex: inspected.run.integrityIndex,
@@ -10331,7 +10258,7 @@ bundle
           manifest: inspected.manifest,
           fileCount: inspected.files.length,
           observedEvidenceEvents: observedCount
-        },
+        }, artifactClaim("bundle", { run: inspected.run })),
         null,
         2
       )
@@ -10345,7 +10272,8 @@ bundle
   .argument("<bundleB>")
   .action((bundleA: string, bundleB: string) => {
     const diff = diffEvidenceBundles(resolve(process.cwd(), bundleA), resolve(process.cwd(), bundleB));
-    console.log(JSON.stringify(diff, null, 2));
+    const claims = [bundleA, bundleB].map((file) => artifactClaim("bundle", { run: inspectEvidenceBundle(resolve(process.cwd(), file)).run }));
+    console.log(JSON.stringify(withClaimFields(diff, aggregateClaim("bundle:diff", claims)), null, 2));
   });
 
 evidence
@@ -10430,6 +10358,8 @@ program
       } else {
         console.log(chalk.green("Gate PASSED"));
       }
+      // The gate's own run, never marked seal-verified here: the claim stays the run's own and is never raised.
+      printClaimResult(artifactClaim("bundle", { run: result.report }), {});
       return;
     }
     console.log(opts.sign === false ? chalk.yellow("Gate FAILED (UNSIGNED policy)") : chalk.red("Gate FAILED"));
@@ -10510,6 +10440,7 @@ ci
     const questions = getRapidQuestions();
     // In CI we auto-score (non-interactive) — try auto mode first, fall back to zero-state
     let result: { percentage: number; preliminaryLevel: string; totalScore: number; maxScore: number };
+    let claim = unverifiedClaim("ci:check", 0);
     try {
       const agentId = opts.agent ?? activeAgent(program) ?? "default";
       ensureWorkspaceReadyForAgent(process.cwd(), agentId);
@@ -10522,6 +10453,7 @@ ci
         ? Math.round((avgLevel / 5) * 100)
         : 0;
       result = { percentage: pct, preliminaryLevel: `L${overallLevel}`, totalScore: pct, maxScore: 100 };
+      claim = runClaimEnvelope(report);
     } catch {
       // No evidence — score with default answers (L0)
       const answers: Record<string, number> = {};
@@ -10536,10 +10468,11 @@ ci
     const passed = scorePassed && levelPassed;
 
     if (opts.json) {
-      console.log(JSON.stringify({ passed, score: result.percentage, level: result.preliminaryLevel, minScore, minLevel: opts.minLevel }, null, 2));
+      console.log(JSON.stringify(withClaimFields({ passed, score: result.percentage, level: result.preliminaryLevel, minScore, minLevel: opts.minLevel }, claim), null, 2));
     } else {
       const icon = passed ? chalk.green("✅ PASS") : chalk.red("❌ FAIL");
       console.log(chalk.bold(`\n🧭 AMC CI Gate Check`));
+      printClaimResult(claim, opts);
       console.log(`  Score: ${result.percentage}% (min: ${minScore}%)`);
       console.log(`  Level: ${result.preliminaryLevel} (min: ${opts.minLevel})`);
       console.log(`  Result: ${icon}`);
@@ -10548,7 +10481,7 @@ ci
       }
       console.log("");
     }
-    process.exit(passed ? 0 : 1);
+    process.exitCode = passed ? 0 : 1;
   });
 
 ci
@@ -10611,11 +10544,14 @@ ci
         },
       });
 
+      // Attacks that reached the agent are observed; attacks that never reached it are not counted.
+      const claim = executedTestClaim("redteam:ci", result.report.totalScenarios, result.passed ? "pass" : "fail");
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       } else {
         const icon = result.passed ? chalk.green("PASS") : chalk.red("FAIL");
         console.log(chalk.bold("\nAMC CI Red-Team Gate"));
+        printClaimResult(claim, opts);
         console.log(`  Result: ${icon}`);
         console.log(`  Red-team score: ${result.report.overallScore0to100}/100 (min: ${result.thresholds.minScore0to100})`);
         console.log(`  Vulnerabilities: ${result.severityCounts.total} (max: ${result.thresholds.maxVulnerabilities})`);
@@ -10637,7 +10573,7 @@ ci
         }
       }
 
-      process.exit(result.passed ? 0 : 1);
+      process.exitCode = result.passed ? 0 : 1;
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
       process.exit(1);
@@ -10775,6 +10711,7 @@ exportGroup
       outFile: opts.out
     });
     console.log(chalk.green(`Badge exported: ${badge.outFile}`));
+    printClaimResult(runIdClaim(badge.runId, badge.agentId), {});
   });
 
 dashboard
@@ -11008,6 +10945,7 @@ assurance
           windowDays: opts.windowDays ? Number(opts.windowDays) : undefined
         });
         console.log(chalk.green(`Assurance run complete: ${run.run.runId}`));
+        printClaimResult(artifactClaim("assurance:store", { recordCount: run.findings.findings.length }), {});
         console.log(`Status: ${run.run.score.status}`);
         console.log(`RiskAssuranceScore: ${run.run.score.riskAssuranceScore ?? "UNKNOWN"}`);
         console.log(`Findings: ${run.findings.findings.length}`);
@@ -11049,6 +10987,7 @@ assurance
         throw error;
       }
       if (noSign) delete process.env.AMC_NO_SIGN;
+      const claim = assuranceClaim(report, true);
       // SARIF output
       if (opts.format === "sarif") {
         const sarifRules = (report.packResults ?? []).map((p, i) => ({
@@ -11070,7 +11009,8 @@ assurance
           version: "2.1.0",
           runs: [{
             tool: { driver: { name: "AMC Assurance Lab", version: "1.0.0", rules: sarifRules } },
-            results: sarifResults
+            results: sarifResults,
+            properties: withClaimFields({}, claim)
           }]
         };
         console.log(JSON.stringify(sarif, null, 2));
@@ -11078,6 +11018,7 @@ assurance
       }
 
       console.log(chalk.green(`Assurance run complete: ${report.assuranceRunId}`));
+      printClaimResult(claim, {});
       console.log(`Status: ${report.status}`);
       if (report.evidenceStore) {
         console.log(`Evidence store: ${report.evidenceStore} (unsigned; amc assurance history lists signed runs only)`);
@@ -11136,6 +11077,8 @@ assurance
   .description("List assurance lab runs")
   .action(() => {
     const rows = assuranceRunsCli(process.cwd());
+    // Stored v1 run records are not re-verified here: self-reported.
+    printClaimResult(artifactClaim("assurance:store", { recordCount: rows.length }), {});
     if (rows.length === 0) {
       console.log("No assurance runs.");
       return;
@@ -11152,7 +11095,8 @@ assurance
   .description("Show assurance run artifacts")
   .requiredOption("--run <id>", "run ID")
   .action((opts: { run: string }) => {
-    console.log(JSON.stringify(assuranceShowRunCli({ workspace: process.cwd(), runId: opts.run }), null, 2));
+    const detail = assuranceShowRunCli({ workspace: process.cwd(), runId: opts.run });
+    console.log(JSON.stringify(withClaimFields(detail, artifactClaim("assurance:store")), null, 2));
   });
 
 assurance
@@ -11167,6 +11111,7 @@ assurance
       outFile: opts.out ? resolve(process.cwd(), opts.out) : undefined
     });
     console.log(chalk.green(`Assurance certificate issued: ${issued.outFile}`));
+    printClaimResult(artifactClaim("assurance:certificate"), {});
     console.log(`certId=${issued.cert.certId}`);
   });
 
@@ -11177,7 +11122,7 @@ withTrustFlags(assurance
   .action((file: string, opts: TrustFlags) => {
     const verified = assuranceVerifyCertCli({ file: resolve(process.cwd(), file), trust: trustFromFlags(opts, ["artifact-seal"]),
       ...(opts.pubkey ? { publicKeyPath: resolve(process.cwd(), opts.pubkey) } : {}) });
-    finishVerify("Assurance certificate", verified.report, { json: opts.json, result: verified });
+    finishVerify("Assurance certificate", verified.report, { json: opts.json, result: verified, claim: artifactClaim("assurance:certificate") });
   });
 
 const assuranceScheduler = assurance.command("scheduler").description("Assurance scheduler controls");
@@ -11195,6 +11140,7 @@ assuranceScheduler
   .action(async () => {
     const out = await assuranceSchedulerRunNowCli(process.cwd());
     console.log(chalk.green(`Assurance scheduler run completed: ${out.run.assuranceRunId}`));
+    printClaimResult(artifactClaim("assurance:store"), {});
     console.log(`certIssued=${out.cert ? "yes" : "no"}`);
   });
 
@@ -11293,6 +11239,9 @@ assurance
     });
     if (verified.ok) {
       console.log(chalk.green("Assurance verification PASSED"));
+      // The run's own claim; its verified seal lets an executed test count as observed, never more.
+      const report = loadAssuranceReport({ workspace: process.cwd(), assuranceRunId: opts.assuranceRun, agentId: opts.agent ?? activeAgent(program) });
+      printClaimResult(assuranceClaim(report, false), {});
       return;
     }
     console.log(chalk.red("Assurance verification FAILED"));
@@ -11352,6 +11301,7 @@ program
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Certificate issued: ${issued.outFile}`));
+    printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`certId=${issued.certId}`);
   });
 
@@ -11383,6 +11333,7 @@ cert
       preview
     });
     console.log(chalk.green(`Trust certificate generated: ${generated.outputPath}`));
+    printClaimResult(runIdClaim(generated.envelope.payload.scoreSourceRunId, opts.agent), {});
     console.log(`format=${generated.format}`);
     console.log(`status=${generated.signatureStatus}`);
     if (generated.signatureStatus === "UNSIGNED_PREVIEW") {
@@ -11454,15 +11405,20 @@ withTrustFlags(cert
       const { verifyTrustCertificateEnvelope } = await import("./cert/trustCertificate.js");
       const verdict = verifyTrustCertificateEnvelope(envelope as never, trust, certPath);
       finishVerify("Certificate", verdict.report, { json: opts.json, result: verdict,
-        details: [`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`, "type=amc-trust-certificate"] });
+        details: [`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`, "type=amc-trust-certificate"],
+        claim: artifactClaim("trust-certificate") });
       return;
     }
+    const checked: { run: DiagnosticReport | null } = { run: null };
     const result = await verifyCertificate({
       certFile: certPath,
       revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined,
-      trust
+      trust,
+      capture: checked
     });
-    finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`] });
+    // The run the verifier checked (not a second read of the file); its claim is the run's own, never raised by the signature.
+    const claim = artifactClaim("certificate", { run: checked.run, sealVerified: result.ok });
+    finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`], claim });
   });
 
 cert
@@ -11473,20 +11429,20 @@ cert
     const certPath = resolve(process.cwd(), file);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
-      console.log(JSON.stringify(envelope, null, 2));
+      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate")), null, 2));
       return;
     }
     const inspected = inspectCertificate(certPath);
     console.log(
       JSON.stringify(
-        {
+        withClaimFields({
           certId: inspected.cert.certId,
           agentId: inspected.cert.agentId,
           issuedTs: inspected.cert.issuedTs,
           integrityIndex: inspected.cert.integrityIndex,
           trustLabel: inspected.cert.trustLabel,
           fileCount: inspected.fileCount
-        },
+        }, artifactClaim("certificate", { run: inspected.run })),
         null,
         2
       )
@@ -11636,6 +11592,7 @@ notary
       outFile: opts.out
     });
     console.log(chalk.green(`Attestation written: ${out.outFile}`));
+    printClaimResult(artifactClaim("notary:attestation"), {});
   });
 
 withTrustFlags(notary
@@ -11644,6 +11601,7 @@ withTrustFlags(notary
   .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
+    printClaimResult(artifactClaim("notary:attestation"), { json: opts.json });
     finishVerify("Notary attestation", result.report, { json: opts.json, result });
   });
 
@@ -12339,6 +12297,8 @@ transparency
     const result = verifyTransparencyLog(process.cwd());
     if (result.ok) {
       console.log(chalk.green("Transparency log verification PASSED"));
+      // An intact log proves its entries are unchanged, not that what they record is true.
+      printClaimResult(artifactClaim("transparency:log", { recordCount: result.entryCount }), {});
       console.log(`entries=${result.entryCount}`);
       return;
     }
@@ -12379,6 +12339,7 @@ withTrustFlags(transparency
   .action((file: string, opts: TrustFlags) => {
     const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
       opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+    printClaimResult(artifactClaim("transparency:log"), { json: opts.json });
     finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
   });
 
@@ -12519,11 +12480,13 @@ compliance
       format,
       agentId: opts.agent ?? activeAgent(program)
     });
+    const claim = envelopeForComplianceReport(out.report, out.report.ts);
     if (opts.json) {
-      console.log(JSON.stringify(out.report, null, 2));
+      console.log(JSON.stringify(withClaimFields(out.report, claim), null, 2));
       return;
     }
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
+    printClaimResult(claim, {});
     console.log(`Framework: ${family.displayName}`);
     // P0-17: a percentage is not a status; nothing evaluated prints "not evaluated", never a score.
     const { coverage } = out.report;
@@ -12560,6 +12523,7 @@ compliance
     });
     writeFileAtomic(resolve(process.cwd(), opts.out), JSON.stringify(report, null, 2), 0o644);
     console.log(chalk.green(`Fleet compliance report generated: ${resolve(process.cwd(), opts.out)}`));
+    printClaimResult(aggregateClaim(`compliance:fleet:${framework}`, report.agents.map((agent) => agent.claim)), {});
   });
 
 compliance
@@ -12569,7 +12533,8 @@ compliance
   .argument("<reportB>")
   .action((reportA: string, reportB: string) => {
     const diff = complianceDiffCli(readUtf8(resolve(process.cwd(), reportA)), readUtf8(resolve(process.cwd(), reportB)));
-    console.log(JSON.stringify(diff, null, 2));
+    // Report files read back from disk carry no seal: self-reported.
+    console.log(JSON.stringify(withClaimFields(diff, unverifiedClaim("compliance:diff", diff.categoryDeltas.length, { regulated: true })), null, 2));
   });
 
 compliance
@@ -12598,13 +12563,14 @@ compliance
       frameworks,
     });
 
+    const claim = coverageMatrixClaim(matrix);
     if (opts.json) {
-      console.log(JSON.stringify(matrix, null, 2));
+      console.log(JSON.stringify(withClaimFields(matrix, claim), null, 2));
       return;
     }
 
     if (opts.heatmap) {
-      console.log(renderCoverageHeatmap(matrix));
+      printTitledResult(renderCoverageHeatmap(matrix), claim);
       return;
     }
 
@@ -12612,8 +12578,9 @@ compliance
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Coverage matrix written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
     console.log(chalk.gray(`\nOverall: ${matrix.overallScore === null ? "not evaluated" : `${(matrix.overallScore * 100).toFixed(1)}%`} | Gaps: ${matrix.gaps.length}`));
   });
@@ -12685,9 +12652,11 @@ compliance
     }
 
     const result = classifyEuAiActRisk(capabilities);
+    // Classifies the capabilities the caller declared: self-reported, and a regulated mapping.
+    const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });
 
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -12701,6 +12670,7 @@ compliance
 
     console.log("");
     console.log(chalk.bold("🇪🇺 EU AI Act Risk Classification"));
+    printClaimResult(claim, {});
     console.log("");
     console.log(`Risk Tier: ${chalk.hex(tierColor).bold(result.riskTier)}`);
     console.log(`Articles: ${result.articles.length > 0 ? result.articles.join(", ") : "none"}`);
@@ -12772,20 +12742,23 @@ compliance
     }
 
     const roadmap = generateEuAiActRoadmap(classification);
+    // Planned from a declared or overridden risk tier: self-reported, and a regulated mapping.
+    const claim = unverifiedClaim("compliance:euAiActRoadmap", 1, { regulated: true });
 
     if (opts.json || opts.out) {
-      const output = JSON.stringify(roadmap, null, 2);
       if (opts.out) {
-        writeFileAtomic(resolve(process.cwd(), opts.out), output, 0o644);
+        writeFileAtomic(resolve(process.cwd(), opts.out), JSON.stringify(roadmap, null, 2), 0o644);
         console.log(chalk.green(`EU AI Act compliance roadmap saved to: ${opts.out}`));
+        printClaimResult(claim, {});
       } else {
-        console.log(output);
+        console.log(JSON.stringify(withClaimFields(roadmap, claim), null, 2));
       }
       return;
     }
 
     console.log("");
     console.log(chalk.bold("🇪🇺 EU AI Act Compliance Roadmap"));
+    printClaimResult(claim, {});
     console.log(`Risk Tier: ${chalk.bold(roadmap.riskTier)}`);
     console.log(`Steps: ${roadmap.totalSteps} | Estimated: ${roadmap.estimatedTotalWeeks} weeks`);
     console.log("");
@@ -13063,6 +13036,7 @@ outcomes
       unit: opts.unit
     });
     console.log(chalk.green(`Outcome signal recorded (${out.trustTier}): ${out.outcomeEventId}`));
+    printClaimResult(unverifiedClaim("outcomes:attest", 1), {});
     console.log(`eventHash=${out.eventHash}`);
     console.log(`receiptId=${out.receiptId}`);
   });
@@ -13881,6 +13855,7 @@ loop
       days: Number(opts.days)
     });
     console.log(chalk.green(`Loop run complete for ${result.agentId}`));
+    printClaimResult(runIdClaim(result.runId, result.agentId), {});
     console.log(`runId=${result.runId}`);
     console.log(`assuranceRunId=${result.assuranceRunId ?? "none"}`);
     console.log(`dashboard=${result.dashboardDir}`);
@@ -14177,6 +14152,7 @@ fleet
         outFile: resolve(process.cwd(), resolvedOut)
       });
       console.log(chalk.green(`Fleet compliance report written: ${report.outFile}`));
+      printClaimResult(fleetHealthClaim(buildFleetHealthDashboard({ workspace: process.cwd() })), {});
       console.log(`Agents included: ${report.agentCount}`);
       console.log(`sha256=${report.sha256}`);
       return;
@@ -14190,6 +14166,7 @@ fleet
       outputPath: resolve(process.cwd(), opts.output)
     });
     console.log(chalk.green(`Fleet report written: ${report.reportPath}`));
+    printClaimResult(report.claim, {});
     console.log(`Agents included: ${report.agentCount}`);
   });
 
@@ -14222,11 +14199,16 @@ fleet
         console.error(formatFleetProgressEvent(event));
       } : undefined,
     });
+    // Each agent's run, seal-checked; the fleet claims no more than its weakest run.
+    const claims = new Map(result.diagnosticReports.map((report) => [report.agentId, runClaimEnvelope(report)]));
+    const claim = aggregateClaim("fleet:score", [...claims.values()]);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      const agents = result.agents.map((agent) => withClaimFields(agent, claims.get(agent.agentId) ?? unverifiedClaim(`diagnostic:${agent.agentId}`, 0)));
+      console.log(JSON.stringify(withClaimFields({ ...result, agents }, claim), null, 2));
       return;
     }
     console.log(chalk.green(`Fleet scoring complete: ${result.agents.length}/${result.agentCount} agents scored`));
+    printClaimResult(claim, opts);
     console.log(`SLA: ${(slaMs / 1000).toFixed(0)}s | First result: ${result.agents[0]?.firstResultMs ?? "n/a"}ms | Failures: ${result.failures.length}`);
     console.log(`Mean: ${result.aggregate.fleetMeanScore} | Median: ${result.aggregate.fleetMedianScore} | StdDev: ${result.aggregate.fleetStdDev}`);
     console.log(`Weak links: ${result.weakLinks.length}`);
@@ -14251,11 +14233,12 @@ fleet
       console.log(chalk.yellow(`  ⚠ ${wl.agentId}: score=${wl.overallScore}, risk=${wl.riskLabel}, ${wl.deviationFromMean}σ below mean`));
     }
     if (opts.md) {
-      console.log("\n" + renderFleetScoringMarkdown(result));
+      console.log("\n" + renderFleetScoringMarkdown(result, claims));
     }
     if (opts.out) {
       console.log(chalk.green(`Report written: ${opts.out}`));
     }
+    printClaimLegendFooter();
   });
 
 fleetGraph
@@ -14418,11 +14401,7 @@ fleet
   .option("--json", "print full JSON payload", false)
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
-    if (opts.json) {
-      console.log(JSON.stringify(health, null, 2));
-      return;
-    }
-    console.log(`Fleet baseline integrity: ${health.baselineIntegrityIndex.toFixed(3)}`);
+    if (emitClaimResult(`Fleet baseline integrity: ${health.baselineIntegrityIndex.toFixed(3)}`, health, fleetHealthClaim(health), opts)) return;
     console.log(`Agents: ${health.agentCount} (scored ${health.scoredAgentCount})`);
     console.log(`Average integrity: ${health.averageIntegrityIndex.toFixed(3)}`);
     console.log(`Average overall level: ${health.averageOverallLevel.toFixed(2)}`);
@@ -14443,11 +14422,7 @@ fleet
   .option("--json", "print full JSON payload", false)
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
-    if (opts.json) {
-      console.log(JSON.stringify(health, null, 2));
-      return;
-    }
-    console.log(chalk.bold("\n🌐  Fleet Status"));
+    if (emitClaimResult(chalk.bold("\n🌐  Fleet Status"), health, fleetHealthClaim(health), opts)) return;
     console.log(`  Agents:          ${health.agentCount} total, ${health.scoredAgentCount} scored`);
     console.log(`  Avg score:       L${health.averageOverallLevel.toFixed(1)} (integrity: ${health.averageIntegrityIndex.toFixed(3)})`);
     console.log(`  Baseline:        ${health.baselineIntegrityIndex.toFixed(3)}`);
@@ -14467,11 +14442,12 @@ fleet
   .action((opts: { json?: boolean }) => {
     const health = buildFleetHealthDashboard({ workspace: process.cwd() });
     const overview = buildFleetExecutiveOverview(health);
+    const claim = fleetHealthClaim(health);
     if (opts.json) {
-      console.log(JSON.stringify(overview, null, 2));
+      console.log(JSON.stringify(withClaimFields(overview, claim), null, 2));
       return;
     }
-    console.log(renderFleetExecutiveOverview(overview));
+    printTitledResult(renderFleetExecutiveOverview(overview), claim);
   });
 
 const fleetPolicy = fleet.command("policy").description("Fleet governance policy operations");
@@ -14569,6 +14545,8 @@ fleetSlo
     const status = fleetSloStatus(process.cwd());
     const color = status.overallStatus === "BREACHED" ? chalk.red : chalk.green;
     console.log(color(`Overall SLO status: ${status.overallStatus}`));
+    // SLOs are computed over each agent's latest run: the status claims no more than the weakest run.
+    printClaimResult(fleetHealthClaim(buildFleetHealthDashboard({ workspace: process.cwd() })), {});
     if (status.statuses.length === 0) {
       console.log("No fleet SLOs defined.");
       return;
@@ -14885,6 +14863,7 @@ fleet
     }
 
     console.log(chalk.green(`Trust composition report (JSON): ${reportPath}`));
+    printClaimResult(aggregateClaim("fleet:trust-composition", reports.map((report) => runClaimEnvelope(report, workspace))), {});
     console.log(`DAG valid: ${trustReport.dagValid ? "YES" : "NO"}`);
     console.log(`Fleet composite score: ${trustReport.fleetCompositeScore.toFixed(3)}`);
     console.log(`Weakest link: ${trustReport.fleetWeakestLink ?? "none"}`);
@@ -15164,6 +15143,8 @@ agent
     const unknown = parsed.unknownReasons?.length ?? 0;
     const measuredCount = parsed.measuredScores ? Object.keys(parsed.measuredScores).length : 0;
     console.log(chalk.green("Diagnostic self-run complete"));
+    // The CLI cannot check the Studio run's seal, so it claims no more than self-reported.
+    printClaimResult(unverifiedClaim("studio:diagnostic-self-run", measuredCount), {});
     console.log(`agentId: ${parsed.agentId ?? "unknown"}`);
     console.log(`runId: ${parsed.runId ?? "unknown"}`);
     console.log(`status: ${parsed.reportStatus ?? "unknown"}`);
@@ -15350,6 +15331,7 @@ program
       type: opts.type
     });
     console.log(chalk.green(`Ingested ${ingest.fileCount} file(s)`));
+    printClaimResult(unverifiedClaim("ingest", ingest.fileCount), {});
     console.log(`Ingest session: ${ingest.ingestSessionId}`);
   });
 
@@ -15373,6 +15355,8 @@ program
       trust: loadTrustContext()
     });
     console.log(chalk.green(`Recorded events: ${attested.attestedEventCount} (${attested.trustTier}: ${attested.reason})`));
+    // Even a pinned attestation stays self-reported until it is an independent, pinned review (docs/CLAIM_KINDS.md).
+    printClaimResult(unverifiedClaim("ingest:attest", attested.attestedEventCount), {});
     console.log(`Bundle hash: ${attested.bundleHash}`);
   });
 
@@ -16588,6 +16572,7 @@ transform
       evidenceLinks: opts.evidenceLinks
     });
     console.log(chalk.green(`Transformation attestation created: ${out.attestation.attestationId}`));
+    printClaimResult(unverifiedClaim("transform:attest", 1), {});
     console.log(`Path: ${out.path}`);
   });
 
@@ -16604,6 +16589,7 @@ transform
       process.exit(1);
     }
     console.log(chalk.green(`Attestation verified: ${verify.path}`));
+    printClaimResult(unverifiedClaim("transform:attest", 1), {});
   });
 
 const org = program.command("org").description("Org graph and real-time comparative scorecards");
@@ -16816,6 +16802,7 @@ org
       window: opts.window
     });
     console.log(chalk.green(`Org scorecard recomputed for ${opts.window}`));
+    printClaimResult(latestRunsClaim("org:scorecard", [...new Set(out.scorecard.nodes.flatMap((node) => node.agentIds))]), {});
     console.log(`Latest: ${out.latestPath}`);
     console.log(`Latest sig: ${out.latestSigPath}`);
     console.log(`History: ${out.historyPath}`);
@@ -17064,6 +17051,7 @@ auditBinder
       throw new Error("audit binder create did not produce an export artifact");
     }
     console.log(chalk.green("Audit binder exported"));
+    printClaimResult(artifactClaim("audit:binder"), {});
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
     console.log(`binderId: ${out.binder.binderId}`);
@@ -17081,7 +17069,7 @@ withTrustFlags(auditBinder
       return;
     }
     finishVerify("Audit binder", verify.report, { json: opts.json, result: verify,
-      details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`] });
+      details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`], claim: artifactClaim("audit:binder") });
   });
 
 auditBinder
@@ -17278,6 +17266,7 @@ audit
       return;
     }
     console.log(chalk.green("Audit verify passed"));
+    printClaimResult(artifactClaim("audit:workspace"), {});
   });
 
 const bench = program.command("bench").description("Public benchmark registry + ecosystem comparative view");
@@ -17622,7 +17611,7 @@ withTrustFlags(benchmark
   .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const verify = verifyBenchmarkArtifact(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
-    finishVerify("Benchmark", verify.report, { json: opts.json, result: verify });
+    finishVerify("Benchmark", verify.report, { json: opts.json, result: verify, claim: artifactClaim("benchmark") });
   });
 
 benchmark
@@ -17680,8 +17669,12 @@ benchmark
       groupBy: opts.groupBy
     });
     const sortedByOverall = rows.slice().sort((a, b) => b.bench.run.overall - a.bench.run.overall || a.bench.benchId.localeCompare(b.bench.benchId));
+    // Imported benchmarks are their publishers' figures: self-reported.
+    const claim = benchmarkResultClaim("benchmark:report", rows.length, Date.now());
     const lines = [
       "# AMC Benchmark Report",
+      "",
+      formatClaimLabel(renderClaimLabel(claim), "report"),
       "",
       `Imported benchmarks: ${rows.length}`,
       `Group-by: ${opts.groupBy}`,
@@ -17696,12 +17689,14 @@ benchmark
       ...sortedByOverall.slice(0, 10).map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`),
       "",
       "## Full List",
-      ...rows.map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`)
+      ...rows.map((row) => `- ${row.bench.benchId}: overall ${row.bench.run.overall.toFixed(3)}, integrity ${row.bench.run.integrityIndex.toFixed(3)}, trust ${row.bench.run.trustLabel}`),
+      "", "## How to read claim kinds", "", renderClaimLegend("markdown")
     ];
     const outFile = resolve(process.cwd(), opts.out);
     ensureDir(dirname(outFile));
     writeFileAtomic(outFile, lines.join("\n"), 0o644);
     console.log(chalk.green(`Benchmark report written: ${outFile}`));
+    printClaimResult(claim, {});
   });
 
 benchmark
@@ -17712,7 +17707,7 @@ benchmark
       workspace: process.cwd(),
       groupBy: opts.groupBy
     });
-    console.log(JSON.stringify(stats, null, 2));
+    console.log(JSON.stringify(withClaimFields(stats, benchmarkResultClaim("benchmark:stats", listImportedBenchmarks(process.cwd()).length, Date.now())), null, 2));
   });
 
 benchmark
@@ -17727,8 +17722,9 @@ benchmark
       agentId: opts.agent,
     });
 
+    const claim = benchmarkResultClaim(`benchmark:${result.agentId}`, result.benchmarkCount, result.ts);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17736,8 +17732,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Benchmark report written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
   });
 
@@ -17755,8 +17752,9 @@ benchmark
       agent2,
     });
 
+    const claim = benchmarkResultClaim(`benchmark:${result.agent1}:${result.agent2}`, result.benchmarkCount, result.ts);
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17764,8 +17762,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Benchmark comparison written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printLabelledReport(md);
     }
   });
 
@@ -17807,8 +17806,10 @@ benchmark
     });
     const ciGate = buildProviderDriftCiGate(report, { mode: payload.gateMode ?? "ci" });
 
+    // Canary rows come from the caller's file: self-reported receipts, whatever the gate decides.
+    const claim = unverifiedClaim("benchmark:providerDrift", payload.baseline.length + payload.candidate.length, { result: ciGate.passed ? "pass" : "fail" });
     if (opts.json) {
-      console.log(JSON.stringify({ report, watchAlerts, evalPack, ciGate }, null, 2));
+      console.log(JSON.stringify(withClaimFields({ report, watchAlerts, evalPack, ciGate }, claim), null, 2));
       return;
     }
 
@@ -17816,8 +17817,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Provider drift benchmark written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printTitledResult(md, claim);
       if (watchAlerts.length > 0) {
         console.log("");
         console.log(chalk.red(`Watch alerts: ${watchAlerts.length}`));
@@ -17843,8 +17845,10 @@ benchmark
       agentId: opts.agent ?? payload.agentId ?? activeAgent(program) ?? "default",
     });
 
+    // Corpus rows and scores come from the caller's file: self-reported receipts.
+    const claim = unverifiedClaim("benchmark:replayCorpus", payload.rows.length, { result: result.ciReceipt.passed ? "pass" : "fail" });
     if (opts.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(JSON.stringify(withClaimFields(result, claim), null, 2));
       return;
     }
 
@@ -17852,8 +17856,9 @@ benchmark
     if (opts.out) {
       writeFileAtomic(resolve(process.cwd(), opts.out), md, 0o644);
       console.log(chalk.green(`Replay benchmark corpus written: ${opts.out}`));
+      printClaimResult(claim, {});
     } else {
-      console.log(md);
+      printTitledResult(md, claim);
       if (result.watchAlerts.length > 0) {
         console.log("");
         console.log(chalk.red(`Watch alerts: ${result.watchAlerts.length}`));
@@ -18594,10 +18599,12 @@ program
     const results = lab.simulateExperiment(opts.experiment);
     if (results.length === 0) {
       console.log(chalk.red("No results — experiment not found or has no probes."));
+      process.exitCode = 1;
       return;
     }
-    const { EXAMPLE_BANNER } = await import("./claims/eligibility/exampleMode.js");
+    const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(chalk.bold(`\nSimulated ${results.length} probe results:\n`));
     for (const r of results) {
@@ -18702,11 +18709,15 @@ program
   .action(async () => {
     const ir = await import("./audit/insiderRisk.js");
     const scores = ir.computeInsiderRiskScores();
+    // Scores computed from ingested activity AMC did not observe: self-reported.
+    const claim = unverifiedClaim("audit:insiderRisk", scores.length);
     if (scores.length === 0) {
       console.log(chalk.green("No insider risk scores computed (no data ingested)."));
+      printClaimResult(claim, {});
       return;
     }
     console.log(chalk.bold("\nInsider Risk Scores:\n"));
+    printClaimResult(claim, {});
     for (const s of scores) {
       const color = s.riskLevel === "critical" ? chalk.red : s.riskLevel === "high" ? chalk.yellow : chalk.white;
       console.log(color(`  ${s.actorId} — ${s.riskLevel.toUpperCase()} (${(s.overallScore * 100).toFixed(0)}%) — ${s.alertCount} alert(s), ${s.criticalAlertCount} critical`));
@@ -18721,6 +18732,7 @@ program
     const ir = await import("./audit/insiderRisk.js");
     const bundle = ir.exportAttestationBundle(opts.tenant);
     console.log(chalk.bold(`\nAttestation Bundle: ${bundle.bundleId}`));
+    printClaimResult(unverifiedClaim("audit:insiderRiskAttestation", bundle.alerts.length), {});
     console.log(`  Tenant: ${bundle.tenantId}`);
     console.log(`  Alerts: ${bundle.alerts.length}`);
     console.log(`  Approval events: ${bundle.approvalEvents.length}`);
@@ -19016,7 +19028,7 @@ program
   .action(async (opts: { tenant: string; redactionTests: boolean }) => {
     const dr = await import("./compliance/dataResidency.js");
     const report = dr.generateResidencyReport(opts.tenant, { includeRedactionTests: opts.redactionTests }, process.cwd());
-    console.log(dr.renderResidencyReportMarkdown(report));
+    printLabelledReport(dr.renderResidencyReportMarkdown(report));
   });
 
 program
@@ -19090,6 +19102,8 @@ program
       }
       return existing;
     })();
+    // No run: nothing was evaluated, and the claim line says so.
+    printClaimResult(report ? runClaimEnvelope(report, workspace) : unverifiedClaim("diagnostic:why-capped", 0), {});
     if (!report) return;
     const whyCaps = opux.computeWhyCaps(report);
     const filtered = opts.question ? whyCaps.filter(w => w.questionId === opts.question) : whyCaps;
@@ -19393,7 +19407,7 @@ program
     const windowMs = parseWindowToMs(opts.window);
     const report = analyzeAgentConfidenceDrift(db, agentId, windowMs);
     ledger.close();
-    console.log(renderConfidenceDriftMarkdown(report));
+    printTitledResult(renderConfidenceDriftMarkdown(report), unverifiedClaim("claims:confidenceDrift", report.results.length));
   });
 
 // ── Lessons Learned CLI ─────────────────────────────────────────────────
@@ -19575,7 +19589,8 @@ orgCommunity
     const { initCommunityPlatform, scoreCommunityGovernance, renderCommunityGovernanceMarkdown } = await import("./org/communityGovernance.js");
     const config = initCommunityPlatform(opts.platform);
     const report = scoreCommunityGovernance(config);
-    console.log(renderCommunityGovernanceMarkdown(report));
+    // Scores a freshly initialised default configuration, not observed platform behaviour.
+    printTitledResult(renderCommunityGovernanceMarkdown(report), unverifiedClaim("org:communityGovernance", 0));
   });
 
 // ── Agent Discovery ────────────────────────────────────────────────────────
@@ -19608,7 +19623,9 @@ passport
     const { loadDiscoveryRegistry, searchCapabilities } = await import("./passport/agentDiscovery.js");
     const registry = loadDiscoveryRegistry(process.cwd());
     const results = searchCapabilities(registry, { capability: opts.capability, minLevel: Number(opts.minLevel) });
-    console.log(JSON.stringify(results, null, 2));
+    // Capabilities and levels in the discovery registry are what agents declared: self-reported.
+    const claim = unverifiedClaim("passport:discovery", results.length);
+    console.log(JSON.stringify(withClaimFieldsEach(results, () => claim), null, 2));
   });
 
 passport
@@ -19637,13 +19654,14 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { generateKnownUnknownsReport, renderKnownUnknownsMarkdown } = await import("./diagnostic/knownUnknowns.js");
     const workspace = process.cwd();
-    const report = loadRunReport(workspace, agentId);
+    const report = latestRunForAgent(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
+      printClaimResult(unverifiedClaim("diagnostic:knownUnknowns", 0), {});
       return;
     }
     const unknownsReport = generateKnownUnknownsReport(report);
-    console.log(renderKnownUnknownsMarkdown(unknownsReport));
+    printTitledResult(renderKnownUnknownsMarkdown(unknownsReport), runClaimEnvelope(report, workspace));
     console.log(JSON.stringify(unknownsReport.summary, null, 2));
   });
 
@@ -19657,13 +19675,14 @@ program
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     const { computeDiagnosticMetaConfidence, renderMetaConfidenceMarkdown } = await import("./diagnostic/metaConfidence.js");
     const workspace = process.cwd();
-    const report = loadRunReport(workspace, agentId);
+    const report = opts.run ? loadRunReport(workspace, opts.run, agentId) : latestRunForAgent(workspace, agentId);
     if (!report) {
       console.log(chalk.yellow("No diagnostic run found."));
+      printClaimResult(unverifiedClaim("diagnostic:metaConfidence", 0), {});
       return;
     }
     const mc = computeDiagnosticMetaConfidence(report);
-    console.log(renderMetaConfidenceMarkdown(mc));
+    printTitledResult(renderMetaConfidenceMarkdown(mc), runClaimEnvelope(report, workspace));
   });
 
 // ── Confidence Governor ────────────────────────────────────────────────────
@@ -19856,13 +19875,12 @@ shield
         previousActions: parseCsvOption(opts.previousActions),
       });
 
-      if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+      // A decision on an action the caller described, not one AMC observed: self-reported.
+      const claim = unverifiedClaim("shield:runtimeAnalyzer", 1, { result: result.allowed ? "pass" : "fail" });
+      if (emitClaimResult(chalk.bold.cyan("\nShield Runtime Analysis"), result, claim, opts)) {
         if (opts.failOnBlock && result.blocked) process.exitCode = 1;
         return;
       }
-
-      console.log(chalk.bold.cyan("\nShield Runtime Analysis"));
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Action:"), opts.action);
       console.log(chalk.gray("Tool:"), opts.tool);
@@ -19934,8 +19952,7 @@ shield
     try {
       const { checkReputation } = await import("./shield/index.js");
       const result = checkReputation(toolId);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🛡️  Tool Reputation"));
+      if (emitClaimResult(chalk.bold.cyan("\n🛡️  Tool Reputation"), result, unverifiedClaim("shield:toolReputation", 0, { method: "keyword_match" }), opts)) return;
       console.log(chalk.gray("Tool:"), toolId);
       console.log(chalk.gray("Score:"), result.score ?? "N/A");
       console.log(chalk.gray("Trusted:"), result.trusted ? chalk.green("yes") : chalk.red("no"));
@@ -20299,8 +20316,7 @@ shield
         sessionId: opts.session,
         workspaceId: opts.workspace ?? process.cwd(),
       });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🛡️  Trust Pipeline"));
+      if (emitClaimResult(chalk.bold.cyan("\n🛡️  Trust Pipeline"), result, unverifiedClaim("shield:trustPipeline", 1, { result: result.allowed ? "pass" : "fail" }), opts)) return;
       console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Allowed:"), result.allowed ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Overall Trust Score:"), result.overallTrustScore.toFixed(1));
@@ -21188,6 +21204,8 @@ enforce
     try {
       const { CORE_SAFETY_PROPERTIES, boundedModelCheck, verifyCertificate } = await import("./enforce/formalVerification.js");
       console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Formal Verification"));
+      // Checks AMC's built-in safety model, not the agent: no agent evidence is used.
+      printClaimResult(unverifiedClaim("enforce:formalVerification", 0), {});
       const properties = opts.all || !opts.property
         ? CORE_SAFETY_PROPERTIES
         : CORE_SAFETY_PROPERTIES.filter((p) => p.id === opts.property || p.name === opts.property);
@@ -21253,6 +21271,7 @@ withTrustFlags(enforce
       // A proof certificate carries an unkeyed hash and names no signer, so it is never trusted (P0-51).
       const report = unsignedArtifactReport({ kind: "proof-certificate", path: "<certificateJson>", sha256: sha256Hex(certificateJson) },
         trustFromFlags(opts, ["artifact-seal"]), result.issues, "certificateHash");
+      printClaimResult(unverifiedClaim("enforce:proofCertificate", 1, { signatureValid: result.valid }), { json: opts.json });
       finishVerify("Proof certificate", report, { json: opts.json, result: { ...result, report } });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -21270,8 +21289,7 @@ watch
     try {
       const { attestOutput } = await import("./watch/index.js");
       const result = attestOutput(output);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n👁️  Output Attestation"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n👁️  Output Attestation"), result, unverifiedClaim("watch:outputAttestation", 1), opts)) return;
       console.log(chalk.gray("Output:"), output);
       console.log(chalk.gray("Hash:"), result.hash || "N/A");
       console.log(chalk.gray("Attested:"), chalk.green("yes"));
@@ -21566,8 +21584,7 @@ product
       const { AutonomyDial } = await import("./product/index.js");
       const dial = new AutonomyDial();
       const result = dial.decide(agentId, mode);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.yellow("\n📦  Autonomy Decision"));
+      if (emitClaimResult(chalk.bold.yellow("\n📦  Autonomy Decision"), result, unverifiedClaim("product:autonomyDial", 1), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Mode:"), mode);
       console.log(chalk.gray("Decision:"), JSON.stringify(result, null, 2));
@@ -22010,6 +22027,7 @@ withTrustFlags(passport
       // The token is an HMAC under a shared secret and names no signer, so it is never trusted (P0-51).
       const report = unsignedArtifactReport({ kind: "trust-token", path: "<tokenJson>", sha256: sha256Hex(tokenJson) },
         trustFromFlags(opts, ["artifact-seal"]), result.reasons, "signature");
+      printClaimResult(unverifiedClaim("passport:trust-token", Array.isArray(token.claims) ? token.claims.length : 0, { signatureValid: result.valid }), { json: opts.json });
       finishVerify("Trust token", report, { json: opts.json, result: { ...result, report }, details: [`tokenId: ${token.tokenId ?? "N/A"}`] });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22026,8 +22044,7 @@ passport
       const { translateTrustScores, TRUST_TRANSLATIONS } = await import("./passport/trustInterchange.js");
       const scores = { overall: parseFloat(opts.score) };
       const result = translateTrustScores(scores, opts.from, opts.to);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.cyan("\n🔑  Trust Score Translation"));
+      if (emitClaimResult(chalk.bold.cyan("\n🔑  Trust Score Translation"), result, unverifiedClaim("passport:translate-score", 1), opts)) return;
       console.log(chalk.gray("From:"), opts.from);
       console.log(chalk.gray("To:"), opts.to);
       console.log(chalk.gray("Input score:"), opts.score);
@@ -22080,6 +22097,7 @@ const score = program.command("score").description("Maturity scoring, adversaria
     }
     const result = computeQuickScore(answers, tier);
     console.log(chalk.bold.hex('#4AEF79')("\n📊  Assessment Result"));
+    printClaimResult(selfAnswerClaim("score:quickScore", Object.values(answers)), {});
     console.log(chalk.gray(`Tier: ${tier}`));
     console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
     console.log(renderAsciiRadar(result.layerScores));
@@ -22105,8 +22123,9 @@ score
     try {
       const { computeMaturityScore } = await import("./score/index.js");
       const result = computeMaturityScore([], {});
+      const claim = unverifiedClaim("score:formalSpec", 0);
       if (opts.json) {
-        const output: any = { ...result };
+        const output: any = withClaimFields({ ...result }, claim);
         if ((result.overallScore ?? 0) === 0) {
           output.hint = "Score is 0 because no evidence has been collected yet. Run: amc evidence collect, amc wrap <runtime> -- <command>, or amc quickscore";
         }
@@ -22114,6 +22133,7 @@ score
         return;
       }
       console.log(chalk.bold.hex('#4AEF79')("\n📊  Maturity Score"));
+      printClaimResult(claim, opts);
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Score:"), result.overallScore ?? "N/A");
       console.log(chalk.gray("Level:"), result.overallLevel || "unknown");
@@ -22133,8 +22153,7 @@ score
     try {
       const { testGamingResistance } = await import("./score/index.js");
       const result = testGamingResistance({ q1: agentId });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📊  Adversarial Test"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📊  Adversarial Test"), result, unverifiedClaim("score:gamingResistanceTest", 0), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Gaming Resistant:"), result.gamingResistant ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Details:"), JSON.stringify(result, null, 2));
@@ -22153,8 +22172,7 @@ score
       // artifact from a literal and labelling it OBSERVED.
       const { collectEvidenceFromLedger } = await import("./score/evidenceCollector.js");
       const result = collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14));
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"), result, unverifiedClaim("score:evidenceCollector", result.artifacts.length), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Artifacts:"), result.artifacts.length);
       console.log(chalk.gray("Total trust:"), result.totalTrust.toFixed(2));
@@ -22176,8 +22194,7 @@ score
       const { assessProductionReadiness } = await import("./score/productionReadiness.js");
       const resolvedAgentId = resolveAgentId(process.cwd(), agentId ?? activeAgent(program));
       const result = assessProductionReadiness(resolvedAgentId, { strictMode: !!opts.strict });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🛠  Production Readiness"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛠  Production Readiness"), result, unverifiedClaim("score:productionReadiness", result.gates.filter((gate) => gate.passed).length, { result: result.ready ? "pass" : "fail" }), opts)) return;
       console.log(chalk.gray("Agent:"), resolvedAgentId);
       console.log(chalk.gray("Ready:"), result.ready ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Score:"), result.score);
@@ -22198,8 +22215,7 @@ score
     try {
       const { scoreOperationalIndependence } = await import("./score/operationalIndependence.js");
       const result = scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"), result, unverifiedClaim("score:operationalIndependence", result.telemetryConfidence > 0 ? 1 : 0), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Context:"), result.context);
       console.log(chalk.gray("Score:"), result.score);
@@ -22289,8 +22305,7 @@ score
     try {
       const { scoreBehavioralContractMaturity } = await import("./score/behavioralContractMaturity.js");
       const result = scoreBehavioralContractMaturity();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📋  Behavioral Contract Maturity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📋  Behavioral Contract Maturity"), result, controlSurfaceClaim("score:behavioralContractMaturity", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Alignment card:"), result.hasAlignmentCard ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Permitted actions:"), result.hasPermittedActions ? chalk.green("yes") : chalk.red("no"));
@@ -22310,8 +22325,7 @@ score
     try {
       const { scoreFailSecureGovernance } = await import("./score/failSecureGovernance.js");
       const result = scoreFailSecureGovernance();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🔒  Fail-Secure Governance"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔒  Fail-Secure Governance"), result, controlSurfaceClaim("score:failSecureGovernance", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Fails closed:"), result.failsClosedByDefault ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Tool whitelist:"), result.hasToolCallWhitelist ? chalk.green("yes") : chalk.red("no"));
@@ -22330,8 +22344,7 @@ score
     try {
       const { scoreOutputIntegrityMaturity } = await import("./score/outputIntegrityMaturity.js");
       const result = scoreOutputIntegrityMaturity();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n✅  Output Integrity Maturity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n✅  Output Integrity Maturity"), result, controlSurfaceClaim("score:outputIntegrityMaturity", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output validation:"), result.hasOutputValidation ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Confidence calibration:"), result.hasConfidenceCalibration ? chalk.green("yes") : chalk.red("no"));
@@ -22349,8 +22362,7 @@ score
     try {
       const { scoreAgentStatePortability } = await import("./score/agentStatePortability.js");
       const result = scoreAgentStatePortability();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📦  Agent State Portability"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📦  Agent State Portability"), result, controlSurfaceClaim("score:agentStatePortability", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Serializable state:"), result.hasSerializableState ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Vendor-neutral format:"), result.hasVendorNeutralFormat ? chalk.green("yes") : chalk.red("no"));
@@ -22374,8 +22386,7 @@ score
     try {
       const { scoreEUAIActCompliance } = await import("./score/euAIActCompliance.js");
       const result = scoreEUAIActCompliance();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Obligations"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Obligations"), result, unverifiedClaim("score:euAIActCompliance", 0, { regulated: true }), opts)) return;
       console.log(chalk.gray("Risk class (self-reported):"), result.riskClassification);
       printNotEvaluatedCriteria(result.criteria, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -22389,8 +22400,7 @@ score
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
       const result = scoreOWASPLLMCoverage();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"), result, unverifiedClaim("score:owaspLLMCoverage", 0, { regulated: true }), opts)) return;
       printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22406,11 +22416,7 @@ score
         workspace: process.cwd(),
         agentId: opts.agent
       });
-      if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
-        return;
-      }
-      console.log(chalk.bold.hex('#4AEF79')("\n🏛️  Regulatory Readiness"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🏛️  Regulatory Readiness"), result, unverifiedClaim("score:regulatoryReadiness", 0, { regulated: true }), opts)) return;
       console.log(chalk.gray("Agent:"), result.agentId);
       console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${result.notEvaluated.length} criteria: file presence is not evidence)`));
       console.log(chalk.gray("Latest run:"), result.latestRunId ?? "none");
@@ -22429,8 +22435,7 @@ score
     try {
       const { scoreSelfKnowledgeMaturity } = await import("./score/selfKnowledgeMaturity.js");
       const result = scoreSelfKnowledgeMaturity();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🔍  prior art Self-Knowledge Maturity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔍  prior art Self-Knowledge Maturity"), result, controlSurfaceClaim("score:selfKnowledgeMaturity", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Typed relationships:"), result.hasTypedRelationships ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trace layer:"), result.hasTraceLayer ? chalk.green("yes") : chalk.red("no"));
@@ -22448,8 +22453,7 @@ score
     try {
       const { scoreKernelSandboxMaturity } = await import("./score/kernelSandboxMaturity.js");
       const result = scoreKernelSandboxMaturity();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🏗️  Kernel Sandbox Maturity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🏗️  Kernel Sandbox Maturity"), result, controlSurfaceClaim("score:kernelSandboxMaturity", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("OS-level isolation:"), result.hasOSLevelIsolation ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Filesystem restrictions:"), result.hasFilesystemRestrictions ? chalk.green("yes") : chalk.red("no"));
@@ -22467,8 +22471,7 @@ score
     try {
       const { scoreRuntimeIdentityMaturity } = await import("./score/runtimeIdentityMaturity.js");
       const result = scoreRuntimeIdentityMaturity();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🪪  Runtime Identity Maturity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🪪  Runtime Identity Maturity"), result, controlSurfaceClaim("score:runtimeIdentityMaturity", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Agent identity binding:"), result.hasAgentIdentityBinding ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("User identity propagation:"), result.hasUserIdentityPropagation ? chalk.green("yes") : chalk.red("no"));
@@ -22488,8 +22491,7 @@ score
     try {
       const { scanCalibrationInfrastructure } = await import("./score/calibrationGap.js");
       const result = scanCalibrationInfrastructure(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Calibration Gap Analysis"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Calibration Gap Analysis"), result, controlSurfaceClaim("score:calibrationGap", result), opts)) return;
       console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError.toFixed(4));
       console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio.toFixed(2));
       console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio.toFixed(2));
@@ -22504,8 +22506,7 @@ score
     try {
       const { scanEvidenceConflicts } = await import("./score/evidenceConflict.js");
       const result = scanEvidenceConflicts(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⚡  Evidence Conflict Analysis"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⚡  Evidence Conflict Analysis"), result, controlSurfaceClaim("score:evidenceConflict", result), opts)) return;
       console.log(chalk.gray("Conflict ratio:"), result.conflictRatio.toFixed(4));
       console.log(chalk.gray("Score:"), result.score);
       console.log(chalk.gray("Level:"), result.level);
@@ -22520,8 +22521,7 @@ score
     try {
       const { scanDensityMapInfra } = await import("./score/densityMap.js");
       const result = scanDensityMapInfra(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🗺️   Evidence Density Map"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🗺️   Evidence Density Map"), result, controlSurfaceClaim("score:densityMap", result), opts)) return;
       console.log(chalk.gray("Blind spots:"), result.blindSpots);
       console.log(chalk.gray("Coverage:"), `${(result.overallCoverage * 100).toFixed(1)}%`);
       console.log(chalk.gray("Cluster pattern:"), result.clusterPattern);
@@ -22539,8 +22539,7 @@ score
       const { ingestEvidence, TRUST_WEIGHTS } = await import("./score/evidenceIngestion.js");
       const format = (opts.format || "custom") as never;
       const result = ingestEvidence({ format, data: {}, sourceSystem: "cli", timestamp: new Date().toISOString() });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📥  Evidence Ingestion"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📥  Evidence Ingestion"), result, unverifiedClaim("score:evidenceIngestion", result.totalIngested), opts)) return;
       console.log(chalk.gray("Format:"), format);
       console.log(chalk.gray("Ingested:"), result.totalIngested);
       console.log(chalk.gray("Unmapped:"), result.unmapped.length);
@@ -22557,8 +22556,7 @@ score
     try {
       const { scanLevelTransitionInfra } = await import("./score/levelTransition.js");
       const result = scanLevelTransitionInfra(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📈  Level Transition Quality"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📈  Level Transition Quality"), result, controlSurfaceClaim("score:levelTransition", result), opts)) return;
       console.log(chalk.gray("Avg quality:"), result.avgTransitionQuality.toFixed(2));
       console.log(chalk.gray("Retention rate:"), `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Demotion rate:"), result.demotionRate.toFixed(4));
@@ -22574,8 +22572,7 @@ score
     try {
       const { scoreGamingResistance } = await import("./score/gamingResistance.js");
       const result = scoreGamingResistance(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"), result, unverifiedClaim("score:gamingResistance", 0), opts)) return;
       console.log(chalk.yellow(result.assessmentReason));
       console.log(chalk.gray("Source inventory only (paths, not evidence); see --json for present and missing paths."));
       if (!result.controlInventory.applicable) {
@@ -22591,15 +22588,10 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreSleeperDetection } = await import("./score/sleeperDetection.js");
-      const { reportControlSurfaceScopeSkip } = await import(
-        "./score/controlSurfaceScope.js"
-      );
-      // Grades AMC's own control surface; refuses to emit a number for a
-      // directory it cannot actually assess. See controlSurfaceScope.ts.
-      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
+      // Grades AMC's own control surface; outside an AMC checkout it is not applicable. See controlSurfaceScope.ts.
+      if (printControlSurfaceSkip("score:sleeperDetection", opts)) return;
       const result = scoreSleeperDetection(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🕵️   Sleeper Detection"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🕵️   Sleeper Detection"), result, controlSurfaceClaim("score:sleeperDetection", result), opts)) return;
       console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -22612,15 +22604,10 @@ score
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreAuditDepth } = await import("./score/auditDepth.js");
-      const { reportControlSurfaceScopeSkip } = await import(
-        "./score/controlSurfaceScope.js"
-      );
-      // Grades AMC's own control surface; refuses to emit a number for a
-      // directory it cannot actually assess. See controlSurfaceScope.ts.
-      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
+      // Grades AMC's own control surface; outside an AMC checkout it is not applicable. See controlSurfaceScope.ts.
+      if (printControlSurfaceSkip("score:auditDepth", opts)) return;
       const result = scoreAuditDepth(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📝  Audit Depth"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📝  Audit Depth"), result, controlSurfaceClaim("score:auditDepth", result), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Black-box:"), result.blackBox.score);
       console.log(chalk.gray("White-box:"), result.whiteBox.score);
@@ -22636,8 +22623,7 @@ score
     try {
       const { scanPolicyConsistency } = await import("./score/policyConsistency.js");
       const result = scanPolicyConsistency(process.cwd());
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⚖️   Policy Consistency (pass^k)"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⚖️   Policy Consistency (pass^k)"), result, controlSurfaceClaim("score:policyConsistency", result), opts)) return;
       console.log(chalk.gray("Pass rate:"), `${(result.passRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       for (const pk of result.passK) {
@@ -22654,8 +22640,7 @@ score
     try {
       const { scoreAutonomyDuration } = await import("./score/autonomyDuration.js");
       const result = scoreAutonomyDuration({ agentId: "default", domain: "general", interventionTimestamps: [], actionTimestamps: [], selfPauseTimestamps: [] });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⏱️   Autonomy Duration"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⏱️   Autonomy Duration"), result, unverifiedClaim("score:autonomyDuration", 0), opts)) return;
       console.log(chalk.gray("Autonomy score:"), result.autonomyScore.toFixed(2));
       console.log(chalk.gray("Oversight:"), result.oversightAdequacy);
       console.log(chalk.gray("Risk class:"), result.riskClass);
@@ -22670,8 +22655,7 @@ score
     try {
       const { scorePauseQuality } = await import("./score/pauseQuality.js");
       const result = scorePauseQuality({ pauses: [], totalActions: 0, totalErrors: 0, errorsWithoutPriorPause: 0, taskDurationMs: 0 });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n⏸️   Pause Quality"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⏸️   Pause Quality"), result, unverifiedClaim("score:pauseQuality", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Total pauses:"), result.totalPauses);
       console.log(chalk.gray("Pause rate:"), `${(result.pauseRate * 100).toFixed(1)}%`);
@@ -22687,8 +22671,7 @@ score
     try {
       const { scoreTaskHorizon } = await import("./score/taskHorizon.js");
       const result = scoreTaskHorizon({ taskDurationMinutes: 0, completedAutonomously: false, activeGovernanceControls: [] });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Task Horizon"), result, unverifiedClaim("score:taskHorizon", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score.toFixed(2));
       console.log(chalk.gray("Band:"), result.band.label);
       console.log(chalk.gray("Level:"), result.level);
@@ -22703,8 +22686,7 @@ score
     try {
       const { scoreFactuality } = await import("./score/factuality.js");
       const result = scoreFactuality({});
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📚  Factuality"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📚  Factuality"), result, unverifiedClaim("score:factuality", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("  Parametric:"), result.parametric.score.toFixed(2));
       console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score.toFixed(2));
@@ -22731,8 +22713,7 @@ score
         rewardHackingResistance: 0,
         deceptiveAlignmentResistance: 0,
       });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🧭  Alignment Index"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🧭  Alignment Index"), result, unverifiedClaim("score:alignmentIndex", 0), opts)) return;
       console.log(chalk.gray("Overall:"), result.overall.toFixed(2), chalk.gray(`(${result.grade})`));
       console.log(chalk.gray("Dimensions:"));
       for (const d of result.dimensions) {
@@ -22755,8 +22736,7 @@ score
     try {
       const { scoreInterpretability } = await import("./score/interpretability.js");
       const result = scoreInterpretability([]);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🔍  Interpretability"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔍  Interpretability"), result, unverifiedClaim("score:interpretability", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Explanation coverage:"), `${(result.explanationCoverage * 100).toFixed(1)}%`);
       console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore.toFixed(2));
@@ -22778,8 +22758,7 @@ score
         { context: opts.context ?? "", output: opts.output ?? "" },
         { overlapThreshold: opts.threshold },
       );
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🎯  Faithfulness"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Faithfulness"), result, unverifiedClaim("score:faithfulness", result.totalClaims), opts)) return;
       console.log(chalk.gray("Score:"), result.score.toFixed(3));
       console.log(chalk.gray("Claims:"), `${result.supportedClaims}/${result.totalClaims} supported`);
       console.log(chalk.gray("Explanation:"), result.explanation);
@@ -22802,8 +22781,7 @@ score
         ? JSON.parse(readUtf8(resolve(process.cwd(), opts.file))) as { events: unknown[] }
         : { events: [] };
       const result = scoreA2AProtocol(input as Parameters<typeof scoreA2AProtocol>[0]);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🤝  A2A Protocol"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🤝  A2A Protocol"), result, unverifiedClaim("score:a2aProtocol", input.events.length), opts)) return;
       console.log(chalk.gray("Overall:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Agent card:"), result.agentCardCompleteness.toFixed(2));
       console.log(chalk.gray("Task lifecycle:"), result.taskLifecycleCompliance.toFixed(2));
@@ -22837,8 +22815,7 @@ score
         ? JSON.parse(readUtf8(resolve(process.cwd(), opts.file))) as { events: unknown[] }
         : { events: [] };
       const result = scoreDistributedAgents(input as Parameters<typeof scoreDistributedAgents>[0]);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🌐  Distributed Agents"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🌐  Distributed Agents"), result, unverifiedClaim("score:distributedAgents", input.events.length), opts)) return;
       console.log(chalk.gray("Overall:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Partition tolerance:"), result.partitionTolerance.toFixed(2));
       console.log(chalk.gray("State synchronization:"), result.stateSynchronization.toFixed(2));
@@ -22868,8 +22845,7 @@ score
     try {
       const { scoreMemoryIntegrity } = await import("./score/memoryIntegrity.js");
       const result = scoreMemoryIntegrity({ events: [], sessionCount: 0, totalDurationMs: 0 });
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🧠  Memory Integrity"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🧠  Memory Integrity"), result, unverifiedClaim("score:memoryIntegrity", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
       console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore.toFixed(2));
@@ -22889,8 +22865,7 @@ score
         ? JSON.parse(readUtf8(resolve(process.cwd(), opts.file))) as { events: unknown[] }
         : { events: [] };
       const result = scoreMemoryDepth(input as Parameters<typeof scoreMemoryDepth>[0]);
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🗄️  Memory Depth"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🗄️  Memory Depth"), result, unverifiedClaim("score:memoryDepth", input.events.length), opts)) return;
       console.log(chalk.gray("Overall:"), result.overallScore.toFixed(2));
       console.log(chalk.gray("Backend resilience:"), result.backendResilience.toFixed(2));
       console.log(chalk.gray("Compression fidelity:"), result.compressionFidelity.toFixed(2));
@@ -22920,8 +22895,7 @@ score
     try {
       const { scoreOutputAttestation } = await import("./score/outputAttestation.js");
       const result = scoreOutputAttestation({});
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"), result, unverifiedClaim("score:outputAttestation", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output signing:"), result.hasOutputSigning ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trust level binding:"), result.hasTrustLevelBinding ? chalk.green("yes") : chalk.red("no"));
@@ -22936,8 +22910,7 @@ score
     try {
       const { scoreMutualVerification } = await import("./score/mutualVerification.js");
       const result = scoreMutualVerification({});
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"), result, unverifiedClaim("score:mutualVerification", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Challenge-response:"), result.hasChallengeResponse ? chalk.green("yes") : chalk.red("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -22952,8 +22925,7 @@ score
       const { TransparencyLog } = await import("./score/networkTransparencyLog.js");
       const log = new TransparencyLog();
       const result = log.score();
-      if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🌐  Network Transparency Log"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🌐  Network Transparency Log"), result, unverifiedClaim("score:networkTransparencyLog", result.logSize), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Log size:"), result.logSize);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -22965,7 +22937,8 @@ memory.command("assess <agentId>").description("Full memory maturity assessment"
   const { assessMemoryMaturity } = await import("./score/memoryMaturity.js");
   const result = assessMemoryMaturity({ agentId: 0 });
   result.agentId = agentId;
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold(`Memory Maturity — ${agentId}`)); console.log(`  Persistence: L${result.persistenceLevel}`); console.log(`  Continuity:  L${result.continuityLevel}`); console.log(`  Integrity:   L${result.integrityLevel}`); console.log(`  Overall:     ${result.overallScore}/100`); if (result.gaps.length) { console.log(chalk.yellow(`  Gaps: ${result.gaps.join("; ")}`)); } }
+  const claim = unverifiedClaim("score:memoryMaturity", 0);
+  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold(`Memory Maturity — ${agentId}`)); printClaimResult(claim, opts); console.log(`  Persistence: L${result.persistenceLevel}`); console.log(`  Continuity:  L${result.continuityLevel}`); console.log(`  Integrity:   L${result.integrityLevel}`); console.log(`  Overall:     ${result.overallScore}/100`); if (result.gaps.length) { console.log(chalk.yellow(`  Gaps: ${result.gaps.join("; ")}`)); } }
 });
 memory
   .command("writeback <episode>")
@@ -23083,7 +23056,8 @@ dag.command("score").description("Score DAG governance").option("--json", "JSON 
   const { captureDAG, scoreDAGGovernance } = await import("./score/orchestrationDAG.js");
   const dagResult = captureDAG([]);
   const result = scoreDAGGovernance(dagResult);
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); }
+  const claim = unverifiedClaim("score:orchestrationDAG", 0);
+  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); printClaimResult(claim, opts); console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); }
 });
 
 // Confidence command
@@ -23126,8 +23100,7 @@ score
     }
 
     const result = computeQuickScore(answers, tier, opts.questionSet);
-    if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-    console.log(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`));
+    if (emitClaimResult(chalk.bold.hex('#4AEF79')(`\n📊  ${tier.charAt(0).toUpperCase() + tier.slice(1)} Score Assessment`), result, selfAnswerClaim("score:quickScore", Object.values(answers)), opts)) return;
     console.log(chalk.gray(`Score: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
     console.log(renderAsciiRadar(result.layerScores));
     if (result.gaps.length > 0) {
@@ -23244,6 +23217,7 @@ score
           runComparisons
         };
 
+        const historyClaim = unverifiedClaim("score:industryAdjustedHistory", runComparisons.length);
         const renderHistoryMarkdown = (): string => {
           const rows = runComparisons.map((row) => {
             const delta = row.deltaFromPrevious === null
@@ -23254,6 +23228,8 @@ score
           });
           return [
             "# Industry-Adjusted Comparison Report",
+            "",
+            formatClaimLabel(renderClaimLabel(historyClaim), "report"),
             "",
             `Industry: ${model.name} (${industryId})`,
             `Agent: ${resolvedAgentId}`,
@@ -23277,6 +23253,7 @@ score
           writeFileSync(outPath, body, "utf8");
           if (!opts.json) {
             console.log(chalk.bold.hex('#4AEF79')("Industry-adjust comparison report"));
+            printClaimResult(historyClaim, opts);
             console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
             console.log(chalk.gray("Agent:"), resolvedAgentId);
             console.log(chalk.gray("Runs compared:"), runComparisons.length);
@@ -23285,11 +23262,11 @@ score
         }
 
         if (opts.json) {
-          console.log(JSON.stringify(report, null, 2));
+          console.log(JSON.stringify(withClaimFields(report, historyClaim), null, 2));
           return;
         }
         if (!opts.out) {
-          console.log(renderHistoryMarkdown());
+          printLabelledReport(renderHistoryMarkdown());
         }
         return;
       }
@@ -23340,11 +23317,7 @@ score
           level: adjustment.level,
           evidenceExpectation: requiredDimensions.has(dimension) ? "required" : "supporting",
         }));
-      if (opts.json) {
-        console.log(JSON.stringify(opts.drilldown ? { ...result, dimensionDrilldown } : result, null, 2));
-        return;
-      }
-      console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry-Adjusted Score`));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')(`\n📊  Industry-Adjusted Score`), opts.drilldown ? { ...result, dimensionDrilldown } : result, unverifiedClaim("score:industryAdjusted", 1), opts)) return;
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
       console.log(chalk.gray("Raw score:"), result.rawScore);
@@ -23405,8 +23378,7 @@ score
         process.exit(1); return;
       }
       const benchmark = { industry: opts.industry, name: model.name, status: "not_evaluated", reason: "no peer data: AMC has no measured peer distribution for this industry" };
-      if (opts.json) { console.log(JSON.stringify(benchmark, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry Benchmarks — ${model.name}`));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')(`\n📊  Industry Benchmarks — ${model.name}`), benchmark, unverifiedClaim("score:industryBenchmark", 0), opts)) return;
       console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${benchmark.reason})`));
       console.log(chalk.gray("Risk profile:"), model.riskProfile);
       console.log(chalk.gray("Frameworks:"), model.regulatoryFrameworks.join(", "));
@@ -23432,6 +23404,7 @@ score
       if (!isSimulationLaneActive(systemType)) {
         console.log(chalk.yellow(`\n⚠  Simulation & Forecast lane is not applicable for system type '${systemType}'.`));
         console.log(chalk.gray("This lane activates for: simulation-engine, forecast-decision-support, synthetic-social-environment"));
+        printClaimResult(unverifiedClaim("lanes:simulationForecast", 0, { applicability: { state: "not_applicable", rationale: `system type ${systemType}` } }), {});
         return;
       }
       let responses: Record<string, string> = {};
@@ -23457,10 +23430,10 @@ score
       const report = evaluateSimulationLane(systemType, responses);
       if (!report || !report.active) {
         console.log(chalk.yellow("Lane not active for this system type."));
+        printClaimResult(unverifiedClaim("lanes:simulationForecast", 0, { applicability: { state: "not_applicable", rationale: `system type ${systemType}` } }), {});
         return;
       }
-      if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🔮  Simulation & Forecast Lane — Results"));
+      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔮  Simulation & Forecast Lane — Results"), report, unverifiedClaim("lanes:simulationForecast", Object.keys(responses).length), opts)) return;
       console.log(chalk.gray("System type:"), systemType);
       console.log(chalk.gray("Overall score:"), chalk.bold(`${report.overallScore}/100`));
       console.log(chalk.gray("Maturity level:"), chalk.bold(`L${report.overallLevel}`));
@@ -23528,8 +23501,7 @@ score
         }
       }
       const report = scoreSafetyResearchLane(responses);
-      if (opts.json) { console.log(JSON.stringify(report, null, 2)); return; }
-      console.log(chalk.bold.hex('#FF6B6B')("\n🛡️  AI Safety Research Lane — Results"));
+      if (emitClaimResult(chalk.bold.hex('#FF6B6B')("\n🛡️  AI Safety Research Lane — Results"), report, unverifiedClaim("lanes:safetyResearch", Object.keys(responses).length), opts)) return;
       console.log(chalk.gray("Overall score:"), chalk.bold(`${report.overallScore.toFixed(1)}/100`));
       console.log(chalk.gray("Maturity level:"), chalk.bold(`L${report.overallLevel}`));
       const answered = Object.keys(responses).length;
@@ -24128,6 +24100,7 @@ program
     // Step 3: Results
     console.log(chalk.hex('#4AEF79')("\nStep 3: Your Results\n"));
     console.log(chalk.bold(`  Overall: ${result.totalScore}/${result.maxScore} (${result.percentage}%)`));
+    printClaimResult(selfAnswerClaim("score:quickScore", Object.values(answers)), {});
     console.log(renderAsciiRadar(result.layerScores));
 
     if (result.gaps.length > 0) {

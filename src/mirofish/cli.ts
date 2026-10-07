@@ -15,6 +15,13 @@ import {
 } from "./format.js";
 import type { SimulationOptions } from "./types.js";
 import { exampleEnvelope, EXAMPLE_BANNER, withExampleBanner } from "../claims/eligibility/exampleMode.js";
+import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/render.js";
+import { printLabelledReport, withClaimFields } from "../cli/claimOutput.js";
+
+/** Banner first and last, the synthetic-example claim line right after the first banner. */
+function labelledExample(producer: string, text: string, surface: "cli" | "report" = "cli"): string {
+  return withExampleBanner(`${formatClaimLabel(renderClaimLabel(exampleEnvelope(producer)), surface)}\n${text.trim()}`);
+}
 
 function defaultSeed(): number {
   return Math.floor(Math.random() * 2 ** 31);
@@ -45,13 +52,14 @@ export function registerMirofishCommands(program: Command): void {
       // Seeded Monte Carlo output, not an observation of any agent: always labelled synthetic_example.
       switch (opts.output) {
         case "json":
-          console.log(JSON.stringify({ banner: EXAMPLE_BANNER, envelope: exampleEnvelope("mirofish:run"), ...result }, null, 2));
+          console.log(JSON.stringify(withClaimFields({ banner: EXAMPLE_BANNER, envelope: exampleEnvelope("mirofish:run"), ...result },
+            exampleEnvelope("mirofish:run")), null, 2));
           break;
         case "markdown":
-          console.log(withExampleBanner(formatSimulationMarkdown(result)));
+          printLabelledReport(labelledExample("mirofish:run", formatSimulationMarkdown(result), "report"));
           break;
         default:
-          console.log(withExampleBanner(formatSimulationText(result)));
+          printLabelledReport(labelledExample("mirofish:run", formatSimulationText(result)));
       }
     });
 
@@ -121,7 +129,7 @@ export function registerMirofishCommands(program: Command): void {
       const r1 = runSimulation(s1, simOpts);
       const r2 = runSimulation(s2, simOpts);
 
-      console.log(withExampleBanner(formatComparisonText(r1, r2)));
+      printLabelledReport(labelledExample("mirofish:compare", formatComparisonText(r1, r2)));
     });
 
   /* ── stress ──────────────────────────────────────── */
@@ -137,6 +145,6 @@ export function registerMirofishCommands(program: Command): void {
         seed: parseInt(opts.seed, 10),
       });
 
-      console.log(withExampleBanner(formatStressText(result)));
+      printLabelledReport(labelledExample("mirofish:stress", formatStressText(result)));
     });
 }

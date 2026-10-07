@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Command } from "commander";
 import chalk from "chalk";
+import { emitClaimResult, unverifiedClaim } from "./cli/claimOutput.js";
 import YAML from "yaml";
 import type { InferenceObjective, InferenceStrategyInput } from "./enforce/inferenceStrategy.js";
 
@@ -43,11 +44,9 @@ export function registerStrategyCommands(program: Command, activeAgent: (p: Comm
           applyRoute: Boolean(opts.apply),
           policyApproval: Boolean(opts.approve)
         });
-        if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
-          return;
-        }
-        console.log(chalk.bold(`Strategy comparison ${result.run.strategyRunId}`));
+        // Strategy records come from the caller's file: self-reported.
+        const claim = unverifiedClaim("strategy:compare", readStrategies(opts.file).length);
+        if (emitClaimResult(chalk.bold(`Strategy comparison ${result.run.strategyRunId}`), result, claim, opts)) return;
         console.log(`  Recommended: ${result.run.recommendedStrategyId}`);
         console.log(`  Confidence: ${result.run.confidence.toFixed(2)}`);
         console.log(`  Route change: ${result.run.routeChange.status}`);

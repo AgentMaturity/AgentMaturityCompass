@@ -1,5 +1,7 @@
 import type { AssurancePackDefinition, AssurancePromptContext } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
+import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "../assurance/packs/industryPackManifest.js";
+import { envelopeFromDimensions } from "../claims/eligibility/adapters/results.js";
 import { isUngradableEvidence } from "../assurance/scenarioGrading.js";
 import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
 import {
@@ -172,10 +174,11 @@ export function buildDomainReportForAgent(params: {
   outputPath?: string;
 } & DomainCommandOptions): DomainReportBuildResult {
   const assessment = assessDomainForAgent(params);
-  const reportObject = assessment.result ? buildDomainReport(assessment.result) : undefined;
+  const claim = envelopeFromDimensions(`domain:${assessment.domain}`, assessment.claimKind, assessment.statusDimensions);
+  const reportObject = assessment.result ? buildDomainReport(assessment.result, claim) : undefined;
   const reportMarkdown = reportObject
     ? withExampleBanner(reportObject.markdown)
-    : renderNotEvaluatedDomainReport(assessment.domainName, assessment.reasons);
+    : renderNotEvaluatedDomainReport(assessment.domainName, assessment.reasons, claim);
 
   if (params.outputPath) {
     writeFileAtomic(params.outputPath, reportMarkdown);

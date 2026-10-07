@@ -3,10 +3,6 @@ import { dirname, extname, join } from "node:path";
 import type { DiagnosticReport } from "../types.js";
 import { resolveRunReport, type ResolvedRunReport } from "../diagnostic/runner.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
-import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
-import { envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
-import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
-import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 
 export type ExecutiveBriefFormat = "html" | "markdown";
 
@@ -25,7 +21,6 @@ export interface ExecutiveBriefArtifact {
   format: ExecutiveBriefFormat;
   content: string;
   resolved: ResolvedRunReport;
-  claim: ClaimEnvelope;
 }
 
 interface ExecutiveBriefModel {
@@ -45,7 +40,6 @@ interface ExecutiveBriefModel {
   boardDecision: string;
   topGaps: Array<{ name: string; score: number; action: string }>;
   nextActions: string[];
-  claim: ClaimEnvelope;
 }
 
 function escapeHtml(value: string): string {
@@ -102,12 +96,6 @@ function actionForLayer(score: number): string {
   return "Stop expansion until minimum controls and evidence are in place.";
 }
 
-/** The run's claim, after checking its seal: an unsealed run is never more than self-reported. */
-function briefClaim(report: DiagnosticReport, opts: ExecutiveBriefOptions): ClaimEnvelope {
-  const sealVerified = sealedRunReportVerifies(opts.workspace, report as unknown as Record<string, unknown>);
-  return envelopeForStoredRun(report, { sealVerified, now: (opts.now ?? new Date()).getTime() });
-}
-
 function buildModel(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions): ExecutiveBriefModel {
   const report = resolved.report;
   const score = averageLayerScore(report);
@@ -147,8 +135,7 @@ function buildModel(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions): E
       "Ask the accountable owner to accept or reject each remediation action in writing.",
       "Require a fresh AMC run after remediation and before expanding scope.",
       "Share the signed certificate or report bundle only when artifact status is VALID and evidence readiness is READY."
-    ],
-    claim: briefClaim(report, opts)
+    ]
   };
 }
 
@@ -177,8 +164,6 @@ function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: Executi
 
   return [
     `# ${model.title}`,
-    "",
-    formatClaimLabel(renderClaimLabel(model.claim), "report"),
     "",
     `Agent: ${model.agentId}`,
     `Run: ${model.runId} (${model.resolvedBy})`,
@@ -210,10 +195,6 @@ function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: Executi
     "## Next Actions",
     "",
     nextActions,
-    "",
-    "## How to read claim kinds",
-    "",
-    renderClaimLegend("markdown"),
     ""
   ].join("\n");
 }
@@ -264,7 +245,6 @@ function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: ExecutiveBr
   <div class="brandline"><span class="wordmark">amc<span class="cursor">_</span> / executive</span><span>Evidence over claims.</span></div>
   <h1>${escapeHtml(model.title)}</h1>
   <div class="meta">Agent ${escapeHtml(model.agentId)} | Run ${escapeHtml(model.runId)} (${escapeHtml(model.resolvedBy)}) | Generated ${escapeHtml(model.generatedAt)}</div>
-  <p>${formatClaimLabel(renderClaimLabel(model.claim), "studio")}</p>
   <section class="snapshot" aria-label="Board risk snapshot">
     <div class="metric"><div class="label">Maturity</div><div class="value">${escapeHtml(model.maturityLevel)}</div><div>${model.maturityScore.toFixed(2)}/5</div></div>
     <div class="metric"><div class="label">Integrity</div><div class="value">${model.integrityPct.toFixed(1)}%</div><div>evidence-weighted</div></div>
@@ -282,8 +262,6 @@ function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: ExecutiveBr
   <p class="boundary">${escapeHtml(model.claimBoundary)}</p>
   <h2>Next Actions</h2>
   <ol>${actions}</ol>
-  <h2>How to read claim kinds</h2>
-  ${renderClaimLegend("html")}
   <div class="footer">Print-ready HTML: open this file in a browser and use Print to PDF for a board packet.</div>
 </main>
 </body>
@@ -304,7 +282,6 @@ export function writeExecutiveBriefArtifact(opts: ExecutiveBriefOptions): Execut
     path: outputPath,
     format,
     content,
-    resolved,
-    claim: briefClaim(resolved.report, opts)
+    resolved
   };
 }

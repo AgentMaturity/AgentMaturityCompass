@@ -90,6 +90,11 @@ export interface ComplianceCategoryResult {
     eventType: string;
   }>;
   neededToSatisfy: string[];
+  /**
+   * True only when every requirement passed on control-bound events that all counted as OBSERVED (computed over the
+   * counted set, not the display refs). Absent in reports written before P0-22, which read as self-reported.
+   */
+  countedObserved?: boolean;
 }
 
 export interface ComplianceReportJson {

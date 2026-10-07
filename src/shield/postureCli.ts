@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import chalk from "chalk";
+import { printClaimResult, unverifiedClaim, withClaimFields } from "../cli/claimOutput.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { buildPostureScorecard } from "./posture.js";
 
@@ -10,14 +11,17 @@ export function runPostureCli(params: { dir?: string; now: number; json?: boolea
     writeFileAtomic(resolve(params.out), JSON.stringify(card, null, 2), 0o644);
     console.log(chalk.green(`Posture scorecard saved to: ${params.out}`));
   }
+  // A static scan of configuration files: self-reported, level 1 at most (docs/CLAIM_KINDS.md).
+  const claim = unverifiedClaim("shield:posture", card.dimensions.length, { method: "keyword_match", result: card.verdict === "CLEAN" ? "pass" : card.verdict === "BLOCK" ? "fail" : "not_evaluated" });
   if (params.json) {
-    console.log(JSON.stringify(card, null, 2));
+    console.log(JSON.stringify(withClaimFields(card, claim), null, 2));
     if (card.verdict === "BLOCK") process.exitCode = 1;
     return;
   }
   const levelColors: Record<string, string> = { L5: "#2ecc40", L4: "#3d9970", L3: "#7fdbff", L2: "#ff851b", L1: "#e4811b", L0: "#e05d44" };
   const verdictColors: Record<string, string> = { CLEAN: "#2ecc40", REVIEW: "#ff851b", BLOCK: "#e05d44" };
   console.log(chalk.bold.cyan("\n🛡️  Agent Security Posture"));
+  printClaimResult(claim, params);
   console.log(chalk.gray("Path:"), root);
   console.log(chalk.gray("Overall:"), chalk.hex(levelColors[card.overallLevel] ?? "#555").bold(`${card.overallLevel} (${card.overallScore}/100)`),
     chalk.gray("| Verdict:"), chalk.hex(verdictColors[card.verdict] ?? "#555").bold(card.verdict));

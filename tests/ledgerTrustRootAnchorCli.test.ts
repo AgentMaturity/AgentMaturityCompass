@@ -178,9 +178,13 @@ async function sessionVerify(cwd: string, args: string[] = []) {
   let failure: unknown = null;
   try {
     await program.parseAsync(["node", "amc", "session", "verify", ...args]);
+    // session verify sets process.exitCode rather than exiting, so the P0-22 claim-label postAction hook runs.
+    exit = Number(process.exitCode ?? 0);
   } catch (error) {
     if (error instanceof Exit) exit = error.code ?? 0;
     else failure = error;
+  } finally {
+    process.exitCode = undefined;
   }
   return { exit, failure, out: out.join("\n"), err };
 }

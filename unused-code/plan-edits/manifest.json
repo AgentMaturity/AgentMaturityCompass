@@ -136,6 +136,13 @@
       "sha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57"
     },
     {
+      "path": "src/executive/brief.ts",
+      "issue": "P0-22",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-22/src/executive/brief.ts.landed",
+      "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a"
+    },
+    {
       "path": "src/federation/federationStore.ts",
       "issue": "P0-52",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
