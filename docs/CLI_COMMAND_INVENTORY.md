@@ -247,7 +247,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc commit` | Commitment plan flow (7/14/30-day checklist) | `--target <name>`<br>`--days <n>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc comms-check` | Check a message/communication against compliance policies (lightweight communications firewall) | `--text <message>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc compare` | Compare two runs OR multiple models (side-by-side evaluation) | `--agent <agentId>`<br>`--window <window>`<br>`--target <name>`<br>`--iterations <n>`<br>`--output <path>`<br>`--json`<br>`--badge`<br>`--format <fmt>` | - |
-| `amc compare-models` | Run the same agent evaluation across multiple models and show comparison matrix | `--agent <agentId>`<br>`--window <window>`<br>`--target <name>`<br>`--iterations <n>`<br>`--output <path>`<br>`--json` | - |
+| `amc compare-models` | Not evaluated: AMC cannot run the agent per model; refuses and points to amc compare <run-a> <run-b> | `--agent <agentId>`<br>`--window <window>`<br>`--target <name>`<br>`--iterations <n>`<br>`--output <path>`<br>`--json` | - |
 | `amc compliance` | Evidence-linked compliance map operations | - | `comply` |
 | `amc compliance diff` | Diff two compliance report JSON files | - | `comply diff` |
 | `amc compliance fleet` | Generate fleet compliance summary | `--framework <framework>`<br>`--window <window>`<br>`--out <path>` | `comply fleet` |

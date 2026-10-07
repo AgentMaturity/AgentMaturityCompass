@@ -171,7 +171,7 @@ amc demo prospect
 amc demo share --public-base-url https://reports.example.com/amc-demo
 ```
 
-`amc demo prospect` prints a five-minute flow that includes `amc demo gap --fast`, `amc demo run --no-vault`, `amc compare-models`, and `amc leaderboard show`. `amc demo share` writes a static leave-behind bundle; publish the generated directory to the matching base URL before sending the link.
+`amc demo prospect` prints a five-minute flow that includes `amc demo gap --fast`, `amc demo run --no-vault`, `amc compare <run-a> <run-b>`, and `amc leaderboard show`. `amc demo share` writes a static leave-behind bundle; publish the generated directory to the matching base URL before sending the link.
 
 ---
 

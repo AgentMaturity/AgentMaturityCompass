@@ -1957,6 +1957,11 @@ export function compareRuns(a: DiagnosticReport, b: DiagnosticReport): {
 }
 
 
+/** What `amc compare-models` and `amc compare <model> <model>` print: model comparison is not evaluated. */
+export const MODEL_COMPARISON_NOT_EVALUATED =
+  "Model comparison is not evaluated: AMC does not run the agent once per model, so it cannot attribute scores to models. "
+  + "Run the agent with each model, then compare the two runs: amc compare <run-a> <run-b>.";
+
 export async function compareModels(
   workspace: string,
   models: string[],
@@ -1991,97 +1996,8 @@ export async function compareModels(
   if (models.length < 2) {
     throw new Error("At least 2 models required for comparison");
   }
-
-  const results: Array<{
-    model: string;
-    runId: string;
-    integrityIndex: number;
-    trustLabel: TrustLabel;
-    layerScores: LayerScore[];
-    overallScore: number;
-  }> = [];
-
-  // Run diagnostic for each model
-  for (const model of models) {
-    console.log(`Running diagnostic for model: ${model}`);
-
-    // For now, we'll simulate running with different models
-    // In a real implementation, this would involve:
-    // 1. Configuring the agent to use the specific model
-    // 2. Running the diagnostic with that configuration
-    // 3. Collecting the results
-
-    const report = await runDiagnostic({
-      workspace,
-      window: options.window ?? "14d",
-      targetName: options.targetName ?? "default",
-      agentId: options.agentId,
-      claimMode: "auto"
-    });
-
-    const overallScore = report.layerScores.length > 0
-      ? report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length
-      : 0;
-
-    results.push({
-      model,
-      runId: report.runId,
-      integrityIndex: report.integrityIndex,
-      trustLabel: report.trustLabel,
-      layerScores: report.layerScores,
-      overallScore
-    });
-  }
-
-  // Calculate summary statistics
-  const bestModel = results.reduce((best, current) =>
-    current.overallScore > best.overallScore ? current : best
-  );
-
-  const worstModel = results.reduce((worst, current) =>
-    current.overallScore < worst.overallScore ? current : worst
-  );
-
-  const avgIntegrityIndex = results.reduce((sum, r) => sum + r.integrityIndex, 0) / results.length;
-
-  // Find significant differences across layers
-  const significantDifferences: Array<{
-    layer: LayerName;
-    bestModel: string;
-    worstModel: string;
-    delta: number;
-  }> = [];
-
-  if (results.length > 0 && results[0]!.layerScores.length > 0) {
-    for (const layer of results[0]!.layerScores) {
-      const layerScores = results.map(r => ({
-        model: r.model,
-        score: r.layerScores.find(l => l.layerName === layer.layerName)?.avgFinalLevel ?? 0
-      }));
-
-      const best = layerScores.reduce((b, c) => c.score > b.score ? c : b);
-      const worst = layerScores.reduce((w, c) => c.score < w.score ? c : w);
-      const delta = best.score - worst.score;
-
-      if (delta > 0.5) { // Only include significant differences
-        significantDifferences.push({
-          layer: layer.layerName,
-          bestModel: best.model,
-          worstModel: worst.model,
-          delta: Number(delta.toFixed(3))
-        });
-      }
-    }
-  }
-
-  return {
-    models,
-    comparisonMatrix: results,
-    summary: {
-      bestModel: bestModel.model,
-      worstModel: worstModel.model,
-      avgIntegrityIndex: Number(avgIntegrityIndex.toFixed(3)),
-      significantDifferences
-    }
-  };
+  // P0-15: runDiagnostic takes no model, so a per-model run would score the same evidence under each name and the
+  // comparison would be invented. Refuse until AMC can run the agent per model.
+  void workspace; void options;
+  throw new Error(MODEL_COMPARISON_NOT_EVALUATED);
 }

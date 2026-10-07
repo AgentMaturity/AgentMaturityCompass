@@ -260,7 +260,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 241 | `amc commit` | Commitment plan flow (7/14/30-day checklist) |
 | 242 | `amc comms-check` | Check a message/communication against compliance policies (lightweight communications firewall) |
 | 243 | `amc compare` | Compare two runs OR multiple models (side-by-side evaluation) |
-| 244 | `amc compare-models` | Run the same agent evaluation across multiple models and show comparison matrix |
+| 244 | `amc compare-models` | Not evaluated: AMC cannot run the agent per model; refuses and points to amc compare <run-a> <run-b> |
 | 245 | `amc compliance` | Evidence-linked compliance map operations |
 | 246 | `amc compliance diff` | Diff two compliance report JSON files |
 | 247 | `amc compliance fleet` | Generate fleet compliance summary |
@@ -2937,7 +2937,7 @@ Compare two runs OR multiple models (side-by-side evaluation)
 
 #### `amc compare-models`
 
-Run the same agent evaluation across multiple models and show comparison matrix
+Not evaluated: AMC cannot run the agent per model; refuses and points to amc compare <run-a> <run-b>
 
 
 | Option | Description |

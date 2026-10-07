@@ -34,7 +34,7 @@ describe("prospect demo flow", () => {
     expect(plan.claimBoundary).toContain("not production audit evidence");
     expect(plan.commands.liveEvidence).toBe("amc demo prospect --live --share");
     expect(plan.steps.map((step) => step.command)).toContain("amc demo run --no-vault");
-    expect(plan.steps.map((step) => step.command)).toContain("amc compare-models --agent default --iterations 3");
+    expect(plan.steps.map((step) => step.command)).toContain("amc compare <run-a> <run-b>");
     expect(plan.steps.map((step) => step.command)).toContain("amc leaderboard show");
     expect(markdown).toContain("amc demo gap --fast");
     expect(markdown).toContain("amc demo share --public-base-url <url>");
