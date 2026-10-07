@@ -33,14 +33,24 @@ function runTarExtract(bundleFile: string, outputDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outputDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
 
-function importOne(workspace: string, file: string, trust: TrustContext): ImportedBenchmark {
+/**
+ * Throws unless the benchmark verifies, its signer is admitted (trusted, or integrity-only when the caller allowed it: a
+ * federation import whose pinned peer vouches for the bytes) and its benchId stays inside imported/. Writes nothing, so
+ * callers can check a whole batch before writing any of it.
+ */
+export function admitBenchmark(workspace: string, file: string, trust: TrustContext): ImportedBenchmark {
   const verify = verifyBenchmarkArtifact(file, trust);
-  // Trusted, or integrity-only when the caller allowed it (a federation import whose pinned peer vouches for the bytes).
   if (verdictExitCode(verify.report) === 1 || !verify.bench) {
     throw new Error(`Invalid benchmark '${file}': ${untrustedReasons(verify.report).join("; ")}`);
   }
   const benchId = verify.bench.benchId;
-  const targetDir = containedPath(importedBenchmarksDir(workspace), "the imported benchmarks directory", benchId);
+  const dir = containedPath(importedBenchmarksDir(workspace), "the imported benchmarks directory", benchId);
+  return { benchId, dir, report: verify.report };
+}
+
+function importOne(workspace: string, file: string, trust: TrustContext): ImportedBenchmark {
+  const admitted = admitBenchmark(workspace, file, trust);
+  const targetDir = admitted.dir;
   ensureDir(targetDir);
   const tmp = mkdtempSync(join(tmpdir(), "amc-bench-import-"));
   try {
@@ -62,11 +72,7 @@ function importOne(workspace: string, file: string, trust: TrustContext): Import
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
-  return {
-    benchId,
-    dir: targetDir,
-    report: verify.report
-  };
+  return admitted;
 }
 
 /** Imports benchmarks whose signer the trust context admits (P0-09); the CLI and API pass the operator's AMC home trust. */

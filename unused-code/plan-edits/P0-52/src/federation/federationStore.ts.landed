@@ -6,7 +6,6 @@ import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { safeIdSchema } from "../utils/pathSafety.js";
 import { federationConfigSchema, federationPeerSchema, type FederationConfigFile, type FederationPeer } from "./federationSchema.js";
 
 interface SignedDigest {
@@ -172,11 +171,6 @@ export function addFederationPeer(params: {
   sigPath: string;
   peer: FederationPeer;
 } {
-  // The peer id names the record file: refuse anything but one safe path segment before it reaches a path (P0-52).
-  const peerIdCheck = safeIdSchema.safeParse(params.peerId);
-  if (!peerIdCheck.success) {
-    throw new Error(`invalid peer id '${params.peerId}': ${peerIdCheck.error.issues[0]?.message ?? "not a safe id"}`);
-  }
   ensureDir(federationPeersDir(params.workspace));
   const peer = federationPeerSchema.parse({
     v: 1,
