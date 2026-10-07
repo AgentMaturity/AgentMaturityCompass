@@ -3053,6 +3053,7 @@ Alias: `amc comply report`
 | `--window <window>` | - |
 | `--out <path>` | - |
 | `--agent <agentId>` | - |
+| `--station <station>` | - |
 | `--json` | - |
 
 #### `amc compliance risk-classify`
@@ -3825,6 +3826,7 @@ Alias: `amc sector pack list`
 
 | Option | Description |
 |--------|-------------|
+| `--station <station>` | - |
 | `--domain <d>` | - |
 | `--json` | - |
 
