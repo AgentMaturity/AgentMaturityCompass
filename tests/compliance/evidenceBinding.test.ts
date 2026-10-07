@@ -185,6 +185,16 @@ describe("verifiedAssuranceByPack", () => {
     expect(out.unverifiable.map((row) => row.packIds)).toEqual([["invalid"], ["no-status"], ["unverified"]]);
   });
 
+  test("only an evidence status of MEASURED counts: a missing or unknown status is not evidence", () => {
+    const ws = workspace();
+    const now = Date.now();
+    write(ws, "measured", {}, true);
+    write(ws, "no-evidence-status", { evidenceStatus: undefined }, true);
+    write(ws, "future-status", { evidenceStatus: "PARTIALLY_MEASURED" }, true);
+    const out = verifiedAssuranceByPack({ workspace: ws, agentId: "default", windowStartTs: now - 86_400_000, windowEndTs: now + 1000 });
+    expect([...out.packs.keys()]).toEqual(["measured"]);
+  });
+
   test("an agent without a reports folder has no verified packs", () => {
     const ws = workspace();
     const out = verifiedAssuranceByPack({ workspace: ws, agentId: "nobody", windowStartTs: 0, windowEndTs: Date.now() });

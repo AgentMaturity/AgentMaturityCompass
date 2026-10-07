@@ -70,7 +70,7 @@ function readReport(file: string): Partial<AssuranceReport> | null {
 /**
  * The window logic of `latestAssuranceByPack`, but a report counts only when its seal verifies
  * (`sealedRunReportVerifies`), the run itself verified (status VALID, verificationPassed) and it
- * measured something (not INSUFFICIENT_EVIDENCE).
+ * measured something (evidenceStatus MEASURED; a missing or unknown status counts for nothing).
  */
 export function verifiedAssuranceByPack(params: {
   workspace: string;
@@ -98,7 +98,7 @@ export function verifiedAssuranceByPack(params: {
       out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)) });
       continue;
     }
-    if (report.evidenceStatus === "INSUFFICIENT_EVIDENCE") continue;
+    if (report.evidenceStatus !== "MEASURED") continue;
     for (const pack of packResults) {
       const prior = latest.get(pack.packId);
       if (!prior || report.ts > prior.ts) latest.set(pack.packId, { ts: report.ts, pack });

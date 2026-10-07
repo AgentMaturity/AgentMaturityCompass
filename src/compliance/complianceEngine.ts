@@ -361,7 +361,7 @@ function worstEvidence(states: EvidenceState[]): EvidenceState {
   );
 }
 
-/** Any fail is a failure (PARTIAL only when another requirement passed); else any not evaluated wins. */
+/** Any fail is a failure (PARTIAL only when another requirement passed); SATISFIED only when every requirement passed. */
 function evaluateMapping(
   mapping: ComplianceMapping,
   evaluate: (requirement: ComplianceEvidenceRequirement) => RequirementOutcome
@@ -369,14 +369,14 @@ function evaluateMapping(
   const outcomes = mapping.evidenceRequirements.map(evaluate);
   const failed = outcomes.some((row) => row.outcome === "fail");
   const notEvaluated = outcomes.filter((row) => row.outcome === "not_evaluated");
-  let status: ComplianceCategoryResult["status"] = "SATISFIED";
-  let result: ResultState = "pass";
+  let status: ComplianceCategoryResult["status"] = "NOT_EVALUATED";
+  let result: ResultState = "not_evaluated";
   if (failed) {
     result = "fail";
     status = outcomes.some((row) => row.outcome === "pass") ? "PARTIAL" : "MISSING";
-  } else if (notEvaluated.length > 0) {
-    result = "not_evaluated";
-    status = "NOT_EVALUATED";
+  } else if (outcomes.length > 0 && outcomes.every((row) => row.outcome === "pass")) {
+    result = "pass";
+    status = "SATISFIED";
   }
   return {
     id: mapping.id,
