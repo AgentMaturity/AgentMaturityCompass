@@ -13,6 +13,7 @@ import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligi
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { loadRunReport } from "../diagnostic/runReportResolution.js";
 import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
+import { assuranceReportClaim } from "../migration/legacy/classify.js";
 import { controlSurfaceScopeMessage, detectControlSurfaceScope } from "../score/controlSurfaceScope.js";
 import type { AssuranceReport, DiagnosticReport } from "../types.js";
 
@@ -176,10 +177,15 @@ export function artifactClaim(producer: string, artifact: { run?: DiagnosticRepo
   return unverifiedClaim(producer, artifact.recordCount ?? 1);
 }
 
-/** An assurance run: `fresh` when this process produced it; a run read back from disk is seal-checked. */
+/**
+ * An assurance run: `fresh` when this process produced it; a run read back from disk is seal-checked. A 1.x run (no
+ * evidenceStatus) graded a canned reply, so it is a legacy synthetic example whatever its seal says (P1-35).
+ */
 export function assuranceClaim(report: AssuranceReport, fresh: boolean, workspace = process.cwd()): ClaimEnvelope {
-  const sealVerified = fresh ? null : sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
-  return envelopeForAssuranceReport(report, { sealVerified, now: Date.now() });
+  return assuranceReportClaim(report, () => {
+    const sealVerified = fresh ? null : sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
+    return envelopeForAssuranceReport(report, { sealVerified, now: Date.now() });
+  }, Date.now());
 }
 
 /** A run named by id (certificates, badges, bundles): its seal-checked claim, or not evaluated when it cannot be read. */
