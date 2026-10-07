@@ -69,6 +69,8 @@ import {
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
+import { AutoCompactor } from "./compaction/autoCompact.js";
+import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -110,6 +112,8 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
+  /** Null unless the operator declared a context window. */
+  private readonly compactor: AutoCompactor | null;
 
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
@@ -122,7 +126,8 @@ export class AgentDriver {
     this.session = init.session;
     this.validation = init.validation === undefined ? undefined : freezeNativeValidationPlan(init.validation);
     this.hooks = init.hooks ?? NO_HOOKS;
-    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config };
+    const compaction = init.config?.compaction === undefined ? undefined : resolveCompactionConfig(init.config.compaction);
+    this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, ...(compaction === undefined ? {} : { compaction }) };
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
@@ -144,6 +149,8 @@ export class AgentDriver {
         this.hooks.notify(notification);
       }
     };
+    const window = compaction?.contextWindowTokens ?? null;
+    this.compactor = compaction === undefined || window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
   }
 
   get status(): AgentStatus {
@@ -436,6 +443,11 @@ export class AgentDriver {
         }
 
         signal.throwIfAborted();
+        // Between steps only, after `step/end` committed the usage it measures. A
+        // summary step it runs takes the next step number, so keep ours in line.
+        if (this.compactor !== null && this.head !== null) {
+          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal);
+        }
         // A listener that objects to the turn stopping says so by steering; the
         // inbox is re-read after it runs, so listener ORDER cannot change the
         // outcome.
