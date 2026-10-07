@@ -1,0 +1,64 @@
+# Admitted evidence producers. `module` paths and `emits` were checked on main at e263c571.
+# maxClaimKind caps what a producer's evidence can claim; a planned producer gives no evidence until it ships.
+producers:
+  - id: amc.leases.issuer
+    module: src/leases/leaseSigner.ts
+    # Signed lease tokens and the signed revocation list (LeasePayload, LeaseRevocations: src/leases/leaseSchema.ts).
+    emits: [lease_token, lease_revocations]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.toolPipeline.guard
+    module: src/tools/toolPipeline.ts
+    # Audit types the pipeline's record hook writes (src/tools/toolEvidence.ts).
+    emits: [TOOL_CALL_ALLOWED, TOOL_CALL_DENIED, TOOL_CALL_FAILED]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.approvals.engine
+    module: src/approvals/approvalEngine.ts
+    # Approval records and their consumption (approvalSchema, approvalConsumedSchema: src/approvals/approvalSchema.ts).
+    emits: [approval, approval_consumed]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.ledger
+    module: src/ledger/ledger.ts
+    # Hash-chained evidence events (EvidenceEventType: src/types.ts).
+    emits: [evidence_event]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.gateway.egress
+    module: src/gateway/server.ts
+    emits: [NETWORK_EGRESS_BLOCKED]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.signedConfig.tools
+    module: src/toolhub/toolhubValidators.ts
+    # The signature over .amc/tools.yaml (verifyToolsConfigSignature).
+    emits: [tools_config_signature]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.questionnaire
+    module: src/diagnostic/questionBank.ts
+    emits: [questionnaire_answer]
+    maxClaimKind: self_reported
+    status: available
+    plannedBy: null
+  - id: amc.authorizationRecord
+    module: src/actions/authorizationRecord.ts
+    # Contract: src/contracts/v1/authorizationRecord.ts.
+    emits: [amc.authorization-record/v1]
+    maxClaimKind: observed
+    status: planned
+    plannedBy: P1-02
+  - id: amc.toolPipeline.receipt
+    module: src/tools/toolPipeline.ts
+    # Receipt kinds (src/receipts/receipt.ts) the pipeline does not write yet.
+    emits: [guard_check, tool_action]
+    maxClaimKind: observed
+    status: planned
+    plannedBy: P1-03

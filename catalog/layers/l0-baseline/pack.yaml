@@ -1,0 +1,19 @@
+# Layer 0: controls every agent deployment needs in every station (P1-14 adds the rest).
+id: amc.l0.baseline
+version: 0.1.0
+layer: 0
+title: Layer 0 baseline
+stations: [education, environment, health, wealth, technology, mobility, governance]
+jurisdictions: []
+compilerCompat: ^0.1.0
+publisher: AgentMaturity (agent-maturity-compass)
+maintainers:
+  - { name: Sid, role: maintainer }
+licence: MIT
+support: experimental
+controls: [L0-IDN-01]
+stewardship:
+  partner: null
+  updatePlan: null
+  triageTargetDays: null
+  coverageDoc: null

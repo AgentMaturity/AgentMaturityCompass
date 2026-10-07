@@ -23,7 +23,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
 function run(label, cmd, args, opts) {
@@ -114,6 +114,14 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
     () => run("installed standalone production API (no dev dependencies)", "node",
       [join(root, "scripts", "standalone-api-smoke.mjs"), join(consumer, "node_modules", pkg.name, "dist", "standalone-api.js")],
       { cwd: workspace, env: isolated }).ok,
+    () => {
+      // The control catalog ships as catalog/** next to dist/ and loads through its default root (P1-09).
+      const entry = pathToFileURL(join(consumer, "node_modules", pkg.name, "dist", "catalog", "index.js")).href;
+      const script = `const m = await import(${JSON.stringify(entry)}); const v = m.validateCatalog(m.loadCatalog());`
+        + " if (!v.ok) { console.error(JSON.stringify(v.errors, null, 2)); process.exit(1); }"
+        + " console.log(m.buildCatalogLock(m.loadCatalog()).catalog.digest);";
+      return run("installed control catalog loads with loadCatalog() and validates", "node", ["--input-type=module", "-e", script], { cwd: workspace, env: isolated }).ok;
+    },
     () => run("amc doctor", join(consumer, "node_modules", ".bin", "amc"), ["doctor"], { cwd: workspace, env: isolated }).ok,
     () => {
       const ok = run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok;
