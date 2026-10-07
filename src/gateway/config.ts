@@ -27,7 +27,9 @@ const routeSchema = z.object({
   upstream: z.string().min(1),
   stripPrefix: z.boolean().default(true),
   openaiCompatible: z.boolean().default(false),
-  agentId: z.string().optional()
+  agentId: z.string().optional(),
+  /** Top-level JSON request fields this route refuses with 403 (absent means none), e.g. ["dsh_session_log"]. */
+  refuseRequestFields: z.array(z.string().min(1)).optional()
 });
 
 const proxySchema = z.object({

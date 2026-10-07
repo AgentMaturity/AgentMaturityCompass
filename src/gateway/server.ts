@@ -32,6 +32,7 @@ import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
+import { findRefusedFields } from "./requestFieldGuard.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -1362,6 +1363,18 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         res.statusCode = leaseVerification.statusCode;
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify({ error: leaseVerification.message }));
+        return;
+      }
+
+      // Signed route policy refuses named top-level fields (e.g. dsh_session_log); the audit keeps names and size, never content.
+      const refusedFields = findRefusedFields(requestBody, route.refuseRequestFields ?? []);
+      if (refusedFields.length > 0) {
+        const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix,
+          upstreamId: route.upstream, agentId: attributedAgentId, fields: refusedFields, requestBytes: requestBody.byteLength };
+        appendEvidence({ eventType: "audit", payload: JSON.stringify(refusal), meta: refusal });
+        res.statusCode = 403;
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify({ error: `request field refused by route ${route.prefix}: ${refusedFields.join(", ")}` }));
         return;
       }
 
