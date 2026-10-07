@@ -266,7 +266,8 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleIncidentRoute)
+    // The oversight route signs a record naming its reviewer: it needs the authenticated principal (P1-17).
+    handler: (pathname, method, req, res, context) => handleIncidentRoute(pathname, method, req, res, context.workspace, context.principal)
   },
   {
     id: 'assurance',
