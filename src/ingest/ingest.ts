@@ -1,7 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { verifyThirdPartyAttestation } from "../claims/evidenceProvenance.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
+import type { TrustContext } from "../trust/trustContext.js";
+import { ed25519KeyId } from "../trust/trustList.js";
+import type { EvidenceEvent } from "../types.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -108,17 +113,40 @@ function payloadForEvent(workspace: string, event: { payload_inline: string | nu
   return "";
 }
 
+/** The ingest session's original review events (not earlier attestation copies), oldest first. */
+function ingestSourceEvents(ledger: ReturnType<typeof openLedger>, ingestSessionId: string): EvidenceEvent[] {
+  const sourceEvents = ledger
+    .getAllEvents()
+    .filter((event) => event.session_id === ingestSessionId && event.event_type === "review"
+      && (JSON.parse(event.meta_json) as { source?: unknown }).source !== "attested_ingest")
+    .sort((a, b) => a.ts - b.ts);
+  if (sourceEvents.length === 0) {
+    throw new Error(`No ingest review events found for session ${ingestSessionId}`);
+  }
+  return sourceEvents;
+}
+
+function bundleHashOf(sourceEvents: EvidenceEvent[]): string {
+  return sha256Hex(canonicalize(sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts }))));
+}
+
+/** The digest a third-party attester signs for `amc attest --attester-signature` (printed by `amc attest` as the bundle hash). */
+export function ingestBundleHash(workspace: string, ingestSessionId: string): string {
+  const ledger = openLedger(workspace);
+  try {
+    return bundleHashOf(ingestSourceEvents(ledger, ingestSessionId));
+  } finally {
+    ledger.close();
+  }
+}
+
 /**
- * Records a human or system attestation over an ingest session.
+ * Records a human or system attestation over an ingest session (P0-18).
  *
- * ATTESTED means "a named party vouches for this content". Previously this
- * function re-appended the identical, unverified payloads with
- * trustTier: "ATTESTED" and no attester at all, so the tier upgrade asserted
- * that someone had vouched when nobody had — and the audit event claimed
- * OBSERVED, a tier reserved for evidence AMC captured itself.
- *
- * The attester and their statement are now required and recorded, so the
- * upgrade is traceable to whoever made the claim.
+ * The attester and their statement are required and recorded. That alone is a self-attestation: the rows stay
+ * SELF_REPORTED with `attestation.kind: "self_attested"`, because the operator vouching for their own import is not
+ * independent evidence. Only a signature over the bundle hash by a third-party key pinned for independent-attestation
+ * in a signed trust list makes the rows ATTESTED; the workspace's own monitor and auditor keys never do.
  */
 export function attestIngestSession(params: {
   workspace: string;
@@ -128,40 +156,41 @@ export function attestIngestSession(params: {
   attestedBy: string;
   /** What they are attesting to (e.g. provenance of the exported logs). */
   statement: string;
+  /** A third party's Ed25519 signature over the bundle hash. */
+  attesterSignature?: { keyId: string; sigB64: string };
+  /** Trust lists that may pin the attester; without one no signature is admitted. */
+  trust?: TrustContext | null;
 }): {
   attestedEventCount: number;
   bundleHash: string;
+  trustTier: "ATTESTED" | "SELF_REPORTED";
+  reason: string;
 } {
   const workspace = params.workspace;
   const attestedBy = params.attestedBy?.trim() ?? "";
   const statement = params.statement?.trim() ?? "";
   if (attestedBy.length === 0 || statement.length === 0) {
     throw new Error(
-      "Attestation requires attestedBy and statement: ATTESTED means a named party vouches for the content, " +
-        "and re-signing unverified payloads without naming an attester would upgrade trust on nobody's word."
+      "Attestation requires attestedBy and statement: an attestation names who vouches for the content and what they vouch for."
     );
   }
   const agentId = resolveAgentId(workspace, params.agentId);
   const ledger = openLedger(workspace);
   try {
-    const sourceEvents = ledger
-      .getAllEvents()
-      .filter((event) => event.session_id === params.ingestSessionId && event.event_type === "review")
-      .sort((a, b) => a.ts - b.ts);
-
-    if (sourceEvents.length === 0) {
-      throw new Error(`No ingest review events found for session ${params.ingestSessionId}`);
-    }
-
-    const bundleHash = sha256Hex(
-      canonicalize(
-        sourceEvents.map((event) => ({
-          id: event.id,
-          sha256: event.payload_sha256,
-          ts: event.ts
-        }))
-      )
-    );
+    const sourceEvents = ingestSourceEvents(ledger, params.ingestSessionId);
+    const bundleHash = bundleHashOf(sourceEvents);
+    const ownKeyIds = (["monitor", "auditor"] as const).flatMap((role) => getPublicKeyHistory(workspace, role))
+      .map((pem) => ed25519KeyId(pem)).filter((keyId): keyId is string => keyId !== null);
+    const thirdParty = params.attesterSignature
+      ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
+      : null;
+    const verdict = thirdParty
+      ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, ownKeyIds)
+      : { verified: false, reason: "self-attested: no third-party signature was given" };
+    const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
+    const attestation = verdict.verified && thirdParty
+      ? { ...thirdParty, attestedBy, statement }
+      : { kind: "self_attested", attestedBy, statement };
     const attestationSig = ledger.signRunHash(bundleHash);
 
     for (const event of sourceEvents) {
@@ -173,13 +202,12 @@ export function attestIngestSession(params: {
         payload,
         payloadExt: event.payload_path?.endsWith(".json") ? "json" : "txt",
         meta: {
-          trustTier: "ATTESTED",
+          trustTier,
           source: "attested_ingest",
           agentId,
           ingestSessionId: params.ingestSessionId,
           originalEventId: event.id,
-          attestedBy,
-          attestationStatement: statement
+          attestation
         }
       });
     }
@@ -198,23 +226,25 @@ export function attestIngestSession(params: {
       payloadExt: "json",
       inline: true,
       meta: {
+        source: "attested_ingest",
         auditType: "INGEST_ATTESTED",
         severity: "LOW",
         ingestSessionId: params.ingestSessionId,
         bundleHash,
+        // The monitor key seals the record; it says who wrote it, not that the content is true.
         signature: attestationSig,
-        attestedBy,
-        attestationStatement: statement,
-        // A vouched-for import is ATTESTED. OBSERVED is reserved for evidence
-        // AMC captured itself.
-        trustTier: "ATTESTED",
+        attestation,
+        attestationReason: verdict.reason,
+        trustTier,
         agentId
       }
     });
 
     return {
       attestedEventCount: sourceEvents.length,
-      bundleHash
+      bundleHash,
+      trustTier,
+      reason: verdict.reason
     };
   } finally {
     ledger.close();

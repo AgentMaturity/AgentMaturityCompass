@@ -516,7 +516,7 @@ export async function resolveAgentResponder(
     });
   }
 
-  // Fallback: straight to the provider. Not captured by AMC, so weaker tier.
+  // Fallback: straight to the provider, without the gateway's signed capture.
   const auth = provider.auth;
   const apiKeyEnv = "env" in auth && typeof auth.env === "string" ? auth.env : undefined;
   const apiKey = apiKeyEnv ? process.env[apiKeyEnv] : undefined;
@@ -555,7 +555,8 @@ export async function resolveAgentResponder(
       routePrefix,
       upstreamId: provider.upstreamId,
       providerTemplateId: provider.templateId,
-      trustTier: "ATTESTED"
+      // AMC sends the request and captures the reply itself, so it observed the exchange (P0-18).
+      trustTier: "OBSERVED"
     },
     headers,
     openaiCompatible: provider.openaiCompatible,

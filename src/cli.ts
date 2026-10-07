@@ -7,7 +7,7 @@ import { stdin } from "node:process";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import chalk from "chalk";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import YAML from "yaml";
 import { guardCheck } from "./guardrails/guardEngine.js";
 import { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
@@ -252,7 +252,7 @@ import {
 import { auditVibeCode } from "./score/vibeCodeAudit.js";
 import { scoreRegulatoryReadiness } from "./score/regulatoryReadiness.js";
 import { parseWindowToMs } from "./utils/time.js";
-import { evalImportCli, evalStatusCli } from "./eval/evalCli.js";
+import { EVAL_IMPORT_TRUST_TIER_REMOVED, evalImportCli, evalStatusCli } from "./eval/evalCli.js";
 import { evalRunCli, inferFormat, type EvalOutputFormat } from "./eval/evalRunCli.js";
 import { buildDashboard } from "./dashboard/build.js";
 import { serveDashboard } from "./dashboard/serve.js";
@@ -7117,15 +7117,21 @@ evalCmd
   .requiredOption("--format <format>", "eval format: openai|langsmith|deepeval|promptfoo|wandb|langfuse|langwatch")
   .requiredOption("--file <path>", "path to JSON/JSONL eval export file")
   .option("--agent <agentId>", "agent ID (defaults to active agent)")
-  .option("--trust-tier <tier>", "override trust tier: OBSERVED|OBSERVED_HARDENED|ATTESTED|SELF_REPORTED")
+  .option("--historical", "accept cases timestamped over 24 hours ago or ahead; the file's time is kept as meta.claimedTs", false)
+  // Removed in 2.0.0 (P0-18): kept hidden only to refuse with a pointer instead of commander's unknown-option error.
+  .addOption(new Option("--trust-tier <tier>").hideHelp())
   .option("--json", "emit JSON output", false)
-  .action((opts: { format: string; file: string; agent?: string; trustTier?: string; json: boolean }) => {
+  .action((opts: { format: string; file: string; agent?: string; trustTier?: string; historical: boolean; json: boolean }) => {
+    if (opts.trustTier !== undefined) {
+      console.error(EVAL_IMPORT_TRUST_TIER_REMOVED);
+      process.exit(2);
+    }
     const result = evalImportCli({
       workspace: process.cwd(),
       format: opts.format,
       file: opts.file,
       agentId: opts.agent,
-      trustTier: opts.trustTier
+      historical: opts.historical
     });
     if (opts.json) {
       console.log(JSON.stringify(result, null, 2));
@@ -13074,7 +13080,7 @@ outcomes
 
 outcomes
   .command("attest")
-  .description("Record manual attested outcome signal")
+  .description("Record a manual outcome signal (self-attested, SELF_REPORTED)")
   .requiredOption("--metric <metricId>", "metric ID from outcome contract")
   .requiredOption("--value <value>", "value")
   .requiredOption("--reason <text>", "attestation reason")
@@ -13092,7 +13098,7 @@ outcomes
       workOrderId: opts.workorder,
       unit: opts.unit
     });
-    console.log(chalk.green(`Outcome attestation recorded: ${out.outcomeEventId}`));
+    console.log(chalk.green(`Outcome signal recorded (${out.trustTier}): ${out.outcomeEventId}`));
     console.log(`eventHash=${out.eventHash}`);
     console.log(`receiptId=${out.receiptId}`);
   });
@@ -15378,20 +15384,24 @@ program
 
 program
   .command("attest")
-  .description("Auditor-attest an ingest session to upgrade trust tier to ATTESTED")
+  .description("Record an attestation over an ingest session (ATTESTED only with a pinned third-party signature)")
   .requiredOption("--ingest-session <id>", "ingest session ID")
   .requiredOption("--attested-by <identity>", "who is vouching for this content (person or system id)")
   .requiredOption("--statement <text>", "what is being attested (e.g. provenance of the exported logs)")
+  .option("--attester-signature <file>", "JSON { keyId, sigB64 }: a third party's Ed25519 signature over the bundle hash")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string }) => {
+  .action((opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string; attesterSignature?: string }) => {
     const attested = attestIngestSession({
       workspace: process.cwd(),
       ingestSessionId: opts.ingestSession,
       agentId: opts.agent ?? activeAgent(program),
       attestedBy: opts.attestedBy,
-      statement: opts.statement
+      statement: opts.statement,
+      attesterSignature: opts.attesterSignature === undefined ? undefined
+        : JSON.parse(readUtf8(resolve(process.cwd(), opts.attesterSignature))) as { keyId: string; sigB64: string },
+      trust: loadTrustContext()
     });
-    console.log(chalk.green(`Attested events: ${attested.attestedEventCount}`));
+    console.log(chalk.green(`Recorded events: ${attested.attestedEventCount} (${attested.trustTier}: ${attested.reason})`));
     console.log(`Bundle hash: ${attested.bundleHash}`);
   });
 

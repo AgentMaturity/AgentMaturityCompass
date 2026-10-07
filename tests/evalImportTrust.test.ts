@@ -67,7 +67,7 @@ describe("eval import trust tier", () => {
       cwd: dir, encoding: "utf8", env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE }, timeout: 60_000
     });
     expect(run.status).toBe(2);
-    expect(run.stderr).toContain("--trust-tier was removed in 1.2.0: trust tiers are derived from provenance, and imported results are SELF_REPORTED. See docs/EVIDENCE_TRUST.md.");
+    expect(run.stderr).toContain("--trust-tier was removed in 2.0.0: trust tiers are derived from provenance, and imported results are SELF_REPORTED. See docs/EVIDENCE_TRUST.md.");
     expect(importedRows(dir)).toEqual([]);
   }, 90_000);
 });

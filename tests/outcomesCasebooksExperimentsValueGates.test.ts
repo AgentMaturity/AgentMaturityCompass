@@ -344,7 +344,6 @@ describe("outcome compass", () => {
     const ingested = ingestOutcomeWebhook({
       workspace,
       payload,
-      trustTier: "OBSERVED",
       sourceLabel: "vitest.outcomes.webhook"
     });
     expect(typeof ingested.outcomeEventId).toBe("string");

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
+import { effectiveTrustTier, readerTrustList } from "../claims/evidenceProvenance.js";
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
@@ -74,15 +75,9 @@ export interface EvalCoverageStatus {
 const SUPPORTED_QUESTION_IDS = new Set(questionIds);
 const DEFAULT_QUESTION_IDS = ["AMC-1.7"];
 const MAX_SNIPPET_CHARS = 2_400;
-const DEFAULT_TRUST_TIER_BY_FORMAT: Record<EvalImportFormat, TrustTier> = {
-  openai: "ATTESTED",
-  langsmith: "ATTESTED",
-  deepeval: "ATTESTED",
-  promptfoo: "ATTESTED",
-  wandb: "ATTESTED",
-  langfuse: "ATTESTED",
-  langwatch: "ATTESTED"
-};
+/** Proposed defaults (P0-18): a case claimed further ahead or further back than this needs --historical. */
+export const EVAL_IMPORT_MAX_FUTURE_SKEW_MS = 5 * 60_000;
+export const EVAL_IMPORT_MAX_AGE_MS = 24 * 60 * 60_000;
 
 const OWASP_LLM_TOP10_IDS = [
   "AMC-5.8",
@@ -719,10 +714,6 @@ function confidenceCalibrationError(params: {
     return null;
   }
   return Number(Math.abs(confidence - observedOutcome).toFixed(6));
-}
-
-function defaultTrustTierForFormat(format: EvalImportFormat): TrustTier {
-  return DEFAULT_TRUST_TIER_BY_FORMAT[format] ?? "SELF_REPORTED";
 }
 
 function parseRawJsonOrJsonl(file: string): unknown {
@@ -1518,7 +1509,8 @@ export function importEvalResults(params: {
   format: EvalImportFormat;
   file: string;
   agentId?: string;
-  trustTier?: TrustTier;
+  /** Accept cases outside the time window; they are stored with meta.historical. */
+  historical?: boolean;
 }): EvalImportResult {
   const workspace = params.workspace;
   const file = resolve(workspace, params.file);
@@ -1531,7 +1523,18 @@ export function importEvalResults(params: {
     throw new Error(`No evaluable rows found for format '${params.format}' in file: ${file}`);
   }
 
-  const trustTier = params.trustTier ?? defaultTrustTierForFormat(params.format);
+  const now = Date.now();
+  const outOfWindow = parsed.cases.filter((item) =>
+    item.ts !== null && (item.ts > now + EVAL_IMPORT_MAX_FUTURE_SKEW_MS || item.ts < now - EVAL_IMPORT_MAX_AGE_MS));
+  if (outOfWindow.length > 0 && params.historical !== true) {
+    throw new Error(
+      `Refusing eval import: ${outOfWindow.length} case(s) are timestamped more than 5 minutes ahead or more than 24 hours ago ` +
+        `(${outOfWindow.map((item) => item.id).join(", ")}). Events are recorded at import time; pass --historical to import them ` +
+        "as historical, keeping each case's own time as meta.claimedTs."
+    );
+  }
+  // Imported results are self-reported whatever the format; tiers derive from provenance (docs/EVIDENCE_TRUST.md).
+  const trustTier: TrustTier = "SELF_REPORTED";
   const agentId = resolveAgentId(workspace, params.agentId);
   const questionCoverage = summarizeQuestionCoverage(parsed.cases);
   const sessionId = randomUUID();
@@ -1573,6 +1576,8 @@ export function importEvalResults(params: {
     });
 
     for (const item of parsed.cases) {
+      // The file's time is a claim; the ledger records when AMC wrote the event.
+      const caseTime = { claimedTs: item.ts ?? undefined, historical: params.historical === true ? true : undefined };
       const questionIdsForCase = sanitizeQuestionIds(item.questionIds);
       const primaryQuestionId = questionIdsForCase[0] ?? DEFAULT_QUESTION_IDS[0];
       const unitScore = normalizedScore(item.score);
@@ -1597,8 +1602,8 @@ export function importEvalResults(params: {
         }),
         payloadExt: "json",
         inline: true,
-        ts: item.ts ?? undefined,
         meta: {
+          ...caseTime,
           source: "eval_import",
           framework: params.format,
           runId: parsed.runId,
@@ -1638,8 +1643,8 @@ export function importEvalResults(params: {
           }),
           payloadExt: "json",
           inline: true,
-          ts: item.ts ?? undefined,
           meta: {
+            ...caseTime,
             source: "eval_import",
             framework: params.format,
             runId: parsed.runId,
@@ -1685,8 +1690,8 @@ export function importEvalResults(params: {
               }),
               payloadExt: "json",
               inline: true,
-              ts: item.ts ?? undefined,
               meta: {
+                ...caseTime,
                 source: "eval_import",
                 framework: params.format,
                 runId: parsed.runId,
@@ -1726,8 +1731,8 @@ export function importEvalResults(params: {
           }),
           payloadExt: "json",
           inline: true,
-          ts: item.ts ?? undefined,
           meta: {
+            ...caseTime,
             source: "eval_import",
             auditType: "EXTERNAL_EVAL_FAILURE",
             severity: "MEDIUM",
@@ -1826,14 +1831,6 @@ function parseMetaQuestionIds(meta: Record<string, unknown>): string[] {
   return sanitizeQuestionIds(derived, []);
 }
 
-function parseMetaTrustTier(meta: Record<string, unknown>): TrustTier {
-  const value = meta.trustTier;
-  if (value === "OBSERVED" || value === "OBSERVED_HARDENED" || value === "ATTESTED" || value === "SELF_REPORTED") {
-    return value;
-  }
-  return "SELF_REPORTED";
-}
-
 function emptyTrustTierBreakdown(): Record<TrustTier, number> {
   return {
     OBSERVED: 0,
@@ -1895,7 +1892,8 @@ export function evalImportCoverageStatus(params: {
       if (!isEvalImportFormat(frameworkValue)) {
         continue;
       }
-      const trustTier = parseMetaTrustTier(meta);
+      // Rows 1.1.x stored as ATTESTED read SELF_REPORTED here too; the ledger is not rewritten.
+      const trustTier = effectiveTrustTier(row, { trustList: readerTrustList }) ?? "SELF_REPORTED";
       const questionIdsForEvent = parseMetaQuestionIds(meta);
       const framework = frameworkValue;
       const state = frameworkState.get(framework) ?? {

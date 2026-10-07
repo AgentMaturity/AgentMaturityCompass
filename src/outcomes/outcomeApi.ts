@@ -47,10 +47,16 @@ export function verifyHmacSignature(body: string, secret: string, provided: stri
   return timingSafeEqual(left, right);
 }
 
+/**
+ * Ingested outcome signals are SELF_REPORTED (P0-18): AMC did not observe them. `attestationKind` records who reported
+ * them: "self_attested" for an operator session, "external_report" for a webhook.
+ */
+type OutcomeAttestationKind = "self_attested" | "external_report";
+
 export function ingestFeedbackOutcome(params: {
   workspace: string;
   payload: unknown;
-  trustTier?: "OBSERVED" | "ATTESTED" | "SELF_REPORTED";
+  attestationKind?: OutcomeAttestationKind;
 }): {
   outcomeEventId: string;
   eventHash: string;
@@ -67,7 +73,8 @@ export function ingestFeedbackOutcome(params: {
       userIdHash: parsed.userIdHash ?? null,
       tags,
       commentSha256: commentSha,
-      source: "feedback.ingest"
+      source: "feedback.ingest",
+      attestation: { kind: params.attestationKind ?? "external_report" }
     };
     const written = ledger.appendOutcomeEvent({
       ts: Date.now(),
@@ -77,7 +84,7 @@ export function ingestFeedbackOutcome(params: {
       metricId: "feedback.rating",
       value: parsed.rating,
       unit: "1-5",
-      trustTier: params.trustTier ?? "ATTESTED",
+      trustTier: "SELF_REPORTED",
       source: "import",
       meta,
       payload: JSON.stringify({
@@ -101,7 +108,7 @@ export function ingestOutcomeWebhook(params: {
   workspace: string;
   payload: unknown;
   sourceLabel?: string;
-  trustTier?: "OBSERVED" | "ATTESTED" | "SELF_REPORTED";
+  attestationKind?: OutcomeAttestationKind;
 }): {
   outcomeEventId: string;
   eventHash: string;
@@ -120,11 +127,12 @@ export function ingestOutcomeWebhook(params: {
       metricId: parsed.signalId,
       value: parsed.value,
       unit: parsed.unit ?? null,
-      trustTier: params.trustTier ?? "OBSERVED",
+      trustTier: "SELF_REPORTED",
       source: "webhook",
       meta: {
         ...(parsed.meta ?? {}),
-        sourceLabel: params.sourceLabel ?? "outcomes.webhook"
+        sourceLabel: params.sourceLabel ?? "outcomes.webhook",
+        attestation: { kind: params.attestationKind ?? "external_report" }
       },
       payload: JSON.stringify(parsed)
     });
