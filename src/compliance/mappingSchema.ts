@@ -88,6 +88,8 @@ export interface ComplianceCategoryResult {
     eventId: string;
     eventHash: string;
     eventType: string;
+    /** The tier this event counted at; absent in reports written before P0-22, which read as self-reported. */
+    trustTier?: "OBSERVED" | "ATTESTED" | "SELF_REPORTED";
   }>;
   neededToSatisfy: string[];
 }

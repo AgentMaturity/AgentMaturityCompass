@@ -439,6 +439,8 @@ export async function verifyCertificate(params: {
   certFile: string;
   revocationFile?: string;
   trust: TrustContext;
+  /** Receives the run.json these checks read, so a claim label never takes it from a second read of the file. */
+  capture?: { run: DiagnosticReport | null };
 }): Promise<CertificateVerification> {
   const extracted = mkTmp("amc-cert-verify-");
   const errors: string[] = [];
@@ -493,6 +495,7 @@ export async function verifyCertificate(params: {
     let run: DiagnosticReport | null = null;
     try {
       run = JSON.parse(readUtf8(join(extracted, "run.json"))) as DiagnosticReport;
+      if (params.capture) params.capture.run = run;
     } catch (error) {
       errors.push(`invalid run.json: ${String(error)}`);
     }

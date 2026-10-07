@@ -10231,9 +10231,9 @@ withTrustFlags(bundle
   .description("Verify evidence bundle offline")
   .argument("<file>"), { pubkey: "pin the auditor public key (artifact-seal)", expectMonitor: true, json: true })
   .action(async (file: string, opts: TrustFlags) => {
-    const result = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
-    // A trusted bundle's run seal verified with pinned keys; its claim is the run's own, never raised by the signature.
-    const claim = artifactClaim("bundle", { run: result.ok ? inspectEvidenceBundle(resolve(process.cwd(), file)).run : null, sealVerified: result.ok });
+    const { run, ...result } = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
+    // The run the verifier checked (not a second read of the file); its claim is the run's own, never raised by the signature.
+    const claim = artifactClaim("bundle", { run, sealVerified: result.ok });
     finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`], claim });
   });
 
@@ -10352,8 +10352,8 @@ program
       } else {
         console.log(chalk.green("Gate PASSED"));
       }
-      // The gate checks the bundle's run against a policy; the claim stays the run's own.
-      printClaimResult(artifactClaim("bundle", { run: inspectEvidenceBundle(resolve(process.cwd(), opts.bundle)).run }), {});
+      // The gate's own run, never marked seal-verified here: the claim stays the run's own and is never raised.
+      printClaimResult(artifactClaim("bundle", { run: result.report }), {});
       return;
     }
     console.log(opts.sign === false ? chalk.yellow("Gate FAILED (UNSIGNED policy)") : chalk.red("Gate FAILED"));
@@ -11400,12 +11400,15 @@ withTrustFlags(cert
         claim: artifactClaim("trust-certificate") });
       return;
     }
+    const checked: { run: DiagnosticReport | null } = { run: null };
     const result = await verifyCertificate({
       certFile: certPath,
       revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined,
-      trust
+      trust,
+      capture: checked
     });
-    const claim = artifactClaim("certificate", { run: result.ok ? inspectCertificate(certPath).run : null, sealVerified: result.ok });
+    // The run the verifier checked (not a second read of the file); its claim is the run's own, never raised by the signature.
+    const claim = artifactClaim("certificate", { run: checked.run, sealVerified: result.ok });
     finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`], claim });
   });
 

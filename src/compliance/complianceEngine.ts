@@ -196,7 +196,8 @@ interface RequirementOutcome {
 const NOTHING_NEEDED = "No additional evidence required for this requirement";
 
 function refsOf(events: EvidenceEvent[]): EvidenceRef[] {
-  return events.slice(0, 12).map((event) => ({ eventId: event.id, eventHash: event.event_hash, eventType: event.event_type }));
+  return events.slice(0, 12).map((event) => ({ eventId: event.id, eventHash: event.event_hash, eventType: event.event_type,
+    trustTier: inferTrustTier(event, eventMeta(event)) }));
 }
 
 function evaluateEvidenceEvent(

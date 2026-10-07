@@ -105,21 +105,23 @@ export function envelopeForAssurancePack(assuranceRunId: string, pack: Assurance
     result: pack.failCount > 0 ? "fail" : "pass", sealVerified: options.sealVerified, evidenceRefs: [assuranceRunId], now: options.now });
 }
 
-type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework" | "trustTierCoverage" | "configTrusted" | "windowEndTs">;
+type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework" | "configTrusted" | "windowEndTs">;
 
 /**
- * A compliance category is a regulated result on control-bound runtime evidence. With no applicability decision it
- * cannot pass (rule 9), and untrusted compliance maps make its evidence untrusted.
+ * A compliance category is a regulated result on control-bound runtime evidence. Its tiers are its own evidence
+ * references' (a reference with no recorded tier reads as self-reported), never the report-wide coverage. With no
+ * applicability decision it cannot pass (rule 9), and untrusted compliance maps make its evidence untrusted.
  */
 export function envelopeForComplianceCategory(report: ComplianceReportClaimInput, category: ComplianceCategoryResult,
   now: number): ClaimEnvelope {
+  const tiers = [...new Set(category.evidenceRefs.map((ref) => ref.trustTier ?? "SELF_REPORTED"))];
   return evaluateClaimEligibility({
     producer: `compliance:${report.framework}:${category.id}`,
     method: "runtime_observation",
     regulated: true,
     proposed: { result: category.result, level: null },
-    evidence: { eventCount: category.evidenceRefs.length, tiers: report.trustTierCoverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"],
-      newestTs: report.windowEndTs, boundToControl: true, sameScope: true, contradictory: category.evidence === "contradictory",
+    evidence: { eventCount: category.evidenceRefs.length, tiers, newestTs: report.windowEndTs, boundToControl: true,
+      sameScope: true, contradictory: category.evidence === "contradictory",
       signatureValid: report.configTrusted ? null : false, issuerPinned: null },
     evidenceRefs: category.evidenceRefs.map((ref) => ref.eventId),
     now
