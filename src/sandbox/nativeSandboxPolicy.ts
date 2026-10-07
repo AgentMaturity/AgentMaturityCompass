@@ -38,6 +38,8 @@ export function nativeShellSandboxPolicy(workspace: string, timeoutMs: number, s
   if (expectedPolicySha256 !== undefined && snapshot.digestSha256 !== expectedPolicySha256) throw new Error("Signed tools policy changed after shell admission; review and retry the call.");
   const definition = findToolDefinition(snapshot.config, "bash");
   if (!definition) throw new Error("Native shell is absent from the signed tools policy.");
+  let home = homedir();
+  try { home = realpathSync(home); } catch { /* compare the literal path */ }
   // Never migrate allow.paths into mounts. The generic validator still
   // requires actual path arguments whenever ordinary path rules are declared.
   const writableRoots = (definition.nativeSandbox?.writableDirectories ?? []).map(path => {
@@ -48,6 +50,8 @@ export function nativeShellSandboxPolicy(workspace: string, timeoutMs: number, s
       if (logical !== real || !within(root, real) || !statSync(real).isDirectory()) throw new Error("invalid directory");
     } catch { throw new Error("Native shell write grants must name existing nonsymlink workspace directories."); }
     if (within(resolve(root, ".amc"), real)) throw new Error("AMC authority paths cannot be granted to a shell.");
+    // Startup files and launch agents there would run the shell's writes outside the sandbox later.
+    if (within(real, home)) throw new Error("Native shell write grants cannot contain your home directory.");
     return real;
   });
   const sandbox = definition.nativeSandbox;

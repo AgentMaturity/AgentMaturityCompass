@@ -18,6 +18,13 @@ import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTyp
  * All networking is denied, Unix sockets included; with a signed egress
  * allowlist the only exception is AMC's per-call proxy port on localhost.
  *
+ * `(allow default)` would also let the command ask launchd, LaunchServices or
+ * another app to start a process outside the profile, so Mach lookups are
+ * limited to five system services, and opening apps, AppleEvents, launchd job
+ * creation, signals to and inspection of processes outside the shell's group,
+ * and hard-link creation are denied. Measured on macOS 26.6.2 with /bin/sh,
+ * git, node and curl.
+ *
  * Seatbelt matches resolved paths only (`/var` is `/private/var`), so every
  * path is resolved first. `sandbox-exec` reports nothing when it applies a
  * profile, so confinement is measured: before the command starts, a wrapper
@@ -30,6 +37,13 @@ const SANDBOX_EXEC = "/usr/bin/sandbox-exec";
 /** Home-relative secrets every macOS shell is denied, before the signed `readDeny`. */
 export const MACOS_SECRET_PATHS = [".ssh", ".aws", ".config/gcloud", ".azure", ".gnupg", ".kube", ".docker",
   ".netrc", ".npmrc", "Library/Keychains", ".amc"] as const;
+
+/** The only Mach services the shell may look up: temp-dir helper, logging, notifications, user and group lookups. */
+export const MACOS_MACH_SERVICES = ["com.apple.bsd.dirhelper", "com.apple.logd", "com.apple.system.notification_center",
+  "com.apple.system.opendirectoryd.libinfo", "com.apple.system.opendirectoryd.membership"] as const;
+
+/** Launchers denied by path as well, in case a later macOS reaches them without a Mach lookup. */
+const LAUNCHERS = ["/usr/bin/open", "/usr/bin/osascript", "/bin/launchctl", "/usr/bin/at"] as const;
 
 // `true`, not `:`: a failed redirection on a special builtin ends a POSIX shell such as dash.
 const PROBE_WRAPPER = '{ true >"$1"; } 2>/dev/null && exit 125; true >"$2" || exit 125; shift 2; exec "$@"';
@@ -59,23 +73,35 @@ export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): str
   const subpaths = (paths: readonly string[]): string => paths.map(path => `(subpath "${sbplString(path)}")`).join(" ");
   return [
     "(version 1)",
-    ";; Reads stay open except the deny-list below. Mach services are not restricted.",
+    ";; Reads stay open except the deny-list below.",
     "(allow default)",
     "(deny file-write*)",
     `(allow file-write* ${subpaths([...input.writableRoots, input.privateTmp])} (literal "/dev/null"))`,
     `(deny file-read* file-write* ${subpaths([join(input.workspace, ".amc"), ...input.denied])})`,
+    ";; A hard link in a writable root to an outside file would write through to it.",
+    "(deny file-link)",
     "(deny network*)",
     ...(input.proxyPort === null ? [] : [`(allow network-outbound (remote ip "localhost:${input.proxyPort}"))`]),
+    ";; Nothing may ask launchd, LaunchServices or another app to start a process outside this profile.",
+    "(deny mach-lookup)",
+    `(allow mach-lookup (global-name ${MACOS_MACH_SERVICES.map(name => `"${name}"`).join(" ")}))`,
+    "(deny lsopen)",
+    "(deny appleevent-send)",
+    "(deny job-creation)",
+    "(deny signal (target others))",
+    "(allow signal (target pgrp))",
+    "(deny process-info* (target others))",
+    `(deny process-exec ${LAUNCHERS.map(path => `(literal "${path}")`).join(" ")})`,
     ""
   ].join("\n");
 }
 
 const LIMITATIONS = [
   "Reads outside the deny-list stay open: the command can read any other file your user can.",
-  "Mach and XPC services are not restricted; a system service reached that way acts outside this profile, including on the network.",
+  "Mach lookups are limited to the temp-directory helper, logging, notifications and user and group lookups; tools that need another system service (the keychain, certificate trust through trustd, LaunchServices) fail.",
   "sandbox-exec is deprecated by Apple; the profile is checked on the macOS versions AMC's CI runs, not on every release.",
   "This confines a shell subprocess, not AMC or worker-thread Code Mode.",
-  "Existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
+  "Hard-link creation is denied and existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
   "A successful command does not establish a count of denied operations."
 ];
 
