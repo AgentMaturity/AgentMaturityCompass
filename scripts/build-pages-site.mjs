@@ -133,6 +133,39 @@ function copyBrandAssets(output) {
   });
 }
 
+/**
+ * P1-01: copies spec/schemas/ to <out>/spec/schemas/, serves each schema at its own `$id` path too (the
+ * external-evidence `$id` is standards/external-evidence/v1/schema.json), and renders the spec pages to HTML.
+ */
+export async function copySpec(output) {
+  const specRoot = resolve(repositoryRoot, "spec");
+  const indexPath = resolve(specRoot, "schemas/index.json");
+  const index = JSON.parse(readFileSync(indexPath, "utf8"));
+  const indexTarget = resolve(output, "spec/schemas/index.json");
+  mkdirSync(dirname(indexTarget), { recursive: true });
+  copyFileSync(indexPath, indexTarget);
+  for (const row of index.schemas) {
+    const source = resolve(specRoot, "schemas/v1", row.name);
+    assertInside(resolve(specRoot, "schemas/v1"), source, `Schema ${row.name}`);
+    const bytes = readFileSync(source);
+    if (sha256(bytes) !== row.sha256) throw new Error(`spec/schemas/v1/${row.name} does not match spec/schemas/index.json: run npm run gen:schemas`);
+    const url = new URL(row.$id);
+    if (url.origin !== "https://agentmaturity.co") throw new Error(`Schema $id is not served by this site: ${row.$id}`);
+    for (const target of new Set([resolve(output, "spec/schemas/v1", row.name), resolve(output, url.pathname.slice(1))])) {
+      assertInside(output, target, `Schema target ${row.$id}`);
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, bytes);
+    }
+  }
+  const { marked } = await import(pathToFileURL(resolve(repositoryRoot, "node_modules/marked/lib/marked.esm.js")).href);
+  for (const [source, target, title] of [["README.md", "index.html", "AMC public contracts"],
+    ["ACCEPTANCE_RULES.md", "acceptance-rules.html", "AMC acceptance rules"]]) {
+    const html = marked.parse(readFileSync(resolve(specRoot, source), "utf8")).replace(/href="ACCEPTANCE_RULES\.md"/g, 'href="acceptance-rules.html"');
+    writeFileSync(resolve(output, "spec", target), `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="../brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
+  }
+  return index.schemas.map(row => row.$id);
+}
+
 async function readDocsBuildManifest() {
   delete globalThis.AMC_DOCS_BUILD_MANIFEST;
   await import(`${pathToFileURL(resolve(websiteRoot, "docs/docs.js")).href}?pages-build=${Date.now()}`);
@@ -232,6 +265,8 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   };
   const manifestPath = resolve(resolvedOutput, "docs/content-manifest.json");
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+
+  await copySpec(resolvedOutput);
 
   const brandAssets = copyBrandAssets(resolvedOutput);
   const brandManifest = {
