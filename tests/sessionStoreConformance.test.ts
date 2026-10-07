@@ -204,26 +204,31 @@ function brokenBackend(
 }
 
 describe("session store conformance — both backends, one suite", () => {
+  // Each backend's suite runs once (lazily, so a filtered single test still works) and the three tests below read the
+  // same report: re-running both suites for the case-list comparison doubled this block's cost and timed out under load.
+  type ConformanceReport = ReturnType<typeof runSessionStoreConformance>;
+  const reports: { sqlite?: ConformanceReport; jsonl?: ConformanceReport } = {};
+  const sqliteReport = (): ConformanceReport => (reports.sqlite ??= withPassphrase(() => runSessionStoreConformance(sqliteBackend)));
+  const jsonlReport = (): ConformanceReport => (reports.jsonl ??= withPassphrase(() => runSessionStoreConformance(jsonlBackend)));
+
   it("has cases at all (a suite that ran zero cases would pass vacuously)", () => {
     expect(SESSION_STORE_CONFORMANCE_CASES.length).toBeGreaterThanOrEqual(15);
   });
 
   it("the SQLite backend passes every case", () => {
-    const report = withPassphrase(() => runSessionStoreConformance(sqliteBackend));
+    const report = sqliteReport();
     expect(report.failed).toEqual([]);
     expect(report.passed).toHaveLength(SESSION_STORE_CONFORMANCE_CASES.length);
   });
 
   it("the JSONL backend passes every case — signed and chained, not a fast path", () => {
-    const report = withPassphrase(() => runSessionStoreConformance(jsonlBackend));
+    const report = jsonlReport();
     expect(report.failed).toEqual([]);
     expect(report.passed).toHaveLength(SESSION_STORE_CONFORMANCE_CASES.length);
   });
 
   it("both backends run the identical case list", () => {
-    const sqlite = withPassphrase(() => runSessionStoreConformance(sqliteBackend));
-    const jsonl = withPassphrase(() => runSessionStoreConformance(jsonlBackend));
-    expect(jsonl.passed).toEqual(sqlite.passed);
+    expect(jsonlReport().passed).toEqual(sqliteReport().passed);
   });
 
   it("identical control-plane input yields identical event hashes on both backends", () => {
