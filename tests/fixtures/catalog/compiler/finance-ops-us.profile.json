@@ -1,0 +1,18 @@
+{
+  "profileVersion": 1,
+  "profileId": "finance-ops-us",
+  "deployment": { "tenantId": "tenant-example", "workspaceId": "workspace-example", "deploymentId": "finance-ops-us-1", "agentIds": ["finance-ops-agent"] },
+  "primaryStation": { "value": "wealth", "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "stations": { "value": ["wealth", "technology"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "domains": { "value": ["wealth.banking-finance-ops"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "jurisdictions": { "value": ["US"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "roles": { "value": ["deployer"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "entityTypes": { "value": ["non_bank_financial_institution"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "riskClass": { "value": "high", "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "useCases": { "value": ["reconciliation", "payment_proposal"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "dataClasses": { "value": ["customer_financial"], "provenance": "reviewed", "source": "fixture: synthetic example profile", "reviewedBy": { "reviewer": "example-reviewer", "date": "2026-10-08" } },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}
