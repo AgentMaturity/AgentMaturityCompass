@@ -66,6 +66,13 @@
       "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2"
     },
     {
+      "path": "src/compliance/complianceEngine.ts",
+      "issue": "P0-17",
+      "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
+      "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
+    },
+    {
       "path": "src/index.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
