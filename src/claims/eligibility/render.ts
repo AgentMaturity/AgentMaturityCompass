@@ -9,6 +9,10 @@ const KIND_LABELS: Record<ClaimKind, string> = {
 };
 const LEGACY_LABEL = "Legacy (1.x), self-reported";
 
+export function claimKindLabel(kind: ClaimKind): string {
+  return KIND_LABELS[kind];
+}
+
 export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   SYNTHETIC_VALUES: "synthetic example values are not evidence",
   SELF_REPORTED_NO_POSITIVE_STATUS: "self-reported answers cannot pass a regulated control",
