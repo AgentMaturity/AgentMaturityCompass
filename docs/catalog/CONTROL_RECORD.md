@@ -150,7 +150,9 @@ Code: `src/catalog/evidence/` (P1-11). `evaluateControl(record, items, ctx)` adm
 against the control's evidence contracts and returns a `ControlResult`: the five status dimensions of
 [CLAIM_KINDS.md](../CLAIM_KINDS.md), a claim kind derived through `evaluateClaimEligibility`, the admitted and rejected
 refs with reasons, and a `digest` (sha256 of the canonical result without `evaluatedAt`, with review `pending`, so a
-review can name it). It is deterministic: items are taken in ref order.
+review can name it). It is deterministic: items are taken in ref order. A result set written to a file for export goes
+through `writeSignedControlResults` (`signedResults.ts`), which signs the sha256 of exactly the bytes written as
+`CONTROL_RESULT` ([OSCAL.md](../exports/OSCAL.md), "Signed results").
 
 An item's provenance is proved by the loader that read it, from the same bytes, never by reading a field back from an
 editable file. Ledger rows count only when the whole hash chain verifies and its head carries the workspace

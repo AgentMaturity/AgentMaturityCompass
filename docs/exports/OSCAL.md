@@ -29,8 +29,12 @@ Code: `src/exports/oscal/` (`oscalIds.ts`, `oscalCatalog.ts`, `oscalProfile.ts`,
   verify against this workspace's auditor keys. That check is a local audit trail, not portable trust (P0-09). The
   shipped catalog must match the plan's catalog lockfile.
 - **`--results <file>`**: a JSON array of P1-11 control results (`ControlResult`, `resultVersion: 1`, as
-  `evaluateControl` in `src/catalog/evidence/evaluate.ts` returns them). It needs `--plan`. The whole file is refused,
-  and nothing is written, unless every result:
+  `evaluateControl` in `src/catalog/evidence/evaluate.ts` returns them), signed as `CONTROL_RESULT` in `<file>.sig`
+  (see "Signed results" below). It needs `--plan`. The file and its `.sig` are each read once, and the results are
+  parsed from the same bytes the signature was verified over. The whole file is refused as an integrity failure, and
+  nothing is written, when `<file>.sig` is missing or malformed, its digest is not the sha256 of the file's bytes, the
+  signature does not verify against this workspace's auditor keys, or the signer is not trusted (below). It is also
+  refused unless every result:
   - has the exact P1-11 shape and a claim kind `evaluateControl` can derive (`independently_reviewed` is refused);
   - hashes to its own `digest`, and appears once;
   - names a catalog control at the version and digest the shipped catalog holds;
@@ -38,13 +42,31 @@ Code: `src/exports/oscal/` (`oscalIds.ts`, `oscalCatalog.ts`, `oscalProfile.ts`,
   - is coherent: a `synthetic_example` result is always `not_evaluated`, and a `pass` needs applicability
     `applicable` and evidence `sufficient`.
 
-  Control results are not signed yet. Their digest is unkeyed: it shows a result is unchanged since it was hashed, not
-  who produced it. The assessment-results metadata remarks say so.
+  An unsigned or unverified results file is never exported, so it can never read as satisfied.
 - **No results** (no `--results`, or an empty array): no `assessment-results.json` and the message
   `not evaluated: no control results`. Exit 0; nothing is invented.
 - `--out` under `.amc/` is refused. A `profile.json` or `assessment-results.json` left in `--out` by an earlier export
   that this export does not replace is refused before anything is written.
 - Exit codes: 0 written, 1 refusal or error.
+
+## Signed results
+
+AMC writes a control-result file for export only through `writeSignedControlResults(workspace, path, results)`
+(`src/catalog/evidence/signedResults.ts`). It writes the results as JSON and signs the sha256 of exactly the bytes
+written as `CONTROL_RESULT` through the workspace signing policy (`signDigestWithPolicy`), in `<file>.sig`
+(`digestSha256`, `signature`, `signedTs`, `signer`, `envelope`). It is blocked in agent mode (`control results sign`)
+and refuses a path under `.amc/`. No CLI command writes a results file yet: a new command path waits for the P0-01
+freeze to lift.
+
+`amc export oscal` reads the file through `readSignedControlResults`:
+
+- Against this workspace's auditor keys the signature is a local audit trail, not portable trust: it shows that a key
+  of the exporting workspace wrote the file and that the bytes are unchanged, not that the results are true.
+- When the operator has a trust list (`<AMC home>/trust/amc-trust-list.json` with its pinned roots, P0-09), the signing
+  key must also be admitted by it for `artifact-seal`; otherwise the file is refused. A distrusted or revoked key is
+  refused with or without a trust list. An unreadable or unverifiable trust list refuses the export.
+- The command says which applied: `checked against this workspace's auditor keys: a local audit trail` or
+  `signer pinned for artifact-seal by trust list <listId>`.
 
 ## Pinned OSCAL version
 
@@ -137,7 +159,7 @@ no applicable control writes no profile, because `include-controls` needs at lea
 | OSCAL field (schema definition) | AMC source |
 | --- | --- |
 | `assessment-results.uuid` (`oscal-ar-oscal-ar:assessment-results`) | `oscalUuid("assessment-results", digest of the plan digest and the results' digests)` |
-| `metadata.title`, `version`, `last-modified`, `props`, `remarks` | fixed title, that digest, the latest `evaluatedAt`, `plan-digest`, the notice on claims and unsigned results |
+| `metadata.title`, `version`, `last-modified`, `props`, `remarks` | fixed title, that digest, the latest `evaluatedAt`, `plan-digest` and `results-sha256` (the sha256 of the signed results file), the notice on claims and on the results signature |
 | `import-ap.href`, `remarks` (`oscal-ar-oscal-ar:import-ap`) | `#<plan resource uuid>`: AMC has no OSCAL assessment plan, so this points at the compiled plan in back-matter and says so |
 | `results[].uuid`, `title`, `description`, `start`, `end`, `props` (`oscal-ar-oscal-ar:result`) | one result per assessment window: `oscalUuid("result", "<planDigest>|<start>|<end>")`, the window, `plan-digest` |
 | `reviewed-controls.control-selections[].include-controls[].control-id` (`oscal-ar-oscal-assessment-common:reviewed-controls`) | the control ids with a result in that window |
@@ -169,8 +191,9 @@ unresolved reason in its `remarks`), `evidence`, `enforcement`, `enforcement-bou
                "disposition": "prop" | "remarks" | "omitted", "note": "…" }] }
 ```
 
-`count` is how many values of that field the inputs held; fields with none are left out. Dispositions: `prop` (an AMC
-prop or AMC-namespaced part, often canonical JSON that OSCAL tools see as an opaque string), `remarks`, `omitted`.
+The `results` input digest is the sha256 of the signed results file. `count` is how many values of that field the
+inputs held; fields with none are left out. Dispositions: `prop` (an AMC prop or AMC-namespaced part, often canonical
+JSON that OSCAL tools see as an opaque string), `remarks`, `omitted`.
 
 | Model | Fields |
 | --- | --- |
