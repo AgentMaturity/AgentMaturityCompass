@@ -121,8 +121,9 @@ export function buildBenchProofs(params: {
 /**
  * Checks each proof's Merkle path and, when the bundle carries its signed merkle root, that every proof resolves to
  * that root rather than to a root the proof names for itself (P0-09). The root's signature is the caller's to check
- * under a trust context; verifyProofsAgainstSignedRoot does both. With a signed root, the tree and the RFC 9162 tree
- * size come from that root (P1-26), and a proof of the other tree fails.
+ * under a trust context; verifyProofsAgainstSignedRoot does both. P1-26: the tree and the RFC 9162 tree size come
+ * from the signed root, never from a proof, and a proof naming another tree fails; without a signed root only the
+ * legacy tree is checked, so an RFC 9162 proof cannot pick its own tree size.
  */
 export function verifyBenchProofBundle(bundle: BenchProofBundle): {
   ok: boolean;
@@ -131,16 +132,16 @@ export function verifyBenchProofBundle(bundle: BenchProofBundle): {
   const errors: string[] = [];
   const signedRow = bundle.merkleRoot ? bundle.merkleRoot.root as { root?: unknown; leafCount?: unknown; algorithm?: unknown } | null : null;
   const signedRoot = signedRow?.root;
+  const algorithm: MerkleAlgorithm = signedRow?.algorithm === "rfc9162-sha256" ? "rfc9162-sha256" : "amc-legacy-v1";
   for (const proof of bundle.proofs) {
-    const algorithm = proof.algorithm ?? "amc-legacy-v1";
-    if (bundle.merkleRoot && algorithm !== (signedRow?.algorithm ?? "amc-legacy-v1")) {
-      errors.push(`inclusion proof ${proof.proofId} uses ${algorithm}, the signed merkle root another tree`);
+    if ((proof.algorithm ?? "amc-legacy-v1") !== algorithm || (signedRow && signedRow.algorithm !== undefined && signedRow.algorithm !== algorithm)) {
+      errors.push(`inclusion proof ${proof.proofId} names ${proof.algorithm ?? "amc-legacy-v1"}, but the signed merkle root is ${String(signedRow?.algorithm ?? "amc-legacy-v1")}`);
     }
     const valid = verifyEntryInclusion({
       algorithm,
       entryHash: proof.eventHash,
       leafIndex: proof.leafIndex,
-      treeSize: bundle.merkleRoot ? (typeof signedRow?.leafCount === "number" ? signedRow.leafCount : undefined) : proof.treeSize,
+      treeSize: typeof signedRow?.leafCount === "number" ? signedRow.leafCount : undefined,
       proofPath: proof.merklePath,
       root: proof.rootHash
     });

@@ -27,7 +27,7 @@ import {
   merkleRootsPath,
   transparencyMerkleDir
 } from "./merklePaths.js";
-import { transparencyEntrySchema } from "./logSchema.js";
+import { transparencyEntrySchema, transparencySealSchema } from "./logSchema.js";
 import { merkleProofPayloadSchema, merkleProofSignatureSchema, type MerkleProofPayload } from "./proofSchema.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
@@ -142,7 +142,8 @@ function writeSignedRow(workspace: string, rootPath: string, sigPath: string, ro
 
 /**
  * Reads a signed row and checks its signature over the bytes it parsed (one read, so no swap in between). `row` is
- * null when a file is missing or the row does not parse; `errors` lists every failed check.
+ * null when a file is missing or the row does not parse; `errors` lists every failed check. The keys are the
+ * workspace's own auditor keys, so this is a local audit trail only; portable verdicts use P0-09 pinned trust.
  */
 function readSignedRow<T>(workspace: string, path: string, sigPath: string, schema: z.ZodType<T>, label: string): { row: T | null; errors: string[] } {
   if (!pathExists(path) || !pathExists(sigPath)) {
@@ -185,15 +186,41 @@ function readSignedCurrentRoot(workspace: string): { row: z.infer<typeof merkleR
   return readSignedRow(workspace, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "merkle root");
 }
 
+/** The hash of the log's last entry ("" when empty), or null when the last line does not parse. */
+function logTailHash(workspace: string): string | null {
+  if (!pathExists(transparencyLogPath(workspace))) {
+    return "";
+  }
+  const lines = readUtf8(transparencyLogPath(workspace)).trimEnd();
+  try {
+    return lines.length === 0 ? "" : transparencyEntrySchema.parse(JSON.parse(lines.slice(lines.lastIndexOf("\n") + 1)) as unknown).hash;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * The tree this workspace grows (P1-26). Legacy only while a signed root that verifies says so (or predates the
- * field) and no migration record exists; a new workspace, or a root whose signature fails, grows the RFC 9162 tree.
- * The choice never comes from an unsigned file, so editing a cache cannot downgrade the log.
+ * The tree the log seal names (P1-26): its `merkleAlgorithm` (absent means legacy) when the seal's signature verifies
+ * and it covers the log's last entry, else null. The seal is re-signed on every append and migration appends a log
+ * entry, so neither deleting a file nor restoring an older seal brings back a legacy claim for the current log.
+ */
+function sealedTreeAlgorithm(workspace: string): MerkleAlgorithm | null {
+  const { row, errors } = readSignedRow(workspace, join(transparencyDir(workspace), "log.seal.json"),
+    join(transparencyDir(workspace), "log.seal.sig"), transparencySealSchema, "transparency seal");
+  return row !== null && errors.length === 0 && row.lastHash === logTailHash(workspace) ? row.merkleAlgorithm ?? "amc-legacy-v1" : null;
+}
+
+/**
+ * The tree this workspace grows (P1-26), sticky and fail-closed. Legacy only while the signed current root, the log
+ * seal (covering the last entry) and the absence of a migration record all say so; anything missing, unverifiable or
+ * naming rfc9162-sha256 means RFC 9162. The choice never comes from an unsigned file, so editing a cache, deleting a
+ * file or restoring an older signed root cannot downgrade a migrated log.
  */
 export function currentTreeAlgorithm(workspace: string): MerkleAlgorithm {
   const { row, errors } = readSignedCurrentRoot(workspace);
   const legacy = row !== null && errors.length === 0 && (row.algorithm ?? "amc-legacy-v1") === "amc-legacy-v1";
-  return legacy && !pathExists(merkleMigrationPath(workspace)) ? "amc-legacy-v1" : "rfc9162-sha256";
+  return legacy && !pathExists(merkleMigrationPath(workspace)) && sealedTreeAlgorithm(workspace) === "amc-legacy-v1"
+    ? "amc-legacy-v1" : "rfc9162-sha256";
 }
 
 function tarCreate(sourceDir: string, outFile: string): void {
@@ -259,39 +286,22 @@ function publishRoot(params: {
  * to it whenever the incremental resume state cannot be trusted. It is no longer
  * on the per-append hot path.
  *
- * P1-26: it keeps the workspace's tree unless `algorithm` names another. Moving a
- * legacy log to `rfc9162-sha256` needs a legacy root that verifies against the
- * log, and signs a migration record binding both roots over the same entries.
- * Nothing moves a log back to the legacy tree.
+ * P1-26: it rebuilds the tree currentTreeAlgorithm names; writeMerkleMigrationRecord
+ * plus a sealed log entry is the only way from the legacy tree to RFC 9162, and
+ * nothing goes back.
  */
-export function rebuildTransparencyMerkle(workspace: string, opts: { algorithm?: MerkleAlgorithm } = {}): {
+export function rebuildTransparencyMerkle(workspace: string): {
   leafCount: number;
   root: string;
   algorithm: MerkleAlgorithm;
   currentRootPath: string;
   currentRootSigPath: string;
-  migrationPath: string | null;
 } {
-  const current = currentTreeAlgorithm(workspace);
-  const algorithm = opts.algorithm ?? current;
-  if (algorithm === "amc-legacy-v1" && current !== "amc-legacy-v1") {
-    throw new Error("refusing to rebuild as amc-legacy-v1: the legacy tree is ambiguous, and logs migrate only to rfc9162-sha256");
-  }
+  const algorithm = currentTreeAlgorithm(workspace);
   ensureDir(transparencyMerkleDir(workspace));
   const entryHashes = readTransparencyEntryHashes(workspace);
   const root = entryTreeRoot(algorithm, entryHashes);
   const lastEntryHash = entryHashes[entryHashes.length - 1] ?? "";
-  let migrationPath: string | null = null;
-  if (algorithm !== current) {
-    const legacy = verifyTransparencyMerkle(workspace);
-    if (!legacy.ok || legacy.root === null) {
-      throw new Error(`migrate only a legacy root that verifies; run \`amc transparency merkle rebuild\` first (${legacy.errors.join("; ")})`);
-    }
-    migrationPath = merkleMigrationPath(workspace);
-    writeSignedRow(workspace, migrationPath, merkleMigrationSigPath(workspace), merkleMigrationSchema.parse({
-      v: 1, ts: Date.now(), legacyRoot: legacy.root, rfc9162Root: root, leafCount: entryHashes.length, lastEntryHash
-    }));
-  }
   const leavesText = entryHashes.map((entryHash, index) => merkleLeafLine(entryHash, index, algorithm)).join("\n");
   writeFileAtomic(merkleLeavesPath(workspace), leavesText.length > 0 ? `${leavesText}\n` : "", 0o644);
 
@@ -310,9 +320,31 @@ export function rebuildTransparencyMerkle(workspace: string, opts: { algorithm?:
     root,
     algorithm,
     currentRootPath: merkleCurrentRootPath(workspace),
-    currentRootSigPath: merkleCurrentRootSigPath(workspace),
-    migrationPath
+    currentRootSigPath: merkleCurrentRootSigPath(workspace)
   };
+}
+
+/**
+ * Step one of moving a legacy log to RFC 9162 (P1-26): signs a record binding the verified legacy root to the RFC 9162
+ * root over the same entries. The caller then appends a log entry naming the record's sha256, which re-seals the log
+ * as rfc9162-sha256 and rebuilds the index (transparencyMerkleRebuildCli does both).
+ */
+export function writeMerkleMigrationRecord(workspace: string): { path: string; sha256: string; record: MerkleMigrationRecord } {
+  if (currentTreeAlgorithm(workspace) !== "amc-legacy-v1") {
+    throw new Error("this log already grows the rfc9162-sha256 tree");
+  }
+  const legacy = verifyTransparencyMerkle(workspace);
+  if (!legacy.ok || legacy.root === null) {
+    throw new Error(`migrate only a legacy root that verifies; run \`amc transparency merkle rebuild\` first (${legacy.errors.join("; ")})`);
+  }
+  const entryHashes = readTransparencyEntryHashes(workspace);
+  const record = merkleMigrationSchema.parse({
+    v: 1, ts: Date.now(), legacyRoot: legacy.root, rfc9162Root: entryTreeRoot("rfc9162-sha256", entryHashes),
+    leafCount: entryHashes.length, lastEntryHash: entryHashes[entryHashes.length - 1] ?? ""
+  });
+  const path = merkleMigrationPath(workspace);
+  writeSignedRow(workspace, path, merkleMigrationSigPath(workspace), record);
+  return { path, sha256: sha256Hex(readFileSync(path)), record };
 }
 
 export interface TransparencyMerkleVerification {
@@ -398,6 +430,10 @@ export function verifyTransparencyMerkle(workspace: string): TransparencyMerkleV
     errors.push(`cannot recompute merkle root from transparency log: ${String(error)}`);
   }
   const migration = verifyMerkleMigration(workspace, entryHashes, errors);
+  // Sticky: after a migration (a signed record, or a seal naming RFC 9162), a legacy root is a downgrade.
+  if (algorithm === "amc-legacy-v1" && (migration !== null || sealedTreeAlgorithm(workspace) === "rfc9162-sha256")) {
+    errors.push("merkle root uses amc-legacy-v1 but the log moved to rfc9162-sha256; a legacy root is refused after migration");
+  }
   return {
     ok: errors.length === 0,
     errors,
@@ -461,9 +497,17 @@ export function exportTransparencyProofBundle(params: {
   outFile: string;
 }): { outFile: string; proof: MerkleProofPayload } {
   const proof = generateTransparencyInclusionProof(params.workspace, params.entryHash);
+  // P1-26: the bundle carries the signed root its verifier takes the tree and tree size from, so it must be that root.
+  const rootBytes = readFileSync(merkleCurrentRootPath(params.workspace));
+  const signedRow = merkleRootRowSchema.parse(JSON.parse(rootBytes.toString("utf8")) as unknown);
+  if (signedRow.root !== proof.merkleRoot || (signedRow.algorithm ?? "amc-legacy-v1") !== (proof.algorithm ?? "amc-legacy-v1")) {
+    throw new Error("the proof's root is not the signed current root; run `amc transparency merkle rebuild` first");
+  }
   const tmp = mkdtempSync(join(tmpdir(), "amc-proof-"));
   try {
     writeFileAtomic(join(tmp, "proof.json"), JSON.stringify(proof, null, 2), 0o644);
+    writeFileAtomic(join(tmp, "root.json"), rootBytes, 0o644);
+    writeFileAtomic(join(tmp, "root.sig"), readFileSync(merkleCurrentRootSigPath(params.workspace)), 0o644);
     const digest = sha256Hex(readFileSync(join(tmp, "proof.json")));
     const signed = signDigestWithPolicy({
       workspace: params.workspace,
@@ -496,8 +540,41 @@ export function exportTransparencyProofBundle(params: {
 }
 
 /**
+ * The tree and size a proof bundle is checked under (P1-26), from its signed root.json, never from proof.json. A
+ * bundle without root.json predates P1-26 and is checked as amc-legacy-v1 only; a proof naming another tree than its
+ * signed root fails.
+ */
+function bundledRootTree(dir: string, proof: MerkleProofPayload, check: (file: string, digest: string, sig: z.infer<typeof rootSignatureSchema>) => boolean,
+  errors: string[]): { algorithm: MerkleAlgorithm; treeSize: number | undefined } {
+  const rootFile = join(dir, "root.json");
+  const sigFile = join(dir, "root.sig");
+  let tree: { algorithm: MerkleAlgorithm; treeSize: number | undefined } = { algorithm: "amc-legacy-v1", treeSize: undefined };
+  if (pathExists(rootFile) || pathExists(sigFile)) {
+    try {
+      const bytes = readFileSync(rootFile);
+      const row = merkleRootRowSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+      const sig = rootSignatureSchema.parse(JSON.parse(readUtf8(sigFile)) as unknown);
+      const digest = sha256Hex(bytes);
+      if (digest !== sig.digestSha256 || !check("root.sig", digest, sig)) errors.push("signed root signature invalid");
+      if (row.root !== proof.merkleRoot) errors.push(`proof root ${proof.merkleRoot} is not the signed root ${row.root}`);
+      tree = { algorithm: row.algorithm ?? "amc-legacy-v1", treeSize: row.leafCount };
+    } catch (error) {
+      errors.push(`invalid signed root in the bundle: ${String(error)}`);
+      return { algorithm: "rfc9162-sha256", treeSize: undefined };
+    }
+  }
+  if ((proof.algorithm ?? "amc-legacy-v1") !== tree.algorithm) {
+    errors.push(`proof names ${proof.algorithm ?? "amc-legacy-v1"}, but its signed root is ${tree.algorithm}`);
+  }
+  if (tree.algorithm === "rfc9162-sha256" && proof.treeSize !== tree.treeSize) {
+    errors.push(`proof tree size ${String(proof.treeSize)} is not the signed root's ${String(tree.treeSize)}`);
+  }
+  return tree;
+}
+
+/**
  * auditor.pub, the envelope key and --pubkey only locate the signer of proof.json (which names the Merkle root the path
- * must resolve to); admitKey decides whether it is pinned for artifact-seal (P0-51).
+ * must resolve to) and of root.json; admitKey decides whether it is pinned for artifact-seal (P0-51).
  */
 export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustContext, pubkeyPem?: string | null): {
   ok: boolean;
@@ -525,30 +602,36 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
       errors.push("proof bundle missing required files");
       return finish();
     }
+    const proofBytes = readFileSync(proofFile);
     try {
-      proof = merkleProofPayloadSchema.parse(JSON.parse(readUtf8(proofFile)) as unknown);
+      proof = merkleProofPayloadSchema.parse(JSON.parse(proofBytes.toString("utf8")) as unknown);
     } catch (error) {
       errors.push(`invalid proof.json: ${String(error)}`);
     }
+    const candidates = [pubkeyPem, readUtf8(pubFile)];
+    const signedBy = (name: string, digest: string, sig: z.infer<typeof rootSignatureSchema>): boolean => {
+      const check = checkDigestSignature({ signature: name, purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+        candidates: [...candidates, envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
+      signatures.push(check.admission);
+      return check.verified && (sig.envelope === undefined || sig.signature === sig.envelope.sigB64);
+    };
     try {
       const sig = merkleProofSignatureSchema.parse(JSON.parse(readUtf8(sigFile)) as unknown);
-      const digest = sha256Hex(readFileSync(proofFile));
+      const digest = sha256Hex(proofBytes);
       if (digest !== sig.digestSha256) {
         errors.push("proof signature digest mismatch");
-      } else {
-        const check = checkDigestSignature({ signature: "proof.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
-          candidates: [pubkeyPem, readUtf8(pubFile), envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
-        signatures.push(check.admission);
-        if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
-          errors.push("proof signature invalid");
-        }
+      } else if (!signedBy("proof.sig", digest, sig)) {
+        errors.push("proof signature invalid");
       }
     } catch (error) {
       errors.push(`invalid proof.sig: ${String(error)}`);
     }
-    if (proof && !verifyEntryInclusion({ algorithm: proof.algorithm ?? "amc-legacy-v1", entryHash: proof.entryHash, leafIndex: proof.leafIndex,
-      treeSize: proof.treeSize, proofPath: proof.proofPath, root: proof.merkleRoot })) {
-      errors.push("proof path does not resolve to merkle root");
+    if (proof) {
+      const tree = bundledRootTree(root, proof, signedBy, errors);
+      if (!verifyEntryInclusion({ algorithm: tree.algorithm, entryHash: proof.entryHash, leafIndex: proof.leafIndex,
+        treeSize: tree.treeSize, proofPath: proof.proofPath, root: proof.merkleRoot })) {
+        errors.push("proof path does not resolve to merkle root");
+      }
     }
     return finish();
   } catch (error) {
@@ -582,12 +665,13 @@ function applyIncrementalAppend(params: {
   workspace: string;
   entryHash: string;
   prevEntryHash: string;
+  algorithm: MerkleAlgorithm;
 }): TransparencyMerkleUpdate | null {
   const state = readMerkleFrontierState(params.workspace);
   if (!state) {
     return null;
   }
-  const algorithm = currentTreeAlgorithm(params.workspace);
+  const { algorithm } = params;
   const blocker = frontierResumeBlocker({
     state,
     expectedPrevEntryHash: params.prevEntryHash,
@@ -641,13 +725,15 @@ function applyIncrementalAppend(params: {
  */
 export function updateTransparencyMerkleAfterAppend(
   workspace: string,
-  appended: { entryHash: string; prevEntryHash: string }
+  /** `algorithm`: what currentTreeAlgorithm said just before the append (appendTransparencyEntry passes it). */
+  appended: { entryHash: string; prevEntryHash: string; algorithm?: MerkleAlgorithm }
 ): TransparencyMerkleUpdate {
   try {
     const incremental = applyIncrementalAppend({
       workspace,
       entryHash: appended.entryHash,
-      prevEntryHash: appended.prevEntryHash
+      prevEntryHash: appended.prevEntryHash,
+      algorithm: appended.algorithm ?? currentTreeAlgorithm(workspace)
     });
     const result = incremental ?? { mode: "rebuild" as const, reason: "no usable merkle frontier state", leafCount: 0, root: "" };
     if (result.mode === "incremental") {

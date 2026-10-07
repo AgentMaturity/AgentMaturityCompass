@@ -12476,7 +12476,7 @@ transparencyMerkle
     const out = transparencyMerkleRebuildCli(process.cwd(), { algorithm: opts.algorithm });
     console.log(chalk.green("Transparency Merkle rebuilt"));
     console.log(`algorithm=${out.algorithm}`);
-    if (out.migrationPath) console.log(`migration=${out.migrationPath}`);
+    if (out.migration) console.log(`migration=${out.migration.path} (log entry ${out.migration.entryHash})`);
     console.log(`leafCount=${out.leafCount}`);
     console.log(`root=${out.root}`);
     console.log(`currentRoot=${out.currentRootPath}`);

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MERKLE_ALGORITHMS } from "./merkle.js";
 
 /**
  * What a transparency entry may anchor.
@@ -11,6 +12,9 @@ import { z } from "zod";
  * `session-root` (P2.4 stage 2) anchors the Merkle root of one closed agent
  * session, so a session can be proven to a third party who holds nothing but a
  * proof bundle and the signed transparency root.
+ *
+ * `merkle-migration` (P1-26) records the signed legacy-to-RFC 9162 migration
+ * record in the hash chain, so the move cannot be undone by deleting a file.
  */
 export const TRANSPARENCY_ARTIFACT_KINDS = [
   "amccert",
@@ -24,7 +28,8 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "plugin",
   "garak-scan-report",
   "vulnerability-scan-report",
-  "session-root"
+  "session-root",
+  "merkle-migration"
 ] as const;
 
 export type TransparencyArtifactKind = (typeof TRANSPARENCY_ARTIFACT_KINDS)[number];
@@ -47,7 +52,9 @@ export const transparencySealSchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
   lastHash: z.string(),
-  signerFingerprint: z.string().length(64)
+  signerFingerprint: z.string().length(64),
+  /** P1-26: the tree the Merkle index grows, re-signed on every append; absent (older seals) means amc-legacy-v1. */
+  merkleAlgorithm: z.enum(MERKLE_ALGORITHMS).optional()
 });
 
 export const transparencySealSignatureSchema = z.object({
