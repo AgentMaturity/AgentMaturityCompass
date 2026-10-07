@@ -17,9 +17,31 @@ The CLI, Dashboard, diagnostics, and Studio all read this chain. There is no sep
 4. An authenticated approver opens Studio or uses the CLI to record a signed decision.
 5. The agent polls `/agent/approvals/:id/status` with a valid lease.
 6. ToolHub permits execution only after the signed quorum is `QUORUM_MET` and every bound policy, tools, budget, intent, work-order, and lease context still verifies.
-7. A successful execute consumes the approval once. Replay is denied.
+7. Execute consumes the approval once, by exclusive create, before the tool runs. A replay, or a second execute racing the first, is denied before any effect. A tool run that then fails has still spent the approval.
 
 `DENIED`, `EXPIRED`, `CANCELLED`, and `CONSUMED` are terminal. AMC rejects further decisions or cancellation attempts for a terminal request.
+
+## What an approval binds
+
+For a native agent run with `--approve-tools`, a call in an authorized class (every class except `READ_ONLY` and `WRITE_LOW`) is approved under the tool's own signed action class, not the `--approve-tools` class, and the question names the amount and recipient first. The approval binds the call's authorization intent: the tool, its adapter and class, a digest of the normalized arguments, the amount, recipient, destination and resource, the deployment digest of the signed policy files, and the workspace id. The intent is kept with the signed request.
+
+The tool pipeline binds an authorization record (`amc.authorization-record/v1`, ADR 009) when the call enters and rechecks it as the last step before the tool runs. The call is denied, and the tool never runs, when:
+
+- the amount, recipient, destination or resource differs from what was approved (`binding_changed:amount` and so on), or the tool differs (`tool_changed`);
+- a signed tools, action or budgets policy changed after the approval (`policy_revision_changed`, `deployment_changed`);
+- the approval expired, was cancelled or denied, was already consumed, or was issued under another action class;
+- the class is frozen by a signed incident, a lease the composition supplies is revoked or does not cover the class (a lease's optional `executeActionClasses`), or a delegated child calls outside its scope;
+- an approval, lease, freeze or policy store cannot be read (`authority_store_unavailable`).
+
+A `FINANCIAL` tool must declare `bindingFields` for `amount`, `currency` and `recipient` in `.amc/tools.yaml`, and a `DATA_EXPORT` tool for `destination`; otherwise every call is denied `binding_fields_missing`. Amounts are decimal strings such as `"100.50"`; a JSON number is refused. Create the approval policy (`amc policy approval init`) before the first gated run: the deployment digest covers it, so a policy the engine creates while raising the first approval denies that call `deployment_changed`.
+
+```yaml
+- name: payments.transfer
+  actionClass: FINANCIAL
+  bindingFields: { amount: amount, currency: currency, recipient: payee }
+```
+
+Arguments such as `approvalId`, `approved` or `consent` grant nothing. Only the approval gate names approvals, after a grant. Under a gate, a call in an authorized class needs a signed approval from the approvals engine: an answerer's allow, including an ADR-5 exception, names none and is denied `approval_missing`. Code Mode sub-calls are asked one by one. Each call's tool evidence rows carry `authorizationId` and `authorizationDigest`, and one `AUTHORIZATION_RECORD` audit row holds the full record. The record and its signatures are checked against the workspace's own keys: a local audit trail, not a portable verdict.
 
 ## CLI
 

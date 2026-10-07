@@ -10,13 +10,15 @@
         { "path": "src/tools/toolPipeline.ts", "symbol": "ToolPipeline" },
         { "path": "src/tools/toolPipeline.ts", "symbol": "askApproval" },
         { "path": "src/agent/agentToolset.ts", "symbol": "agentToolset" },
+        { "path": "src/actions/authorize.ts", "symbol": "bindAuthorization" },
+        { "path": "src/actions/authorize.ts", "symbol": "recheckAuthorization" },
         { "path": "src/tools/toolEvidence.ts", "symbol": "toolEvidenceFor" }
       ],
-      "evidence": "Tool evidence rows: audit TOOL_CALL_ALLOWED, TOOL_CALL_DENIED or TOOL_CALL_FAILED, a metric row and a stdout descriptor, written by the composed recorder",
+      "evidence": "Tool evidence rows: audit TOOL_CALL_ALLOWED, TOOL_CALL_DENIED or TOOL_CALL_FAILED, a metric row and a stdout descriptor, written by the composed recorder; for an authorized call each carries authorizationId and authorizationDigest, and one AUTHORIZATION_RECORD row holds the record",
       "status": "enforced",
       "bypasses": [
         "A recorder that throws after the body ran is swallowed in ToolPipeline.execute; the effect stands and its row is missing",
-        "The approval answer is allow, deny or unavailable; no authorization record binds it to the frozen arguments",
+        "Exceptions and break-glass are not part of the authorization record (P2-24); tenant, deployment and control ids stay unregistered (P1-12)",
         "domainRules written by applyDomainToAgent (src/domains/domainApply.ts) are read by no guard"
       ],
       "owners": ["P1-02", "P1-03", "P1-12"],

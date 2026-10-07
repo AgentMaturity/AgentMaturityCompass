@@ -1,0 +1,14 @@
+---
+"agent-maturity-compass": major
+---
+
+Security: a tool call is now bound to an authorization record and rechecked before it runs (P1-02, ADR 009).
+
+- Every native tool call in an authorized class (every class except `READ_ONLY` and `WRITE_LOW`) carries an `amc.authorization-record/v1`. The tool pipeline binds it when the call enters, from the signed tools config, the workspace's policy files and AMC's clock, and rechecks it after the guards as the last step before the tool body. The recheck recomputes the argument and deployment digests, re-verifies each approval against the exact intent about to run, checks the signed freeze for the class, the record's expiry, the delegation scope and any lease, then consumes the approvals. Any failure denies at the new `authorization` stage with codes such as `binding_changed:amount`, `approval_consumed`, `policy_revision_changed` or `authority_store_unavailable`, and the tool never runs.
+- With `--approve-tools`, a call in an authorized class is approved under the tool's own signed action class, not the flag's class, and the approval binds its authorization intent (tool, adapter, class, normalized-argument digest, amount, recipient, destination, resource, deployment digest, workspace). The engine keeps that intent with the signed request. A changed amount, recipient, destination, resource, tool or signed policy after approval denies the call.
+- Under an approval gate, a call in an authorized class needs a signed approval from the approvals engine. An answerer's `allow`, including an ADR-5 exception, names none and is now denied `approval_missing` for those classes. Code Mode sub-calls are asked one by one instead of riding on the `run_code` approval.
+- `FINANCIAL` tools must declare `bindingFields` for `amount`, `currency` and `recipient` in `.amc/tools.yaml`, and `DATA_EXPORT` tools for `destination`; otherwise every call is denied `binding_fields_missing`. Amounts are decimal strings; a JSON number is refused.
+- Arguments such as `approvalId`, `approved` or `consent` grant nothing; the record keeps them as untrusted `agentSuppliedMetadata`.
+- Approval consumption is an exclusive create, so two processes cannot both spend one approval. ToolHub now consumes before running the tool and denies a replay before any effect; a tool run that then fails has spent its approval.
+- A lease may name `executeActionClasses`; `toolhub:execute` then covers only those classes, including for agent tokens minted from the lease.
+- Tool evidence rows of an authorized call carry `authorizationId` and `authorizationDigest`, and one `AUTHORIZATION_RECORD` audit row holds the full record. The record is AMC's own statement, checked against the workspace's own keys: a local audit trail, not a portable verdict.
