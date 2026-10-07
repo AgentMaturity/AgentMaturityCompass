@@ -153,7 +153,8 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("benchmark replay-corpus", "benchmark:replayCorpus"),
 
   // Compliance and audit: regulated results, never a pass without an applicability decision.
-  self("compliance report", "compliance"),
+  // Without --framework, a non-interactive call lists the frameworks instead.
+  self("compliance report", "compliance", (o) => typeof o.framework === "string"),
   self("compliance matrix", "compliance:matrix"),
   self("compliance fleet", "compliance:fleet"),
   self("compliance diff", "compliance:diff"),

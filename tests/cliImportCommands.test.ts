@@ -73,9 +73,15 @@ describe("amc import text rendering", () => {
     expect(text()).not.toMatch(/Next:|--expected-digest/);
   });
 
-  test("JSON output stays the exact receipt serialization", async () => {
+  test("JSON output is the exact receipt serialization plus its claim fields (P0-22)", async () => {
     importer.runNeutralImport.mockReturnValue(preview);
     await run("import", "fixture", "--dry-run", "--json");
-    expect(lines).toEqual([JSON.stringify(preview, null, 2)]);
+    expect(lines).toHaveLength(1);
+    const { claimKind, statusDimensions, claimLabel, ...receipt } = JSON.parse(lines[0]!) as Record<string, unknown>;
+    expect(receipt).toEqual(preview);
+    // Imported records are what their source reported: self-reported, never evaluated by the import.
+    expect(claimKind).toBe("self_reported");
+    expect(statusDimensions).toMatchObject({ result: "not_evaluated" });
+    expect(claimLabel).toMatch(/^Claim: Self-reported · Result: not evaluated/);
   });
 });
