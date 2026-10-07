@@ -13,6 +13,7 @@ It is an engineering evidence package, not legal advice.
 - Supply-chain integrity summaries (plugins, releases, backups)
 - Recurrence/cadence status
 - Compliance control-family results from the active signed map
+- For an agent scope, the agent's newest conformance run that verifies under pinned trust (`sections.conformanceRun`), with an allowlisted projection of it (ids, statuses, claim kinds, status-dimension states, counts, digests and times; session and answer ids hashed) in `checks/conformance-run.json` and `summaries/conformance-run.md`, whose digests binder.json records; otherwise `status: null` and the note "no verified conformance run". See `docs/CONFORMANCE_RUNS.md`.
 - Proof bindings to transparency and Merkle roots
 
 ## What It Does Not Contain
