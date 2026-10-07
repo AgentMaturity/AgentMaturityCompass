@@ -66,15 +66,12 @@ describe("release engineering pack", () => {
     const dir = tmp("amc-release-tamper-");
     const extracted = join(dir, "extract");
     try {
-      const privateKeyPath = join(dir, "release-signing.pem");
-      writeFileSync(privateKeyPath, makePrivateKeyPem(), { mode: 0o600 });
-      const outFile = join(dir, "bundle.amcrelease");
-      createReleaseBundle({
-        workspace,
-        outFile,
-        privateKeyPath,
-        skipInstallBuild: true
-      });
+      // A real signed bundle in the `amc release pack` format, of a one-file package: packing the whole repository
+      // here took ~8 s alone and timed out (30 s) when CI ran several suites at once. The tamper checks need any
+      // signed bundle with a manifest and an SBOM artifact, not the repository's own.
+      const tiny = tinyReleaseBundle(dir);
+      const outFile = tiny.file;
+      const signerTrust = pinnedTrust([{ publicKeyPem: tiny.publicKeyPem, purposes: ["release"] }]);
 
       // Tamper inside a directory that holds only the bundle tree, so the repack is a well-formed bundle and
       // the verifier gets as far as checking the signature and hashes instead of failing to find the archive root.
@@ -88,7 +85,7 @@ describe("release engineering pack", () => {
       writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
       const tamperedManifestBundle = join(dir, "tampered-manifest.amcrelease");
       repackFromDir(extracted, tamperedManifestBundle);
-      const tamperedManifest = verifyReleaseBundle(tamperedManifestBundle, releaseTrust(privateKeyPath));
+      const tamperedManifest = verifyReleaseBundle(tamperedManifestBundle, signerTrust);
       expect(tamperedManifest.ok).toBe(false);
       expect(tamperedManifest.errors).toContain("manifest signature verification failed");
 
@@ -100,7 +97,7 @@ describe("release engineering pack", () => {
       writeFileSync(sbomPath, `${readFileSync(sbomPath, "utf8")}\n/*tamper*/\n`);
       const tamperedArtifactBundle = join(dir, "tampered-artifact.amcrelease");
       repackFromDir(extracted, tamperedArtifactBundle);
-      const tamperedArtifact = verifyReleaseBundle(tamperedArtifactBundle, releaseTrust(privateKeyPath));
+      const tamperedArtifact = verifyReleaseBundle(tamperedArtifactBundle, signerTrust);
       expect(tamperedArtifact.ok).toBe(false);
       expect(tamperedArtifact.errors.some((error) => error.startsWith("sbom sha mismatch"))).toBe(true);
       // The signature is still the signer's: only the artifact changed, and the verdict says which.
