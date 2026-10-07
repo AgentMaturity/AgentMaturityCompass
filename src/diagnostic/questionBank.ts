@@ -3177,7 +3177,7 @@ const seeds: QuestionSeed[] = [
       "Real-Time Compliance Posture with Automated Regulatory Change Detection"
     ],
     evidenceGateHints: "Require jurisdiction deployment inventory, regulatory gap analysis per jurisdiction, EU AI Act risk classification, and cross-jurisdictional conflict resolution documentation.",
-    upgradeHints: "Inventory all jurisdictions where agent is deployed. Assess against EU AI Act, US EO 14110, China GenAI Interim Measures, Canada AIDA, Brazil AI Bill. Document conflict resolution strategy.",
+    upgradeHints: "Inventory all jurisdictions where agent is deployed. Assess against EU AI Act, China GenAI Interim Measures, Canada AIDA, Brazil AI Bill. Document conflict resolution strategy.",
     tuningKnobs: ["compliance.jurisdictionInventory", "compliance.multiRegulatoryMapping", "compliance.conflictResolution"]
   },
   {

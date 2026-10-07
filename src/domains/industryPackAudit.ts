@@ -119,7 +119,7 @@ export interface FrameworkAnchors {
 const DIMENSION_ANCHORS: Array<{ match: RegExp; anchors: FrameworkAnchors }> = [
   { match: /privacy|data protection|pii|phi|confidential|consent/i, anchors: { euAiAct: "Art. 10 — Data & data governance", nist: "MAP 2.3 — data provenance & privacy", iso: "A.7 — Data for AI systems", soc2: "P / C — Privacy & Confidentiality criteria" } },
   { match: /security|encryption|access|threat|cyber|vulnerab|breach/i, anchors: { euAiAct: "Art. 15 — Accuracy, robustness & cybersecurity", nist: "MANAGE 2.2 — risk treatment controls", iso: "A.8 — Operational controls", soc2: "CC6 — Logical & physical access controls" } },
-  { match: /governance|policy|oversight role|accountab|management|risk|control map/i, anchors: { euAiAct: "Art. 9 — Risk management system", nist: "GOVERN 1.1 — policies & accountability", iso: "A.5 — Internal organization & AI policy", soc2: "CC1 / CC3 — Control environment & risk assessment" } },
+  { match: /governance|policy|oversight role|accountab|management|risk|control map/i, anchors: { euAiAct: "Art. 9 — Risk management system", nist: "GOVERN 1.1 — legal and regulatory requirements involving AI are understood, managed, and documented", iso: "A.5 — Internal organization & AI policy", soc2: "CC1 / CC3 — Control environment & risk assessment" } },
   { match: /transparen|explainab|disclos|report|documentation|notice/i, anchors: { euAiAct: "Art. 13 — Transparency & information provision", nist: "MAP 3.4 — documentation & transparency", iso: "A.9 — Information for interested parties", soc2: "CC2 — Communication & information" } },
   { match: /audit|log|record|monitor|trace|observab|surveillance/i, anchors: { euAiAct: "Art. 12 — Record-keeping (automatic logs)", nist: "MEASURE 2.7 — monitoring & logging", iso: "A.6 — AI system lifecycle & operation", soc2: "CC7 — System operations & monitoring" } },
   { match: /human|review|approval|escalat|intervention|override/i, anchors: { euAiAct: "Art. 14 — Human oversight", nist: "MANAGE 4.1 — human roles & intervention", iso: "A.6.2 — AI system operation controls", soc2: "CC5 — Control activities" } },
@@ -129,7 +129,7 @@ const DIMENSION_ANCHORS: Array<{ match: RegExp; anchors: FrameworkAnchors }> = [
 
 const DEFAULT_ANCHORS: FrameworkAnchors = {
   euAiAct: "Art. 9 — Risk management system",
-  nist: "GOVERN 1.1 — policies & accountability",
+  nist: "GOVERN 1.1 — legal and regulatory requirements involving AI are understood, managed, and documented",
   iso: "A.5 — AI policy",
   soc2: "CC3 — Risk assessment",
 };

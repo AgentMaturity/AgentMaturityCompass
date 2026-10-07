@@ -23,7 +23,7 @@ A citation field holding several citations is split on `;` and each part is chec
 
 | Rule | Name | Fails when | Tolerance |
 | --- | --- | --- | --- |
-| CIT001 | superseded-as-live | A citation matches an entry in `src/compliance/citations/supersededInstruments.ts` and does not resolve to a catalogue record with status `repealed` and `supersededBy`. | Ratcheted until P0-24 corrects the citations, then zero |
+| CIT001 | superseded-as-live | A citation matches an entry in `src/compliance/citations/supersededInstruments.ts` and does not resolve to a catalogue record with status `repealed` and `supersededBy`. | Zero (since P0-24) |
 | CIT002 | framework-id | An id does not match its format (`AML.T0000` or `AML.T0000.000`; `GOVERN 1.1`; `A.5` or `A.6.2`). | Zero |
 | CIT002 | framework-id | An id is missing from a filled reference table, or breaks a pair rule: prompt injection must be ATLAS `AML.T0051`; ISO/IEC 42001 `A.5` must not be labelled as AI policy. | Ratcheted until P0-24 and the expert review |
 | CIT003 | pack-reference | A pack id does not resolve in `listAssurancePacks()` (or, for `related.packs`, after ignoring case, `-` and `_`). | Zero |

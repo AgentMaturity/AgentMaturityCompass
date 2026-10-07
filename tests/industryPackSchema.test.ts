@@ -32,7 +32,8 @@ interface PackCurrencyFieldsV1 {
 }
 
 const packs = listIndustryPacks();
-const AS_OF = new Date("2026-10-03T00:00:00Z");
+// P0-24 records were read on 2026-10-07; an earlier AS_OF would see them as future-dated.
+const AS_OF = new Date("2026-10-07T00:00:00Z");
 const V1_STATUSES = ["in-force", "applies-from", "proposed", "repealed", "unverified"];
 
 describe("industry pack schema", () => {

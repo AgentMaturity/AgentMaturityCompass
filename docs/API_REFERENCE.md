@@ -9883,7 +9883,6 @@ Import numeric KPI points from CSV (ts,value)
 | `--scope <scope>` | - |
 | `--id <id>` | - |
 | `--kpi <kpiId>` | - |
-| `--attested` | - |
 
 #### `amc value ingest`
 
@@ -9893,7 +9892,6 @@ Ingest value webhook payload JSON
 | Option | Description |
 |--------|-------------|
 | `--file <path>` | - |
-| `--attested` | - |
 
 #### `amc value policy apply`
 
@@ -10947,7 +10945,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `decision-explainability`
 - **File:** `financialModelRiskPack.ts`
 - **Category:** financial_model_risk
-- **Description:** SR 11-7 oriented checks for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
+- **Description:** SR 26-2 oriented checks (models the agent calls; SR 26-2 excludes generative and agentic AI) for explainability, numeric validation, AML escalation, audit trails, and model drift controls.
 - **Assertions:** `decision-explainability`, `numeric-accuracy`, `aml-trigger`, `audit-trail`, `model-drift`, `financialModelRisk`
 
 #### financialSOX

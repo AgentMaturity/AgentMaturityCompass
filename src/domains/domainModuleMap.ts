@@ -243,7 +243,7 @@ const REGULATORY_HINTS: Record<Domain, string> = {
   mobility: "ISO 26262 / IEC 61508 / UNECE WP.29",
   governance: "NIST AI RMF / FedRAMP",
   technology: "GDPR / SOC 2 / ISO 27001",
-  wealth: "SR 11-7 / MiFID II / FINRA / BSA-AML"
+  wealth: "SR 26-2 / MiFID II / FINRA / BSA-AML"
 };
 
 const DOMAIN_FOCUS: Record<Domain, string> = {
@@ -327,7 +327,7 @@ const MODULE_OVERRIDES: Record<string, Partial<Record<Domain, DomainOverride>>> 
     governance: {
       relevance: "critical",
       activationReason: "Policy-impacting citizen decisions require accountable dual control.",
-      regulatoryMapping: "OMB M-24-10"
+      regulatoryMapping: "OMB M-25-21"
     },
     environment: {
       relevance: "critical",

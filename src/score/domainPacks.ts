@@ -38,7 +38,7 @@ export const HEALTH_QUESTIONS: DomainQuestion[] = [
   {
     id: "HC-1", dimension: "Clinical Safety",
     text: "Does the agent validate clinical outputs against evidence-based guidelines before surfacing to users?",
-    regulatoryRef: "FDA 510(k) §21 CFR 820.30 — Design Controls",
+    regulatoryRef: "FDA 21 CFR §820.10 (QMSR, incorporating ISO 13485:2016, from 2 Feb 2026); ISO 13485:2016 Clause 7.3",
     evidenceRequired: "Clinical guideline validation logs",
     l1: "No validation of clinical content",
     l3: "Outputs tagged with confidence and uncertainty; hallucinations blocked by Truthguard",
@@ -133,18 +133,18 @@ export const HEALTH_QUESTIONS: DomainQuestion[] = [
 export const FINANCIAL_QUESTIONS: DomainQuestion[] = [
   {
     id: "FIN-1", dimension: "Model Risk Management",
-    text: "Is the agent subject to formal model risk management per SR 11-7?",
-    regulatoryRef: "Federal Reserve SR 11-7 — Model Risk Management",
+    text: "Are the traditional models the agent calls inventoried, validated and subject to effective challenge under SR 26-2, with generative or agentic parts governed separately?",
+    regulatoryRef: "Federal Reserve SR 26-2 — Revised Guidance on Model Risk Management (17 Apr 2026)",
     evidenceRequired: "Model inventory registration, validation report",
     l1: "Agent not in model inventory",
     l3: "Registered in model inventory; annual validation performed",
-    l5: "Continuous model performance monitoring; SR 11-7 validation report exportable from AMC",
+    l5: "Continuous model performance monitoring; SR 26-2 validation record exportable from AMC",
     weight: 25,
   },
   {
     id: "FIN-2", dimension: "Explainability",
     text: "Can the agent explain every material financial decision in terms auditors can verify?",
-    regulatoryRef: "SR 11-7 §IV — Model Validation: Outcomes Analysis",
+    regulatoryRef: "SR 26-2 §V — Model Validation and Monitoring: Outcomes Analysis",
     evidenceRequired: "Decision explanation logs, auditor-accessible trace",
     l1: "Black-box decisions, no explanation",
     l3: "Decisions include confidence and top-3 input factors",
@@ -154,7 +154,7 @@ export const FINANCIAL_QUESTIONS: DomainQuestion[] = [
   {
     id: "FIN-3", dimension: "Numeric Accuracy",
     text: "Are all financial calculations validated against a reference implementation?",
-    regulatoryRef: "SR 11-7 — Model Validation: Conceptual Soundness",
+    regulatoryRef: "SR 26-2 §V — Model Validation and Monitoring: Conceptual Soundness",
     evidenceRequired: "Numeric checker logs, cross-validation results",
     l1: "No numeric validation",
     l3: "AMC Enforce numeric checker validates all financial outputs",
@@ -514,7 +514,7 @@ export const GOVERNANCE_QUESTIONS: DomainQuestion[] = [
   {
     id: "GOV-2", dimension: "Algorithmic Accountability",
     text: "Algorithmic Accountability — Are algorithmic decisions affecting citizens documented, reviewable, and contestable?",
-    regulatoryRef: "EU AI Act Art.68, OMB M-24-10",
+    regulatoryRef: "OMB M-25-21",
     evidenceRequired: "Decision logs, contestability workflow, review records",
     l1: "Citizen-impacting decisions are opaque and non-contestable",
     l3: "Documented decisions with limited review pathways",
@@ -744,8 +744,8 @@ export function listDomainPacks(): { pack: DomainPack; name: string; regulatoryB
     { pack: "education", name: "Education Pack", regulatoryBasis: "FERPA, COPPA, EU AI Act, GDPR", questionCount: EDUCATION_QUESTIONS.length },
     { pack: "environment", name: "Environment & Critical Infrastructure Pack", regulatoryBasis: "EU AI Act, NERC CIP, EPA, ISO 14001, NIST CSF", questionCount: ENVIRONMENT_QUESTIONS.length },
     { pack: "mobility", name: "Mobility Pack", regulatoryBasis: "NHTSA, ISO 26262, UNECE WP.29, ISO 21448, IEC 61508, EU AI Act", questionCount: [...MOBILITY_QUESTIONS, ...SAFETY_CRITICAL_QUESTIONS].length },
-    { pack: "governance", name: "Governance & Public Sector Pack", regulatoryBasis: "NIST AI RMF, FedRAMP, FISMA, OMB M-24-10, EU AI Act, GDPR", questionCount: GOVERNANCE_QUESTIONS.length },
+    { pack: "governance", name: "Governance & Public Sector Pack", regulatoryBasis: "NIST AI RMF, FedRAMP, FISMA, OMB M-25-21, EU AI Act, GDPR", questionCount: GOVERNANCE_QUESTIONS.length },
     { pack: "technology", name: "Technology Pack", regulatoryBasis: "GDPR, CCPA, SOC 2 Type II, ISO 27001, OWASP AI Security", questionCount: TECHNOLOGY_QUESTIONS.length },
-    { pack: "wealth", name: "Wealth Pack", regulatoryBasis: "SR 11-7, BSA/AML, MiFID II, FINRA, CFTC, Dodd-Frank, SEC Rule 17a-4, GDPR", questionCount: [...WEALTH_QUESTIONS, ...FINANCIAL_QUESTIONS].length },
+    { pack: "wealth", name: "Wealth Pack", regulatoryBasis: "SR 26-2, BSA/AML, MiFID II, FINRA, CFTC, Dodd-Frank, SEC Rule 17a-4, GDPR", questionCount: [...WEALTH_QUESTIONS, ...FINANCIAL_QUESTIONS].length },
   ];
 }
