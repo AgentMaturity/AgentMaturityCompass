@@ -170,6 +170,9 @@ express, all enforced by AMC (`src/trust/trustList.ts`):
   whose `keyId` the verifier pinned as a trust-list root. The list is expired when `asOf` ≥ `list.expiresAt`.
 - `timestampAuthorities` (optional, P1-25): `anchorId`s are unique, and each `rootCertificatePem` is exactly one PEM
   X.509 certificate. A timestamp token counts only through a path to one of them (docs/TRUSTED_TIME.md).
+- `transparencyLogs` (optional, P1-26): `logId`s are unique, and each `publicKeyPem` is an Ed25519 or ECDSA P-256,
+  P-384 or P-521 SPKI key. A public log checkpoint counts only when a C2SP signed-note signature under that key, with
+  `origin` as key name and first line, verifies (docs/PUBLIC_ANCHORING.md).
 
 ## verifier-report
 
@@ -181,7 +184,9 @@ read the separate results and not `trusted` alone. Status values are spelled `pa
 (P1-25) keeps `claimedAt` (what the artifact says) apart from `attested` (an RFC 3161 token that verified against a
 pinned TSA anchor); `basis` is `claimed`, `attested-upper-bound` or `attested-window`, and `freshness` fails with
 `BACKDATED_CLAIM` or `POSTDATED_CLAIM` when the claim lies outside the window widened by the token's accuracy and the
-tolerance (5 minutes).
+tolerance (5 minutes). The optional `anchoring.public` (P1-26) says whether the artifact's transparency checkpoint is
+held by a public log the verifier pinned: `anchored` (with `backend` and `logIndex`), `not-anchored`, or `invalid`,
+which is also an integrity error (docs/PUBLIC_ANCHORING.md).
 
 ## signature-envelope
 
