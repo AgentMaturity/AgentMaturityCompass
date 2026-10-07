@@ -25,6 +25,7 @@ import {
   admitKey, buildVerifierReport, checkDigestSignature, untrustedReasons, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
 import { carriedLedgerAnchoring, claimedTime, fileSha256 } from "../trust/signatureCheck.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -237,6 +238,7 @@ export async function issueCertificate(params: {
     throw new Error(`Run file not found: ${runPath}`);
   }
   const run = JSON.parse(readUtf8(runPath)) as DiagnosticReport;
+  assertNotExample(run, "certified");
   const policyAbs = resolve(workspace, params.policyPath);
   const policySigAbs = `${policyAbs}.sig`;
   if (!pathExists(policyAbs) || !pathExists(policySigAbs)) {

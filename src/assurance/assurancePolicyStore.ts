@@ -37,7 +37,7 @@ function assuranceRunDir(workspace: string, runId: string): string {
   return join(assuranceRunsRoot(workspace), runId);
 }
 
-function assuranceRunJsonPath(workspace: string, runId: string): string {
+export function assuranceRunJsonPath(workspace: string, runId: string): string {
   return join(assuranceRunDir(workspace, runId), "run.json");
 }
 

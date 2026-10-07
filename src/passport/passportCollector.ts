@@ -26,6 +26,7 @@ import { hashPassportId } from "./passportRedaction.js";
 import type { PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 function fileSha(path: string): string {
   if (!pathExists(path)) {
@@ -195,6 +196,7 @@ export function collectPassportData(params: {
   const scopeIdHash = hashPassportId(`${scope.type}:${scope.id}`, truncBytes);
 
   const report = readLatestDiagnosticRun(params.workspace, scope.agentIdForDiagnostic);
+  assertNotExample(report, "signed into a passport");
   const trustLabel = mapTrustLabel(report?.trustLabel);
   const integrityIndex = Number((report?.integrityIndex ?? 0).toFixed(4));
   const correlationRatio = Number((report?.correlationRatio ?? 0).toFixed(4));

@@ -17,6 +17,7 @@ import { exportNotaryAttestationBundle, verifyNotaryAttestationBundle } from "./
 import { resolveNotaryBindHost, startNotaryServer } from "./notaryServer.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
+import { assertFileNotExample } from "../claims/eligibility/exampleMode.js";
 
 function loadPassphraseForInit(): string {
   const fromFile = process.env.AMC_NOTARY_PASSPHRASE_FILE;
@@ -207,6 +208,7 @@ export function notarySignCli(params: {
   fingerprint: string;
   payloadSha256: string;
 } {
+  assertFileNotExample(params.inFile, "notary-signed");
   const notaryDir = resolveNotaryDir(params.notaryDir);
   const config = loadNotaryConfig(notaryDir);
   const signer = loadNotarySigner({

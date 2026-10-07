@@ -5,6 +5,8 @@ import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { resolveAgentId } from "../fleet/paths.js";
+import { eventMeta } from "../claims/evidenceProvenance.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 export type IngestType = "chatgpt" | "claude_console" | "gemini_ui" | "generic_json" | "generic_text";
 
@@ -152,6 +154,7 @@ export function attestIngestSession(params: {
     if (sourceEvents.length === 0) {
       throw new Error(`No ingest review events found for session ${params.ingestSessionId}`);
     }
+    for (const event of sourceEvents) assertNotExample(eventMeta(event), "attested");
 
     const bundleHash = sha256Hex(
       canonicalize(

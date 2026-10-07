@@ -53,7 +53,7 @@ function runCli(cwd: string, args: string[]) {
 function writeExampleRun(dir: string, runId: string): void {
   const path = join(dir, `${runId}.json`);
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify({ runId, agentId: "default", ts: Date.now(), ...EXAMPLE }));
+  writeFileSync(path, JSON.stringify({ runId, agentId: "example-agent", ts: Date.now(), ...EXAMPLE }));
 }
 
 beforeAll(() => {
@@ -122,27 +122,30 @@ describe("assertNotExample", () => {
 });
 
 describe("signing paths refuse a synthetic_example result", () => {
-  const runsDir = () => join(workspace, ".amc", "agents", "default", "runs");
+  const runsDir = () => join(workspace, ".amc", "agents", "example-agent", "runs");
 
   test("amc certify (issueCertificate)", async () => {
     writeExampleRun(runsDir(), "example-certify");
     const { issueCertificate } = await import("../src/assurance/certificate.js");
     await expect(issueCertificate({
-      workspace, runId: "example-certify", policyPath: "missing-policy.yaml", outFile: join(workspace, "x.amccert"), agentId: "default"
+      workspace, runId: "example-certify", policyPath: "missing-policy.yaml", outFile: join(workspace, "x.amccert"), agentId: "example-agent"
     })).rejects.toThrow(/synthetic_example results cannot be/);
   });
 
   test("amc bundle export (exportEvidenceBundle)", async () => {
     writeExampleRun(runsDir(), "example-bundle");
     const { exportEvidenceBundle } = await import("../src/bundles/bundle.js");
-    expect(() => exportEvidenceBundle({ workspace, runId: "example-bundle", outFile: join(workspace, "x.amcbundle"), agentId: "default" }))
+    expect(() => exportEvidenceBundle({ workspace, runId: "example-bundle", outFile: join(workspace, "x.amcbundle"), agentId: "example-agent" }))
       .toThrow(/synthetic_example results cannot be/);
   });
 
   test("amc assurance cert-issue (issueAssuranceCertificate)", async () => {
-    writeExampleRun(join(workspace, ".amc", "assurance", "runs", "example-assurance"), "run");
+    // Its own workspace: other collectors read every assurance run, and this fixture is not a valid one.
+    const own = tempDir("amc-p015-assurance-");
+    initWorkspace({ workspacePath: own, trustBoundaryMode: "isolated" });
+    writeExampleRun(join(own, ".amc", "assurance", "runs", "example-assurance"), "run");
     const { assuranceIssueCertCli } = await import("../src/assurance/assuranceCli.js");
-    await expect(assuranceIssueCertCli({ workspace, runId: "example-assurance" })).rejects.toThrow(/synthetic_example results cannot be/);
+    await expect(assuranceIssueCertCli({ workspace: own, runId: "example-assurance" })).rejects.toThrow(/synthetic_example results cannot be/);
   });
 
   test("amc attest (attestIngestSession)", async () => {
@@ -158,7 +161,7 @@ describe("signing paths refuse a synthetic_example result", () => {
     ledger.close();
     const { attestIngestSession } = await import("../src/ingest/ingest.js");
     expect(() => attestIngestSession({
-      workspace, ingestSessionId: "example-ingest", agentId: "default", attestedBy: "auditor", statement: "example"
+      workspace, ingestSessionId: "example-ingest", agentId: "example-agent", attestedBy: "auditor", statement: "example"
     })).toThrow(/synthetic_example results cannot be/);
   });
 

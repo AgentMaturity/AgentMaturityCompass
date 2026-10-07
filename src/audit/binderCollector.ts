@@ -36,6 +36,7 @@ import { type AuditPolicy } from "./auditPolicySchema.js";
 import { hashAuditId } from "./binderRedaction.js";
 import { binderJsonSchema, type AuditBinderJson } from "./binderSchema.js";
 import { type EvidenceRequest } from "./evidenceRequestSchema.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 interface ScopeInput {
   type: "WORKSPACE" | "NODE" | "AGENT";
@@ -765,6 +766,7 @@ export async function collectAuditBinderData(params: {
     const runId = findLatestAgentRunId(params.workspace, scope.id);
     if (runId) {
       const run = loadRunReport(params.workspace, runId, scope.id);
+      assertNotExample(run, "included in an audit binder");
       maturityOverall = Number((run.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / Math.max(1, run.layerScores.length)).toFixed(6));
       maturityByDim = byDimensionFromRun(run);
       unknownQuestionsCount = run.questionScores.filter((row) => row.finalLevel <= 1).length;

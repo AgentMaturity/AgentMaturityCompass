@@ -18,6 +18,7 @@ import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { carriedLedgerAnchoring } from "../trust/signatureCheck.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -641,6 +642,7 @@ export function exportEvidenceBundle(params: {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
   const report = loadRunReport(params.workspace, params.runId, agentId);
+  assertNotExample(report, "exported as an evidence bundle");
 
   const root = mkTmp("amc-bundle-build-");
   const cleanup = () => rmSync(root, { recursive: true, force: true });

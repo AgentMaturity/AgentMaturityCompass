@@ -26,6 +26,7 @@ import {
   assuranceCertificatesDir,
   assuranceLatestCertificatePath,
   assuranceLatestCertificateShaPath,
+  assuranceRunJsonPath,
   assuranceTimestampedCertificatePath,
   assuranceTimestampedCertificateShaPath,
   loadAssuranceFindings,
@@ -34,6 +35,7 @@ import {
   verifyAssurancePolicySignature
 } from "./assurancePolicyStore.js";
 import { evaluateAssuranceEvidenceGates } from "./assuranceScoring.js";
+import { assertFileNotExample } from "../claims/eligibility/exampleMode.js";
 
 function cleanup(path: string): void {
   if (pathExists(path)) {
@@ -135,6 +137,7 @@ export async function issueAssuranceCertificate(params: {
   runId: string;
   outFile?: string;
 }): Promise<AssuranceIssueCertificateResult> {
+  assertFileNotExample(assuranceRunJsonPath(params.workspace, params.runId), "issued an assurance certificate");
   const policySig = verifyAssurancePolicySignature(params.workspace);
   if (!policySig.valid) {
     throw new Error(`assurance policy signature invalid: ${policySig.reason ?? "unknown"}`);
