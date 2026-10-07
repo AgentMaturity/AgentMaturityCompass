@@ -61,6 +61,13 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # The repository is a pnpm workspace (packageManager pnpm@10.33.0); npm ci cannot install from pnpm-lock.yaml (P0-46).
+    - name: Set up pnpm
+      if: inputs.amc-version == 'local'
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.33.0
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
@@ -73,8 +80,8 @@ runs:
         case "${{ inputs.amc-version }}" in
           local)
             ACTION_REPOSITORY=$(CDPATH= cd -- "$GITHUB_ACTION_PATH/.." && pwd)
-            npm ci --prefix "$ACTION_REPOSITORY"
-            npm run --prefix "$ACTION_REPOSITORY" build
+            pnpm --dir "$ACTION_REPOSITORY" install --frozen-lockfile
+            pnpm --dir "$ACTION_REPOSITORY" run build
             npm install -g "$ACTION_REPOSITORY"
             ;;
           1.2.0)
