@@ -28,14 +28,30 @@ import { issueAssuranceCertificate } from "../../src/assurance/assuranceCertific
 import { handleBomRoute } from "../../src/api/bomRouter.js";
 import { handleCryptoRoute } from "../../src/api/cryptoRouter.js";
 import { handleAssuranceRoute } from "../../src/api/assuranceRouter.js";
+import { handleToolsRoute } from "../../src/api/toolsRouter.js";
+import { handleBenchmarkRoute } from "../../src/api/benchmarkRouter.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { startFakeAgentServer, useFakeAgentEnv } from "../helpers/fakeAgentServer.js";
 import { merkleLeafHash } from "../../src/transparency/merkle.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { listEntry, testKey, trustList, type TestKey } from "./trustFixtures.js";
+import { createAuditBinderArtifact } from "../../src/audit/binderArtifact.js";
+import { generateAuditPacket } from "../../src/evidence/auditPacket.js";
+import { createBenchArtifact } from "../../src/bench/benchArtifact.js";
+import { exportBenchmarkArtifact } from "../../src/benchmarks/benchExport.js";
+import { createBackup } from "../../src/ops/backup/backupEngine.js";
+import { buildPromptPackForApi } from "../../src/prompt/promptPackApi.js";
+import { promptLatestPackPath } from "../../src/prompt/promptPolicyStore.js";
+import { federateInitCli } from "../../src/federation/federationCli.js";
+import { exportFederationPackage } from "../../src/federation/federationSync.js";
+import { ensureFederationPublisherKey } from "../../src/federation/federationIdentity.js";
+import { installedPluginTrust, pluginKeygen, pluginPack, verifyPluginPackage } from "../../src/plugins/pluginPackage.js";
+import { initPluginRegistry, publishPluginToRegistry } from "../../src/plugins/pluginRegistry.js";
+import { browseRegistry, resolveRegistryPackage } from "../../src/plugins/pluginRegistryClient.js";
+import { operatorTrustHome, pinnedTrust } from "../helpers/trustContext.js";
 
 /**
- * P0-09 PR 2 forgery suite: one describe per verifier in the PR 2 rows of the issue table. Each builds a real
+ * P0-09 forgery suite: one describe per verifier in the PR 2 and PR 3 rows of the issue table. Each builds a real
  * artifact, then forges a copy the way gap G1 allows: tamper with the content, re-sign it with a fresh key and swap
  * the public key the artifact carries. Every case runs the shipped CLI, because exit codes are the contract.
  */
@@ -135,7 +151,7 @@ function expectRow(row: {
 }
 
 // ── Shared workspace: evidence bundle, certificate and revocation ─────────
-let evidence: { workspace: string; bundle: string; certificate: string; revocation: string; certId: string; auditorPub: string; monitorFingerprint: string };
+let evidence: { workspace: string; runId: string; bundle: string; certificate: string; revocation: string; certId: string; auditorPub: string; monitorFingerprint: string };
 
 async function evidenceFixture() {
   const workspace = dir("amc-forgery-ws-");
@@ -163,7 +179,7 @@ async function evidenceFixture() {
   const certificate = join(workspace, "run.amccert");
   const issued = await issueCertificate({ workspace, runId: run.runId, policyPath, outFile: certificate });
   const revocation = revokeCertificate({ workspace, certFile: certificate, reason: "test revocation", outFile: "run.amcrevoke" }).outFile;
-  return { workspace, bundle, certificate, revocation, certId: issued.certId, auditorPub, monitorFingerprint };
+  return { workspace, runId: run.runId, bundle, certificate, revocation, certId: issued.certId, auditorPub, monitorFingerprint };
 }
 
 /** Re-seals a run report the way the exporter does, with any key. */
@@ -389,7 +405,8 @@ function forgeSignedDocument(source: string, directory: string, documentName: st
   const docPath = join(root, documentName);
   const doc = readJson(docPath);
   change(doc);
-  writeFileSync(docPath, documentName === "cert.json" ? `${canonicalize(doc)}\n` : JSON.stringify(doc, null, 2));
+  // bench.json is signed over its bytes, so it is written canonically; the others are signed over canonical JSON.
+  writeFileSync(docPath, documentName === "cert.json" ? `${canonicalize(doc)}\n` : documentName === "bench.json" ? canonicalize(doc) : JSON.stringify(doc, null, 2));
   const digest = sha(canonicalize(doc));
   const sigName = documentName.replace(".json", ".sig");
   writeJson(join(root, sigName), { digestSha256: digest, signature: signDigest(digest, key), signedTs: Date.now(), signer: "auditor" });
@@ -555,6 +572,8 @@ describe("API verify routes use the server's trust context and refuse request-su
   const previousMonitor = process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
   beforeAll(async () => {
     signed ??= await signedArtifactFixture();
+    plugin ??= pluginFixture();
+    benchmark ??= benchmarkFixture();
     process.env.AMC_HOME = amcHome; // the server's AMC home pins nothing
     delete process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
   }, 180_000);
@@ -578,7 +597,10 @@ describe("API verify routes use the server's trust context and refuse request-su
     ["POST /api/v1/bundle/verify", handleBomRoute as Handler, "/api/v1/bundle/verify", () => ({ file: evidence.bundle }), "publicKeyPath"],
     ["POST /api/v1/crypto/cert/verify", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify", () => ({ certFile: evidence.certificate }), "allowUnpinned"],
     ["POST /api/v1/crypto/cert/verify-revocation", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify-revocation", () => ({ file: evidence.revocation }), "trustList"],
-    ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"]
+    ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"],
+    ["POST /api/v1/plugins/verify", handleToolsRoute as Handler, "/api/v1/plugins/verify", () => ({ file: plugin.file }), "pubkeyPath"],
+    ["POST /api/v1/plugins/registry/verify", handleToolsRoute as Handler, "/api/v1/plugins/registry/verify", () => ({ dir: plugin.registry }), "trustList"],
+    ["POST /api/v1/benchmarks/verify", handleBenchmarkRoute as Handler, "/api/v1/benchmarks/verify", () => ({ file: benchmark }), "trustRoot"]
   ];
   for (const [name, handler, pathname, body, field] of cases) {
     test(`${name} refuses a body that carries ${field}`, async () => {
@@ -593,6 +615,30 @@ describe("API verify routes use the server's trust context and refuse request-su
       expect(out.json.data?.report?.issuerAdmission.status).toBe("fail");
     });
   }
+
+  test("POST /api/v1/plugins/print refuses a body that carries pubkeyPath and returns the verifier report", async () => {
+    const refused = await route(handleToolsRoute as Handler, "/api/v1/plugins/print", { file: plugin.file, pubkeyPath: plugin.publisherPub }, evidence.workspace);
+    expect(refused.status).toBe(400);
+    expect(refused.json.error).toContain('request field "pubkeyPath" is refused');
+    const out = await route(handleToolsRoute as Handler, "/api/v1/plugins/print", { file: plugin.file }, evidence.workspace);
+    const verification = (out.json.data as unknown as { verification: { ok: boolean; report: { issuerAdmission: { status: string; signatures: Array<{ status: string }> } } } }).verification;
+    expect(verification.ok).toBe(false);
+    expect(verification.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
+  });
+
+  test("POST /api/v1/benchmarks/import returns the verifier report of each benchmark it admitted", async () => {
+    const previous = process.env.AMC_HOME;
+    process.env.AMC_HOME = operatorTrustHome([{ publicKeyPem: readFileSync(evidence.auditorPub, "utf8"), purposes: ["artifact-seal"] }]);
+    roots.push(process.env.AMC_HOME);
+    try {
+      const out = await route(handleBenchmarkRoute as Handler, "/api/v1/benchmarks/import", { path: benchmark }, dir("amc-forgery-import-ws-"));
+      expect(out.status).toBe(200);
+      const imported = (out.json.data as unknown as { imported: Array<{ report: { trusted: boolean } }> }).imported;
+      expect(imported.map(row => row.report.trusted)).toEqual([true]);
+    } finally {
+      process.env.AMC_HOME = previous;
+    }
+  });
 
   test("Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer", async () => {
     const probe = createServer();
@@ -617,5 +663,295 @@ describe("API verify routes use the server's trust context and refuse request-su
     } finally {
       await server.close();
     }
+  });
+});
+
+// ── PR 3 rows ───────────────────────────────────────────────────────────────
+/** Re-signs a JSON file signed over the sha256 of its bytes ({digestSha256, signature}) with any key. */
+function resignFileDigest(jsonPath: string, sigPath: string, key: TestKey, signer = "auditor"): void {
+  const digest = sha(readFileSync(jsonPath));
+  writeJson(sigPath, { digestSha256: digest, signature: signDigest(digest, key), signedTs: Date.now(), signer });
+}
+
+function recordPub(pem: string, name: string): string {
+  const path = join(dir("amc-forgery-records-"), name);
+  writeFileSync(path, pem);
+  return path;
+}
+
+describe("verifyAuditBinderFile (amc audit binder verify)", () => {
+  let binder: string;
+  beforeAll(async () => {
+    signed ??= await signedArtifactFixture();
+    binder = (await createAuditBinderArtifact({ workspace: signed.workspace, scopeType: "WORKSPACE", outFile: "binder.amcaudit" })).outFile;
+  }, 180_000);
+  expectRow({
+    verify: (file, flags) => amc(signed.workspace, ["audit", "binder", "verify", file, ...flags]),
+    genuine: () => binder,
+    forged: () => forgeSignedDocument(binder, "amc-audit", "binder.json", attacker, doc => { doc.generatedTs = Number(doc.generatedTs) + 1; }),
+    pin: () => ["--pubkey", signed.auditorPub]
+  });
+});
+
+describe("audit packet README guide (amc audit-packet has no verify command)", () => {
+  test("step 1 verifies the manifest with an auditor key pinned outside the packet, not the key the packet carries", async () => {
+    const out = await generateAuditPacket({ workspace: evidence.workspace, outputFile: "packet.zip" });
+    const zip = readFileSync(out.outFile).toString("latin1");
+    expect(zip).not.toContain("Verify `meta/manifest.sig.json` against `keys/auditor_ed25519.pub`");
+    expect(zip).toContain("pinned outside this packet");
+  }, 60_000);
+});
+
+describe("verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle", () => {
+  let bench: string;
+  beforeAll(async () => {
+    signed ??= await signedArtifactFixture();
+    // A bench carries inclusion proofs for the event kinds it reports on.
+    appendTransparencyEntry({ workspace: signed.workspace, type: "ORG_SCORECARD_UPDATED", agentId: "default", artifact: { kind: "policy", sha256: sha("scorecard"), id: "scorecard" } });
+    bench = createBenchArtifact({ workspace: signed.workspace, scope: "workspace", outFile: "workspace.amcbench", windowDays: 30 }).outFile;
+  }, 180_000);
+  expectRow({
+    verify: (file, flags) => amc(signed.workspace, ["bench", "verify", file, ...flags]),
+    genuine: () => bench,
+    forged: () => forgeSignedDocument(bench, "amc-bench", "bench.json", attacker, doc => { doc.generatedTs = Number(doc.generatedTs) + 1; }),
+    pin: () => ["--pubkey", signed.auditorPub]
+  });
+
+  test("a bench whose inclusion proof carries its own fabricated root is refused", () => {
+    const result = amc(signed.workspace, ["bench", "verify", fabricateProofRoot(bench, "amc-bench"), "--pubkey", signed.auditorPub]);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("signed merkle root");
+  });
+});
+
+let benchmark: string;
+function benchmarkFixture(): string {
+  return exportBenchmarkArtifact({ workspace: evidence.workspace, runId: evidence.runId, outFile: "run.amcbench" }).outFile;
+}
+
+describe("verifyBenchmarkArtifact (amc benchmark verify)", () => {
+  beforeAll(() => { benchmark ??= benchmarkFixture(); }, 60_000);
+  function forge(): string {
+    const root = extract(benchmark);
+    const benchPath = join(root, "bench.json");
+    writeJson(benchPath, { ...readJson(benchPath), createdTs: Date.now() });
+    resignFileDigest(benchPath, join(root, "bench.sig"), attacker);
+    writeFileSync(join(root, "public-keys", "auditor.pub"), attacker.publicKeyPem);
+    return pack(root, "forged.amcbench");
+  }
+  expectRow({
+    verify: (file, flags) => amc(evidence.workspace, ["benchmark", "verify", file, ...flags]),
+    genuine: () => benchmark,
+    forged: forge,
+    pin: () => ["--pubkey", evidence.auditorPub]
+  });
+});
+
+describe("verifyBackup (amc backup verify)", () => {
+  const previous = process.env.AMC_BACKUP_PASSPHRASE;
+  let backup: string;
+  beforeAll(() => {
+    process.env.AMC_BACKUP_PASSPHRASE = "p0-09-forgery-backup-passphrase";
+    backup = createBackup({ workspace: evidence.workspace, outFile: join(dir("amc-forgery-backup-"), "ws.amcbackup") }).outFile;
+  }, 60_000);
+  afterAll(() => {
+    if (previous === undefined) delete process.env.AMC_BACKUP_PASSPHRASE;
+    else process.env.AMC_BACKUP_PASSPHRASE = previous;
+  });
+  function forge(): string {
+    const top = extract(backup);
+    const root = existsSync(join(top, "manifest.json")) ? top : join(top, readdirSync(top)[0]!);
+    const manifestPath = join(root, "manifest.json");
+    writeJson(manifestPath, { ...readJson(manifestPath), createdTs: Date.now() });
+    resignFileDigest(manifestPath, join(root, "manifest.sig"), attacker);
+    writeFileSync(join(root, "keys", "auditor.pub"), attacker.publicKeyPem);
+    return pack(top, "forged.amcbackup");
+  }
+  expectRow({
+    verify: (file, flags) => amc(evidence.workspace, ["backup", "verify", file, ...flags]),
+    genuine: () => backup,
+    forged: forge,
+    pin: () => ["--pubkey", evidence.auditorPub]
+  });
+
+  test("backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr", () => {
+    const to = join(dir("amc-forgery-restore-"), "restored");
+    const result = amc(evidence.workspace, ["backup", "restore", backup, "--to", to, "--allow-unpinned"]);
+    expect(result.status, result.output).toBe(2);
+    expect(result.stdout).toContain("Backup restored to");
+    expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.stderr).toBe(true);
+    const pinned = amc(evidence.workspace, ["backup", "restore", backup, "--to", join(dir("amc-forgery-restore-"), "restored"), "--pubkey", evidence.auditorPub]);
+    expect(pinned.status, pinned.output).toBe(0);
+    // A backup has no ledger to anchor, so restore offers no --allow-unanchored.
+    expect(amc(evidence.workspace, ["backup", "restore", "--help"]).stdout).not.toContain("--allow-unanchored");
+  });
+});
+
+/** A minimal plugin source tree for pluginPack. */
+function pluginSource(content: string): string {
+  const root = dir("amc-forgery-plugin-src-");
+  mkdirSync(join(root, "content", "learn", "questions"), { recursive: true });
+  writeFileSync(join(root, "content", "learn", "questions", "AMC-X.1.md"), content);
+  writeJson(join(root, "manifest.json"), {
+    v: 1,
+    plugin: {
+      id: "amc.plugin.forgery.learn", name: "forgery fixture", version: "1.0.0", description: "fixture plugin",
+      publisher: { org: "Fixture Org", contact: "ops@example.com", website: "https://example.com", pubkeyFingerprint: "0".repeat(64) },
+      compatibility: { amcMinVersion: ">=1.0.0", nodeMinVersion: ">=20",
+        schemaVersions: { policyPacks: 1, assurancePacks: 1, complianceMaps: 1, adapters: 1, outcomes: 1, casebooks: 1, transform: 1 } },
+      risk: { category: "LOW", notes: "fixture", touches: ["learn"] }
+    },
+    artifacts: [], generatedTs: Date.now(), signing: { algorithm: "ed25519", pubkeyFingerprint: "0".repeat(64) }
+  });
+  return root;
+}
+
+let plugin: { file: string; publisherPub: string; registry: string; registryPub: string; registryFingerprint: string };
+
+function pluginFixture() {
+  const keys = pluginKeygen({ outDir: dir("amc-forgery-publisher-") });
+  const file = join(dir("amc-forgery-plugin-"), "plugin.amcplug");
+  pluginPack({ inputDir: pluginSource("# fixture\n"), keyPath: keys.privateKeyPath, outFile: file });
+  const registryDir = join(dir("amc-forgery-registry-"), "registry");
+  const registry = initPluginRegistry({ dir: registryDir });
+  publishPluginToRegistry({ dir: registryDir, pluginFile: file, registryKeyPath: registry.keyPath });
+  // The operator records both public keys outside the package and the registry they verify.
+  return { file, publisherPub: recordPub(readFileSync(keys.publicKeyPath, "utf8"), "publisher.pub"), registry: registryDir,
+    registryPub: recordPub(readFileSync(registry.pubPath, "utf8"), "registry.pub"), registryFingerprint: registry.fingerprint };
+}
+
+describe("verifyPluginPackage (amc plugin verify)", () => {
+  beforeAll(() => { plugin ??= pluginFixture(); });
+  function forge(): string {
+    const keys = pluginKeygen({ outDir: dir("amc-forgery-attacker-") });
+    const file = join(dir("amc-forgery-plugin-"), "forged.amcplug");
+    pluginPack({ inputDir: pluginSource("# tampered by the forger\n"), keyPath: keys.privateKeyPath, outFile: file });
+    return file;
+  }
+  expectRow({
+    verify: (file, flags) => amc(evidence.workspace, ["plugin", "verify", file, ...flags]),
+    genuine: () => plugin.file,
+    forged: forge,
+    pin: () => ["--pubkey", plugin.publisherPub]
+  });
+
+  test("an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it", () => {
+    const publisher = readFileSync(plugin.publisherPub, "utf8");
+    const keyId = sha(publisher);
+    expect(verifyPluginPackage({ file: plugin.file, trust: installedPluginTrust(evidence.workspace, keyId) }).ok).toBe(true);
+    const previous = process.env.AMC_HOME;
+    process.env.AMC_HOME = operatorTrustHome([], [distrusted(keyId)]);
+    roots.push(process.env.AMC_HOME);
+    try {
+      const verified = verifyPluginPackage({ file: plugin.file, trust: installedPluginTrust(evidence.workspace, keyId) });
+      expect(verified.ok).toBe(false);
+      expect(verified.report.issuerAdmission.signatures[0]?.status).toBe("distrusted");
+    } finally {
+      if (previous === undefined) delete process.env.AMC_HOME;
+      else process.env.AMC_HOME = previous;
+    }
+  });
+});
+
+describe("plugin registry (amc plugin registry verify, and the registry client)", () => {
+  beforeAll(() => { plugin ??= pluginFixture(); });
+  function forge(): string {
+    const copy = join(dir("amc-forgery-registry-"), "registry");
+    spawnSync("cp", ["-R", plugin.registry, copy]);
+    const index = readJson(join(copy, "index.json")) as { registry: Record<string, unknown> };
+    index.registry = { ...index.registry, name: "Forged Registry", issuerFingerprint: attacker.keyId };
+    writeFileSync(join(copy, "index.json"), `${canonicalize(index)}\n`);
+    const payload = Buffer.from(canonicalize(index), "utf8");
+    writeFileSync(join(copy, "index.sig"), `${canonicalize({ digestSha256: sha(payload), signature: sign(null, payload, attacker.privateKeyPem).toString("base64"),
+      signedTs: Date.now(), signer: "registry" })}\n`);
+    writeFileSync(join(copy, "registry.pub"), attacker.publicKeyPem);
+    return copy;
+  }
+  expectRow({
+    verify: (registry, flags) => amc(evidence.workspace, ["plugin", "registry", "verify", "--dir", registry, ...flags]),
+    genuine: () => plugin.registry,
+    forged: forge,
+    pin: () => ["--pubkey", plugin.registryPub]
+  });
+
+  test("the client refuses a registry.pub that is not pinned", async () => {
+    // A caller that passes no pin (the type now requires one) is refused at run time too.
+    await expect(resolveRegistryPackage({ registryBase: plugin.registry, pluginRef: "amc.plugin.forgery.learn" } as never)).rejects.toThrow(/not pinned|not admitted/);
+    await expect(browseRegistry({ registryBase: plugin.registry, trust: pinnedTrust([]) })).rejects.toThrow(/not pinned|not admitted/);
+  });
+
+  test("the client admits a pinned registry and the publisher its signed index names", async () => {
+    const resolved = await resolveRegistryPackage({ registryBase: plugin.registry, pluginRef: "amc.plugin.forgery.learn",
+      pinnedRegistryPubkeyFingerprint: plugin.registryFingerprint });
+    expect(resolved.version).toBe("1.0.0");
+    const forgedIndex = forge();
+    await expect(resolveRegistryPackage({ registryBase: forgedIndex, pluginRef: "amc.plugin.forgery.learn",
+      pinnedRegistryPubkeyFingerprint: plugin.registryFingerprint })).rejects.toThrow();
+  });
+});
+
+describe("verifyPromptPackFile (amc prompt pack verify)", () => {
+  let packFile: string;
+  beforeAll(() => {
+    buildPromptPackForApi({ workspace: evidence.workspace, agentId: "default" });
+    packFile = join(dir("amc-forgery-prompt-"), "pack.amcprompt");
+    writeFileSync(packFile, readFileSync(promptLatestPackPath(evidence.workspace, "default")));
+  }, 60_000);
+  function forge(): string {
+    const top = extract(packFile);
+    const root = join(top, "amc-prompt");
+    const packJson = { ...readJson(join(root, "pack.json")), generatedTs: Date.now() };
+    writeFileSync(join(root, "pack.json"), `${canonicalize(packJson)}\n`);
+    const digest = sha(canonicalize(packJson));
+    writeFileSync(join(root, "pack.sig"), `${canonicalize({ digestSha256: digest, signature: signDigest(digest, attacker), signedTs: Date.now(), signer: "auditor" })}\n`);
+    resignFileDigest(join(root, "lint", "lint.json"), join(root, "lint", "lint.sig"), attacker);
+    writeFileSync(join(root, "signer.pub"), attacker.publicKeyPem);
+    return pack(top, "forged.amcprompt");
+  }
+  expectRow({
+    verify: (file, flags) => amc(evidence.workspace, ["prompt", "pack", "verify", file, ...flags]),
+    genuine: () => packFile,
+    forged: forge,
+    pin: () => ["--pubkey", evidence.auditorPub]
+  });
+});
+
+describe("verifyFederationPackage (amc federate verify-bundle)", () => {
+  let federation: { file: string; publisherPub: string };
+  beforeAll(() => {
+    federateInitCli({ workspace: evidence.workspace, orgName: "Forgery Org" });
+    const file = exportFederationPackage({ workspace: evidence.workspace, outFile: join(dir("amc-forgery-fed-"), "sync.amcfed") }).outFile;
+    federation = { file, publisherPub: recordPub(ensureFederationPublisherKey(evidence.workspace).publicKeyPem, "publisher.pub") };
+  }, 60_000);
+  function forge(): string {
+    const top = extract(federation.file);
+    const root = existsSync(join(top, "manifest.json")) ? top : join(top, readdirSync(top)[0]!);
+    writeFileSync(join(root, "public-keys", "publisher.pub"), attacker.publicKeyPem);
+    const manifestPath = join(root, "manifest.json");
+    const manifest = readJson(manifestPath) as { sourceOrgName: string; publisherKeyFingerprint: string; files: Array<{ path: string; sha256: string; size: number }> };
+    manifest.sourceOrgName = "Forged Org";
+    manifest.publisherKeyFingerprint = attacker.keyId;
+    manifest.files = manifest.files.map(row => {
+      const bytes = readFileSync(join(root, row.path));
+      return { ...row, sha256: sha(bytes), size: bytes.length };
+    });
+    writeJson(manifestPath, manifest);
+    resignFileDigest(manifestPath, join(root, "manifest.sig"), attacker, "publisher");
+    return pack(top, "forged.amcfed");
+  }
+  expectRow({
+    verify: (file, flags) => amc(evidence.workspace, ["federate", "verify-bundle", file, ...flags]),
+    genuine: () => federation.file,
+    forged: forge,
+    pin: () => ["--pubkey", federation.publisherPub]
+  });
+});
+
+describe("console seal check (src/console/assets/app.js)", () => {
+  test("shows the server's verdict and labels the client-side check consistency only", () => {
+    const app = readFileSync(resolve("src/console/assets/app.js"), "utf8");
+    expect(app).not.toContain("Client seal signature: <strong>");
+    expect(app).toContain("Server verdict");
+    expect(app).toMatch(/consistency only/);
   });
 });

@@ -1,0 +1,138 @@
+# PR 3 mutations M1-M6 on 9d9187ef: each applied, dist/ rebuilt, tests run, then restored with git checkout and checked with git diff --quiet
+# M2 was first written as a type-unsafe edit (build exit 2) and rerun type-clean; only the clean run is kept
+
+## M1: admitKey admits the artifact's unpinned embedded key
+file: src/trust/admission.ts
+replaced: // 5. Not pinned.
+  if (context.allowUnpinned)
+with: // 5. Not pinned.
+  return result({ status: "admitted", source: "explicit-key", listId: null, timeBasis: null, detail: null });
+  if (context.allowUnpinned)
+build exit 0
+vitest tests/trust/embeddedKeyForgery.test.ts tests/trust/verifySurfaces.test.ts exit 1
+Test Files  1 failed | 1 passed (2)
+Tests  54 failed | 38 passed (92)
+failing:
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/verify answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/bundle/verify answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify-revocation answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify answers an unpinned issuer with ok:false and the verifier report
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer
+FAIL  tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the client refuses a registry.pub that is not pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > verify all names the key to pin when it refuses an unpinned release bundle
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy re-signed with an embedded key fails as not-pinned by default
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy still fails when the legitimate key is pinned
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+restored: git checkout -- src/trust/admission.ts; git diff --quiet exit 0
+
+## M3: amc verify ignores anchored
+file: src/cli.ts
+replaced: const code = ledgerExitCode(result, trust);
+with: const code = 0 as number; void ledgerExitCode;
+build exit 0
+vitest tests/ledgerTrustRootAnchorCli.test.ts exit 1
+Test Files  1 failed (1)
+Tests  5 failed | 12 passed (17)
+failing:
+FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a clean workspace whose monitor key is not pinned
+FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a distrusted monitor key even when it is pinned and --allow-unanchored is used
+FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails the workspace-write forgery as UNANCHORED by default
+FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > gives an integrity-only result with exit 2 under --allow-unanchored
+FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > prints the full monitor key id with an UNANCHORED refusal, so the operator can compare it with their record
+restored: git checkout -- src/cli.ts; git diff --quiet exit 0
+
+## M4: verifyBenchProofBundle drops the proof.rootHash vs signed root comparison
+file: src/bench/benchProofs.ts
+replaced: if (bundle.merkleRoot && proof.rootHash !== signedRoot) {
+with: if (bundle.merkleRoot && false && proof.rootHash !== signedRoot) {
+build exit 0
+vitest tests/trust/embeddedKeyForgery.test.ts exit 1
+Test Files  1 failed (1)
+Tests  3 failed | 85 passed (88)
+failing:
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > an assurance certificate whose inclusion proof carries its own fabricated root is refused
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a bench whose inclusion proof carries its own fabricated root is refused
+FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a passport whose inclusion proof carries its own fabricated root is refused
+restored: git checkout -- src/bench/benchProofs.ts; git diff --quiet exit 0
+
+## M5: registry client accepts an unpinned registry.pub
+file: src/plugins/pluginRegistryClient.ts
+replaced: if (admission.status !== "admitted") {
+with: if (admission.status !== "admitted" && false) {
+build exit 0
+vitest tests/trust/embeddedKeyForgery.test.ts exit 1
+Test Files  1 failed (1)
+Tests  1 failed | 87 passed (88)
+failing:
+FAIL  tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the client refuses a registry.pub that is not pinned
+restored: git checkout -- src/plugins/pluginRegistryClient.ts; git diff --quiet exit 0
+
+## M6: API routes accept a request-supplied pubkeyPath
+file: src/trust/requestTrust.ts
+replaced: "pubkey", "pubkeyPath",
+with: "pubkey",
+build exit 0
+vitest tests/trust/embeddedKeyForgery.test.ts exit 1
+Test Files  1 failed (1)
+Tests  1 failed | 87 passed (88)
+failing:
+FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify refuses a body that carries pubkeyPath
+restored: git checkout -- src/trust/requestTrust.ts; git diff --quiet exit 0
+
+## M2: distrust never matches
+file: src/trust/admission.ts
+replaced: function distrustOf(keyId: string, claimed: number | null, context: TrustContext): DistrustEntry | undefined {
+with: function distrustOf(keyId: string, claimed: number | null, context: TrustContext): DistrustEntry | undefined {
+  if (keyId) return undefined;
+build exit 0
+vitest tests/trust/verifySurfaces.test.ts exit 1
+Test Files  1 failed (1)
+Tests  1 failed | 3 passed (4)
+failing:
+FAIL  tests/trust/verifySurfaces.test.ts > verify surfaces (P0-09) > refuses a key in an injected built-in distrust entry even with --pubkey
+restored: git checkout -- src/trust/admission.ts; git diff --quiet exit 0
+

@@ -47,7 +47,7 @@ amc passport policy print
 amc passport policy apply --file .amc/passport/policy.yaml --reason "policy update"
 
 amc passport create --scope agent --id <agentId> --out ./agent.amcpass
-amc passport verify ./agent.amcpass
+amc passport verify ./agent.amcpass --pubkey <recorded-auditor.pub>
 amc passport show ./agent.amcpass --format badge
 amc passport badge --scope agent --id <agentId>
 amc passport export-latest --scope agent --id <agentId> --out ./agent-latest.amcpass

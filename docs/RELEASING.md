@@ -45,13 +45,13 @@ Bundle contents include:
 ## 4) Verify offline
 
 ```bash
-amc release verify dist/amc-<version>.amcrelease
+amc release verify dist/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
 ```
 
-Optional public-key override:
+`--pubkey` takes one key; the bundle's own `keys/release-signing.pub` never vouches for it. To pin release keys through a signed trust list instead:
 
 ```bash
-amc release verify dist/amc-<version>.amcrelease --pubkey ./release-signing.pub
+amc release verify dist/amc-<version>.amcrelease --trust-list <trust-list.json> --trust-root <root key sha256>
 ```
 
 ## 5) Tag-driven GitHub release

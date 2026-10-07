@@ -89,8 +89,8 @@ amc scim token create --host-dir /path/to/host --name idp-scim --out /secure/sci
 
 ```bash
 amc backup create --out .amc/backups/drill.amcbackup
-amc backup verify .amc/backups/drill.amcbackup
-amc backup restore .amc/backups/drill.amcbackup --to /tmp/amc-restore --force
+amc backup verify .amc/backups/drill.amcbackup --pubkey <recorded-auditor.pub>
+amc backup restore .amc/backups/drill.amcbackup --to /tmp/amc-restore --force --pubkey <recorded-auditor.pub>
 AMC_WORKSPACE_DIR=/tmp/amc-restore amc verify all --json
 ```
 

@@ -1,0 +1,92 @@
+## MR1 bench import skips admitRegistryKey (src/bench/benchRegistryClient.ts)
+diff --git a/src/bench/benchRegistryClient.ts b/src/bench/benchRegistryClient.ts
+index 89303c08..2722346b 100644
+--- a/src/bench/benchRegistryClient.ts
++++ b/src/bench/benchRegistryClient.ts
+@@ -204,7 +204,7 @@ export async function importBenchFromRegistry(params: {
+     throw new Error("registry fingerprint does not match pinned fingerprint");
+   }
+   const operator = loadTrustContext();
+-  admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, operator);
++
+ 
+   const at = params.benchRef.lastIndexOf("@");
+   const benchId = at > 0 ? params.benchRef.slice(0, at) : params.benchRef;
+     × registry init/publish/verify/serve and import from allowlisted registry 432ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 3 passed (4)
+restore: git diff --quiet exit 0
+## MR2 bench registries config signature not checked (src/bench/benchRegistryClient.ts)
+diff --git a/src/bench/benchRegistryClient.ts b/src/bench/benchRegistryClient.ts
+index 89303c08..439c2545 100644
+--- a/src/bench/benchRegistryClient.ts
++++ b/src/bench/benchRegistryClient.ts
+@@ -150,7 +150,7 @@ function resolveRegistryFromConfig(config: BenchRegistryConfig, registryId: stri
+  */
+ function signedBenchRegistry(workspace: string, registryId: string) {
+   const signature = verifyBenchRegistriesSignature(workspace);
+-  if (!signature.valid) {
++  if (false) {
+     throw new Error(`bench registries config signature invalid: ${signature.reason ?? "unknown"}`);
+   }
+   return resolveRegistryFromConfig(benchRegistryConfigSchema.parse(loadBenchRegistriesConfig(workspace)), registryId);
+     × registry init/publish/verify/serve and import from allowlisted registry 439ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 3 passed (4)
+restore: git diff --quiet exit 0
+## MR3 plugin browse loads the unsigned registries config (src/plugins/pluginApi.ts)
+diff --git a/src/plugins/pluginApi.ts b/src/plugins/pluginApi.ts
+index ac53dccc..0b2b3864 100644
+--- a/src/plugins/pluginApi.ts
++++ b/src/plugins/pluginApi.ts
+@@ -208,7 +208,7 @@ export function loadSignedPluginRegistriesConfig(workspace: string): ReturnType<
+     return defaultPluginRegistriesConfig();
+   }
+   const signature = verifyPluginRegistriesConfig(workspace);
+-  if (!signature.valid) {
++  if (!signature.valid && false) {
+     throw new Error(`plugin registries signature invalid: ${signature.reason ?? "unknown"}`);
+   }
+   return loadPluginRegistriesConfig(workspace);
+     × install rejects registry publisher metadata mismatch 200ms
+     × prints signed package verification and extracts canonical, alternate and flat layouts 189ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 9 passed (11)
+restore: git diff --quiet exit 0
+## MR4 workspaceSelfTrust uses only the built-in distrust (src/trust/trustContext.ts)
+diff --git a/src/trust/trustContext.ts b/src/trust/trustContext.ts
+index 0c6d0ec7..aa7b39d1 100644
+--- a/src/trust/trustContext.ts
++++ b/src/trust/trustContext.ts
+@@ -117,7 +117,7 @@ export function workspaceSelfTrust(workspace: string, now: Date = new Date()): T
+       return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
+     });
+   });
+-  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: operatorDistrust(now), allowUnpinned: false, allowUnanchored: false };
++  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: builtInDistrust(), allowUnpinned: false, allowUnanchored: false };
+ }
+ 
+ /**
+     × applies the operator's distrust and key-compromise revocations from the AMC home trust list, whatever it pins 7ms
+     × an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it 35ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  2 failed | 103 skipped (105)
+restore: git diff --quiet exit 0
+## MR5 verify all ignores issuer admission when classifying a backup (src/verify/verifyAll.ts)
+diff --git a/src/verify/verifyAll.ts b/src/verify/verifyAll.ts
+index c04a6ed6..526ad758 100644
+--- a/src/verify/verifyAll.ts
++++ b/src/verify/verifyAll.ts
+@@ -422,7 +422,7 @@ export async function verifyAll(params: {
+         if (!verify.ok) {
+           backupErrors.push(`${file}: ${untrustedReasons(verify.report).join("; ")}`);
+           // A refused signer is a failure, never a skip: only an admitted backup can be "passphrase or vault only".
+-          const issuerAdmitted = verify.report.issuerAdmission.status === "pass";
++          const issuerAdmitted = true;
+           if (!issuerAdmitted || !verify.errors.every((row) => row.toLowerCase().includes("backup passphrase required"))) {
+             requiresPassphraseOnly = false;
+           }
+       × fails, never skips, a backup whose signer is not admitted, naming the key, with or without a passphrase 516ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 12 passed (13)
+restore: git diff --quiet exit 0

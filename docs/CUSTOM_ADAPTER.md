@@ -168,7 +168,7 @@ Build and verify:
 ```bash
 amc plugin keygen --out-dir ./keys
 amc plugin pack --in ./my-amc-plugin --key ./keys/publisher.key --out ./dist/my-framework-adapter.amcplug
-amc plugin verify ./dist/my-framework-adapter.amcplug
+amc plugin verify ./dist/my-framework-adapter.amcplug --pubkey ./keys/publisher.pub
 amc plugin install --registry local ./dist/my-framework-adapter.amcplug
 amc plugin workspace-verify
 amc adapters list

@@ -2,8 +2,8 @@ import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, afterEach, describe, expect, it } from "vitest";
-import { admitKey, loadTrustContext, signTrustList, workspaceSelfTrust, type KeyPurpose } from "../../src/trust/index.js";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
+import { admitKey, loadTrustContext, signTrustList, withPins, workspaceSelfTrust, type KeyPurpose } from "../../src/trust/index.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { distrustEntry, listEntry, testKey, trustList } from "./trustFixtures.js";
 
@@ -114,6 +114,24 @@ describe("workspaceSelfTrust", () => {
     expect(admit("auditor", "artifact-seal")).toMatchObject({ status: "admitted", source: "workspace-self" });
     expect(admit("monitor", "ledger-row")).toMatchObject({ status: "admitted", source: "workspace-self" });
     expect(admit("monitor", "artifact-seal").status).toBe("not-pinned"); // a pin admits only for its purposes (step 6 order)
+  });
+
+  it("applies the operator's distrust and key-compromise revocations from the AMC home trust list, whatever it pins", () => {
+    const amcHome = home();
+    const revoked = testKey();
+    const list = trustList([listEntry(revoked, { revokedAt: "2026-02-01T00:00:00.000Z", revocationReason: "key-compromise" })],
+      { distrust: [distrustEntry(auditor.keyId)] });
+    put(join(amcHome, "trust", "amc-trust-list.json"), signTrustList(list, root.privateKeyPem));
+    put(join(amcHome, "trust", "trust-roots.json"), roots(root.keyId));
+    vi.stubEnv("AMC_HOME", amcHome);
+    try {
+      const pinned = withPins(workspaceSelfTrust(workspace, NOW), [auditor, revoked].map(key => ({ keyId: key.keyId, purposes: ["artifact-seal"], origin: "test" })));
+      for (const key of [auditor, revoked]) {
+        expect(admitKey({ publicKeyPem: key.publicKeyPem, purpose: "artifact-seal", signature: "s", context: pinned }).status).toBe("distrusted");
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("never admits a workspace key as an independent or third-party issuer", () => {

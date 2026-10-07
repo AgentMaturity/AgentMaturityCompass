@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import {
@@ -418,15 +419,15 @@ function runAgentFlow(agent) {
     ? runAmc(`${agent.id}-bundle-export`, ["bundle", "export", "--agent", agent.id, "--run", postScoreJson.runId, "--out", bundlePath], { timeoutMs: 60_000 })
     : null;
   if (bundle) commands.push(commandSummary(bundle));
-  const bundleVerify = bundle ? runAmc(`${agent.id}-bundle-verify`, ["bundle", "verify", bundlePath], { timeoutMs: 60_000 }) : null;
+  const bundleVerify = bundle ? runAmc(`${agent.id}-bundle-verify`, ["bundle", "verify", bundlePath, ...auditorPin, "--expect-monitor", recordedMonitorFingerprint], { timeoutMs: 60_000 }) : null;
   if (bundleVerify) commands.push(commandSummary(bundleVerify));
   const audit = runAmc(`${agent.id}-audit-binder`, ["audit", "binder", "create", "--scope", "agent", "--id", agent.id, "--out", auditPath], { timeoutMs: 60_000 });
   commands.push(commandSummary(audit));
-  const auditVerify = runAmc(`${agent.id}-audit-verify`, ["audit", "binder", "verify", auditPath], { timeoutMs: 60_000 });
+  const auditVerify = runAmc(`${agent.id}-audit-verify`, ["audit", "binder", "verify", auditPath, ...auditorPin], { timeoutMs: 60_000 });
   commands.push(commandSummary(auditVerify));
   const passport = runAmc(`${agent.id}-passport-create`, ["passport", "create", "--scope", "agent", "--id", agent.id, "--out", passportPath], { timeoutMs: 60_000 });
   commands.push(commandSummary(passport));
-  const passportVerify = runAmc(`${agent.id}-passport-verify`, ["passport", "verify", passportPath], { timeoutMs: 60_000 });
+  const passportVerify = runAmc(`${agent.id}-passport-verify`, ["passport", "verify", passportPath, ...auditorPin], { timeoutMs: 60_000 });
   commands.push(commandSummary(passportVerify));
 
   const shield = runAmc(`${agent.id}-assurance-security-starter`, ["assurance", "run", "--agent", agent.id, "--pack", "security-starter", "--mode", "sandbox", "--out", join("agents", agent.id, "artifacts", "security-starter.md")], { timeoutMs: 90_000 });
@@ -579,6 +580,14 @@ function writeMarkdown(receipt) {
 }
 
 const setupSteps = setupWorkspace();
+// P0-09: verifiers admit only pinned keys. Record the workspace's auditor key and monitor fingerprint now, outside the
+// workspace, as an operator does at vault creation, and pin those copies; never the keys inside the artifacts.
+const pinsDir = join(runRoot, "pins");
+ensureDir(pinsDir);
+const recordedAuditorPub = join(pinsDir, "auditor.pub");
+writeFileSync(recordedAuditorPub, readFileSync(join(workspace, ".amc", "keys", "auditor_ed25519.pub")));
+const recordedMonitorFingerprint = createHash("sha256").update(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), "utf8"), "utf8").digest("hex");
+const auditorPin = ["--pubkey", recordedAuditorPub];
 const setupCommands = setupSteps.map(commandSummary);
 const packListJson = parseJsonLoose(setupSteps.find((cmd) => cmd.label === "industry-pack-list")?.stdout ?? "");
 const results = agents.map(runAgentFlow);

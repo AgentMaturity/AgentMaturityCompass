@@ -365,7 +365,7 @@ import {
   promptStatusForApi,
   promptVerifyForApi
 } from "../prompt/promptPackApi.js";
-import { verifyPromptPackFile } from "../prompt/promptPackVerifier.js";
+import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
 import {
   listPromptAgentsWithPacks,
   verifyPromptLintSignature
@@ -649,9 +649,7 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   const promptPackErrors: string[] = [];
   const promptPackAgents = listPromptAgentsWithPacks(options.workspace);
   for (const agentId of promptPackAgents) {
-    const verify = verifyPromptPackFile({
-      file: promptLatestPackPath(options.workspace, agentId)
-    });
+    const verify = verifyWorkspacePromptPack(options.workspace, promptLatestPackPath(options.workspace, agentId));
     if (!verify.ok) {
       promptPackErrors.push(`pack(${agentId}) ${verify.errors.join("; ")}`);
     }
@@ -4528,10 +4526,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "binder export not found" });
           return;
         }
-        const verify = auditBinderVerifyForApi({
-          file,
-          workspace: options.workspace
-        });
+        // P0-09: the server operator's trust context decides, never the workspace's own keys.
+        const verify = auditBinderVerifyForApi({ file, workspace: options.workspace, trust: loadTrustContext() });
         json(res, verify.ok ? 200 : 422, verify);
         return;
       }
@@ -7676,7 +7672,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "path is required" });
           return;
         }
-        const imported = ingestBenchmarks(options.workspace, parsed.path);
+        const refusedTrust = requestTrustOverride(parsed);
+        if (refusedTrust) {
+          json(res, 400, { error: refusedTrust });
+          return;
+        }
+        const imported = ingestBenchmarks(options.workspace, parsed.path, loadTrustContext());
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCHMARK_INGESTED",

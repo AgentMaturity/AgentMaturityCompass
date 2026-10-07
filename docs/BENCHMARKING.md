@@ -16,7 +16,7 @@ No transcripts, raw tool outputs, secrets, or evidence DB are included.
 
 ```bash
 amc benchmark export --agent <agentId> --run <runId> --out ./benchmarks/<name>.amcbench
-amc benchmark verify ./benchmarks/<name>.amcbench
+amc benchmark verify ./benchmarks/<name>.amcbench --pubkey <publisher-auditor.pub>
 amc benchmark ingest ./benchmarks
 amc benchmark list --sort overall --limit 25
 amc benchmark stats --group-by riskTier

@@ -29,7 +29,7 @@ For each release checkpoint, retain at least:
 
 ```bash
 # bundle + cert
-amc bundle verify .amc/agents/<agentId>/bundles/latest.amcbundle
+amc bundle verify .amc/agents/<agentId>/bundles/latest.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 amc assurance cert verify .amc/assurance/certificates/latest.amccert
 
 # bom + signatures
@@ -39,7 +39,7 @@ amc bom verify --in ./amc-bom.json --sig ./amc-bom.json.sig --pubkey .amc/keys/a
 amc transparency merkle verify-proof .amc/transparency/proofs/<entryHash>.amcproof
 
 # audit binder
-amc audit binder verify ./exports/latest.amcaudit
+amc audit binder verify ./exports/latest.amcaudit --pubkey <recorded-auditor.pub>
 ```
 
 ## Evidence Handling Rules

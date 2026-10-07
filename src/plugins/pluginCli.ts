@@ -24,6 +24,7 @@ import {
 } from "./pluginApi.js";
 import { loadPluginRegistriesConfig, savePluginRegistriesConfig } from "./pluginStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
 
 export function pluginKeygenCli(params: { outDir: string }) {
   return pluginKeygen({ outDir: params.outDir });
@@ -33,15 +34,16 @@ export function pluginPackCli(params: { inputDir: string; keyPath: string; outFi
   return pluginPack({ inputDir: params.inputDir, keyPath: params.keyPath, outFile: params.outFile });
 }
 
-export function pluginVerifyCli(params: { file: string; pubkeyPath?: string }) {
+export function pluginVerifyCli(params: { file: string; pubkeyPath?: string; trust: TrustContext }) {
   return verifyPluginPackage({
     file: params.file,
-    pubkeyPath: params.pubkeyPath
+    pubkeyPath: params.pubkeyPath,
+    trust: params.trust
   });
 }
 
-export function pluginPrintCli(file: string) {
-  return printPluginPackage(file);
+export function pluginPrintCli(file: string, trust: TrustContext) {
+  return printPluginPackage(file, trust);
 }
 
 export function pluginInitCli(workspace: string) {
@@ -72,8 +74,8 @@ export function pluginRegistryPublishCli(params: {
   return publishPluginToRegistry(params);
 }
 
-export function pluginRegistryVerifyCli(dir: string) {
-  return verifyPluginRegistry(dir);
+export function pluginRegistryVerifyCli(dir: string, trust: TrustContext, pubkeyPath?: string) {
+  return verifyPluginRegistry(dir, trust, pubkeyPath);
 }
 
 export async function pluginRegistryServeCli(params: { dir: string; port: number; host?: string }) {
@@ -81,7 +83,8 @@ export async function pluginRegistryServeCli(params: { dir: string; port: number
 }
 
 export async function pluginSearchCli(params: { registry: string; query?: string }) {
-  return browseRegistry({ registryBase: params.registry, query: params.query });
+  // An ad hoc registry URL: only the operator's AMC home trust list can admit its registry.pub (P0-09).
+  return browseRegistry({ registryBase: params.registry, query: params.query, trust: loadTrustContext() });
 }
 
 export async function pluginInstallCli(params: {

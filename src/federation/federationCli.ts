@@ -10,6 +10,7 @@ import {
   verifyFederationConfigSignature
 } from "./federationStore.js";
 import { exportFederationPackage, importFederationPackage, verifyFederationPackage } from "./federationSync.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 export function federateInitCli(params: {
   workspace: string;
@@ -71,6 +72,6 @@ export function federateInspectCli(workspace: string): ReturnType<typeof loadFed
   return loadFederationConfig(workspace);
 }
 
-export function federateVerifyBundleCli(bundleFile: string): ReturnType<typeof verifyFederationPackage> {
-  return verifyFederationPackage(bundleFile);
+export function federateVerifyBundleCli(bundleFile: string, trust: TrustContext, pubkeyPath?: string): ReturnType<typeof verifyFederationPackage> {
+  return verifyFederationPackage(bundleFile, trust, pubkeyPath);
 }

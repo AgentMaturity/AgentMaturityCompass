@@ -41,13 +41,13 @@ Create and verify encrypted signed backup:
 
 ```bash
 amc backup create --out .amc/backups/latest.amcbackup
-amc backup verify .amc/backups/latest.amcbackup
+amc backup verify .amc/backups/latest.amcbackup --pubkey <recorded-auditor.pub>
 ```
 
 Restore drill:
 
 ```bash
-amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force
+amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force --pubkey <recorded-auditor.pub>
 AMC_WORKSPACE_DIR=/tmp/amc-restore amc verify all --json
 ```
 

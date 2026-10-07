@@ -92,9 +92,22 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
 }
 
 /**
+ * The operator's distrust: the built-in list, every AMC home trust list's distrust entries, and its key-compromise
+ * revocations, which refuse a key for every purpose and time. Distrust beats every pin, workspace-self pins included.
+ */
+function operatorDistrust(now: Date): DistrustEntry[] {
+  const operator = loadTrustContext({ now });
+  const compromised = operator.lists.flatMap(list => list.entries.filter(entry => entry.revocationReason === "key-compromise")
+    .map((entry): DistrustEntry => ({ keyId: entry.keyId, distrustedFrom: null, reason: "key-compromise",
+      note: `revoked at ${entry.revokedAt ?? "an unrecorded time"} in trust list ${list.listId}`, source: `trust-list:${list.listId}` })));
+  return [...operator.distrust, ...compromised];
+}
+
+/**
  * For internal round trips only (an export re-checking what this workspace just signed). The keys come from the
  * workspace under test, so this is a self-check: never wire it into a CLI or API verdict, and never treat it as an
  * independent issuer. Only the role purposes are pinned, so independent-attestation and evidence-authority never pass.
+ * The operator's distrust still applies (operatorDistrust).
  */
 export function workspaceSelfTrust(workspace: string, now: Date = new Date()): TrustContext {
   const explicitPins = (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
@@ -104,5 +117,13 @@ export function workspaceSelfTrust(workspace: string, now: Date = new Date()): T
       return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
     });
   });
-  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: builtInDistrust(), allowUnpinned: false, allowUnanchored: false };
+  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: operatorDistrust(now), allowUnpinned: false, allowUnanchored: false };
+}
+
+/**
+ * `context` plus pins by key id, for fingerprints recorded outside the artifact being verified: a registry entry the
+ * pinned registry signed, a peer key the operator added, a publisher the workspace's signed install lock names.
+ */
+export function withPins(context: TrustContext, pins: readonly TrustPin[]): TrustContext {
+  return { ...context, explicitPins: [...context.explicitPins, ...pins] };
 }

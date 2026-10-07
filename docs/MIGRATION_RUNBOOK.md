@@ -26,13 +26,13 @@ Create signed encrypted backup:
 
 ```bash
 amc backup create --out .amc/backups/pre-migration-<ts>.amcbackup
-amc backup verify .amc/backups/pre-migration-<ts>.amcbackup
+amc backup verify .amc/backups/pre-migration-<ts>.amcbackup --pubkey <recorded-auditor.pub>
 ```
 
 Restore to isolated path and verify:
 
 ```bash
-amc backup restore .amc/backups/pre-migration-<ts>.amcbackup --to /tmp/amc-restore-<ts>
+amc backup restore .amc/backups/pre-migration-<ts>.amcbackup --to /tmp/amc-restore-<ts> --pubkey <recorded-auditor.pub>
 ```
 
 Expected: restore succeeds and key files exist in `/tmp/amc-restore-<ts>`.
@@ -44,7 +44,7 @@ Expected: restore succeeds and key files exist in `/tmp/amc-restore-<ts>`.
 Prefer signed bundle verification before apply:
 
 ```bash
-amc release verify /path/to/amc-<version>.amcrelease
+amc release verify /path/to/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
 ```
 
 If verification fails, stop.

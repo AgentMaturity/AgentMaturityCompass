@@ -8,7 +8,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { extractPluginPackage, printPluginPackage, pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
-import { initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
+import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
 import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
@@ -16,6 +16,7 @@ import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { loadInstalledPluginAssets } from "../src/plugins/pluginLoader.js";
 import { ensureDir, readUtf8 } from "../src/utils/fs.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -177,7 +178,8 @@ describe("plugin marketplace", () => {
       keyPath: keys.privateKeyPath,
       outFile
     });
-    const verified = verifyPluginPackage({ file: outFile });
+    const publisher = pinnedTrust([{ publicKeyPem: readFileSync(keys.publicKeyPath, "utf8"), purposes: ["artifact-seal"] }]);
+    const verified = verifyPluginPackage({ file: outFile, trust: publisher });
     expect(verified.ok).toBe(true);
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-plugin-tamper-"));
@@ -192,7 +194,7 @@ describe("plugin marketplace", () => {
       if (repack.status !== 0) {
         throw new Error(repack.stderr || repack.stdout || "repack failed");
       }
-      const check = verifyPluginPackage({ file: tampered });
+      const check = verifyPluginPackage({ file: tampered, trust: publisher });
       expect(check.ok).toBe(false);
     } finally {
       rmSync(tamperDir, { recursive: true, force: true });
@@ -218,7 +220,7 @@ describe("plugin marketplace", () => {
       pluginFile: packageFile,
       registryKeyPath: join(registryDir, "registry.key")
     });
-    const verified = verifyPluginRegistry(registryDir);
+    const verified = verifyPluginRegistry(registryDir, pinnedTrust([{ publicKeyPem: readFileSync(join(registryDir, "registry.pub"), "utf8"), purposes: ["artifact-seal"] }]));
     expect(verified.ok).toBe(true);
 
     const port = await pickPort();
@@ -290,6 +292,12 @@ describe("plugin marketplace", () => {
         action: "install"
       })
     ).rejects.toThrow(/publisher fingerprint mismatch/i);
+
+    // P0-09: the registries config pins the registry key, so browsing needs its auditor signature too.
+    expect((await browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).plugins).toHaveLength(1);
+    const registriesPath = join(ws, ".amc", "plugins", "registries.yaml");
+    writeFileSync(registriesPath, `${readUtf8(registriesPath)}\n# edited without re-signing\n`);
+    await expect(browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).rejects.toThrow("plugin registries signature invalid");
   });
 
   test("workspace install is dual-control and tamper breaks readiness", async () => {
@@ -475,6 +483,11 @@ describe("plugin marketplace", () => {
         approvalRequestId: requested.approvalRequestId
       })
     ).toThrow(/publisher fingerprint mismatch|risk category mismatch/i);
+
+    // P0-09: dropping the recorded publisher does not skip the check; with no pinned publisher nothing is admitted.
+    writeFileSync(pendingPath, JSON.stringify({ ...pending, publisherFingerprint: null, riskCategory: "HIGH" }, null, 2));
+    expect(() => executePluginRequest({ workspace: ws, approvalRequestId: requested.approvalRequestId }))
+      .toThrow(/publisher not admitted: manifest\.sig \(artifact-seal\): not-pinned/);
   });
 
   test("override denied by default and allowed with signed overrides", () => {
@@ -586,14 +599,15 @@ describe("supported plugin package public workflows", () => {
       contentFiles: [{ path: "learn/questions/AMC-PUBLIC.md", content: "# owned public workflow fixture\n" }] });
     const file = join(ws, "owned-public.amcplug");
     const packed = pluginPack({ inputDir: source, keyPath: keys.privateKeyPath, outFile: file });
-    const verified = verifyPluginPackage({ file });
+    const publisher = pinnedTrust([{ publicKeyPem: readFileSync(keys.publicKeyPath, "utf8"), purposes: ["artifact-seal"] }]);
+    const verified = verifyPluginPackage({ file, trust: publisher });
     expect(verified.ok).toBe(true);
-    const printed = printPluginPackage(file);
+    const printed = printPluginPackage(file, publisher);
     expect(printed.pluginId).toBe("amc.plugin.fixture.public");
     expect(printed.version).toBe("1.0.0");
     expect(printed.artifactCount).toBe(1);
     expect(printed.publisherFingerprint).toBe(verified.publisherFingerprint);
-    expect(printed.verification).toEqual({ ok: true, errors: [] });
+    expect(printed.verification).toEqual({ ok: true, errors: [], report: expect.objectContaining({ trusted: true }) as unknown });
     expect(packed.outFile).toBe(file);
     expect(packed.manifest).toEqual(verified.manifest);
     expect(packed.manifest.signing.pubkeyFingerprint).toBe(keys.fingerprint);
@@ -625,8 +639,8 @@ describe("supported plugin package public workflows", () => {
   test("malformed gzip printing preserves the verifier refusal", () => {
     const ws = workspace(), file = join(ws, "malformed.amcplug");
     writeFileSync(file, "owned invalid gzip fixture");
-    expect(() => verifyPluginPackage({ file })).toThrow();
-    expect(() => printPluginPackage(file)).toThrow();
+    expect(() => verifyPluginPackage({ file, trust: pinnedTrust([]) })).toThrow();
+    expect(() => printPluginPackage(file, pinnedTrust([]))).toThrow();
   });
   test("incomplete valid archive printing refuses verification and omits identity", () => {
     const ws = workspace(), content = join(ws, "owned-incomplete-plugin"), file = join(ws, "incomplete.amcplug");
@@ -634,10 +648,11 @@ describe("supported plugin package public workflows", () => {
     writeFileSync(join(content, "manifest.json"), "{}");
     const tar = spawnSync("tar", ["-czf", file, "-C", content, "."], { encoding: "utf8" });
     expect(tar.status, tar.stderr).toBe(0);
-    const verified = verifyPluginPackage({ file });
+    const { report, ...verified } = verifyPluginPackage({ file, trust: pinnedTrust([]) });
     expect(verified).toEqual({ ok: false, errors: ["plugin bundle missing manifest/signature/publisher key"],
       manifest: null, publisherFingerprint: null });
-    const printed = printPluginPackage(file);
+    expect(report.integrity).toEqual({ status: "fail", errors: ["plugin bundle missing manifest/signature/publisher key"] });
+    const printed = printPluginPackage(file, pinnedTrust([]));
     expect(printed.verification.ok).toBe(false);
     expect(printed.verification.errors.length).toBeGreaterThan(0);
     expect(printed.pluginId).toBeNull();

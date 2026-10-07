@@ -22,7 +22,7 @@ registry/
 ```bash
 amc plugin registry init --dir ./registry --registry-id official --registry-name "Official Registry"
 amc plugin registry publish --dir ./registry --file ./dist/my.amcplug --registry-key ./registry/registry.key
-amc plugin registry verify --dir ./registry
+amc plugin registry verify --dir ./registry --pubkey <recorded-registry.pub>
 ```
 
 Serve locally (LAN/offline):

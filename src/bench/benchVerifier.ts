@@ -3,8 +3,9 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { benchArtifactSchema, benchPiiScanSchema, benchSignatureSchema, type BenchArtifact } from "./benchSchema.js";
-import { verifyBenchDigestSignature, digestFile } from "./benchSigner.js";
-import { verifyBenchProofBundle, type BenchInclusionProof } from "./benchProofs.js";
+import { digestFile } from "./benchSigner.js";
+import { verifyProofsAgainstSignedRoot, type BenchInclusionProof } from "./benchProofs.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
@@ -76,17 +77,31 @@ export interface BenchVerifyResult {
   bench: BenchArtifact | null;
   errors: BenchVerifyError[];
   fileSha256: string;
+  report: VerifierReportV1;
 }
 
+/**
+ * Verifies a .amcbench offline. signer.pub, the signature envelope and --pubkey only locate the signer: bench.json and
+ * its signed Merkle root need keys the trust context admits for artifact-seal, and inclusion proofs must resolve to
+ * that signed root (P0-09). ok equals report.trusted.
+ */
 export function verifyBenchArtifactFile(params: {
   file: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }): BenchVerifyResult {
   const file = resolve(params.file);
   const errors: BenchVerifyError[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "not-applicable", detail: null };
   const fileSha256 = digestFile(file);
   const tmp = mkdtempSync(join(tmpdir(), "amc-bench-verify-"));
   let bench: BenchArtifact | null = null;
+  const finish = (): BenchVerifyResult => {
+    const report = buildVerifierReport({ artifact: { kind: "bench", path: file, sha256: fileSha256 }, context: params.trust,
+      integrityErrors: errors.map((error) => `${error.code}: ${error.message}`), signatures, anchoring });
+    return { ok: report.trusted, bench, errors, fileSha256, report };
+  };
   try {
     tarExtract(file, tmp);
     const root = resolveRoot(tmp);
@@ -95,11 +110,11 @@ export function verifyBenchArtifactFile(params: {
     const pubPath = join(root, "signer.pub");
     if (!pathExists(benchPath)) {
       errors.push({ code: "MISSING_BENCH_JSON", message: "bench.json missing" });
-      return { ok: false, bench: null, errors, fileSha256 };
+      return finish();
     }
     if (!pathExists(sigPath)) {
       errors.push({ code: "MISSING_BENCH_SIG", message: "bench.sig missing" });
-      return { ok: false, bench: null, errors, fileSha256 };
+      return finish();
     }
     bench = benchArtifactSchema.parse(JSON.parse(readUtf8(benchPath)) as unknown);
     const signature = benchSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
@@ -107,13 +122,15 @@ export function verifyBenchArtifactFile(params: {
     if (digest !== signature.digestSha256) {
       errors.push({ code: "DIGEST_MISMATCH", message: "bench.json digest mismatch with bench.sig" });
     }
-    const pubPem = params.publicKeyPath ? readUtf8(resolve(params.publicKeyPath)) : pathExists(pubPath) ? readUtf8(pubPath) : undefined;
-    const sigOk = verifyBenchDigestSignature({
-      digestHex: digest,
-      signature,
-      publicKeyPem: pubPem
-    });
-    if (!sigOk) {
+    const candidates = [
+      params.publicKeyPath ? readUtf8(resolve(params.publicKeyPath)) : null,
+      pathExists(pubPath) ? readUtf8(pubPath) : null,
+      envelopePublicKey(signature.envelope)
+    ];
+    const check = checkDigestSignature({ signature: "bench.sig", purpose: "artifact-seal", digestHex: digest,
+      signatureB64: signature.signature, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
+    signatures.push(check.admission);
+    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "bench signature verification failed" });
     }
 
@@ -136,16 +153,10 @@ export function verifyBenchArtifactFile(params: {
     }
 
     const inclusion = parseInclusionProofs(root);
-    const proofBundle = verifyBenchProofBundle({
-      transparencyRoot: null,
-      merkleRoot: null,
-      proofs: inclusion
-    });
-    if (!proofBundle.ok) {
-      for (const err of proofBundle.errors) {
-        errors.push({ code: "PROOF_INVALID", message: err });
-      }
-    }
+    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates, claimedSignedAt: signature.signedTs });
+    errors.push(...proofs.errors.map((message) => ({ code: "PROOF_INVALID", message })));
+    if (proofs.admission) signatures.push(proofs.admission);
+    anchoring = proofs.anchoring;
     if (
       bench.proofBindings.includedEventProofIds.length > 0 &&
       inclusion.length !== bench.proofBindings.includedEventProofIds.length
@@ -156,23 +167,13 @@ export function verifyBenchArtifactFile(params: {
       });
     }
 
-    return {
-      ok: errors.length === 0,
-      bench,
-      errors,
-      fileSha256
-    };
+    return finish();
   } catch (error) {
     errors.push({
       code: "VERIFY_EXCEPTION",
       message: String(error)
     });
-    return {
-      ok: false,
-      bench,
-      errors,
-      fileSha256
-    };
+    return finish();
   } finally {
     cleanup(tmp);
   }

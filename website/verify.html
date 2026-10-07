@@ -50,10 +50,19 @@
       <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
       <p>2. Download the sample bundle we published:</p>
       <pre><code>curl -fsSLO https://agentmaturity.co/verify/amc-sample-evidence.amcbundle</code></pre>
-      <p>3. Verify it:</p>
-      <pre><code>amc bundle verify amc-sample-evidence.amcbundle</code></pre>
-      <p>You should see:</p>
+      <p>3. Save the sample's auditor public key. We publish it here, outside the bundle, because a bundle's own keys never vouch for it. Its fingerprint (SHA-256 of the key file) is <code>eb6f84cc395175206962b8054442619563ceca075ff38a746739cd6df2031945</code>.</p>
+      <pre><code>cat &gt; amc-sample-auditor.pub &lt;&lt;'EOF'
+-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAiknpzbSC8obwQGVNQZXdMt3yFExL1xzvEoHCg2WA8+U=
+-----END PUBLIC KEY-----
+EOF</code></pre>
+      <p>4. Verify it, pinning that key and the fingerprint of the sample's monitor (ledger) key:</p>
+      <pre><code>amc bundle verify amc-sample-evidence.amcbundle \
+  --pubkey amc-sample-auditor.pub \
+  --expect-monitor 93a2ad7bebb2e8b93a0de857710f9c39205f3dd29e23c8557291a0c4a470610f</code></pre>
+      <p>You should see this, with exit code 0:</p>
       <pre><code>Bundle verification PASSED</code></pre>
+      <p>Without the two pins, the same command prints <code>Bundle verification FAILED</code>, names each signing key as <code>not-pinned</code> with its fingerprint, and exits 1. Anyone can re-sign a forged bundle with a fresh key and ship that key inside it, so AMC trusts only keys you pinned from outside the bundle. Adding <code>--allow-unpinned --allow-unanchored</code> gives an integrity-only result: exit code 2 and an <code>UNTRUSTED:</code> line, never a pass.</p>
 
       <p>AMC checks the bundle's signatures, hash chain, and manifest — fully offline. If a single byte had been edited after signing, verification would fail. Try it: flip one character anywhere in the file and run the command again. We did exactly that while publishing this page, and verification failed as it should.</p>
 
@@ -67,9 +76,12 @@
       </ul>
 
       <h2>Verify anyone's agent the same way</h2>
-      <p>When someone hands you an AMC bundle — a vendor, a contractor, a teammate — run the same commands. You don't need their infrastructure or their word:</p>
-      <pre><code>amc bundle verify their-agent-evidence.amcbundle
+      <p>When someone hands you an AMC bundle — a vendor, a contractor, a teammate — ask them for their auditor public key and monitor key fingerprint, recorded when their vault was created, through a channel other than the bundle: their website, your contract, or a signed trust list. Then run the same commands. You don't need their infrastructure, only those keys from outside the bundle:</p>
+      <pre><code>amc bundle verify their-agent-evidence.amcbundle \
+  --pubkey their-auditor.pub \
+  --expect-monitor &lt;their monitor key sha256&gt;
 amc bundle inspect their-agent-evidence.amcbundle</code></pre>
+      <p>To pin many issuers at once, use a signed trust list (<code>--trust-list</code> and <code>--trust-root</code>); see <a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md">the trust-list guide</a>.</p>
 
       <h2>Verify our releases too</h2>
       <p>The installer itself is verifiable: it downloads a pinned GitHub Release, checks every archive against the published <code>SHA256SUMS</code>, and refuses anything that doesn't match. Our published test counts are enforced by the test suite itself — the number and the suite are checked against each other, so the badge can't silently drift.</p>

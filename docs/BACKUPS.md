@@ -6,7 +6,7 @@ AMC supports signed, encrypted, offline-verifiable workspace backups.
 - `amc backup create --out <file.amcbackup>`
 - `amc backup verify <file.amcbackup> [--pubkey <path>]`
 - `amc backup print <file.amcbackup>`
-- `amc backup restore <file.amcbackup> --to <dir> [--force]`
+- `amc backup restore <file.amcbackup> --to <dir> --pubkey <recorded-auditor.pub> [--force]`
 
 ## Security Model
 - Backup manifest is always signed (Ed25519 auditor key).

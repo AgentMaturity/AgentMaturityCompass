@@ -11,6 +11,7 @@ import {
 import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
 import type { AuditBinderJson } from "../src/audit/binderSchema.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const DOC = "docs/source-reviews/GAP-1063-scale-donovan-audit-binder.md";
 const TITLE = "Donovan: Empowering the Public Sector with AI Agents | Scale AI | Scale AI";
@@ -131,6 +132,7 @@ describe("GAP-1063 Scale Donovan audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: created.outFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok, JSON.stringify(verified.errors)).toBe(true);
     expect(verified.fileSha256).toBe(created.sha256);
@@ -166,6 +168,7 @@ describe("GAP-1063 Scale Donovan audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: tamperedFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok).toBe(false);
     expect(verified.errors.map((error) => error.code)).toEqual(expect.arrayContaining([

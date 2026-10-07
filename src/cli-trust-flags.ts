@@ -23,8 +23,12 @@ export interface TrustFlags {
 
 const collect = (value: string, previous: string[] = []): string[] => [...previous, value];
 
-/** Portable verify commands get every flag; ledger-only workspace checks have no issuer to pin, so no --allow-unpinned. */
-export function withTrustFlags(command: Command, extra: { pubkey?: string; expectMonitor?: boolean; json?: boolean; ledgerOnly?: boolean } = {}): Command {
+/**
+ * Portable verify commands get every flag; ledger-only workspace checks have no issuer to pin, so no --allow-unpinned;
+ * issuer-only actions that verify no ledger (backup restore) get no --allow-unanchored.
+ */
+export function withTrustFlags(command: Command,
+  extra: { pubkey?: string; expectMonitor?: boolean; json?: boolean; ledgerOnly?: boolean; issuerOnly?: boolean } = {}): Command {
   if (extra.pubkey) command.option("--pubkey <path>", extra.pubkey);
   if (extra.expectMonitor) {
     command.option("--expect-monitor <sha256>", "pin the monitor key (ledger-row) by a fingerprint recorded outside what is verified");
@@ -33,7 +37,7 @@ export function withTrustFlags(command: Command, extra: { pubkey?: string; expec
     .option("--trust-list <file>", "signed trust list that pins issuer keys (repeatable; default <AMC home>/trust/amc-trust-list.json)", collect)
     .option("--trust-root <sha256>", "trust-list root key id (repeatable; default <AMC home>/trust/trust-roots.json)", collect);
   if (!extra.ledgerOnly) command.option("--allow-unpinned", "integrity-only result for issuer keys nobody pinned (exit 2, never trusted)");
-  command.option("--allow-unanchored", "integrity-only result for an unanchored ledger (exit 2, never trusted)");
+  if (!extra.issuerOnly) command.option("--allow-unanchored", "integrity-only result for an unanchored ledger (exit 2, never trusted)");
   if (extra.json) command.option("--json", "print the result with its verifier report as JSON");
   return command;
 }
@@ -69,6 +73,13 @@ export function finishVerify(label: string, report: VerifierReportV1, opts: { js
   }
   if (code === 2) untrusted(reasons, report.overrides);
   if (code !== 0) process.exit(code);
+}
+
+/** After an action that proceeds on an allowed integrity-only verdict (backup restore): "UNTRUSTED:" on stderr, exit 2. */
+export function exitIfUntrusted(report: VerifierReportV1): void {
+  if (verdictExitCode(report) !== 2) return;
+  untrusted(untrustedReasons(report), report.overrides);
+  process.exit(2);
 }
 
 /**

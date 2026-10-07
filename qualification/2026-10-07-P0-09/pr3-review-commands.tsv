@@ -1,0 +1,15 @@
+cmd	exit	durationMs
+pnpm install --frozen-lockfile	0	618
+pnpm run build	0	25621
+npx vitest run tests/trust tests/cliTrustFlags.test.ts tests/ledgerTrustRootAnchorCli.test.ts	0	59835
+npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-review-affected-tests.txt)	0	78180
+npm run typecheck && npm run typecheck:tests && npm run lint	0	50461
+npm run check:counts	0	324
+npm run check:freeze	0	1075
+npm run check:docs-drift	0	265
+npm run check:architecture-boundaries	0	1313
+npm run check:api-ref	0	204
+npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts	0	30073
+npm run check:packed-install	0	43511
+npm run check:clean-source	0	41600
+npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-review-affected-tests.txt) --coverage --coverage.enabled=true --coverage.reporter=json-summary	0	90000

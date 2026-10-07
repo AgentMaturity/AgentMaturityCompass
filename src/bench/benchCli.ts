@@ -3,6 +3,7 @@ import { benchArtifactSchema } from "./benchSchema.js";
 import type { BenchRegistryConfig } from "./benchRegistrySchema.js";
 import { createBenchArtifact, inspectBenchArtifact, listExportedBenchArtifacts } from "./benchArtifact.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { initBenchRegistry, publishBenchToRegistry, serveBenchRegistry, verifyBenchRegistry } from "./benchRegistryServer.js";
 import { browseBenchRegistry, importBenchFromRegistry, listImportedBenchArtifacts } from "./benchRegistryClient.js";
 import {
@@ -57,10 +58,12 @@ export function benchCreateCli(params: {
 export function benchVerifyCli(params: {
   file: string;
   pubkeyPath?: string;
+  trust: TrustContext;
 }) {
   return verifyBenchArtifactFile({
     file: resolve(params.file),
-    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined
+    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined,
+    trust: params.trust
   });
 }
 

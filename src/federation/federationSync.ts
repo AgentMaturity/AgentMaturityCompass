@@ -4,8 +4,10 @@ import { dirname, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
-import { ensureFederationPublisherKey, signFederationDigest, verifyFederationDigest } from "./federationIdentity.js";
-import { federationInboxDir, federationOutboxDir, loadFederationConfig } from "./federationStore.js";
+import { ensureFederationPublisherKey, signFederationDigest } from "./federationIdentity.js";
+import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
+import { buildVerifierReport, checkDigestSignature, ed25519KeyId, loadTrustContext, untrustedReasons, withPins, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { generateTransparencyInclusionProof, currentTransparencyMerkleRoot, ensureTransparencyMerkleInitialized, exportTransparencyProofBundle } from "../transparency/merkleIndexStore.js";
@@ -259,12 +261,24 @@ export function exportFederationPackage(params: {
   }
 }
 
-export function verifyFederationPackage(bundleFile: string): {
+/**
+ * Verifies a .amcfed offline. public-keys/publisher.pub and --pubkey only locate the signer; manifest.sig needs a key
+ * the trust context admits for artifact-seal (P0-09). ok equals report.trusted.
+ */
+export function verifyFederationPackage(bundleFile: string, trust: TrustContext, pubkeyPath?: string): {
   ok: boolean;
   errors: string[];
   manifest: FederationManifest | null;
+  report: VerifierReportV1;
 } {
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let manifest: FederationManifest | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "federation-package", path: resolve(bundleFile), sha256: fileSha256(resolve(bundleFile)) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, manifest, report };
+  };
   const temp = mkdtempSync(join(tmpdir(), "amc-fed-verify-"));
   try {
     tarExtract(bundleFile, temp);
@@ -273,13 +287,9 @@ export function verifyFederationPackage(bundleFile: string): {
     const sigPath = join(root, "manifest.sig");
     const pubPath = join(root, "public-keys", "publisher.pub");
     if (!pathExists(manifestPath) || !pathExists(sigPath) || !pathExists(pubPath)) {
-      return {
-        ok: false,
-        errors: ["federation package missing manifest/signature/publisher key"],
-        manifest: null
-      };
+      errors.push("federation package missing manifest/signature/publisher key");
+      return finish();
     }
-    let manifest: FederationManifest | null = null;
     try {
       manifest = federationManifestSchema.parse(JSON.parse(readUtf8(manifestPath)) as unknown);
     } catch (error) {
@@ -288,13 +298,13 @@ export function verifyFederationPackage(bundleFile: string): {
     try {
       const sig = federationManifestSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
       const digest = sha256Hex(readFileSync(manifestPath));
+      const check = checkDigestSignature({ signature: "manifest.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+        candidates: [pubkeyPath ? readUtf8(resolve(pubkeyPath)) : null, readUtf8(pubPath)], context: trust, claimedSignedAt: sig.signedTs });
+      signatures.push(check.admission);
       if (digest !== sig.digestSha256) {
         errors.push("manifest digest mismatch");
-      } else {
-        const pub = readUtf8(pubPath);
-        if (!verifyFederationDigest(digest, sig.signature, pub)) {
-          errors.push("manifest signature invalid");
-        }
+      } else if (!check.verified) {
+        errors.push("manifest signature invalid");
       }
     } catch (error) {
       errors.push(`invalid manifest.sig: ${String(error)}`);
@@ -312,14 +322,18 @@ export function verifyFederationPackage(bundleFile: string): {
         }
       }
     }
-    return {
-      ok: errors.length === 0,
-      errors,
-      manifest
-    };
+    return finish();
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
+}
+
+/** The operator's trust plus the publisher keys of the peers this workspace added (auditor-signed peer records). */
+export function federationPeerTrust(workspace: string): TrustContext {
+  return withPins(loadTrustContext(), listFederationPeers(workspace).flatMap(({ peer, valid }) => {
+    const keyId = valid ? ed25519KeyId(peer.publisherPublicKeyPem) : null;
+    return keyId ? [{ keyId, purposes: ["artifact-seal" as const], origin: `federation peer ${peer.peerId}` }] : [];
+  }));
 }
 
 export function importFederationPackage(params: {
@@ -333,9 +347,11 @@ export function importFederationPackage(params: {
   bomCount: number;
   pluginCount: number;
 } {
-  const verify = verifyFederationPackage(params.bundleFile);
+  // Only a package signed by a peer the operator added (`amc federate peer add`) or a trust list pins is imported.
+  const trust = federationPeerTrust(params.workspace);
+  const verify = verifyFederationPackage(params.bundleFile, trust);
   if (!verify.ok || !verify.manifest) {
-    throw new Error(`federation package verify failed: ${verify.errors.join("; ")}`);
+    throw new Error(`federation package verify failed: ${untrustedReasons(verify.report).join("; ")}`);
   }
   const temp = mkdtempSync(join(tmpdir(), "amc-fed-import-"));
   try {
@@ -366,7 +382,9 @@ export function importFederationPackage(params: {
     if (pathExists(benchDir)) {
       for (const entry of readdirSync(benchDir, { withFileTypes: true })) {
         if (!entry.isFile() || !entry.name.endsWith(".amcbench")) continue;
-        ingestBenchmarks(params.workspace, join(benchDir, entry.name));
+        // A peer pin admits the package seal, not the benchmarks inside it: each benchmark's own signer must be
+        // admitted by the operator's trust (or be the peer key itself) before it reaches the workspace's stats.
+        ingestBenchmarks(params.workspace, join(benchDir, entry.name), trust);
         benchmarkCount += 1;
       }
     }

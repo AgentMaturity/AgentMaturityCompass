@@ -1,6 +1,6 @@
 /** Body fields that would let a request add pins or allow flags. */
 const REQUEST_TRUST_FIELDS = [
-  "pubkey", "publicKey", "publicKeyPath", "publicKeyPem", "trust", "trustList", "trustLists", "trustRoot", "trustRoots",
+  "pubkey", "pubkeyPath", "publicKey", "publicKeyPath", "publicKeyPem", "trust", "trustList", "trustLists", "trustRoot", "trustRoots",
   "allowUnpinned", "allowUnanchored", "expectMonitor", "expectedMonitorFingerprint"
 ] as const;
 

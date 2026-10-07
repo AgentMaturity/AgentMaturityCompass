@@ -103,7 +103,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc audit binder export-execute` | Execute previously approved external binder export | `--approval <id>` | - |
 | `amc audit binder export-request` | Create dual-control approval request for external binder sharing | `--scope <scope>`<br>`--agent <agentId>`<br>`--out <file.amcaudit>`<br>`--id <id>`<br>`--request-id <id>` | - |
 | `amc audit binder list` | List exported binders and cached workspace binder | - | - |
-| `amc audit binder verify` | Verify .amcaudit file | `--pubkey <path>` | - |
+| `amc audit binder verify` | Verify .amcaudit file | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc audit export` | Export enterprise audit logs for Splunk, Datadog, CloudTrail, or Azure Monitor | `--format <format>`<br>`--output <path>`<br>`--limit <n>` | - |
 | `amc audit init` | Initialize signed audit policy and compliance maps | - | - |
 | `amc audit map` | Audit compliance map operations | - | - |
@@ -131,8 +131,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc backup` | Signed encrypted backup/restore operations | - | - |
 | `amc backup create` | Create signed encrypted backup bundle | `--out <file>` | - |
 | `amc backup print` | Print backup manifest summary | - | - |
-| `amc backup restore` | Restore a verified backup into target directory | `--to <dir>`<br>`--force` | - |
-| `amc backup verify` | Verify signed backup bundle offline | `--pubkey <path>` | - |
+| `amc backup restore` | Restore a verified backup into target directory | `--to <dir>`<br>`--force`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned` | - |
+| `amc backup verify` | Verify signed backup bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc badge` | Generate maturity badge for README/docs (markdown, HTML, or URL) | `--agent <agentId>`<br>`--level <0-5>`<br>`--score <0-100>`<br>`--format <format>` | - |
 | `amc bench` | Public benchmark registry + ecosystem comparative view | - | - |
 | `amc bench compare` | Compute local vs imported ecosystem comparison | `--scope <scope>`<br>`--id <id>`<br>`--against <mode>` | - |
@@ -156,7 +156,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bench registry serve` | - | `--dir <dir>`<br>`--port <port>`<br>`--host <host>` | - |
 | `amc bench registry verify` | - | `--dir <dir>` | - |
 | `amc bench search` | Browse a bench registry index | `--registry <pathOrUrl>`<br>`--query <text>` | - |
-| `amc bench verify` | Verify .amcbench artifact offline | `--pubkey <path>` | - |
+| `amc bench verify` | Verify .amcbench artifact offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc bench verify-policy` | Verify signed bench policy | - | - |
 | `amc benchmark` | Signed ecosystem benchmark snapshots | - | - |
 | `amc benchmark compare` | Compare benchmark results between two agents head-to-head | `--json`<br>`--out <path>` | - |
@@ -168,7 +168,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc benchmark report` | - | `--out <file>`<br>`--group-by <groupBy>` | - |
 | `amc benchmark run` | Run standard benchmark suite (latency, accuracy, safety, cost-efficiency, reliability) against an agent | `--agent <agentId>`<br>`--json`<br>`--out <path>` | - |
 | `amc benchmark stats` | - | `--group-by <groupBy>` | - |
-| `amc benchmark verify` | - | - | - |
+| `amc benchmark verify` | - | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc blobs` | Encrypted evidence blob operations | - | - |
 | `amc blobs key` | Blob key management | - | - |
 | `amc blobs key init` | Initialize encrypted blob key material | - | - |
@@ -448,7 +448,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc federate peer add` | Add a peer publisher public key | `--peerId <id>`<br>`--name <name>`<br>`--pubkey <file>` | - |
 | `amc federate peer list` | List federation peers | - | - |
 | `amc federate verify` | Verify federation config signature | - | - |
-| `amc federate verify-bundle` | Verify .amcfed package | - | - |
+| `amc federate verify-bundle` | Verify .amcfed package | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc firewall` | Runtime protection for live agent traffic | - | - |
 | `amc firewall check` | Evaluate a request or response payload against Runtime Firewall | `--text <text>`<br>`--direction <direction>`<br>`--agent <id>`<br>`--provider <name>`<br>`--model <name>`<br>`--route <path>`<br>`--method <method>`<br>`--run <runId>`<br>`--episode <episodeId>`<br>`--lifecycle-run <id>`<br>`--bridge-request <id>`<br>`--require-policy`<br>`--no-record`<br>`--json` | - |
 | `amc firewall disable` | Disable Runtime Firewall for this workspace | `--json` | - |
@@ -847,12 +847,12 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc plugin registry init` | Initialize local signed plugin registry directory | `--dir <dir>`<br>`--registry-id <id>`<br>`--registry-name <name>` | - |
 | `amc plugin registry publish` | Publish plugin package into registry and re-sign index | `--dir <dir>`<br>`--file <plugin>`<br>`--registry-key <key>` | - |
 | `amc plugin registry serve` | Serve plugin registry over local HTTP | `--dir <dir>`<br>`--host <host>`<br>`--port <port>` | - |
-| `amc plugin registry verify` | Verify registry signature and package hashes | `--dir <dir>` | - |
+| `amc plugin registry verify` | Verify registry signature and package hashes | `--dir <dir>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc plugin registry-fingerprint` | Compute registry public key fingerprint | `--pubkey <path>` | - |
 | `amc plugin remove` | Request plugin removal (requires SECURITY dual-control approval) | `--agent <agentId>` | - |
 | `amc plugin search` | Search a plugin registry by id/fingerprint | `--registry <base>`<br>`--query <text>` | - |
 | `amc plugin upgrade` | Request plugin upgrade (requires SECURITY dual-control approval) | `--registry <id>`<br>`--agent <agentId>` | - |
-| `amc plugin verify` | Verify plugin package signature + artifact hashes | `--pubkey <path>` | - |
+| `amc plugin verify` | Verify plugin package signature + artifact hashes | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc plugin workspace-verify` | Verify workspace plugin signatures/integrity | - | - |
 | `amc policy` | Policy-as-code operations | - | - |
 | `amc policy action` | Signed autonomy action policy | - | - |
@@ -895,7 +895,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc prompt pack build` | Build and sign .amcprompt for an agent | `--agent <agentId>`<br>`--out <file>` | - |
 | `amc prompt pack diff` | Diff latest prompt pack against previous snapshot | `--agent <agentId>` | - |
 | `amc prompt pack show` | Show provider-specific enforced system prompt | `--agent <agentId>`<br>`--provider <provider>`<br>`--format <format>` | - |
-| `amc prompt pack verify` | Verify .amcprompt signature and lint signature | `--pubkey <path>` | - |
+| `amc prompt pack verify` | Verify .amcprompt signature and lint signature | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc prompt policy` | Prompt policy operations | - | - |
 | `amc prompt policy apply` | Apply prompt policy from YAML file and sign | `--file <path>`<br>`--reason <reason>` | - |
 | `amc prompt policy print` | Print prompt policy | - | - |

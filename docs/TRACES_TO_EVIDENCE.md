@@ -86,7 +86,7 @@ amc watch alerts              # live checks: cost spikes, error rates, leakage p
 ```bash
 amc                           # rescore: watch evidence coverage climb
 amc bundle export --run <runId> --out evidence.amcbundle
-amc bundle verify evidence.amcbundle   # anyone can verify offline
+amc bundle verify evidence.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>   # anyone can verify offline with the recorded keys
 ```
 
 Readiness gates stay honest: ingested-only evidence can raise coverage but external claims stay gated until readiness reports `READY` — which requires observed, high-trust evidence. That is by design.

@@ -142,7 +142,7 @@ If not isolated, keep `shared` and treat results as untrusted (`INVALID`).
 ## Bundle Sharing Pattern
 
 - Export: `amc bundle export --agent <id> --run <runId> --out <file.amcbundle>`
-- Verify offline: `amc bundle verify <file.amcbundle>`
+- Verify offline: `amc bundle verify <file.amcbundle> --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>` (keys recorded when the vault was created, never the copies inside the bundle)
 - Enforce in CI: `amc gate --bundle <file.amcbundle> --policy <gatePolicy.json>`
 
 ## Assurance + Certification Pattern
@@ -150,7 +150,7 @@ If not isolated, keep `shared` and treat results as untrusted (`INVALID`).
 - Run assurance: `amc assurance run --agent <id> --all --mode sandbox --window 14d`
 - Verify assurance determinism: `amc assurance verify --agent <id> --assuranceRun <id>`
 - Issue cert: `amc certify --agent <id> --run <runId> --policy <gatePolicy.json> --out <file.amccert>`
-- Verify cert offline: `amc cert verify <file.amccert>`
+- Verify cert offline: `amc cert verify <file.amccert> --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>`
 
 ---
 

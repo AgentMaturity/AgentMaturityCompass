@@ -37,7 +37,7 @@ Each binder includes:
 Use:
 
 ```bash
-amc audit binder verify ./workspace.amcaudit
+amc audit binder verify ./workspace.amcaudit --pubkey <recorded-auditor.pub>
 ```
 
 A tampered binder must fail verification and be treated as untrusted.

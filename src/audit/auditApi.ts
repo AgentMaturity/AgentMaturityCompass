@@ -40,6 +40,7 @@ import {
 import { loadEvidenceRequest } from "./evidenceRequestStore.js";
 import { evidenceRequestItemSchema } from "./evidenceRequestSchema.js";
 import { auditSchedulerRunNow, auditSchedulerSetEnabled, auditSchedulerStatus } from "./auditScheduler.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 const pendingExportSchema = z.object({
   v: z.literal(1),
@@ -395,11 +396,13 @@ export function auditBinderVerifyForApi(params: {
   file: string;
   workspace?: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }) {
   return verifyAuditBinderFile({
     file: resolve(params.file),
     workspace: params.workspace,
-    publicKeyPath: params.publicKeyPath ? resolve(params.publicKeyPath) : undefined
+    publicKeyPath: params.publicKeyPath ? resolve(params.publicKeyPath) : undefined,
+    trust: params.trust
   });
 }
 

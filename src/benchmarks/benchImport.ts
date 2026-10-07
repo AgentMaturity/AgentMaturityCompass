@@ -5,6 +5,10 @@ import { dirname, join, resolve } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { importedBenchmarksDir } from "./benchStore.js";
 import { verifyBenchmarkArtifact } from "./benchVerify.js";
+import { untrustedReasons, verdictExitCode, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+
+/** One imported benchmark and the verifier report that admitted it. */
+export interface ImportedBenchmark { benchId: string; dir: string; report: VerifierReportV1 }
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 
 /**
@@ -28,10 +32,11 @@ function runTarExtract(bundleFile: string, outputDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outputDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
 
-function importOne(workspace: string, file: string): { benchId: string; dir: string } {
-  const verify = verifyBenchmarkArtifact(file);
-  if (!verify.ok || !verify.bench) {
-    throw new Error(`Invalid benchmark '${file}': ${verify.errors.join("; ")}`);
+function importOne(workspace: string, file: string, trust: TrustContext): ImportedBenchmark {
+  const verify = verifyBenchmarkArtifact(file, trust);
+  // Trusted, or integrity-only when the caller allowed it (a federation import whose pinned peer vouches for the bytes).
+  if (verdictExitCode(verify.report) === 1 || !verify.bench) {
+    throw new Error(`Invalid benchmark '${file}': ${untrustedReasons(verify.report).join("; ")}`);
   }
   const benchId = verify.bench.benchId;
   const targetDir = join(importedBenchmarksDir(workspace), benchId);
@@ -58,15 +63,17 @@ function importOne(workspace: string, file: string): { benchId: string; dir: str
   }
   return {
     benchId,
-    dir: targetDir
+    dir: targetDir,
+    report: verify.report
   };
 }
 
-export function ingestBenchmarks(workspace: string, fileOrDir: string): {
-  imported: Array<{ benchId: string; dir: string }>;
+/** Imports benchmarks whose signer the trust context admits (P0-09); the CLI and API pass the operator's AMC home trust. */
+export function ingestBenchmarks(workspace: string, fileOrDir: string, trust: TrustContext): {
+  imported: ImportedBenchmark[];
 } {
   const target = resolve(workspace, fileOrDir);
-  const imported: Array<{ benchId: string; dir: string }> = [];
+  const imported: ImportedBenchmark[] = [];
   if (!pathExists(target)) {
     throw new Error(`Benchmark path not found: ${target}`);
   }
@@ -77,13 +84,13 @@ export function ingestBenchmarks(workspace: string, fileOrDir: string): {
       if (!entry.isFile() || !entry.name.endsWith(".amcbench")) {
         continue;
       }
-      imported.push(importOne(workspace, join(target, entry.name)));
+      imported.push(importOne(workspace, join(target, entry.name), trust));
     }
     return { imported };
   }
   if (!target.endsWith(".amcbench")) {
     throw new Error(`Benchmark file must end with .amcbench: ${target}`);
   }
-  imported.push(importOne(workspace, target));
+  imported.push(importOne(workspace, target, trust));
   return { imported };
 }

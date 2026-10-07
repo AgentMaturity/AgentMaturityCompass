@@ -1,12 +1,12 @@
 # Trust lists and pinned issuers
 
-A signature proves who signed a record and that it has not changed since. It does not prove the record is true, and a public key shipped inside an artifact cannot vouch for that artifact: anyone can sign fabricated content with a fresh key and include that key. AMC's trust library (`agent-maturity-compass/trust`) therefore counts a signature only when the person running the verifier pinned its key for that purpose, and the key is neither revoked nor distrusted. The verify commands adopt it in P0-09 PR 2 and PR 3; see "Status" below.
+A signature proves who signed a record and that it has not changed since. It does not prove the record is true, and a public key shipped inside an artifact cannot vouch for that artifact: anyone can sign fabricated content with a fresh key and include that key. AMC's trust library (`agent-maturity-compass/trust`) therefore counts a signature only when the person running the verifier pinned its key for that purpose, and the key is neither revoked nor distrusted. The verify commands adopted it in P0-09 PR 2 and PR 3; see "Status" below.
 
 This page describes the trust-list format, how a key is admitted, the built-in distrust list and the verifier report.
 
 ## Status
 
-P0-09 lands in three pull requests. PR 1 added the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **PR 2 wires `amc verify`, `verify all`, `evidence verify`, `session verify`, `agent-loop verify`, `bundle verify`, `cert verify`, `cert verify-revocation`, `passport verify`, `assurance cert-verify` and `release verify`**, their API routes and the flags and exit codes below. PR 3 wires the remaining verifiers marked PR 3 in [the verifier inventory](security/verifier-inventory.md); until then they behave as before.
+P0-09 lands in three pull requests. PR 1 added the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **PR 2 wires `amc verify`, `verify all`, `evidence verify`, `session verify`, `agent-loop verify`, `bundle verify`, `cert verify`, `cert verify-revocation`, `passport verify`, `assurance cert-verify` and `release verify`**, their API routes and the flags and exit codes below. **PR 3 wires `audit binder verify`, `bench verify`, `benchmark verify`, `backup verify` (and `backup restore`), `plugin verify`, `plugin registry verify`, `prompt pack verify` and `federate verify-bundle`**, the imports and installs behind them (`benchmark ingest`, `federate import`, `plugin install`, `plugin search`, bench registry imports), their API routes, and binds bench inclusion proofs to the signed Merkle root. [The verifier inventory](security/verifier-inventory.md) says which PR wired each command; seven portable commands outside the issue table are not wired yet and are listed there.
 
 ## Two-minute path: pin your own keys
 
@@ -137,7 +137,7 @@ The claim each command checks: `bundle verify` and `cert verify` use the run sea
 
 ## Built-in distrust list
 
-The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. Every verify command wired so far applies it. A malformed file stops verification instead of being ignored.
+The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. Every wired verify command applies it. A malformed file stops verification instead of being ignored.
 
 ## Workspace self-trust
 
@@ -149,7 +149,7 @@ Every verifier will return `VerifierReportV1` (`type: "amc.verifier-report"`, `v
 
 ## Flags
 
-On every portable verify command wired so far: `--trust-list <file>` and `--trust-root <sha256>` (both repeatable), `--allow-unpinned`, `--allow-unanchored` and `--json`. `--pubkey <path>` pins one key for the purposes the command checks; PR 2 added it to `bundle verify`, `cert verify`, `cert verify-revocation` and `assurance cert-verify`. `--expect-monitor <sha256>` pins the monitor key on `verify`, `verify all`, `evidence verify`, `bundle verify`, `cert verify`, `session verify` and `agent-loop verify`. The ledger-only commands have no issuer to pin, so they take every flag except `--allow-unpinned`. These are flags on existing commands; no command path is added. Allow flags are never read from environment variables or API request bodies, and API routes build their trust context from the server's AMC home and refuse a body that names a pin or an allow flag.
+On every wired portable verify command: `--trust-list <file>` and `--trust-root <sha256>` (both repeatable), `--allow-unpinned`, `--allow-unanchored` and `--json`. `--pubkey <path>` pins one key for the purposes the command checks; PR 2 added it to `bundle verify`, `cert verify`, `cert verify-revocation` and `assurance cert-verify`, and PR 3 to `benchmark verify`, `plugin registry verify`, `federate verify-bundle` and `backup restore` (which also takes `--trust-list`, `--trust-root` and `--allow-unpinned`, but not `--allow-unanchored`, because a backup carries no ledger to anchor; a restore allowed by `--allow-unpinned` exits 2 with `UNTRUSTED:` on stderr). `--expect-monitor <sha256>` pins the monitor key on `verify`, `verify all`, `evidence verify`, `bundle verify`, `cert verify`, `session verify` and `agent-loop verify`. The ledger-only commands have no issuer to pin, so they take every flag except `--allow-unpinned`. These are flags on existing commands; no command path is added. Allow flags are never read from environment variables or API request bodies, and API routes build their trust context from the server's AMC home and refuse a body that names a pin or an allow flag.
 
 Example, with the fingerprints and `.pub` files recorded when the workspace was created:
 
@@ -159,9 +159,15 @@ amc bundle verify run.amcbundle --pubkey ~/amc-pins/auditor.pub --expect-monitor
 amc cert verify agent.amccert --pubkey ~/amc-pins/auditor.pub --expect-monitor <monitor sha256> --revocation agent.amcrevoke
 amc passport verify agent.amcpass --pubkey ~/amc-pins/auditor.pub
 amc release verify amc-2.0.0.amcrelease --pubkey release-signing.pub
+amc audit binder verify workspace.amcaudit --pubkey ~/amc-pins/auditor.pub
+amc backup verify latest.amcbackup --pubkey ~/amc-pins/auditor.pub
+amc plugin verify my-plugin.amcplug --pubkey publisher.pub
+amc federate verify-bundle latest.amcfed --pubkey peer-publisher.pub
 ```
 
-A bundle or certificate carries its own ledger, so it is anchored only when its monitor key is pinned; a passport or assurance certificate is anchored when its inclusion proofs resolve to its signed Merkle root.
+Imports and installs have no verify flags; they admit what the operator already pinned. `benchmark ingest` and `plugin search` use the AMC home trust list. `federate import` admits a package from a peer added with `amc federate peer add` (the peer's publisher key, recorded out of band) and takes the benchmarks inside it on that peer's signed manifest. `plugin install` and the marketplace need the registry fingerprint pinned in the workspace's signed registries config, and admit a package only for the publisher the pinned registry's signed index names; bench registry imports work the same way. The registries config counts only with a valid auditor signature, so an edit without it is refused, and a registry key the operator distrusts is refused even when its fingerprint is pinned. Publishing to a plugin or bench registry checks integrity only, because the registry operator vouches for a publisher by signing the index that names it.
+
+A bundle or certificate carries its own ledger, so it is anchored only when its monitor key is pinned; a passport, assurance certificate, audit binder or bench is anchored when its inclusion proofs resolve to its signed Merkle root (`verifyBenchProofBundle` refuses any proof whose own `rootHash` differs from the signed root).
 
 ## Exit codes
 

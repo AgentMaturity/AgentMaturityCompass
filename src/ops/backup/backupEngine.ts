@@ -4,7 +4,7 @@ import { join, dirname, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../../crypto/keys.js";
+import { getPublicKeyHistory, getPublicKeyPem } from "../../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { loadOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../policy.js";
@@ -14,7 +14,9 @@ import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
 import { decryptBackupPayload, encryptBackupPayload, type BackupEncryptionEnvelope } from "./backupCrypto.js";
 import { appendOpsAuditEvent } from "../audit.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../../crypto/signing/signer.js";
+import { signDigestWithPolicy } from "../../crypto/signing/signer.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, untrustedReasons, verdictExitCode, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../../trust/index.js";
+import { fileSha256 } from "../../trust/signatureCheck.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../../security/safeTarArchive.js";
 
 /**
@@ -267,25 +269,19 @@ function loadBundle(bundleFile: string): {
   };
 }
 
-function verifyManifestSignature(manifestPath: string, sigPath: string, auditorPub: string): string[] {
+/** keys/auditor.pub, the envelope key and --pubkey only locate the signer; admitKey decides whether it counts (P0-09). */
+function verifyManifestSignature(manifestPath: string, sigPath: string, candidates: Array<string | null>, trust: TrustContext,
+  signatures: IssuerAdmission[]): string[] {
   const errors: string[] = [];
   const digest = sha256Hex(readFileSync(manifestPath));
   try {
     const sig = backupManifestSigSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
+    const check = checkDigestSignature({ signature: "manifest.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+      candidates: [...candidates, envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
+    signatures.push(check.admission);
     if (sig.digestSha256 !== digest) {
       errors.push("manifest digest mismatch");
-    } else if (
-      !(
-        verifySignedDigest({
-          workspace: process.cwd(),
-          digestHex: digest,
-          signed: {
-            signature: sig.signature,
-            envelope: sig.envelope
-          }
-        }) || verifyHexDigestAny(digest, sig.signature, [auditorPub])
-      )
-    ) {
+    } else if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
       errors.push("manifest signature invalid");
     }
   } catch (error) {
@@ -324,11 +320,24 @@ function verifyDecryptedFiles(payloadTarBytes: Buffer, manifest: BackupManifest)
   return errors;
 }
 
-export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; passphrase?: string }): {
+/**
+ * Verifies a .amcbackup offline. keys/auditor.pub and --pubkey only locate the signer; manifest.sig needs a key the
+ * trust context admits for artifact-seal (P0-09). ok equals report.trusted.
+ */
+export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; passphrase?: string; trust: TrustContext }): {
   ok: boolean;
   errors: string[];
   manifest: BackupManifest | null;
+  report: VerifierReportV1;
 } {
+  const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let manifest: BackupManifest | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "backup", path: resolve(params.backupFile), sha256: fileSha256(resolve(params.backupFile)) },
+      context: params.trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, manifest, report };
+  };
   let loaded:
     | {
         root: string;
@@ -338,11 +347,8 @@ export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; 
   try {
     loaded = loadBundle(params.backupFile);
   } catch (error) {
-    return {
-      ok: false,
-      errors: [`backup bundle extract failed: ${String(error)}`],
-      manifest: null
-    };
+    errors.push(`backup bundle extract failed: ${String(error)}`);
+    return finish();
   }
   const { root, cleanup } = loaded;
   try {
@@ -350,21 +356,19 @@ export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; 
     const sigPath = join(root, "manifest.sig");
     const payloadPath = join(root, "payload", "workspace.tar.gz.enc");
     const payloadShaPath = join(root, "payload.sha256");
-    const pubPath = params.pubkeyPath ? resolve(params.pubkeyPath) : join(root, "keys", "auditor.pub");
-    const errors: string[] = [];
-    if (!pathExists(manifestPath) || !pathExists(sigPath) || !pathExists(payloadPath) || !pathExists(payloadShaPath) || !pathExists(pubPath)) {
+    const pubPath = join(root, "keys", "auditor.pub");
+    if (!pathExists(manifestPath) || !pathExists(sigPath) || !pathExists(payloadPath) || !pathExists(payloadShaPath)) {
       errors.push("backup bundle missing required files");
-      return { ok: false, errors, manifest: null };
+      return finish();
     }
-    let manifest: BackupManifest | null = null;
     try {
       manifest = backupManifestSchema.parse(JSON.parse(readUtf8(manifestPath)) as unknown);
     } catch (error) {
       errors.push(`invalid manifest: ${String(error)}`);
-      return { ok: false, errors, manifest: null };
+      return finish();
     }
-    const auditorPub = readUtf8(pubPath);
-    errors.push(...verifyManifestSignature(manifestPath, sigPath, auditorPub));
+    const candidates = [params.pubkeyPath ? readUtf8(resolve(params.pubkeyPath)) : null, pathExists(pubPath) ? readUtf8(pubPath) : null];
+    errors.push(...verifyManifestSignature(manifestPath, sigPath, candidates, params.trust, signatures));
     const payloadSha = sha256Hex(readFileSync(payloadPath));
     if (payloadSha !== manifest.payload.payloadSha256) {
       errors.push("payload sha mismatch");
@@ -376,7 +380,7 @@ export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; 
     const passphrase = params.passphrase ?? backupPassphraseFromEnv();
     if (!passphrase || passphrase.length === 0) {
       errors.push("backup passphrase required for full verification");
-      return { ok: false, errors, manifest };
+      return finish();
     }
     try {
       const decrypted = decryptBackupPayload({
@@ -388,11 +392,7 @@ export function verifyBackup(params: { backupFile: string; pubkeyPath?: string; 
     } catch (error) {
       errors.push(`payload decrypt failed: ${String(error)}`);
     }
-    return {
-      ok: errors.length === 0,
-      errors,
-      manifest
-    };
+    return finish();
   } finally {
     cleanup();
   }
@@ -416,17 +416,23 @@ export async function restoreBackup(params: {
   toDir: string;
   force?: boolean;
   passphrase?: string;
+  pubkeyPath?: string;
+  /** The operator's pins for the backup's auditor key (P0-09); --allow-unpinned restores an integrity-only backup. */
+  trust: TrustContext;
 }): Promise<{
   restoredTo: string;
   trusted: boolean;
   warnings: string[];
+  report: VerifierReportV1;
 }> {
   const verify = verifyBackup({
     backupFile: params.backupFile,
-    passphrase: params.passphrase
+    passphrase: params.passphrase,
+    pubkeyPath: params.pubkeyPath,
+    trust: params.trust
   });
-  if (!verify.ok || !verify.manifest) {
-    throw new Error(`backup verify failed: ${verify.errors.join("; ")}`);
+  if (verdictExitCode(verify.report) === 1 || !verify.manifest) {
+    throw new Error(`backup verify failed: ${untrustedReasons(verify.report).join("; ")}`);
   }
   const { root, cleanup } = loadBundle(params.backupFile);
   try {
@@ -446,7 +452,7 @@ export async function restoreBackup(params: {
       }
       ensureDir(target);
       tarExtract(payloadTar, target);
-      const warnings: string[] = [];
+      const warnings = verify.report.trusted ? [] : untrustedReasons(verify.report).map((reason) => `UNTRUSTED (--allow-unpinned): ${reason}`);
       const opsSig = verifyOpsPolicySignature(target);
       if (!opsSig.valid) {
         warnings.push(`ops policy invalid after restore: ${opsSig.reason ?? "unknown"}`);
@@ -494,7 +500,8 @@ export async function restoreBackup(params: {
       return {
         restoredTo: target,
         trusted: warnings.length === 0,
-        warnings
+        warnings,
+        report: verify.report
       };
     } finally {
       rmSync(temp, { recursive: true, force: true });

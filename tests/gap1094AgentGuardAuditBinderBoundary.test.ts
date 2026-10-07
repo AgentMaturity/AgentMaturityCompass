@@ -11,6 +11,7 @@ import {
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
 import type { AuditBinderJson } from "../src/audit/binderSchema.js";
 import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const DOC = "docs/source-reviews/GAP-1094-agentguard-audit-binder.md";
 const REPO = "https://github.com/WhitzardAgent/AgentGuard";
@@ -151,6 +152,7 @@ describe("GAP-1094 AgentGuard audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: created.outFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok, JSON.stringify(verified.errors)).toBe(true);
     expect(verified.fileSha256).toBe(created.sha256);
@@ -186,6 +188,7 @@ describe("GAP-1094 AgentGuard audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: tamperedFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok).toBe(false);
     expect(verified.errors.map((error) => error.code)).toEqual(expect.arrayContaining([

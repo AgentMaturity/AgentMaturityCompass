@@ -20,6 +20,7 @@ import {
   auditRequestFulfillForApi
 } from "../src/audit/auditApi.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 const _originalVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -98,7 +99,8 @@ describe("audit binder + compliance maps", () => {
     });
     const verify = verifyAuditBinderFile({
       file: created.outFile,
-      workspace: ws
+      workspace: ws,
+      trust: workspaceKeyTrust(ws)
     });
     expect(verify.ok, JSON.stringify(verify.errors)).toBe(true);
   });

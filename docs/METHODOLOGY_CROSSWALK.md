@@ -53,7 +53,7 @@ AMC is not an AIUC auditor. Its signed evidence bundles, red-team receipts, and 
 amc compliance report --framework EU_AI_ACT   # framework-mapped report
 amc audit binder create                     # assessor-ready signed binder
 amc bundle export --run <runId> --out evidence.amcbundle
-amc bundle verify evidence.amcbundle        # anyone can check integrity offline
+amc bundle verify evidence.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>  # anyone can check it offline with the publisher's recorded keys
 ```
 
 *Mappings summarized here are maintained in the compliance packs (`compliance-*.json`) and covered by the drift-checked docs suite. If this document and a pack disagree, the pack is canonical.*

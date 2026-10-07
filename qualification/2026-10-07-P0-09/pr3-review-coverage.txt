@@ -1,0 +1,18 @@
+# Focused in-process coverage on cbbd012b for every src/*.ts file the PR 3 review round changes
+# npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-review-affected-tests.txt) --coverage --coverage.enabled=true --coverage.reporter=json-summary (thresholds 0)
+# 77 files, 1356 tests passed. Columns: metric:focused%/floor% (covered/total vs the floor's covered/total in scripts/quality/coverage-baseline.json)
+# toolsRouter.ts was already below its whole-suite floor in this focused set on 0b818f4f and on 0ffc2850 (see pr3-coverage.txt).
+# The review round adds 2 lines, 2 branches and 4 statements there (the /plugins/print refusal), all covered by the forgery suite
+# (224-222, 143-141, 235-231), so the whole-suite figures rise above the floors as they did for PR 3.
+ok    src/audit/binderVerifier.ts l:95.9/76.7(94/98 vs 99/129) f:100.0/93.3(12/12 vs 14/15) b:71.6/51.1(48/67 vs 48/94) s:96.2/76.7(100/104 vs 102/133)
+ok    src/bench/benchRegistryClient.ts l:68.3/62.1(71/104 vs 54/87) f:69.6/57.9(16/23 vs 11/19) b:44.7/40.3(34/76 vs 25/62) s:67.6/62.2(75/111 vs 56/90)
+ok    src/benchmarks/benchImport.ts l:73.0/73.0(27/37 vs 27/37) f:100.0/100.0(3/3 vs 3/3) b:43.8/43.8(7/16 vs 7/16) s:73.0/73.0(27/37 vs 27/37)
+ok    src/cli-trust-flags.ts l:90.6/65.0(29/32 vs new) f:91.7/75.0(11/12 vs new) b:94.3/59.0(50/53 vs new) s:91.8/64.0(45/49 vs new)
+ok    src/cli.ts l:0.0/0.0(0/10663 vs 0/10758) f:0.0/0.0(0/1213 vs 0/1213) b:0.0/0.0(0/5203 vs 0/5223) s:0.0/0.0(0/11288 vs 0/11381)
+ok    src/marketplace/marketplaceIndex.ts l:0.0/0.0(0/86 vs 0/86) f:0.0/0.0(0/21 vs 0/21) b:0.0/0.0(0/64 vs 0/64) s:0.0/0.0(0/105 vs 0/105)
+ok    src/ops/backup/backupEngine.ts l:81.3/79.4(183/225 vs 173/218) f:74.1/72.0(20/27 vs 18/25) b:60.7/54.9(71/117 vs 62/113) s:80.1/78.0(185/231 vs 174/223)
+ok    src/plugins/pluginApi.ts l:69.2/65.2(99/143 vs 88/135) f:50.0/43.5(12/24 vs 10/23) b:52.4/49.5(54/103 vs 46/93) s:66.4/62.4(99/149 vs 88/141)
+ok    src/plugins/pluginPackage.ts l:88.8/83.3(135/152 vs 125/150) f:80.0/78.3(20/25 vs 18/23) b:67.4/53.0(62/92 vs 44/83) s:83.9/78.8(141/168 vs 130/165)
+ok    src/trust/trustContext.ts l:100.0/65.0(39/39 vs new) f:100.0/75.0(14/14 vs new) b:94.7/59.0(36/38 vs new) s:100.0/64.0(46/46 vs new)
+ok    src/verify/verifyAll.ts l:80.9/60.9(152/188 vs 112/184) f:90.5/66.7(19/21 vs 16/24) b:53.6/37.2(112/209 vs 71/191) s:80.8/60.0(160/198 vs 117/195)
+BELOW src/api/toolsRouter.ts l:85.2/87.4(224/263 vs 222/254) f:100.0/100.0(7/7 vs 7/7) b:62.2/69.2(143/230 vs 155/224) s:77.6/79.9(235/303 vs 230/288)  <- lines branches statements

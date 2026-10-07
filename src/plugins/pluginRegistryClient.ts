@@ -6,6 +6,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { verifyPluginPackage } from "./pluginPackage.js";
+import { admitKey, loadTrustContext, untrustedReasons, withPins, type TrustContext } from "../trust/index.js";
 import {
   pluginRegistryIndexSchema,
   pluginRegistryIndexSignatureSchema,
@@ -118,7 +119,12 @@ export interface ResolvedRegistryPackage {
   packagePath: string;
 }
 
-async function fetchRegistryIndex(baseRaw: string): Promise<{
+/**
+ * Fetches and verifies a registry index. registry.pub comes from the registry itself, so it counts only when the trust
+ * context admits it for artifact-seal: a pinned fingerprint in the workspace's signed registries config, or the
+ * operator's trust list (P0-09).
+ */
+async function fetchRegistryIndex(baseRaw: string, trust: TrustContext): Promise<{
   base: string;
   index: PluginRegistryIndex;
   registryPub: string;
@@ -131,6 +137,10 @@ async function fetchRegistryIndex(baseRaw: string): Promise<{
   const verifyResult = verifyRegistryIndexSignature({ index, sigRaw, pubPem: registryPub });
   if (!verifyResult.ok) {
     throw new Error(`registry index signature invalid: ${verifyResult.reason ?? "unknown"}`);
+  }
+  const admission = admitKey({ publicKeyPem: registryPub, purpose: "artifact-seal", signature: "index.sig", context: trust });
+  if (admission.status !== "admitted") {
+    throw new Error(`registry key not admitted: ${admission.status}: ${admission.detail ?? ""}`);
   }
   return {
     base,
@@ -161,19 +171,29 @@ function selectVersion(
     .at(-1)!;
 }
 
+/** The operator's trust plus the registry fingerprint the workspace's signed registries config pins. */
+export function registryTrust(pinnedRegistryPubkeyFingerprint: string): TrustContext {
+  return withPins(loadTrustContext(), [{ keyId: pinnedRegistryPubkeyFingerprint, purposes: ["artifact-seal"], origin: "pinned registry fingerprint" }]);
+}
+
 export async function resolveRegistryPackage(params: {
   registryBase: string;
   pluginRef: string;
-  pinnedRegistryPubkeyFingerprint?: string;
+  /** Required: a registry.pub nobody pinned is refused (P0-09). */
+  pinnedRegistryPubkeyFingerprint: string;
   allowPluginPublishers?: string[];
   allowRiskCategories?: Array<"LOW" | "MEDIUM" | "HIGH" | "CRITICAL">;
 }): Promise<ResolvedRegistryPackage> {
   const at = params.pluginRef.lastIndexOf("@");
   const pluginId = at > 0 ? params.pluginRef.slice(0, at) : params.pluginRef;
   const requestedVersion = at > 0 ? params.pluginRef.slice(at + 1) : null;
-  const { base, index, registryPub } = await fetchRegistryIndex(params.registryBase);
+  if (!params.pinnedRegistryPubkeyFingerprint) {
+    throw new Error("registry key not admitted: not-pinned: no pinned registry fingerprint");
+  }
+  const trust = registryTrust(params.pinnedRegistryPubkeyFingerprint);
+  const { base, index, registryPub } = await fetchRegistryIndex(params.registryBase, trust);
   const registryFingerprint = sha256Hex(Buffer.from(registryPub, "utf8"));
-  if (params.pinnedRegistryPubkeyFingerprint && params.pinnedRegistryPubkeyFingerprint !== registryFingerprint) {
+  if (params.pinnedRegistryPubkeyFingerprint !== registryFingerprint) {
     throw new Error("registry fingerprint mismatch with pinned fingerprint");
   }
   const selected = selectVersion(index, pluginId, requestedVersion);
@@ -196,8 +216,10 @@ export async function resolveRegistryPackage(params: {
   const temp = mkdtempSync(join(tmpdir(), "amc-plugin-registry-"));
   const packagePath = join(temp, "plugin.amcplug");
   writeFileAtomic(packagePath, bytes, 0o644);
-  const verifyResult = verifyPluginPackage({ file: packagePath });
-  if (!verifyResult.ok || !verifyResult.manifest || !verifyResult.publisherFingerprint) {
+  // The publisher counts because the pinned registry's signed index names it for this version.
+  const verifyResult = verifyPluginPackage({ file: packagePath, trust: withPins(trust,
+    [{ keyId: selected.publisherFingerprint, purposes: ["artifact-seal"], origin: `registry ${index.registry.id} index` }]) });
+  if (verifyResult.report.integrity.status !== "pass" || !verifyResult.manifest || !verifyResult.publisherFingerprint) {
     throw new Error(`plugin verification failed: ${verifyResult.errors.join("; ")}`);
   }
   if (verifyResult.manifest.plugin.id !== pluginId || verifyResult.manifest.plugin.version !== selected.version) {
@@ -208,6 +230,9 @@ export async function resolveRegistryPackage(params: {
   }
   if (verifyResult.manifest.plugin.risk.category !== selected.riskCategory) {
     throw new Error("plugin risk category mismatch with registry entry");
+  }
+  if (!verifyResult.ok) {
+    throw new Error(`plugin publisher not admitted: ${untrustedReasons(verifyResult.report).join("; ")}`);
   }
   return {
     registryId: index.registry.id,
@@ -225,12 +250,14 @@ export async function resolveRegistryPackage(params: {
 export async function browseRegistry(params: {
   registryBase: string;
   query?: string;
+  /** Who may sign the index: registryTrust(pinned fingerprint), or the operator's trust list. */
+  trust: TrustContext;
 }): Promise<{
   registryId: string;
   registryFingerprint: string;
   plugins: PluginRegistryIndex["plugins"];
 }> {
-  const { index, registryPub } = await fetchRegistryIndex(params.registryBase);
+  const { index, registryPub } = await fetchRegistryIndex(params.registryBase, params.trust);
   const query = (params.query ?? "").trim().toLowerCase();
   const filtered = query.length === 0
     ? index.plugins

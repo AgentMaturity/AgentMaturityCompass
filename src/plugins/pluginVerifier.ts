@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { pluginManifestSchema } from "./pluginManifestSchema.js";
-import { verifyPluginPackage } from "./pluginPackage.js";
+import { installedPluginTrust, verifyPluginPackage } from "./pluginPackage.js";
 import { installedPluginsLockSchema } from "./pluginRegistrySchema.js";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
 import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
@@ -59,7 +59,7 @@ export function verifyInstalledPluginsIntegrity(workspace: string): InstalledPlu
       errors.push(`installed package sha mismatch for ${item.id}@${item.version}`);
       continue;
     }
-    const verify = verifyPluginPackage({ file: pluginFile });
+    const verify = verifyPluginPackage({ file: pluginFile, trust: installedPluginTrust(workspace, item.publisherFingerprint) });
     if (!verify.ok || !verify.manifest) {
       errors.push(`installed plugin verification failed for ${item.id}@${item.version}: ${verify.errors.join("; ")}`);
       continue;

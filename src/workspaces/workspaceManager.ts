@@ -9,7 +9,7 @@ import { benchPolicyPath, verifyBenchPolicySignature } from "../bench/benchPolic
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import { verifyDiagnosticBankSignature } from "../diagnostic/bank/bankLoader.js";
 import { verifyCgxPolicySignature } from "../cgx/cgxStore.js";
-import { verifyPromptPackFile } from "../prompt/promptPackVerifier.js";
+import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
 import { listPromptAgentsWithPacks, verifyPromptLintSignature } from "../prompt/promptPackStore.js";
 import { promptLatestPackPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
 import { assuranceReadinessGate } from "../assurance/assuranceControlPlane.js";
@@ -162,9 +162,7 @@ export class WorkspaceManager {
         }
       }
       for (const agentId of listPromptAgentsWithPacks(dir)) {
-        const verify = verifyPromptPackFile({
-          file: promptLatestPackPath(dir, agentId)
-        });
+        const verify = verifyWorkspacePromptPack(dir, promptLatestPackPath(dir, agentId));
         if (!verify.ok) {
           reasons.push(`prompt pack invalid (${agentId}): ${verify.errors.join("; ")}`);
         }

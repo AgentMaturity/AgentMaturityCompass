@@ -27,7 +27,7 @@ amc trust status
 1. Determine which subsystems failed (ledger, transparency, policies, artifacts).
 2. Check latest backup integrity before restore.
 ```bash
-amc backup verify .amc/backups/latest.amcbackup
+amc backup verify .amc/backups/latest.amcbackup --pubkey <recorded-auditor.pub>
 amc backup print .amc/backups/latest.amcbackup
 ```
 
@@ -35,7 +35,7 @@ amc backup print .amc/backups/latest.amcbackup
 
 1. Restore to isolated path.
 ```bash
-amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force
+amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force --pubkey <recorded-auditor.pub>
 ```
 2. Verify restored workspace offline.
 ```bash

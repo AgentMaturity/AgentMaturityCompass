@@ -500,7 +500,7 @@ amc bench init
 amc bench verify-policy
 
 amc bench create --scope workspace --out .amc/bench/exports/workspace/workspace/latest.amcbench
-amc bench verify .amc/bench/exports/workspace/workspace/latest.amcbench
+amc bench verify .amc/bench/exports/workspace/workspace/latest.amcbench --pubkey <recorded-auditor.pub>
 amc bench print .amc/bench/exports/workspace/workspace/latest.amcbench
 ```
 
