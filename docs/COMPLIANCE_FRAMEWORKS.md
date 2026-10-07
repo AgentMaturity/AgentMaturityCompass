@@ -292,12 +292,12 @@ Specific audit event types that indicate non-compliance:
 
 ## Compliance Status
 
-Each control category can have one of four statuses:
+Each control category has one of four statuses (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules):
 
-- **SATISFIED**: All evidence requirements met
-- **PARTIAL**: Some evidence requirements met
-- **MISSING**: No evidence found
-- **UNKNOWN**: Unable to determine status
+- **SATISFIED**: Every evidence requirement passed on control-bound AMC runtime evidence
+- **PARTIAL**: A requirement failed while another passed
+- **MISSING**: A requirement failed and none passed
+- **NOT_EVALUATED**: Control-bound evidence is absent, untrusted or outside the window, or the maps are untrusted; this is not a pass
 
 ## Extending Compliance Mappings
 
