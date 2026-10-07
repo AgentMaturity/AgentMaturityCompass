@@ -3,6 +3,8 @@ import type { Ledger } from "../ledger/ledger.js";
 import { hashBinaryOrPath } from "../ledger/ledger.js";
 import type { RuntimeName, TrustTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import type { AgentToolCall } from "./agentResponder.js";
 
 export function startAssuranceSession(params: {
   ledger: Ledger;
@@ -138,13 +140,18 @@ export function writeScenarioResponse(params: {
   packId: string;
   scenarioId: string;
   response: string;
+  /** Tool calls the agent made; the digest then covers canonical `{ text, toolCalls }`. */
+  toolCalls?: AgentToolCall[];
   agentId: string;
 }): string {
+  const toolCallCount = params.toolCalls?.length ?? 0;
+  // A reply without tool calls keeps the plain-text digest older records carry.
+  const recorded = toolCallCount > 0 ? canonicalize({ text: params.response, toolCalls: params.toolCalls }) : params.response;
   return params.ledger.appendEvidence({
     sessionId: params.sessionId,
     runtime: params.runtime,
     eventType: "stdout",
-    payload: redactedScenarioPayload(params.response),
+    payload: redactedScenarioPayload(recorded),
     payloadExt: "json",
     meta: {
       source: "assurance",
@@ -152,7 +159,8 @@ export function writeScenarioResponse(params: {
       scenarioId: params.scenarioId,
       direction: "agent_to_assurance",
       agentId: params.agentId,
-      trustTier: params.trustTier
+      trustTier: params.trustTier,
+      toolCallCount
     }
   });
 }

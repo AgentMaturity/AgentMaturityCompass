@@ -59,6 +59,13 @@
       "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0"
     },
     {
+      "path": "src/assurance/validators.ts",
+      "issue": "P0-19",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
+    },
+    {
       "path": "src/bench/benchRegistryClient.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",

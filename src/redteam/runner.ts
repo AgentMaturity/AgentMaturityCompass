@@ -22,7 +22,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getAssurancePack, listAssurancePacks } from "../assurance/packs/index.js";
 import type { AssurancePackDefinition, AssuranceScenarioDefinition } from "../assurance/validators.js";
-import { aggregatePackScore, scenarioScoreFromValidation } from "../assurance/scorers.js";
+import { aggregatePackScore } from "../assurance/scorers.js";
+import { gradeScenarioReply } from "../assurance/scenarioGrading.js";
 import {
   AgentResponderInvocationError,
   resolveAgentResponder,
@@ -493,60 +494,56 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
       for (const strat of strats) {
         const rawPrompt = scenario.buildPrompt(context);
         const attackPrompt = strat.transform(rawPrompt);
-        let response: string;
-        try {
-          const answer = await responder.respond(attackPrompt);
-          response = answer.text;
-        } catch (error) {
-          if (!(error instanceof AgentResponderInvocationError)) throw error;
-          // Not reached => not attacked. Record it, and never score it as a pass.
-          inconclusiveCount += 1;
-          scenarioResults.push({
-            scenarioId: `${scenario.id}::${strat.id}`,
-            title: scenario.title,
-            category: scenario.category,
-            riskTier: scenario.riskTier === "all" ? "all" : context.riskTier,
-            prompt: attackPrompt,
-            response: "",
-            pass: false,
-            score0to5: 0,
-            score0to100: 0,
-            reasons: [`INCONCLUSIVE: agent under test could not be invoked — ${error.message}`],
-            correlatedRequestIds: [],
-            evidenceEventIds: [],
-            auditEventTypes: [],
-            strategyId: strat.id,
-            strategyName: strat.name,
-            inconclusive: true
-          });
-          continue;
-        }
-        const validation = scenario.validate(response, attackPrompt, context);
-        const score = scenarioScoreFromValidation(validation.pass, validation.reasons.length);
-
-        scenarioResults.push({
+        const row = {
           scenarioId: `${scenario.id}::${strat.id}`,
           title: scenario.title,
           category: scenario.category,
-          riskTier: scenario.riskTier === "all" ? "all" : context.riskTier,
+          riskTier: scenario.riskTier === "all" ? ("all" as const) : context.riskTier,
           prompt: attackPrompt,
-          response,
-          pass: validation.pass,
-          score0to5: score.score0to5,
-          score0to100: score.score0to100,
-          reasons: validation.reasons,
           correlatedRequestIds: [],
           evidenceEventIds: [],
-          auditEventTypes: validation.auditTypes,
           strategyId: strat.id,
-          strategyName: strat.name,
+          strategyName: strat.name
+        };
+        const answer = await responder.respond(attackPrompt).catch((error: unknown) => {
+          if (!(error instanceof AgentResponderInvocationError)) throw error;
+          return error;
+        });
+        // Not reached => not attacked. Refused, tool-call-only or token-claim => not graded. Neither is ever scored.
+        if (answer instanceof AgentResponderInvocationError) {
+          inconclusiveCount += 1;
+          scenarioResults.push({ ...row, response: "", pass: false, score0to5: 0, score0to100: 0,
+            reasons: [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], auditEventTypes: [], inconclusive: true });
+          continue;
+        }
+        const response = answer.text;
+        const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
+        const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
+        if (grade.kind === "inconclusive") {
+          inconclusiveCount += 1;
+          scenarioResults.push({ ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons: grade.reasons,
+            auditEventTypes: grade.auditTypes, inconclusive: true, inconclusiveCause: grade.cause, ...toolCalls });
+          continue;
+        }
+        const { validation } = grade;
+
+        scenarioResults.push({
+          ...row,
+          response,
+          pass: validation.pass,
+          score0to5: grade.score0to5,
+          score0to100: grade.score0to100,
+          reasons: validation.reasons,
+          auditEventTypes: validation.auditTypes,
+          gradingMethod: grade.gradingMethod,
+          ...toolCalls
         });
 
         if (validation.pass) {
           totalPass++;
         } else {
           totalFail++;
-          const severity = classifySeverity(score.score0to100, false);
+          const severity = classifySeverity(grade.score0to100, false);
           allVulns.push({
             scenarioId: scenario.id,
             scenarioTitle: scenario.title,
@@ -557,34 +554,19 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
             cvss: scoreRedTeamCvss({
               category: scenario.category,
               severity,
-              scenarioScore0to100: score.score0to100,
+              scenarioScore0to100: grade.score0to100,
             }),
             prompt: attackPrompt,
             response,
             reasons: validation.reasons,
-            score0to100: score.score0to100,
+            score0to100: grade.score0to100,
           });
         }
       }
     }
 
-    const agg = aggregatePackScore(
-      scenarioResults.map((sr) => ({
-        scenarioId: sr.scenarioId,
-        title: sr.title,
-        category: sr.category,
-        riskTier: sr.riskTier,
-        prompt: sr.prompt,
-        response: sr.response,
-        pass: sr.pass,
-        score0to5: sr.score0to5,
-        score0to100: sr.score0to100,
-        reasons: sr.reasons,
-        correlatedRequestIds: sr.correlatedRequestIds,
-        evidenceEventIds: sr.evidenceEventIds,
-        auditEventTypes: sr.auditEventTypes,
-      }))
-    );
+    // Inconclusive rows stay flagged so the aggregate excludes them.
+    const agg = aggregatePackScore(scenarioResults);
 
     pluginResults.push({
       packId: pack.id,

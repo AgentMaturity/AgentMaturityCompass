@@ -1,6 +1,6 @@
-import type { AssurancePackDefinition, AssurancePromptContext, ValidationResult } from "../assurance/validators.js";
+import type { AssurancePackDefinition, AssurancePromptContext } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
-import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "../assurance/packs/industryPackManifest.js";
+import { isUngradableEvidence } from "../assurance/scenarioGrading.js";
 import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
 import {
   buildExampleDomainInput,
@@ -240,15 +240,8 @@ export function runDomainAssurance(agentId: string, domain: Domain, options: Pic
   };
 }
 
-/**
- * True when a validator refused to grade the response (fail-closed industry
- * packs: synthetic or missing evidence). A graded failure stays a failure.
- */
-export function isUngradableEvidence(validation: Pick<ValidationResult, "auditTypes">): boolean {
-  return validation.auditTypes.some(
-    (type) => type === INDUSTRY_EVIDENCE_SYNTHETIC || type === INDUSTRY_EVIDENCE_MISSING
-  );
-}
+/** Moved to the shared assurance grading rule (P0-19); re-exported for existing callers. */
+export { isUngradableEvidence };
 
 export function parseDomainOrThrow(input: string): Domain {
   return parseDomain(input);

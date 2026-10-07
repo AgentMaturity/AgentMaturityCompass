@@ -120,7 +120,12 @@ function assuranceReportsDir(workspace: string, agentId: string): string {
 type ScenarioRow = { auditEventTypes: string[]; inconclusive?: boolean };
 const ONE_MEASURED: ScenarioRow[] = [{ auditEventTypes: ["TOOL_GOVERNANCE_SUCCEEDED"] }];
 
-function assuranceReport(agentId: string, now: number, score: number, scenarioResults: ScenarioRow[] = ONE_MEASURED) {
+// P0-19: only structured or executed grading is regulated evidence; the fixtures model such a pack unless a test says otherwise.
+type PackGrading = { gradingMethod?: string; regulatedEligible?: boolean };
+const STRUCTURED: PackGrading = { gradingMethod: "structured", regulatedEligible: true };
+
+function assuranceReport(agentId: string, now: number, score: number, scenarioResults: ScenarioRow[] = ONE_MEASURED,
+  grading: PackGrading = STRUCTURED) {
   return {
     assuranceRunId: `run-${randomUUID()}`,
     agentId,
@@ -134,7 +139,7 @@ function assuranceReport(agentId: string, now: number, score: number, scenarioRe
     sessionId: "session-fixture",
     evidenceStatus: "MEASURED",
     packResults: [
-      { packId: "toolGovernance", score0to100: score, scenarioResults }
+      { packId: "toolGovernance", score0to100: score, scenarioResults, ...grading }
     ],
     overallScore0to100: score,
     integrityIndex: 1,
@@ -145,8 +150,9 @@ function assuranceReport(agentId: string, now: number, score: number, scenarioRe
 }
 
 /** Seal the way the assurance runner does: hash the canonical report with empty seal fields, sign as auditor. */
-function writeSealedAssuranceReport(workspace: string, agentId: string, score: number, scenarioResults?: ScenarioRow[]): void {
-  const base = assuranceReport(agentId, Date.now(), score, scenarioResults);
+function writeSealedAssuranceReport(workspace: string, agentId: string, score: number, scenarioResults?: ScenarioRow[],
+  grading?: PackGrading): void {
+  const base = assuranceReport(agentId, Date.now(), score, scenarioResults, grading);
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
   const sig = ledger.signRunHash(hash);
@@ -329,6 +335,18 @@ describe("compliance fails closed (P0-17)", () => {
     const row = category(workspace, AGENT_A, "fx_pack");
     expect(row.result).toBe("fail");
     expect(row.status).toBe("MISSING");
+  });
+
+  test("a sealed passing run of a keyword-graded pack is NOT_EVALUATED and untrusted, never a pass (P0-19)", () => {
+    for (const grading of [{ gradingMethod: "keyword", regulatedEligible: false }, {}]) {
+      const workspace = newWorkspace();
+      initComplianceMaps(workspace, FIXTURE_MAPS);
+      writeSealedAssuranceReport(workspace, AGENT_A, 100, undefined, grading);
+      const row = category(workspace, AGENT_A, "fx_pack");
+      expect({ status: row.status, result: row.result, evidence: row.evidence })
+        .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "untrusted" });
+      expect(row.notEvaluatedReasons.join(" ")).toContain("assurance pack toolGovernance is keyword-graded; keyword grading is not regulated evidence");
+    }
   });
 
   test("a sealed run whose pack scenarios were all inconclusive leaves requires_assurance_pack NOT_EVALUATED", () => {
