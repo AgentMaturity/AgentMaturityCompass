@@ -126,7 +126,7 @@ Agent tokens cannot perform admin actions (service lifecycle, signing, target up
 - Direct host actions outside ToolHub are treated as bypass attempts and reduce maturity ceilings when detected.
 - MCP context is declared policy metadata. Use AMC's separate signed MCP server risk attestation for capability, sandbox, signer, and scan proof.
 
-## Native Linux shell mount grants
+## Native shell mount grants
 
 A native `bash` tool accepts `command` and optional `timeoutMs`; it does not supply a file path to the generic path validator. Configure reviewed shell write mounts separately in its existing signed entry:
 
@@ -145,8 +145,8 @@ A native `bash` tool accepts `command` and optional `timeoutMs`; it does not sup
       - '(^|\s)wget(\s|$)'
 ```
 
-Merge this into the reviewed `allowedTools` list, preserve existing command restrictions, then run `amc tools sign` and `amc tools verify`. Each mount must be an existing, exact relative workspace directory: no glob, symlink, escape, or `.amc` authority directory. An empty list grants no host writes. The OS backend continues to deny socket networking and apply its own filesystem restrictions.
+Merge this into the reviewed `allowedTools` list, preserve existing command restrictions, then run `amc tools sign` and `amc tools verify`. Each mount must be an existing, exact relative workspace directory: no glob, symlink, escape, or `.amc` authority directory. An empty list grants no host writes. The OS backend continues to deny socket networking and apply its own filesystem restrictions. `kind: os-native` selects Bubblewrap on Linux and Seatbelt on macOS; the optional `egress.allowHosts`, `readDeny` and `maxProcesses` fields are described in [Sandbox mode](SANDBOX.md#shell-egress-allowlist).
 
-`nativeSandbox` is an enforcement requirement, not metadata granting every caller permission. Only the immutable native Linux Bubblewrap tool binding can satisfy it. ToolHub's legacy executors, non-Linux callers and replacement tools refuse the requirement. Admission pins the verified policy digest and the selected tool; changing the signed policy before launch refuses the call. The native session records the actual confinement outcome.
+`nativeSandbox` is an enforcement requirement, not metadata granting every caller permission. Only the immutable native shell binding (Bubblewrap on Linux; Seatbelt on macOS unless the kind is `linux-bwrap`) can satisfy it. ToolHub's legacy executors, callers on other platforms and replacement tools refuse the requirement. Admission pins the verified policy digest and the selected tool; changing the signed policy before launch refuses the call. The native session records the actual confinement outcome.
 
 Existing `allow.paths` and `deny.paths` retain their ordinary per-call meaning and still require path arguments. They are never converted into shell mount grants or bypassed by `nativeSandbox`. Filesystem tool grants remain independent. See [Ubuntu prerequisites and qualification limits](NATIVE_SANDBOX_UBUNTU.md).

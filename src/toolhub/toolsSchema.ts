@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import { z } from "zod";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { protectedPathGlobs } from "./protectedPaths.js";
@@ -18,6 +19,12 @@ const stableServerIdSchema = z.string()
   .min(1)
   .max(160)
   .regex(/^[a-z0-9][a-z0-9._:/-]*$/, "must be a lowercase stable identifier");
+
+/** A lowercase host name, a `.suffix` or an IP literal without a zone; never a wildcard, port or URL. */
+const egressHostSchema = z.string().min(1).max(253).refine(
+  host => (isIP(host) !== 0 && !host.includes("%")) || /^\.?(?:[a-z0-9-]+\.)*[a-z0-9-]+$/.test(host),
+  "egress hosts are lowercase names, .suffix entries or IP literals"
+);
 
 export const toolContextSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -53,10 +60,18 @@ export const toolDefinitionSchema = z.object({
   requireExecTicket: z.boolean().optional(),
   denyByDefault: z.boolean().optional(),
   context: toolContextSchema.optional(),
-  // These are mount grants, never per-call path glob exceptions.
+  // These are mount grants, never per-call path glob exceptions. `os-native`
+  // confines with Bubblewrap on Linux and Seatbelt on macOS; `linux-bwrap`
+  // keeps its Linux-only meaning.
   nativeSandbox: z.object({
-    kind: z.literal("linux-bwrap"),
-    writableDirectories: z.array(z.string().min(1).max(4096)).max(64)
+    kind: z.enum(["linux-bwrap", "os-native"]),
+    writableDirectories: z.array(z.string().min(1).max(4096)).max(64),
+    // Hosts reachable through AMC's per-call egress proxy; absent denies all networking.
+    egress: z.object({ allowHosts: z.array(egressHostSchema).min(1).max(256) }).strict().optional(),
+    // Exact paths (workspace-relative, absolute or `~/`) the shell may neither read nor write.
+    readDeny: z.array(z.string().min(1).max(4096)).max(64).optional(),
+    // Processes the shell may add to the user's count at launch (RLIMIT_NPROC); default 256.
+    maxProcesses: z.number().int().min(1).max(4096).optional()
   }).strict().optional()
 }).superRefine((tool, ctx) => {
   if (tool.nativeSandbox && (tool.name !== "bash" || tool.actionClass !== "WRITE_HIGH" || tool.context?.kind === "mcp")) {

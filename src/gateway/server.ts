@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
+import { decideEgress } from "../enforce/egressAllowlist.js";
 import {
   loadGatewayConfig,
   resolveGatewayConfigEnv,
@@ -621,19 +622,14 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
 }
 
 function hostAllowed(config: GatewayConfig, host: string): boolean {
-  const normalizedHost = host.toLowerCase();
-  if (!config.proxy.enabled) {
+  if (!config.proxy.enabled || !config.proxy.denyByDefault) {
     return true;
   }
-  if (!config.proxy.denyByDefault) {
-    if (config.proxy.allowlistHosts.length === 0) {
-      return true;
-    }
-  }
-
-  const allowlist = config.proxy.allowlistHosts.map((item) => item.toLowerCase());
-  const match = allowlist.some((allowed) => normalizedHost === allowed || normalizedHost.endsWith(`.${allowed}`));
-  return config.proxy.denyByDefault ? match : true;
+  // A gateway entry covers the host and its subdomains. A leading-dot entry
+  // matched nothing here before and still does. The gateway resolves nothing,
+  // so the private-address rule reaches IP-literal hosts only.
+  const allowHosts = config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]);
+  return decideEgress(host, [], { allowHosts }).allowed;
 }
 
 function extractAgentId(route: GatewayConfig["routes"][number], headers: IncomingHttpHeaders): string {

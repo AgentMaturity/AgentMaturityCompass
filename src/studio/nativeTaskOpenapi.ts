@@ -150,7 +150,8 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       description: "Native input bindings and local admission bounds, not live model qualification. Dispatch separately requires the running client's exact input contract." },
     NativeTaskToolScope: object({ ready: bool, digest: { ...digest, type: ["string", "null"] }, approvalRequired: { type: "boolean", const: true },
       tools: { type: "array", items: object({ name: string, actionClass: string, paths: strings, deniedPaths: strings, hosts: strings, binaries: strings,
-        nativeSandbox: { oneOf: [{ type: "null" }, object({ kind: { type: "string", const: "linux-bwrap" }, writableDirectories: strings })] }
+        nativeSandbox: { oneOf: [{ type: "null" }, object({ kind: { type: "string", enum: ["linux-bwrap", "os-native"] }, writableDirectories: strings,
+          egress: object({ allowHosts: strings }), readDeny: strings, maxProcesses: integer }, ["kind", "writableDirectories"])] }
       }) }, message: string }),
     NativeTaskOptions: object({ schemaVersion: { type: "string", const: "2026-09-08" }, agentId: agent, demo: bool,
       providers: { type: "array", items: object({ id: provider, local: bool, model: { type: "string", enum: ["fixed", "required"] }, credential: { oneOf: [
@@ -160,7 +161,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       boundary: string, nativeCsrfToken: nullableString, executionBlocked: bool, shell: ref("NativeTaskShell")
     }),
     NativeTaskShell: { ...object({ offered: bool, decision: { type: "string", enum: ["confined", "unconfined-opt-in", "refused"] },
-      enforcement: { type: "string", enum: ["enforced", "none"] }, boundary: { type: ["string", "null"], enum: ["linux-bwrap", null] },
+      enforcement: { type: "string", enum: ["enforced", "none"] }, boundary: { type: ["string", "null"], enum: ["linux-bwrap", "macos-seatbelt", null] },
       reason: nullableString, optInSource: { type: ["string", "null"], enum: ["cli-flag", "sdk-option", null] } }),
       description: "Whether native tasks are offered bash. Show reason as a banner: the refusal, or the warning for an UNCONFINED macOS shell enabled by the operator's environment when Studio started." },
     NativeTaskResponse: envelope(ref("NativeTask")),

@@ -2,18 +2,19 @@ import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, op
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
+import { PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 const BWRAP = "/usr/bin/bwrap";
 const RUNTIME_ROOTS = ["/usr", "/bin", "/lib", "/lib64"] as const;
 const RUNTIME_FILES = ["/etc/ld.so.cache", "/etc/ld.so.conf", "/etc/nsswitch.conf", "/etc/passwd", "/etc/group", "/etc/localtime"] as const;
 
-function within(root: string, path: string): boolean {
+export function within(root: string, path: string): boolean {
   const suffix = relative(root, path);
   return suffix === "" || (!isAbsolute(suffix) && suffix !== ".." && !suffix.startsWith(`..${sep}`));
 }
 
-function admitWritableDirectory(root: string): void {
+export function admitWritableDirectory(root: string): void {
   const pending = [root];
   let remaining = 20_000;
   while (pending.length) {
@@ -117,6 +118,8 @@ export function bwrapBackend(): SandboxBackend {
       if (!available.ok) return declined(available.reason, "unavailable");
       if (!command.length || command.some(argument => argument.includes("\0"))) return declined("Invalid confined command.");
       if (!Number.isFinite(policy.timeoutMs) || policy.timeoutMs <= 0) return declined("A positive finite shell deadline is required.");
+      // Relaying to the egress proxy needs a narrower seccomp filter, which waits for review of ADR-008.
+      if (policy.allowHosts) return declined("A signed shell egress allowlist is not available on Linux yet (its in-namespace relay awaits review of ADR-008). Remove nativeSandbox.egress to run with all networking denied.", "unavailable");
       if (policy.signal?.aborted) return { ...declined("The shell was cancelled before launch."), cancelled: true };
       let temporary: string | undefined;
       let launched = false;
@@ -167,10 +170,18 @@ export function bwrapBackend(): SandboxBackend {
         bind(workspace, workspace, false);
         // Nested writable binds are applied from outermost to innermost.
         for (const root of writableRoots.sort((a, b) => a.length - b.length)) bind(root, root, true);
+        // Mask signed readDeny paths in the workspace; other host paths are not mounted at all.
+        // Runtime roots are refused rather than masked: /bin and /lib can alias /usr.
+        for (const path of policy.readDeny ?? []) {
+          if ([...RUNTIME_ROOTS, ...RUNTIME_FILES].some(root => within(root, path))) return declined("Linux shell readDeny cannot name system runtime paths.");
+          if (!within(workspace, path) || !existsSync(path)) continue;
+          args.push(...(statSync(path).isDirectory() ? ["--tmpfs", path, "--remount-ro", path] : ["--ro-bind", "/dev/null", path]));
+        }
+        const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
         args.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),
           // Do not expose procfs: it could reopen a launcher-owned descriptor via PID 1.
           "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/",
-          "--chdir", workspace, "--", ...command);
+          "--chdir", workspace, "--", ...(limit === null ? command : withProcessLimit(limit, command)));
         launched = true;
         const outcome = await runProcess({ argv: args, cwd: workspace,
           env: { PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
@@ -187,13 +198,15 @@ export function bwrapBackend(): SandboxBackend {
           stdout: outcome.stdout.text, stderr: outcome.stderr.text, writableRoots: applied ? writableRoots : [],
           treeExitProven: outcome.treeExitProven, droppedBytes: outcome.stdout.droppedBytes + outcome.stderr.droppedBytes,
           ...(applied ? { enforcement: {
-            hostWrites: "declared-roots-only" as const, network: "socket-syscalls-denied" as const,
+            boundary: "linux-bwrap" as const, hostWrites: "declared-roots-only" as const, reads: "workspace-ro-and-runtime" as const,
+            network: "denied" as const, allowHosts: [], processLimit: limit === null ? null : { mechanism: "rlimit-nproc" as const, max: limit },
             readonlyRoots, privateWritableRoots: ["/tmp", "/dev"], launcherStatus: "command-exited" as const,
             sourcePolicySha256: policy.sourcePolicySha256 ?? null,
             limitations: ["No procfs or host environment is exposed; process-introspection tools may fail.",
               "This confines a shell subprocess, not AMC or worker-thread Code Mode.",
               "Existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
-              "A successful command does not establish a count of denied operations."]
+              "A successful command does not establish a count of denied operations.",
+              ...(limit === null ? [] : [PROCESS_LIMIT_LIMITATION])]
           } } : {})
         };
       } catch {

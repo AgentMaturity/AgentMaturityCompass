@@ -37,7 +37,8 @@ function outcome(cwd: string, output = "computed output", patch: Partial<Sandbox
   return { confined: true, backend: "bwrap", failure: null, exitCode: 0, timedOut: false,
     stdout: JSON.stringify({ protocol: "amc-executable/1", invocationId: requestAt(cwd).invocationId, ok: true, output }),
     stderr: "", writableRoots: [], treeExitProven: true, droppedBytes: 0,
-    enforcement: { hostWrites: "declared-roots-only", network: "socket-syscalls-denied", readonlyRoots: [cwd],
+    enforcement: { boundary: "linux-bwrap", hostWrites: "declared-roots-only", reads: "workspace-ro-and-runtime", network: "denied",
+      allowHosts: [], processLimit: null, readonlyRoots: [cwd],
       privateWritableRoots: ["/tmp", "/dev"], launcherStatus: "command-exited", sourcePolicySha256: "c".repeat(64), limitations: [] }, ...patch };
 }
 function runner(): NativeExecutableRunner { return new NativeExecutableRunner(snapshot.workspace, snapshot.manifestPath, snapshot.manifestDigest); }

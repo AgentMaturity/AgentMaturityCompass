@@ -329,7 +329,7 @@ export function validateToolRequest(input: {
   nativeSandboxPermit?: NativeSandboxValidationPermit;
 }): { ok: boolean; reason?: string } {
   if (input.tool.nativeSandbox && !nativeSandboxPermitMatches(input.nativeSandboxPermit, input.workspace, input.tool, input.args)) {
-    return { ok: false, reason: "nativeSandbox requires the bound native confined shell (Bubblewrap on Linux, Seatbelt on macOS); this caller cannot enforce it" };
+    return { ok: false, reason: "nativeSandbox requires the bound native Linux Bubblewrap shell; this caller cannot enforce it" };
   }
   // The invariant, first and for every tool. This replaces a branch that
   // applied a hardcoded glob list to `git.*` alone — protection three tools

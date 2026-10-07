@@ -27,7 +27,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--credentials-file <path>", "Explicit credential file fixed for this ACP process")
     .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
-    .option("--unsafe-unconfined-shell", "macOS only: offer the native shell UNCONFINED, with your full user rights; refused on Windows, never needed on Linux")
+    .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
     .option("--validation-config <path>", "Operator JSON containing named public checks")
     .option("--validation-config-sha256 <digest>", "Pin exact reviewed validation configuration bytes")
