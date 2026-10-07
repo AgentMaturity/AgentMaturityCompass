@@ -124,8 +124,8 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
   let transparency: LedgerCheckpointV1["transparency"] = null;
   if (pathExists(merkleCurrentRootPath(workspace))) {
     const merkle = verifyTransparencyMerkle(workspace);
-    if (!merkle.ok || merkle.root === null) throw new Error(`the transparency root does not verify: ${merkle.errors.join("; ")}`);
-    transparency = { root: merkle.root, leafCount: merkle.leafCount, algorithm: "amc-legacy-v1" };
+    if (!merkle.ok || merkle.root === null || merkle.algorithm === null) throw new Error(`the transparency root does not verify: ${merkle.errors.join("; ")}`);
+    transparency = { root: merkle.root, leafCount: merkle.leafCount, algorithm: merkle.algorithm };
   }
   const previous = chain[chain.length - 1];
   const checkpoint: LedgerCheckpointV1 = {

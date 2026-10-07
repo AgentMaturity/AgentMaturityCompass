@@ -1,12 +1,12 @@
 import { appendFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { z } from "zod";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { buildMerkleProofFromEntryHashes, buildMerkleRootFromEntryHashes, merkleLeafHash, verifyMerkleProof } from "./merkle.js";
+import { entryInclusionProof, entryLeafHash, entryTreeRoot, MERKLE_ALGORITHMS, verifyEntryInclusion, type MerkleAlgorithm } from "./merkle.js";
 import { appendLeafToFrontier, buildFrontierFromEntryHashes, frontierRoot, type MerkleFrontier } from "./merkleFrontier.js";
 import {
   clearMerklePendingMarker,
@@ -22,6 +22,8 @@ import {
   merkleCurrentRootPath,
   merkleCurrentRootSigPath,
   merkleLeavesPath,
+  merkleMigrationPath,
+  merkleMigrationSigPath,
   merkleRootsPath,
   transparencyMerkleDir
 } from "./merklePaths.js";
@@ -61,8 +63,21 @@ const merkleRootRowSchema = z.object({
   ts: z.number().int(),
   leafCount: z.number().int().min(0),
   root: z.string().length(64),
-  lastEntryHash: z.string().default("")
+  lastEntryHash: z.string().default(""),
+  /** P1-26: absent means amc-legacy-v1. */
+  algorithm: z.enum(MERKLE_ALGORITHMS).optional()
 });
+
+/** P1-26: signed once, when `rebuild --algorithm rfc9162-sha256` migrates a legacy log. */
+const merkleMigrationSchema = z.strictObject({
+  v: z.literal(1),
+  ts: z.number().int(),
+  legacyRoot: z.string().length(64),
+  rfc9162Root: z.string().length(64),
+  leafCount: z.number().int().min(0),
+  lastEntryHash: z.string()
+});
+export type MerkleMigrationRecord = z.infer<typeof merkleMigrationSchema>;
 
 const rootSignatureSchema = z.object({
   digestSha256: z.string().length(64),
@@ -106,8 +121,8 @@ function readTransparencyEntryHashes(workspace: string): string[] {
   return lines.map((line) => transparencyEntrySchema.parse(JSON.parse(line) as unknown).hash);
 }
 
-function writeCurrentRoot(workspace: string, row: z.infer<typeof merkleRootRowSchema>): void {
-  const rootPath = merkleCurrentRootPath(workspace);
+/** Writes `row` as JSON and its MERKLE_ROOT signature (over the file's sha256) next to it. */
+function writeSignedRow(workspace: string, rootPath: string, sigPath: string, row: object): void {
   writeFileAtomic(rootPath, JSON.stringify(row, null, 2), 0o644);
   const digest = sha256Hex(readFileSync(rootPath));
   const signed = signDigestWithPolicy({
@@ -122,7 +137,63 @@ function writeCurrentRoot(workspace: string, row: z.infer<typeof merkleRootRowSc
     signer: "auditor" as const,
     envelope: signed.envelope
   };
-  writeFileAtomic(merkleCurrentRootSigPath(workspace), JSON.stringify(signature, null, 2), 0o644);
+  writeFileAtomic(sigPath, JSON.stringify(signature, null, 2), 0o644);
+}
+
+/**
+ * Reads a signed row and checks its signature over the bytes it parsed (one read, so no swap in between). `row` is
+ * null when a file is missing or the row does not parse; `errors` lists every failed check.
+ */
+function readSignedRow<T>(workspace: string, path: string, sigPath: string, schema: z.ZodType<T>, label: string): { row: T | null; errors: string[] } {
+  if (!pathExists(path) || !pathExists(sigPath)) {
+    return { row: null, errors: [`${label} or signature missing`] };
+  }
+  let bytes: Buffer;
+  let row: T;
+  try {
+    bytes = readFileSync(path);
+    row = schema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+  } catch (error) {
+    return { row: null, errors: [`invalid ${basename(path)}: ${String(error)}`] };
+  }
+  const errors: string[] = [];
+  const digest = sha256Hex(bytes);
+  try {
+    const sig = rootSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
+    if (sig.digestSha256 !== digest) {
+      errors.push(`${label} signature digest mismatch`);
+    } else {
+      const verified = verifySignedDigest({
+        workspace,
+        digestHex: digest,
+        signed: {
+          signature: sig.signature,
+          envelope: sig.envelope
+        }
+      }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+      if (!verified) {
+        errors.push(`${label} signature invalid`);
+      }
+    }
+  } catch (error) {
+    errors.push(`invalid ${basename(sigPath)}: ${String(error)}`);
+  }
+  return { row, errors };
+}
+
+function readSignedCurrentRoot(workspace: string): { row: z.infer<typeof merkleRootRowSchema> | null; errors: string[] } {
+  return readSignedRow(workspace, merkleCurrentRootPath(workspace), merkleCurrentRootSigPath(workspace), merkleRootRowSchema, "merkle root");
+}
+
+/**
+ * The tree this workspace grows (P1-26). Legacy only while a signed root that verifies says so (or predates the
+ * field) and no migration record exists; a new workspace, or a root whose signature fails, grows the RFC 9162 tree.
+ * The choice never comes from an unsigned file, so editing a cache cannot downgrade the log.
+ */
+export function currentTreeAlgorithm(workspace: string): MerkleAlgorithm {
+  const { row, errors } = readSignedCurrentRoot(workspace);
+  const legacy = row !== null && errors.length === 0 && (row.algorithm ?? "amc-legacy-v1") === "amc-legacy-v1";
+  return legacy && !pathExists(merkleMigrationPath(workspace)) ? "amc-legacy-v1" : "rfc9162-sha256";
 }
 
 function tarCreate(sourceDir: string, outFile: string): void {
@@ -136,13 +207,13 @@ function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
 
-function merkleLeafLine(entryHash: string, index: number): string {
+function merkleLeafLine(entryHash: string, index: number, algorithm: MerkleAlgorithm): string {
   return JSON.stringify(
     merkleLeafRowSchema.parse({
       v: 1,
       index,
       entryHash,
-      leafHash: merkleLeafHash(entryHash)
+      leafHash: entryLeafHash(algorithm, entryHash)
     })
   );
 }
@@ -165,16 +236,18 @@ function publishRoot(params: {
   leafCount: number;
   root: string;
   lastEntryHash: string;
+  algorithm: MerkleAlgorithm;
 }): z.infer<typeof merkleRootRowSchema> {
   const row = merkleRootRowSchema.parse({
     v: 1,
     ts: Date.now(),
     leafCount: params.leafCount,
     root: params.root,
-    lastEntryHash: params.lastEntryHash
+    lastEntryHash: params.lastEntryHash,
+    algorithm: params.algorithm
   });
   appendIndexRow(merkleRootsPath(params.workspace), JSON.stringify(row));
-  writeCurrentRoot(params.workspace, row);
+  writeSignedRow(params.workspace, merkleCurrentRootPath(params.workspace), merkleCurrentRootSigPath(params.workspace), row);
   return row;
 }
 
@@ -185,35 +258,60 @@ function publishRoot(params: {
  * is tested against this function's output at every leaf count, and falls back
  * to it whenever the incremental resume state cannot be trusted. It is no longer
  * on the per-append hot path.
+ *
+ * P1-26: it keeps the workspace's tree unless `algorithm` names another. Moving a
+ * legacy log to `rfc9162-sha256` needs a legacy root that verifies against the
+ * log, and signs a migration record binding both roots over the same entries.
+ * Nothing moves a log back to the legacy tree.
  */
-export function rebuildTransparencyMerkle(workspace: string): {
+export function rebuildTransparencyMerkle(workspace: string, opts: { algorithm?: MerkleAlgorithm } = {}): {
   leafCount: number;
   root: string;
+  algorithm: MerkleAlgorithm;
   currentRootPath: string;
   currentRootSigPath: string;
+  migrationPath: string | null;
 } {
+  const current = currentTreeAlgorithm(workspace);
+  const algorithm = opts.algorithm ?? current;
+  if (algorithm === "amc-legacy-v1" && current !== "amc-legacy-v1") {
+    throw new Error("refusing to rebuild as amc-legacy-v1: the legacy tree is ambiguous, and logs migrate only to rfc9162-sha256");
+  }
   ensureDir(transparencyMerkleDir(workspace));
   const entryHashes = readTransparencyEntryHashes(workspace);
-  const root = buildMerkleRootFromEntryHashes(entryHashes);
-  const leavesText = entryHashes.map((entryHash, index) => merkleLeafLine(entryHash, index)).join("\n");
+  const root = entryTreeRoot(algorithm, entryHashes);
+  const lastEntryHash = entryHashes[entryHashes.length - 1] ?? "";
+  let migrationPath: string | null = null;
+  if (algorithm !== current) {
+    const legacy = verifyTransparencyMerkle(workspace);
+    if (!legacy.ok || legacy.root === null) {
+      throw new Error(`migrate only a legacy root that verifies; run \`amc transparency merkle rebuild\` first (${legacy.errors.join("; ")})`);
+    }
+    migrationPath = merkleMigrationPath(workspace);
+    writeSignedRow(workspace, migrationPath, merkleMigrationSigPath(workspace), merkleMigrationSchema.parse({
+      v: 1, ts: Date.now(), legacyRoot: legacy.root, rfc9162Root: root, leafCount: entryHashes.length, lastEntryHash
+    }));
+  }
+  const leavesText = entryHashes.map((entryHash, index) => merkleLeafLine(entryHash, index, algorithm)).join("\n");
   writeFileAtomic(merkleLeavesPath(workspace), leavesText.length > 0 ? `${leavesText}\n` : "", 0o644);
 
-  const lastEntryHash = entryHashes[entryHashes.length - 1] ?? "";
   writeMerkleFrontierState({
     workspace,
-    frontier: buildFrontierFromEntryHashes(entryHashes),
+    frontier: buildFrontierFromEntryHashes(entryHashes, algorithm),
     leafCount: entryHashes.length,
     lastEntryHash,
     root
   });
-  publishRoot({ workspace, leafCount: entryHashes.length, root, lastEntryHash });
+  publishRoot({ workspace, leafCount: entryHashes.length, root, lastEntryHash, algorithm });
   // The root now provably covers the whole log, so any recorded lag is repaired.
   clearMerklePendingMarker(workspace);
   return {
     leafCount: entryHashes.length,
     root,
+    algorithm,
     currentRootPath: merkleCurrentRootPath(workspace),
-    currentRootSigPath: merkleCurrentRootSigPath(workspace)
+    currentRootSigPath: merkleCurrentRootSigPath(workspace),
+    migrationPath
   };
 }
 
@@ -224,6 +322,30 @@ export interface TransparencyMerkleVerification {
   leafCount: number;
   /** True when a failed update left the signed root behind the log and nothing has repaired it. */
   lagPending: boolean;
+  /** P1-26: the tree the signed root uses; null when no signed root parsed. */
+  algorithm: MerkleAlgorithm | null;
+  /** P1-26: the signed legacy-to-RFC 9162 migration record, when the log was migrated. */
+  migration: MerkleMigrationRecord | null;
+}
+
+/** The migration record, checked against the log's first `leafCount` entries under both trees. */
+function verifyMerkleMigration(workspace: string, entryHashes: readonly string[], errors: string[]): MerkleMigrationRecord | null {
+  if (!pathExists(merkleMigrationPath(workspace))) {
+    return null;
+  }
+  const signed = readSignedRow(workspace, merkleMigrationPath(workspace), merkleMigrationSigPath(workspace), merkleMigrationSchema, "merkle migration record");
+  errors.push(...signed.errors);
+  const record = signed.row;
+  if (record === null) {
+    return null;
+  }
+  const prefix = entryHashes.slice(0, record.leafCount);
+  if (record.leafCount > entryHashes.length || (prefix[prefix.length - 1] ?? "") !== record.lastEntryHash) {
+    errors.push(`merkle migration record does not cover the log's first ${record.leafCount} entries`);
+  } else if (entryTreeRoot("amc-legacy-v1", prefix) !== record.legacyRoot || entryTreeRoot("rfc9162-sha256", prefix) !== record.rfc9162Root) {
+    errors.push("merkle migration record roots do not match the log");
+  }
+  return record;
 }
 
 export function verifyTransparencyMerkle(workspace: string): TransparencyMerkleVerification {
@@ -236,46 +358,14 @@ export function verifyTransparencyMerkle(workspace: string): TransparencyMerkleV
       `merkle update pending since ${new Date(pending.ts).toISOString()} for entry ${pending.entryHash}: ${pending.reason}`
     );
   }
-  if (!pathExists(merkleCurrentRootPath(workspace)) || !pathExists(merkleCurrentRootSigPath(workspace))) {
-    errors.push("merkle root or signature missing");
-    return {
-      ok: false,
-      errors,
-      root: null,
-      leafCount: 0,
-      lagPending: pending !== null
-    };
-  }
-  let currentRoot: z.infer<typeof merkleRootRowSchema> | null = null;
-  try {
-    currentRoot = merkleRootRowSchema.parse(JSON.parse(readUtf8(merkleCurrentRootPath(workspace))) as unknown);
-  } catch (error) {
-    errors.push(`invalid current.root.json: ${String(error)}`);
-  }
+  // One read: the signature is checked over the bytes the row was parsed from.
+  const signed = readSignedCurrentRoot(workspace);
+  errors.push(...signed.errors);
+  const currentRoot = signed.row;
   if (!currentRoot) {
-    return { ok: false, errors, root: null, leafCount: 0, lagPending: pending !== null };
+    return { ok: false, errors, root: null, leafCount: 0, lagPending: pending !== null, algorithm: null, migration: null };
   }
-  const digest = sha256Hex(readFileSync(merkleCurrentRootPath(workspace)));
-  try {
-    const sig = rootSignatureSchema.parse(JSON.parse(readUtf8(merkleCurrentRootSigPath(workspace))) as unknown);
-    if (sig.digestSha256 !== digest) {
-      errors.push("merkle root signature digest mismatch");
-    } else {
-      const verified = verifySignedDigest({
-        workspace,
-        digestHex: digest,
-        signed: {
-          signature: sig.signature,
-          envelope: sig.envelope
-        }
-      }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
-      if (!verified) {
-        errors.push("merkle root signature invalid");
-      }
-    }
-  } catch (error) {
-    errors.push(`invalid current.root.sig: ${String(error)}`);
-  }
+  const algorithm = currentRoot.algorithm ?? "amc-legacy-v1";
   // Recomputed from the log, never taken from the stored row — this is the
   // check that catches a root which lags, was rolled back, or was written by
   // someone else's tree. A log line that no longer parses used to throw out of
@@ -285,12 +375,12 @@ export function verifyTransparencyMerkle(workspace: string): TransparencyMerkleV
   let entryHashes: string[] = [];
   try {
     entryHashes = readTransparencyEntryHashes(workspace);
-    const expected = buildMerkleRootFromEntryHashes(entryHashes);
+    const expected = entryTreeRoot(algorithm, entryHashes);
     if (expected !== currentRoot.root) {
       errors.push(`merkle root mismatch: expected ${expected}, found ${currentRoot.root}`);
     }
     // The signed row also CLAIMS a leaf count and a last entry hash. Checking
-    // only the root leaves those claims unverified, and this tree duplicates a
+    // only the root leaves those claims unverified, and the legacy tree duplicates a
     // lone final node rather than promoting it (the Bitcoin construction), so a
     // log of n and one of n+1 whose last entry repeats can share a root. Binding
     // both claims to the log closes that ambiguity, and makes a rolled-back or
@@ -307,12 +397,15 @@ export function verifyTransparencyMerkle(workspace: string): TransparencyMerkleV
   } catch (error) {
     errors.push(`cannot recompute merkle root from transparency log: ${String(error)}`);
   }
+  const migration = verifyMerkleMigration(workspace, entryHashes, errors);
   return {
     ok: errors.length === 0,
     errors,
     root: currentRoot.root,
     leafCount: entryHashes.length,
-    lagPending: pending !== null
+    lagPending: pending !== null,
+    algorithm,
+    migration
   };
 }
 
@@ -341,13 +434,15 @@ function rootSignatureFingerprint(workspace: string): string {
   return sha256Hex(Buffer.from(pub, "utf8"));
 }
 
+/** An inclusion proof in the workspace's tree; RFC 9162 proofs also carry `algorithm` and `treeSize` (P1-26). */
 export function generateTransparencyInclusionProof(workspace: string, entryHash: string): MerkleProofPayload {
   const entryHashes = readTransparencyEntryHashes(workspace);
   const index = entryHashes.indexOf(entryHash);
   if (index < 0) {
     throw new Error(`entry hash not found in transparency log: ${entryHash}`);
   }
-  const proof = buildMerkleProofFromEntryHashes(entryHashes, index);
+  const algorithm = currentTreeAlgorithm(workspace);
+  const proof = entryInclusionProof(algorithm, entryHashes, index);
   return merkleProofPayloadSchema.parse({
     v: 1,
     ts: Date.now(),
@@ -355,7 +450,8 @@ export function generateTransparencyInclusionProof(workspace: string, entryHash:
     leafIndex: index,
     merkleRoot: proof.root,
     proofPath: proof.proofPath,
-    rootSignatureFingerprint: rootSignatureFingerprint(workspace)
+    rootSignatureFingerprint: rootSignatureFingerprint(workspace),
+    ...(algorithm === "rfc9162-sha256" ? { algorithm, treeSize: entryHashes.length } : {})
   });
 }
 
@@ -450,7 +546,8 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
     } catch (error) {
       errors.push(`invalid proof.sig: ${String(error)}`);
     }
-    if (proof && !verifyMerkleProof({ entryHash: proof.entryHash, proofPath: proof.proofPath, root: proof.merkleRoot })) {
+    if (proof && !verifyEntryInclusion({ algorithm: proof.algorithm ?? "amc-legacy-v1", entryHash: proof.entryHash, leafIndex: proof.leafIndex,
+      treeSize: proof.treeSize, proofPath: proof.proofPath, root: proof.merkleRoot })) {
       errors.push("proof path does not resolve to merkle root");
     }
     return finish();
@@ -490,24 +587,26 @@ function applyIncrementalAppend(params: {
   if (!state) {
     return null;
   }
+  const algorithm = currentTreeAlgorithm(params.workspace);
   const blocker = frontierResumeBlocker({
     state,
     expectedPrevEntryHash: params.prevEntryHash,
-    leavesBytes: leavesFileBytes(params.workspace)
+    leavesBytes: leavesFileBytes(params.workspace),
+    algorithm
   });
   if (blocker !== null) {
     return { mode: "rebuild", reason: blocker, leafCount: 0, root: "" };
   }
-  const frontier: MerkleFrontier = appendLeafToFrontier(state.frontier, params.entryHash);
+  const frontier: MerkleFrontier = appendLeafToFrontier(state.frontier, params.entryHash, algorithm);
   const leafCount = state.leafCount + 1;
-  const root = frontierRoot(frontier);
-  appendIndexRow(merkleLeavesPath(params.workspace), merkleLeafLine(params.entryHash, state.leafCount));
+  const root = frontierRoot(frontier, algorithm);
+  appendIndexRow(merkleLeavesPath(params.workspace), merkleLeafLine(params.entryHash, state.leafCount, algorithm));
   // Publish before advancing the resume state, so the frontier only ever
   // describes a root that is actually signed on disk. If signing fails here the
   // frontier stays behind, its recorded leaves.jsonl size no longer matches, and
   // the next append rebuilds rather than resuming from a state whose root was
   // never published.
-  publishRoot({ workspace: params.workspace, leafCount, root, lastEntryHash: params.entryHash });
+  publishRoot({ workspace: params.workspace, leafCount, root, lastEntryHash: params.entryHash, algorithm });
   writeMerkleFrontierState({
     workspace: params.workspace,
     frontier,

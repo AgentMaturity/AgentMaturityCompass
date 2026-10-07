@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { appendTransparencyEntry, readTransparencyEntries } from "../src/transparency/logChain.js";
-import { buildMerkleRootFromEntryHashes, merkleLeafHash, merkleNodeHash } from "../src/transparency/merkle.js";
+import { buildMerkleRootFromEntryHashes, entryTreeRoot, MERKLE_ALGORITHMS, merkleLeafHash, merkleNodeHash } from "../src/transparency/merkle.js";
 import {
   appendLeafToFrontier,
   buildFrontierFromEntryHashes,
@@ -95,14 +95,14 @@ function promotingFrontierRoot(frontier: MerkleFrontier): string {
 }
 
 describe("transparency merkle frontier equivalence", () => {
-  test("frontier root equals the full rebuild at every leaf count", () => {
+  test.each(MERKLE_ALGORITHMS)("frontier root equals the full rebuild at every leaf count (%s)", (algorithm) => {
     const hashes = fakeEntryHashes(160);
     let frontier: MerkleFrontier = EMPTY_MERKLE_FRONTIER;
     for (let n = 0; n <= hashes.length; n += 1) {
-      expect(frontierRoot(frontier), `leafCount ${n}`).toBe(buildMerkleRootFromEntryHashes(hashes.slice(0, n)));
+      expect(frontierRoot(frontier, algorithm), `leafCount ${n}`).toBe(entryTreeRoot(algorithm, hashes.slice(0, n)));
       expect(frontierMatchesLeafCount(frontier, n), `shape at leafCount ${n}`).toBe(true);
       if (n < hashes.length) {
-        frontier = appendLeafToFrontier(frontier, hashes[n]!);
+        frontier = appendLeafToFrontier(frontier, hashes[n]!, algorithm);
       }
     }
   });
@@ -111,7 +111,7 @@ describe("transparency merkle frontier equivalence", () => {
     const hashes = fakeEntryHashes(16);
     const divergences: number[] = [];
     for (let n = 0; n <= hashes.length; n += 1) {
-      const frontier = buildFrontierFromEntryHashes(hashes.slice(0, n));
+      const frontier = buildFrontierFromEntryHashes(hashes.slice(0, n), "amc-legacy-v1");
       if (promotingFrontierRoot(frontier) !== buildMerkleRootFromEntryHashes(hashes.slice(0, n))) {
         divergences.push(n);
       }
@@ -125,7 +125,7 @@ describe("transparency merkle frontier equivalence", () => {
   });
 
   test("frontier shape check rejects a leaf count the nodes cannot have produced", () => {
-    const frontier = buildFrontierFromEntryHashes(fakeEntryHashes(11));
+    const frontier = buildFrontierFromEntryHashes(fakeEntryHashes(11), "rfc9162-sha256");
     expect(frontierMatchesLeafCount(frontier, 11)).toBe(true);
     expect(frontierMatchesLeafCount(frontier, 12)).toBe(false);
     expect(frontierMatchesLeafCount(frontier, 10)).toBe(false);
@@ -140,7 +140,8 @@ describe("incremental transparency merkle updates", () => {
       appendEntry(workspace, i);
     }
     const entryHashes = readTransparencyEntries(workspace).map((entry) => entry.hash);
-    const expectedRoot = buildMerkleRootFromEntryHashes(entryHashes);
+    // New workspaces grow the RFC 9162 tree (P1-26).
+    const expectedRoot = entryTreeRoot("rfc9162-sha256", entryHashes);
 
     const incrementalRoot = currentTransparencyMerkleRoot(workspace);
     expect(incrementalRoot?.root).toBe(expectedRoot);
@@ -189,7 +190,7 @@ describe("incremental transparency merkle updates", () => {
     expect(state).not.toBeNull();
     expect(state?.leafCount).toBe(leafCount);
     expect(state?.lastEntryHash).toBe(last);
-    expect(frontierRoot(state!.frontier)).toBe(currentTransparencyMerkleRoot(workspace)?.root);
+    expect(frontierRoot(state!.frontier, "rfc9162-sha256")).toBe(currentTransparencyMerkleRoot(workspace)?.root);
     expect(frontierMatchesLeafCount(state!.frontier, leafCount)).toBe(true);
   });
 });
@@ -227,7 +228,7 @@ describe("incremental resume is used, and untrusted resume state falls back", ()
     expect(update.mode).toBe("incremental");
     expect(update.reason).toBeNull();
     expect(update.leafCount).toBe(readTransparencyEntries(workspace).length);
-    expect(update.root).toBe(buildMerkleRootFromEntryHashes(readTransparencyEntries(workspace).map((e) => e.hash)));
+    expect(update.root).toBe(entryTreeRoot("rfc9162-sha256", readTransparencyEntries(workspace).map((e) => e.hash)));
     expect(verifyTransparencyMerkle(workspace).ok).toBe(true);
   });
 
@@ -276,7 +277,7 @@ describe("incremental resume is used, and untrusted resume state falls back", ()
 
     expect(update.mode).toBe("rebuild");
     expect(update.reason).toMatch(/do not fold to the recorded root/i);
-    expect(update.root).toBe(buildMerkleRootFromEntryHashes(readTransparencyEntries(workspace).map((e) => e.hash)));
+    expect(update.root).toBe(entryTreeRoot("rfc9162-sha256", readTransparencyEntries(workspace).map((e) => e.hash)));
     expect(verifyTransparencyMerkle(workspace).ok).toBe(true);
   });
 

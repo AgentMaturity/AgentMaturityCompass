@@ -1,4 +1,5 @@
 import type { TrustContext } from "../trust/trustContext.js";
+import type { MerkleAlgorithm } from "./merkle.js";
 import {
   currentTransparencyMerkleRoot,
   ensureTransparencyMerkleInitialized,
@@ -9,8 +10,8 @@ import {
   verifyTransparencyProofBundle
 } from "./merkleIndexStore.js";
 
-export function transparencyMerkleRebuildCli(workspace: string): ReturnType<typeof rebuildTransparencyMerkle> {
-  return rebuildTransparencyMerkle(workspace);
+export function transparencyMerkleRebuildCli(workspace: string, opts: { algorithm?: MerkleAlgorithm } = {}): ReturnType<typeof rebuildTransparencyMerkle> {
+  return rebuildTransparencyMerkle(workspace, opts);
 }
 
 export function transparencyMerkleRootCli(workspace: string): {

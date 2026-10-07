@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MERKLE_ALGORITHMS } from "./merkle.js";
 
 export const merkleProofPayloadSchema = z.object({
   v: z.literal(1),
@@ -6,6 +7,9 @@ export const merkleProofPayloadSchema = z.object({
   entryHash: z.string().length(64),
   leafIndex: z.number().int().min(0),
   merkleRoot: z.string().length(64),
+  /** P1-26: absent means amc-legacy-v1. RFC 9162 proofs verify from leafIndex and treeSize, not position flags. */
+  algorithm: z.enum(MERKLE_ALGORITHMS).optional(),
+  treeSize: z.number().int().min(1).optional(),
   proofPath: z.array(
     z.object({
       position: z.enum(["left", "right"]),

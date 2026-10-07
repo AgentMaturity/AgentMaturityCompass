@@ -37,3 +37,12 @@ export function merkleFrontierPath(workspace: string): string {
 export function merklePendingPath(workspace: string): string {
   return join(transparencyMerkleDir(workspace), "pending.json");
 }
+
+/** P1-26: the signed record binding the legacy root to the RFC 9162 root over the same entries. */
+export function merkleMigrationPath(workspace: string): string {
+  return join(transparencyMerkleDir(workspace), "migration.json");
+}
+
+export function merkleMigrationSigPath(workspace: string): string {
+  return join(transparencyMerkleDir(workspace), "migration.sig");
+}
