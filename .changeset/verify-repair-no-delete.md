@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": major
+---
+
+Breaking: `amc verify --repair` no longer deletes `.amc/blobs`, `.amc/reports` or the evidence ledger. It prints a recovery plan, changes nothing and exits 1 when verification fails (0 when it passes). `--apply` moves a failing evidence store to `.amc/quarantine/` with a signed receipt after a legal-hold check. Apply asks you to type `archive`, or takes `--yes`; it refuses (exit 2) and moves nothing when the hold state is unknown or a hold is active, the monitor key does not match the expected fingerprint, a planned file changed since the plan, signing is unavailable, or a rename fails (moved files are put back). Files are renamed, never copied and deleted, and the receipt (`repair-receipt.json`, signed as the new `REPAIR_RECEIPT` kind) lists every move with its SHA-256. `amc verify` now notes archived stores, and its messages no longer recommend deleting evidence. Tagged releases v1.0.0, v1.1.0 and v1.1.1 ship the deleting `--repair`; do not run it on those versions.
