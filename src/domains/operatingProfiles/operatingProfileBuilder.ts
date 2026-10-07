@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
 import { defaultApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
 import { defaultBudgets } from "../../budgets/budgets.js";
@@ -10,14 +11,17 @@ import type { ActionClass } from "../../types.js";
 import {
   getDomainMetadata,
   getIndustryAssurancePacksForStation,
+  isDomain,
   type Domain
 } from "../domainRegistry.js";
 import { getPacksForDomain } from "../industryPacks.js";
-import { checkOperatingProfileConsistency } from "./operatingProfileConsistency.js";
-import type {
-  OperatingProfile,
-  ProfileRiskTier,
-  StationOperatingProfileData
+import { checkOperatingProfileConsistency, countProfileFacts, visitProfileFacts } from "./operatingProfileConsistency.js";
+import {
+  LEGACY_OPERATING_PROFILE_SCHEMA_VERSION,
+  OPERATING_PROFILE_SCHEMA_VERSION,
+  type OperatingProfile,
+  type ProfileRiskTier,
+  type StationOperatingProfileData
 } from "./operatingProfileTypes.js";
 import { EDUCATION_PROFILE, ENVIRONMENT_PROFILE, HEALTH_PROFILE, MOBILITY_PROFILE } from "./stationProfilesA.js";
 import { GOVERNANCE_PROFILE, TECHNOLOGY_PROFILE, WEALTH_PROFILE } from "./stationProfilesB.js";
@@ -143,7 +147,7 @@ export function buildOperatingProfile(input: BuildOperatingProfileInput): Operat
     .map((entry) => ({ id: entry.packId, mappedBy: "industryMap" as const, rationale: entry.rationale, source: entry.source }));
 
   const profile: OperatingProfile = {
-    schemaVersion: "2026-10-03",
+    schemaVersion: OPERATING_PROFILE_SCHEMA_VERSION,
     ...data,
     stationName: metadata.name,
     agentId,
@@ -169,9 +173,52 @@ export function buildOperatingProfile(input: BuildOperatingProfileInput): Operat
       opsPolicy: buildOpsPolicy(data)
     },
     operatorFlow: [...OPERATOR_FLOW],
+    profileFacts: { asserted: 0, observed: 0, reviewed: 0 },
     consistency: { ok: true, violations: [] }
   };
 
+  profile.profileFacts = countProfileFacts(profile);
   profile.consistency = checkOperatingProfileConsistency(profile);
+  return profile;
+}
+
+const configFragment = z.record(z.string(), z.unknown());
+const profileHeaderSchema = z.object({
+  schemaVersion: z.enum([OPERATING_PROFILE_SCHEMA_VERSION, LEGACY_OPERATING_PROFILE_SCHEMA_VERSION]),
+  station: z.string().refine(isDomain, "unknown station"),
+  agentId: z.string().trim().min(1),
+  riskTier: z.enum(["critical", "high"]),
+  proposedSignedConfigs: z.object({
+    approvalPolicy: configFragment,
+    budgets: configFragment,
+    tools: configFragment,
+    actionPolicy: configFragment,
+    firewall: configFragment,
+    opsPolicy: configFragment
+  })
+});
+
+/**
+ * Reads the JSON of a profile file (P1-10's input contract). A legacy 2026-10-03 profile has no
+ * fact statuses; each of its values is read as `asserted`, the only status emission could give.
+ * The sections themselves are checked by checkOperatingProfileConsistency.
+ */
+export function readOperatingProfile(raw: unknown): OperatingProfile {
+  const header = profileHeaderSchema.safeParse(raw);
+  if (!header.success) {
+    throw new Error(`not an operating profile: ${header.error.issues.map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")}`);
+  }
+  const expectedTier = profileRiskTier(header.data.station as Domain);
+  if (header.data.riskTier !== expectedTier) {
+    throw new Error(`not an operating profile: riskTier ${header.data.riskTier} does not match station ${header.data.station} (${expectedTier})`);
+  }
+  const profile = clone(raw) as OperatingProfile;
+  if (header.data.schemaVersion === LEGACY_OPERATING_PROFILE_SCHEMA_VERSION) {
+    visitProfileFacts(profile, (_path, entry) => {
+      entry.fact = { status: "asserted" };
+    });
+    profile.profileFacts = countProfileFacts(profile);
+    profile.schemaVersion = OPERATING_PROFILE_SCHEMA_VERSION;
+  }
   return profile;
 }

@@ -3,11 +3,15 @@ export {
   STATION_OPERATING_PROFILES,
   buildOperatingProfile,
   profileRiskTier,
+  readOperatingProfile,
   type BuildOperatingProfileInput
 } from "./operatingProfileBuilder.js";
 export {
   REQUIRED_PROFILE_SECTIONS,
-  checkOperatingProfileConsistency
+  checkOperatingProfileConsistency,
+  countProfileFacts,
+  visitProfileFacts,
+  type ProfileFactEntry
 } from "./operatingProfileConsistency.js";
 export {
   OPERATING_PROFILE_DIR,
@@ -19,11 +23,17 @@ export {
   type EmitOperatingProfileResult
 } from "./operatingProfileEmit.js";
 export { SOURCES as OPERATING_PROFILE_SOURCES, listProfileSources, type SourceId } from "./operatingProfileSources.js";
+export {
+  LEGACY_OPERATING_PROFILE_SCHEMA_VERSION,
+  OPERATING_PROFILE_SCHEMA_VERSION
+} from "./operatingProfileTypes.js";
 export type {
   ApprovalClassSetting,
   IncidentReportingClock,
   OperatingProfile,
   OperatingProfileConsistency,
+  ProfileFact,
+  ProfileFactStatus,
   ProfileRiskTier,
   ProfileSource,
   SourcedSetting,

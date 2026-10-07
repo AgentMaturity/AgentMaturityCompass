@@ -2,8 +2,9 @@ import type { ActionClass } from "../../types.js";
 import type {
   OperatingProfile,
   OperatingProfileConsistency,
-  ProfileSource,
-  SourcedSetting
+  ProfileFact,
+  ProfileFactStatus,
+  ProfileSource
 } from "./operatingProfileTypes.js";
 
 /** Sections every station profile must carry; a missing one is a violation, not a default. */
@@ -21,8 +22,17 @@ export const REQUIRED_PROFILE_SECTIONS = [
 const CRITICAL_TICKETED: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY"];
 const CRITICAL_MIN_SAMPLING_PERCENT = 10;
 
-function isSourcedSetting(value: unknown): value is SourcedSetting<unknown> {
-  return !!value && typeof value === "object" && "value" in value && "source" in value && "basis" in value;
+const FACT_STATUSES: readonly ProfileFactStatus[] = ["asserted", "observed", "reviewed"];
+
+/** A sourced setting or an incident clock: an entry with a source, a basis sentence and a fact status. */
+export interface ProfileFactEntry {
+  source: ProfileSource;
+  basis: unknown;
+  fact?: ProfileFact;
+}
+
+function isFactEntry(value: unknown): value is ProfileFactEntry {
+  return !!value && typeof value === "object" && "source" in value && "basis" in value;
 }
 
 function sourceProblems(source: ProfileSource | undefined, where: string): string[] {
@@ -36,21 +46,34 @@ function sourceProblems(source: ProfileSource | undefined, where: string): strin
   return problems;
 }
 
-function walkSourced(value: unknown, path: string, out: string[]): void {
-  if (isSourcedSetting(value)) {
-    out.push(...sourceProblems(value.source, path));
-    if (typeof value.basis !== "string" || value.basis.trim().length === 0) out.push(`${path}: basis empty`);
-    return;
+function factProblems(fact: ProfileFact | undefined, where: string): string[] {
+  if (!fact || !FACT_STATUSES.includes(fact.status)) return [`${where}: fact status missing or unknown`];
+  if (fact.status === "reviewed" && !(fact.reviewedBy?.trim() && /^\d{4}-\d{2}-\d{2}/.test(fact.reviewedAt ?? ""))) {
+    return [`${where}: a reviewed fact needs reviewedBy and reviewedAt`];
   }
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => walkSourced(item, `${path}[${index}]`, out));
-    return;
-  }
-  if (value && typeof value === "object") {
-    for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
-      walkSourced(child, `${path}.${key}`, out);
+  return [];
+}
+
+/** Calls `visit` for every setting and clock under the required sections, with its path. */
+export function visitProfileFacts(profile: object, visit: (path: string, entry: ProfileFactEntry) => void): void {
+  const walk = (value: unknown, path: string): void => {
+    if (isFactEntry(value)) {
+      visit(path, value);
+    } else if (Array.isArray(value)) {
+      value.forEach((item, index) => walk(item, `${path}[${index}]`));
+    } else if (value && typeof value === "object") {
+      for (const [key, child] of Object.entries(value as Record<string, unknown>)) walk(child, `${path}.${key}`);
     }
-  }
+  };
+  for (const section of REQUIRED_PROFILE_SECTIONS) walk((profile as Record<string, unknown>)[section], section);
+}
+
+export function countProfileFacts(profile: object): Record<ProfileFactStatus, number> {
+  const counts: Record<ProfileFactStatus, number> = { asserted: 0, observed: 0, reviewed: 0 };
+  visitProfileFacts(profile, (_path, entry) => {
+    if (entry.fact && FACT_STATUSES.includes(entry.fact.status)) counts[entry.fact.status] += 1;
+  });
+  return counts;
 }
 
 function approvalPolicyClass(profile: OperatingProfile, actionClass: ActionClass): { requiredApprovals?: number; requireDistinctUsers?: boolean } | undefined {
@@ -66,8 +89,14 @@ export function checkOperatingProfileConsistency(profile: OperatingProfile): Ope
       violations.push(`missing section: ${section}`);
     }
   }
-  for (const section of REQUIRED_PROFILE_SECTIONS) {
-    if (section in profile) walkSourced(profile[section], section, violations);
+  visitProfileFacts(profile, (path, entry) => {
+    violations.push(...sourceProblems(entry.source, path));
+    if (typeof entry.basis !== "string" || entry.basis.trim().length === 0) violations.push(`${path}: basis empty`);
+    violations.push(...factProblems(entry.fact, path));
+  });
+  const facts = countProfileFacts(profile);
+  if (FACT_STATUSES.some((status) => profile.profileFacts?.[status] !== facts[status])) {
+    violations.push("profileFacts: does not match the fact statuses in the profile");
   }
 
   const writeHigh = profile.approvals.WRITE_HIGH;

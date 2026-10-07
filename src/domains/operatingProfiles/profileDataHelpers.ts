@@ -6,8 +6,9 @@ import type {
   SourcedSetting
 } from "./operatingProfileTypes.js";
 
+/** Nothing is measured when a profile is emitted, so every value starts as asserted. */
 export function sourced<T>(value: T, source: ProfileSource, basis: string): SourcedSetting<T> {
-  return { value, source, basis };
+  return { value, source, basis, fact: { status: "asserted" } };
 }
 
 export function approval(
@@ -34,7 +35,8 @@ export function clock(input: {
     authority: input.authority,
     deadline: { value: input.value, unit: input.unit },
     source: input.source,
-    basis: input.basis
+    basis: input.basis,
+    fact: { status: "asserted" }
   };
 }
 

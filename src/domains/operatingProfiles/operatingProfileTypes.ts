@@ -19,11 +19,25 @@ export interface ProfileSource {
   reason?: string;
 }
 
-/** A setting plus the source it rests on and the sentence that connects them. */
+/**
+ * How a profile value is known. `asserted`: proposed from the cited source, nothing measured
+ * (every value at emission). `observed`: measured from evidence. `reviewed`: a named person
+ * reviewed it, with `reviewedBy` and `reviewedAt`. A status is a claim kind, never a verdict.
+ */
+export type ProfileFactStatus = "asserted" | "observed" | "reviewed";
+
+export interface ProfileFact {
+  status: ProfileFactStatus;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}
+
+/** A setting plus the source it rests on, the sentence that connects them and how the value is known. */
 export interface SourcedSetting<T> {
   value: T;
   source: ProfileSource;
   basis: string;
+  fact: ProfileFact;
 }
 
 export type ProfileRiskTier = "critical" | "high";
@@ -44,6 +58,7 @@ export interface IncidentReportingClock {
   deadline: { value: number; unit: "hours" | "days" | "working-days" | "calendar-days" };
   source: ProfileSource;
   basis: string;
+  fact: ProfileFact;
 }
 
 export interface StationOperatingProfileData {
@@ -97,8 +112,15 @@ export interface OperatingProfileConsistency {
   violations: string[];
 }
 
+/**
+ * Profiles written since P1-15 carry a fact status on every value. A profile with the
+ * legacy version has none; readOperatingProfile maps each of its values to `asserted`.
+ */
+export const OPERATING_PROFILE_SCHEMA_VERSION = "2026-10-07";
+export const LEGACY_OPERATING_PROFILE_SCHEMA_VERSION = "2026-10-03";
+
 export interface OperatingProfile extends StationOperatingProfileData {
-  schemaVersion: "2026-10-03";
+  schemaVersion: typeof OPERATING_PROFILE_SCHEMA_VERSION;
   stationName: string;
   agentId: string;
   riskTier: ProfileRiskTier;
@@ -119,5 +141,7 @@ export interface OperatingProfile extends StationOperatingProfileData {
     opsPolicy: Record<string, unknown>;
   };
   operatorFlow: string[];
+  /** Counts of the fact statuses above; the consistency check requires them to match. */
+  profileFacts: Record<ProfileFactStatus, number>;
   consistency: OperatingProfileConsistency;
 }

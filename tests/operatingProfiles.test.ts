@@ -17,7 +17,10 @@ import {
   defaultOperatingProfilePath,
   emitOperatingProfile,
   listProfileSources,
+  OPERATING_PROFILE_SCHEMA_VERSION,
   profileRiskTier,
+  readOperatingProfile,
+  visitProfileFacts,
   type OperatingProfile
 } from "../src/domains/operatingProfiles/index.js";
 
@@ -80,6 +83,8 @@ describe("station operating profiles", () => {
         entries.push({ path: `${station}.incidentReportingClocks.${clockEntry.id}`, entry: { source: clockEntry.source as unknown as Record<string, unknown>, basis: clockEntry.basis } });
       }
       expect(entries.length, station).toBeGreaterThan(20);
+      // Nothing is measured at emission: every setting and clock is asserted.
+      expect(profile.profileFacts, station).toEqual({ asserted: entries.length, observed: 0, reviewed: 0 });
       for (const { path, entry } of entries) {
         expect(typeof entry.source.title === "string" && entry.source.title.length > 0, `${path} title`).toBe(true);
         expect(typeof entry.source.url === "string" && entry.source.url.length > 0, `${path} url`).toBe(true);
@@ -191,6 +196,16 @@ describe("station operating profiles", () => {
     }
     expect(() => assertOutsideSignedConfigTree(workspace, join(workspace, ".amcx", "p.json"))).not.toThrow();
     expect(() => assertOutsideSignedConfigTree(workspace, join(workspace, "profiles", "p.json"))).not.toThrow();
+
+    // A 2026-10-03 profile carries no fact statuses; the reader maps each value to asserted.
+    const legacy = JSON.parse(readFileSync(emitted.path, "utf8")) as Record<string, unknown>;
+    visitProfileFacts(legacy, (_path, entry) => delete entry.fact);
+    legacy.schemaVersion = "2026-10-03";
+    delete legacy.profileFacts;
+    const read = readOperatingProfile(legacy);
+    expect(read.schemaVersion).toBe(OPERATING_PROFILE_SCHEMA_VERSION);
+    expect(read.profileFacts).toEqual(parsed.profileFacts);
+    expect(checkOperatingProfileConsistency(read).ok).toBe(true);
   });
 
   test("emit in dry-run mode builds the profile but writes nothing", () => {
