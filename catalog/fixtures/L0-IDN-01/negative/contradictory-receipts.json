@@ -1,0 +1,30 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-01",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "bindingPoint": "tool_pipeline",
+    "tool": "fixture.write",
+    "workspaceId": "ws-a",
+    "agentId": "agent-1",
+    "evidenceWindow": {
+      "receipts": [
+        {
+          "callId": "c-1",
+          "decision": "allow",
+          "principalId": "principal-1"
+        },
+        {
+          "callId": "c-1",
+          "decision": "deny",
+          "principalId": null
+        }
+      ]
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": null
+  }
+}

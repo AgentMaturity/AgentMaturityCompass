@@ -1,0 +1,13 @@
+# Terms that predicates, citations, packs, owners and crosswalks may use. A term outside this file is CAT_VOCAB.
+# Seeded with the seven stations and the terms the L0-IDN-01 example uses; add terms with the content that needs them.
+stations: [education, environment, health, wealth, technology, mobility, governance]
+jurisdictions: [US]
+roles: []
+entityTypes: [hipaa_covered_entity, hipaa_business_associate, non_bank_financial_institution]
+riskClasses: []
+useCases: []
+dataClasses: []
+domains: []
+ownerRoles: [ciso]
+# amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
+frameworks: [amc-audit-map-v1]

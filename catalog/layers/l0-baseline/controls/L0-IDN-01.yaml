@@ -1,0 +1,134 @@
+# Agent-drafted, experimental: HIPAA and GLBA applicability and paragraph pins need the legal reviewer (D-08).
+id: L0-IDN-01
+version: 0.1.0
+support: experimental
+layer: 0
+family: identity-and-delegation
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Unique agent identity bound to a human principal
+statement: >-
+  Every tool call is attributed at the enforcement point to a unique agent
+  identity and to the human principal the agent acts for, and a call with no
+  resolvable identity or principal is refused.
+riskRationale: >-
+  Shared or missing identities make effects unattributable, so nobody can
+  review, revoke or reconstruct which agent or person caused them.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons:
+    - Layer 0 applies to every agent deployment in every station.
+  exclusions: []
+citations:
+  - key: hipaa-164-312
+    registerId: null
+    instrument: HIPAA Security Rule, technical safeguards
+    clause: "45 CFR 164.312(a)(1) access control; 164.312(b) audit controls"
+    edition: "CFR 2024 annual edition, Title 45 Vol. 2 (GPO)"
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "Not recorded: the legal review (D-08) pins the effective and compliance dates."
+    url: "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml"
+    retrieval:
+      state: unverified
+      reason: "Read by track F1 on 2026-10-03 without a content hash; fetch and hash before review."
+    appliesWhen:
+      all:
+        - { fact: jurisdictions, includesAny: [US] }
+        - { fact: entityTypes, includesAny: [hipaa_covered_entity, hipaa_business_associate] }
+    legalReview: null
+    note: "Strategy: unique agent identity and audit controls (§164.312). Legal review pins the paragraph and confirms applicability."
+  - key: glba-safeguards-314-4
+    registerId: null
+    instrument: GLBA Safeguards Rule
+    clause: "16 CFR 314.4"
+    edition: "eCFR current text on the retrieval date"
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "Not recorded: the legal review (D-08) pins the effective and compliance dates."
+    url: "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-314/section-314.4"
+    retrieval:
+      state: unverified
+      reason: "URL from the strategy's US register; not yet fetched and hashed."
+    appliesWhen:
+      all:
+        - { fact: jurisdictions, includesAny: [US] }
+        - { fact: entityTypes, includesAny: [non_bank_financial_institution] }
+    legalReview: null
+    note: "Strategy: log and monitor authorized users, agents included. Legal review pins the paragraph."
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    A tool-pipeline guard denies any call whose lease is missing, expired,
+    revoked or issued for another workspace, or whose authorization record
+    names no principal, before the tool body runs.
+  parameters:
+    - { name: toolPipeline.requireAgentLease, value: true, strictness: true_wins }
+    - { name: toolPipeline.requirePrincipal, value: true, strictness: true_wins }
+  manualDuty: null
+tests:
+  - id: L0-IDN-01-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The guard decision and the ledger row it writes; the agent's reply is never read.
+    fixtures:
+      positive:
+        - L0-IDN-01/positive/lease-and-principal.json
+      negative:
+        - L0-IDN-01/negative/no-lease.json
+        - L0-IDN-01/negative/expired-lease.json
+        - L0-IDN-01/negative/other-workspace-lease.json
+        - L0-IDN-01/negative/no-principal.json
+        - L0-IDN-01/negative/replayed-authorization.json
+        - L0-IDN-01/negative/contradictory-receipts.json
+        - L0-IDN-01/negative/empty-window.json
+    passCriteria: >-
+      Guard fixtures are denied with IDENTITY_UNRESOLVED or PRINCIPAL_UNRESOLVED
+      and no tool body runs; the contradictory and empty evidence fixtures give
+      not_evaluated; the positive fixture is allowed and its receipt names
+      agentId and principalId.
+    attempts: 1
+evidence:
+  - id: L0-IDN-01-E1
+    producer: amc.authorizationRecord
+    bindingFields: [tenantId, workspaceId, deploymentId, agentId, principalId, sessionId, controlId, controlVersion, policyDigest]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-IDN-01-E2
+    producer: amc.leases.issuer
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.LEASE_SCOPING
+    relation: partial
+    rationale: >-
+      The audit-map control checks that leases are workspace-scoped; it does
+      not check that each call names a human principal.
+review:
+  status: pending
+  expert: null
+  credential: null
+  reviewedAt: null
+  nextReview: null
+provenance:
+  draftedBy: ai
+  draftedAt: "2026-10-05"
+  approvedBy: null
