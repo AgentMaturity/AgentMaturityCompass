@@ -14,7 +14,7 @@ import { verifyForecastWorkspaceArtifacts } from "../forecast/forecastVerifier.j
 import { verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { verifyBenchArtifactFile } from "../bench/benchVerifier.js";
 import { listExportedBenchArtifacts } from "../bench/benchArtifact.js";
-import { listImportedBenchArtifacts } from "../bench/benchRegistryClient.js";
+import { importedBenchSigner, listImportedBenchArtifacts } from "../bench/benchRegistryClient.js";
 import { importedBenchPath } from "../bench/benchRegistryStore.js";
 import { backupVerifyCli } from "../ops/backup/backupCli.js";
 import { releaseVerifyCli } from "../release/releaseCli.js";
@@ -262,7 +262,7 @@ export async function verifyAll(params: {
       trust: workspaceSelfTrust(workspace)
     });
     if (!verify.ok) {
-      auditExportErrors.push(`${row.file}: ${verify.errors.map((error) => error.message).join("; ")}`);
+      auditExportErrors.push(`${row.file}: ${untrustedReasons(verify.report).join("; ")}`);
     }
   }
   checks.push(
@@ -383,16 +383,24 @@ export async function verifyAll(params: {
   for (const artifact of listExportedBenchArtifacts(workspace)) {
     const verify = verifyBenchArtifactFile({ file: artifact.file, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok) {
-      benchErrors.push(`export ${artifact.file}: ${verify.errors.map((row) => row.message).join("; ")}`);
+      benchErrors.push(`export ${artifact.file}: ${untrustedReasons(verify.report).join("; ")}`);
     }
   }
   for (const imported of listImportedBenchArtifacts(workspace)) {
     const artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
-    // The signer this workspace recorded when a pinned registry vouched for the import: a self-check, labelled workspace-self.
-    const verify = verifyBenchArtifactFile({ file: artifactPath, trust: withPins(workspaceSelfTrust(workspace),
-      [{ keyId: imported.signerFingerprint, purposes: ["artifact-seal"], origin: "workspace-self:bench import record" }]) });
+    // The signer the pinned registry's signed index names (cached at import), not meta.json: a self-check, labelled workspace-self.
+    const self = workspaceSelfTrust(workspace);
+    let signer: string;
+    try {
+      signer = await importedBenchSigner(workspace, imported, self);
+    } catch (error) {
+      benchErrors.push(`import ${artifactPath}: signer not authenticated: ${error instanceof Error ? error.message : String(error)}`);
+      continue;
+    }
+    const verify = verifyBenchArtifactFile({ file: artifactPath, trust: withPins(self,
+      [{ keyId: signer, purposes: ["artifact-seal"], origin: "workspace-self:signed bench registry index" }]) });
     if (!verify.ok) {
-      benchErrors.push(`import ${artifactPath}: ${verify.errors.map((row) => row.message).join("; ")}`);
+      benchErrors.push(`import ${artifactPath}: ${untrustedReasons(verify.report).join("; ")}`);
     }
   }
   checks.push(
@@ -412,17 +420,13 @@ export async function verifyAll(params: {
       try {
         const verify = backupVerifyCli({ backupFile: file, trust: workspaceSelfTrust(workspace) });
         if (!verify.ok) {
-          backupErrors.push(`${file}: ${verify.errors.join("; ")}`);
-          const onlyPassphraseErrors = verify.errors.every((row) =>
-            row.toLowerCase().includes("backup passphrase required")
-          );
-          if (!onlyPassphraseErrors) {
+          backupErrors.push(`${file}: ${untrustedReasons(verify.report).join("; ")}`);
+          // A refused signer is a failure, never a skip: only an admitted backup can be "passphrase or vault only".
+          const issuerAdmitted = verify.report.issuerAdmission.status === "pass";
+          if (!issuerAdmitted || !verify.errors.every((row) => row.toLowerCase().includes("backup passphrase required"))) {
             requiresPassphraseOnly = false;
           }
-          const onlyVaultErrors = verify.errors.every((row) =>
-            row.toLowerCase().includes("vault is locked")
-          );
-          if (!onlyVaultErrors) {
+          if (!issuerAdmitted || !verify.errors.every((row) => row.toLowerCase().includes("vault is locked"))) {
             requiresUnlockedVaultOnly = false;
           }
         }

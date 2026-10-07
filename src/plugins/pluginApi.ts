@@ -202,6 +202,18 @@ export function listInstalledPlugins(workspace: string): {
   };
 }
 
+/** The registries config pins registry fingerprints, so it counts only with a valid auditor signature (P0-09). */
+export function loadSignedPluginRegistriesConfig(workspace: string): ReturnType<typeof loadPluginRegistriesConfig> {
+  if (!pathExists(pluginsRegistriesPath(workspace))) {
+    return defaultPluginRegistriesConfig();
+  }
+  const signature = verifyPluginRegistriesConfig(workspace);
+  if (!signature.valid) {
+    throw new Error(`plugin registries signature invalid: ${signature.reason ?? "unknown"}`);
+  }
+  return loadPluginRegistriesConfig(workspace);
+}
+
 export async function browsePluginRegistryForWorkspace(params: {
   workspace: string;
   registryId: string;
@@ -211,7 +223,7 @@ export async function browsePluginRegistryForWorkspace(params: {
   registryFingerprint: string;
   plugins: Awaited<ReturnType<typeof browseRegistry>>["plugins"];
 }> {
-  const registries = loadPluginRegistriesConfig(params.workspace);
+  const registries = loadSignedPluginRegistriesConfig(params.workspace);
   const entry = resolveRegistryConfigForWorkspace({
     workspace: params.workspace,
     registries,

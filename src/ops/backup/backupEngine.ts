@@ -423,6 +423,7 @@ export async function restoreBackup(params: {
   restoredTo: string;
   trusted: boolean;
   warnings: string[];
+  report: VerifierReportV1;
 }> {
   const verify = verifyBackup({
     backupFile: params.backupFile,
@@ -499,7 +500,8 @@ export async function restoreBackup(params: {
       return {
         restoredTo: target,
         trusted: warnings.length === 0,
-        warnings
+        warnings,
+        report: verify.report
       };
     } finally {
       rmSync(temp, { recursive: true, force: true });

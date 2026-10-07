@@ -6,9 +6,9 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
-import { loadTrustContext, untrustedReasons, withPins } from "../trust/index.js";
-import { cacheRegistryIndex, listImportedBenches, storeImportedBench } from "./benchRegistryStore.js";
-import { loadBenchRegistriesConfig } from "./benchPolicyStore.js";
+import { admitKey, loadTrustContext, untrustedReasons, withPins, type TrustContext } from "../trust/index.js";
+import { cacheRegistryIndex, listImportedBenches, storeImportedBench, type ImportedBenchMeta } from "./benchRegistryStore.js";
+import { benchImportsCacheDir, loadBenchRegistriesConfig, verifyBenchRegistriesSignature } from "./benchPolicyStore.js";
 
 function isHttp(base: string): boolean {
   return /^https?:\/\//i.test(base);
@@ -144,6 +144,42 @@ function resolveRegistryFromConfig(config: BenchRegistryConfig, registryId: stri
   return entry;
 }
 
+/**
+ * The registries config pins registry fingerprints, so it counts only with a valid auditor signature (P0-09).
+ * Checked before loading, because loading a missing config writes the signed defaults.
+ */
+function signedBenchRegistry(workspace: string, registryId: string) {
+  const signature = verifyBenchRegistriesSignature(workspace);
+  if (!signature.valid) {
+    throw new Error(`bench registries config signature invalid: ${signature.reason ?? "unknown"}`);
+  }
+  return resolveRegistryFromConfig(benchRegistryConfigSchema.parse(loadBenchRegistriesConfig(workspace)), registryId);
+}
+
+/** The registry key vouches for the signers its index names only while admitted: distrust beats the pin (P0-09). */
+function admitRegistryKey(pubRaw: string, pinnedFingerprint: string, base: TrustContext): void {
+  const admission = admitKey({ publicKeyPem: pubRaw, purpose: "artifact-seal", signature: "index.sig",
+    context: withPins(base, [{ keyId: pinnedFingerprint, purposes: ["artifact-seal"], origin: "pinned bench registry fingerprint" }]) });
+  if (admission.status !== "admitted") {
+    throw new Error(`registry key not admitted: ${admission.status}: ${admission.detail ?? ""}`);
+  }
+}
+
+/**
+ * The signer an imported bench was admitted for, re-read from the cached index the pinned registry signed, never from
+ * the unsigned meta.json (P0-09). Throws when the signed config, the cache, its signature or the pin does not hold.
+ */
+export async function importedBenchSigner(workspace: string, meta: ImportedBenchMeta, trust: TrustContext): Promise<string> {
+  if (!verifyBenchRegistriesSignature(workspace).signatureExists) throw new Error("bench registries config is not signed");
+  const registry = signedBenchRegistry(workspace, meta.registryId);
+  const cached = await fetchBenchRegistryIndex(join(benchImportsCacheDir(workspace), meta.registryId));
+  if (cached.registryFingerprint !== registry.pinnedRegistryFingerprint) throw new Error("cached registry index is not from the pinned registry");
+  admitRegistryKey(cached.pubRaw, registry.pinnedRegistryFingerprint, trust);
+  const signer = cached.index.benches.find((row) => row.benchId === meta.benchId)?.versions.find((row) => row.version === meta.version)?.signerFingerprint;
+  if (!signer) throw new Error(`the signed registry index names no signer for ${meta.benchId}@${meta.version}`);
+  return signer;
+}
+
 export async function importBenchFromRegistry(params: {
   workspace: string;
   registryId: string;
@@ -154,8 +190,7 @@ export async function importBenchFromRegistry(params: {
   filePath: string;
   registryFingerprint: string;
 }> {
-  const config = benchRegistryConfigSchema.parse(loadBenchRegistriesConfig(params.workspace));
-  const registry = resolveRegistryFromConfig(config, params.registryId);
+  const registry = signedBenchRegistry(params.workspace, params.registryId);
   const base = isHttp(registry.base) ? registry.base : resolve(params.workspace, registry.base);
   const fetched = await fetchBenchRegistryIndex(base);
   cacheRegistryIndex({
@@ -168,6 +203,8 @@ export async function importBenchFromRegistry(params: {
   if (registry.pinnedRegistryFingerprint !== fetched.registryFingerprint) {
     throw new Error("registry fingerprint does not match pinned fingerprint");
   }
+  const operator = loadTrustContext();
+  admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, operator);
 
   const at = params.benchRef.lastIndexOf("@");
   const benchId = at > 0 ? params.benchRef.slice(0, at) : params.benchRef;
@@ -197,7 +234,7 @@ export async function importBenchFromRegistry(params: {
   const tmpPath = join(resolve(params.workspace), ".amc", "bench", "imports", "tmp-import.amcbench");
   writeFileAtomic(tmpPath, bytes, 0o644);
   // The signer counts because the pinned registry's signed index names it for this version (P0-09).
-  const trust = withPins(loadTrustContext(), [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
+  const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
   const verified = verifyBenchArtifactFile({ file: tmpPath, trust });
   if (!verified.ok) {
     throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);

@@ -193,7 +193,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
-import { finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
@@ -9273,7 +9273,7 @@ withTrustFlags(backup
   .description("Restore a verified backup into target directory")
   .argument("<file>", "backup file path")
   .requiredOption("--to <dir>", "restore target directory")
-  .option("--force", "allow restore into existing target directory", false), { pubkey: "pin the auditor public key (artifact-seal)" })
+  .option("--force", "allow restore into existing target directory", false), { pubkey: "pin the auditor public key (artifact-seal)", issuerOnly: true })
   .action(async (file: string, opts: { to: string; force: boolean } & TrustFlags) => {
     const restored = await backupRestoreCli({
       backupFile: file,
@@ -9289,6 +9289,7 @@ withTrustFlags(backup
         console.log(`- ${warning}`);
       }
     }
+    exitIfUntrusted(restored.report);
   });
 
 backup

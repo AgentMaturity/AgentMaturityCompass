@@ -340,7 +340,7 @@ export function printPluginPackage(file: string, trust: TrustContext): {
   version: string | null;
   publisherFingerprint: string | null;
   artifactCount: number;
-  verification: { ok: boolean; errors: string[] };
+  verification: { ok: boolean; errors: string[]; report: VerifierReportV1 };
 } {
   const verified = verifyPluginPackage({ file, trust });
   return {
@@ -351,7 +351,8 @@ export function printPluginPackage(file: string, trust: TrustContext): {
     artifactCount: verified.manifest?.artifacts.length ?? 0,
     verification: {
       ok: verified.ok,
-      errors: verified.errors
+      errors: verified.errors,
+      report: verified.report
     }
   };
 }

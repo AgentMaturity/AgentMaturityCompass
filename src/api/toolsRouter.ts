@@ -252,8 +252,11 @@ export async function handleToolsRoute(
       try {
         const body = await bodyJson<{ file: string }>(req);
         if (!body.file) { apiError(res, 400, 'Required: file'); return true; }
+        // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+        const refused = requestTrustOverride(body);
+        if (refused) { apiError(res, 400, refused); return true; }
         const { pluginPrintCli } = await import('../plugins/pluginCli.js');
-        const { loadTrustContext } = await import('../trust/index.js');
         const out = pluginPrintCli(body.file, loadTrustContext());
         apiSuccess(res, out);
       } catch (err) {

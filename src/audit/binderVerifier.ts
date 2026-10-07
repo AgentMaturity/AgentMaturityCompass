@@ -12,7 +12,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
-import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, untrustedReasons, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { binderJsonSchema, binderPiiScanSchema, binderSignatureSchema, type AuditBinderJson } from "./binderSchema.js";
 import { listBinderExports, verifyBinderCacheSignature } from "./binderStore.js";
 import { verifyAuditMapActiveSignature, verifyAuditMapBuiltinSignature } from "./auditMapStore.js";
@@ -202,7 +202,9 @@ export function verifyAuditWorkspace(params: {
       trust: workspaceSelfTrust(params.workspace)
     });
     if (!verify.ok) {
-      errors.push(`export ${row.file}: ${verify.errors.map((error) => error.message).join("; ")}`);
+      // Integrity messages as before, then each refused signer with its key id (untrustedReasons lists integrity first).
+      const refusals = untrustedReasons(verify.report).slice(verify.report.integrity.errors.length);
+      errors.push(`export ${row.file}: ${[...verify.errors.map((error) => error.message), ...refusals].join("; ")}`);
     }
   }
 
