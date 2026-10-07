@@ -269,6 +269,13 @@
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
     },
     {
+      "path": "src/workspace.ts",
+      "issue": "P1-25",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
+    },
+    {
       "path": "tests/apiRouterResponseParity.test.ts",
       "issue": "P0-23",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
