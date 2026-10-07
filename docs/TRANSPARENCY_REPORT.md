@@ -33,7 +33,7 @@ amc transparency report --all --out transparency-{agentId}.md
 ## What's in the Report
 
 ### Identity
-Who/what is this agent — framework, risk tier, current maturity level (L1-L5), trust score (0-100), and certification status.
+Who/what is this agent — framework, risk tier, current maturity level (L1-L5), trust score (0-100), and evidence standing.
 
 ### Capabilities
 What the agent can **do**:
@@ -138,7 +138,7 @@ interface AgentTransparencyReport {
     maturityLevel: number;     // 1.0 - 5.0
     maturityLabel: string;     // "L3 — Defined"
     trustScore: number;        // 0-100
-    certificationStatus: "certified" | "not-certified" | "pending";
+    evidenceStanding: "evidence_supported" | "partial_evidence" | "insufficient_evidence";
     lastAssessed: string;      // ISO timestamp
   };
 
@@ -196,13 +196,15 @@ interface AgentTransparencyReport {
 
 ---
 
-## Certification Status Logic
+## Evidence Standing Logic
 
-| Status | Condition |
+The evidence standing says how far the latest run's evidence supports its level. AMC computes it itself, so it is never a certification.
+
+| Standing | Condition |
 |---|---|
-| **certified** | integrityIndex ≥ 0.9 AND maturityLevel ≥ 4 |
-| **pending** | integrityIndex ≥ 0.6 OR maturityLevel ≥ 2 |
-| **not-certified** | Below pending thresholds |
+| **evidence_supported** | integrityIndex ≥ 0.9 AND maturityLevel ≥ 4 |
+| **partial_evidence** | integrityIndex ≥ 0.6 OR maturityLevel ≥ 2 |
+| **insufficient_evidence** | Below the partial_evidence thresholds |
 
 ---
 

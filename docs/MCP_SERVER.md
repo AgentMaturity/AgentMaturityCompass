@@ -125,7 +125,7 @@ Output: { maturityLabel, trustScore (0-100), dimensions, topPriority }
 ## AMC Trust Score: my-agent
 
 Overall: L3 — Defined · Trust Score: 62/100
-Certification: pending
+Evidence standing: partial_evidence
 Risk Tier: high
 Last Assessed: 2026-02-27T09:00:00.000Z
 
@@ -182,9 +182,11 @@ Output: Complete AgentTransparencyReport (capabilities, data access, trust evide
 Score an agent against an industry-specific Sector Pack.
 
 ```
-Input:  { packId: string, responses: Record<questionId, level 1-5> }
-Output: { percentage, level, certified, complianceGaps }
+Input:  { packId: string, responses: Record<questionId, integer 1-5> }
+Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
+
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)).
 
 Available pack IDs (40 total across 7 stations):
 

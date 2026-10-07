@@ -177,10 +177,10 @@ L3 (Defined): "Role-based access control with audit logging, but no automated br
 L5 (Optimizing): "Zero-trust RBAC with just-in-time access, cryptographic access audit chains..."
 ```
 
-### Certification Thresholds
-Each pack has a minimum score threshold for certification readiness, calibrated to risk:
+### Self-Assessment Targets
+Each pack carries a self-assessment target (the `certificationThreshold` data field), calibrated to risk. Meeting it certifies nothing: pack answers are self-reported.
 
-| Risk Tier | Typical Threshold |
+| Risk Tier | Typical Target |
 |---|---|
 | `high` | 68–72% |
 | `very-high` | 75–80% |
@@ -194,7 +194,7 @@ Each pack has a minimum score threshold for certification readiness, calibrated 
 Composite Score = (base_score × 0.5) + (domain_score × 0.3) + (sector_score × 0.2)
 ```
 
-Pack scoring uses weighted question responses (L1–L5):
+Pack scoring uses weighted question responses. Each answer is a self-declared Likert value, an integer 1–5; any other value throws a `RangeError` instead of being clamped. An unanswered question counts as 1.
 
 ```typescript
 import { scoreIndustryPack } from "agent-maturity-compass";
@@ -205,11 +205,15 @@ const result = scoreIndustryPack("digital-health-record", {
   // ...
 });
 
-console.log(result.percentage);     // 78
-console.log(result.level);          // 4
-console.log(result.certified);      // true
+console.log(result.percentage);     // 78 (self-reported score)
+console.log(result.level);          // 4 (self-reported level from the one level table)
+console.log(result.selfAssessment); // { complete, answered, total }: complete when every question is answered
+console.log(result.claimKind);      // "self_reported"
+console.log(result.eligibleLevel);  // 1 (self-reported answers cap at L1)
 console.log(result.complianceGaps); // [...] questions below L3
 ```
+
+A complete self-assessment is not a certification. See "Units, levels and claim kinds" in [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md) and [CLAIM_KINDS.md](CLAIM_KINDS.md).
 
 ---
 
