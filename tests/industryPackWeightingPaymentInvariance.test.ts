@@ -101,7 +101,8 @@ describe("industry pack weighting never depends on payment", () => {
     expect(set.questions).toEqual(unweighted);
     expect(set.questions.every((question) => (question.scoringWeight ?? 1) === 1)).toBe(true);
     expect(set.info.domainPackWeighting).toEqual(NOTICE);
-    expect(set.info.domainPackWeighting).not.toHaveProperty("entitlementActive");
+    // Exactly the notice keys: no licence-state field survives.
+    expect(Object.keys(set.info.domainPackWeighting ?? {}).sort()).toEqual(Object.keys(NOTICE).sort());
   }
 
   test("A1: no licence gives the unweighted questions and the removal notice", () => {
