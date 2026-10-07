@@ -95,7 +95,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance waiver request` | Request time-limited readiness waiver (dual-control approval required) | `--hours <n>`<br>`--reason <text>`<br>`--agent <id>` | - |
 | `amc assurance waiver revoke` | Revoke active or specific waiver | `--waiver <id>` | - |
 | `amc assurance waiver status` | Show waiver status (activates approved pending waivers) | - | - |
-| `amc attest` | Auditor-attest an ingest session to upgrade trust tier to ATTESTED | `--ingest-session <id>`<br>`--attested-by <identity>`<br>`--statement <text>`<br>`--agent <agentId>` | - |
+| `amc attest` | Record an attestation over an ingest session (ATTESTED only with a pinned third-party signature) | `--ingest-session <id>`<br>`--attested-by <identity>`<br>`--statement <text>`<br>`--attester-signature <file>`<br>`--agent <agentId>` | - |
 | `amc attestation-export` | Export attestation bundle for external auditors | `--tenant <id>` | - |
 | `amc audit` | Audit binder and compliance maps | - | - |
 | `amc audit binder` | Audit binder artifact operations | - | - |
@@ -384,7 +384,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enterprise status` | Show current license status, tier, and enabled features | - | - |
 | `amc enterprise usage` | Show multi-tenant usage metering and quota utilization | - | - |
 | `amc eval` | Eval interop import and coverage status | - | - |
-| `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--trust-tier <tier>`<br>`--json` | - |
+| `amc eval import` | Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC evidence | `--format <format>`<br>`--file <path>`<br>`--agent <agentId>`<br>`--historical`<br>`--json` | - |
 | `amc eval registry` | Show signed metadata for existing AMC evaluators | `--refresh`<br>`--json` | - |
 | `amc eval run` | One-shot evaluation: read amcconfig.yaml, run all diagnostic tests, output results | `--format <format>`<br>`--output <path>`<br>`--window <window>`<br>`--agent <agentId>`<br>`--fail-on-error`<br>`--threshold <n>` | - |
 | `amc eval status` | Show imported eval coverage per AMC dimension | `--agent <agentId>`<br>`--window <window>`<br>`--json` | - |
@@ -785,7 +785,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc org unassign` | - | `--agent <id>`<br>`--node <id>` | - |
 | `amc org verify` | Verify signed org.yaml | - | - |
 | `amc outcomes` | Outcome contracts, value signals, and reports | - | - |
-| `amc outcomes attest` | Record manual attested outcome signal | `--metric <metricId>`<br>`--value <value>`<br>`--reason <text>`<br>`--workorder <id>`<br>`--unit <unit>`<br>`--agent <agentId>` | - |
+| `amc outcomes attest` | Record a manual outcome signal (self-attested, SELF_REPORTED) | `--metric <metricId>`<br>`--value <value>`<br>`--reason <text>`<br>`--workorder <id>`<br>`--unit <unit>`<br>`--agent <agentId>` | - |
 | `amc outcomes diff` | Diff two outcome reports | - | - |
 | `amc outcomes init` | Create and sign outcome contract | `--agent <agentId>`<br>`--archetype <id>` | - |
 | `amc outcomes report` | Generate outcomes report (agent) or fleet outcomes report | `--window <window>`<br>`--out <path>`<br>`--agent <agentId>` | - |

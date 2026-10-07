@@ -108,7 +108,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 89 | `amc assurance waiver request` | Request time-limited readiness waiver (dual-control approval required) |
 | 90 | `amc assurance waiver revoke` | Revoke active or specific waiver |
 | 91 | `amc assurance waiver status` | Show waiver status (activates approved pending waivers) |
-| 92 | `amc attest` | Auditor-attest an ingest session to upgrade trust tier to ATTESTED |
+| 92 | `amc attest` | Record an attestation over an ingest session (ATTESTED only with a pinned third-party signature) |
 | 93 | `amc attestation-export` | Export attestation bundle for external auditors |
 | 94 | `amc audit` | Audit binder and compliance maps |
 | 95 | `amc audit binder` | Audit binder artifact operations |
@@ -798,7 +798,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 779 | `amc org unassign` | - |
 | 780 | `amc org verify` | Verify signed org.yaml |
 | 781 | `amc outcomes` | Outcome contracts, value signals, and reports |
-| 782 | `amc outcomes attest` | Record manual attested outcome signal |
+| 782 | `amc outcomes attest` | Record a manual outcome signal (self-attested, SELF_REPORTED) |
 | 783 | `amc outcomes diff` | Diff two outcome reports |
 | 784 | `amc outcomes init` | Create and sign outcome contract |
 | 785 | `amc outcomes report` | Generate outcomes report (agent) or fleet outcomes report |
@@ -1865,7 +1865,7 @@ Revoke active or specific waiver
 
 #### `amc attest`
 
-Auditor-attest an ingest session to upgrade trust tier to ATTESTED
+Record an attestation over an ingest session (ATTESTED only with a pinned third-party signature)
 
 
 | Option | Description |
@@ -1873,6 +1873,7 @@ Auditor-attest an ingest session to upgrade trust tier to ATTESTED
 | `--ingest-session <id>` | - |
 | `--attested-by <identity>` | - |
 | `--statement <text>` | - |
+| `--attester-signature <file>` | - |
 | `--agent <agentId>` | - |
 
 #### `amc attestation-export`
@@ -4164,7 +4165,7 @@ Import eval outputs (LangSmith, DeepEval, Promptfoo, OpenAI Evals, W&B, Langfuse
 | `--format <format>` | - |
 | `--file <path>` | - |
 | `--agent <agentId>` | - |
-| `--trust-tier <tier>` | - |
+| `--historical` | - |
 | `--json` | - |
 
 #### `amc eval registry`
@@ -7038,7 +7039,7 @@ List org lifecycle runs
 
 #### `amc outcomes attest`
 
-Record manual attested outcome signal
+Record a manual outcome signal (self-attested, SELF_REPORTED)
 
 
 | Option | Description |
