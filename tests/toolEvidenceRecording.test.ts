@@ -125,7 +125,8 @@ describe("a governed call leaves evidence", () => {
     const audits = written.filter(row => row.event_type === "audit");
     // Admission and disposition are separate facts. Exact types/counts keep
     // duplicate tool evidence visible instead of counting every audit as a call.
-    expect(audits.map(row => row.meta.auditType).sort()).toEqual([NATIVE_BUDGET_RESERVATION, "TOOL_CALL_ALLOWED"]);
+    // EFFECTIVE_POLICY is the session's one effective-policy receipt, written before its first governed call (P1-12).
+    expect(audits.map(row => row.meta.auditType).sort()).toEqual(["EFFECTIVE_POLICY", NATIVE_BUDGET_RESERVATION, "TOOL_CALL_ALLOWED"]);
     const disposition = audits.find(row => row.meta.auditType === "TOOL_CALL_ALLOWED")!;
     expect(disposition.meta).toMatchObject({ callId: request.callId, actionClass: "READ_ONLY", effectiveMode: "EXECUTE" });
     expect(audits.find(row => row.meta.auditType === NATIVE_BUDGET_RESERVATION)?.meta).toMatchObject({
