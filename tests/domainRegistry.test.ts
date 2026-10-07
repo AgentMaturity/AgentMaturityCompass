@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { listAssurancePacks } from "../src/assurance/packs/index.js";
+import { INDUSTRY_PACK_MANIFEST } from "../src/assurance/packs/industryPackManifest.js";
 import {
   DOMAIN_REGISTRY,
   INDUSTRY_ASSURANCE_PACK_IDS,
@@ -51,6 +52,14 @@ describe("industry assurance pack to station registry", () => {
     expect(unmapped).toEqual([]);
     for (const packId of INDUSTRY_ASSURANCE_PACK_IDS) {
       expect(listIndustryAssurancePackStations(packId).length, packId).toBeGreaterThan(0);
+    }
+  });
+
+  test("the industry pack manifest labels each pack with a mapped station, or cross-framework only for two or more", () => {
+    for (const entry of INDUSTRY_PACK_MANIFEST) {
+      const stations = listIndustryAssurancePackStations(entry.id);
+      if (entry.station === "cross-framework") expect(stations.length, entry.id).toBeGreaterThanOrEqual(2);
+      else expect(stations, entry.id).toContain(entry.station);
     }
   });
 
