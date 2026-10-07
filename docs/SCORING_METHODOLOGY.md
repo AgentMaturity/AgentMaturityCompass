@@ -7,14 +7,16 @@ AMC publishes a machine-readable scoring methodology manifest so reports, badges
 | Field | Current Value |
 |-------|---------------|
 | Methodology ID | `amc-public-scoring-methodology` |
-| Methodology Version | `2026.08.27-r225` |
-| Release Date | `2026-08-27` |
+| Methodology Version | `2026.10.08-r226` |
+| Release Date | `2026-10-08` |
 
 | Manifest Command | `amc methodology --json` |
 | Human-Readable Command | `amc methodology` |
 | Sample Dataset Command | `amc methodology --sample-dataset --json` |
 
-Current methodology delta: AMC now derives the public badge methodology assurance hash and the diagnostic methodology-versioning receipt from one canonical source-review boundary and gate selection. This includes the existing OpenAI Simple Evals boundary on both surfaces. Scoring ranges, thresholds, weighting, maturity labels, evidence gates, question-level answer anchors, and historical methodology hashes are unchanged.
+Current methodology delta: diagnostic levels are cumulative and are earned only from rows that registered emitters write, bound to a question through its evidence map above L1; L3 is not evaluated for any question yet, and L4 and L5 are not evaluated (see How a Level Is Earned). Scores drop wherever seeded, untagged or unregistered evidence counted. Level bands, layer and overall arithmetic, and trust-label thresholds are unchanged.
+
+Previous methodology delta (r223): AMC now derives the public badge methodology assurance hash and the diagnostic methodology-versioning receipt from one canonical source-review boundary and gate selection. This includes the existing OpenAI Simple Evals boundary on both surfaces. Scoring ranges, thresholds, weighting, maturity labels, evidence gates, question-level answer anchors, and historical methodology hashes are unchanged.
 
 Reference verification recognizes hashes emitted by AMC's supported built-in question sets: `amc-legacy-240-v1` and `amc-lifecycle-2026-v1`. Custom question-set hashes fail closed because they are not part of the immutable built-in hash registry; verify those artifacts from their full signed manifest rather than treating them as a published built-in methodology reference.
 
@@ -36,6 +38,117 @@ Prior no-bloat boundaries remain active: No Lunary adapter, SDK/importer, trace 
 
 
 Every generated diagnostic report now includes a `methodology` object with the methodology id, version, release date, question-set summary, public documentation link, and SHA-256 hash of the canonical manifest. Reports also include a `methodologyVersioning` receipt that binds public comparability to changelog, deprecation, migration, telemetry, benchmark, calibration, archive, export-sanitization, and badge-assurance proof. Badge URLs include `amc_methodology`, `amc_methodology_hash`, and `amc_methodology_assurance` query parameters, and badge HTML/Markdown includes a title containing the same method reference.
+
+## How a Level Is Earned
+
+Introduced in `2026.10.08-r226` (P1-07). This section is the diagnostic scoring rule; where an older section of this document says otherwise, this section wins. The constants it describes live in `src/diagnostic/levelSemantics.ts`, the emitter registry in `src/diagnostic/evidenceEmitters.ts` and the evidence maps in `src/diagnostic/evidenceMaps/`.
+
+### Levels are cumulative
+
+A question's supported level is the highest n for which the gates for every level 1 to n exist and pass. Gates are read by their level, never by position, and a missing level stops the climb. Before r226 the runner walked from L5 down and kept the first gate that passed, so a question could reach L3 without the review its L2 gate required.
+
+| Level | Meaning | Passes when |
+|---|---|---|
+| L0 | Not evidenced | Always. |
+| L1 | Self-declared | At least two rows (one session, one day) tagged to the question, or bound to it by its evidence map, that a registered emitter admits by provenance. Self-reported input never yields more than L1. |
+| L2 | Configuration evidence | `OBSERVED` rows from every emitter the question's evidence map lists for L2, bound by the map and never by the row's own tag, meeting the gate's event, session and day minimums (4, 2 and 2). |
+| L3 | Runtime evidence | `OBSERVED` runtime or executed test rows from every emitter the map lists for L3, bound the same way (8, 3 and 3). No emitter is mapped at L3 yet, so L3 is not evaluated for any question. Keyword matches never count. |
+| L4 | Continuity, anchoring and sampling | Not evaluated until anchoring (P1-25, P1-26) and a sampling record exist. |
+| L5 | Independently attested | Not evaluated until a registry issues scoped attestations signed by a key with purpose `attestation` in the pinned trust list (P0-09, P3-04). |
+
+A level that cannot be evaluated is reported as not evaluated, with its reason, and never as a pass. In the published question bank such a gate carries `notEvaluated` and keeps its earlier requirements as a description of what the level would need. The final level is `min(claimedLevel, supportedMaxLevel)` after the documented caps; no question can exceed L2 under r226, and only the four mapped questions can exceed L1.
+
+### Gate vocabulary
+
+An evaluated gate names evidence event types (`requiredEvidenceTypes`; every named type must be present), audit types (`mustInclude.auditTypes`), metric keys (`mustInclude.metricKeys`), the event, session and day minimums, and the accepted trust tiers. It never names keyword patterns, meta keys or artifact-path patterns. A row counts once per question. Synthetic rows (`claimKind: synthetic_example`, `provenance: dogfood` or `source: dogfood-maturity`) count at no level.
+
+### Emitter registry
+
+A row counts above L0 only when a registered emitter admits it: the row's shape matches the entry (event type, and the audit type, metric key or meta field the entry names) and its provenance matches too. The producer derived from the row (P0-18) must be the entry's producer, and the row's effective trust tier must be the tier the entry's claim kind writes. Shape alone admits nothing, so the diagnostic's own findings (for example `ASSURANCE_EVIDENCE_MISSING`), imported rows dressed as runtime rows and stale observations count toward no level.
+
+| Emitter | Module | Row | Claim kind | Producer | Level use |
+|---|---|---|---|---|---|
+| `tool-call-allowed` | `src/tools/toolEvidence.ts` | `audit` `TOOL_CALL_ALLOWED` | `observed` | `amc-runtime` | L1, L2 |
+| `tool-call-denied` | `src/tools/toolEvidence.ts` | `audit` `TOOL_CALL_DENIED` | `observed` | `amc-runtime` | L1, L2 |
+| `tool-call-failed` | `src/tools/toolEvidence.ts` | `audit` `TOOL_CALL_FAILED` | `observed` | `amc-runtime` | L1 |
+| `tool-call-outcome` | `src/tools/toolEvidence.ts` | `metric` `tool_call_outcome` | `observed` | `amc-runtime` | L1, L2 |
+| `tool-output-digest` | `src/tools/toolEvidence.ts` | `stdout` | `observed` | `amc-runtime` | L1 |
+| `delegation-settled` | `src/diagnostic/spineEvidenceProjection.ts` | `audit` `DELEGATION_SETTLED` with `meta.delegationScope` | `observed` | `amc-runtime` | L1, L2 |
+| `delegate-report-digest` | `src/diagnostic/spineEvidenceProjection.ts` | `stdout` | `observed` | `amc-runtime` | L1 |
+| `artifact-provenance` | `src/artifact/artifactProvenance.ts` | `artifact` | `observed` | `amc-runtime` | L1 |
+| `eval-import-case` | `src/eval/evalImporters.ts` | `test` | `self_reported` | `import` | L1 |
+| `eval-import-score` | `src/eval/evalImporters.ts` | `metric` `external_eval_score` | `self_reported` | `import` | L1 |
+| `eval-import-calibration` | `src/eval/evalImporters.ts` | `metric` `confidence_calibration_error` | `self_reported` | `import` | L1 |
+
+The dogfood seeder is never an emitter, and importers are `self_reported`. Every literal `auditType` the source writes is either registered or listed in `NON_MATURITY_AUDIT_MODULES` with the reason it cannot evidence maturity. `npm run check:gates` proves the registry against the source in CI and fails when an evaluated gate asks for a row no registered, non-synthetic emitter writes (see [CI.md](CI.md)).
+
+### Evidence maps
+
+A map binds emitters to one question per level and says why, quoting the question's own evidence hints. It is a methodology claim and is reviewed as one. Above L1 the map is the only binding: a row's own `questionIds` tag decides nothing there, so a writer cannot choose which questions its rows lift.
+
+| Question | L2 emitters | L3 emitters | Still needs for L3 |
+|---|---|---|---|
+| AMC-5.29 | `tool-call-allowed`, `tool-call-denied` | none | tool-interface reconstruction, per-step scope decisions and status-aware validation metrics |
+| AMC-SCI-2 | `tool-call-allowed` | none | MCP server identity checks, attestation receipts and sanitized tool-result traces |
+| AMC-OPDISC-6 | `tool-call-outcome` | none | batched execution traces and duplicate-call metrics |
+| AMC-2.15 | `delegation-settled` | none | executed sub-agent privilege escalation tests |
+
+Every other question has no map and is not evaluable above L1 on runtime evidence; what it needs is its own `evidenceGateHints`.
+
+### Formula
+
+One scale, as the code computes it:
+
+- Question: `finalLevel = min(claimedLevel, supportedMaxLevel)`, an integer from 0 to 5, where `supportedMaxLevel` is the cumulative level above after the documented caps.
+- Confidence: `clamp(0.2 + 0.1 × satisfiedRequiredEvidenceTypes + 0.05 × max(0, distinctDays − gateMinDistinctDays) − 0.15 × contradictions, 0, 1)` for the reached gate. Confidence is reported; it is never multiplied into a level.
+- Layer: `avgFinalLevel = Σ(finalLevel × scoringWeight) / Σ(scoringWeight)`; `confidenceWeightedFinalLevel = Σ(finalLevel × confidence × scoringWeight) / Σ(confidence × scoringWeight)` is reported alongside.
+- Overall: `Σ(avgFinalLevel) / layerCount`.
+- Integrity index: `clamp(evidenceCoverage − Σ penalties, 0, 1)`, or 0 when the ledger does not verify, where `evidenceCoverage` is the share of questions with at least one accepted evidence row.
+- Bands: an averaged level maps to a label through the table under Public Methodology Version (`LEVEL_BANDS`).
+
+### Trust labels
+
+| Integrity index | Label |
+|---|---|
+| below 0.4 | `UNRELIABLE — DO NOT USE FOR CLAIMS` |
+| 0.4 to below 0.6 | `LOW TRUST` |
+| 0.6 and above | `HIGH TRUST` |
+
+Unsigned or invalid configuration caps the index used for the label at 0.59 (`LOW TRUST`). These are `TRUST_LABEL_THRESHOLDS`. Assurance runs use their own labels (see Trust Labels below).
+
+### Staleness
+
+Evidence older than 90 days loses trust: `OBSERVED_HARDENED` becomes `OBSERVED`, and every other tier becomes `SELF_REPORTED`. A stale observation never becomes `ATTESTED`. A stale row from an observed emitter no longer matches that emitter, so it counts toward no level.
+
+### No opt-out
+
+`STRICT_EVIDENCE_BINDING` no longer exists as an opt-out. Setting it prints `STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level` once per run and changes nothing.
+
+### Reachability
+
+Per level, how many questions can be reached on evidence that registered, non-synthetic emitters write (reachable), are evaluable but blocked by a lower level that is not (capped), or are not evaluable. `npm run check:gates` prints the current table.
+
+Before r226 (main at `e263c571`, 244 questions; levels were not cumulative):
+
+| Level | Reachable on runtime evidence | Why not |
+|---|---:|---|
+| L1 | 244 | requires `stdout`, which tool calls and delegations write |
+| L2 | 0 | requires `review`, which only imports write, and imports are self-reported |
+| L3 | 0 | all 244 gates require audit types only the dogfood seeder wrote |
+| L4 | 0 | as L3, plus `artifact` |
+| L5 | 0 | as L3, plus `test` and `OBSERVED` only |
+
+r226, default bank (`amc-legacy-240-v1`, 244 questions):
+
+| Level | Reachable | Capped | Not evaluable |
+|---|---:|---:|---:|
+| L1 | 244 | 0 | 0 |
+| L2 | 4 | 0 | 240 |
+| L3 | 0 | 0 | 244 |
+| L4 | 0 | 0 | 244 |
+| L5 | 0 | 0 | 244 |
+
+r226, lifecycle set (`amc-lifecycle-2026-v1`, 264 questions): L1 264 reachable; L2 4 reachable and 260 not evaluable; L3, L4 and L5 264 not evaluable each.
 
 ## Units, Levels and Claim Kinds
 
@@ -62,7 +175,7 @@ One level table turns a percentage into a level for industry packs, pack audits,
 
 The diagnostic level ranges in the table above apply to averaged diagnostic levels and are unchanged.
 
-**Self-reported results cap at L1.** Diagnostic gates at L2 and above accept `OBSERVED` and `ATTESTED` evidence only, so self-reported events alone cannot support L2 or higher. Numeric self-answers (industry packs, pack audits, rubric packs) carry the claim kind `self_reported`, an eligible level of at most 1 and never a positive regulated status. Their percentage and level are reported as self-reported.
+**Self-reported results cap at L1.** Diagnostic gates at L2 and above admit `OBSERVED` rows from registered emitters only (see How a Level Is Earned), so self-reported events alone cannot support L2 or higher. Numeric self-answers (industry packs, pack audits, rubric packs) carry the claim kind `self_reported`, an eligible level of at most 1 and never a positive regulated status. Their percentage and level are reported as self-reported.
 
 **No certification wording.** AMC output is evidence of conformity. No self-computed result says "certified", "certification ready" or "MCP-Certified": industry packs report `selfAssessment` (complete, answered, total) and treat the pack's `certificationThreshold` field as a self-assessment target, the transparency report shows an evidence standing, the cross-framework map reports `targetMet`, and MCP compliance bands read `MCP-Full`, `MCP-Partial`, `MCP-Minimal` and `Not-MCP`. A certification can come only from a registry-issued attestation. See [CLAIM_KINDS.md](CLAIM_KINDS.md) for claim kinds and status dimensions.
 
@@ -218,6 +331,7 @@ ChemGraph-style agentic computational chemistry workflow rows are relevant to AM
 
 | Version | Date | Summary | Migration |
 |---------|------|---------|-----------|
+| `2026.10.08-r226` | `2026-10-08` | Rebuilds the diagnostic gates from runtime evidence and makes levels cumulative (P1-07): a level is the highest n for which gates L1 to Ln all pass, only rows a registered emitter admits by provenance count above L0, and above L1 a question's evidence map, not the row's own tag, binds rows to it. L2 is evaluated for AMC-5.29, AMC-SCI-2, AMC-OPDISC-6 and AMC-2.15; L3 has no admissible emitter yet; L4 and L5 are not evaluated. The `STRICT_EVIDENCE_BINDING` opt-out is removed. Bands, layer and overall arithmetic, and trust-label thresholds are unchanged and now come from one module; the published formulas match the code. | Reports, badges, methodology receipts, and signed outputs generated under `2026.08.27-r225` remain valid as r225 scores and must not be rewritten. Re-score under `2026.10.08-r226` before comparing or publishing. Scores DROP wherever seeded, untagged or unregistered evidence counted, or a higher gate passed without the lower ones; a question may rise from L0 to L1 where it has two admitted rows but no `stdout` row. Results from 1.x carry the P1-35 relabel notice. See [methodology/CHANGELOG.md](methodology/CHANGELOG.md). |
 | `2026.08.27-r225` | `2026-08-27` | Corrects the trust tier of evidence AMC executes itself. The native agent loop wrote no trust tier at all, and an absent tier reads back as `SELF_REPORTED`, so AMC's own governed, hash-chained runs were graded as unverified agent claims while a foreign CLI observed through the gateway was graded `OBSERVED` — the reverse of the ordering this document describes. Native rows now carry `OBSERVED`; they do **not** carry `OBSERVED_HARDENED`, whose documented meaning is sandbox execution with cryptographic attestation. `trustTier` is now validated where it is written. And trace correlation now reads the `agent_stdout`/`agent_stderr` events that `amc adapters run` writes, alongside the `stdout`/`stderr` that `wrap` and `supervise` write; the supported observation path previously contributed no traces and its correlation ratio was structurally zero. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.08.25-r224` remain historical artifacts and must not be rewritten. Re-score under `2026.08.27-r225` before comparing or publishing. Scores may move in **either** direction, unlike r224: a correlation ratio below 0.8 caps AMC-1.7 at L2 and AMC-2.3, AMC-2.5 and AMC-3.3.1 at L3, so a workspace observed through `amc adapters run` whose trace receipts verify may score **higher** as those caps lift, while one whose newly-counted traces do not verify may cross below 0.8 for the first time and score **lower**. Both are corrections: the r224 ratio measured only part of the evidence. Outstanding badges issued under r224 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current. |
 | `2026.08.25-r224` | `2026-08-25` | Corrects two evidence-gating behaviours to match what this document already described. `requiredEvidenceTypes` now requires every named evidence type to be **present**, where it previously only filtered which events were counted — a gate naming stdout, audit, and metric was satisfied by stdout alone. And evidence now counts only toward the question it was tagged to at every level, where levels 0-2 previously fell back to scoring a question against every event in the window, including events tagged to other questions. Both corrections make scores stricter. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.29-r223` remain historical artifacts and must not be rewritten. Re-score under `2026.08.25-r224` before comparing or publishing; a workspace may score **lower** than it did under r223 because evidence that previously counted no longer does. Treat a drop as a correction rather than a regression. Outstanding badges issued under r223 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current. |
 | `2026.07.29-r223` | `2026-07-29` | Aligns the public badge methodology assurance hash with the diagnostic methodology-versioning receipt by centralizing the canonical source-review boundary and gate selection and including the existing OpenAI Simple Evals boundary in both surfaces. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.10-r222` remain historical artifacts and must not be rewritten. Regenerate them under `2026.07.29-r223` before comparing or publishing `amc_methodology_assurance`; r223 uses one canonical assurance hash across public and diagnostic surfaces, while r222 remains verifiable by its embedded version and manifest hash. |
@@ -471,6 +585,7 @@ For a current proof bundle:
 - For OpenAI Simple Evals-style metric-validity claims, attach live GitHub metadata relevance review for `openai/simple-evals`, AMC-owned eval-pack manifest, validation table, evaluator-suite proof through existing primitives, trace-evaluation proof when traces or Watch are claimed, fail-closed threshold policy, metric owner, sample size, confidence interval, badge-assurance hash, signed evidence refs, artifact hashes, row hashes, and no-copy/source-review proof before using Score, Shield, or Watch outputs externally; do not add an OpenAI Simple Evals subsystem, SDK/importer, adapter, parity layer, or copied upstream code/prose/config/task/result content.
 - Regenerate or dual-run tournament receipts when opponent pools, round counts, seed policy, generation counts, replay evidence, ranking aggregation, or leaderboard publication rules change.
 - For historical reports, preserve the original artifact and attach a fresh AMC report instead of editing the old report in place.
+- Re-score reports generated under `2026.08.27-r225` or earlier under `2026.10.08-r226` before comparing them: levels are cumulative, only rows from registered emitters count above L0, and L3 to L5 are not evaluated until their emitters exist.
 
 ## Evaluation Mode Taxonomy
 
@@ -2050,14 +2165,16 @@ This document describes the complete scoring pipeline: from evidence collection 
 
 ## 2. Evidence Collection
 
-AMC collects evidence through multiple channels, each assigned a trust tier based on the degree of verification:
+AMC collects evidence through multiple channels, each assigned a trust tier based on the degree of verification. The tier decides which diagnostic levels a row can support (see How a Level Is Earned); it is not a weight on the level.
 
-| Trust Tier | Weight | Source | Verification Method |
-|-----------|--------|--------|---------------------|
-| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios | Sandbox execution with cryptographic attestation |
-| `OBSERVED` | 1.0× | Captured by AMC — gateway proxy, or AMC's own agent loop | Network-level interception, or the harness's signed hash-chained session log |
-| `ATTESTED` | 0.8× | Third-party cryptographic attestation | Signature verification against known keys |
-| `SELF_REPORTED` | 0.4× | Agent's own claims | Capped weight; cannot exceed L3 alone |
+| Trust Tier | Source | Verification Method | Diagnostic levels it can support |
+|-----------|--------|---------------------|---------------------------------|
+| `OBSERVED_HARDENED` | AMC-controlled adversarial scenarios | Sandbox execution with cryptographic attestation | L1 to L3, from a registered observed emitter |
+| `OBSERVED` | Captured by AMC — gateway proxy, or AMC's own agent loop | Network-level interception, or the harness's signed hash-chained session log | L1 to L3, from a registered observed emitter |
+| `ATTESTED` | Third-party cryptographic attestation | Signature verification against pinned trust (P0-18) | none above L0 yet: no registered emitter writes attested rows, and L5 awaits P3-04 |
+| `SELF_REPORTED` | Agent's own claims and imported rows | None | L1 at most |
+
+The trust weights in `src/score/trustWeights.ts` (1.1, 1.0, 0.8 and 0.4) apply to the formal-spec and drift scorers, not to diagnostic levels.
 
 ### 2.1 Evidence Events
 
@@ -2081,11 +2198,7 @@ Events form a hash chain — each event references the previous event's hash, cr
 
 ### 2.2 Evidence Staleness
 
-Evidence degrades over time to reflect that agent behavior may change:
-
-- Evidence older than 90 days is downgraded by one trust tier
-- `OBSERVED_HARDENED` → `OBSERVED` → `ATTESTED` → `SELF_REPORTED`
-- Stale `SELF_REPORTED` evidence is discarded entirely
+Evidence degrades over time to reflect that agent behavior may change. Evidence older than 90 days: `OBSERVED_HARDENED` becomes `OBSERVED`, and every other tier becomes `SELF_REPORTED`. A stale observation never becomes `ATTESTED`, and a stale row from an observed emitter counts toward no level (see How a Level Is Earned).
 
 ## 3. Question Bank
 
@@ -2133,10 +2246,10 @@ collected for a different question. Scores issued under r223 remain valid *as
 r223 scores* and carry that version; a re-issue under r224 is a re-measurement,
 not a revocation.
 
-Tag evidence with `meta.questionId` to bind it to a question. The
-`STRICT_EVIDENCE_BINDING=false` environment variable restores the pre-r224
-fallback for local diagnosis; it is not intended for scoring a real workspace
-and the resulting score should not be published.
+Tag evidence with `meta.questionId` or `meta.questionIds` to bind it to a
+question at L1. Above L1, `2026.10.08-r226` binds rows only through the
+question's evidence map. The `STRICT_EVIDENCE_BINDING=false` fallback was
+removed in r226; setting the variable now only prints a deprecation warning.
 
 ## 4. Scoring Pipeline
 
@@ -2145,42 +2258,26 @@ and the resulting score should not be published.
 For each question, AMC computes:
 
 1. **Claimed Level** — The level the agent (or its operator) claims to achieve
-2. **Supported Max Level** — The highest level supportable by available evidence
-3. **Final Level** — `min(claimedLevel, supportedMaxLevel)`, adjusted by confidence
-
-```
-finalLevel = min(claimedLevel, supportedMaxLevel) × confidenceMultiplier
-```
-
-Where `confidenceMultiplier` ranges from 0.5 (minimal evidence) to 1.0 (strong evidence).
+2. **Supported Max Level** — The highest n for which gates L1 to Ln all pass, after the documented caps (see How a Level Is Earned)
+3. **Final Level** — `min(claimedLevel, supportedMaxLevel)`, an integer from 0 to 5
 
 ### 4.2 Confidence Computation
 
-Confidence for each question is derived from:
-
-- **Evidence count**: More evidence items → higher confidence
-- **Evidence diversity**: Multiple trust tiers → higher confidence than single-tier
-- **Evidence recency**: Recent evidence weighted more heavily
-- **Cross-correlation**: Evidence that corroborates across questions boosts confidence
+Confidence is reported next to each level and is never multiplied into it:
 
 ```
-confidence = min(1.0,
-  evidenceCountFactor × 0.4 +
-  evidenceDiversityFactor × 0.3 +
-  evidenceRecencyFactor × 0.2 +
-  crossCorrelationFactor × 0.1
-)
+confidence = clamp(0.2 + 0.1 × satisfiedRequiredEvidenceTypes
+                 + 0.05 × max(0, distinctDays − gateMinDistinctDays)
+                 − 0.15 × contradictions, 0, 1)
 ```
 
 ### 4.3 Layer Scoring
 
-Each layer score is the **confidence-weighted average** of its question scores:
+Each layer score is the scoring-weight average of its questions' final levels; the confidence-weighted average is reported alongside:
 
 ```
-layerScore = Σ(questionFinalLevel × questionConfidence) / Σ(questionConfidence)
+layerScore = Σ(questionFinalLevel × scoringWeight) / Σ(scoringWeight)
 ```
-
-This ensures that high-confidence assessments carry more weight than low-confidence ones.
 
 ### 4.4 Overall Score
 
@@ -2195,15 +2292,10 @@ overallScore = Σ(layerScore) / layerCount
 The **Integrity Index** measures the trustworthiness of the assessment itself:
 
 ```
-integrityIndex = hashChainIntegrity × evidenceCoverage × signatureValidity
+integrityIndex = clamp(evidenceCoverage − Σ penalties, 0, 1)    (0 when the ledger does not verify)
 ```
 
-Where:
-- `hashChainIntegrity`: 1.0 if all ledger hashes verify, 0.0 on any break
-- `evidenceCoverage`: Proportion of questions with at least one evidence event
-- `signatureValidity`: Proportion of evidence events with valid signatures
-
-An integrity index below 0.9 triggers a warning. Below 0.7 marks the report as `DEGRADED`.
+Where `evidenceCoverage` is the proportion of questions with at least one accepted evidence event, and the penalties are fixed deductions for contradictions, unsupported claims, unsigned or invalid configuration, unsafe or bypassed provider routes, missing LLM, truth-protocol or assurance evidence, ticketing, approval replay, lease, budget, drift, freeze and trace-correlation findings in the window.
 
 ## 6. Trust Labels
 
@@ -2224,7 +2316,7 @@ A trust label is not claim eligibility: only a `READY` evidence-readiness result
 AMC includes multiple mechanisms to prevent score inflation:
 
 ### 7.1 Self-Report Caps
-Self-reported evidence alone cannot push a question above L3 (0.4× weight cap).
+Self-reported evidence alone cannot push a question above L1: gates at L2 and above admit observed rows from registered emitters only.
 
 ### 7.2 Statistical Anomaly Detection
 - **Uniform distribution detection**: Real assessments have natural variance. Suspiciously uniform scores trigger review.

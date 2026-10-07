@@ -9,6 +9,7 @@ import {
 } from "../diagnostic/questionSets.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { AMC_MATURITY_LEVELS } from "../score/maturityTaxonomy.js";
+import { LEVEL_BANDS } from "../diagnostic/levelSemantics.js";
 
 export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
 /**
@@ -65,8 +66,8 @@ export const AMC_PUBLIC_METHODOLOGY_ID = "amc-public-scoring-methodology";
  * the earlier number counted evidence the methodology said it required and
  * evidence gathered for something else.
  */
-export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.08.27-r225";
-export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-08-27";
+export const AMC_PUBLIC_METHODOLOGY_VERSION = "2026.10.08-r226";
+export const AMC_PUBLIC_METHODOLOGY_RELEASE_DATE = "2026-10-08";
 
 export const AMC_PUBLIC_METHODOLOGY_DOC = "docs/SCORING_METHODOLOGY.md";
 export const AMC_PUBLIC_METHODOLOGY_URL = "https://agentmaturity.co/methodology.html";
@@ -234,6 +235,14 @@ const HISTORICAL_PUBLIC_METHODOLOGY_HASHES = new Map<string, ReadonlySet<string>
       "3d0f873991e60496782701af3c17023ab87e88c6a3b45ea9b4f999a6d72819c7",
     ]),
   ],
+  // r225's manifest hashes, computed from the r225 build (e263c571) before the r226 bump.
+  [
+    "2026.08.27-r225",
+    new Set([
+      "88f18011dd3ff78a76a2c983dd58923785b90028709b2d3e0f3d888af80579f2",
+      "6592f306a8263738d462758045b7b4bdedd644f5ecbc480434d3b09e34f65b57",
+    ]),
+  ],
   [
     "2026.08.25-r224",
     new Set([
@@ -300,6 +309,7 @@ export interface PublicMethodologyReproducibilityPacket {
         acceptedTrustTiers: string[];
         mustInclude: unknown;
         mustNotInclude: unknown;
+        notEvaluated: string | null;
       }>;
       evidenceGateHints: string;
       upgradeHints: string;
@@ -398,15 +408,6 @@ function questionSetSummary(questionSet?: DiagnosticQuestionSetInfo): PublicMeth
   };
 }
 
-const PUBLIC_SCORE_RANGES = {
-  L0: [0, 0.99],
-  L1: [1, 1.99],
-  L2: [2, 2.99],
-  L3: [3, 3.99],
-  L4: [4, 4.74],
-  L5: [4.75, 5],
-} as const;
-
 export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSetInfo): PublicMethodologyManifest {
   const manifestWithoutHash = {
     id: AMC_PUBLIC_METHODOLOGY_ID,
@@ -420,7 +421,7 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
     questionSet: questionSetSummary(questionSet),
     scoreScale: AMC_MATURITY_LEVELS.map(({ level, label }) => ({
       level,
-      numericRange: [...PUBLIC_SCORE_RANGES[level]] as [number, number],
+      numericRange: [...LEVEL_BANDS[level]] as [number, number],
       label,
     })),
     evidenceTrustTiers: [
@@ -442,15 +443,15 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       {
         tier: "SELF_REPORTED" as const,
         weight: 0.4,
-        publicMeaning: "Owner or agent claims; capped and insufficient for high-confidence L4/L5 claims alone."
+        publicMeaning: "Owner or agent claims and imported rows; they support a diagnostic level of L1 at most."
       }
     ],
     formulas: {
-      finalQuestionLevel: "min(claimedLevel, supportedMaxLevel) * confidenceMultiplier",
-      confidence: "min(1.0, evidenceCountFactor*0.4 + evidenceDiversityFactor*0.3 + evidenceRecencyFactor*0.2 + crossCorrelationFactor*0.1)",
-      layerScore: "sum(questionFinalLevel * questionConfidence) / sum(questionConfidence)",
+      finalQuestionLevel: "min(claimedLevel, supportedMaxLevel), where supportedMaxLevel is the highest n for which gates L1..Ln all pass on rows tagged to the question from registered emitters, after the documented caps; L4 and L5 are not evaluated",
+      confidence: "clamp(0.2 + 0.1*satisfiedRequiredEvidenceTypes + 0.05*max(0, distinctDays - gateMinDistinctDays) - 0.15*contradictions, 0, 1); reported, never multiplied into a level",
+      layerScore: "sum(questionFinalLevel * scoringWeight) / sum(scoringWeight); the confidence-weighted average is reported alongside",
       overallScore: "sum(layerScore) / layerCount",
-      integrityIndex: "hashChainIntegrity * evidenceCoverage * signatureValidity"
+      integrityIndex: "clamp(evidenceCoverage - sum(penalties), 0, 1), or 0 when the ledger does not verify"
     },
     reportBindings: {
       diagnosticJsonField: "methodology" as const,
@@ -3468,6 +3469,12 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
       // stops being a variable compared against itself and becomes a real gate:
       // bump the constant without writing an entry and the suite goes red.
       {
+        version: "2026.10.08-r226",
+        date: "2026-10-08",
+        summary: "Rebuilds the diagnostic gates from runtime evidence and makes levels cumulative (P1-07). A question's level is now the highest n for which gates L1 to Ln all pass; before, the runner kept the highest passing gate, so a question could reach L3 without the review its L2 gate required, and every L3 to L5 gate required audit types only the dogfood seeder wrote. Only rows that an emitter in the published registry (src/diagnostic/evidenceEmitters.ts) admits by shape and by P0-18 provenance count above L0, so seeded rows, keyword-only text, the diagnostic's own findings and imported rows cannot lift a level beyond their claim kind; above L1 a question's evidence map, never the row's own tag, binds rows to it. L1 is self-declared: two admitted rows tagged to the question or bound by its map. L2 is configuration evidence: observed rows from every emitter the question's evidence map names, evaluated today for AMC-5.29, AMC-SCI-2, AMC-OPDISC-6 and AMC-2.15. L3 has no admissible emitter yet and is not evaluated; L4 (continuity, anchoring, sampling) and L5 (registry attestation) are not evaluated. The STRICT_EVIDENCE_BINDING opt-out is removed. Level bands, layer and overall arithmetic, and trust-label thresholds are unchanged and now come from one module; the published formulas are corrected to the arithmetic the code runs, with no confidence multiplier.",
+        migration: "Reports, badges, methodology receipts, and signed outputs generated under 2026.08.27-r225 remain valid as r225 scores and must not be rewritten. Re-score under 2026.10.08-r226 before comparing or publishing. Scores DROP wherever a level was reached through seeded, untagged or unregistered evidence, or through a higher gate without the lower ones: no question can exceed L2 under r226, and only four can exceed L1. That is a correction, not a regression. A question may RISE from L0 to L1 where it has two tagged rows from registered emitters but no stdout row. Results from 1.x carry the P1-35 relabel notice. Outstanding badges issued under r225 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current."
+      },
+      {
         version: "2026.08.27-r225",
         date: "2026-08-27",
         summary: "Corrects the trust tier of evidence AMC executes itself. The native agent loop wrote no trust tier at all, and an absent tier reads back as SELF_REPORTED, so AMC's own governed, hash-chained runs were graded as unverified agent claims while a foreign CLI observed through the gateway was graded OBSERVED — the reverse of the ordering docs/SCORING_METHODOLOGY.md describes. Native rows now carry OBSERVED; they do not carry OBSERVED_HARDENED, whose documented meaning is sandbox execution with cryptographic attestation. `trustTier` is now validated where it is written, so an unrecognised value fails at the write instead of silently becoming the weakest tier at scoring time. And trace correlation now reads the `agent_stdout`/`agent_stderr` events that `amc adapters run` writes, alongside the `stdout`/`stderr` that `wrap` and `supervise` write; the supported observation path previously contributed no traces and its correlation ratio was structurally zero. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged.",
@@ -4843,7 +4850,8 @@ export function getPublicMethodologyManifest(questionSet?: DiagnosticQuestionSet
 
       "For ChemGraph-style agentic computational chemistry workflow claims, attach verified DOI/OpenAlex source-review receipts for 10.1038/s42004-025-01776-9 / W7119161162, AMC-owned eval-pack manifest, validation table, existing metric-validity primitive mapping, trace/evaluator proof when claimed, threshold policy, metric owner, sample size, confidence interval, signed evidence refs, row hashes, and no-copy/source-review proof before using Score, Shield, or Watch outputs externally; do not add a chemistry/domain subsystem, connector, importer, parity layer, or copied paper prose/data.",
       "Regenerate or dual-run tournament receipts when opponent pools, round counts, seed policy, generation counts, replay evidence, ranking aggregation, or leaderboard publication rules change.",
-      "For historical reports, preserve the original artifact and attach a fresh AMC report instead of editing the old report in place."
+      "For historical reports, preserve the original artifact and attach a fresh AMC report instead of editing the old report in place.",
+      "Re-score reports generated under 2026.08.27-r225 or earlier under 2026.10.08-r226 before comparing them: levels are cumulative, only rows from registered emitters count above L0, and L3 to L5 are not evaluated until their emitters exist (P1-07)."
     ],
     changePolicy: "Any scoring, weighting, trust-tier, question-set, report-binding, corpus, QA-generation, support-span, failure-diagnosis, privacy-mode, telemetry-boundary, legal-code RAG corpus/Legifrance/vector-store/embedding/retrieval-technique/evaluation metric-validity semantics, SOC dataset schema, ATT&CK mapping, action schema, label-quality, cross-model audit, network troubleshooting scenario/topology/incident/fault/evaluation semantics, inference optimization scenario/hardware/server/backend/search-space/gate/relaunch/latency/throughput/tail/exploration metric-validity semantics, Java coding-agent benchmark/source/license/task/YAML/workspace/sandbox/lifecycle/CLI-agent/jury/judge-tier/Maven/JUnit/JaCoCo/result/pass@k metric-validity semantics, web eval dataset source/subject/query/search-provider/document/filter/QA/export/freshness/source-coverage/answer-grounding metric-validity semantics, Parallel/OpenClaw research-skill source/license/skill/API/search/deep-research/chat/extract/citation/source-policy/batch/monitoring/security/dependency/benchmark-validation metric-validity semantics, resume-RAG evaluator source/license/upload/parser/job-description/RAG-strategy/query-expansion/retrieval/vector-store/Ollama/embedding/endpoint/rating/batch/privacy/dependency metric-validity semantics, Sutro-style unstructured-data batch inference function/schema/source/input-order/priority/dry-run-cost/model-pool/observability/export/retention/multi-model/embedding methodology semantics, OpenHands/critic-rubrics-style source/no-license/arXiv/release/rubric-feature/function-calling-schema/sparse-outcome/reranking/early-stopping methodology semantics, OpenCode-lab source/lab/context/prompt/tool/AGENTS/repeated-run/fork-agreement/model-variance/ground-truth-correction metric-validity semantics, AcademiClaw-style source/default-branch/task-corpus/bilingual-task/workspace-query/Docker/rubric/eval-runner/result/conversation-trace/meta-eval/model-roster/metric/CI metric-validity semantics, IBM/rag-chunking-techniques-style source/license/default-branch/README/policy-corpus/simple-RAG-notebook/smart-chunking-notebook/RAG-evaluation-notebook/chunking-strategy/retrieval-pipeline/embedding-vectorstore/evaluation-dataset/metric/CI metric-validity semantics, hariohmprasath/k8s-ai-style source/license/default-branch/README/release/build-workflow/agent-module/MCP-server/Kubernetes-tool-inventory/diagnostic/resource/log-analysis/metric/CI metric-validity semantics, iCSawyer/SecureVibeBench-style source/license/homepage/default-branch/README/results/dataset/format/evaluation-runner/agent-adapter/vulnerability-scenario/test-script/parser/patch-diff/metric/CI metric-validity semantics, hparreao/Awesome-AI-Evaluation-Guide-style source/license/default-branch/README/benchmark-guide/tools-platforms/metric-selection/threshold/calibration/component-trace/human-review/cost-control/deprecation/migration methodology semantics, HumanStudy-Bench-style source/default-branch/study-config/participant-background/human-response/agent-response/evaluator/metric/validator/scorer/standardizer/reliability/validation-pipeline/CI metric-validity semantics, Legacy-Bench-style source/license/default-branch/README/task-corpus/legacy-language/environment/harness/agent-task/patch/test-oracle/evaluator/metric/CI/result/replay metric-validity semantics, Yummytanmo/SubtleMemory-style source/license/arXiv/Hugging-Face/persona/bench-instance/history-session/relation-taxonomy/construction/evaluation-stage/adapter/judge/score-summary/diagnostic/CI metric-validity semantics, Bent-Solutions/hermes-bench-style source/license/default-branch/README/build-spec/backend-runner/judge/task-registry/model-server-config/adapter/result-schema/frontend-review/regression/Docker metric-validity semantics, cooperbench/CooperBench-style source/no-license/default-branch/release/README/changelog/dataset/task/feature-conflict/runner/eval-backend/team-harness/agent-adapter/CI/package-lock/report metric-validity semantics, TestSprite/CoderCup-style source/license/homepage/default-branch/README/contributing/CI/package-lock/task-spec/test-suite/runner-contract/score-ledger/live-artifact/methodology/reference/cost-accounting metric-validity semantics, mlvanguards/agentic-graph-rag-evaluation-cometml-style source/no-license/default-branch/README/graph-orchestrator/RAG-pipeline/database/vector-store/evaluation/experiment-tracking/UI/dependency-lock metric-validity semantics, Coding-Crashkurse/RAG-Evaluation-with-Ragas-style RAGAS notebook/testset/LangFuse metric-validity semantics, TerminalWorld public-recording/task-synthesis/Docker/state-test/AllPassing-Nop-Partial replay semantics, bioinformatics task/dataset/truth/workflow/environment/tool/grader/perturbation/privacy metric-validity semantics, ARIASHA/MiRAGE-style drug-repositioning dataset/split/mapping/feature/similarity/negative-sampling/classifier/score/evaluation/case-study metric-validity semantics, mobile-agent environment/app/API/UI/task/checkpoint/license semantics, document or multimodal RAG carrier/routing/KG/memory/observability replay semantics, Encourage-style modular RAG method/inference/template/vector-DB/metric/MLflow replay semantics, CloneMem-style digital-trace/persona/question/evidence/bilingual/task-category/temporal-memory replay semantics, ResearchHarness-style tool-surface/native-tool-call/API/workspace/trace/adapter/provider/baseline replay semantics, PaperArena-style source/no-license/README/requirements/hub-config/runner/scorer/dataset-builder/tool/RAG/reflector/run-script/Hugging-Face-dataset/paper-QA/result/score/replay/CI tool-use replay semantics, GTO Wizard-style poker-agent API-scope/no-solver/hand-history/action-trace/AIVAT/legal-action replay semantics, SAP agent-evaluation tutorial objective/process/enterprise-context/notebook/dataset/log/metric/tooling/policy live-drift semantics, Agent_Mont-style monitoring framework/token/cost/latency/resource/carbon/log/visualization replay semantics, MiniAppBench-style query-set/evaluation-reference/generated-MiniApp/source-code/live-instance/browser-automation/render/dynamic-interaction/human-alignment replay semantics, Knowlytics-AI-style MCQ/RAG source/no-license/owned-corpus/quiz/evaluator/retrieval/generation/scoring/feedback replay semantics, Calibra-style source/license/homepage/default-branch/package/docs/task/test/campaign-matrix/agent/model-provider/skill-MCP-environment/seed/budget/trial-analysis-comparison/dashboard-export methodology-versioning semantics, spent-style Claude Code session-cost hook/config/JSONL/pricing/classifier/dashboard/privacy replay semantics, FIRE-style atomic-claim fact-checking dataset/retriever/verifier/decision-policy/search-provider/evidence/query/label/cost replay semantics, AgentKernelArena-style GPU-kernel task/config/workspace/GPU/compile/correctness/performance/A-B replay semantics, LLM Evaluation System-style package/MCP/dataset/synthetic-QA/document-grounding/judge/jury/binary-scoring/OpenTelemetry/Bedrock/PDF/S3 replay semantics, InnovatorBench-style source/paper/dataset/task/ResearchGym/tool/environment/checkpoint/score/replay/CI/no-leaderboard/no-dataset-copy replay semantics, Navi-Bench-style real-website web-agent dataset/task-config/evaluator/browser-provider/crash-adjusted-score/trajectory/visualization live-drift semantics, Strands benchmark-harness source/config/task/runtime/trajectory/patch/test/result-upload live-drift semantics, Awesome-Agent-Memory-style source/catalog/taxonomy/benchmark/eval-dataset/retrieval/persistence/forgetting/hallucination live-drift semantics, Agent Reading Test-style source/license/homepage/answer-key/task-manifest/score-form/live-site/raw-content/canary/failure-mode/content-delivery live-drift semantics, AI Reputation Claude-style source/no-license/README/agent-roster/skill-catalog/review-source/sentiment/competitor/response-policy/crisis/report/hallucinated-citation/PII live-drift semantics, neutree-ai/llm-fighter-style source/license/homepage/API/UI/game-result/schema/engine/runner/LLM-adapter/YAML-export/game-UI/combat-log/exported-log/win-rate/game-score/action-validity/combat-stability live-drift semantics, lemoz/darwin-godel-machine-style source/no-license/README/security/CI/controller/archive/self-modification/evaluation/scorer/sandbox/live-run/benchmark/score-movement/lineage/provider/model live-drift semantics, mpsuesser/effect-autoagent-style source/license/default-branch/README/package/lockfile/CI/benchmark-runner/harness/task/metrics/experiment-log/blueprint/trajectory/container/task-fixture/Docker/replay-command/seed/score-delta replay semantics, Praveengovianalytics/falcon-evaluate-style source/license/default-branch/release/package/lockfile/requirements/README/docs/workflow/modules/metric-family/provider-route/canary-result provider-drift semantics, Responsible-AI-Labs/rail-score-sdk-style source/license/release/PyPI/client/policy/middleware/telemetry/compliance/agent/integration/score/guardrail/safe-regeneration/tool-call/compliance live-drift semantics, edge AI agent device-profile/runtime/optimization/dataset/task/application/latency/memory/energy/accuracy/privacy/offline replay semantics, Agent Workflow Kit-style risk-score/workflow-level/spec-layer/approval/verification/docs-check replay semantics, MedAsk-style SymptomCheck/Triage vignette/simulator/evaluator/result/replay clinical benchmark semantics, BioKGBench-style KGCheck/KGQA/SCV dataset/KG/evaluator/replay biomedical benchmark semantics, BioMedArena-style source/config/harness/eval-suite/adapter/tool/vendor/baseline/replay/coverage/sandbox biomedical harness replay semantics, rag-eval-style document-QA dataset/endpoint/ranking/response/replay/CI semantics, A2A-NT-style buyer/seller role/product/budget/wholesale/trace/extraction/judging/anomaly/provider/clean-deal methodology semantics, ResearchGym-style task/artifact/budget/inspection/live-drift semantics, LLM/RAG eval-suite semantic/bias/hallucination live-drift semantics, KITE-style RAG corpus/query/ground-truth/rubric/pipeline/response/result/judge/grade/dataset-family/configuration live-drift semantics, PokerEval-style package/citation/simulation/opponent-pool/hand-history/BB-per-100/all-in-adjusted-BB-per-100/EV/VPIP/table-context live-drift semantics, Multi-User-LLM-Agent-style question/scenario/user-role/permission/preference/queue/instruction/trace/evaluator/metric-threshold explainability semantics, AgentTrial-style statistical suite/case/trial/confidence-interval/failure-attribution/regression/reliability question-explainability semantics, CodeQuest-style source-status/evaluator/optimizer/code-artifact/dimension-delta/replay/CI/no-source-copy question-explainability semantics, OccuBench-style professional-task/scenario/world-model/fault/verifier/trajectory/robustness explainability semantics, NoMIRACL-style multilingual RAG language/subset/qrels/retrieval/abstention/hallucination/error live-drift semantics, scaling-law discovery task/split/config/artifact/R2/NMSE/NMAE live-drift semantics, Ollama metrics sidecar/proxy/host/scrape/endpoint/token/latency/time-per-token/model-loaded/RAM/error-rate live-drift semantics, provider observability pipeline proof semantics, LLM workflow observability trace/debugger/feedback/session-replay methodology semantics, geospatial provider-drift task/dataset/tool/trace/judge/calibration/token-cost semantics, warehouse-native LLM eval dbt/warehouse/capture/baseline/judge/drift/no-egress replay semantics, cryptography benchmark task/rubric/sandbox/baseline methodology, modality-representation, retrieval or element-selection protocol, local hardware or run-profile benchmark binding, harness, model-pool, tier-policy, verification-protocol, tournament/leaderboard protocol, evaluator metric, or cost-accounting change must publish a new methodology version or explicit benchmark sub-version and preserve old report hashes."
   };
@@ -4982,7 +4990,8 @@ function publicQuestionRows(): PublicMethodologyReproducibilityPacket["questionB
       requiredTrustTier: gate.requiredTrustTier ?? null,
       acceptedTrustTiers: [...(gate.acceptedTrustTiers ?? [])],
       mustInclude: gate.mustInclude,
-      mustNotInclude: gate.mustNotInclude
+      mustNotInclude: gate.mustNotInclude,
+      notEvaluated: gate.notEvaluated ?? null
     })),
     evidenceGateHints: question.evidenceGateHints,
     upgradeHints: question.upgradeHints,
