@@ -164,6 +164,13 @@
       "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
     },
     {
+      "path": "src/trust/trustConfig.ts",
+      "issue": "P0-45",
+      "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
+      "archivePath": "unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "sha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9"
+    },
+    {
       "path": "src/types.ts",
       "issue": "P0-44",
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
