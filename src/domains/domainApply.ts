@@ -37,41 +37,9 @@ export interface DomainApplyResult {
   dryRun: boolean;
 }
 
-function normalizeText(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-}
-
-function tokens(value: string): Set<string> {
-  return new Set(
-    normalizeText(value)
-      .split(" ")
-      .map((part) => part.trim())
-      .filter((part) => part.length >= 4)
-  );
-}
-
-function questionMatchesGapDimension(questionDimension: string, gapDimensions: string[]): boolean {
-  if (gapDimensions.length === 0) return false;
-  const normalizedQuestion = normalizeText(questionDimension);
-  const questionTokens = tokens(questionDimension);
-
-  for (const gapDimension of gapDimensions) {
-    const normalizedGap = normalizeText(gapDimension);
-    if (normalizedGap === normalizedQuestion) return true;
-    if (normalizedGap.includes(normalizedQuestion) || normalizedQuestion.includes(normalizedGap)) return true;
-
-    const gapTokens = tokens(gapDimension);
-    for (const token of questionTokens) {
-      if (gapTokens.has(token)) return true;
-    }
-  }
-  return false;
-}
-
-function selectPackQuestions(pack: IndustryPack, gapDimensions: string[]): IndustryPackQuestion[] {
-  const matched = pack.questions.filter((question) => questionMatchesGapDimension(question.dimension, gapDimensions));
-  if (matched.length > 0) return matched;
-  return pack.questions.slice(0, Math.min(3, pack.questions.length));
+/** No assessed gap can steer rule selection (P0-15), so each pack contributes its first three questions. */
+function selectPackQuestions(pack: IndustryPack): IndustryPackQuestion[] {
+  return pack.questions.slice(0, 3);
 }
 
 function toDomainLabel(domain: Domain): string {
@@ -99,7 +67,6 @@ function buildGuardrailsContent(params: {
   domain: Domain;
   agentId: string;
   packs: IndustryPack[];
-  gapDimensions: string[];
   complianceFrameworks: string[];
 }): { content: string; enabledRules: string[] } {
   const lines: string[] = [];
@@ -117,7 +84,7 @@ function buildGuardrailsContent(params: {
   lines.push("");
 
   for (const pack of params.packs) {
-    const selectedQuestions = selectPackQuestions(pack, params.gapDimensions);
+    const selectedQuestions = selectPackQuestions(pack);
     lines.push(`## Pack: ${pack.id} (${pack.name})`);
     lines.push("");
     lines.push(`Regulatory Basis: ${pack.regulatoryBasis.join("; ")}`);
@@ -198,7 +165,6 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
   const dryRun = opts.dryRun === true;
 
   const { status, reasons } = assessDomainForAgent({ agentId, domain, workspace: workspacePath });
-  const gapDimensions: string[] = [];
   const complianceFrameworks = dedupe([
     ...packs.flatMap((pack) => pack.complianceFrameworks),
     ...(opts.compliance ?? [])
@@ -208,7 +174,6 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
     domain,
     agentId,
     packs,
-    gapDimensions,
     complianceFrameworks
   });
 
