@@ -141,7 +141,6 @@ function buildPromptContext(workspace: string, agentId: string): AssurancePrompt
   };
 }
 
-
 function scoreIntegrity(packResults: AssurancePackResult[]): number {
   const scenarios = packResults.flatMap((pack) => pack.scenarioResults);
   if (scenarios.length === 0) {
@@ -182,15 +181,6 @@ async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
   }
 }
 
-
-/**
- * Writes the v1 assurance artifacts (run, findings, trace refs).
- *
- * assuranceStore, assuranceCertificates and the scheduler all read these files,
- * but nothing wrote them: saveAssuranceRunArtifacts had no callers, so
- * `amc assurance cert issue` failed on any workspace no matter how many scans
- * had been run. Persisting them here closes that chain.
- */
 /**
  * Maps a pack's free-form scenario category onto the fixed v1 category enum.
  *
@@ -350,8 +340,7 @@ function persistV1Artifacts(params: {
 }
 
 export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
-  // AMC_NO_SIGN=1 makes the ledger write "unsigned" signatures, so the run is unsigned whatever the caller passed, and its
-  // rows go to the separate unsigned store, never into .amc/evidence.sqlite where they break signed readers (P0-27 F2).
+  // AMC_NO_SIGN=1 rows are unsigned whatever the caller passed; they go to the unsigned store (UNSIGNED_EVIDENCE_STORE).
   const unsignedStore = process.env.AMC_NO_SIGN === "1";
   if (unsignedStore) input = { ...input, noSign: true };
   const workspace = input.workspace;
@@ -680,8 +669,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
 
     return report;
   } catch (error) {
-    sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
-    throw error;
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
   } finally {
     ledger.close();
   }
@@ -972,8 +960,7 @@ export async function applyAssurancePatchKit(params: {
     });
     ledger.sealSession(sessionId);
   } catch (error) {
-    sealAbortedAssuranceSession({ ledger, sessionId, runId: params.assuranceRunId, agentId, error });
-    throw error;
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId: params.assuranceRunId, agentId, error });
   } finally {
     ledger.close();
   }
