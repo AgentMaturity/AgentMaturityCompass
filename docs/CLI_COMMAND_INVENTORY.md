@@ -256,7 +256,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc compliance regulatory-check` | Check for regulatory changes from configured feeds | `--framework <name>`<br>`--json` | `comply regulatory-check` |
 | `amc compliance regulatory-feeds` | List all configured regulatory feed sources | `--json` | `comply regulatory-feeds` |
 | `amc compliance regulatory-gap` | Run gap analysis against current AMC configuration | `--framework <name>`<br>`--json` | `comply regulatory-gap` |
-| `amc compliance report` | Generate evidence-linked compliance report | `--framework <framework>`<br>`--window <window>`<br>`--out <path>`<br>`--agent <agentId>`<br>`--json` | `comply report` |
+| `amc compliance report` | Generate evidence-linked compliance report | `--framework <framework>`<br>`--window <window>`<br>`--out <path>`<br>`--agent <agentId>`<br>`--station <station>`<br>`--json` | `comply report` |
 | `amc compliance risk-classify` | Classify agent into EU AI Act risk tiers (UNACCEPTABLE / HIGH / LIMITED / MINIMAL) | `--agent <agentId>`<br>`--capabilities <json>`<br>`--biometric`<br>`--critical-infra`<br>`--education`<br>`--employment`<br>`--essential-services`<br>`--law-enforcement`<br>`--migration`<br>`--justice`<br>`--realtime-biometric`<br>`--social-scoring`<br>`--subliminal`<br>`--exploits-vulnerabilities`<br>`--emotion-recognition`<br>`--chatbot`<br>`--synthetic-content`<br>`--human-interaction`<br>`--safety-component`<br>`--json` | `comply risk-classify` |
 | `amc compliance roadmap` | Generate step-by-step compliance plan for a framework | `--framework <framework>`<br>`--agent <agentId>`<br>`--capabilities <json>`<br>`--risk-tier <tier>`<br>`--out <path>`<br>`--json` | `comply roadmap` |
 | `amc compliance verify` | Verify compliance maps signature | - | `comply verify` |
@@ -340,7 +340,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain pack activate` | Activate Industry Packs with a valid issued license key | `--key <licenseKey>`<br>`--expires-at <isoDate>`<br>`--json` | `sector pack activate` |
 | `amc domain pack checkout` | Create a checkout link only when a verified provider is configured | `--success-url <url>`<br>`--cancel-url <url>`<br>`--email <email>`<br>`--reference <id>`<br>`--json` | `sector pack checkout` |
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
-| `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | `sector pack list` |
+| `amc domain pack list` | List all available industry sector packs | `--station <station>`<br>`--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
 | `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |

@@ -223,8 +223,8 @@ A complete self-assessment is not a certification. See "Units, levels and claim 
 # List all sector packs
 amc sector pack list
 
-# List packs for one domain
-amc sector pack list --domain health
+# List packs for one station (--domain is a deprecated alias)
+amc sector pack list --station health
 
 # Score an agent against a sector pack (the registered command is `pack run`; the agent comes from the global --agent selector)
 amc --agent my-agent sector pack run --pack digital-health-record --baseline
