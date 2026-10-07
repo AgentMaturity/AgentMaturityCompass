@@ -55,14 +55,24 @@ describe("verify surfaces (P0-09)", () => {
     expect(unreviewed.map(row => row.command)).toEqual([]);
   });
 
-  it("registers --trust-list on every wired portable command", () => {
-    const wired = inventoryRows().filter(row => row.kind === "portable artifact" && row.pinning.startsWith("Wired"));
-    expect(wired.length).toBeGreaterThanOrEqual(PR3_COMMANDS.length + 5);
-    for (const row of wired) {
-      const help = spawnSync(process.execPath, [resolve("dist/cli.js"), ...row.command.split(" "), "--help"], { encoding: "utf8", timeout: 60_000 });
-      expect(help.stdout, row.command).toContain("--trust-list");
-      expect(help.stdout, row.command).toContain("--allow-unpinned");
-    }
+  it("registers --trust-list on every portable command except the ten recorded as open after P0-09", () => {
+    // Step 10 puts the flags on every portable verify command. These ten rows sit outside the issue table and do not
+    // take them yet; the P0-09 receipt records them as open. The list must shrink, never grow.
+    const open = [
+      "bench registry verify", "bom verify", "domain pack verify", "enforce verify-certificate", "imports verify-profile",
+      "notary verify-attest", "passport verify-token", "session verify-proof", "transparency merkle verify-proof", "transparency verify-bundle"
+    ];
+    // assurance cert-verify is portable but registered as command("cert-verify"), so it is a note, not a table row.
+    const portable = [...inventoryRows().filter(row => row.kind === "portable artifact").map(row => row.command), "assurance cert-verify"];
+    expect(portable.length).toBe(24);
+    const missing = portable.filter(command => {
+      const help = spawnSync(process.execPath, [resolve("dist/cli.js"), ...command.split(" "), "--help"], { encoding: "utf8", timeout: 60_000 });
+      expect(help.status, command).toBe(0);
+      return !(help.stdout.includes("--trust-list") && help.stdout.includes("--allow-unpinned"));
+    });
+    expect(missing.sort()).toEqual(open);
+    const wired = inventoryRows().filter(row => row.pinning.startsWith("Wired") && row.kind === "portable artifact");
+    expect(wired.filter(row => open.includes(row.command))).toEqual([]);
   }, 300_000);
 
   it("never imports workspaceSelfTrust into a CLI or API handler", () => {
