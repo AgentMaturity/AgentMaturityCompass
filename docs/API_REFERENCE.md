@@ -330,7 +330,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 311 | `amc demo` | Run interactive demos of AMC capabilities |
 | 312 | `amc demo gap` | Scripted illustration of the 84-point documentation inflation gap (no agent is executed) |
 | 313 | `amc demo prospect` | Run a guided 5-minute prospect demo flow |
-| 314 | `amc demo run` | Run a simulated agent through the AMC gateway and produce a real score (~30s) |
+| 314 | `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) |
 | 315 | `amc demo share` | Generate a static client-facing prospect demo bundle |
 | 316 | `amc diagnostic` | Diagnostic bank/render operations |
 | 317 | `amc diagnostic bank` | Signed diagnostic 126-question bank operations |
@@ -3585,7 +3585,7 @@ Run a guided 5-minute prospect demo flow
 
 #### `amc demo run`
 
-Run a simulated agent through the AMC gateway and produce a real score (~30s)
+Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s)
 
 
 | Option | Description |

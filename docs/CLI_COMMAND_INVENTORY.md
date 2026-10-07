@@ -317,7 +317,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc demo` | Run interactive demos of AMC capabilities | - | - |
 | `amc demo gap` | Scripted illustration of the 84-point documentation inflation gap (no agent is executed) | `--json`<br>`--fast` | - |
 | `amc demo prospect` | Run a guided 5-minute prospect demo flow | `--share`<br>`--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
-| `amc demo run` | Run a simulated agent through the AMC gateway and produce a real score (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
+| `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
 | `amc demo share` | Generate a static client-facing prospect demo bundle | `--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
 | `amc diagnostic` | Diagnostic bank/render operations | - | - |
 | `amc diagnostic bank` | Signed diagnostic 126-question bank operations | - | - |

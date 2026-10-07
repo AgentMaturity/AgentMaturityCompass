@@ -5035,23 +5035,23 @@ paths:
   /v1/regulatory/eu-ai-act:
     get:
       tags: [compliance]
-      summary: Score EU AI Act compliance
+      summary: EU AI Act criteria (not evaluated; file presence is not evidence)
       responses:
         '200':
-          description: EU AI Act score
+          description: Each criterion not evaluated, with score and level null
 
   /v1/regulatory/owasp-llm:
     get:
       tags: [compliance]
-      summary: Score OWASP LLM Top 10 coverage
+      summary: OWASP LLM Top 10 risks (not evaluated; file presence is not evidence)
       responses:
         '200':
-          description: OWASP LLM score
+          description: Each risk not evaluated, with score and level null
 
   /v1/regulatory/readiness:
     get:
       tags: [compliance]
-      summary: Weighted regulatory readiness score
+      summary: Regulatory readiness (not evaluated; lists the criteria it could not evaluate)
       parameters:
         - name: agentId
           in: query

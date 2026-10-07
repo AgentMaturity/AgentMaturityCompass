@@ -181,7 +181,7 @@ Aisha can initialize trust, add edges, list them, and run `amc fleet trust-repor
 **Status:** Resolved for dimension-level weighting inspection.
 
 **R31 — industry-adjust exports comparison reports across scored runs**
-`amc score industry-adjust --industry healthcare --history --out healthcare-industry-report.md` now reads recent scored runs for the selected agent, reapplies the selected industry trust model to each run, and exports a Markdown or JSON comparison report. The report includes raw score, adjusted score, delta from previous run, maturity level, percentile rank, decay, and evidence mix, so Tom can save trend evidence for notebooks, reviews, or compliance appendices.
+`amc score industry-adjust --industry healthcare --history --out healthcare-industry-report.md` now reads recent scored runs for the selected agent, reapplies the selected industry trust model to each run, and exports a Markdown or JSON comparison report. The report includes raw score, adjusted score, delta from previous run, maturity level, decay, and evidence mix (percentile rank was removed in P0-15: no peer data exists), so Tom can save trend evidence for notebooks, reviews, or compliance appendices.
 **Status:** Resolved for saved/exportable industry-adjust comparisons.
 
 **R10 — compliance reports shorten evidence refs and show config fixes**
@@ -555,6 +555,8 @@ Adjusted score: 70
 Maturity level: L3
 Percentile rank: p63
 ```
+
+P0-15 removed the percentile rank above: it ranked against invented peer data. The command now prints none.
 
 #### Friction Points:
 1. **`amc score --help` has 43 subcommands** — Tom would spend 5 minutes reading help before finding the 3 `industry-*` commands buried in the middle.
