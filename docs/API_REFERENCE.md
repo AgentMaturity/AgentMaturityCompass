@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-06
+> Auto-generated from source on 2026-10-07
 
 ## Table of Contents
 
@@ -1926,6 +1926,11 @@ Verify .amcaudit file
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc audit export`
 
@@ -2036,6 +2041,10 @@ Restore a verified backup into target directory
 |--------|-------------|
 | `--to <dir>` | - |
 | `--force` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
 
 #### `amc backup verify`
 
@@ -2045,6 +2054,11 @@ Verify signed backup bundle offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc badge`
 
@@ -2199,6 +2213,11 @@ Verify .amcbench artifact offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc benchmark compare`
 
@@ -2286,6 +2305,20 @@ Run standard benchmark suite (latency, accuracy, safety, cost-efficiency, reliab
 | Option | Description |
 |--------|-------------|
 | `--group-by <groupBy>` | - |
+
+#### `amc benchmark verify`
+
+-
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc blobs reencrypt`
 
@@ -4619,6 +4652,20 @@ Add a peer publisher public key
 | `--peerId <id>` | - |
 | `--name <name>` | - |
 | `--pubkey <file>` | - |
+
+#### `amc federate verify-bundle`
+
+Verify .amcfed package
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc firewall check`
 
@@ -7417,6 +7464,12 @@ Verify registry signature and package hashes
 | Option | Description |
 |--------|-------------|
 | `--dir <dir>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc plugin registry-fingerprint`
 
@@ -7464,6 +7517,11 @@ Verify plugin package signature + artifact hashes
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc policy action logic apply`
 
@@ -7725,6 +7783,11 @@ Verify .amcprompt signature and lint signature
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc prompt policy apply`
 

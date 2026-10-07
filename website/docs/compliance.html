@@ -353,8 +353,8 @@ amc audit binder create --framework EU_AI_ACT
 <span class="comment"># List existing binders</span>
 amc audit binder list
 
-<span class="comment"># Verify binder integrity</span>
-amc audit binder verify
+<span class="comment"># Verify a binder, pinning the issuer's auditor key recorded outside the binder</span>
+amc audit binder verify binder.amcaudit --pubkey auditor.pub
 
 <span class="comment"># Export for external sharing (controlled access)</span>
 amc audit binder export-request
