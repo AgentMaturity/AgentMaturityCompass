@@ -70,12 +70,26 @@ It scans these workspace locations and nothing else:
 - assurance reports in `.amc/reports/assurance/` and `.amc/agents/<agent>/reports/assurance/`;
 - each file named with `--path`: a `.amcbundle`, a `.amccert`, an `.amcpass`, a JSON run, assurance report, compliance report or trust certificate, or a text domain report.
 
-Bundles and certificates are extracted to temporary folders. The only files it writes are:
+### Integrity before classification
 
-- `.amc/migrations/relabel.jsonl`: one JSON line per relabelled result, appended and never rewritten. Each record holds the notice id and version, the artifact (`kind`, `locator` as a workspace path or `ledger-session:<id>`, and `sha256`), the original 1.x claims (`trustTier`, `level`, `label`), the assigned claim (`claimKind`, `legacy: true`, `levelCap`), the rule, the time and the AMC version that wrote it. A session's `sha256` covers its event hashes in ledger order. Each line's `prevHash` is the SHA-256 of the line before it (64 zeros for the first), so an edited line breaks the chain at that line.
-- `.amc/migrations/receipts/<UTC timestamp>.json` and its `.sig`: the migration receipt, signed by the auditor key as `MIGRATION_RECEIPT`. It records the notice, start and finish times, the counts scanned and relabelled per kind, the skipped files with reasons, the log head after the run (`relabelLogHead`, which pins the last line) and `originalsDigest`, the SHA-256 over the sorted SHA-256 of every artifact scanned.
+Every artifact goes through AMC's own check before its content is trusted for a label:
 
-A second run records nothing new: a result already recorded under the same notice version, by `sha256`, is skipped. A new notice version records results again under that version. A broken log, or a receipt that cannot be signed, stops the run before it writes anything. `--dry-run` prints what would be recorded and writes nothing.
+- The ledger is checked first with the same rule `amc verify` uses (the trust flags you pass apply). If it fails, or is unanchored without `--allow-unanchored`, every session is listed under `skipped` as `integrity check failed: <reason>`, and no session is hashed or classified.
+- A diagnostic run or assurance report has its run seal checked against the workspace auditor keys.
+- A `.amcbundle` goes through the bundle verifier and a diagnostic `.amccert` through the certificate verifier, each with the trust from your flags. Each extracts the file to a temporary folder. A `.amccert` is an assurance certificate only when it parses as one; anything else is checked as a diagnostic certificate, never quietly retyped.
+
+A check that fails is never dropped. When the content cannot be read, or reads as something other than a 1.x result, the file is listed under `skipped` as `integrity check failed: <reason>`, not as "not a 1.x result". When it is a 1.x result, it is still relabelled, and its record says `integrity.status: "integrityFailed"` with the reasons. A verified check never raises the claim either: the record is a legacy relabel whatever the verdict.
+
+### What it writes
+
+The only files it writes are:
+
+- `.amc/migrations/relabel.jsonl`: one JSON line per relabelled result, appended and never rewritten. Each record holds the notice id and version, the artifact (`kind`, `locator` as a workspace path or `ledger-session:<id>`, and `sha256`), the original 1.x claims (`trustTier`, `level`, `label`), the assigned claim (`claimKind`, `legacy: true`, `levelCap`), the integrity verdict (`status` `verified`, `integrityFailed` or `notChecked`, `trusted` and `reasons`), the rule, the time and the AMC version that wrote it. A session's `sha256` covers its event hashes in ledger order. Each line's `prevHash` is the SHA-256 of the line before it (64 zeros for the first), so an edited line breaks the chain at that line.
+- `.amc/migrations/receipts/<UTC timestamp>.json` and its `.sig`: the migration receipt, signed by the auditor key as `MIGRATION_RECEIPT`. It records the notice, start and finish times, the counts scanned and relabelled per kind, the skipped files with reasons, the log's line count and head after the run (`relabelLogLines`, `relabelLogHead`) and `originalsDigest`, the SHA-256 over the sorted SHA-256 of every artifact scanned.
+
+Relabel records are read only through `verifyRelabelLog`, which checks the chain and then binds it to the receipts: every receipt's `MIGRATION_RECEIPT` signature must verify against the workspace auditor keys, each receipt's `relabelLogHead` must equal the chain head at its `relabelLogLines`, and the newest receipt must cover every line. A rewritten, re-chained or extended log fails, and lines no signed receipt attests fail too. A run interrupted between appending its lines and writing its receipt leaves such lines; AMC then refuses to append and leaves the decision to you.
+
+A second run records nothing new: a result already recorded under the same notice version, by `sha256`, is skipped. A new notice version records results again under that version. A log that fails its check, or a receipt that cannot be signed, stops the run before it writes anything. `--dry-run` prints what would be recorded and writes nothing.
 
 ## Getting observed results again
 
