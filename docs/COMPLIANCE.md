@@ -22,7 +22,7 @@ Each requirement runs through the catalog evidence evaluator (`evaluateControl`,
 - **Same tenant.** A record that names a `tenantId` is another tenant's evidence (`cross_tenant`): a single workspace records no tenant.
 
 Per requirement:
-- `requires_evidence_event`: sufficient on control-bound runtime evidence; otherwise not evaluated. Admitted allow and deny records for one tool call id are `contradictory`.
+- `requires_evidence_event`: sufficient on control-bound runtime evidence; otherwise not evaluated. Admitted allow and deny records for one tool call id are `contradictory`, and a requirement met only by self-reported records never passes.
 - `requires_assurance_pack`: reads only sealed assurance reports that verify against the workspace auditor key, whose run passed its own ledger integrity check (`status: VALID`, `verificationPassed: true`) and that measured something; a hand-written, unsealed or integrity-failed report is not evaluated (`untrusted`). A pack whose scenarios were all inconclusive is not evaluated, and so is a passing pack with any inconclusive scenario (a partial measurement cannot pass). A sealed run below `minScore` or above `maxSucceeded` fails.
 - `requires_no_audit`: a denied audit type from the agent or the `system` session fails. With no AMC runtime activity for the agent in the window it is not evaluated: absence of violations proves nothing. A denied audit type that was not admitted (an import, for example) still blocks a pass.
 

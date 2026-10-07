@@ -67,18 +67,26 @@ export function decideEvidence(record: EvaluableControl, admitted: readonly Admi
   return short.length > 0 ? "incomplete" : "sufficient";
 }
 
-/** A trusted violation is a failure whatever the evidence; a violation that was not admitted still blocks a pass. */
-export function decideResult(applicability: Applicability, evidence: EvidenceState, admitted: readonly AdmittedItem[],
-  rejected: readonly RejectedItem[], reasons: string[]): ResultState {
+/**
+ * A trusted violation is a failure whatever the evidence; a violation that was not admitted still blocks a pass, and so
+ * does a contract met only by self-reported items (truth rule 3: self-reported evidence is never a positive regulated status).
+ */
+export function decideResult(record: EvaluableControl, applicability: Applicability, evidence: EvidenceState,
+  admitted: readonly AdmittedItem[], rejected: readonly RejectedItem[], reasons: string[]): ResultState {
   if (admitted.some(({ item }) => item.verdict === "violates")) return "fail";
   const unadmitted = rejected.filter(({ item }) => item.verdict === "violates");
   if (unadmitted.length > 0) {
     reasons.push(`${unadmitted.length} violating record(s) were not admitted (${[...new Set(unadmitted.map((row) => row.reason))].join(", ")}); the control cannot pass`);
     return "not_evaluated";
   }
+  const selfReported = record.evidence.filter((contract) => {
+    const own = admitted.filter(({ item }) => item.producerId === contract.producer);
+    return own.length > 0 && !own.some((row) => isObservedTier(row.trustTier));
+  });
+  for (const contract of selfReported) reasons.push(`${contract.id} is met only by self-reported records, which cannot pass a regulated control`);
   if (applicability.state === "unresolved") reasons.push(`not evaluated: ${applicability.reason}`);
   if (applicability.state === "not_applicable") reasons.push(`not evaluated: not applicable (${applicability.rationale})`);
-  return applicability.state === "applicable" && evidence === "sufficient" ? "pass" : "not_evaluated";
+  return applicability.state === "applicable" && evidence === "sufficient" && selfReported.length === 0 ? "pass" : "not_evaluated";
 }
 
 /** Enforced only on admitted allow or deny records from the control's binding point under the plan's policy digest. */

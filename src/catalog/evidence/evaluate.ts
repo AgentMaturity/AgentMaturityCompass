@@ -48,7 +48,7 @@ export function evaluateControl(record: EvaluableControl, items: readonly Eviden
     producer: `catalog:${record.id}`,
     method: synthetic ? "synthetic" : "runtime_observation",
     regulated: true,
-    proposed: { result: decideResult(applicability, evidence, admitted, rejected, reasons), level: null },
+    proposed: { result: decideResult(record, applicability, evidence, admitted, rejected, reasons), level: null },
     evidence: {
       eventCount: admitted.length,
       tiers: admitted.length > 0 && admitted.every((row) => isObservedTier(row.trustTier)) ? ["OBSERVED"] : ["SELF_REPORTED"],
