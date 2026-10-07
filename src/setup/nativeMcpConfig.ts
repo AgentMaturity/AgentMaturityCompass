@@ -6,9 +6,16 @@ import { LocalCredentialsService } from "../credentials/localCredentialsService.
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import type { NativeToolCapability } from "../agent/nativeToolCapabilities.js";
-import { nativeMcpToolName, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
+import { discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
-import { nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
+import { NativeMcpHttpRefused, nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
+import { isNativeMcpProtocolVersion } from "../mcp/protocol/version.js";
+import { NativeMcpOAuthRefused, nativeMcpOAuthUrl, nativeMcpScopes } from "../mcp/oauth/discovery.js";
+import { NativeMcpOAuthTokenStore } from "../mcp/oauth/tokenStore.js";
+import {
+  authorizeNativeMcpOAuth, resolveNativeMcpOAuth, withNativeMcpOAuthStepUp,
+  type NativeMcpOAuthConfig, type NativeMcpOAuthReceipt
+} from "../mcp/oauth/authorize.js";
 
 interface StdioConfiguration {
   readonly transport?: "stdio";
@@ -18,6 +25,8 @@ interface StdioConfiguration {
   /** Child variable name -> AMC credential reference. Literal env is refused. */
   readonly envRefs?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
+  /** Exact protocol version; without it AMC probes server/discover and falls back to initialize. */
+  readonly protocolVersion?: string;
 }
 interface HttpConfiguration {
   readonly transport: "streamable-http";
@@ -28,6 +37,9 @@ interface HttpConfiguration {
   readonly headerRefs?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
   readonly notificationLifetimeMs?: number;
+  readonly protocolVersion?: string;
+  /** OAuth 2.1 per the MCP 2026-07-28 authorization spec; exclusive with headerRefs. */
+  readonly auth?: NativeMcpOAuthConfig;
 }
 
 export interface NativeMcpConfiguration {
@@ -78,9 +90,12 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
   if (server.timeoutMs !== undefined && (typeof server.timeoutMs !== "number" || !Number.isSafeInteger(server.timeoutMs) || server.timeoutMs < 1 || server.timeoutMs > 300_000)) {
     return refuse("MCP server timeoutMs must be an integer from 1 through 300000.");
   }
+  if (server.protocolVersion !== undefined && !isNativeMcpProtocolVersion(server.protocolVersion)) {
+    return refuse("MCP server protocolVersion must be 2026-07-28 or a protocol version the installed MCP SDK supports.");
+  }
   const http = server.transport === "streamable-http";
   if (http) {
-    if (!onlyKeys(server, ["transport", "id", "url", "origin", "headerRefs", "timeoutMs", "notificationLifetimeMs"]) || typeof server.url !== "string" || typeof server.origin !== "string") {
+    if (!onlyKeys(server, ["transport", "id", "url", "origin", "headerRefs", "timeoutMs", "notificationLifetimeMs", "protocolVersion", "auth"]) || typeof server.url !== "string" || typeof server.origin !== "string") {
       return refuse("MCP HTTP requires explicit url and origin. Use headerRefs; literal headers and stdio fields are refused.");
     }
     try { nativeMcpHttpEndpoint(server.url, server.origin); }
@@ -90,8 +105,9 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
       try { nativeMcpNotificationLifetime(server.notificationLifetimeMs); }
       catch { return refuse("MCP HTTP notificationLifetimeMs must be an integer from 1 through 86400000."); }
     }
+    if (server.auth !== undefined) validateOAuthConfiguration(server.auth, server.headerRefs);
   } else {
-    if ((server.transport !== undefined && server.transport !== "stdio") || !onlyKeys(server, ["transport", "id", "command", "args", "envRefs", "timeoutMs"])
+    if ((server.transport !== undefined && server.transport !== "stdio") || !onlyKeys(server, ["transport", "id", "command", "args", "envRefs", "timeoutMs", "protocolVersion"])
       || typeof server.command !== "string" || !server.command.trim() || /[\x00-\x1f\x7f]/.test(server.command)) {
       return refuse("MCP server requires an id and executable. Use envRefs for credential references; literal env and unsupported server fields are refused.");
     }
@@ -131,6 +147,26 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
   return { path: absolute, sha256, config: value as unknown as NativeMcpConfiguration };
 }
 
+/** basic/authorization: auth is pinned by the config digest; it never coexists with literal header credentials. */
+function validateOAuthConfiguration(auth: unknown, headerRefs: unknown): void {
+  if (!object(auth) || auth.kind !== "oauth2" || !onlyKeys(auth, ["kind", "clientId", "clientIdMetadataUrl", "allowDynamicRegistration", "scopes", "redirectPort"])) {
+    refuse("MCP HTTP auth requires kind \"oauth2\" and only clientId, clientIdMetadataUrl, allowDynamicRegistration, scopes and redirectPort.");
+  }
+  const oauth = auth as Record<string, unknown>;
+  if (headerRefs !== undefined) refuse("MCP HTTP auth and headerRefs are exclusive; choose one credential source.");
+  if (oauth.clientId !== undefined && (typeof oauth.clientId !== "string" || !/^[\x21-\x7e]{1,256}$/.test(oauth.clientId))) refuse("MCP OAuth clientId must be 1–256 visible ASCII characters.");
+  if (oauth.clientIdMetadataUrl !== undefined) {
+    let url: URL | undefined;
+    try { url = nativeMcpOAuthUrl(oauth.clientIdMetadataUrl, false); } catch { /* refused below */ }
+    // client-registration §Client ID Metadata Documents: an https URL with a path component.
+    if (!url || url.pathname === "/" || url.search) refuse("MCP OAuth clientIdMetadataUrl must be an HTTPS URL with a path and no query or fragment.");
+  }
+  if (oauth.allowDynamicRegistration !== undefined && typeof oauth.allowDynamicRegistration !== "boolean") refuse("MCP OAuth allowDynamicRegistration must be a boolean.");
+  if (oauth.scopes !== undefined && (!Array.isArray(oauth.scopes) || !nativeMcpScopes(oauth.scopes))) refuse("MCP OAuth scopes must be a bounded array of OAuth scope tokens.");
+  if (oauth.redirectPort !== undefined && (typeof oauth.redirectPort !== "number" || !Number.isSafeInteger(oauth.redirectPort)
+    || oauth.redirectPort < 1024 || oauth.redirectPort > 65_535)) refuse("MCP OAuth redirectPort must be an integer from 1024 through 65535.");
+}
+
 /** Run preflight; the signed allowlist remains an independent permission boundary. */
 export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfiguration, workspace: string, approvalClass: ActionClass): {
   readonly expectedCatalogDigest: string;
@@ -167,12 +203,20 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
 }): Promise<NativeMcpServer> {
   const source = config.server;
   const references = source.transport === "streamable-http" ? source.headerRefs : source.envRefs;
+  const version = source.protocolVersion === undefined ? {} : { protocolVersion: source.protocolVersion };
   const server: NativeMcpServer = source.transport === "streamable-http"
-    ? { transport: source.transport, id: source.id, url: source.url, origin: source.origin,
+    ? { transport: source.transport, id: source.id, url: source.url, origin: source.origin, ...version,
       ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }),
       ...(source.notificationLifetimeMs === undefined ? {} : { notificationLifetimeMs: source.notificationLifetimeMs }) }
-    : { id: source.id, command: source.command, ...(source.transport === undefined ? {} : { transport: source.transport }),
+    : { id: source.id, command: source.command, ...version, ...(source.transport === undefined ? {} : { transport: source.transport }),
       ...(source.args === undefined ? {} : { args: source.args }), ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }) };
+  if (server.transport === "streamable-http" && source.transport === "streamable-http" && source.auth) {
+    try {
+      const { accessToken, receipt } = await resolveNativeMcpOAuth({ endpoint: nativeMcpHttpEndpoint(server.url, server.origin),
+        config: source.auth, store: oauthStore(options), timeoutMs: source.timeoutMs ?? 30_000 });
+      return { ...server, headers: { Authorization: `Bearer ${accessToken}` }, auth: receipt };
+    } catch (error) { return refuse(oauthFailure(error)); }
+  }
   if (references === undefined || Object.keys(references).length === 0) return server;
   let store: LocalCredentialsService | undefined;
   try {
@@ -190,4 +234,50 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
     if (error instanceof NativeMcpConfigError) throw error;
     return refuse("Could not resolve the MCP credential references. Inspect credential metadata separately; values and file content are withheld.");
   } finally { await store?.close(); }
+}
+
+function oauthStore(options: { readonly workspace: string; readonly credentialsHome?: string; readonly credentialsFile?: string }): NativeMcpOAuthTokenStore {
+  return new NativeMcpOAuthTokenStore({ projectDir: options.workspace,
+    ...(options.credentialsHome === undefined ? {} : { homeDir: options.credentialsHome }),
+    ...(options.credentialsFile === undefined ? {} : { path: options.credentialsFile }) });
+}
+
+function oauthFailure(error: unknown): string {
+  return error instanceof NativeMcpOAuthRefused ? error.message
+    : "MCP OAuth authorization could not be completed; tokens, codes and server responses are withheld.";
+}
+
+/**
+ * `amc agent-loop mcp-catalog --authorize`: the only interactive OAuth path.
+ * It prints the authorization URL (never opens a browser), stores the grant,
+ * then reads the catalog with it, stepping up scopes at most twice.
+ */
+export async function authorizeNativeMcpCatalog(config: NativeMcpConfiguration, options: {
+  readonly workspace: string;
+  readonly credentialsHome?: string;
+  readonly credentialsFile?: string;
+  readonly onAuthorizationUrl: (url: string) => void;
+  readonly signal?: AbortSignal;
+}): Promise<{ readonly server: NativeMcpServer; readonly catalog: NativeMcpCatalog }> {
+  const source = config.server;
+  if (source.transport !== "streamable-http" || !source.auth) return refuse("--authorize requires a streamable-http server with auth.kind \"oauth2\".");
+  const { auth, timeoutMs = 30_000 } = source;
+  const endpoint = nativeMcpHttpEndpoint(source.url, source.origin);
+  const store = oauthStore(options);
+  let receipt: NativeMcpOAuthReceipt | undefined;
+  const authorize = async (extraScopes?: readonly string[]) => {
+    try {
+      receipt = await authorizeNativeMcpOAuth({ endpoint, config: auth, store, timeoutMs, onAuthorizationUrl: options.onAuthorizationUrl,
+        ...(extraScopes ? { extraScopes } : {}), ...(options.signal ? { signal: options.signal } : {}) });
+    } catch (error) { refuse(oauthFailure(error)); }
+  };
+  await authorize();
+  let server: NativeMcpServer | undefined;
+  const catalog = await withNativeMcpOAuthStepUp({
+    run: async () => { server = await resolveNativeMcpServer(config, options); return discoverNativeMcpCatalog(server, options.workspace, options.signal); },
+    requiredScopes: error => error instanceof NativeMcpHttpRefused ? error.requiredScopes : undefined,
+    reauthorize: authorize,
+    granted: () => receipt?.scopes ?? []
+  });
+  return { server: server!, catalog };
 }
