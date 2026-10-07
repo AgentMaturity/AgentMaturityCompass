@@ -5304,7 +5304,7 @@ program
   .option("--ci", "output GitHub Actions annotations", false)
   .option("--score-only", "run only the maturity diagnostic (legacy mode)", false)
   .option("--question-set <version>", "assessment question set: legacy or lifecycle")
-  .option("--industry-pack-weights", "apply entitled Industry Pack weighting to expanded assessment questions", false)
+  .option("--industry-pack-weights", "deprecated: has no effect (Industry Pack weighting was removed in 2.0.0)", false)
   .option("--json", "emit structured JSON output", false)
   .option("--fix", "after scoring, generate a signed one-command fix plan to improve the agent", false)
   .action(
@@ -5318,6 +5318,9 @@ program
       json: boolean;
       fix: boolean;
     }) => {
+      if (opts.industryPackWeights) {
+        process.stderr.write("warning: --industry-pack-weights is deprecated and has no effect; a licence never changes a score.\n");
+      }
       const workspace = process.cwd();
       const agentId = resolveAgentId(workspace, activeAgent(program));
       const previousNoSign = process.env.AMC_NO_SIGN;

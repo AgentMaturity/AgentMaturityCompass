@@ -288,7 +288,6 @@ export interface DiagnosticQuestionSetInfo {
   domainPackWeighting?: {
     requested: boolean;
     applied: boolean;
-    entitlementActive: boolean;
     modifiedQuestionCount: number;
     message: string;
   };

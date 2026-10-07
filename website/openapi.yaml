@@ -3823,7 +3823,8 @@ paths:
                   enum: [amc-legacy-240-v1, amc-lifecycle-2026-v1, legacy, lifecycle]
                 applyIndustryPackWeights:
                   type: boolean
-                  description: Applies Industry Pack weighting only when the workspace has an active Industry Packs entitlement.
+                  deprecated: true
+                  description: Deprecated and ignored. Industry Pack weighting was removed in 2.0.0; a licence never changes a score.
       responses:
         '200':
           description: Diagnostic report with separate artifact validity and evidence readiness
