@@ -20,6 +20,7 @@ import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { IncidentInputError, MAX_FUTURE_SKEW_MS } from "./incidentClockEvents.js";
@@ -230,6 +231,8 @@ export interface RecordWorkspaceOversightInput {
  * record, not which person reviewed.
  */
 export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): HumanOversightRecord {
+  // Signs with the workspace auditor key: never from agent mode.
+  assertOwnerMode(input.workspace, "incident oversight");
   if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) {
     throw new IncidentInputError(`unknown decision ${input.decision}; expected one of ${OVERSIGHT_DECISIONS.join(", ")}`);
   }
