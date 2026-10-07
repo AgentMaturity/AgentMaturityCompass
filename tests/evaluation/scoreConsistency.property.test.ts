@@ -110,12 +110,11 @@ function seedHighRiskGovernanceEvidence(workspace: string): void {
       binaryPath: "seed-runtime",
       binarySha256: "seed-sha"
     });
-    // The four types the L4 gate names, so this evidence can reach L4 on its
-    // own and the assurance cap has something to LOWER — the cap only applies
-    // when supportedMaxLevel > 3, and it is the subject of this test.
-    //
-    // The seed used to emit `audit` alone and still reach L4, because
-    // `requiredEvidenceTypes` was a filter rather than a requirement.
+    // The four types the old L4 gate named. Since P1-07 AMC-1.8 has no evidence
+    // map, so these rows support L1 at most (L2 and above are not evaluated) and
+    // the assurance cap, which only lowers levels above 3, has nothing to lower.
+    // The integrity drift this test is about comes from the ASSURANCE_EVIDENCE_MISSING
+    // audits each run writes, which still accumulate.
     for (const eventType of ["stdout", "audit", "metric", "artifact"] as const) {
       ledger.appendEvidence({
         sessionId,
@@ -271,12 +270,13 @@ describe("score consistency properties", () => {
     const q2 = run2.questionScores.find((row) => row.questionId === "AMC-1.8");
     const q3 = run3.questionScores.find((row) => row.questionId === "AMC-1.8");
 
-    expect(q1?.finalLevel).toBe(3);
-    expect(q2?.finalLevel).toBe(3);
-    expect(q3?.finalLevel).toBe(3);
-    expect(q1?.flags).toContain("FLAG_ASSURANCE_EVIDENCE_MISSING");
-    expect(q2?.flags).toContain("FLAG_ASSURANCE_EVIDENCE_MISSING");
-    expect(q3?.flags).toContain("FLAG_ASSURANCE_EVIDENCE_MISSING");
+    // P1-07: was 3 with FLAG_ASSURANCE_EVIDENCE_MISSING, reached top-down through
+    // an L4 gate without L2's review. Levels are cumulative now and AMC-1.8 has no
+    // evidence map, so the seed supports L1; the runner's own
+    // ASSURANCE_EVIDENCE_MISSING rows come from no registered emitter and lift nothing.
+    expect(q1?.finalLevel).toBe(1);
+    expect(q2?.finalLevel).toBe(1);
+    expect(q3?.finalLevel).toBe(1);
 
     expect(run2.integrityIndex).toBeLessThan(run1.integrityIndex);
     expect(run3.integrityIndex).toBeLessThanOrEqual(run2.integrityIndex);

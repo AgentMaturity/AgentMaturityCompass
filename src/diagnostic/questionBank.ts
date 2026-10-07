@@ -1,4 +1,5 @@
 import type { DiagnosticQuestion, EvidenceEventType, Gate, LayerName, OptionLevel } from "../types.js";
+import { levelGates } from "./levelSemantics.js";
 
 export interface QuestionSeed {
   id: string;
@@ -752,7 +753,8 @@ export function buildQuestion(seed: QuestionSeed): DiagnosticQuestion {
     evidenceGateHints: seed.evidenceGateHints,
     upgradeHints: seed.upgradeHints,
     tuningKnobs: seed.tuningKnobs,
-    gates,
+    // P1-07: rebuilt from the evidence map; the requirements above describe levels that are not yet evaluable.
+    gates: levelGates(seed.id, gates),
     questionSetVersion: LEGACY_QUESTION_SET_VERSION,
     family: "core",
     surfaces: ["Score"],

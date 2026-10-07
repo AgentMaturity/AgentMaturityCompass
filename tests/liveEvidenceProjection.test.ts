@@ -248,29 +248,26 @@ describe("what live scoring can honestly claim", () => {
 
   it("one run on one day reaches L1 and no further", () => {
     // Measured against the real runner too: nine governed calls in one day
-    // scored nine questions at L1. L2 needs two distinct days before its
-    // `review` requirement even comes up.
+    // scored nine questions at L1. L2 needs two distinct days (P1-07).
     const oneDay = harnessEvidence(9, 3, 1);
 
     expect(evaluateGate(gateOf("AMC-SCI-2", 1), oneDay).pass, "L1 is reachable in a day").toBe(true);
     expect(evaluateGate(gateOf("AMC-SCI-2", 3), oneDay).pass, "L3 needs three distinct days").toBe(false);
   });
 
-  it("L1 is the ceiling: L3 is blocked on evidence the harness does not produce", () => {
+  it("L3 is not evaluated on the evidence the harness produces", () => {
     // Not a threshold problem. Forty calls over ten days in eight sessions
-    // clears every count L3 asks for — and still fails, because every L3 gate
-    // in the bank requires an `ALIGNMENT_CHECK_PASS` audit row, and nothing on
-    // the tool path performs an alignment check.
-    //
-    // This is why the feature claims L0->L1 and nothing more. It is also why
-    // the reason string had to be fixed first: before that, this gate failed
-    // with `events=120/8, sessions=8/3, days=10/3` and no explanation at all.
+    // clears every count L3 ever asked for. Before P1-07 the gate still failed
+    // because it required an `ALIGNMENT_CHECK_PASS` row only the dogfood seeder
+    // wrote; now AMC-SCI-2's evidence map lists no L3 emitter (it also needs MCP
+    // server identity checks, attestation receipts and sanitized tool-result
+    // traces), so L3 is not evaluated rather than failed on a fiction.
     const abundant = harnessEvidence(40, 8, 10);
     const verdict = evaluateGate(gateOf("AMC-SCI-2", 3), abundant);
 
     expect(verdict.pass).toBe(false);
-    expect(verdict.reason, "counts are satisfied").toContain("events=120/8");
-    expect(verdict.reason, "and the real blocker is named").toContain("auditType:ALIGNMENT_CHECK_PASS");
+    expect(verdict.reason, "and the real blocker is named").toContain("not evaluated");
+    expect(verdict.reason).toContain("MCP server identity checks");
   });
 
   it("never reaches L4 or L5, however much traffic there is", () => {
@@ -282,15 +279,19 @@ describe("what live scoring can honestly claim", () => {
 
     expect(evaluateGate(gateOf("AMC-SCI-2", 4), enormous).pass, "L4 needs artifact").toBe(false);
     expect(evaluateGate(gateOf("AMC-SCI-2", 5), enormous).pass, "L5 needs artifact and test").toBe(false);
-    expect(evaluateGate(gateOf("AMC-SCI-2", 4), enormous).reason).toContain("missing evidence types=artifact");
+    expect(evaluateGate(gateOf("AMC-SCI-2", 4), enormous).reason, "L4 is not evaluated (P1-07)").toContain("not evaluated");
   });
 
-  it("L2 stays out of reach without human review, for every question in the bank", () => {
-    // Measured across all 244: every L2 gate is {review, stdout}. Machine
-    // evidence cannot supply `review`, so live scoring skips L2 entirely and
-    // lands on L3 — which is the gate ladder's own design, not a workaround.
-    const nonReview = questionBank.filter((q) => !q.gates[2]!.requiredEvidenceTypes.includes("review"));
+  it("L2 is evaluated only where an evidence map names an observed emitter", () => {
+    // Before P1-07 every L2 gate was {review, stdout} and machine evidence could
+    // never supply `review`. Now L2 is configuration evidence: evaluated only for
+    // questions whose evidence map names registered observed emitters, and not
+    // evaluated (rather than silently unreachable) everywhere else.
+    const evaluated = questionBank.filter((q) => !q.gates[2]!.notEvaluated);
 
-    expect(nonReview.map((q) => q.id), "every L2 gate requires review").toEqual([]);
+    expect(evaluated.map((q) => q.id).sort()).toEqual(["AMC-2.15", "AMC-5.29", "AMC-OPDISC-6", "AMC-SCI-2"]);
+    for (const question of evaluated) {
+      expect(question.gates[2]!.acceptedTrustTiers, question.id).toEqual(["OBSERVED"]);
+    }
   });
 });

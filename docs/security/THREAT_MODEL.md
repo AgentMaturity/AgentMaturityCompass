@@ -212,7 +212,7 @@ Each item was read in the code at `e25cce1a`. File and symbol, not line numbers,
 4. Guard events go to `process.cwd()/.amc/guard_events.sqlite` (`guardEventsDbPath` in `src/enforce/evidenceEmitter.ts`, overridable by `AMC_GUARD_EVENTS_DB_PATH`), not to the workspace, and `pruneGuardEvents` deletes across every agent in that file. Owner: P2-01.
 5. A recorder failure after a tool ran is swallowed in `ToolPipeline.execute` (`src/tools/toolPipeline.ts`). Owners: P1-03, P1-04.
 6. `src/enforce/egressProxy.ts` (`checkEgressRequest`) is not a proxy, is called only by `tests/enforce-full.test.ts`, allows every host when its list is empty, and logs every decision as `agentId: 'system'`. The enforcing forward proxy is the gateway's (`hostAllowed`, `createProxyServer` and the CONNECT handler in `src/gateway/server.ts`). Owner: proposed follow-up.
-7. Strict evidence binding turns off when `STRICT_EVIDENCE_BINDING` is `0`, `false`, `off` or `no` (`isStrictEvidenceBindingEnabled` in `src/diagnostic/runner.ts`). Owner: P1-12 (silent opt-outs).
+7. Closed by P1-07: strict evidence binding used to turn off when `STRICT_EVIDENCE_BINDING` was `0`, `false`, `off` or `no`. The opt-out is removed; the variable now only prints a deprecation warning (`selectRelevantEvents` in `src/diagnostic/runner.ts`), and untagged evidence never counts toward a level.
 8. `amc init --skip-vault` sets `AMC_VAULT_PASSPHRASE` to `"skip-vault-" + Date.now()` (`src/cli.ts`). Owner: proposed follow-up.
 9. Retention deletes without a legal-hold check (`runRetention` in `src/ops/retention/retentionEngine.ts`). Owner: P2-01.
 

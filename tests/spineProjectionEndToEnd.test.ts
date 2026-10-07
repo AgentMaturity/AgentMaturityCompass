@@ -101,10 +101,10 @@ describe("a scope-verified delegation scores", () => {
     expect(selected.every((e) => e.trustTier === "OBSERVED")).toBe(true);
   });
 
-  it("clears the L1 gate on two delegations, and no higher", async () => {
-    // The ceiling, end to end. L1 wants a `stdout` row and two events; L2 wants
-    // a `review` row and L3 an ALIGNMENT_CHECK_PASS audit, neither of which a
-    // harness can honestly emit -- so more delegations never buy a higher level.
+  it("clears the L1 gate on one day of delegations, and no higher", async () => {
+    // The ceiling, end to end. L1 wants two tagged rows. L2 (P1-07) wants
+    // observed settled-delegation rows across two sessions and two days, and L3
+    // is not evaluated -- so delegations on one day never buy a higher level.
     const dir = workspace();
     await delegate(dir, "child-1", ["READ_ONLY"]);
     await delegate(dir, "child-2", ["READ_ONLY"]);
@@ -122,17 +122,15 @@ describe("a scope-verified delegation scores", () => {
       else reasons.set(level, evaluation.reason);
     }
 
-    expect(passing, "L0 and L1 only, however many delegations there are").toEqual([0, 1]);
+    expect(passing, "L0 and L1 only on one day of delegations").toEqual([0, 1]);
 
     // ATTRIBUTED, because "it failed" is not "it failed for the reason I claim".
-    // These four delegations land in one UTC day, so a day threshold would stop
-    // L2 on its own and the ceiling would look structural when it was an
-    // accident of the fixture. Assert the type is missing too — that is the part
-    // no amount of running would ever fix.
-    expect(reasons.get(2), "L2 is missing the human-review row, not only the days")
-      .toContain("missing evidence types=review");
-    expect(reasons.get(3), "L3 wants an alignment check nothing here claims")
-      .toContain("auditType:ALIGNMENT_CHECK_PASS");
+    // These four delegations land in one UTC day: L2 has its rows and fails on
+    // the day minimum alone, while L3 fails because it is not evaluated, which no
+    // amount of running would ever fix.
+    expect(reasons.get(2), "L2 needs a second day").toContain("days=1/2");
+    expect(reasons.get(2), "and nothing else").not.toContain("unmet=");
+    expect(reasons.get(3), "L3 is not evaluated on runtime evidence").toContain("not evaluated");
   });
 
   it("counts toward nothing when no scope was declared", async () => {

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { EvidenceEvent, Gate } from "../src/types.js";
 import { evaluateGate, parseEvidenceEvent, type ParsedEvidenceEvent } from "../src/diagnostic/gates.js";
-import { isStrictEvidenceBindingEnabled, selectRelevantEvents } from "../src/diagnostic/runner.js";
+import { selectRelevantEvents } from "../src/diagnostic/runner.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const ORIGINAL_STRICT_EVIDENCE_BINDING = process.env.STRICT_EVIDENCE_BINDING;
@@ -64,14 +64,19 @@ afterEach(() => {
 });
 
 describe("anti-gaming: strict evidence binding", () => {
-  test("strict evidence binding is enabled by default", () => {
-    delete process.env.STRICT_EVIDENCE_BINDING;
-    expect(isStrictEvidenceBindingEnabled()).toBe(true);
-  });
-
-  test("strict evidence binding can be disabled explicitly", () => {
+  test("STRICT_EVIDENCE_BINDING=false no longer turns binding off, and says so once (P1-07)", () => {
+    // The opt-out used to let untagged evidence count. It is gone: the variable is read only to warn.
     process.env.STRICT_EVIDENCE_BINDING = "false";
-    expect(isStrictEvidenceBindingEnabled()).toBe(false);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const warnings = new Set<string>();
+    const untagged = makeParsedEvent({ trustTier: "OBSERVED" });
+
+    expect(selectRelevantEvents("AMC-1.1", [untagged], 2, warnings)).toHaveLength(0);
+    expect(selectRelevantEvents("AMC-1.2", [untagged], 2, warnings)).toHaveLength(0);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toBe(
+      "STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level"
+    );
   });
 
   test("selectRelevantEvents returns question-tagged evidence when available", () => {
@@ -110,15 +115,17 @@ describe("anti-gaming: strict evidence binding", () => {
     expect(warn.mock.calls[0]?.[0]).toContain("untagged evidence counts toward no question at any level");
   });
 
-  test("L3+ selection warns and falls back when strict mode is disabled", () => {
+  test("L3+ selection does not fall back when the removed opt-out is set (P1-07)", () => {
+    // This test used to assert that STRICT_EVIDENCE_BINDING=false returned another question's evidence.
+    // The fallback is deleted; the variable now only produces the deprecation warning.
     process.env.STRICT_EVIDENCE_BINDING = "false";
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const unrelated = makeParsedEvent({ questionId: "AMC-1.2", trustTier: "OBSERVED" });
 
     const selected = selectRelevantEvents("AMC-1.1", [unrelated], 4);
-    expect(selected).toEqual([unrelated]);
+    expect(selected).toHaveLength(0);
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0]?.[0]).toContain("Falling back to unbound evidence");
+    expect(warn.mock.calls[0]?.[0]).toContain("STRICT_EVIDENCE_BINDING is no longer supported");
   });
 
   test("missing questionId binding does not inflate scoring to level 3+", () => {
