@@ -3,6 +3,8 @@
  * basic/authorization/authorization-server-discovery). Every fetch here is
  * unauthenticated, refuses redirects and is bounded; no response text is echoed.
  */
+import { lookup } from "node:dns/promises";
+import { isNonPublicAddress } from "../../enforce/egressAllowlist.js";
 import { MCP_STATELESS_PROTOCOL_VERSION, statelessRequestMeta } from "../protocol/version.js";
 
 export const NATIVE_MCP_OAUTH_LIMITS = Object.freeze({ bodyBytes: 64 * 1024, timeoutMs: 10_000, scopes: 32 });
@@ -14,6 +16,28 @@ export class NativeMcpOAuthRefused extends Error {
   }
 }
 const refuse = (message: string, code?: "AUTH_REQUIRED" | "REFUSED"): never => { throw new NativeMcpOAuthRefused(message, code); };
+
+/**
+ * Where OAuth requests for one MCP endpoint may go. Metadata from the server names every OAuth URL, so a public MCP
+ * server must not make AMC call hosts on the operator's private network: non-public addresses are allowed only when
+ * the MCP endpoint itself is on one (an internal deployment) or is literal loopback HTTP (development).
+ */
+export interface NativeMcpOAuthNetwork { readonly development: boolean; readonly allowNonPublic: boolean }
+
+async function resolvesNonPublic(hostname: string): Promise<boolean> {
+  const host = hostname.replace(/^\[|\]$/g, "");
+  try {
+    const addresses = await lookup(host, { all: true, verbatim: true });
+    return addresses.length === 0 || addresses.some(({ address }) => isNonPublicAddress(address));
+  } catch {
+    return true; // A host that does not resolve is treated as non-public: refused unless the endpoint is internal.
+  }
+}
+
+export async function nativeMcpOAuthNetwork(endpoint: URL): Promise<NativeMcpOAuthNetwork> {
+  const development = isLoopbackHttp(endpoint);
+  return { development, allowNonPublic: development || await resolvesNonPublic(endpoint.hostname) };
+}
 
 export interface NativeMcpOAuthChallenge {
   readonly error?: string;
@@ -75,7 +99,11 @@ export function parseNativeMcpBearerChallenge(header: string | null): NativeMcpO
     ...(scopes ? { scopes } : {}), ...(params.resource_metadata ? { resourceMetadata: params.resource_metadata } : {}) };
 }
 
-export async function nativeMcpOAuthFetch(url: URL, init: RequestInit, timeoutMs: number): Promise<{ status: number; body?: unknown; headers: Headers }> {
+export async function nativeMcpOAuthFetch(url: URL, init: RequestInit, timeoutMs: number, network: NativeMcpOAuthNetwork): Promise<{ status: number; body?: unknown; headers: Headers }> {
+  // ponytail: checked before fetch, which resolves again; pin the connection (as the shell egress proxy does) if DNS rebinding matters here.
+  if (!network.allowNonPublic && await resolvesNonPublic(url.hostname)) {
+    return refuse("MCP OAuth metadata named a host on a private or non-public address while the MCP server is public; it was refused.");
+  }
   let response: Response;
   try {
     response = await fetch(url, { ...init, redirect: "manual", credentials: "omit", cache: "no-store",
@@ -128,14 +156,15 @@ function covers(endpoint: URL, resource: unknown): resource is string {
 }
 
 /** authorization-server-discovery §Protected Resource Metadata Discovery Requirements. */
-export async function discoverNativeMcpProtectedResource(endpoint: URL, challenge: NativeMcpOAuthChallenge, timeoutMs: number): Promise<NativeMcpProtectedResource> {
-  const development = isLoopbackHttp(endpoint);
+export async function discoverNativeMcpProtectedResource(endpoint: URL, challenge: NativeMcpOAuthChallenge, timeoutMs: number,
+  network: NativeMcpOAuthNetwork): Promise<NativeMcpProtectedResource> {
+  const development = network.development;
   const path = endpoint.pathname.replace(/\/$/, "");
   const candidates = challenge.resourceMetadata !== undefined ? [nativeMcpOAuthUrl(challenge.resourceMetadata, development)]
     : [...(path ? [new URL(`/.well-known/oauth-protected-resource${path}`, endpoint.origin)] : []),
       new URL("/.well-known/oauth-protected-resource", endpoint.origin)];
   for (const url of candidates) {
-    const { status, body } = await nativeMcpOAuthFetch(url, { method: "GET", headers: { accept: "application/json" } }, timeoutMs);
+    const { status, body } = await nativeMcpOAuthFetch(url, { method: "GET", headers: { accept: "application/json" } }, timeoutMs, network);
     if (status !== 200) continue;
     const document = body as Record<string, unknown> | null;
     const servers = document?.authorization_servers;
@@ -156,7 +185,8 @@ export async function discoverNativeMcpProtectedResource(endpoint: URL, challeng
  * MUST equal the issuer used to build the URL. security-considerations
  * §Authorization Code Protection: refuse unless S256 PKCE is advertised.
  */
-export async function discoverNativeMcpAuthorizationServer(issuer: string, development: boolean, timeoutMs: number): Promise<NativeMcpAuthorizationServer> {
+export async function discoverNativeMcpAuthorizationServer(issuer: string, network: NativeMcpOAuthNetwork, timeoutMs: number): Promise<NativeMcpAuthorizationServer> {
+  const development = network.development;
   const base = nativeMcpOAuthUrl(issuer, development);
   if (base.search) return refuse("MCP authorization server issuer has a query; it was refused.");
   const path = base.pathname.replace(/\/$/, "");
@@ -164,7 +194,7 @@ export async function discoverNativeMcpAuthorizationServer(issuer: string, devel
     ? [`/.well-known/oauth-authorization-server${path}`, `/.well-known/openid-configuration${path}`, `${path}/.well-known/openid-configuration`]
     : ["/.well-known/oauth-authorization-server", "/.well-known/openid-configuration"];
   for (const candidate of candidates) {
-    const { status, body } = await nativeMcpOAuthFetch(new URL(candidate, base.origin), { method: "GET", headers: { accept: "application/json" } }, timeoutMs);
+    const { status, body } = await nativeMcpOAuthFetch(new URL(candidate, base.origin), { method: "GET", headers: { accept: "application/json" } }, timeoutMs, network);
     if (status !== 200) continue;
     const document = body as Record<string, unknown> | null;
     if (!document || typeof document !== "object" || document.issuer !== issuer) {
