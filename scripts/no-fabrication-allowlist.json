@@ -2,11 +2,6 @@
   "$comment": "P0-16 allowlist for scripts/check-no-fabrication.mjs. permanent: reviewed legitimate uses. pending: wording an open issue removes (owner); --strict at Gate G0 fails while any remain. pathPresence: control-surface scorers that report AMC's own control inventory, refuse or are not evaluated outside an AMC checkout, and are retired by P1-53; names may only be dropped from the set frozen in the script; pathPresenceBaseline may only go down. An entry that matches nothing fails as stale.",
   "permanent": [
     {
-      "file": "src/assurance/certificate.ts",
-      "rule": "R4",
-      "reason": "Refusal text: assertNotExample(run, \"certified\") throws 'synthetic_example results cannot be certified'."
-    },
-    {
       "file": "src/business/grcExport.ts",
       "rule": "R4",
       "reason": "Negation: the caveat says the exports are 'not certified' GRC implementations."
