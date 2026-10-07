@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { lstatSync, readdirSync, readFileSync } from "node:fs";
+import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -63,7 +63,10 @@ export const approvalRequestSchema = z.object({
     toolsHash: z.string().length(64),
     budgetsHash: z.string().length(64),
     leaseConstraintsHash: z.string().length(64)
-  })
+  }),
+  // The authorization intent an approver reviewed (P1-02): protected facts and digests, never raw arguments.
+  // Its hash is `boundHashes.intentHash`, so a recheck can name which fact changed.
+  authorizationIntent: z.record(z.string(), z.unknown()).optional()
 });
 
 export const approvalDecisionSchema = z.object({
@@ -161,7 +164,8 @@ function signArtifact(workspace: string, path: string): string {
   return sigPath;
 }
 
-function verifyArtifact(workspace: string, path: string): { valid: boolean; reason?: string } {
+/** Pass the bytes the caller will parse, so what is verified is what is read (no verify-then-reread). */
+function verifyArtifact(workspace: string, path: string, bytes?: Buffer): { valid: boolean; reason?: string } {
   if (!pathExists(path)) {
     return { valid: false, reason: "file missing" };
   }
@@ -171,7 +175,7 @@ function verifyArtifact(workspace: string, path: string): { valid: boolean; reas
   }
   try {
     const sig = signatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const digest = sha256Hex(readFileSync(path));
+    const digest = sha256Hex(bytes ?? readFileSync(path));
     if (digest !== sig.digestSha256) {
       return { valid: false, reason: "digest mismatch" };
     }
@@ -179,6 +183,24 @@ function verifyArtifact(workspace: string, path: string): { valid: boolean; reas
     return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
   } catch (error) {
     return { valid: false, reason: String(error) };
+  }
+}
+
+/**
+ * Publish complete bytes at `path` only if nothing is there; false when something already was.
+ * ponytail: hard links only; fall back to openSync(path, "wx") when a filesystem without them shows up.
+ */
+function publishExclusive(path: string, bytes: string): boolean {
+  const tmp = `${path}.${randomUUID()}.tmp`;
+  writeFileSync(tmp, bytes, { mode: 0o644 });
+  try {
+    linkSync(tmp, path);
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") return false;
+    throw error;
+  } finally {
+    rmSync(tmp, { force: true });
   }
 }
 
@@ -211,6 +233,7 @@ export function createApprovalRequestRecord(input: {
     budgetsHash: string;
     leaseConstraintsHash: string;
   };
+  authorizationIntent?: Record<string, unknown>;
 }): { request: ApprovalRequestRecord; path: string; sigPath: string } {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   ensureDirs(input.workspace, agentId);
@@ -239,7 +262,8 @@ export function createApprovalRequestRecord(input: {
       toolsHash: input.boundHashes.toolsHash,
       budgetsHash: input.boundHashes.budgetsHash,
       leaseConstraintsHash: input.boundHashes.leaseConstraintsHash
-    }
+    },
+    ...(input.authorizationIntent === undefined ? {} : { authorizationIntent: input.authorizationIntent })
   });
   const path = requestPath(input.workspace, agentId, request.approvalRequestId);
   writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
@@ -262,13 +286,14 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
+  const bytes = readFileSync(path);
   if (params.requireValidSignature !== false) {
-    const verification = verifyArtifact(params.workspace, path);
+    const verification = verifyArtifact(params.workspace, path, bytes);
     if (!verification.valid) {
       throw new Error(`invalid approval request signature: ${verification.reason ?? "unknown"}`);
     }
   }
-  return approvalRequestSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  return approvalRequestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
 }
 
 export function updateApprovalRequestStatus(params: {
@@ -381,22 +406,6 @@ export function markApprovalConsumed(params: {
     requireValidSignature: true
   });
   const path = consumedPath(params.workspace, request.agentId, request.approvalRequestId);
-  if (pathExists(path)) {
-    const consumed = loadApprovalConsumed({
-      workspace: params.workspace,
-      agentId: request.agentId,
-      approvalRequestId: request.approvalRequestId
-    });
-    if (!consumed) {
-      throw new Error("approval consumption artifact missing");
-    }
-    return {
-      consumed,
-      path,
-      sigPath: sigPathFor(path),
-      replay: true
-    };
-  }
   const consumed = approvalConsumedSchema.parse({
     v: 1,
     approvalRequestId: request.approvalRequestId,
@@ -406,7 +415,13 @@ export function markApprovalConsumed(params: {
     reason: params.reason
   });
   ensureDirs(params.workspace, request.agentId);
-  writeFileAtomic(path, JSON.stringify(consumed, null, 2), 0o644);
+  // Exclusive create, so two processes cannot both consume: the loser sees the winner's file and is a replay.
+  // A reader that lands between the link and the signature fails closed on the missing signature.
+  if (!publishExclusive(path, JSON.stringify(consumed, null, 2))) {
+    const prior = loadApprovalConsumed({ workspace: params.workspace, agentId: request.agentId, approvalRequestId: request.approvalRequestId });
+    if (!prior) throw new Error("approval consumption artifact missing");
+    return { consumed: prior, path, sigPath: sigPathFor(path), replay: true };
+  }
   const sigPath = signArtifact(params.workspace, path);
   updateApprovalRequestStatus({
     workspace: params.workspace,
@@ -432,11 +447,12 @@ export function loadApprovalConsumed(params: {
   if (!pathExists(path)) {
     return null;
   }
-  const verification = verifyArtifact(params.workspace, path);
+  const bytes = readFileSync(path);
+  const verification = verifyArtifact(params.workspace, path, bytes);
   if (!verification.valid) {
     throw new Error(`invalid approval consumed signature: ${verification.reason ?? "unknown"}`);
   }
-  const consumed = approvalConsumedSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  const consumed = approvalConsumedSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
   if (consumed.approvalRequestId !== params.approvalRequestId || consumed.agentId !== agentId) {
     throw new Error("invalid approval consumed binding");
   }
