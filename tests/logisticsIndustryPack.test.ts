@@ -44,10 +44,14 @@ describe("freight, 3PL, and warehouse industry pack", () => {
     ]));
     expect(pack.questions.length).toBeGreaterThanOrEqual(15);
     expect(baseline.level).toBe(1);
-    expect(baseline.certified).toBe(false);
+    expect(baseline.selfAssessment).toEqual({ complete: false, answered: 0, total: pack.questions.length });
     expect(baseline.complianceGaps.length).toBe(pack.questions.length);
+    // P0-21: all-5 answers are a complete self-assessment, self-reported and capped at L1, never certified.
     expect(mature.level).toBe(5);
     expect(mature.percentage).toBe(100);
-    expect(mature.certified).toBe(true);
+    expect(mature.selfAssessment.complete).toBe(true);
+    expect(mature.claimKind).toBe("self_reported");
+    expect(mature.eligibleLevel).toBe(1);
+    expect("certified" in mature).toBe(false);
   });
 });

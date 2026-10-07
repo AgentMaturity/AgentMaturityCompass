@@ -241,12 +241,11 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         console.log(chalk.gray(`  Questions: ${pack.questions.length}\n`));
       }
 
-      let responses: Record<string, number> = {};
+      // Baseline and non-interactive runs answer nothing: unanswered questions count as 1 and the
+      // self-assessment reads incomplete, so a default is never reported as an answer.
+      const responses: Record<string, number> = {};
 
-      if (opts.baseline) {
-        // Score all questions at L1 to show gap surface
-        for (const q of pack.questions) { responses[q.id] = 1; }
-      } else if (process.stdin.isTTY) {
+      if (!opts.baseline && process.stdin.isTTY) {
         // Interactive assessment
         const inq = await import("inquirer");
         for (const q of pack.questions) {
@@ -262,9 +261,6 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
           }]);
           responses[q.id] = level;
         }
-      } else {
-        // Non-interactive: default to L1 baseline
-        for (const q of pack.questions) { responses[q.id] = 1; }
       }
 
       const result = scoreIndustryPack(opts.pack as PackIdType, responses);
@@ -272,8 +268,10 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
 
       console.log(chalk.bold("  Results:"));
       console.log(`    Pack:       ${result.packId}`);
-      console.log(`    Score:      ${result.percentage.toFixed(1)} / 100`);
-      console.log(`    Level:      L${result.level}`);
+      console.log(`    Self-reported score: ${result.percentage.toFixed(1)} / 100 (L${result.level})`);
+      const { complete, answered, total } = result.selfAssessment;
+      console.log(`    Self-assessment:     ${complete ? "complete" : "incomplete"} (${answered}/${total} answered; self-reported; not a certification)`);
+      console.log(`    Eligible level:      ${result.eligibleLevel === null ? "none" : `L${result.eligibleLevel}`} (self-reported answers cap at L1)`);
       console.log(`    Questions:  ${result.questionResults.length}`);
       const lowScoring = result.questionResults.filter(q => q.percentage < 50);
       if (lowScoring.length > 0) {

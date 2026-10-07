@@ -32,7 +32,7 @@ describe("score crossFrameworkMapping", () => {
     expect(report.coveragePercent).toBe(0);
     expect(report.coveredControls).toHaveLength(0);
     expect(report.gapControls.length).toBe(10);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("GDPR framework has article-level controls and zero coverage with no evidence", () => {
@@ -40,7 +40,7 @@ describe("score crossFrameworkMapping", () => {
     expect(report.coveragePercent).toBe(0);
     expect(report.coveredControls).toHaveLength(0);
     expect(report.gapControls.length).toBe(17);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("GDPR Article 5 accountability is represented and coverable", () => {
@@ -57,14 +57,14 @@ describe("score crossFrameworkMapping", () => {
     const report = generateFrameworkReport("MITRE_ATLAS", { passedQIDs: [], activeModules: [] });
     expect(report.coveragePercent).toBe(0);
     expect(report.gapControls.length).toBe(15);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("OWASP API Top 10 has all 10 controls and zero coverage with no evidence", () => {
     const report = generateFrameworkReport("OWASP_API_TOP10", { passedQIDs: [], activeModules: [] });
     expect(report.coveragePercent).toBe(0);
     expect(report.gapControls.length).toBe(10);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("MITRE ATLAS coverage via prompt injection question", () => {
@@ -90,7 +90,7 @@ describe("score crossFrameworkMapping", () => {
     expect(report.coveragePercent).toBe(0);
     expect(report.coveredControls).toHaveLength(0);
     expect(report.gapControls.length).toBe(12);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("NIST coverage can be satisfied by AMC question IDs", () => {
@@ -128,7 +128,7 @@ describe("score crossFrameworkMapping", () => {
     expect(report.coveragePercent).toBe(8);
   });
 
-  test("NIST readiness becomes true when coverage threshold is fully met", () => {
+  test("NIST coverage target is met when coverage threshold is fully met", () => {
     const report = generateFrameworkReport("NIST_AI_RMF", {
       passedQIDs: [
         "AMC-1.1",
@@ -151,16 +151,16 @@ describe("score crossFrameworkMapping", () => {
     });
     expect(report.coveragePercent).toBeGreaterThanOrEqual(80);
     expect(report.gapControls.length).toBeLessThanOrEqual(2);
-    expect(report.certificationReadiness).toBe(true);
+    expect(report.targetMet).toBe(true);
   });
 
-  test("NIST readiness stays false for low coverage", () => {
+  test("NIST coverage target stays unmet for low coverage", () => {
     const report = generateFrameworkReport("NIST_AI_RMF", {
       passedQIDs: ["AMC-1.2", "AMC-1.4"],
       activeModules: []
     });
     expect(report.coveragePercent).toBeLessThan(80);
-    expect(report.certificationReadiness).toBe(false);
+    expect(report.targetMet).toBe(false);
   });
 
   test("EU AI Act manual controls include EU-61 when AMC-2.11 is covered", () => {

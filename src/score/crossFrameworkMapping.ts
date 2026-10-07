@@ -24,7 +24,8 @@ export interface FrameworkComplianceReport {
   automatedControls: string[];
   manualControls: string[];
   auditArtifacts: string[];  // file types AMC can generate
-  certificationReadiness: boolean;
+  /** Self-reported coverage target (80% covered, at most two gaps). Meeting it certifies nothing. */
+  targetMet: boolean;
 }
 
 // NIST AI RMF control mapping
@@ -235,7 +236,7 @@ export function generateFrameworkReport(
     automatedControls: automated,
     manualControls: manual,
     auditArtifacts: FRAMEWORK_ARTIFACTS[framework],
-    certificationReadiness: coveragePercent >= 80 && gaps.length <= 2,
+    targetMet: coveragePercent >= 80 && gaps.length <= 2,
   };
 }
 

@@ -65,7 +65,8 @@ export interface MCPComplianceResult {
   failed: string[];
   warnings: string[];
   recommendations: string[];
-  badge: 'MCP-Certified' | 'MCP-Compatible' | 'MCP-Aware' | 'Not-MCP';
+  /** A self-computed conformance band, not a certification. */
+  badge: 'MCP-Full' | 'MCP-Partial' | 'MCP-Minimal' | 'Not-MCP';
   safety: MCPSafetyScorecard;
   promptInjection: MCPPromptInjectionDetectionResult;
 }
@@ -413,9 +414,9 @@ export function scoreMcpCompliance(capabilities: MCPCapabilityDeclaration): MCPC
     'non-compliant';
 
   const badge: MCPComplianceResult['badge'] =
-    level === 'full' ? 'MCP-Certified' :
-    level === 'partial' ? 'MCP-Compatible' :
-    level === 'minimal' ? 'MCP-Aware' :
+    level === 'full' ? 'MCP-Full' :
+    level === 'partial' ? 'MCP-Partial' :
+    level === 'minimal' ? 'MCP-Minimal' :
     'Not-MCP';
 
   const recommendations = failed
@@ -542,9 +543,10 @@ Agents that are MCP-compliant can be:
 - Rated for practical safety posture across MCP trust boundaries
 
 ## Compliance Levels
-- **MCP-Certified**: Full compliance (90%+). Required checks passed. Production-ready.
-- **MCP-Compatible**: Partial compliance (60–89%). Core protocol + most features.
-- **MCP-Aware**: Minimal compliance. Basic tool manifest only.
+These bands are self-computed from the checks AMC ran; none of them is a certification.
+- **MCP-Full**: score 90+ with required checks passed and safety thresholds met.
+- **MCP-Partial**: score 65–89 with required checks passed. Core protocol + most features.
+- **MCP-Minimal**: core checks only. Basic tool manifest.
 - **Not-MCP**: No MCP support detected.
 
 ## Quick Start

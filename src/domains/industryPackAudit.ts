@@ -15,9 +15,12 @@
  */
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import type { ClaimKind } from "../claims/eligibility/types.js";
 import type { IndustryPack, IndustryPackQuestion } from "./industryPacks.js";
+import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js";
 
-export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/1";
+/** /2 (P0-21): the overall pass flag and its threshold gave way to the self-assessment fields. */
+export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/2";
 
 export const AUDIT_FRAMEWORKS = ["EU AI Act", "NIST AI RMF", "ISO 42001", "SOC 2", "Sector"] as const;
 export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
@@ -62,10 +65,13 @@ export interface IndustryPackAudit {
   euAIActClassification: string;
   generatedAt: string;
   overall: {
+    /** Self-reported score. */
     percentage: number;
     level: number;
-    certified: boolean;
-    certificationThreshold: number;
+    selfAssessment: PackSelfAssessment;
+    claimKind: ClaimKind;
+    eligibleLevel: number | null;
+    selfAssessmentTarget: number;
     controlCount: number;
     passCount: number;
     adequateCount: number;
@@ -218,18 +224,13 @@ export interface BuildIndustryPackAuditInput {
 export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): IndustryPackAudit {
   const { pack, responses, now, frameworkFilter } = input;
   const controls: AuditControl[] = [];
-  let totalEarned = 0;
-  let totalPossible = 0;
+  const { answers, ...assessed } = selfAssessPack(pack, responses, now);
   let passCount = 0;
   let adequateCount = 0;
   let gapCount = 0;
 
-  for (const q of pack.questions) {
-    const raw = responses[q.id];
-    const level = Math.min(5, Math.max(1, Number.isFinite(raw) ? Math.floor(raw as number) : 1));
-    const levelPct = (level - 1) / 4;
-    totalEarned += q.weight * levelPct;
-    totalPossible += q.weight;
+  for (const [index, q] of pack.questions.entries()) {
+    const level: number = answers[index]!;
     const status = levelStatus(level);
     if (status === "PASS") passCount += 1;
     else if (status === "ADEQUATE") adequateCount += 1;
@@ -254,10 +255,6 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     });
   }
 
-  const percentage = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
-  const level = percentage >= 90 ? 5 : percentage >= 75 ? 4 : percentage >= 55 ? 3 : percentage >= 30 ? 2 : 1;
-  const certified = percentage >= pack.certificationThreshold && gapCount === 0;
-
   const coverage = new Map<AuditFramework, number>();
   for (const control of controls) {
     for (const entry of control.crosswalk) {
@@ -277,10 +274,8 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
     euAIActClassification: pack.euAIActClassification,
     generatedAt: new Date(now).toISOString(),
     overall: {
-      percentage,
-      level,
-      certified,
-      certificationThreshold: pack.certificationThreshold,
+      ...assessed,
+      selfAssessmentTarget: pack.certificationThreshold,
       controlCount: controls.length,
       passCount,
       adequateCount,
@@ -307,7 +302,9 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   lines.push(`- Pack: \`${audit.packId}\` · Station: ${audit.stationId} · Risk tier: ${audit.riskTier}`);
   lines.push(`- EU AI Act classification: ${audit.euAIActClassification}`);
   lines.push(`- Generated: ${audit.generatedAt}`);
-  lines.push(`- Overall: **${audit.overall.percentage}%** (L${audit.overall.level}) · certified: **${audit.overall.certified ? "YES" : "NO"}** (threshold ${audit.overall.certificationThreshold}%)`);
+  const overall = audit.overall;
+  lines.push(`- Overall (self-reported): ${overall.percentage}% · self-assessment complete: ${overall.selfAssessment.complete ? "yes" : "no"} · claim kind: ${overall.claimKind.replace("_", "-")}`);
+  lines.push(`- Self-reported level L${overall.level}; eligible level ${overall.eligibleLevel === null ? "none" : `L${overall.eligibleLevel}`} · self-assessment target ${overall.selfAssessmentTarget}%`);
   lines.push(`- Controls: ${audit.overall.controlCount} — PASS ${audit.overall.passCount} · ADEQUATE ${audit.overall.adequateCount} · GAP ${audit.overall.gapCount}`);
   lines.push(`- Receipt: \`sha256:${audit.receiptHash}\` — tamper-evident; recompute over the signed bundle to verify offline.`);
   lines.push("");

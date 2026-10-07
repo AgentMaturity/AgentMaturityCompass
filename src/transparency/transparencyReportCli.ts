@@ -102,7 +102,7 @@ export function registerTransparencyReportCommands(program: Command): void {
             console.log(chalk.green(`✓ Report written to ${outPath}`));
             console.log(
               chalk.cyan(
-                `  Trust Score: ${report.identity.trustScore}/100 · ${report.identity.maturityLabel} · ${report.identity.certificationStatus}`
+                `  Trust Score: ${report.identity.trustScore}/100 · ${report.identity.maturityLabel} · evidence standing: ${report.identity.evidenceStanding}`
               )
             );
           } else {

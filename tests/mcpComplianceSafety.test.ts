@@ -62,7 +62,7 @@ describe("mcp compliance scoring", () => {
   test("scores full compliance with strong MCP safety posture", () => {
     const result = scoreMcpCompliance(baselineCapabilities());
     expect(result.level).toBe("full");
-    expect(result.badge).toBe("MCP-Certified");
+    expect(result.badge).toBe("MCP-Full");
     expect(result.score).toBe(100);
     expect(result.safety.overall).toBe(100);
     expect(result.safety.supplyChainGovernance.score).toBe(100);
@@ -235,7 +235,7 @@ describe("mcp compliance scoring", () => {
     );
 
     expect(result.level).toBe("minimal");
-    expect(result.badge).toBe("MCP-Aware");
+    expect(result.badge).toBe("MCP-Minimal");
   });
 
   test("returns non-compliant when MCP protocol support is missing", () => {

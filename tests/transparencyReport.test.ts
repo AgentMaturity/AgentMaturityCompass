@@ -244,7 +244,7 @@ describe("generateTransparencyReport", () => {
     expect(report.identity.maturityLevel).toBe(0);
     expect(report.identity.maturityLabel).toBe("L0 — Absent");
     expect(report.identity.trustScore).toBe(0);
-    expect(report.identity.certificationStatus).toBe("not-certified");
+    expect(report.identity.evidenceStanding).toBe("insufficient_evidence");
   });
 
   it("handles agent with no BOM gracefully", () => {
@@ -266,7 +266,8 @@ describe("generateTransparencyReport", () => {
     expect(report.version).toBe("1.0");
   });
 
-  it("certification status — certified when integrity >= 0.9 and level >= 4", () => {
+  // P0-21: the same inputs now give an evidence standing; a self-computed report never says "certified".
+  it("evidence standing — evidence_supported when integrity >= 0.9 and level >= 4", () => {
     const { workspace, agentId } = createTestWorkspace({
       integrityIndex: 0.95,
       avgLevel: 4.2,
@@ -274,10 +275,10 @@ describe("generateTransparencyReport", () => {
     tracked(workspace);
 
     const report = generateTransparencyReport(agentId, workspace);
-    expect(report.identity.certificationStatus).toBe("certified");
+    expect(report.identity.evidenceStanding).toBe("evidence_supported");
   });
 
-  it("certification status — pending when integrity >= 0.6 or level >= 2", () => {
+  it("evidence standing — partial_evidence when integrity >= 0.6 or level >= 2", () => {
     const { workspace, agentId } = createTestWorkspace({
       integrityIndex: 0.7,
       avgLevel: 2.5,
@@ -285,10 +286,10 @@ describe("generateTransparencyReport", () => {
     tracked(workspace);
 
     const report = generateTransparencyReport(agentId, workspace);
-    expect(report.identity.certificationStatus).toBe("pending");
+    expect(report.identity.evidenceStanding).toBe("partial_evidence");
   });
 
-  it("certification status — not-certified when integrity < 0.6 and level < 2", () => {
+  it("evidence standing — insufficient_evidence when integrity < 0.6 and level < 2", () => {
     const { workspace, agentId } = createTestWorkspace({
       integrityIndex: 0.3,
       avgLevel: 1.2,
@@ -297,6 +298,6 @@ describe("generateTransparencyReport", () => {
     tracked(workspace);
 
     const report = generateTransparencyReport(agentId, workspace);
-    expect(report.identity.certificationStatus).toBe("not-certified");
+    expect(report.identity.evidenceStanding).toBe("insufficient_evidence");
   });
 });

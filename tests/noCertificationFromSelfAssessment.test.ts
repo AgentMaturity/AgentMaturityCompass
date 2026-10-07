@@ -8,7 +8,7 @@ import { buildDomainReport } from "../src/domains/domainReportBuilder.js";
 import { buildIndustryPackAudit, renderIndustryPackAuditMarkdown } from "../src/domains/industryPackAudit.js";
 import { listIndustryPacks, scoreIndustryPack, type IndustryPack } from "../src/domains/industryPacks.js";
 import { getDomainPackQuestions } from "../src/score/domainPacks.js";
-import type { Level0to5, Likert1to5 } from "../src/score/units.js";
+import { level, likert } from "../src/score/units.js";
 import { generateTransparencyReport, renderTransparencyReportMarkdown } from "../src/transparency/transparencyReport.js";
 
 type ToolHandler = (args: Record<string, unknown>) => Promise<{ content: Array<{ text: string }>; isError?: boolean }>;
@@ -110,8 +110,8 @@ describe("no certification from self-assessment (P0-21)", () => {
     const report = buildDomainReport(assessDomain({
       agentId: "agent-tech",
       domain: "technology",
-      baseScores: { "AMC-1.1": 5, "AMC-1.2": 5 } as Record<string, Level0to5>,
-      domainQuestionScores: Object.fromEntries(getDomainPackQuestions("technology").map((q) => [q.id, 5])) as Record<string, Likert1to5>
+      baseScores: { "AMC-1.1": level(5), "AMC-1.2": level(5) },
+      domainQuestionScores: Object.fromEntries(getDomainPackQuestions("technology").map((q) => [q.id, likert(5)]))
     }));
     expect(certificationWords(JSON.stringify(report))).toEqual([]);
   });
