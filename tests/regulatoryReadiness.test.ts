@@ -101,56 +101,50 @@ afterEach(() => {
   }
 });
 
+// These tests used to assert path-presence scores (ISO controls covered by doc
+// file names, a readiness score of 70+ from AMC source paths). File presence is
+// not evidence, so since P0-15 all three components are not evaluated.
 describe("scoreISO42001Coverage", () => {
-  test("returns zero score when no controls are present", () => {
-    const workspace = bareWorkspace();
-    const score = scoreISO42001Coverage(workspace);
-    expect(score.score).toBe(0);
-    expect(score.passedControls).toBe(0);
-    expect(score.gaps.length).toBe(score.totalControls);
+  test("reports every control as not evaluated in a bare workspace", () => {
+    const score = scoreISO42001Coverage(bareWorkspace());
+    expect(score.status).toBe("not_evaluated");
+    expect(score.score).toBeNull();
+    expect(score.controls).toHaveLength(score.totalControls);
   });
 
-  test("detects covered ISO controls from workspace artifacts", () => {
+  test("stays not evaluated when governance documents exist", () => {
     const workspace = newWorkspace();
     writeArtifact(workspace, "docs/AI_GOVERNANCE.md");
     writeArtifact(workspace, "docs/POLICY.md");
     writeArtifact(workspace, "docs/MONITORING.md");
-
     const score = scoreISO42001Coverage(workspace);
-    expect(score.passedControls).toBeGreaterThanOrEqual(3);
-    expect(score.score).toBeGreaterThan(0);
+    expect(score.score).toBeNull();
+    expect(score.controls.every((control) => control.status === "not_evaluated")).toBe(true);
   });
 });
 
 describe("scoreRegulatoryReadiness", () => {
-  test("combines EU + ISO + OWASP into a single readiness score", () => {
+  test("is not evaluated even with every formerly accepted artifact and lists all 28 criteria", () => {
     const workspace = newWorkspace();
     populateHighCoverageArtifacts(workspace);
     writeRun(workspace, "agent-reg", "run-1", 1000, 0.95);
 
-    const score = scoreRegulatoryReadiness({
-      workspace,
-      agentId: "agent-reg"
-    });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
 
-    expect(score.components.euAiAct).toBeGreaterThanOrEqual(90);
-    expect(score.components.owaspLLM).toBe(100);
-    expect(score.components.iso42001).toBeGreaterThanOrEqual(90);
-    expect(score.score).toBeGreaterThanOrEqual(70);
+    expect(score.status).toBe("not_evaluated");
+    expect(score.score).toBeNull();
+    expect(score.components).toEqual({ euAiAct: null, iso42001: null, owaspLLM: null });
+    expect(score.notEvaluated).toHaveLength(28);
     expect(score.agentId).toBe("agent-reg");
   });
 
-  test("agent evidence modifier increases with stronger latest integrity index", () => {
+  test("still reports the latest sealed run", () => {
     const workspace = newWorkspace();
-    populateHighCoverageArtifacts(workspace);
     writeRun(workspace, "agent-reg", "run-low", 1000, 0.4);
-    const low = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
-
     writeRun(workspace, "agent-reg", "run-high", 2000, 0.9);
-    const high = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
-
-    expect(high.agentEvidenceModifier).toBeGreaterThan(low.agentEvidenceModifier);
-    expect(high.score).toBeGreaterThanOrEqual(low.score);
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBe("run-high");
+    expect(score.latestIntegrityIndex).toBe(0.9);
   });
 
   test("normalizes custom weights for deterministic weighted composite", () => {

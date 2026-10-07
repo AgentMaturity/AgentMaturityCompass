@@ -18,6 +18,7 @@ interface ControlInventoryDimension {
 }
 
 export interface GamingResistanceReport {
+  status: "not_evaluated";
   applicable: false;
   notApplicableReason: string;
   assessmentStatus: "not_measured";
@@ -78,6 +79,7 @@ export function scoreGamingResistance(root: string): GamingResistanceReport {
     "this inventory cannot establish resistance to score manipulation.";
 
   return {
+    status: "not_evaluated",
     applicable: false,
     notApplicableReason: assessmentReason,
     assessmentStatus: "not_measured",

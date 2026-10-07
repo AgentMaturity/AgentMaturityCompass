@@ -22405,53 +22405,44 @@ score
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+function printNotEvaluatedCriteria(criteria: Array<{ id: string; reason: string }>, recommendations: string[]): void {
+  console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"));
+  for (const criterion of criteria) console.log(chalk.gray(`  ${criterion.id}: not evaluated (${criterion.reason})`));
+  for (const line of recommendations) console.log(chalk.gray(line));
+}
+
 score
   .command("eu-ai-act")
-  .description("Score EU AI Act compliance maturity (Art. 9-17, GPAI systemic risk)")
+  .description("EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreEUAIActCompliance } = await import("./score/euAIActCompliance.js");
       const result = scoreEUAIActCompliance();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Compliance"));
-      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Risk class:"), result.riskClassification);
-      console.log(chalk.gray("Risk management system:"), result.hasRiskManagementSystem ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Technical documentation:"), result.hasTechnicalDocumentation ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Human oversight design:"), result.hasHumanOversightDesign ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Adversarial testing:"), result.hasAdversarialTesting ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("FRIA:"), result.hasFundamentalRightsImpactAssessment ? chalk.green("yes") : chalk.red("no"));
-      if (result.gaps.length) console.log(chalk.yellow("Gaps:"), result.gaps.slice(0, 3).join("; "));
+      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Obligations"));
+      console.log(chalk.gray("Risk class (self-reported):"), result.riskClassification);
+      printNotEvaluatedCriteria(result.criteria, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 score
   .command("owasp-llm")
-  .description("Score OWASP LLM Top 10 coverage (all 10 risks)")
+  .description("OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
-      const { reportControlSurfaceScopeSkip } = await import(
-        "./score/controlSurfaceScope.js"
-      );
-      // Grades AMC's own control surface; refuses to emit a number for a
-      // directory it cannot actually assess. See controlSurfaceScope.ts.
-      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreOWASPLLMCoverage();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"));
-      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Covered:"), `${result.coveredCount}/10`);
-      if (result.uncoveredRisks.length) console.log(chalk.yellow("Uncovered:"), result.uncoveredRisks.join(", "));
-      else console.log(chalk.green("All 10 OWASP LLM risks covered ✓"));
+      printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 score
   .command("regulatory-readiness")
-  .description("Compute weighted regulatory readiness score (EU AI Act + ISO + OWASP)")
+  .description("Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence")
   .requiredOption("--agent <id>", "agent ID")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; json?: boolean }) => {
@@ -22466,15 +22457,9 @@ score
       }
       console.log(chalk.bold.hex('#4AEF79')("\n🏛️  Regulatory Readiness"));
       console.log(chalk.gray("Agent:"), result.agentId);
-      console.log(chalk.gray("Score:"), `${result.score}/100`, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Weighted composite:"), result.weightedComposite.toFixed(2));
-      console.log(chalk.gray("Components:"), `EU=${result.components.euAiAct} ISO=${result.components.iso42001} OWASP=${result.components.owaspLLM}`);
-      console.log(chalk.gray("Weights:"), `EU=${result.weights.euAiAct.toFixed(2)} ISO=${result.weights.iso42001.toFixed(2)} OWASP=${result.weights.owaspLLM.toFixed(2)}`);
-      console.log(chalk.gray("Agent evidence modifier:"), result.agentEvidenceModifier.toFixed(2));
+      console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${result.notEvaluated.length} criteria: file presence is not evidence)`));
       console.log(chalk.gray("Latest run:"), result.latestRunId ?? "none");
-      if (result.gaps.length > 0) {
-        console.log(chalk.yellow("Top gaps:"), result.gaps.slice(0, 4).join("; "));
-      }
+      for (const line of result.recommendations) console.log(chalk.gray(line));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
       process.exit(1);

@@ -15,43 +15,21 @@ describe("owaspLLMCoverage", () => {
     rmSync(tmp, { recursive: true, force: true });
   });
 
-  it("returns zero coverage for empty directory", () => {
+  // These tests used to score coverage from AMC source file names. File presence
+  // is not evidence that a risk is mitigated (P0-15).
+  it("reports all 10 risks as not evaluated in an empty directory", () => {
     const r = scoreOWASPLLMCoverage(tmp);
-    expect(r.score).toBe(0);
-    expect(r.coveredCount).toBe(0);
-    expect(r.uncoveredRisks).toHaveLength(10);
-    expect(r.gaps.length).toBeGreaterThan(0);
+    expect(r.status).toBe("not_evaluated");
+    expect(r.score).toBeNull();
+    expect(r.level).toBeNull();
+    expect(r.risks).toHaveLength(10);
   });
 
-  it("detects partial coverage", () => {
+  it("stays not evaluated when the formerly accepted source files exist", () => {
     mkdirSync(join(tmp, "src/assurance/packs"), { recursive: true });
     writeFileSync(join(tmp, "src/assurance/packs/injectionPack.ts"), "");
     const r = scoreOWASPLLMCoverage(tmp);
-    expect(r.llm01_promptInjection).toBe(true);
-    expect(r.coveredCount).toBe(1);
-    expect(r.uncoveredRisks).toHaveLength(9);
-    expect(r.score).toBe(10);
-  });
-
-  it("returns full coverage when all artifacts present", () => {
-    mkdirSync(join(tmp, "src/assurance/packs"), { recursive: true });
-    mkdirSync(join(tmp, "src/score"), { recursive: true });
-    mkdirSync(join(tmp, "src/ops"), { recursive: true });
-    writeFileSync(join(tmp, "src/assurance/packs/injectionPack.ts"), "");
-    writeFileSync(join(tmp, "src/score/outputIntegrityMaturity.ts"), "");
-    writeFileSync(join(tmp, "src/assurance/packs/ragPoisoningPack.ts"), "");
-    writeFileSync(join(tmp, "src/ops/circuitBreaker.ts"), "");
-    writeFileSync(join(tmp, "src/assurance/packs/sbomSupplyChainPack.ts"), "");
-    writeFileSync(join(tmp, "src/assurance/packs/dlpExfiltrationPack.ts"), "");
-    writeFileSync(join(tmp, "src/score/mcpCompliance.ts"), "");
-    writeFileSync(join(tmp, "src/assurance/packs/governanceBypassPack.ts"), "");
-    writeFileSync(join(tmp, "src/score/humanOversightQuality.ts"), "");
-    writeFileSync(join(tmp, "src/assurance/packs/exfiltrationPack.ts"), "");
-    const r = scoreOWASPLLMCoverage(tmp);
-    expect(r.coveredCount).toBe(10);
-    expect(r.score).toBe(100);
-    expect(r.level).toBe(5);
-    expect(r.uncoveredRisks).toHaveLength(0);
-    expect(r.gaps).toHaveLength(0);
+    expect(r.score).toBeNull();
+    expect(r.risks.find((risk) => risk.id === "LLM01")?.status).toBe("not_evaluated");
   });
 });
