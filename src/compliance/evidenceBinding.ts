@@ -5,6 +5,7 @@ import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import type { AssurancePackResult, AssuranceReport, EvidenceEvent } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
+import { sha256Hex } from "../utils/hash.js";
 import type { ComplianceEvidenceRequirement, ComplianceMapping } from "./mappingSchema.js";
 
 /**
@@ -54,16 +55,23 @@ export function subjectRole(event: EvidenceEvent, agentId: string, scope: Bindin
 
 export interface VerifiedAssurance {
   packs: Map<string, AssurancePackResult>;
-  /** In-window reports (or unreadable files) whose hash, seal or ledger integrity did not verify; they count for nothing. */
-  unverifiable: Array<{ file: string; packIds: string[] }>;
+  /** The sealed run each entry of `packs` came from: its id, its time and its verified seal hash. */
+  runs: Map<string, { runId: string; ts: number; reportSha256: string }>;
+  /**
+   * In-window reports (or unreadable files) whose hash, seal or ledger integrity did not verify; they count for nothing.
+   * `sha256` is of the file bytes.
+   */
+  unverifiable: Array<{ file: string; packIds: string[]; sha256: string }>;
 }
 
-function readReport(file: string): Partial<AssuranceReport> | null {
+function readReport(file: string): { report: Partial<AssuranceReport> | null; sha256: string } {
+  let text = "";
   try {
-    const parsed: unknown = JSON.parse(readUtf8(file));
-    return parsed && typeof parsed === "object" ? (parsed as Partial<AssuranceReport>) : null;
+    text = readUtf8(file);
+    const parsed: unknown = JSON.parse(text);
+    return { report: parsed && typeof parsed === "object" ? (parsed as Partial<AssuranceReport>) : null, sha256: sha256Hex(text) };
   } catch {
-    return null;
+    return { report: null, sha256: sha256Hex(text) };
   }
 }
 
@@ -78,15 +86,15 @@ export function verifiedAssuranceByPack(params: {
   windowStartTs: number;
   windowEndTs: number;
 }): VerifiedAssurance {
-  const out: VerifiedAssurance = { packs: new Map(), unverifiable: [] };
+  const out: VerifiedAssurance = { packs: new Map(), runs: new Map(), unverifiable: [] };
   const dir = join(getAgentPaths(params.workspace, params.agentId).reportsDir, "assurance");
   if (!pathExists(dir)) return out;
-  const latest = new Map<string, { ts: number; pack: AssurancePackResult }>();
+  const latest = new Map<string, { ts: number; pack: AssurancePackResult; runId: string; reportSha256: string }>();
   for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort((a, b) => a.localeCompare(b))) {
     const file = join(dir, name);
-    const report = readReport(file);
+    const { report, sha256 } = readReport(file);
     if (!report) {
-      out.unverifiable.push({ file, packIds: [] });
+      out.unverifiable.push({ file, packIds: [], sha256 });
       continue;
     }
     if (report.agentId !== params.agentId || typeof report.ts !== "number"
@@ -95,15 +103,20 @@ export function verifiedAssuranceByPack(params: {
     // A seal proves who wrote the report, not that the run was sound: the runner seals INVALID runs too.
     if (!sealedRunReportVerifies(params.workspace, report as Record<string, unknown>)
       || report.status !== "VALID" || report.verificationPassed !== true) {
-      out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)) });
+      out.unverifiable.push({ file, packIds: packResults.map((pack) => String(pack?.packId)), sha256 });
       continue;
     }
     if (report.evidenceStatus !== "MEASURED") continue;
     for (const pack of packResults) {
       const prior = latest.get(pack.packId);
-      if (!prior || report.ts > prior.ts) latest.set(pack.packId, { ts: report.ts, pack });
+      if (!prior || report.ts > prior.ts) {
+        latest.set(pack.packId, { ts: report.ts, pack, runId: String(report.assuranceRunId), reportSha256: String(report.reportJsonSha256) });
+      }
     }
   }
-  for (const [packId, row] of latest) out.packs.set(packId, row.pack);
+  for (const [packId, row] of latest) {
+    out.packs.set(packId, row.pack);
+    out.runs.set(packId, { runId: row.runId, ts: row.ts, reportSha256: row.reportSha256 });
+  }
   return out;
 }

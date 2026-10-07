@@ -23,7 +23,7 @@ const TRUST_FAILURES: ReadonlySet<RejectionReason> = new Set(["producer_not_admi
 export const isObservedTier = (tier: TrustTier): boolean => tier === "OBSERVED" || tier === "OBSERVED_HARDENED";
 
 export function decideApplicability(ctx: EvaluationContext): Applicability {
-  return ctx.plan?.applicability ?? { state: "unresolved", reason: "no compiled plan (P1-10) decides this control's applicability" };
+  return ctx.plan?.applicability ?? { state: "unresolved", reason: "no compiled plan decides this control's applicability yet" };
 }
 
 function contradiction(admitted: readonly AdmittedItem[]): string | null {

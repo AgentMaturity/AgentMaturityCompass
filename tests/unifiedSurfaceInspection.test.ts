@@ -62,7 +62,7 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(enforce?.issues.join(" ")).toMatch(/signature|integrity|invalid/i);
   });
 
-  test("Comply is not evaluated without control-bound evidence and keeps unevaluated frameworks in its average", async () => {
+  test("Comply is not evaluated without control-bound evidence, nor with it until applicability is decided", async () => {
     const root = workspace();
     initComplianceMaps(root);
     const comply = async () => (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" }))
@@ -71,7 +71,7 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     const before = await comply();
     expect(before?.status).toBe("skipped");
     expect(before?.score).toBe(0);
-    expect(before?.summary).toContain("not evaluated: no category had control-bound evidence");
+    expect(before?.summary).toContain("not evaluated: no category passed or failed (0 with sufficient evidence");
 
     const ledger = openLedger(root);
     try {
@@ -84,12 +84,13 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
       ledger.close();
     }
     const after = await comply();
-    expect(after?.status).toBe("success");
-    expect(after?.score).toBeGreaterThan(0);
-    expect(after?.summary).toContain("over 3 framework(s), 1 evaluated (1 satisfied, 0 partial, 0 failed)");
-    // SOC2 alone was evaluated; NIST AI RMF and ISO 42001 count 0, so Comply is a third of SOC2's coverage.
+    // P1-11: sufficient evidence without an applicability decision is not a pass, so nothing scores.
+    expect(after?.status).toBe("skipped");
+    expect(after?.score).toBe(0);
+    expect(after?.summary).toMatch(/not evaluated: no category passed or failed \([1-9]\d* with sufficient evidence and unresolved applicability\)/);
     const soc2 = generateComplianceReport({ workspace: root, agentId: "default", window: "30d", framework: "SOC2" });
-    expect(after?.score).toBe(Math.round(((soc2.coverage.score ?? 0) * 100) / 3));
+    expect(soc2.categories.find((row) => row.id === "soc2_availability")?.evidence).toBe("sufficient");
+    expect(soc2.coverage.score).toBeNull();
   });
 
   test("Comply fails when a category fails a requirement, instead of reading as pending", async () => {

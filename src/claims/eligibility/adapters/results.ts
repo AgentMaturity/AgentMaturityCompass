@@ -110,35 +110,23 @@ export function envelopeForAssurancePack(assuranceRunId: string, pack: Assurance
     result: pack.failCount > 0 ? "fail" : "pass", sealVerified: options.sealVerified, evidenceRefs: [assuranceRunId], now: options.now });
 }
 
-type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework" | "configTrusted" | "windowEndTs">;
+type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework">;
 
 /**
- * A compliance category is a regulated result on control-bound runtime evidence. It reads as observed only when the
- * engine found its evidence sufficient and every event it counted was OBSERVED (`countedObserved`); evidence the
- * engine rejected, a mixed or partial set, or a report written before that field existed is self-reported. Never
- * the report-wide coverage. With no applicability decision it cannot pass (rule 9), and untrusted compliance maps
- * make its evidence untrusted.
+ * A compliance category as the engine decided it (P1-11): its claim kind, five dimensions and reason codes come from the
+ * evidence that report admitted, in the same evaluation. Nothing is re-derived here from refs, totals or coverage.
  */
-export function envelopeForComplianceCategory(report: ComplianceReportClaimInput, category: ComplianceCategoryResult,
-  now: number): ClaimEnvelope {
-  const tiers = category.evidence === "sufficient" && category.countedObserved === true ? ["OBSERVED" as const] : ["SELF_REPORTED" as const];
-  return evaluateClaimEligibility({
-    producer: `compliance:${report.framework}:${category.id}`,
-    method: "runtime_observation",
-    regulated: true,
-    proposed: { result: category.result, level: null },
-    evidence: { eventCount: category.evidenceRefs.length, tiers, newestTs: report.windowEndTs, boundToControl: true,
-      sameScope: true, contradictory: category.evidence === "contradictory",
-      signatureValid: report.configTrusted ? null : false, issuerPinned: null },
-    evidenceRefs: category.evidenceRefs.map((ref) => ref.eventId),
-    now
-  });
+export function envelopeForComplianceCategory(report: ComplianceReportClaimInput, category: ComplianceCategoryResult): ClaimEnvelope {
+  return { claimKind: category.claimKind, statusDimensions: category.dimensions,
+    provenance: { producer: `compliance:${report.framework}:${category.id}`, method: "runtime_observation",
+      evidenceRefs: category.admitted.map((row) => row.ref.id) },
+    eligibleLevel: null, reasons: [...category.claimReasons] };
 }
 
 export function envelopeForComplianceReport(report: ComplianceReportClaimInput & Pick<ComplianceReportJson, "categories">,
   now: number): ClaimEnvelope {
   return envelopeForAggregate(`compliance:${report.framework}`,
-    report.categories.map((category) => envelopeForComplianceCategory(report, category, now)), now);
+    report.categories.map((category) => envelopeForComplianceCategory(report, category)), now);
 }
 
 /**

@@ -16,7 +16,7 @@ function frameworkLegalReviewNotes(framework: string): string[] {
     case "EU_AI_ACT":
       return [
         "EU AI Act legal review: confirm provider/deployer role, high-risk classification, FRIA obligations, technical documentation, human oversight, post-market monitoring, and serious-incident reporting duties.",
-        "Confirm whether each PARTIAL, MISSING, NOT_EVALUATED, or UNKNOWN category maps to a legal obligation, internal policy control, or non-applicable item with counsel-approved rationale."
+        "Confirm whether each MISSING or NOT_EVALUATED category maps to a legal obligation, internal policy control, or non-applicable item with counsel-approved rationale."
       ];
     case "SOC2":
       return [
@@ -64,17 +64,17 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   );
   const counts = `S:${report.coverage.satisfied} P:${report.coverage.partial} M:${report.coverage.missing} N:${report.coverage.notEvaluated} U:${report.coverage.unknown}`;
   lines.push(report.coverage.score === null
-    ? `- Coverage: not evaluated (0 of ${report.categories.length} categories had control-bound evidence) (${counts})`
+    ? `- Coverage: not evaluated (0 of ${report.categories.length} categories passed or failed) (${counts})`
     : `- Coverage score: ${(report.coverage.score * 100).toFixed(1)}% (${counts})`);
   lines.push("- Full hashes remain available in JSON reports: `amc compliance report --json`.");
   lines.push("");
   lines.push("## Status and Evidence Drilldown");
   lines.push("");
-  lines.push("- SATISFIED: every requirement passed on control-bound AMC runtime evidence and the compliance maps are trusted.");
-  lines.push("- PARTIAL: at least one requirement failed while another passed.");
-  lines.push("- MISSING: at least one requirement failed and none passed.");
-  lines.push("- NOT_EVALUATED: control-bound evidence is absent, untrusted or outside the window, or the maps are untrusted; this is not a pass.");
-  lines.push("- UNKNOWN: legacy status from reports written before NOT_EVALUATED existed.");
+  lines.push("- Each category carries five status dimensions (result, evidence, enforcement, review, applicability) and a claim kind, decided from the evidence this report admitted; the claim line under each heading prints them.");
+  lines.push("- SATISFIED (result pass): every requirement passed on admitted, control-bound AMC runtime evidence, the compliance maps are trusted, and a compiled plan records that the control applies.");
+  lines.push("- MISSING (result fail): an admitted record shows a requirement failed (a denied audit event or a failing sealed assurance run).");
+  lines.push("- NOT_EVALUATED: evidence is absent, untrusted, stale, contradictory or outside the window, the maps are untrusted, or no applicability decision is recorded; this is not a pass.");
+  lines.push("- PARTIAL and UNKNOWN appear only in reports written by earlier versions; neither earns coverage credit.");
   lines.push("- Hash drill-down: match the `eventId` below in the JSON report to inspect the full `eventHash` and evidence metadata.");
   lines.push("");
   lines.push("## Categories");
@@ -82,7 +82,7 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   for (const category of report.categories) {
     lines.push(`### ${category.category} (${category.status})`);
     lines.push("");
-    lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceCategory(report, category, report.ts)), "report"));
+    lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceCategory(report, category)), "report"));
     lines.push("");
     lines.push(category.description);
     lines.push("");
@@ -112,7 +112,7 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push(`- Markdown report: this file, generated for framework \`${report.framework}\`.`);
   lines.push(`- JSON evidence report: \`amc compliance report --framework ${report.framework} --json --out compliance-${report.framework.toLowerCase()}.json\`.`);
   lines.push("- Evidence drill-down: use the event IDs above to recover full hashes and metadata from the JSON report.");
-  lines.push("- Reviewer focus: resolve every PARTIAL, MISSING, NOT_EVALUATED, and UNKNOWN item before using this report as customer, board, regulator, or audit evidence.");
+  lines.push("- Reviewer focus: resolve every MISSING and NOT_EVALUATED item before using this report as customer, board, regulator, or audit evidence.");
   lines.push("");
   lines.push("Framework-specific legal-review notes:");
   for (const note of frameworkLegalReviewNotes(report.framework)) {
