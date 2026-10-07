@@ -17,7 +17,7 @@ A control result needs evidence bound to that control. AMC does not bind evidenc
 Planned work adds the rest:
 
 - P1-11 binds evidence to controls, so a control can pass or fail on its own evidence.
-- P1-28 adds an OSCAL export built on those bound results.
+- P1-28 adds `amc export oscal` ([exports/OSCAL.md](exports/OSCAL.md)): the control catalog, a compiled plan and its control results as OSCAL, with a loss report. This GRC export and its SARIF output do not change.
 
 ## Which run is exported
 

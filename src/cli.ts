@@ -10822,6 +10822,19 @@ exportGroup
   });
 
 exportGroup
+  .command("oscal")
+  .description("Export the control catalog, a compiled plan and its control results as OSCAL 1.2.3, with a loss report (experimental)")
+  .requiredOption("--out <dir>", "output directory (never under .amc/)")
+  .option("--plan <plan.json>", "compiled plan from amc catalog compile; it and plan.sig.json beside it must verify")
+  .option("--results <file>", "JSON list of P1-11 control results evaluated under --plan")
+  .action(async (opts: { out: string; plan?: string; results?: string }) => {
+    try {
+      const { runOscalExportCli } = await import("./exports/oscal/oscalCli.js");
+      runOscalExportCli({ workspace: process.cwd(), ...opts });
+    } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
+  });
+
+exportGroup
   .command("badge")
   .description("Export deterministic maturity badge SVG for a run")
   .requiredOption("--run <runId>", "run ID")
