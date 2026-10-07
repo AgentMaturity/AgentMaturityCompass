@@ -4,7 +4,8 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { assertNotExample, EXAMPLE_BANNER } from "../src/claims/eligibility/exampleMode.js";
+import { assertFileNotExample, assertNotExample, EXAMPLE_BANNER } from "../src/claims/eligibility/exampleMode.js";
+import { assessDomainForAgent, buildDomainReportForAgent, getDomainGaps, getDomainRoadmap } from "../src/domains/domainCliIntegration.js";
 import { createIndustryPackLicenseKey } from "../src/domains/industryPackEntitlement.js";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -136,6 +137,43 @@ describe("assertNotExample", () => {
     expect(() => assertNotExample({ envelope: { claimKind: "synthetic_example" } }, "signed")).toThrow(/synthetic_example/);
     expect(() => assertNotExample({ claimKind: "observed" }, "certified")).not.toThrow();
     expect(() => assertNotExample(null, "certified")).not.toThrow();
+  });
+});
+
+describe("example mode in process", () => {
+  test("assessment, gaps and roadmap carry illustrative values only with example: true", () => {
+    const dir = tempDir("amc-p015-inproc-");
+    const example = assessDomainForAgent({ agentId: "a", domain: "health", workspace: dir, example: true });
+    expect(example).toMatchObject({ status: "not_evaluated", claimKind: "synthetic_example", banner: EXAMPLE_BANNER });
+    expect(typeof example.result?.compositeScore).toBe("number");
+    expect(Array.isArray(getDomainGaps("a", "health", { workspace: dir, example: true }))).toBe(true);
+    expect(Array.isArray(getDomainRoadmap("a", "health", { workspace: dir, example: true }))).toBe(true);
+    expect(getDomainGaps("a", "health", { workspace: dir })).toBeNull();
+    expect(getDomainRoadmap("a", "health", { workspace: dir })).toBeNull();
+  });
+
+  test("an example report file starts and ends with the banner; a real one says not evaluated", () => {
+    const dir = tempDir("amc-p015-report-");
+    const examplePath = join(dir, "example.md");
+    buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: dir, outputPath: examplePath, example: true });
+    const lines = readFileSync(examplePath, "utf8").trim().split("\n");
+    expect(lines[0]).toBe(EXAMPLE_BANNER);
+    expect(lines.at(-1)).toBe(EXAMPLE_BANNER);
+    const real = buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: dir });
+    expect(real.reportObject).toBeUndefined();
+    expect(real.reportMarkdown).toContain("## Result: Not evaluated");
+    expect(real.reportMarkdown).not.toMatch(/No compliance gaps identified|Certification Readiness|Composite Score/);
+  });
+
+  test("assertFileNotExample refuses an example JSON file and ignores missing or non-JSON files", () => {
+    const dir = tempDir("amc-p015-file-");
+    const example = join(dir, "example.json");
+    writeFileSync(example, JSON.stringify(EXAMPLE));
+    expect(() => assertFileNotExample(example, "signed")).toThrow("synthetic_example results cannot be signed");
+    const text = join(dir, "notes.txt");
+    writeFileSync(text, "plain text, not JSON");
+    expect(() => assertFileNotExample(text, "signed")).not.toThrow();
+    expect(() => assertFileNotExample(join(dir, "missing.json"), "signed")).not.toThrow();
   });
 });
 

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { CONSTRUCT_VALIDITY_DATA } from "../src/index.js";
-import { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } from "../src/score/industryTrustModels.js";
+import { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS, latestObservedEvidenceShare } from "../src/score/industryTrustModels.js";
 
 /**
  * P0-15: the industry models shipped peer percentiles with invented sample
@@ -44,6 +44,12 @@ describe("industry trust models carry no invented peer data", () => {
     const result = computeIndustryAdjustedScore({ safety: 0.8 }, "healthcare", Date.now(), null);
     expect(result.observedEvidenceShare).toBeNull();
     expect(result.riskFactors.join(" ")).toMatch(/observed evidence share is not evaluated/i);
+  });
+
+  test("without a run the observed-evidence share is null, not a default", () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-p015-share-"));
+    roots.push(dir);
+    expect(latestObservedEvidenceShare(dir, "default")).toBeNull();
   });
 
   test("amc score industry-adjust --score 75 prints no percentile", () => {

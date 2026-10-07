@@ -34,12 +34,13 @@ function writeArtifact(workspace: string, relPath: string): void {
   writeFileSync(abs, "fixture\n");
 }
 
-function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
+function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number | null,
+  extra: Record<string, unknown> = {}): void {
   const runPath = join(workspace, ".amc", "agents", agentId, "runs", `${runId}.json`);
   mkdirSync(dirname(runPath), { recursive: true });
   // Sealed the way the diagnostic writer seals: since G9-05, an unsealed run
   // file is refused as a scoring input, so the fixture must be a real one.
-  const base = { runId, ts, integrityIndex, reportJsonSha256: "", runSealSig: "" };
+  const base = { runId, ts, ...(integrityIndex === null ? {} : { integrityIndex }), ...extra, reportJsonSha256: "", runSealSig: "" };
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
   const sig = ledger.signRunHash(hash);
@@ -145,6 +146,25 @@ describe("scoreRegulatoryReadiness", () => {
     const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
     expect(score.latestRunId).toBe("run-high");
     expect(score.latestIntegrityIndex).toBe(0.9);
+  });
+
+  test("ignores unsealed and malformed run files", () => {
+    const workspace = newWorkspace();
+    const runsDir = join(workspace, ".amc", "agents", "agent-reg", "runs");
+    mkdirSync(runsDir, { recursive: true });
+    writeFileSync(join(runsDir, "run-unsealed.json"), JSON.stringify({ runId: "run-unsealed", ts: 5000, integrityIndex: 1 }));
+    writeFileSync(join(runsDir, "run-broken.json"), "{not json");
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBeNull();
+    expect(score.latestIntegrityIndex).toBeNull();
+  });
+
+  test("derives the latest integrity from layer scores when the run has no integrity index", () => {
+    const workspace = newWorkspace();
+    writeRun(workspace, "agent-reg", "run-layers", 1000, null, { layerScores: [{ avgFinalLevel: 4 }, { avgFinalLevel: 2 }] });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBe("run-layers");
+    expect(score.latestIntegrityIndex).toBeCloseTo(0.6);
   });
 
   test("normalizes custom weights for deterministic weighted composite", () => {

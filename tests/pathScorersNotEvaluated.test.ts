@@ -135,6 +135,16 @@ describe("EU AI Act technical documentation", () => {
     expect(eu.riskClassification).toBe("high");
     expect(eu.riskClassificationClaimKind).toBe("self_reported");
   });
+
+  test("a classification file without a risk class, or a corrupt one, leaves the class unknown", () => {
+    const root = tempDir("amc-p015-class-");
+    mkdirSync(join(root, ".amc"));
+    writeFileSync(join(root, ".amc/eu_ai_act_classification.json"), "{}");
+    expect(scoreEUAIActCompliance(root).riskClassification).toBe("unknown");
+    writeFileSync(join(root, ".amc/eu_ai_act_classification.json"), "{not json");
+    expect(scoreEUAIActCompliance(root).riskClassification).toBe("unknown");
+    expect(scoreEUAIActCompliance().status).toBe("not_evaluated");
+  });
 });
 
 describe("gaming resistance", () => {
