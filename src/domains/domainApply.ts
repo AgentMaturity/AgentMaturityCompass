@@ -42,6 +42,9 @@ export interface DomainApplyResult {
   packsApplied: string[];
   guardrailsGenerated: number;
   configFileUpdated: string | null;
+  /** Proposed controls (`<pack>:<question>`). AMC does not enforce them; only a compiled, activated plan is enforced (P1-12). */
+  guardrailsProposed: string[];
+  /** @deprecated Always empty since P1-12: domain apply enables nothing. Kept for one minor release. */
   guardrailsEnabled: string[];
   complianceFrameworks: string[];
   /** Domain assessments are not evaluated without evidence (P0-15), so no gap steers rule selection. */
@@ -60,7 +63,14 @@ function toDomainLabel(domain: Domain): string {
 }
 
 function toRuleText(question: IndustryPackQuestion): string {
-  return `Enforce ${question.dimension} at least at L3: ${question.l3}. Escalate or block when unmet; target L5 path: ${question.l5}.`;
+  return `Proposed control (not enforced by AMC until compiled): ${question.dimension} at least at L3: ${question.l3}; target L5 path: ${question.l5}.`;
+}
+
+/** The guardrails.yaml row for one proposed rule. Proposals claim nothing: AMC enforces only compiled plans. */
+interface DomainRuleProposal { id: string; packId: string; questionId: string; status: "proposed"; enforcement: "none" }
+function proposal(id: string): DomainRuleProposal {
+  const at = id.indexOf(":");
+  return { id, packId: id.slice(0, Math.max(at, 0)), questionId: id.slice(at + 1), status: "proposed", enforcement: "none" };
 }
 
 function dedupe(values: string[]): string[] {
@@ -81,12 +91,14 @@ function buildGuardrailsContent(params: {
   agentId: string;
   packs: IndustryPack[];
   complianceFrameworks: string[];
-}): { content: string; enabledRules: string[] } {
+}): { content: string; proposedRules: string[] } {
   const lines: string[] = [];
-  const enabledRules: string[] = [];
+  const proposedRules: string[] = [];
   const domainLabel = toDomainLabel(params.domain);
 
   lines.push(`# AMC Domain Guardrails — ${domainLabel}`);
+  lines.push("");
+  lines.push("These are proposed controls for review. AMC does not enforce them; it enforces only a compiled, activated control plan (amc catalog compile).");
   lines.push("");
   lines.push(`Agent: ${params.agentId}`);
   lines.push(`Domain: ${params.domain}`);
@@ -109,13 +121,13 @@ function buildGuardrailsContent(params: {
       lines.push(`# Question: ${question.text}`);
       lines.push(`# Required at L3: ${question.l3}`);
       lines.push(`# Required at L5: ${question.l5}`);
-      lines.push(`RULE: ${toRuleText(question)}`);
+      lines.push(toRuleText(question));
       lines.push("");
-      enabledRules.push(`${pack.id}:${question.id}`);
+      proposedRules.push(`${pack.id}:${question.id}`);
     }
   }
 
-  return { content: lines.join("\n").trimEnd(), enabledRules: dedupe(enabledRules) };
+  return { content: lines.join("\n").trimEnd(), proposedRules: dedupe(proposedRules) };
 }
 
 function parseYamlObject(raw: string): Record<string, unknown> {
@@ -202,27 +214,20 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
   const applyResult = applyGuardrails(targetFile, rendered.content, readFn, writeFn);
 
   const agentPaths = getAgentPaths(workspacePath, agentId);
-  const existingGuardrails = pathExists(agentPaths.guardrails) ? parseYamlObject(readUtf8(agentPaths.guardrails)) : {};
-  const existingDomainRules = toRecord(existingGuardrails.domainRules);
-  const nextDomainRules: Record<string, boolean> = {};
-
-  for (const [ruleId, enabled] of Object.entries(existingDomainRules)) {
-    if (typeof enabled === "boolean") {
-      nextDomainRules[ruleId] = enabled;
-    }
-  }
-  for (const ruleId of rendered.enabledRules) {
-    nextDomainRules[ruleId] = true;
-  }
+  const { domainRules: legacyRules, ...existingGuardrails } = pathExists(agentPaths.guardrails) ? parseYamlObject(readUtf8(agentPaths.guardrails)) : {};
+  // Legacy `domainRules: { "<pack>:<question>": true }` claimed rules nothing read; they become proposals.
+  const legacyIds = Object.entries(toRecord(legacyRules)).filter(([, on]) => on === true).map(([id]) => id);
+  const existingIds = (Array.isArray(existingGuardrails.domainRuleProposals) ? existingGuardrails.domainRuleProposals : [])
+    .flatMap((row) => (typeof toRecord(row).id === "string" ? [toRecord(row).id as string] : []));
 
   const nextGuardrails: Record<string, unknown> = {
     ...existingGuardrails,
-    domainRules: nextDomainRules,
+    domainRuleProposals: dedupe([...existingIds, ...legacyIds, ...rendered.proposedRules]).map(proposal),
     domainApply: {
       domain,
       packsApplied: packs.map((pack) => pack.id),
       complianceFrameworks,
-      enabledRules: rendered.enabledRules,
+      proposedRules: rendered.proposedRules,
       assessment: { status, reasons }
     }
   };
@@ -248,9 +253,10 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
     agentId,
     domain,
     packsApplied: packs.map((pack) => pack.id),
-    guardrailsGenerated: rendered.enabledRules.length,
+    guardrailsGenerated: rendered.proposedRules.length,
     configFileUpdated: applyResult.path,
-    guardrailsEnabled: rendered.enabledRules,
+    guardrailsProposed: rendered.proposedRules,
+    guardrailsEnabled: [],
     complianceFrameworks,
     assessment: { status, reasons },
     dryRun,
