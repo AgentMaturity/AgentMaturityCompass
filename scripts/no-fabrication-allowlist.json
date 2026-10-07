@@ -35,34 +35,10 @@
       "reason": "Trust ladder names L5 'Certified'."
     },
     {
-      "file": "src/domains/industryPackAudit.ts",
-      "rule": "R4",
-      "owner": "P0-21",
-      "reason": "Audit Markdown prints 'certified: YES/NO'."
-    },
-    {
-      "file": "src/mcp/amcMcpServer.ts",
-      "rule": "R4",
-      "owner": "P0-21",
-      "reason": "MCP tool output prints '**Certified:** Yes/No'."
-    },
-    {
       "file": "src/repl/replRenderer.ts",
       "rule": "R4",
       "owner": "P0-22",
       "reason": "REPL renders the L5 label from the CERTIFIED case."
-    },
-    {
-      "file": "src/score/mcpCompliance.ts",
-      "rule": "R4",
-      "owner": "P0-21",
-      "reason": "'MCP-Certified' badge in the type, the badge choice and the report text."
-    },
-    {
-      "file": "src/transparency/transparencyReport.ts",
-      "rule": "R4",
-      "owner": "P0-21",
-      "reason": "CertificationStatus 'certified' and the '✅ Certified' label in the transparency report."
     }
   ],
   "pathPresence": [
