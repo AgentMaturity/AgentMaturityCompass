@@ -573,11 +573,13 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | `--authorities <path>`<br>`--original <path>`<br>`--expected-digest <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |
 | `amc improve` | Guided improvement — shows what to fix next based on your current score | `--json` | - |
 | `amc incident` | Incident tracking and response operations | - | - |
+| `amc incident clocks` | List an incident's regulatory reporting clocks for a station, or record a trigger or a submitted notice | `--station <station>`<br>`--now <iso>`<br>`--trigger <trigger>`<br>`--notified <clockId>`<br>`--at <iso>`<br>`--json` | - |
 | `amc incident close` | Close an incident with a resolution summary | `--resolution <text>` | - |
 | `amc incident create` | Create a manual incident | `--title <title>`<br>`--severity <severity>`<br>`--agent <agentId>` | - |
 | `amc incident link` | Link evidence to an incident | `--evidence <evidenceId>` | - |
 | `amc incident list` | List incidents for an agent | `--status <status>`<br>`--limit <n>`<br>`--agent <agentId>` | - |
-| `amc incident show` | Show incident details | - | - |
+| `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) | `--decision <decision>`<br>`--reviewer <id>`<br>`--rationale <text>`<br>`--clock <clockId...>` | - |
+| `amc incident show` | Show incident details, or write its regulator evidence packet with --packet | `--packet <dir>`<br>`--station <station>` | - |
 | `amc incidents` | Incident operations and dispatch workflows | - | - |
 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels | `--agent <agentId>`<br>`--summary <text>`<br>`--details <json>` | - |
 | `amc incidents help` | Show incident-focused command groups | - | - |
