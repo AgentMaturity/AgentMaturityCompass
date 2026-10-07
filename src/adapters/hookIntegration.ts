@@ -10,6 +10,7 @@ import {
   writeFileSync
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import { z } from "zod";
 import {
@@ -28,6 +29,7 @@ import {
   type ProviderHookControlResult,
 } from "../bridge/hookControl.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { boundedFetchSignal, CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import {
   approvalPolicyPath,
   approvalPolicySigPath,
@@ -547,6 +549,15 @@ function forwardArgs(input: {
   ];
 }
 
+/** AMC's own dist/cli.js, resolved from this installed package and never from the caller's cwd. */
+export function amcCliScriptPath(mode: HookMode, moduleUrl = import.meta.url): string {
+  const cliPath = resolve(dirname(fileURLToPath(moduleUrl)), "..", "..", "dist", "cli.js");
+  if (mode === "control" && cliPath.split(sep).includes("_npx")) {
+    throw new HookIntegrationError("HOOK_PATH_UNSAFE", "control hooks cannot run AMC from the purgeable npx cache; install AMC with npm, then re-run the install");
+  }
+  return cliPath;
+}
+
 function expectedHandler(input: {
   workspace: string;
   provider: HookProvider;
@@ -559,9 +570,9 @@ function expectedHandler(input: {
   if (input.provider === "claude-code") {
     return {
       type: "command",
-      command: "amc",
-      args,
-      timeout: 10,
+      command: process.execPath,
+      args: [amcCliScriptPath(input.mode), ...args],
+      timeout: CLAUDE_HOOK_TIMEOUT_SECONDS,
       statusMessage: input.mode === "control" ? CLAUDE_CONTROL_STATUS_MESSAGE : CLAUDE_STATUS_MESSAGE
     };
   }
@@ -574,6 +585,24 @@ function expectedHandler(input: {
       ? "Evaluate provider tool requests with signed AMC controls"
       : "Send privacy-minimal tool observations to AMC Watch"
   };
+}
+
+/**
+ * The Claude Code control handler this AMC would install for the workspace's signed manifest,
+ * built from the same inputs install validates. Throws when there is no valid control manifest.
+ */
+export function expectedClaudeControlHandler(workspaceInput: string): JsonObject {
+  const workspace = resolve(workspaceInput);
+  const paths = managedPaths(workspace, "claude-code");
+  const manifest = loadSignedManifest(workspace, paths);
+  if (manifest?.mode !== "control") {
+    throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "no signed Claude Code control installation manifest");
+  }
+  validateManifestPaths(workspace, "claude-code", paths, manifest);
+  const bridgeBase = normalizeBridgeBase(manifest.bridgeBase);
+  assertControlBridgeLocal("control", bridgeBase);
+  const agentId = validateAgentId(manifest.agentId);
+  return expectedHandler({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase, tokenPath: paths.token });
 }
 
 function handlerHash(handler: JsonObject): string {
@@ -1636,6 +1665,7 @@ async function resolveProviderTerminalAction(input: {
   correlationSha256: string;
   retryDelayMs: number;
   timeoutMs: number;
+  signal?: AbortSignal;
 }): Promise<string> {
   const body = JSON.stringify({
     provider: input.provider,
@@ -1648,7 +1678,7 @@ async function resolveProviderTerminalAction(input: {
       const response = await fetch(url, {
         method: "POST",
         redirect: "error",
-        signal: AbortSignal.timeout(input.timeoutMs),
+        signal: boundedFetchSignal(input.timeoutMs, input.signal),
         headers: {
           authorization: `Bearer ${input.authorization.token}`,
           "content-type": "application/json",
@@ -1699,6 +1729,7 @@ export async function forwardProviderHookEvent(input: {
   observedAt?: number;
   retryDelayMs?: number;
   timeoutMs?: number;
+  signal?: AbortSignal;
 }): Promise<{
   status: number;
   receiptId: string;
@@ -1729,6 +1760,7 @@ export async function forwardProviderHookEvent(input: {
         correlationSha256: inspection.correlationSha256,
         retryDelayMs,
         timeoutMs,
+        signal: input.signal,
       })
     : undefined;
   const event = mapProviderHookEvent({
@@ -1747,7 +1779,7 @@ export async function forwardProviderHookEvent(input: {
       const response = await fetch(url, {
         method: "POST",
         redirect: "error",
-        signal: AbortSignal.timeout(timeoutMs),
+        signal: boundedFetchSignal(timeoutMs, input.signal),
         headers: {
           authorization: `Bearer ${authorization.token}`,
           "content-type": "application/json",
@@ -1806,6 +1838,7 @@ export async function forwardProviderHookControl(input: {
   observedAt?: number;
   retryDelayMs?: number;
   timeoutMs?: number;
+  signal?: AbortSignal;
 }): Promise<{
   observation: { status: number; receiptId: string; idempotentReplay: boolean };
   control: ProviderHookControlResult;
@@ -1841,7 +1874,7 @@ export async function forwardProviderHookControl(input: {
       const response = await fetch(url, {
         method: "POST",
         redirect: "error",
-        signal: AbortSignal.timeout(timeoutMs),
+        signal: boundedFetchSignal(timeoutMs, input.signal),
         headers: {
           authorization: `Bearer ${authorization.token}`,
           "content-type": "application/json",
