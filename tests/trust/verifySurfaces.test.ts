@@ -59,8 +59,7 @@ describe("verify surfaces (P0-09)", () => {
     // Step 10 puts the flags on every portable verify command. These ten rows sit outside the issue table and do not
     // take them yet; the P0-09 receipt records them as open. The list must shrink, never grow.
     const open = [
-      "bench registry verify", "bom verify", "domain pack verify", "enforce verify-certificate", "imports verify-profile",
-      "notary verify-attest", "passport verify-token", "session verify-proof", "transparency merkle verify-proof", "transparency verify-bundle"
+      "domain pack verify", "enforce verify-certificate", "imports verify-profile", "passport verify-token", "session verify-proof"
     ];
     // assurance cert-verify is portable but registered as command("cert-verify"), so it is a note, not a table row.
     const portable = [...inventoryRows().filter(row => row.kind === "portable artifact").map(row => row.command), "assurance cert-verify"];

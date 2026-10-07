@@ -87,18 +87,17 @@ export async function handleBomRoute(
     // POST /api/v1/bom/verify — verify a BOM signature
     if (pathname === '/api/v1/bom/verify' && method === 'POST') {
       try {
-        const body = await bodyJson<{ inputFile: string; sigFile: string; pubkeyPemFile?: string }>(req);
+        const body = await bodyJson<{ inputFile: string; sigFile: string }>(req);
         if (!body.inputFile || !body.sigFile) {
           apiError(res, 400, 'inputFile and sigFile required'); return true;
         }
+        // P0-51: the server operator's trust context decides; a request cannot add pins (pubkeyPemFile) or allow flags.
+        const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+        const refused = requestTrustOverride(body);
+        if (refused) { apiError(res, 400, refused); return true; }
         const { verifyBomSignature } = await import('../bom/bomVerifier.js');
-        const result = verifyBomSignature({
-          workspace,
-          inputFile: body.inputFile,
-          sigFile: body.sigFile,
-          pubkeyPemFile: body.pubkeyPemFile,
-        });
-        apiSuccess(res, { ok: result.ok, reason: result.reason ?? null });
+        const result = verifyBomSignature({ workspace, inputFile: body.inputFile, sigFile: body.sigFile, trust: loadTrustContext() });
+        apiSuccess(res, { ok: result.ok, reason: result.reason ?? null, report: result.report });
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'BOM verification failed');
       }

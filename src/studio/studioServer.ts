@@ -8183,7 +8183,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "file is required" });
           return;
         }
-        json(res, 200, verifyTransparencyProofBundle(parsed.file));
+        // P0-51: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const refused = requestTrustOverride(parsed);
+        if (refused) {
+          json(res, 400, { error: refused });
+          return;
+        }
+        json(res, 200, verifyTransparencyProofBundle(parsed.file, loadTrustContext()));
         return;
       }
 

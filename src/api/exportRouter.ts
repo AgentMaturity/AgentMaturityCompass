@@ -143,8 +143,12 @@ export async function handleExportRoute(
       if (!body.file) {
         apiError(res, 400, 'file required'); return true;
       }
+      // P0-51: the server operator's trust context decides; a request cannot add pins or allow flags.
+      const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { notaryVerifyAttestCli } = await import('../notary/notaryCli.js');
-      const result = notaryVerifyAttestCli(body.file);
+      const result = notaryVerifyAttestCli(body.file, loadTrustContext());
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Notary verification failed');

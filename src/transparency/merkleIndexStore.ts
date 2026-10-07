@@ -28,8 +28,9 @@ import {
 import { transparencyEntrySchema } from "./logSchema.js";
 import { merkleProofPayloadSchema, merkleProofSignatureSchema, type MerkleProofPayload } from "./proofSchema.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
-import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -398,12 +399,24 @@ export function exportTransparencyProofBundle(params: {
   }
 }
 
-export function verifyTransparencyProofBundle(bundleFile: string): {
+/**
+ * auditor.pub, the envelope key and --pubkey only locate the signer of proof.json (which names the Merkle root the path
+ * must resolve to); admitKey decides whether it is pinned for artifact-seal (P0-51).
+ */
+export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustContext, pubkeyPem?: string | null): {
   ok: boolean;
   errors: string[];
   proof: MerkleProofPayload | null;
+  report: VerifierReportV1;
 } {
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let proof: MerkleProofPayload | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "transparency-proof", path: bundleFile, sha256: fileSha256(bundleFile) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, proof, report };
+  };
   const tmp = mkdtempSync(join(tmpdir(), "amc-proof-verify-"));
   try {
     tarExtract(bundleFile, tmp);
@@ -413,13 +426,9 @@ export function verifyTransparencyProofBundle(bundleFile: string): {
     const sigFile = join(root, "proof.sig");
     const pubFile = join(root, "auditor.pub");
     if (!pathExists(proofFile) || !pathExists(sigFile) || !pathExists(pubFile)) {
-      return {
-        ok: false,
-        errors: ["proof bundle missing required files"],
-        proof: null
-      };
+      errors.push("proof bundle missing required files");
+      return finish();
     }
-    let proof: MerkleProofPayload | null = null;
     try {
       proof = merkleProofPayloadSchema.parse(JSON.parse(readUtf8(proofFile)) as unknown);
     } catch (error) {
@@ -431,15 +440,10 @@ export function verifyTransparencyProofBundle(bundleFile: string): {
       if (digest !== sig.digestSha256) {
         errors.push("proof signature digest mismatch");
       } else {
-        const pub = readUtf8(pubFile);
-        const ok = sig.envelope
-          ? sig.signature === sig.envelope.sigB64 &&
-            verifySignatureEnvelope(digest, sig.envelope, {
-              trustedPublicKeys: [pub],
-              requireTrustedKey: true
-            })
-          : verifyHexDigestAny(digest, sig.signature, [pub]);
-        if (!ok) {
+        const check = checkDigestSignature({ signature: "proof.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+          candidates: [pubkeyPem, readUtf8(pubFile), envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
+        signatures.push(check.admission);
+        if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
           errors.push("proof signature invalid");
         }
       }
@@ -449,11 +453,10 @@ export function verifyTransparencyProofBundle(bundleFile: string): {
     if (proof && !verifyMerkleProof({ entryHash: proof.entryHash, proofPath: proof.proofPath, root: proof.merkleRoot })) {
       errors.push("proof path does not resolve to merkle root");
     }
-    return {
-      ok: errors.length === 0,
-      errors,
-      proof
-    };
+    return finish();
+  } catch (error) {
+    errors.push(String(error));
+    return finish();
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

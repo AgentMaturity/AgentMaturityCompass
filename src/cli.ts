@@ -11629,21 +11629,13 @@ notary
     console.log(chalk.green(`Attestation written: ${out.outFile}`));
   });
 
-notary
+withTrustFlags(notary
   .command("verify-attest")
   .description("Verify a .amcattest bundle offline")
-  .argument("<file>")
-  .action((file: string) => {
-    const result = notaryVerifyAttestCli(file);
-    if (result.ok) {
-      console.log(chalk.green("Notary attestation verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Notary attestation verification FAILED"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the notary public key (notary)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const result = notaryVerifyAttestCli(file, trustFromFlags(opts, ["notary"]), opts.pubkey);
+    finishVerify("Notary attestation", result.report, { json: opts.json, result });
   });
 
 notary
@@ -12371,21 +12363,14 @@ transparency
     console.log(chalk.green(`Transparency bundle exported: ${out.outFile}`));
   });
 
-transparency
+withTrustFlags(transparency
   .command("verify-bundle")
   .description("Verify exported transparency bundle")
-  .argument("<file>")
-  .action((file: string) => {
-    const verified = verifyTransparencyBundle(resolve(process.cwd(), file));
-    if (verified.ok) {
-      console.log(chalk.green("Transparency bundle verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Transparency bundle verification FAILED"));
-    for (const error of verified.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the auditor public key that sealed the log (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const verified = verifyTransparencyBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
+      opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+    finishVerify("Transparency bundle", verified.report, { json: opts.json, result: verified });
   });
 
 transparencyMerkle
@@ -12435,21 +12420,14 @@ transparencyMerkle
     console.log(`merkleRoot=${out.proof.merkleRoot}`);
   });
 
-transparencyMerkle
+withTrustFlags(transparencyMerkle
   .command("verify-proof")
   .description("Verify signed inclusion proof bundle")
-  .argument("<file>")
-  .action((file: string) => {
-    const out = transparencyMerkleVerifyProofCli(resolve(process.cwd(), file));
-    if (out.ok) {
-      console.log(chalk.green("Proof verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Proof verification FAILED"));
-    for (const error of out.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the auditor public key that signed the proof (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = transparencyMerkleVerifyProofCli(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
+      opts.pubkey ? readFileSync(resolve(opts.pubkey), "utf8") : null);
+    finishVerify("Proof", out.report, { json: opts.json, result: out });
   });
 
 compliance
@@ -16352,23 +16330,14 @@ bom
     console.log(chalk.green(`BOM signed: ${signed.sigFile}`));
   });
 
-bom
+withTrustFlags(bom
   .command("verify")
   .requiredOption("--in <file>", "input BOM JSON")
-  .requiredOption("--sig <file>", "signature file")
-  .option("--pubkey <file>", "optional explicit auditor public key PEM")
-  .action((opts: { in: string; sig: string; pubkey?: string }) => {
-    const verify = verifyBomSignature({
-      workspace: process.cwd(),
-      inputFile: opts.in,
-      sigFile: opts.sig,
-      pubkeyPemFile: opts.pubkey
-    });
-    if (!verify.ok) {
-      console.log(chalk.red(`BOM verify failed: ${verify.reason ?? "unknown"}`));
-      process.exit(1);
-    }
-    console.log(chalk.green("BOM verified"));
+  .requiredOption("--sig <file>", "signature file"), { pubkey: "pin the auditor public key that signed the BOM (artifact-seal)", json: true })
+  .action((opts: { in: string; sig: string } & TrustFlags) => {
+    const verify = verifyBomSignature({ workspace: process.cwd(), inputFile: opts.in, sigFile: opts.sig, pubkeyPemFile: opts.pubkey,
+      trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("BOM", verify.report, { json: opts.json, result: verify });
   });
 
 registerApprovalCliCommands(program);
@@ -17434,27 +17403,13 @@ benchRegistry
     console.log(`Index: ${out.indexPath}`);
   });
 
-benchRegistry
+withTrustFlags(benchRegistry
   .command("verify")
-  .requiredOption("--dir <dir>", "registry directory")
-  .action((opts: { dir: string }) => {
-    const out = benchRegistryVerifyCli(opts.dir);
-    if (!out.ok) {
-      console.log(chalk.red("Bench registry verify failed"));
-      for (const error of out.errors) {
-        console.log(`- ${error}`);
-      }
-      process.exit(1);
-      return;
-    }
-    console.log(chalk.green("Bench registry verified"));
-    if (!out.index) {
-      console.log("Registry index unavailable");
-      process.exit(1);
-      return;
-    }
-    console.log(`Registry: ${out.index.registry.id}`);
-    console.log(`Entries: ${out.index.benches.length}`);
+  .requiredOption("--dir <dir>", "registry directory"), { pubkey: "pin the registry public key (artifact-seal)", json: true })
+  .action((opts: { dir: string } & TrustFlags) => {
+    const out = benchRegistryVerifyCli(opts.dir, trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
+    finishVerify("Bench registry", out.report, { json: opts.json, result: out,
+      details: [`Registry: ${out.index?.registry.id ?? "unknown"}`, `Entries: ${out.index?.benches.length ?? 0}`] });
   });
 
 benchRegistry
