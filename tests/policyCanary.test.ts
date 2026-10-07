@@ -296,6 +296,8 @@ describe("emergency overrides", () => {
     }, ws);
 
     expect(filePostmortem(override.overrideId, "artifact-123", ws)).toBe(true);
+    // A library caller without a workspace still updates the in-process entry.
+    expect(filePostmortem(override.overrideId, "artifact-123")).toBe(true);
     expect(filePostmortem("nonexistent", "artifact-123", ws)).toBe(false);
   });
 
