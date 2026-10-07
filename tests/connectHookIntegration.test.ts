@@ -13,6 +13,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { observedAepActionEventSchema } from "../src/bridge/hookIngress.js";
@@ -20,6 +21,7 @@ import {
   CLAUDE_CODE_HOOK_SOURCE,
   GEMINI_CLI_HOOK_SOURCE,
   HookIntegrationError,
+  amcCliScriptPath,
   forwardProviderHookEvent,
   getHookIntegrationStatus,
   installHookIntegration,
@@ -643,6 +645,16 @@ describe("AMC provider hook integration", () => {
       agentId: "symlink-agent"
     })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PATH_UNSAFE" }));
     expect(existsSync(join(outside, "settings.local.json"))).toBe(false);
+  });
+
+  test("refuses a control install that would run AMC from the purgeable npx cache", () => {
+    const npxPackage = join(tmpdir(), "_npx", "0a1b2c3d", "node_modules", "agent-maturity-compass");
+    const npxModuleUrl = pathToFileURL(join(npxPackage, "dist", "adapters", "hookIntegration.js")).href;
+
+    expect(() => amcCliScriptPath("control", npxModuleUrl))
+      .toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PATH_UNSAFE" }));
+    expect(amcCliScriptPath("observe", npxModuleUrl)).toBe(join(npxPackage, "dist", "cli.js"));
+    expect(amcCliScriptPath("control")).toBe(resolve("dist", "cli.js"));
   });
 
   test("recovers a stale installer lock but serializes a current writer", () => {

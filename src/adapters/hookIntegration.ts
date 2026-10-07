@@ -550,8 +550,8 @@ function forwardArgs(input: {
 }
 
 /** AMC's own dist/cli.js, resolved from this installed package and never from the caller's cwd. */
-function amcCliScriptPath(mode: HookMode): string {
-  const cliPath = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "dist", "cli.js");
+export function amcCliScriptPath(mode: HookMode, moduleUrl = import.meta.url): string {
+  const cliPath = resolve(dirname(fileURLToPath(moduleUrl)), "..", "..", "dist", "cli.js");
   if (mode === "control" && cliPath.split(sep).includes("_npx")) {
     throw new HookIntegrationError("HOOK_PATH_UNSAFE", "control hooks cannot run AMC from the purgeable npx cache; install AMC with npm, then re-run the install");
   }
