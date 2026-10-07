@@ -1549,7 +1549,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
       { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "pii-detection-leakage", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.6", "AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
@@ -1568,7 +1568,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     ],
     related: {
       questions: ["AMC-4.6", "AMC-1.8"],
-      packs: ["sandbox_boundary", "host_hardening"],
+      packs: ["sandbox_boundary"],
       configs: ["action-policy.yaml"]
     }
   }),
@@ -1579,7 +1579,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Business associate contracts and group health plan requirements for AI systems processing PHI on behalf of covered entities.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.4 },
-      { type: "requires_assurance_pack", packId: "delegation_trust_chain", minScore: 75, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "delegationTrustChain", minScore: 75, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.5", "AMC-2.1"],
@@ -1608,8 +1608,8 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "§164.502-514 Privacy Rule Uses and Disclosures",
     description: "Minimum necessary standard, de-identification requirements, authorization requirements, and permitted uses and disclosures of PHI by AI agents.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "context_leakage", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "pii-detection-leakage", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "context-leakage", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-OINT-1"],
@@ -1745,7 +1745,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Batch processing, job scheduling, backup/recovery, and operational monitoring for AI agents in financial workflows.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
-      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.1", "AMC-4.6"],
@@ -1759,8 +1759,8 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "Segregation of Duties",
     description: "Separation of AI agent capabilities to prevent single-agent control over conflicting financial functions.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "excessive_agency", minScore: 85, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "approval_theater", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "excessive-agency", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "approval-theater", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.5", "AMC-2.1", "AMC-5.15"],
@@ -1822,7 +1822,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
       { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "stepup_approval_bypass", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "stepup-approval-bypass", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.8", "AMC-4.6", "AMC-5.15"],
@@ -1882,7 +1882,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Contingency plan, training, testing, backup, recovery, and reconstitution for AI-dependent federal services.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
-      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.1", "AMC-SPORT-1"],
@@ -1897,7 +1897,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "User, device, and service identification and authentication for AI agent endpoints and API consumers.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "agent_identity_spoofing", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "agentIdentitySpoofing", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.8", "AMC-3.3.1"],
@@ -1931,7 +1931,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     ],
     related: {
       questions: ["AMC-1.1", "AMC-5.8", "AMC-5.15"],
-      packs: ["injection", "advanced_threats", "mcp_security_resilience"],
+      packs: ["injection", "advanced_threats"],
       configs: ["action-policy.yaml", "tools.yaml"]
     }
   }),
@@ -1942,7 +1942,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Application partitioning, information in shared resources, cryptographic protection, and boundary protection for AI system communications.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sandboxBoundary", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
@@ -1957,7 +1957,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Flaw remediation, malicious code protection, information handling, memory protection, and software integrity for AI components.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "sbom_supply_chain", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sbom-supply-chain", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-5.12", "AMC-5.8", "AMC-1.1"],
@@ -2016,11 +2016,11 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "Req 11 Test Security Regularly",
     description: "Regular security testing of AI components. AMC assurance packs provide automated adversarial testing with signed evidence.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 60, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sandboxBoundary", minScore: 60, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-5.10", "AMC-5.12"],
-      packs: ["sandbox_boundary", "compound_threats", "advanced_threats"],
+      packs: ["sandbox_boundary", "compoundThreat", "advanced_threats"],
       configs: []
     }
   }),
