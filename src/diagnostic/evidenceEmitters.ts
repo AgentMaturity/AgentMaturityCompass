@@ -62,6 +62,7 @@ export const EVIDENCE_EMITTERS: readonly EmitterEntry[] = [
  */
 export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: string }> = [
   { module: "src/agent/agentToolset.ts", why: "native shell confinement settings; untagged, so they bind to no question" },
+  { module: "src/agent/compaction/autoCompact.ts", why: "context compaction bookkeeping (P1-37); token counts before and after, not agent behaviour" },
   { module: "src/approvals/approvalStudioService.ts", why: "operator approval decisions about AMC actions, not the scored agent's behaviour" },
   { module: "src/archetypes/index.ts", why: "operator applied an archetype to AMC configuration" },
   { module: "src/assurance/assuranceRunner.ts", why: "assurance run bookkeeping; scenario results are `test` rows, untagged" },
@@ -100,6 +101,11 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/studio/studioServer.ts", why: "Studio operator actions on AMC itself" },
   { module: "src/studio/studioSupervisor.ts", why: "Studio runtime lifecycle and configuration signature failures" },
   { module: "src/toolhub/toolhubServer.ts", why: "ToolHub approval workflow and refusals; read only by score caps and penalties" },
+  { module: "src/tools/builtin/planTool.ts", why: "session plan bookkeeping (P1-43); the agent's own notes, never maturity evidence" },
+  { module: "src/tools/builtin/todoTool.ts", why: "session todo bookkeeping (P1-43); the agent's own notes, never maturity evidence" },
+  { module: "src/tools/builtin/webFetchTool.ts", why: "web egress decisions (P1-43); untagged, so they bind to no question" },
+  { module: "src/tools/builtin/webSearchTool.ts", why: "web egress decisions (P1-43); untagged, so they bind to no question" },
+  { module: "src/tools/toolEvidence.ts", why: "authorization records (P1-02) for AMC enforcement; untagged, so they bind to no question" },
   { module: "src/watch/continuousMonitor.ts", why: "score-drop alert about a prior score" },
   { module: "src/watch/observabilityBridge.ts", why: "observability ingestion; external reports are self-reported" },
   { module: "src/workspaces/workspaceRouter.ts", why: "workspace override refusal" }

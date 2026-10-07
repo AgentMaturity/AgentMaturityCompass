@@ -1,0 +1,26 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-01",
+  "polarity": "negative",
+  "evidenceClass": "cross_tenant",
+  "setup": {
+    "bindingPoint": "tool_pipeline",
+    "tool": "fixture.write",
+    "workspaceId": "ws-a",
+    "agentId": "agent-1",
+    "lease": {
+      "workspaceId": "ws-b",
+      "agentId": "agent-1",
+      "state": "valid"
+    },
+    "authorizationRecord": {
+      "principalId": "principal-1",
+      "nonce": "n-1",
+      "firstUse": true
+    }
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "IDENTITY_UNRESOLVED"
+  }
+}

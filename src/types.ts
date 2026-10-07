@@ -80,7 +80,10 @@ export type EvidenceEventType =
   // its payload is the shortened text the model reads from then on, which is
   // what keeps the SurfacePartRef invariant true — every projected part is the
   // payload of exactly one logged event, including a compacted one.
-  | "loop/compact";
+  | "loop/compact"
+  // A ledger checkpoint whose RFC 3161 token arrived (P1-25): later rows chain
+  // through it, so they cannot predate the token's genTime.
+  | "time/checkpoint";
 
 export type RiskTier = "low" | "med" | "high" | "critical";
 
@@ -3386,6 +3389,8 @@ export interface AMCConfig {
     includeProxyEnv: boolean;
     customBaseUrlEnvKeys: string[];
   };
+  /** P1-25 trusted time (TSAs, checkpoints), kept as written; src/time/tsaClient.ts parses it strictly. */
+  time?: unknown;
 }
 
 export interface GatePolicy {

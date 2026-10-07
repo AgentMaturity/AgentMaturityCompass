@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { timeEvidenceSchema, type TimeEvidence, type TimeFinding } from "../time/timeEvidence.js";
 import { amcVersion } from "../version.js";
 import { admitKey, issuerAdmissionSchema, type IssuerAdmission } from "./admission.js";
 import type { TrustContext } from "./trustContext.js";
@@ -7,7 +8,10 @@ const dimensionStatus = z.enum(["pass", "fail", "not-evaluated"]);
 const reasons = z.strictObject({ status: dimensionStatus, reasons: z.array(z.string()) });
 const anchoringSchema = z.strictObject({ status: z.enum(["anchored", "unanchored", "not-applicable"]), detail: z.string().nullable() });
 
-/** One report for every verifier. Scope, freshness, completeness and satisfaction stay "not-evaluated" until P1-06. */
+/**
+ * One report for every verifier. Scope, freshness, completeness and satisfaction stay "not-evaluated" until P1-06,
+ * except that freshness fails on a claimed time outside the attested window and states the time basis (P1-25).
+ */
 export const verifierReportSchema = z.strictObject({
   type: z.literal("amc.verifier-report"),
   version: z.literal(1),
@@ -18,6 +22,8 @@ export const verifierReportSchema = z.strictObject({
   integrity: z.strictObject({ status: dimensionStatus, errors: z.array(z.string()) }),
   issuerAdmission: z.strictObject({ status: dimensionStatus, signatures: z.array(issuerAdmissionSchema) }),
   anchoring: anchoringSchema,
+  /** P1-25: the artifact's claimed time and, when a pinned TSA's token verified, its attested time. */
+  time: timeEvidenceSchema.optional(),
   scope: reasons,
   freshness: reasons,
   completeness: reasons,
@@ -36,6 +42,7 @@ export interface VerifierReportInput {
   anchoring: VerifierReportV1["anchoring"];
   warnings?: readonly string[];
   verifiedAt?: Date;
+  time?: { evidence: TimeEvidence; findings: readonly TimeFinding[] };
 }
 
 /** trusted = integrity passes, every signature is admitted and the ledger is not unanchored. Allow flags never make it true. */
@@ -47,7 +54,11 @@ export function buildVerifierReport(input: VerifierReportInput): VerifierReportV
   const overrides: VerifierReportV1["overrides"] = [];
   if (input.signatures.some(signature => signature.status === "unpinned-allowed")) overrides.push("allow-unpinned");
   if (input.anchoring.status === "unanchored" && input.context.allowUnanchored) overrides.push("allow-unanchored");
-  const warnings = [...(input.warnings ?? [])];
+  const warnings = [...(input.warnings ?? []), ...(input.time?.findings ?? [])
+    .map(finding => `${finding}: claimed time ${input.time?.evidence.claimedAt} lies outside the attested window`)];
+  const freshness = input.time
+    ? { status: input.time.findings.length ? "fail" as const : "not-evaluated" as const, reasons: [`basis: ${input.time.evidence.basis}`, ...input.time.findings] }
+    : notEvaluated;
   if (input.context.mode === "workspace-self") {
     warnings.push("workspace-self: keys were read from the workspace being verified; this is a self-check, not independent verification");
   }
@@ -58,7 +69,8 @@ export function buildVerifierReport(input: VerifierReportInput): VerifierReportV
     integrity: { status: integrity, errors: [...input.integrityErrors] },
     issuerAdmission: { status: issuer, signatures: [...input.signatures] },
     anchoring: input.anchoring,
-    scope: notEvaluated, freshness: notEvaluated, completeness: notEvaluated, satisfaction: notEvaluated,
+    ...(input.time ? { time: input.time.evidence } : {}),
+    scope: notEvaluated, freshness, completeness: notEvaluated, satisfaction: notEvaluated,
     trusted: integrity === "pass" && issuer === "pass" && input.anchoring.status !== "unanchored",
     overrides, warnings
   };

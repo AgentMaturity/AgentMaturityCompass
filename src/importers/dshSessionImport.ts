@@ -7,6 +7,7 @@ import {
   dshEventSchema, dshHeaderSchema, record, summarizeDshStream, validateDshPayload,
   type DshEvent, type DshHeader
 } from "./dshSessionContract.js";
+import { SourceFormatError, headerVersion } from "./sourceFormatError.js";
 
 export interface ParsedDshSession {
   rows: unknown[];
@@ -19,7 +20,13 @@ export interface ParsedDshSession {
   };
 }
 
-function refuse(message: string): never { throw new Error(`DSH session import refused: ${message}`); }
+const DSH_SUPPORTED = { format: "dsh-session", supported: "dsh-session v2", sourceRevision: DSH_SOURCE_REVISION } as const;
+/** Every DSH refusal names the pinned format; messages carry positions only, never source values. */
+function refuse(message: string, code = "DSH_SESSION_REFUSED", detectedVersion: number | null = 2): never {
+  throw new SourceFormatError(`DSH session import refused: ${message}`, { ...DSH_SUPPORTED, code, detectedVersion });
+}
+// Header keys DSH writes and Pi's v3 session header does not; any one marks the file as DSH, whatever its version.
+const DSH_ONLY_HEADER_KEYS = ["createdAt", "isSeeded", "delegationDepth", "seedLength", "agentPreset"];
 function boundedJson(value: unknown): void {
   const pending: Array<{ value: unknown; depth: number }> = [{ value, depth: 0 }];
   let members = 0;
@@ -41,11 +48,15 @@ export function parseDetectedDshSession(text: string): ParsedDshSession | null {
   if (!first) return null;
   let header: unknown;
   try { header = JSON.parse(first); } catch {
-    if (/"(?:isSeeded|delegationDepth)"\s*:/.test(first)) refuse("malformed DSH header; no generic fallback.");
+    if (/"(?:isSeeded|delegationDepth|seedLength)"\s*:/.test(first)) refuse("malformed DSH header; no generic fallback.", "DSH_SESSION_REFUSED", null);
     return null;
   }
-  if (!record(header) || header.type !== "session" || !["createdAt", "isSeeded", "delegationDepth"].some(key => Object.hasOwn(header, key))) return null;
-  if (header.version !== 2) refuse("only pinned DSH v2 plaintext JSONL is supported; export the current v2 generation with DSH before importing. No automatic migration is performed.");
+  if (!record(header) || header.type !== "session" || !DSH_ONLY_HEADER_KEYS.some(key => Object.hasOwn(header, key))) return null;
+  if (header.version !== 2) {
+    const version = headerVersion(header.version);
+    throw new SourceFormatError(`DSH session format ${version === null ? "with a missing or invalid version" : `v${version}`} is not supported; AMC imports DSH v2 (revision ${DSH_SOURCE_REVISION.slice(0, 8)}). No migration is attempted.`,
+      { ...DSH_SUPPORTED, code: "DSH_SESSION_VERSION_UNSUPPORTED", detectedVersion: version });
+  }
   return parseDshSession(text);
 }
 
@@ -139,7 +150,9 @@ export function sanitizeDshSession(parsed: ParsedDshSession, redactedRows: unkno
 }
 
 export function dshSessionWarnings(parsed: ParsedDshSession): string[] {
+  const uploads = parsed.events.filter(event => event.type === "session-log-deepseek/delivery-accepted").length;
   return [
+    ...(uploads ? [`${uploads} session-log-deepseek/delivery-accepted event(s): this DSH log reports that DeepSeek accepted uploaded session-log data. A deployment that must keep session logs local did not, for this session (source-reported).`] : []),
     "DSH file events are SELF_REPORTED and NOT_EVALUATED; local import/signing supplies no independent observation.",
     "Only settled assistant streams are durable. A process loss before settlement may leave no attempt stream; no missing deltas are invented.",
     "Trace durations are unknown. Stream sample times are retained as source metadata, not measured full-call latency.",

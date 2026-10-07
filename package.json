@@ -9,6 +9,7 @@
     "dist/trust/amc-distrust.json",
     "!dist/sea/**",
     "!dist/installers/**",
+    "catalog/**",
     "scripts/postinstall.js",
     "scripts/run-policy-fixtures-ci.mjs",
     "fixtures/policy/amc-ci-policy-fixtures.yaml",

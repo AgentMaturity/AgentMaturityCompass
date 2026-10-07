@@ -60,6 +60,19 @@ export function canonicalHost(value: string): string {
   try { return new URL(`http://[${host}]`).hostname.slice(1, -1); } catch { return host; } // A zone id has no URL form.
 }
 
+/**
+ * One spelling per host for identity comparison: canonicalHost without a trailing dot or IPv6 zone id, and an IPv6
+ * address that embeds an IPv4 one (mapped, compatible or NAT64) written as that IPv4 address.
+ */
+export function canonicalAddress(value: string): string {
+  const host = canonicalHost(value.replace(/\.+$/, ""));
+  const unzoned = host.replace(/%.*$/, "");
+  if (isIP(unzoned) !== 6) return host;
+  const address = canonicalHost(unzoned); // without the zone id the URL form applies
+  const words = ipv6Words(address);
+  return (words && embeddedIPv4(words)) ?? address;
+}
+
 /** Anything that is not a plain public address counts as non-public, including a value that is not an address at all. */
 export function isNonPublicAddress(address: string): boolean {
   // Drop a zone id before canonicalizing: it would defeat both the URL form and the range check.

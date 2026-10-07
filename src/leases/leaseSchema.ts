@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import type { ActionClass } from "../types.js";
 
 export const leaseScopeSchema = z.enum([
   "gateway:llm",
@@ -27,6 +29,9 @@ export const leasePayloadSchema = z.object({
   agentId: z.string().min(1),
   workOrderId: z.string().min(1).nullable().optional(),
   scopes: z.array(leaseScopeSchema).min(1),
+  // When present, toolhub:execute covers only these action classes (AMC-1546). Absent keeps the old meaning:
+  // every class the signed action policy allows to execute.
+  executeActionClasses: z.array(z.enum(ACTION_CLASSES as [ActionClass, ...ActionClass[]])).optional(),
   routeAllowlist: z.array(z.string().startsWith("/")).min(1),
   modelAllowlist: z.array(z.string().min(1)).min(1),
   maxTokensPerMinute: z.number().int().positive(),

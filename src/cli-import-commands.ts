@@ -6,6 +6,17 @@ import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from ".
 import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
 
+type ImportOriginalRef = import("./importers/importOriginals.js").ImportOriginalRef;
+function renderOriginals(originals: ImportOriginalRef[] | undefined): void {
+  // Manifests written before original retention carry no list; say so rather than imply the bytes exist.
+  if (!originals) { console.log("  Originals: not recorded (import predates original-byte retention)."); return; }
+  for (const original of originals) {
+    const source = original.source ? `${original.source.format} v${original.source.version ?? "?"}${original.source.sourceRevision ? ` (revision ${original.source.sourceRevision.slice(0, 12)})` : ""}` : "unknown format";
+    console.log(`  Original: SHA-256 ${original.sha256}; ${original.bytes} bytes; ${source}; ${original.storage.kind === "encrypted-blob"
+      ? `retained encrypted as ${original.storage.blobId}` : "not retained (operator opt-out)"}`);
+  }
+}
+
 const shellWord = (value: string): string => /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 
 /** `next` selects the receipt's own reviewed actions (preview), an inspection pointer (applied) or nothing (show). */
@@ -39,7 +50,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
     .option("--validate", "validate support without writing artifacts", false)
     .option("--json", "JSON output")
     .option("--expected-digest <sha256>", "apply only the semantic source digest reviewed in a preview")
-    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean; expectedDigest?: string }) => {
+    .option("--no-retain-original", "keep only the SHA-256 of each source file instead of its encrypted original bytes")
+    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean; expectedDigest?: string; retainOriginal?: boolean }) => {
       try {
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
         const mode = opts.validate ? "validate" : opts.dryRun ? "dry-run" : "import";
@@ -49,7 +61,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
           inputPath: resolve(process.cwd(), path),
           agentId,
           mode,
-          expectedSemanticDigest: opts.expectedDigest
+          expectedSemanticDigest: opts.expectedDigest,
+          retainOriginals: opts.retainOriginal !== false
         });
         // Imported records are what their source reported: self-reported, and no maturity evaluation is performed.
         if (emitClaimResult(chalk.bold(`Neutral import ${result.importId}`), result, unverifiedClaim("import:neutral", result.plan.candidateCount), opts)) return;
@@ -71,6 +84,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Lifecycle: ${result.lifecycleRun?.artifact.lifecycleRunId ?? "-"}`);
         console.log(`  Trace index: ${result.traceFailureIndex?.ref.indexId ?? "-"}`);
         console.log(`  Manifest: ${result.resourceManifest?.manifest.manifestId ?? "-"}`);
+        renderOriginals(result.originals);
         for (const path of result.externalEvidencePaths ?? []) console.log(`  Portable evidence: ${path}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
@@ -162,6 +176,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Categories: ${manifest.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${manifest.plan.redactionCount}`);
         renderNormalization(manifest.plan, "none");
+        renderOriginals(manifest.originals);
         for (const path of manifest.externalEvidencePaths ?? []) console.log(`  Portable evidence: ${path}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
@@ -183,6 +198,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         }
         const removed = result.removed.filter((entry) => entry.status === "removed").length;
         console.log(chalk.green(`Rolled back ${removed} file(s).`));
+        console.log(result.originalsKept);
         console.log(`Receipt: ${result.receiptPath}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));

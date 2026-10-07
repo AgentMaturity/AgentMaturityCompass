@@ -1,4 +1,9 @@
 import { randomUUID } from "node:crypto";
+import {
+  authorizationIntentFor, bindAuthorization, recheckAuthorization,
+  type AuthorizationContext, type AuthorizationIntentResult, type BindResult
+} from "../actions/authorize.js";
+import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { freezeToolArguments } from "./toolArguments.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import type {
@@ -15,7 +20,11 @@ import type {
  *
  * Stage order is the design, so it is stated once here and enforced below:
  *
- *   visibility -> freeze arguments -> approval -> guards -> body -> filters
+ *   visibility -> freeze arguments -> approval -> guards -> authorization -> body -> filters
+ *
+ * Authorization (P1-02) is last before the body on purpose: the record bound when the call entered is rechecked
+ * against the policy files, the approvals and the freezes as they are NOW, synchronously, and its approvals are
+ * consumed there. Nothing awaits between that recheck and the body.
  *
  * Approval sits BEFORE guards deliberately. Approval is a question about
  * whether a human wants this; a guard is a statement that policy forbids it.
@@ -55,6 +64,26 @@ export const RUN_CODE_TOOL = "run_code";
  */
 export type ToolDispatchMode = "native" | "code";
 
+/** Classes bound to an authorization record by default: every class except reads and low-impact writes. */
+export const DEFAULT_AUTHORIZE_CLASSES: ReadonlySet<string> = new Set(
+  ACTION_CLASSES.filter((actionClass) => actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW"));
+
+/** Approvals named by trusted composition: the approval gate, the pipeline's own gate stage, ToolHub. */
+export interface ToolAuthority {
+  readonly approvalRequestIds: readonly string[];
+}
+
+/**
+ * An approval gate composed in front of this pipeline (P1-02). Once one is bound, a call it gates in an authorized
+ * class needs a signed approval named through `authority`, whatever path the call took, and a Code Mode sub-call is
+ * asked on its own instead of riding on the `run_code` approval.
+ */
+export interface BoundApprovalGate {
+  gates(toolName: string): boolean;
+  /** Asks about one sub-call. Resolves to the signed requests that granted it, or null when it was not granted. */
+  ask(execution: ToolExecution, intent: AuthorizationIntentResult | null): Promise<ToolAuthority | null>;
+}
+
 export interface ToolPipelineInit {
   readonly registry: ToolRegistry;
   readonly workspace: string;
@@ -67,6 +96,12 @@ export interface ToolPipelineInit {
   readonly filters?: readonly ToolOutputFilter[];
   /** Called exactly once per call, after the outcome is final. */
   readonly record?: (execution: ToolExecution, outcome: ToolOutcome) => void;
+  /** Classes whose calls are bound to an authorization record and rechecked before the body. */
+  readonly authorizeClasses?: ReadonlySet<string>;
+  /** Authorized classes that need a signed approval through `authority` even with no gate bound (hooks, ToolHub). */
+  readonly boundApprovalRequiredFor?: ReadonlySet<string>;
+  /** Who is acting, for the record. Read per call, because the CLI binds its session after composing. */
+  readonly authorizationContext?: () => Omit<AuthorizationContext, "authority">;
 }
 
 export interface ToolCallInput {
@@ -79,6 +114,18 @@ export interface ToolCallInput {
   readonly callId?: string;
   readonly rootCallId?: string;
   readonly parentToken?: string | null;
+  /** Set only by trusted composition, after an approval was granted. Arguments never grant anything. */
+  readonly authority?: ToolAuthority;
+}
+
+/** What the authorization stage needs, decided when the call entered. */
+interface CallAuthorization {
+  /** A sub-call the bound gate refused, denied at the approval stage. */
+  readonly refused: ToolDenial | null;
+  readonly context: AuthorizationContext | null;
+  readonly bound: BindResult | null;
+  /** A bound gate gates this call, so it needs a signed approval. */
+  readonly required: boolean;
 }
 
 function denialOutcome(denied: ToolDenial): ToolOutcome {
@@ -103,7 +150,26 @@ export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinit
 }
 
 export class ToolPipeline {
+  private readonly gates: BoundApprovalGate[] = [];
+
   constructor(private readonly init: ToolPipelineInit) {}
+
+  /** Bind a composed approval gate. Gates only add: a later one never lifts what an earlier one requires. */
+  bindApprovalGate(gate: BoundApprovalGate): void {
+    this.gates.push(gate);
+  }
+
+  /** The intent an approval for this call must bind, or null for a call outside the authorized classes. */
+  authorizationIntent(input: Pick<ToolCallInput, "name" | "agentId" | "arguments" | "requestedMode">): AuthorizationIntentResult | null {
+    const definition = this.init.registry.visible(input.agentId).get(input.name);
+    if (!definition || !this.authorizes(definition.actionClass)) return null;
+    return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
+      effectiveMode: input.requestedMode, arguments: input.arguments });
+  }
+
+  private authorizes(actionClass: string): boolean {
+    return (this.init.authorizeClasses ?? DEFAULT_AUTHORIZE_CLASSES).has(actionClass);
+  }
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
     const collapsed = this.collapses(input);
@@ -136,7 +202,7 @@ export class ToolPipeline {
     }
 
     const callId = input.callId ?? randomUUID();
-    const execution: ToolExecution = {
+    const draft: ToolExecution = {
       token: `tok_${randomUUID()}`,
       callId,
       rootCallId: input.rootCallId ?? callId,
@@ -151,10 +217,15 @@ export class ToolPipeline {
       ...(input.signal === undefined ? {} : { signal: input.signal })
     };
 
+    const authorization = await this.enter(draft, input.authority);
+    const bound = authorization.bound;
+    const execution: ToolExecution = bound?.ok
+      ? { ...draft, authorization: { authorizationId: bound.record.authorizationId, digest: bound.digest, record: bound.record } }
+      : draft;
     selectedDefinitions.set(execution, definition);
     let outcome: ToolOutcome;
     try {
-      outcome = await this.runStages(execution, definition.body);
+      outcome = await this.runStages(execution, definition.body, authorization);
     } finally {
       selectedDefinitions.delete(execution);
     }
@@ -187,7 +258,45 @@ export class ToolPipeline {
     return (input.parentToken ?? null) === null;
   }
 
-  private async runStages(execution: ToolExecution, body: ToolBody): Promise<ToolOutcome> {
+  /**
+   * Decide the call's authority as it enters. A sub-call under a bound gate is asked here, before the record binds,
+   * so the human wait is never inside the record's lifetime. Binding failures are held until after the guards, so a
+   * guard's denial is still the one reported for a call the guards refuse.
+   */
+  private async enter(draft: ToolExecution, supplied: ToolAuthority | undefined): Promise<CallAuthorization> {
+    const authorizes = this.authorizes(draft.actionClass);
+    const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
+    let authority = supplied;
+    if (gate !== undefined && draft.parentToken !== null) {
+      const intent = authorizes ? authorizationIntentFor(draft) : null;
+      // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
+      const granted = intent?.ok === false ? undefined : await gate.ask(draft, intent).catch((): null => null);
+      if (granted === null) {
+        return { refused: { stage: "approval", reason: "approval not granted for this sub-call", guardLabel: null },
+          context: null, bound: null, required: false };
+      }
+      authority = granted;
+    }
+    if (!authorizes) return { refused: null, context: null, bound: null, required: false };
+    const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
+    const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
+    return { refused: null, context, bound: bindAuthorization(draft, context), required };
+  }
+
+  /** The authorization stage: a reason to deny, or null. Synchronous, so nothing runs between it and the body. */
+  private authorizationDenial(execution: ToolExecution, authorization: CallAuthorization): string | null {
+    const { bound, context } = authorization;
+    if (bound === null || context === null) return null;
+    if (!bound.ok) return `${bound.failures.join(", ")}: ${bound.reason}`;
+    if (authorization.required && bound.record.authority.approvals.length === 0) {
+      return "approval_missing: this composition requires a signed approval named through the authority channel";
+    }
+    const recheck = recheckAuthorization(bound.record, execution, context);
+    return recheck.ok ? null : recheck.failures.join(", ");
+  }
+
+  private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization): Promise<ToolOutcome> {
+    if (authorization.refused !== null) return denialOutcome(authorization.refused);
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
 
@@ -195,6 +304,9 @@ export class ToolPipeline {
     if (denied) {
       return denialOutcome({ stage: "guard", reason: denied.reason, guardLabel: denied.label });
     }
+
+    const unauthorized = this.authorizationDenial(execution, authorization);
+    if (unauthorized !== null) return denialOutcome({ stage: "authorization", reason: unauthorized, guardLabel: null });
 
     try {
       const result = await body(execution);

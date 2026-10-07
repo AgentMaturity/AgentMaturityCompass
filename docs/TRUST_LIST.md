@@ -81,6 +81,8 @@ Entry rules:
 - `source` is `operator`, `amc-project` or `imported:<uri>`.
 - `listId` matches `[a-z0-9][a-z0-9._-]{0,63}`; `sequence` is a positive integer.
 
+Optional `timestampAuthorities` (P1-25) pins RFC 3161 timestamp authorities: at most 64 entries of `{ "anchorId", "name", "rootCertificatePem", "policyOids"? }`. `anchorId` matches the `listId` pattern and is unique in the list; `rootCertificatePem` is exactly one PEM X.509 certificate (a root, an intermediate or the TSA certificate itself); `policyOids`, when present, lists the TSA policies accepted under that anchor. A timestamp token verifies only through a path to one of these certificates, never through a certificate the token carries. See [TRUSTED_TIME.md](TRUSTED_TIME.md).
+
 ### Signing
 
 The signed bytes are the ASCII tag `AMC_TRUST_LIST_V1`, one 0x00 byte, then the canonical JSON of `list` (object keys sorted at every level, arrays kept in order) in UTF-8. The signature is Ed25519 over those bytes, never over a digest, so reordering keys in the file does not change it. In Node:
@@ -131,7 +133,7 @@ Every refusal names the key id, so you can pin the right key.
 
 ### Signing times are claims
 
-Until trusted time lands (P1-25), a signing time is whatever the artifact claims. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
+Issuer admission still uses the signing time the artifact claims. Since P1-25 a certificate can also carry an RFC 3161 token, and its verifier report states the attested time separately in `time` ([TRUSTED_TIME.md](TRUSTED_TIME.md)); admission does not use it yet. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
 
 The claim each command checks: `bundle verify` and `cert verify` use the run seal's own `ts` for `run.json`, and the `signedTs` of `manifest.sig` or `cert.sig` for every other signature the artifact carries; `passport verify` and `assurance cert-verify` use their signature's `signedTs`, which the signed Merkle root shares; `cert verify-revocation` uses the revocation's `ts`; a trust certificate uses its `generatedTs`. Two checks have no signing claim and run at verification time: a release bundle (its `generatedTs` is a reproducible build time, not a signing time) and the ledger's monitor key for `ledger-row`.
 
@@ -145,7 +147,7 @@ The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory,
 
 ## Verifier report
 
-Every verifier will return `VerifierReportV1` (`type: "amc.verifier-report"`, `version: 1`). It keeps integrity separate from issuer admission: `integrity` (`pass` or `fail` with errors), `issuerAdmission` (every signature's admission), `anchoring` (`anchored`, `unanchored` or `not-applicable`), and `scope`, `freshness`, `completeness` and `satisfaction`, which stay `not-evaluated` until P1-06. `trusted` is true only when integrity passes, every signature is admitted and anchoring is not `unanchored`. `--allow-unpinned` and `--allow-unanchored` appear in `overrides` and never make a report trusted.
+Every verifier will return `VerifierReportV1` (`type: "amc.verifier-report"`, `version: 1`). It keeps integrity separate from issuer admission: `integrity` (`pass` or `fail` with errors), `issuerAdmission` (every signature's admission), `anchoring` (`anchored`, `unanchored` or `not-applicable`), and `scope`, `freshness`, `completeness` and `satisfaction`, which stay `not-evaluated` until P1-06. Where a verifier reads time (P1-25), the optional `time` field holds the claimed time, any attested time and its `basis`; `freshness` then states that basis and fails with `BACKDATED_CLAIM` or `POSTDATED_CLAIM` when the claim lies outside the attested window. `trusted` is true only when integrity passes, every signature is admitted and anchoring is not `unanchored`. `--allow-unpinned` and `--allow-unanchored` appear in `overrides` and never make a report trusted.
 
 ## Flags
 

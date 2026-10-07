@@ -7,6 +7,7 @@ import { toErrorMessage } from "./utils/errors.js";
 import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
 import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
+import type { Station } from "./domains/stations.js";
 
 type DomainProductCliDeps = {
   product: Command;
@@ -110,20 +111,32 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
   sectorPack
     .command("list")
     .description("List all available industry sector packs")
-    .option("--domain <d>", "Filter by domain: health|education|environment|mobility|governance|technology|wealth")
+    .option("--station <station>", "Filter by station: education|environment|health|wealth|technology|mobility|governance")
+    .option("--domain <d>", "Deprecated alias of --station")
     .option("--json", "Output as JSON")
-    .action(async (opts: { domain?: string; json?: boolean }) => {
+    .action(async (opts: { station?: string; domain?: string; json?: boolean }) => {
       const { listIndustryPackIds, getIndustryPack, getIndustryPacksByStation } = await import("./domains/industryPacks.js");
-      const { parseDomainOrThrow } = await import("./domains/domainCliIntegration.js");
+      const { parseStation } = await import("./domains/stations.js");
       const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("./domains/industryPackEntitlement.js");
+      if (opts.station !== undefined && opts.domain !== undefined) {
+        console.error(chalk.red("Use --station or --domain, not both."));
+        process.exit(1); return;
+      }
+      if (opts.domain !== undefined) console.error("--domain is deprecated; use --station");
+      const stationInput = opts.station ?? opts.domain;
+      let station: Station | undefined;
+      try {
+        station = stationInput === undefined ? undefined : parseStation(stationInput);
+      } catch (e: unknown) {
+        console.error(chalk.red(toErrorMessage(e)));
+        process.exit(1); return;
+      }
       const entitlement = getIndustryPackEntitlement(process.cwd());
 
       let packs: Array<{ packId: string; name: string; domain: string; questionCount: number; riskLevel: string; locked: boolean }>;
 
-      if (opts.domain) {
-        const domain = parseDomainOrThrow(opts.domain);
-        const domainPacks = getIndustryPacksByStation(domain);
-        packs = domainPacks.map(p => toIndustryPackCatalogItem(p, entitlement));
+      if (station) {
+        packs = getIndustryPacksByStation(station).map(p => toIndustryPackCatalogItem(p, entitlement));
       } else {
         const allIds = listIndustryPackIds();
         packs = allIds.map(id => {

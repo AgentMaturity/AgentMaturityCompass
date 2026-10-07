@@ -1,5 +1,6 @@
 /** Pinned physical DSH v2 import subset; no source-runtime reconstruction or migration. */
 import { z } from "zod";
+import { SourceFormatError } from "./sourceFormatError.js";
 
 export const DSH_SOURCE_REVISION = "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8";
 export const DSH_IMPORT_LIMITS = { bytes: 32 * 1024 * 1024, lineBytes: 4 * 1024 * 1024, events: 100_000, depth: 128, expandedMembers: 500_000 } as const;
@@ -38,7 +39,10 @@ export const DSH_SURFACE_EVENTS = new Set(["user/message", "assistant/message", 
 export function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-function requireValue(ok: boolean, message: string): asserts ok { if (!ok) throw new Error(`Malformed DSH v2 ${message}.`); }
+function requireValue(ok: boolean, message: string): asserts ok {
+  if (!ok) throw new SourceFormatError(`DSH session import refused: malformed DSH v2 ${message}.`, { code: "DSH_SESSION_REFUSED", format: "dsh-session",
+    detectedVersion: 2, supported: "dsh-session v2", sourceRevision: DSH_SOURCE_REVISION });
+}
 function isCount(value: unknown): value is number { return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 && !Object.is(value, -0); }
 function validateUsage(value: unknown): void {
   requireValue(record(value) && isCount(value.inputTokens) && isCount(value.outputTokens), "token usage");

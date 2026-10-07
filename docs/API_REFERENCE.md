@@ -1278,6 +1278,9 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
 | `--max-steps <n>` | - |
+| `--context-window <tokens>` | - |
+| `--compact-threshold <fraction>` | - |
+| `--no-auto-summary` | - |
 | `--agent-id <id>` | - |
 | `--system-prompt <text>` | - |
 
@@ -1446,6 +1449,9 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
 | `--max-steps <n>` | - |
+| `--context-window <tokens>` | - |
+| `--compact-threshold <fraction>` | - |
+| `--no-auto-summary` | - |
 | `--session <id>` | - |
 | `--fork-from <id>` | - |
 
@@ -1516,6 +1522,9 @@ Run one agent turn and report what the signed log recorded
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
 | `--max-steps <n>` | - |
+| `--context-window <tokens>` | - |
+| `--compact-threshold <fraction>` | - |
+| `--no-auto-summary` | - |
 | `--tools <mode>` | - |
 | `--tool-mode <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
@@ -3053,6 +3062,7 @@ Alias: `amc comply report`
 | `--window <window>` | - |
 | `--out <path>` | - |
 | `--agent <agentId>` | - |
+| `--station <station>` | - |
 | `--json` | - |
 
 #### `amc compliance risk-classify`
@@ -3825,6 +3835,7 @@ Alias: `amc sector pack list`
 
 | Option | Description |
 |--------|-------------|
+| `--station <station>` | - |
 | `--domain <d>` | - |
 | `--json` | - |
 
@@ -5603,6 +5614,7 @@ Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchm
 | `--validate` | - |
 | `--json` | - |
 | `--expected-digest <sha256>` | - |
+| `--no-retain-original` | - |
 
 #### `amc imports list`
 

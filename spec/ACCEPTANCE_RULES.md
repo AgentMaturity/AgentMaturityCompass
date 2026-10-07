@@ -168,6 +168,8 @@ express, all enforced by AMC (`src/trust/trustList.ts`):
   an `authority`; `purposes` and `keyId`s are unique.
 - Signature: Ed25519 over `"AMC_TRUST_LIST_V1"` (ASCII), one `0x00` byte, then the canonical form of `list`, by a key
   whose `keyId` the verifier pinned as a trust-list root. The list is expired when `asOf` ≥ `list.expiresAt`.
+- `timestampAuthorities` (optional, P1-25): `anchorId`s are unique, and each `rootCertificatePem` is exactly one PEM
+  X.509 certificate. A timestamp token counts only through a path to one of them (docs/TRUSTED_TIME.md).
 
 ## verifier-report
 
@@ -175,7 +177,11 @@ What AMC's verify commands return with `--json` (docs/TRUST_LIST.md). `integrity
 `freshness`, `completeness` and `satisfaction` are separate results; the last four stay `not-evaluated` until P1-06.
 `trusted` is AMC's summary (integrity and issuer admission pass and the ledger is not unanchored); a consumer must
 read the separate results and not `trusted` alone. Status values are spelled `pass`, `fail` and `not-evaluated`
-(hyphen). `overrides` lists any allow flag used; an override never makes a report trusted.
+(hyphen). `overrides` lists any allow flag used; an override never makes a report trusted. The optional `time`
+(P1-25) keeps `claimedAt` (what the artifact says) apart from `attested` (an RFC 3161 token that verified against a
+pinned TSA anchor); `basis` is `claimed`, `attested-upper-bound` or `attested-window`, and `freshness` fails with
+`BACKDATED_CLAIM` or `POSTDATED_CLAIM` when the claim lies outside the window widened by the token's accuracy and the
+tolerance (5 minutes).
 
 ## signature-envelope
 
@@ -191,6 +197,21 @@ refuse them; they are not signed and are not evidence.
 
 RFC for P1-30: one key-id rule for every record (today trust lists hash the canonical PEM and envelopes hash the PEM
 as carried).
+
+## control-record, pack-manifest and catalog-lock
+
+The Regulated Control Catalog (P1-09). `loadCatalog` parses each YAML file with these schemas after refusing anchors,
+aliases, explicit tags, floats and unquoted dates; `validateCatalog` adds the cross-file rules. Rules the schemas cannot
+express, all listed in docs/catalog/CONTROL_RECORD.md:
+
+- Binding kind and points agree; `executed_adversarial` tests need at least 25 attempts; a mandatory enforced control
+  needs a test with a positive and a negative fixture; evidence binds `controlId` and one scope field.
+- `reviewed` and `qualified` controls need verified, legally reviewed citations, an approved expert review and, for
+  AI-drafted content, `provenance.approvedBy`. Evidence producers cap the levels a control may list.
+- Citation URLs are https on the shared official host list; register ids exist and agree with `statusType`; a
+  superseded instrument is cited only as historical.
+- A lock verifies only against a rebuild from the same tree: every digest, source row and the register digest must
+  match. A matching lock shows the content is unchanged, not that it is true.
 
 ## The `amc standard` artifacts and external evidence
 

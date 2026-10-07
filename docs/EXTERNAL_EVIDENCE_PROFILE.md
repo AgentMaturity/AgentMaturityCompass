@@ -6,7 +6,7 @@ This is an AMC-proposed profile. An implementation and conformance corpus do not
 
 ## Create and consume an import
 
-`amc import <path> --dry-run --json` shows the source digests, mapping losses and semantic digest. Apply with `--expected-digest <reviewed-digest>`. Each applied source writes bounded profiles under `.amc/imports/runs/<import-id>/external-evidence/`; `amc imports show <import-id>` lists the exact paths. Each file is independently consumable. The importer also retains the fuller redacted source in `normalized.json`.
+`amc import <path> --dry-run --json` shows the source digests, mapping losses and semantic digest. Apply with `--expected-digest <reviewed-digest>`. Each applied source writes bounded profiles under `.amc/imports/runs/<import-id>/external-evidence/`; `amc imports show <import-id>` lists the exact paths. Each file is independently consumable. The importer also retains the fuller redacted source in `normalized.json` and, unless `--no-retain-original` is passed, the exact original bytes encrypted in the workspace blob store; profiles never embed those originals.
 
 The generic export is an operational trace projection. It retains reported failures/cancellations, source times and source identifiers as attributes. It omits payloads, usage, costs and unproven tool/parent edges. A source with no mapped traces emits an empty profile with explicit losses. Multiple parts remain separate; no cross-part lineage is invented. Imported profiles stay unsigned and `SELF_REPORTED`, regardless of the importer's local signing key.
 

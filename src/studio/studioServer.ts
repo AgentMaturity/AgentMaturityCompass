@@ -63,6 +63,7 @@ import {
 } from "../value/valueApi.js";
 import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { valueSchedulerTick } from "../value/valueScheduler.js";
+import { timeCheckpointTick } from "../time/checkpoint.js";
 import { emitValueSse } from "../value/valueSse.js";
 import {
   assuranceCertIssueForApi,
@@ -100,6 +101,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
+import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
@@ -1128,6 +1130,7 @@ function verifyLeaseForScope(params: {
   scope: "toolhub:intent" | "toolhub:execute" | "governor:check" | "receipt:verify" | "diagnostic:self-run";
   routePath?: string;
   model?: string | null;
+  actionClass?: ActionClass;
 }): { ok: true } | { ok: false; status: number; error: string } {
   const parsedUrl = new URL(params.req.url ?? "/", `http://${params.req.headers.host ?? "127.0.0.1"}`);
   const carrier = extractLeaseCarrier({
@@ -1161,7 +1164,8 @@ function verifyLeaseForScope(params: {
     requiredScope: params.scope,
     routePath: params.routePath,
     model: params.model,
-    revokedLeaseIds: revoked
+    revokedLeaseIds: revoked,
+    ...(params.actionClass === undefined ? {} : { actionClass: params.actionClass })
   });
   if (!verification.ok) {
     const message = verification.error ?? "lease verification failed";
@@ -1655,6 +1659,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             });
           }
         }
+        // P1-25: a no-op unless time.tsa is configured; pending checkpoints retry on the next tick.
+        if (state.ok) await timeCheckpointTick(options.workspace);
       }).catch(() => {
         // Scheduler loop is best effort; failures are surfaced via explicit endpoints and subsequent ticks.
       });
@@ -6396,7 +6402,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           req,
           expectedAgentId: intentAgent,
-          scope: "toolhub:execute"
+          scope: "toolhub:execute",
+          actionClass: toolhub.intent(parsed.intentId)?.actionClass
         });
         if (!leaseCheck.ok) {
           json(res, leaseCheck.status, { error: leaseCheck.error });
@@ -8604,10 +8611,20 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { listIndustryPacks } = await import("../domains/industryPacks.js");
         const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("../domains/industryPackEntitlement.js");
+        const { parseStation } = await import("../domains/stations.js");
+        const stationParam = url.searchParams.get("station");
+        let station: string | null = null;
+        try {
+          station = stationParam === null ? null : parseStation(stationParam);
+        } catch {
+          json(res, 400, { error: `unknown station: ${stationParam}` });
+          return;
+        }
         const entitlement = getIndustryPackEntitlement(options.workspace);
         json(res, 200, {
           entitlement, entitlementNote: ENTITLEMENT_NOTE,
-          packs: listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement))
+          packs: listIndustryPacks().filter((pack) => station === null || pack.stationId === station)
+            .map((pack) => toIndustryPackCatalogItem(pack, entitlement))
         });
         return;
       }

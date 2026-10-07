@@ -10,6 +10,7 @@ import { agentToolset } from "./agentToolset.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { AgentDriver } from "./agentDriver.js";
 import { readAgentRunSummary } from "./runReport.js";
+import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
 
@@ -281,6 +282,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
         parentShell: init.parentShell ?? null,
+        delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
+          ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
         ...(grant === undefined ? {} : { subagents: {
           identity: ctx.identity, runner: grant.runner, session,
           ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
@@ -333,7 +336,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           // missing/pruned-payload diagnostics, which are not the child's words.
           // This read-back retains the existing unsigned refusal; it is not an
           // independent signature/chain verification or a successful-task claim.
-          const textBlocks = session.readEvents().filter(event => event.event_type === "assistant/block"
+          const rows = session.readEvents(), inSummaryStep = compactionSummaryRows(rows);
+          const textBlocks = rows.filter(event => event.event_type === "assistant/block" && !inSummaryStep(event)
             && (JSON.parse(event.meta_json) as { blockKind?: unknown }).blockKind === "text");
           const fresh: string[] = [];
           const unavailable = new Set<string>();
