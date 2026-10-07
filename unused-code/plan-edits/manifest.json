@@ -248,6 +248,13 @@
       "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
     },
     {
+      "path": "src/studio/studioState.ts",
+      "issue": "P1-02",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-02/src/studio/studioState.ts.landed",
+      "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b"
+    },
+    {
       "path": "src/toolhub/toolhubValidators.ts",
       "issue": "P1-05",
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
