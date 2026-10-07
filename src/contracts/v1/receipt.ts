@@ -42,7 +42,7 @@ const v2Fields = {
   v: z.literal(2),
   ...payloadFields,
   executionId: nonEmpty,
-  /** Null until P1-04 issues idempotency keys. */
+  /** AMC's per-execution key (P1-04); null only for an execution whose authorization record did not bind. */
   idempotencyKey: nonEmpty.nullable(),
   authorizationRecordDigest: sha256HexSchema.nullable(),
   enforcement: enforcementLevelSchema

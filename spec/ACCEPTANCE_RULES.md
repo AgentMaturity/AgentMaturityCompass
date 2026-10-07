@@ -114,7 +114,8 @@ schema cannot express (docs/RECEIPTS.md):
   `cancelled` once dispatched); `outcome_unknown` → `completed` through reconciliation only. A receipt may repeat its
   predecessor's state only to mark the evidence incomplete. Any other order fails satisfaction.
 - A `completed` or `cancelled` receipt that follows `outcome_unknown` for the same execution must carry
-  `reconciliation`, whose `fromReceiptId` names the `outcome_unknown` receipt.
+  `reconciliation`, whose `fromReceiptId` names the `outcome_unknown` receipt. So must a `completed` receipt that marks a
+  `completed` execution's evidence complete again (P1-04); its `fromReceiptId` names the receipt it follows.
 - From `authorized` on, `authorizationRecordDigest` must equal the digest of the execution's authorization record.
 - `enforcement.level: "enforced"` names the boundary that held; it is AMC's statement and is checked against the
   deployment's declared boundaries, never taken on trust.

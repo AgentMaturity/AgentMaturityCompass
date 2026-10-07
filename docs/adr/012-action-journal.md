@@ -67,9 +67,9 @@ threat model makes failure rows 1 (authority or evidence store unavailable), 2 (
 
 - Each journaled call costs four FULL-sync commits and a chain verification per transition. `requested` and
   `authorized` are not yet merged into one commit.
-- An `outcome_unknown` execution blocks the agent's consequential calls in that workspace until P1-04's reconcile()
-  exists; until then an operator has no in-product way to clear it. That is deliberate: nothing replays an ambiguous
-  effect.
+- An `outcome_unknown` execution blocks the agent's consequential calls in that workspace until it is reconciled. P1-04
+  adds `reconcile()` and the operator's dual-control resolution (`amc action resolve`, docs/RECEIPTS.md); nothing
+  replays an ambiguous effect.
 - A thrown body in an authorized class is now `TOOL_OUTCOME_UNKNOWN`, not `ERROR`, and blocks the agent: a confined
   `bash` run that was cancelled or whose process tree exit was not proven, or a `web_fetch` refused after its request
   was sent, for example. Invalid `bash` arguments throw `DefiniteFailureError`, since no process starts. Other
@@ -79,7 +79,7 @@ threat model makes failure rows 1 (authority or evidence store unavailable), 2 (
 
 ## Not done here
 
-- Idempotency keys, adapter propagation and `reconcile()` (P1-04); writer fencing and resume rules (P2-12); one
+- Idempotency keys, adapter propagation and `reconcile()` (delivered by P1-04); writer fencing and resume rules (P2-12); one
   execution API across surfaces and journaling ToolHub's `runTool` (P2-13, P1-54); the hazard-reviewed safe state for
   row 7 (P2-26).
 - A pid reused on the same host reads as a live owner until P2-12's fencing tokens.
