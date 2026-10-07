@@ -3,6 +3,9 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
+import { openLedger } from "../../src/ledger/ledger.js";
+import { initComplianceMaps } from "../../src/compliance/complianceEngine.js";
+import type { ComplianceEvidenceRequirement, ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
 import {
   generateCoverageMatrix,
   renderCoverageMatrixMarkdown,
@@ -76,6 +79,73 @@ describe("generateCoverageMatrix", () => {
       const curr = order[matrix.gaps[i]!.severity] ?? 3;
       expect(prev).toBeLessThanOrEqual(curr);
     }
+  });
+});
+
+describe("gaps and not-evaluated categories (P0-17)", () => {
+  const NO_AUDIT: ComplianceEvidenceRequirement = { type: "requires_no_audit", auditTypesDenylist: ["DENIED_SIGNAL"] };
+  const EVENT: ComplianceEvidenceRequirement = { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0 };
+  const PACK: ComplianceEvidenceRequirement = { type: "requires_assurance_pack", packId: "toolGovernance", minScore: 50, maxSucceeded: 0 };
+  const mapping = (id: string, framework: string, evidenceRequirements: ComplianceEvidenceRequirement[]) =>
+    ({ id, framework, category: id, description: id, evidenceRequirements, related: { questions: [], packs: [], configs: [] } });
+  const maps = {
+    complianceMaps: {
+      version: 1,
+      mappings: [
+        mapping("fx_ok", "SOC2", [EVENT]),
+        mapping("fx_partial", "SOC2", [EVENT, NO_AUDIT]),
+        mapping("fx_missing", "SOC2", [NO_AUDIT]),
+        mapping("fx_none", "SOC2", [PACK]),
+        mapping("fx_eu_missing", "EU_AI_ACT", [NO_AUDIT])
+      ]
+    }
+  } as ComplianceMapsFile;
+
+  function audit(ws: string, auditType: string, controlIds: string[]): void {
+    const ledger = openLedger(ws);
+    try {
+      ledger.startSession({ sessionId: `s-${auditType}`, runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      ledger.appendEvidence({
+        sessionId: `s-${auditType}`, runtime: "unknown", eventType: "audit", payload: JSON.stringify({ auditType }),
+        payloadExt: "json", inline: true, meta: { trustTier: "OBSERVED", agentId: "default", controlIds }
+      });
+    } finally {
+      ledger.close();
+    }
+  }
+
+  test("failed categories are gaps; not-evaluated categories are listed apart and earn nothing", () => {
+    const ws = newWorkspace();
+    initComplianceMaps(ws, maps);
+    audit(ws, "FIXTURE_SIGNAL", ["fx_ok", "fx_partial"]);
+    audit(ws, "DENIED_SIGNAL", []);
+    const matrix = generateCoverageMatrix({ workspace: ws, window: "14d", frameworks: ["SOC2", "EU_AI_ACT"] });
+
+    expect(matrix.gaps.map((gap) => [gap.category, gap.status, gap.severity])).toEqual([
+      ["fx_eu_missing", "MISSING", "critical"],
+      ["fx_missing", "MISSING", "high"],
+      ["fx_partial", "PARTIAL", "medium"]
+    ]);
+    expect(matrix.notEvaluated.map((row) => row.category)).toEqual(["fx_none"]);
+    expect(matrix.frameworks.map((fw) => fw.score)).toEqual([0.375, 0]);
+    expect(matrix.overallScore).toBe(0.1875);
+
+    const md = renderCoverageMatrixMarkdown(matrix);
+    expect(md).toContain("## Gap Analysis");
+    expect(md).toContain("## Not Evaluated");
+    expect(md).toContain("| SOC 2");
+    const heatmap = renderCoverageHeatmap(matrix);
+    for (const line of ["█ fx_ok", "▓ fx_partial", "░ fx_missing", "? fx_none", "Overall: 18.8%"]) {
+      expect(heatmap).toContain(line);
+    }
+  });
+
+  test("a framework whose report cannot be generated is not scored", () => {
+    const ws = newWorkspace();
+    const matrix = generateCoverageMatrix({ workspace: ws, window: "not-a-window", frameworks: ["SOC2"] });
+    expect(matrix.frameworks[0]).toMatchObject({ framework: "SOC2", score: null, total: 0, notEvaluated: 0 });
+    expect(matrix.overallScore).toBeNull();
+    expect(renderCoverageMatrixMarkdown(matrix)).toContain("**Overall Score:** not evaluated");
   });
 });
 

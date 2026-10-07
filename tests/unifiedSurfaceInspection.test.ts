@@ -7,6 +7,8 @@ import { unifiedRun } from "../src/unified/unifiedRun.js";
 import { initWorkspace } from "../src/workspace.js";
 import { actionPolicyPath } from "../src/governor/actionPolicyEngine.js";
 import { passportExportsDir } from "../src/passport/passportStore.js";
+import { initComplianceMaps } from "../src/compliance/complianceEngine.js";
+import { openLedger } from "../src/ledger/ledger.js";
 
 const workspaces: string[] = [];
 
@@ -58,6 +60,33 @@ describe("unified run surface inspection", { timeout: 120_000 }, () => {
     expect(enforce?.status).toBe("failed");
     expect(enforce?.score).toBe(0);
     expect(enforce?.issues.join(" ")).toMatch(/signature|integrity|invalid/i);
+  });
+
+  test("Comply is not evaluated without control-bound evidence and averages only evaluated frameworks", async () => {
+    const root = workspace();
+    initComplianceMaps(root);
+    const comply = async () => (await inspectUnifiedConfiguredSurfaces({ workspace: root, agentId: "default" }))
+      .find((module) => module.name === "Comply");
+
+    const before = await comply();
+    expect(before?.status).toBe("skipped");
+    expect(before?.score).toBe(0);
+    expect(before?.summary).toContain("not evaluated: no category had control-bound evidence");
+
+    const ledger = openLedger(root);
+    try {
+      ledger.startSession({ sessionId: "comply-bound", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      ledger.appendEvidence({
+        sessionId: "comply-bound", runtime: "unknown", eventType: "audit", payload: JSON.stringify({ auditType: "FIXTURE_SIGNAL" }),
+        payloadExt: "json", inline: true, meta: { trustTier: "OBSERVED", agentId: "default", controlIds: ["soc2_availability"] }
+      });
+    } finally {
+      ledger.close();
+    }
+    const after = await comply();
+    expect(after?.status).toBe("success");
+    expect(after?.score).toBeGreaterThan(0);
+    expect(after?.summary).toContain("over 1 evaluated framework(s) (1 satisfied, 0 partial)");
   });
 
   test("verifies Vault ledger integrity instead of treating directory existence as proof", async () => {
