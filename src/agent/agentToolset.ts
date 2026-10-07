@@ -28,6 +28,7 @@ import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
+import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
@@ -242,6 +243,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // is the escape; tests/subagentSpawn.test.ts turns red if it happens.
   const { workspace, agentId } = options;
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
+  // Opened on the first journaled call (P1-03), which also recovers what crashed runs left. One that cannot open
+  // denies that call `journal_unavailable` and is tried again on the next.
+  let journal: ActionJournal | null = null;
   const readiness = checkToolsetReadiness(workspace, { additionalCapabilities: [
     ...(options.additionalCapabilities ?? []), ...(options.subagents ? NATIVE_DELEGATION_CAPABILITIES : [])
   ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }),
@@ -359,6 +363,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
+    journal: () => (journal ??= openActionJournal(workspace)),
     // Read per call: the CLI binds its session writer after composing.
     authorizationContext: () => ({ sessionId: options.sessionId,
       ...(options.delegation === undefined ? {} : { runAs: options.delegation.runAs, delegation: options.delegation }) }),
@@ -441,6 +446,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     close: (): void => {
       ledgerHandle?.close();
       ledgerHandle = null;
+      journal?.close();
+      journal = null;
     }
   };
 }
