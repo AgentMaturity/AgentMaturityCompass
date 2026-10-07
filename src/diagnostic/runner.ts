@@ -33,7 +33,7 @@ import type {
 } from "../types.js";
 import { getQuestionSet } from "./questionSets.js";
 import { evaluateGate, parseEvidenceEventWith, type ParsedEvidenceEvent } from "./gates.js";
-import { evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
+import { countAttestedOnce, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import { deriveDeterministicAudits, persistAuditFindings, type AuditFinding } from "./audits.js";
 import { loadTargetProfile, verifyTargetProfileSignature } from "../targets/targetProfile.js";
 import { loadAMCConfig } from "../workspace.js";
@@ -627,9 +627,9 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
     let _cachedAllEvents: ParsedEvidenceEvent[] | null = null;
     const reader = readerTrustFor(workspace); // P0-18: trust lists and own keys load once per run
-    function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: synthetic rows never reach the diagnostic
-      return (_cachedAllEvents ??= ledger.getEventsBetween(windowStartTs, now)
-        .filter((event) => evidenceProducer(event) !== "synthetic").map((event) => parseEventForRunner(workspace, event, reader)));
+    function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: no synthetic rows; an attested event once, in its window
+      return (_cachedAllEvents ??= countAttestedOnce(ledger.getEventsBetween(windowStartTs, now).filter((event) => evidenceProducer(event) !== "synthetic")
+        .map((event) => parseEventForRunner(workspace, event, reader)), (event) => event.trustTier, { startTs: windowStartTs, endTs: now }));
     }
 
     const initialEvents = filterEventsForAgent(

@@ -60,11 +60,16 @@ export function producerOfMeta(meta: Record<string, unknown>): EvidenceProducer 
   return producer ?? "amc-runtime";
 }
 
-/** One source event of an ingest bundle; the bundle hash is sha256 of the canonical list of these. */
+/**
+ * One source event of an ingest bundle; the bundle hash is sha256 of the canonical list of these. `agentId` and
+ * `sessionId` are the subject the attester signs for: the agent and session the attested copy is written to.
+ */
 export interface BundleEntry {
   id: string;
   sha256: string;
   ts: number;
+  agentId: string;
+  sessionId: string;
 }
 
 /**
@@ -147,16 +152,21 @@ function hasAttestationShape(value: unknown): value is ThirdPartyAttestation {
   return !!record && typeof record === "object" && ["keyId", "sigB64", "digestSha256"].every((field) => typeof record[field] === "string");
 }
 
+type ReadRow = Pick<EvidenceEvent, "meta_json"> & { payload_sha256?: string; session_id?: string };
+
 /**
- * Whether the attestation was made over this row: its signed bundle hashes to the signed digest and lists the row's
- * original event with this row's payload hash. Without that, one genuine signature could be copied onto any row.
+ * The bundle entry the attestation binds to this row, if any: the signed bundle hashes to the signed digest and lists
+ * the row's original event with this row's payload hash, agent (`meta.agentId`) and session. Without that, one genuine
+ * signature could be copied onto any row, or onto another agent's. A bundle whose entries name no subject binds nothing.
  */
-function attestationBindsRow(attestation: ThirdPartyAttestation, meta: Record<string, unknown>, payloadSha256: string | undefined): boolean {
+function boundEntry(attestation: ThirdPartyAttestation, meta: Record<string, unknown>, row: ReadRow): BundleEntry | undefined {
   const bundle = attestation.bundle;
-  if (!Array.isArray(bundle) || typeof meta.originalEventId !== "string" || typeof payloadSha256 !== "string") return false;
+  if (!Array.isArray(bundle) || typeof meta.originalEventId !== "string" || typeof row.payload_sha256 !== "string"
+    || typeof meta.agentId !== "string" || typeof row.session_id !== "string") return undefined;
   // ponytail: every copy stores the whole bundle (quadratic in session size); store a Merkle path if sessions get large.
-  return bundleDigest(bundle) === attestation.digestSha256
-    && bundle.some((entry) => entry?.id === meta.originalEventId && entry?.sha256 === payloadSha256);
+  if (bundleDigest(bundle) !== attestation.digestSha256) return undefined;
+  return bundle.find((entry) => entry?.id === meta.originalEventId && entry?.sha256 === row.payload_sha256
+    && entry?.agentId === meta.agentId && entry?.sessionId === row.session_id);
 }
 
 /**
@@ -166,20 +176,46 @@ function attestationBindsRow(attestation: ThirdPartyAttestation, meta: Record<st
  * reading SELF_REPORTED. Stored rows are never rewritten. `reader` may be a loader, which runs only for a row that
  * claims ATTESTED with an attestation bound to it.
  */
-export function effectiveTrustTier(
-  event: Pick<EvidenceEvent, "meta_json"> & { payload_sha256?: string }, reader: ReaderTrust | (() => ReaderTrust)
-): TrustTier | null {
+export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => ReaderTrust)): TrustTier | null {
   const meta = eventMeta(event);
   const producer = producerOfMeta(meta);
   if (producer === "synthetic") return null;
   const declared = typeof meta.trustTier === "string" && TIERS.includes(meta.trustTier) ? meta.trustTier as TrustTier : "SELF_REPORTED";
   if (declared === "ATTESTED") {
     const attestation = meta.attestation;
-    if (!hasAttestationShape(attestation) || !attestationBindsRow(attestation, meta, event.payload_sha256)) return "SELF_REPORTED";
+    if (!hasAttestationShape(attestation) || !boundEntry(attestation, meta, event)) return "SELF_REPORTED";
     const { trustList, ownKeyIds } = typeof reader === "function" ? reader() : reader;
     return verifyThirdPartyAttestation(attestation, trustList, ownKeyIds).verified ? "ATTESTED" : "SELF_REPORTED";
   }
   return producer === "amc-runtime" ? declared : "SELF_REPORTED";
+}
+
+/**
+ * The rows a reader counts over [startTs, endTs] (P0-18). A row that reads ATTESTED (`tierOf`) counts once per attested
+ * event (attester key, signed digest and original event id), as its earliest copy, and only while the attested event's
+ * own time lies in the window, so a copy appended later never carries attested evidence into a later window. Other
+ * rows, and rows read ATTESTED without a bound attestation (stale OBSERVED in the diagnostic), pass unchanged.
+ */
+export function countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent, "ts">>(
+  rows: readonly T[], tierOf: (row: T) => string | null | undefined, window: { startTs: number; endTs: number }
+): T[] {
+  const attested = new Map<T, { key: string; ts: number }>();
+  const earliest = new Map<string, T>();
+  for (const row of rows) {
+    const meta = eventMeta(row);
+    const attestation = meta.attestation;
+    if (tierOf(row) !== "ATTESTED" || !hasAttestationShape(attestation)) continue;
+    const entry = boundEntry(attestation, meta, row);
+    if (!entry) continue;
+    const key = `${attestation.keyId}\n${attestation.digestSha256}\n${entry.id}`;
+    attested.set(row, { key, ts: entry.ts });
+    const kept = earliest.get(key);
+    if (!kept || row.ts < kept.ts) earliest.set(key, row);
+  }
+  return rows.filter((row) => {
+    const event = attested.get(row);
+    return !event || (event.ts >= window.startTs && event.ts <= window.endTs && earliest.get(event.key) === row);
+  });
 }
 
 /**

@@ -22,7 +22,7 @@ import {
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
-import { effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
+import { countAttestedOnce, effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
 
@@ -435,10 +435,13 @@ export function generateComplianceReport(params: {
       attested: 0,
       selfReported: 0
     };
-    // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest.
+    // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest, and an
+    // attested event counts once, inside the window of its own time.
     const reader = readerTrustFor(workspace);
-    for (const event of events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic")) {
-      const tier = inferTrustTier(event, eventMeta(event), reader);
+    const subjectRows = events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic");
+    const tiers = new Map(subjectRows.map((row) => [row, inferTrustTier(row, eventMeta(row), reader)]));
+    for (const event of countAttestedOnce(subjectRows, (row) => tiers.get(row), { startTs: windowStartTs, endTs: windowEndTs })) {
+      const tier = tiers.get(event);
       if (tier === "OBSERVED") trustCounts.observed += 1;
       else if (tier === "ATTESTED") trustCounts.attested += 1;
       else trustCounts.selfReported += 1;

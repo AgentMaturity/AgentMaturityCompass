@@ -120,15 +120,16 @@ function ingestSessionEvents(ledger: ReturnType<typeof openLedger>, ingestSessio
   return { sources, copies: review.filter(({ meta }) => meta.source === "attested_ingest").map(({ meta }) => meta) };
 }
 
-function bundleOf(sourceEvents: EvidenceEvent[]): BundleEntry[] {
-  return sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts }));
+/** The signed bundle names its subject: the agent the copies are written for and the ingest session they are written to. */
+function bundleOf(sourceEvents: EvidenceEvent[], agentId: string, sessionId: string): BundleEntry[] {
+  return sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts, agentId, sessionId }));
 }
 
 /** The digest a third-party attester signs for `amc attest --attester-signature` (printed by `amc attest` as the bundle hash). */
-export function ingestBundleHash(workspace: string, ingestSessionId: string): string {
+export function ingestBundleHash(workspace: string, ingestSessionId: string, agentId?: string): string {
   const ledger = openLedger(workspace);
   try {
-    return bundleDigest(bundleOf(ingestSessionEvents(ledger, ingestSessionId).sources));
+    return bundleDigest(bundleOf(ingestSessionEvents(ledger, ingestSessionId).sources, resolveAgentId(workspace, agentId), ingestSessionId));
   } finally {
     ledger.close();
   }
@@ -172,7 +173,7 @@ export function attestIngestSession(params: {
   const ledger = openLedger(workspace);
   try {
     const { sources: sourceEvents, copies } = ingestSessionEvents(ledger, params.ingestSessionId);
-    const bundle = bundleOf(sourceEvents);
+    const bundle = bundleOf(sourceEvents, agentId, params.ingestSessionId);
     const bundleHash = bundleDigest(bundle);
     const thirdParty = params.attesterSignature
       ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
