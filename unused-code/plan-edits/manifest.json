@@ -190,6 +190,13 @@
       "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
       "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
       "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5"
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
+      "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1"
     }
   ]
 }
