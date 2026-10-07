@@ -343,9 +343,9 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 324 | `amc doctor-fix` | Auto-repair common setup issues |
 | 325 | `amc domain` | Domain-specific architecture and compliance operations |
 | 326 | `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent |
-| 327 | `amc domain assess` | Run full domain assessment |
-| 328 | `amc domain assurance` | Run domain-specific assurance packs |
-| 329 | `amc domain gaps` | Show compliance gaps for an agent and domain |
+| 327 | `amc domain assess` | Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output) |
+| 328 | `amc domain assurance` | Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply) |
+| 329 | `amc domain gaps` | Show compliance gaps for an agent and domain (not evaluated without evidence) |
 | 330 | `amc domain list` | List all 7 domains with metadata |
 | 331 | `amc domain modules` | Show module activation map for domain |
 | 332 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains |
@@ -356,8 +356,8 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 337 | `amc domain pack list` | List all available industry sector packs |
 | 338 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score |
 | 339 | `amc domain pack verify` | Verify an Industry Packs license key |
-| 340 | `amc domain report` | Build full domain report and write it to a file |
-| 341 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain |
+| 340 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) |
+| 341 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) |
 | 342 | `amc down` | Stop AMC Studio local control plane |
 | 343 | `amc drift` | Drift/regression detection and reporting |
 | 344 | `amc drift check` | - |
@@ -1004,7 +1004,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 985 | `amc score collect-evidence` | Collect an agent's evidence from the ledger |
 | 986 | `amc score density-map` | Heatmap of evidence density per question per dimension — reveals blind spots |
 | 987 | `amc score distributed-agents` | Score distributed multi-agent execution: partitions, sync, failover, consensus, load, observability |
-| 988 | `amc score eu-ai-act` | Score EU AI Act compliance maturity (Art. 9-17, GPAI systemic risk) |
+| 988 | `amc score eu-ai-act` | EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence |
 | 989 | `amc score evidence-conflict` | Measure internal consistency of evidence — detect conflicting signals |
 | 990 | `amc score evidence-coverage` | Show automated vs manual evidence coverage |
 | 991 | `amc score evidence-ingest` | Ingest evidence from external systems (openai-evals, langsmith, mlflow, custom) |
@@ -1014,7 +1014,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 995 | `amc score formal-spec` | Compute formal maturity score for an agent |
 | 996 | `amc score gaming-resistance` | Inventory AMC source controls; behavioral gaming resistance is not measured |
 | 997 | `amc score industry-adjust` | Adjust a score using an industry-specific trust model |
-| 998 | `amc score industry-benchmark` | Show industry benchmark percentiles |
+| 998 | `amc score industry-benchmark` | Show industry benchmark percentiles (not evaluated: no peer data) |
 | 999 | `amc score industry-list` | List all available industry trust models |
 | 1000 | `amc score interpretability` | Score structural transparency and explainability |
 | 1001 | `amc score kernel-sandbox` | Score kernel-level sandbox maturity (OS isolation, filesystem/network restrictions) |
@@ -1026,11 +1026,11 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 1007 | `amc score operational-independence` | Calculate operational independence score |
 | 1008 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents |
 | 1009 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) |
-| 1010 | `amc score owasp-llm` | Score OWASP LLM Top 10 coverage (all 10 risks) |
+| 1010 | `amc score owasp-llm` | OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence |
 | 1011 | `amc score pause-quality` | Score quality of agent-initiated pauses |
 | 1012 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) |
 | 1013 | `amc score production-ready` | Run production readiness gate for an agent |
-| 1014 | `amc score regulatory-readiness` | Compute weighted regulatory readiness score (EU AI Act + ISO + OWASP) |
+| 1014 | `amc score regulatory-readiness` | Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence |
 | 1015 | `amc score runtime-identity` | Score runtime execution identity maturity (JIT credentials, user propagation, revocation) |
 | 1016 | `amc score safety-research` | Run the AI Safety Research evaluation lane — 4-dimension assessment based on frontier safety research |
 | 1017 | `amc score self-knowledge` | Score prior art self-knowledge maturity (typed attention, trace layer, confidence+citation) |
@@ -3682,7 +3682,7 @@ Alias: `amc sector apply`
 
 #### `amc domain assess`
 
-Run full domain assessment
+Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output)
 
 Alias: `amc sector assess`
 
@@ -3690,11 +3690,12 @@ Alias: `amc sector assess`
 |--------|-------------|
 | `--agent <id>` | - |
 | `--domain <d>` | - |
+| `--example` | - |
 | `--json` | - |
 
 #### `amc domain assurance`
 
-Run domain-specific assurance packs
+Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply)
 
 Alias: `amc sector assurance`
 
@@ -3702,11 +3703,12 @@ Alias: `amc sector assurance`
 |--------|-------------|
 | `--agent <id>` | - |
 | `--domain <d>` | - |
+| `--example` | - |
 | `--json` | - |
 
 #### `amc domain gaps`
 
-Show compliance gaps for an agent and domain
+Show compliance gaps for an agent and domain (not evaluated without evidence)
 
 Alias: `amc sector gaps`
 
@@ -3714,6 +3716,7 @@ Alias: `amc sector gaps`
 |--------|-------------|
 | `--agent <id>` | - |
 | `--domain <d>` | - |
+| `--example` | - |
 | `--json` | - |
 
 #### `amc domain list`
@@ -3830,7 +3833,7 @@ Alias: `amc sector pack verify`
 
 #### `amc domain report`
 
-Build full domain report and write it to a file
+Build full domain report and write it to a file (not evaluated without evidence)
 
 Alias: `amc sector report`
 
@@ -3839,11 +3842,12 @@ Alias: `amc sector report`
 | `--agent <id>` | - |
 | `--domain <d>` | - |
 | `--output <file>` | - |
+| `--example` | - |
 | `--json` | - |
 
 #### `amc domain roadmap`
 
-Generate 30/60/90-day roadmap for this domain
+Generate 30/60/90-day roadmap for this domain (not evaluated without evidence)
 
 Alias: `amc sector roadmap`
 
@@ -3851,6 +3855,7 @@ Alias: `amc sector roadmap`
 |--------|-------------|
 | `--agent <id>` | - |
 | `--domain <d>` | - |
+| `--example` | - |
 | `--json` | - |
 
 #### `amc drift check`
@@ -8580,7 +8585,7 @@ Score distributed multi-agent execution: partitions, sync, failover, consensus, 
 
 #### `amc score eu-ai-act`
 
-Score EU AI Act compliance maturity (Art. 9-17, GPAI systemic risk)
+EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence
 
 
 | Option | Description |
@@ -8681,7 +8686,7 @@ Adjust a score using an industry-specific trust model
 
 #### `amc score industry-benchmark`
 
-Show industry benchmark percentiles
+Show industry benchmark percentiles (not evaluated: no peer data)
 
 
 | Option | Description |
@@ -8793,7 +8798,7 @@ Score output integrity maturity (OWASP LLM02, confidence calibration, citation)
 
 #### `amc score owasp-llm`
 
-Score OWASP LLM Top 10 coverage (all 10 risks)
+OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence
 
 
 | Option | Description |
@@ -8830,7 +8835,7 @@ Run production readiness gate for an agent
 
 #### `amc score regulatory-readiness`
 
-Compute weighted regulatory readiness score (EU AI Act + ISO + OWASP)
+Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence
 
 
 | Option | Description |

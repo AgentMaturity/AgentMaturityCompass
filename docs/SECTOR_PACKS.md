@@ -27,6 +27,8 @@ Supply-chain and logistics users can start with familiar operational language in
 
 Use `amc domain list` for the full alias table, then run `amc domain modules --domain supply-chain` or `amc domain modules --domain logistics` to inspect activated modules. For freight, 3PL, warehouse, and carrier reliability depth, start with `amc domain pack describe --pack freight-3pl-warehouse` and `amc score operational-independence <agent-id> --domain logistics --json`.
 
+`amc domain assess`, `gaps`, `report`, `roadmap` and `assurance` report "not evaluated" without evidence: they no longer derive scores from the agent id or grade a canned reply. `--example` prints labelled synthetic output (claim kind `synthetic_example`) that is never evidence. See [Domain Packs](DOMAIN_PACKS.md#results-without-evidence-not-evaluated).
+
 ---
 
 ## The 7 Stations — 41 Packs, 390 Questions

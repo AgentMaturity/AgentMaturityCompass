@@ -246,8 +246,8 @@ amc
 # Define what your agent is allowed to do
 amc score behavioral-contract    # Shows if you have an alignment card
 
-# Check if you have basic safety controls
-amc score owasp-llm              # OWASP LLM Top 10 coverage
+# Lists the OWASP LLM Top 10; reports not evaluated (file presence is not evidence)
+amc score owasp-llm
 ```
 
 **L1 → L2** (add structure):
@@ -538,9 +538,9 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 ### Compliance
 | Command | What it checks |
 |---------|---------------|
-| `amc score eu-ai-act` | EU AI Act compliance |
-| `amc score owasp-llm` | OWASP LLM Top 10 |
-| `amc score regulatory-readiness` | Combined regulatory score |
+| `amc score eu-ai-act` | EU AI Act obligations; not evaluated (file presence is not evidence) |
+| `amc score owasp-llm` | OWASP LLM Top 10; not evaluated (file presence is not evidence) |
+| `amc score regulatory-readiness` | Combined regulatory readiness; not evaluated (file presence is not evidence) |
 
 ### All commands
 ```bash

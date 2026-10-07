@@ -91,7 +91,18 @@ External regulatory and standards anchors confirm this is a real operational sur
 2. Run domain pack scoring (domain-specific questions).
 3. Run domain assurance pack(s) for evidence generation.
 4. Evaluate compliance gaps and module activation state.
-5. Generate 30/60/90 roadmap and certification readiness decision.
+5. Generate a 30/60/90 roadmap.
+
+## Results Without Evidence: "Not Evaluated"
+
+`amc domain assess`, `gaps`, `report`, `roadmap` and `assurance` report **not evaluated** unless evidence exists. Earlier versions printed scores, levels, gaps, a "Certification Readiness" verdict and an "all checks passed" assurance result that were computed from a hash of the agent id or graded against a canned reply. Those were fabricated and are removed.
+
+- The base part reads the agent's latest sealed diagnostic run (`amc quickscore`). An unsealed run file is not evidence.
+- The domain-rubric questions have no evidence source yet, so the assessment as a whole stays not evaluated and says why.
+- `amc domain assurance` invokes no agent, so it grades nothing; an assurance pack that is not registered is listed as not evaluated by id. Use `amc assurance run` against a real agent for observed results.
+- The commands exit 0 for a not-evaluated result and 1 for bad arguments. `--json` returns `status`, `reasons`, `claimKind` and `statusDimensions`.
+
+`--example` prints labelled synthetic output so you can see the report shape. It starts and ends with the banner `SYNTHETIC EXAMPLE — illustrative values, not evidence. Never cite this output.`, carries claim kind `synthetic_example` (and a `banner` field in JSON), stamps the banner into any `--output` file and writes nothing under `.amc/`. Signing paths (`amc certify`, `amc assurance cert-issue`, `amc bundle export`, `amc attest`, `amc passport create`, `amc audit binder create`, `amc notary sign`) refuse a `synthetic_example` result.
 
 ## Module Activation Matrix (Domain Highlights)
 
@@ -126,10 +137,11 @@ amc domain list
 amc domain list --json
 ```
 
-Assessment:
+Assessment (not evaluated without evidence; `--example` shows labelled synthetic output):
 
 ```bash
 amc domain assess --agent agent-1 --domain health
+amc domain assess --agent agent-1 --domain health --example
 amc domain assess --agent agent-1 --domain wealth --json
 amc domain assess --agent agent-1 --domain supply-chain
 amc domain assess --agent agent-1 --domain logistics
