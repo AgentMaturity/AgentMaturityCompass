@@ -29,6 +29,13 @@ producers:
     maxClaimKind: observed
     status: available
     plannedBy: null
+  - id: amc.assuranceRunner
+    module: src/assurance/assuranceRunner.ts
+    # Assurance run reports sealed by the auditor key (runSealSig); compliance pack requirements read them (P1-11).
+    emits: [assurance_report]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
   - id: amc.gateway.egress
     module: src/gateway/server.ts
     emits: [NETWORK_EGRESS_BLOCKED]
