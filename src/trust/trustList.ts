@@ -1,6 +1,6 @@
 import { createPublicKey, sign, verify, X509Certificate } from "node:crypto";
 import { z } from "zod";
-import { assertNoteKey, isValidKeyName } from "../transparency/checkpointNote.js";
+import { assertNoteKey } from "../transparency/checkpointNote.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -102,7 +102,7 @@ export const timestampAuthoritySchema = z.strictObject({
 export const transparencyLogSchema = z.strictObject({
   logId: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/),
   name: z.string().min(1),
-  origin: z.string().max(256).refine(isValidKeyName, "origin must be non-empty without spaces or plus signs"),
+  origin: z.string().max(256).regex(/^[^\s+]+$/, "origin must be non-empty without spaces or plus signs"),
   /** The checkpoint key: an Ed25519 or ECDSA (P-256, P-384, P-521) SPKI public key. */
   publicKeyPem: z.string().min(1).max(4096)
 }).superRefine((log, ctx) => {

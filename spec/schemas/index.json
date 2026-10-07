@@ -103,12 +103,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
       "name": "trust-list.schema.json",
-      "sha256": "ed3015dbf3a024ecb0d4b85b6187bd02f816fc36d3c97d3bb6b5f8619632e103"
+      "sha256": "2b6af58b33879b08373990e9fc3d0b9144d81758557df2641d8a626c7be165d5"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
       "name": "verifier-report.schema.json",
-      "sha256": "ae18f45479b657de84447fc273a9f0ed822dd089038006e8ba8807affe6a1a3d"
+      "sha256": "2078d2ca3175b36aabe92b1fb5163c4fb1c7b0b39ceb0aa4f57fad9a6b972927"
     }
   ],
   "version": 1
