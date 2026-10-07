@@ -1,18 +1,16 @@
 /**
- * Dogfood evidence seeding.
+ * Dogfood evidence seeding: a development tool (P0-18).
  *
- * Writes OBSERVED-tier evidence for synthetic dogfood agents so AMC can be
- * exercised end to end without a live agent. Nothing here was captured from a
- * real interaction: every event is fabricated for demonstration.
- *
- * Every event carries meta.provenance = "dogfood" and meta.source =
- * "dogfood-maturity" so it can be identified and filtered. Do not run this
- * against a workspace whose scores are relied upon — seeded OBSERVED evidence
- * is the highest trust tier and will raise the maturity score.
+ * Writes synthetic events for dogfood agents so AMC's surfaces can be exercised end to end without a live agent.
+ * Nothing here was captured from a real interaction. Every event is SELF_REPORTED with meta.claimKind =
+ * "synthetic_example", meta.provenance = "dogfood" and meta.source = "dogfood-maturity"; diagnostic gates and
+ * compliance drop synthetic evidence, so seeding never changes a level. It runs only from a source checkout with
+ * AMC_DEV_DOGFOOD=1.
  */
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { buildAgentConfig, initFleet, loadFleetConfig, scaffoldAgent } from "../fleet/registry.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -149,12 +147,20 @@ export function targetLevelForQuestion(targetMaturity: number, questionIndex: nu
   return clampLevel(questionIndex % 2 === 0 ? base + 1 : base);
 }
 
+/** Throws unless AMC_DEV_DOGFOOD=1 and this module runs from a source checkout, not an installed package. */
+export function assertDogfoodSeedingAllowed(env: NodeJS.ProcessEnv = process.env, modulePath = fileURLToPath(import.meta.url)): void {
+  if (env.AMC_DEV_DOGFOOD !== "1" || /[\\/]node_modules[\\/]/.test(modulePath)) {
+    throw new Error("dogfood seeding is a development tool: set AMC_DEV_DOGFOOD=1 in a source checkout");
+  }
+}
+
 export function generateDogfoodMaturityEvidence(params: {
   workspace: string;
   agent: DogfoodMaturityAgent;
   now?: number;
   questions?: DiagnosticQuestion[];
 }): DogfoodMaturityEvidenceResult {
+  assertDogfoodSeedingAllowed();
   const questions = params.questions ?? questionBank;
   const now = params.now ?? Date.now();
   scaffoldDogfoodAgent(params.workspace, params.agent);
@@ -309,7 +315,8 @@ function appendGlobalSupportEvidence(params: {
   const meta = {
     agentId: params.agent.id,
     questionId: "AMC-1.5",
-    trustTier: "OBSERVED",
+    trustTier: "SELF_REPORTED",
+    claimKind: "synthetic_example",
     request_id: `${params.agent.id}-global-request`,
     upstreamId: DEFAULT_PROVIDER_TEMPLATE,
     upstreamBaseUrl: DEFAULT_PROVIDER_BASE_URL,
@@ -400,7 +407,8 @@ function baseMeta(agent: DogfoodMaturityAgent, questionId: string, gate: Gate): 
   const meta: Record<string, unknown> = {
     agentId: agent.id,
     questionId,
-    trustTier: "OBSERVED",
+    trustTier: "SELF_REPORTED",
+    claimKind: "synthetic_example",
     source: "dogfood-maturity",
     request_id: `${agent.id}-${questionId}`,
     upstreamId: DEFAULT_PROVIDER_TEMPLATE,

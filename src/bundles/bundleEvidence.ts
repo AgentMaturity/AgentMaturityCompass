@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { join } from "node:path";
+import { trustTierByEventId } from "../claims/evidenceProvenance.js";
 import type { EvidenceEvent } from "../types.js";
 import { inventorySessionSpills, restoreSessionSpills } from "../session/spill/spillLifecycle.js";
 import { pathExists } from "../utils/fs.js";
@@ -30,40 +31,11 @@ export function restoreBundleSpills(root: string, workspace: string): string[] {
   }
 }
 
-/** Project stored tier metadata; bundle and ledger authentication remain separate. */
+/** Provenance tiers of the bundle's rows (P0-18), never the stored tier; bundle and ledger authentication remain separate. */
 export function trustTierByEventIdFromBundle(root: string): Map<string, string> {
   const db = new Database(join(root, "evidence", "evidence.sqlite"), { readonly: true });
   try {
-    const rows = db.prepare("SELECT id, meta_json, event_type FROM evidence_events").all() as Array<{
-      id: string;
-      meta_json: string;
-      event_type: string;
-    }>;
-
-    const out = new Map<string, string>();
-    for (const row of rows) {
-      let trustTier = "OBSERVED";
-      try {
-        const parsed = JSON.parse(row.meta_json) as Record<string, unknown>;
-        if (
-          parsed.trustTier === "OBSERVED" ||
-          parsed.trustTier === "OBSERVED_HARDENED" ||
-          parsed.trustTier === "ATTESTED" ||
-          parsed.trustTier === "SELF_REPORTED"
-        ) {
-          trustTier = parsed.trustTier;
-        } else if (row.event_type === "review") {
-          trustTier = "SELF_REPORTED";
-        }
-      } catch {
-        if (row.event_type === "review") {
-          trustTier = "SELF_REPORTED";
-        }
-      }
-      out.set(row.id, trustTier);
-    }
-
-    return out;
+    return trustTierByEventId(db.prepare("SELECT id, meta_json FROM evidence_events").all() as Array<{ id: string; meta_json: string }>);
   } finally {
     db.close();
   }

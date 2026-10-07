@@ -1,8 +1,10 @@
-import type { TrustTier } from "../types.js";
 import { evalImportCoverageStatus, importEvalResults, type EvalImportFormat } from "./evalImporters.js";
 
 const FORMAT_SET = new Set<EvalImportFormat>(["openai", "langsmith", "deepeval", "promptfoo", "wandb", "langfuse", "langwatch"]);
-const TRUST_SET = new Set<TrustTier>(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"]);
+
+/** What `amc eval import --trust-tier` prints before exiting 2. */
+export const EVAL_IMPORT_TRUST_TIER_REMOVED =
+  "--trust-tier was removed in 2.0.0: trust tiers are derived from provenance, and imported results are SELF_REPORTED. See docs/EVIDENCE_TRUST.md.";
 
 export function parseEvalImportFormat(value: string): EvalImportFormat {
   const normalized = value.trim().toLowerCase() as EvalImportFormat;
@@ -12,35 +14,19 @@ export function parseEvalImportFormat(value: string): EvalImportFormat {
   return normalized;
 }
 
-export function parseEvalImportTrustTier(value: string | undefined): TrustTier | undefined {
-  if (!value) {
-    return undefined;
-  }
-  const normalized = value.trim().toUpperCase() as TrustTier;
-  if (!TRUST_SET.has(normalized)) {
-    throw new Error(`Unsupported trust tier '${value}'. Expected one of: OBSERVED, OBSERVED_HARDENED, ATTESTED, SELF_REPORTED`);
-  }
-  return normalized;
-}
-
 export function evalImportCli(params: {
   workspace: string;
   format: string | EvalImportFormat;
   file: string;
   agentId?: string;
-  trustTier?: string | TrustTier;
+  historical?: boolean;
 }) {
   return importEvalResults({
     workspace: params.workspace,
     format: typeof params.format === "string" ? parseEvalImportFormat(params.format) : params.format,
     file: params.file,
     agentId: params.agentId,
-    trustTier:
-      params.trustTier === undefined
-        ? undefined
-        : typeof params.trustTier === "string"
-          ? parseEvalImportTrustTier(params.trustTier)
-          : params.trustTier
+    historical: params.historical
   });
 }
 

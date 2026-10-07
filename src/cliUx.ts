@@ -248,7 +248,7 @@ export function buildCommandInventory(program: Command, options: { includeIntern
         name: child.name(),
         description: child.description(),
         aliases: [...aliases],
-        options: child.options.map((option) => option.flags),
+        options: child.options.filter((option) => !option.hidden).map((option) => option.flags),
         subcommands: child.commands
           .filter((grandchild) => options.includeInternal || !isInternalCommand(grandchild))
           .map((grandchild) => grandchild.name())

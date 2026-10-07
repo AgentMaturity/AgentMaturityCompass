@@ -59,7 +59,7 @@ Each question scores 0–5. Scores are **evidence-gated**: you can't claim L5 wi
 | Tier | Weight | How |
 |------|--------|-----|
 | **OBSERVED** | Highest | AMC gateway captured it directly |
-| **ATTESTED** | Medium | An auditor verified external logs |
+| **ATTESTED** | Medium | A third party whose key you pinned signed the external logs |
 | **SELF_REPORTED** | Lowest | You said so (capped scores) |
 
 ## Improve Your Score

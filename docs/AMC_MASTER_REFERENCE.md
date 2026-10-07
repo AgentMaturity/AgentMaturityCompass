@@ -58,7 +58,7 @@ Complete reference for every `amc` command organized by category.
 | `amc monitor --stdin --runtime <name>` | Record stdin stream as evidence |
 | `amc connect` | Connect wizard for any agent/provider |
 | `amc ingest` | Ingest external logs as SELF_REPORTED evidence |
-| `amc attest` | Auditor-attest ingest to upgrade trust to ATTESTED |
+| `amc attest` | Record an attestation over an ingest session (ATTESTED only with a pinned third-party signature) |
 
 ## Quickscore & Sharing
 

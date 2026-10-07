@@ -14,8 +14,8 @@
  * Preferred transport is the AMC gateway: requests carry a signed lease, and
  * the gateway records redacted `llm_request`/`llm_response` evidence with
  * receipts, so scan results are OBSERVED-tier. A direct-to-provider transport
- * exists for workspaces without a running gateway; because it bypasses
- * evidence capture it is reported at the weaker ATTESTED tier.
+ * exists for workspaces without a running gateway; AMC still sends each
+ * request and captures each reply itself, so it is OBSERVED too (P0-18).
  */
 
 import type { TrustTier } from "../types.js";
@@ -38,9 +38,9 @@ export interface AgentResponderTarget {
   upstreamId: string;
   providerTemplateId: string;
   /**
-   * Evidence tier justified by this transport. Gateway traffic is captured as
-   * signed ledger evidence, so it is OBSERVED; direct calls are not captured
-   * by AMC and are therefore only ATTESTED.
+   * Evidence tier justified by this transport. Both are OBSERVED: gateway
+   * traffic is captured as signed ledger evidence, and on the direct transport
+   * AMC sends the request and captures the reply itself.
    */
   trustTier: TrustTier;
 }
@@ -516,7 +516,7 @@ export async function resolveAgentResponder(
     });
   }
 
-  // Fallback: straight to the provider. Not captured by AMC, so weaker tier.
+  // Fallback: straight to the provider, without the gateway's signed capture.
   const auth = provider.auth;
   const apiKeyEnv = "env" in auth && typeof auth.env === "string" ? auth.env : undefined;
   const apiKey = apiKeyEnv ? process.env[apiKeyEnv] : undefined;
@@ -555,7 +555,8 @@ export async function resolveAgentResponder(
       routePrefix,
       upstreamId: provider.upstreamId,
       providerTemplateId: provider.templateId,
-      trustTier: "ATTESTED"
+      // AMC sends the request and captures the reply itself, so it observed the exchange (P0-18).
+      trustTier: "OBSERVED"
     },
     headers,
     openaiCompatible: provider.openaiCompatible,

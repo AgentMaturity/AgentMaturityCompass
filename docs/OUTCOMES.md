@@ -18,9 +18,11 @@ Contracts are owner/auditor signed. If signature is invalid, reports are marked 
 
 ## Trust Tiers For Outcomes
 
-- `OBSERVED`: strongest; emitted by trusted AMC services (ToolHub, webhook ingest with verified auth)
-- `ATTESTED`: imported/manual with auditor attestation
-- `SELF_REPORTED`: weakest; cannot support high-stakes claims
+- `OBSERVED`: strongest; emitted by AMC's own runtime (ToolHub)
+- `ATTESTED`: needs a third-party signature from a key pinned for `independent-attestation`; no outcome writer records one today
+- `SELF_REPORTED`: weakest; cannot support high-stakes claims. Operator sessions, `amc outcomes attest` and HMAC webhooks write this tier with `attestation.kind` `self_attested` or `external_report`, and scoring reads 1.x webhook, manual and imported rows stored as `OBSERVED` or `ATTESTED` as `SELF_REPORTED`
+
+See [EVIDENCE_TRUST.md](EVIDENCE_TRUST.md) for how tiers derive from provenance.
 
 Hard behavior:
 - low observed coverage forces `UNKNOWN` metric status

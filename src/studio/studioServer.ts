@@ -2129,11 +2129,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           const ingested = ingestFeedbackOutcome({
             workspace: options.workspace,
             payload,
-            trustTier: "ATTESTED"
+            attestationKind: "self_attested"
           });
           json(res, 200, {
             ...ingested,
-            trustTier: "ATTESTED",
+            trustTier: "SELF_REPORTED",
             auth: "session"
           });
           recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
@@ -2148,11 +2148,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const ingested = ingestFeedbackOutcome({
           workspace: options.workspace,
           payload,
-          trustTier: "OBSERVED"
+          attestationKind: "external_report"
         });
         json(res, 200, {
           ...ingested,
-          trustTier: "OBSERVED",
+          trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
         recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
@@ -2175,12 +2175,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           const ingested = ingestOutcomeWebhook({
             workspace: options.workspace,
             payload,
-            trustTier: "ATTESTED",
+            attestationKind: "self_attested",
             sourceLabel: "studio.manual.outcomes.ingest"
           });
           json(res, 200, {
             ...ingested,
-            trustTier: "ATTESTED",
+            trustTier: "SELF_REPORTED",
             auth: "session"
           });
           recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
@@ -2195,12 +2195,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const ingested = ingestOutcomeWebhook({
           workspace: options.workspace,
           payload,
-          trustTier: "OBSERVED",
+          attestationKind: "external_report",
           sourceLabel: "studio.webhook.outcomes.ingest"
         });
         json(res, 200, {
           ...ingested,
-          trustTier: "OBSERVED",
+          trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
         recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
@@ -6090,12 +6090,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           output: typeof parsed.output === "undefined" ? parsed : parsed.output
         });
-        const trustTier =
-          auth.roles.has("AGENT") && !validation.context.evidenceBound
-            ? "SELF_REPORTED"
-            : auth.roles.has("AGENT")
-              ? "OBSERVED"
-              : "ATTESTED";
+        // P0-18: only an agent's evidence-bound output is observed; a person validating text vouches for nothing.
+        const trustTier = auth.roles.has("AGENT") && validation.context.evidenceBound ? "OBSERVED" : "SELF_REPORTED";
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "OUTPUT_VALIDATED",

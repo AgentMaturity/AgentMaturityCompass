@@ -21,7 +21,7 @@ Evidence in AMC carries a trust tier that determines its weight in scoring:
 |------|--------|--------|-------------|
 | OBSERVED | 1.0× | Gateway/Monitor/Proxy | Captured in real time by trusted AMC infrastructure. Agent cannot forge. |
 | OBSERVED_HARDENED | 1.0× | Sandbox + Proxy | OBSERVED evidence from a sandboxed execution with network isolation. Strongest tier. |
-| ATTESTED | 0.8× | Ingested + auditor-signed | Imported logs with auditor attestation. Lower trust than OBSERVED. |
+| ATTESTED | 0.8× | Ingested + third-party-signed | Imported logs signed by a third party whose key is pinned for `independent-attestation`; the operator's own attestation leaves them SELF_REPORTED. Lower trust than OBSERVED. |
 | SELF_REPORTED | 0.4× | Agent self-report | Provided by the agent itself. Used only as claims, never as proof. |
 
 ### Scoring Rules

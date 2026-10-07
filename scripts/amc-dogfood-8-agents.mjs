@@ -27,6 +27,9 @@ const baseEnv = {
 };
 process.env.AMC_VAULT_PASSPHRASE = passphrase;
 process.env.AMC_INDUSTRY_PACKS_ACTIVE = "1";
+// The seeder is a development tool and refuses without this (P0-18). Its events are synthetic_example and never
+// raise a level, so the strict-maturity targets below stay unmet until P1-07 rebuilds the gates from runtime evidence.
+process.env.AMC_DEV_DOGFOOD = "1";
 
 const industryPacks = new Map([
   ["health-patient-lifecycle-agent", { domain: "health", pack: "patient-lifecycle" }],

@@ -391,19 +391,25 @@ export async function handleEvidenceRoute(
   // POST /api/v1/evidence/attest — attest an ingest session
   if (pathname === '/api/v1/evidence/attest' && method === 'POST') {
     try {
-      const body = await bodyJson<{ agentId?: string; ingestSessionId: string; attestedBy?: string; statement?: string }>(req);
+      const body = await bodyJson<{
+        agentId?: string; ingestSessionId: string; attestedBy?: string; statement?: string; attesterSignature?: { keyId: string; sigB64: string };
+      }>(req);
       if (!body.ingestSessionId) { apiError(res, 400, 'ingestSessionId required'); return true; }
-      // ATTESTED means a named party vouches for the content.
+      // An attestation names who vouches for the content; ATTESTED also needs a pinned third-party signature.
       if (!body.attestedBy || !body.statement) { apiError(res, 400, 'attestedBy and statement are required to attest'); return true; }
       const { attestIngestSession } = await import('../ingest/ingest.js');
+      const { loadTrustContext } = await import('../trust/index.js');
       const result = attestIngestSession({
         workspace,
         agentId: body.agentId ?? 'default',
         ingestSessionId: body.ingestSessionId,
         attestedBy: body.attestedBy,
         statement: body.statement,
+        attesterSignature: body.attesterSignature,
+        // The operator's trust lists from the AMC home, never from the request.
+        trust: loadTrustContext(),
       });
-      apiSuccess(res, { attested: true, ...result });
+      apiSuccess(res, { attested: result.trustTier === 'ATTESTED', ...result });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Attestation failed');
     }

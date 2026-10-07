@@ -62,7 +62,7 @@ describe("observability debug mode", () => {
         agentId: "agent-a",
         dimension: "resilience",
         questionId: "AMC-4.1",
-        trustTier: "ATTESTED",
+        trustTier: "OBSERVED_HARDENED",
         severity: "high"
       }
     });
@@ -88,7 +88,7 @@ describe("observability debug mode", () => {
     });
     expect(rows).toHaveLength(1);
     expect(rows[0]!.id).toBe("ev-1");
-    expect(rows[0]!.trustTier).toBe("ATTESTED");
+    expect(rows[0]!.trustTier).toBe("OBSERVED_HARDENED");
   });
 
   test("formats debug rows with structured labels", () => {
@@ -171,7 +171,7 @@ describe("observability debug mode", () => {
       id: "ev-trust-2",
       ts: 1_700_000_001_000,
       eventType: "audit",
-      meta: { agentId: "agent-anomaly", trustTier: "ATTESTED" }
+      meta: { agentId: "agent-anomaly", trustTier: "OBSERVED" }
     });
     appendEvent({
       workspace,

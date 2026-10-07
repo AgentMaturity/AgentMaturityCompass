@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { bundleDigest, eventMeta, verifyThirdPartyAttestation, workspaceOwnKeyIds, type BundleEntry } from "../claims/evidenceProvenance.js";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
-import { canonicalize } from "../utils/json.js";
-import { sha256Hex } from "../utils/hash.js";
+import { readEventPayload } from "../session/eventPayload.js";
+import type { TrustContext } from "../trust/trustContext.js";
+import type { EvidenceEvent } from "../types.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { eventMeta } from "../claims/evidenceProvenance.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 export type IngestType = "chatgpt" | "claude_console" | "gemini_ui" | "generic_json" | "generic_text";
@@ -100,27 +101,48 @@ export function ingestEvidence(params: {
   }
 }
 
-function payloadForEvent(workspace: string, event: { payload_inline: string | null; payload_path: string | null }): string {
-  if (event.payload_inline !== null) {
-    return event.payload_inline;
+/** The original's plaintext payload (blobs are stored encrypted), so the copy keeps the payload hash the bundle lists. */
+function payloadForEvent(workspace: string, event: EvidenceEvent): Buffer {
+  const read = readEventPayload(workspace, event);
+  if (read.status !== "ok") throw new Error(`cannot attest event ${event.id}: its payload is ${read.status === "pruned" ? "pruned" : read.detail}`);
+  return read.bytes;
+}
+
+type IngestMeta = { source?: unknown; trustTier?: unknown; originalEventId?: unknown; attestation?: { keyId?: unknown } };
+
+/** The ingest session's review events: the originals, oldest first, and earlier attestation copies. */
+function ingestSessionEvents(ledger: ReturnType<typeof openLedger>, ingestSessionId: string): { sources: EvidenceEvent[]; copies: IngestMeta[] } {
+  const review = ledger.getAllEvents().filter((event) => event.session_id === ingestSessionId && event.event_type === "review")
+    .map((event) => ({ event, meta: JSON.parse(event.meta_json) as IngestMeta }));
+  const sources = review.filter(({ meta }) => meta.source !== "attested_ingest").map(({ event }) => event).sort((a, b) => a.ts - b.ts);
+  if (sources.length === 0) {
+    throw new Error(`No ingest review events found for session ${ingestSessionId}`);
   }
-  if (event.payload_path !== null) {
-    return readFileSync(resolve(workspace, event.payload_path), "utf8");
+  return { sources, copies: review.filter(({ meta }) => meta.source === "attested_ingest").map(({ meta }) => meta) };
+}
+
+/** The signed bundle names its subject: the agent the copies are written for and the ingest session they are written to. */
+function bundleOf(sourceEvents: EvidenceEvent[], agentId: string, sessionId: string): BundleEntry[] {
+  return sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts, agentId, sessionId }));
+}
+
+/** The digest a third-party attester signs for `amc attest --attester-signature` (printed by `amc attest` as the bundle hash). */
+export function ingestBundleHash(workspace: string, ingestSessionId: string, agentId?: string): string {
+  const ledger = openLedger(workspace);
+  try {
+    return bundleDigest(bundleOf(ingestSessionEvents(ledger, ingestSessionId).sources, resolveAgentId(workspace, agentId), ingestSessionId));
+  } finally {
+    ledger.close();
   }
-  return "";
 }
 
 /**
- * Records a human or system attestation over an ingest session.
+ * Records a human or system attestation over an ingest session (P0-18).
  *
- * ATTESTED means "a named party vouches for this content". Previously this
- * function re-appended the identical, unverified payloads with
- * trustTier: "ATTESTED" and no attester at all, so the tier upgrade asserted
- * that someone had vouched when nobody had — and the audit event claimed
- * OBSERVED, a tier reserved for evidence AMC captured itself.
- *
- * The attester and their statement are now required and recorded, so the
- * upgrade is traceable to whoever made the claim.
+ * The attester and their statement are required and recorded. That alone is a self-attestation: the rows stay
+ * SELF_REPORTED with `attestation.kind: "self_attested"`, because the operator vouching for their own import is not
+ * independent evidence. Only a signature over the bundle hash by a third-party key pinned for independent-attestation
+ * in a signed trust list makes the rows ATTESTED; the workspace's own monitor and auditor keys never do.
  */
 export function attestIngestSession(params: {
   workspace: string;
@@ -130,41 +152,49 @@ export function attestIngestSession(params: {
   attestedBy: string;
   /** What they are attesting to (e.g. provenance of the exported logs). */
   statement: string;
+  /** A third party's Ed25519 signature over the bundle hash. */
+  attesterSignature?: { keyId: string; sigB64: string };
+  /** Trust lists that may pin the attester; without one no signature is admitted. */
+  trust?: TrustContext | null;
 }): {
   attestedEventCount: number;
   bundleHash: string;
+  trustTier: "ATTESTED" | "SELF_REPORTED";
+  reason: string;
 } {
   const workspace = params.workspace;
   const attestedBy = params.attestedBy?.trim() ?? "";
   const statement = params.statement?.trim() ?? "";
   if (attestedBy.length === 0 || statement.length === 0) {
     throw new Error(
-      "Attestation requires attestedBy and statement: ATTESTED means a named party vouches for the content, " +
-        "and re-signing unverified payloads without naming an attester would upgrade trust on nobody's word."
+      "Attestation requires attestedBy and statement: an attestation names who vouches for the content and what they vouch for."
     );
   }
   const agentId = resolveAgentId(workspace, params.agentId);
   const ledger = openLedger(workspace);
   try {
-    const sourceEvents = ledger
-      .getAllEvents()
-      .filter((event) => event.session_id === params.ingestSessionId && event.event_type === "review")
-      .sort((a, b) => a.ts - b.ts);
-
-    if (sourceEvents.length === 0) {
-      throw new Error(`No ingest review events found for session ${params.ingestSessionId}`);
+    const { sources: sourceEvents, copies } = ingestSessionEvents(ledger, params.ingestSessionId);
+    const bundle = bundleOf(sourceEvents, agentId, params.ingestSessionId);
+    const bundleHash = bundleDigest(bundle);
+    const thirdParty = params.attesterSignature
+      ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
+      : null;
+    const verdict = thirdParty
+      ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, workspaceOwnKeyIds(workspace))
+      : { verified: false, reason: "self-attested: no third-party signature was given" };
+    // A key attests an event once: a replay, or a re-signed wider bundle, would only multiply the same ATTESTED rows.
+    const sourceIds = new Set(sourceEvents.map((event) => event.id));
+    const covered = verdict.verified && thirdParty ? copies.find((meta) => meta.trustTier === "ATTESTED"
+      && meta.attestation?.keyId === thirdParty.keyId && sourceIds.has(meta.originalEventId as string)) : undefined;
+    if (covered && thirdParty) {
+      throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} (event ${String(covered.originalEventId)}); attest new evidence in a new ingest session`);
     }
+    // P0-15: a synthetic_example row is never attested, by the operator or a third party.
     for (const event of sourceEvents) assertNotExample(eventMeta(event), "attested");
-
-    const bundleHash = sha256Hex(
-      canonicalize(
-        sourceEvents.map((event) => ({
-          id: event.id,
-          sha256: event.payload_sha256,
-          ts: event.ts
-        }))
-      )
-    );
+    const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
+    const attestation = verdict.verified && thirdParty
+      ? { ...thirdParty, attestedBy, statement, bundle }
+      : { kind: "self_attested", attestedBy, statement };
     const attestationSig = ledger.signRunHash(bundleHash);
 
     for (const event of sourceEvents) {
@@ -176,13 +206,12 @@ export function attestIngestSession(params: {
         payload,
         payloadExt: event.payload_path?.endsWith(".json") ? "json" : "txt",
         meta: {
-          trustTier: "ATTESTED",
+          trustTier,
           source: "attested_ingest",
           agentId,
           ingestSessionId: params.ingestSessionId,
           originalEventId: event.id,
-          attestedBy,
-          attestationStatement: statement
+          attestation
         }
       });
     }
@@ -201,23 +230,25 @@ export function attestIngestSession(params: {
       payloadExt: "json",
       inline: true,
       meta: {
+        source: "attested_ingest",
         auditType: "INGEST_ATTESTED",
         severity: "LOW",
         ingestSessionId: params.ingestSessionId,
         bundleHash,
+        // The monitor key seals the record; it says who wrote it, not that the content is true.
         signature: attestationSig,
-        attestedBy,
-        attestationStatement: statement,
-        // A vouched-for import is ATTESTED. OBSERVED is reserved for evidence
-        // AMC captured itself.
-        trustTier: "ATTESTED",
+        attestation,
+        attestationReason: verdict.reason,
+        trustTier,
         agentId
       }
     });
 
     return {
       attestedEventCount: sourceEvents.length,
-      bundleHash
+      bundleHash,
+      trustTier,
+      reason: verdict.reason
     };
   } finally {
     ledger.close();

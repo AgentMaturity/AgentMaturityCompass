@@ -231,7 +231,7 @@ describe("fleet mode and trust tiers", () => {
     );
   });
 
-  test("ingest starts as SELF_REPORTED and attest promotes evidence to ATTESTED", () => {
+  test("ingest starts as SELF_REPORTED and an operator attest keeps it SELF_REPORTED", () => {
     const workspace = newWorkspace();
     const ingestFile = join(workspace, "chat.txt");
     writeFileSync(ingestFile, "assistant: hello");
@@ -266,7 +266,9 @@ describe("fleet mode and trust tiers", () => {
       .map((event) => parseEvidenceEvent(event));
     const audits = ledger2.getAllEvents().filter((event) => event.event_type === "audit");
     ledger2.close();
-    expect(after.some((event) => event.trustTier === "ATTESTED")).toBe(true);
+    // An operator attestation without a pinned third-party signature stays SELF_REPORTED (P0-18).
+    expect(after.length).toBeGreaterThan(before.length);
+    expect(after.every((event) => event.trustTier === "SELF_REPORTED")).toBe(true);
     expect(audits.some((event) => (JSON.parse(event.payload_inline ?? "{}") as Record<string, unknown>).auditType === "INGEST_ATTESTED")).toBe(true);
   });
 

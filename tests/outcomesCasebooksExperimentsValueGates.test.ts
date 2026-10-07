@@ -74,7 +74,7 @@ function appendOutcomeSignal(params: {
   metricId: string;
   category: "Emotional" | "Functional" | "Economic" | "Brand" | "Lifetime";
   value: number | string | boolean;
-  trustTier: "OBSERVED" | "ATTESTED" | "SELF_REPORTED";
+  trustTier: "OBSERVED" | "SELF_REPORTED";
 }): void {
   const ledger = openLedger(params.workspace);
   try {
@@ -86,7 +86,8 @@ function appendOutcomeSignal(params: {
       value: params.value,
       unit: null,
       trustTier: params.trustTier,
-      source: "manual",
+      // P0-18: only AMC's runtime (ToolHub) observes an outcome; anything else is a manual SELF_REPORTED signal.
+      source: params.trustTier === "OBSERVED" ? "toolhub" : "manual",
       meta: {
         fixture: true
       }
@@ -210,14 +211,14 @@ describe("outcome compass", () => {
       metricId: "fixture.ok",
       category: "Functional",
       value: true,
-      trustTier: "ATTESTED"
+      trustTier: "SELF_REPORTED"
     });
     appendOutcomeSignal({
       workspace,
       metricId: "fixture.total",
       category: "Functional",
       value: true,
-      trustTier: "ATTESTED"
+      trustTier: "SELF_REPORTED"
     });
 
     const out = runOutcomeReport({
@@ -344,7 +345,6 @@ describe("outcome compass", () => {
     const ingested = ingestOutcomeWebhook({
       workspace,
       payload,
-      trustTier: "OBSERVED",
       sourceLabel: "vitest.outcomes.webhook"
     });
     expect(typeof ingested.outcomeEventId).toBe("string");

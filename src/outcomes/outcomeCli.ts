@@ -114,6 +114,7 @@ export function outcomesAttestCli(params: {
   outcomeEventId: string;
   eventHash: string;
   receiptId: string;
+  trustTier: "SELF_REPORTED";
 } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const contract = loadOutcomeContract(params.workspace, agentId);
@@ -140,9 +141,11 @@ export function outcomesAttestCli(params: {
       metricId: params.metricId,
       value: parseValue(params.value),
       unit: params.unit ?? null,
-      trustTier: "ATTESTED",
+      // The operator's own auditor signature proves who recorded it, not that it is true (P0-18).
+      trustTier: "SELF_REPORTED",
       source: "manual",
       meta: {
+        attestation: { kind: "self_attested" },
         reason: params.reason,
         attestationDigest,
         auditorAttestationSig,
@@ -153,7 +156,8 @@ export function outcomesAttestCli(params: {
     return {
       outcomeEventId: written.outcomeEventId,
       eventHash: written.eventHash,
-      receiptId: written.receiptId
+      receiptId: written.receiptId,
+      trustTier: "SELF_REPORTED"
     };
   } finally {
     ledger.close();

@@ -89,6 +89,15 @@ function metricEvents(events: OutcomeEvent[], metricId: string): OutcomeEvent[] 
   return events.filter((event) => event.metric_id === metricId);
 }
 
+/**
+ * The tier an outcome counts at (P0-18): only AMC's runtime (ToolHub) observes outcomes and no outcome writer verifies
+ * a third-party attestation, so webhook, manual and imported rows, 1.x rows stored as OBSERVED or ATTESTED included,
+ * read SELF_REPORTED. Stored rows are never rewritten.
+ */
+export function outcomeTrustTier(event: OutcomeEvent): OutcomeEvent["trust_tier"] {
+  return event.source === "toolhub" && event.trust_tier === "OBSERVED" ? "OBSERVED" : "SELF_REPORTED";
+}
+
 function computeTrustCoverage(events: OutcomeEvent[]): OutcomeMetricResult["trustCoverage"] {
   if (events.length === 0) {
     return {
@@ -97,9 +106,9 @@ function computeTrustCoverage(events: OutcomeEvent[]): OutcomeMetricResult["trus
       selfReported: 0
     };
   }
-  const observed = events.filter((event) => event.trust_tier === "OBSERVED").length;
-  const attested = events.filter((event) => event.trust_tier === "ATTESTED").length;
-  const self = events.filter((event) => event.trust_tier === "SELF_REPORTED").length;
+  const observed = events.filter((event) => outcomeTrustTier(event) === "OBSERVED").length;
+  const attested = events.filter((event) => outcomeTrustTier(event) === "ATTESTED").length;
+  const self = events.filter((event) => outcomeTrustTier(event) === "SELF_REPORTED").length;
   return {
     observed: Number((observed / events.length).toFixed(4)),
     attested: Number((attested / events.length).toFixed(4)),
@@ -113,7 +122,7 @@ function maxTrustRank(events: OutcomeEvent[]): number {
   }
   let max = 0;
   for (const event of events) {
-    max = Math.max(max, trustRank(event.trust_tier));
+    max = Math.max(max, trustRank(outcomeTrustTier(event)));
   }
   return max;
 }

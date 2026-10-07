@@ -22,7 +22,7 @@ import {
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
-import { eventMeta, evidenceProducer } from "../claims/evidenceProvenance.js";
+import { countAttestedOnce, effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
 
@@ -46,21 +46,13 @@ interface SignedDigest {
   };
 }
 
-const trustTierSchema = z.enum(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"]);
-
-function inferTrustTier(event: EvidenceEvent, meta: Record<string, unknown>): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
-  if (typeof meta.trustTier === "string") {
-    const parsed = trustTierSchema.safeParse(meta.trustTier);
-    if (parsed.success) {
-      if (parsed.data === "SELF_REPORTED") return "SELF_REPORTED";
-      if (parsed.data === "ATTESTED") return "ATTESTED";
-      return "OBSERVED";
-    }
-  }
-  if (event.event_type === "review") {
-    return "SELF_REPORTED";
-  }
-  return "OBSERVED";
+function inferTrustTier(
+  event: EvidenceEvent, meta: Record<string, unknown>, reader: () => ReaderTrust = readerTrustFor()
+): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
+  // P0-18: the tier comes from provenance; effectiveTrustTier reads the same cached parse as `meta`.
+  const tier = effectiveTrustTier(event, reader);
+  if (tier === "OBSERVED" || tier === "OBSERVED_HARDENED") return "OBSERVED";
+  return tier === "ATTESTED" ? "ATTESTED" : "SELF_REPORTED";
 }
 
 function complianceMapsPath(workspace: string): string {
@@ -443,8 +435,13 @@ export function generateComplianceReport(params: {
       attested: 0,
       selfReported: 0
     };
-    for (const event of events.filter((row) => subjectRole(row, agentId, "agent") === "positive")) {
-      const tier = inferTrustTier(event, eventMeta(event));
+    // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest, and an
+    // attested event counts once, inside the window of its own time.
+    const reader = readerTrustFor(workspace);
+    const subjectRows = events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic");
+    const tiers = new Map(subjectRows.map((row) => [row, inferTrustTier(row, eventMeta(row), reader)]));
+    for (const event of countAttestedOnce(subjectRows, (row) => tiers.get(row), { startTs: windowStartTs, endTs: windowEndTs })) {
+      const tier = tiers.get(event);
       if (tier === "OBSERVED") trustCounts.observed += 1;
       else if (tier === "ATTESTED") trustCounts.attested += 1;
       else trustCounts.selfReported += 1;

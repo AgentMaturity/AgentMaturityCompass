@@ -225,8 +225,9 @@ AMC can ingest evidence from systems that operate at Level 1 only:
 amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 
 # Evidence arrives as SELF_REPORTED (0.4× trust)
-# Upgrade to ATTESTED via human/notary attestation
-amc attest --agent imported-agent --run <runId> --reason "verified against source logs"
+# Record who vouched; the rows stay SELF_REPORTED unless a third party whose key is
+# pinned for independent-attestation signed the bundle hash (docs/EVIDENCE_TRUST.md)
+amc attest --ingest-session <id> --attested-by <identity> --statement "verified against source logs" --attester-signature sig.json
 ```
 
 This means AMC doesn't require replacing existing tooling. It can sit on top of any Level 1 artifact source and add Level 2 (trust classification + signing) and Level 3 (knowledge graph + provenance) capabilities.

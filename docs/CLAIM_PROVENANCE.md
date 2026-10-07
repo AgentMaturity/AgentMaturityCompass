@@ -86,7 +86,7 @@ HYPOTHESIS → DERIVED → SELF_REPORTED → ATTESTED → OBSERVED → OBSERVED_
 | HYPOTHESIS → DERIVED | 2+ supporting evidence artifacts from different sessions | Automatic during scoring |
 | DERIVED → SELF_REPORTED | Cross-session confirmation (same claim observed in 2+ sessions) | Automatic during scoring |
 | SESSION_LOCAL → SELF_REPORTED | Same claim confirmed in a subsequent session | Automatic during scoring |
-| SELF_REPORTED → ATTESTED | Human or notary cryptographic attestation | `amc attest --agent <id> --claim <claimId>` |
+| SELF_REPORTED → ATTESTED | A third party's signature from a key pinned for `independent-attestation`; the operator's own attestation does not count (docs/EVIDENCE_TRUST.md) | `amc attest --attester-signature <file>` |
 | ATTESTED → OBSERVED | AMC gateway/monitor directly observes the behavior | Automatic when gateway captures matching evidence |
 | OBSERVED → OBSERVED_HARDENED | Observation occurs in hardened context (notary + sandbox + assurance pack) | Automatic when assurance context is present |
 

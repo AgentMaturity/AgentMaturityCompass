@@ -191,7 +191,7 @@ export {
   type EvalDimensionCoverage,
   type EvalCoverageStatus
 } from "./eval/evalImporters.js";
-export { evalImportCli, evalStatusCli, parseEvalImportFormat, parseEvalImportTrustTier } from "./eval/evalCli.js";
+export { evalImportCli, evalStatusCli, parseEvalImportFormat } from "./eval/evalCli.js";
 export {
   buildEvalReplayCorpusEvidenceReceipt,
   type EvalReplayCorpusEvidenceReceipt,
