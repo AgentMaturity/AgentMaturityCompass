@@ -193,8 +193,8 @@ describe("compliance fails closed (P0-17)", () => {
   test("imported review rows carrying agent A's id are not agent activity for requires_no_audit", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
-    appendEvent(workspace, { eventType: "review", meta: { agentId: AGENT_A, source: "chatgpt" } });
-    appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A, source: "eval_import" } });
+    appendEvent(workspace, { eventType: "review", meta: { agentId: AGENT_A, source: "chatgpt", trustTier: "SELF_REPORTED" } });
+    appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A, source: "eval_import", trustTier: "SELF_REPORTED" } });
     const row = category(workspace, AGENT_A, "fx_no_audit");
     expect({ status: row.status, result: row.result, evidence: row.evidence })
       .toEqual({ status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
@@ -251,7 +251,8 @@ describe("compliance fails closed (P0-17)", () => {
   test("a bound event from eval_import is NOT_EVALUATED with untrusted evidence", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);
-    appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["fx_event"], source: "eval_import" } });
+    // Imports are written SELF_REPORTED since P0-18; the ledger refuses OBSERVED for them.
+    appendEvent(workspace, { meta: { agentId: AGENT_A, controlIds: ["fx_event"], source: "eval_import", trustTier: "SELF_REPORTED" } });
     const row = category(workspace, AGENT_A, "fx_event");
     expect(row.status).toBe("NOT_EVALUATED");
     expect(row.evidence).toBe("untrusted");

@@ -6089,7 +6089,8 @@ describe("question score explainability receipts", () => {
       payload: "manual review observed but not part of the selected L3 evidence types",
       inline: true,
       ts: now,
-      meta: { questionId: "AMC-1.1", trustTier: "ATTESTED" }
+      // A manual review is SELF_REPORTED; the ledger refuses ATTESTED without a third-party attestation (P0-18).
+      meta: { questionId: "AMC-1.1", trustTier: "SELF_REPORTED" }
     });
     ledger.sealSession("alignment-review");
     ledger.close();

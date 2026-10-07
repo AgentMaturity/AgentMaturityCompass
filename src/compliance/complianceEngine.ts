@@ -22,7 +22,7 @@ import {
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
-import { eventMeta, evidenceProducer } from "../claims/evidenceProvenance.js";
+import { effectiveTrustTier, eventMeta, evidenceProducer, readerTrustList } from "../claims/evidenceProvenance.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
 
@@ -46,21 +46,11 @@ interface SignedDigest {
   };
 }
 
-const trustTierSchema = z.enum(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"]);
-
 function inferTrustTier(event: EvidenceEvent, meta: Record<string, unknown>): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
-  if (typeof meta.trustTier === "string") {
-    const parsed = trustTierSchema.safeParse(meta.trustTier);
-    if (parsed.success) {
-      if (parsed.data === "SELF_REPORTED") return "SELF_REPORTED";
-      if (parsed.data === "ATTESTED") return "ATTESTED";
-      return "OBSERVED";
-    }
-  }
-  if (event.event_type === "review") {
-    return "SELF_REPORTED";
-  }
-  return "OBSERVED";
+  // P0-18: the tier comes from provenance; effectiveTrustTier reads the same cached parse as `meta`.
+  const tier = effectiveTrustTier(event, { trustList: readerTrustList });
+  if (tier === "OBSERVED" || tier === "OBSERVED_HARDENED") return "OBSERVED";
+  return tier === "ATTESTED" ? "ATTESTED" : "SELF_REPORTED";
 }
 
 function complianceMapsPath(workspace: string): string {

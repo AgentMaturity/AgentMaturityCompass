@@ -1,3 +1,4 @@
+import { producerOfMeta } from "../claims/evidenceProvenance.js";
 import type { TrustTier } from "../types.js";
 
 /**
@@ -31,4 +32,24 @@ export function assertValidTrustTier(meta: Record<string, unknown>): void {
   throw new Error(
     `invalid trustTier ${JSON.stringify(value)}; expected one of ${TRUST_TIERS.join(", ")} or none`
   );
+}
+
+/**
+ * assertValidTrustTier, plus the tier the producer may claim (P0-18). Only AMC's runtime writes OBSERVED or
+ * OBSERVED_HARDENED, and ATTESTED needs an attestation record (keyId, sigB64, digestSha256) that the writer verified
+ * and readers re-verify against the trust list. A shape check only: no trust-list or file reads on the append path.
+ */
+export function assertTrustTierProvenance(meta: Record<string, unknown>): void {
+  assertValidTrustTier(meta);
+  const tier = meta["trustTier"];
+  if (tier === undefined || tier === "SELF_REPORTED") return;
+  const producer = producerOfMeta(meta);
+  const attestation = meta["attestation"] as Record<string, unknown> | null | undefined;
+  const allowed = tier === "ATTESTED"
+    ? producer !== "synthetic" && typeof attestation === "object" && attestation !== null
+      && ["keyId", "sigB64", "digestSha256"].every((field) => typeof attestation[field] === "string")
+    : producer === "amc-runtime";
+  if (!allowed) {
+    throw new Error(`trust tier ${String(tier)} is not allowed for ${producer} evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)`);
+  }
 }

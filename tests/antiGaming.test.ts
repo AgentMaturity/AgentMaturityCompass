@@ -150,9 +150,14 @@ describe("anti-gaming: conservative trust parsing", () => {
     expect(parsed.trustTier).toBe("SELF_REPORTED");
   });
 
-  test("known trust metadata is preserved for fresh evidence", () => {
+  test("known trust metadata is preserved for fresh runtime evidence", () => {
+    const parsed = makeParsedEvent({ trustTier: "OBSERVED_HARDENED", ts: Date.now() - 5 * DAY_MS });
+    expect(parsed.trustTier).toBe("OBSERVED_HARDENED");
+  });
+
+  test("ATTESTED without a verifiable third-party attestation reads SELF_REPORTED (P0-18)", () => {
     const parsed = makeParsedEvent({ trustTier: "ATTESTED", ts: Date.now() - 5 * DAY_MS });
-    expect(parsed.trustTier).toBe("ATTESTED");
+    expect(parsed.trustTier).toBe("SELF_REPORTED");
   });
 
   test("stale OBSERVED evidence degrades to ATTESTED", () => {

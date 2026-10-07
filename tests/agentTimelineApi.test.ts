@@ -134,7 +134,7 @@ describe("agent timeline API route", () => {
       id: "ev-2",
       ts: 1_700_000_100_000,
       agentId: "agent-api",
-      trustTier: "ATTESTED",
+      trustTier: "OBSERVED_HARDENED",
       questionId: "AMC-2.3"
     });
     writeRun(workspace, "agent-api", "run-a", 1_700_000_050_000, [2, 3], ["ev-1"]);

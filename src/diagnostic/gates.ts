@@ -1,3 +1,4 @@
+import { effectiveTrustTier, producerOfMeta, readerTrustList } from "../claims/evidenceProvenance.js";
 import type { EvidenceEvent, Gate, TrustTier } from "../types.js";
 import { dayKey } from "../utils/time.js";
 
@@ -24,18 +25,6 @@ function degradeTrustTierForStaleness(trustTier: TrustTier): TrustTier {
   }
 }
 
-function trustTierFromMeta(meta: Record<string, unknown>): TrustTier {
-  if (
-    meta.trustTier === "OBSERVED" ||
-    meta.trustTier === "OBSERVED_HARDENED" ||
-    meta.trustTier === "ATTESTED" ||
-    meta.trustTier === "SELF_REPORTED"
-  ) {
-    return meta.trustTier;
-  }
-  return "SELF_REPORTED";
-}
-
 export function parseEvidenceEvent(event: EvidenceEvent): ParsedEvidenceEvent {
   let meta: Record<string, unknown> = {};
   try {
@@ -44,7 +33,9 @@ export function parseEvidenceEvent(event: EvidenceEvent): ParsedEvidenceEvent {
     meta = {};
   }
 
-  const baselineTrustTier = trustTierFromMeta(meta);
+  // P0-18: the tier comes from provenance, not from the row. Synthetic rows read SELF_REPORTED here and evaluateGate
+  // drops them.
+  const baselineTrustTier = effectiveTrustTier(event, { trustList: readerTrustList }) ?? "SELF_REPORTED";
   const staleEvidence =
     Number.isFinite(event.ts) && event.ts > 0 && Date.now() - event.ts > EVIDENCE_STALE_AFTER_MS;
   const trustTier = staleEvidence ? degradeTrustTierForStaleness(baselineTrustTier) : baselineTrustTier;
@@ -80,7 +71,9 @@ export interface GateEvaluation {
   distinctDays: number;
 }
 
-export function evaluateGate(gate: Gate, events: ParsedEvidenceEvent[]): GateEvaluation {
+export function evaluateGate(gate: Gate, allEvents: ParsedEvidenceEvent[]): GateEvaluation {
+  // Synthetic (seeded or example) evidence never satisfies a gate, at any tier.
+  const events = allEvents.filter((event) => producerOfMeta(event.meta) !== "synthetic");
   const acceptedTrustTiers: TrustTier[] =
     gate.acceptedTrustTiers && gate.acceptedTrustTiers.length > 0
       ? gate.acceptedTrustTiers
