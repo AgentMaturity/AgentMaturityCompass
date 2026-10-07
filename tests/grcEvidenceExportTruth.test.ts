@@ -150,6 +150,22 @@ describe("amc export grc selects and verifies the run", () => {
     expect(text).toMatch(/CC7\.3 not evaluated — Evaluation of security events/);
   });
 
+  test("--json prints the v2 manifest, --sarif writes run findings, and an unknown framework is refused", () => {
+    const ws = workspace();
+    writeRun(ws, getAgentPaths(ws, "default").runsDir, run({ coverage: 0.5 }), false);
+    const lines: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { lines.push(args.join(" ")); });
+    runGrcExportCli({ workspace: ws, agentId: "default", framework: "eu_ai_act", out: "grc.json", sarif: "grc.sarif", json: true });
+    const printed = JSON.parse(lines.join("\n")) as { schemaVersion: string; framework: string };
+    expect(printed).toEqual(JSON.parse(readFileSync(join(ws, "grc.json"), "utf8")));
+    expect(printed.schemaVersion).toBe("amc.grc-evidence.v2");
+    expect(printed.framework).toBe("EU_AI_ACT");
+    const sarif = JSON.parse(readFileSync(join(ws, "grc.sarif"), "utf8")) as { runs: Array<{ results: Array<{ ruleId: string }> }> };
+    expect(sarif.runs[0]!.results.map((r) => r.ruleId)).toEqual(["AMC-GRC-RUN-UNVERIFIED", "AMC-GRC-EVIDENCE-NOT-READY", "AMC-GRC-LOW-COVERAGE"]);
+    expect(() => runGrcExportCli({ workspace: ws, agentId: "default", framework: "HIPAA", out: "x.json" }))
+      .toThrow(/--framework must be one of/);
+  });
+
   test("a run edited to VALID without a valid seal is untrusted and never observed", () => {
     const ws = workspace();
     const file = writeRun(ws, getAgentPaths(ws, "default").runsDir,
