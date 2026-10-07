@@ -332,6 +332,7 @@ import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
 import { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
 import { registerApprovalCliCommands } from "./approvals/approvalCliCommands.js";
+import { registerCatalogCommands } from "./catalog/catalogCli.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/approvalPolicyEngine.js";
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
@@ -16475,6 +16476,7 @@ withTrustFlags(bom
   });
 
 registerApprovalCliCommands(program);
+registerCatalogCommands(program);
 
 const whatif = program.command("whatif").description("Equalizer what-if simulator");
 
