@@ -24,7 +24,7 @@ import { listWorkOrders, verifyWorkOrder } from "../workorders/workorderEngine.j
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { mintReceipt, verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
+import { mintReceipt, verifyReceipt, type MintReceiptInput } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import type { SqliteConnectionLease } from "../storage/sqlitePool.js";
@@ -60,13 +60,8 @@ export interface AppendEvidenceResult {
 }
 
 export interface AppendEvidenceWithReceiptInput extends AppendEvidenceInput {
-  receipt: {
-    kind: ReceiptKind;
-    agentId: string;
-    providerId: string;
-    model: string | null;
-    bodySha256: string;
-  };
+  /** With `action`, the receipt is a v2 action-state receipt (P1-03). */
+  receipt: Pick<MintReceiptInput, "kind" | "agentId" | "providerId" | "model" | "bodySha256" | "action">;
 }
 
 
@@ -735,13 +730,9 @@ export class Ledger {
       });
       const eventHash = sha256Hex(`${prevHash}${baseCanonicalMetadata}${payloadSha256}`);
       const minted = mintReceipt({
-        kind: input.receipt.kind,
+        ...input.receipt,
         ts,
-        agentId: input.receipt.agentId,
-        providerId: input.receipt.providerId,
-        model: input.receipt.model,
         eventHash,
-        bodySha256: input.receipt.bodySha256,
         sessionId: input.sessionId,
         privateKeyPem: this.monitorPrivateKey(),
         receiptId

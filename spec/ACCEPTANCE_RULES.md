@@ -93,9 +93,9 @@ The receipt AMC mints today: `<base64url(payload bytes)>.<base64url(signature)>`
 canonical form of the payload and the signature is Ed25519 over those bytes (not over a digest). `receiptSha256` is
 sha256 of the whole receipt string.
 
-1. Split on `.` into exactly two parts; decode the payload; strict parse. AMC's own check (`verifyReceipt`) today
-   refuses only a malformed string, `v` other than 1, a missing `receipt_id`, `event_hash` or `body_sha256`, and a bad
-   signature; the field types in the schema are the form AMC mints. P1-03 moves AMC's check onto this schema.
+1. Split on `.` into exactly two parts; decode the payload; parse with this schema. AMC's own check
+   (`parseReceipt`, used by `verifyReceipt`) does so since P1-03; a signed member the schema does not name is accepted
+   and left out of the parsed payload.
 2. Signature over the decoded payload bytes as received, never re-serialized.
 3. Issuer admission: the monitor key, purpose `receipt`.
 4. Binding: `event_hash` names the ledger row the receipt is for, and `body_sha256` the request or response body.
@@ -103,12 +103,16 @@ sha256 of the whole receipt string.
 
 ## receipt
 
-One state of one execution. Contract only: P1-03 emits it, signs it and fixes its signed bytes. Until then a verifier
-reports a `v: 2` receipt's integrity as not evaluated. Rules the schema cannot express:
+One state of one execution. AMC emits it since P1-03, always with `kind: "action_state"`, as the receipt on a signed
+`ACTION_STATE` audit row whose payload is the canonical `amc.action-receipt/v1` record; `body_sha256` is that record's
+sha256 and `event_hash` names the row. Signed bytes are the canonical payload, as for `legacy-receipt`. Rules the
+schema cannot express (docs/RECEIPTS.md):
 
 - Every receipt of one execution has the same `executionId` and `idempotencyKey`.
-- States run `requested` → `authorized` or `denied` → `started` → `completed`, `cancelled` or `outcome_unknown`.
-  Any other order fails satisfaction.
+- States follow `ALLOWED_TRANSITIONS` (`src/actions/receiptStates.ts`): `requested` → `authorized`, `denied` or
+  `cancelled`; `authorized` → `started`, `denied` or `cancelled`; `started` → `completed` or `outcome_unknown` (never
+  `cancelled` once dispatched); `outcome_unknown` → `completed` through reconciliation only. A receipt may repeat its
+  predecessor's state only to mark the evidence incomplete. Any other order fails satisfaction.
 - A `completed` or `cancelled` receipt that follows `outcome_unknown` for the same execution must carry
   `reconciliation`, whose `fromReceiptId` names the `outcome_unknown` receipt.
 - From `authorized` on, `authorizationRecordDigest` must equal the digest of the execution's authorization record.
