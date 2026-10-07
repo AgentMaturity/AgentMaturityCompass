@@ -32,6 +32,8 @@ A package is imported to `.amc/federation/inbox/<identity>/<manifestId>/`. `<ide
 
 The manifest is signed by the peer but is not trusted to name paths. `sourceOrgId` and `manifestId` must be one safe path segment (`[A-Za-z0-9][A-Za-z0-9._-]{0,127}`), and each `files[].path` must be a relative POSIX path inside the package (no leading `/`, drive letter, backslash, empty, `.` or `..` segment). A package that breaks these is refused as an invalid manifest. `federate verify-bundle` and `federate import` additionally refuse any resolved path that leaves the extraction root or the inbox directory, and an import resolves every path before it writes the first file, so a package refused for its paths writes nothing.
 
+The bundle is extracted once to verify it and again to copy from. `federate import` records the sha256 of every file verification admitted (the manifest's files plus `manifest.json`, `manifest.sig` and `public-keys/publisher.pub`) and refuses with "changed between verification and import" before writing anything unless the second extraction matches, so a bundle replaced in between is never imported.
+
 A benchmark inside a package is checked the same way before it reaches your stats: its `benchId` must be one safe path segment and its import directory must stay inside `.amc/benchmarks/imported`, whoever signed it.
 
 ## Console

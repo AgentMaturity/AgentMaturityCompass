@@ -14,6 +14,20 @@ import { ed25519KeyId } from "../src/trust/index.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { operatorTrustHome, pinnedTrust } from "./helpers/trustContext.js";
 
+// Counts every archive extraction and can make one of them read a different bundle, to model a bundle replaced on disk
+// between the two extractions an import makes (one to verify, one to copy from). Every other call passes through.
+const extraction = vi.hoisted(() => ({ calls: 0, swapAt: 0, replacement: "" }));
+vi.mock("../src/security/safeTarArchive.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/security/safeTarArchive.js")>();
+  return {
+    ...actual,
+    extractValidatedTarGzipArchive: (input: Parameters<typeof actual.extractValidatedTarGzipArchive>[0]) => {
+      extraction.calls += 1;
+      return actual.extractValidatedTarGzipArchive(extraction.calls === extraction.swapAt ? { ...input, file: extraction.replacement } : input);
+    }
+  };
+});
+
 // An admitted peer's manifest is peer-signed but still attacker-controlled data (P0-52): its ids and file paths must
 // not steer where the importing workspace writes, and the inbox is named after the identity that was admitted.
 
@@ -35,6 +49,8 @@ function newWorkspace(orgName: string): string {
 }
 
 beforeEach(() => {
+  extraction.calls = 0;
+  extraction.swapAt = 0;
   // An empty operator home: no trust list, so only peer records admit a package.
   process.env.AMC_HOME = tempDir("amc-fed-contain-home-");
 });
@@ -269,5 +285,39 @@ describe("containment at use, when a manifest reaches the importer without the s
     const bundle = craftPackage({ signer: source, manifestId: "../../../escaped", listed: [{ path: "payload.txt", content: "pwned" }] });
     expectRefusedWithoutWriting(dest, bundle, /escapes the federation inbox/);
     expect(existsSync(join(dest, "escaped"))).toBe(false);
+  });
+});
+
+describe("a bundle replaced between verification and import", () => {
+  const CERT = "artifacts/certs/a.amccert";
+  const append = (path: string) => (root: string): void => writeFileSync(join(root, path), `${readFileSync(join(root, path), "utf8")}\n`);
+
+  /** The bundle with one file of its federation/ root changed after the fact (its manifest and signature are untouched). */
+  function tamperedCopy(bundle: string, mutate: (root: string) => void): string {
+    const top = tempDir("amc-fed-swap-");
+    expect(spawnSync("tar", ["-xzf", bundle, "-C", top]).status).toBe(0);
+    mutate(join(top, "federation"));
+    const out = join(tempDir("amc-fed-swap-out-"), "swapped.amcfed");
+    expect(spawnSync("tar", ["-czf", out, "-C", top, "."]).status).toBe(0);
+    return out;
+  }
+
+  test.each([
+    ["a listed file's bytes", CERT, (root: string) => writeFileSync(join(root, CERT), "EVIL")],
+    ["a listed file, removed", CERT, (root: string) => rmSync(join(root, CERT))],
+    ["manifest.json", "manifest.json", append("manifest.json")],
+    ["manifest.sig", "manifest.sig", append("manifest.sig")],
+    ["publisher.pub", "public-keys/publisher.pub", append("public-keys/publisher.pub")]
+  ])("refuses a swapped %s and writes nothing", (_label, path, mutate) => {
+    const { source, dest } = peerPair();
+    const bundle = craftPackage({ signer: source, listed: [{ path: CERT, content: "cert" }] });
+    const swapped = tamperedCopy(bundle, mutate);
+    const before = tree(dest);
+    extraction.calls = 0;
+    extraction.swapAt = 2;
+    extraction.replacement = swapped;
+    expect(() => importFederationPackage({ workspace: dest, bundleFile: bundle })).toThrow(`changed between verification and import: ${path}`);
+    expect(extraction.calls).toBe(2);
+    expect(tree(dest)).toEqual(before);
   });
 });
