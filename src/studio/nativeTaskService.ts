@@ -16,6 +16,7 @@ import { selectSupportedNativeTools } from "../agent/nativeToolCapabilities.js";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyAgentRun } from "../agent/runReport.js";
+import { loadTrustContext } from "../trust/trustContext.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
@@ -498,13 +499,18 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
           entry.projectionAt = 0; refresh(entry); if (entry.projection?.closed) persist(entry, { closed: true }); }
         entry.projectionAt = 0; refresh(entry);
         const verificationHead = entry.projection?.storeHeadEventHash;
-        const report = await verifyAgentRun(workspace, entry.descriptor.sessionId);
+        // P0-51: the operator's trust (the AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT in Studio's environment)
+        // decides, as `amc agent-loop verify` does; with it, report.ok also needs the monitor key admitted.
+        const trust = loadTrustContext({ env: environment, ...(options.credentialsHome ? { amcHome: options.credentialsHome } : {}) });
+        const report = await verifyAgentRun(workspace, entry.descriptor.sessionId, trust);
         entry.projectionAt = 0; refresh(entry);
         const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
-        entry.verification = !report.ok ? "failed" : !sameHead ? "not-verified"
-          : report.trustRoot.anchored ? "externally-anchored" : "workspace-key-consistency";
+        entry.verification = !report.ok ? "failed" : !sameHead ? "not-verified" : "externally-anchored";
         entry.verificationStoreHead = sameHead ? verificationHead : undefined;
-        entry.error = report.ok ? null : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
+        const monitor = report.trustRoot.monitorAdmission;
+        entry.error = report.ok ? null : report.integrityOk
+          ? `UNTRUSTED: the recorded evidence is internally consistent, but the operator's trust list and AMC_EXPECTED_MONITOR_FINGERPRINT do not admit its monitor key (${monitor?.status ?? "not-pinned"}${monitor?.keyId ? ` ${monitor.keyId}` : ""}), so authorship is not verified. No verified result is claimed.`
+          : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
         if (report.ok && !sameHead) entry.error = "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current.";
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
       finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; }

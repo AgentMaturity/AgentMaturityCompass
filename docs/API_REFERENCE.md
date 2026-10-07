@@ -2195,6 +2195,12 @@ Apply bench registries config from JSON file
 | Option | Description |
 |--------|-------------|
 | `--dir <dir>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc bench search`
 
@@ -2362,7 +2368,12 @@ Re-encrypt blob batch from one key version to another
 |--------|-------------|
 | `--in <file>` | - |
 | `--sig <file>` | - |
-| `--pubkey <file>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc bootstrap`
 
@@ -3831,6 +3842,11 @@ Alias: `amc sector pack verify`
 | Option | Description |
 |--------|-------------|
 | `--key <licenseKey>` | - |
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 | `--json` | - |
 
 #### `amc domain report`
@@ -4148,6 +4164,19 @@ Generate a TLA+ specification for the AMC safety model
 |--------|-------------|
 | `--properties <list>` | - |
 | `--output <path>` | - |
+
+#### `amc enforce verify-certificate`
+
+Verify the integrity of a proof certificate (pass JSON as string)
+
+
+| Option | Description |
+|--------|-------------|
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc enterprise audit-export`
 
@@ -5607,6 +5636,10 @@ Independently verify an external-evidence profile without opening a workspace
 | `--original <path>` | - |
 | `--expected-digest <sha256>` | - |
 | `--json` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 
 #### `amc improve`
 
@@ -6785,6 +6818,20 @@ Show notary backend and log status
 |--------|-------------|
 | `--notary-dir <dir>` | - |
 
+#### `amc notary verify-attest`
+
+Verify a .amcattest bundle offline
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
 #### `amc observe anomalies`
 
 Detect observability anomalies (evidence rate drops, trust regressions, score volatility)
@@ -7367,6 +7414,19 @@ Verify .amcpass artifact offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
+#### `amc passport verify-token`
+
+Verify an AMC Trust Token (pass JSON string)
+
+
+| Option | Description |
+|--------|-------------|
 | `--trust-list <file>` | - |
 | `--trust-root <sha256>` | - |
 | `--allow-unpinned` | - |
@@ -9032,6 +9092,10 @@ Verify a session inclusion proof offline — needs only the bundle and a pinned 
 |--------|-------------|
 | `--expect-auditor-key <sha256>` | - |
 | `--json` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
 
 #### `amc sessions list`
 
@@ -9699,6 +9763,20 @@ Export signed inclusion proof bundle for entry hash
 | `--entry-hash <hash>` | - |
 | `--out <file>` | - |
 
+#### `amc transparency merkle verify-proof`
+
+Verify signed inclusion proof bundle
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
 #### `amc transparency report`
 
 Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is
@@ -9720,6 +9798,20 @@ Tail transparency entries
 | Option | Description |
 |--------|-------------|
 | `--n <count>` | - |
+
+#### `amc transparency verify-bundle`
+
+Verify exported transparency bundle
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc trust enable-notary`
 

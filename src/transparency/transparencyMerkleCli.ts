@@ -1,3 +1,4 @@
+import type { TrustContext } from "../trust/trustContext.js";
 import {
   currentTransparencyMerkleRoot,
   ensureTransparencyMerkleInitialized,
@@ -34,6 +35,6 @@ export function transparencyMerkleProofCli(params: {
   return exportTransparencyProofBundle(params);
 }
 
-export function transparencyMerkleVerifyProofCli(bundleFile: string): ReturnType<typeof verifyTransparencyProofBundle> {
-  return verifyTransparencyProofBundle(bundleFile);
+export function transparencyMerkleVerifyProofCli(bundleFile: string, trust: TrustContext, pubkeyPem?: string | null): ReturnType<typeof verifyTransparencyProofBundle> {
+  return verifyTransparencyProofBundle(bundleFile, trust, pubkeyPem);
 }

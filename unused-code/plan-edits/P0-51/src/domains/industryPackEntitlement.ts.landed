@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import type { IndustryPack } from "./industryPacks.js";
-import { admitKey, buildVerifierReport, ed25519KeyId, withPins, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 
 export const INDUSTRY_PACKS_PLAN_ID = "industry-packs-monthly";
 export const INDUSTRY_PACKS_MONTHLY_PRICE_USD = "9.99";
@@ -285,32 +284,6 @@ export function verifyIndustryPackLicenseKey(
     return { valid: false, payload, reason: "license has expired" };
   }
   return { valid: true, payload };
-}
-
-/**
- * `amc domain pack verify` (P0-51): the license verdict as a VerifierReportV1. Only an Ed25519 signature counts, and only
- * from a key admitted for artifact-seal: --pubkey (pinned by the caller's trust context), a trust list, or the operator's
- * AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY, which this function pins as an operator-held key. An HMAC-signed or legacy
- * allowlisted license names no signer, so it is never trusted here; activation keeps accepting them.
- */
-export function verifyIndustryPackLicenseReport(licenseKey: string, trust: TrustContext, pubkeyPem: string | null = null,
-  env: NodeJS.ProcessEnv = process.env, now = Date.now()): ReturnType<typeof verifyIndustryPackLicenseKey> & { report: VerifierReportV1 } {
-  const operatorPem = licensePublicKeyPem(env);
-  const operatorKeyId = operatorPem === null ? null : ed25519KeyId(operatorPem);
-  const context = operatorKeyId === null ? trust
-    : withPins(trust, [{ keyId: operatorKeyId, purposes: ["artifact-seal"], origin: "AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY" }]);
-  const keys = [pubkeyPem, operatorPem].filter((pem): pem is string => typeof pem === "string" && pem.trim().length > 0);
-  const [, payloadPart = "", signaturePart = ""] = licenseKey.trim().split(".");
-  const signer = keys.find((pem) => verifyPayloadEd25519(payloadPart, signaturePart, pem)) ?? null;
-  // The license's own checks (format, signature, payload, status, expiry) against one Ed25519 key, with no HMAC secret or legacy allowlist.
-  const result = keys.length === 0
-    ? { valid: false, payload: null, reason: "no Ed25519 license public key: pass --pubkey or set AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY" }
-    : verifyIndustryPackLicenseKey(licenseKey, { AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: signer ?? keys[0] }, now);
-  const report = buildVerifierReport({ artifact: { kind: "industry-pack-license", path: "--key", sha256: sha256Hex(licenseKey.trim()) },
-    context, integrityErrors: result.valid ? [] : [result.reason ?? "license verification failed"], anchoring: { status: "not-applicable", detail: null },
-    signatures: [admitKey({ publicKeyPem: signer ?? keys[0] ?? null, purpose: "artifact-seal", signature: "license signature", context,
-      claimedSignedAt: result.payload?.issuedAt ?? null })] });
-  return { ...result, valid: report.trusted, report };
 }
 
 export function buildIndustryPackCheckoutUrl(params: {

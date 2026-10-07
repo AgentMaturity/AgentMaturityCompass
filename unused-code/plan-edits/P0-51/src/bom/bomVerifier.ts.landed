@@ -1,14 +1,12 @@
 import { readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { z } from "zod";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { maturityBomSchema, type MaturityBom } from "./bomSchema.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
-import { buildVerifierReport, checkDigestSignature, envelopePublicKey, untrustedReasons, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
-import { fileSha256 } from "../trust/signatureCheck.js";
+import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 
 const bomSignatureSchema = z.object({
   v: z.literal(1),
@@ -84,55 +82,55 @@ export function signBomFile(params: {
   };
 }
 
-/**
- * --pubkey, the current workspace's auditor key history and the key the envelope carries only locate the signer;
- * admitKey decides whether it is pinned for artifact-seal (P0-51). A workspace or embedded key never vouches by being there.
- */
 export function verifyBomSignature(params: {
   workspace: string;
   inputFile: string;
   sigFile: string;
   pubkeyPemFile?: string;
-  trust: TrustContext;
-}): { ok: boolean; reason?: string; bom: MaturityBom | null; signature: BomSignature | null; report: VerifierReportV1 } {
+}): { ok: boolean; reason?: string; bom: MaturityBom | null; signature: BomSignature | null } {
   const inputFile = resolve(params.workspace, params.inputFile);
   const sigFile = resolve(params.workspace, params.sigFile);
-  const errors: string[] = [];
-  const signatures: IssuerAdmission[] = [];
-  let bom: MaturityBom | null = null;
-  let signature: BomSignature | null = null;
-  const finish = () => {
-    const report = buildVerifierReport({ artifact: { kind: "maturity-bom", path: inputFile, sha256: fileSha256(inputFile) },
-      context: params.trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
-    return { ok: report.trusted, reason: report.trusted ? undefined : untrustedReasons(report).join("; "), bom, signature, report };
-  };
   if (!pathExists(inputFile)) {
-    errors.push("bom file missing");
-    return finish();
+    return { ok: false, reason: "bom file missing", bom: null, signature: null };
   }
   if (!pathExists(sigFile)) {
-    errors.push("bom signature file missing");
-    return finish();
+    return { ok: false, reason: "bom signature file missing", bom: null, signature: null };
   }
   try {
-    bom = loadBom(inputFile);
-    signature = bomSignatureSchema.parse(JSON.parse(readFileSync(sigFile, "utf8")) as unknown);
+    const bom = loadBom(inputFile);
+    const signature = bomSignatureSchema.parse(JSON.parse(readFileSync(sigFile, "utf8")) as unknown);
     const digest = sha256Hex(readFileSync(inputFile));
     if (digest !== signature.bomSha256) {
-      errors.push("bom digest mismatch");
-      return finish();
+      return {
+        ok: false,
+        reason: "bom digest mismatch",
+        bom,
+        signature
+      };
     }
-    const workspaceKeys = pathExists(join(params.workspace, ".amc", "keys", "auditor_ed25519.pub")) ? getPublicKeyHistory(params.workspace, "auditor") : [];
-    const check = checkDigestSignature({ signature: "bom.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: signature.signature,
-      candidates: [params.pubkeyPemFile ? readFileSync(resolve(params.workspace, params.pubkeyPemFile), "utf8") : null,
-        ...workspaceKeys, envelopePublicKey(signature.envelope)],
-      context: params.trust, claimedSignedAt: signature.signedTs });
-    signatures.push(check.admission);
-    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
-      errors.push("signature verification failed");
-    }
+    const keys = params.pubkeyPemFile
+      ? [readFileSync(resolve(params.workspace, params.pubkeyPemFile), "utf8")]
+      : getPublicKeyHistory(params.workspace, "auditor");
+    const ok = verifySignedDigest({
+      workspace: params.workspace,
+      digestHex: digest,
+      signed: {
+        signature: signature.signature,
+        envelope: signature.envelope
+      }
+    }) || verifyHexDigestAny(digest, signature.signature, keys);
+    return {
+      ok,
+      reason: ok ? undefined : "signature verification failed",
+      bom,
+      signature
+    };
   } catch (error) {
-    errors.push(String(error));
+    return {
+      ok: false,
+      reason: String(error),
+      bom: null,
+      signature: null
+    };
   }
-  return finish();
 }

@@ -233,7 +233,7 @@ Telemetry is **off by default**. When enabled, only sends: OS, Node version, AMC
 | `amc notary init` | Initialize notary signing boundary |
 | `amc notary start` | Start notary process |
 | `amc notary attest --out <file>` | Generate attestation |
-| `amc notary verify-attest <file>` | Verify attestation |
+| `amc notary verify-attest <file> --pubkey <notary.pub>` | Verify attestation against a pinned notary key |
 | `amc trust enable-notary` | Enable notary-backed trust |
 | `amc trust status` | Show trust posture |
 

@@ -13,7 +13,11 @@ import {
 } from "./benchRegistrySchema.js";
 import { inspectBenchArtifact } from "./benchArtifact.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
-import { loadTrustContext, untrustedReasons, verdictExitCode } from "../trust/index.js";
+import {
+  buildVerifierReport, checkSignature, loadTrustContext, untrustedReasons, verdictExitCode,
+  type IssuerAdmission, type TrustContext, type VerifierReportV1
+} from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 
 function registryIndexPath(dir: string): string {
   return join(dir, "index.json");
@@ -138,21 +142,26 @@ export function initBenchRegistry(params: {
   };
 }
 
-export function verifyBenchRegistry(dirRaw: string): {
+/** registry.pub and --pubkey only locate the index signer; admitKey decides whether it is pinned for artifact-seal (P0-51). */
+export function verifyBenchRegistry(dirRaw: string, trust: TrustContext, pubkeyPath?: string): {
   ok: boolean;
   errors: string[];
   index: BenchRegistryIndex | null;
+  report: VerifierReportV1;
 } {
   const dir = resolve(dirRaw);
   const errors: string[] = [];
-  if (!pathExists(registryIndexPath(dir)) || !pathExists(registryIndexSigPath(dir)) || !pathExists(registryPubPath(dir))) {
-    return {
-      ok: false,
-      errors: ["registry missing index/index.sig/registry.pub"],
-      index: null
-    };
-  }
+  const signatures: IssuerAdmission[] = [];
   let index: BenchRegistryIndex | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "bench-registry", path: dir, sha256: fileSha256(registryIndexPath(dir)) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, index, report };
+  };
+  if (!pathExists(registryIndexPath(dir)) || !pathExists(registryIndexSigPath(dir)) || !pathExists(registryPubPath(dir))) {
+    errors.push("registry missing index/index.sig/registry.pub");
+    return finish();
+  }
   try {
     index = loadIndex(dir);
   } catch (error) {
@@ -160,12 +169,21 @@ export function verifyBenchRegistry(dirRaw: string): {
   }
   const pubPem = readUtf8(registryPubPath(dir));
   if (index) {
-    const checked = verifyIndex(index, readUtf8(registryIndexSigPath(dir)), pubPem);
-    if (!checked.ok) {
-      errors.push(`index signature invalid: ${checked.reason ?? "unknown"}`);
-    }
-    if (index.registry.issuerFingerprint !== fingerprintForPublicPem(pubPem)) {
-      errors.push("registry fingerprint mismatch");
+    const parsed = index;
+    const sigRaw = readUtf8(registryIndexSigPath(dir));
+    try {
+      const sig = benchRegistryIndexSignatureSchema.parse(JSON.parse(sigRaw) as unknown);
+      const check = checkSignature({ signature: "index.sig", purpose: "artifact-seal", context: trust, claimedSignedAt: sig.signedTs,
+        candidates: [pubkeyPath ? readUtf8(resolve(pubkeyPath)) : null, pubPem], verify: (pem) => verifyIndex(parsed, sigRaw, pem).ok });
+      signatures.push(check.admission);
+      if (!check.verified) {
+        errors.push(`index signature invalid: ${verifyIndex(parsed, sigRaw, pubPem).reason ?? "unknown"}`);
+      }
+      if (parsed.registry.issuerFingerprint !== check.admission.keyId) {
+        errors.push("registry fingerprint mismatch");
+      }
+    } catch (error) {
+      errors.push(`invalid index.sig: ${String(error)}`);
     }
     for (const bench of index.benches) {
       for (const version of bench.versions) {
@@ -185,11 +203,7 @@ export function verifyBenchRegistry(dirRaw: string): {
       }
     }
   }
-  return {
-    ok: errors.length === 0,
-    errors,
-    index
-  };
+  return finish();
 }
 
 export function publishBenchToRegistry(params: {

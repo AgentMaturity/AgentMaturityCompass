@@ -177,7 +177,7 @@ amc import ./session.v2.jsonl --agent default --dry-run --json
 
 Inspect the reported source hashes, semantic digest, failures, unknowns and losses. Apply the same source with `--expected-digest` set to the reviewed semantic digest. The importer preserves settled stream records, tool/cancel outcomes and lineage; inherited history is not counted as new child execution. It refuses unsupported required formats/events and malformed rows. Compressed Zstandard files and v0/v1 migration require an explicit supported export first.
 
-Imports remain `SELF_REPORTED` and `NOT_EVALUATED`. `amc imports show IMPORT_ID` lists normalized artifacts and portable profile paths. The [External Evidence Profile](EXTERNAL_EVIDENCE_PROFILE.md) explains standalone verification with `amc imports verify-profile profile.json --original original.jsonl --json`, independent digests and admitted authority keys. A valid portable file does not prove its source task ran or succeeded, and the profile's availability does not establish industry adoption.
+Imports remain `SELF_REPORTED` and `NOT_EVALUATED`. `amc imports show IMPORT_ID` lists normalized artifacts and portable profile paths. The [External Evidence Profile](EXTERNAL_EVIDENCE_PROFILE.md) explains standalone verification with `amc imports verify-profile profile.json --original original.jsonl --json`, independent digests and admitted authority keys; an unsigned profile names no signer, so that command exits 1 for it even when its digests check out. A valid portable file does not prove its source task ran or succeeded, and the profile's availability does not establish industry adoption.
 
 ## Source entry points for Graphify
 

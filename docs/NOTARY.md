@@ -26,7 +26,7 @@ amc notary pubkey
 
 # 4) Generate and verify attestation bundle
 amc notary attest --out /tmp/current.amcattest
-amc notary verify-attest /tmp/current.amcattest
+amc notary verify-attest /tmp/current.amcattest --pubkey <recorded-notary.pub>  # the key printed by `amc notary pubkey`, recorded out of band
 ```
 
 ## Enable Notary trust mode in workspace

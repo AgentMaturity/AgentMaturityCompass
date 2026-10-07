@@ -513,7 +513,7 @@ CLI operations:
 amc transparency merkle rebuild
 amc transparency merkle root
 amc transparency merkle prove --entry-hash <sha256> --out proof.amcproof
-amc transparency merkle verify-proof proof.amcproof
+amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
 ```
 
 ### 6.4 Certificate Format
@@ -563,7 +563,7 @@ amc verify all --json
 amc assurance cert verify --cert ./amc-cert.tar.gz
 
 # Merkle proof verification (offline)
-amc transparency merkle verify-proof proof.amcproof
+amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
 
 # Signature verification
 amc fix-signatures --verify-only

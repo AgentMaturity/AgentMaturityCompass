@@ -8,11 +8,14 @@
  */
 import type { Command } from "commander";
 import { hostname } from "node:os";
+import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
-import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
+import { fileSha256 } from "./trust/signatureCheck.js";
 
 export function registerSessionCommands(program: Command): void {
   const session = program
@@ -305,29 +308,26 @@ export function registerSessionCommands(program: Command): void {
       process.exit(alarms.length === 0 ? 0 : 1);
     });
 
-  session
+  withTrustFlags(session
     .command("verify-proof")
     .description("Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint")
     .argument("<file>", "proof bundle path")
     .requiredOption("--expect-auditor-key <sha256>", "auditor public key fingerprint, obtained out of band")
-    .option("--json", "Output as JSON")
-    .action(async (file: string, opts: { expectAuditorKey: string; json?: boolean }) => {
+    .option("--json", "Output as JSON"))
+    .action(async (file: string, opts: { expectAuditorKey: string } & TrustFlags) => {
+      const trust = trustFromFlags(opts, ["artifact-seal"]);
       const { verifySessionAnchorProofFile } = await import("./transparency/sessionAnchorVerify.js");
       const verdict = verifySessionAnchorProofFile({
         file,
         expectedAuditorKeyFingerprint: opts.expectAuditorKey
       });
-      if (opts.json) {
-        console.log(JSON.stringify(verdict, null, 2));
-        process.exit(verdict.ok ? 0 : 1);
-        return;
-      }
-      if (verdict.ok) {
-        console.log(chalk.green("Session inclusion proof VERIFIED"));
-      } else {
-        console.log(chalk.red("Session inclusion proof FAILED"));
-        for (const err of verdict.errors) console.log(`  - ${err}`);
-      }
-      process.exit(verdict.ok ? 0 : 1);
+      // The verifier checks the bundle's key against --expect-auditor-key; admitKey adds the operator's distrust and
+      // trust lists, so a distrusted or revoked auditor key fails even when its fingerprint matches (P0-51).
+      const pinned = /^[0-9a-f]{64}$/i.test(opts.expectAuditorKey) ? opts.expectAuditorKey.toLowerCase() : null;
+      const context = pinned === null ? trust : withPins(trust, [{ keyId: pinned, purposes: ["artifact-seal"], origin: "--expect-auditor-key" }]);
+      const report = buildVerifierReport({ artifact: { kind: "session-anchor-proof", path: resolve(file), sha256: fileSha256(resolve(file)) },
+        context, integrityErrors: verdict.errors, anchoring: { status: "not-applicable", detail: null },
+        signatures: [admitKey({ publicKeyPem: verdict.auditorPublicKeyPem, purpose: "artifact-seal", signature: "signed merkle root", context })] });
+      finishVerify("Session inclusion proof", report, { json: opts.json, result: { ...verdict, ok: report.trusted, report } });
     });
 }

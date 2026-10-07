@@ -296,7 +296,7 @@ The hash chain is indexed by a Merkle tree for efficient inclusion proofs:
 
 ```bash
 amc transparency merkle prove --entry-hash <hash> --out proof.amcproof
-amc transparency merkle verify-proof proof.amcproof
+amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
 ```
 
 This allows any party to verify that a specific trust event exists in the log without downloading the entire chain.

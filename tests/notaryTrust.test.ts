@@ -4,7 +4,8 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { notaryAttestCli, notaryInitCli, notaryVerifyAttestCli } from "../src/notary/notaryCli.js";
+import { notaryAttestCli, notaryInitCli, notaryPubkeyCli, notaryVerifyAttestCli } from "../src/notary/notaryCli.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 import { loadNotaryConfig, saveNotaryConfig } from "../src/notary/notaryConfigStore.js";
 import { startNotaryServer } from "../src/notary/notaryServer.js";
 import { buildNotaryAuthSignature } from "../src/notary/notaryAuth.js";
@@ -161,8 +162,11 @@ describe("notary + trust hard mode", () => {
             workspace,
             outFile: bundlePath
           });
-          const verified = notaryVerifyAttestCli(bundlePath);
+          // The operator pins the notary key it read from the notary itself, never the copy inside the bundle (P0-51).
+          const notaryPem = notaryPubkeyCli({ notaryDir }).pubkeyPem;
+          const verified = notaryVerifyAttestCli(bundlePath, pinnedTrust([{ publicKeyPem: notaryPem, purposes: ["notary"] }]));
           expect(verified.ok).toBe(true);
+          expect(notaryVerifyAttestCli(bundlePath, pinnedTrust([])).report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
         } finally {
           await runtime.close();
         }

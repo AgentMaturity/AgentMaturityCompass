@@ -55,13 +55,10 @@ describe("verify surfaces (P0-09)", () => {
     expect(unreviewed.map(row => row.command)).toEqual([]);
   });
 
-  it("registers --trust-list on every portable command except the ten recorded as open after P0-09", () => {
-    // Step 10 puts the flags on every portable verify command. These ten rows sit outside the issue table and do not
-    // take them yet; the P0-09 receipt records them as open. The list must shrink, never grow.
-    const open = [
-      "bench registry verify", "bom verify", "domain pack verify", "enforce verify-certificate", "imports verify-profile",
-      "notary verify-attest", "passport verify-token", "session verify-proof", "transparency merkle verify-proof", "transparency verify-bundle"
-    ];
+  it("registers --trust-list on every portable command (P0-09 step 10, the last ten wired by P0-51)", () => {
+    // Step 10 puts the flags on every portable verify command. P0-09 left ten open; P0-51 wired them. The list must
+    // shrink, never grow, and is now empty.
+    const open: string[] = [];
     // assurance cert-verify is portable but registered as command("cert-verify"), so it is a note, not a table row.
     const portable = [...inventoryRows().filter(row => row.kind === "portable artifact").map(row => row.command), "assurance cert-verify"];
     expect(portable.length).toBe(24);
