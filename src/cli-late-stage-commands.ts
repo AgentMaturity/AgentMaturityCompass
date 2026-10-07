@@ -265,7 +265,7 @@ export function registerLateStageCliCommands({
     .option("--demo", "Alias for --no-vault")
     .option("--json", "Output as JSON")
     .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
-      const { runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
+      const { DEMO_AGENT_ID, runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
       const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
       const { issueLeaseForCli } = await import("./leases/leaseCli.js");
       const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
@@ -316,7 +316,8 @@ export function registerLateStageCliCommands({
           process.exit(1);
         }
 
-        // Issue a lease token for the demo
+        // The lease and the traffic are for the demo agent: scripted traffic must never land on the operator's own
+        // agents (`default` included) as if they had produced it.
         console.log(chalk.gray("  Issuing demo lease token..."));
         const workspace = process.cwd();
         ensureLeaseRevocationStore(workspace);
@@ -324,7 +325,7 @@ export function registerLateStageCliCommands({
         const lease = issueLeaseForCli({
           workspace,
           workspaceId: wsId,
-          agentId: "default",
+          agentId: DEMO_AGENT_ID,
           ttl: "15m",
           scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
           routes: "/local",
@@ -339,17 +340,17 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
         console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
 
-        const result = await runDemo(gatewayUrl, lease.token);
+        const result = await runDemo(gatewayUrl, lease.token, DEMO_AGENT_ID);
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
-        console.log(chalk.gray(`  The gateway recorded this scripted traffic for agent "default"; it is demo traffic, not evidence of your agent.\n`));
+        console.log(chalk.gray(`  The gateway recorded this scripted traffic for agent "${DEMO_AGENT_ID}"; it is demo traffic, not evidence of any agent.\n`));
 
         if (opts.json) {
           // The lease signs the traffic, not its truth: the result stays DEMO_ONLY.
           console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result, trustLabel: "DEMO_ONLY" }, null, 2));
         } else {
-          console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
+          console.log(chalk.gray(`  Run 'amc score evidence-coverage ${DEMO_AGENT_ID}' to see how evidence gaps are reported.`));
           console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
           console.log(chalk.bold.yellow(EXAMPLE_BANNER));
         }
