@@ -54,10 +54,11 @@ until the token is re-issued.
 the intent's action class before any intent, ticket or approval is consumed. Every
 scope refusal on the scope-gated routes keeps its `missing scope <scope>` error and,
 for a static-token agent, adds `refusedBy` (the meta path, scopes, execute classes
-and grant source) and `widen` (the exact operator steps). Lease scopes cannot name an
-action class (`leaseScopeSchema` is a closed enum), so a lease-only execute is decided
-by the governor's signed action policy alone; that boundary is asserted by
-`tests/studioAgentTokenScopes.test.ts`, not claimed as a guard.
+and grant source) and `widen` (the exact operator steps). A lease may name
+`executeActionClasses`; `toolhub:execute` then covers only those classes, for the lease
+itself on `POST /toolhub/execute` and for agent tokens minted from it. A lease that names
+none leaves a lease-only execute to the governor's signed action policy alone; that
+boundary is asserted by `tests/studioAgentTokenScopes.test.ts`, not claimed as a guard.
 
 ## Tool execution and compatibility
 

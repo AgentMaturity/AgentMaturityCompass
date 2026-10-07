@@ -43,7 +43,8 @@ import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
 export type ToolAuditType =
   | "TOOL_CALL_ALLOWED"
   | "TOOL_CALL_DENIED"
-  | "TOOL_CALL_FAILED";
+  | "TOOL_CALL_FAILED"
+  | "AUTHORIZATION_RECORD";
 
 export interface ToolEvidenceRecord {
   readonly eventType: "audit" | "metric" | "stdout";
@@ -73,11 +74,8 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
 
-  const common = {
+  const call = {
     trustTier: "OBSERVED" as const,
-    ...(questionIds.length > 0
-      ? { questionIds, projectionVersion: LIVE_PROJECTION_VERSION, projectionRules }
-      : {}),
     agentId: execution.agentId,
     toolName: execution.name,
     actionClass: execution.actionClass,
@@ -86,8 +84,26 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     // Code Mode sub-call to its parent.
     toolToken: execution.token,
     parentToken: execution.parentToken,
-    callId: execution.callId
+    callId: execution.callId,
+    // The record this call ran (or was refused) under, on every row (P1-02).
+    ...(execution.authorization === undefined ? {} : {
+      authorizationId: execution.authorization.authorizationId,
+      authorizationDigest: execution.authorization.digest
+    })
   };
+  const common = {
+    ...call,
+    ...(questionIds.length > 0
+      ? { questionIds, projectionVersion: LIVE_PROJECTION_VERSION, projectionRules }
+      : {})
+  };
+
+  // The full record, once, beside the decision it governed. Untagged: it evidences no question on its own.
+  const authorization: ToolEvidenceRecord[] = execution.authorization === undefined ? [] : [{
+    eventType: "audit",
+    payload: JSON.stringify({ auditType: "AUTHORIZATION_RECORD", record: execution.authorization.record }),
+    meta: { ...call, auditType: "AUTHORIZATION_RECORD", executionId: execution.authorization.record.executionId }
+  }];
 
   const audit: ToolEvidenceRecord = {
     eventType: "audit",
@@ -136,7 +152,7 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
   // the caller already has.
   const produced = outcome.bytes > 0 || outcome.output.length > 0;
   if (!produced) {
-    return [audit, metric];
+    return [audit, metric, ...authorization];
   }
 
   const stdout: ToolEvidenceRecord = {
@@ -156,5 +172,5 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     }
   };
 
-  return [audit, metric, stdout];
+  return [audit, metric, stdout, ...authorization];
 }

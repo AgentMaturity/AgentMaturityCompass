@@ -30,6 +30,7 @@ import {
   type ApprovalRequestRecord
 } from "./approvalChainStore.js";
 import { evaluateApprovalQuorum } from "./approvalQuorum.js";
+import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
 export interface ApprovalRequestInput {
@@ -224,7 +225,9 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     rolesAllowed: parseUserRoles(rule.rolesAllowed),
     ttlMinutes: rule.ttlMinutes,
     requiredAssurancePacks: rule.requireAssurancePacks,
-    boundHashes: requestBoundHashes(input)
+    boundHashes: requestBoundHashes(input),
+    // Kept with the signed request so an approver sees the protected facts and a recheck can name what changed.
+    ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {})
   });
   return {
     approval: {
@@ -367,7 +370,10 @@ export function verifyApprovalForExecution(params: {
   workspace: string;
   approvalId: string;
   expectedAgentId: string;
-  expectedIntentId: string;
+  /** At least one of the intent id and the intent hash is required. */
+  expectedIntentId?: string;
+  /** The hash of the exact intent about to run (P1-02); a grant for any other intent does not verify. */
+  expectedIntentHash?: string;
   expectedToolName: string;
   expectedActionClass: ActionClass;
 }): {
@@ -396,7 +402,10 @@ export function verifyApprovalForExecution(params: {
   if (request.agentId !== params.expectedAgentId) {
     return { ok: false, status: null, approval: request, error: "approval agent mismatch" };
   }
-  if (request.intentId !== params.expectedIntentId) {
+  if (params.expectedIntentId === undefined && params.expectedIntentHash === undefined) {
+    return { ok: false, status: null, approval: request, error: "approval intent binding missing" };
+  }
+  if (params.expectedIntentId !== undefined && request.intentId !== params.expectedIntentId) {
     return { ok: false, status: null, approval: request, error: "approval intent mismatch" };
   }
   if (request.toolName !== params.expectedToolName) {
@@ -404,6 +413,9 @@ export function verifyApprovalForExecution(params: {
   }
   if (request.actionClass !== params.expectedActionClass) {
     return { ok: false, status: null, approval: request, error: "approval action class mismatch" };
+  }
+  if (params.expectedIntentHash !== undefined && request.boundHashes.intentHash !== params.expectedIntentHash) {
+    return { ok: false, status: null, approval: request, error: "approval intent hash mismatch" };
   }
   const chain = inspectApprovalChainIntegrity({
     workspace: params.workspace,

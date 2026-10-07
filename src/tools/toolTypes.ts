@@ -1,3 +1,4 @@
+import type { AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import type { ActionClass } from "../types.js";
 
 /**
@@ -60,6 +61,15 @@ export interface ToolExecution {
    * unreachable from the only surface that fans out.
    */
   readonly signal?: AbortSignal;
+  /**
+   * The authorization record bound for this call (P1-02), present for an authorized class once it binds. Rechecked
+   * after the guards; the body and the recorder see the same record, its id and its digest.
+   */
+  readonly authorization?: {
+    readonly authorizationId: string;
+    readonly digest: string;
+    readonly record: AuthorizationRecordV1;
+  };
 }
 
 /**
@@ -81,7 +91,7 @@ export interface LabelledToolGuard {
 }
 
 /** Where a denial came from. Kept distinct so evidence can tell them apart. */
-export type ToolDenialStage = "visibility" | "approval" | "guard";
+export type ToolDenialStage = "visibility" | "approval" | "guard" | "authorization";
 
 export interface ToolDenial {
   readonly stage: ToolDenialStage;

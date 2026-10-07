@@ -22,12 +22,22 @@
  * `proceed` is derived in the seam as `answer === "allow"`, so `unavailable` —
  * the answer to every way of not answering — cannot reach the tool.
  *
+ * AN APPROVAL BINDS THE CALL THAT RUNS (P1-02). Over a pipeline-backed seam, a
+ * call in an authorized class is asked under the TOOL'S OWN signed class, about
+ * its authorization intent: the normalized arguments' digest, the amount,
+ * recipient, destination and resource, and the deployment digest. The granted
+ * engine request goes to the pipeline through `authority`, and the pipeline
+ * rechecks it against the exact call as the last step before the body. The gate
+ * also binds itself to the pipeline, so every Code Mode sub-call is asked on its
+ * own and no gated call in an authorized class runs without a signed approval.
+ *
  * SCHEMAS AND EXECUTION MODE PASS STRAIGHT THROUGH. A gate that hid tools from
  * the model would be a different feature (and a worse one: the model would work
  * around a capability it cannot see instead of asking for it), and a gate that
  * forced every gated call exclusive would serialize work for a reason that has
  * nothing to do with the tools.
  */
+import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ActionClass } from "../types.js";
 import type {
   ApprovalAsk,
@@ -77,6 +87,27 @@ function refusalText(decision: ApprovalDecision, toolName: string): string {
   );
 }
 
+/** One question: about the authorization intent when the call has one, else about the raw call as before. */
+async function ask(approval: ToolApprovalSeam, options: ToolApprovalGateOptions, call: {
+  readonly callId: string; readonly toolName: string; readonly where: string; readonly signal?: AbortSignal;
+  readonly intent: AuthorizationIntentResult | null; readonly legacyPayload: Record<string, unknown>;
+}): Promise<ApprovalDecision> {
+  const intent = call.intent?.ok === true ? call.intent : null;
+  return approval.request({
+    toolCallId: call.callId,
+    toolName: call.toolName,
+    // An authorized class is approved under its own signed rule; a grant under another class never matches it.
+    actionClass: intent?.payload.actionClass ?? options.actionClass,
+    riskTier: options.riskTier,
+    question: intent === null ? `The agent wants to call "${call.toolName}" ${call.where}.` : `${intent.question} ${call.where}.`,
+    // Hashed into the engine request's `intentHash`, so the grant is bound to THESE facts and a later call with
+    // different ones cannot spend it.
+    intentPayload: intent?.payload ?? call.legacyPayload,
+    // The turn's signal, so a cancelled turn withdraws the question instead of leaving a live grant behind.
+    ...(call.signal === undefined ? {} : { signal: call.signal })
+  });
+}
+
 /**
  * Gate a tool seam on the approval seam.
  *
@@ -91,6 +122,15 @@ export function gateToolCallsOnApproval(
   approval: ToolApprovalSeam,
   options: ToolApprovalGateOptions
 ): AgentToolSeam {
+  inner.bindApprovalGate?.({
+    gates: (toolName) => isGated(options, toolName),
+    ask: async (execution, intent) => {
+      const decision = await ask(approval, options, { callId: execution.callId, toolName: execution.name, intent,
+        where: `from inside the program of call ${execution.rootCallId}`, signal: execution.signal,
+        legacyPayload: { toolName: execution.name, arguments: execution.arguments } });
+      return decision.proceed ? { approvalRequestIds: decision.approvalRequestId === null ? [] : [decision.approvalRequestId] } : null;
+    }
+  });
   return {
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
@@ -98,20 +138,13 @@ export function gateToolCallsOnApproval(
     execute: async (request: ToolCallRequest): Promise<ToolCallOutcome> => {
       if (!isGated(options, request.toolName)) return inner.execute(request);
 
-      const decision = await approval.request({
-        toolCallId: request.callId,
-        toolName: request.toolName,
-        actionClass: options.actionClass,
-        riskTier: options.riskTier,
-        question: `The agent wants to call "${request.toolName}" during turn ${request.turn}, step ${request.step}.`,
-        // The model's own arguments, verbatim. They are hashed into the engine
-        // request's `intentHash`, so the grant is bound to THESE arguments and a
-        // later call with different ones cannot spend it.
-        intentPayload: { toolName: request.toolName, rawArguments: request.rawArguments },
-        // The turn's signal, so a cancelled turn withdraws the question instead
-        // of leaving a live grant behind for something else to spend.
-        signal: request.signal
-      });
+      const intent = inner.authorizationIntent?.(request) ?? null;
+      // A call whose intent cannot bind is not put to a human: the pipeline denies it with the reason.
+      if (intent?.ok === false) return inner.execute(request);
+      const decision = await ask(approval, options, { callId: request.callId, toolName: request.toolName, intent,
+        where: `during turn ${request.turn}, step ${request.step}`, signal: request.signal,
+        // Without an intent, the model's own arguments, verbatim.
+        legacyPayload: { toolName: request.toolName, rawArguments: request.rawArguments } });
 
       if (!decision.proceed) {
         return {
@@ -122,7 +155,9 @@ export function gateToolCallsOnApproval(
           denied: true
         };
       }
-      return inner.execute(request);
+      // The only place a top-level call gains authority: after a grant, naming the engine request that granted it.
+      return inner.execute({ ...request,
+        authority: { approvalRequestIds: decision.approvalRequestId === null ? [] : [decision.approvalRequestId] } });
     }
   };
 }

@@ -1,5 +1,6 @@
 import { verify } from "node:crypto";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
 
 function fromBase64Url(encoded: string): Buffer {
@@ -29,6 +30,8 @@ export interface VerifyLeaseOptions {
   routePath?: string;
   model?: string | null;
   revokedLeaseIds?: Set<string>;
+  /** The class about to execute; a lease that names `executeActionClasses` must include it (AMC-1546). */
+  actionClass?: ActionClass;
 }
 
 export interface VerifyLeaseResult {
@@ -66,6 +69,9 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
     }
     if (input.requiredScope && !hasScope(payload, input.requiredScope)) {
       return { ok: false, payload, error: `lease scope denied: ${input.requiredScope}` };
+    }
+    if (input.actionClass !== undefined && payload.executeActionClasses !== undefined && !payload.executeActionClasses.includes(input.actionClass)) {
+      return { ok: false, payload, error: `lease scope denied: toolhub:execute does not cover ${input.actionClass}` };
     }
     if (input.routePath) {
       const allowed = payload.routeAllowlist.some((prefix) => input.routePath!.startsWith(prefix));

@@ -56,6 +56,8 @@ export interface SubagentRunContext {
   /** The child's own session. A child is never a second writer on the parent's. */
   readonly childSessionId: string;
   readonly goal: string;
+  /** The signed delegation packet that authorized this child; its authorization records name it as their parent. */
+  readonly packetId?: string;
   /**
    * The action classes this child is authorised for, validated.
    *
@@ -442,7 +444,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     // is idle. Even an executor waiting on a handle-free promise gets a timeout.
   }
   const first = await execute(() => runner({ continuable: request.continuable === true,
-    toolsetAgentId: identity.governedAs, identity, childSessionId, goal: request.goal,
+    toolsetAgentId: identity.governedAs, identity, childSessionId, goal: request.goal, packetId,
     ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses }),
     ...(request.stopConditions === undefined ? {} : { stopConditions: stops.conditions }), signal: controller.signal }));
   if (!first.ok) return { ok: false, reason: first.reason ?? closeReason, packetId,

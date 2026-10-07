@@ -18,8 +18,10 @@
  * exited 137 because it was killed on a deadline is `exitCode: 137` AND
  * `timedOut: true`; collapsing them loses which one an operator is looking at.
  */
+import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ToolSchema } from "../llm/request/requestSpec.js";
 import type { ToolDispatch, ToolOutcome } from "../session/sessionTypes.js";
+import type { BoundApprovalGate, ToolAuthority } from "../tools/toolPipeline.js";
 
 /** One tool call, exactly as the model asked for it. */
 export interface ToolCallRequest {
@@ -34,6 +36,11 @@ export interface ToolCallRequest {
   readonly parentToken: string | null;
   readonly dispatch: ToolDispatch;
   readonly signal: AbortSignal;
+  /**
+   * Approvals granted for THIS call (P1-02). Set only by the approval gate after a grant; the loop never sets it and
+   * the model cannot reach it. The pipeline re-verifies every one against the exact call before the body runs.
+   */
+  readonly authority?: ToolAuthority;
 }
 
 /** What running one tool produced. */
@@ -74,6 +81,10 @@ export interface AgentToolSeam {
    */
   executionMode(request: ToolCallRequest): "parallel" | "exclusive";
   execute(request: ToolCallRequest): Promise<ToolCallOutcome>;
+  /** Pipeline-backed seams: the intent an approval for this call must bind, or null outside the authorized classes. */
+  authorizationIntent?(request: ToolCallRequest): AuthorizationIntentResult | null;
+  /** Pipeline-backed seams: a composed approval gate binds itself, so sub-calls are asked and approvals required. */
+  bindApprovalGate?(gate: BoundApprovalGate): void;
 }
 
 /**

@@ -25,6 +25,7 @@ import {
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
+import type { ActionClass } from "../types.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
@@ -68,6 +69,17 @@ export interface AgentToolsetOptions {
    * every run in a chain shares `governedAs` by design.
    */
   readonly subagents?: SubagentCapability;
+  /**
+   * Set only for a delegated child: its run id, its place in the chain and its scope, recorded in every authorization
+   * record (P1-02) and rechecked there. A call outside `allowedActionClasses` is denied `scope_widened`.
+   */
+  readonly delegation?: {
+    readonly runAs: string;
+    readonly depth: number;
+    /** The signed delegation packet that authorized this child. */
+    readonly parentExecutionId: string | null;
+    readonly allowedActionClasses?: readonly ActionClass[];
+  };
   /** Human answerer for `ask_user` (P1-43). Absent: every ask_user call refuses. */
   readonly askUser?: AskUserAnswerer;
   /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
@@ -347,6 +359,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
+    // Read per call: the CLI binds its session writer after composing.
+    authorizationContext: () => ({ sessionId: options.sessionId,
+      ...(options.delegation === undefined ? {} : { runAs: options.delegation.runAs, delegation: options.delegation }) }),
     // Enforcement that leaves no trace is advisory again at the only moment
     // that matters. Every governed call — allowed, denied or failed — lands in
     // the signed spine.

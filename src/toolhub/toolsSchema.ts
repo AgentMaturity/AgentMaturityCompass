@@ -60,6 +60,16 @@ export const toolDefinitionSchema = z.object({
   requireExecTicket: z.boolean().optional(),
   denyByDefault: z.boolean().optional(),
   context: toolContextSchema.optional(),
+  // The argument that carries each protected fact an approval binds (P1-02). A closed set of roles, like
+  // toolArgumentRoles.ts: FINANCIAL tools must name amount, currency and recipient, DATA_EXPORT tools destination.
+  bindingFields: z.object({
+    amount: z.string().min(1).max(128).optional(),
+    currency: z.string().min(1).max(128).optional(),
+    recipient: z.string().min(1).max(128).optional(),
+    destination: z.string().min(1).max(128).optional(),
+    resourceId: z.string().min(1).max(128).optional(),
+    resourceVersion: z.string().min(1).max(128).optional()
+  }).strict().optional(),
   // These are mount grants, never per-call path glob exceptions. `os-native`
   // confines with Bubblewrap on Linux and Seatbelt on macOS; `linux-bwrap`
   // keeps its Linux-only meaning.

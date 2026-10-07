@@ -724,6 +724,12 @@ export class ToolHubService {
         }
       );
     }
+    if (approvalUsedId) {
+      // Spent before any effect, by exclusive create (P1-02): a replay or a racing second execute is denied here.
+      let consume: ReturnType<typeof consumeApprovedExecution> | null = null;
+      try { consume = consumeApprovedExecution({ workspace: this.workspace, approvalId: approvalUsedId, expectedAgentId: intent.request.agentId, executionId }); } catch { /* unreadable: denied below */ }
+      if (!consume?.consumed) return this.auditDenied(intent, consume ? "APPROVAL_REPLAY_ATTEMPTED" : "APPROVAL_QUORUM_FAILED", consume?.reason ?? "approval consumption could not be recorded", { executeAttempted: true, executeWithoutTicketAttempted: true });
+    }
     const blastRadiusConsentHash = hashToolBlastRadiusConsent(blastRadiusConsent);
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-exec-${randomUUID()}`;
@@ -848,72 +854,6 @@ export class ToolHubService {
       }
 
       if (approvalUsedId) {
-        const consume = consumeApprovedExecution({
-          workspace: this.workspace,
-          approvalId: approvalUsedId,
-          expectedAgentId: intent.request.agentId,
-          executionId
-        });
-        if (consume.replay) {
-          const replayPayload = {
-            auditType: "APPROVAL_REPLAY_ATTEMPTED",
-            severity: "HIGH",
-            approvalId: approvalUsedId,
-            executionId,
-            intentId: intent.intentId,
-            agentId: intent.request.agentId,
-            message: consume.reason
-          };
-          const replayText = JSON.stringify(replayPayload);
-          const replayBodySha = sha256Hex(Buffer.from(replayText, "utf8"));
-          const replayEvent = ledger.appendEvidenceWithReceipt({
-            sessionId,
-            runtime: "unknown",
-            eventType: "audit",
-            payload: replayText,
-            payloadExt: "json",
-            inline: true,
-            meta: {
-              ...replayPayload,
-              trustTier: "OBSERVED",
-              bodySha256: replayBodySha
-            },
-            receipt: {
-              kind: "guard_check",
-              agentId: intent.request.agentId,
-              providerId: "toolhub",
-              model: null,
-              bodySha256: replayBodySha
-            }
-          });
-          eventIds.push(replayEvent.id);
-          ledger.sealSession(sessionId);
-          const failed: ExecutionRecord = {
-            executionId,
-            ts: Date.now(),
-            intentId: intent.intentId,
-            agentId: intent.request.agentId,
-            toolName: intent.request.toolName,
-            requestedMode,
-            effectiveMode: "SIMULATE",
-            allowed: false,
-            reasons: [consume.reason],
-            result: {
-              error: consume.reason,
-              auditType: "APPROVAL_REPLAY_ATTEMPTED"
-            },
-            eventIds
-          };
-          this.executions.set(executionId, failed);
-          return {
-            executionId,
-            agentId: intent.request.agentId,
-            allowed: false,
-            effectiveMode: "SIMULATE",
-            result: failed.result,
-            reasons: failed.reasons
-          };
-        }
         const approvalPayload = {
           auditType: "APPROVAL_CONSUMED",
           severity: "MEDIUM",

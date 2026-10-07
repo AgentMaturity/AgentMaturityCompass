@@ -101,6 +101,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
+import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
 import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
@@ -1129,6 +1130,7 @@ function verifyLeaseForScope(params: {
   scope: "toolhub:intent" | "toolhub:execute" | "governor:check" | "receipt:verify" | "diagnostic:self-run";
   routePath?: string;
   model?: string | null;
+  actionClass?: ActionClass;
 }): { ok: true } | { ok: false; status: number; error: string } {
   const parsedUrl = new URL(params.req.url ?? "/", `http://${params.req.headers.host ?? "127.0.0.1"}`);
   const carrier = extractLeaseCarrier({
@@ -1162,7 +1164,8 @@ function verifyLeaseForScope(params: {
     requiredScope: params.scope,
     routePath: params.routePath,
     model: params.model,
-    revokedLeaseIds: revoked
+    revokedLeaseIds: revoked,
+    ...(params.actionClass === undefined ? {} : { actionClass: params.actionClass })
   });
   if (!verification.ok) {
     const message = verification.error ?? "lease verification failed";
@@ -6399,7 +6402,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           req,
           expectedAgentId: intentAgent,
-          scope: "toolhub:execute"
+          scope: "toolhub:execute",
+          actionClass: toolhub.intent(parsed.intentId)?.actionClass
         });
         if (!leaseCheck.ok) {
           json(res, leaseCheck.status, { error: leaseCheck.error });
