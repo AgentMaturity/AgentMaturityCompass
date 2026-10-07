@@ -401,6 +401,8 @@ amc bundle export --out evidence.amcbundle
 
 Already running evals elsewhere? Import them:
 
+Imported results are SELF_REPORTED and recorded at import time; an export with cases more than 24 hours old (or more than 5 minutes in the future) is refused unless you pass `--historical`. See [EVIDENCE_TRUST.md](EVIDENCE_TRUST.md).
+
 ```bash
 # From OpenAI Evals
 amc eval import --format openai --file ./openai-evals.jsonl

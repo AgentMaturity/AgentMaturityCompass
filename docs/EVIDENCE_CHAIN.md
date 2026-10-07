@@ -428,8 +428,8 @@ amc transparency merkle verify-proof proof.amcproof
 # Ingest external logs (arrives as SELF_REPORTED, 0.4× trust)
 amc ingest ./external-logs/ --type generic_json --agent imported-agent
 
-# Upgrade trust tier via attestation
-amc attest --agent imported-agent --run <runId> --reason "verified against source"
+# Record an attestation; ATTESTED only with a pinned third-party signature (docs/EVIDENCE_TRUST.md)
+amc attest --ingest-session <id> --attested-by <identity> --statement "verified against source" --attester-signature sig.json
 
 # Memory and corrections
 amc memory-extract --agent my-agent

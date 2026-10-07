@@ -262,7 +262,7 @@ The **overall score** for an agent is a weighted average across dimensions, wher
 | Tier | Weight | Description |
 |------|--------|-------------|
 | `OBSERVED` | 1.0 | Captured by AMC gateway/monitor from running agent in real-time; not repudiable |
-| `ATTESTED` | 0.8 | External logs elevated to attested tier via auditor attestation (`amc attest`) |
+| `ATTESTED` | 0.8 | External logs signed by a third party whose key is pinned for `independent-attestation` (`amc attest --attester-signature`); the operator's own attestation leaves them SELF_REPORTED |
 | `SELF_REPORTED` | 0.4 | Agent or operator self-declaration; weakest tier |
 
 An L5 assessment REQUIRES exclusively `OBSERVED` evidence. L4 permits `OBSERVED` and `ATTESTED`. L1–L3 accept all tiers.

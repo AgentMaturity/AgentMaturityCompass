@@ -578,7 +578,7 @@ amc monitor events --limit 20                            # recent score, drift, 
 amc dataset create support-bot                           # create a reusable eval dataset
 amc dataset add-case support-bot --prompt "..." --expected "..."
 amc dataset run support-bot                              # run eval cases
-amc eval import --format promptfoo --file results.json   # import external eval results
+amc eval import --format promptfoo --file results.json   # import external eval results (SELF_REPORTED; older than 24h needs --historical)
 amc eval registry                                        # inspect signed evaluator metadata
 amc eval registry --refresh                              # explicitly refresh and sign the derived snapshot
 amc lite-score                                           # score a non-agent chatbot / LLM app
