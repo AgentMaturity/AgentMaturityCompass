@@ -32,8 +32,11 @@ threat model makes failure rows 1 (authority or evidence store unavailable), 2 (
   The body runs only after that commit; a running body refreshes a heartbeat every 10 s.
 - **Pipeline.** Calls in the authorized classes are journaled when a composition supplies `journal` (the native agent
   toolset opens one on first use). Order: `request`, then `blocked_by_unreconciled` if the agent has an
-  `outcome_unknown` execution or one with incomplete evidence, then approval, guards and binding, `authorize`, the
-  P1-02 recheck and consume, `start`, the body, `complete` or `markUnknown`, the recorder. Every refusal before
+  `outcome_unknown` execution, one with incomplete evidence, or a `started` one whose owner died or whose heartbeat is
+  stale; then approval, guards and binding, `authorize`, the block read again (the approval wait can last minutes),
+  the P1-02 recheck and consume, `start`, the body, `complete` or `markUnknown`, the recorder. Everything from the
+  guards to the body is synchronous. `start` reads the block a third time inside its own transaction and refuses
+  (`ActionBlocked`), so no other call or process can start past it between the check and the write. Every refusal before
   `started` is a `denied` receipt; an abort before it is `cancelled`. A journal that cannot write before `started`
   denies `journal_unavailable` and nothing is dispatched (row 1).
 - **Effect classification.** A body may declare `effect` and `externalRef`. Declared `applied` or `not_applied` is
@@ -54,6 +57,9 @@ threat model makes failure rows 1 (authority or evidence store unavailable), 2 (
   accepts). The turn ends there, so no `started` follows.
 - **Telemetry (row 8).** The exporter counts what it drops; the journal writes at most one `TELEMETRY_DROPPED` audit
   row a minute with the count. The journal never depends on the exporter.
+- **Action evidence.** `actionEvidenceCoverage` verifies the ledger chain, then counts from rows it re-verified in one
+  read snapshot, grouping every execution of a call (from the signed `requested` rows and the index). A broken chain
+  dominates its call, more than one execution is unknown and reported, and an unverifiable ledger is not evaluated.
 - **Receipt contract.** `parseReceipt` parses v1 payloads with `legacy-receipt` and v2 with `receipt`. `ReceiptKind`
   gains `action_state`, which is always v2.
 

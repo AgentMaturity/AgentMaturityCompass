@@ -57,9 +57,11 @@ when the recorder failed after the effect.
 
 **What outcome unknown means.** The effect may or may not have happened: the body threw without proving it had no
 effect, it declared `effect: "unknown"`, a `FINANCIAL`, `DATA_EXPORT` or `IDENTITY` body declared no effect, or the
-process died after `started`. AMC records it honestly and never replays the call. An `outcome_unknown` execution, or
-one whose evidence is incomplete, blocks the same agent's later consequential calls (`blocked_by_unreconciled`) until
-it is reconciled. A body that proves no effect happened throws `DefiniteFailureError` and gets `completed` /
+process died after `started`. AMC records it honestly and never replays the call. An `outcome_unknown` execution, one
+whose evidence is incomplete, or a `started` one whose process died or whose heartbeat is older than 60 s, blocks the
+same agent's later consequential calls (`blocked_by_unreconciled`) until it is reconciled. The block is read when the
+call enters, again after any approval wait, and once more inside the transaction that writes `started`, so neither a
+long approval wait nor another process can start a call past it. A body that proves no effect happened throws `DefiniteFailureError` and gets `completed` /
 `not_applied`. AMC never promises exactly-once delivery: a local ledger cannot make an external effect happen once,
 so it records what it knows and refuses to guess.
 
@@ -82,8 +84,11 @@ verify against the workspace's monitor keys and bind the same bytes and state. A
 cross-workspace receipt fails. These are the workspace's own keys: a local audit trail, not a portable verdict.
 
 **Action evidence.** `actionEvidenceCoverage(workspace, sessionId)` counts a session's consequential calls as linked
-(verified chain, `completed`, evidence complete), unknown, unlinked, or integrity failures. A session with no
-consequential call is not evaluated.
+(exactly one execution, its chain verified, `completed`, evidence complete), unknown (including a call with more than
+one execution, also counted as `duplicateExecutions`), unlinked, or integrity failures, which dominate every other
+outcome for their call. It verifies the ledger first and counts only rows it re-verified in the same read; a ledger
+that fails verification is not evaluated, with the integrity errors. A session with no consequential call is not
+evaluated.
 
 ## Verification
 
