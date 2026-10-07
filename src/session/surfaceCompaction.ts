@@ -6,7 +6,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { readEventPayload } from "./eventPayload.js";
 import { foldSurfaceEntries, surfaceProjection, type SurfaceEntry } from "./surfaceProjection.js";
 import { extractEnvelope, SESSION_GENESIS, type SurfaceRole } from "./sessionTypes.js";
-import { compactionReceipt, selectCompactionEntries, type SurfaceCompactionOp, type SurfaceCompactionReceipt } from "./surfaceCompactionValidation.js";
+import { assertAutomaticProvenance, compactionReceipt, parseCompactionReceipt, selectCompactionEntries,
+  type AutomaticCompaction, type SurfaceCompactionOp, type SurfaceCompactionReceipt } from "./surfaceCompactionValidation.js";
+export type { AutomaticCompaction };
 
 export interface LiveSurfaceEntry {
   readonly originEventId: string; readonly sourceEventId: string; readonly sourceEventHash: string;
@@ -70,6 +72,7 @@ export function validateSurfaceCompactions(workspace: string, events: readonly E
       if (!envelope || envelope.surface.op !== "compact") throw new Error(`compaction ${row.id} has an unsupported surface operation`);
       const receipt = compactionReceipt(row), previous = prior.get(row.session_id);
       if (!previous || receipt.basis.eventId !== previous.id || receipt.basis.eventHash !== previous.event_hash) throw new Error("compaction basis does not name the preceding session event");
+      assertAutomaticProvenance(receipt, rows, row.session_id);
       const legacyCounts = meta(row);
       if (legacyCounts.replacedBytes !== receipt.replacedBytes || legacyCounts.replacementBytes !== receipt.replacementBytes) throw new Error("compaction compatibility counts disagree with measured receipt");
       const replacement = authenticatedBytes(workspace, row, true);
@@ -94,6 +97,8 @@ export function validateSurfaceCompactions(workspace: string, events: readonly E
 export function prepareSurfaceCompaction(workspace: string, events: readonly EvidenceEvent[], params: {
   readonly origins: readonly string[]; readonly mode: SurfaceCompactionReceipt["mode"];
   readonly replacement?: string; readonly summaryRole?: "user" | "assistant"; readonly reason: string;
+  /** Present only for automatic compaction; selects receipt v2. Savings are still measured here, never supplied. */
+  readonly automatic?: AutomaticCompaction | undefined;
 }): { readonly surface: SurfaceCompactionOp; readonly payload: Buffer; readonly typeMeta: Record<string, unknown> } {
   if (typeof params.reason !== "string" || !params.reason.trim() || params.reason.length > 2048) throw new Error("compaction requires a bounded reason");
   if (params.summaryRole !== undefined && params.summaryRole !== "user" && params.summaryRole !== "assistant") throw new Error("compaction summary role must be user or assistant");
@@ -115,9 +120,13 @@ export function prepareSurfaceCompaction(workspace: string, events: readonly Evi
   if (!Number.isSafeInteger(replacedBytes) || payload.byteLength >= replacedBytes || payload.byteLength > 1_000_000) {
     throw new Error(`compaction replacement must be smaller than the ${replacedBytes} measured current payload bytes`);
   }
-  const receipt: SurfaceCompactionReceipt = { v: 1, mode: params.mode, reason: params.reason,
+  const measured = { mode: params.mode, reason: params.reason,
     basis: { sessionId: head.session_id, eventId: head.id, eventHash: head.event_hash, seq: envelope.seq }, sources,
     replacedBytes, replacementBytes: payload.byteLength, savedBytes: replacedBytes - payload.byteLength, measurement: "payload-bytes-not-tokens" };
+  const automatic = params.automatic;
+  const receipt: SurfaceCompactionReceipt = parseCompactionReceipt(automatic === undefined ? { v: 1, ...measured } : { v: 2, ...measured,
+    trigger: automatic.trigger, ...(automatic.summarizer === undefined ? {} : { summarizer: automatic.summarizer }) });
+  assertAutomaticProvenance(receipt, byId, head.session_id);
   const first = selected[0]!;
   const surface: SurfaceCompactionOp = { op: "compact", origins: [...params.origins], replacement: params.mode === "drop" ? null : {
     role: params.mode === "replace" ? first.role : params.summaryRole ?? (first.role === "user" ? "user" : "assistant"),
