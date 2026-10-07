@@ -1,15 +1,12 @@
 import { z } from "zod";
 import { assertSafeTarMemberPath } from "../security/safeTarArchive.js";
+import { safeIdSchema } from "../utils/pathSafety.js";
 
 /**
  * A manifest is signed by a peer, not trusted by it: its ids name directories and its file paths name files on the
- * importer's disk, so they must be one safe path segment and relative POSIX paths inside the package (P0-52).
+ * importer's disk, so ids are one safe path segment (safeIdSchema) and file paths are relative POSIX paths inside the
+ * package (P0-52).
  */
-export const federationIdSchema = z.string().regex(
-  /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/,
-  "must be one safe path segment of letters, digits, dot, underscore or hyphen (at most 128 characters, no leading dot)"
-);
-
 function isPackageRelativePath(value: string): boolean {
   try {
     // The canonical form only: assertSafeTarMemberPath also strips "./" and a trailing "/", which a file row never has.
@@ -51,10 +48,10 @@ export const federationPeerSchema = z.object({
 
 export const federationManifestSchema = z.object({
   v: z.literal(1),
-  manifestId: federationIdSchema,
+  manifestId: safeIdSchema,
   createdTs: z.number().int(),
   sourceOrgName: z.string().min(1),
-  sourceOrgId: federationIdSchema,
+  sourceOrgId: safeIdSchema,
   publisherKeyFingerprint: z.string().length(64),
   files: z.array(
     z.object({

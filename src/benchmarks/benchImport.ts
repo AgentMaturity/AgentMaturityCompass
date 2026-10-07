@@ -3,6 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:f
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { importedBenchmarksDir } from "./benchStore.js";
 import { verifyBenchmarkArtifact } from "./benchVerify.js";
 import { untrustedReasons, verdictExitCode, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -39,7 +40,7 @@ function importOne(workspace: string, file: string, trust: TrustContext): Import
     throw new Error(`Invalid benchmark '${file}': ${untrustedReasons(verify.report).join("; ")}`);
   }
   const benchId = verify.bench.benchId;
-  const targetDir = join(importedBenchmarksDir(workspace), benchId);
+  const targetDir = containedPath(importedBenchmarksDir(workspace), "the imported benchmarks directory", benchId);
   ensureDir(targetDir);
   const tmp = mkdtempSync(join(tmpdir(), "amc-bench-import-"));
   try {

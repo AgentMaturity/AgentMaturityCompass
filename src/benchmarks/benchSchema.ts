@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { questionBank } from "../diagnostic/questionBank.js";
+import { safeIdSchema } from "../utils/pathSafety.js";
 
 const layerNames = [
   "Strategic Agent Operations",
@@ -13,7 +14,8 @@ const questionEnum = z.enum(questionBank.map((q) => q.id) as [string, ...string[
 
 export const benchmarkSchema = z.object({
   v: z.literal(1),
-  benchId: z.string().min(1),
+  // Names the directory a benchmark is imported into, so it is one safe path segment (P0-52).
+  benchId: safeIdSchema,
   createdTs: z.number().int(),
   publisher: z.object({
     orgName: z.string().min(1),

@@ -1,9 +1,9 @@
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { federationIdSchema, federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
+import { federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
 import { ensureFederationPublisherKey, signFederationDigest } from "./federationIdentity.js";
 import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
 import { buildVerifierReport, checkDigestSignature, ed25519KeyId, loadTrustContext, untrustedReasons, withPins, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -11,6 +11,7 @@ import { fileSha256 } from "../trust/signatureCheck.js";
 import { toErrorMessage } from "../utils/errors.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { containedPath, safeIdSchema } from "../utils/pathSafety.js";
 import { generateTransparencyInclusionProof, currentTransparencyMerkleRoot, ensureTransparencyMerkleInitialized, exportTransparencyProofBundle } from "../transparency/merkleIndexStore.js";
 import { ingestBenchmarks } from "../benchmarks/benchImport.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
@@ -57,20 +58,6 @@ function resolveExtractedRoot(outDir: string, requiredFiles: string[]): string {
     }
   }
   return outDir;
-}
-
-/**
- * `parts` resolved under `root`, refusing a result outside it. The manifest schema already limits ids and file paths;
- * this is the second gate at the point of use, so a manifest that reaches here unchecked still cannot leave its root.
- */
-function containedPath(root: string, label: string, ...parts: string[]): string {
-  const base = resolve(root);
-  const full = resolve(base, ...parts);
-  const rel = relative(base, full);
-  if (rel === "" || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
-    throw new Error(`federation package path escapes ${label}: ${JSON.stringify(parts.join("/"))}`);
-  }
-  return full;
 }
 
 function collectArtifacts(workspace: string): {
@@ -368,7 +355,7 @@ function admittedInboxName(workspace: string, report: VerifierReportV1): string 
     throw new Error("federation package has no admitted signing key");
   }
   const peerId = listFederationPeers(workspace).find(({ peer, valid }) => valid && ed25519KeyId(peer.publisherPublicKeyPem) === keyId)?.peer.peerId;
-  return peerId !== undefined && federationIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
+  return peerId !== undefined && safeIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
 }
 
 export function importFederationPackage(params: {
