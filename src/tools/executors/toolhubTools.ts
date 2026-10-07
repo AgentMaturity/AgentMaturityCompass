@@ -105,7 +105,8 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
       description: "Fetch a URL on the signed host allowlist.",
       body: async (execution) => {
         const args = httpArgs.parse(execution.arguments);
-        const response = await executeHttpFetch({ ...args, simulate: simulated(execution) });
+        const response = await executeHttpFetch({ ...args, simulate: simulated(execution),
+          ...(execution.idempotencyKey && execution.idempotencyHeader ? { idempotency: { header: execution.idempotencyHeader, key: execution.idempotencyKey } } : {}) });
         return {
           output: response.body,
           // An HTTP status is not an exit code, and mapping it to one would

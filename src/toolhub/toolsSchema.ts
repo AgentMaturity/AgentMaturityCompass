@@ -70,6 +70,14 @@ export const toolDefinitionSchema = z.object({
     resourceId: z.string().min(1).max(128).optional(),
     resourceVersion: z.string().min(1).max(128).optional()
   }).strict().optional(),
+  // What the tool's effect is and how AMC settles it (P1-04). `repeatable` is true only when repeating the effect is
+  // harmless. `idempotency` names where AMC's per-execution key travels: an HTTP header the body sets, or an argument AMC
+  // fills (excluded from the arguments digest). `reconcile` names the adapter that asks the system of record.
+  effects: z.object({
+    repeatable: z.boolean(),
+    idempotency: z.object({ carrier: z.enum(["http-header", "argument"]), name: z.string().regex(/^[A-Za-z0-9_.-]{1,128}$/) }).strict().optional(),
+    reconcile: z.object({ adapterId: z.string().min(1).max(128) }).strict().optional()
+  }).strict().optional(),
   // These are mount grants, never per-call path glob exceptions. `os-native`
   // confines with Bubblewrap on Linux and Seatbelt on macOS; `linux-bwrap`
   // keeps its Linux-only meaning.
@@ -84,6 +92,11 @@ export const toolDefinitionSchema = z.object({
     maxProcesses: z.number().int().min(1).max(4096).optional()
   }).strict().optional()
 }).superRefine((tool, ctx) => {
+  // AMC overwrites the carrier argument, so it must never be an argument that carries a protected fact.
+  const carrier = tool.effects?.idempotency;
+  if (carrier?.carrier === "argument" && Object.values(tool.bindingFields ?? {}).includes(carrier.name)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["effects", "idempotency", "name"], message: "the idempotency argument cannot be a binding field" });
+  }
   if (tool.nativeSandbox && (tool.name !== "bash" || tool.actionClass !== "WRITE_HIGH" || tool.context?.kind === "mcp")) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["nativeSandbox"], message: "nativeSandbox requires the native bash WRITE_HIGH tool" });
   }
@@ -98,6 +111,7 @@ export const toolsConfigSchema = z.object({
 });
 
 export type ToolDefinition = z.infer<typeof toolDefinitionSchema>;
+export type EffectDeclaration = NonNullable<ToolDefinition["effects"]>;
 export type ToolsConfig = z.infer<typeof toolsConfigSchema>;
 
 /**

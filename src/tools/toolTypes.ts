@@ -71,6 +71,12 @@ export interface ToolExecution {
     readonly digest: string;
     readonly record: AuthorizationRecordV1;
   };
+  /** The record's execution id (P1-04), present once a record binds. */
+  readonly executionId?: string;
+  /** AMC's idempotency key for this execution (P1-04), for the body to pass to the system of record. */
+  readonly idempotencyKey?: string;
+  /** The header the signed `effects.idempotency` names when its carrier is `http-header`; the body sets it to the key. */
+  readonly idempotencyHeader?: string;
 }
 
 /**

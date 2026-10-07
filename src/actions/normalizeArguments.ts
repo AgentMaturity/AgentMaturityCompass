@@ -56,7 +56,9 @@ function urlOrigin(value: string): string {
 
 /**
  * The digest and protected facts of one call's arguments (normalizer `amc.args/v1`). Which argument carries which fact
- * comes from the signed tool definition's `bindingFields`, never from the arguments themselves.
+ * comes from the signed tool definition's `bindingFields`, never from the arguments themselves. The argument that
+ * carries AMC's idempotency key (P1-04) is AMC's, not the call's: it is left out of the digest, and a value the model
+ * supplied is kept as agent-supplied metadata.
  */
 export function normalizeArguments(definition: SignedToolDefinition | null, actionClass: ActionClass,
   args: Readonly<Record<string, unknown>>): NormalizedArguments {
@@ -66,7 +68,10 @@ export function normalizeArguments(definition: SignedToolDefinition | null, acti
   const undeclared = required.filter(role => fields[role] === undefined);
   if (undeclared.length > 0) return refuse(`${actionClass} tools must declare bindingFields ${undeclared.join(", ")} in the signed tools config`);
 
-  const normalized = nfc(args) as Record<string, unknown>;
+  const all = nfc(args) as Record<string, unknown>;
+  const carrier = definition?.effects?.idempotency?.carrier === "argument" ? definition.effects.idempotency.name : null;
+  const carried = carrier === null ? undefined : all[carrier];
+  const normalized = carrier === null ? all : Object.fromEntries(Object.entries(all).filter(([key]) => key !== carrier));
   const read = (role: BindingRole): string | null => {
     const name = fields[role];
     const value = name === undefined ? undefined : normalized[name];
@@ -93,7 +98,8 @@ export function normalizeArguments(definition: SignedToolDefinition | null, acti
       digested = { ...normalized, [fields.amount!]: amount.value, ...(fields.currency === undefined ? {} : { [fields.currency]: currency }) };
     }
     const destination = read("destination");
-    const metadata = Object.entries(normalized).filter(([key]) => AGENT_METADATA_KEY.test(key));
+    const metadata = [...Object.entries(normalized).filter(([key]) => AGENT_METADATA_KEY.test(key)),
+      ...(carrier !== null && carried !== undefined ? [[carrier, carried] as const] : [])];
     return {
       ok: true,
       argumentsDigest: sha256Hex(canonicalize({ normalizer: ARGS_NORMALIZER, arguments: digested })),
