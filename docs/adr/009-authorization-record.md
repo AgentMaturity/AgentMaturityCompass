@@ -44,7 +44,8 @@ Every call in an authorized class (by default every class except `READ_ONLY` and
 - **Atomic consume.** `markApprovalConsumed` publishes the consumed file by exclusive create (`linkSync`); a second
   consumer is a replay. ToolHub consumes before running the tool and denies a replay before any effect.
 - **Per-class lease scope.** A lease may name `executeActionClasses`; `toolhub:execute` then covers only those
-  classes (AMC-1546), for agent tokens minted from the lease and for the recheck.
+  classes (AMC-1546): `verifyLeaseToken` refuses another class when the caller names one (Studio's
+  `POST /toolhub/execute` does), agent tokens minted from the lease are narrowed, and the recheck applies it.
 - **Evidence.** Every tool evidence row of the call carries `authorizationId` and `authorizationDigest`, and one
   `AUTHORIZATION_RECORD` audit row carries the full record.
 
