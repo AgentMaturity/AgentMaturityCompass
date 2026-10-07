@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { readFileSync, readdirSync, realpathSync, unlinkSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { z } from "zod";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
@@ -9,7 +9,6 @@ import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { isWithin } from "../utils/pathSafety.js";
 
 export const SIGNED_CONTROL_JOURNAL_SCHEMA_VERSION = "2026-07-10" as const;
 
@@ -118,12 +117,9 @@ function controlCheckpointRoot(): string {
 
 export function controlCheckpointDir(workspace: string, controlKind: SignedControlKind): string {
   const root = controlCheckpointRoot();
-  const governed = resolvedWorkspacePath(workspace);
-  // Segment-aware: a prefix test accepted `<workspace>/..cache` as outside (P0-27 F3).
-  if (isWithin(governed, root)) {
-    throw new SignedControlJournalError(
-      `Control checkpoint root ${root} must be outside the governed workspace ${governed}. Set AMC_CONTROL_CHECKPOINT_DIR to a directory outside the workspace.`
-    );
+  const relativeToWorkspace = relative(resolvedWorkspacePath(workspace), root);
+  if (relativeToWorkspace === "" || (!relativeToWorkspace.startsWith("..") && !isAbsolute(relativeToWorkspace))) {
+    throw new SignedControlJournalError("Control checkpoint root must be outside the governed workspace.");
   }
   return join(root, workspacePathSha256(workspace), controlKind);
 }

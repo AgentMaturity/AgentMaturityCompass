@@ -6,10 +6,12 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { saveAssuranceRunArtifacts } from "./assurancePolicyStore.js";
+import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
 import type { AssuranceFindingCategory, AssuranceFindingSeverity } from "./assuranceSchema.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
@@ -139,7 +141,6 @@ function buildPromptContext(workspace: string, agentId: string): AssurancePrompt
   };
 }
 
-
 function scoreIntegrity(packResults: AssurancePackResult[]): number {
   const scenarios = packResults.flatMap((pack) => pack.scenarioResults);
   if (scenarios.length === 0) {
@@ -180,15 +181,6 @@ async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
   }
 }
 
-
-/**
- * Writes the v1 assurance artifacts (run, findings, trace refs).
- *
- * assuranceStore, assuranceCertificates and the scheduler all read these files,
- * but nothing wrote them: saveAssuranceRunArtifacts had no callers, so
- * `amc assurance cert issue` failed on any workspace no matter how many scans
- * had been run. Persisting them here closes that chain.
- */
 /**
  * Maps a pack's free-form scenario category onto the fixed v1 category enum.
  *
@@ -348,6 +340,9 @@ function persistV1Artifacts(params: {
 }
 
 export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
+  // AMC_NO_SIGN=1 rows are unsigned whatever the caller passed; they go to the unsigned store (UNSIGNED_EVIDENCE_STORE).
+  const unsignedStore = process.env.AMC_NO_SIGN === "1";
+  if (unsignedStore) input = { ...input, noSign: true };
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const context = buildPromptContext(workspace, agentId);
@@ -357,7 +352,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
   const windowStartTs = now - windowMs;
   const packIds = packIdsForRun(input);
   const reportsDir = assuranceReportsDir(workspace, agentId);
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
   const trustTier: TrustTier =
@@ -621,6 +616,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
       sessionId,
+      ...(unsignedStore ? { evidenceStore: UNSIGNED_EVIDENCE_STORE } : {}),
       packResults,
       overallScore0to100,
       integrityIndex,
@@ -672,6 +668,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     });
 
     return report;
+  } catch (error) {
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
   } finally {
     ledger.close();
   }
@@ -930,8 +928,8 @@ export async function applyAssurancePatchKit(params: {
   }));
 
   const ledger = openLedger(params.workspace);
+  const sessionId = randomUUID();
   try {
-    const sessionId = randomUUID();
     ledger.startSession({
       sessionId,
       runtime: "unknown",
@@ -961,6 +959,8 @@ export async function applyAssurancePatchKit(params: {
       }
     });
     ledger.sealSession(sessionId);
+  } catch (error) {
+    throw sealAbortedAssuranceSession({ ledger, sessionId, runId: params.assuranceRunId, agentId, error });
   } finally {
     ledger.close();
   }

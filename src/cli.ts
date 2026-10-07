@@ -10376,7 +10376,10 @@ evidence
       includeRationale: Boolean(opts.includeRationale)
     });
     console.log(chalk.green(`Evidence exported: ${exported.outFile}`));
-    console.log(`format=${exported.format} events=${exported.eventCount} chainInvalid=${exported.chainInvalidCount}`);
+    const scope = exported.agentFilter
+      ? ` sessions=${exported.agentFilter.sessionsIncluded.length} excluded=${exported.agentFilter.rowsExcluded}`
+      : "";
+    console.log(`format=${exported.format} events=${exported.eventCount}${scope} chainInvalid=${exported.chainInvalidCount}`);
     console.log(`sha256=${exported.sha256}`);
   });
 
@@ -11074,6 +11077,9 @@ assurance
 
       console.log(chalk.green(`Assurance run complete: ${report.assuranceRunId}`));
       console.log(`Status: ${report.status}`);
+      if (report.evidenceStore) {
+        console.log(`Evidence store: ${report.evidenceStore} (unsigned; amc assurance history lists signed runs only)`);
+      }
       console.log(`TrustTier: ${report.trustTier}`);
       console.log(`IntegrityIndex: ${report.integrityIndex.toFixed(3)} (${report.trustLabel})`);
       console.log(`Overall score: ${report.overallScore0to100.toFixed(2)}`);

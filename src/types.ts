@@ -3448,6 +3448,11 @@ export interface AssuranceReport {
    * A report without one predates this field and cannot make the claim.
    */
   sessionId?: string;
+  /**
+   * Workspace-relative ledger holding this run's session when it is not `.amc/evidence.sqlite`: an AMC_NO_SIGN=1 run
+   * writes to `.amc/unsigned/evidence.sqlite`, which signed readers and `amc assurance history` never open.
+   */
+  evidenceStore?: string;
   ts: number;
   mode: "supervise" | "sandbox";
   windowStartTs: number;
