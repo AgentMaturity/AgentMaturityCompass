@@ -34,11 +34,26 @@ export interface EvidenceExportRecord {
   meta: Record<string, unknown>;
 }
 
+/**
+ * What an agent-filtered export includes (P0-27 F4). Native sessions name their agent only on `session/open`, so a
+ * filter on row meta alone dropped the session's turn, step, request and tool rows without saying so. The filter keeps
+ * rows whose meta names the agent plus every row of a session whose `session/open` names it, and reports the rest.
+ */
+export interface VerifierEvidenceAgentFilter {
+  agentId: string;
+  mode: "row-meta-or-owned-session";
+  /** Sessions whose `session/open` row names the agent, in ledger order. */
+  sessionsIncluded: string[];
+  /** Ledger rows left out of this export. */
+  rowsExcluded: number;
+}
+
+/** Version 2 replaced the bare agent id in `agentFilter` with {@link VerifierEvidenceAgentFilter}. */
 export interface VerifierEvidenceDataset {
-  schemaVersion: 1;
+  schemaVersion: 2;
   generatedTs: number;
   workspace: string;
-  agentFilter: string | null;
+  agentFilter: VerifierEvidenceAgentFilter | null;
   includeChain: boolean;
   includeRationale: boolean;
   eventCount: number;
@@ -61,6 +76,7 @@ export interface ExportVerifierEvidenceParams extends CollectVerifierEvidencePar
 export interface ExportVerifierEvidenceResult {
   outFile: string;
   format: EvidenceExportFormat;
+  agentFilter: VerifierEvidenceAgentFilter | null;
   eventCount: number;
   chainInvalidCount: number;
   sha256: string;
@@ -267,14 +283,18 @@ function hashChainStatus(rows: EvidenceRow[]): Map<string, { index: number; vali
   return status;
 }
 
+// The shared "system" session is never owned by one agent, so its rows enter an agent's export only by naming the agent.
+const OWNED_SESSIONS_SQL =
+  "SELECT session_id FROM evidence_events WHERE event_type = 'session/open' AND session_id <> 'system' AND json_extract(meta_json, '$.agentId') = ?";
+
 function activeAgentFilterClause(agentId: string | undefined): { sql: string; params: unknown[] } {
   if (!agentId || agentId.trim().length === 0) {
     return { sql: "", params: [] };
   }
   const normalized = agentId.trim();
   return {
-    sql: " WHERE json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ?",
-    params: [normalized, normalized]
+    sql: ` WHERE json_extract(meta_json, '$.agentId') = ? OR json_extract(meta_json, '$.agent_id') = ? OR session_id IN (${OWNED_SESSIONS_SQL})`,
+    params: [normalized, normalized, normalized]
   };
 }
 
@@ -335,11 +355,21 @@ export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): 
       };
     });
 
+    const agentId = params.agentId?.trim();
+    const agentFilter: VerifierEvidenceAgentFilter | null = agentId
+      ? {
+          agentId,
+          mode: "row-meta-or-owned-session",
+          sessionsIncluded: [...new Set(db.prepare(`${OWNED_SESSIONS_SQL} ORDER BY rowid ASC`).pluck().all(agentId) as string[])],
+          rowsExcluded: allRows.length - selectedRows.length
+        }
+      : null;
+
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
       generatedTs: Date.now(),
       workspace: params.workspace,
-      agentFilter: params.agentId?.trim() ?? null,
+      agentFilter,
       includeChain,
       includeRationale,
       eventCount: records.length,
@@ -409,7 +439,7 @@ export function renderVerifierEvidencePdf(dataset: VerifierEvidenceDataset): Buf
     "AMC Verifier-Ready Evidence Export",
     "",
     `Generated: ${new Date(dataset.generatedTs).toISOString()}`,
-    `Agent filter: ${dataset.agentFilter ?? "none"}`,
+    `Agent filter: ${dataset.agentFilter?.agentId ?? "none"}`,
     `Events: ${dataset.eventCount}`,
     `Chain invalid count: ${dataset.chainInvalidCount}`,
     "",
@@ -458,6 +488,7 @@ export function exportVerifierEvidence(params: ExportVerifierEvidenceParams): Ex
   return {
     outFile,
     format: params.format,
+    agentFilter: dataset.agentFilter,
     eventCount: dataset.eventCount,
     chainInvalidCount: dataset.chainInvalidCount,
     sha256

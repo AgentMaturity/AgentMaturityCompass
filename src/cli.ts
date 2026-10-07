@@ -10375,7 +10375,10 @@ evidence
       includeRationale: Boolean(opts.includeRationale)
     });
     console.log(chalk.green(`Evidence exported: ${exported.outFile}`));
-    console.log(`format=${exported.format} events=${exported.eventCount} chainInvalid=${exported.chainInvalidCount}`);
+    const scope = exported.agentFilter
+      ? ` sessions=${exported.agentFilter.sessionsIncluded.length} excluded=${exported.agentFilter.rowsExcluded}`
+      : "";
+    console.log(`format=${exported.format} events=${exported.eventCount}${scope} chainInvalid=${exported.chainInvalidCount}`);
     console.log(`sha256=${exported.sha256}`);
   });
 

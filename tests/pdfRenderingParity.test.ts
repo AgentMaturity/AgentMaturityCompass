@@ -113,7 +113,8 @@ function workspace() {
 function dataset(count: number): VerifierEvidenceDataset {
   const ts = 1_700_000_000_000;
   return {
-    schemaVersion: 1, generatedTs: ts, workspace: "owned metadata fixture", agentFilter: "agent (fixture) \\",
+    schemaVersion: 2, generatedTs: ts, workspace: "owned metadata fixture",
+    agentFilter: { agentId: "agent (fixture) \\", mode: "row-meta-or-owned-session", sessionsIncluded: ["fixture-session"], rowsExcluded: 0 },
     includeChain: true, includeRationale: true, eventCount: count, chainInvalidCount: count,
     records: Array.from({ length: count }, (_, index) => ({
       eventId: `fixture-${index}`, ts, isoTs: new Date(ts).toISOString(), sessionId: "fixture-session",
@@ -128,7 +129,9 @@ describe("actual public evidence and passport rendering", () => {
   for (const count of [0, 1, 112]) {
     test(`public evidence PDF preserves archived bytes for ${count} supplied metadata rows`, () => {
       const value = dataset(count), original = originals.find(row => row.originalPath === "src/evidence/exporter.ts")!;
-      const expected = original.functions.renderVerifierEvidencePdf!(value), actual = renderVerifierEvidencePdf(value);
+      // The archived renderer read the v1 bare agent id; v2 (P0-27) carries it as agentFilter.agentId.
+      const v1 = { ...value, schemaVersion: 1, agentFilter: value.agentFilter!.agentId } as unknown as VerifierEvidenceDataset;
+      const expected = original.functions.renderVerifierEvidencePdf!(v1), actual = renderVerifierEvidencePdf(value);
       expect(actual.equals(expected)).toBe(true);
       expect((renderVerifierEvidence(value, "pdf") as Buffer).equals(expected)).toBe(true);
       byteStructure(actual);
