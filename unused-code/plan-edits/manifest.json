@@ -129,6 +129,20 @@
       "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63"
     },
     {
+      "path": "src/diagnostic/l5DeltaReport.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/l5DeltaReport.ts.landed",
+      "sha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/questionScoreExplainability.ts.landed",
+      "sha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374"
+    },
+    {
       "path": "src/diagnostic/runner.ts",
       "issue": "P0-18",
       "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
