@@ -151,15 +151,15 @@ describe("evidence counts only toward its own question", () => {
     expect(selectRelevantEvents("AMC-1.1", [mine], 2)).toHaveLength(1);
   });
 
-  it("can be turned off for local diagnosis, and says so", () => {
-    // The escape hatch survives, because someone debugging why a score is 0
-    // needs to see what the old behaviour would have counted. It is not for
-    // scoring a real workspace, and the methodology doc says as much.
+  it("cannot be turned off any more (P1-07)", () => {
+    // The escape hatch let untagged and borrowed evidence count, and a score
+    // computed that way could still be published. P1-07 removed it: the
+    // variable is read only to warn that it no longer does anything.
     const prior = process.env["STRICT_EVIDENCE_BINDING"];
     process.env["STRICT_EVIDENCE_BINDING"] = "false";
     try {
       const other = event({ id: "x", type: "stdout", session: "s1", dayOffset: 0, questionId: "AMC-1.2" });
-      expect(selectRelevantEvents("AMC-1.1", [other], 2)).toHaveLength(1);
+      expect(selectRelevantEvents("AMC-1.1", [other], 2)).toHaveLength(0);
     } finally {
       if (prior === undefined) delete process.env["STRICT_EVIDENCE_BINDING"];
       else process.env["STRICT_EVIDENCE_BINDING"] = prior;
@@ -213,6 +213,6 @@ describe("the methodology version records the change", () => {
     // A published methodology whose behaviour changes without its version
     // changing makes two different scores indistinguishable to a consumer.
     expect(AMC_PUBLIC_METHODOLOGY_VERSION).not.toBe("2026.07.29-r223");
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.27-r225");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.10.08-r226");
   });
 });

@@ -42,11 +42,11 @@ describe("GAP-0015 Lunary public methodology versioning", () => {
     const manifest = getPublicMethodologyManifest();
     const receipt = buildDiagnosticMethodologyVersioningReceipt(manifest);
 
-    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.08.27-r225");
-    expect(manifest.changelog[5]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
-    expect(manifest.changelog[6]?.summary).toContain("Lunary-style public-methodology");
-    expect(manifest.changelog[6]?.migration).toContain("Reports generated under 2026.06.25-r218");
-    expect(manifest.changelog[7]?.summary).toContain("LangSmith-style public-methodology");
+    expect(AMC_PUBLIC_METHODOLOGY_VERSION).toBe("2026.10.08-r226");
+    expect(manifest.changelog[6]?.summary).toContain("Cua-style computer-use benchmark public-methodology");
+    expect(manifest.changelog[7]?.summary).toContain("Lunary-style public-methodology");
+    expect(manifest.changelog[7]?.migration).toContain("Reports generated under 2026.06.25-r218");
+    expect(manifest.changelog[8]?.summary).toContain("LangSmith-style public-methodology");
     expect(receipt.status).toBe("ready");
     expect(receipt.sourceRef).toContain(LUNARY_SOURCE_REVIEW_REF);
     expect(receipt.requiredAuditFields).toEqual(expect.arrayContaining([

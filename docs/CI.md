@@ -70,3 +70,15 @@ A legitimate random call or hash reduction carries a marker comment on its own l
 - `// amc-allow-random: fuzz-input` for a generated attack or test input that a separate evaluator grades.
 
 Reviewers question every new marker and every new allowlist entry: each one is a place where the guard no longer looks. `npm run check:no-fabrication -- --json` prints counts per rule and the marker count so growth shows in review. `npm run check:no-fabrication -- --strict` also fails while any `pending` entry remains; Gate G0 requires it to exit 0.
+
+## Diagnostic gate reachability (AMC repository CI)
+
+`npm run check:gates` (`scripts/check-gate-reachability.mjs`) runs in the `build-test` job after the build as the step "Diagnostic gate reachability". It reads the built question bank and fails when:
+
+- an evaluated diagnostic gate requires an event type, audit type or metric key that no registered, non-synthetic emitter in `src/diagnostic/evidenceEmitters.ts` writes at that level, or carries a keyword, meta-key or artifact-pattern requirement;
+- an evaluated gate above L1 admits `SELF_REPORTED` evidence, or L4 or L5 is evaluated before its emitters exist;
+- an emitter entry's module is missing or does not contain the literal it claims to write, lives in `src/dogfood/`, is synthetic, or is an importer that is not `self_reported`;
+- a literal `auditType` emission in `src/` has neither an emitter entry nor a line in `NON_MATURITY_AUDIT_MODULES` saying why it cannot evidence maturity;
+- an evidence map in `src/diagnostic/evidenceMaps/` names an unknown question or an unregistered, non-observed or wrong-level emitter.
+
+It prints, per level, how many questions are reachable, capped and not evaluable. See [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md) for the level rules.

@@ -251,6 +251,8 @@ export interface Gate {
   acceptedTrustTiers?: TrustTier[];
   mustInclude: GateConstraint;
   mustNotInclude: GateConstraint;
+  /** Set when no registered emitter can evidence this level: the gate never passes and reports this reason (P1-07). */
+  notEvaluated?: string;
 }
 
 export interface DiagnosticQuestion {

@@ -62,6 +62,12 @@ function compileRegex(pattern: string): RegExp {
   return re;
 }
 
+/** Runtime rows bind to questions through `questionIds` (a list); a `questionId` requirement accepts either field. */
+function hasMetaKey(meta: Record<string, unknown>, key: string): boolean {
+  if (Object.prototype.hasOwnProperty.call(meta, key)) return true;
+  return key === "questionId" && Array.isArray(meta.questionIds) && meta.questionIds.length > 0;
+}
+
 export interface GateEvaluation {
   pass: boolean;
   matchedEventIds: string[];
@@ -71,6 +77,10 @@ export interface GateEvaluation {
 }
 
 export function evaluateGate(gate: Gate, allEvents: ParsedEvidenceEvent[]): GateEvaluation {
+  // A level no registered emitter can evidence is not evaluated, never passed (P1-07).
+  if (gate.notEvaluated) {
+    return { pass: false, matchedEventIds: [], reason: `not evaluated at gate ${gate.level}: ${gate.notEvaluated}`, distinctSessions: 0, distinctDays: 0 };
+  }
   // Synthetic (seeded or example) evidence never satisfies a gate, at any tier.
   const events = allEvents.filter((event) => producerOfMeta(event.meta) !== "synthetic");
   const acceptedTrustTiers: TrustTier[] =
@@ -132,7 +142,7 @@ export function evaluateGate(gate: Gate, allEvents: ParsedEvidenceEvent[]): Gate
 
   if (gate.mustInclude.metaKeys && gate.mustInclude.metaKeys.length > 0) {
     for (const key of gate.mustInclude.metaKeys) {
-      requireInclude(`metaKey:${key}`, trustFilteredEvents.some((event) => Object.prototype.hasOwnProperty.call(event.meta, key)));
+      requireInclude(`metaKey:${key}`, trustFilteredEvents.some((event) => hasMetaKey(event.meta, key)));
     }
   }
 

@@ -32,7 +32,16 @@ import type {
   TrustLabel
 } from "../types.js";
 import { getQuestionSet } from "./questionSets.js";
-import { evaluateGate, parseEvidenceEventWith, type ParsedEvidenceEvent } from "./gates.js";
+import { parseEvidenceEventWith, type ParsedEvidenceEvent } from "./gates.js";
+import { fromRegisteredEmitter } from "./evidenceEmitters.js";
+import {
+  computeLayerScores,
+  evaluateLevels,
+  eventQuestionIds,
+  overallScore,
+  trustLabelFromIntegrity,
+  UNTRUSTED_CONFIG_INTEGRITY_CAP
+} from "./levelSemantics.js";
 import { countAttestedOnce, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import { deriveDeterministicAudits, persistAuditFindings, type AuditFinding } from "./audits.js";
 import { loadTargetProfile, verifyTargetProfileSignature } from "../targets/targetProfile.js";
@@ -51,7 +60,6 @@ import { buildMetricValidationReport } from "../score/metricValidity.js";
 import { buildDiagnosticMethodologyVersioningReceipt } from "./methodologyVersioning.js";
 import {
   loadAgentConfig,
-  mandatoryTrustTierForLevel5,
   verifyAgentConfigSignature,
   verifyFleetConfigSignature
 } from "../fleet/registry.js";
@@ -224,21 +232,8 @@ export function applyGlobalCherryPickDefense(level: number, events: ParsedEviden
   return level;
 }
 
-const STRICT_EVIDENCE_BINDING_FALSY = new Set(["0", "false", "off", "no"]);
-/** Untagged evidence stops counting at this level. 0 = every level; ADR-0023. */
-const STRICT_EVIDENCE_BINDING_LEVEL = 0;
-
-/**
- * The questions one event is tagged to. A list, because one governed fact can
- * legitimately evidence several questions (P5.2a) — counted ONCE per question,
- * never duplicated within one, so `minEvents` cannot be inflated by breadth.
- */
-function eventQuestionIds(event: ParsedEvidenceEvent): string[] {
-  const raw = event.meta.questionIds ?? event.meta.questionId ?? event.meta.question_id;
-  const list = Array.isArray(raw) ? raw : [raw];
-  const ids = list.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
-  return [...new Set(ids.map((v) => v.trim()))];
-}
+/** P1-07 removed the opt-out: setting the variable changes nothing, and says so once per run. */
+const STRICT_BINDING_REMOVED = "STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level";
 
 function buildQuestionEventIndex(events: ParsedEvidenceEvent[]): Map<string, ParsedEvidenceEvent[]> {
   const byQuestion = new Map<string, ParsedEvidenceEvent[]>();
@@ -252,14 +247,7 @@ function buildQuestionEventIndex(events: ParsedEvidenceEvent[]): Map<string, Par
   return byQuestion;
 }
 
-export function isStrictEvidenceBindingEnabled(): boolean {
-  const raw = process.env.STRICT_EVIDENCE_BINDING;
-  if (raw === undefined) {
-    return true;
-  }
-  return !STRICT_EVIDENCE_BINDING_FALSY.has(raw.trim().toLowerCase());
-}
-
+/** The evidence tagged to this question. Untagged evidence, or evidence tagged to another question, never counts. */
 export function selectRelevantEvents(
   questionId: string,
   events: ParsedEvidenceEvent[],
@@ -267,36 +255,23 @@ export function selectRelevantEvents(
   warningState?: Set<string>,
   eventsByQuestionId?: Map<string, ParsedEvidenceEvent[]>
 ): ParsedEvidenceEvent[] {
+  const warnings = warningState ?? new Set<string>();
+  if (process.env.STRICT_EVIDENCE_BINDING !== undefined && !warnings.has("strict-binding")) {
+    console.warn(STRICT_BINDING_REMOVED);
+    warnings.add("strict-binding");
+  }
   const tagged = eventsByQuestionId?.get(questionId)
     ?? events.filter((event) => eventQuestionIds(event).includes(questionId));
-  if (tagged.length > 0) {
+  if (tagged.length > 0 || events.length === 0) {
     return tagged;
   }
-
-  if (events.length === 0) {
-    return events;
-  }
-
-  const warnings = warningState ?? new Set<string>();
-  if (isStrictEvidenceBindingEnabled() && level >= STRICT_EVIDENCE_BINDING_LEVEL) {
-    const warningKey = "strict-binding";
-    if (!warnings.has(warningKey)) {
-      console.warn(
-        `[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
-      );
-      warnings.add(warningKey);
-    }
-    return [];
-  }
-
-  const warningKey = "fallback";
-  if (!warnings.has(warningKey)) {
+  if (!warnings.has("strict-binding")) {
     console.warn(
-      `[diagnostic] Falling back to unbound evidence for untagged events at L${level}; add meta.questionId tagging to avoid score inflation (example question: ${questionId}).`
+      `[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: ${questionId}, seen at L${level}).`
     );
-    warnings.add(warningKey);
+    warnings.add("strict-binding");
   }
-  return events;
+  return [];
 }
 
 function confidenceForQuestion(
@@ -323,58 +298,6 @@ function summarizeNarrative(questionId: string, supported: number, claimed: numb
     return `${questionId}: insufficient verified evidence in window; level capped at 0.`;
   }
   return `${questionId}: evidence gates support level ${supported}; final level reflects claim-evidence minimum.`;
-}
-
-function computeLayerScores(
-  questionScores: QuestionScore[],
-  questions: Array<{ id: string; layerName: LayerName; scoringWeight?: number }>
-): LayerScore[] {
-  const scoreByQuestionId = new Map<string, QuestionScore>(
-    questionScores.map((score) => [score.questionId, score])
-  );
-  const byLayer = new Map<LayerName, Array<{ score: QuestionScore; weight: number }>>();
-  for (const question of questions) {
-    const rows = byLayer.get(question.layerName) ?? [];
-    const score = scoreByQuestionId.get(question.id);
-    if (score) {
-      rows.push({ score, weight: Math.max(0, question.scoringWeight ?? 1) });
-    }
-    byLayer.set(question.layerName, rows);
-  }
-
-  const out: LayerScore[] = [];
-  for (const [layerName, rows] of byLayer.entries()) {
-    if (rows.length === 0) {
-      continue;
-    }
-    const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
-    const avgFinalLevel = totalWeight > 0
-      ? rows.reduce((sum, row) => sum + row.score.finalLevel * row.weight, 0) / totalWeight
-      : rows.reduce((sum, row) => sum + row.score.finalLevel, 0) / rows.length;
-    const confidenceWeightSum = rows.reduce((sum, row) => sum + row.score.confidence * row.weight, 0);
-    const confidenceWeightedFinalLevel =
-      confidenceWeightSum > 0
-        ? rows.reduce((sum, row) => sum + row.score.finalLevel * row.score.confidence * row.weight, 0) / confidenceWeightSum
-        : avgFinalLevel;
-
-    out.push({
-      layerName,
-      avgFinalLevel: Number(avgFinalLevel.toFixed(3)),
-      confidenceWeightedFinalLevel: Number(confidenceWeightedFinalLevel.toFixed(3))
-    });
-  }
-
-  return out;
-}
-
-function trustLabelFromIntegrity(integrity: number): TrustLabel {
-  if (integrity < 0.4) {
-    return "UNRELIABLE — DO NOT USE FOR CLAIMS";
-  }
-  if (integrity < 0.6) {
-    return "LOW TRUST";
-  }
-  return "HIGH TRUST";
 }
 
 function prioritizeUpgradeActions(
@@ -442,6 +365,9 @@ function rejectedEvidenceReason(
   matchedGateLevel: number,
   requiredEvidenceTypes: EvidenceEventType[]
 ): string {
+  if (!fromRegisteredEmitter(event)) {
+    return "not accepted: no registered emitter writes rows of this shape, so it counts toward no level above L0 (P1-07)";
+  }
   const requiredTypes = requiredEvidenceTypes.join(", ");
   if (requiredEvidenceTypes.length > 0 && !requiredEvidenceTypes.includes(event.event_type)) {
     return `not accepted by the selected L${matchedGateLevel} gate evidence set; event type ${event.event_type} is outside required evidence types (${requiredTypes})`;
@@ -672,7 +598,6 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const correlationNotes = correlationWarnings(correlation);
     const hasLlmEvidenceInWindow = events.some((event) => event.event_type === "llm_request" || event.event_type === "llm_response");
     const sandboxEnabled = hasSandboxAttestation(events);
-    const mandatoryTier = mandatoryTrustTierForLevel5(workspace);
     let proxyDenyByDefault = false;
     try {
       const gatewayConfig = loadGatewayConfig(workspace);
@@ -728,35 +653,21 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const assuranceMissingQuestions = new Set<string>();
     const relevanceWarnings = new Set<string>();
     const eventsByQuestionId = buildQuestionEventIndex(events);
+    const eventsById = new Map<string, ParsedEvidenceEvent>(events.map((event) => [event.id, event]));
 
     for (const question of activeQuestions) {
-      let relevant = selectRelevantEvents(question.id, events, 0, relevanceWarnings, eventsByQuestionId);
-
-      let supportedMaxLevel = 0;
-      let matchedIds: string[] = [];
-      let matchedGateLevel = 0;
-      let gateMinDays = 0;
-      let gateEvidenceTypes: EvidenceEventType[] = [];
+      const relevant = selectRelevantEvents(question.id, events, 0, relevanceWarnings, eventsByQuestionId);
+      // P1-07: levels are cumulative. The highest n for which gates L1..Ln all pass; L4 and L5 are not evaluated.
+      // Every in-scope row: L2 and L3 bind through the evidence map, not through the row's own tag.
+      const { level: supportedLevel, perLevel } = evaluateLevels(question, events, relevant);
+      const matchedGate = question.gates.find((gate) => gate.level === supportedLevel);
+      let supportedMaxLevel: number = supportedLevel;
+      const matchedGateLevel = supportedLevel;
+      const matchedIds = (perLevel.find((row) => row.level === supportedLevel)?.matchedEventIds ?? []).slice(0, 64);
+      const gateMinDays = matchedGate?.minDistinctDays ?? 0;
+      const gateEvidenceTypes = matchedGate?.requiredEvidenceTypes ?? [];
+      const failedGateReasons = perLevel.filter((row) => row.level > supportedLevel).reverse().map((row) => row.reason);
       let missingLlmCapApplied = false;
-      const failedGateReasons: string[] = [];
-      for (let level = 5; level >= 0; level -= 1) {
-        const levelRelevant = selectRelevantEvents(question.id, events, level, relevanceWarnings, eventsByQuestionId);
-        const gate = { ...question.gates[level]! };
-        if (level === 5 && gate.requiredTrustTier === undefined) {
-          gate.requiredTrustTier = mandatoryTier;
-        }
-        const evaluation = evaluateGate(gate, levelRelevant);
-        if (evaluation.pass) {
-          supportedMaxLevel = level;
-          matchedGateLevel = level;
-          matchedIds = evaluation.matchedEventIds.slice(0, 64);
-          gateMinDays = gate.minDistinctDays;
-          gateEvidenceTypes = gate.requiredEvidenceTypes;
-          relevant = levelRelevant;
-          break;
-        }
-        failedGateReasons.push(evaluation.reason);
-      }
 
       supportedMaxLevel = applyGlobalCherryPickDefense(supportedMaxLevel, relevant);
       const relevantAuditMap = buildAuditCountMap(relevant);
@@ -1086,9 +997,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       questionScores.push(questionScore);
 
       const matchedIdSet = new Set(matchedIds);
-      const relevantById = new Map<string, ParsedEvidenceEvent>(relevant.map((event) => [event.id, event]));
       const acceptedEvidence = matchedIds
-        .map((eventId) => relevantById.get(eventId))
+        .map((eventId) => eventsById.get(eventId))
         .filter((event): event is ParsedEvidenceEvent => Boolean(event));
       const rejectedEvidence = relevant
         .filter((event) => !matchedIdSet.has(event.id))
@@ -1249,7 +1159,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       : 0;
     const trustLabel =
       anyUntrustedConfig
-        ? trustLabelFromIntegrity(Math.min(integrityIndex, 0.59))
+        ? trustLabelFromIntegrity(Math.min(integrityIndex, UNTRUSTED_CONFIG_INTEGRITY_CAP))
         : trustLabelFromIntegrity(integrityIndex);
 
     // Prior runs feed the drift cap and the trend rows, so they are scoring
@@ -1277,12 +1187,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     if (driftRegressionCount > 0) {
       const previous = priorRuns[0];
       if (previous) {
-        const previousOverall =
-          previous.layerScores.length > 0
-            ? previous.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / previous.layerScores.length
-            : 0;
-        const currentOverall =
-          layerScores.length > 0 ? layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / layerScores.length : 0;
+        const previousOverall = overallScore(previous.layerScores);
+        const currentOverall = overallScore(layerScores);
         if (currentOverall > previousOverall) {
           layerScores = layerScores.map((row) => ({
             ...row,

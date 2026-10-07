@@ -82,6 +82,7 @@
     "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
     "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
+    "check:gates": "node scripts/check-gate-reachability.mjs",
     "test:coverage": "vitest run --coverage",
     "gen:changelog-page": "node scripts/gen-changelog-page.mjs",
     "check:changelog-page": "node scripts/gen-changelog-page.mjs --check",

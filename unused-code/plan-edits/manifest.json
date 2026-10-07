@@ -136,6 +136,13 @@
       "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5"
     },
     {
+      "path": "src/diagnostic/spineEvidenceProjection.ts",
+      "issue": "P1-07",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/spineEvidenceProjection.ts.landed",
+      "sha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a"
+    },
+    {
       "path": "src/domains/industryPackEntitlement.ts",
       "issue": "P0-51",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",

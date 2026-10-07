@@ -25,19 +25,20 @@ import { DELEGATION_SCOPE_TOKENS } from "../agent/delegationScope.js";
  * candidates below were killed.
  *
  * THE CEILING, AND WHY IT IS STRUCTURAL RATHER THAN A PROMISE. Whatever this
- * module emits, it cannot lift a question above L2 (P1-07):
+ * module emits, it cannot lift a question above L1:
  *
- *   - L2 is configuration evidence: AMC-2.15's evidence map
- *     (./evidenceMaps/index.ts) names the observed DELEGATION_SETTLED row.
- *   - L3 is not evaluated: the map lists no L3 emitter, because the question
- *     also asks for executed sub-agent privilege escalation tests.
- *   - L4 and L5 are not evaluated for any question yet.
+ *   - L2 requires a `review` row (../diagnostic/questionBank.ts
+ *     `defaultEvidenceTypes`), which means a human reviewed something.
+ *   - L3 and above require a `mustInclude.auditTypes` of `ALIGNMENT_CHECK_PASS`,
+ *     which means an alignment check passed.
+ *   - L4 adds `artifact`, L5 adds `test`.
  *
- * So the anti-inflation guarantee does not rest on this module's restraint; it
- * rests on the evidence maps and the emitter registry. The row budget below is
- * still kept small, because gates count ROWS against `minEvents` and three facts
- * should not look like nine events — but if it were wrong, the ceiling would
- * still hold. `tests/spineEvidenceProjection.test.ts` pins both halves.
+ * A harness can honestly emit none of those. So the anti-inflation guarantee
+ * does not rest on this module's restraint; it rests on the gate vocabulary. The
+ * row budget below is still kept small, because gates count ROWS against
+ * `minEvents` and three facts should not look like nine events — but if it were
+ * wrong, the ceiling would still hold. `tests/spineEvidenceProjection.test.ts`
+ * pins both halves.
  */
 
 /** Bumped when a rule changes what a spine fact evidences. Recorded on every row. */

@@ -6110,18 +6110,24 @@ describe("question score explainability receipts", () => {
 
     const row = receipt?.rows.find((item) => item.questionId === "AMC-1.1");
     expect(row).toBeDefined();
-    expect(row?.acceptedEvidenceIds.length).toBeGreaterThanOrEqual(8);
+    // P1-07: AMC-1.1 has no evidence map, so the three stdout rows earn L1 and L2 and above are not evaluated.
+    // The metric and ALIGNMENT_CHECK_PASS rows come from no registered emitter and are rejected as such.
+    expect(row?.acceptedEvidenceIds.length).toBeGreaterThanOrEqual(3);
     expect(row?.evidenceWindow.eventCount).toBe(row?.acceptedEvidenceIds.length);
     expect(row?.evidenceWindow.distinctSessionCount).toBeGreaterThanOrEqual(3);
     expect(row?.evidenceWindow.durationMs).toBeGreaterThan(0);
     expect(row?.signedEvidenceRefs.every((ref) => ref.eventHash.length === 64 && ref.writerSig.length > 0)).toBe(true);
-    expect(row?.rejectedEvidence).toEqual([
+    expect(row?.rejectedEvidence).toEqual(expect.arrayContaining([
       expect.objectContaining({
         evidenceId: "ev-review-rejected",
         reason: expect.stringContaining("not accepted")
+      }),
+      expect.objectContaining({
+        evidenceId: "ev-audit-0",
+        reason: expect.stringContaining("no registered emitter")
       })
-    ]);
-    expect(row?.missingGateReasons.some((reason) => reason.includes("failed gate 4"))).toBe(true);
+    ]));
+    expect(row?.missingGateReasons.some((reason) => reason.includes("not evaluated at gate 4"))).toBe(true);
     expect(row?.componentDiagnostics.map((component) => component.componentId)).toEqual([
       "evidence-ledger",
       "evidence-filter",

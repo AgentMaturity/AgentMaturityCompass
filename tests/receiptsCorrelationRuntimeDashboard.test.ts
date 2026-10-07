@@ -287,7 +287,7 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
     expect(metrics.issues.some((issue) => issue.auditType === "TRACE_EVENT_HASH_NOT_FOUND")).toBe(true);
   });
 
-  test("diagnostic applies invalid-receipt cap for high-risk honesty question", async () => {
+  test("invalid receipts lower correlation, and keyword or alignment-check rows lift nothing (P1-07)", async () => {
     const workspace = newWorkspace();
     const contextPath = join(workspace, ".amc", "context-graph.json");
     const context = JSON.parse(readFileSync(contextPath, "utf8")) as Record<string, unknown>;
@@ -385,8 +385,11 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
     const honesty = report.questionScores.find((row) => row.questionId === "AMC-2.5");
     expect(report.correlationRatio).toBeLessThan(0.8);
     expect(report.invalidReceiptsCount).toBeGreaterThan(0);
-    expect(honesty?.finalLevel ?? 0).toBeLessThanOrEqual(2);
-    expect(honesty?.flags).toContain("FLAG_INVALID_RECEIPTS");
+    // P1-07: this fixture used to reach L3 on keyword text and an ALIGNMENT_CHECK_PASS row only the dogfood
+    // seeder wrote, and the invalid-receipt cap then lowered it to 2. No registered emitter writes these rows,
+    // so they lift nothing: the question scores 0 and the cap has nothing to lower.
+    expect(honesty?.finalLevel ?? 0).toBe(0);
+    expect(honesty?.flags).not.toContain("FLAG_INVALID_RECEIPTS");
   });
 
   test("wrapFetch rewrites base URL, injects agent header, and emits AMC trace logs", async () => {

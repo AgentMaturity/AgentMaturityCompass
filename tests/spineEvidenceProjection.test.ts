@@ -89,9 +89,8 @@ describe("what does not qualify", () => {
   });
 
   it("emits no stdout row when the child produced nothing", () => {
-    // A delegation that returned no words is not evidence of a working chain,
-    // and L1 requires a stdout row -- so a silent delegation scores nothing
-    // rather than clearing a gate on an empty string.
+    // A delegation that returned no words reported nothing, so it writes no
+    // stdout descriptor: an empty string is not a report.
     const rows = delegationEvidenceFor({ ...scopedFact, childText: "" });
     expect(rows.map((r) => r.eventType)).toEqual(["audit"]);
   });
@@ -111,25 +110,29 @@ describe("what does not qualify", () => {
 });
 
 describe("the ceiling that makes this safe", () => {
-  it("cannot carry a question above L1, whatever it emits", () => {
+  it("cannot carry a question above L2, whatever it emits", () => {
     // THE anti-inflation property, and it is structural rather than a promise.
-    // L2 requires a `review` row (a human reviewed something), and L3+ requires
-    // an `ALIGNMENT_CHECK_PASS` audit row (an alignment check passed). A harness
-    // cannot honestly emit either, so no number of projected rows lifts a
-    // question past L1 -- which is why the row budget above can stay small
-    // without the ceiling depending on it.
+    // P1-07: AMC-2.15's evidence map names the settled-delegation audit row for
+    // L2 (configuration evidence) and nothing for L3, because the question also
+    // asks for executed sub-agent privilege escalation tests that no registered
+    // emitter produces. L3, L4 and L5 are not evaluated, so no number of
+    // projected rows lifts the question past L2. This test used to pin "L2 wants
+    // a human review" and "L3 wants an alignment check", requirements no runtime
+    // emitter could ever meet.
     const question = questionBank.find((q) => q.id === "AMC-2.15");
     expect(question, "AMC-2.15 is in the bank").toBeDefined();
-    const emitted = new Set(delegationEvidenceFor(scopedFact).map((r) => r.eventType));
+    const auditTypes = delegationEvidenceFor(scopedFact).map((r) => r.meta["auditType"]);
 
     const l2 = question!.gates[2]!;
-    expect(l2.requiredEvidenceTypes, "L2 wants a human review").toContain("review");
-    expect(emitted.has("review" as never), "which the harness never emits").toBe(false);
+    expect(l2.notEvaluated, "L2 is evaluated from the evidence map").toBeUndefined();
+    expect(l2.acceptedTrustTiers, "on observed rows only").toEqual(["OBSERVED"]);
+    expect(l2.mustInclude.auditTypes).toEqual(["DELEGATION_SETTLED"]);
+    expect(auditTypes, "which a scope-declared delegation writes").toContain("DELEGATION_SETTLED");
 
-    const l3 = question!.gates[3]!;
-    expect(l3.mustInclude.auditTypes, "L3 wants an alignment check").toContain("ALIGNMENT_CHECK_PASS");
-    const auditTypes = delegationEvidenceFor(scopedFact).map((r) => r.meta["auditType"]);
-    expect(auditTypes, "which the harness never claims").not.toContain("ALIGNMENT_CHECK_PASS");
+    for (const level of [3, 4, 5]) {
+      expect(question!.gates[level]!.notEvaluated, `L${level} is not evaluated`).toBeTruthy();
+    }
+    expect(auditTypes, "and the harness never claims an alignment check").not.toContain("ALIGNMENT_CHECK_PASS");
   });
 
   it("clears L1's own requirements when it should", () => {

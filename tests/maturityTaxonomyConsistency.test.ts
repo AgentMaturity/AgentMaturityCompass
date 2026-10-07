@@ -20,6 +20,7 @@ import {
   getQuestionSet,
   LIFECYCLE_QUESTION_SET_VERSION,
 } from "../src/diagnostic/questionSets.js";
+import { LEVEL_BANDS, LEVEL_SEMANTICS, TRUST_LABEL_THRESHOLDS } from "../src/diagnostic/levelSemantics.js";
 import { probeEndpoint } from "../src/scanner/endpointProbe.js";
 import { scanLocal } from "../src/scanner/localScanner.js";
 
@@ -58,8 +59,8 @@ describe("AMC aggregate maturity taxonomy", () => {
   it("publishes the current methodology release and corrected labels without changing score ranges", () => {
     const manifest = getPublicMethodologyManifest();
 
-    expect(manifest.version).toBe("2026.08.27-r225");
-    expect(manifest.releaseDate).toBe("2026-08-27");
+    expect(manifest.version).toBe("2026.10.08-r226");
+    expect(manifest.releaseDate).toBe("2026-10-08");
     expect(manifest.scoreScale.map(({ level, label }) => [level, label])).toEqual(canonicalRows);
     expect(manifest.scoreScale.map(({ numericRange }) => numericRange)).toEqual([
       [0, 0.99],
@@ -69,16 +70,17 @@ describe("AMC aggregate maturity taxonomy", () => {
       [4, 4.74],
       [4.75, 5],
     ]);
-    expect(manifest.changelog[0]).toMatchObject({ version: "2026.08.27-r225", date: "2026-08-27" });
-    expect(manifest.changelog[0]?.summary).toContain("trust tier");
-    expect(manifest.changelog[1]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
-    expect(manifest.changelog[1]?.summary).toContain("requiredEvidenceTypes");
-    expect(manifest.changelog[2]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
-    expect(manifest.changelog[2]?.summary).toContain("public badge methodology assurance hash");
-    expect(manifest.changelog[2]?.migration).toContain("2026.07.10-r222");
-    expect(manifest.changelog[3]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
-    expect(manifest.changelog[3]?.summary).toContain("canonical L0-L5 maturity taxonomy");
-    expect(manifest.changelog[3]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
+    expect(manifest.changelog[0]).toMatchObject({ version: "2026.10.08-r226", date: "2026-10-08" });
+    expect(manifest.changelog[1]).toMatchObject({ version: "2026.08.27-r225", date: "2026-08-27" });
+    expect(manifest.changelog[1]?.summary).toContain("trust tier");
+    expect(manifest.changelog[2]).toMatchObject({ version: "2026.08.25-r224", date: "2026-08-25" });
+    expect(manifest.changelog[2]?.summary).toContain("requiredEvidenceTypes");
+    expect(manifest.changelog[3]).toMatchObject({ version: "2026.07.29-r223", date: "2026-07-29" });
+    expect(manifest.changelog[3]?.summary).toContain("public badge methodology assurance hash");
+    expect(manifest.changelog[3]?.migration).toContain("2026.07.10-r222");
+    expect(manifest.changelog[4]).toMatchObject({ version: "2026.07.10-r222", date: "2026-07-10" });
+    expect(manifest.changelog[4]?.summary).toContain("canonical L0-L5 maturity taxonomy");
+    expect(manifest.changelog[4]?.migration).toContain("Numerical scores, thresholds, and historical hashes are unchanged");
     expect(manifest.migrationGuidance[0]).toContain("2026.07.10-r222");
     expect(manifest.migrationGuidance[0]).toContain("amc_methodology_assurance");
   });
@@ -262,8 +264,8 @@ describe("AMC aggregate maturity taxonomy", () => {
       "website/docs/methodology.html",
       "website/methodology.html",
     ]) {
-      expect(read(path), `${path} should publish the current methodology version`).toContain("2026.08.27-r225");
-      expect(read(path), `${path} should publish the current methodology release date`).toContain("2026-08-27");
+      expect(read(path), `${path} should publish the current methodology version`).toContain("2026.10.08-r226");
+      expect(read(path), `${path} should publish the current methodology release date`).toContain("2026-10-08");
     }
 
     const methodologyDoc = read("docs/SCORING_METHODOLOGY.md");
@@ -271,6 +273,21 @@ describe("AMC aggregate maturity taxonomy", () => {
     expect(methodologyDoc).toContain("`amc-legacy-240-v1`");
     expect(methodologyDoc).toContain("`amc-lifecycle-2026-v1`");
     expect(methodologyDoc).toContain("Custom question-set hashes fail closed");
+  });
+
+  it("documents one scale: the methodology tables match the exported constants (P1-07)", () => {
+    const doc = read("docs/SCORING_METHODOLOGY.md");
+    for (const [level, label] of canonicalRows) {
+      const [low, high] = LEVEL_BANDS[level as keyof typeof LEVEL_BANDS];
+      expect(doc, `${level} band`).toContain(`| ${level} | ${label} | ${low}-${high} |`);
+    }
+    for (const { level, name } of LEVEL_SEMANTICS) {
+      expect(doc, `L${level} meaning`).toContain(`| L${level} | ${name} |`);
+    }
+    const [unreliable, low] = TRUST_LABEL_THRESHOLDS;
+    expect(doc).toContain(`| below ${unreliable!.below} | \`${unreliable!.label}\` |`);
+    expect(doc).toContain(`| ${unreliable!.below} to below ${low!.below} | \`${low!.label}\` |`);
+    expect(doc).toContain(`| ${low!.below} and above | \`HIGH TRUST\` |`);
   });
 
   it("publishes exact aggregate score bands in the public rubric", () => {
