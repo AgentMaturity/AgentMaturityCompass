@@ -1758,6 +1758,16 @@ function writeObservabilityLaneForScoreRun(input: {
   });
 }
 
+/**
+ * `--eu-ai-act` on the score commands. A maturity level is not an EU AI Act conformity assessment, so no level maps to a
+ * risk class or a compliance status (truth rule: never print "compliant" for a self-computed result).
+ */
+function printEuAiActNotEvaluated(): void {
+  console.log("");
+  console.log(chalk.bold("  EU AI Act: ") + "not evaluated" + chalk.gray(" (a maturity level is not an EU AI Act conformity assessment)"));
+  console.log(chalk.gray("  Risk class: amc compliance risk-classify · Evidence-linked report: amc compliance report --framework EU_AI_ACT"));
+}
+
 async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
   const started = Date.now();
   const releaseLock = await acquireInstantScoreLock(params.workspace);
@@ -3083,7 +3093,7 @@ program
   .option("--json", "emit JSON output", false)
   .option("--quiet", "suppress non-JSON output (use with --json for clean piping)", false)
   .option("--answers <jsonOrFile>", "score from inline JSON answers or a JSON answer file without prompting")
-  .option("--eu-ai-act", "show EU AI Act risk classification mapping", false)
+  .option("--eu-ai-act", "point to the EU AI Act risk classification and evidence report (a maturity level is not an EU AI Act assessment)", false)
   .option("--auto", "auto-score from ledger evidence (no questions asked)", false)
   .option("--rapid", "rapid 5-question assessment (original quickscore)", false)
   .option("--agent <agentId>", "agent ID for auto mode")
@@ -3142,17 +3152,7 @@ program
         console.log(chalk.gray("  Next: amc guide --go    # generate improvement plan"));
         console.log(chalk.gray("        amc assurance run --all  # run red-team packs"));
         if (opts.euAiAct) {
-          const euMapping: Record<number, { classification: string; status: string }> = {
-            0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT" },
-            1: { classification: "High Risk — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT" },
-            2: { classification: "High Risk — Controls Developing", status: "⚠️  IN PROGRESS" },
-            3: { classification: "High Risk — EU AI Act Minimum", status: "✅ COMPLIANT (baseline)" },
-            4: { classification: "High Risk — Exceeds Requirements", status: "✅ FULLY COMPLIANT" },
-            5: { classification: "High Risk — Gold Standard", status: "✅ EXEMPLARY" },
-          };
-          const m = euMapping[overallLevel] ?? euMapping[0]!;
-          console.log("");
-          console.log(chalk.bold("  EU AI Act: ") + m.status + chalk.gray(` (${m.classification})`));
+          printEuAiActNotEvaluated();
         }
         console.log("");
         return;
@@ -3244,22 +3244,7 @@ program
 
       // EU AI Act mapping (rapid)
       if (opts.euAiAct) {
-        const levelNum = parseInt(result.preliminaryLevel.replace(/\D/g, ""), 10) || 0;
-        const euMapping: Record<number, { classification: string; status: string; action: string }> = {
-          0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT", action: "Agent lacks basic governance. Cannot be deployed under EU AI Act." },
-          1: { classification: "High Risk (Art. 6) — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT", action: "Meets intent but lacks operational controls. Requires Art. 9 risk management, Art. 13 transparency." },
-          2: { classification: "High Risk (Art. 6) — Controls Developing", status: "⚠️  IN PROGRESS", action: "Repeatable processes exist. Complete Art. 14 human oversight and Art. 15 accuracy requirements." },
-          3: { classification: "High Risk (Art. 6) — EU AI Act Minimum", status: "✅ COMPLIANT (baseline)", action: "Meets minimum EU AI Act requirements. Maintain Art. 61 post-market monitoring." },
-          4: { classification: "High Risk (Art. 6) — Exceeds Requirements", status: "✅ FULLY COMPLIANT", action: "Exceeds requirements with cryptographic proof chains. Audit-ready." },
-          5: { classification: "High Risk (Art. 6) — Gold Standard", status: "✅ EXEMPLARY", action: "Self-governing with continuous verification. Model for EU AI Act compliance." },
-        };
-        const mapping = euMapping[levelNum] ?? euMapping[0]!;
-        console.log("");
-        console.log(chalk.bold("━━━ EU AI Act Classification ━━━"));
-        console.log(`  Classification: ${mapping.classification}`);
-        console.log(`  Status: ${mapping.status}`);
-        console.log(`  Action: ${mapping.action}`);
-        console.log(chalk.gray("  Reference: EU AI Act 2024/1689, Art. 6, 9, 13-15, 61"));
+        printEuAiActNotEvaluated();
       }
 
       if (result.recommendations.length === 0) {
@@ -3441,22 +3426,7 @@ program
 
     // EU AI Act mapping
     if (opts.euAiAct) {
-      const levelNum = parseInt(result.overallLevel.replace(/\D/g, ""), 10) || 0;
-      const euMapping: Record<number, { classification: string; status: string; action: string }> = {
-        0: { classification: "Unclassified / Unacceptable Risk", status: "❌ NOT COMPLIANT", action: "Agent lacks basic governance. Cannot be deployed under EU AI Act." },
-        1: { classification: "High Risk (Art. 6) — Gaps Identified", status: "⚠️  PARTIALLY COMPLIANT", action: "Meets intent but lacks operational controls. Requires Art. 9 risk management, Art. 13 transparency." },
-        2: { classification: "High Risk (Art. 6) — Controls Developing", status: "⚠️  IN PROGRESS", action: "Repeatable processes exist. Complete Art. 14 human oversight and Art. 15 accuracy requirements." },
-        3: { classification: "High Risk (Art. 6) — EU AI Act Minimum", status: "✅ COMPLIANT (baseline)", action: "Meets minimum EU AI Act requirements. Maintain Art. 61 post-market monitoring." },
-        4: { classification: "High Risk (Art. 6) — Exceeds Requirements", status: "✅ FULLY COMPLIANT", action: "Exceeds requirements with cryptographic proof chains. Audit-ready." },
-        5: { classification: "High Risk (Art. 6) — Gold Standard", status: "✅ EXEMPLARY", action: "Self-governing with continuous verification. Model for EU AI Act compliance." },
-      };
-      const mapping = euMapping[levelNum] ?? euMapping[0]!;
-      console.log(chalk.bold("  ━━━ EU AI Act Classification ━━━"));
-      console.log(`    Classification: ${mapping.classification}`);
-      console.log(`    Status: ${mapping.status}`);
-      console.log(`    Action: ${mapping.action}`);
-      console.log(chalk.gray("    Reference: EU AI Act 2024/1689, Art. 6, 9, 13-15, 61"));
-      console.log("");
+      printEuAiActNotEvaluated();
     }
 
     // Top 5 recommendations
