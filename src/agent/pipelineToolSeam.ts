@@ -61,8 +61,31 @@ function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutc
   };
 }
 
+/** The model's arguments as a JSON object, or the reason they are not one. */
+function parseArguments(rawArguments: string): Record<string, unknown> {
+  const parsed: unknown = JSON.parse(rawArguments === "" ? "{}" : rawArguments);
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new TypeError("arguments must be a JSON object");
+  }
+  return parsed as Record<string, unknown>;
+}
+
 export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
   return {
+    authorizationIntent(request: ToolCallRequest) {
+      let args: Record<string, unknown>;
+      try {
+        args = parseArguments(request.rawArguments);
+      } catch {
+        return null; // `execute` answers unparseable arguments with an ERROR; there is nothing to approve.
+      }
+      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE" });
+    },
+
+    bindApprovalGate(gate) {
+      init.pipeline.bindApprovalGate(gate);
+    },
+
     schemas(): readonly ToolSchema[] | null {
       const visible = [...init.registry.visible(init.agentId).values()];
       const offered = visible
@@ -93,11 +116,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
 
       let args: Record<string, unknown>;
       try {
-        const parsed: unknown = JSON.parse(request.rawArguments === "" ? "{}" : request.rawArguments);
-        if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-          throw new TypeError("arguments must be a JSON object");
-        }
-        args = parsed as Record<string, unknown>;
+        args = parseArguments(request.rawArguments);
       } catch (error: unknown) {
         // The model produced something unparseable. That is an ERROR the model
         // can correct, never a DENIED — policy did not refuse this, and saying
@@ -121,7 +140,8 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           requestedMode: "EXECUTE",
           callId: request.callId,
           parentToken: request.parentToken,
-          signal: request.signal
+          signal: request.signal,
+          ...(request.authority === undefined ? {} : { authority: request.authority })
         });
         return toLoopOutcome(outcome, request.signal.aborted);
       } catch (error: unknown) {
