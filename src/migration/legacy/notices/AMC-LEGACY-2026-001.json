@@ -1,0 +1,34 @@
+{
+  "id": "AMC-LEGACY-2026-001",
+  "version": 1,
+  "date": "2026-10-07",
+  "reason": "AMC 1.x graded a canned reply in every assurance run and stored it as observed (G4), let operators choose the trust tier of their own evidence (G2), and verified artifacts with keys shipped inside them (G1). Its results cannot show who observed what, so AMC reads them as self-reported or as a synthetic example, never as observed, and never rewrites them.",
+  "rules": [
+    {
+      "id": "R1-assurance-canned-reply",
+      "claimKind": "synthetic_example",
+      "detects": "An assurance report without evidenceStatus: AMC 1.x graded its own canned reply, not the agent."
+    },
+    {
+      "id": "R2-dogfood-seeded",
+      "claimKind": "synthetic_example",
+      "detects": "A ledger session seeded by dogfood (meta.provenance dogfood, meta.source dogfood-maturity or binary amc-dogfood-agent) whose events carry no claim kind."
+    },
+    {
+      "id": "R3-domain-report",
+      "claimKind": "synthetic_example",
+      "detects": "A domain report printing a certification-readiness line computed from generated scores; checked only for a file passed with --path."
+    },
+    {
+      "id": "R4-operator-tier",
+      "claimKind": "self_reported",
+      "detects": "A ledger session whose imported, manual or external events store a meta.trustTier of OBSERVED or OBSERVED_HARDENED, or ATTESTED without a third-party attestation; the original tier is kept."
+    },
+    {
+      "id": "R5-no-claim-envelope",
+      "claimKind": "self_reported",
+      "detects": "Any other result AMC 1.x wrote without a claim envelope: a diagnostic run (alone or inside a bundle or certificate) whose AMC version is missing or below 1.2.0, or a compliance report without per-category results. Levels are capped at L1 and the original level is kept."
+    }
+  ],
+  "docs": "docs/migration/LEGACY_RESULTS.md"
+}

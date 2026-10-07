@@ -7,7 +7,11 @@ const KIND_LABELS: Record<ClaimKind, string> = {
   observed: "Observed",
   independently_reviewed: "Independently reviewed"
 };
-const LEGACY_LABEL = "Legacy (1.x), self-reported";
+// A legacy result is never observed or reviewed (rule 2); labels cite the notice it is read under (P1-35).
+const LEGACY_LABELS: Partial<Record<ClaimKind, string>> = {
+  self_reported: "Legacy (1.x), self-reported",
+  synthetic_example: "Legacy (1.x), synthetic example"
+};
 
 export function claimKindLabel(kind: ClaimKind): string {
   return KIND_LABELS[kind];
@@ -56,8 +60,10 @@ function fields(label: ClaimLabel): [string, string][] {
 
 export function renderClaimLabel(envelope: ClaimEnvelope): ClaimLabel {
   const { statusDimensions: s } = envelope;
-  const kindLabel = envelope.provenance.legacy && envelope.claimKind === "self_reported"
-    ? LEGACY_LABEL : KIND_LABELS[envelope.claimKind];
+  const legacy = envelope.provenance.legacy;
+  const legacyLabel = legacy ? LEGACY_LABELS[envelope.claimKind] : undefined;
+  const kindLabel = legacyLabel === undefined ? KIND_LABELS[envelope.claimKind]
+    : legacy?.notice ? `${legacyLabel} (notice ${legacy.notice})` : legacyLabel;
   const dimensions: ClaimLabel["dimensions"] = {
     result: resultText(s, envelope.reasons),
     evidence: s.evidence,

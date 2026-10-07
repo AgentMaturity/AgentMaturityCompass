@@ -2,7 +2,11 @@ import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport, getDefaultEnvironment } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { ToolListChangedNotificationSchema, CallToolResultSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { Protocol } from "@modelcontextprotocol/sdk/shared/protocol.js";
+import {
+  ToolListChangedNotificationSchema, CallToolResultSchema, InitializeResultSchema, ListToolsResultSchema, ResultSchema,
+  LATEST_PROTOCOL_VERSION, McpError, ErrorCode, type ClientRequest
+} from "@modelcontextprotocol/sdk/types.js";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
 import type { AgentToolset } from "../agent/agentToolset.js";
 import type { ActionClass } from "../types.js";
@@ -10,6 +14,12 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { NativeMcpHttpTransport, NativeMcpHttpRefused, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
 import { NATIVE_MCP_RECONNECT_LIMITS } from "./nativeMcpReconnect.js";
+import {
+  MCP_CLIENT_INFO, MCP_LEGACY_PROTOCOL_VERSIONS, MCP_STATELESS_PROTOCOL_VERSION, NativeMcpProtocolRefused,
+  classifyNativeMcpDiscover, nativeMcpResultType, nativeMcpServerInfo, statelessRequestMeta, type NativeMcpProtocolReceipt
+} from "./protocol/version.js";
+import { mcpParamHeaderBindings } from "./protocol/headers.js";
+import type { NativeMcpOAuthReceipt } from "./oauth/authorize.js";
 
 export interface NativeMcpStdioServer {
   readonly transport?: "stdio";
@@ -19,6 +29,8 @@ export interface NativeMcpStdioServer {
   /** Explicit values for the child only. Never serialized into catalog or error output. */
   readonly env?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
+  /** Exact protocol version; absent means probe server/discover, then fall back to initialize. */
+  readonly protocolVersion?: string;
 }
 export type NativeMcpServer = NativeMcpStdioServer | NativeMcpHttpServer;
 
@@ -33,8 +45,20 @@ export interface NativeMcpCatalogTool {
 
 export interface NativeMcpCatalog {
   readonly serverId: string;
+  /** SHA-256 of the negotiated protocol version and the tools; a version change needs fresh review. */
   readonly digest: string;
+  readonly protocol: NativeMcpProtocolReceipt;
   readonly tools: readonly NativeMcpCatalogTool[];
+  /** Tools a 2026-07-28 HTTP client must exclude (invalid x-mcp-header annotations). */
+  readonly excludedTools?: readonly { readonly name: string; readonly reason: string }[];
+}
+
+/** What a mount records: the protocol and authorization facts, never a credential. */
+export interface NativeMcpMountReceipt {
+  readonly serverId: string;
+  readonly catalogDigest: string;
+  readonly protocol: NativeMcpProtocolReceipt;
+  readonly auth: NativeMcpOAuthReceipt | null;
 }
 
 export interface NativeMcpGrant {
@@ -84,6 +108,14 @@ function transportFailure(transport: Transport, fallback: string): string {
   return transport instanceof NativeMcpHttpTransport ? transport.failureMessage ?? fallback : fallback;
 }
 
+/** Keeps a classified HTTP failure (and its step-up scopes) or a fixed protocol refusal; hides everything else. */
+function connectionFailure(transport: Transport, error: unknown, fallback: string): Error {
+  if (transport instanceof NativeMcpHttpTransport && transport.failureMessage) {
+    return new NativeMcpHttpRefused(transport.failureMessage, transport.failureCode, transport.requiredScopes);
+  }
+  return error instanceof NativeMcpProtocolRefused ? error : new Error(fallback, { cause: error instanceof Error ? error.name : "unknown" });
+}
+
 function parameters(server: NativeMcpServer, workspace: string): { transport: Transport; client: Client; timeout: number } {
   if (!/^[a-zA-Z0-9_-]{1,32}$/.test(server.id)) throw new Error("MCP server id must be 1–32 letters, digits, underscores or hyphens");
   const timeout = server.timeoutMs ?? 30_000;
@@ -96,18 +128,75 @@ function parameters(server: NativeMcpServer, workspace: string): { transport: Tr
       cwd: resolve(workspace), env: { ...getDefaultEnvironment(), ...server.env }, stderr: "pipe", maxBufferSize: 4 * 1024 * 1024 });
     stdio.stderr?.on("data", () => {}); transport = stdio;
   }
-  const client = new Client({ name: "amc-governed-native-tools", version: "1.0.0" }, { capabilities: {} });
+  const client = new Client({ ...MCP_CLIENT_INFO }, { capabilities: {} });
   return { transport, client, timeout };
 }
 
-async function readCatalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
+const PROBE_TIMEOUT_MS = 5_000;
+/** The SDK types only the initialize-era methods; 2026-07-28 adds server/discover. */
+const rpc = (method: string, params: Record<string, unknown>) => ({ method, params }) as unknown as ClientRequest;
+/** basic/index §_meta: every 2026-07-28 request carries the protocol fields. */
+function requestParams(protocol: NativeMcpProtocolReceipt, params: Record<string, unknown>): Record<string, unknown> {
+  return protocol.mode === "stateless" ? { ...params, _meta: statelessRequestMeta() } : params;
+}
+
+/**
+ * Negotiates the era (basic/versioning §Backward Compatibility). A pinned
+ * version is used exactly; otherwise server/discover is probed first and an
+ * initialize-era server is spoken to through the SDK's legacy handshake. The
+ * SDK Client always sends initialize from connect(), so AMC attaches the
+ * transport with the base Protocol and sends initialize itself when needed.
+ */
+async function negotiate(client: Client, transport: Transport, server: NativeMcpServer, timeout: number, signal?: AbortSignal): Promise<NativeMcpProtocolReceipt> {
+  const pinned = server.protocolVersion;
+  const http = transport instanceof NativeMcpHttpTransport ? transport : undefined;
+  if (pinned === undefined || pinned === MCP_STATELESS_PROTOCOL_VERSION) {
+    http?.beginStatelessProbe();
+    await Protocol.prototype.connect.call(client, transport);
+    let outcome: ReturnType<typeof classifyNativeMcpDiscover>;
+    try {
+      const result = await client.request(rpc("server/discover", { _meta: statelessRequestMeta() }), ResultSchema,
+        { timeout: http ? timeout : Math.min(timeout, PROBE_TIMEOUT_MS), ...(signal ? { signal } : {}) });
+      outcome = classifyNativeMcpDiscover({ result });
+    } catch (error) {
+      // transports/stdio §Backward Compatibility: no answer in time means legacy. HTTP has no such rule.
+      if (signal?.aborted || !(error instanceof McpError) || (http && error.code === ErrorCode.RequestTimeout)) throw error;
+      outcome = classifyNativeMcpDiscover({ errorCode: error.code });
+    }
+    if (outcome.kind === "stateless") {
+      http?.useStateless();
+      return { negotiatedVersion: MCP_STATELESS_PROTOCOL_VERSION, mode: "stateless", serverInfo: outcome.serverInfo };
+    }
+    if (outcome.kind === "refused") throw new NativeMcpProtocolRefused(outcome.reason);
+    if (pinned !== undefined) throw new NativeMcpProtocolRefused(`MCP server did not accept the pinned protocol version ${pinned}.`);
+    http?.useLegacy();
+  } else await Protocol.prototype.connect.call(client, transport);
+  const init = await client.request({ method: "initialize", params: { protocolVersion: pinned ?? LATEST_PROTOCOL_VERSION,
+    capabilities: {}, clientInfo: { ...MCP_CLIENT_INFO } } }, InitializeResultSchema, { timeout, ...(signal ? { signal } : {}) });
+  if (!MCP_LEGACY_PROTOCOL_VERSIONS.includes(init.protocolVersion) || (pinned !== undefined && init.protocolVersion !== pinned)) {
+    throw new NativeMcpProtocolRefused("MCP server negotiated a protocol version that is unsupported or differs from the pinned one.");
+  }
+  transport.setProtocolVersion?.(init.protocolVersion);
+  await client.notification({ method: "notifications/initialized" });
+  return { negotiatedVersion: init.protocolVersion, mode: "legacy", serverInfo: nativeMcpServerInfo(init.serverInfo) };
+}
+
+async function readCatalog(client: Client, server: NativeMcpServer, timeout: number, protocol: NativeMcpProtocolReceipt, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
   const tools: NativeMcpCatalogTool[] = [];
+  const excludedTools: { name: string; reason: string }[] = [];
+  const headerAware = protocol.mode === "stateless" && transport instanceof NativeMcpHttpTransport;
   const cursors = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await client.listTools(cursor ? { cursor } : {}, { timeout, signal });
+    const page = await client.request(rpc("tools/list", requestParams(protocol, cursor ? { cursor } : {})), ListToolsResultSchema, { timeout, ...(signal ? { signal } : {}) });
+    if (nativeMcpResultType(page) !== "complete") throw new NativeMcpProtocolRefused("MCP tools/list returned input_required, which the protocol does not allow; it was refused.");
     for (const tool of page.tools) {
-      if (tools.length >= 256 || tools.some((item) => item.name === tool.name)) throw new Error("MCP catalog is oversized or repeats a tool name");
+      if (tools.length + excludedTools.length >= 256 || tools.some((item) => item.name === tool.name) || excludedTools.some((item) => item.name === tool.name)) {
+        throw new Error("MCP catalog is oversized or repeats a tool name");
+      }
+      // 2026-07-28 streamable-http §Schema Extension: a client MUST exclude a tool with an invalid x-mcp-header.
+      const bindings = headerAware ? mcpParamHeaderBindings(tool.inputSchema) : [];
+      if (typeof bindings === "string") { excludedTools.push({ name: tool.name, reason: bindings }); continue; }
       tools.push({ name: tool.name, description: tool.description ?? "", inputSchema: tool.inputSchema,
         outputSchema: tool.outputSchema ?? null, annotations: tool.annotations ?? null,
         execution: tool.execution ?? null });
@@ -117,26 +206,29 @@ async function readCatalog(client: Client, server: NativeMcpServer, timeout: num
     if (cursors.size > 32) throw new Error("MCP catalog has too many pages");
   } while (cursor);
   tools.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
-  const bytes = canonical(tools);
+  // The negotiated version is part of what was reviewed: an era or version change needs fresh review.
+  const bytes = canonical({ protocolVersion: protocol.negotiatedVersion, tools });
   if (Buffer.byteLength(bytes) > 1024 * 1024) throw new Error("MCP catalog exceeds the accepted size");
   // A server can echo its environment into a description or schema. Reject the
   // whole catalog before publishing it; redacting would change what was reviewed.
+  const published = bytes + canonical(protocol.serverInfo) + canonical(excludedTools);
   for (const secret of serverSecrets(server, transport)) {
-    if (secret && bytes.includes(JSON.stringify(secret).slice(1,-1))) throw new Error("MCP catalog contains credential material");
+    if (secret && published.includes(JSON.stringify(secret).slice(1,-1))) throw new Error("MCP catalog contains credential material");
   }
-  if (transport instanceof NativeMcpHttpTransport && transport.containsSensitiveMaterial(bytes)) {
+  if (transport instanceof NativeMcpHttpTransport && transport.containsSensitiveMaterial(published)) {
     throw new Error("MCP catalog contains credential material");
   }
-  return { serverId: server.id, tools, digest: createHash("sha256").update(bytes).digest("hex") };
+  return { serverId: server.id, protocol, tools, ...(excludedTools.length ? { excludedTools } : {}),
+    digest: createHash("sha256").update(bytes).digest("hex") };
 }
 
 /** A notification gap invalidates an in-progress catalog snapshot, not the pin. */
-async function catalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
-  if (!(transport instanceof NativeMcpHttpTransport)) return readCatalog(client, server, timeout, signal, transport);
+async function catalog(client: Client, server: NativeMcpServer, timeout: number, protocol: NativeMcpProtocolReceipt, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
+  if (!(transport instanceof NativeMcpHttpTransport)) return readCatalog(client, server, timeout, protocol, signal, transport);
   for (let attempt = 0; attempt <= NATIVE_MCP_RECONNECT_LIMITS.retries; attempt++) {
     await transport.waitForRecovery(signal);
     const generation = transport.recoveryGeneration;
-    const current = await readCatalog(client, server, timeout, signal, transport);
+    const current = await readCatalog(client, server, timeout, protocol, signal, transport);
     await transport.waitForRecovery(signal);
     if (generation === transport.recoveryGeneration) return current;
   }
@@ -150,9 +242,9 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
   const abort = () => { void client.close().finally(() => transport.close()).catch(() => {}); };
   signal?.addEventListener("abort", abort, { once: true });
   try {
-    await client.connect(transport, { timeout, signal });
-    return await catalog(client, server, timeout, signal, transport);
-  } catch { throw new Error(transportFailure(transport, "MCP catalog discovery failed; no tool grant was created")); }
+    const protocol = await negotiate(client, transport, server, timeout, signal);
+    return await catalog(client, server, timeout, protocol, signal, transport);
+  } catch (error) { throw connectionFailure(transport, error, "MCP catalog discovery failed; no tool grant was created"); }
   finally {
     signal?.removeEventListener("abort", abort);
     // Preserve a classified authentication/session failure even if remote DELETE
@@ -166,6 +258,7 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
 export interface MountedNativeMcpServer {
   readonly catalog: NativeMcpCatalog;
   readonly toolNames: readonly string[];
+  readonly receipt: NativeMcpMountReceipt;
   close(): Promise<void>;
 }
 
@@ -209,8 +302,8 @@ export async function mountNativeMcpServer(options: {
   client.onclose = () => { active = false; for (const remove of dispose.splice(0).reverse()) remove(); };
   client.onerror = () => { void close().catch(() => {}); };
   try {
-    await client.connect(transport, { timeout, signal: options.signal });
-    const initial = await catalog(client, server, timeout, options.signal, transport);
+    const protocol = await negotiate(client, transport, server, timeout, options.signal);
+    const initial = await catalog(client, server, timeout, protocol, options.signal, transport);
     if (!active || initial.digest !== options.expectedCatalogDigest) throw new Error("MCP catalog differs from the reviewed digest");
     const secrets = serverSecrets(server, transport);
     const names: string[] = [];
@@ -220,6 +313,11 @@ export async function mountNativeMcpServer(options: {
       // This mount runs synchronous calls. Preserve task admission explicitly;
       // the SDK's page-local metadata cache cannot establish this capability.
       if (remote.execution?.taskSupport === "required") throw new Error("MCP tool requires unsupported task-based execution");
+      if (protocol.mode === "stateless" && transport instanceof NativeMcpHttpTransport) {
+        const bindings = mcpParamHeaderBindings(remote.inputSchema);
+        if (typeof bindings === "string") throw new Error("MCP tool has invalid x-mcp-header annotations");
+        transport.pinToolHeaders(remote.name, bindings);
+      }
       // Stable short names satisfy provider function-name constraints without alias collisions.
       const name = nativeMcpToolName(server.id, remote.name);
       // Each reviewed schema has its own namespace. Reusing an Ajv instance
@@ -242,16 +340,20 @@ export async function mountNativeMcpServer(options: {
           let callStarted = false;
           let responseReceived = false;
           try {
-            const current = await catalog(client, server, timeout, signal, transport);
+            const current = await catalog(client, server, timeout, protocol, signal, transport);
             if (!active || current.digest !== initial.digest) { await close(); throw new Error("catalog changed"); }
             if (signal?.aborted) throw new Error("MCP call cancelled before dispatch");
             // listTools() resets the SDK output-validator cache for EACH page.
             // Accept only AMC's pinned per-tool schema, independently of that
             // mutable cache and before redaction changes returned values.
             callStarted = true;
-            const result = await client.request({ method: "tools/call", params: { name: remote.name, arguments: { ...execution.arguments } } }, CallToolResultSchema, { timeout, signal });
+            const result = await client.request(rpc("tools/call", requestParams(protocol, { name: remote.name, arguments: { ...execution.arguments } })), CallToolResultSchema, { timeout, signal });
             responseReceived = true;
             if (!active || signal?.aborted) throw new Error("MCP grant was disposed while receiving the response");
+            // basic/patterns/mrtr: AMC declares no sampling, roots or elicitation capability, so it cannot answer.
+            if (nativeMcpResultType(result) === "input_required") {
+              return { ok: false, exitCode: 1, output: "MCP server asked for more input (input_required). AMC declares no sampling, roots or elicitation capability; the call did not complete and was not retried." };
+            }
             if (validateOutput !== null) {
               if (result.structuredContent === undefined && result.isError !== true) throw new Error("MCP structured output is missing");
               if (result.structuredContent !== undefined && !validateOutput(result.structuredContent).valid) throw new Error("MCP structured output does not match the reviewed schema");
@@ -277,10 +379,12 @@ export async function mountNativeMcpServer(options: {
     dispose.push(toolset.registry.guard(`mcp-session-${server.id}`, (execution) => names.includes(execution.name)
       && (!active || execution.agentId !== agentId || resolve(execution.workspace) !== workspace)
       ? "MCP grant is no longer valid in this execution scope" : undefined, agentId));
-    return { catalog: initial, toolNames: names, close };
+    const receipt: NativeMcpMountReceipt = { serverId: server.id, catalogDigest: initial.digest, protocol,
+      auth: server.transport === "streamable-http" ? server.auth ?? null : null };
+    return { catalog: initial, toolNames: names, receipt, close };
   } catch (error) {
     await close().catch(() => {});
     // Do not expose server diagnostics, command arguments or credential environment on failure.
-    throw new Error(transportFailure(transport, "MCP mount refused; review the configured server, catalog digest and tool grants"), { cause: error instanceof Error ? error.name : "unknown" });
+    throw connectionFailure(transport, error, "MCP mount refused; review the configured server, catalog digest and tool grants");
   }
 }

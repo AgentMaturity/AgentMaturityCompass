@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-17",
+  "date": "2026-10-07",
+  "commit": "98230cf0a4092d8aef116b6bc75a45a5271c3d11",
+  "branch": "rtd/p1-17-f4-incident-clocks",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 33559
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 27702
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 35151
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 2966
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 492
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 291
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1361
+    },
+    {
+      "cmd": "npm run check:citations",
+      "exit": 0,
+      "durationMs": 343
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1430
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 212
+    },
+    {
+      "cmd": "npm run check:no-fabrication",
+      "exit": 0,
+      "durationMs": 1715
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 296
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "728a4be2ad415bce2f9d25b4285576d4fe1d237387dd31c7bd87fa9b6dd1d60f"
+    },
+    {
+      "path": "sources.md",
+      "sha256": "f1998c54a2d316efa4e7acc537a164d700fbef5042629b604f8ef23f27bbfd00"
+    },
+    {
+      "path": "clocks-wealth.json",
+      "sha256": "4d9e2d66eb6e71b3abce7010fc0293c3df7bbb9c9a495c93aee83c011cba98f1"
+    }
+  ],
+  "notes": "Tests are paused by Sid's standing order for this round (no vitest, coverage, mutation checks, release gate or CI), so tests is null and the issue's new tests and mutation checks are not recorded here. Every command exited 0. clocks-wealth.json is the --json clocks listing of a seeded wealth incident in a fresh workspace; sources.md lists the primary texts read on 2026-10-07 with retrieval times and hashes. All clock durations are agent-drafted and experimental until a named expert signs off (D-08)."
+}

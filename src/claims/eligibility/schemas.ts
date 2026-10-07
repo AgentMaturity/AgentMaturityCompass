@@ -32,7 +32,7 @@ export const claimEnvelopeSchema = z.object({
     method: z.enum(["synthetic", "numeric_self_answer", "keyword_match", "unkeyed_checksum",
       "path_presence", "runtime_observation", "executed_test", "human_review"]),
     evidenceRefs: z.array(z.string()),
-    legacy: z.object({ version: z.string(), originalTier: z.string().optional() }).strict().optional()
+    legacy: z.object({ version: z.string(), originalTier: z.string().optional(), notice: z.string().optional() }).strict().optional()
   }).strict(),
   eligibleLevel: z.number().nullable(),
   reasons: z.array(z.enum(["SYNTHETIC_VALUES", "SELF_REPORTED_NO_POSITIVE_STATUS", "SELF_REPORTED_LEVEL_CAP",

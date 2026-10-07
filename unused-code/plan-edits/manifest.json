@@ -192,6 +192,13 @@
       "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404"
     },
     {
+      "path": "src/ops/policy.ts",
+      "issue": "P1-15",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
+      "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",

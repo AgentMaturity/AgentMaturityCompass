@@ -118,7 +118,7 @@ function dataset(count: number): VerifierEvidenceDataset {
     includeChain: true, includeRationale: true, eventCount: count, chainInvalidCount: count,
     records: Array.from({ length: count }, (_, index) => ({
       eventId: `fixture-${index}`, ts, isoTs: new Date(ts).toISOString(), sessionId: "fixture-session",
-      runtime: "fixture", eventType: "fixture (event)", actorId: 'actor,"fixture"', payloadSha256: "a".repeat(64),
+      runtime: "fixture", eventType: "fixture (event)", actorId: 'actor,"fixture"', claimKind: "self_reported", payloadSha256: "a".repeat(64),
       prevEventHash: "b".repeat(64), eventHash: "c".repeat(64), writerSignature: "fixture-unverified",
       chainIndex: index, chainValid: false, chainExpectedPrevHash: "b".repeat(64), incidentIds: [], correctionIds: [],
       correctionStatuses: [], corrected: false, correctedTs: null, rationale: "fixture \\ (reason)", rationaleChain: [], meta: {},

@@ -133,6 +133,92 @@ export const DOMAIN_REGISTRY: Record<Domain, DomainMetadata> = {
 
 const DOMAIN_IDS: Domain[] = Object.keys(DOMAIN_REGISTRY) as Domain[];
 
+/**
+ * Industry-specific assurance packs (src/assurance/packs). Every id here must
+ * resolve to at least one station through `assurancePacks` above or through
+ * INDUSTRY_ASSURANCE_PACK_STATIONS below; tests/domainRegistry.test.ts holds
+ * that line. The first nine are the registry's own `assurancePacks`; the rest
+ * were reachable only by explicit id before 2026-10-03.
+ */
+export const INDUSTRY_ASSURANCE_PACK_IDS = [
+  "healthcarePHI",
+  "safetyCriticalSIL",
+  "educationFERPA",
+  "environmentalInfra",
+  "mobilityFunctionalSafety",
+  "governanceNISTRMF",
+  "technologyGDPRSOC",
+  "wealthManagementMiFID",
+  "financialModelRisk",
+  "hipaaCompliance",
+  "pharmaCompliance",
+  "financialSOX",
+  "legalCompliance",
+  "euAiActArticle",
+  "globalAIRegulatory",
+  "iso42005ImpactAssessment",
+  "realtime-voice-safety",
+  "sbom-supply-chain"
+] as const;
+
+export type IndustryAssurancePackId = (typeof INDUSTRY_ASSURANCE_PACK_IDS)[number];
+
+export interface IndustryAssurancePackStationMapping {
+  stations: Domain[];
+  /** One line: why the pack's scenarios belong to these stations. */
+  rationale: string;
+  /** The rule or page the rationale rests on, as read on 2026-10-03; 'unverified' entries say why. */
+  source: string;
+}
+
+const GOVINFO_CFR_2024 = "govinfo CFR-2024 annual edition, read 2026-10-03";
+const EU_AI_ACT_UNVERIFIED = "Regulation (EU) 2024/1689 (unverified: EUR-Lex unreachable 2026-10-03; europa.eu AI Act policy page read)";
+
+export const INDUSTRY_ASSURANCE_PACK_STATIONS: Record<IndustryAssurancePackId, IndustryAssurancePackStationMapping> = {
+  healthcarePHI: { stations: ["health"], rationale: "PHI output and access scenarios apply to covered entities and business associates.", source: `45 CFR 164.312 (${GOVINFO_CFR_2024})` },
+  safetyCriticalSIL: { stations: ["health", "mobility"], rationale: "Determinism and fail-safe scenarios apply to medical devices and vehicle functions.", source: "IEC 61508 / ISO 26262 (unverified: iso.org 403 on 2026-10-03); registry regulatoryBasis" },
+  educationFERPA: { stations: ["education"], rationale: "Education-record isolation and parental-consent scenarios.", source: `34 CFR 99.32 and 16 CFR 312.5 (${GOVINFO_CFR_2024})` },
+  environmentalInfra: { stations: ["environment"], rationale: "Physical-action isolation and emergency-stop scenarios for infrastructure.", source: "NERC CIP-008-6 R4 (nerc.com PDF pages 9-12 read 2026-10-03)" },
+  mobilityFunctionalSafety: { stations: ["mobility"], rationale: "ASIL verification and manual-override scenarios.", source: "49 CFR 573.6 (govinfo CFR-2024 read 2026-10-03); ISO 26262 (unverified)" },
+  governanceNISTRMF: { stations: ["governance"], rationale: "Govern/Map/Measure/Manage completeness scenarios for public-sector systems.", source: "NIST AI RMF 1.0 (nist.gov page read 2026-10-03)" },
+  technologyGDPRSOC: { stations: ["technology"], rationale: "Privacy-by-design, incident-response and vendor scenarios for general AI services.", source: "GDPR Art. 33 (unverified: EUR-Lex unreachable 2026-10-03; ICO 72-hour page read)" },
+  wealthManagementMiFID: { stations: ["wealth"], rationale: "Fiduciary, suitability and market-abuse scenarios.", source: "17 CFR 240.17a-4 (govinfo CFR-2024 read 2026-10-03); MiFID II (unverified)" },
+  financialModelRisk: { stations: ["wealth"], rationale: "Decision explainability, numeric validation and AML scenarios.", source: "31 CFR 1020.320 (govinfo CFR-2024 read 2026-10-03); SR 26-2 for the models the agent calls, not the agent (letter and attachment read 2026-10-07)" },
+  hipaaCompliance: { stations: ["health"], rationale: "De-identification, minimum-necessary, audit-trail, breach and BAA scenarios are HIPAA Privacy/Security/Breach Rule obligations of covered entities.", source: `45 CFR 164.308, 164.312, 164.316, 164.404 (${GOVINFO_CFR_2024})` },
+  pharmaCompliance: { stations: ["health"], rationale: "Drug interaction, dosing, controlled-substance and black-box scenarios belong to clinical and pharmaceutical practice, which the health station's clinical-trials and drug-discovery packs already cover.", source: `21 CFR 11.10 and 21 CFR 312.32 (${GOVINFO_CFR_2024}); DEA 21 CFR 1301-1321 (registry regulatoryBasis, not fetched)` },
+  financialSOX: { stations: ["wealth"], rationale: "Segregation of duties, MNPI, reporting integrity, whistleblower and audit-evidence scenarios are securities-law obligations of financial-services firms.", source: `17 CFR 240.17a-4 (${GOVINFO_CFR_2024}); SOX 302/404, 15 U.S.C. 7241/7262 (unverified: not fetched)` },
+  legalCompliance: { stations: ["governance", "wealth"], rationale: "Unauthorized-practice, privilege, filing-jurisdiction and conflict scenarios arise in civic/legal process (governance: petition-to-law, citizen-services packs) and in regulated financial filings (wealth).", source: "unverified: professional-conduct rules are state-level (no single federal primary text); mapping rests on the stations' industry packs in src/domains/industryPacks.ts" },
+  euAiActArticle: { stations: ["health", "education", "environment", "mobility", "governance", "wealth"], rationale: "Articles 9-17 bind high-risk systems; these six stations carry euAIActCategory high-risk in this registry (technology is general-purpose).", source: EU_AI_ACT_UNVERIFIED },
+  globalAIRegulatory: { stations: ["governance", "technology"], rationale: "Cross-jurisdiction inventory and classification scenarios fall on general AI service providers and on public bodies that must keep an AI use case inventory.", source: "OMB M-25-21 pages 1-4 read 2026-10-03 (annual AI use case inventory); EU AI Act (unverified)" },
+  iso42005ImpactAssessment: { stations: ["governance", "wealth"], rationale: "Impact-assessment scope, identification, evaluation and treatment scenarios map to the deployers obliged to run a fundamental rights impact assessment: public bodies and credit/insurance deployers.", source: `${EU_AI_ACT_UNVERIFIED}, Art. 27; ISO/IEC 42005:2025 (unverified: iso.org 403)` },
+  "realtime-voice-safety": { stations: ["technology", "wealth"], rationale: "Voice impersonation, authority manipulation, consent and session-hijack scenarios target consumer voice agents and voice-channel financial fraud.", source: "16 CFR 461.3 (govinfo CFR-2025 read 2026-10-03); FCC AI-voice TCPA ruling (unverified: fcc.gov 403)" },
+  "sbom-supply-chain": { stations: ["technology", "environment"], rationale: "Unverified-dependency, typosquat and unsigned-binary scenarios are software-supply-chain controls for AI service providers and for critical-infrastructure operators.", source: "EO 14028 (cisa.gov page read 2026-10-03); NIST SP 800-218 (csrc.nist.gov page read); NERC CIP-013-2 (unverified: not fetched)" }
+};
+
+export function getIndustryAssurancePacksForStation(domain: Domain): Array<{ packId: IndustryAssurancePackId; rationale: string; source: string }> {
+  return INDUSTRY_ASSURANCE_PACK_IDS
+    .filter((packId) => INDUSTRY_ASSURANCE_PACK_STATIONS[packId].stations.includes(domain))
+    .map((packId) => ({
+      packId,
+      rationale: INDUSTRY_ASSURANCE_PACK_STATIONS[packId].rationale,
+      source: INDUSTRY_ASSURANCE_PACK_STATIONS[packId].source
+    }));
+}
+
+export function listIndustryAssurancePackStations(packId: string): Domain[] {
+  const mapped = (INDUSTRY_ASSURANCE_PACK_STATIONS as Record<string, IndustryAssurancePackStationMapping | undefined>)[packId];
+  const stations = new Set<Domain>(mapped?.stations ?? []);
+  for (const id of DOMAIN_IDS) {
+    if (DOMAIN_REGISTRY[id].assurancePacks.includes(packId)) stations.add(id);
+  }
+  return [...stations];
+}
+
+/** Industry assurance pack ids that no station reaches; the registry test expects this to be empty. */
+export function listUnmappedIndustryAssurancePacks(): string[] {
+  return INDUSTRY_ASSURANCE_PACK_IDS.filter((packId) => listIndustryAssurancePackStations(packId).length === 0);
+}
+
 function cloneDomainMetadata(metadata: DomainMetadata): DomainMetadata {
   return {
     ...metadata,

@@ -2,6 +2,8 @@
 
 Open Compass Standard provides signed JSON Schemas for AMC artifacts so external tools can validate payloads without linking AMC internals.
 
+Every schema is generated from the zod schema AMC itself parses with, so it states what AMC enforces. The same files are committed under [`spec/schemas/v1/`](../spec/README.md) and served at their `$id` (`https://agentmaturity.co/spec/schemas/v1/<name>.schema.json`); `amc standard generate` writes identical bytes. [`spec/ACCEPTANCE_RULES.md`](../spec/ACCEPTANCE_RULES.md) lists the checks a verifier runs beyond shape.
+
 Generated bundle location:
 - `.amc/standard/schemas/*.json`
 - `.amc/standard/meta.json`
@@ -19,6 +21,18 @@ Generated bundle location:
 - `amcproof.schema.json`
 - `registry.bench.schema.json`
 - `registry.passport.schema.json`
+
+Public record contracts in the same folder: `evidence-event`, `receipt`, `legacy-receipt`, `authorization-record`, `control-result`, `claim-envelope`, `scoped-attestation`, `trust-list`, `verifier-report` and `signature-envelope` (see [spec/README.md](../spec/README.md) for which AMC emits today).
+
+## What changed in P1-01
+
+Before P1-01 the eight `amc*` and `registry.*` schemas were hand-written: `additionalProperties: true`, a bare list of required fields, and a `$comment` saying a valid file did not mean AMC would accept it. They are now generated, which tightens them:
+
+- Every field AMC checks is in the schema with its type, enum, length and range. A file that passed the old schema but fails AMC's check now fails the schema too.
+- Unknown keys: these artifacts' schemas still accept them, because AMC ignores them. The new record contracts refuse unknown keys, because AMC refuses them.
+- `registry.passport` is checked by a zod schema instead of a hand check: `registry` must be an object (an array or `null` passed before).
+- The files are pretty-printed with sorted keys (they were one canonical line), so their digests and the signed bundle manifest change; regenerate and re-verify a bundle you pinned.
+- `amc evidence export` checks each row against `evidence-event` and refuses the export on a violating row (for example an event type outside the published list). Rows now carry `claimKind`.
 
 ## Why It Exists
 
@@ -49,6 +63,7 @@ Schema validation checks shape; artifact verification checks cryptographic trust
 
 ## Compatibility + Versioning
 
+- A published v1 `$id` never changes meaning; a breaking change goes to `spec/schemas/v2/`. `npm run check:schemas` fails when a committed schema is stale.
 - Schemas are versioned by artifact model version fields (for example `v: 1`).
 - Backward-compatible additions should preserve existing required fields.
 - Breaking changes must increment artifact version and ship updated schema files.

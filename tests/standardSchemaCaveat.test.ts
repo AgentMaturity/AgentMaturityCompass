@@ -6,28 +6,29 @@ import { generateStandardSchemas } from "../src/standard/standardGenerator.js";
 import { initWorkspace } from "../src/workspace.js";
 
 /**
- * The Open Compass bundle publishes deliberately permissive JSON Schemas so
- * third parties can extend the format — AMC itself validates against stricter
- * internal zod schemas, so passing the published schema does not mean AMC would
- * accept the artifact.
- *
- * That caveat lived only in a source comment. The bundle ships signed, so a
- * consumer reading amcbench.schema.json saw an authoritative-looking statement
- * of AMC's requirements with nothing marking it as the looser interchange form.
- * The caveat has to travel with the artifact.
+ * The Open Compass bundle used to publish hand-written permissive schemas
+ * (`additionalProperties: true`) with a caveat that passing them did NOT mean
+ * AMC would accept the artifact. P1-01 replaced them: every published schema is
+ * generated from the zod schema AMC parses with, so it states exactly what AMC
+ * enforces and needs no caveat. `amc standard generate` writes the same bytes
+ * as the committed spec/schemas/v1/ files that `npm run check:schemas` keeps current.
  */
 describe("published standard schemas", () => {
-  it("carry the permissiveness caveat in the artifact, not just the source", () => {
+  it("are the generated spec schemas, with no permissiveness caveat", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-standard-"));
     try {
       initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
       generateStandardSchemas(workspace);
       const dir = join(workspace, ".amc", "standard", "schemas");
       const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
-      expect(files.length).toBeGreaterThan(0);
+      expect(files.length).toBe(9);
 
       for (const file of files) {
-        const schema = JSON.parse(readFileSync(join(dir, file), "utf8"));
+        const text = readFileSync(join(dir, file), "utf8");
+        expect(text, file).toBe(readFileSync(join("spec", "schemas", "v1", file), "utf8"));
+        const schema = JSON.parse(text);
+        expect(schema.$comment ?? "", file).not.toMatch(/does NOT mean AMC would accept/);
+        expect(schema.additionalProperties, file).not.toBe(true);
         if (file === "external-evidence.schema.json") {
           expect(schema.$id).toBe("https://agentmaturity.co/standards/external-evidence/v1/schema.json");
           expect(schema.$comment).toContain("Shape validation does not establish provenance authority");
@@ -37,10 +38,8 @@ describe("published standard schemas", () => {
           expect(schema.required).toContain("signature");
           continue;
         }
-        expect(schema.$comment, file).toMatch(/does NOT mean AMC would accept/);
-        // The looseness the caveat is warning about must actually be present,
-        // otherwise the warning is describing a different document.
-        expect(schema.additionalProperties, file).toBe(true);
+        expect(schema.$id, file).toBe(`https://agentmaturity.co/spec/schemas/v1/${file}`);
+        expect(schema.$schema, file).toBe("https://json-schema.org/draft/2020-12/schema");
       }
     } finally {
       rmSync(workspace, { recursive: true, force: true });

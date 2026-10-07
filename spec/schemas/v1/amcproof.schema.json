@@ -1,0 +1,224 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/amcproof.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "assumptions": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "claimText": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "constraintsChecked": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "counterexample": {
+      "properties": {
+        "brokenClauseId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "inputFact": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "missingAssumption": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "remediationHint": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "brokenClauseId",
+        "inputFact",
+        "remediationHint"
+      ],
+      "type": "object"
+    },
+    "domainId": {
+      "enum": [
+        "health",
+        "education",
+        "environment",
+        "mobility",
+        "governance",
+        "technology",
+        "wealth"
+      ],
+      "type": "string"
+    },
+    "evidenceRefs": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "formalSpecHash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "type": "string"
+    },
+    "generatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "humanReview": {
+      "properties": {
+        "notes": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewedAt": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "reviewerRole": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "not_required",
+            "pending",
+            "reviewed",
+            "rejected"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "type": "object"
+    },
+    "proofBindings": {
+      "properties": {
+        "canonicalSha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "signatureRef": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "signedEvidenceRefs": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "transparencyEntryHash": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonicalSha256"
+      ],
+      "type": "object"
+    },
+    "proofClass": {
+      "enum": [
+        "evidence_integrity",
+        "runtime_policy",
+        "domain_correctness"
+      ],
+      "type": "string"
+    },
+    "proofId": {
+      "pattern": "^amcproof_[A-Za-z0-9_-]{3,}$",
+      "type": "string"
+    },
+    "result": {
+      "enum": [
+        "proven",
+        "disproven",
+        "unsupported",
+        "not_applicable"
+      ],
+      "type": "string"
+    },
+    "ruleRefs": {
+      "items": {
+        "properties": {
+          "clauseId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "effectiveDate": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+          },
+          "hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          "sourceId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "url": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId",
+          "clauseId",
+          "effectiveDate",
+          "url",
+          "hash"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "sourceManifestHash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "type": "string"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "proofId",
+    "generatedTs",
+    "proofClass",
+    "claimText",
+    "sourceManifestHash",
+    "formalSpecHash",
+    "ruleRefs",
+    "constraintsChecked",
+    "result",
+    "humanReview",
+    "proofBindings"
+  ],
+  "title": "AMC Domain Proof Artifact",
+  "type": "object"
+}

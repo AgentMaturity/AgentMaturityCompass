@@ -212,7 +212,9 @@ describe("studio + vault + mode + loop", () => {
       "firewall migrate-signature",
       "guardrails enable",
       "guardrails disable",
-      "guardrails profile"
+      "guardrails profile",
+      "domain apply --sign-profile",
+      "domain apply --activate-profile"
     ]) {
       expect(() => assertOwnerMode(workspace, command), command).toThrow("blocked in agent mode");
     }

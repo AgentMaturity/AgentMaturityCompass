@@ -1,0 +1,28 @@
+{
+  "eventId": "8b0d6f0e-6a1f-4a43-9a51-3d1f0c2b7e10",
+  "ts": 1767225600000,
+  "isoTs": "2026-01-01T00:00:00.000Z",
+  "sessionId": "session-1",
+  "runtime": "amc",
+  "eventType": "custom/event",
+  "actorId": "agent-1",
+  "claimKind": "observed",
+  "payloadSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "prevEventHash": "GENESIS",
+  "eventHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "writerSignature": "unsigned",
+  "chainIndex": -1,
+  "chainValid": true,
+  "chainExpectedPrevHash": "",
+  "incidentIds": [],
+  "correctionIds": [],
+  "correctionStatuses": [],
+  "corrected": false,
+  "correctedTs": null,
+  "rationale": null,
+  "rationaleChain": [],
+  "meta": {
+    "agentId": "agent-1",
+    "trustTier": "OBSERVED"
+  }
+}

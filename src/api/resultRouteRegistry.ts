@@ -95,7 +95,9 @@ export const API_RESULT_ROUTES: readonly ResultRoute[] = [
   ...resultFamily("api", V1, "runtime_observation", [
     ["POST", "compliance/report"], ["POST", "compliance/fleet"], ["POST", "compliance/diff"],
     ["POST", "compliance/regulatory/check"], ["GET", "regulatory/eu-ai-act"], ["GET", "regulatory/owasp-llm"],
-    ["GET", "regulatory/readiness"]
+    ["GET", "regulatory/readiness"],
+    // P1-17: deadlines computed from operator-stated trigger and notice times; never a filing or compliance verdict.
+    ["GET", "incidents/:id/clocks"]
   ], true)
 ];
 

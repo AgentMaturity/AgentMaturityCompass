@@ -1,0 +1,172 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "benches": {
+      "default": [],
+      "items": {
+        "properties": {
+          "benchId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "evidence": {
+            "properties": {
+              "integrityIndex": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "trustLabel": {
+                "enum": [
+                  "LOW",
+                  "MEDIUM",
+                  "HIGH"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "integrityIndex",
+              "trustLabel"
+            ],
+            "type": "object"
+          },
+          "labels": {
+            "default": {},
+            "properties": {
+              "agentType": {
+                "enum": [
+                  "code-agent",
+                  "support-agent",
+                  "ops-agent",
+                  "research-agent",
+                  "sales-agent",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "deployment": {
+                "enum": [
+                  "single",
+                  "host",
+                  "k8s",
+                  "compose"
+                ],
+                "type": "string"
+              },
+              "industry": {
+                "enum": [
+                  "software",
+                  "fintech",
+                  "health",
+                  "manufacturing",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "scopeType": {
+            "enum": [
+              "WORKSPACE",
+              "NODE",
+              "AGENT"
+            ],
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "properties": {
+                "risk": {
+                  "enum": [
+                    "LOW",
+                    "MEDIUM",
+                    "HIGH"
+                  ],
+                  "type": "string"
+                },
+                "sha256": {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                "signerFingerprint": {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                "url": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "version": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "version",
+                "sha256",
+                "url",
+                "signerFingerprint",
+                "risk"
+              ],
+              "type": "object"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "benchId",
+          "scopeType",
+          "evidence",
+          "versions"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "registry": {
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "issuerFingerprint": {
+          "maxLength": 64,
+          "minLength": 64,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "updatedTs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "issuerFingerprint",
+        "updatedTs"
+      ],
+      "type": "object"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "registry"
+  ],
+  "title": "AMC Bench Registry Index",
+  "type": "object"
+}

@@ -173,7 +173,8 @@ describe("envelope adapters", () => {
     const envelope = envelopeForLegacyResult({ producer: "amc 1.x", version: "1.1.1", originalTier: "OBSERVED",
       method: "runtime_observation", status: "PASS", level: 4, eventCount: 12, now: NOW });
     expect(envelope.claimKind).toBe("self_reported");
-    expect(envelope.provenance.legacy).toEqual({ version: "1.1.1", originalTier: "OBSERVED" });
+    expect(envelope.provenance.legacy).toEqual({ version: "1.1.1", originalTier: "OBSERVED", notice: "AMC-LEGACY-2026-001 v1" });
+    expect(envelope.eligibleLevel).toBe(1);
     expect(envelope.reasons).toContain("LEGACY_1X_UNVERIFIED");
   });
 });

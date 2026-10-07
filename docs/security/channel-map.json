@@ -101,12 +101,17 @@
       "name": "MCP HTTP",
       "enforcementPoints": [
         { "path": "src/mcp/nativeMcpHttpTransport.ts", "symbol": "nativeMcpHttpEndpoint" },
-        { "path": "src/mcp/nativeMcpHttpTransport.ts", "symbol": "NativeMcpHttpTransport" }
+        { "path": "src/mcp/nativeMcpHttpTransport.ts", "symbol": "NativeMcpHttpTransport" },
+        { "path": "src/mcp/nativeMcpClient.ts", "symbol": "negotiate" },
+        { "path": "src/mcp/oauth/discovery.ts", "symbol": "discoverNativeMcpAuthorizationServer" },
+        { "path": "src/mcp/oauth/authorize.ts", "symbol": "validateNativeMcpAuthorizationResponse" },
+        { "path": "src/mcp/oauth/tokenStore.ts", "symbol": "NativeMcpOAuthTokenStore" }
       ],
-      "evidence": "Tool evidence rows",
+      "evidence": "Tool evidence rows; mcp-catalog output and the mount receipt record the negotiated protocol and the OAuth issuer, scopes and expiry",
       "status": "enforced",
       "bypasses": [
-        "No OAuth: a server that needs it is refused rather than authenticated"
+        "A broken 2026-07-28 tools/call stream leaves the remote outcome unknown; AMC reports TOOL_OUTCOME_UNKNOWN and does not replay, so a side effect may have happened unrecorded",
+        "Protected-resource metadata may name any HTTPS authorization server; the operator approves it in the browser and grants are keyed by issuer, but AMC does not pin the issuer in config"
       ],
       "owners": ["P1-39"],
       "asi": ["ASI02", "ASI04"]

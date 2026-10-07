@@ -7,7 +7,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 
-const opsPolicySchema = z.object({
+export const opsPolicySchema = z.object({
   opsPolicy: z.object({
     version: z.literal(1),
     retention: z.object({
@@ -80,7 +80,7 @@ export function opsPolicySigPath(workspace: string): string {
   return `${opsPolicyPath(workspace)}.sig`;
 }
 
-function defaultOpsPolicy(): OpsPolicy {
+export function defaultOpsPolicy(): OpsPolicy {
   return opsPolicySchema.parse({
     opsPolicy: {
       version: 1,

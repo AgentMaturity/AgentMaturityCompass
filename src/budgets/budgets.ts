@@ -21,7 +21,7 @@ const actionClassSchema = z.enum([
   "IDENTITY"
 ]);
 
-const budgetsSchema = z.object({
+export const budgetsSchema = z.object({
   budgets: z.object({
     version: z.literal(1),
     perAgent: z.record(z.string(), 

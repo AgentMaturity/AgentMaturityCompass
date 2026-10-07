@@ -4,11 +4,20 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
-import { bodyJson, apiSuccess, apiError, pathParam, queryParam } from './apiHelpers.js';
+import { bodyJson, apiSuccess, apiError, apiRequestError, pathParam, queryParam } from './apiHelpers.js';
 import { openLedger } from '../ledger/ledger.js';
 import { createIncidentStore, computeIncidentHash } from '../incidents/incidentStore.js';
 import type { Incident, IncidentSeverity, IncidentState } from '../incidents/incidentTypes.js';
-import { signHexDigest, getPrivateKeyPem } from '../crypto/keys.js';
+import {
+  IncidentInputError,
+  clockListing,
+  loadIncidentClocks,
+  parseIsoTimestamp,
+  parseStation,
+  recordIncidentClockEvent
+} from '../incidents/incidentClockEvents.js';
+import { recordWorkspaceOversight } from '../incidents/oversightRecord.js';
+import { signHexDigest, getPrivateKeyPem, getPublicKeyHistory } from '../crypto/keys.js';
 import { sha256Hex } from '../utils/hash.js';
 import { canonicalize } from '../utils/json.js';
 
@@ -19,6 +28,89 @@ function normalizeSeverity(raw: string | undefined): IncidentSeverity {
   if (upper === 'WARN' || upper === 'MEDIUM') return 'WARN';
   if (upper === 'CRITICAL' || upper === 'HIGH') return 'CRITICAL';
   return 'WARN';
+}
+
+const CLOCK_ACTION_METHODS: Record<string, string> = { clocks: 'GET', 'clock-events': 'POST', oversight: 'POST' };
+
+function text(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+/**
+ * GET /api/v1/incidents/:id/clocks?station=&now=, POST /api/v1/incidents/:id/clock-events
+ * and POST /api/v1/incidents/:id/oversight (P1-17). 400 on a bad station, trigger, clock,
+ * decision or timestamp; 404 on an unknown incident.
+ */
+async function handleIncidentClockRoute(
+  incidentId: string,
+  action: string,
+  req: IncomingMessage,
+  res: ServerResponse,
+  workspace: string,
+): Promise<boolean> {
+  const ledger = openLedger(workspace);
+  try {
+    const store = createIncidentStore(ledger.db);
+    store.initTables();
+    const incident = store.getIncident(incidentId);
+    if (!incident) { apiError(res, 404, 'Incident not found'); return true; }
+
+    if (action === 'clocks') {
+      const url = req.url ?? '';
+      const station = parseStation(queryParam(url, 'station') ?? '');
+      const now = queryParam(url, 'now');
+      const nowTs = now === undefined ? Date.now() : parseIsoTimestamp(now, 'now');
+      const loaded = loadIncidentClocks(store, incidentId, station, nowTs, getPublicKeyHistory(workspace, 'monitor'));
+      apiSuccess(res, clockListing(loaded, station, nowTs));
+      return true;
+    }
+
+    const body = await bodyJson<Record<string, unknown>>(req);
+    if (action === 'clock-events') {
+      const station = parseStation(text(body.station));
+      const trigger = body.trigger === undefined ? undefined : text(body.trigger);
+      const notified = body.notified === undefined ? undefined : text(body.notified);
+      if ((trigger === undefined) === (notified === undefined)) {
+        throw new IncidentInputError('give exactly one of trigger or notified');
+      }
+      const event = recordIncidentClockEvent(store, {
+        incidentId,
+        station,
+        kind: trigger === undefined ? 'NOTIFIED' : 'TRIGGER',
+        triggerOrClockId: trigger ?? notified ?? '',
+        ts: parseIsoTimestamp(text(body.at), 'at'),
+        recordedBy: 'api',
+        privateKeyPem: getPrivateKeyPem(workspace, 'monitor'),
+        publicKeys: getPublicKeyHistory(workspace, 'monitor'),
+      });
+      apiSuccess(res, event, 201);
+      return true;
+    }
+
+    const clockIds = body.clockIds ?? [];
+    if (!Array.isArray(clockIds) || clockIds.some((id) => typeof id !== 'string')) {
+      throw new IncidentInputError('clockIds must be an array of clock ids');
+    }
+    const record = recordWorkspaceOversight({
+      workspace,
+      incident,
+      reviewerId: text(body.reviewerId),
+      decision: text(body.decision),
+      rationale: text(body.rationale),
+      clockIds: clockIds as string[],
+      reviewedTs: Date.now(),
+      privateKeyPem: getPrivateKeyPem(workspace, 'auditor'),
+      publicKeys: getPublicKeyHistory(workspace, 'auditor'),
+    });
+    apiSuccess(res, record, 201);
+    return true;
+  } catch (err) {
+    if (err instanceof IncidentInputError) apiError(res, 400, err.message);
+    else apiRequestError(res, err, 'Could not process incident clocks', 500);
+    return true;
+  } finally {
+    ledger.close();
+  }
 }
 
 export async function handleIncidentRoute(
@@ -140,6 +232,11 @@ export async function handleIncidentRoute(
       ledger.close();
     }
     return true;
+  }
+
+  const clockParams = pathParam(pathname, '/api/v1/incidents/:id/:action');
+  if (clockParams?.id && clockParams.action && CLOCK_ACTION_METHODS[clockParams.action] === method) {
+    return handleIncidentClockRoute(clockParams.id, clockParams.action, req, res, workspace);
   }
 
   // Match /:id routes

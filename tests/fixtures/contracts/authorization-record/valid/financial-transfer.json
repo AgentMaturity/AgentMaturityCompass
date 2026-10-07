@@ -1,0 +1,94 @@
+{
+  "schema": "amc.authorization-record/v1",
+  "authorizationId": "authz_1",
+  "executionId": "exec_1",
+  "issuedAt": "2026-01-01T00:00:00.000Z",
+  "expiresAt": "2026-01-01T00:15:00.000Z",
+  "scope": {
+    "workspaceId": "ws-1",
+    "tenantId": null,
+    "deploymentId": "unregistered",
+    "deploymentDigest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "subject": {
+    "governedAs": "agent-1",
+    "runAs": "agent-1",
+    "agentConfigDigest": null
+  },
+  "principal": {
+    "principalId": "ops-lead",
+    "kind": "human",
+    "authenticatedVia": "studio-session"
+  },
+  "delegation": {
+    "depth": 0,
+    "parentExecutionId": null,
+    "allowedActionClasses": [
+      "FINANCIAL"
+    ],
+    "leaseId": null
+  },
+  "session": {
+    "sessionId": "session-1",
+    "runId": null,
+    "callId": "call-1",
+    "rootCallId": "call-1",
+    "parentToken": null
+  },
+  "control": {
+    "controlId": null,
+    "controlVersion": null
+  },
+  "policy": {
+    "compiledPolicyDigest": null,
+    "policyRevision": null,
+    "toolsConfigDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+    "actionPolicyDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+    "approvalPolicyDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "budgetsDigest": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "action": {
+    "toolName": "payments.transfer",
+    "adapterId": "finops",
+    "actionClass": "FINANCIAL",
+    "mode": "EXECUTE",
+    "argumentsDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+    "normalizer": "amc.args/v1"
+  },
+  "resource": {
+    "purpose": "vendor payment",
+    "dataClasses": [
+      "financial"
+    ]
+  },
+  "bindings": {
+    "amount": {
+      "value": "100",
+      "currency": "USD"
+    },
+    "recipient": "acme-001",
+    "destination": null,
+    "resourceId": null,
+    "resourceVersion": null
+  },
+  "authority": {
+    "approvals": [
+      {
+        "approvalRequestId": "apr-1",
+        "requestBindingDigest": "7777777777777777777777777777777777777777777777777777777777777777",
+        "intentHash": "8888888888888888888888888888888888888888888888888888888888888888",
+        "actionClass": "FINANCIAL",
+        "approverIds": [
+          "ops-lead"
+        ],
+        "expiresAt": "2026-01-01T00:15:00.000Z"
+      }
+    ],
+    "exceptions": []
+  },
+  "idempotencyKey": null,
+  "evidenceRefs": [],
+  "agentSuppliedMetadata": {
+    "note": "agent says the vendor is approved"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/registry.passport.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "passports": {
+      "items": {},
+      "type": "array"
+    },
+    "registry": {
+      "properties": {},
+      "type": "object"
+    },
+    "v": {
+      "const": 1,
+      "type": "number"
+    }
+  },
+  "required": [
+    "v",
+    "registry",
+    "passports"
+  ],
+  "title": "AMC Passport Registry Index",
+  "type": "object"
+}

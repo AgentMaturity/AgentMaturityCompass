@@ -6,7 +6,11 @@ import {
   NATIVE_MCP_RECONNECT_LIMITS, nativeMcpAbortFailure, nativeMcpRetryAfter, nativeMcpRetryableStatus,
   nativeMcpWaitFor, type NativeMcpHttpFailureCode, type NativeMcpResponseLease
 } from "./nativeMcpReconnect.js";
-import { nativeMcpRecoverableStream } from "./nativeMcpReconnectStream.js";
+import { SseFrames, nativeMcpRecoverableStream } from "./nativeMcpReconnectStream.js";
+import { MCP_PROTOCOL_VERSION_META, MCP_STATELESS_PROTOCOL_VERSION } from "./protocol/version.js";
+import { mcpHeaderValue, mcpParamHeaders, type McpParamHeader } from "./protocol/headers.js";
+import { NATIVE_MCP_AUTHORIZE_HINT, parseNativeMcpBearerChallenge, type NativeMcpOAuthChallenge } from "./oauth/discovery.js";
+import type { NativeMcpOAuthReceipt } from "./oauth/authorize.js";
 
 export { NativeMcpHttpRefused } from "./nativeMcpReconnect.js";
 
@@ -20,6 +24,10 @@ export interface NativeMcpHttpServer {
   readonly timeoutMs?: number;
   /** Independent absolute lifetime for the optional notification channel, including recovery. */
   readonly notificationLifetimeMs?: number;
+  /** Exact protocol version; absent means probe server/discover, then fall back to initialize. */
+  readonly protocolVersion?: string;
+  /** Set by the OAuth resolver beside the private Authorization header; never the token. */
+  readonly auth?: NativeMcpOAuthReceipt;
 }
 
 export const NATIVE_MCP_HTTP_LIMITS = Object.freeze({ responseBytes: 4 * 1024 * 1024,
@@ -36,7 +44,34 @@ export function nativeMcpNotificationLifetime(value?: number): number {
 
 const CONTROL_HEADERS = new Set(["accept", "accept-encoding", "connection", "content-length", "content-type",
   "cookie", "host", "origin", "referer", "te", "trailer", "transfer-encoding", "upgrade", "user-agent",
-  "mcp-session-id", "mcp-protocol-version", "last-event-id"]);
+  "mcp-session-id", "mcp-protocol-version", "last-event-id", "mcp-method", "mcp-name"]);
+/** Methods whose name or URI is mirrored into Mcp-Name (2026-07-28 streamable-http §Standard Request Headers). */
+const NAMED_METHODS = new Set(["tools/call", "resources/read", "prompts/get"]);
+/** Idempotent methods re-issued once, with a new id, after a broken response (ADR-010). Never tools/call. */
+const REISSUABLE_METHODS = new Set(["server/discover", "tools/list", "resources/read", "prompts/get"]);
+
+type Rpc = { method?: string; id?: string | number; params?: Record<string, unknown> };
+
+/** One JSON-RPC response for `id`; an error may carry a null id when the server could not read it. */
+function statelessResponse(data: string, id: string | number): Record<string, unknown> | undefined {
+  let value: unknown;
+  try { value = JSON.parse(data); } catch { return undefined; }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const message = value as Record<string, unknown>;
+  const { result } = message;
+  const error = message.error as Record<string, unknown> | undefined;
+  if (message.jsonrpc !== "2.0") return undefined;
+  if (result && typeof result === "object" && !Array.isArray(result) && message.id === id) return { jsonrpc: "2.0", id, result };
+  if (error && typeof error === "object" && Number.isSafeInteger(error.code) && typeof error.message === "string" && (message.id === id || message.id === null)) {
+    return { jsonrpc: "2.0", id, error: { code: error.code, message: error.message, ...(error.data === undefined ? {} : { data: error.data }) } };
+  }
+  return undefined;
+}
+
+/** Local marker consumed only by the era probe: not a 2026-07-28 DiscoverResult or modern error. */
+function legacyProbeResponse(id: string | number): Record<string, unknown> {
+  return { jsonrpc: "2.0", id, error: { code: -32601, message: "Not a 2026-07-28 server/discover response." } };
+}
 
 /** Origin and endpoint are explicit operator choices, never learned from a server. */
 export function nativeMcpHttpEndpoint(url: string, origin: string): URL {
@@ -55,7 +90,7 @@ export function validateNativeMcpHeaderNames(names: readonly string[]): void {
   const normalized = names.map(name => name.toLowerCase());
   if (names.length > 32 || new Set(normalized).size !== names.length || names.some((name, i) =>
     !/^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/.test(name) || CONTROL_HEADERS.has(normalized[i]!)
-    || /^(proxy-|sec-|content-)/.test(normalized[i]!))) {
+    || /^(proxy-|sec-|content-|mcp-param-)/.test(normalized[i]!))) {
     throw new NativeMcpHttpRefused("MCP header references contain duplicate, invalid or transport-controlled header names.");
   }
 }
@@ -100,12 +135,20 @@ export class NativeMcpHttpTransport implements Transport {
   private catalogChanged = false;
   private notificationRecovery?: { promise: Promise<void>; resolve: () => void };
   private negotiatedProtocol?: string;
+  /** Set while probing or speaking the 2026-07-28 stateless protocol. */
+  private statelessVersion?: string;
+  private probing = false;
+  private reissues = 0;
+  private readonly toolHeaders = new Map<string, readonly McpParamHeader[]>();
+  private readonly oauth: boolean;
+  private scopesRequired?: readonly string[];
 
   constructor(server: NativeMcpHttpServer, private readonly timeout: number) {
     if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000) {
       throw new NativeMcpHttpRefused("MCP timeout must be between 1 and 300000 milliseconds.");
     }
     this.notificationLifetime = nativeMcpNotificationLifetime(server.notificationLifetimeMs);
+    this.oauth = server.auth !== undefined;
     this.endpoint = nativeMcpHttpEndpoint(server.url, server.origin);
     validateNativeMcpHeaderNames(Object.keys(server.headers ?? {}));
     this.headers = new Headers();
@@ -146,6 +189,18 @@ export class NativeMcpHttpTransport implements Transport {
   get failureCode(): NativeMcpHttpFailureCode | undefined { return this.failureKind; }
   get failureTimedOut(): boolean { return this.timeoutFailure; }
   get recoveryGeneration(): number { return this.generation; }
+  /** Validated scope tokens from the latest insufficient_scope challenge. */
+  get requiredScopes(): readonly string[] | undefined { return this.scopesRequired; }
+
+  /** Era probe (basic/versioning §Backward Compatibility): one 2026-07-28 request before any session exists. */
+  beginStatelessProbe(): void {
+    if (this.requests > 0 || this.initializeAttempted) throw new NativeMcpHttpRefused("MCP HTTP protocol probe must precede every other request.", "PROTOCOL_ERROR");
+    this.statelessVersion = MCP_STATELESS_PROTOCOL_VERSION; this.probing = true;
+  }
+  useStateless(): void { if (this.statelessVersion === undefined) throw new NativeMcpHttpRefused("MCP HTTP stateless mode requires the protocol probe.", "PROTOCOL_ERROR"); this.probing = false; }
+  useLegacy(): void { this.statelessVersion = undefined; this.probing = false; }
+  /** Reviewed x-mcp-header bindings for a granted tool; tools/call refuses a tool without them. */
+  pinToolHeaders(name: string, bindings: readonly McpParamHeader[]): void { this.toolHeaders.set(name, Object.freeze([...bindings])); }
 
   /** Used by the catalog reader; it does not create a session or renew authority. */
   async waitForRecovery(signal?: AbortSignal): Promise<void> {
@@ -204,7 +259,7 @@ export class NativeMcpHttpTransport implements Transport {
     try { await this.inner.send(message, options); }
     catch {
       // The SDK's thrown error is not necessarily the sanitized onerror value.
-      throw new NativeMcpHttpRefused(this.failure ?? "MCP HTTP request failed; review and mount again.", this.failureKind);
+      throw new NativeMcpHttpRefused(this.failure ?? "MCP HTTP request failed; review and mount again.", this.failureKind, this.scopesRequired);
     }
   }
 
@@ -215,7 +270,7 @@ export class NativeMcpHttpTransport implements Transport {
     // Set the close latch before calling user/SDK handlers that may reenter.
     const closing = this.close();
     void closing.catch(() => {});
-    try { this.onerror?.(new NativeMcpHttpRefused(this.failure, this.failureKind)); }
+    try { this.onerror?.(new NativeMcpHttpRefused(this.failure, this.failureKind, this.scopesRequired)); }
     catch { /* Preserve the classified failure and complete shutdown despite consumer callbacks. */ }
   }
 
@@ -254,7 +309,17 @@ export class NativeMcpHttpTransport implements Transport {
     }
   }
 
-  private async fetchOnce(scope: RequestScope, method: string, headers: Headers, body?: string, initialize = false): Promise<NativeMcpResponseLease> {
+  private authFailure(status: number, challenge: NativeMcpOAuthChallenge): string {
+    if (!this.oauth) {
+      return "MCP HTTP authentication refused. Configure explicit headerRefs, or auth.kind \"oauth2\" and run `amc agent-loop mcp-catalog --authorize`; OAuth is never enrolled automatically.";
+    }
+    if (status === 403 && challenge.error === "insufficient_scope") {
+      return `MCP server requires OAuth scopes the stored grant lacks${challenge.scopes ? ` (${challenge.scopes.join(" ")})` : ""}. Add them to auth.scopes if this run needs them. ${NATIVE_MCP_AUTHORIZE_HINT}`;
+    }
+    return `MCP OAuth access token was refused (HTTP ${status}). ${NATIVE_MCP_AUTHORIZE_HINT}`;
+  }
+
+  private async fetchOnce(scope: RequestScope, method: string, headers: Headers, body?: string, initialize = false, stateless = false): Promise<NativeMcpResponseLease> {
     if (this.closing || scope.controller.signal.aborted) throw nativeMcpAbortFailure();
     if (++this.requests > NATIVE_MCP_HTTP_LIMITS.requests) {
       throw new NativeMcpHttpRefused("MCP HTTP request bound refused; review and mount again.", "BOUND_EXCEEDED");
@@ -283,12 +348,15 @@ export class NativeMcpHttpTransport implements Transport {
         throw new NativeMcpHttpRefused("MCP HTTP redirects or endpoint changes are refused; review the configured endpoint explicitly.");
       }
       if (response.status === 401 || response.status === 403) {
-        throw new NativeMcpHttpRefused("MCP HTTP authentication refused. Configure explicit headerRefs; automatic OAuth enrollment is not enabled.", "AUTH_REQUIRED");
+        const challenge = parseNativeMcpBearerChallenge(response.headers.get("www-authenticate"));
+        if (response.status === 403 && challenge.error === "insufficient_scope" && challenge.scopes) this.scopesRequired = challenge.scopes;
+        throw new NativeMcpHttpRefused(this.authFailure(response.status, challenge), "AUTH_REQUIRED", this.scopesRequired);
       }
-      if (response.status === 404) {
+      // 2026-07-28 has no sessions: a 404 carries a JSON-RPC error and session headers are ignored.
+      if (!stateless && response.status === 404) {
         throw new NativeMcpHttpRefused("MCP HTTP session expired or endpoint is absent; review and create a fresh mount.", "SESSION_EXPIRED");
       }
-      const session = response.headers.get("mcp-session-id");
+      const session = stateless ? null : response.headers.get("mcp-session-id");
       if (session !== null && (!/^[\x21-\x7e]{1,256}$/.test(session)
         || (initialize ? !response.ok : session !== this.pinnedSession))) {
         throw new NativeMcpHttpRefused("MCP HTTP server changed its session identity; fresh review is required.", "SESSION_CHANGED");
@@ -363,7 +431,7 @@ export class NativeMcpHttpTransport implements Transport {
       || this.controllers.size >= NATIVE_MCP_HTTP_LIMITS.activeRequests) {
       throw new NativeMcpHttpRefused("MCP HTTP endpoint or request bound refused; review and mount again.");
     }
-    let rpc: { method?: string; id?: string | number } = {};
+    let rpc: Rpc = {};
     let body: string | undefined;
     if (method === "POST") {
       if (typeof init.body !== "string" || Buffer.byteLength(init.body) > 1024 * 1024) throw new NativeMcpHttpRefused("MCP HTTP request exceeds its size limit.");
@@ -372,6 +440,7 @@ export class NativeMcpHttpTransport implements Transport {
       catch { throw new NativeMcpHttpRefused("MCP HTTP request is not valid JSON.", "PROTOCOL_ERROR"); }
       if (!rpc || typeof rpc !== "object" || Array.isArray(rpc)) throw new NativeMcpHttpRefused("MCP HTTP requires one JSON-RPC message.", "PROTOCOL_ERROR");
     }
+    if (this.statelessVersion !== undefined) return this.fetchStateless(method, init, rpc, body);
     const initialize = rpc.method === "initialize";
     if (initialize) {
       if (this.initializeAttempted) throw new NativeMcpHttpRefused("MCP HTTP session renewal requires a fresh reviewed mount.");
@@ -448,6 +517,117 @@ export class NativeMcpHttpTransport implements Transport {
       lease?.cancel(); scope.cleanup(); scope.controller.abort();
       const safe = this.failureFor(error, scope); this.refuse(safe); throw safe;
     }
+  }
+
+  /**
+   * 2026-07-28 Streamable HTTP: one POST per request with the request-metadata
+   * headers; no session, GET stream or resumption. The SDK receives one JSON
+   * response under its own id. Origin pinning and redirect refusal are unchanged.
+   */
+  private async fetchStateless(method: string, init: RequestInit, rpc: Rpc, body: string | undefined): Promise<Response> {
+    if (method !== "POST" || body === undefined || typeof rpc.method !== "string") {
+      throw new NativeMcpHttpRefused("MCP HTTP 2026-07-28 has no GET stream or session; review and mount again.", "PROTOCOL_ERROR");
+    }
+    // §Sending Messages: no client notifications on HTTP; closing a response stream is the cancellation.
+    if (rpc.id === undefined) return new Response(null, { status: 202 });
+    const params = rpc.params ?? {};
+    const meta = params._meta as Record<string, unknown> | undefined;
+    if (meta?.[MCP_PROTOCOL_VERSION_META] !== this.statelessVersion) {
+      throw new NativeMcpHttpRefused("MCP request lacks its per-request protocol metadata; nothing was dispatched.", "NOT_DISPATCHED");
+    }
+    const headers = new Headers(init.headers);
+    headers.delete("mcp-session-id"); headers.delete("last-event-id");
+    headers.set("mcp-protocol-version", this.statelessVersion!); headers.set("mcp-method", rpc.method);
+    if (NAMED_METHODS.has(rpc.method)) {
+      const name = rpc.method === "resources/read" ? params.uri : params.name;
+      if (typeof name !== "string") throw new NativeMcpHttpRefused("MCP request has no name for its Mcp-Name header; nothing was dispatched.", "NOT_DISPATCHED");
+      headers.set("mcp-name", mcpHeaderValue(name));
+    }
+    if (rpc.method === "tools/call") {
+      const bindings = this.toolHeaders.get(params.name as string);
+      if (!bindings) throw new NativeMcpHttpRefused("MCP tool header bindings were not pinned for this mount; nothing was dispatched.", "NOT_DISPATCHED");
+      try { for (const [name, value] of mcpParamHeaders(bindings, params.arguments)) headers.set(name, value); }
+      catch { throw new NativeMcpHttpRefused("MCP tool header parameter cannot be encoded; nothing was dispatched.", "NOT_DISPATCHED"); }
+    }
+    const scope = this.requestScope(init, false);
+    const reissuable = REISSUABLE_METHODS.has(rpc.method);
+    try {
+      for (let attempt = 0; ; attempt++) {
+        const id = attempt === 0 ? rpc.id : `amc-reissue-${++this.reissues}`;
+        try {
+          const message = await this.exchangeStateless(scope, headers, attempt === 0 ? body : JSON.stringify({ ...rpc, id }), id, reissuable);
+          scope.cleanup();
+          return new Response(JSON.stringify({ ...message, id: rpc.id }), { status: 200, headers: { "content-type": "application/json" } });
+        } catch (error) {
+          if (!(error instanceof NativeMcpReconnectTransient)) throw error;
+          // §Sending Messages: a broken stream loses the request. Re-issue only idempotent reads, once, with a new id.
+          if (reissuable && attempt === 0) continue;
+          if (this.probing) { scope.cleanup(); return new Response(JSON.stringify(legacyProbeResponse(rpc.id)), { status: 200, headers: { "content-type": "application/json" } }); }
+          if (error.timedOut) this.timeoutFailure = true;
+          if (rpc.method === "tools/call") {
+            throw new NativeMcpHttpRefused("MCP tool call outcome unknown (TOOL_OUTCOME_UNKNOWN): the response stream broke before a result arrived.", "TOOL_OUTCOME_UNKNOWN");
+          }
+          throw error;
+        }
+      }
+    } catch (error) {
+      scope.cleanup(); scope.controller.abort();
+      const safe = this.failureFor(error, scope); this.refuse(safe); throw safe;
+    }
+  }
+
+  private async exchangeStateless(scope: RequestScope, headers: Headers, body: string, id: string | number, reissuable: boolean): Promise<Record<string, unknown>> {
+    const lease = await this.fetchOnce(scope, "POST", headers, body, false, true);
+    const { status } = lease.response;
+    const mediaType = lease.response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+    if (status === 200 && mediaType === "text/event-stream") return this.readStatelessStream(lease, scope, id);
+    if (reissuable && nativeMcpRetryableStatus(status)) {
+      lease.cancel(); await scope.budget.wait(nativeMcpRetryAfter(lease.response.headers.get("retry-after")));
+      throw new NativeMcpReconnectTransient();
+    }
+    let bytes: Uint8Array = new Uint8Array();
+    if (lease.response.body) bytes = await this.readJson(lease, scope); else lease.release();
+    const message = statelessResponse(Buffer.from(bytes).toString("utf8"), id);
+    if (message && (status === 200 ? mediaType === "application/json" : status >= 400 && status < 500 && "error" in message)) return message;
+    // §Backward Compatibility: a 4xx without a recognized JSON-RPC error identifies a legacy server.
+    if (this.probing && [400, 404, 405].includes(status)) return legacyProbeResponse(id);
+    throw new NativeMcpHttpRefused(status === 200 ? "MCP HTTP response is not one JSON-RPC response for its request."
+      : `MCP HTTP request refused (HTTP ${status}); review and mount again. No tool call was replayed.`, status === 200 ? "PROTOCOL_ERROR" : "REFUSED");
+  }
+
+  /** Reads one request-scoped SSE stream to its response; there is no resumption. */
+  private async readStatelessStream(lease: NativeMcpResponseLease, scope: RequestScope, id: string | number): Promise<Record<string, unknown>> {
+    const reader = lease.response.body?.getReader();
+    if (!reader) throw new NativeMcpHttpRefused("MCP HTTP SSE response body is missing.", "PROTOCOL_ERROR");
+    const frames = new SseFrames(() => {});
+    let bytes = 0;
+    try {
+      while (true) {
+        let chunk: ReadableStreamReadResult<Uint8Array>;
+        try { chunk = await reader.read(); }
+        catch { if (scope.controller.signal.aborted) throw nativeMcpAbortFailure(); throw new NativeMcpReconnectTransient(); }
+        if (scope.controller.signal.aborted) throw nativeMcpAbortFailure();
+        if (chunk.done) throw new NativeMcpReconnectTransient();
+        bytes += chunk.value.byteLength; this.charge(chunk.value.byteLength);
+        if (bytes > NATIVE_MCP_HTTP_LIMITS.responseBytes) throw new NativeMcpHttpRefused("MCP HTTP response exceeds its size limit.", "BOUND_EXCEEDED");
+        for (const frame of frames.feed(chunk.value)) {
+          if (frame.event !== "message" || !frame.data) continue;
+          let message: unknown;
+          try { message = JSON.parse(frame.data); } catch { throw new NativeMcpHttpRefused("MCP HTTP stream returned invalid protocol data.", "PROTOCOL_ERROR"); }
+          const method = message && typeof message === "object" ? (message as Rpc).method : undefined;
+          if (typeof method === "string") {
+            // Servers never send requests in 2026-07-28 (MRTR replaces them); notifications here are request-scoped.
+            if ((message as Rpc).id !== undefined) throw new NativeMcpHttpRefused("MCP server sent a request on a response stream; it was refused.", "PROTOCOL_ERROR");
+            if (++this.notifications > NATIVE_MCP_HTTP_LIMITS.notifications) throw new NativeMcpHttpRefused("MCP HTTP server-message limit exceeded; review and mount again.", "BOUND_EXCEEDED");
+            if (method === "notifications/tools/list_changed") this.catalogChanged = true;
+            continue;
+          }
+          const response = statelessResponse(frame.data, id);
+          if (!response) throw new NativeMcpHttpRefused("MCP HTTP response crossed request streams or is invalid; no response id was remapped.", "PROTOCOL_ERROR");
+          return response;
+        }
+      }
+    } finally { lease.cancel(); void reader.cancel().catch(() => {}); }
   }
 
   close(): Promise<void> {

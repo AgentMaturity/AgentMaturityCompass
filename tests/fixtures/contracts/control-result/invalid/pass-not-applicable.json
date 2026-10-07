@@ -1,0 +1,28 @@
+{
+  "type": "amc.control-result",
+  "version": 1,
+  "controlId": "AC-7",
+  "controlVersion": "1.0.0",
+  "evaluatedAt": "2026-01-01T00:00:00.000Z",
+  "dimensions": {
+    "result": "pass",
+    "applicability": {
+      "state": "not_applicable",
+      "rationale": "n/a"
+    },
+    "evidence": "sufficient",
+    "enforcement": {
+      "state": "enforced",
+      "boundary": "tool-pipeline"
+    },
+    "review": "pending"
+  },
+  "claimKind": "observed",
+  "evidenceRefs": [
+    "ev-1"
+  ],
+  "exceptions": [],
+  "entitlement": {
+    "active": false
+  }
+}
