@@ -125,6 +125,7 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("domain assurance", "domain"),
   self("domain apply", "industry-pack", (o) => o.audit === true),
   self("domain pack run", "industry-pack"),
+  self("domain conformance", "conformance"),
 
   // Assurance, shield, benchmarks. Tests AMC executed against the agent are observed when they reached it.
   self("assurance run", "assurance"),
