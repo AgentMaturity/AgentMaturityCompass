@@ -131,7 +131,10 @@ describe("envelope adapters", () => {
   });
 
   test("INVALID and UNRELIABLE runs are untrusted", () => {
-    expect(envelopeForDiagnosticReport({ ...report, status: "INVALID" }, NOW).statusDimensions.evidence).toBe("untrusted");
+    const invalid = envelopeForDiagnosticReport({ ...report, status: "INVALID" }, NOW);
+    expect(invalid.statusDimensions.evidence).toBe("untrusted");
+    // An invalid run's observed rows vouch for nothing: the claim is self-reported, never observed.
+    expect(invalid.claimKind).toBe("self_reported");
     const unreliable = envelopeForDiagnosticReport({ ...report, trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" }, NOW);
     expect(unreliable.statusDimensions.evidence).toBe("untrusted");
     expect(unreliable.statusDimensions.result).toBe("not_evaluated");
