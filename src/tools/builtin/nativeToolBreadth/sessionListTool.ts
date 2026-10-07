@@ -103,6 +103,8 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
     actionClass: "READ_ONLY",
     description: spec.description,
     parameters: spec.parameters,
+    // No await from the read to the write: READ_ONLY calls may run in parallel,
+    // and two of them must not both build on the same previous record.
     body: receiptedBody(spec.auditType, record, async (execution, allow) => {
       const payload = spec.argsSchema.parse(execution.arguments);
       const rendered = spec.render(payload);
