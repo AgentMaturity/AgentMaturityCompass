@@ -69,6 +69,7 @@
         { "path": "src/gateway/server.ts", "symbol": "hostAllowed" },
         { "path": "src/gateway/server.ts", "symbol": "createProxyServer" },
         { "path": "src/sandbox/egress/shellEgressProxy.ts", "symbol": "startShellEgressProxy" },
+        { "path": "src/gateway/requestFieldGuard.ts", "symbol": "prepareFieldGuard" },
         { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "governedGet" }
       ],
       "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
@@ -76,6 +77,7 @@
       "bypasses": [
         "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; MCP servers and extensions open sockets directly",
         "The gateway resolves nothing itself, so the decideEgress non-public address rule reaches IP-literal hosts only there; an allowed name can resolve to a private or metadata address (follow-up P1-59, proposed)",
+        "For an upstream with refuseRequestFields, the gateway forward proxy resolves the target once, refuses any name, subdomain or address shared with a guarded upstream, and connects only to a checked address (P1-24); guarded upstream addresses are resolved once at gateway start, so an address the provider adds later is matched only by name",
         "A host allowlist cannot stop domain fronting through a listed host; the shell proxy pins the Host header for plain HTTP only",
         "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system",
         "There is no workspace-wide egress allowlist for in-process tools: web_fetch and web_search apply decideEgress to their own signed hosts, and the shell's allowlist governs only the shell (P2-13)"

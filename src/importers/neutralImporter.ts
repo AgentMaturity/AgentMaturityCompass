@@ -1,5 +1,5 @@
 import { buildNeutralRecordMapping, parsedJsonlLineNumbers, type NeutralRecordMappingReceipt } from "./neutralImportMapping.js";
-import { existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import { writeEpisodeRecord, type WriteEpisodeRecordResult } from "../lifecycle/
 import { writeLifecycleRunArtifact, type WriteLifecycleRunArtifactResult } from "../lifecycle/lifecycleRunArtifact.js";
 import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
-import { PiSessionFormatError, parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
+import { parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
 import { tracesFromCandidate } from "./traceMapping.js";
 import { parseDetectedCallbackTelemetry, parseCallbackTelemetry, callbackTelemetryTraces, callbackTelemetryWarnings,
   type ParsedCallbackTelemetry } from "./callbackTelemetryImport.js";
@@ -21,6 +21,8 @@ import { canonicalize } from "../utils/json.js";
 import { neutralExternalEvidenceProfiles } from "./externalEvidenceExport.js";
 import { buildImportedDiagnosticReport, renderImportedReportMarkdown, normalizedImportBody, type NeutralImportProjection } from "./neutralImportPresentation.js";
 import { parseDetectedDshSession, sanitizeDshSession, dshSessionTraces, dshSessionWarnings, type ParsedDshSession } from "./dshSessionImport.js";
+import { SourceFormatError } from "./sourceFormatError.js";
+import { ORIGINAL_NOT_RETAINED_LOSS, oversizedImportReason, readImportSource, retainImportOriginals, type ImportOriginalRef } from "./importOriginals.js";
 
 export const neutralImportCategorySchema = z.enum([
   "trace-jsonl",
@@ -112,6 +114,8 @@ export interface NeutralImportRunManifest {
   traceFailureIndexPath: string | null;
   collaborationTelemetryEvents: NeutralCollaborationTelemetryRef[];
   writtenPaths: string[];
+  /** Exact source bytes per candidate (absent in manifests written before P1-24); never removed by rollback. */
+  originals?: ImportOriginalRef[];
 }
 
 export interface NeutralImportResult {
@@ -136,6 +140,7 @@ export interface NeutralImportResult {
   } | null;
   collaborationTelemetryEvents: NeutralCollaborationTelemetryRef[];
   writtenPaths: string[];
+  originals: ImportOriginalRef[];
 }
 
 export interface NeutralImportRollbackEntry {
@@ -150,10 +155,12 @@ export interface NeutralImportRollbackResult {
   manifestPath: string;
   receiptPath: string;
   removed: NeutralImportRollbackEntry[];
+  originalsKept: string;
 }
 
 interface ParsedCandidate extends NeutralImportProjection {
   collaborationTelemetry: CollaborationTelemetryCandidate[];
+  raw: Buffer;
 }
 
 interface CollaborationTelemetryCandidate {
@@ -299,8 +306,7 @@ function safeJsonParse(text: string): unknown {
   return JSON.parse(text) as unknown;
 }
 
-function parseFile(path: string, format: "json" | "jsonl" | "yaml"): unknown {
-  const text = readUtf8(path);
+function parseFile(text: string, format: "json" | "jsonl" | "yaml"): unknown {
   if (format === "jsonl") {
     const rows: unknown[] = [];
     for (const [index, line] of text.split(/\r?\n/).entries()) {
@@ -512,12 +518,9 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       unsupported.push({ path: file, kind: "unsupported-format", reason: "Add JSON, JSONL, YAML, or NDJSON files for AMC to import this artifact." });
       continue;
     }
-    const stat = statSync(file);
-    if (stat.size > MAX_FILE_BYTES) {
-      unsupported.push({ path: file, kind: "oversized", reason: `File is larger than ${MAX_FILE_BYTES} bytes; split it into smaller JSON, JSONL, or YAML artifacts.` });
-      continue;
-    }
-    const raw = readFileSync(file);
+    const read = readImportSource(file, format, MAX_FILE_BYTES);
+    if (!("raw" in read)) { unsupported.push({ path: file, ...read }); continue; }
+    const raw = read.raw;
     const text = raw.toString("utf8");
     let piSession: ParsedPiSession | null = null;
     let dshSession: ParsedDshSession | null = null;
@@ -526,10 +529,11 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
     try {
       dshSession = format === "jsonl" ? parseDetectedDshSession(text) : null;
       piSession = !dshSession && format === "jsonl" ? parseDetectedPiSession(text) : null;
+      if (!dshSession && !piSession && raw.byteLength > MAX_FILE_BYTES) { unsupported.push({ path: file, kind: "oversized", reason: oversizedImportReason(MAX_FILE_BYTES) }); continue; }
       callbackTelemetry = format === "json" ? parseDetectedCallbackTelemetry(text) : null;
-      parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(file, format);
+      parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(text, format);
     } catch (error) {
-      unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "malformed", reason: error instanceof PiSessionFormatError ? error.message
+      unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "malformed", reason: error instanceof SourceFormatError ? error.message
         : `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
       continue;
     }
@@ -566,7 +570,7 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         path: file,
         format,
         digest: sha256Hex(raw),
-        bytes: stat.size,
+        bytes: raw.byteLength,
         recordCount: count,
         confidence: 0.9,
         summary: dshSession ? `DSH v2: ${dshSession.format.eventCount} events, ${dshSession.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : callbackTelemetry ? `${callbackTelemetry.format.spanCount} callback spans; SELF_REPORTED, not evaluated; ${callbackTelemetry.format.pendingSpans} unresolved outcomes.` : piSession
@@ -580,7 +584,7 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       malformedSourceLines: piSession?.malformedLines,
       traces,
       collaborationTelemetry,
-      evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`]
+      evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`], raw
     });
   }
 
@@ -615,7 +619,7 @@ export function validateNeutralImport(input: {
   return buildNeutralImportPlan(input, parseCandidates(input));
 }
 
-function buildNeutralImportPlan(input: { workspace: string; inputPath: string; agentId?: string }, parsed: ReturnType<typeof parseCandidates>): NeutralImportPlan {
+function buildNeutralImportPlan(input: { workspace: string; inputPath: string; agentId?: string; retainOriginals?: boolean }, parsed: ReturnType<typeof parseCandidates>): NeutralImportPlan {
   const workspace = resolve(input.workspace);
   const agentId = normalizeAgentId(input.agentId ?? "default");
   const sourcePath = resolve(input.inputPath);
@@ -660,7 +664,8 @@ function buildNeutralImportPlan(input: { workspace: string; inputPath: string; a
       join(getAgentPaths(workspace, agentId).rootDir, "episodes", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "lifecycle-runs", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "trace-indexes", `${parsed.importId}.json`),
-      ...(hasCollaborationTelemetry ? [join(getAgentPaths(workspace, agentId).rootDir, "runtime-runs", parsed.importId)] : [])
+      ...(hasCollaborationTelemetry ? [join(getAgentPaths(workspace, agentId).rootDir, "runtime-runs", parsed.importId)] : []),
+      ...(input.retainOriginals === false ? [] : [join(importsRoot(workspace), "originals.jsonl"), join(workspace, ".amc", "blobs")])
     ].map((path) => workspaceRelative(workspace, path)),
     normalization: {
       normalizerVersion: "amc-neutral/2026-09-08", semanticDigest, sourceTrust: "SELF_REPORTED", evaluation: "NOT_EVALUATED",
@@ -680,11 +685,13 @@ function buildNeutralImportPlan(input: { workspace: string; inputPath: string; a
         "Source item counts include records or config fields; they are not a trace coverage percentage.",
         ...(unknownTimestamps > 0 ? ["Missing or invalid source event times remain unknown; ingestion time is separate."] : []),
         ...(unknownDurations > 0 ? ["Missing durations remain unknown, not zero latency. No elapsed duration is inferred between events."] : []),
-        "No cost or maturity result is inferred from import completion. Source claims remain self-reported."
+        "No cost or maturity result is inferred from import completion. Source claims remain self-reported.",
+        ...(input.retainOriginals === false ? [ORIGINAL_NOT_RETAINED_LOSS] : [])
       ],
       nextActions: [
         { label: "Inspect supported import options", argv: ["amc", "import", "--help"] },
-        ...(status === "ready" ? [{ label: "Apply the reviewed import", argv: ["amc", "import", sourcePath, "--agent", agentId, "--expected-digest", semanticDigest] }] : []),
+        ...(status === "ready" ? [{ label: "Apply the reviewed import", argv: ["amc", "import", sourcePath, "--agent", agentId, "--expected-digest", semanticDigest,
+          ...(input.retainOriginals === false ? ["--no-retain-original"] : [])] }] : []),
         { label: "Review actual captured evidence", argv: ["amc", "evidence", "--help"] }
       ]
     }
@@ -740,43 +747,31 @@ export function runNeutralImport(input: {
   agentId?: string;
   mode?: NeutralImportMode;
   expectedSemanticDigest?: string;
+  retainOriginals?: boolean;
 }): NeutralImportResult {
   const workspace = resolve(input.workspace);
   const agentId = normalizeAgentId(input.agentId ?? "default");
   const mode = input.mode ?? "dry-run";
   const sourcePath = resolve(input.inputPath);
   const parsed = parseCandidates({ workspace, inputPath: sourcePath, agentId });
-  const plan = buildNeutralImportPlan({ workspace, inputPath: sourcePath, agentId }, parsed);
+  const plan = buildNeutralImportPlan({ workspace, inputPath: sourcePath, agentId, retainOriginals: input.retainOriginals }, parsed);
   if (input.expectedSemanticDigest !== undefined && (!/^[a-f0-9]{64}$/.test(input.expectedSemanticDigest)
     || plan.normalization?.semanticDigest !== input.expectedSemanticDigest)) {
     throw new Error("Import source changed or reviewed digest is invalid. Review the source again before applying.");
   }
   if (mode === "dry-run" || mode === "validate") {
-    return {
-      schemaVersion: "2026-05-22",
-      importId: plan.importId,
-      mode,
-      applied: false,
-      plan,
-      normalizedPath: null,
-      importManifestPath: null,
-      signaturePath: null,
-      diagnosticReportPath: null,
-      diagnosticMarkdownPath: null,
-      episode: null,
-      lifecycleRun: null,
-      resourceManifest: null,
-      traceFailureIndex: null,
-      collaborationTelemetryEvents: [],
-      writtenPaths: []
-    };
+    return { schemaVersion: "2026-05-22", importId: plan.importId, mode, applied: false, plan, normalizedPath: null, importManifestPath: null,
+      signaturePath: null, diagnosticReportPath: null, diagnosticMarkdownPath: null, episode: null, lifecycleRun: null, resourceManifest: null,
+      traceFailureIndex: null, collaborationTelemetryEvents: [], writtenPaths: [], originals: [] };
   }
   assertReady(plan);
 
-  // Construct the portable projection before any write, so a refused profile cannot leave a partial import.
+  // Construct the portable projection and retain the exact original bytes before any other write, so a refused
+  // profile or an unretainable original (IMPORT_ORIGINAL_NOT_RETAINABLE) cannot leave a partial import.
   const externalProfiles = parsed.candidates.flatMap((item, candidateIndex) =>
     neutralExternalEvidenceProfiles({ candidate: item.candidate, traces: item.traces, ingestedAt: plan.detectedAt })
       .map((profile, part) => ({ profile, name: `${candidateIndex}-${part}.json` })));
+  const originals = retainImportOriginals(workspace, parsed.candidates, input.retainOriginals !== false);
 
   const paths = getAgentPaths(workspace, agentId);
   const runDir = importRunDir(workspace, plan.importId);
@@ -897,7 +892,8 @@ export function runNeutralImport(input: {
     resourceManifestPath: resourceManifest.manifestPath,
     traceFailureIndexPath: traceFailureIndex?.path ?? null,
     collaborationTelemetryEvents,
-    writtenPaths: [...new Set(writtenPaths)]
+    writtenPaths: [...new Set(writtenPaths)],
+    originals
   };
   const manifestPath = importManifestPath(workspace, plan.importId);
   writeFileAtomic(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 0o600);
@@ -921,7 +917,8 @@ export function runNeutralImport(input: {
       ? { path: traceFailureIndex.path, ref: traceFailureIndex.ref, signaturePath: traceFailureIndex.signaturePath }
       : null,
     collaborationTelemetryEvents,
-    writtenPaths: manifest.writtenPaths
+    writtenPaths: manifest.writtenPaths,
+    originals
   };
 }
 
@@ -981,7 +978,8 @@ export function rollbackNeutralImport(input: { workspace: string; importId: stri
     rolledBackAt: new Date().toISOString(),
     manifestPath,
     receiptPath: join(rollbackDir(workspace), `${input.importId}-${Date.now()}.json`),
-    removed
+    removed,
+    originalsKept: "Retained original bytes are kept; retention policy, not rollback, governs their deletion."
   };
   writeFileAtomic(receipt.receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 0o600);
   return receipt;

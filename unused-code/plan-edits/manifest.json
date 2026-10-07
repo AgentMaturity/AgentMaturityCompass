@@ -164,11 +164,25 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/gateway/config.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc"
+    },
+    {
       "path": "src/governor/emergencyOverride.ts",
       "issue": "P0-10",
       "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
       "archivePath": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
+    },
+    {
+      "path": "src/importers/dshSessionImport.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/importers/dshSessionImport.ts.landed",
+      "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4"
     },
     {
       "path": "src/index.ts",

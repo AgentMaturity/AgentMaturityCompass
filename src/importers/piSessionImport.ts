@@ -21,6 +21,7 @@
  */
 import type { ProductionTrace } from "../agents/traceIngestion.js";
 import { sha256Hex } from "../utils/hash.js";
+import { SourceFormatError, headerVersion } from "./sourceFormatError.js";
 
 export const PI_SESSION_SUPPORTED_VERSION = 3;
 
@@ -67,8 +68,12 @@ export interface ParsedPiSession {
 }
 
 /** Only bounded format diagnostics belong in the public import plan. */
-export class PiSessionFormatError extends Error {
+export class PiSessionFormatError extends SourceFormatError {
   override readonly name = "PiSessionFormatError";
+  constructor(message: string, detectedVersion: number | null = null) {
+    super(message, { code: "PI_SESSION_REFUSED", format: "pi-session", detectedVersion,
+      supported: `pi-session v${PI_SESSION_SUPPORTED_VERSION}`, sourceRevision: null });
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -130,8 +135,19 @@ export function parsePiSession(text: string): ParsedPiSession {
   return { rows, format, malformedLines };
 }
 
+/** Pi's durable storage header (`kind: "header"` with `v`/`storageVersion`) is a different format; never import it generically. */
+function refusePiDurableSession(line: string | null): void {
+  let header: unknown;
+  try { header = line === null ? null : JSON.parse(line); } catch { return; }
+  if (!isRecord(header) || header.kind !== "header" || !(Object.hasOwn(header, "v") || Object.hasOwn(header, "storageVersion"))) return;
+  const version = headerVersion(header.v);
+  throw new SourceFormatError(`Pi durable session format ${version === null ? "with a missing or invalid version" : `v${version}`} is not supported; AMC imports Pi CLI session v${PI_SESSION_SUPPORTED_VERSION}.`,
+    { code: "PI_DURABLE_SESSION_UNSUPPORTED", format: "pi-durable-session", detectedVersion: version, supported: `pi-session v${PI_SESSION_SUPPORTED_VERSION}`, sourceRevision: null });
+}
+
 /** Recognized Pi files never fall back to generic parsing after a format error. */
 export function parseDetectedPiSession(text: string): ParsedPiSession | null {
+  refusePiDurableSession(firstLine(text));
   const detected = detectPiSession(text);
   if (detected?.kind === "unsupported") throw new PiSessionFormatError(detected.reason);
   return detected ? parsePiSession(text) : null;
