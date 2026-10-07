@@ -108,8 +108,17 @@ function isReadOnlyCliRequest(argv: readonly string[]): boolean {
   return true;
 }
 
+/**
+ * The provider hook forwarder must reach its own fail-closed deny within the hook timeout. An
+ * unbounded rebuild or process.exit(1) here would run before that and let Claude Code run the
+ * tool, so a native load failure is left to surface inside the forwarder, which denies it.
+ */
+function isHookForward(argv: readonly string[]): boolean {
+  return argv[0] === "connect" && argv[1] === "hooks" && argv[2] === "forward";
+}
+
 function guard(): void {
-  if (isReadOnlyCliRequest(process.argv.slice(2))) return;
+  if (isReadOnlyCliRequest(process.argv.slice(2)) || isHookForward(process.argv.slice(2))) return;
   if (process.env.AMC_NO_AUTO_REBUILD === "1" || process.env.CI || process.env.CONTINUOUS_INTEGRATION) {
     return;
   }

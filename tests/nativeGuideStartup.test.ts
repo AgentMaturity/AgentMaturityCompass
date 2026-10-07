@@ -23,7 +23,8 @@ describe("read-only guide startup", () => {
     ["--help", "--all"],
     ["help", "agent-loop", "run"],
     ["agent-loop", "run", "--help"],
-    ["credentials", "set", "--help"]
+    ["credentials", "set", "--help"],
+    ["connect", "hooks", "forward", "--provider", "claude-code", "--mode", "control", "--agent", "a", "--token-file", ".amc/hooks/claude-code.lease"]
   ])("does not load or rebuild the database for %j", async (...args) => {
     await startup(args);
     expect(native.probe).not.toHaveBeenCalled();
@@ -35,7 +36,9 @@ describe("read-only guide startup", () => {
     ["agent-loop", "run", "--", "--help"],
     ["--agent", "agent-loop", "run", "hello"],
     ["agent-loop", "guide", "unexpected-positional"],
-    ["run", "--help", "--arbitrary"]
+    ["run", "--help", "--arbitrary"],
+    ["connect", "hooks", "status", "--provider", "claude-code"],
+    ["connect", "hooks", "forward-extra"]
   ])("retains ABI repair for non-guide command %j", async (...args) => {
     await startup(args);
     expect(native.probe).toHaveBeenCalledTimes(2);

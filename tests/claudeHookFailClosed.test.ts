@@ -1,0 +1,427 @@
+import { spawn } from "node:child_process";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer, type RequestListener, type Server } from "node:http";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { boundedFetchSignal, forwardDeadlineMs, HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
+import { installHookIntegration, type HookProvider } from "../src/adapters/hookIntegration.js";
+import { runHookForward } from "../src/adapters/hookIntegrationCli.js";
+import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
+import { startBridgeServer } from "../src/bridge/bridgeServer.js";
+import { questionBank } from "../src/diagnostic/questionBank.js";
+import { getAgentPaths } from "../src/fleet/paths.js";
+import { defaultActionPolicy, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
+import type { DiagnosticReport } from "../src/types.js";
+import { initWorkspace } from "../src/workspace.js";
+
+const cliPath = resolve(process.cwd(), "dist/cli.js");
+const PASSPHRASE = "claude-hook-fail-closed-passphrase";
+const roots: string[] = [];
+const closers: Array<() => Promise<void>> = [];
+
+const CLAUDE_DENY = {
+  hookSpecificOutput: {
+    hookEventName: "PreToolUse",
+    permissionDecision: "deny",
+    permissionDecisionReason: "AMC control is unavailable; the action is denied fail closed.",
+  },
+};
+
+function newWorkspace(): string {
+  const workspace = mkdtempSync(join(tmpdir(), "amc-claude-fail-closed-"));
+  roots.push(workspace);
+  process.env.AMC_VAULT_PASSPHRASE = PASSPHRASE;
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  initApprovalPolicy(workspace);
+  return workspace;
+}
+
+function installObservedRun(workspace: string, agentId: string): void {
+  const now = Date.now();
+  const report: DiagnosticReport = {
+    agentId,
+    runId: "run_fail_closed",
+    ts: now,
+    windowStartTs: now - 60_000,
+    windowEndTs: now,
+    status: "VALID",
+    verificationPassed: true,
+    trustBoundaryViolated: false,
+    trustBoundaryMessage: null,
+    integrityIndex: 0.95,
+    trustLabel: "HIGH TRUST",
+    targetProfileId: null,
+    layerScores: [],
+    questionScores: questionBank.map((question) => ({
+      questionId: question.id,
+      claimedLevel: 5,
+      supportedMaxLevel: 5,
+      finalLevel: 5,
+      confidence: 0.95,
+      evidenceEventIds: ["ev_fail_closed"],
+      flags: [],
+      narrative: "AMC-owned hook fail-closed fixture",
+    })),
+    inflationAttempts: [],
+    unsupportedClaimCount: 0,
+    contradictionCount: 0,
+    correlationRatio: 1,
+    invalidReceiptsCount: 0,
+    correlationWarnings: [],
+    evidenceCoverage: 1,
+    evidenceTrustCoverage: { observed: 1, attested: 0, selfReported: 0 },
+    targetDiff: [],
+    prioritizedUpgradeActions: [],
+    evidenceToCollectNext: [],
+    runSealSig: "fixture",
+    reportJsonSha256: "fixture",
+  };
+  const paths = getAgentPaths(workspace, agentId);
+  mkdirSync(paths.runsDir, { recursive: true });
+  writeFileSync(join(paths.runsDir, `${report.runId}.json`), JSON.stringify(report, null, 2));
+}
+
+function permitReadAndWrite(workspace: string): void {
+  const policy = defaultActionPolicy();
+  for (const rule of policy.actions) {
+    if (rule.actionClass !== "READ_ONLY" && rule.actionClass !== "WRITE_LOW") continue;
+    rule.minEffectiveQuestionLevels = {};
+    rule.requireTrustTierAtLeast = "OBSERVED";
+    rule.requireAssurancePacks = {};
+    rule.allowExecute = true;
+    rule.requireExecTicket = false;
+  }
+  policy.riskTierDefaults.low.requireSandboxForExecute = false;
+  policy.riskTierDefaults.medium.requireSandboxForExecute = false;
+  initActionPolicy(workspace, policy);
+}
+
+async function listen(handler: RequestListener): Promise<string> {
+  const server: Server = createServer(handler);
+  await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", resolvePromise));
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("stub bridge did not bind");
+  closers.push(() => new Promise<void>((resolvePromise) => {
+    server.closeAllConnections();
+    server.close(() => resolvePromise());
+  }));
+  return `http://127.0.0.1:${address.port}`;
+}
+
+async function freePort(): Promise<number> {
+  const server = createServer();
+  await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", resolvePromise));
+  const address = server.address();
+  await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
+  if (!address || typeof address === "string") throw new Error("server did not bind");
+  return address.port;
+}
+
+function installControl(workspace: string, provider: HookProvider, agentId: string, bridgeBase: string): void {
+  installHookIntegration({ workspace, provider, agentId, bridgeBase, mode: "control" });
+}
+
+/** The installed hook timeout in milliseconds, read from the written provider settings. */
+function installedTimeoutMs(workspace: string, provider: HookProvider): number {
+  if (provider === "gemini-cli") {
+    const config = JSON.parse(readFileSync(join(workspace, ".gemini", "settings.json"), "utf8")) as {
+      hooks: { BeforeTool: Array<{ hooks: Array<{ timeout: number }> }> };
+    };
+    return config.hooks.BeforeTool[0]!.hooks[0]!.timeout;
+  }
+  const config = JSON.parse(readFileSync(join(workspace, ".claude", "settings.local.json"), "utf8")) as {
+    hooks: { PreToolUse: Array<{ hooks: Array<{ timeout: number }> }> };
+  };
+  return config.hooks.PreToolUse[0]!.hooks[0]!.timeout * 1000;
+}
+
+interface ForwardRun {
+  status: number | null;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+}
+
+/** Spawns the hidden forwarder asynchronously so the in-process stub bridge keeps serving. */
+function forward(input: {
+  workspace: string;
+  provider: HookProvider;
+  agentId: string;
+  bridgeBase: string;
+  stdin: string;
+}): Promise<ForwardRun> {
+  const started = Date.now();
+  const child = spawn(process.execPath, [
+    cliPath, "connect", "hooks", "forward",
+    "--provider", input.provider,
+    "--mode", "control",
+    "--agent", input.agentId,
+    "--bridge-url", input.bridgeBase,
+    "--token-file", `.amc/hooks/${input.provider}.lease`,
+  ], {
+    cwd: input.workspace,
+    env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE },
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  let stdout = "";
+  let stderr = "";
+  child.stdout.setEncoding("utf8").on("data", (chunk: string) => { stdout += chunk; });
+  child.stderr.setEncoding("utf8").on("data", (chunk: string) => { stderr += chunk; });
+  child.stdin.end(input.stdin);
+  const killer = setTimeout(() => child.kill("SIGKILL"), 60_000);
+  return new Promise((resolvePromise) => {
+    child.on("close", (status) => {
+      clearTimeout(killer);
+      resolvePromise({ status, stdout, stderr, durationMs: Date.now() - started });
+    });
+  });
+}
+
+function claudeRead(path: string, id: string): string {
+  return JSON.stringify({
+    session_id: "private-fail-closed-session",
+    hook_event_name: "PreToolUse",
+    tool_name: "Read",
+    tool_use_id: id,
+    tool_input: { file_path: path },
+  });
+}
+
+afterEach(async () => {
+  while (closers.length > 0) await closers.pop()!();
+  while (roots.length > 0) {
+    const root = roots.pop();
+    if (root) rmSync(root, { recursive: true, force: true });
+  }
+});
+
+describe("Claude Code control hook fails closed with exit code 2", () => {
+  test("a bridge that never answers is denied with exit 2 before the hook timeout", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "claude-code", "hung-agent", bridgeBase);
+    const timeoutMs = installedTimeoutMs(workspace, "claude-code");
+
+    const run = await forward({
+      workspace,
+      provider: "claude-code",
+      agentId: "hung-agent",
+      bridgeBase,
+      stdin: claudeRead("/private/hung-never-forwarded.txt", "toolu_hung_01"),
+    });
+
+    expect(run.status).toBe(2);
+    expect(JSON.parse(run.stdout)).toEqual(CLAUDE_DENY);
+    expect(run.durationMs).toBeLessThan(timeoutMs - 1000);
+    expect(run.stderr).not.toContain("hung-never-forwarded");
+  }, 60_000);
+
+  test("a bridge that returns HTTP 500 twice is denied with exit 2", async () => {
+    const workspace = newWorkspace();
+    let requests = 0;
+    const bridgeBase = await listen((_req, res) => {
+      requests += 1;
+      res.writeHead(500, { "content-type": "application/json" });
+      res.end(JSON.stringify({ error: "fixture outage" }));
+    });
+    installControl(workspace, "claude-code", "outage-agent", bridgeBase);
+
+    const run = await forward({
+      workspace,
+      provider: "claude-code",
+      agentId: "outage-agent",
+      bridgeBase,
+      stdin: claudeRead("/private/outage-never-forwarded.txt", "toolu_outage_01"),
+    });
+
+    expect(requests).toBe(2);
+    expect(run.status).toBe(2);
+    expect(JSON.parse(run.stdout)).toEqual(CLAUDE_DENY);
+    expect(run.stderr).toContain("AMC hook control unavailable; action denied.");
+  }, 60_000);
+
+  test("a policy deny exits 2 and allow and ask exit 0 with the matching native JSON", async () => {
+    const workspace = newWorkspace();
+    const agentId = "policy-agent";
+    installObservedRun(workspace, agentId);
+    permitReadAndWrite(workspace);
+    mkdirSync(join(workspace, "workspace"), { recursive: true });
+    const readable = join(workspace, "workspace", "public.txt");
+    writeFileSync(readable, "public fixture");
+    const port = await freePort();
+    const bridgeBase = `http://127.0.0.1:${port}`;
+    const bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
+    closers.push(() => bridge.close());
+    installControl(workspace, "claude-code", agentId, bridgeBase);
+
+    const denied = await forward({
+      workspace, provider: "claude-code", agentId, bridgeBase,
+      stdin: JSON.stringify({
+        hook_event_name: "PreToolUse",
+        tool_name: "UnmappedDangerousTool",
+        tool_use_id: "toolu_policy_deny_01",
+        tool_input: { secret: "DO_NOT_RETAIN_FAIL_CLOSED" },
+      }),
+    });
+    expect(denied.status).toBe(2);
+    expect(JSON.parse(denied.stdout)).toEqual({
+      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "deny" }),
+    });
+    expect(denied.stderr).toContain("not mapped to an allowed ToolHub tool");
+    expect(denied.stderr).not.toContain("DO_NOT_RETAIN_FAIL_CLOSED");
+
+    const allowed = await forward({
+      workspace, provider: "claude-code", agentId, bridgeBase,
+      stdin: claudeRead(readable, "toolu_policy_allow_01"),
+    });
+    expect(allowed.status).toBe(0);
+    expect(JSON.parse(allowed.stdout)).toEqual({
+      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "allow" }),
+    });
+
+    const asked = await forward({
+      workspace, provider: "claude-code", agentId, bridgeBase,
+      stdin: JSON.stringify({
+        hook_event_name: "PreToolUse",
+        tool_name: "Write",
+        tool_use_id: "toolu_policy_ask_01",
+        tool_input: { file_path: join(workspace, "workspace", "output", "draft.txt"), content: "PRIVATE" },
+      }),
+    });
+    expect(asked.status).toBe(0);
+    expect(JSON.parse(asked.stdout)).toEqual({
+      hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "ask" }),
+    });
+  }, 90_000);
+
+  test("empty stdin and malformed JSON are denied with exit 2", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen((_req, res) => { res.writeHead(500); res.end(); });
+    installControl(workspace, "claude-code", "input-agent", bridgeBase);
+
+    for (const stdin of ["", "{\"hook_event_name\": \"PreToolUse\", "]) {
+      const run = await forward({ workspace, provider: "claude-code", agentId: "input-agent", bridgeBase, stdin });
+      expect(run.status).toBe(2);
+      expect(JSON.parse(run.stdout)).toEqual(CLAUDE_DENY);
+      expect(run.stderr).toContain("AMC hook control input invalid; action denied.");
+    }
+  }, 60_000);
+});
+
+describe("Gemini CLI control hook keeps its outputs and exit codes", () => {
+  const GEMINI_DENY = { decision: "deny", reason: "AMC control is unavailable; the action is denied fail closed." };
+  const geminiRead = JSON.stringify({
+    hook_event_name: "BeforeTool",
+    tool_name: "read_file",
+    tool_input: { file_path: "/private/gemini-never-forwarded.txt" },
+  });
+
+  test("an outage or malformed input denies with exit 0 and empty stdin still exits 1", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen((_req, res) => { res.writeHead(500); res.end(); });
+    installControl(workspace, "gemini-cli", "gemini-agent", bridgeBase);
+
+    const outage = await forward({ workspace, provider: "gemini-cli", agentId: "gemini-agent", bridgeBase, stdin: geminiRead });
+    expect(outage.status).toBe(0);
+    expect(JSON.parse(outage.stdout)).toEqual(GEMINI_DENY);
+
+    const malformed = await forward({ workspace, provider: "gemini-cli", agentId: "gemini-agent", bridgeBase, stdin: "{" });
+    expect(malformed.status).toBe(0);
+    expect(JSON.parse(malformed.stdout)).toEqual(GEMINI_DENY);
+
+    const empty = await forward({ workspace, provider: "gemini-cli", agentId: "gemini-agent", bridgeBase, stdin: "" });
+    expect(empty.status).toBe(1);
+    expect(empty.stdout).toBe("");
+  }, 60_000);
+
+  test("a bridge that never answers is denied with exit 0 before the Gemini hook timeout", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "gemini-cli", "gemini-hung", bridgeBase);
+    const timeoutMs = installedTimeoutMs(workspace, "gemini-cli");
+
+    const run = await forward({ workspace, provider: "gemini-cli", agentId: "gemini-hung", bridgeBase, stdin: geminiRead });
+
+    expect(run.status).toBe(0);
+    expect(JSON.parse(run.stdout)).toEqual(GEMINI_DENY);
+    expect(run.durationMs).toBeLessThan(timeoutMs - 1000);
+  }, 60_000);
+});
+
+describe("in-process forwarder deadline", () => {
+  test("rejects at the deadline even when the work ignores the abort signal", async () => {
+    let aborted = false;
+    await expect(withHookDeadline(50, (signal) => new Promise<never>(() => {
+      signal.addEventListener("abort", () => { aborted = true; });
+    }))).rejects.toBeInstanceOf(HookDeadlineError);
+    expect(aborted).toBe(true);
+    await expect(withHookDeadline(1_000, async () => "done")).resolves.toBe("done");
+    expect(boundedFetchSignal(1_000).aborted).toBe(false);
+    const deadline = new AbortController();
+    const bounded = boundedFetchSignal(60_000, deadline.signal);
+    deadline.abort();
+    expect(bounded.aborted).toBe(true);
+  });
+
+  test("shortens the forwarder deadline by the process start-up time so the hook ends inside its timeout", async () => {
+    expect(forwardDeadlineMs(10_000, 500)).toBe(HOOK_FORWARD_DEADLINE_MS);
+    expect(forwardDeadlineMs(10_000, 6_500)).toBe(2_500);
+    expect(forwardDeadlineMs(10_000, 9_500)).toBe(0);
+
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "claude-code", "slow-start-agent", bridgeBase);
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    // A process that already spent 8.7 s starting has 300 ms left before the 10 s timeout minus the 1 s margin.
+    vi.spyOn(process, "uptime").mockReturnValue(8.7);
+    try {
+      const started = Date.now();
+      const slowStart = await runHookForward(claude, async () => claudeRead("/private/slow-start.txt", "toolu_slow_start_01"), workspace);
+      expect(slowStart).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
+      expect(Date.now() - started).toBeLessThan(2_000);
+    } finally {
+      vi.restoreAllMocks();
+    }
+  }, 30_000);
+
+  test("maps every Claude control failure to exit 2 and keeps observe-mode and Gemini failures at exit 1", async () => {
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "claude-code", "inproc-agent", bridgeBase);
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "inproc-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+
+    const hung = await runHookForward(claude, async () => claudeRead("/private/inproc.txt", "toolu_inproc_01"), workspace, 300);
+    expect(hung).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
+
+    const stalledInput = await runHookForward(claude, () => new Promise<string>(() => {}), workspace, 100);
+    expect(stalledInput.exitCode).toBe(2);
+
+    const empty = await runHookForward(claude, async () => "  ", workspace);
+    expect(empty).toMatchObject({ exitCode: 2, stderr: "AMC hook control input invalid; action denied.\n" });
+
+    const terminal = await runHookForward(claude, async () => JSON.stringify({
+      hook_event_name: "PostToolUse",
+      tool_name: "Read",
+      tool_use_id: "toolu_inproc_02",
+      tool_response: { content: "private" },
+    }), workspace, 300);
+    // The tool already ran: no PreToolUse deny and no claim that the action was denied.
+    const notRecorded = { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
+    expect(terminal).toEqual(notRecorded);
+    const failure = await runHookForward(claude, async () => JSON.stringify({
+      hook_event_name: "PostToolUseFailure",
+      tool_name: "Bash",
+      tool_use_id: "toolu_inproc_03",
+      tool_input: { command: "ls" },
+      error: "exit 1",
+    }), workspace, 300);
+    expect(failure).toEqual(notRecorded);
+
+    const observeEmpty = await runHookForward({ ...claude, mode: "observe" }, async () => "", workspace);
+    expect(observeEmpty).toEqual({ stdout: "", stderr: "provider hook input is required on stdin\n", exitCode: 1 });
+
+    const geminiEmpty = await runHookForward({ ...claude, provider: "gemini-cli", tokenFile: ".amc/hooks/gemini-cli.lease" }, async () => "", workspace);
+    expect(geminiEmpty.exitCode).toBe(1);
+  }, 30_000);
+});
