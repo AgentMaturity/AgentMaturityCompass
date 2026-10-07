@@ -37,7 +37,7 @@ import { hashAuditId } from "./binderRedaction.js";
 import { binderJsonSchema, type AuditBinderJson } from "./binderSchema.js";
 import { type EvidenceRequest } from "./evidenceRequestSchema.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
-import { binderConformanceRun } from "../domains/conformance/conformanceExport.js";
+import { binderConformanceRun } from "./binderConformanceRun.js";
 
 interface ScopeInput {
   type: "WORKSPACE" | "NODE" | "AGENT";
@@ -98,7 +98,7 @@ interface BinderCollectResult {
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
   sourceEventHashes: string[];
-  conformanceRun: ReturnType<typeof binderConformanceRun>["run"];
+  conformanceFiles: ReturnType<typeof binderConformanceRun>["files"];
 }
 
 function dedupeSorted(values: string[]): string[] {
@@ -557,7 +557,7 @@ export async function collectAuditBinderData(params: {
   const assurancePolicy = loadAssurancePolicy(params.workspace);
 
   const trust = loadTrustConfig(params.workspace);
-  const conformance = binderConformanceRun(params.workspace, scope.type === "AGENT" ? scope.id : null, params.trust);
+  const conformance = binderConformanceRun(params.workspace, scope.type === "AGENT" ? scope.id : null, params.policy.auditPolicy.privacy.hashTruncBytes, params.trust);
   const notary = await checkNotaryTrust(params.workspace).catch(() => null);
 
   const opsPolicy = loadOpsPolicy(params.workspace);
@@ -1161,5 +1161,5 @@ export async function collectAuditBinderData(params: {
     }
   });
 
-  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceRun: conformance.run };
+  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files };
 }

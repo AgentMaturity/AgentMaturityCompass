@@ -1,14 +1,8 @@
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
 import { getPublicKeyHistory } from "../../crypto/keys.js";
-import { getAgentPaths } from "../../fleet/paths.js";
-import { checkDigestSignature, loadTrustContext, type TrustContext } from "../../trust/index.js";
-import { pathExists, readUtf8 } from "../../utils/fs.js";
+import { checkDigestSignature, type TrustContext } from "../../trust/index.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
-import {
-  conformanceExportSchema, type ConformanceCounts, type ConformanceExport, type ConformanceRequirement, type ConformanceStatus
-} from "./conformanceSchema.js";
+import { conformanceExportSchema, type ConformanceExport, type ConformanceRequirement } from "./conformanceSchema.js";
 
 /** The JSON export: the sealed run, pretty-printed; `parseConformanceExport` reads it back. */
 export function renderConformanceJson(run: ConformanceExport): string {
@@ -67,61 +61,6 @@ export function verifyConformanceExport(candidate: unknown, opts: { workspace: s
     errors.push("counts do not match the requirements");
   }
   return { ok: errors.length === 0, errors, run };
-}
-
-export const NO_VERIFIED_CONFORMANCE_RUN = "no verified conformance run";
-
-export interface BinderConformanceRun {
-  section: {
-    status: ConformanceStatus | null;
-    conformanceRunId: string | null;
-    station: string | null;
-    counts: ConformanceCounts | null;
-    reportJsonSha256: string | null;
-    notes: string[];
-  };
-  /** The run that verified, for the binder's checks/ and summaries/ copies; null whenever the section's status is. */
-  run: ConformanceExport | null;
-}
-
-/**
- * The audit binder's conformanceRun section for one agent. Each run file under the agent's reports/conformance/ is
- * read once and verified under `trust` (default: the operator's pinned trust, P0-09); the newest one fills the section
- * and is returned for the binder's copies, so nothing is read twice. Fails closed: no agent scope, no run, a trust
- * context that cannot load, or any run file that does not verify gives status null and "no verified conformance
- * run", never a pass. Notes never carry error text, which can name local paths a binder must not hold.
- */
-export function binderConformanceRun(workspace: string, agentId: string | null, trust?: TrustContext): BinderConformanceRun {
-  const none = (...notes: string[]): BinderConformanceRun => ({ run: null, section: { status: null, conformanceRunId: null,
-    station: null, counts: null, reportJsonSha256: null, notes: [NO_VERIFIED_CONFORMANCE_RUN, ...notes] } });
-  if (agentId === null) return none("conformance runs are agent-scoped and this binder's scope is not an agent");
-  const dir = join(getAgentPaths(workspace, agentId).reportsDir, "conformance");
-  if (!pathExists(dir)) return none();
-  let context: TrustContext;
-  try {
-    context = trust ?? loadTrustContext();
-  } catch {
-    return none("the operator's pinned trust could not be loaded");
-  }
-  const verified: ConformanceExport[] = [];
-  let failed = 0;
-  for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
-    let candidate: unknown;
-    try {
-      candidate = JSON.parse(readUtf8(join(dir, file))) as unknown;
-    } catch {
-      failed += 1;
-      continue;
-    }
-    const result = verifyConformanceExport(candidate, { workspace, trust: context });
-    if (result.ok && result.run?.agentId === agentId) verified.push(result.run);
-    else failed += 1;
-  }
-  if (failed > 0) return none(`${failed} conformance run file(s) did not verify under pinned trust`);
-  const run = verified.sort((a, b) => b.generatedTs - a.generatedTs)[0];
-  if (!run) return none();
-  return { run, section: { status: run.status, conformanceRunId: run.conformanceRunId, station: run.station, counts: run.counts,
-    reportJsonSha256: run.reportJsonSha256, notes: [`weakest claim kind: ${run.claimKind}`] } };
 }
 
 function evidenceSummary(requirement: ConformanceRequirement): string {

@@ -56,13 +56,10 @@ export {
 } from "./conformanceRun.js";
 
 export {
-  NO_VERIFIED_CONFORMANCE_RUN,
-  binderConformanceRun,
   parseConformanceExport,
   renderConformanceJson,
   renderConformanceMarkdown,
   verifyConformanceExport,
-  type BinderConformanceRun,
   type ConformanceVerification
 } from "./conformanceExport.js";
 
