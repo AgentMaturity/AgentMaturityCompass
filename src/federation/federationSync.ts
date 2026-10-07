@@ -8,8 +8,10 @@ import { ensureFederationPublisherKey, signFederationDigest } from "./federation
 import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
 import { buildVerifierReport, checkDigestSignature, ed25519KeyId, loadTrustContext, untrustedReasons, withPins, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
+import { toErrorMessage } from "../utils/errors.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { containedPath, safeIdSchema } from "../utils/pathSafety.js";
 import { generateTransparencyInclusionProof, currentTransparencyMerkleRoot, ensureTransparencyMerkleInitialized, exportTransparencyProofBundle } from "../transparency/merkleIndexStore.js";
 import { ingestBenchmarks } from "../benchmarks/benchImport.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
@@ -42,6 +44,9 @@ function tarCreate(sourceDir: string, outFile: string): void {
 function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
+
+/** The three files every package carries and an import copies; verification records the sha256 of each one it admitted. */
+const PACKAGE_ENVELOPE = ["manifest.json", "manifest.sig", "public-keys/publisher.pub"];
 
 function resolveExtractedRoot(outDir: string, requiredFiles: string[]): string {
   const hasRequiredAt = (base: string): boolean => requiredFiles.every((file) => pathExists(join(base, file)));
@@ -261,28 +266,27 @@ export function exportFederationPackage(params: {
   }
 }
 
-/**
- * Verifies a .amcfed offline. public-keys/publisher.pub and --pubkey only locate the signer; manifest.sig needs a key
- * the trust context admits for artifact-seal (P0-09). ok equals report.trusted.
- */
-export function verifyFederationPackage(bundleFile: string, trust: TrustContext, pubkeyPath?: string): {
+/** verifyFederationPackage plus the sha256 of each envelope file it read, so an import can tell the bytes it copies are the ones admitted. */
+function verifyPackage(bundleFile: string, trust: TrustContext, pubkeyPath?: string): {
   ok: boolean;
   errors: string[];
   manifest: FederationManifest | null;
   report: VerifierReportV1;
+  envelope: Array<{ path: string; sha256: string }>;
 } {
   const errors: string[] = [];
+  let envelope: Array<{ path: string; sha256: string }> = [];
   const signatures: IssuerAdmission[] = [];
   let manifest: FederationManifest | null = null;
   const finish = () => {
     const report = buildVerifierReport({ artifact: { kind: "federation-package", path: resolve(bundleFile), sha256: fileSha256(resolve(bundleFile)) },
       context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
-    return { ok: report.trusted, errors, manifest, report };
+    return { ok: report.trusted, errors, manifest, report, envelope };
   };
   const temp = mkdtempSync(join(tmpdir(), "amc-fed-verify-"));
   try {
     tarExtract(bundleFile, temp);
-    const root = resolveExtractedRoot(temp, ["manifest.json", "manifest.sig", "public-keys/publisher.pub"]);
+    const root = resolveExtractedRoot(temp, PACKAGE_ENVELOPE);
     const manifestPath = join(root, "manifest.json");
     const sigPath = join(root, "manifest.sig");
     const pubPath = join(root, "public-keys", "publisher.pub");
@@ -290,6 +294,7 @@ export function verifyFederationPackage(bundleFile: string, trust: TrustContext,
       errors.push("federation package missing manifest/signature/publisher key");
       return finish();
     }
+    envelope = PACKAGE_ENVELOPE.map((path) => ({ path, sha256: sha256Hex(readFileSync(join(root, path))) }));
     try {
       manifest = federationManifestSchema.parse(JSON.parse(readUtf8(manifestPath)) as unknown);
     } catch (error) {
@@ -311,7 +316,13 @@ export function verifyFederationPackage(bundleFile: string, trust: TrustContext,
     }
     if (manifest) {
       for (const row of manifest.files) {
-        const file = join(root, row.path);
+        let file: string;
+        try {
+          file = containedPath(root, "the package root", row.path);
+        } catch (error) {
+          errors.push(toErrorMessage(error));
+          continue;
+        }
         if (!pathExists(file)) {
           errors.push(`missing file listed in manifest: ${row.path}`);
           continue;
@@ -328,12 +339,49 @@ export function verifyFederationPackage(bundleFile: string, trust: TrustContext,
   }
 }
 
+/**
+ * Verifies a .amcfed offline. public-keys/publisher.pub and --pubkey only locate the signer; manifest.sig needs a key
+ * the trust context admits for artifact-seal (P0-09). ok equals report.trusted.
+ */
+export function verifyFederationPackage(bundleFile: string, trust: TrustContext, pubkeyPath?: string): {
+  ok: boolean;
+  errors: string[];
+  manifest: FederationManifest | null;
+  report: VerifierReportV1;
+} {
+  const { ok, errors, manifest, report } = verifyPackage(bundleFile, trust, pubkeyPath);
+  return { ok, errors, manifest, report };
+}
+
 /** The operator's trust plus the publisher keys of the peers this workspace added (auditor-signed peer records). */
 export function federationPeerTrust(workspace: string): TrustContext {
   return withPins(loadTrustContext(), listFederationPeers(workspace).flatMap(({ peer, valid }) => {
     const keyId = valid ? ed25519KeyId(peer.publisherPublicKeyPem) : null;
     return keyId ? [{ keyId, purposes: ["artifact-seal" as const], origin: `federation peer ${peer.peerId}` }] : [];
   }));
+}
+
+/**
+ * The inbox directory for a package is named after the identity that was admitted, never after the sourceOrgId the
+ * manifest claims: the matching peer record's peerId, or key-<first 16 hex of the key id> when only the operator's
+ * trust list admitted the key (or the peer record's id is not a safe directory name).
+ */
+function admittedInboxName(workspace: string, report: VerifierReportV1): string {
+  const keyId = report.issuerAdmission.signatures.find((row) => row.status === "admitted")?.keyId;
+  if (!keyId) {
+    throw new Error("federation package has no admitted signing key");
+  }
+  const peerId = listFederationPeers(workspace).find(({ peer, valid }) => valid && ed25519KeyId(peer.publisherPublicKeyPem) === keyId)?.peer.peerId;
+  return peerId !== undefined && safeIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
+}
+
+/** The bytes at `src`, refused unless they hash to what verification admitted for `path`. */
+function admittedBytes({ src, path, sha256 }: { src: string; path: string; sha256: string }): Buffer {
+  const bytes = pathExists(src) ? readFileSync(src) : null;
+  if (bytes === null || sha256Hex(bytes) !== sha256) {
+    throw new Error(`federation package changed between verification and import: ${path}`);
+  }
+  return bytes;
 }
 
 export function importFederationPackage(params: {
@@ -349,32 +397,32 @@ export function importFederationPackage(params: {
 } {
   // Only a package signed by a peer the operator added (`amc federate peer add`) or a trust list pins is imported.
   const trust = federationPeerTrust(params.workspace);
-  const verify = verifyFederationPackage(params.bundleFile, trust);
+  const verify = verifyPackage(params.bundleFile, trust);
   if (!verify.ok || !verify.manifest) {
     throw new Error(`federation package verify failed: ${untrustedReasons(verify.report).join("; ")}`);
   }
   const temp = mkdtempSync(join(tmpdir(), "amc-fed-import-"));
   try {
     tarExtract(params.bundleFile, temp);
-    const root = resolveExtractedRoot(temp, ["manifest.json", "manifest.sig", "public-keys/publisher.pub"]);
-    const importedPath = join(federationInboxDir(params.workspace), verify.manifest.sourceOrgId, verify.manifest.manifestId);
+    const root = resolveExtractedRoot(temp, PACKAGE_ENVELOPE);
+    const importedPath = containedPath(federationInboxDir(params.workspace), "the federation inbox",
+      admittedInboxName(params.workspace, verify.report), verify.manifest.manifestId);
+    // Everything copied: the manifest's files and the envelope, each with the sha256 verification admitted.
+    const copies = [...verify.manifest.files, ...verify.envelope].map(({ path, sha256 }) => ({
+      path,
+      sha256,
+      src: containedPath(root, "the package root", path),
+      dst: containedPath(importedPath, "the imported package directory", path)
+    }));
+    // The bundle was extracted once to verify and is extracted again here. Before writing anything, refuse unless every
+    // byte about to be copied is still what verification admitted (a bundle replaced in between must not be imported).
+    for (const copy of copies) {
+      admittedBytes(copy);
+    }
     ensureDir(importedPath);
-    for (const file of verify.manifest.files) {
-      const src = join(root, file.path);
-      const dst = join(importedPath, file.path);
-      ensureDir(dirname(dst));
-      writeFileAtomic(dst, readFileSync(src), 0o644);
-    }
-    if (pathExists(join(root, "manifest.json"))) {
-      writeFileAtomic(join(importedPath, "manifest.json"), readFileSync(join(root, "manifest.json")), 0o644);
-    }
-    if (pathExists(join(root, "manifest.sig"))) {
-      writeFileAtomic(join(importedPath, "manifest.sig"), readFileSync(join(root, "manifest.sig")), 0o644);
-    }
-    if (pathExists(join(root, "public-keys", "publisher.pub"))) {
-      const pubDst = join(importedPath, "public-keys", "publisher.pub");
-      ensureDir(dirname(pubDst));
-      writeFileAtomic(pubDst, readFileSync(join(root, "public-keys", "publisher.pub")), 0o644);
+    for (const copy of copies) {
+      ensureDir(dirname(copy.dst));
+      writeFileAtomic(copy.dst, admittedBytes(copy), 0o644);
     }
 
     const benchDir = join(importedPath, "artifacts", "benchmarks");

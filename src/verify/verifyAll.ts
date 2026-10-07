@@ -387,7 +387,14 @@ export async function verifyAll(params: {
     }
   }
   for (const imported of listImportedBenchArtifacts(workspace)) {
-    const artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
+    let artifactPath: string;
+    try {
+      artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
+    } catch (error) {
+      // A meta.json naming an escaping id is a failed check, not a crash of `verify all`.
+      benchErrors.push(`import ${imported.benchId}@${imported.version}: ${error instanceof Error ? error.message : String(error)}`);
+      continue;
+    }
     // The signer the pinned registry's signed index names (cached at import), not meta.json: a self-check, labelled workspace-self.
     const self = workspaceSelfTrust(workspace);
     let signer: string;

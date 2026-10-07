@@ -10,6 +10,7 @@ import { pinnedTrust, workspaceKeyPem, workspaceKeyTrust } from "./helpers/trust
 import { tinyReleaseBundle, type TinyReleaseBundle } from "./helpers/tinyReleaseBundle.js";
 import { createBackup } from "../src/ops/backup/backupEngine.js";
 import { distrustEntry } from "./trust/trustFixtures.js";
+import { benchImportsBenchesDir } from "../src/bench/benchPolicyStore.js";
 
 describe("verify all on a fresh workspace (first-run passport boundary)", () => {
   let dir: string;
@@ -65,6 +66,17 @@ describe("verify all and the operator's trust (P0-09)", () => {
 
   const check = (report: Awaited<ReturnType<typeof verifyAll>>, id: string) => report.checks.find((row) => row.id === id);
   const monitorId = () => ed25519KeyId(workspaceKeyPem(dir, "monitor"))!;
+
+  test("an imported bench whose local meta.json names an escaping id is a FAIL row, not a thrown error", async () => {
+    const metaDir = join(benchImportsBenchesDir(dir), "bench-x", "1.0.0");
+    mkdirSync(metaDir, { recursive: true });
+    writeFileSync(join(metaDir, "meta.json"), JSON.stringify({ v: 1, benchId: "../../../escaped", version: "1.0.0",
+      importedTs: Date.now(), registryId: "r", registryFingerprint: "a".repeat(64), signerFingerprint: "b".repeat(64),
+      trustLabel: "LOW", scopeType: "WORKSPACE", sha256: "c".repeat(64), sourceUrl: "file:///r" }));
+    const row = check(await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) }), "bench-artifacts");
+    expect(row?.status).toBe("FAIL");
+    expect(row?.details).toEqual([expect.stringContaining("../../../escaped")]);
+  });
 
   test("passes the ledger trust root when the operator pinned the monitor key, and names the key", async () => {
     const report = await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) });

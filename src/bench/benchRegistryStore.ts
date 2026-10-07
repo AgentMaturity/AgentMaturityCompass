@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { benchArtifactSchema } from "./benchSchema.js";
 import {
   benchImportsBenchesDir,
@@ -67,7 +68,8 @@ export function importedBenchPath(workspace: string, benchId: string, version: s
   metaPath: string;
   benchJsonPath: string;
 } {
-  const dir = join(benchImportsBenchesDir(workspace), benchId, version);
+  // benchId comes from a signed artifact and version from a signed index; neither may leave the imports directory (P0-52).
+  const dir = containedPath(benchImportsBenchesDir(workspace), "the imported benches directory", benchId, version);
   return {
     dir,
     artifactPath: join(dir, "bench.amcbench"),
