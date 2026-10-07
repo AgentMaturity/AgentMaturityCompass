@@ -1,5 +1,5 @@
 {
-  "$comment": "P0-16 allowlist for scripts/check-no-fabrication.mjs. permanent: reviewed legitimate uses. pending: wording an open issue removes (owner); --strict at Gate G0 fails while any remain. pathPresence: control-surface scorers that refuse outside an AMC checkout and are retired by P1-53; pathPresenceBaseline may only go down. An entry that matches nothing fails as stale.",
+  "$comment": "P0-16 allowlist for scripts/check-no-fabrication.mjs. permanent: reviewed legitimate uses. pending: wording an open issue removes (owner); --strict at Gate G0 fails while any remain. pathPresence: control-surface scorers that report AMC's own control inventory, refuse or are not evaluated outside an AMC checkout, and are retired by P1-53; names may only be dropped from the set frozen in the script; pathPresenceBaseline may only go down. An entry that matches nothing fails as stale.",
   "permanent": [
     {
       "file": "src/assurance/certificate.ts",
@@ -30,11 +30,6 @@
       "file": "src/score/controlSurfaceScope.ts",
       "rule": "R3",
       "reason": "Its src/ markers detect an AMC checkout so path scorers can refuse elsewhere; it does not score."
-    },
-    {
-      "file": "src/score/gamingResistance.ts",
-      "rule": "R3",
-      "reason": "Converted by P0-15: a controlInventory of present and missing paths with status not_evaluated, score null and level null; no number is derived from the paths."
     }
   ],
   "pending": [
@@ -86,6 +81,7 @@
     "src/score/factSimulationBoundary.ts",
     "src/score/failSecureGovernance.ts",
     "src/score/forecastLegitimacy.ts",
+    "src/score/gamingResistance.ts",
     "src/score/kernelSandboxMaturity.ts",
     "src/score/levelTransition.ts",
     "src/score/memorySecurityArchitecture.ts",
@@ -101,5 +97,5 @@
     "src/score/syntheticIdentityGovernance.ts",
     "src/score/trustAuthorizationSync.ts"
   ],
-  "pathPresenceBaseline": 24
+  "pathPresenceBaseline": 25
 }
