@@ -97,6 +97,14 @@ export class TransitionRefused extends Error {
   }
 }
 
+/** `started` refused because another execution of the same agent is unreconciled. Thrown before anything is written. */
+export class ActionBlocked extends Error {
+  constructor(readonly executionId: string, readonly blockedBy: string) {
+    super(`blocked_by_unreconciled:${blockedBy}: an earlier action's outcome or evidence is unreconciled, and nothing is replayed automatically`);
+    this.name = "ActionBlocked";
+  }
+}
+
 /** The journal could not durably record: the store, the keys or the durability setting failed. */
 export class JournalUnavailable extends Error {
   constructor(message: string, options?: { cause?: unknown }) {

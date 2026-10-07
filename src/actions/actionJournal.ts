@@ -23,10 +23,10 @@ import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { recoverUnsettled, type ActionRecoveryReport } from "./actionRecovery.js";
+import { DEFAULT_ACTION_STALE_AFTER_MS, recoverUnsettled, type ActionRecoveryReport } from "./actionRecovery.js";
 import { authorizationRecordDigest, type AuthorizationRecordV1 } from "./authorizationRecord.js";
 import {
-  actionIntentV1Schema, actionReceiptV1Schema, JournalUnavailable, ReceiptChainBroken, receiptDigest, transitionAllowed,
+  ActionBlocked, actionIntentV1Schema, actionReceiptV1Schema, JournalUnavailable, ReceiptChainBroken, receiptDigest, transitionAllowed,
   TransitionRefused, type ActionIntentV1, type ActionReceiptV1, type EffectState, type ReceiptState
 } from "./receiptStates.js";
 
@@ -90,7 +90,10 @@ export interface ActionJournal {
   markEvidenceIncomplete(executionId: string, reasonCode: string): ActionReceiptV1;
   heartbeat(executionId: string): void;
   get(executionId: string): ActionExecutionView | null;
-  /** Executions of this agent whose outcome or evidence is unreconciled; they block its journaled calls. */
+  /**
+   * Executions of this agent that block its journaled calls: `outcome_unknown`, evidence incomplete, or `started` with a
+   * dead owner or a heartbeat older than the staleness window. `start` re-reads this inside its own transaction.
+   */
   blockingExecutions(scope: { readonly workspaceId: string; readonly agentId: string }): string[];
   verifyReceiptChain(executionId: string): ChainVerification;
   /** Executions not yet in a terminal state, from the index; each transition re-verifies its chain. */
@@ -112,6 +115,8 @@ interface Change {
   readonly request?: ActionRequest;
   /** Builds the intent from the verified head; throwing refuses the transition before anything is written. */
   readonly intent?: (head: ActionReceiptV1) => ActionIntentV1;
+  /** A precondition read inside the transaction, against the verified head; throwing refuses before anything is written. */
+  readonly guard?: (head: ActionReceiptV1) => void;
 }
 
 interface TransitionRow { seq: number; receipt_json: string; receipt_digest: string; evidence_event_id: string }
@@ -223,16 +228,17 @@ export function openActionJournal(workspace: string, options: { readonly staleAf
     ledger.close();
     throw new JournalUnavailable(`the ledger connection commits with synchronous=${actual}; FULL (2) or EXTRA (3) is required`);
   }
-  const journal = createJournal(workspace, ledger);
+  const staleAfterMs = options.staleAfterMs ?? DEFAULT_ACTION_STALE_AFTER_MS;
+  const journal = createJournal(workspace, ledger, staleAfterMs);
   try {
-    return { ...journal, recovery: recoverUnsettled(journal, options.staleAfterMs) };
+    return { ...journal, recovery: recoverUnsettled(journal, staleAfterMs) };
   } catch (error) {
     journal.close();
     throw error;
   }
 }
 
-function createJournal(workspace: string, ledger: Ledger): ActionJournal {
+function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number): ActionJournal {
   const db = ledger.db;
   const workspaceId = workspaceIdFromDirectory(workspace);
   /** This process's executions and their agents, so a failed post-dispatch write can block the right agent. */
@@ -243,6 +249,29 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
     const chain = verifyChainIn(ledger, executionId);
     if (!chain.ok) throw new ReceiptChainBroken(executionId, chain.errors);
     return [...chain.receipts];
+  };
+
+  /**
+   * What blocks `agentId`'s journaled calls, except `exclude`. State is read from each chain's latest appended receipt as
+   * well as the index row; either one blocks. A `started` execution blocks once its owner is dead on this host or its
+   * heartbeat is older than `staleAfterMs`: a live call in flight does not block a parallel one.
+   * ponytail: one indexed scan of the agent's unsettled executions per check; add a head-state table if histories grow large.
+   */
+  const blockingFor = (agentId: string, exclude: string | null): string[] => {
+    const staleBefore = Date.now() - staleAfterMs;
+    const rows = db.prepare(`SELECT e.execution_id AS id, e.state AS indexState, e.evidence_complete AS indexComplete,
+          json_extract(t.receipt_json, '$.state') AS headState, json_extract(t.receipt_json, '$.evidenceComplete') AS headComplete,
+          e.owner_pid AS pid, e.owner_host AS host, e.heartbeat_ts AS heartbeat
+        FROM action_executions e JOIN action_transitions t ON t.execution_id = e.execution_id
+          AND t.seq = (SELECT MAX(x.seq) FROM action_transitions x WHERE x.execution_id = e.execution_id)
+        WHERE e.workspace_id = ? AND e.agent_id = ? AND (e.state IN ('started', 'outcome_unknown') OR e.evidence_complete = 0
+          OR json_extract(t.receipt_json, '$.state') IN ('started', 'outcome_unknown') OR json_extract(t.receipt_json, '$.evidenceComplete') = 0)`)
+      .all(workspaceId, agentId) as Array<{ id: string; indexState: string; indexComplete: number; headState: string; headComplete: number;
+        pid: number | null; host: string | null; heartbeat: number | null }>;
+    const blocking = rows.filter((row) => row.indexState === "outcome_unknown" || row.headState === "outcome_unknown"
+      || row.indexComplete === 0 || row.headComplete === 0
+      || row.heartbeat === null || row.heartbeat < staleBefore || ownerAlive(row.pid, row.host) === false).map((row) => row.id);
+    return [...new Set([...blocking, ...(unreconciledInProcess.get(`${workspaceId}\0${agentId}`) ?? [])])].filter((id) => id !== exclude);
   };
 
   const block = (executionId: string, agentId: string): void => {
@@ -256,7 +285,7 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
       writeTelemetryDrops(ledger);
       return receipt;
     } catch (error) {
-      const failure = error instanceof TransitionRefused || error instanceof ReceiptChainBroken ? error
+      const failure = error instanceof TransitionRefused || error instanceof ReceiptChainBroken || error instanceof ActionBlocked ? error
         : new JournalUnavailable(message(error), { cause: error });
       const agentId = agents.get(executionId);
       if (agentId !== undefined && (change.to === undefined || change.to === "completed" || change.to === "outcome_unknown")) {
@@ -276,6 +305,7 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
       // P1-04 adds reconcile(); until then nothing settles an unknown outcome, and nothing replays it.
       throw new TransitionRefused(executionId, head.state, to);
     }
+    if (head !== null) change.guard?.(head);
     const intent = change.intent && head ? change.intent(head) : null;
     const carried = head !== null && head.state === to ? head : null;
     const now = Date.now();
@@ -299,7 +329,9 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
     const evidence = ledger.appendEvidenceWithReceipt({
       sessionId, runtime: "unknown", eventType: "audit", payload: bytes, inline: true,
       meta: { trustTier: "OBSERVED", auditType: "ACTION_STATE", executionId, seq: receipt.seq, state: receipt.state,
-        reasonCode: receipt.reasonCode, evidenceComplete, agentId: receipt.agentId },
+        reasonCode: receipt.reasonCode, evidenceComplete, agentId: receipt.agentId,
+        // The signed tie from an execution to the native session call it serves, so coverage need not trust the index.
+        ...(change.request ? { agentSessionId: change.request.sessionId, callId: change.request.callId } : {}) },
       receipt: { kind: "action_state", agentId: receipt.agentId, providerId: ACTION_JOURNAL_BINARY, model: null, bodySha256: digest, action }
     });
     ledger.sealSession(sessionId);
@@ -336,7 +368,12 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
     authorize: (executionId, authorizationDigest) => transition(executionId, { to: "authorized", reasonCode: "authorized", authorizationDigest }),
     deny: (executionId, reasonCode) => transition(executionId, { to: "denied", reasonCode }),
     cancel: (executionId, reasonCode) => transition(executionId, { to: "cancelled", reasonCode }),
-    start: (executionId, record) => transition(executionId, { to: "started", reasonCode: "dispatching", intent: (head) => {
+    start: (executionId, record) => transition(executionId, { to: "started", reasonCode: "dispatching", guard: (head) => {
+      // Atomic with the write: no call of this agent starts while another is unreconciled, whatever another process did
+      // since the caller last looked. The agent is the one the verified chain names.
+      const blocking = blockingFor(head.agentId, executionId);
+      if (blocking.length > 0) throw new ActionBlocked(executionId, blocking[0]!);
+    }, intent: (head) => {
       // The intent comes from the record the chain authorized, checked against the authorized digest, never from a caller.
       const digest = authorizationRecordDigest(record);
       if (digest !== head.authorizationDigest || record.executionId !== executionId) throw new TransitionRefused(executionId, head.state, "started");
@@ -369,18 +406,7 @@ function createJournal(workspace: string, ledger: Ledger): ActionJournal {
       if ((intent === null ? null : receiptDigest(intent)) !== head.intentDigest) throw new ReceiptChainBroken(executionId, ["stored intent does not match the receipts"]);
       return { executionId, state: head.state, effect: head.effect, evidenceComplete: head.evidenceComplete, intent, receipts };
     },
-    blockingExecutions({ workspaceId: scope, agentId }) {
-      if (scope !== workspaceId) return [];
-      // State is read from each chain's latest appended receipt as well as the index row; either one blocks.
-      // ponytail: one indexed scan of the agent's executions per call; add a head-state table if histories grow large.
-      const rows = db.prepare(`SELECT e.execution_id AS id FROM action_executions e
-          JOIN action_transitions t ON t.execution_id = e.execution_id
-            AND t.seq = (SELECT MAX(x.seq) FROM action_transitions x WHERE x.execution_id = e.execution_id)
-          WHERE e.workspace_id = ? AND e.agent_id = ? AND (e.state = 'outcome_unknown' OR e.evidence_complete = 0
-            OR json_extract(t.receipt_json, '$.state') = 'outcome_unknown' OR json_extract(t.receipt_json, '$.evidenceComplete') = 0)`)
-        .all(workspaceId, agentId) as Array<{ id: string }>;
-      return [...new Set([...rows.map((row) => row.id), ...(unreconciledInProcess.get(`${workspaceId}\0${agentId}`) ?? [])])];
-    },
+    blockingExecutions: ({ workspaceId: scope, agentId }) => (scope === workspaceId ? blockingFor(agentId, null) : []),
     verifyReceiptChain(executionId) {
       const chain = verifyChainIn(ledger, executionId);
       return chain.receipts.length === 0 && chain.errors.length === 0 ? { ...chain, ok: false, errors: ["no receipts for this execution"] } : chain;

@@ -53,7 +53,9 @@ export function recoverUnsettled(journal: ActionJournal, staleAfterMs = DEFAULT_
         cancelled.push(row.executionId);
       }
     } catch (error) {
-      if (!(error instanceof ReceiptChainBroken || error instanceof TransitionRefused)) throw error;
+      // Refused: another recoverer settled it first, and the chain says so. Anything but a broken chain is a store failure.
+      if (error instanceof TransitionRefused) continue;
+      if (!(error instanceof ReceiptChainBroken)) throw error;
       journal.block(row.executionId, row.agentId);
       integrityFailures.push({ executionId: row.executionId, error: error.message });
     }

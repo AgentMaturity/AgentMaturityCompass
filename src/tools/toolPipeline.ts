@@ -4,7 +4,7 @@ import {
   authorizationIntentFor, bindAuthorization, recheckAuthorization,
   type AuthorizationContext, type AuthorizationIntentResult, type BindResult
 } from "../actions/authorize.js";
-import type { EffectState, ReceiptState } from "../actions/receiptStates.js";
+import { ActionBlocked, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -34,11 +34,13 @@ import {
  *
  * A journaled call (P1-03: a composed journal and an authorized class) is wrapped in receipts:
  *
- *   requested -> blocked? -> approval -> guards -> binding -> authorized -> recheck + consume -> started -> body
- *     -> completed | outcome_unknown -> recorder
+ *   requested -> blocked? -> approval -> guards -> binding -> authorized -> blocked? -> recheck + consume
+ *     -> started (refused atomically while blocked) -> body -> completed | outcome_unknown -> recorder
  *
  * `started` commits the intent durably before the body runs, and every denial before it is a `denied` receipt. A
- * journal that cannot write before `started` denies `journal_unavailable` and nothing is dispatched.
+ * journal that cannot write before `started` denies `journal_unavailable` and nothing is dispatched. The first
+ * `blocked?` is an early answer only: the approval wait can last minutes, so the block is read again after it, and
+ * `started` re-reads it inside its own transaction, where no other call or process can slip past it.
  *
  * Approval sits BEFORE guards deliberately. Approval is a question about
  * whether a human wants this; a guard is a statement that policy forbids it.
@@ -408,8 +410,10 @@ export class ToolPipeline {
   }
 
   /**
-   * The stages of a journaled call (P1-03), each state a receipt. Everything from the abort check to the body is
-   * synchronous: no cancellation, recheck or intent can change between the last check and dispatch.
+   * The stages of a journaled call (P1-03), each state a receipt. Everything after the approval wait, from the guards to
+   * the body, is synchronous: no cancellation, block, recheck or intent can change in this process between the last
+   * check and dispatch, and `start` re-reads the block in its transaction against other processes. Everything read
+   * before the wait is read again after it: the block here, the record's facts and approvals by the recheck.
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
     authorization: CallAuthorization): Promise<ToolOutcome> {
@@ -437,17 +441,19 @@ export class ToolPipeline {
         return { ...denialOutcome(denied), action: action(head, false) };
       }
     };
-    let blocking: string[];
-    try {
-      blocking = journal.blockingExecutions({ workspaceId: journal.workspaceId, agentId: execution.agentId }).filter((id) => id !== executionId);
-    } catch (error) {
-      return deny(unavailable(error), "journal_unavailable");
-    }
-    if (blocking.length > 0) {
-      const code = `blocked_by_unreconciled:${blocking[0]}`;
-      return deny({ stage: "authorization", guardLabel: null,
-        reason: `${code}: an earlier action's outcome or evidence is unreconciled, and nothing is replayed automatically` }, code);
-    }
+    const blocked = (blockedBy: string): ToolOutcome => deny({ stage: "authorization", guardLabel: null,
+      reason: `blocked_by_unreconciled:${blockedBy}: an earlier action's outcome or evidence is unreconciled, and nothing is replayed automatically` },
+    `blocked_by_unreconciled:${blockedBy}`);
+    /** The block as it is now: an id that blocks this call, null for none, or a denial when the journal cannot say. */
+    const blockingNow = (): string | ToolOutcome | null => {
+      try {
+        return journal.blockingExecutions({ workspaceId: journal.workspaceId, agentId: execution.agentId }).find((id) => id !== executionId) ?? null;
+      } catch (error) {
+        return deny(unavailable(error), "journal_unavailable");
+      }
+    };
+    const early = blockingNow();
+    if (early !== null) return typeof early === "string" ? blocked(early) : early;
     if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
     const approval = await this.askApproval(execution);
     if (approval?.denied) return deny(approval.denied, "approval_denied");
@@ -472,6 +478,9 @@ export class ToolPipeline {
     } catch (error) {
       return deny(unavailable(error), "journal_unavailable");
     }
+    // Read again after the approval wait, before the recheck spends any approval. `start` reads it once more, atomically.
+    const late = blockingNow();
+    if (late !== null) return typeof late === "string" ? blocked(late) : late;
     const recheck = recheckAuthorization(bound.record, execution, authorization.context);
     if (!recheck.ok) {
       return deny({ stage: "authorization", reason: recheck.failures.join(", "), guardLabel: null }, `recheck_failed:${recheck.failures.join(",")}`);
@@ -479,6 +488,7 @@ export class ToolPipeline {
     try {
       journal.start(executionId, bound.record);
     } catch (error) {
+      if (error instanceof ActionBlocked) return blocked(error.blockedBy); // Another call went unreconciled meanwhile.
       return deny(unavailable(error), "journal_unavailable"); // The intent is not durable, so nothing is dispatched.
     }
     return this.dispatchJournaled(journal, execution, body, action);
