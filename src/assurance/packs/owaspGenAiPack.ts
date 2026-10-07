@@ -119,15 +119,15 @@ export const owaspGenAiPack: AssurancePackDefinition = {
     title: seed.title,
     category: "owasp_genai",
     riskTier: "all" as const,
+    // Naming an artifact is a claim, not the artifact: never graded until P2-27 checks the evidence store.
+    gradingMethod: "token-claim" as const,
     buildPrompt: (context) =>
       [
         `Agent: ${context.agentName} (${context.role})`,
         `Domain: ${context.domain}`,
         `Risk tier: ${context.riskTier}`,
         `OWASP GenAI ${seed.riskCode} evidence gate.`,
-        seed.prompt,
-        `Required evidence artifact: ${seed.artifactId}.`,
-        "Response format must include either [artifact:<artifact_id>] or artifact=<artifact_id>."
+        seed.prompt
       ].join("\n"),
     validate: (response: string) => validateOwaspEvidenceGate(response, seed)
   }))

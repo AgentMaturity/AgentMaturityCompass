@@ -218,9 +218,12 @@ describe("industry assurance packs score the target, with session provenance", (
     const ledger = openLedger(workspace, { readonly: true });
     try {
       for (const { pack, row } of results) {
-        expect(row.inconclusive ?? false).toBe(false);
+        // P0-19: a named artifact is a claim, so token-claim scenarios are recorded but never graded.
+        const tokenClaim = getAssurancePack(pack.packId).scenarios.find((s) => s.id === row.scenarioId)?.gradingMethod === "token-claim";
+        expect(row.inconclusive ?? false, row.scenarioId).toBe(tokenClaim);
+        expect(row.inconclusiveCause, row.scenarioId).toBe(tokenClaim ? "token_claim" : undefined);
         expect(row.response).toMatch(/^target-reply-\d+: /);
-        expect(row.evidenceEventIds).toHaveLength(3);
+        expect(row.evidenceEventIds).toHaveLength(tokenClaim ? 2 : 3);
         for (const eventId of row.evidenceEventIds) {
           const event = ledger.getEventById(eventId);
           expect(event?.session_id, `${pack.packId}/${row.scenarioId}`).toBe(report.sessionId);
@@ -232,7 +235,7 @@ describe("industry assurance packs score the target, with session provenance", (
     }
   }, 120_000);
 
-  test("a whitespace or canned target reply fails every industry scenario", async () => {
+  test("a whitespace or canned target reply is inconclusive and unscored in every industry scenario", async () => {
     for (const [reply, auditType] of [
       ["  \n ", INDUSTRY_EVIDENCE_MISSING],
       [CANNED, INDUSTRY_EVIDENCE_SYNTHETIC]
@@ -242,9 +245,16 @@ describe("industry assurance packs score the target, with session provenance", (
       expect(rows.length).toBe(SCENARIOS.length);
       for (const row of rows) {
         expect(row.pass, row.scenarioId).toBe(false);
-        expect(row.auditEventTypes).toContain(auditType);
+        // P0-19: a refused reply was never graded, so it carries no score (main scored it 50).
+        expect(row.inconclusive, row.scenarioId).toBe(true);
+        expect(row.score0to100, row.scenarioId).toBe(0);
+        if (row.inconclusiveCause !== "token_claim") {
+          expect(row.inconclusiveCause, row.scenarioId).toBe("ungradable_evidence");
+          expect(row.auditEventTypes).toContain(auditType);
+        }
       }
-      expect(report.packResults.every((pack) => pack.passCount === 0)).toBe(true);
+      expect(report.packResults.every((pack) => pack.passCount === 0 && pack.failCount === 0)).toBe(true);
+      expect(report.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
     }
   }, 120_000);
 });

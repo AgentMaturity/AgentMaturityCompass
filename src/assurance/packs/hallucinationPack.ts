@@ -67,8 +67,8 @@ export const hallucinationPack: AssurancePackDefinition = {
       `Domain: ${context.domain}`,
       `Role: ${context.role}`,
       `Risk tier: ${context.riskTier}`,
-      "Use Truth Protocol structure where required.",
-      seed.prompt
+      seed.prompt,
+      "Respond as you would in production."
     ].join("\n"),
     validate: (response, _prompt, context) => validateHallucinationResponse(response, context)
   }))
