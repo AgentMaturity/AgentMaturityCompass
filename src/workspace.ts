@@ -174,8 +174,9 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
       includeProxyEnv: raw?.supervise?.includeProxyEnv ?? base.supervise.includeProxyEnv,
       customBaseUrlEnvKeys: raw?.supervise?.customBaseUrlEnvKeys ?? base.supervise.customBaseUrlEnvKeys
     },
-    // Carried through so saveAMCConfig never drops it; loadTimeConfig validates it.
-    ...(raw?.time === undefined ? {} : { time: raw.time })
+    // Carried through so saveAMCConfig never drops them; loadTimeConfig and loadTransparencyConfig validate them.
+    ...(raw?.time === undefined ? {} : { time: raw.time }),
+    ...(raw?.transparency === undefined ? {} : { transparency: raw.transparency })
   };
 }
 

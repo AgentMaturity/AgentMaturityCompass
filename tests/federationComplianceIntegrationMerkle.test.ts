@@ -9,7 +9,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initComplianceMaps, verifyComplianceMapsSignature, generateComplianceReport } from "../src/compliance/complianceEngine.js";
 import { appendTransparencyEntry, readTransparencyEntries } from "../src/transparency/logChain.js";
-import { buildMerkleRootFromEntryHashes } from "../src/transparency/merkle.js";
+import { entryTreeRoot } from "../src/transparency/merkle.js";
 import {
   rebuildTransparencyMerkle,
   exportTransparencyProofBundle,
@@ -185,7 +185,7 @@ describe("compliance + merkle + federation + integrations", () => {
       }
     });
     const rebuilt = rebuildTransparencyMerkle(workspace);
-    const expectedRoot = buildMerkleRootFromEntryHashes(readTransparencyEntries(workspace).map((entry) => entry.hash));
+    const expectedRoot = entryTreeRoot("rfc9162-sha256", readTransparencyEntries(workspace).map((entry) => entry.hash));
     expect(rebuilt.root).toBe(expectedRoot);
 
     const proofFile = join(workspace, ".amc", "transparency", "proofs", `${e1.hash}.amcproof`);

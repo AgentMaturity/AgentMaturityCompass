@@ -441,6 +441,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
+| `amc export oscal` | Export the control catalog, a compiled plan and its control results as OSCAL 1.2.3, with a loss report (experimental) | `--out <dir>`<br>`--plan <plan.json>`<br>`--results <file>` | - |
 | `amc export policy` | Export framework-agnostic North Star policy integration pack | `--target <name>`<br>`--out <dir>`<br>`--agent <agentId>` | - |
 | `amc federate` | Offline federation sync operations | - | - |
 | `amc federate export` | Export offline federation sync package (.amcfed) | `--out <file>` | - |
@@ -1134,7 +1135,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc transparency init` | Initialize append-only transparency log | - | - |
 | `amc transparency merkle` | Merkle transparency root/proof operations | - | - |
 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
-| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | - | - |
+| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | `--algorithm <algorithm>` | - |
 | `amc transparency merkle root` | Show current Merkle root and history | - | - |
 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is | `--agent <id>`<br>`--format <fmt>`<br>`--out <file>`<br>`--all`<br>`--workspace <path>` | - |

@@ -16,6 +16,61 @@
             }
           ]
         },
+        "public": {
+          "additionalProperties": false,
+          "properties": {
+            "backend": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "rekor-v2"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "detail": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "logIndex": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "status": {
+              "enum": [
+                "anchored",
+                "not-anchored",
+                "invalid"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "backend",
+            "logIndex",
+            "detail"
+          ],
+          "type": "object"
+        },
         "status": {
           "enum": [
             "anchored",

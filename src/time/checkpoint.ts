@@ -3,11 +3,19 @@ import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { signingRoute } from "../crypto/signing/signer.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
+import {
+  anchorReceiptPath, anchorsDir, checkpointNotePath, checkpointNoteText, loadTransparencyConfig, pinnedTransparencyLogs, verifyAnchorReceipt,
+  type AnchorReceiptV1, type TransparencyConfig
+} from "../transparency/anchors/anchor.js";
+import { submitRekorV2Entry } from "../transparency/anchors/rekorV2.js";
+import { NOTE_MAX_BYTES, signNote, verifySignedNote } from "../transparency/checkpointNote.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { merkleCurrentRootPath } from "../transparency/merklePaths.js";
-import type { TrustContext } from "../trust/trustContext.js";
+import type { PublicAnchoring } from "../trust/verifierReport.js";
+import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
 import type { TimestampAuthority } from "../trust/trustList.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, pathExists } from "../utils/fs.js";
@@ -124,8 +132,8 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
   let transparency: LedgerCheckpointV1["transparency"] = null;
   if (pathExists(merkleCurrentRootPath(workspace))) {
     const merkle = verifyTransparencyMerkle(workspace);
-    if (!merkle.ok || merkle.root === null) throw new Error(`the transparency root does not verify: ${merkle.errors.join("; ")}`);
-    transparency = { root: merkle.root, leafCount: merkle.leafCount, algorithm: "amc-legacy-v1" };
+    if (!merkle.ok || merkle.root === null || merkle.algorithm === null) throw new Error(`the transparency root does not verify: ${merkle.errors.join("; ")}`);
+    transparency = { root: merkle.root, leafCount: merkle.leafCount, algorithm: merkle.algorithm };
   }
   const previous = chain[chain.length - 1];
   const checkpoint: LedgerCheckpointV1 = {
@@ -167,18 +175,97 @@ function checkpointDue(workspace: string, config: TimeConfig, last: LedgerCheckp
   }
 }
 
+export interface AnchorResult { anchor: string; sequence: number; status: PublicAnchoring["status"] | "failed"; detail: string | null }
+
+/**
+ * P1-26: the signed C2SP note for a checkpoint whose transparency tree is RFC 9162, written once to
+ * `.amc/transparency/anchors/<sequence>.note`; an existing note must be that text signed by an auditor key.
+ */
+function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
+  const { sequence, transparency } = entry.checkpoint;
+  if (transparency?.algorithm !== "rfc9162-sha256") {
+    throw new Error(`checkpoint ${sequence} covers no RFC 9162 transparency tree; run \`amc transparency merkle rebuild --algorithm rfc9162-sha256\``);
+  }
+  const text = checkpointNoteText({ workspaceId: entry.checkpoint.workspaceId, sequence, checkpointSha256: entry.sha256,
+    treeSize: transparency.leafCount, rootHash: transparency.root });
+  const origin = text.slice(0, text.indexOf("\n"));
+  const path = checkpointNotePath(workspace, sequence);
+  if (pathExists(path)) {
+    const existing = boundedFile(path, NOTE_MAX_BYTES);
+    if (!getPublicKeyHistory(workspace, "auditor").some(pem => verifySignedNote(existing, { name: origin, publicKeyPem: pem }) === text)) {
+      throw new Error(`${path} is not checkpoint ${sequence}'s note signed by an auditor key`);
+    }
+    return existing;
+  }
+  // Mirrors signDigestWithPolicy: where the notary must sign Merkle roots, the vault key does not sign their checkpoints.
+  if (signingRoute(workspace, "MERKLE_ROOT") === "notary") {
+    throw new Error("the trust config requires the notary for MERKLE_ROOT, and a C2SP note needs a raw Ed25519 signature the notary does not make");
+  }
+  const note = Buffer.from(signNote(text, origin, getPrivateKeyPem(workspace, "auditor")), "utf8");
+  ensureDir(anchorsDir(workspace));
+  writeFileSync(path, note, { flag: "wx", mode: 0o644 });
+  return note;
+}
+
+async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, anchor: TransparencyConfig["anchors"][number], trust: TrustContext): Promise<AnchorResult> {
+  const result = (status: AnchorResult["status"], detail: string | null): AnchorResult => ({ anchor: anchor.name, sequence: entry.checkpoint.sequence, status, detail });
+  const logs = pinnedTransparencyLogs(trust).filter(log => anchor.logIds.includes(log.logId));
+  if (!logs.length) return result("failed", `none of its logIds (${anchor.logIds.join(", ")}) is in a verified trust list`);
+  try {
+    const note = checkpointNote(workspace, entry);
+    const digest = sha256Hex(note);
+    // The token first: a public log entry is permanent, so nothing is submitted that the anchor could not complete.
+    const { grant, failures } = await timestampDigest(workspace, digest, trust);
+    if (!grant) return result("failed", `no RFC 3161 token for the checkpoint note: ${failures.join("; ") || "no time.tsa configured"}`);
+    const response = await submitRekorV2Entry(new URL(anchor.url), note);
+    const receipt: AnchorReceiptV1 = { type: "amc.anchor-receipt", version: 1, backend: "rekor-v2", service: anchor.url, checkpointSha256: digest,
+      submittedAt: new Date().toISOString(), responseB64: response.toString("base64"), timestampTokenB64: grant.tokenDer.toString("base64") };
+    const bytes = Buffer.from(`${JSON.stringify(receipt, null, 2)}\n`, "utf8");
+    // Kept whatever it says: the entry is public now, and a verifier reports a bad anchor instead of never seeing it.
+    writeFileSync(anchorReceiptPath(workspace, entry.checkpoint.sequence, anchor.name), bytes, { flag: "wx", mode: 0o644 });
+    const verified = verifyAnchorReceipt(bytes, note, trust, logs);
+    return result(verified.status, verified.detail);
+  } catch (error) {
+    return result("failed", error instanceof Error ? error.message : String(error));
+  }
+}
+
+/**
+ * P1-26: anchors the newest ledger checkpoint in each log of `transparency.anchors` (`anchorEvery`: every checkpoint,
+ * or at most daily per log). A no-op without anchors. Failures are returned, never thrown; the checkpoint stays
+ * unanchored and a later tick tries the then-newest checkpoint.
+ */
+export async function anchorCheckpoints(workspace: string, trust?: TrustContext, now = Date.now()): Promise<AnchorResult[]> {
+  const config = loadTransparencyConfig(workspace);
+  const chain = readCheckpointChain(workspace);
+  const latest = chain.at(-1);
+  if (!config.anchors.length || !latest) return [];
+  const context = trust ?? loadTrustContext();
+  const results: AnchorResult[] = [];
+  for (const anchor of config.anchors) {
+    if (pathExists(anchorReceiptPath(workspace, latest.checkpoint.sequence, anchor.name))) continue;
+    const lastAnchored = [...chain].reverse().find(entry => pathExists(anchorReceiptPath(workspace, entry.checkpoint.sequence, anchor.name)));
+    if (config.anchorEvery === "daily" && lastAnchored && now - Date.parse(lastAnchored.checkpoint.claimedAt) < 86_400_000) continue;
+    results.push(await anchorCheckpoint(workspace, latest, anchor, context));
+  }
+  return results;
+}
+
 const inFlight = new Set<string>();
 
-/** One scheduler tick: a no-op unless TSAs are configured; completes pending tokens, then checkpoints when due. */
-export async function timeCheckpointTick(workspace: string, now = Date.now()): Promise<{ ran: boolean }> {
+/**
+ * One scheduler tick: a no-op unless TSAs are configured; completes pending tokens, checkpoints when due, then
+ * anchors the newest checkpoint publicly when `transparency.anchors` asks for it (P1-26).
+ */
+export async function timeCheckpointTick(workspace: string, now = Date.now()): Promise<{ ran: boolean; anchors: AnchorResult[] }> {
   const config = loadTimeConfig(workspace);
-  if (!config.tsa.length || inFlight.has(workspace)) return { ran: false };
+  if (!config.tsa.length || inFlight.has(workspace)) return { ran: false, anchors: [] };
   inFlight.add(workspace);
   try {
     await completePendingCheckpoints(workspace);
     const due = checkpointDue(workspace, config, readCheckpointChain(workspace).at(-1)?.checkpoint, now);
     if (due) await checkpointLedger(workspace);
-    return { ran: due };
+    return { ran: due, anchors: await anchorCheckpoints(workspace, undefined, now) };
   } finally {
     inFlight.delete(workspace);
   }

@@ -6,7 +6,8 @@ import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { updateTransparencyMerkleAfterAppend } from "./merkleIndexStore.js";
+import { currentTreeAlgorithm, updateTransparencyMerkleAfterAppend } from "./merkleIndexStore.js";
+import type { MerkleAlgorithm } from "./merkle.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
@@ -94,7 +95,8 @@ function readEntries(workspace: string): TransparencyEntry[] {
     .map((line) => transparencyEntrySchema.parse(JSON.parse(line) as unknown));
 }
 
-function writeSeal(workspace: string, lastHash: string): void {
+/** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
+function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): void {
   ensureDir(transparencyDir(workspace));
   const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
   const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
@@ -102,7 +104,8 @@ function writeSeal(workspace: string, lastHash: string): void {
     v: 1,
     ts: Date.now(),
     lastHash,
-    signerFingerprint
+    signerFingerprint,
+    merkleAlgorithm
   });
   const sealPath = transparencySealPath(workspace);
   writeFileAtomic(sealPath, JSON.stringify(seal, null, 2), 0o644);
@@ -132,7 +135,7 @@ export function initTransparencyLog(workspace: string): {
     writeFileAtomic(transparencyLogPath(workspace), "", 0o644);
   }
   if (!pathExists(transparencySealPath(workspace)) || !pathExists(transparencySealSigPath(workspace))) {
-    writeSeal(workspace, "");
+    writeSeal(workspace, "", currentTreeAlgorithm(workspace));
   }
   return {
     logPath: transparencyLogPath(workspace),
@@ -154,6 +157,8 @@ export function appendTransparencyEntry(params: {
   };
 }): TransparencyEntry {
   initTransparencyLog(params.workspace);
+  // Read before the line lands, while the seal still covers the log's last entry (P1-26).
+  const merkleAlgorithm = currentTreeAlgorithm(params.workspace);
   const prev = lastTransparencyEntryHash(params.workspace);
   const payload = {
     v: 1 as const,
@@ -173,7 +178,7 @@ export function appendTransparencyEntry(params: {
     hash
   });
   appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
-  writeSeal(params.workspace, entry.hash);
+  writeSeal(params.workspace, entry.hash, merkleAlgorithm);
   // Not wrapped in a try/catch. The Merkle root is part of what an append
   // promises: inclusion proofs are generated from the log, so a root that stops
   // advancing means the exporter keeps issuing proofs against a root nobody
@@ -184,7 +189,8 @@ export function appendTransparencyEntry(params: {
   // TransparencyMerkleLagError, whose message states that the log line landed.
   updateTransparencyMerkleAfterAppend(params.workspace, {
     entryHash: entry.hash,
-    prevEntryHash: entry.prev
+    prevEntryHash: entry.prev,
+    algorithm: merkleAlgorithm
   });
   return entry;
 }

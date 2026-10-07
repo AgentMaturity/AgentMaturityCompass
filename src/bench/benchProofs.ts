@@ -4,7 +4,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
 import { generateTransparencyInclusionProof, verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
-import { verifyMerkleProof } from "../transparency/merkle.js";
+import { verifyEntryInclusion, type MerkleAlgorithm } from "../transparency/merkle.js";
 import type { IssuerAdmission, TrustContext, VerifierReportV1 } from "../trust/index.js";
 import { checkDigestSignature, envelopePublicKey } from "../trust/signatureCheck.js";
 
@@ -15,6 +15,10 @@ export interface BenchInclusionProof {
   rootHash: string;
   merklePath: Array<{ position: "left" | "right"; hash: string }>;
   verifiedBy: "amc";
+  /** P1-26: RFC 9162 proofs name their tree and carry the leaf index and tree size; absent means amc-legacy-v1. */
+  algorithm?: MerkleAlgorithm;
+  leafIndex?: number;
+  treeSize?: number;
 }
 
 export interface BenchProofBundle {
@@ -78,7 +82,8 @@ export function buildBenchProofs(params: {
         eventHash: generated.entryHash,
         rootHash: generated.merkleRoot,
         merklePath: generated.proofPath,
-        verifiedBy: "amc"
+        verifiedBy: "amc",
+        ...(generated.algorithm ? { algorithm: generated.algorithm, leafIndex: generated.leafIndex, treeSize: generated.treeSize } : {})
       });
     } catch {
       // Keep export robust if proof cannot be generated for a specific entry.
@@ -116,17 +121,27 @@ export function buildBenchProofs(params: {
 /**
  * Checks each proof's Merkle path and, when the bundle carries its signed merkle root, that every proof resolves to
  * that root rather than to a root the proof names for itself (P0-09). The root's signature is the caller's to check
- * under a trust context; verifyProofsAgainstSignedRoot does both.
+ * under a trust context; verifyProofsAgainstSignedRoot does both. P1-26: the tree and the RFC 9162 tree size come
+ * from the signed root, never from a proof, and a proof naming another tree fails; without a signed root only the
+ * legacy tree is checked, so an RFC 9162 proof cannot pick its own tree size.
  */
 export function verifyBenchProofBundle(bundle: BenchProofBundle): {
   ok: boolean;
   errors: string[];
 } {
   const errors: string[] = [];
-  const signedRoot = bundle.merkleRoot ? (bundle.merkleRoot.root as { root?: unknown } | null)?.root : undefined;
+  const signedRow = bundle.merkleRoot ? bundle.merkleRoot.root as { root?: unknown; leafCount?: unknown; algorithm?: unknown } | null : null;
+  const signedRoot = signedRow?.root;
+  const algorithm: MerkleAlgorithm = signedRow?.algorithm === "rfc9162-sha256" ? "rfc9162-sha256" : "amc-legacy-v1";
   for (const proof of bundle.proofs) {
-    const valid = verifyMerkleProof({
+    if ((proof.algorithm ?? "amc-legacy-v1") !== algorithm || (signedRow && signedRow.algorithm !== undefined && signedRow.algorithm !== algorithm)) {
+      errors.push(`inclusion proof ${proof.proofId} names ${proof.algorithm ?? "amc-legacy-v1"}, but the signed merkle root is ${String(signedRow?.algorithm ?? "amc-legacy-v1")}`);
+    }
+    const valid = verifyEntryInclusion({
+      algorithm,
       entryHash: proof.eventHash,
+      leafIndex: proof.leafIndex,
+      treeSize: typeof signedRow?.leafCount === "number" ? signedRow.leafCount : undefined,
       proofPath: proof.merklePath,
       root: proof.rootHash
     });

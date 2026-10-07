@@ -79,16 +79,22 @@ async function checkedAddress(host: string): Promise<string> {
   return addresses[0]!;
 }
 
-/** POSTs a timestamp query and returns the reply body. Redirects, other statuses and other content types are refused. */
-export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA_TIMEOUT_MS): Promise<Buffer> {
-  if (url.username || url.password) throw new Error("a TSA URL must not carry credentials");
+/**
+ * POSTs `body` to an operator-configured URL through the egress check (checkedAddress) and returns the reply body.
+ * Only `expect.status` with content type `expect.accept` is accepted; redirects are refused, replies are capped at
+ * `expect.maxBytes`. P1-26's Rekor client shares it.
+ */
+export async function postToConfiguredUrl(url: URL, body: Buffer, expect: {
+  contentType: string; accept: string; status: number; maxBytes: number; timeoutMs: number;
+}): Promise<Buffer> {
+  if (url.username || url.password) throw new Error("a configured URL must not carry credentials");
   const host = canonicalHost(url.hostname);
   const address = await checkedAddress(host);
   const https = url.protocol === "https:";
   const options: RequestOptions & { servername?: string } = {
     host: address, port: url.port || (https ? 443 : 80), method: "POST", path: `${url.pathname}${url.search}`, agent: false, setHost: false,
-    headers: { host: url.host, "content-type": "application/timestamp-query", accept: "application/timestamp-reply", "content-length": body.length },
-    signal: AbortSignal.timeout(timeoutMs),
+    headers: { host: url.host, "content-type": expect.contentType, accept: expect.accept, "content-length": body.length },
+    signal: AbortSignal.timeout(expect.timeoutMs),
     // TLS checks the certificate against the configured name, not the address it resolved to.
     ...(https && isIP(host) === 0 ? { servername: host } : {})
   };
@@ -96,17 +102,17 @@ export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA
     const request = (https ? httpsRequest : httpRequest)(options, (response: IncomingMessage) => {
       const type = (response.headers["content-type"] ?? "").split(";")[0]!.trim().toLowerCase();
       const status = response.statusCode ?? 0;
-      if (status !== 200 || type !== "application/timestamp-reply") {
+      if (status !== expect.status || type !== expect.accept) {
         response.resume();
         reject(new Error(status >= 300 && status < 400 ? `redirect (HTTP ${status}) refused`
-          : status !== 200 ? `HTTP ${status}` : `content type "${type}" is not application/timestamp-reply`));
+          : status !== expect.status ? `HTTP ${status}` : `content type "${type}" is not ${expect.accept}`));
         return;
       }
       const chunks: Buffer[] = [];
       let size = 0;
       response.on("data", (chunk: Buffer) => {
         size += chunk.length;
-        if (size > TIMESTAMP_TOKEN_MAX_BYTES) request.destroy(new Error(`reply exceeds ${TIMESTAMP_TOKEN_MAX_BYTES} bytes`));
+        if (size > expect.maxBytes) request.destroy(new Error(`reply exceeds ${expect.maxBytes} bytes`));
         else chunks.push(chunk);
       });
       response.on("end", () => resolve(Buffer.concat(chunks)));
@@ -115,6 +121,12 @@ export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA
     request.on("error", reject);
     request.end(body);
   });
+}
+
+/** POSTs a timestamp query and returns the reply body. Redirects, other statuses and other content types are refused. */
+export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA_TIMEOUT_MS): Promise<Buffer> {
+  return await postToConfiguredUrl(url, body, { contentType: "application/timestamp-query", accept: "application/timestamp-reply",
+    status: 200, maxBytes: TIMESTAMP_TOKEN_MAX_BYTES, timeoutMs });
 }
 
 export interface TimestampGrant { tsa: string; tokenDer: Buffer; attested: AttestedTime }

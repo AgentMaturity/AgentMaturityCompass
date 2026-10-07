@@ -1,6 +1,7 @@
 import { statSync, unlinkSync } from "node:fs";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import type { MerkleAlgorithm } from "./merkle.js";
 import { merkleFrontierPath, merkleLeavesPath, merklePendingPath, transparencyMerkleDir } from "./merklePaths.js";
 import {
   frontierMatchesLeafCount,
@@ -109,12 +110,14 @@ export function leavesFileBytes(workspace: string): number {
  * the entry before it, so a frontier whose `lastEntryHash` equals it covers
  * exactly the prefix this append extends. The shape and self-root checks then
  * make a hand-edited frontier fall back to a rebuild instead of silently
- * steering every future root.
+ * steering every future root. `algorithm` comes from the signed root, never from
+ * this cache, so a frontier of the other tree cannot fold to its recorded root.
  */
 export function frontierResumeBlocker(params: {
   state: MerkleFrontierState;
   expectedPrevEntryHash: string;
   leavesBytes: number;
+  algorithm: MerkleAlgorithm;
 }): string | null {
   const { state } = params;
   if (state.lastEntryHash !== params.expectedPrevEntryHash) {
@@ -126,7 +129,7 @@ export function frontierResumeBlocker(params: {
   if (!frontierMatchesLeafCount(state.frontier, state.leafCount)) {
     return `frontier shape does not match leafCount ${state.leafCount}`;
   }
-  if (frontierRoot(state.frontier) !== state.root) {
+  if (frontierRoot(state.frontier, params.algorithm) !== state.root) {
     return "frontier nodes do not fold to the recorded root";
   }
   if (state.leavesBytes !== params.leavesBytes) {
