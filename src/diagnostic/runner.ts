@@ -66,6 +66,9 @@ import {
 } from "./confidenceControls.js";
 import { buildQuestionExplainabilityReport, type QuestionExplainabilityInputRow } from "./questionScoreExplainability.js";
 import { evaluateDiagnosticEvidenceReadiness } from "./evidenceReadiness.js";
+import { markdownCell, markdownHeatmap } from "./reportMarkdown.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend, type ClaimEnvelope } from "../claims/eligibility/index.js";
+import { envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
 
 function parseEventForRunner(workspace: string, event: EvidenceEvent, reader: () => ReaderTrust): ParsedEvidenceEvent {
   const parsed = parseEvidenceEventWith(event, reader);
@@ -568,18 +571,6 @@ export function enforceHighRiskSandboxRequirement(params: {
     supportedMaxLevel: params.supportedMaxLevel,
     applied: false
   };
-}
-
-function markdownHeatmap(diff: Array<{ questionId: string; current: number; target: number; gap: number }>): string {
-  const header = "| Question | Current | Target | Gap |\n|---|---:|---:|---:|";
-  const rows = diff
-    .map((row) => `| ${row.questionId} | ${row.current} | ${row.target} | ${row.gap} |`)
-    .join("\n");
-  return `${header}\n${rows}`;
-}
-
-function markdownCell(input: string): string {
-  return input.replace(/\|/g, "\\|").replace(/\s+/g, " ").trim();
 }
 
 export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string): Promise<DiagnosticReport> {
@@ -1496,7 +1487,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       status
     });
 
-    const markdown = generateReport(report, "md") as string;
+    const sealVerified = sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
+    const markdown = generateReport(report, "md", envelopeForStoredRun(report, { sealVerified, now })) as string;
     const reportPath = outputMarkdownPath ?? join(agentPaths.reportsDir, `${runId}.md`);
     ensureDir(agentPaths.reportsDir);
     writeFileAtomic(reportPath, markdown, 0o644);
@@ -1555,7 +1547,8 @@ export function explainDiagnosticReportStatus(
   };
 }
 
-export function generateReport(report: DiagnosticReport, format: "md" | "json"): string | DiagnosticReport {
+/** A run read without its seal checked is labelled self-reported; callers that verified the seal pass `claim`. */
+export function generateReport(report: DiagnosticReport, format: "md" | "json", claim?: ClaimEnvelope): string | DiagnosticReport {
   if (format === "json") {
     return report;
   }
@@ -1854,7 +1847,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
 
   return [
     `# Agent Maturity Compass Report (${report.runId})`,
-    "",
+    "", formatClaimLabel(renderClaimLabel(claim ?? envelopeForStoredRun(report, { sealVerified: false, now: report.ts })), "report"), "",
     `- Agent: ${report.agentId}`,
     `- Artifact Status: **${report.status}** — ${statusExplanation.artifactLabel}`,
     `- Artifact Verification: ${statusExplanation.verificationLabel}`,
@@ -1927,7 +1920,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json"):
     "",
     "## Evidence to Collect Next",
     checklist,
-    ""
+    "", "## How to read claim kinds", "", renderClaimLegend("markdown"), ""
   ].join("\n");
 }
 

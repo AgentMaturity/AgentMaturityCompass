@@ -38,7 +38,7 @@ function dots(label: string, totalWidth: number): string {
 
 /* ── Main renderer ──────────────────────────────────────────── */
 
-export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: boolean; firstRun?: boolean }): string {
+export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: boolean; firstRun?: boolean; claimLine?: string }): string {
   const lines: string[] = [];
   const W = 56; // content width
 
@@ -47,6 +47,7 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
   lines.push(`  ${DIM}╭${"─".repeat(W)}╮${RESET}`);
   lines.push(`  ${DIM}│${RESET}  ${BOLD}${WHITE}AMC Full Assessment${RESET} ${DIM}—${RESET} ${WHITE}${result.agentId}${RESET}${" ".repeat(Math.max(0, W - 26 - result.agentId.length))}${DIM}│${RESET}`);
   lines.push(`  ${DIM}╰${"─".repeat(W)}╯${RESET}`);
+  if (opts?.claimLine) lines.push(`  ${opts.claimLine}`);
   lines.push("");
 
   // First run: a fresh agent legitimately scores low because there is little
