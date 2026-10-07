@@ -93,7 +93,8 @@ function toMaturityLevel(score: number): DomainAssessmentResult["level"] {
   return `L${percentToLevel(percent(score))}` as DomainAssessmentResult["level"];
 }
 
-function requiredLevelForQuestion(question: DomainQuestion): number {
+/** The level a domain question needs before it reports no compliance gap: L4 for critical or weight >= 20, else L3. */
+export function requiredLevelForQuestion(question: DomainQuestion): number {
   if (CRITICAL_QUESTION_IDS.has(question.id)) return 4;
   if (question.weight >= 20) return 4;
   return 3;

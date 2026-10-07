@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { dirname } from "node:path";
+import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { ConformanceEnvironment } from "./conformanceSchema.js";
 
@@ -20,9 +20,11 @@ export function currentConformanceEnvironment(): ConformanceEnvironment {
  * Resolves the AMC source commit a run was produced from.
  *
  * An explicit value must be a full sha. Otherwise `AMC_SOURCE_COMMIT`, then
- * `git rev-parse HEAD` in the checkout this module lives in. When none of
- * those yields a sha the answer is "unknown" with the reason — a guessed or
- * truncated commit would be a boundary the reader cannot check.
+ * `git rev-parse HEAD` when this package's root is itself the top of a git
+ * checkout (never the HEAD of a project that installed AMC under
+ * node_modules). When none of those yields a sha the answer is "unknown" with
+ * the reason — a guessed or borrowed commit would be a boundary the reader
+ * cannot check.
  */
 export function resolveSourceCommit(explicit?: string): SourceCommitResolution {
   if (explicit !== undefined) {
@@ -36,21 +38,22 @@ export function resolveSourceCommit(explicit?: string): SourceCommitResolution {
     return { sourceCommit: fromEnv, resolution: "env:AMC_SOURCE_COMMIT" };
   }
   try {
-    const cwd = dirname(fileURLToPath(import.meta.url));
-    const out = execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd,
+    // src/domains/conformance/ and dist/domains/conformance/ both sit three levels under the package root.
+    const packageRoot = realpathSync(fileURLToPath(new URL("../../../", import.meta.url)));
+    const [top, sha] = execFileSync("git", ["rev-parse", "--show-toplevel", "HEAD"], {
+      cwd: packageRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
       timeout: 5_000
-    }).trim();
-    if (GIT_SHA_RE.test(out)) {
-      return { sourceCommit: out, resolution: "git rev-parse HEAD (module checkout)" };
+    }).trim().split("\n");
+    if (top !== undefined && realpathSync(top) === packageRoot && sha !== undefined && GIT_SHA_RE.test(sha)) {
+      return { sourceCommit: sha, resolution: "git rev-parse HEAD (AMC checkout; uncommitted changes are not shown)" };
     }
   } catch {
-    // git absent, or the module is not inside a checkout — fall through.
+    // git absent, or the package root is not a checkout — fall through.
   }
   return {
     sourceCommit: "unknown",
-    resolution: "no explicit value, no valid AMC_SOURCE_COMMIT, git rev-parse unavailable"
+    resolution: "no explicit value, no valid AMC_SOURCE_COMMIT, and the package root is not an AMC git checkout"
   };
 }

@@ -1,4 +1,5 @@
 import { getDomainPackQuestions } from "../../score/domainPacks.js";
+import { requiredLevelForQuestion } from "../domainAssessmentEngine.js";
 import { getDomainMetadata, type Domain } from "../domainRegistry.js";
 import { getIndustryPacksByStation } from "../industryPacks.js";
 import type { ConformanceRequirementKind } from "./conformanceSchema.js";
@@ -18,9 +19,8 @@ export const INDUSTRY_PACK_MINIMUM_LEVEL = 3;
 export const DEFAULT_SCENARIO_PACK_IDS: readonly string[] = ["injection"];
 
 /**
- * The slice of a station operating profile the conformance reads. The
- * profile module (src/domains/operatingProfiles, track F1) is not present at
- * this commit; a caller adapts its own shape to this one.
+ * The slice of a station operating profile the conformance reads. The CLI
+ * adapts a signed operating profile (src/domains/operatingProfiles) to it.
  */
 export interface ConformanceStationProfile {
   id: string;
@@ -39,7 +39,22 @@ export interface RequirementSpec {
   regulatoryRef?: string;
   criterion: string;
   questionId?: string;
+  /** Questions only: the lowest response level that meets the requirement. */
+  minimumLevel?: number;
   packId?: string;
+}
+
+/** The AMC data files requirements are derived from. */
+type StationDataFile = "src/domains/industryPacks.ts" | "src/score/domainPacks.ts" | "src/domains/domainRegistry.ts";
+
+/** A requirement's source: the station data file and the entry in it. */
+function stationDataSource(file: StationDataFile, entry: string): string {
+  return `${file}#${entry}`;
+}
+
+function questionCriterion(minimumLevel: number): string {
+  return `response level >= L${minimumLevel} from a sealed ledger session within the maximum evidence age; ` +
+    "a self-reported answer supports L1 at most (design rule 1)";
 }
 
 function uniqueInOrder(values: readonly string[]): string[] {
@@ -62,10 +77,11 @@ function sectorPackRequirements(station: Domain, profile?: ConformanceStationPro
       id: `industry-pack:${pack.id}:${question.id}`,
       kind: "industry-pack-question" as const,
       title: `${pack.name} — ${question.id} (${question.dimension})`,
-      source: `src/domains/industryPacks.ts#${pack.id}`,
+      source: stationDataSource("src/domains/industryPacks.ts", pack.id),
       regulatoryRef: question.regulatoryRef,
-      criterion: `recorded response level >= L${INDUSTRY_PACK_MINIMUM_LEVEL} with ledger-session provenance`,
+      criterion: questionCriterion(INDUSTRY_PACK_MINIMUM_LEVEL),
       questionId: question.id,
+      minimumLevel: INDUSTRY_PACK_MINIMUM_LEVEL,
       packId: pack.id
     }))
   );
@@ -76,10 +92,11 @@ function domainQuestionRequirements(station: Domain): RequirementSpec[] {
     id: `domain-question:${station}:${question.id}`,
     kind: "domain-question" as const,
     title: `${station} domain pack — ${question.id} (${question.dimension})`,
-    source: `src/score/domainPacks.ts#${station}`,
+    source: stationDataSource("src/score/domainPacks.ts", station),
     regulatoryRef: question.regulatoryRef,
-    criterion: "recorded response level with ledger-session provenance and no compliance gap reported by assessDomain",
-    questionId: question.id
+    criterion: questionCriterion(requiredLevelForQuestion(question)),
+    questionId: question.id,
+    minimumLevel: requiredLevelForQuestion(question)
   }));
 }
 
@@ -107,7 +124,7 @@ export function deriveStationRequirements(station: Domain, profile?: Conformance
   const scenarioPackIds = uniqueInOrder([...DEFAULT_SCENARIO_PACK_IDS, ...(profile?.requiredScenarioPacks ?? [])]).filter(
     (packId) => !assuranceSet.has(packId)
   );
-  const registrySource = `src/domains/domainRegistry.ts#${station}.assurancePacks`;
+  const registrySource = stationDataSource("src/domains/domainRegistry.ts", `${station}.assurancePacks`);
   const profileSource = profile ? `profile:${profile.id}` : null;
 
   return [

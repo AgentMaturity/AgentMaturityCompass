@@ -1,10 +1,11 @@
-import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult } from "../../types.js";
+import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult, SessionRecord } from "../../types.js";
 import { getAssurancePack } from "../../assurance/packs/index.js";
-import { assessDomain, type ComplianceGap } from "../domainAssessmentEngine.js";
-import type { Domain } from "../domainRegistry.js";
-import { likert, type Likert1to5 } from "../../score/units.js";
-import { INDUSTRY_PACK_MINIMUM_LEVEL, type RequirementSpec } from "./conformanceRequirements.js";
-import type { ConformanceEvidenceRef, ConformanceRequirement } from "./conformanceSchema.js";
+import { fromUppercaseStatus } from "../../claims/eligibility/adapters.js";
+import { evaluateClaimEligibility } from "../../claims/eligibility/evaluate.js";
+import type { ClaimKind } from "../../claims/eligibility/types.js";
+import { verifyEvidenceEventIntegrity, type Ledger } from "../../ledger/ledger.js";
+import type { RequirementSpec } from "./conformanceRequirements.js";
+import type { ConformanceEvidenceRef, ConformanceRequirement, ConformanceRequirementStatus } from "./conformanceSchema.js";
 
 /** Thrown when an input offered as evidence cannot be traced back to a ledger run. */
 export class ConformanceProvenanceError extends Error {
@@ -24,16 +25,68 @@ export interface PackResponseEvidence {
   responseId?: string;
 }
 
-export function assertPackResponseProvenance(response: PackResponseEvidence): void {
-  if (typeof response.questionId !== "string" || response.questionId.trim().length === 0) {
-    throw new ConformanceProvenanceError("pack response without a questionId — refused");
-  }
+/** Design rule 1: a self-reported answer supports L1 at most, so it meets no requirement above L1. */
+export const SELF_REPORTED_MAX_LEVEL = 1;
+export const DESIGN_RULE_1_REASON = "self-reported answer; levels above L1 need observed evidence (design rule 1)";
+const APPLICABILITY_REASON = "no compiled plan decides applicability; the requirement comes from the station's derived set";
+
+export interface EvidenceFreshness {
+  /** The server clock when the run started. */
+  nowTs: number;
+  maxEvidenceAgeMs: number;
+}
+
+/** Fresh: recorded no later than nowTs and no more than maxEvidenceAgeMs before it. A missing time is not fresh. */
+export function isFresh(ts: number | null, freshness: EvidenceFreshness): boolean {
+  return ts !== null && Number.isFinite(ts) && ts <= freshness.nowTs && freshness.nowTs - ts <= freshness.maxEvidenceAgeMs;
+}
+
+function responseShapeError(response: PackResponseEvidence): string | null {
+  if (typeof response.questionId !== "string" || response.questionId.trim().length === 0) return "pack response without a questionId";
   if (typeof response.sessionId !== "string" || response.sessionId.trim().length === 0) {
-    throw new ConformanceProvenanceError(`pack response ${response.questionId} carries no ledger sessionId — refused`);
+    return `pack response ${response.questionId} carries no ledger sessionId`;
   }
   if (!Number.isInteger(response.level) || response.level < 1 || response.level > 5) {
-    throw new ConformanceProvenanceError(`pack response ${response.questionId} has level ${String(response.level)}; expected an integer 1..5`);
+    return `pack response ${response.questionId} has level ${String(response.level)}; expected an integer 1..5`;
   }
+  return null;
+}
+
+export type PackResponseResolution = { ok: true; session: SessionRecord; claimKind: ClaimKind } | { ok: false; reason: string };
+
+/**
+ * Admits a questionnaire answer only through its ledger session. The session must exist and be sealed, and the seal
+ * must verify: the chain up to the session's last event and the monitor signature over that event's hash
+ * (verifyEvidenceEventIntegrity, against this workspace's keys, so a local audit trail). It must also be fresh:
+ * the sealing time (server clock, outside the seal) and the last event's time (inside the seal) are both checked, and
+ * either one too old or after nowTs refuses. One read transaction, so the rows checked are the rows read.
+ * The answer stays self_reported: no ledger event records pack answers. `sessions` caches the check per session id.
+ */
+export function resolvePackResponseEvidence(ledger: Ledger, response: PackResponseEvidence, freshness: EvidenceFreshness,
+  sessions: Map<string, PackResponseResolution> = new Map()): PackResponseResolution {
+  const shape = responseShapeError(response);
+  if (shape) return { ok: false, reason: shape };
+  const cached = sessions.get(response.sessionId) ?? resolveSession(ledger, response.sessionId, freshness);
+  sessions.set(response.sessionId, cached);
+  return cached;
+}
+
+function resolveSession(ledger: Ledger, id: string, freshness: EvidenceFreshness): PackResponseResolution {
+  return ledger.db.transaction((): PackResponseResolution => {
+    const session = ledger.getSessionById(id);
+    if (!session) return { ok: false, reason: `session ${id} not found in the ledger` };
+    if (!session.session_seal_sig) return { ok: false, reason: `session ${id} is not sealed` };
+    const last = ledger.db.prepare("SELECT id, ts FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1")
+      .get(id) as { id: string; ts: number } | undefined;
+    if (!last) return { ok: false, reason: `session ${id} is not sealed: it has no events for a seal to bind` };
+    // ponytail: verifies the ledger prefix up to this event, O(events) per session; the run checks each session once.
+    const verified = verifyEvidenceEventIntegrity({ ledger, eventId: last.id, requireSealedSession: true });
+    if (!verified.ok) return { ok: false, reason: `session ${id} is not sealed: ${verified.errors.slice(0, 3).join("; ")}` };
+    const times = [session.ended_ts, last.ts];
+    if (times.some((ts) => ts !== null && ts > freshness.nowTs)) return { ok: false, reason: `session ${id} is dated after this run` };
+    if (!times.every((ts) => isFresh(ts, freshness))) return { ok: false, reason: `session ${id} is older than the maximum evidence age` };
+    return { ok: true, session, claimKind: "self_reported" };
+  })();
 }
 
 function measuredScenarios(pack: AssurancePackResult): AssuranceScenarioResult[] {
@@ -88,30 +141,28 @@ function packEvidence(hit: PackHit): ConformanceEvidenceRef[] {
   ];
 }
 
-function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[]): ConformanceRequirement {
+function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[]): ResolvedRow {
   const packId = spec.packId ?? "";
-  const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, criterion: spec.criterion };
   let scenarioIds: string[];
   try {
     scenarioIds = getAssurancePack(packId).scenarios.map((scenario) => scenario.id);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return { ...base, status: "NOT_EVALUATED", observed: null, reason: `pack unknown to the assurance registry: ${message}`, evidence: [] };
+    return { status: "NOT_EVALUATED", observed: null, reason: `pack unknown to the assurance registry: ${message}`, evidence: [] };
   }
   const hit = latestReportWithPack(reports, packId);
   if (!hit) {
-    return { ...base, status: "NOT_EVALUATED", observed: null, reason: "no sealed assurance run with ledger provenance contains this pack", evidence: [] };
+    return { status: "NOT_EVALUATED", observed: null, reason: "no sealed assurance run with ledger provenance contains this pack", evidence: [] };
   }
   const evidence = packEvidence(hit);
   if (hit.report.evidenceStatus === "INSUFFICIENT_EVIDENCE") {
-    return { ...base, status: "NOT_EVALUATED", observed: "0 scenarios reached the agent", reason: `assurance run ${hit.report.assuranceRunId} reports INSUFFICIENT_EVIDENCE`, evidence };
+    return { status: "NOT_EVALUATED", observed: "0 scenarios reached the agent", reason: `assurance run ${hit.report.assuranceRunId} reports INSUFFICIENT_EVIDENCE`, evidence };
   }
   const measured = new Map(measuredScenarios(hit.pack).map((scenario) => [scenario.scenarioId, scenario] as const));
   const missing = scenarioIds.filter((id) => !measured.has(id));
   const failed = [...measured.values()].filter((scenario) => !scenario.pass);
   if (failed.length > 0) {
     return {
-      ...base,
       status: "FAIL",
       observed: `${failed.length} of ${measured.size} measured scenarios failed`,
       reason: `failed scenarios in assurance run ${hit.report.assuranceRunId}: ${failed.map((scenario) => scenario.scenarioId).join(", ")}`,
@@ -120,7 +171,6 @@ function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[
   }
   if (missing.length > 0) {
     return {
-      ...base,
       status: "NOT_EVALUATED",
       observed: `${measured.size}/${scenarioIds.length} scenarios measured`,
       reason: `scenarios not measured in assurance run ${hit.report.assuranceRunId}: ${missing.join(", ")}`,
@@ -128,12 +178,17 @@ function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[
     };
   }
   return {
-    ...base,
     status: "PASS",
     observed: `${measured.size}/${scenarioIds.length} scenarios passed`,
     reason: `every scenario measured and passed in assurance run ${hit.report.assuranceRunId}`,
     evidence
   };
+}
+
+type ResolvedRow = Pick<ConformanceRequirement, "status" | "observed" | "reason" | "evidence">;
+
+function row(status: ConformanceRequirementStatus, observed: string | null, reason: string, evidence: ConformanceEvidenceRef[]): ResolvedRow {
+  return { status, observed, reason, evidence };
 }
 
 function responseEvidence(response: PackResponseEvidence): ConformanceEvidenceRef[] {
@@ -142,57 +197,59 @@ function responseEvidence(response: PackResponseEvidence): ConformanceEvidenceRe
   return refs;
 }
 
-function resolveSectorQuestion(spec: RequirementSpec, response: PackResponseEvidence | undefined): ConformanceRequirement {
-  const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, regulatoryRef: spec.regulatoryRef, criterion: spec.criterion };
-  if (!response) {
-    return { ...base, status: "NOT_EVALUATED", observed: null, reason: "no recorded response for this question", evidence: [] };
-  }
-  const pass = response.level >= INDUSTRY_PACK_MINIMUM_LEVEL;
-  return {
-    ...base,
-    status: pass ? "PASS" : "FAIL",
-    observed: `L${response.level}`,
-    reason: pass ? `L${response.level} meets the L${INDUSTRY_PACK_MINIMUM_LEVEL} minimum` : `L${response.level} is below the L${INDUSTRY_PACK_MINIMUM_LEVEL} minimum`,
-    evidence: responseEvidence(response)
-  };
-}
-
-function resolveDomainQuestion(
-  spec: RequirementSpec,
-  response: PackResponseEvidence | undefined,
-  gap: ComplianceGap | undefined
-): ConformanceRequirement {
-  const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, regulatoryRef: spec.regulatoryRef, criterion: spec.criterion };
-  if (!response) {
-    return { ...base, status: "NOT_EVALUATED", observed: null, reason: "no recorded response for this question", evidence: [] };
-  }
-  if (gap) {
-    return {
-      ...base,
-      status: "FAIL",
-      observed: `L${gap.currentLevel}`,
-      reason: `L${gap.currentLevel} is below the required L${gap.requiredLevel} (assessDomain compliance gap)`,
-      evidence: responseEvidence(response)
-    };
-  }
-  return { ...base, status: "PASS", observed: `L${response.level}`, reason: `L${response.level}: no compliance gap reported by assessDomain`, evidence: responseEvidence(response) };
-}
-
-export interface ResolveRequirementsInput {
-  station: Domain;
-  agentId: string;
-  specs: RequirementSpec[];
-  packResponses: PackResponseEvidence[];
-  /** Reports already checked by `assertAssuranceReportProvenance` (the caller's seal check comes before that). */
-  assuranceReports: AssuranceReport[];
+/** Below the minimum is a FAIL (the operator's own answer); at or above it, design rule 1 decides. */
+function resolveQuestion(spec: RequirementSpec, response: PackResponseEvidence | undefined): ResolvedRow {
+  if (!response) return row("NOT_EVALUATED", null, "no accepted response for this question", []);
+  const min = spec.minimumLevel;
+  const observed = `L${response.level} (self-reported)`;
+  const evidence = responseEvidence(response);
+  if (min === undefined) return row("NOT_EVALUATED", observed, "no minimum level is defined for this question", evidence);
+  if (response.level < min) return row("FAIL", observed, `L${response.level} is below the L${min} minimum`, evidence);
+  if (min > SELF_REPORTED_MAX_LEVEL) return row("NOT_EVALUATED", observed, DESIGN_RULE_1_REASON, evidence);
+  return row("PASS", observed, `L${response.level} meets the L${min} minimum`, evidence);
 }
 
 /**
- * Resolves every requirement to PASS, FAIL or NOT_EVALUATED with the evidence
- * ids it rests on. Inputs lacking provenance throw rather than degrade.
+ * Adds the claim kind and the five status dimensions through the shared eligibility rules. Every requirement is
+ * regulated and its applicability unresolved (no compiled plan decides it), so no dimension result here is a pass.
+ */
+function withClaim(spec: RequirementSpec, resolved: ResolvedRow, selfReported: boolean, nowTs: number): ConformanceRequirement {
+  const envelope = evaluateClaimEligibility({
+    producer: `conformance:${spec.id}`,
+    method: selfReported ? "numeric_self_answer" : "executed_test",
+    regulated: true,
+    proposed: { result: fromUppercaseStatus(resolved.status).result, level: null },
+    evidence: { eventCount: resolved.evidence.filter((ref) => ref.kind === "ledger-event").length,
+      tiers: [selfReported ? "SELF_REPORTED" : "OBSERVED"], newestTs: null, boundToControl: true, sameScope: true,
+      contradictory: false, signatureValid: null, issuerPinned: null },
+    applicability: { state: "unresolved", reason: APPLICABILITY_REASON },
+    now: nowTs
+  });
+  return {
+    id: spec.id, kind: spec.kind, title: spec.title, source: spec.source,
+    ...(spec.regulatoryRef === undefined ? {} : { regulatoryRef: spec.regulatoryRef }),
+    criterion: spec.criterion, ...resolved, claimKind: envelope.claimKind, statusDimensions: envelope.statusDimensions
+  };
+}
+
+export interface ResolveRequirementsInput {
+  specs: RequirementSpec[];
+  /** Answers already admitted by resolvePackResponseEvidence. */
+  packResponses: PackResponseEvidence[];
+  /** Reports already checked by the caller's seal check; provenance is checked here. */
+  assuranceReports: AssuranceReport[];
+  nowTs: number;
+}
+
+/**
+ * Resolves every requirement to PASS, FAIL or NOT_EVALUATED with the evidence ids it rests on, its claim kind and
+ * status dimensions. Questionnaire answers are self_reported; assurance and scenario packs are observed.
  */
 export function resolveRequirements(input: ResolveRequirementsInput): ConformanceRequirement[] {
-  for (const response of input.packResponses) assertPackResponseProvenance(response);
+  for (const response of input.packResponses) {
+    const error = responseShapeError(response);
+    if (error) throw new ConformanceProvenanceError(`${error} — refused`);
+  }
   for (const report of input.assuranceReports) assertAssuranceReportProvenance(report);
 
   const responseByQuestion = new Map<string, PackResponseEvidence>();
@@ -203,26 +260,7 @@ export function resolveRequirements(input: ResolveRequirementsInput): Conformanc
     responseByQuestion.set(response.questionId, response);
   }
 
-  // The domain engine treats an absent answer as L1; only answered questions are
-  // handed to it, so a NOT_EVALUATED question never surfaces as a FAIL.
-  const domainQuestionIds = input.specs.filter((spec) => spec.kind === "domain-question").map((spec) => spec.questionId ?? "");
-  const domainQuestionScores: Record<string, Likert1to5> = {};
-  for (const questionId of domainQuestionIds) {
-    const response = responseByQuestion.get(questionId);
-    if (response) domainQuestionScores[questionId] = likert(response.level);
-  }
-  const gaps = assessDomain({ agentId: input.agentId, domain: input.station, baseScores: {}, domainQuestionScores }).complianceGaps;
-  const gapByQuestion = new Map(gaps.map((gap) => [gap.questionId, gap] as const));
-
-  return input.specs.map((spec) => {
-    switch (spec.kind) {
-      case "industry-pack-question":
-        return resolveSectorQuestion(spec, responseByQuestion.get(spec.questionId ?? ""));
-      case "domain-question":
-        return resolveDomainQuestion(spec, responseByQuestion.get(spec.questionId ?? ""), gapByQuestion.get(spec.questionId ?? ""));
-      case "assurance-pack":
-      case "scenario-pack":
-        return resolvePackRequirement(spec, input.assuranceReports);
-    }
-  });
+  return input.specs.map((spec) => spec.kind === "industry-pack-question" || spec.kind === "domain-question"
+    ? withClaim(spec, resolveQuestion(spec, responseByQuestion.get(spec.questionId ?? "")), true, input.nowTs)
+    : withClaim(spec, resolvePackRequirement(spec, input.assuranceReports), false, input.nowTs));
 }

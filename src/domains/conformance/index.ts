@@ -31,10 +31,15 @@ export {
 
 export {
   ConformanceProvenanceError,
+  DESIGN_RULE_1_REASON,
+  SELF_REPORTED_MAX_LEVEL,
   assertAssuranceReportProvenance,
-  assertPackResponseProvenance,
+  isFresh,
+  resolvePackResponseEvidence,
   resolveRequirements,
+  type EvidenceFreshness,
   type PackResponseEvidence,
+  type PackResponseResolution,
   type ResolveRequirementsInput
 } from "./conformanceEvidence.js";
 
@@ -51,10 +56,14 @@ export {
 } from "./conformanceRun.js";
 
 export {
+  NO_VERIFIED_CONFORMANCE_RUN,
+  binderConformanceRun,
   parseConformanceExport,
   renderConformanceJson,
   renderConformanceMarkdown,
-  verifyConformanceExport
+  verifyConformanceExport,
+  type BinderConformanceRun,
+  type ConformanceVerification
 } from "./conformanceExport.js";
 
 export { currentConformanceEnvironment, resolveSourceCommit, type SourceCommitResolution } from "./environment.js";

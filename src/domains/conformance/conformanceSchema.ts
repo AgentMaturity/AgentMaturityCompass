@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { claimKindSchema, statusDimensionsSchema } from "../../claims/eligibility/schemas.js";
+import { STATIONS } from "../stations.js";
 
 /**
  * Conformance run — the composed, sealed result of one station's
@@ -10,15 +12,7 @@ import { z } from "zod";
  * because an average is how NOT_EVALUATED disappears.
  */
 
-export const conformanceStationSchema = z.enum([
-  "health",
-  "education",
-  "environment",
-  "mobility",
-  "governance",
-  "technology",
-  "wealth"
-]);
+export const conformanceStationSchema = z.enum(STATIONS);
 
 export const conformanceRequirementStatusSchema = z.enum(["PASS", "FAIL", "NOT_EVALUATED"]);
 
@@ -49,7 +43,11 @@ export const conformanceRequirementSchema = z.object({
   /** What was measured (e.g. "L4", "3/3 scenarios passed"); null when nothing was. */
   observed: z.string().nullable(),
   reason: z.string().min(1),
-  evidence: z.array(conformanceEvidenceRefSchema)
+  evidence: z.array(conformanceEvidenceRefSchema),
+  /** self_reported for questionnaire answers, observed for assurance and scenario packs. */
+  claimKind: claimKindSchema,
+  /** The five status dimensions (P0-08); applicability stays unresolved until a compiled plan decides it. */
+  statusDimensions: statusDimensionsSchema
 });
 
 export const conformanceAssuranceInputSchema = z.object({
@@ -96,6 +94,11 @@ export const conformanceExportSchema = z.object({
   profile: conformanceProfileRefSchema.nullable(),
   status: conformanceStatusSchema,
   counts: conformanceCountsSchema,
+  /** The weakest claim kind and the joined dimensions of the requirements. */
+  claimKind: claimKindSchema,
+  statusDimensions: statusDimensionsSchema,
+  /** Evidence older than maxEvidenceAgeMs before nowTs (the server clock at the run), or dated after it, was refused. */
+  freshness: z.object({ nowTs: z.number().int(), maxEvidenceAgeMs: z.number().int().positive() }),
   failedRequirementIds: z.array(z.string().min(1)),
   notEvaluatedRequirementIds: z.array(z.string().min(1)),
   requirements: z.array(conformanceRequirementSchema),

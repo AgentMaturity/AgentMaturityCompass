@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import type { AssuranceReport } from "../../types.js";
+import { envelopeForAggregate, envelopeFromDimensions } from "../../claims/eligibility/adapters/results.js";
 import { sealedRunReportVerifies } from "../../diagnostic/reportSeal.js";
 import { getAgentPaths, resolveAgentId } from "../../fleet/paths.js";
 import { openLedger, type Ledger } from "../../ledger/ledger.js";
@@ -11,8 +12,12 @@ import { sha256Hex } from "../../utils/hash.js";
 import type { Domain } from "../domainRegistry.js";
 import {
   assertAssuranceReportProvenance,
+  isFresh,
+  resolvePackResponseEvidence,
   resolveRequirements,
-  type PackResponseEvidence
+  type EvidenceFreshness,
+  type PackResponseEvidence,
+  type PackResponseResolution
 } from "./conformanceEvidence.js";
 import { renderConformanceJson, renderConformanceMarkdown } from "./conformanceExport.js";
 import { deriveStationRequirements, type ConformanceStationProfile } from "./conformanceRequirements.js";
@@ -57,13 +62,15 @@ export function conformanceStatusFrom(requirements: readonly ConformanceRequirem
 export interface ComposeConformanceInput {
   station: Domain;
   agentId: string;
+  /** Answers already admitted by resolvePackResponseEvidence. */
   packResponses: PackResponseEvidence[];
   /** Reports whose seal the caller has already verified; provenance is checked here. */
   assuranceReports: AssuranceReport[];
   profile?: ConformanceStationProfile;
   refusedInputs?: ConformanceRefusedInput[];
   sourceCommit?: string;
-  nowTs?: number;
+  /** The freshness the evidence was admitted under; its nowTs is the run's generatedTs. */
+  freshness: EvidenceFreshness;
   conformanceRunId?: string;
 }
 
@@ -71,26 +78,31 @@ export interface ComposeConformanceInput {
 export function composeConformanceRun(input: ComposeConformanceInput): ConformanceExport {
   const specs = deriveStationRequirements(input.station, input.profile);
   const requirements = resolveRequirements({
-    station: input.station,
-    agentId: input.agentId,
     specs,
     packResponses: input.packResponses,
-    assuranceReports: input.assuranceReports
+    assuranceReports: input.assuranceReports,
+    nowTs: input.freshness.nowTs
   });
   const verdict = conformanceStatusFrom(requirements);
+  // The run claims no more than its weakest requirement (envelopeForAggregate).
+  const claim = envelopeForAggregate(`conformance:${input.station}`,
+    requirements.map((row) => envelopeFromDimensions(row.id, row.claimKind, row.statusDimensions)), input.freshness.nowTs);
   const commit = resolveSourceCommit(input.sourceCommit);
   const run: ConformanceExport = {
     schema: "amc.conformance-run/1",
     conformanceRunId: input.conformanceRunId ?? randomUUID(),
     station: input.station,
     agentId: input.agentId,
-    generatedTs: input.nowTs ?? Date.now(),
+    generatedTs: input.freshness.nowTs,
     sourceCommit: commit.sourceCommit,
     sourceCommitResolution: commit.resolution,
     environment: currentConformanceEnvironment(),
     profile: input.profile ? { id: input.profile.id, source: input.profile.source } : null,
     status: verdict.status,
     counts: verdict.counts,
+    claimKind: claim.claimKind,
+    statusDimensions: claim.statusDimensions,
+    freshness: { nowTs: input.freshness.nowTs, maxEvidenceAgeMs: input.freshness.maxEvidenceAgeMs },
     failedRequirementIds: verdict.failedRequirementIds,
     notEvaluatedRequirementIds: verdict.notEvaluatedRequirementIds,
     requirements,
@@ -120,8 +132,8 @@ export function sealConformanceRun(run: ConformanceExport, sign: (hashHex: strin
   return { ...base, reportJsonSha256: hash, runSealSig: sign(hash) };
 }
 
-interface LoadedAssuranceEvidence {
-  accepted: AssuranceReport[];
+interface AdmittedInputs<T> {
+  accepted: T[];
   refused: ConformanceRefusedInput[];
 }
 
@@ -143,17 +155,17 @@ function eventsBelongToSession(ledger: Ledger, report: AssuranceReport): string 
 
 /**
  * Loads the agent's assurance reports as conformance evidence. A report is
- * accepted only when its seal verifies against the workspace auditor keys,
- * it names a ledger session, and every measured scenario's event ids exist in
- * that session. Anything else is listed under refusedInputs with the reason.
+ * accepted only when its seal verifies against the workspace auditor keys (a
+ * local audit trail), it names a ledger session, its ts is within the maximum
+ * evidence age, and every measured scenario's event ids exist in that session.
+ * Anything else is listed under refusedInputs, by workspace-relative path.
  */
 function loadAssuranceEvidence(params: {
   workspace: string;
   agentId: string;
   ledger: Ledger;
-  maxEvidenceAgeMs?: number;
-  nowTs: number;
-}): LoadedAssuranceEvidence {
+  freshness: EvidenceFreshness;
+}): AdmittedInputs<AssuranceReport> {
   const dir = join(getAgentPaths(params.workspace, params.agentId).reportsDir, "assurance");
   const accepted: AssuranceReport[] = [];
   const refused: ConformanceRefusedInput[] = [];
@@ -163,36 +175,50 @@ function loadAssuranceEvidence(params: {
     .map((file) => join(dir, file))
     .sort((a, b) => a.localeCompare(b));
   for (const file of files) {
+    const source = relative(params.workspace, file);
     let parsed: Record<string, unknown>;
     try {
       parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
     } catch (error) {
-      refused.push({ source: file, reason: `unreadable JSON: ${error instanceof Error ? error.message : String(error)}` });
+      refused.push({ source, reason: `unreadable JSON: ${error instanceof Error ? error.message : String(error)}` });
       continue;
     }
     if (parsed.agentId !== params.agentId) continue;
     if (!sealedRunReportVerifies(params.workspace, parsed)) {
-      refused.push({ source: file, reason: "seal did not verify against the workspace auditor keys (hash or signature)" });
+      refused.push({ source, reason: "seal did not verify against the workspace auditor keys (hash or signature)" });
       continue;
     }
     const report = parsed as unknown as AssuranceReport;
     try {
       assertAssuranceReportProvenance(report);
     } catch (error) {
-      refused.push({ source: file, reason: error instanceof Error ? error.message : String(error) });
+      refused.push({ source, reason: error instanceof Error ? error.message : String(error) });
       continue;
     }
-    if (params.maxEvidenceAgeMs !== undefined && report.ts < params.nowTs - params.maxEvidenceAgeMs) {
-      refused.push({ source: file, reason: `assurance run ${report.assuranceRunId} is older than maxEvidenceAgeMs=${params.maxEvidenceAgeMs}` });
+    if (!isFresh(report.ts, params.freshness)) {
+      refused.push({ source, reason: `assurance run ${report.assuranceRunId} is older than the maximum evidence age, or dated after this run` });
       continue;
     }
     const mismatch = eventsBelongToSession(params.ledger, report);
     if (mismatch !== null) {
-      refused.push({ source: file, reason: mismatch });
+      refused.push({ source, reason: mismatch });
       continue;
     }
     accepted.push(report);
   }
+  return { accepted, refused };
+}
+
+/** Admits each answer through its ledger session (checked once per session); refusals keep the answer's position. */
+function admitPackResponses(ledger: Ledger, responses: PackResponseEvidence[], freshness: EvidenceFreshness): AdmittedInputs<PackResponseEvidence> {
+  const sessions = new Map<string, PackResponseResolution>();
+  const accepted: PackResponseEvidence[] = [];
+  const refused: ConformanceRefusedInput[] = [];
+  responses.forEach((response, index) => {
+    const resolution = resolvePackResponseEvidence(ledger, response, freshness, sessions);
+    if (resolution.ok) accepted.push(response);
+    else refused.push({ source: `responses[${index}]`, reason: resolution.reason });
+  });
   return { accepted, refused };
 }
 
@@ -203,9 +229,10 @@ export interface RunIndustryConformanceInput {
   packResponses: PackResponseEvidence[];
   profile?: ConformanceStationProfile;
   sourceCommit?: string;
-  nowTs?: number;
-  /** When set, assurance runs older than this are refused as stale evidence. Off by default. */
-  maxEvidenceAgeMs?: number;
+  /** Required and > 0, no default: evidence recorded longer ago than this, or after the run, is refused. */
+  maxEvidenceAgeMs: number;
+  /** Where the JSON and Markdown go; defaults to the agent's reports/conformance/. */
+  outDir?: string;
 }
 
 export interface RunIndustryConformanceResult {
@@ -221,35 +248,34 @@ export function conformanceReportsDir(workspace: string, agentId: string): strin
 }
 
 /**
- * Runs a station conformance against a workspace: loads and verifies the
- * agent's assurance evidence, composes the requirements, seals the result with
- * the workspace auditor key and writes JSON + Markdown under
- * `reports/conformance/`.
+ * Runs a station conformance check against a workspace: admits the agent's
+ * assurance evidence and the questionnaire answers, composes the requirements,
+ * seals the result with the workspace auditor key and writes JSON + Markdown.
+ * The run's time is the server clock here, never a caller's value.
  */
 export function runIndustryConformance(input: RunIndustryConformanceInput): RunIndustryConformanceResult {
+  if (!Number.isSafeInteger(input.maxEvidenceAgeMs) || input.maxEvidenceAgeMs <= 0) {
+    throw new Error("maxEvidenceAgeMs must be a positive whole number of milliseconds");
+  }
   const agentId = resolveAgentId(input.workspace, input.agentId);
-  const nowTs = input.nowTs ?? Date.now();
+  const freshness: EvidenceFreshness = { nowTs: Date.now(), maxEvidenceAgeMs: input.maxEvidenceAgeMs };
   const ledger = openLedger(input.workspace);
   try {
-    const evidence = loadAssuranceEvidence({
-      workspace: input.workspace,
-      agentId,
-      ledger,
-      maxEvidenceAgeMs: input.maxEvidenceAgeMs,
-      nowTs
-    });
+    const assurance = loadAssuranceEvidence({ workspace: input.workspace, agentId, ledger, freshness });
+    const answers = admitPackResponses(ledger, input.packResponses, freshness);
     const unsealed = composeConformanceRun({
       station: input.station,
       agentId,
-      packResponses: input.packResponses,
-      assuranceReports: evidence.accepted,
+      packResponses: answers.accepted,
+      assuranceReports: assurance.accepted,
       profile: input.profile,
-      refusedInputs: evidence.refused,
+      refusedInputs: [...assurance.refused, ...answers.refused],
       sourceCommit: input.sourceCommit,
-      nowTs
+      freshness
     });
     const run = sealConformanceRun(unsealed, (hash) => ledger.signRunHash(hash));
-    const dir = conformanceReportsDir(input.workspace, agentId);
+    const dir = input.outDir ? resolve(input.outDir) : conformanceReportsDir(input.workspace, agentId);
+    ensureDir(dir);
     const jsonPath = join(dir, `${run.conformanceRunId}.json`);
     const markdownPath = join(dir, `${run.conformanceRunId}.md`);
     writeFileAtomic(jsonPath, renderConformanceJson(run), 0o644);
