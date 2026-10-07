@@ -1,13 +1,14 @@
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
+import { federationIdSchema, federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
 import { ensureFederationPublisherKey, signFederationDigest } from "./federationIdentity.js";
 import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
 import { buildVerifierReport, checkDigestSignature, ed25519KeyId, loadTrustContext, untrustedReasons, withPins, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
+import { toErrorMessage } from "../utils/errors.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { generateTransparencyInclusionProof, currentTransparencyMerkleRoot, ensureTransparencyMerkleInitialized, exportTransparencyProofBundle } from "../transparency/merkleIndexStore.js";
@@ -56,6 +57,20 @@ function resolveExtractedRoot(outDir: string, requiredFiles: string[]): string {
     }
   }
   return outDir;
+}
+
+/**
+ * `parts` resolved under `root`, refusing a result outside it. The manifest schema already limits ids and file paths;
+ * this is the second gate at the point of use, so a manifest that reaches here unchecked still cannot leave its root.
+ */
+function containedPath(root: string, label: string, ...parts: string[]): string {
+  const base = resolve(root);
+  const full = resolve(base, ...parts);
+  const rel = relative(base, full);
+  if (rel === "" || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
+    throw new Error(`federation package path escapes ${label}: ${JSON.stringify(parts.join("/"))}`);
+  }
+  return full;
 }
 
 function collectArtifacts(workspace: string): {
@@ -311,7 +326,13 @@ export function verifyFederationPackage(bundleFile: string, trust: TrustContext,
     }
     if (manifest) {
       for (const row of manifest.files) {
-        const file = join(root, row.path);
+        let file: string;
+        try {
+          file = containedPath(root, "the package root", row.path);
+        } catch (error) {
+          errors.push(toErrorMessage(error));
+          continue;
+        }
         if (!pathExists(file)) {
           errors.push(`missing file listed in manifest: ${row.path}`);
           continue;
@@ -336,6 +357,20 @@ export function federationPeerTrust(workspace: string): TrustContext {
   }));
 }
 
+/**
+ * The inbox directory for a package is named after the identity that was admitted, never after the sourceOrgId the
+ * manifest claims: the matching peer record's peerId, or key-<first 16 hex of the key id> when only the operator's
+ * trust list admitted the key (or the peer record's id is not a safe directory name).
+ */
+function admittedInboxName(workspace: string, report: VerifierReportV1): string {
+  const keyId = report.issuerAdmission.signatures.find((row) => row.status === "admitted")?.keyId;
+  if (!keyId) {
+    throw new Error("federation package has no admitted signing key");
+  }
+  const peerId = listFederationPeers(workspace).find(({ peer, valid }) => valid && ed25519KeyId(peer.publisherPublicKeyPem) === keyId)?.peer.peerId;
+  return peerId !== undefined && federationIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
+}
+
 export function importFederationPackage(params: {
   workspace: string;
   bundleFile: string;
@@ -357,11 +392,15 @@ export function importFederationPackage(params: {
   try {
     tarExtract(params.bundleFile, temp);
     const root = resolveExtractedRoot(temp, ["manifest.json", "manifest.sig", "public-keys/publisher.pub"]);
-    const importedPath = join(federationInboxDir(params.workspace), verify.manifest.sourceOrgId, verify.manifest.manifestId);
+    const importedPath = containedPath(federationInboxDir(params.workspace), "the federation inbox",
+      admittedInboxName(params.workspace, verify.report), verify.manifest.manifestId);
+    // Resolve every source and destination before the first write, so a bad row refuses the package whole.
+    const copies = verify.manifest.files.map((file) => ({
+      src: containedPath(root, "the package root", file.path),
+      dst: containedPath(importedPath, "the imported package directory", file.path)
+    }));
     ensureDir(importedPath);
-    for (const file of verify.manifest.files) {
-      const src = join(root, file.path);
-      const dst = join(importedPath, file.path);
+    for (const { src, dst } of copies) {
       ensureDir(dirname(dst));
       writeFileAtomic(dst, readFileSync(src), 0o644);
     }
