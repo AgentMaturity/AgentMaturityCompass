@@ -296,23 +296,18 @@ describe("value realization engine", () => {
 
     const selfOut = ingestValueWebhookForApi({
       workspace,
-      payload: goodPayload,
-      sourceTrust: "SELF_REPORTED"
+      payload: goodPayload
     });
     expect(selfOut.ingested).toBe(1);
-    const attestedOut = ingestValueWebhookForApi({
-      workspace,
-      payload: goodPayload,
-      sourceTrust: "ATTESTED"
-    });
-    expect(attestedOut.ingested).toBe(1);
+    expect(selfOut.trustKind).toBe("SELF_REPORTED");
 
     const rows = readValueEvents({
       workspace,
       scope: { type: "AGENT", idHash: scopeHash("AGENT", "default") }
     });
-    expect(rows.some((row) => row.source.trustKind === "SELF_REPORTED")).toBe(true);
-    expect(rows.some((row) => row.source.trustKind === "ATTESTED")).toBe(true);
+    // A webhook sender cannot choose ATTESTED: nothing verifies a third-party signature on value events.
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((row) => row.source.trustKind === "SELF_REPORTED" && row.source.signatureValid === false)).toBe(true);
 
     expect(() =>
       ingestValueWebhookForApi({
@@ -320,8 +315,7 @@ describe("value realization engine", () => {
         payload: {
           ...goodPayload,
           events: [{ ts: Date.now(), kpiId: "cycle_time_hours", value: 5, labels: { owner: "alice@example.com" } }]
-        },
-        sourceTrust: "SELF_REPORTED"
+        }
       })
     ).toThrow(/forbidden/i);
   });

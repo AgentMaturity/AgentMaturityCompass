@@ -482,6 +482,7 @@ import {
   valueContractInitCli,
   valueContractPrintCli,
   valueContractVerifyCli,
+  VALUE_ATTESTED_REMOVED,
   valueImportCsvCli,
   valueIngestWebhookCli,
   valueInitCli,
@@ -13235,13 +13236,17 @@ value
   .command("ingest")
   .description("Ingest value webhook payload JSON")
   .requiredOption("--file <path>", "payload JSON/YAML file")
-  .option("--attested", "mark ingested events as ATTESTED", false)
-  .action((opts: { file: string; attested: boolean }) => {
+  // Removed in 2.0.0 (P0-18 follow-up): kept hidden only to refuse with a pointer instead of commander's unknown-option error.
+  .addOption(new Option("--attested").hideHelp())
+  .action((opts: { file: string; attested?: boolean }) => {
+    if (opts.attested !== undefined) {
+      console.error(VALUE_ATTESTED_REMOVED);
+      process.exit(2);
+    }
     assertOwnerMode(process.cwd(), "value ingest");
     const out = valueIngestWebhookCli({
       workspace: process.cwd(),
-      file: opts.file,
-      attest: opts.attested
+      file: opts.file
     });
     console.log(chalk.green(`Value events ingested: ${out.ingested}`));
     console.log(`sha256=${out.sha256}`);
@@ -13256,8 +13261,12 @@ value
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .option("--id <id>", "scope id", "workspace")
   .requiredOption("--kpi <kpiId>", "kpi id")
-  .option("--attested", "mark imported events as ATTESTED", false)
-  .action((opts: { csv: string; scope: string; id: string; kpi: string; attested: boolean }) => {
+  .addOption(new Option("--attested").hideHelp())
+  .action((opts: { csv: string; scope: string; id: string; kpi: string; attested?: boolean }) => {
+    if (opts.attested !== undefined) {
+      console.error(VALUE_ATTESTED_REMOVED);
+      process.exit(2);
+    }
     assertOwnerMode(process.cwd(), "value import");
     const scope = opts.scope.toLowerCase();
     if (!(scope === "workspace" || scope === "node" || scope === "agent")) {
@@ -13268,8 +13277,7 @@ value
       file: opts.csv,
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
-      kpiId: opts.kpi,
-      attest: opts.attested
+      kpiId: opts.kpi
     });
     console.log(chalk.green(`CSV value events ingested: ${out.ingested}`));
     console.log(`sha256=${out.sha256}`);
