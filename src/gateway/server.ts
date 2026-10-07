@@ -32,7 +32,7 @@ import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
-import { findRefusedFields } from "./requestFieldGuard.js";
+import { guardedUpstreamHostRefused, refusedFieldsForUpstream, requestFieldRefusal } from "./requestFieldGuard.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -81,7 +81,8 @@ function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | s
 
 function selectRoute(pathname: string, config: GatewayConfig): GatewayConfig["routes"][number] | null {
   const sorted = [...config.routes].sort((a, b) => b.prefix.length - a.prefix.length);
-  return sorted.find((route) => pathname.startsWith(route.prefix)) ?? null;
+  // Match on a path-segment boundary: "/dsh" serves "/dsh" and "/dsh/...", never "/dsh2".
+  return sorted.find((route) => pathname === route.prefix || pathname.startsWith(route.prefix.endsWith("/") ? route.prefix : `${route.prefix}/`)) ?? null;
 }
 
 function joinPath(basePathname: string, forwardedPathname: string): string {
@@ -623,6 +624,7 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
 }
 
 function hostAllowed(config: GatewayConfig, host: string): boolean {
+  if (guardedUpstreamHostRefused(config, host)) return false; // a tunnel cannot be field-checked
   if (!config.proxy.enabled || !config.proxy.denyByDefault) {
     return true;
   }
@@ -1366,15 +1368,15 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      // Signed route policy refuses named top-level fields (e.g. dsh_session_log); the audit keeps names and size, never content.
-      const refusedFields = findRefusedFields(requestBody, route.refuseRequestFields ?? []);
-      if (refusedFields.length > 0) {
-        const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix,
-          upstreamId: route.upstream, agentId: attributedAgentId, fields: refusedFields, requestBytes: requestBody.byteLength };
+      // Refused fields (e.g. dsh_session_log) belong to the upstream, and an unreadable body is refused; the audit keeps names and size, never content.
+      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, refusedFieldsForUpstream(resolvedConfig, route.upstream));
+      if (fieldRefusal) {
+        const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream,
+          agentId: attributedAgentId, reason: fieldRefusal.reason, fields: fieldRefusal.fields, requestBytes: requestBody.byteLength };
         appendEvidence({ eventType: "audit", payload: JSON.stringify(refusal), meta: refusal });
         res.statusCode = 403;
         res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify({ error: `request field refused by route ${route.prefix}: ${refusedFields.join(", ")}` }));
+        res.end(JSON.stringify({ error: `request refused by the route field guard (${fieldRefusal.reason})` }));
         return;
       }
 

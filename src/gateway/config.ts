@@ -28,7 +28,7 @@ const routeSchema = z.object({
   stripPrefix: z.boolean().default(true),
   openaiCompatible: z.boolean().default(false),
   agentId: z.string().optional(),
-  /** Top-level JSON request fields this route refuses with 403 (absent means none), e.g. ["dsh_session_log"]. */
+  /** Top-level JSON request fields refused with 403 (absent means none), e.g. ["dsh_session_log"]. Every route to the same upstream enforces the union. */
   refuseRequestFields: z.array(z.string().min(1)).optional()
 });
 
