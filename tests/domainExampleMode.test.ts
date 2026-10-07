@@ -1,4 +1,6 @@
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
+import { createServer } from "node:http";
+import { promisify } from "node:util";
 import { createHash, generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -114,6 +116,47 @@ describe("--example on the five domain commands", () => {
 });
 
 describe("other synthetic producers carry the label", () => {
+  test("amc demo run through a gateway (the default vault mode) is labelled in text and --json", async () => {
+    // A stand-in gateway that accepts the demo's scripted requests; the CLI runs async so this server can answer.
+    const server = createServer((req, res) => {
+      req.resume();
+      req.on("end", () => { res.setHeader("content-type", "application/json"); res.end("{}"); });
+    });
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    const address = server.address();
+    const gateway = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const run = (extra: string[]) => promisify(execFile)(process.execPath, [CLI, "demo", "run", "--gateway", gateway, ...extra], {
+      cwd: workspace, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
+    });
+    try {
+      const text = await run([]);
+      const lines = text.stdout.trim().split("\n");
+      expect([lines[0], lines.at(-1)]).toEqual([EXAMPLE_BANNER, EXAMPLE_BANNER]);
+      expect(text.stdout).not.toMatch(/full scored report/);
+      const json = await run(["--json"]);
+      const parsed = JSON.parse(json.stdout.slice(json.stdout.indexOf("{"))) as { banner?: string; claimKind?: string; envelope?: { claimKind?: string }; trustLabel?: string };
+      expect(parsed.banner).toBe(EXAMPLE_BANNER);
+      expect(parsed.claimKind).toBe("synthetic_example");
+      expect(parsed.envelope?.claimKind).toBe("synthetic_example");
+      expect(parsed.trustLabel).toBe("DEMO_ONLY");
+    } finally {
+      await new Promise((done) => server.close(done));
+    }
+  }, 60_000);
+
+  test("lab-simulate placeholder results carry a synthetic_example envelope", async () => {
+    const lab = await import("../src/lab/cognitionLab.js");
+    lab.resetLabState();
+    const template = lab.getLabTemplates()[0]!;
+    const experiment = lab.createLabExperiment({ kind: template.kind, name: "example", description: "example", modelId: "m" });
+    const results = lab.simulateExperiment(experiment.experimentId);
+    expect(results.length).toBeGreaterThan(0);
+    for (const result of results) {
+      expect((result.metadata.envelope as { claimKind?: string } | undefined)?.claimKind).toBe("synthetic_example");
+    }
+    lab.resetLabState();
+  });
+
   test("amc mirofish run prints the banner first and last, and its JSON is synthetic_example", () => {
     const scenario = join(workspace, "example-scenario.yml");
     writeFileSync(scenario, [

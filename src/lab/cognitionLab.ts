@@ -13,6 +13,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { envelopeForSyntheticExample } from "../claims/eligibility/adapters.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   saveWorkspaceRecord,
@@ -412,7 +413,8 @@ export function cancelLabExperiment(experimentId: string, workspace?: string): L
  * No model is called. Scores are derived from a hash of the experiment/probe
  * ids purely so repeated runs are reproducible — they are not measurements and
  * must never be presented as model performance or used as evidence. Every
- * result is tagged `metadata.simulated = true`.
+ * result is tagged `metadata.simulated = true` and carries a `synthetic_example`
+ * envelope in `metadata.envelope`.
  *
  * Use this to exercise the lab workflow (wiring, reporting, storage), not to
  * evaluate a model.
@@ -445,7 +447,7 @@ export function simulateExperiment(experimentId: string): LabProbeResult[] {
       scores,
       latencyMs: Math.floor(100 + seed * 900),
       tokenCount: Math.floor(50 + seed * 450),
-      metadata: { simulated: true, modelId: experiment.modelId },
+      metadata: { simulated: true, modelId: experiment.modelId, envelope: envelopeForSyntheticExample({ producer: "lab:simulate", now: Date.now() }) },
     });
     results.push(result);
   }

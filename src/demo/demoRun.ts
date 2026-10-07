@@ -1,6 +1,6 @@
 /**
- * `amc demo run` — Run a simulated agent through the AMC gateway
- * and produce a real score in ~30 seconds. Zero config needed.
+ * `amc demo run` — Send scripted demo traffic through the AMC gateway in
+ * ~30 seconds. Its output is a synthetic example, not evidence.
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
