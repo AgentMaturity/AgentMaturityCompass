@@ -20,6 +20,7 @@
  */
 import { z } from "zod";
 import { transparencyEntrySchema } from "./logSchema.js";
+import { MERKLE_ALGORITHMS } from "./merkle.js";
 import { merkleProofSignatureSchema } from "./proofSchema.js";
 
 /** The transparency `artifact.kind` a session-root anchor is filed under. */
@@ -116,7 +117,9 @@ export const signedMerkleRootRowSchema = z.object({
   ts: z.number().int(),
   leafCount: z.number().int().min(0),
   root: z.string().length(64),
-  lastEntryHash: z.string().default("")
+  lastEntryHash: z.string().default(""),
+  /** P1-26: absent means amc-legacy-v1. */
+  algorithm: z.enum(MERKLE_ALGORITHMS).optional()
 });
 
 export type SessionRootDescriptor = z.infer<typeof sessionRootDescriptorSchema>;

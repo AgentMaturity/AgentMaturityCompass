@@ -3391,6 +3391,8 @@ export interface AMCConfig {
   };
   /** P1-25 trusted time (TSAs, checkpoints), kept as written; src/time/tsaClient.ts parses it strictly. */
   time?: unknown;
+  /** P1-26 public anchoring, kept as written; src/transparency/anchors/anchor.ts parses it strictly. */
+  transparency?: unknown;
 }
 
 export interface GatePolicy {

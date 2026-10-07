@@ -1,5 +1,6 @@
 import { createPublicKey, sign, verify, X509Certificate } from "node:crypto";
 import { z } from "zod";
+import { assertNoteKey } from "../transparency/checkpointNote.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -93,6 +94,23 @@ export const timestampAuthoritySchema = z.strictObject({
   if (!parses) ctx.addIssue({ code: "custom", message: "rootCertificatePem must be exactly one PEM X.509 certificate" });
 });
 
+/**
+ * P1-26: a public transparency log the operator pins (for example a Rekor v2 shard). Its checkpoints count only when
+ * a C2SP signed-note signature under `publicKeyPem` verifies with `origin` as key name and first line; a key a log
+ * response carries never counts.
+ */
+export const transparencyLogSchema = z.strictObject({
+  logId: z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/),
+  name: z.string().min(1),
+  origin: z.string().max(256).regex(/^[^\s+]+$/, "origin must be non-empty without spaces or plus signs"),
+  /** The checkpoint key: an Ed25519 or ECDSA (P-256, P-384, P-521) SPKI public key. */
+  publicKeyPem: z.string().min(1).max(4096)
+}).superRefine((log, ctx) => {
+  let valid = log.publicKeyPem.trimStart().startsWith("-----BEGIN PUBLIC KEY-----");
+  try { if (valid) assertNoteKey(log.publicKeyPem); } catch { valid = false; }
+  if (!valid) ctx.addIssue({ code: "custom", message: "publicKeyPem must be an Ed25519 or ECDSA P-256, P-384 or P-521 SPKI public key" });
+});
+
 export const trustListSchema = z.strictObject({
   type: z.literal("amc.trust-list"),
   version: z.literal(1),
@@ -105,6 +123,9 @@ export const trustListSchema = z.strictObject({
   distrust: z.array(distrustEntrySchema),
   timestampAuthorities: z.array(timestampAuthoritySchema).max(64)
     .refine(authorities => new Set(authorities.map(authority => authority.anchorId)).size === authorities.length, "duplicate anchorId")
+    .optional(),
+  transparencyLogs: z.array(transparencyLogSchema).max(64)
+    .refine(logs => new Set(logs.map(log => log.logId)).size === logs.length, "duplicate logId")
     .optional()
 });
 
@@ -116,6 +137,7 @@ export const signedTrustListSchema = z.strictObject({
 export type TrustListEntry = z.infer<typeof trustListEntrySchema>;
 export type DistrustEntry = z.infer<typeof distrustEntrySchema>;
 export type TimestampAuthority = z.infer<typeof timestampAuthoritySchema>;
+export type TransparencyLog = z.infer<typeof transparencyLogSchema>;
 export type TrustList = z.infer<typeof trustListSchema>;
 export type SignedTrustList = z.infer<typeof signedTrustListSchema>;
 

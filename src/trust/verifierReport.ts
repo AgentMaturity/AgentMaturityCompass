@@ -6,7 +6,22 @@ import type { TrustContext } from "./trustContext.js";
 
 const dimensionStatus = z.enum(["pass", "fail", "not-evaluated"]);
 const reasons = z.strictObject({ status: dimensionStatus, reasons: z.array(z.string()) });
-const anchoringSchema = z.strictObject({ status: z.enum(["anchored", "unanchored", "not-applicable"]), detail: z.string().nullable() });
+/**
+ * P1-26: whether the artifact's transparency checkpoint is held by a public log the operator pinned. "invalid" is
+ * also an integrity error; "not-anchored" says why (no anchor, an unpinned log or TSA, an entry newer than the anchor).
+ */
+export const publicAnchoringSchema = z.strictObject({
+  status: z.enum(["anchored", "not-anchored", "invalid"]),
+  backend: z.enum(["rekor-v2"]).nullable(),
+  logIndex: z.number().int().nonnegative().nullable(),
+  detail: z.string().nullable()
+});
+export type PublicAnchoring = z.infer<typeof publicAnchoringSchema>;
+const anchoringSchema = z.strictObject({
+  status: z.enum(["anchored", "unanchored", "not-applicable"]),
+  detail: z.string().nullable(),
+  public: publicAnchoringSchema.optional()
+});
 
 /**
  * One report for every verifier. Scope, freshness, completeness and satisfaction stay "not-evaluated" until P1-06,

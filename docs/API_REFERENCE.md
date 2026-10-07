@@ -9835,6 +9835,15 @@ Export signed inclusion proof bundle for entry hash
 | `--entry-hash <hash>` | - |
 | `--out <file>` | - |
 
+#### `amc transparency merkle rebuild`
+
+Rebuild Merkle leaves/roots from transparency log
+
+
+| Option | Description |
+|--------|-------------|
+| `--algorithm <algorithm>` | - |
+
 #### `amc transparency merkle verify-proof`
 
 Verify signed inclusion proof bundle

@@ -1,4 +1,5 @@
-import { MERKLE_EMPTY_ROOT, merkleLeafHash, merkleNodeHash } from "./merkle.js";
+import { entryLeafHash, MERKLE_EMPTY_ROOT, merkleNodeHash, type MerkleAlgorithm } from "./merkle.js";
+import { nodeHash as rfc9162NodeHash, RFC9162_EMPTY_ROOT } from "./rfc9162.js";
 
 /**
  * The O(log n) state an incremental Merkle writer needs.
@@ -16,6 +17,10 @@ import { MERKLE_EMPTY_ROOT, merkleLeafHash, merkleNodeHash } from "./merkle.js";
  * That property is not a nicety: verifyTransparencyMerkle recomputes the root
  * from the log and compares it to the signed current.root.json, so any divergence
  * turns every subsequent verification into a hard failure.
+ *
+ * P1-26: the same frontier serves the RFC 9162 tree, whose perfect subtrees are
+ * the same set; only the hashes and the final fold differ (RFC 9162 promotes the
+ * ragged tail instead of duplicating it). Every function takes the algorithm.
  */
 export interface MerkleFrontierNode {
   readonly level: number;
@@ -35,8 +40,9 @@ export const EMPTY_MERKLE_FRONTIER: MerkleFrontier = Object.freeze([]);
  * full rebuild performs, just done once per append instead of once per level
  * per append.
  */
-export function appendLeafToFrontier(frontier: MerkleFrontier, entryHash: string): MerkleFrontier {
-  const next: MerkleFrontierNode[] = [...frontier, { level: 0, hash: merkleLeafHash(entryHash) }];
+export function appendLeafToFrontier(frontier: MerkleFrontier, entryHash: string, algorithm: MerkleAlgorithm): MerkleFrontier {
+  const node = algorithm === "rfc9162-sha256" ? rfc9162NodeHash : merkleNodeHash;
+  const next: MerkleFrontierNode[] = [...frontier, { level: 0, hash: entryLeafHash(algorithm, entryHash) }];
   while (next.length >= 2) {
     const right = next[next.length - 1]!;
     const left = next[next.length - 2]!;
@@ -44,7 +50,7 @@ export function appendLeafToFrontier(frontier: MerkleFrontier, entryHash: string
       break;
     }
     next.length -= 2;
-    next.push({ level: left.level + 1, hash: merkleNodeHash(left.hash, right.hash) });
+    next.push({ level: left.level + 1, hash: node(left.hash, right.hash) });
   }
   return next;
 }
@@ -56,8 +62,14 @@ export function appendLeafToFrontier(frontier: MerkleFrontier, entryHash: string
  * odd-node rule says a tail is promoted by hashing it against itself until it
  * reaches the level of the subtree on its left — which is precisely what the
  * inner `while` does. Then the two combine, and the fold continues one level up.
+ * RFC 9162 promotes the tail unchanged, so its fold is a plain right-to-left
+ * pairing.
  */
-export function frontierRoot(frontier: MerkleFrontier): string {
+export function frontierRoot(frontier: MerkleFrontier, algorithm: MerkleAlgorithm): string {
+  if (algorithm === "rfc9162-sha256") {
+    return frontier.reduceRight<string | null>((current, node) => current === null ? node.hash : rfc9162NodeHash(node.hash, current), null)
+      ?? RFC9162_EMPTY_ROOT;
+  }
   if (frontier.length === 0) {
     return MERKLE_EMPTY_ROOT;
   }
@@ -77,10 +89,10 @@ export function frontierRoot(frontier: MerkleFrontier): string {
 }
 
 /** Builds the frontier from scratch. Used by the repair path, which already reads every hash. */
-export function buildFrontierFromEntryHashes(entryHashes: readonly string[]): MerkleFrontier {
+export function buildFrontierFromEntryHashes(entryHashes: readonly string[], algorithm: MerkleAlgorithm): MerkleFrontier {
   let frontier: MerkleFrontier = EMPTY_MERKLE_FRONTIER;
   for (const entryHash of entryHashes) {
-    frontier = appendLeafToFrontier(frontier, entryHash);
+    frontier = appendLeafToFrontier(frontier, entryHash, algorithm);
   }
   return frontier;
 }

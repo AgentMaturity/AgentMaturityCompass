@@ -1134,7 +1134,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc transparency init` | Initialize append-only transparency log | - | - |
 | `amc transparency merkle` | Merkle transparency root/proof operations | - | - |
 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
-| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | - | - |
+| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | `--algorithm <algorithm>` | - |
 | `amc transparency merkle root` | Show current Merkle root and history | - | - |
 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is | `--agent <id>`<br>`--format <fmt>`<br>`--out <file>`<br>`--all`<br>`--workspace <path>` | - |

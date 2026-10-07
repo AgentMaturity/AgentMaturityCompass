@@ -153,34 +153,36 @@ function signWithNotary(params: {
   };
 }
 
+/** Who signs `kind` under the workspace's trust config; throws when that config's signature is invalid. */
+export function signingRoute(workspace: string, kind: SignKind): "vault" | "notary" {
+  const trustSig = verifyTrustConfigSignature(workspace);
+  if (!trustSig.valid) {
+    const trustPath = trustConfigPath(workspace);
+    if (!pathExists(trustPath)) {
+      return "vault";
+    }
+    const trust = loadTrustConfig(workspace);
+    // Bootstrap path: allow initial signing while trust mode is local and signature is not yet created.
+    if (!trustSig.signatureExists && trust.trust.mode === "LOCAL_VAULT") {
+      return "vault";
+    }
+    throw new Error(`trust config signature invalid: ${trustSig.reason ?? "unknown"}`);
+  }
+  const trust = loadTrustConfig(workspace);
+  if (trust.trust.mode !== "NOTARY") {
+    return "vault";
+  }
+  const requireNotary = trust.trust.enforcement.requireNotaryFor.includes(kind);
+  return requireNotary || trust.trust.enforcement.denyLocalVaultSigningIfNotaryEnabled ? "notary" : "vault";
+}
+
 export function signDigestWithPolicy(params: {
   workspace: string;
   kind: SignKind;
   digestHex: string;
 }): SignedDigest {
   assertSha256HexDigest(params.digestHex);
-  const trustSig = verifyTrustConfigSignature(params.workspace);
-  if (!trustSig.valid) {
-    const trustPath = trustConfigPath(params.workspace);
-    if (!pathExists(trustPath)) {
-      return signDigestWithVault(params);
-    }
-    const trust = loadTrustConfig(params.workspace);
-    // Bootstrap path: allow initial signing while trust mode is local and signature is not yet created.
-    if (!trustSig.signatureExists && trust.trust.mode === "LOCAL_VAULT") {
-      return signDigestWithVault(params);
-    }
-    throw new Error(`trust config signature invalid: ${trustSig.reason ?? "unknown"}`);
-  }
-  const trust = loadTrustConfig(params.workspace);
-  if (trust.trust.mode !== "NOTARY") {
-    return signDigestWithVault(params);
-  }
-  const requireNotary = trust.trust.enforcement.requireNotaryFor.includes(params.kind);
-  if (requireNotary || trust.trust.enforcement.denyLocalVaultSigningIfNotaryEnabled) {
-    return signWithNotary(params);
-  }
-  return signDigestWithVault(params);
+  return signingRoute(params.workspace, params.kind) === "notary" ? signWithNotary(params) : signDigestWithVault(params);
 }
 
 export function verifySignedDigest(params: {

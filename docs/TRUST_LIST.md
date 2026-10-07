@@ -83,6 +83,8 @@ Entry rules:
 
 Optional `timestampAuthorities` (P1-25) pins RFC 3161 timestamp authorities: at most 64 entries of `{ "anchorId", "name", "rootCertificatePem", "policyOids"? }`. `anchorId` matches the `listId` pattern and is unique in the list; `rootCertificatePem` is exactly one PEM X.509 certificate (a root, an intermediate or the TSA certificate itself); `policyOids`, when present, lists the TSA policies accepted under that anchor. A timestamp token verifies only through a path to one of these certificates, never through a certificate the token carries. See [TRUSTED_TIME.md](TRUSTED_TIME.md).
 
+Optional `transparencyLogs` (P1-26) pins public transparency logs such as a Rekor v2 shard: at most 64 entries of `{ "logId", "name", "origin", "publicKeyPem" }`. `logId` matches the `listId` pattern and is unique in the list; `origin` is the log's checkpoint origin and signed-note key name (no spaces or `+`); `publicKeyPem` is the log's checkpoint key, an Ed25519 or ECDSA P-256, P-384 or P-521 SPKI public key. A log checkpoint counts only when a C2SP signed-note signature under this key verifies, never under a key a log reply carries. See [PUBLIC_ANCHORING.md](PUBLIC_ANCHORING.md).
+
 ### Signing
 
 The signed bytes are the ASCII tag `AMC_TRUST_LIST_V1`, one 0x00 byte, then the canonical JSON of `list` (object keys sorted at every level, arrays kept in order) in UTF-8. The signature is Ed25519 over those bytes, never over a digest, so reordering keys in the file does not change it. In Node:

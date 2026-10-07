@@ -12471,9 +12471,13 @@ withTrustFlags(transparency
 transparencyMerkle
   .command("rebuild")
   .description("Rebuild Merkle leaves/roots from transparency log")
-  .action(() => {
-    const out = transparencyMerkleRebuildCli(process.cwd());
+  .addOption(new Option("--algorithm <algorithm>", "migrate the log's tree (only amc-legacy-v1 to rfc9162-sha256; signs a migration record)")
+    .choices(["amc-legacy-v1", "rfc9162-sha256"]))
+  .action((opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
+    const out = transparencyMerkleRebuildCli(process.cwd(), { algorithm: opts.algorithm });
     console.log(chalk.green("Transparency Merkle rebuilt"));
+    console.log(`algorithm=${out.algorithm}`);
+    if (out.migration) console.log(`migration=${out.migration.path} (log entry ${out.migration.entryHash})`);
     console.log(`leafCount=${out.leafCount}`);
     console.log(`root=${out.root}`);
     console.log(`currentRoot=${out.currentRootPath}`);
