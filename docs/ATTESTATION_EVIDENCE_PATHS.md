@@ -33,10 +33,10 @@ amc bundle verify .amc/agents/<agentId>/bundles/latest.amcbundle --pubkey <recor
 amc assurance cert verify .amc/assurance/certificates/latest.amccert
 
 # bom + signatures
-amc bom verify --in ./amc-bom.json --sig ./amc-bom.json.sig --pubkey .amc/keys/auditor_ed25519.pub
+amc bom verify --in ./amc-bom.json --sig ./amc-bom.json.sig --pubkey <recorded-auditor.pub>
 
 # transparency proof
-amc transparency merkle verify-proof .amc/transparency/proofs/<entryHash>.amcproof
+amc transparency merkle verify-proof .amc/transparency/proofs/<entryHash>.amcproof --pubkey <recorded-auditor.pub>
 
 # audit binder
 amc audit binder verify ./exports/latest.amcaudit --pubkey <recorded-auditor.pub>

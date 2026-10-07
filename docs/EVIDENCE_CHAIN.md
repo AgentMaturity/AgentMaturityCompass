@@ -263,7 +263,7 @@ amc transparency merkle root
 amc transparency merkle prove --entry-hash <hash> --out proof.amcproof
 
 # Verify a proof offline (no network required)
-amc transparency merkle verify-proof proof.amcproof
+amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
 ```
 
 ### Guarantees
@@ -423,7 +423,7 @@ amc export receipts --format jsonl --out receipts.jsonl
 amc transparency merkle rebuild
 amc transparency merkle root
 amc transparency merkle prove --entry-hash <hash> --out proof.amcproof
-amc transparency merkle verify-proof proof.amcproof
+amc transparency merkle verify-proof proof.amcproof --pubkey <recorded-auditor.pub>
 
 # Ingest external logs (arrives as SELF_REPORTED, 0.4× trust)
 amc ingest ./external-logs/ --type generic_json --agent imported-agent

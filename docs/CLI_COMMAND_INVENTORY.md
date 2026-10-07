@@ -154,7 +154,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bench registry init` | - | `--dir <dir>`<br>`--id <id>`<br>`--name <name>` | - |
 | `amc bench registry publish` | - | `--dir <dir>`<br>`--file <bench.amcbench>`<br>`--registry-key <file>`<br>`--version <version>` | - |
 | `amc bench registry serve` | - | `--dir <dir>`<br>`--port <port>`<br>`--host <host>` | - |
-| `amc bench registry verify` | - | `--dir <dir>` | - |
+| `amc bench registry verify` | - | `--dir <dir>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc bench search` | Browse a bench registry index | `--registry <pathOrUrl>`<br>`--query <text>` | - |
 | `amc bench verify` | Verify .amcbench artifact offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc bench verify-policy` | Verify signed bench policy | - | - |
@@ -178,7 +178,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bom` | Maturity Bill of Materials | - | - |
 | `amc bom generate` | - | `--run <runId|latest>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc bom sign` | - | `--in <file>`<br>`--out <file>` | - |
-| `amc bom verify` | - | `--in <file>`<br>`--sig <file>`<br>`--pubkey <file>` | - |
+| `amc bom verify` | - | `--in <file>`<br>`--sig <file>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc bootstrap` | Bootstrap workspace for production deployment (non-interactive) | `--workspace <path>` | - |
 | `amc budgets` | Signed autonomy and usage budgets | - | - |
 | `amc budgets init` | - | `--agent <agentId>` | - |
@@ -342,7 +342,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain pack describe` | Show details of a specific industry sector pack | `--pack <packId>`<br>`--json` | `sector pack describe` |
 | `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
-| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--json` | `sector pack verify` |
+| `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | `sector pack verify` |
 | `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
 | `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
@@ -377,7 +377,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce taint` | Track tainted input through the system | `--json` | - |
 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model | `--properties <list>`<br>`--output <path>` | - |
-| `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | - | - |
+| `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance | - | - |
 | `amc enterprise activate` | Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX) | - | - |
 | `amc enterprise audit-export` | Export audit trail in SIEM format | `--format <format>`<br>`--output <path>`<br>`--limit <count>`<br>`--signed` | - |
@@ -570,7 +570,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc imports list` | List recent neutral import runs | `--limit <n>`<br>`--json` | - |
 | `amc imports rollback` | Remove files written by a neutral import run | `--json` | - |
 | `amc imports show` | Inspect a neutral import manifest | `--json` | - |
-| `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | `--authorities <path>`<br>`--original <path>`<br>`--expected-digest <sha256>`<br>`--json` | - |
+| `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | `--authorities <path>`<br>`--original <path>`<br>`--expected-digest <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |
 | `amc improve` | Guided improvement — shows what to fix next based on your current score | `--json` | - |
 | `amc incident` | Incident tracking and response operations | - | - |
 | `amc incident close` | Close an incident with a resolution summary | `--resolution <text>` | - |
@@ -745,7 +745,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc notary sign` | Sign a payload file using Notary (admin utility) | `--kind <kind>`<br>`--in <file>`<br>`--out <file>`<br>`--notary-dir <dir>` | - |
 | `amc notary start` | Start AMC Notary service (foreground) | `--notary-dir <dir>`<br>`--workspace <dir>`<br>`--bind <host>` | - |
 | `amc notary status` | Show notary backend and log status | `--notary-dir <dir>` | - |
-| `amc notary verify-attest` | Verify a .amcattest bundle offline | - | - |
+| `amc notary verify-attest` | Verify a .amcattest bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc observe` | Observability — timeline, anomaly detection, and tracing | - | - |
 | `amc observe anomalies` | Detect observability anomalies (evidence rate drops, trust regressions, score volatility) | `--agent <agentId>`<br>`--json` | - |
 | `amc observe timeline` | Show agent evidence timeline with score progression | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
@@ -828,7 +828,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc passport translate-score` | Translate trust scores between scoring systems | `--from <system>`<br>`--to <system>`<br>`--score <n>`<br>`--json` | - |
 | `amc passport verify` | Verify .amcpass artifact offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc passport verify-policy` | Verify signed passport policy | - | - |
-| `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | - | - |
+| `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc playground` | Interactive scenario runner | - | - |
 | `amc playground list` | List available scenarios | - | - |
 | `amc playground run` | Run all demo scenarios | `--json` | - |
@@ -1036,7 +1036,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session show` | Show a session's projected conversation and its event spine | `--json` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
-| `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json` | - |
+| `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
 | `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
 | `amc setup` | Setup wizard for the full-score path and Studio gateway | `--provider <name>`<br>`--auto`<br>`--non-interactive`<br>`--demo` | - |
@@ -1132,11 +1132,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
 | `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | - | - |
 | `amc transparency merkle root` | Show current Merkle root and history | - | - |
-| `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | - | - |
+| `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is | `--agent <id>`<br>`--format <fmt>`<br>`--out <file>`<br>`--all`<br>`--workspace <path>` | - |
 | `amc transparency tail` | Tail transparency entries | `--n <count>` | - |
 | `amc transparency verify` | Verify transparency chain + seal signature | - | - |
-| `amc transparency verify-bundle` | Verify exported transparency bundle | - | - |
+| `amc transparency verify-bundle` | Verify exported transparency bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc trust` | Trust mode and Notary enforcement configuration | - | - |
 | `amc trust enable-notary` | Enable fail-closed NOTARY trust mode | `--base-url <url>`<br>`--pin <pubkeyFile>`<br>`--require <level>`<br>`--unix-socket <path>` | - |
 | `amc trust freshness` | Report temporal trust freshness and half-life decay | `--agent <agentId>`<br>`--lookback-days <n>`<br>`--stale-threshold <n>`<br>`--half-life-behavioral <days>`<br>`--half-life-assurance <days>`<br>`--half-life-cryptographic <days>`<br>`--half-life-self-reported <days>`<br>`--view <mode>` | - |
