@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-10-07",
+  "commit": "e25cce1a",
+  "channels": [
+    {
+      "id": "network-egress",
+      "name": "Network egress",
+      "enforcementPoints": [
+        {
+          "path": "src/gateway/server.ts",
+          "symbol": "hostAllowed"
+        }
+      ],
+      "evidence": "gateway NETWORK_EGRESS_BLOCKED rows",
+      "status": "enforced",
+      "bypasses": [],
+      "owners": [
+        "P9-99"
+      ],
+      "asi": [
+        "ASI02"
+      ]
+    }
+  ],
+  "failurePolicy": [
+    {
+      "id": "recorder-fails-after-effect",
+      "failure": "Evidence recorder fails after the effect happened",
+      "behaviour": "The effect stands; dependent actions wait",
+      "evidenceState": "Evidence incomplete",
+      "tests": [
+        "tests/toolEvidenceRecording.test.ts"
+      ],
+      "owners": [
+        "P1-03"
+      ]
+    }
+  ]
+}
