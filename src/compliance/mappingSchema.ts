@@ -3,6 +3,7 @@ import type { EvidenceEventType } from "../types.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { questionIds } from "../diagnostic/questionBank.js";
 import { frameworkChoices } from "./frameworks.js";
+import { STATIONS, type Station } from "../domains/stations.js";
 
 const frameworkEnum = z.enum(frameworkChoices() as [string, ...string[]]);
 const questionEnum = z.enum(questionIds as [string, ...string[]]);
@@ -53,6 +54,8 @@ export const complianceMappingSchema = z.object({
   evidenceRequirements: z.array(complianceEvidenceRequirementSchema).min(1),
   /** Whose evidence counts. Absent means "agent": workspace `system` events can only fail it. */
   binding: z.object({ scope: z.enum(["agent", "workspace"]) }).optional(),
+  /** Explicit station tags; absent means derived (stationsForMapping in stationTags.ts). Never changes a result. */
+  stations: z.array(z.enum(STATIONS)).min(1).optional(),
   related: z.object({
     questions: z.array(questionEnum).default([]),
     packs: z.array(z.string().min(1)).default([]),
@@ -102,6 +105,8 @@ export interface ComplianceReportJson {
   ts: number;
   workspace: string;
   framework: string;
+  /** Present when the report kept only the mappings tagged with this station. */
+  station?: Station;
   agentId: string;
   windowStartTs: number;
   windowEndTs: number;
