@@ -107,6 +107,25 @@ function mappedGate(gate: Gate, emitterIds: readonly string[], needs: string | u
 }
 
 /**
+ * For upgrade, guide and explain output: the lowest level above `current`, up to `target`, whose gate (from
+ * `levelGates`, the gates the runner scores with) AMC cannot evaluate. Levels are cumulative, so no action raises the
+ * question to that level or past it. Output gives `notice` (the gate's reason, which names the NOT_YET_EVIDENCEABLE
+ * need or the plan issue it waits on) instead of that gate's earlier requirements, and never promises the gain.
+ */
+export function notEvaluatedLevel(
+  question: Pick<DiagnosticQuestion, "gates"> | undefined,
+  current: number,
+  target: number
+): { level: Level; notice: string } | undefined {
+  const gate = [...(question?.gates ?? [])]
+    .sort((a, b) => a.level - b.level)
+    .find((row) => row.level > current && row.level <= target && row.notEvaluated);
+  return gate?.notEvaluated
+    ? { level: gate.level, notice: `Not evaluated: ${gate.notEvaluated}. No action raises this question to L${gate.level} until that exists.` }
+    : undefined;
+}
+
+/**
  * The questions one event is tagged to: `meta.questionIds` (a list), `meta.questionId` or `meta.question_id`.
  * A list, because one governed fact can evidence several questions; it counts once per question.
  */

@@ -161,7 +161,11 @@ Markdown for agents. Each gap includes:
 
 ### Guardrails (`--guardrails`)
 
-Operational rules with severity indicators (🔴🟡🔵), Quick Start (top 3 priorities), prohibited behaviors, and framework-specific setup code.
+Operational rules with severity indicators (🔴🟡🔵), Quick Start (top 3 priorities), prohibited behaviors, and framework-specific setup code. Prohibited behaviors and evidence requirements come only from gates AMC evaluates.
+
+### Levels AMC does not evaluate yet
+
+Levels are cumulative, and some gates are not evaluated yet (see [How a level is earned](SCORING_METHODOLOGY.md#how-a-level-is-earned)). When a gap needs such a level, its section says "Not evaluated", gives the gate's reason and what the level still needs, and lists no instructions, evidence or acceptance criteria for it. CLI commands cover only the evaluable levels below it. No output promises a level AMC cannot award.
 
 ### JSON (`--json`)
 
