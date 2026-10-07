@@ -30,7 +30,7 @@ const EMPTY: CitationLintInput = {
 };
 
 function buildInput(c: Case): CitationLintInput {
-  const records: CitationLintInput["records"] = [];
+  const records: Array<CitationLintInput["records"][number]> = [];
   if (c.record !== false) {
     const record: Record<string, unknown> = { ...fixture.completeRecord };
     for (const [key, value] of Object.entries(c.recordPatch ?? {})) {
@@ -110,9 +110,9 @@ describe("shared official host list", () => {
 describe("framework reference tables", () => {
   it("records where each filled table came from", () => {
     for (const table of [FRAMEWORK_REFERENCE_TABLES.nistAiRmf, FRAMEWORK_REFERENCE_TABLES.atlas]) {
-      expect(table.source.url).toMatch(/^https:\/\//);
-      expect(table.source.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(table.source.sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(table.source?.url).toMatch(/^https:\/\//);
+      expect(table.source?.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(table.source?.sha256).toMatch(/^[0-9a-f]{64}$/);
       expect(table.entries.length).toBeGreaterThan(0);
     }
     expect(FRAMEWORK_REFERENCE_TABLES.nistAiRmf.entries).toHaveLength(72);

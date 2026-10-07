@@ -19,6 +19,8 @@
  */
 import { frameworkChoices, normalizeFrameworkName, type ComplianceFramework } from "../../compliance/frameworks.js";
 import { REGULATORY_CATALOGUE } from "./regulatoryCatalogue.js";
+import { SHARED_OFFICIAL_HOSTS, isSharedOfficialUrl } from "../../compliance/citations/officialHosts.js";
+import type { CitationStatusType } from "../../compliance/citations/citationRecord.js";
 import type { IndustryPack } from "../industryPacks.js";
 
 /** PackCurrencyFields v1 status enum. */
@@ -58,6 +60,22 @@ export interface RegulatoryInstrument {
   note?: string;
   /** Free-text spellings used in pack content; matched exactly or as a prefix followed by a separator. */
   aliases: string[];
+  // Citation-record fields (src/compliance/citations/citationRecord.ts). Optional here; a record
+  // without them is reported by scripts/check-citations.mjs (CIT004) until P1-09 fills them in.
+  /** Instrument name as the source titles it. */
+  instrument?: string;
+  /** Clause, article or section cited; "whole instrument" when the record cites all of it. */
+  clause?: string;
+  /** Edition, version or amendment state the record was read in. */
+  edition?: string;
+  /** Set by whoever writes the record; never derived from `status`. */
+  statusType?: CitationStatusType;
+  /** ISO date by which compliance is due when it differs from effectiveDate. */
+  complianceDueDate?: string;
+  /** Why effectiveDate or complianceDueDate is absent. */
+  dateNote?: string;
+  /** sha256 of the source bytes read, when retrievedAt alone does not pin them. */
+  contentSha256?: string;
 }
 
 /** A pack's regulatoryBasis entry with its resolved currency (PackCurrencyFields v1, plus text and instrumentId). */
@@ -94,28 +112,10 @@ const UNRESOLVED_JURISDICTION = "unresolved";
 
 /**
  * Hosts accepted as the official source of a verified instrument (exact host or
- * any subdomain). Planner list plus issuing bodies actually read in the review:
- * govinfo.gov (US GPO, Federal Register and CFR text), w3.org (WCAG),
- * pcisecuritystandards.org (PCI DSS), oecd.org (OECD legal instruments) and
- * consort-spirit.org (CONSORT/SPIRIT statements).
+ * any subdomain): the shared list in src/compliance/citations/officialHosts.ts,
+ * which also covers the regulatory register's policy.officialHosts.
  */
-export const OFFICIAL_SOURCE_HOSTS = [
-  "europa.eu", "nist.gov", "iso.org", "federalregister.gov", "ecfr.gov", "hhs.gov",
-  "legislation.gov.uk", "unece.org", "iec.ch", "who.int", "fatf-gafi.org", "ich.org",
-  "govinfo.gov", "w3.org", "pcisecuritystandards.org", "oecd.org", "consort-spirit.org",
-] as const;
-
-export function isOfficialSourceUrl(url: string): boolean {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return false;
-  }
-  if (parsed.protocol !== "https:") return false;
-  const host = parsed.hostname.toLowerCase();
-  return OFFICIAL_SOURCE_HOSTS.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
-}
+export { SHARED_OFFICIAL_HOSTS as OFFICIAL_SOURCE_HOSTS, isSharedOfficialUrl as isOfficialSourceUrl };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ALIAS_SEPARATOR = /^[\s§(,;/:.-]/;
@@ -203,7 +203,7 @@ export function validateRegulatoryInstrument(inst: RegulatoryInstrument, asOf: D
     }
   } else {
     if (!inst.url) errors.push(`${at}: status "${inst.status}" requires an https source url (or status "unverified")`);
-    else if (!isOfficialSourceUrl(inst.url)) errors.push(`${at}: url ${inst.url} is not an https url on an official source host`);
+    else if (!isSharedOfficialUrl(inst.url)) errors.push(`${at}: url ${inst.url} is not an https url on an official source host`);
     errors.push(...dateErrors("retrievedAt", inst.retrievedAt, asOf, PACK_REVIEW_MAX_AGE_DAYS).map((e) => `${at}: ${e}`));
   }
   if (inst.status === "repealed" && !inst.supersededBy) {

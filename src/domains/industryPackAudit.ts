@@ -82,7 +82,7 @@ export interface IndustryPackAudit {
  * RMF subcategories, ISO/IEC 42001 Annex A, SOC 2 Trust Services Criteria) —
  * not third-party content. The sector regulation is carried through verbatim.
  */
-interface FrameworkAnchors {
+export interface FrameworkAnchors {
   euAiAct: string;
   nist: string;
   iso: string;
@@ -106,6 +106,11 @@ const DEFAULT_ANCHORS: FrameworkAnchors = {
   iso: "A.5 — AI policy",
   soc2: "CC3 — Risk assessment",
 };
+
+/** Every anchor set the audit can emit, read-only; scripts/check-citations.mjs lints their framework ids. */
+export const INDUSTRY_PACK_AUDIT_ANCHORS: readonly Readonly<FrameworkAnchors>[] = Object.freeze(
+  [...DIMENSION_ANCHORS.map((entry) => entry.anchors), DEFAULT_ANCHORS].map((anchors) => Object.freeze({ ...anchors }))
+);
 
 function anchorsForDimension(dimension: string): FrameworkAnchors {
   for (const entry of DIMENSION_ANCHORS) {
