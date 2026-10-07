@@ -87,11 +87,29 @@ async function request(path, options) {
     throw new ConsoleApiError(typeof parsed.error === "string" ? parsed.error : `HTTP ${response.status}`,
       response.status, typeof parsed.code === "string" ? parsed.code : "HTTP_ERROR", parsed);
   }
+  recordClaims(parsed);
   return {
     ok: true,
     status: response.status,
     data: parsed
   };
+}
+
+// P0-23: result routes carry claim fields beside a result or a `claim` on each list item.
+const claimListeners = new Set();
+
+export function onClaims(listener) {
+  claimListeners.add(listener);
+}
+
+function recordClaims(body) {
+  if (!body || typeof body !== "object" || claimListeners.size === 0) return;
+  const claims = typeof body.claimKind === "string" ? [body] : [];
+  const holder = body.data && typeof body.data === "object" ? body.data : body;
+  for (const value of Object.values(holder)) {
+    if (Array.isArray(value)) claims.push(...value.map((item) => item?.claim).filter((claim) => typeof claim?.claimKind === "string"));
+  }
+  if (claims.length > 0) for (const listener of claimListeners) listener(claims);
 }
 
 export async function login(params) {
