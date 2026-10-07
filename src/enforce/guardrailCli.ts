@@ -66,7 +66,7 @@ export function registerGuardrailControlCommands(program: Command): void {
         console.log(chalk.bold("\nGuardrail Runtime Bindings\n"));
         for (const guardrail of rows) {
           const status = !guardrail.mutable
-            ? chalk.gray("CATALOG  ")
+            ? guardrail.enforcement === "enforced" ? chalk.green("PIPELINE ") : chalk.gray("CATALOG  ")
             : guardrail.effective
               ? chalk.green("EFFECTIVE")
               : guardrail.requestedEnabled
@@ -97,9 +97,10 @@ export function registerGuardrailControlCommands(program: Command): void {
           actor: "local-cli"
         });
         let effectiveSummary = "status pending";
+        let rows: ReturnType<typeof listGuardrailsWithRuntimeStatus> = [];
         try {
-          const count = listGuardrailsWithRuntimeStatus(process.cwd()).filter((guardrail) => guardrail.effective).length;
-          effectiveSummary = `${count} effective`;
+          rows = listGuardrailsWithRuntimeStatus(process.cwd());
+          effectiveSummary = `${rows.filter((guardrail) => guardrail.effective).length} effective`;
         } catch (error) {
           console.log(chalk.yellow(`Profile committed, but effective status could not be refreshed: ${message(error)}`));
         }
@@ -107,8 +108,11 @@ export function registerGuardrailControlCommands(program: Command): void {
           `Applied signed profile: ${profileName} (${result.state.requestedGuardrails.length} bound requests, ${effectiveSummary})`
         ));
         for (const name of result.state.requestedGuardrails) console.log(`  - ${name}`);
-        if (result.unsupported.length > 0) {
-          console.log(chalk.yellow(`  Catalog-only, not activated: ${result.unsupported.join(", ")}`));
+        for (const name of result.unsupported) {
+          const row = rows.find((candidate) => candidate.name === name);
+          console.log(row?.enforcement === "enforced"
+            ? chalk.gray(`  - ${name} (enforced at ${row.boundary}; not set by profiles)`)
+            : chalk.yellow(`  - ${name} (not enforced)`));
         }
       } catch (error) {
         reportCommandError(error);

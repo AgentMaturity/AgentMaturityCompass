@@ -35,7 +35,7 @@ function assertDigest(plan: CompiledPlan | undefined, what: string): void {
 }
 
 /** Verifies a signed plan whole: digest recomputed from the plan as given, CONTROL_PLAN signature over that digest. */
-export function assertSignedPlan(workspace: string, signed: SignedPlan, what = "previous plan"): void {
+export function assertSignedPlan(workspace: string, signed: Pick<SignedPlan, "plan" | "signature">, what = "previous plan"): void {
   assertDigest(signed.plan, what);
   const digestHex = hexOf(signed.plan.digest);
   if (signed.signature?.digestSha256 !== digestHex || !verifySignedDigest({ workspace, digestHex, signed: signed.signature })) {
