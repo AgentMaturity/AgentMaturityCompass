@@ -47,12 +47,11 @@ describe("INDUSTRY_TRUST_MODELS", () => {
     }
   });
 
-  it("each model should have benchmarkPercentiles", () => {
+  // The benchmark percentiles were invented (no peer data was ever measured), so
+  // P0-15 removed them; this used to assert their ordering.
+  it("no model carries invented benchmark percentiles", () => {
     for (const model of Object.values(INDUSTRY_TRUST_MODELS)) {
-      const bp = model.benchmarkPercentiles;
-      expect(bp.p25).toBeLessThan(bp.p50);
-      expect(bp.p50).toBeLessThan(bp.p75);
-      expect(bp.p75).toBeLessThan(bp.p90);
+      expect(model).not.toHaveProperty("benchmarkPercentiles");
     }
   });
 
@@ -99,10 +98,10 @@ describe("computeIndustryAdjustedScore", () => {
     expect(result.industryId).toBe("finance");
   });
 
-  it("percentileRank should be between 0 and 100", () => {
+  it("percentileRank is null: there is no peer data", () => {
     const result = computeIndustryAdjustedScore(testScores, "enterprise_saas", lastVerifiedAt, 0.5);
-    expect(result.percentileRank).toBeGreaterThanOrEqual(0);
-    expect(result.percentileRank).toBeLessThanOrEqual(100);
+    expect(result.percentileRank).toBeNull();
+    expect(result.percentileReason).toBe("no peer data");
   });
 
   it("decayApplied should be 0 for recently verified agent", () => {

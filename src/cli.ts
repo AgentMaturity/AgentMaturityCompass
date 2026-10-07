@@ -23241,7 +23241,7 @@ score
         console.log(chalk.gray("Available industries:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
         process.exit(1); return;
       }
-      const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS, latestObservedEvidenceShare } = await import("./score/industryTrustModels.js");
       const industryId = opts.industry!;
       const model = INDUSTRY_TRUST_MODELS[industryId];
       if (!model) {
@@ -23271,14 +23271,13 @@ score
             attested: run.evidenceTrustCoverage?.attested ?? 0,
             selfReported: run.evidenceTrustCoverage?.selfReported ?? 0
           };
-          const observedShare = evidenceMix.observed || 0.8;
-          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, observedShare, nowTs);
+          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, run.evidenceTrustCoverage?.observed ?? null, nowTs);
           let deltaFromPrevious: number | null = null;
           if (index > 0) {
             const previous = runs[index - 1]!;
             const previousRaw = Math.max(0, Math.min(1, previous.integrityIndex ?? 0));
             const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
-            const previousObserved = previous.evidenceTrustCoverage?.observed ?? 0.8;
+            const previousObserved = previous.evidenceTrustCoverage?.observed ?? null;
             const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
             deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
           }
@@ -23290,7 +23289,6 @@ score
             adjustedScore: adjusted.adjustedScore,
             deltaFromPrevious,
             maturityLevel: adjusted.maturityLevel,
-            percentileRank: adjusted.percentileRank,
             decayApplied: adjusted.decayApplied,
             evidenceMix
           };
@@ -23312,7 +23310,7 @@ score
               ? "baseline"
               : `${row.deltaFromPrevious >= 0 ? "+" : ""}${row.deltaFromPrevious.toFixed(1)}`;
             const evidenceMix = `obs ${(row.evidenceMix.observed * 100).toFixed(0)}% / att ${(row.evidenceMix.attested * 100).toFixed(0)}% / self ${(row.evidenceMix.selfReported * 100).toFixed(0)}%`;
-            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | p${row.percentileRank.toFixed(0)} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
+            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
           });
           return [
             "# Industry-Adjusted Comparison Report",
@@ -23323,8 +23321,8 @@ score
             `Lookback: ${lookbackDays} days`,
             `Runs compared: ${runComparisons.length}`,
             "",
-            "| Run | Scored at | Raw | Adjusted | Delta from previous | Level | Percentile | Decay | Evidence mix |",
-            "|---|---:|---:|---:|---:|---|---:|---:|---|",
+            "| Run | Scored at | Raw | Adjusted | Delta from previous | Level | Decay | Evidence mix |",
+            "|---|---:|---:|---:|---:|---|---:|---|",
             ...rows,
             "",
             "Delta from previous is calculated from industry-adjusted scores, not raw scores.",
@@ -23385,7 +23383,8 @@ score
       }
       const rawDimensionScores: Record<string, number> = {};
       for (const dim of dims) rawDimensionScores[dim] = rawScore;
-      const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), 0.8);
+      const observedShare = latestObservedEvidenceShare(process.cwd(), opts.agent ?? activeAgent(program));
+      const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), observedShare);
       const requiredDimensions = new Set(model.evidenceRequirements.requiredDimensions);
       const dimensionDrilldown = Object.entries(result.dimensionAdjustments)
         .sort(([, a], [, b]) => b.weight - a.weight)
@@ -23407,7 +23406,6 @@ score
       console.log(chalk.gray("Raw score:"), result.rawScore);
       console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
-      console.log(chalk.gray("Percentile rank:"), `p${result.percentileRank.toFixed(0)}`);
       console.log(chalk.gray("Decay applied:"), result.decayApplied);
       const scoreDelta = result.adjustedScore - result.rawScore;
       const topWeights = Object.entries(model.dimensionWeights)
@@ -23450,7 +23448,7 @@ score
 
 score
   .command("industry-benchmark")
-  .description("Show industry benchmark percentiles")
+  .description("Show industry benchmark percentiles (not evaluated: no peer data)")
   .requiredOption("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
   .option("--json", "Output as JSON")
   .action(async (opts: { industry: string; json?: boolean }) => {
@@ -23462,15 +23460,10 @@ score
         console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
         process.exit(1); return;
       }
-      const bench = model.benchmarkPercentiles;
-      if (opts.json) { console.log(JSON.stringify({ industry: opts.industry, name: model.name, benchmarkPercentiles: bench }, null, 2)); return; }
+      const benchmark = { industry: opts.industry, name: model.name, status: "not_evaluated", reason: "no peer data: AMC has no measured peer distribution for this industry" };
+      if (opts.json) { console.log(JSON.stringify(benchmark, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry Benchmarks — ${model.name}`));
-      console.log(chalk.gray("Sample size:"), bench.sampleSize);
-      console.log(chalk.gray("P25:"), bench.p25.toFixed(3));
-      console.log(chalk.gray("P50:"), bench.p50.toFixed(3));
-      console.log(chalk.gray("P75:"), bench.p75.toFixed(3));
-      console.log(chalk.gray("P90:"), bench.p90.toFixed(3));
-      console.log(chalk.gray("P99:"), bench.p99.toFixed(3));
+      console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${benchmark.reason})`));
       console.log(chalk.gray("Risk profile:"), model.riskProfile);
       console.log(chalk.gray("Frameworks:"), model.regulatoryFrameworks.join(", "));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }

@@ -337,27 +337,21 @@ describe("R4-08 EU AI Act Risk Classification", () => {
 
 // ─── R4-09: Formal Construct Validity ──────────────
 
+// These tests used to assert the hand-written study figures (r=0.82, alpha 0.89,
+// n=240) as if they were results. No study was run, so P0-15 nulls them.
 describe("R4-09 Formal Construct Validity", () => {
-  test("expert correlation improved to 0.82", () => {
-    expect(CONSTRUCT_VALIDITY_DATA.expertCorrelation).toBe(0.82);
+  test("reports no study figure while no study has been run", () => {
+    for (const key of ["sampleSize", "expertCorrelation", "interRaterReliability", "testRetestReliability",
+      "convergentValidity", "discriminantValidity", "internalConsistency"] as const) {
+      expect(CONSTRUCT_VALIDITY_DATA[key]).toBeNull();
+    }
+    expect(CONSTRUCT_VALIDITY_DATA.validated).toBe(false);
   });
 
-  test("test-retest reliability excellent (0.91)", () => {
-    expect(CONSTRUCT_VALIDITY_DATA.testRetestReliability).toBeGreaterThan(0.9);
-  });
-
-  test("internal consistency alpha > 0.8", () => {
-    expect(CONSTRUCT_VALIDITY_DATA.internalConsistency).toBeGreaterThan(0.8);
-  });
-
-  test("5 factor loadings all > 0.7", () => {
+  test("keeps the 5 factor names with no loadings", () => {
     const loadings = Object.values(CONSTRUCT_VALIDITY_DATA.factorLoadings);
     expect(loadings).toHaveLength(5);
-    for (const l of loadings) expect(l).toBeGreaterThan(0.7);
-  });
-
-  test("sample size matches question count", () => {
-    expect(CONSTRUCT_VALIDITY_DATA.sampleSize).toBe(240);
+    for (const l of loadings) expect(l).toBeNull();
   });
 });
 

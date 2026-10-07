@@ -1,9 +1,9 @@
 /**
  * Industry-Specific Trust Models for AMC Score
  *
- * Dynamic risk weighting, sector-specific trust decay rates,
- * regulatory environment adaptation, and industry benchmark normalization.
- * Replaces one-size-fits-all weighting with context-aware scoring.
+ * Dynamic risk weighting, sector-specific trust decay rates and
+ * regulatory environment adaptation. AMC has no measured peer data, so no
+ * model carries benchmark percentiles and no score has a percentile rank.
  *
  * All scores are 0–1 (matching AMC canonical M(a,d,t) model).
  * Maturity levels: L0–L5 (from formalSpec.ts scoreToLevel).
@@ -11,6 +11,7 @@
 
 import { type MaturityLevel } from "./formalSpec.js";
 import { scoreToLevel, toDisplayScore } from "./scoringScale.js";
+import { resolveRunReport } from "../diagnostic/runReportResolution.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -27,17 +28,6 @@ export interface IndustryTrustModel {
     requiredDimensions: string[];               // Dimensions that MUST have evidence
   };
   regulatoryFrameworks: string[];              // Applicable compliance frameworks
-  benchmarkPercentiles: IndustryBenchmark;     // What scores mean in this industry
-}
-
-export interface IndustryBenchmark {
-  p25: number;    // 25th percentile score (0–1)
-  p50: number;    // Median (0–1)
-  p75: number;    // 75th percentile (0–1)
-  p90: number;    // Top 10% (0–1)
-  p99: number;    // Top 1% (0–1)
-  sampleSize: number;
-  lastUpdated: number;
 }
 
 export interface IndustryAdjustedScore {
@@ -45,7 +35,9 @@ export interface IndustryAdjustedScore {
   adjustedScore: number;           // Display scale (default 0–100)
   maturityLevel: MaturityLevel;    // L0–L5 derived from internal score
   industryId: string;
-  percentileRank: number;          // 0–100 where this agent sits vs industry peers
+  percentileRank: null;            // no peer data has been measured
+  percentileReason: "no peer data";
+  observedEvidenceShare: number | null; // from the agent's run; null when not evaluated
   dimensionAdjustments: Record<string, { raw: number; weighted: number; weight: number; level: MaturityLevel }>;
   decayApplied: number;            // Display scale
   riskFactors: string[];
@@ -72,7 +64,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["security", "privacy", "safety", "compliance"],
     },
     regulatoryFrameworks: ["HIPAA", "FDA_21CFR11", "EU_MDR", "GDPR"],
-    benchmarkPercentiles: { p25: 0.45, p50: 0.62, p75: 0.78, p90: 0.88, p99: 0.95, sampleSize: 1200, lastUpdated: Date.now() },
   },
   finance: {
     industryId: "finance",
@@ -91,7 +82,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["security", "compliance", "governance", "reliability"],
     },
     regulatoryFrameworks: ["SOX", "PCI_DSS", "MiFID_II", "GDPR", "DORA"],
-    benchmarkPercentiles: { p25: 0.48, p50: 0.65, p75: 0.80, p90: 0.90, p99: 0.96, sampleSize: 2500, lastUpdated: Date.now() },
   },
   defense: {
     industryId: "defense",
@@ -110,7 +100,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["security", "reliability", "safety", "governance", "evaluation"],
     },
     regulatoryFrameworks: ["NIST_800_53", "FedRAMP", "ITAR", "CMMC"],
-    benchmarkPercentiles: { p25: 0.55, p50: 0.70, p75: 0.85, p90: 0.92, p99: 0.98, sampleSize: 300, lastUpdated: Date.now() },
   },
   autonomous_vehicles: {
     industryId: "autonomous_vehicles",
@@ -129,7 +118,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["safety", "reliability", "security", "evaluation", "transparency"],
     },
     regulatoryFrameworks: ["ISO_26262", "IEC_61508", "UNECE_R157", "SOTIF_ISO_21448"],
-    benchmarkPercentiles: { p25: 0.40, p50: 0.58, p75: 0.75, p90: 0.86, p99: 0.94, sampleSize: 150, lastUpdated: Date.now() },
   },
   enterprise_saas: {
     industryId: "enterprise_saas",
@@ -148,7 +136,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["security", "reliability"],
     },
     regulatoryFrameworks: ["SOC2", "GDPR", "ISO_27001"],
-    benchmarkPercentiles: { p25: 0.35, p50: 0.52, p75: 0.70, p90: 0.82, p99: 0.92, sampleSize: 5000, lastUpdated: Date.now() },
   },
   entertainment: {
     industryId: "entertainment",
@@ -167,7 +154,6 @@ export const INDUSTRY_TRUST_MODELS: Record<string, IndustryTrustModel> = {
       requiredDimensions: ["fairness"],
     },
     regulatoryFrameworks: ["COPPA", "GDPR"],
-    benchmarkPercentiles: { p25: 0.25, p50: 0.40, p75: 0.58, p90: 0.72, p99: 0.85, sampleSize: 3000, lastUpdated: Date.now() },
   },
 };
 
@@ -181,7 +167,7 @@ export function computeIndustryAdjustedScore(
   rawDimensionScores: Record<string, number>,  // 0–1 per dimension
   industryId: string,
   lastVerifiedAt: number,
-  observedEvidenceShare: number,
+  observedEvidenceShare: number | null,  // the run's evidenceTrustCoverage.observed; null without a run
   now?: number,
 ): IndustryAdjustedScore {
   const model = INDUSTRY_TRUST_MODELS[industryId] ?? INDUSTRY_TRUST_MODELS.enterprise_saas!;
@@ -215,7 +201,9 @@ export function computeIndustryAdjustedScore(
   // Risk factors
   const riskFactors: string[] = [];
   if (staleHours > model.maxStaleHours * 0.5) riskFactors.push(`Trust aging: ${staleHours.toFixed(0)}h since last verification`);
-  if (observedEvidenceShare < model.evidenceRequirements.minObservedShare) {
+  if (observedEvidenceShare === null) {
+    riskFactors.push("Observed evidence share is not evaluated: no scored run supplied it");
+  } else if (observedEvidenceShare < model.evidenceRequirements.minObservedShare) {
     riskFactors.push(`Low observed evidence: ${(observedEvidenceShare * 100).toFixed(0)}% (need ${(model.evidenceRequirements.minObservedShare * 100).toFixed(0)}%)`);
   }
 
@@ -227,16 +215,6 @@ export function computeIndustryAdjustedScore(
     }
   }
 
-  // Percentile rank (internal 0–1 vs internal benchmarks)
-  const bench = model.benchmarkPercentiles;
-  let percentileRank: number;
-  if (internalScore >= bench.p99) percentileRank = 99;
-  else if (internalScore >= bench.p90) percentileRank = 90 + 9 * (internalScore - bench.p90) / (bench.p99 - bench.p90);
-  else if (internalScore >= bench.p75) percentileRank = 75 + 15 * (internalScore - bench.p75) / (bench.p90 - bench.p75);
-  else if (internalScore >= bench.p50) percentileRank = 50 + 25 * (internalScore - bench.p50) / (bench.p75 - bench.p50);
-  else if (internalScore >= bench.p25) percentileRank = 25 + 25 * (internalScore - bench.p25) / (bench.p50 - bench.p25);
-  else percentileRank = 25 * internalScore / Math.max(0.01, bench.p25);
-
   const rawAvg = Object.values(rawDimensionScores).reduce((s, v) => s + v, 0) / Math.max(1, Object.keys(rawDimensionScores).length);
 
   return {
@@ -244,10 +222,21 @@ export function computeIndustryAdjustedScore(
     adjustedScore: toDisplayScore(internalScore),
     maturityLevel: scoreToLevel(internalScore),
     industryId: model.industryId,
-    percentileRank: Math.round(percentileRank * 10) / 10,
+    percentileRank: null,
+    percentileReason: "no peer data",
+    observedEvidenceShare,
     dimensionAdjustments: adjustments,
     decayApplied: toDisplayScore(decayPoints),
     riskFactors,
     complianceGaps,
   };
+}
+
+/** The latest run's observed-evidence share for an agent, or null when there is no run. */
+export function latestObservedEvidenceShare(workspace: string, agentId?: string): number | null {
+  try {
+    return resolveRunReport(workspace, "latest", agentId).report.evidenceTrustCoverage?.observed ?? null;
+  } catch {
+    return null;
+  }
 }

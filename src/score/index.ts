@@ -507,14 +507,13 @@ export type {
   ScoreSample,
 } from "./statisticalAnalysis.js";
 
-// ── Industry Trust Models (sector-specific weights, decay, benchmarks) ────
+// ── Industry Trust Models (sector-specific weights and decay; no peer benchmarks) ────
 export {
   INDUSTRY_TRUST_MODELS,
   computeIndustryAdjustedScore,
 } from './industryTrustModels.js';
 export type {
   IndustryTrustModel,
-  IndustryBenchmark,
   IndustryAdjustedScore,
 } from './industryTrustModels.js';
 
