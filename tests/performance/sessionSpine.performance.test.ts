@@ -95,16 +95,29 @@ describe("session spine throughput", () => {
     ).toBeLessThan(firstHalfMs * 3);
   });
 
-  test("control-plane events (no blob) sustain a higher floor", () => {
+  test("control-plane events (no blob) sustain the floor and do not degrade super-linearly", () => {
     const svc = openService(newWorkspace());
     const N = 1500;
-    const t = performance.now();
-    for (let i = 0; i < N; i += 1) {
+    const step = (): void => {
       // step markers are inline control-plane events, no blob write.
       svc.startStep();
       svc.endStep({ stopReason: null, usage: { inputTokens: 0, outputTokens: 0, cacheRead: 0, cacheWrite: 0 } });
-    }
-    const perSec = ((N * 2) / (performance.now() - t)) * 1000;
-    expect(perSec, `control throughput ${perSec.toFixed(0)} ev/s`).toBeGreaterThan(500);
+    };
+    const half = N / 2;
+    const t0 = performance.now();
+    for (let i = 0; i < half; i += 1) step();
+    const firstHalfMs = performance.now() - t0;
+    const t1 = performance.now();
+    for (let i = half; i < N; i += 1) step();
+    const secondHalfMs = performance.now() - t1;
+    const perSec = ((N * 2) / (firstHalfMs + secondHalfMs)) * 1000;
+
+    // The requirement is headroom over a streaming turn (~50-100 ev/s), not the dev machine's ~2,000 ev/s:
+    // a 500 ev/s floor failed on hosted runners at 247-496 ev/s with no code change. Growth is the regression signal.
+    expect(perSec, `control throughput ${perSec.toFixed(0)} ev/s`).toBeGreaterThan(150);
+    expect(
+      secondHalfMs,
+      `second half ${secondHalfMs.toFixed(0)}ms vs first ${firstHalfMs.toFixed(0)}ms`
+    ).toBeLessThan(firstHalfMs * 3);
   });
 });
