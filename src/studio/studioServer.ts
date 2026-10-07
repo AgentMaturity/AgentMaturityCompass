@@ -106,6 +106,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { bindStudioResultRoute, ENTITLEMENT_NOTE, withClaimBody } from "./studioClaimOutput.js";
 import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
@@ -443,7 +444,7 @@ async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<str
 function json(res: ServerResponse, status: number, payload: unknown): void {
   res.statusCode = status;
   res.setHeader("content-type", "application/json");
-  res.end(JSON.stringify(payload));
+  res.end(JSON.stringify(withClaimBody(res, status, payload)));
 }
 
 function ipToInt(ip: string): number | null {
@@ -1707,6 +1708,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const pathname = url.pathname;
       const method = (req.method ?? "GET").toUpperCase();
       metricRoute = normalizeMetricRoute(pathname);
+      bindStudioResultRoute(res, method, pathname, options.workspace);
 
       if (pathname === "/auth/login") {
         if (!authLimiter(`auth:${clientIp}`)) {
@@ -8491,7 +8493,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         json(res, 200, {
-          entitlement: getIndustryPackEntitlement(options.workspace)
+          entitlement: getIndustryPackEntitlement(options.workspace), entitlementNote: ENTITLEMENT_NOTE
         });
         return;
       }
@@ -8503,7 +8505,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         if (!entitlement.checkoutAvailable) {
-          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement });
+          json(res, 503, { error: "Industry Packs checkout is not publicly available or configured yet.", entitlement, entitlementNote: ENTITLEMENT_NOTE });
           return;
         }
         const parsed = req.method === "POST"
@@ -8522,7 +8524,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         });
         json(res, 200, {
           checkoutUrl,
-          entitlement
+          entitlement, entitlementNote: ENTITLEMENT_NOTE
         });
         return;
       }
@@ -8558,7 +8560,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             subscriptionId: entitlement.subscriptionId
           }
         });
-        json(res, 200, { entitlement });
+        json(res, 200, { entitlement, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 
@@ -8574,7 +8576,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { verifyIndustryPackLicenseKey } = await import("../domains/industryPackEntitlement.js");
         const verification = verifyIndustryPackLicenseKey(parsed.licenseKey);
-        json(res, verification.valid ? 200 : 422, verification);
+        json(res, verification.valid ? 200 : 422, { ...verification, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 
@@ -8586,7 +8588,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("../domains/industryPackEntitlement.js");
         const entitlement = getIndustryPackEntitlement(options.workspace);
         json(res, 200, {
-          entitlement,
+          entitlement, entitlementNote: ENTITLEMENT_NOTE,
           packs: listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement))
         });
         return;
@@ -8604,7 +8606,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 402, {
             error: "industry_packs_locked",
             message: formatIndustryPackPaywallMessage(entitlement),
-            entitlement
+            entitlement, entitlementNote: ENTITLEMENT_NOTE
           });
           return;
         }
@@ -8614,7 +8616,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "industry pack not found" });
           return;
         }
-        json(res, 200, { pack, entitlement });
+        json(res, 200, { pack, entitlement, entitlementNote: ENTITLEMENT_NOTE });
         return;
       }
 

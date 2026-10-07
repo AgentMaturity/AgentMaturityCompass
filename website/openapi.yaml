@@ -48,6 +48,134 @@ components:
       description: Signed, short-lived AMC agent lease. Observation requires hook:observe; explicit loopback control also requires hook:control. Both require an allowed /hooks route.
 
   schemas:
+    ClaimKind:
+      type: string
+      enum:
+        - synthetic_example
+        - self_reported
+        - observed
+        - independently_reviewed
+    StatusDimensions:
+      type: object
+      properties:
+        applicability:
+          oneOf:
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - applicable
+              required:
+                - state
+              additionalProperties: false
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - not_applicable
+                rationale:
+                  type: string
+              required:
+                - state
+                - rationale
+              additionalProperties: false
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - unresolved
+                reason:
+                  type: string
+              required:
+                - state
+                - reason
+              additionalProperties: false
+        evidence:
+          type: string
+          enum:
+            - sufficient
+            - incomplete
+            - stale
+            - contradictory
+            - untrusted
+        result:
+          type: string
+          enum:
+            - pass
+            - fail
+            - not_evaluated
+        enforcement:
+          oneOf:
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - none
+              required:
+                - state
+              additionalProperties: false
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - advisory
+              required:
+                - state
+              additionalProperties: false
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - observed
+              required:
+                - state
+              additionalProperties: false
+            - type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - enforced
+                boundary:
+                  type: string
+              required:
+                - state
+                - boundary
+              additionalProperties: false
+        review:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+            - expired
+      required:
+        - applicability
+        - evidence
+        - result
+        - enforcement
+        - review
+      additionalProperties: false
+    ClaimResult:
+      type: object
+      required:
+        - claimKind
+        - statusDimensions
+        - claimLabel
+      properties:
+        claimKind:
+          $ref: '#/components/schemas/ClaimKind'
+        statusDimensions:
+          $ref: '#/components/schemas/StatusDimensions'
+        claimLabel:
+          type: string
+          description: The canonical claim line, as printed on every surface
     ApiResponse:
       type: object
       properties:
@@ -3757,6 +3885,7 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/DomainProofStatus'
+                  - $ref: '#/components/schemas/ClaimResult'
 
   /v1/proof/check:
     post:
@@ -3775,7 +3904,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
         '400':
           description: Invalid input, rejected legacy path, prohibited output-file request, or failed proof check
 
@@ -3831,7 +3962,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnosticReportResponse'
+                allOf:
+                  - $ref: '#/components/schemas/DiagnosticReportResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/quickscore:
     post:
@@ -3851,6 +3984,10 @@ paths:
       responses:
         '200':
           description: Rapid score result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/quickscore/questions:
     get:
@@ -3881,6 +4018,10 @@ paths:
       responses:
         '200':
           description: Quick score result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/quick/questions:
     get:
@@ -3911,7 +4052,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnosticReportResponse'
+                allOf:
+                  - $ref: '#/components/schemas/DiagnosticReportResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/history:
     get:
@@ -3930,6 +4073,21 @@ paths:
       responses:
         '200':
           description: Run history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/compare:
     get:
@@ -3953,6 +4111,10 @@ paths:
       responses:
         '200':
           description: Comparison result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
     post:
       tags: [score]
       summary: Compare two runs (POST)
@@ -3972,6 +4134,10 @@ paths:
       responses:
         '200':
           description: Comparison result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/formal-spec:
     post:
@@ -3990,6 +4156,10 @@ paths:
       responses:
         '200':
           description: Full diagnostic result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/adversarial:
     post:
@@ -4006,6 +4176,10 @@ paths:
       responses:
         '200':
           description: Adversarial test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/runs:
     get:
@@ -4023,6 +4197,10 @@ paths:
       responses:
         '200':
           description: Run ID list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/run/{runId}:
     get:
@@ -4044,7 +4222,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnosticReportResponse'
+                allOf:
+                  - $ref: '#/components/schemas/DiagnosticReportResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
 
   /v1/score/report/{runId}:
     get:
@@ -4071,7 +4251,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnosticReportResponse'
+                allOf:
+                  - $ref: '#/components/schemas/DiagnosticReportResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
             text/markdown:
               schema:
                 type: string
@@ -4101,7 +4283,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnosticReportResponse'
+                allOf:
+                  - $ref: '#/components/schemas/DiagnosticReportResponse'
+                  - $ref: '#/components/schemas/ClaimResult'
             text/markdown:
               schema:
                 type: string
@@ -4173,6 +4357,10 @@ paths:
       responses:
         '200':
           description: Session score result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Fleet ──────────────────────────────────────────────────────
   /v1/fleet/health:
@@ -4230,6 +4418,10 @@ paths:
       responses:
         '200':
           description: Agent configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
     delete:
       tags: [fleet]
       summary: Remove agent
@@ -4261,6 +4453,10 @@ paths:
       responses:
         '200':
           description: Fleet report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/fleet/graph:
     get:
@@ -4541,6 +4737,10 @@ paths:
       responses:
         '200':
           description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/compliance/report:
     post:
@@ -4566,6 +4766,10 @@ paths:
       responses:
         '201':
           description: Report generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/compliance/fleet:
     post:
@@ -4585,6 +4789,10 @@ paths:
       responses:
         '200':
           description: Fleet compliance report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/compliance/diff:
     post:
@@ -4604,6 +4812,10 @@ paths:
       responses:
         '200':
           description: Diff result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/enforce/resources/status:
     get:
@@ -5040,6 +5252,10 @@ paths:
       responses:
         '200':
           description: Each criterion not evaluated, with score and level null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/regulatory/owasp-llm:
     get:
@@ -5048,6 +5264,10 @@ paths:
       responses:
         '200':
           description: Each risk not evaluated, with score and level null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/regulatory/readiness:
     get:
@@ -5062,6 +5282,10 @@ paths:
       responses:
         '200':
           description: Regulatory readiness result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Evidence ───────────────────────────────────────────────────
   /v1/evidence/status:
@@ -5487,6 +5711,10 @@ paths:
       responses:
         '200':
           description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/notary/sign:
     post:
@@ -5516,6 +5744,10 @@ paths:
       responses:
         '200':
           description: Log verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/cert/generate:
     post:
@@ -5560,6 +5792,10 @@ paths:
       responses:
         '201':
           description: Certificate issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/cert/verify:
     post:
@@ -5577,6 +5813,10 @@ paths:
       responses:
         '200':
           description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/cert/inspect:
     post:
@@ -5594,6 +5834,10 @@ paths:
       responses:
         '200':
           description: Certificate details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/cert/revoke:
     post:
@@ -5632,6 +5876,10 @@ paths:
       responses:
         '200':
           description: Revocation verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/merkle/rebuild:
     post:
@@ -5684,6 +5932,10 @@ paths:
       responses:
         '200':
           description: Proof verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/crypto/receipts-chain/{receiptId}:
     get:
@@ -5882,6 +6134,10 @@ paths:
       responses:
         '200':
           description: Badge exported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/export/badge/url:
     get:
@@ -5905,6 +6161,10 @@ paths:
       responses:
         '200':
           description: Badge URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/export/badge/generate:
     get:
@@ -5928,6 +6188,10 @@ paths:
       responses:
         '200':
           description: Badge and formatted output
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/attest/notary:
     post:
@@ -5947,6 +6211,10 @@ paths:
       responses:
         '200':
           description: Attestation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/attest/notary/verify:
     post:
@@ -5964,6 +6232,10 @@ paths:
       responses:
         '200':
           description: Verification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/attest/outcome:
     post:
@@ -5991,6 +6263,10 @@ paths:
       responses:
         '200':
           description: Outcome attested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Canary ─────────────────────────────────────────────────────
   /v1/canary/start:
@@ -6191,6 +6467,10 @@ paths:
       responses:
         '200':
           description: Gate result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/ci/policy/default:
     get:
@@ -6254,6 +6534,10 @@ paths:
       responses:
         '200':
           description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Config ─────────────────────────────────────────────────────
   /v1/config:
@@ -7099,6 +7383,10 @@ paths:
       responses:
         '200':
           description: Readiness status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Benchmark ──────────────────────────────────────────────────
   /v1/benchmarks:
@@ -7122,6 +7410,10 @@ paths:
       responses:
         '200':
           description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/benchmarks/export:
     post:
@@ -7679,12 +7971,22 @@ paths:
       responses:
         '200':
           description: Sleeper detection result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/security/gaming-resistance:
     get:
       tags: [security]
       summary: Inventory score-gaming source controls; behavioral resistance is unmeasured
       responses:
+        '200':
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
         '422':
           description: No behavioral gaming-resistance evidence is available, including in an AMC source checkout. The source inventory cannot satisfy a security threshold.
           content:
@@ -7749,6 +8051,10 @@ paths:
       responses:
         '200':
           description: Insider risk report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/security/insider/alerts:
     get:
@@ -7787,6 +8093,10 @@ paths:
       responses:
         '200':
           description: Risk scores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/security/advanced-threats:
     post:
@@ -7838,6 +8148,10 @@ paths:
       responses:
         '200':
           description: Adversarial test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   # ── Shield ─────────────────────────────────────────────────────
   /v1/shield/status:
@@ -7951,6 +8265,10 @@ paths:
           description: Confirmation completed with safe proof
         '200':
           description: Confirmation blocked by policy or scope gate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/shield/exploit-confirmation/proofs:
     get:
@@ -8976,6 +9294,21 @@ paths:
       responses:
         '200':
           description: Passport registry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: '#/components/schemas/ClaimResult'
 
   /v1/passport/{id}:
     get:
@@ -8990,6 +9323,10 @@ paths:
       responses:
         '200':
           description: Public passport data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/passport/{id}/verify:
     get:
@@ -9004,6 +9341,10 @@ paths:
       responses:
         '200':
           description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
 
   /v1/passport/{id}/revoke:
     post:

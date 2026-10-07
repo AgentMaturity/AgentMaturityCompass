@@ -44,7 +44,8 @@ import { handleComplianceRoute } from './complianceRouter.js';
 import { handleMemoryRoute } from './memoryRouter.js';
 import { handleMetricsRoute } from './metricsRouter.js';
 import { handleExportRoute } from './exportRouter.js';
-import { apiError } from './apiHelpers.js';
+import { apiError, labelResultsOn } from './apiHelpers.js';
+import { API_RESULT_ROUTES, labelResult, matchResultRoute } from './resultRouteRegistry.js';
 import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
@@ -518,6 +519,8 @@ export async function handleApiRoute(
 
   try {
     const route = matchApiRoute(pathname);
+    const resultRoute = matchResultRoute(API_RESULT_ROUTES, method.toUpperCase(), pathname);
+    if (resultRoute) labelResultsOn(res, (data) => labelResult(resultRoute, data, workspace));
     if (route) {
       const handled = await route.handler(pathname, method, req, res, {
         workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {})

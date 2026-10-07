@@ -45,9 +45,11 @@ describe("public OpenAPI webhook schemas", () => {
       ["/v1/score/report", "get"]
     ]) {
       const response = spec.paths[path][method].responses["200"];
-      expect(response.content["application/json"].schema.$ref).toBe(
-        "#/components/schemas/DiagnosticReportResponse"
-      );
+      // P0-23: diagnostic results also carry the claim fields.
+      expect(response.content["application/json"].schema.allOf).toEqual([
+        { $ref: "#/components/schemas/DiagnosticReportResponse" },
+        { $ref: "#/components/schemas/ClaimResult" }
+      ]);
     }
   });
 

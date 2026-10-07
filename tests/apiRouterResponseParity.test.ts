@@ -156,10 +156,20 @@ async function call(port: number, path: string, method: string, payload?: unknow
     }); req.once("error", reject); req.setTimeout(10_000, () => req.destroy(new Error("Router HTTP timeout"))); req.end(data);
   });
 }
+// P0-23: the current dispatcher appends claim fields to result routes; the archived one predates them.
+function withoutClaim(body: Buffer): string {
+  const text = body.toString("utf8");
+  if (!text.startsWith("{")) return text;
+  const { claimKind, statusDimensions, claimLabel, ...rest } = JSON.parse(text) as Record<string, unknown>;
+  return claimKind === undefined && statusDimensions === undefined && claimLabel === undefined ? text : JSON.stringify(rest);
+}
 async function parity(path: string, method: string, payload?: unknown, headers?: IncomingHttpHeaders): Promise<Wire> {
   const before = await call(ports[0], path, method, payload, headers), after = await call(ports[1], path, method, payload, headers);
-  expect({ ...after, body: after.body.toString("utf8") }).toEqual({ ...before, body: before.body.toString("utf8") });
-  expect(after.body).toEqual(before.body); return after;
+  expect({ ...after, body: withoutClaim(after.body) }).toEqual({ ...before, body: before.body.toString("utf8") });
+  if (after.status === 200 && path.startsWith("/api/v1/") && !path.endsWith("/status") && !path.includes("/watch/")) {
+    expect(JSON.parse(after.body.toString("utf8")).claimKind).toBe("self_reported");
+  }
+  return after;
 }
 
 for (const lane of laneSpecs) for (const surface of ["score", "shield", "watch", "benchmarks"]) {

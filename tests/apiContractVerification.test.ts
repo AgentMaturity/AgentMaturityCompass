@@ -176,9 +176,11 @@ describe("2. Endpoint pattern consistency", () => {
     const route = spec.paths["/api/v1/score/evidence-drilldown/{runId}/{questionId}"] as any;
 
     expect(route?.get?.tags).toEqual(expect.arrayContaining(["Studio", "Score", "Shield", "Watch"]));
-    expect(route?.get?.responses?.["200"]?.content?.["application/json"]?.schema?.$ref).toBe(
-      "#/components/schemas/ScoreEvidenceDrilldownResponse"
-    );
+    // P0-23: a result route joins its own schema with the claim fields.
+    expect(route?.get?.responses?.["200"]?.content?.["application/json"]?.schema?.allOf).toEqual([
+      { $ref: "#/components/schemas/ScoreEvidenceDrilldownResponse" },
+      { $ref: "#/components/schemas/ClaimResult" }
+    ]);
     expect(spec.components.schemas).toHaveProperty("ScoreEvidenceDrilldownResponse");
   });
 

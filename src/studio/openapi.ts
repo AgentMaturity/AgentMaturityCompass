@@ -15,6 +15,8 @@ import { dirname } from "node:path";
 import YAML from "yaml";
 import type { OpenApiOperation } from "./openapiTypes.js";
 import { nativeTaskEndpoints, nativeTaskSchemas } from "./nativeTaskOpenapi.js";
+import { API_RESULT_ROUTES, claimOpenApiSchemas, withClaimResponses } from "../api/resultRouteRegistry.js";
+import { STUDIO_RESULT_ROUTES } from "./studioClaimOutput.js";
 const nativeMutationParameters = nativeTaskEndpoints()["/api/v1/native-tasks"]!.post!.parameters!.filter(parameter => parameter.in === "header");
 
 export interface OpenApiContractIssue {
@@ -2132,6 +2134,7 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
     ...bridgeSpec.components.schemas,
     ...studioSchemas(),
     ...nativeTaskSchemas(),
+    ...claimOpenApiSchemas(),
   };
 
   return {
@@ -2144,7 +2147,7 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
         "Includes endpoints for diagnostics, assurance, CGX, leases, approvals, " +
         "plugins, forecasting, and provider proxying.",
     },
-    paths: allPaths,
+    paths: withClaimResponses(withClaimResponses(allPaths, API_RESULT_ROUTES, true), STUDIO_RESULT_ROUTES, false),
     components: {
       schemas: allSchemas,
       securitySchemes: {
