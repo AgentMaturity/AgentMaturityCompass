@@ -14,6 +14,8 @@ import {
   type IndustryPackAuditSignature,
 } from "./industryPackAudit.js";
 import { printLabelledReport, withClaimFields } from "../cli/claimOutput.js";
+import { activateOperatingProfile } from "./operatingProfiles/operatingProfileActivation.js";
+import { inspectOperatingProfileForSigning, signOperatingProfile } from "./operatingProfiles/operatingProfileSignature.js";
 
 function collectComplianceFrameworks(value: string, previous: string[] = []): string[] {
   const next = value
@@ -47,6 +49,48 @@ function loadResponses(path: string): Record<string, number> {
   return out;
 }
 
+interface OperatingProfileFlags {
+  agent: string;
+  signProfile?: string;
+  activateProfile?: string;
+  allowWidening?: boolean;
+  dryRun?: boolean;
+  json?: boolean;
+}
+
+/** --sign-profile signs a reviewed profile; --activate-profile activates a signed one. --dry-run writes nothing. */
+function runOperatingProfileFlags(opts: OperatingProfileFlags): void {
+  const workspace = process.cwd();
+  const signed = opts.signProfile === undefined ? null
+    : opts.dryRun ? { ...inspectOperatingProfileForSigning(workspace, opts.signProfile), written: false }
+    : { sigPath: signOperatingProfile(workspace, opts.signProfile), written: true };
+  const activation = opts.activateProfile === undefined ? null : activateOperatingProfile({
+    workspacePath: workspace,
+    profilePath: opts.activateProfile,
+    agentId: opts.agent,
+    dryRun: opts.dryRun,
+    allowWidening: opts.allowWidening
+  });
+  if (opts.json) {
+    console.log(JSON.stringify({ signed, activation }, null, 2));
+    return;
+  }
+  if (signed) {
+    console.log("digestSha256" in signed
+      ? `Would sign ${signed.profilePath} (sha256 ${signed.digestSha256}) as ${signed.sigPath}`
+      : chalk.green(`Operating profile signed: ${signed.sigPath}`));
+  }
+  if (activation) {
+    console.log(chalk.bold.cyan(activation.dryRun ? "\nOperating profile activation (dry-run, nothing written)" : "\nOperating profile activated"));
+    for (const config of activation.configs) {
+      console.log(`  ${config.config}: ${config.path} sha256 ${config.sha256 ?? "(set when written)"}`);
+    }
+    for (const widening of activation.widenings) console.log(chalk.yellow(`  weakens ${widening}`));
+    if (activation.recordPath) console.log(chalk.gray("Activation record:"), activation.recordPath);
+  }
+  console.log(chalk.gray("Self-reported configuration: a signature shows who signed the profile and that it is unchanged, not that its values are correct."));
+}
+
 export function registerDomainApplyCommand(domainCmd: Command): void {
   domainCmd
     .command("apply")
@@ -63,6 +107,9 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
     )
     .option("--file <path>", "Explicit agent config file to update")
     .option("--profile-out <path>", "Where to write the station operating profile (default: amc-operating-profiles/<agent>/<station>.operating-profile.json; never under .amc/)")
+    .option("--sign-profile <path>", "Sign a reviewed operating profile with the workspace auditor key (writes <path>.sig; refuses an inconsistent profile)")
+    .option("--activate-profile <path>", "Activate a signed operating profile for --agent into the six signed configs under .amc/ (refuses unsigned, edited, foreign-signed, inconsistent or weakening profiles)")
+    .option("--allow-widening", "With --activate-profile: accept fragments weaker than the current signed configs, after review", false)
     .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack (paid Industry Packs feature)", false)
     .option("--responses <path>", "JSON file of { questionId: level } responses for the audit (default: L1 baseline)")
     .option("--framework <id>", "Limit the audit crosswalk to one framework (eu_ai_act|nist|iso42001|soc2|sector)")
@@ -77,6 +124,9 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
       compliance: string[];
       file?: string;
       profileOut?: string;
+      signProfile?: string;
+      activateProfile?: string;
+      allowWidening?: boolean;
       audit?: boolean;
       responses?: string;
       framework?: string;
@@ -135,6 +185,11 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
               : [chalk.yellow(`\nAudit bundle written: ${opts.auditBundle} (checksum only — not signed)`)];
             console.log(lines.join("\n"));
           }
+          return;
+        }
+
+        if (opts.signProfile !== undefined || opts.activateProfile !== undefined) {
+          runOperatingProfileFlags(opts);
           return;
         }
 
