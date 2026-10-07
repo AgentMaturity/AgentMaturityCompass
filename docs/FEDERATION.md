@@ -28,4 +28,4 @@ Federation enables offline cross-org sharing of privacy-safe trust artifacts.
 - `amc federate verify-bundle latest.amcfed --pubkey <peer-publisher.pub>` (`federate import` admits only peers added with `amc federate peer add`)
 
 ## Console
-Imported federation benchmarks appear in the benchmarks views and stats.
+Imported federation benchmarks appear in the benchmarks views and stats. A peer added with `amc federate peer add` admits the package seal only: each benchmark inside is ingested only when its own signer is pinned in your AMC home trust list (or is that peer's publisher key), otherwise `federate import` refuses the package and prints the key id to pin.

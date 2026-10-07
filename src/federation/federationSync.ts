@@ -382,8 +382,9 @@ export function importFederationPackage(params: {
     if (pathExists(benchDir)) {
       for (const entry of readdirSync(benchDir, { withFileTypes: true })) {
         if (!entry.isFile() || !entry.name.endsWith(".amcbench")) continue;
-        // The admitted peer's signed manifest covers these bytes; each benchmark's own signer is checked for integrity.
-        ingestBenchmarks(params.workspace, join(benchDir, entry.name), { ...trust, allowUnpinned: true });
+        // A peer pin admits the package seal, not the benchmarks inside it: each benchmark's own signer must be
+        // admitted by the operator's trust (or be the peer key itself) before it reaches the workspace's stats.
+        ingestBenchmarks(params.workspace, join(benchDir, entry.name), trust);
         benchmarkCount += 1;
       }
     }

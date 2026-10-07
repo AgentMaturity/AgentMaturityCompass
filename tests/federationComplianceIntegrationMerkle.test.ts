@@ -24,7 +24,7 @@ import { federateInitCli } from "../src/federation/federationCli.js";
 import { exportFederationPackage, importFederationPackage, verifyFederationPackage } from "../src/federation/federationSync.js";
 import { ensureFederationPublisherKey } from "../src/federation/federationIdentity.js";
 import { addFederationPeer } from "../src/federation/federationStore.js";
-import { pinnedTrust } from "./helpers/trustContext.js";
+import { operatorTrustHome, pinnedTrust, workspaceKeyPem } from "./helpers/trustContext.js";
 import { initIntegrationsConfig, integrationsConfigPath, integrationsConfigSigPath, verifyIntegrationsConfigSignature } from "../src/integrations/integrationStore.js";
 import { dispatchIntegrationTest } from "../src/integrations/integrationDispatcher.js";
 import { verifyOpsReceipt, verifyOpsReceiptForEvent } from "../src/integrations/opsReceipt.js";
@@ -262,15 +262,29 @@ describe("compliance + merkle + federation + integrations", () => {
     });
     expect(() => importFederationPackage({ workspace: dest, bundleFile: fedFile })).toThrow(/not-pinned/);
     addFederationPeer({ workspace: dest, peerId: "source", name: "Source Org", publisherPublicKeyPem: sourcePublisher });
-    const imported = importFederationPackage({
-      workspace: dest,
-      bundleFile: fedFile
-    });
-    expect(imported.benchmarkCount).toBeGreaterThan(0);
-    const stats = benchmarkStats({
-      workspace: dest
-    });
-    expect(stats.count).toBeGreaterThan(0);
+    // The peer pin admits the package seal only. A benchmark inside is signed by the source auditor key, which the
+    // operator has not pinned, so the import refuses it rather than ingest it into stats (P0-09).
+    const benchSigner = workspaceKeyPem(source, "auditor");
+    expect(() => importFederationPackage({ workspace: dest, bundleFile: fedFile })).toThrow(/not-pinned/);
+    expect(benchmarkStats({ workspace: dest }).count).toBe(0);
+    const priorHome = process.env.AMC_HOME;
+    const home = operatorTrustHome([{ publicKeyPem: benchSigner, purposes: ["artifact-seal"] }]);
+    process.env.AMC_HOME = home;
+    try {
+      const imported = importFederationPackage({
+        workspace: dest,
+        bundleFile: fedFile
+      });
+      expect(imported.benchmarkCount).toBeGreaterThan(0);
+      const stats = benchmarkStats({
+        workspace: dest
+      });
+      expect(stats.count).toBeGreaterThan(0);
+    } finally {
+      if (priorHome === undefined) delete process.env.AMC_HOME;
+      else process.env.AMC_HOME = priorHome;
+      rmSync(home, { recursive: true, force: true });
+    }
   });
 
   test("integration dispatch writes evidence with verifiable ops receipt and tamper fails", async () => {
