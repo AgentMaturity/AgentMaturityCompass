@@ -1,7 +1,11 @@
+import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { Readable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { handleComplianceRoute } from "../src/api/complianceRouter.js";
 import { runRedTeamCiGate } from "../src/ci/redteamGate.js";
 import { scoreEUAIActCompliance } from "../src/score/euAIActCompliance.js";
 import { scoreGamingResistance } from "../src/score/gamingResistance.js";
@@ -75,6 +79,41 @@ describe.each([
     expect(readiness.score).toBeNull();
     expect(readiness.level).toBeNull();
     expect(readiness.notEvaluated).toHaveLength(28);
+  });
+});
+
+async function getRoute(workspace: string, url: string): Promise<{ status: number; data: Record<string, unknown> }> {
+  const req = Readable.from([]) as unknown as IncomingMessage;
+  Object.assign(req, { method: "GET", url });
+  let status = 0;
+  let body = "";
+  const res = {
+    writeHead: (code: number) => { status = code; return res; },
+    end: (chunk?: string | Buffer) => { body += chunk?.toString() ?? ""; }
+  } as unknown as ServerResponse;
+  expect(await handleComplianceRoute(url.split("?")[0]!, "GET", req, res, workspace)).toBe(true);
+  return { status, data: (JSON.parse(body) as { data: Record<string, unknown> }).data };
+}
+
+describe("CLI and API report not evaluated", () => {
+  test("amc score eu-ai-act, owasp-llm and regulatory-readiness --json", () => {
+    const cwd = tempDir("amc-p015-cli-");
+    for (const args of [["eu-ai-act"], ["owasp-llm"], ["regulatory-readiness", "--agent", "default"]]) {
+      const run = spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "score", ...args, "--json"], {
+        cwd, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
+      });
+      expect(run.status, run.stderr).toBe(0);
+      expect(JSON.parse(run.stdout)).toMatchObject({ status: "not_evaluated", score: null, level: null });
+    }
+  });
+
+  test("/api/v1/regulatory/{eu-ai-act,owasp-llm,readiness} in an AMC checkout", async () => {
+    const root = fullCheckout();
+    for (const url of ["/api/v1/regulatory/eu-ai-act", "/api/v1/regulatory/owasp-llm", "/api/v1/regulatory/readiness?agentId=default"]) {
+      const { status, data } = await getRoute(root, url);
+      expect(status, url).toBe(200);
+      expect(data, url).toMatchObject({ status: "not_evaluated", score: null, level: null });
+    }
   });
 });
 
