@@ -593,7 +593,7 @@ Implemented:
 
 ### AMC-470: Assessment question expansion
 
-Status: Done. Added `amc-lifecycle-2026-v1` as an explicit opt-in question set with 20 new questions across lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace/repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation. Default scoring stays on `amc-legacy-240-v1`; Industry Pack weighting is applied only when the paid entitlement is active.
+Status: Done. Added `amc-lifecycle-2026-v1` as an explicit opt-in question set with 20 new questions across lifecycle governance, harness resources, evidence binding, typed multi-agent systems, trace/repair, proof exports, reasoning memory, uncertainty controls, runtime gateway/watch, and fleet/org operation. Default scoring stays on `amc-legacy-240-v1`; Industry Pack weighting is applied only when the paid entitlement is active. Superseded in 2.0.0: Industry Pack weighting was removed, `--industry-pack-weights` and `applyIndustryPackWeights` have no effect, and a licence never changes a score.
 
 Gap: the maturity model should include lifecycle governance, harness resources, evidence binding, typed graph, trace/repair, proof exports, memory, uncertainty, runtime, and fleet coverage.
 
@@ -608,7 +608,7 @@ Implement:
 - Version new question groups.
 - Map every new question to surfaces and layers.
 - Preserve backwards-compatible scoring where possible.
-- Keep domain-pack weighting behind entitlement.
+- Keep domain-pack weighting behind entitlement. (Superseded in 2.0.0: the weighting was removed because payment must never change a score.)
 
 Done when:
 - new dimensions are scored and documented without breaking existing fixtures.

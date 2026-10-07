@@ -1,5 +1,3 @@
-import { getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
-import { listIndustryPacks } from "../domains/industryPacks.js";
 import type {
   AMCSurfaceName,
   AssessmentQuestionFamily,
@@ -12,6 +10,8 @@ import { buildQuestion, LEGACY_QUESTION_SET_VERSION, questionBank, type Question
 
 export const DEFAULT_QUESTION_SET_VERSION = LEGACY_QUESTION_SET_VERSION;
 export const LIFECYCLE_QUESTION_SET_VERSION = "amc-lifecycle-2026-v1";
+export const INDUSTRY_PACK_WEIGHTING_REMOVED_MESSAGE =
+  "Industry Pack weighting was removed in 2.0.0: it used fixed per-surface constants, not pack data, and depended on a licence. No question is weighted.";
 
 export type DiagnosticQuestionSetVersion =
   | typeof DEFAULT_QUESTION_SET_VERSION
@@ -20,7 +20,7 @@ export type DiagnosticQuestionSetVersion =
 export interface QuestionSetOptions {
   version?: string;
   workspace?: string;
-  env?: NodeJS.ProcessEnv;
+  /** Deprecated and ignored: a request is acknowledged in `info.domainPackWeighting` and changes no weight. */
   applyIndustryPackWeights?: boolean;
 }
 
@@ -434,67 +434,6 @@ function baseInfo(version: DiagnosticQuestionSetVersion, questions: DiagnosticQu
   };
 }
 
-function applyIndustryWeights(params: {
-  questions: DiagnosticQuestion[];
-  info: DiagnosticQuestionSetInfo;
-  workspace?: string;
-  env?: NodeJS.ProcessEnv;
-}): DiagnosticQuestionSet {
-  const entitlement = getIndustryPackEntitlement(params.workspace, params.env);
-  if (!entitlement.active) {
-    return {
-      version: params.info.version as DiagnosticQuestionSetVersion,
-      title: params.info.title,
-      questions: params.questions,
-      info: {
-        ...params.info,
-        domainPackWeighting: {
-          requested: true,
-          applied: false,
-          entitlementActive: false,
-          modifiedQuestionCount: 0,
-          message: entitlement.message
-        }
-      }
-    };
-  }
-
-  const packCount = listIndustryPacks().length;
-  let modifiedQuestionCount = 0;
-  const questions = params.questions.map((question) => {
-    if (question.questionSetVersion !== LIFECYCLE_QUESTION_SET_VERSION) {
-      return question;
-    }
-    const surfaces = question.surfaces ?? [];
-    const boost = surfaces.some((surface) => surface === "Comply" || surface === "Fleet")
-      ? 1.2
-      : surfaces.some((surface) => surface === "Enforce" || surface === "Watch")
-        ? 1.15
-        : 1.1;
-    modifiedQuestionCount += 1;
-    return {
-      ...question,
-      scoringWeight: boost
-    };
-  });
-
-  return {
-    version: params.info.version as DiagnosticQuestionSetVersion,
-    title: params.info.title,
-    questions,
-    info: {
-      ...params.info,
-      domainPackWeighting: {
-        requested: true,
-        applied: modifiedQuestionCount > 0,
-        entitlementActive: true,
-        modifiedQuestionCount,
-        message: `Industry pack weighting applied from ${packCount} entitled Industry Packs.`
-      }
-    }
-  };
-}
-
 export function getQuestionSet(options: QuestionSetOptions = {}): DiagnosticQuestionSet {
   const version = normalizeVersion(options.version);
   const includeLifecycle = version === LIFECYCLE_QUESTION_SET_VERSION;
@@ -513,12 +452,19 @@ export function getQuestionSet(options: QuestionSetOptions = {}): DiagnosticQues
     return set;
   }
 
-  return applyIndustryWeights({
-    questions: set.questions,
-    info: set.info,
-    workspace: options.workspace,
-    env: options.env
-  });
+  // Payment never changes a result: no licence or entitlement is read here.
+  return {
+    ...set,
+    info: {
+      ...info,
+      domainPackWeighting: {
+        requested: true,
+        applied: false,
+        modifiedQuestionCount: 0,
+        message: INDUSTRY_PACK_WEIGHTING_REMOVED_MESSAGE
+      }
+    }
+  };
 }
 
 export function listQuestionSets(): DiagnosticQuestionSetInfo[] {
@@ -530,8 +476,4 @@ export function listQuestionSets(): DiagnosticQuestionSetInfo[] {
 
 export function allKnownQuestions(): DiagnosticQuestion[] {
   return [...questionBank, ...LIFECYCLE_QUESTIONS];
-}
-
-export function resolveQuestionSetVersion(version?: string): DiagnosticQuestionSetVersion {
-  return normalizeVersion(version);
 }
