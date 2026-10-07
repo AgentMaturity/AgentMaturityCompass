@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P0-09",
   "date": "2026-10-07",
-  "commit": "0ffc2850f4e6746f7a3057e6604d9c4cc448b430",
+  "commit": "cbbd012b5c5291481a72987f865eae8dbd26785f",
   "branch": "rtd/p0-09-verifier-wiring-b",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -12,107 +12,82 @@
     {
       "cmd": "pnpm install --frozen-lockfile",
       "exit": 0,
-      "durationMs": 669
+      "durationMs": 618
     },
     {
       "cmd": "pnpm run build",
       "exit": 0,
-      "durationMs": 24731
+      "durationMs": 25621
     },
     {
       "cmd": "npx vitest run tests/trust tests/cliTrustFlags.test.ts tests/ledgerTrustRootAnchorCli.test.ts",
       "exit": 0,
-      "durationMs": 57473
+      "durationMs": 59835
     },
     {
-      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-affected-tests.txt)",
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-review-affected-tests.txt)",
       "exit": 0,
-      "durationMs": 76095
+      "durationMs": 78180
     },
     {
       "cmd": "npm run typecheck && npm run typecheck:tests && npm run lint",
       "exit": 0,
-      "durationMs": 50870
+      "durationMs": 50461
     },
     {
       "cmd": "npm run check:counts",
       "exit": 0,
-      "durationMs": 363
+      "durationMs": 324
     },
     {
       "cmd": "npm run check:freeze",
       "exit": 0,
-      "durationMs": 1109
+      "durationMs": 1075
     },
     {
       "cmd": "npm run check:docs-drift",
       "exit": 0,
-      "durationMs": 312
+      "durationMs": 265
     },
     {
       "cmd": "npm run check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1364
+      "durationMs": 1313
     },
     {
       "cmd": "npm run check:api-ref",
       "exit": 0,
-      "durationMs": 240
-    },
-    {
-      "cmd": "npm run check:packed-install",
-      "exit": 0,
-      "durationMs": 43935
+      "durationMs": 204
     },
     {
       "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
       "exit": 0,
-      "durationMs": 30317
+      "durationMs": 30073
     },
     {
-      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-affected-tests.txt) --coverage --coverage.enabled=true <--coverage.include per changed src file> --coverage.reporter=json-summary",
+      "cmd": "npm run check:packed-install",
       "exit": 0,
-      "durationMs": 86046
+      "durationMs": 43511
     },
     {
-      "cmd": "npm run typecheck",
+      "cmd": "npm run check:clean-source",
       "exit": 0,
-      "durationMs": 21513
+      "durationMs": 41600
     },
     {
-      "cmd": "npm run typecheck:tests",
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/pr3-review-affected-tests.txt) --coverage --coverage.enabled=true --coverage.reporter=json-summary",
       "exit": 0,
-      "durationMs": 29019
-    },
-    {
-      "cmd": "npm run lint",
-      "exit": 0,
-      "durationMs": 975
-    },
-    {
-      "cmd": "npm run check:counts",
-      "exit": 0,
-      "durationMs": 364
-    },
-    {
-      "cmd": "npm run check:docs-drift",
-      "exit": 0,
-      "durationMs": 317
-    },
-    {
-      "cmd": "npm run check:architecture-boundaries",
-      "exit": 0,
-      "durationMs": 1384
+      "durationMs": 90000
     },
     {
       "cmd": "npm run check:qualification",
       "exit": 0,
-      "durationMs": 267
+      "durationMs": 229
     }
   ],
   "tests": {
-    "total": 8807,
-    "passed": 8807,
+    "total": 8819,
+    "passed": 8819,
     "failed": 0,
     "skipped": 0
   },
@@ -184,7 +159,31 @@
     {
       "path": "pr3-coverage.txt",
       "sha256": "3cf403381a4cac447727f23c80095f6e2ade25b63440550a9b0b5dde5ce3f5f5"
+    },
+    {
+      "path": "pr3-review-affected-tests.txt",
+      "sha256": "c076e679f1a3856427b45360a9f30c68f9f44650a079c97cab523699dc4fa778"
+    },
+    {
+      "path": "pr3-review-commands.tsv",
+      "sha256": "41817574ec6596cfb81487fa5234757e504279d0431afba650ae8050ce2ed4d0"
+    },
+    {
+      "path": "pr3-review-before.log",
+      "sha256": "0a0df9c282fa4d9d2d64fcf9841d6e5b3636529c204df74a0c5946b9425210b1"
+    },
+    {
+      "path": "pr3-review-after.log",
+      "sha256": "463d3916a01d3bdff3d3dcf129990b1f8e1dfbbdc7e92587cda627408df004f7"
+    },
+    {
+      "path": "pr3-review-mutations.log",
+      "sha256": "6fbf4922f307df9ed3ba9fe92ffdd143f2b4206af5a81773bd82259a788326ca"
+    },
+    {
+      "path": "pr3-review-coverage.txt",
+      "sha256": "aceec7f5d98bd24e30db77a51fc07c3a7cd2d8ae242cbd6a24a9c9d734899404"
     }
   ],
-  "notes": "P0-09 PR 2 and PR 3. commit, branch, commands and tests describe the PR 3 run on 0ffc2850 (base 0b818f4f = main f61d22fd plus #53); the PR 2 runs (08edda23 and f4018409) stay in commands.tsv and review-commands.tsv with their logs, all listed in artifacts. tests sums the three vitest runs of the PR 3 block, which overlap in files: the focused trust set (345), every test file that calls a changed verifier, route, import, doc or script (77 files, 1,349, listed in pr3-affected-tests.txt; the coverage run repeats it) and the restoration-parity plus plan-edit-manifest run (7,113). pr3-forgery-before.log is 27 failed, 61 passed on 0b818f4f; pr3-api-before.log the six later API cases failing on 0b818f4f; pr3-forgery-after.log 94 passed; pr3-mutations.log M1-M6 with byte-identical restores; pr3-coverage.txt focused per-file coverage. check:packed-install passed; check:qualification ran with this receipt in place. The full npm test, whole-suite coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt. Open after PR 3: seven portable verify commands outside the issue table, in-chat /verify and Studio nativeTaskService without pins, and the release.yml key until P0-37/P0-38 (see README)."
+  "notes": "P0-09 PR 2 and PR 3. commit, commands and tests describe the PR 3 review-round run on cbbd012b (base 0b818f4f = main f61d22fd plus #53); the PR 3 run on 0ffc2850 stays in pr3-commands.tsv and the PR 2 runs (08edda23 and f4018409) in commands.tsv and review-commands.tsv, all listed in artifacts. tests sums the three vitest runs of the review block, which overlap in files: the focused trust set (350), every test file that calls a changed verifier, route, import or script (77 files, 1,356, listed in pr3-review-affected-tests.txt; the coverage run repeats it) and the restoration-parity plus plan-edit-manifest run (7,113). pr3-review-before.log is 7 failed, 115 passed on the src and dist of 5ab1920e; pr3-review-after.log 137 passed; pr3-review-mutations.log MR1-MR5 with byte-identical restores; pr3-review-coverage.txt focused per-file coverage. check:packed-install and check:clean-source passed; check:qualification ran with this receipt in place. The full npm test, whole-suite coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt. Open after PR 3: ten portable verify commands without the step-10 flags (seven of them unwired), in-chat /verify and Studio nativeTaskService without pins, the release.yml key until P0-37/P0-38, and confirming the website sample's published keys (see README)."
 }

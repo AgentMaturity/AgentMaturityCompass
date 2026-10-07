@@ -1,0 +1,149 @@
+
+ RUN  v4.1.11 /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/amc-p0-09c
+
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > starts from the built-in distrust list, with no pins and no allow flags from the environment 2ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins a --pubkey file for the purposes the command checks 26ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins the key, not the PEM text: a CRLF --pubkey file gets the canonical key id, and a private key is refused 1ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins ledger-row from --expect-monitor, else from AMC_EXPECTED_MONITOR_FINGERPRINT 1ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > loads the default trust list under pinned roots from the AMC home and merges its distrust entries 4ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > uses --trust-list and --trust-root instead of the defaults 2ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > fails hard, never skips, on a bad signature, an expired list, missing roots or a malformed roots file 3ms
+ ✓ tests/trust/trustContext.test.ts > workspaceSelfTrust > admits the workspace's own role keys for their role purposes, labelled workspace-self 0ms
+ ✓ tests/trust/trustContext.test.ts > workspaceSelfTrust > applies the operator's distrust and key-compromise revocations from the AMC home trust list, whatever it pins 3ms
+ ✓ tests/trust/trustContext.test.ts > workspaceSelfTrust > never admits a workspace key as an independent or third-party issuer 1ms
+ ✓ tests/trust/trustContext.test.ts > package surface > exports ./trust and ships the built-in distrust file 1ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all on a fresh workspace (first-run passport boundary) > uninitialized passport reports SKIP, not a critical failure 250ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all on a fresh workspace (first-run passport boundary) > fails closed when passport artifacts exist without a signed policy 185ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > passes the ledger trust root when the operator pinned the monitor key, and names the key 188ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > fails a ledger whose monitor key nobody pinned as a critical UNANCHORED failure 185ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > skips, rather than fails, the trust root under --allow-unanchored, so the run is integrity-only and not a critical failure 178ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > fails a distrusted monitor key even when it is pinned and --allow-unanchored was used 183ms
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > plugin pack + verify catches tampering 316ms
+ ✓ tests/publicBenchmarkRegistry.test.ts > public benchmark registry > bench create/verify works; tamper fails; pii scan blocks free text 354ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > registry init/publish/verify/serve works 248ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > backups > fails, never skips, a backup whose signer is not admitted, naming the key, with or without a passphrase 654ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > install rejects registry publisher metadata mismatch 235ms
+ ✓ tests/publicBenchmarkRegistry.test.ts > public benchmark registry > registry init/publish/verify/serve and import from allowlisted registry 495ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > backups > passes this workspace's own backup, and skips it only when the passphrase is missing 452ms
+ ✓ tests/publicBenchmarkRegistry.test.ts > public benchmark registry > publishing requires quorum approvals and comparer is deterministic 326ms
+ ✓ tests/publicBenchmarkRegistry.test.ts > public benchmark registry > lease-auth cannot access bench APIs and bench console pages have no CDN refs 207ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > workspace install is dual-control and tamper breaks readiness 345ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > release bundles > skips the check when dist/ holds no .amcrelease 192ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 921ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > pending action tampering cannot bypass publisher/risk checks 303ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > override denied by default and allowed with signed overrides 295ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > release bundles > passes a bundle signed by a key the operator pinned for release 563ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > console plugins page serves without CDN or secret leaks 176ms
+ ✓ tests/pluginMarketplace.test.ts > plugin marketplace > invalid plugin asset schema is flagged as FAILED_VALIDATION without crash 231ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy still fails when the legitimate key is pinned 895ms
+ ✓ tests/pluginMarketplace.test.ts > supported plugin package public workflows > prints signed package verification and extracts canonical, alternate and flat layouts 314ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > release bundles > refuses a bundle whose signer is only the key it carries, naming the key to pin 554ms
+ ✓ tests/pluginMarketplace.test.ts > supported plugin package public workflows > malformed gzip printing preserves the verifier refusal 182ms
+ ✓ tests/pluginMarketplace.test.ts > supported plugin package public workflows > incomplete valid archive printing refuses verification and omits identity 209ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > release bundles > does not turn --allow-unanchored into a pass for a release bundle nobody pinned 571ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > release bundles > reports a bundle that is not an archive as one failure line that names the file 189ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with its key pinned is trusted 800ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 724ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 719ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a distrusted monitor key fails even with --expect-monitor and --allow-unanchored 718ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > an issuer key superseded after it sealed the bundle is admitted on the claimed signing time 717ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy re-signed with an embedded key fails as not-pinned by default 790ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy still fails when the legitimate key is pinned 830ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with its key pinned is trusted 758ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 724ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 711ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy re-signed with an embedded key fails as not-pinned by default 657ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy still fails when the legitimate key is pinned 659ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with its key pinned is trusted 675ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 653ms
+ ✓ tests/trust/verifySurfaces.test.ts > verify surfaces (P0-09) > lists every PR 3 command as a wired portable verifier 2ms
+ ✓ tests/trust/verifySurfaces.test.ts > verify surfaces (P0-09) > registers --trust-list on every portable command except the ten recorded as open after P0-09 16609ms
+ ✓ tests/trust/verifySurfaces.test.ts > verify surfaces (P0-09) > never imports workspaceSelfTrust into a CLI or API handler 19ms
+ ✓ tests/trust/verifySurfaces.test.ts > verify surfaces (P0-09) > refuses a key in an injected built-in distrust entry even with --pubkey 8ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a revocation signed by a different pinned key does not revoke the certificate 731ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 706ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy still fails when the legitimate key is pinned 711ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with its key pinned is trusted 677ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 686ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a distrusted key is refused even when it is pinned with --pubkey 682ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a passport whose inclusion proof carries its own fabricated root is refused 728ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 688ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy still fails when the legitimate key is pinned 668ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with its key pinned is trusted 654ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 654ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > an assurance certificate whose inclusion proof carries its own fabricated root is refused 684ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate 662ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy re-signed with an embedded key fails as not-pinned by default 639ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy still fails when the legitimate key is pinned 642ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with its key pinned is trusted 641ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 617ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 686ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy still fails when the legitimate key is pinned 694ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with its key pinned is trusted 675ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 677ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > verify all names the key to pin when it refuses an unpinned release bundle 846ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/bundle/verify refuses a body that carries publicKeyPath 1ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/bundle/verify answers an unpinned issuer with ok:false and the verifier report 46ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify refuses a body that carries allowUnpinned 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify answers an unpinned issuer with ok:false and the verifier report 42ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify-revocation refuses a body that carries trustList 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify-revocation answers an unpinned issuer with ok:false and the verifier report 1ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify refuses a body that carries pubkey 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify answers an unpinned issuer with ok:false and the verifier report 15ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify refuses a body that carries pubkeyPath 1ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify answers an unpinned issuer with ok:false and the verifier report 19ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/registry/verify refuses a body that carries trustList 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/registry/verify answers an unpinned issuer with ok:false and the verifier report 1ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/verify refuses a body that carries trustRoot 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/verify answers an unpinned issuer with ok:false and the verifier report 13ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/print refuses a body that carries pubkeyPath and returns the verifier report 13ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/import returns the verifier report of each benchmark it admitted 26ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer 40ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 694ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > a forged copy still fails when the legitimate key is pinned 700ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > the untouched artifact with its key pinned is trusted 650ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAuditBinderFile (amc audit binder verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 657ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > audit packet README guide (amc audit-packet has no verify command) > step 1 verifies the manifest with an auditor key pinned outside the packet, not the key the packet carries 7ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a forged copy re-signed with an embedded key fails as not-pinned by default 685ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a forged copy still fails when the legitimate key is pinned 693ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > the untouched artifact with its key pinned is trusted 669ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > the untouched artifact with --allow-unpinned is integrity-only and exits 2 654ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle > a bench whose inclusion proof carries its own fabricated root is refused 671ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 664ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > a forged copy still fails when the legitimate key is pinned 655ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > the untouched artifact with its key pinned is trusted 636ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBenchmarkArtifact (amc benchmark verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 653ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 772ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > a forged copy still fails when the legitimate key is pinned 752ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > the untouched artifact with its key pinned is trusted 707ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 726ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr 2307ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 684ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > a forged copy still fails when the legitimate key is pinned 664ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > the untouched artifact with its key pinned is trusted 652ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 643ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it 26ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > a forged copy re-signed with an embedded key fails as not-pinned by default 632ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > a forged copy still fails when the legitimate key is pinned 622ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the untouched artifact with its key pinned is trusted 632ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 645ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the client refuses a registry.pub that is not pinned 2ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > plugin registry (amc plugin registry verify, and the registry client) > the client admits a pinned registry and the publisher its signed index names 27ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 683ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > a forged copy still fails when the legitimate key is pinned 676ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > the untouched artifact with its key pinned is trusted 659ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPromptPackFile (amc prompt pack verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 653ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > a forged copy re-signed with an embedded key fails as not-pinned by default 668ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > a forged copy still fails when the legitimate key is pinned 676ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > the untouched artifact with its key pinned is trusted 671ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyFederationPackage (amc federate verify-bundle) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 675ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > console seal check (src/console/assets/app.js) > shows the server's verdict and labels the client-side check consistency only 1ms
+
+ Test Files  6 passed (6)
+      Tests  137 passed (137)
+   Start at  06:09:29
+   Duration  57.74s (transform 11.20s, setup 138ms, import 15.97s, tests 79.23s, environment 0ms)
+

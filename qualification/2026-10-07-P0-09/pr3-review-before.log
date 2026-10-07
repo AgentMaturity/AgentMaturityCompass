@@ -1,0 +1,148 @@
+
+ RUN  v4.1.11 /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/amc-p0-09c
+
+ ❯ tests/trust/trustContext.test.ts (11 tests | 1 failed) 76ms
+     × applies the operator's distrust and key-compromise revocations from the AMC home trust list, whatever it pins 5ms
+ ❯ tests/publicBenchmarkRegistry.test.ts (4 tests | 1 failed) 1266ms
+     × registry init/publish/verify/serve and import from allowlisted registry 452ms
+ ❯ tests/verifyFreshWorkspacePassport.test.ts (13 tests | 1 failed) 4007ms
+       × fails, never skips, a backup whose signer is not admitted, naming the key, with or without a passphrase 573ms
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts (94 tests | 4 failed) 52115ms
+     × POST /api/v1/plugins/print refuses a body that carries pubkeyPath and returns the verifier report 18ms
+     × POST /api/v1/benchmarks/import returns the verifier report of each benchmark it admitted 27ms
+     × backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr 823ms
+     × an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it 26ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/publicBenchmarkRegistry.test.ts > public benchmark registry > registry init/publish/verify/serve and import from allowlisted registry
+AssertionError: expected 'PASS' to be 'FAIL' // Object.is equality
+
+Expected: "FAIL"
+Received: "PASS"
+
+ ❯ tests/publicBenchmarkRegistry.test.ts:251:28
+    249|     writeFileSync(metaPath, JSON.stringify({ ...JSON.parse(readFileSyn…
+    250|     const forged = await benchCheck();
+    251|     expect(forged?.status).toBe("FAIL");
+       |                            ^
+    252|     expect(forged?.details.join("\n")).toContain("not-pinned");
+    253|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/verifyFreshWorkspacePassport.test.ts > verify all and the operator's trust (P0-09) > backups > fails, never skips, a backup whose signer is not admitted, naming the key, with or without a passphrase
+AssertionError: verify-all-backup-passphrase: expected 'SKIP' to be 'FAIL' // Object.is equality
+
+Expected: "FAIL"
+Received: "SKIP"
+
+ ❯ tests/verifyFreshWorkspacePassport.test.ts:123:49
+    121|         vi.stubEnv("AMC_BACKUP_PASSPHRASE", passphrase);
+    122|         const row = check(await verifyAll({ workspace: dir, trust: wor…
+    123|         expect(row?.status, String(passphrase)).toBe("FAIL");
+       |                                                 ^
+    124|         expect(row?.details[0]).toContain(`manifest.sig (artifact-seal…
+    125|         expect(row?.details[0]).toContain(`key ${keyId} is not pinned`…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/print refuses a body that carries pubkeyPath and returns the verifier report
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:621:28
+    619|   test("POST /api/v1/plugins/print refuses a body that carries pubkeyP…
+    620|     const refused = await route(handleToolsRoute as Handler, "/api/v1/…
+    621|     expect(refused.status).toBe(400);
+       |                            ^
+    622|     expect(refused.json.error).toContain('request field "pubkeyPath" i…
+    623|     const out = await route(handleToolsRoute as Handler, "/api/v1/plug…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/import returns the verifier report of each benchmark it admitted
+TypeError: Cannot read properties of undefined (reading 'trusted')
+ ❯ tests/trust/embeddedKeyForgery.test.ts:637:45
+    635|       expect(out.status).toBe(200);
+    636|       const imported = (out.json.data as unknown as { imported: Array<…
+    637|       expect(imported.map(row => row.report.trusted)).toEqual([true]);
+       |                                             ^
+    638|     } finally {
+    639|       process.env.AMC_HOME = previous;
+ ❯ tests/trust/embeddedKeyForgery.test.ts:637:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyBackup (amc backup verify) > backup restore with --allow-unpinned restores integrity-only, exits 2 and says UNTRUSTED on stderr
+AssertionError: Backup restored to /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-forgery-restore-2NrvPi/restored
+Restore completed with warnings:
+- UNTRUSTED (--allow-unpinned): manifest.sig (artifact-seal): unpinned-allowed — key 6c305646b0452e9fd59b5155103d20ed1a7739b316ba70d477bc93291d3a3620 is not pinned for artifact-seal; integrity only (--allow-unpinned)
+
+: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:780:42
+    778|     const to = join(dir("amc-forgery-restore-"), "restored");
+    779|     const result = amc(evidence.workspace, ["backup", "restore", backu…
+    780|     expect(result.status, result.output).toBe(2);
+       |                                          ^
+    781|     expect(result.stdout).toContain("Backup restored to");
+    782|     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPluginPackage (amc plugin verify) > an installed plugin's publisher is refused once the operator's AMC home trust list distrusts it
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:847:27
+    845|     try {
+    846|       const verified = verifyPluginPackage({ file: plugin.file, trust:…
+    847|       expect(verified.ok).toBe(false);
+       |                           ^
+    848|       expect(verified.report.issuerAdmission.signatures[0]?.status).to…
+    849|     } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/trust/trustContext.test.ts > workspaceSelfTrust > applies the operator's distrust and key-compromise revocations from the AMC home trust list, whatever it pins
+AssertionError: expected 'admitted' to be 'distrusted' // Object.is equality
+
+Expected: "distrusted"
+Received: "admitted"
+
+ ❯ tests/trust/trustContext.test.ts:130:128
+    128|       const pinned = withPins(workspaceSelfTrust(workspace, NOW), [aud…
+    129|       for (const key of [auditor, revoked]) {
+    130|         expect(admitKey({ publicKeyPem: key.publicKeyPem, purpose: "ar…
+       |                                                                                                                                ^
+    131|       }
+    132|     } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  7 failed | 115 passed (122)
+   Start at  05:50:10
+   Duration  55.48s (transform 7.79s, setup 91ms, import 10.84s, tests 57.46s, environment 0ms)
+
