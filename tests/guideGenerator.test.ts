@@ -40,11 +40,21 @@ describe("guideGenerator", () => {
     expect(guide.sections.length).toBeGreaterThan(0);
     expect(guide.summary).toContain("gap");
 
+    // P1-07: these questions have no evidence map, so L2 is not evaluated: each section says why and
+    // promises no level instead of telling the agent what to do to reach L3.
+    expect(guide.summary).toContain("need a level AMC does not evaluate yet");
     for (const s of guide.sections) {
       expect(s.currentLevel).toBeLessThan(3);
       expect(s.targetLevel).toBe(3);
       expect(s.questionId).toBeTruthy();
-      expect(s.agentInstruction).toContain("What you must do");
+      expect(s.notEvaluated).toContain("Not evaluated: L2 not evaluable on runtime evidence");
+      expect(s.whatToFix).toBe(s.notEvaluated);
+      expect(s.agentInstruction).toContain("### Not evaluated");
+      expect(s.agentInstruction).not.toContain("What you must do");
+      expect(s.agentInstruction).not.toContain("Evidence you must produce");
+      expect(s.howToFix).toEqual([]);
+      expect(s.evidenceNeeded).toEqual([]);
+      expect(s.cliCommands).toEqual([]);
     }
   });
 
@@ -64,24 +74,30 @@ describe("guideGenerator", () => {
   });
 
   it("produces valid human markdown", () => {
-    const scores = questionBank.slice(0, 10).map(q => makeScore(q.id, 1));
-    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    // P1-07: AMC-5.29's L2 is evaluable, so its section keeps its fixes; the others name the level AMC cannot evaluate.
+    const scores = [...questionBank.slice(0, 10).map(q => makeScore(q.id, 1)), makeScore("AMC-5.29", 1)];
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 2 });
     const md = guideToHumanMarkdown(guide);
 
     expect(md).toContain("# AMC Improvement Guide");
     expect(md).toContain("Priority Fixes");
     expect(md).toContain("How to fix:");
     expect(md).toContain("```bash");
+    expect(md).toContain("Not evaluated: L2 not evaluable on runtime evidence");
+    expect(md).not.toContain("jump a full level");
   });
 
   it("produces valid agent markdown", () => {
-    const scores = questionBank.slice(0, 10).map(q => makeScore(q.id, 1));
-    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 3 });
+    // P1-07: only AMC-5.29 has an evaluable L2, so only its section tells the agent what to do.
+    const scores = [...questionBank.slice(0, 10).map(q => makeScore(q.id, 1)), makeScore("AMC-5.29", 1)];
+    const guide = generateGuide({ overall: 1.0, questionScores: scores, targetLevel: 2 });
     const md = guideToAgentMarkdown(guide, "langchain");
 
     expect(md).toContain("# AMC Trust Improvement Instructions");
     expect(md).toContain("Required Behavioral Changes");
     expect(md).toContain("What you must do");
+    expect(md).toContain("Must include audit types: TOOL_CALL_ALLOWED, TOOL_CALL_DENIED");
+    expect(md).not.toContain("ALIGNMENT_CHECK_PASS");
     expect(md).toContain("langchain");
     expect(md).toContain("How to Verify");
     expect(md).toContain("amc quickscore");
@@ -100,21 +116,19 @@ describe("guideGenerator", () => {
     }
   });
 
-  it("adds benchmark-submission evidence guidance for high-target verified outcome gaps", () => {
+  it("does not list L4 evidence for a gap that crosses a level AMC cannot evaluate", () => {
     const guide = generateGuide({
       overall: 2,
       questionScores: [makeScore("AMC-2.3", 2)],
       targetLevel: 4,
     });
 
+    // P1-07: AMC-2.3's L3 and L4 are not evaluated, so benchmark-submission evidence cannot raise its level;
+    // the section names L3 and its reason instead of promising L4.
     expect(guide.sections).toHaveLength(1);
-    expect(guide.sections[0]?.evidenceNeeded).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining("Benchmark-submission receipt with signed task breakdown"),
-        expect.stringContaining("Eval-score explainability pack bound to the question ID"),
-      ]),
-    );
-    expect(guideToHumanMarkdown(guide)).toContain("fail-closed thresholds");
+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);
+    expect(guide.sections[0]?.notEvaluated).toContain("Not evaluated: L3 not evaluable on runtime evidence");
+    expect(guideToHumanMarkdown(guide)).not.toContain("Benchmark-submission receipt");
   });
 
   it("surfaces GAP-0616 eval-score proof fields in guide sections and markdown", () => {
@@ -202,12 +216,16 @@ describe("guideGenerator", () => {
     expect(md).toContain("amc quickscore");
   });
 
-  it("guardrails include prohibited behaviors for high targets", () => {
+  it("guardrails list no prohibitions from gates AMC does not evaluate", () => {
     const scores = questionBank.slice(0, 10).map(q => makeScore(q.id, 2));
     const guide = generateGuide({ overall: 2.0, questionScores: scores, targetLevel: 5 });
     const md = guideToGuardrails(guide);
 
-    expect(md).toContain("Prohibited Behaviors");
+    // P1-07: L3 to L5 are not evaluated for these questions, so their gates' exclusions cap nothing and the old
+    // "will cap your trust score" list would be untrue; the evidence summary says why instead.
+    expect(md).not.toContain("Prohibited Behaviors");
+    expect(guideToJSON(guide).prohibitedBehaviors).toEqual([]);
+    expect(md).toContain("AMC does not evaluate a level they need yet");
   });
 
   it("applyGuardrails creates new file when none exists", () => {
