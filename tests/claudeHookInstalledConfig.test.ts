@@ -1,12 +1,15 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { createServer, type RequestListener } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { getHookIntegrationStatus, installHookIntegration } from "../src/adapters/hookIntegration.js";
 import { claudeHookSettingsFindings, probeInstalledClaudeHook, verifyClaudeControl } from "../src/adapters/claudeHookProbe.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { initWorkspace } from "../src/workspace.js";
 
@@ -279,7 +282,8 @@ describe("Claude hook probe outcomes", () => {
     writeFileSync(path, code);
     return path;
   }
-  const DENY_SCRIPT = `process.stdout.write(${JSON.stringify(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } }))}); process.exitCode = 2;`;
+  const DENY_JSON = JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } });
+  const DENY_SCRIPT = `process.stdout.write(${JSON.stringify(DENY_JSON)}); process.exitCode = 2;`;
 
   test("classifies each way the installed handler can fail to block", async () => {
     const workspace = tempDir("amc-claude-probe-");
@@ -291,26 +295,39 @@ describe("Claude hook probe outcomes", () => {
     writeControlHandler(workspace, { command: join(workspace, "missing-node"), args: [], timeout: 10 });
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing" });
 
-    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "allow", "process.exit(0)")], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "not_blocking", exitCode: 0 });
-
-    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "silent", "process.exit(2)")], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "invalid_output", exitCode: 2 });
-
-    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "hang", "setTimeout(() => {}, 20000)")], timeout: 1 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "timed_out", exitCode: null });
-
     writeControlHandler(workspace, { command: process.execPath, args: [], timeout: 10 });
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
 
     writeControlHandler(workspace, { command: process.execPath, timeout: 10 });
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
 
-    writeControlHandler(workspace, { command: workspace, args: [script(workspace, "deny-unreached", DENY_SCRIPT)], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "spawn_failed" });
+    // Existing paths are not enough: without a signed manifest nothing matches what AMC would install.
+    const denyMarker = join(workspace, "deny-ran");
+    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", `require("node:fs").writeFileSync(${JSON.stringify(denyMarker)}, "x"); ${DENY_SCRIPT}`)], timeout: 10 });
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "stale", exitCode: null, durationMs: 0 });
+    expect(existsSync(denyMarker)).toBe(false);
 
-    writeControlHandler(workspace, { command: process.execPath, args: [script(workspace, "deny", DENY_SCRIPT)], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: true, reason: "ok", exitCode: 2 });
+    // The handler AMC installs, run under a stand-in Node executable, for each outcome.
+    const installed = newWorkspace();
+    const fakeNode = join(tempDir("amc-claude-fake-node-"), "node");
+    const probeAs = async (body: string, mode = 0o755) => {
+      writeFileSync(fakeNode, `#!/bin/sh\n${body}\n`);
+      chmodSync(fakeNode, mode);
+      return probeInstalledClaudeHook({ workspace: installed });
+    };
+    writeFileSync(fakeNode, "#!/bin/sh\nexit 0\n", { mode: 0o755 });
+    const realExecPath = process.execPath;
+    process.execPath = fakeNode;
+    try {
+      installHookIntegration({ workspace: installed, provider: "claude-code", agentId: "outcome-agent", bridgeBase: "http://127.0.0.1:3212", mode: "control" });
+      expect(await probeAs("exit 0")).toMatchObject({ ok: false, reason: "not_blocking", exitCode: 0 });
+      expect(await probeAs("exit 2")).toMatchObject({ ok: false, reason: "invalid_output", exitCode: 2 });
+      expect(await probeAs(`printf '%s' '${DENY_JSON}'; exit 2`, 0o644)).toMatchObject({ ok: false, reason: "spawn_failed" });
+      expect(await probeAs(`printf '%s' '${DENY_JSON}'; exit 2`)).toMatchObject({ ok: true, reason: "ok", exitCode: 2 });
+      expect(await probeAs("exec sleep 30")).toMatchObject({ ok: false, reason: "timed_out", exitCode: null });
+    } finally {
+      process.execPath = realExecPath;
+    }
   }, 60_000);
 
   test("reports settings that disable every hook and never verifies with them set", async () => {
@@ -327,5 +344,93 @@ describe("Claude hook probe outcomes", () => {
     const verification = await verifyClaudeControl({ workspace, home });
     expect(verification).toMatchObject({ verified: false, summary: "Control: NOT VERIFIED (disableAllHooks)" });
     expect(verification.probe?.ok).toBe(true);
+  }, 60_000);
+});
+
+describe("Claude control probe runs only the handler AMC would install", () => {
+  type ControlSettings = { hooks: { PreToolUse: Array<{ matcher: string; hooks: InstalledHandler[] }> } };
+
+  /**
+   * Rewrites the installed PreToolUse control handler and re-signs the manifest with the
+   * workspace's own auditor key, so the forged state stays `installed`: what a cloned or
+   * shared workspace can carry when its `.amc` keys are not the user's.
+   */
+  function forgeSignedHandler(workspace: string, edit: (group: ControlSettings["hooks"]["PreToolUse"][number], handler: InstalledHandler) => void): void {
+    const settingsPath = join(workspace, ".claude", "settings.local.json");
+    const settings = JSON.parse(readFileSync(settingsPath, "utf8")) as ControlSettings;
+    const group = settings.hooks.PreToolUse[0]!;
+    const handler = group.hooks[0]!;
+    edit(group, handler);
+    const configText = `${JSON.stringify(settings, null, 2)}\n`;
+    writeFileSync(settingsPath, configText);
+    const manifestPath = join(workspace, ".amc", "hooks", "claude-code.json");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as { configSha256: string; handlers: Array<{ eventName: string; handlerSha256: string }> };
+    manifest.configSha256 = sha256Hex(Buffer.from(configText, "utf8"));
+    for (const row of manifest.handlers) {
+      if (row.eventName === "PreToolUse") row.handlerSha256 = sha256Hex(canonicalize(handler));
+    }
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    signFileWithAuditor(workspace, manifestPath);
+    expect(getHookIntegrationStatus({ workspace, provider: "claude-code" }).state).toBe("installed");
+  }
+
+  function installControl(agentId: string): string {
+    const workspace = newWorkspace();
+    installHookIntegration({ workspace, provider: "claude-code", agentId, bridgeBase: "http://127.0.0.1:3212", mode: "control" });
+    return workspace;
+  }
+
+  async function expectStaleNotRun(workspace: string, marker?: string): Promise<void> {
+    const verification = await verifyClaudeControl({ workspace, home: tempDir("amc-claude-home-") });
+    if (marker) expect(existsSync(marker), "the forged handler ran").toBe(false);
+    expect(verification).toMatchObject({
+      verified: false,
+      summary: "Control: NOT VERIFIED (stale)",
+      probe: { ok: false, reason: "stale", exitCode: null, durationMs: 0 },
+    });
+    expect(verification.notes.join("\n")).toContain("amc connect hooks install --provider claude-code --mode control");
+  }
+
+  test("never spawns a signed handler that runs another program", async () => {
+    const workspace = installControl("forged-shell");
+    const marker = join(workspace, "pwned");
+    forgeSignedHandler(workspace, (_group, handler) => {
+      handler.command = "/usr/bin/env";
+      handler.args = ["/bin/sh", "-c", `touch ${marker}`];
+    });
+    await expectStaleNotRun(workspace, marker);
+  }, 60_000);
+
+  test("never spawns a signed handler whose script is not AMC's CLI", async () => {
+    const workspace = installControl("forged-script");
+    const marker = join(workspace, "script-ran");
+    const script = join(workspace, "evil.js");
+    writeFileSync(script, `require("node:fs").writeFileSync(${JSON.stringify(marker)}, "x"); process.stdout.write(${JSON.stringify(JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "deny" } }))}); process.exitCode = 2;`);
+    forgeSignedHandler(workspace, (_group, handler) => { handler.args = [script, ...handler.args!.slice(1)]; });
+    await expectStaleNotRun(workspace, marker);
+  }, 60_000);
+
+  test.each([
+    ["an appended flag", (_group: { matcher: string }, handler: InstalledHandler) => { handler.args!.push("--verbose"); }],
+    ["a changed bridge URL", (_group: { matcher: string }, handler: InstalledHandler) => {
+      const args = handler.args!;
+      args[args.indexOf("--bridge-url") + 1] = "http://127.0.0.1:1";
+    }],
+    ["a changed agent", (_group: { matcher: string }, handler: InstalledHandler) => {
+      const args = handler.args!;
+      args[args.indexOf("--agent") + 1] = "someone-else";
+    }],
+    ["a longer timeout", (_group: { matcher: string }, handler: InstalledHandler) => { handler.timeout = 600; }],
+    ["a narrowed matcher", (group: { matcher: string }) => { group.matcher = "Read"; }],
+  ])("reports a signed handler with %s as stale and never runs it", async (_label, edit) => {
+    const workspace = installControl("forged-args");
+    forgeSignedHandler(workspace, edit);
+    await expectStaleNotRun(workspace);
+  }, 60_000);
+
+  test("still runs and verifies the genuine installed handler", async () => {
+    const workspace = installControl("genuine-agent");
+    const verification = await verifyClaudeControl({ workspace, home: tempDir("amc-claude-home-") });
+    expect(verification).toMatchObject({ verified: true, probe: { ok: true, reason: "ok", exitCode: 2 } });
   }, 60_000);
 });
