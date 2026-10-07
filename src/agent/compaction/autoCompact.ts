@@ -14,7 +14,8 @@ import { isLlmError } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
 import { extractEnvelope, type TokenUsage } from "../../session/sessionTypes.js";
 import { describeLiveEntries, describeMeasuredLiveEntries, type LiveSurfaceEntry } from "../../session/surfaceCompaction.js";
-import { PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries, type AutomaticCompaction } from "../../session/surfaceCompactionValidation.js";
+import { fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries,
+  type AutomaticCompaction } from "../../session/surfaceCompactionValidation.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
 import type { EvidenceEvent } from "../../types.js";
 import type { CompactionConfig } from "../loopTypes.js";
@@ -56,6 +57,22 @@ function oldestCompletedTurns<T extends LiveSurfaceEntry>(live: readonly T[], at
   // A receipt cites at most 256 sources: stop at the last whole turn that fits.
   const cut = at.get(range[256]!.originEventId)?.turn;
   return range.slice(0, 256).filter(entry => at.get(entry.originEventId)?.turn !== cut);
+}
+
+/**
+ * The assistant and tool runs of a range. User messages (and any other role)
+ * split runs and are never summarized: the user's own instructions stay
+ * verbatim and keep their authority; only the agent's work is paraphrased.
+ */
+function summarizableRuns<T extends LiveSurfaceEntry>(range: readonly T[]): readonly (readonly T[])[] {
+  const runs: T[][] = [];
+  let current: T[] = [];
+  for (const entry of range) {
+    if (entry.role === "assistant" || entry.role === "tool") { current.push(entry); continue; }
+    if (current.length > 0) runs.push(current);
+    current = [];
+  }
+  return current.length > 0 ? [...runs, current] : runs;
 }
 
 /** Complete text-only answers qualify; a tool call, a truncated block or empty text does not. */
@@ -140,13 +157,20 @@ export class AutoCompactor {
     const { session } = this.init, events = session.readEvents();
     const live = describeMeasuredLiveEntries(session.workspace, events), at = positions(events);
     const cutoff = Math.min(turn, ...recentSteps(events, this.config.keepRecentSteps).map(kept => kept.turn ?? turn));
-    const range = oldestCompletedTurns(live, at, cutoff), origins = range.map(entry => entry.originEventId);
+    const range = oldestCompletedTurns(live, at, cutoff), runs = summarizableRuns(range);
+    const ids = (run: readonly LiveSurfaceEntry[]): readonly string[] => run.map(entry => entry.originEventId);
     const skip = (why: string): Outcome => { notify(`no summary: ${why}`); return NOTHING; };
-    if (range.length === 0) return skip("no completed earlier turn lies outside the kept recent steps");
-    if (range.some(entry => entry.bytes === null)) return skip("part of the oldest range is retention-pruned, so its bytes cannot be measured");
-    try { selectCompactionEntries(foldSurfaceEntries(events), origins, "summarize"); }
-    catch (error: unknown) { return skip(error instanceof Error ? error.message : "the oldest range is not compactable"); }
-    const rangeBytes = range.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0);
+    if (runs.length === 0) return skip("no completed earlier turn outside the kept recent steps holds assistant or tool content");
+    if (runs.some(run => run.some(entry => entry.bytes === null))) return skip("part of the oldest range is retention-pruned, so its bytes cannot be measured");
+    // The summary takes the place of the LAST run, after every kept user message of the range;
+    // earlier runs are dropped, so each request precedes the account of the work done for it.
+    const target = runs.at(-1)!, earlier = runs.slice(0, -1);
+    try {
+      const surface = foldSurfaceEntries(events);
+      selectCompactionEntries(surface, ids(target), "summarize");
+      for (const run of earlier) selectCompactionEntries(surface, ids(run), "drop");
+    } catch (error: unknown) { return skip(error instanceof Error ? error.message : "the oldest range is not compactable"); }
+    const targetBytes = target.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0);
     const turns = new Set(range.map(entry => at.get(entry.originEventId)?.turn)).size;
 
     const opened = session.startStep(COMPACTION_SUMMARY_STEP);
@@ -173,13 +197,19 @@ export class AutoCompactor {
     const eventIds: string[] = [];
     if (failure !== null) notify(`summary step did not complete (${failure instanceof Error ? failure.message : "refused"}); the turn continues uncompacted`);
     else if (header === undefined || text === null) notify("summary step returned no complete text-only answer; the turn continues uncompacted");
-    else if (Buffer.byteLength(text, "utf8") >= rangeBytes) notify(`summary is not smaller than the ${rangeBytes} payload bytes it would replace; not applied`);
-    else {
+    // Sized with a same-length placeholder fence: the session layer adds the real random fence.
+    else if (Buffer.byteLength(fenceModelSummary(text, "0".repeat(12)), "utf8") >= targetBytes) {
+      notify(`fenced summary is not smaller than the ${targetBytes} payload bytes of the latest agent run it would replace; not applied`);
+    } else {
       const model = (JSON.parse(header.meta_json) as { model?: unknown }).model;
-      eventIds.push(session.compactSurfaceRange({ originEventIds: origins, replacement: text, summaryRole: "user",
-        reason: `automatic compaction: model-written summary (${SUMMARY_CLAIM_KIND}, not evidence) of ${range.length} entries from ${turns} completed turn(s); originals stay in the ledger`,
+      const summaryId = session.compactSurfaceRange({ originEventIds: ids(target), replacement: text, summaryRole: MODEL_SUMMARY_ROLE,
+        reason: `automatic compaction: fenced model-written summary (${SUMMARY_CLAIM_KIND}, not instructions, not evidence) of the agent's work in `
+          + `${turns} completed turn(s); user messages stay verbatim; originals stay in the ledger`,
         automatic: { trigger, summarizer: { requestHeaderEventId: header.id, promptVersion: SUMMARY_PROMPT_VERSION,
-          model: typeof model === "string" ? model : "", claimKind: SUMMARY_CLAIM_KIND } } }).eventId);
+          model: typeof model === "string" ? model : "", claimKind: SUMMARY_CLAIM_KIND } } }).eventId;
+      eventIds.push(summaryId);
+      for (const run of earlier) eventIds.push(session.dropSurfaceRange({ originEventIds: ids(run), automatic: { trigger },
+        reason: `automatic compaction: agent and tool content covered by summary ${summaryId}; user messages stay verbatim; rows retained` }).eventId);
     }
     // The summary request and its answer leave the context as well; their signed rows stay.
     if (own.length > 0) eventIds.push(session.dropSurfaceRange({ originEventIds: own.map(entry => entry.originEventId),
