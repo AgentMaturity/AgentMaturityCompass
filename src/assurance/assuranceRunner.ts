@@ -262,6 +262,7 @@ function persistV1Artifacts(params: {
         packId: pack.packId,
         category,
         passed: scenario.pass,
+        ...(scenario.inconclusive ? { inconclusive: true } : {}),
         reasons: scenario.reasons.filter((r) => r.length > 0),
         severityOnFailure: severity,
         evidenceRefs,
@@ -269,6 +270,8 @@ function persistV1Artifacts(params: {
       });
       refs.push(traceRef);
 
+      // An inconclusive row was not graded (P0-19): it is not a finding, whatever its zero score says.
+      if (scenario.inconclusive) continue;
       if (scenario.pass) {
         findingCounts.info += 1;
       } else {
@@ -313,11 +316,11 @@ function persistV1Artifacts(params: {
     score: {
       // report.status is artifact validity (VALID/INVALID/UNSIGNED); the
       // pass/fail judgement comes from the scan's own failure counts.
-      status: failed ? "FAIL" : "PASS",
+      status: report.evidenceStatus === "INSUFFICIENT_EVIDENCE" ? "INSUFFICIENT_EVIDENCE" : failed ? "FAIL" : "PASS",
       riskAssuranceScore: report.overallScore0to100,
       categoryScores: {},
       findingCounts,
-      pass: !failed,
+      pass: !failed && report.evidenceStatus !== "INSUFFICIENT_EVIDENCE",
       reasons: []
     },
     notes: []
