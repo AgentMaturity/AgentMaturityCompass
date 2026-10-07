@@ -21,7 +21,7 @@ Planned work adds the rest:
 
 ## Which run is exported
 
-The export reads the agent's newest run by `ts` (preferring a run whose status is `VALID`, as `amc report latest` does) and never another agent's run. It then checks the run's seal against the workspace auditor key. A run whose seal does not verify vouches for nothing: its own `VALID` status is ignored, its evidence is `untrusted` and its claim kind is at most `self_reported`. The CLI prints the run id and whether its seal verified.
+The export reads the agent's newest run by `ts`, whatever that run's own status says, and never another agent's run. Unlike `amc report latest`, it does not prefer an older run marked `VALID`: the unverified status in a run file never decides which run is exported, so a newer failed run is not hidden behind an older passing one. It then checks the run's seal against the workspace auditor key. A run whose seal does not verify vouches for nothing: its own `VALID` status is ignored, its evidence is `untrusted` and its claim kind is at most `self_reported`. The CLI prints the run id and whether its seal verified.
 
 With no runs, the command prints `No run reports found. Run \`amc\` first.` and exits non-zero.
 

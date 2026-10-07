@@ -1,20 +1,38 @@
-import { resolve } from "node:path";
+import { readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 import chalk from "chalk";
 import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/index.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
-import { resolveRunReport } from "../diagnostic/runReportResolution.js";
+import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
-import { writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { buildGrcEvidenceManifest, grcManifestToSarif, type GrcFramework } from "./grcEvidenceExport.js";
 
 const ALLOWED: GrcFramework[] = ["SOC2", "NIST_AI_RMF", "ISO_42001", "EU_AI_ACT"];
 
-function latestRun(workspace: string, agentId: string): DiagnosticReport {
-  try {
-    return resolveRunReport(workspace, "latest", agentId).report;
-  } catch {
-    throw new Error("No run reports found. Run `amc` first.");
+/**
+ * The agent's newest run by ts, from its runs folder and the legacy .amc/runs, skipping other agents'
+ * runs. Unlike resolveRunReport("latest") it does not prefer an older run marked VALID: the unverified
+ * status in a run file never decides which run is exported. The seal is checked by the caller.
+ */
+function newestRun(workspace: string, agentId: string): DiagnosticReport {
+  const id = resolveAgentId(workspace, agentId);
+  let newest: DiagnosticReport | null = null;
+  for (const dir of new Set([getAgentPaths(workspace, id).runsDir, join(workspace, ".amc", "runs")])) {
+    if (!pathExists(dir)) continue;
+    for (const file of readdirSync(dir).filter((name) => name.endsWith(".json"))) {
+      let report: DiagnosticReport;
+      try {
+        report = JSON.parse(readUtf8(join(dir, file))) as DiagnosticReport;
+      } catch {
+        continue; // a corrupt file is not a run
+      }
+      if ((report.agentId && report.agentId !== id) || !Number.isFinite(report.ts)) continue;
+      if (newest === null || report.ts > newest.ts) newest = report;
+    }
   }
+  if (newest === null) throw new Error("No run reports found. Run `amc` first.");
+  return newest;
 }
 
 export function runGrcExportCli(params: {
@@ -29,9 +47,8 @@ export function runGrcExportCli(params: {
   if (!ALLOWED.includes(fw)) {
     throw new Error(`--framework must be one of: ${ALLOWED.join(", ")}`);
   }
-  // resolveRunReport selects the agent's newest run by ts and skips other agents' runs; it does not
-  // verify, so the seal is checked here and decides what the run may claim.
-  const report = latestRun(params.workspace, params.agentId);
+  // The seal decides what the run may claim; selection never reads the run's own status.
+  const report = newestRun(params.workspace, params.agentId);
   const sealVerified = sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>);
   const manifest = buildGrcEvidenceManifest(fw, { ...report, agentId: report.agentId || params.agentId },
     { sealVerified, now: Date.now() });
