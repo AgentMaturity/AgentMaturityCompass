@@ -496,6 +496,37 @@ const migrations: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_guard_module ON amc_guard_events(module_code);
       CREATE INDEX IF NOT EXISTS idx_guard_severity_created ON amc_guard_events(severity, created_at);
     `
+  },
+  {
+    // P1-03 action journal. `action_executions` is an index of each chain's head, rewritten per transition;
+    // `action_transitions` is the append-only chain itself, and every row names the signed ACTION_STATE evidence
+    // row written in the same transaction. `session_id` and `call_id` tie an execution to the native session call.
+    version: 12,
+    sql: `
+      CREATE TABLE IF NOT EXISTS action_executions (
+        execution_id TEXT PRIMARY KEY, workspace_id TEXT NOT NULL, agent_id TEXT NOT NULL,
+        tool_name TEXT NOT NULL, action_class TEXT NOT NULL,
+        state TEXT NOT NULL CHECK (state IN ('requested','authorized','started','completed','denied','cancelled','outcome_unknown')),
+        effect TEXT CHECK (effect IN ('applied','not_applied')),
+        evidence_complete INTEGER NOT NULL DEFAULT 1,
+        authorization_digest TEXT, intent_json TEXT, idempotency_key TEXT, parent_execution_id TEXT,
+        session_id TEXT, call_id TEXT,
+        owner_pid INTEGER, owner_host TEXT, heartbeat_ts INTEGER,
+        created_ts INTEGER NOT NULL, updated_ts INTEGER NOT NULL, last_receipt_digest TEXT NOT NULL
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_action_idem ON action_executions(workspace_id, idempotency_key) WHERE idempotency_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_action_block ON action_executions(workspace_id, agent_id, state, evidence_complete);
+      CREATE INDEX IF NOT EXISTS idx_action_session ON action_executions(session_id, call_id);
+      CREATE TABLE IF NOT EXISTS action_transitions (
+        execution_id TEXT NOT NULL REFERENCES action_executions(execution_id), seq INTEGER NOT NULL,
+        receipt_json TEXT NOT NULL, receipt_digest TEXT NOT NULL, evidence_event_id TEXT NOT NULL,
+        PRIMARY KEY (execution_id, seq)
+      );
+      CREATE TRIGGER IF NOT EXISTS action_transitions_append_only BEFORE UPDATE ON action_transitions
+      BEGIN SELECT RAISE(ABORT, 'action_transitions is append-only'); END;
+      CREATE TRIGGER IF NOT EXISTS action_transitions_no_delete BEFORE DELETE ON action_transitions
+      BEGIN SELECT RAISE(ABORT, 'action_transitions is append-only'); END;
+    `
   }
 ];
 
