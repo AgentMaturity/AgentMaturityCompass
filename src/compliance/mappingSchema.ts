@@ -88,10 +88,13 @@ export interface ComplianceCategoryResult {
     eventId: string;
     eventHash: string;
     eventType: string;
-    /** The tier this event counted at; absent in reports written before P0-22, which read as self-reported. */
-    trustTier?: "OBSERVED" | "ATTESTED" | "SELF_REPORTED";
   }>;
   neededToSatisfy: string[];
+  /**
+   * True only when every requirement passed on control-bound events that all counted as OBSERVED (computed over the
+   * counted set, not the display refs). Absent in reports written before P0-22, which read as self-reported.
+   */
+  countedObserved?: boolean;
 }
 
 export interface ComplianceReportJson {

@@ -39,6 +39,10 @@ export function envelopeForStoredRun(report: DiagnosticReport, options: { sealVe
       evidenceRefs: [report.runId], now: options.now
     });
   }
+  // A run file missing the fields the diagnostic rules read is malformed input: nothing in it is evaluated.
+  if (!report.evidenceTrustCoverage || !Array.isArray(report.layerScores)) {
+    return envelopeForUnverifiedResult({ producer: `diagnostic:${report.agentId}`, recordCount: 0, evidenceRefs: [report.runId], now: options.now });
+  }
   const trusted = options.sealVerified || report.status !== "VALID" ? report : { ...report, status: "INVALID" as const };
   const envelope = envelopeForDiagnosticReport(trusted, options.now);
   return options.sealVerified ? envelope : { ...envelope, claimKind: "self_reported" };
@@ -108,13 +112,15 @@ export function envelopeForAssurancePack(assuranceRunId: string, pack: Assurance
 type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework" | "configTrusted" | "windowEndTs">;
 
 /**
- * A compliance category is a regulated result on control-bound runtime evidence. Its tiers are its own evidence
- * references' (a reference with no recorded tier reads as self-reported), never the report-wide coverage. With no
- * applicability decision it cannot pass (rule 9), and untrusted compliance maps make its evidence untrusted.
+ * A compliance category is a regulated result on control-bound runtime evidence. It reads as observed only when the
+ * engine found its evidence sufficient and every event it counted was OBSERVED (`countedObserved`); evidence the
+ * engine rejected, a mixed or partial set, or a report written before that field existed is self-reported. Never
+ * the report-wide coverage. With no applicability decision it cannot pass (rule 9), and untrusted compliance maps
+ * make its evidence untrusted.
  */
 export function envelopeForComplianceCategory(report: ComplianceReportClaimInput, category: ComplianceCategoryResult,
   now: number): ClaimEnvelope {
-  const tiers = [...new Set(category.evidenceRefs.map((ref) => ref.trustTier ?? "SELF_REPORTED"))];
+  const tiers = category.evidence === "sufficient" && category.countedObserved === true ? ["OBSERVED" as const] : ["SELF_REPORTED" as const];
   return evaluateClaimEligibility({
     producer: `compliance:${report.framework}:${category.id}`,
     method: "runtime_observation",
