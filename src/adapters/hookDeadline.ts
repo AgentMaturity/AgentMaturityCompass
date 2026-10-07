@@ -6,10 +6,24 @@
  * HOOK_FORWARD_DEADLINE_MS + forwarder cold start (p95) + 1,000 ms <= timeout.
  * Measured cold start of `node dist/cli.js connect hooks forward` (empty stdin, exit 2) on macOS
  * arm64, Node 25.5, 10 runs: p95 1,534 ms, so 5,000 + 1,534 + 1,000 = 7,534 ms fits the 10 s
- * timeout and leaves the Bridge 5 s. Linux was not measured for this budget.
+ * timeout and leaves the Bridge 5 s. Linux was not measured for this budget. The budget does not
+ * rest on that number alone: forwardDeadlineMs() subtracts the start-up the process actually
+ * spent, so a slower host gets a shorter Bridge budget instead of overrunning the timeout.
  */
 export const CLAUDE_HOOK_TIMEOUT_SECONDS = 10;
 export const HOOK_FORWARD_DEADLINE_MS = 5_000;
+const HOOK_TIMEOUT_MARGIN_MS = 1_000;
+
+/**
+ * The forwarder deadline left once start-up is paid: at most HOOK_FORWARD_DEADLINE_MS, and never
+ * past `timeoutMs` minus the margin, measured from process start. Both providers install a 10 s timeout.
+ */
+export function forwardDeadlineMs(
+  timeoutMs = CLAUDE_HOOK_TIMEOUT_SECONDS * 1000,
+  startedMs = process.uptime() * 1000,
+): number {
+  return Math.max(0, Math.min(HOOK_FORWARD_DEADLINE_MS, Math.floor(timeoutMs - HOOK_TIMEOUT_MARGIN_MS - startedMs)));
+}
 
 export class HookDeadlineError extends Error {
   constructor(deadlineMs: number) {

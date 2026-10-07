@@ -19,7 +19,7 @@ import {
 import { serializeProviderControlResponse } from "../bridge/hookControl.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
-import { HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
+import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
 
@@ -48,7 +48,7 @@ export interface HookForwardOutcome {
 }
 
 /**
- * Runs one provider hook delivery under HOOK_FORWARD_DEADLINE_MS. Claude Code control mode turns
+ * Runs one provider hook delivery under forwardDeadlineMs(). Claude Code control mode turns
  * every failure into a deny with exit 2, because Claude Code runs the tool after any other
  * failure; Gemini CLI keeps its earlier outputs and exit codes.
  */
@@ -56,7 +56,7 @@ export async function runHookForward(
   opts: HookForwardOptions,
   readInput: () => Promise<string>,
   workspace = process.cwd(),
-  deadlineMs = HOOK_FORWARD_DEADLINE_MS,
+  deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
   const denyExit = opts.provider === "claude-code" && opts.mode === "control" ? 2 : 0;
   const deny = (message: string): HookForwardOutcome => ({
@@ -91,10 +91,13 @@ export async function runHookForward(
       return { stdout: "{}\n", stderr: "", exitCode: 0 };
     });
   } catch (error) {
-    const timedOut = error instanceof HookDeadlineError;
+    // A post-tool hook cannot stop a call that already ran, so it never claims a deny.
+    if (denyExit === 2 && stage === "observe") {
+      return { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
+    }
     if (denyExit === 2 || (opts.mode === "control" && stage !== "empty" && stage !== "observe")) {
-      if (timedOut) return deny("AMC hook control timed out; action denied.");
-      return deny(stage === "control" || stage === "observe"
+      if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
+      return deny(stage === "control"
         ? "AMC hook control unavailable; action denied."
         : "AMC hook control input invalid; action denied.");
     }

@@ -3,8 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { createServer, type RequestListener, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
-import { boundedFetchSignal, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { boundedFetchSignal, forwardDeadlineMs, HOOK_FORWARD_DEADLINE_MS, HookDeadlineError, withHookDeadline } from "../src/adapters/hookDeadline.js";
 import { installHookIntegration, type HookProvider } from "../src/adapters/hookIntegration.js";
 import { runHookForward } from "../src/adapters/hookIntegrationCli.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
@@ -364,7 +364,28 @@ describe("in-process forwarder deadline", () => {
     expect(bounded.aborted).toBe(true);
   });
 
-  test("maps every Claude control failure to exit 2 and keeps observe and Gemini failures at exit 1", async () => {
+  test("shortens the forwarder deadline by the process start-up time so the hook ends inside its timeout", async () => {
+    expect(forwardDeadlineMs(10_000, 500)).toBe(HOOK_FORWARD_DEADLINE_MS);
+    expect(forwardDeadlineMs(10_000, 6_500)).toBe(2_500);
+    expect(forwardDeadlineMs(10_000, 9_500)).toBe(0);
+
+    const workspace = newWorkspace();
+    const bridgeBase = await listen(() => { /* never answers */ });
+    installControl(workspace, "claude-code", "slow-start-agent", bridgeBase);
+    const claude = { provider: "claude-code" as const, mode: "control" as const, agent: "slow-start-agent", tokenFile: ".amc/hooks/claude-code.lease", bridgeUrl: bridgeBase };
+    // A process that already spent 8.7 s starting has 300 ms left before the 10 s timeout minus the 1 s margin.
+    vi.spyOn(process, "uptime").mockReturnValue(8.7);
+    try {
+      const started = Date.now();
+      const slowStart = await runHookForward(claude, async () => claudeRead("/private/slow-start.txt", "toolu_slow_start_01"), workspace);
+      expect(slowStart).toEqual({ stdout: `${JSON.stringify(CLAUDE_DENY)}\n`, stderr: "AMC hook control timed out; action denied.\n", exitCode: 2 });
+      expect(Date.now() - started).toBeLessThan(2_000);
+    } finally {
+      vi.restoreAllMocks();
+    }
+  }, 30_000);
+
+  test("maps every Claude control failure to exit 2 and keeps observe-mode and Gemini failures at exit 1", async () => {
     const workspace = newWorkspace();
     const bridgeBase = await listen(() => { /* never answers */ });
     installControl(workspace, "claude-code", "inproc-agent", bridgeBase);
@@ -385,7 +406,17 @@ describe("in-process forwarder deadline", () => {
       tool_use_id: "toolu_inproc_02",
       tool_response: { content: "private" },
     }), workspace, 300);
-    expect(terminal.exitCode).toBe(2);
+    // The tool already ran: no PreToolUse deny and no claim that the action was denied.
+    const notRecorded = { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
+    expect(terminal).toEqual(notRecorded);
+    const failure = await runHookForward(claude, async () => JSON.stringify({
+      hook_event_name: "PostToolUseFailure",
+      tool_name: "Bash",
+      tool_use_id: "toolu_inproc_03",
+      tool_input: { command: "ls" },
+      error: "exit 1",
+    }), workspace, 300);
+    expect(failure).toEqual(notRecorded);
 
     const observeEmpty = await runHookForward({ ...claude, mode: "observe" }, async () => "", workspace);
     expect(observeEmpty).toEqual({ stdout: "", stderr: "provider hook input is required on stdin\n", exitCode: 1 });
