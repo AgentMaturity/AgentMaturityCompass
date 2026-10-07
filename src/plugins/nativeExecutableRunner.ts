@@ -148,7 +148,7 @@ export class NativeExecutableRunner {
       if (outcome.timedOut) throw new NativeExecutableError("EXECUTABLE_TIMEOUT", "The executable invocation exceeded its wall-clock deadline.");
       if (outcome.treeExitProven !== true) throw new NativeExecutableError("EXECUTABLE_CLEANUP_UNCONFIRMED", "The executable process tree did not provide a confirmed exit receipt. The load is stopped; no result or retry is admitted.");
       if (!outcome.confined || outcome.backend !== "bwrap" || outcome.failure
-        || outcome.enforcement?.network !== "socket-syscalls-denied"
+        || outcome.enforcement?.boundary !== "linux-bwrap" || outcome.enforcement.network !== "denied"
         || outcome.enforcement.hostWrites !== "declared-roots-only" || outcome.writableRoots.length !== 0
         || outcome.enforcement.sourcePolicySha256 !== approval.policyDigest
         || outcome.enforcement.launcherStatus !== "command-exited" || !outcome.enforcement.readonlyRoots.includes(directory)) {

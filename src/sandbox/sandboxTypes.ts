@@ -33,12 +33,28 @@ export interface SandboxPolicy {
   readonly writableRoots: readonly string[];
   /** Wall-clock limit for the confined command. */
   readonly timeoutMs: number;
-  /** Linux native shells require all socket networking to be denied. */
+  /** Native shells deny direct networking; `allowHosts` is the only, proxied exception. */
   readonly network?: "deny";
   readonly signal?: AbortSignal;
   readonly scrubValues?: readonly string[];
   /** Digest of the signed tools configuration that supplied the write grant. */
   readonly sourcePolicySha256?: string;
+  /** Exact paths the command may neither read nor write; real paths where they exist. */
+  readonly readDeny?: readonly string[];
+  /** Present only with a signed egress allowlist: hosts reachable through AMC's per-call proxy. */
+  readonly allowHosts?: readonly string[];
+  /** Processes the command may add to the user's count at launch (RLIMIT_NPROC); absent applies no cap. */
+  readonly maxProcesses?: number;
+  /** Receives every egress proxy decision before it takes effect; a throw denies that connection. */
+  readonly onEgress?: (row: ShellEgressRow) => void;
+}
+
+/** One `NATIVE_SHELL_EGRESS` decision by the shell's egress proxy. */
+export interface ShellEgressRow {
+  readonly host: string;
+  readonly port: number;
+  readonly decision: "allow" | "deny";
+  readonly reason: string;
 }
 
 /**
@@ -69,8 +85,12 @@ export interface SandboxOutcome {
   readonly cancelled?: boolean;
   readonly droppedBytes?: number;
   readonly enforcement?: {
+    readonly boundary: "linux-bwrap" | "macos-seatbelt";
     readonly hostWrites: "declared-roots-only";
-    readonly network: "socket-syscalls-denied";
+    readonly reads: "workspace-ro-and-runtime" | "open-except-denylist";
+    readonly network: "denied" | "proxy-allowlist";
+    readonly allowHosts: readonly string[];
+    readonly processLimit: { readonly mechanism: "rlimit-nproc"; readonly max: number } | null;
     readonly readonlyRoots: readonly string[];
     readonly privateWritableRoots: readonly string[];
     readonly launcherStatus: "command-exited";

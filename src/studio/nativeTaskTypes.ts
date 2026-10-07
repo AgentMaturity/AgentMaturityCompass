@@ -63,7 +63,8 @@ export interface NativeTaskToolScope {
   readonly ready: boolean; readonly digest: string | null; readonly approvalRequired: true;
   readonly tools: readonly { readonly name: string; readonly actionClass: string;
     readonly paths: readonly string[]; readonly deniedPaths: readonly string[]; readonly hosts: readonly string[]; readonly binaries: readonly string[];
-    readonly nativeSandbox: { readonly kind: "linux-bwrap"; readonly writableDirectories: readonly string[] } | null }[];
+    readonly nativeSandbox: { readonly kind: "linux-bwrap" | "os-native"; readonly writableDirectories: readonly string[];
+      readonly egress?: { readonly allowHosts: readonly string[] }; readonly readDeny?: readonly string[]; readonly maxProcesses?: number } | null }[];
   readonly message: string;
 }
 export interface NativeTaskConfiguration {

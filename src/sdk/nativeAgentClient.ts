@@ -96,7 +96,7 @@ export interface AMCNativeClientOptions {
   readonly baseUrl?: string;
   readonly agentId?: string;
   readonly tools?: "none" | "workspace";
-  /** Passes --unsafe-unconfined-shell: macOS only, an UNCONFINED shell with full user rights; refused on Windows. */
+  /** Passes --unsafe-unconfined-shell: macOS without Seatbelt only, an UNCONFINED shell with full user rights; refused on Windows. */
   readonly allowUnconfinedShell?: boolean;
   /** Pin the signed workspace tool policy for every native tool dispatch. */
   readonly expectedToolsDigest?: string;

@@ -31,8 +31,10 @@ import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTra
 /**
  * P0-06: the native shell is offered only when it is confined (Linux with a
  * usable Bubblewrap) or when an operator explicitly opted in to an unconfined
- * shell on macOS. The platform and the Bubblewrap backend are pinned in every
- * case, so these results do not depend on the host running the suite.
+ * shell on macOS. The platform and both backends are pinned in every case, so
+ * these results do not depend on the host running the suite. Seatbelt is
+ * pinned unavailable here; tests/nativeShellPlatformGate.test.ts covers the
+ * Seatbelt-confined macOS decision (P1-05).
  */
 const backend = vi.hoisted(() => ({
   available: { value: { ok: true } as { ok: true } | { ok: false; reason: string } },
@@ -42,8 +44,12 @@ vi.mock("../src/sandbox/bwrapBackend.js", async importOriginal => ({
   ...(await importOriginal<typeof import("../src/sandbox/bwrapBackend.js")>()),
   bwrapBackend: () => ({ kind: "bwrap", available: () => backend.available.value, run: backend.run })
 }));
+vi.mock("../src/sandbox/seatbeltNativeShell.js", async importOriginal => ({
+  ...(await importOriginal<typeof import("../src/sandbox/seatbeltNativeShell.js")>()),
+  seatbeltNativeShell: () => ({ kind: "seatbelt", available: () => ({ ok: false, reason: "/usr/bin/sandbox-exec is missing." }), run: backend.run })
+}));
 
-const DARWIN_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
+const DARWIN_REFUSAL = "The native shell is refused on macOS: /usr/bin/sandbox-exec is missing, so AMC cannot confine it with Seatbelt. To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
 const NOT_HONOURED = "runtime.shell.allowUnconfined is not honoured: a workspace can sign its own config, so a file in the repository cannot grant an unconfined shell. Pass --unsafe-unconfined-shell, or start Studio with AMC_UNSAFE_UNCONFINED_SHELL=1.";
 const CLI_FLAG_WARNING = "WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.";
 const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
@@ -195,7 +201,7 @@ describe("no workspace file can opt in", () => {
       backend.available.value = bwrap;
       const dir = workspace();
       setAllowUnconfined(dir, true);
-      const expected = (decideNativeShell({ platform: os, bwrap, optIn: null }) as { remediation: string }).remediation;
+      const expected = (decideNativeShell({ platform: os, bwrap, seatbelt: { ok: false, reason: "/usr/bin/sandbox-exec is missing." }, optIn: null }) as { remediation: string }).remediation;
       for (const explicit of [undefined, "cli-flag"] as const) expect(nativeShellReadiness(dir, explicit).reason, `${os} ${explicit}`).toBe(expected);
     }
   });

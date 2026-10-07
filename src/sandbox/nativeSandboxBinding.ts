@@ -4,7 +4,8 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 import { bwrapBackend } from "./bwrapBackend.js";
 import { SandboxRunner } from "./sandboxRunner.js";
-import type { SandboxOutcome } from "./sandboxTypes.js";
+import type { SandboxOutcome, ShellEgressRow } from "./sandboxTypes.js";
+import { seatbeltNativeShell } from "./seatbeltNativeShell.js";
 
 declare const permitBrand: unique symbol;
 /** Opaque in-process evidence of the exact confined definition, never a caller flag. */
@@ -23,6 +24,13 @@ const bindings = new WeakMap<ToolDefinition, {
   readonly workspace: string;
   readonly admissions: WeakMap<ToolExecution, NativeSandboxValidationPermit>;
 }>();
+/**
+ * Platforms with an admitted shell backend: Bubblewrap on Linux for either
+ * kind, Seatbelt on macOS unless the signed kind is the Linux-only `linux-bwrap`.
+ */
+function platformAdmits(tool: SignedToolDefinition): boolean {
+  return process.platform === "linux" || (process.platform === "darwin" && tool.nativeSandbox?.kind !== "linux-bwrap");
+}
 function executionJson(execution: ToolExecution): string {
   return JSON.stringify([execution.token, execution.callId, execution.rootCallId, execution.name,
     execution.agentId, execution.workspace, execution.actionClass, execution.requestedMode,
@@ -35,7 +43,7 @@ export function admitNativeSandboxPolicy(
   tool: SignedToolDefinition, policySha256: string
 ): NativeSandboxValidationPermit | undefined {
   const binding = definition && bindings.get(definition);
-  if (!binding || selectedToolDefinitionFor(execution) !== definition || process.platform !== "linux" || execution.workspace !== binding.workspace ||
+  if (!binding || selectedToolDefinitionFor(execution) !== definition || !platformAdmits(tool) || execution.workspace !== binding.workspace ||
       execution.name !== "bash" || execution.actionClass !== "WRITE_HIGH" ||
       tool.name !== "bash" || tool.actionClass !== "WRITE_HIGH" || tool.context?.kind === "mcp" ||
       !/^[a-f0-9]{64}$/.test(policySha256)) return undefined;
@@ -50,7 +58,7 @@ export function admitNativeSandboxPolicy(
 export function nativeSandboxPermitMatches(permit: NativeSandboxValidationPermit | undefined,
   workspace: string, tool: SignedToolDefinition, args: Readonly<Record<string, unknown>>): boolean {
   const admission = permit && permits.get(permit);
-  return !!admission && process.platform === "linux" && admission.workspace === workspace &&
+  return !!admission && platformAdmits(tool) && admission.workspace === workspace &&
     admission.tool === tool && admission.args === args && admission.toolJson === JSON.stringify(tool);
 }
 
@@ -62,8 +70,10 @@ export function createNativeSandboxBash(options: {
   readonly workspace: string;
   readonly scrubValues?: readonly string[];
   readonly record: (execution: ToolExecution, outcome: SandboxOutcome) => void;
+  /** Records each egress proxy decision; without it a signed egress allowlist refuses the call. */
+  readonly recordEgress?: (execution: ToolExecution, row: ShellEgressRow) => void;
 }): ToolDefinition {
-  const { workspace, record } = options;
+  const { workspace, record, recordEgress } = options;
   const scrubValues = Object.freeze([...(options.scrubValues ?? [])]);
   const admissions = new WeakMap<ToolExecution, NativeSandboxValidationPermit>();
   const tool: ToolDefinition = Object.freeze(bashTool({ scrubValues, runConfined: async (execution, command, timeoutMs) => {
@@ -86,11 +96,13 @@ export function createNativeSandboxBash(options: {
       const { nativeShellSandboxPolicy } = await import("./nativeSandboxPolicy.js");
       if (executionJson(execution) !== admission.executionJson || execution.signal !== admission.signal) throw new Error("Native shell execution changed after admission.");
       if (execution.signal?.aborted) throw new Error("Native shell was cancelled before dispatch.");
-      const policy = nativeShellSandboxPolicy(workspace, timeoutMs, execution.signal, scrubValues, admission.policySha256);
-      outcome = await new SandboxRunner({ backends: [bwrapBackend()] }).run(["/bin/sh", "-c", command], workspace, policy);
+      const policy = { ...nativeShellSandboxPolicy(workspace, timeoutMs, execution.signal, scrubValues, admission.policySha256),
+        ...(recordEgress ? { onEgress: (row: ShellEgressRow) => recordEgress(execution, row) } : {}) };
+      const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
+      outcome = await new SandboxRunner({ backends: [backend] }).run(["/bin/sh", "-c", command], workspace, policy);
     } catch (error) {
       outcome = { confined: false, backend: "none", failure: { kind: "runner-failure",
-        reason: error instanceof Error ? error.message : "The Linux shell policy or launcher did not finish; execution and confinement are unconfirmed." },
+        reason: error instanceof Error ? error.message : "The native shell policy or launcher did not finish; execution and confinement are unconfirmed." },
         exitCode: null, timedOut: false, cancelled: execution.signal?.aborted ?? false, stdout: "", stderr: "", writableRoots: [], treeExitProven: false };
     } finally {
       if (permit) permits.delete(permit);

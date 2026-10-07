@@ -3180,10 +3180,28 @@ components:
                     type: string
                     enum:
                       - linux-bwrap
+                      - os-native
                   writableDirectories:
                     type: array
                     items:
                       type: string
+                  egress:
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - allowHosts
+                    properties:
+                      allowHosts:
+                        type: array
+                        items:
+                          type: string
+                  readDeny:
+                    type: array
+                    items:
+                      type: string
+                  maxProcesses:
+                    type: integer
+                    minimum: 0
                 nullable: true
         message:
           type: string
@@ -3347,6 +3365,7 @@ components:
           type: string
           enum:
             - linux-bwrap
+            - macos-seatbelt
             - null
           nullable: true
         reason:

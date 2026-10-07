@@ -257,10 +257,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     record: (execution, outcome) => recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
       backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
-      enforcementLevel: outcome.confined ? "enforced" : "none", boundary: "linux-bwrap",
+      enforcementLevel: outcome.confined ? "enforced" : "none", boundary: shell.boundary,
       writableRoots: outcome.confined ? outcome.writableRoots : [], enforcement: outcome.enforcement ?? null,
       exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
       treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
+      callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
+    }),
+    // Written before the proxy acts on the decision; a failed write denies the connection.
+    recordEgress: (execution, row) => recordAudit({
+      schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_EGRESS", platform: process.platform, boundary: shell.boundary, ...row,
       callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
     })
   }));

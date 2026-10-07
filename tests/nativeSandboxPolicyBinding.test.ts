@@ -35,7 +35,8 @@ function setup(): string {
   backend.run.mockImplementation(async (_argv, _cwd, policy) => ({
     confined: true, backend: "bwrap", failure: null, exitCode: 0, timedOut: false,
     stdout: "fixture launcher completed", stderr: "", writableRoots: policy.writableRoots, treeExitProven: true,
-    enforcement: { hostWrites: "declared-roots-only", network: "socket-syscalls-denied", readonlyRoots: [],
+    enforcement: { boundary: "linux-bwrap", hostWrites: "declared-roots-only", reads: "workspace-ro-and-runtime", network: "denied",
+      allowHosts: [], processLimit: null, readonlyRoots: [],
       privateWritableRoots: [], launcherStatus: "command-exited", sourcePolicySha256: policy.sourcePolicySha256 ?? null,
       limitations: ["Synthetic launcher; OS confinement is not exercised by this test."] }
   }));
@@ -107,9 +108,13 @@ describe("signed native shell mount policy", () => {
 
   it("refuses malformed kind, unknown mount fields, and non-native declarations before signing", () => {
     const root = setup(); const shell = sign(root);
+    expect(toolsConfigSchema.safeParse({ tools: { version: 1, allowedTools: [{ ...shell, nativeSandbox: { kind: "os-native", writableDirectories: [],
+      egress: { allowHosts: [".example.com", "127.0.0.1"] }, readDeny: ["~/.config/secret"], maxProcesses: 64 } }] } }).success).toBe(true);
     for (const change of [
       { nativeSandbox: { kind: "seatbelt", writableDirectories: [] } },
       { nativeSandbox: { kind: "linux-bwrap", writableDirectories: [], allowUnconfined: true } },
+      ...["*.example.com", "example.com:443", "https://example.com", "Example.com"].map(host =>
+        ({ nativeSandbox: { kind: "os-native", writableDirectories: [], egress: { allowHosts: [host] } } })),
       { name: "replacement-shell" }, { actionClass: "READ_ONLY" },
       { context: { kind: "mcp", server: { id: "foreign", name: "Foreign" } } }
     ]) expect(toolsConfigSchema.safeParse({ tools: { version: 1, allowedTools: [{ ...shell, ...change }] } }).success).toBe(false);
@@ -125,7 +130,7 @@ describe("the requirement follows the actual confined body", () => {
     expect(validateToolRequest({ workspace: root, tool, args, nativeSandboxPermit: forged }).ok).toBe(false);
   });
 
-  it("refuses a non-Linux composition without running the replacement body", async () => {
+  it("refuses a linux-bwrap policy on macOS without running the replacement body", async () => {
     const root = setup(); sign(root); Object.defineProperty(process, "platform", { ...platform, value: "darwin" });
     const result = await compose(root).pipeline.execute(call());
     expect(result.denied?.reason).toContain("cannot enforce");

@@ -67,7 +67,7 @@ export function isRunnerFailure(exitCode: number | null, stderr: string): boolea
  * anyway is harmless — nothing can be written to a directory that is not
  * there.
  */
-function realOrLiteral(path: string): string {
+export function realOrLiteral(path: string): string {
   try {
     return realpathSync(path);
   } catch {
@@ -76,7 +76,7 @@ function realOrLiteral(path: string): string {
 }
 
 /** SBPL string literals: only backslash and quote need escaping. */
-function sbplString(value: string): string {
+export function sbplString(value: string): string {
   return value.split("\\").join("\\\\").split("\"").join("\\\"");
 }
 

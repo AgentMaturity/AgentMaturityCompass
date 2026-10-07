@@ -2,19 +2,23 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { bwrapBackend } from "./bwrapBackend.js";
+import { seatbeltNativeShell } from "./seatbeltNativeShell.js";
 
 /**
- * Whether the native `bash` tool is offered at all (P0-06).
+ * Whether the native `bash` tool is offered at all (P0-06, P1-05).
  *
- * Linux runs it under Bubblewrap. Nothing else can confine it yet, so every
- * other platform is refused, except macOS when an operator explicitly accepts
- * an unconfined shell. An opt-in never re-enables an unconfined Linux shell.
- * No workspace file is an opt-in: a workspace verifies its config against its
- * own keys, so a repository could sign one itself.
+ * Linux runs it under Bubblewrap and macOS under Seatbelt. Every other
+ * platform is refused. Only when Seatbelt is unavailable may an operator
+ * explicitly accept an unconfined macOS shell; an opt-in never replaces an
+ * available boundary and never re-enables an unconfined Linux shell. No
+ * workspace file is an opt-in: a workspace verifies its config against its own
+ * keys, so a repository could sign one itself.
  */
 export type ShellOptInSource = "cli-flag" | "sdk-option";
+export type NativeShellBoundary = "linux-bwrap" | "macos-seatbelt";
+type BackendCheck = { readonly ok: true } | { readonly ok: false; readonly reason: string };
 export type NativeShellDecision =
-  | { readonly kind: "confined"; readonly boundary: "linux-bwrap" }
+  | { readonly kind: "confined"; readonly boundary: NativeShellBoundary }
   | { readonly kind: "unconfined-opt-in"; readonly platform: NodeJS.Platform; readonly source: ShellOptInSource }
   | { readonly kind: "refused"; readonly platform: NodeJS.Platform; readonly remediation: string };
 
@@ -23,27 +27,29 @@ export interface NativeShellReadiness {
   readonly offered: boolean;
   readonly decision: NativeShellDecision["kind"];
   readonly enforcement: "enforced" | "none";
-  readonly boundary: "linux-bwrap" | null;
+  readonly boundary: NativeShellBoundary | null;
   readonly reason: string | null;
   readonly optInSource: ShellOptInSource | null;
 }
 
-const MACOS_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
 const NOT_HONOURED = "runtime.shell.allowUnconfined is not honoured: a workspace can sign its own config, so a file in the repository cannot grant an unconfined shell. Pass --unsafe-unconfined-shell, or start Studio with AMC_UNSAFE_UNCONFINED_SHELL=1.";
 const WINDOWS_REFUSAL = "The native shell is not available on Windows. AMC has no confined Windows runner yet; the unsafe flag does not apply on Windows.";
 
 export function decideNativeShell(input: {
   readonly platform: NodeJS.Platform;
-  readonly bwrap: { readonly ok: true } | { readonly ok: false; readonly reason: string };
+  readonly bwrap: BackendCheck;
+  readonly seatbelt: BackendCheck;
   readonly optIn: ShellOptInSource | null;
 }): NativeShellDecision {
-  const { platform, bwrap, optIn } = input;
+  const { platform, bwrap, seatbelt, optIn } = input;
   if (platform === "linux") {
     return bwrap.ok ? { kind: "confined", boundary: "linux-bwrap" } : { kind: "refused", platform,
       remediation: `The native shell is refused: ${bwrap.reason.replace(/\.$/, "")}. Install Bubblewrap at /usr/bin/bwrap (Debian and Ubuntu: apt install bubblewrap); on Ubuntu 24.04 also follow docs/NATIVE_SANDBOX_UBUNTU.md. AMC never falls back to an unconfined Linux shell.` };
   }
   if (platform === "darwin") {
-    return optIn === null ? { kind: "refused", platform, remediation: MACOS_REFUSAL } : { kind: "unconfined-opt-in", platform, source: optIn };
+    if (seatbelt.ok) return { kind: "confined", boundary: "macos-seatbelt" };
+    return optIn === null ? { kind: "refused", platform, remediation: `The native shell is refused on macOS: ${seatbelt.reason.replace(/\.$/, "")}, so AMC cannot confine it with Seatbelt. To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).` }
+      : { kind: "unconfined-opt-in", platform, source: optIn };
   }
   return { kind: "refused", platform, remediation: platform === "win32" ? WINDOWS_REFUSAL
     : `The native shell is not available on ${platform}. AMC has no confined runner for this platform; the unsafe flag applies only on macOS.` };
@@ -65,7 +71,7 @@ function configCarriesOptIn(workspace: string): boolean {
 }
 
 function readinessFor(workspace: string, optIn: ShellOptInSource | null): NativeShellReadiness {
-  const decision = decideNativeShell({ platform: process.platform, bwrap: bwrapBackend().available(), optIn });
+  const decision = decideNativeShell({ platform: process.platform, bwrap: bwrapBackend().available(), seatbelt: seatbeltNativeShell().available(), optIn });
   if (decision.kind === "confined") {
     return { offered: true, decision: decision.kind, enforcement: "enforced", boundary: decision.boundary, reason: null, optInSource: null };
   }
