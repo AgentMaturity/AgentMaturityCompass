@@ -15,6 +15,7 @@ import { canonicalize } from "../utils/json.js";
 import { openActionJournal, type ActionJournal } from "./actionJournal.js";
 import { recordActionIncidents } from "./actionRecovery.js";
 import type { BindingFacts } from "./authorizationRecord.js";
+import { decimal } from "./normalizeArguments.js";
 import {
   ReceiptChainBroken, receiptDigest, type ActionIntentV1, type ActionReceiptV1, type EffectState, type ReceiptState
 } from "./receiptStates.js";
@@ -120,7 +121,9 @@ async function lookup(adapter: ReconcileAdapter, query: ReconcileQuery, signal?:
 function mismatchesOf(bound: BindingFacts, observed: BindingFacts): ReconcileMismatch[] {
   const same = (a: unknown, b: unknown): boolean => canonicalize(a ?? null) === canonicalize(b ?? null);
   const found: ReconcileMismatch[] = [];
-  if (bound.amount !== null && !same(bound.amount, observed.amount)) found.push("amount");
+  // Amounts compare as AMC binds them: "100.50" and "100.5" are one amount.
+  const amount = observed.amount === null ? null : { value: decimal(observed.amount.value), currency: observed.amount.currency };
+  if (bound.amount !== null && !same(bound.amount, amount)) found.push("amount");
   if (bound.recipient !== null && !same(bound.recipient, observed.recipient)) found.push("recipient");
   if (bound.destination !== null && !same(bound.destination, observed.destination)) found.push("destination");
   if ((bound.resourceId !== null || bound.resourceVersion !== null)

@@ -39,7 +39,7 @@ function nfc(value: unknown): unknown {
 }
 
 /** "0100.50", "100.5" and "100.50" are one amount. */
-function decimal(value: string): string {
+export function decimal(value: string): string {
   const trimmed = value.replace(/^(-?)0+(?=\d)/, "$1");
   return trimmed.includes(".") ? trimmed.replace(/0+$/, "").replace(/\.$/, "") : trimmed;
 }
