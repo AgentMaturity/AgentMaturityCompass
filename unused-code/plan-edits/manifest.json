@@ -241,6 +241,13 @@
       "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
     },
     {
+      "path": "src/toolhub/toolhubValidators.ts",
+      "issue": "P1-05",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
+      "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176"
+    },
+    {
       "path": "src/trust/trustConfig.ts",
       "issue": "P0-45",
       "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
