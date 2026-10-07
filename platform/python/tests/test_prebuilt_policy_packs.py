@@ -60,7 +60,9 @@ def test_gdpr_pack_valid():
 def test_mitre_atlas_pack_valid():
     pack = mitre_atlas_policy_pack()
     assert pack.name == "MITRE ATLAS"
-    assert pack.version == "1.0"
+    assert pack.version == "1.1"
+    rule_ids = {rule["id"] for rule in pack.rules}
+    assert "ATLAS_T0051_PROMPT_INJECTION" in rule_ids and "ATLAS_T0054_JAILBREAK" in rule_ids
     assert len(pack.modules) >= 5
     assert len(pack.rules) >= 6
     assert pack.verify_digest()
