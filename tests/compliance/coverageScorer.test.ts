@@ -12,6 +12,12 @@ function row(status: ComplianceCategoryStatus): ComplianceCategoryResult {
     status,
     result,
     evidence: result === "not_evaluated" ? "incomplete" : "sufficient",
+    dimensions: { applicability: { state: "applicable" }, evidence: result === "not_evaluated" ? "incomplete" : "sufficient", result,
+      enforcement: { state: "none" }, review: "pending" },
+    claimKind: "observed",
+    claimReasons: [],
+    admitted: [],
+    rejected: [],
     notEvaluatedReasons: [],
     reasons: [],
     evidenceRefs: [],
@@ -26,10 +32,11 @@ describe("coverageScore (P0-17)", () => {
     expect(coverage).toEqual({ satisfied: 0, partial: 0, missing: 0, unknown: 1, notEvaluated: 2, evaluated: 0, score: null });
   });
 
-  test("NOT_EVALUATED and UNKNOWN earn 0 and stay in the denominator", () => {
+  test("only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator", () => {
     expect(coverageScore([row("SATISFIED"), row("NOT_EVALUATED")]).score).toBe(0.5);
     expect(coverageScore([row("SATISFIED"), row("UNKNOWN")]).score).toBe(0.5);
     const coverage = coverageScore([row("SATISFIED"), row("PARTIAL"), row("MISSING"), row("NOT_EVALUATED")]);
-    expect(coverage).toEqual({ satisfied: 1, partial: 1, missing: 1, unknown: 0, notEvaluated: 1, evaluated: 3, score: 0.375 });
+    // P1-11: a partial result earns nothing (it earned 0.5 before).
+    expect(coverage).toEqual({ satisfied: 1, partial: 1, missing: 1, unknown: 0, notEvaluated: 1, evaluated: 3, score: 0.25 });
   });
 });

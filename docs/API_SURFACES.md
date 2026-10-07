@@ -57,7 +57,7 @@ Claim labels (P0-23):
 ```
 
 - a list result (`score/history`, `assurance`, `assurance/history`, `passports`) puts a `claim` object with the same three fields on each item instead
-- a diagnostic run sealed by this workspace's auditor key carries its own claim (`envelopeForDiagnosticReport`); every other listed result is not evaluated with the reason `RESULT_NOT_BOUND` until an adapter binds it to evidence. Compliance and regulatory results are regulated, so their applicability is unresolved until a decision is recorded
+- a diagnostic run sealed by this workspace's auditor key carries its own claim (`envelopeForDiagnosticReport`), and Studio's `GET /compliance/report` carries the claim of the report it just generated, no more than its weakest category (P1-11); every other listed result is not evaluated with the reason `RESULT_NOT_BOUND` until an adapter binds it to evidence. Compliance and regulatory results are regulated, so their applicability is unresolved until a decision is recorded
 - the additions are additive; clients that validate strict response schemas should use `ClaimResult` from `website/openapi.yaml`. Markdown report formats (`format=md`) carry no claim fields
 
 Implemented routes:

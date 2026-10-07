@@ -213,6 +213,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc casebook init` | Create a signed casebook | `--agent <agentId>`<br>`--casebook <id>` | - |
 | `amc casebook list` | List casebooks | `--agent <agentId>` | - |
 | `amc casebook verify` | Verify signed casebook and case files | `--casebook <id>`<br>`--agent <agentId>` | - |
+| `amc catalog` | Regulated Control Catalog (experimental): compile deployment profiles into control plans | - | - |
+| `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) | `--profile <file>`<br>`--previous <plan.json>`<br>`--lock <catalog.lock.json>`<br>`--out <dir>`<br>`--request-review`<br>`--allow-weakening`<br>`--json` | - |
 | `amc cert` | Certificate operations | - | - |
 | `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
 | `amc cert inspect` | Inspect any AMC certificate (.amccert bundle or trust-certificate JSON) | - | - |
@@ -1132,7 +1134,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc transparency init` | Initialize append-only transparency log | - | - |
 | `amc transparency merkle` | Merkle transparency root/proof operations | - | - |
 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
-| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | - | - |
+| `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | `--algorithm <algorithm>` | - |
 | `amc transparency merkle root` | Show current Merkle root and history | - | - |
 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is | `--agent <id>`<br>`--format <fmt>`<br>`--out <file>`<br>`--all`<br>`--workspace <path>` | - |

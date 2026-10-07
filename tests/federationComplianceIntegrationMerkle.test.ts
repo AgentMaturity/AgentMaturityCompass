@@ -9,7 +9,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initComplianceMaps, verifyComplianceMapsSignature, generateComplianceReport } from "../src/compliance/complianceEngine.js";
 import { appendTransparencyEntry, readTransparencyEntries } from "../src/transparency/logChain.js";
-import { buildMerkleRootFromEntryHashes } from "../src/transparency/merkle.js";
+import { entryTreeRoot } from "../src/transparency/merkle.js";
 import {
   rebuildTransparencyMerkle,
   exportTransparencyProofBundle,
@@ -118,7 +118,7 @@ function signYamlWithAuditor(workspace: string, path: string): void {
 }
 
 describe("compliance + merkle + federation + integrations", () => {
-  test("compliance maps are signed and SATISFIED only when control-bound evidence exists", () => {
+  test("compliance maps are signed and only control-bound evidence is admitted", () => {
     const workspace = newWorkspace();
     const created = initComplianceMaps(workspace);
     expect(created.path).toContain(".amc/compliance-maps.yaml");
@@ -155,7 +155,11 @@ describe("compliance + merkle + federation + integrations", () => {
     });
     const afterMap = after.categories.find((row) => row.id === "nist_map");
     expect(afterMap).toBeDefined();
-    expect(afterMap?.status).toBe("SATISFIED");
+    // P1-11: the bound, receipted runtime event is admitted and observed; without a compiled plan recording that the
+    // control applies, the category is still not evaluated (it read SATISFIED before).
+    expect(afterMap?.evidence).toBe("sufficient");
+    expect(afterMap?.claimKind).toBe("observed");
+    expect(afterMap?.status).toBe("NOT_EVALUATED");
   });
 
   test("merkle transparency rebuild/prove/verify is deterministic and catches tampering", async () => {
@@ -181,7 +185,7 @@ describe("compliance + merkle + federation + integrations", () => {
       }
     });
     const rebuilt = rebuildTransparencyMerkle(workspace);
-    const expectedRoot = buildMerkleRootFromEntryHashes(readTransparencyEntries(workspace).map((entry) => entry.hash));
+    const expectedRoot = entryTreeRoot("rfc9162-sha256", readTransparencyEntries(workspace).map((entry) => entry.hash));
     expect(rebuilt.root).toBe(expectedRoot);
 
     const proofFile = join(workspace, ".amc", "transparency", "proofs", `${e1.hash}.amcproof`);

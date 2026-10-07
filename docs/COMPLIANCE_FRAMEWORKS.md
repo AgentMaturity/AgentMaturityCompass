@@ -292,12 +292,13 @@ Specific audit event types that indicate non-compliance:
 
 ## Compliance Status
 
-Each control category has one of four statuses (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules):
+Each control category carries five status dimensions and a claim kind (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules and [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions) for the decision table), and a `status` derived from its result:
 
-- **SATISFIED**: Every evidence requirement passed on control-bound AMC runtime evidence
-- **PARTIAL**: A requirement failed while another passed
-- **MISSING**: A requirement failed and none passed
-- **NOT_EVALUATED**: Control-bound evidence is absent, untrusted or outside the window, or the maps are untrusted; this is not a pass
+- **SATISFIED** (pass): every evidence requirement passed on admitted, control-bound AMC runtime evidence and a compiled plan records that the control applies
+- **MISSING** (fail): an admitted record shows a requirement failed
+- **NOT_EVALUATED**: evidence is absent, untrusted, stale, contradictory or outside the window, the maps are untrusted, or applicability is unresolved; this is not a pass
+
+`PARTIAL` is no longer emitted and earns no coverage credit in older reports.
 
 ## Extending Compliance Mappings
 

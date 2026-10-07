@@ -39,6 +39,12 @@ function fixtureReport(): ComplianceReportJson {
       status: "NOT_EVALUATED",
       result: "not_evaluated",
       evidence: "untrusted",
+      dimensions: { applicability: { state: "unresolved", reason: "fixture" }, evidence: "untrusted", result: "not_evaluated",
+        enforcement: { state: "none" }, review: "pending" },
+      claimKind: "self_reported",
+      claimReasons: ["SIGNATURE_INVALID"],
+      admitted: [],
+      rejected: [],
       notEvaluatedReasons: ["Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."],
       reasons: ["Compliance maps signature invalid (compliance maps missing); categories are not evaluated against untrusted maps."],
       evidenceRefs: [{
@@ -62,11 +68,14 @@ describe("compliance report readability", () => {
     expect(markdown).toContain("Full hashes remain available in JSON reports: `amc compliance report --json`.");
     expect(markdown).toContain("## Status and Evidence Drilldown");
     // P0-17: untrusted maps or absent evidence are NOT_EVALUATED, never PARTIAL, and there is no score.
-    expect(markdown).toContain("- Coverage: not evaluated (0 of 1 categories had control-bound evidence) (S:0 P:0 M:0 N:1 U:0)");
+    expect(markdown).toContain("- Coverage: not evaluated (0 of 1 categories passed or failed) (S:0 P:0 M:0 N:1 U:0)");
     expect(markdown).not.toContain("Coverage score:");
-    expect(markdown).toContain("SATISFIED: every requirement passed on control-bound AMC runtime evidence and the compliance maps are trusted.");
-    expect(markdown).toContain("PARTIAL: at least one requirement failed while another passed.");
-    expect(markdown).toContain("NOT_EVALUATED: control-bound evidence is absent, untrusted or outside the window, or the maps are untrusted; this is not a pass.");
+    // P1-11: the status is derived from the result, a pass needs an applicability decision, and PARTIAL is gone.
+    expect(markdown).toContain("SATISFIED (result pass): every requirement passed on admitted, control-bound AMC runtime evidence, the compliance maps are trusted, and a compiled plan records that the control applies.");
+    expect(markdown).toContain("PARTIAL and UNKNOWN appear only in reports written by earlier versions; neither earns coverage credit.");
+    expect(markdown).not.toContain("PARTIAL: at least one requirement failed while another passed.");
+    expect(markdown).toContain("NOT_EVALUATED: evidence is absent, untrusted, stale, contradictory or outside the window, the maps are untrusted, or no applicability decision is recorded; this is not a pass.");
+    expect(markdown).toContain("**Claim:** Self-reported · **Result:** not evaluated (the signature does not verify) · **Evidence:** untrusted");
     expect(markdown).toContain("Hash drill-down:");
     expect(markdown).toContain("JSON path: `categories[].evidenceRefs[] | eventId == \"event-123\"`");
     expect(markdown).toContain("## Legal Review Appendix");

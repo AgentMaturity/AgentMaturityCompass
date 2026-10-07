@@ -4,7 +4,6 @@ import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import type { EvidenceEvent } from "../types.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -16,15 +15,22 @@ import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/sign
 import {
   complianceMapsSchema,
   type ComplianceCategoryResult,
-  type ComplianceEvidenceRequirement,
+  type ComplianceCategoryStatus,
   type ComplianceMapping,
   type ComplianceMapsFile,
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
-import { countAttestedOnce, effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
-import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
-import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
+import { countAttestedOnce, effectiveTrustTier, evidenceProducer, readerTrustFor } from "../claims/evidenceProvenance.js";
+import type { ClaimEnvelope, ResultState } from "../claims/eligibility/types.js";
+import { envelopeForAggregate, envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
+import { loadCatalog } from "../catalog/loader.js";
+import type { ControlResult } from "../catalog/evidence/types.js";
+import {
+  complianceContext, evaluateMappingRequirement, ledgerChainError, type ComplianceEvidenceSource, type RequirementEvaluation
+} from "../catalog/evidence/mappingAdapter.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { subjectRole, verifiedAssuranceByPack } from "./evidenceBinding.js";
 import { stationsForMapping } from "./stationTags.js";
 import type { Station } from "../domains/stations.js";
 
@@ -46,15 +52,6 @@ interface SignedDigest {
       notaryFingerprint?: string;
     };
   };
-}
-
-function inferTrustTier(
-  event: EvidenceEvent, meta: Record<string, unknown>, reader: () => ReaderTrust = readerTrustFor()
-): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
-  // P0-18: the tier comes from provenance; effectiveTrustTier reads the same cached parse as `meta`.
-  const tier = effectiveTrustTier(event, reader);
-  if (tier === "OBSERVED" || tier === "OBSERVED_HARDENED") return "OBSERVED";
-  return tier === "ATTESTED" ? "ATTESTED" : "SELF_REPORTED";
 }
 
 function complianceMapsPath(workspace: string): string {
@@ -185,222 +182,57 @@ export function verifyComplianceMapsSignature(workspace: string, explicitPath?: 
   }
 }
 
-type EvidenceRef = ComplianceCategoryResult["evidenceRefs"][number];
+const STATUS_BY_RESULT: Readonly<Record<ResultState, ComplianceCategoryStatus>> = {
+  pass: "SATISFIED", fail: "MISSING", not_evaluated: "NOT_EVALUATED"
+};
+const LIST_CAP = 24;
+const APPLICABILITY_NEEDED = "A compiled plan must record that this control applies before it can pass";
 
-interface RequirementOutcome {
-  outcome: ResultState;
-  evidence: EvidenceState;
-  reason: string;
-  refs: EvidenceRef[];
-  needed: string;
-  /** Set only on a pass whose every counted event (not the display refs) was OBSERVED; the claim kind reads it. */
-  allCountedObserved?: true;
+function envelopeOf(producer: string, result: ControlResult): ClaimEnvelope {
+  return { claimKind: result.claimKind, statusDimensions: result.dimensions,
+    provenance: { producer, method: "runtime_observation", evidenceRefs: result.admitted.map((row) => row.ref.id) },
+    eligibleLevel: null, reasons: result.claimReasons };
 }
 
-const NOTHING_NEEDED = "No additional evidence required for this requirement";
-
-function refsOf(events: EvidenceEvent[]): EvidenceRef[] {
-  return events.slice(0, 12).map((event) => ({ eventId: event.id, eventHash: event.event_hash, eventType: event.event_type }));
-}
-
-function evaluateEvidenceEvent(
-  requirement: Extract<ComplianceEvidenceRequirement, { type: "requires_evidence_event" }>,
-  mapping: ComplianceMapping,
-  events: EvidenceEvent[],
-  isPositive: (event: EvidenceEvent) => boolean,
-  reader: () => ReaderTrust
-): RequirementOutcome {
-  const types = requirement.eventTypes.join(", ");
-  const needed = `Capture ${types} events bound to '${mapping.id}' (meta.controlIds) from AMC runtime with OBSERVED trust tier`;
-  const bound = events.filter((event) =>
-    requirement.eventTypes.includes(event.event_type) && isPositive(event) && isBoundToControl(event, mapping, requirement));
-  const runtime = bound.filter((event) => evidenceProducer(event) === "amc-runtime");
-  if (bound.length === 0) {
-    return { outcome: "not_evaluated", evidence: "incomplete", reason: `no control-bound evidence for ${mapping.id} in window`, refs: [], needed };
-  }
-  if (runtime.length === 0) {
-    const producers = [...new Set(bound.map((event) => evidenceProducer(event)))].join(", ");
-    return {
-      outcome: "not_evaluated",
-      evidence: "untrusted",
-      reason: `${bound.length} control-bound events for ${mapping.id} came only from non-runtime producers (${producers}) and are not admitted`,
-      refs: refsOf(bound),
-      needed
-    };
-  }
-  const observed = runtime.filter((event) => inferTrustTier(event, eventMeta(event), reader) === "OBSERVED").length;
-  const ratio = observed / runtime.length;
-  if (ratio < requirement.minObservedRatio) {
-    return {
-      outcome: "not_evaluated",
-      evidence: "untrusted",
-      reason: `Observed trust ratio ${ratio.toFixed(3)} is below required ${requirement.minObservedRatio.toFixed(3)}`,
-      refs: refsOf(runtime),
-      needed: `Increase OBSERVED evidence ratio to at least ${requirement.minObservedRatio.toFixed(2)}`
-    };
-  }
-  return {
-    outcome: "pass",
-    evidence: "sufficient",
-    reason: `Found ${runtime.length} control-bound runtime events with observed ratio ${ratio.toFixed(3)}`,
-    refs: refsOf(runtime),
-    needed: NOTHING_NEEDED,
-    ...(observed === runtime.length ? { allCountedObserved: true as const } : {})
-  };
-}
-
-function evaluateAssurancePack(
-  requirement: Extract<ComplianceEvidenceRequirement, { type: "requires_assurance_pack" }>,
-  assurance: VerifiedAssurance
-): RequirementOutcome {
-  const needed = `Run assurance pack '${requirement.packId}' with score >= ${requirement.minScore} and *_SUCCEEDED <= ${requirement.maxSucceeded}`;
-  const pack = assurance.packs.get(requirement.packId);
-  if (!pack) {
-    const forged = assurance.unverifiable.some((row) => row.packIds.includes(requirement.packId));
-    return forged
-      ? { outcome: "not_evaluated", evidence: "untrusted", reason: `Assurance report for '${requirement.packId}' failed hash, seal or run integrity verification`, refs: [], needed }
-      : { outcome: "not_evaluated", evidence: "incomplete", reason: `No sealed assurance run for '${requirement.packId}' in window`, refs: [], needed };
-  }
-  // Truth rule 3: a keyword match is never a regulated result, pass or fail. Older reports carry no flag and count for nothing.
-  if (pack.regulatedEligible !== true) {
-    const method = pack.gradingMethod ?? "keyword";
-    return { outcome: "not_evaluated", evidence: "untrusted", reason: `assurance pack ${requirement.packId} is ${method}-graded; keyword grading is not regulated evidence`, refs: [], needed };
-  }
-  // Inconclusive scenarios never reached the agent: a pack that measured nothing, or passed on part of its scenarios, proves nothing.
-  const total = pack.scenarioResults.length;
-  const inconclusive = pack.scenarioResults.filter((scenario) => scenario.inconclusive === true).length;
-  if (inconclusive === total) {
-    return { outcome: "not_evaluated", evidence: "incomplete", reason: `Assurance pack '${requirement.packId}' measured no scenario`, refs: [], needed };
-  }
-  const succeededCount = pack.scenarioResults.reduce(
-    (sum, scenario) => sum + scenario.auditEventTypes.filter((type) => type.endsWith("_SUCCEEDED")).length,
-    0
-  );
-  const pass = pack.score0to100 >= requirement.minScore && succeededCount <= requirement.maxSucceeded;
-  if (pass && inconclusive > 0) {
-    return {
-      outcome: "not_evaluated",
-      evidence: "incomplete",
-      reason: `Assurance pack '${requirement.packId}': ${inconclusive} of ${total} scenarios inconclusive; a partial measurement cannot pass`,
-      refs: [],
-      needed
-    };
-  }
-  return {
-    outcome: pass ? "pass" : "fail",
-    evidence: "sufficient",
-    reason: pass
-      ? `Assurance pack '${requirement.packId}' score ${pack.score0to100} meets threshold`
-      : `Assurance pack '${requirement.packId}' score ${pack.score0to100} / succeeded events ${succeededCount} does not meet threshold`,
-    refs: [],
-    needed: pass ? NOTHING_NEEDED : needed
-  };
-}
-
-function evaluateNoAudit(
-  requirement: Extract<ComplianceEvidenceRequirement, { type: "requires_no_audit" }>,
-  events: EvidenceEvent[],
-  role: (event: EvidenceEvent) => ReturnType<typeof subjectRole>
-): RequirementOutcome {
-  const denied = requirement.auditTypesDenylist.join(", ");
-  // Violations count from any producer and from the workspace system session: fail closed.
-  const violating = events.filter((event) => {
-    const auditType = auditTypeOf(event);
-    return auditType !== null && role(event) !== "none" && requirement.auditTypesDenylist.includes(auditType);
-  });
-  if (violating.length > 0) {
-    return {
-      outcome: "fail",
-      evidence: "sufficient",
-      reason: `Found denied audit events: ${denied}`,
-      refs: refsOf(violating),
-      needed: `Resolve and eliminate audit events: ${denied}`
-    };
-  }
-  const activity = events.filter((event) => role(event) === "positive" && evidenceProducer(event) === "amc-runtime");
-  if (activity.length === 0) {
-    return {
-      outcome: "not_evaluated",
-      evidence: "incomplete",
-      reason: "no agent activity in window; absence of violations proves nothing",
-      refs: [],
-      needed: "Capture AMC runtime evidence for this agent in the window"
-    };
-  }
-  return {
-    outcome: "pass",
-    evidence: "sufficient",
-    reason: `No denied audit events found across ${activity.length} runtime events`,
-    refs: [],
-    needed: NOTHING_NEEDED
-  };
-}
-
-function evaluateRequirement(params: {
-  requirement: ComplianceEvidenceRequirement;
-  mapping: ComplianceMapping;
-  events: EvidenceEvent[];
-  agentId: string;
-  assurance: VerifiedAssurance;
-  reader: () => ReaderTrust;
-}): RequirementOutcome {
-  const scope = params.mapping.binding?.scope ?? "agent";
-  const role = (event: EvidenceEvent) => subjectRole(event, params.agentId, scope);
-  switch (params.requirement.type) {
-    case "requires_evidence_event":
-      return evaluateEvidenceEvent(params.requirement, params.mapping, params.events, (event) => role(event) === "positive", params.reader);
-    case "requires_assurance_pack":
-      return evaluateAssurancePack(params.requirement, params.assurance);
-    case "requires_no_audit":
-      return evaluateNoAudit(params.requirement, params.events, role);
-  }
-}
-
-const EVIDENCE_SEVERITY: EvidenceState[] = ["sufficient", "incomplete", "stale", "contradictory", "untrusted"];
-
-function worstEvidence(states: EvidenceState[]): EvidenceState {
-  return states.reduce<EvidenceState>(
-    (worst, state) => (EVIDENCE_SEVERITY.indexOf(state) > EVIDENCE_SEVERITY.indexOf(worst) ? state : worst),
-    "sufficient"
-  );
-}
-
-/** Any fail is a failure (PARTIAL only when another requirement passed); SATISFIED only when every requirement passed. */
-function evaluateMapping(
-  mapping: ComplianceMapping,
-  evaluate: (requirement: ComplianceEvidenceRequirement) => RequirementOutcome
-): ComplianceCategoryResult {
-  const outcomes = mapping.evidenceRequirements.map(evaluate);
-  const failed = outcomes.some((row) => row.outcome === "fail");
-  const notEvaluated = outcomes.filter((row) => row.outcome === "not_evaluated");
-  let status: ComplianceCategoryResult["status"] = "NOT_EVALUATED";
-  let result: ResultState = "not_evaluated";
-  if (failed) {
-    result = "fail";
-    status = outcomes.some((row) => row.outcome === "pass") ? "PARTIAL" : "MISSING";
-  } else if (outcomes.length > 0 && outcomes.every((row) => row.outcome === "pass")) {
-    result = "pass";
-    status = "SATISFIED";
-  }
+/**
+ * A category from its requirements' control results (P1-11): fail when any requirement fails, pass only when every one
+ * passes, the weakest claim kind and the worst evidence (envelopeForAggregate). `status` is derived from the result for
+ * one more minor release and is never PARTIAL.
+ */
+function evaluateMapping(mapping: ComplianceMapping, evaluations: RequirementEvaluation[], now: number): ComplianceCategoryResult {
+  const producer = `compliance:${mapping.framework}:${mapping.id}`;
+  const claim = envelopeForAggregate(producer, evaluations.map((row) => envelopeOf(producer, row.result)), now);
+  const dimensions = claim.statusDimensions;
+  const reasons = [...new Set(evaluations.flatMap((row) => [...row.notes, ...row.result.reasons]))];
+  const needed = evaluations
+    .filter((row) => row.result.dimensions.result === "fail" || row.result.dimensions.evidence !== "sufficient")
+    .map((row) => row.needed);
+  if (dimensions.applicability.state !== "applicable") needed.push(APPLICABILITY_NEEDED);
   return {
     id: mapping.id,
     framework: mapping.framework,
     category: mapping.category,
     description: mapping.description,
-    status,
-    result,
-    evidence: worstEvidence(outcomes.map((row) => row.evidence)),
-    notEvaluatedReasons: [...new Set(notEvaluated.map((row) => row.reason))],
-    reasons: [...new Set(outcomes.map((row) => row.reason))],
-    evidenceRefs: outcomes.flatMap((row) => row.refs).slice(0, 24),
-    neededToSatisfy: [...new Set(outcomes.map((row) => row.needed))],
-    countedObserved: outcomes.length > 0 && outcomes.every((row) => row.allCountedObserved === true)
+    status: STATUS_BY_RESULT[dimensions.result],
+    result: dimensions.result,
+    evidence: dimensions.evidence,
+    dimensions,
+    claimKind: claim.claimKind,
+    claimReasons: claim.reasons,
+    notEvaluatedReasons: dimensions.result === "not_evaluated" ? reasons : [],
+    reasons,
+    evidenceRefs: evaluations.flatMap((row) => row.refs).slice(0, LIST_CAP),
+    admitted: evaluations.flatMap((row) => row.result.admitted).slice(0, LIST_CAP),
+    rejected: evaluations.flatMap((row) => row.result.rejected).slice(0, LIST_CAP),
+    neededToSatisfy: [...new Set(needed)]
   };
 }
 
-/** Unsigned or tampered maps decide nothing: every category is not evaluated. */
-function untrustedMapping(mapping: ComplianceMapping, reason: string | null): ComplianceCategoryResult {
+/** Unsigned or tampered maps decide nothing: every category is not evaluated on untrusted evidence. */
+function untrustedMapping(mapping: ComplianceMapping, reason: string | null, now: number): ComplianceCategoryResult {
   const message = `Compliance maps signature invalid (${reason ?? "unknown"}); categories are not evaluated against untrusted maps.`;
+  const claim = envelopeForUnverifiedResult({ producer: `compliance:${mapping.framework}:${mapping.id}`, recordCount: 0,
+    regulated: true, signatureValid: false, now });
   return {
     id: mapping.id,
     framework: mapping.framework,
@@ -408,13 +240,25 @@ function untrustedMapping(mapping: ComplianceMapping, reason: string | null): Co
     description: mapping.description,
     status: "NOT_EVALUATED",
     result: "not_evaluated",
-    evidence: "untrusted",
+    evidence: claim.statusDimensions.evidence,
+    dimensions: claim.statusDimensions,
+    claimKind: claim.claimKind,
+    claimReasons: claim.reasons,
     notEvaluatedReasons: [message],
     reasons: [message],
     evidenceRefs: [],
-    neededToSatisfy: ["Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"],
-    countedObserved: false
+    admitted: [],
+    rejected: [],
+    neededToSatisfy: ["Run `amc compliance init` (or re-sign the maps), then `amc compliance verify`"]
   };
+}
+
+function monitorKeysOf(workspace: string): string[] | null {
+  try {
+    return getPublicKeyHistory(workspace, "monitor");
+  } catch {
+    return null;
+  }
 }
 
 export function generateComplianceReport(params: {
@@ -439,16 +283,28 @@ export function generateComplianceReport(params: {
     && (station === undefined || stationsForMapping(row).includes(station)));
   const ledger = openLedger(workspace);
   try {
-    // Events that could matter to this subject at any scope; evidenceBinding decides how each counts.
-    const events = ledger.getEventsBetween(windowStartTs, windowEndTs)
-      .filter((event) => subjectRole(event, agentId, "workspace") !== "none");
-    const assurance = verifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs });
-    // One reader for the whole evaluation, so the tiers a category counted are the tiers the coverage reports.
+    // One read of the whole chain: the rows a category counts are the rows whose chain was verified here.
+    const chain = ledger.getAllEvents();
+    const monitorKeys = monitorKeysOf(workspace);
     const reader = readerTrustFor(workspace);
+    const source: ComplianceEvidenceSource = {
+      workspaceId: workspaceIdFromDirectory(workspace),
+      agentId,
+      // Events that could matter to this subject at any scope; the evidence contracts decide how each counts.
+      rows: chain.filter((event) => event.ts >= windowStartTs && event.ts <= windowEndTs
+        && subjectRole(event, agentId, "workspace") !== "none"),
+      chainError: monitorKeys === null ? "this workspace has no monitor key to verify its ledger" : ledgerChainError(chain, monitorKeys),
+      monitorKeys: monitorKeys ?? [],
+      reader,
+      assurance: verifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs })
+    };
+    const ctx = complianceContext({ workspaceId: source.workspaceId, agentId, windowStartTs, windowEndTs,
+      producers: loadCatalog().producers });
 
     const categories = mappings.map((mapping) => verify.valid
-      ? evaluateMapping(mapping, (requirement) => evaluateRequirement({ requirement, mapping, events, agentId, assurance, reader }))
-      : untrustedMapping(mapping, verify.reason));
+      ? evaluateMapping(mapping, mapping.evidenceRequirements.map((requirement, index) =>
+        evaluateMappingRequirement(mapping, requirement, index, source, ctx)), now)
+      : untrustedMapping(mapping, verify.reason, now));
 
     const trustCounts = {
       observed: 0,
@@ -456,12 +312,12 @@ export function generateComplianceReport(params: {
       selfReported: 0
     };
     // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest, and an
-    // attested event counts once, inside the window of its own time.
-    const subjectRows = events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic");
-    const tiers = new Map(subjectRows.map((row) => [row, inferTrustTier(row, eventMeta(row), reader)]));
+    // attested event counts once, inside the window of its own time. A chain that does not verify vouches for no tier.
+    const subjectRows = source.rows.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic");
+    const tiers = new Map(subjectRows.map((row) => [row, source.chainError ? "SELF_REPORTED" : effectiveTrustTier(row, reader)]));
     for (const event of countAttestedOnce(subjectRows, (row) => tiers.get(row), { startTs: windowStartTs, endTs: windowEndTs })) {
       const tier = tiers.get(event);
-      if (tier === "OBSERVED") trustCounts.observed += 1;
+      if (tier === "OBSERVED" || tier === "OBSERVED_HARDENED") trustCounts.observed += 1;
       else if (tier === "ATTESTED") trustCounts.attested += 1;
       else trustCounts.selfReported += 1;
     }
@@ -489,6 +345,8 @@ export function generateComplianceReport(params: {
       nonClaims: [
         "This report provides evidence-backed signals only; it is not legal advice.",
         "Controls without control-bound AMC runtime evidence in the window are NOT_EVALUATED; absence of evidence is never a pass.",
+        "A category passes only when a compiled plan records that it applies; until then sufficient evidence is still not evaluated.",
+        "Ledger evidence is verified against this workspace's own monitor key: a local audit trail, not a portable verdict.",
         "Owner attestations must be explicitly signed and are not inferred automatically."
       ]
     };

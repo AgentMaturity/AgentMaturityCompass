@@ -62,7 +62,7 @@ Path checks cover issuer signatures, the CA flag and validity at `genTime`. Name
 
 ## Ledger checkpoints
 
-A checkpoint (`amc.ledger-checkpoint`, version 1) commits to the ledger head (`headEventHash`, `eventCount`), the transparency root and the previous checkpoint's SHA-256, and records its own `claimedAt`. AMC verifies the ledger up to the head, the transparency root and the earlier checkpoints first, then signs the checkpoint with the monitor (`ledger-row`) key and writes `.amc/time/checkpoints/<sequence>.json`. The token over the checkpoint's canonical SHA-256 is stored next to it as `<sequence>.tsr`, and a `time/checkpoint` ledger event records the checkpoint and token digests.
+A checkpoint (`amc.ledger-checkpoint`, version 1) commits to the ledger head (`headEventHash`, `eventCount`), the transparency root (with the tree it uses, `amc-legacy-v1` or `rfc9162-sha256`) and the previous checkpoint's SHA-256, and records its own `claimedAt`. AMC verifies the ledger up to the head, the transparency root and the earlier checkpoints first, then signs the checkpoint with the monitor (`ledger-row`) key and writes `.amc/time/checkpoints/<sequence>.json`. The token over the checkpoint's canonical SHA-256 is stored next to it as `<sequence>.tsr`, and a `time/checkpoint` ledger event records the checkpoint and token digests.
 
 - Every event the checkpoint covers existed by the token's `genTime`: an **upper bound**.
 - Every event after the `time/checkpoint` event chains through the token's digest, so it was written after `genTime`: a **lower bound**.
@@ -81,4 +81,4 @@ When TSAs are configured, `amc certify` timestamps the SHA-256 of `cert.json`, e
 
 - Checkpoints at each session seal: sealing is synchronous today, so the Studio scheduler picks the new events up on its next tick.
 - Timestamps on attestations other than `.amccert`, and attested time in issuer admission (which still uses the claimed signing time).
-- Surfacing per-event windows in `amc verify` output; Rekor and SCITT anchoring follow in P1-26.
+- Surfacing per-event windows in `amc verify` output. Public anchoring of checkpoints in Rekor v2 is described in [PUBLIC_ANCHORING.md](PUBLIC_ANCHORING.md); SCITT is not covered.

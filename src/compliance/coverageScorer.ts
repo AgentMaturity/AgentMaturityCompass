@@ -1,8 +1,8 @@
 import type { ComplianceCategoryResult, ComplianceReportJson } from "./mappingSchema.js";
 
 /**
- * NOT_EVALUATED and legacy UNKNOWN earn nothing and stay in the denominator; when no category was
- * evaluated the score is null rather than a number that reads like a measurement.
+ * Only a pass earns credit (P1-11): PARTIAL, MISSING, NOT_EVALUATED and legacy UNKNOWN earn nothing and stay in the
+ * denominator. When no category was evaluated the score is null rather than a number that reads like a measurement.
  */
 export function coverageScore(categories: ComplianceCategoryResult[]): ComplianceReportJson["coverage"] {
   const counts = {
@@ -20,10 +20,9 @@ export function coverageScore(categories: ComplianceCategoryResult[]): Complianc
     else counts.unknown += 1;
   }
   const evaluated = counts.satisfied + counts.partial + counts.missing;
-  const weighted = counts.satisfied * 1 + counts.partial * 0.5;
   return {
     ...counts,
     evaluated,
-    score: evaluated === 0 ? null : Number((weighted / categories.length).toFixed(4))
+    score: evaluated === 0 ? null : Number((counts.satisfied / categories.length).toFixed(4))
   };
 }

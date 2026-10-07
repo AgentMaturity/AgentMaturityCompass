@@ -332,6 +332,7 @@ import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
 import { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
 import { registerApprovalCliCommands } from "./approvals/approvalCliCommands.js";
+import { registerCatalogCommands } from "./catalog/catalogCli.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/approvalPolicyEngine.js";
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
@@ -12470,9 +12471,13 @@ withTrustFlags(transparency
 transparencyMerkle
   .command("rebuild")
   .description("Rebuild Merkle leaves/roots from transparency log")
-  .action(() => {
-    const out = transparencyMerkleRebuildCli(process.cwd());
+  .addOption(new Option("--algorithm <algorithm>", "migrate the log's tree (only amc-legacy-v1 to rfc9162-sha256; signs a migration record)")
+    .choices(["amc-legacy-v1", "rfc9162-sha256"]))
+  .action((opts: { algorithm?: "amc-legacy-v1" | "rfc9162-sha256" }) => {
+    const out = transparencyMerkleRebuildCli(process.cwd(), { algorithm: opts.algorithm });
     console.log(chalk.green("Transparency Merkle rebuilt"));
+    console.log(`algorithm=${out.algorithm}`);
+    if (out.migration) console.log(`migration=${out.migration.path} (log entry ${out.migration.entryHash})`);
     console.log(`leafCount=${out.leafCount}`);
     console.log(`root=${out.root}`);
     console.log(`currentRoot=${out.currentRootPath}`);
@@ -12626,10 +12631,11 @@ compliance
     const { coverage } = out.report;
     const total = out.report.categories.length;
     console.log(coverage.score === null
-      ? `Coverage: not evaluated (0 of ${total} categories had control-bound evidence)`
+      ? `Coverage: not evaluated (0 of ${total} categories passed or failed)`
       : `Coverage: ${(coverage.score * 100).toFixed(1)}% (${coverage.evaluated} of ${total} categories evaluated, ${coverage.satisfied} satisfied)`);
     if (coverage.score === null) {
-      console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window.`));
+      console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window;`));
+      console.log(chalk.gray(`     a pass also needs a compiled plan recording that the control applies.`));
       console.log(chalk.gray(`     Absence of violations is not a pass. Capture evidence first:`));
       console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
       console.log(chalk.gray(`     amc evidence collect`));
@@ -16475,6 +16481,7 @@ withTrustFlags(bom
   });
 
 registerApprovalCliCommands(program);
+registerCatalogCommands(program);
 
 const whatif = program.command("whatif").description("Equalizer what-if simulator");
 

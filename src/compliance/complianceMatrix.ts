@@ -2,8 +2,8 @@
  * Compliance framework coverage matrix and gap analysis.
  *
  * Generates a multi-framework coverage matrix showing which compliance
- * categories are satisfied, partial, missing, or not evaluated across all
- * supported regulatory frameworks.
+ * categories passed, failed or were not evaluated across the requested
+ * frameworks, with each framework's claim kind and five status dimensions.
  */
 
 import { complianceFrameworkFamilies, type ComplianceFramework, type ComplianceFrameworkFamily } from "./frameworks.js";
@@ -40,7 +40,7 @@ export interface ComplianceCoverageMatrix {
   frameworks: FrameworkCoverage[];
   /** Mean over every requested framework, a null framework score counting 0; null when none was evaluated. */
   overallScore: number | null;
-  /** Failed categories (MISSING, PARTIAL). */
+  /** Failed categories (result fail). */
   gaps: ComplianceGap[];
   /** Categories without trusted control-bound evidence: listed apart from gaps, never scored as one. */
   notEvaluated: NotEvaluatedCategory[];
@@ -68,12 +68,9 @@ const PRIMARY_FRAMEWORKS: ComplianceFramework[] = [
   "EU_AI_ACT", "NIST_AI_RMF", "ISO_42001", "SOC2",
 ];
 
-function gapSeverity(status: string, framework: ComplianceFramework): ComplianceGap["severity"] {
-  if (status === "MISSING") {
-    return framework === "EU_AI_ACT" ? "critical" : "high";
-  }
-  if (status === "PARTIAL") return "medium";
-  return "low";
+// Only a failed category is a gap (P1-11: there is no partial result).
+function gapSeverity(framework: ComplianceFramework): ComplianceGap["severity"] {
+  return framework === "EU_AI_ACT" ? "critical" : "high";
 }
 
 export function generateCoverageMatrix(params: {
@@ -112,14 +109,14 @@ export function generateCoverageMatrix(params: {
       });
 
       for (const cat of report.categories) {
-        if (cat.status === "NOT_EVALUATED") {
+        if (cat.result === "not_evaluated") {
           notEvaluated.push({ framework: fw, category: cat.category, reasons: cat.notEvaluatedReasons });
-        } else if (cat.status === "MISSING" || cat.status === "PARTIAL") {
+        } else if (cat.result === "fail") {
           gaps.push({
             framework: fw,
             category: cat.category,
             status: cat.status,
-            severity: gapSeverity(cat.status, fw),
+            severity: gapSeverity(fw),
             neededToSatisfy: cat.neededToSatisfy,
           });
         }
@@ -187,10 +184,16 @@ export function renderCoverageMatrixMarkdown(matrix: ComplianceCoverageMatrix): 
 
   lines.push("## Framework Coverage");
   lines.push("");
-  lines.push("| Framework | Score | Satisfied | Partial | Missing | Not Evaluated | Unknown | Total | Claim |");
-  lines.push("|-----------|-------|-----------|---------|---------|---------------|---------|-------|-------|");
+  lines.push("| Framework | Score | Passed | Failed | Not Evaluated | Total | Claim |");
+  lines.push("|-----------|-------|--------|--------|---------------|-------|-------|");
   for (const fw of matrix.frameworks) {
-    lines.push(`| ${fw.displayName} | ${pctText(fw.score)} | ${fw.satisfied} | ${fw.partial} | ${fw.missing} | ${fw.notEvaluated} | ${fw.unknown} | ${fw.total} | ${fw.claim.claimKind} |`);
+    lines.push(`| ${fw.displayName} | ${pctText(fw.score)} | ${fw.satisfied} | ${fw.missing} | ${fw.notEvaluated} | ${fw.total} | ${fw.claim.claimKind} |`);
+  }
+  lines.push("");
+  lines.push("## Framework Claims");
+  lines.push("");
+  for (const fw of matrix.frameworks) {
+    lines.push(`- ${fw.displayName}: ${formatClaimLabel(renderClaimLabel(fw.claim), "report")}`);
   }
   lines.push("");
 
@@ -241,15 +244,11 @@ export function renderCoverageHeatmap(matrix: ComplianceCoverageMatrix): string 
 
     if (fw.categories.length > 0) {
       for (const cat of fw.categories) {
-        const icon = cat.status === "SATISFIED" ? "█"
-          : cat.status === "PARTIAL" ? "▓"
-          : cat.status === "MISSING" ? "░"
-          : cat.status === "NOT_EVALUATED" ? "?"
-          : "·";
+        const icon = cat.result === "pass" ? "█" : cat.result === "fail" ? "░" : "?";
         const shortCat = cat.category.length > 35
           ? cat.category.slice(0, 32) + "..."
           : cat.category;
-        lines.push(`  ${icon} ${shortCat.padEnd(37)} ${cat.status}`);
+        lines.push(`  ${icon} ${shortCat.padEnd(37)} ${cat.status} · evidence ${cat.dimensions.evidence} · ${cat.claimKind}`);
       }
       lines.push("");
     }
@@ -258,7 +257,7 @@ export function renderCoverageHeatmap(matrix: ComplianceCoverageMatrix): string 
   lines.push("─".repeat(60));
   lines.push(`Overall: ${pctText(matrix.overallScore)} | Gaps: ${matrix.gaps.length} | Not evaluated: ${matrix.notEvaluated.length}`);
   lines.push("");
-  lines.push("Legend: █ SATISFIED  ▓ PARTIAL  ░ MISSING  ? NOT_EVALUATED  · UNKNOWN");
+  lines.push("Legend: █ SATISFIED (pass)  ░ MISSING (fail)  ? NOT_EVALUATED");
 
   return lines.join("\n");
 }

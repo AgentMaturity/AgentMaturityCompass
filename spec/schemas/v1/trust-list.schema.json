@@ -246,6 +246,40 @@
           "maxItems": 64,
           "type": "array"
         },
+        "transparencyLogs": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "logId": {
+                "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "origin": {
+                "maxLength": 256,
+                "pattern": "^[^\\s+]+$",
+                "type": "string"
+              },
+              "publicKeyPem": {
+                "maxLength": 4096,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "logId",
+              "name",
+              "origin",
+              "publicKeyPem"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
         "type": {
           "const": "amc.trust-list",
           "type": "string"

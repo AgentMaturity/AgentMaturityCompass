@@ -31,7 +31,7 @@ import { readFileSync } from "node:fs";
 import { merkleRoot as sessionMerkleRoot } from "../session/sessionMerkle.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { verifyMerkleProof } from "./merkle.js";
+import { verifyEntryInclusion } from "./merkle.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import {
@@ -138,9 +138,19 @@ function verifyInclusion(proof: SessionAnchorProof, errors: string[]): void {
   if (recomputedEntryHash !== proof.entry.hash) {
     errors.push(`transparency entry hash mismatch: recomputed ${recomputedEntryHash}, found ${proof.entry.hash}`);
   }
+  // P1-26: the tree and the RFC 9162 tree size come from the signed root; verifySignedRoot reports one that does not parse.
+  let row: SignedMerkleRootRow | null = null;
+  try {
+    row = signedMerkleRootRowSchema.parse(JSON.parse(proof.signedRoot.fileText) as unknown);
+  } catch {
+    row = null;
+  }
   if (
-    !verifyMerkleProof({
+    !verifyEntryInclusion({
+      algorithm: row?.algorithm ?? "amc-legacy-v1",
       entryHash: proof.entry.hash,
+      leafIndex: proof.inclusion.leafIndex,
+      treeSize: row?.leafCount,
       proofPath: [...proof.inclusion.proofPath],
       root: proof.inclusion.merkleRoot
     })
