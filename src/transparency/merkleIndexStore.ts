@@ -31,7 +31,9 @@ import { transparencyEntrySchema, transparencySealSchema } from "./logSchema.js"
 import { merkleProofPayloadSchema, merkleProofSignatureSchema, type MerkleProofPayload } from "./proofSchema.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
-import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type PublicAnchoring, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { latestAnchorFiles, verifyBundledAnchor } from "./anchors/anchor.js";
+import { consistencyProof } from "./rfc9162.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
 
 /**
@@ -508,6 +510,14 @@ export function exportTransparencyProofBundle(params: {
     writeFileAtomic(join(tmp, "proof.json"), JSON.stringify(proof, null, 2), 0o644);
     writeFileAtomic(join(tmp, "root.json"), rootBytes, 0o644);
     writeFileAtomic(join(tmp, "root.sig"), readFileSync(merkleCurrentRootSigPath(params.workspace)), 0o644);
+    // P1-26: the newest public anchor, with the consistency proof from its tree to the signed root.
+    const anchor = proof.algorithm === "rfc9162-sha256" ? latestAnchorFiles(params.workspace) : null;
+    if (anchor && anchor.treeSize <= signedRow.leafCount) {
+      const leaves = readTransparencyEntryHashes(params.workspace).slice(0, signedRow.leafCount).map((hash) => entryLeafHash("rfc9162-sha256", hash));
+      writeFileAtomic(join(tmp, "anchor.note"), anchor.note, 0o644);
+      writeFileAtomic(join(tmp, "anchor.receipt.json"), anchor.receipt, 0o644);
+      writeFileAtomic(join(tmp, "anchor.consistency.json"), JSON.stringify({ hashes: consistencyProof(leaves, anchor.treeSize) }, null, 2), 0o644);
+    }
     const digest = sha256Hex(readFileSync(join(tmp, "proof.json")));
     const signed = signDigestWithPolicy({
       workspace: params.workspace,
@@ -545,10 +555,10 @@ export function exportTransparencyProofBundle(params: {
  * signed root fails.
  */
 function bundledRootTree(dir: string, proof: MerkleProofPayload, check: (file: string, digest: string, sig: z.infer<typeof rootSignatureSchema>) => boolean,
-  errors: string[]): { algorithm: MerkleAlgorithm; treeSize: number | undefined } {
+  errors: string[]): { algorithm: MerkleAlgorithm; treeSize: number | undefined; root: string } {
   const rootFile = join(dir, "root.json");
   const sigFile = join(dir, "root.sig");
-  let tree: { algorithm: MerkleAlgorithm; treeSize: number | undefined } = { algorithm: "amc-legacy-v1", treeSize: undefined };
+  let tree: { algorithm: MerkleAlgorithm; treeSize: number | undefined; root: string } = { algorithm: "amc-legacy-v1", treeSize: undefined, root: proof.merkleRoot };
   if (pathExists(rootFile) || pathExists(sigFile)) {
     try {
       const bytes = readFileSync(rootFile);
@@ -557,10 +567,10 @@ function bundledRootTree(dir: string, proof: MerkleProofPayload, check: (file: s
       const digest = sha256Hex(bytes);
       if (digest !== sig.digestSha256 || !check("root.sig", digest, sig)) errors.push("signed root signature invalid");
       if (row.root !== proof.merkleRoot) errors.push(`proof root ${proof.merkleRoot} is not the signed root ${row.root}`);
-      tree = { algorithm: row.algorithm ?? "amc-legacy-v1", treeSize: row.leafCount };
+      tree = { algorithm: row.algorithm ?? "amc-legacy-v1", treeSize: row.leafCount, root: row.root };
     } catch (error) {
       errors.push(`invalid signed root in the bundle: ${String(error)}`);
-      return { algorithm: "rfc9162-sha256", treeSize: undefined };
+      return { algorithm: "rfc9162-sha256", treeSize: undefined, root: proof.merkleRoot };
     }
   }
   if ((proof.algorithm ?? "amc-legacy-v1") !== tree.algorithm) {
@@ -585,9 +595,11 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
   const errors: string[] = [];
   const signatures: IssuerAdmission[] = [];
   let proof: MerkleProofPayload | null = null;
+  let publicAnchoring: PublicAnchoring | undefined;
   const finish = () => {
     const report = buildVerifierReport({ artifact: { kind: "transparency-proof", path: bundleFile, sha256: fileSha256(bundleFile) },
-      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+      context: trust, integrityErrors: errors, signatures,
+      anchoring: { status: "not-applicable", detail: null, ...(publicAnchoring ? { public: publicAnchoring } : {}) } });
     return { ok: report.trusted, errors, proof, report };
   };
   const tmp = mkdtempSync(join(tmpdir(), "amc-proof-verify-"));
@@ -632,6 +644,11 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
         treeSize: tree.treeSize, proofPath: proof.proofPath, root: proof.merkleRoot })) {
         errors.push("proof path does not resolve to merkle root");
       }
+      // P1-26: an invalid public anchor is an integrity failure, never a quiet "not anchored".
+      const anchor = verifyBundledAnchor({ dir: root, tree, leafIndex: proof.leafIndex, trust, candidates });
+      if (anchor.admission) signatures.push(anchor.admission);
+      if (anchor.publicAnchoring.status === "invalid") errors.push(`public anchor invalid: ${anchor.publicAnchoring.detail ?? ""}`);
+      publicAnchoring = anchor.publicAnchoring;
     }
     return finish();
   } catch (error) {
