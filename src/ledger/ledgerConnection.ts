@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { getOrCreateSqlitePool, type SqliteConnectionLease } from "../storage/sqlitePool.js";
 import { ensureDir } from "../utils/fs.js";
@@ -12,12 +12,24 @@ function ledgerPoolSize(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 4;
 }
 
+/**
+ * The store for rows written under AMC_NO_SIGN=1 (P0-27 F2), relative to the workspace. Unsigned rows in
+ * `.amc/evidence.sqlite` made every later signed reader of the workspace chain (budget admission among them) fail, so
+ * they live apart. Signed readers never open it, and it is refused unless AMC_NO_SIGN=1, so signed evidence cannot be
+ * diverted into it.
+ */
+export const UNSIGNED_EVIDENCE_STORE = ".amc/unsigned/evidence.sqlite";
+export type LedgerStore = "unsigned";
+
 /** Owns connection setup so evidence readers cannot accidentally initialize writers. */
 export function openLedgerConnection(
   workspace: string,
-  options: { readonly?: boolean; unsignedSignatures: boolean }
+  options: { readonly?: boolean; unsignedSignatures: boolean; store?: LedgerStore }
 ): { db: Database.Database; lease: SqliteConnectionLease | null } {
-  const dbPath = join(workspace, ".amc", "evidence.sqlite");
+  if (options.store === "unsigned" && process.env.AMC_NO_SIGN !== "1") {
+    throw new Error("The unsigned evidence store is only for AMC_NO_SIGN=1 runs; signed evidence belongs in .amc/evidence.sqlite.");
+  }
+  const dbPath = join(workspace, options.store === "unsigned" ? UNSIGNED_EVIDENCE_STORE : ".amc/evidence.sqlite");
   if (options.readonly) {
     // Public-only exports must never initialize a vault, replace trust anchors,
     // migrate evidence, or create an empty ledger. SQLite may still create WAL
@@ -28,7 +40,7 @@ export function openLedgerConnection(
     };
   }
 
-  ensureDir(join(workspace, ".amc"));
+  ensureDir(dirname(dbPath));
   for (const directory of ["blobs", "targets", "runs"]) {
     ensureDir(join(workspace, ".amc", directory));
   }

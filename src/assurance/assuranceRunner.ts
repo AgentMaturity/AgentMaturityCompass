@@ -6,6 +6,7 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -349,6 +350,10 @@ function persistV1Artifacts(params: {
 }
 
 export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
+  // AMC_NO_SIGN=1 makes the ledger write "unsigned" signatures, so the run is unsigned whatever the caller passed, and its
+  // rows go to the separate unsigned store, never into .amc/evidence.sqlite where they break signed readers (P0-27 F2).
+  const unsignedStore = process.env.AMC_NO_SIGN === "1";
+  if (unsignedStore) input = { ...input, noSign: true };
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const context = buildPromptContext(workspace, agentId);
@@ -358,7 +363,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
   const windowStartTs = now - windowMs;
   const packIds = packIdsForRun(input);
   const reportsDir = assuranceReportsDir(workspace, agentId);
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
 
   const proxyDenyByDefault = await hasProxyDenyByDefault(workspace);
   const trustTier: TrustTier =
@@ -622,6 +627,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       status: input.noSign ? "UNSIGNED" : (verification.ok ? "VALID" : "INVALID"),
       verificationPassed: verification.ok,
       sessionId,
+      ...(unsignedStore ? { evidenceStore: UNSIGNED_EVIDENCE_STORE } : {}),
       packResults,
       overallScore0to100,
       integrityIndex,

@@ -92,7 +92,7 @@ export interface AppendOutcomeEventInput {
 }
 
 import { hasTable } from "./ledgerSchema.js";
-import { openLedgerConnection } from "./ledgerConnection.js";
+import { openLedgerConnection, type LedgerStore } from "./ledgerConnection.js";
 import { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
 
 function blobDir(workspace: string): string {
@@ -198,7 +198,7 @@ export class Ledger {
   // alongside the already-unlocked vault payload the PEM itself came from.
   private monitorKeyObjectCache: KeyObject | null = null;
 
-  constructor(workspace: string, options: { readonly?: boolean } = {}) {
+  constructor(workspace: string, options: { readonly?: boolean; store?: LedgerStore } = {}) {
     this.workspace = workspace;
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
     const connection = openLedgerConnection(workspace, {
@@ -1256,7 +1256,8 @@ export {
   type LedgerVerifyOptions
 } from "./ledgerVerification.js";
 
-export function openLedger(workspacePath: string, options: { readonly?: boolean } = {}): Ledger {
+/** `store: "unsigned"` opens the AMC_NO_SIGN=1 store instead of `.amc/evidence.sqlite`, and is refused without it. */
+export function openLedger(workspacePath: string, options: { readonly?: boolean; store?: LedgerStore } = {}): Ledger {
   return new Ledger(workspacePath, options);
 }
 
