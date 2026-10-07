@@ -191,9 +191,7 @@ function findLatestAgentRunId(workspace: string, agentId: string): string | null
   const files = readdirSync(runsDir)
     .filter((name) => name.endsWith(".json"))
     .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
+  if (files.length === 0) return null;
   return files[files.length - 1]!.replace(/\.json$/, "");
 }
 
