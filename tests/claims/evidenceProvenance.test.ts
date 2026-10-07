@@ -1,10 +1,14 @@
-import { describe, expect, test, vi } from "vitest";
+import { rmSync } from "node:fs";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   effectiveTrustTier, evidenceProducer, verifyThirdPartyAttestation, type ThirdPartyAttestation
 } from "../../src/claims/evidenceProvenance.js";
 import { signHexDigest } from "../../src/crypto/keys.js";
+import { evaluateGate, parseEvidenceEvent } from "../../src/diagnostic/gates.js";
+import type { EvidenceEvent, Gate } from "../../src/types.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import type { KeyPurpose, TrustContext } from "../../src/trust/index.js";
+import { operatorTrustHome } from "../helpers/trustContext.js";
 import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } from "../trust/trustFixtures.js";
 
 /**
@@ -101,5 +105,37 @@ describe("verifyThirdPartyAttestation", () => {
     const verdict = verifyThirdPartyAttestation(candidate, trust, own);
     expect(verdict.verified).toBe(false);
     expect(verdict.reason).toMatch(reason);
+  });
+});
+
+describe("diagnostic readers", () => {
+  const homes: string[] = [];
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    while (homes.length > 0) rmSync(homes.pop()!, { recursive: true, force: true });
+  });
+
+  function raw(meta: Record<string, unknown>, fields: Partial<EvidenceEvent> = {}): EvidenceEvent {
+    return { id: "ev", ts: Date.now(), session_id: "s1", runtime: "unknown", event_type: "artifact", payload_path: "agents/a/report.json",
+      payload_inline: null, payload_sha256: "0".repeat(64), meta_json: JSON.stringify(meta), prev_event_hash: "", event_hash: "1".repeat(64),
+      writer_sig: "", ...fields } as EvidenceEvent;
+  }
+
+  test("a gate never counts synthetic evidence, at any tier", () => {
+    const gate: Gate = { level: 2, requiredEvidenceTypes: ["artifact"], minEvents: 1, minSessions: 1, minDistinctDays: 1,
+      acceptedTrustTiers: ["OBSERVED", "SELF_REPORTED"], mustInclude: { artifactPatterns: ["report\\.json"] }, mustNotInclude: {} };
+    expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "OBSERVED" }))]).pass).toBe(true);
+    expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "SELF_REPORTED", claimKind: "synthetic_example" }))]).pass).toBe(false);
+    expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "OBSERVED", provenance: "dogfood" }))]).pass).toBe(false);
+  });
+
+  test("a verified ATTESTED row reads ATTESTED from the operator's trust list, and degrades when stale", () => {
+    const home = operatorTrustHome([{ publicKeyPem: ATTESTER.publicKeyPem, purposes: ["independent-attestation"] }]);
+    homes.push(home);
+    vi.stubEnv("AMC_HOME", home);
+    const meta = { source: "attested_ingest", trustTier: "ATTESTED", attestation: attestation() };
+    expect(parseEvidenceEvent(raw(meta)).trustTier).toBe("ATTESTED");
+    expect(parseEvidenceEvent(raw(meta, { ts: Date.now() - 95 * 86_400_000 })).trustTier).toBe("SELF_REPORTED");
+    expect(parseEvidenceEvent(raw({ ...meta, attestation: attestation(testKey()) })).trustTier).toBe("SELF_REPORTED");
   });
 });

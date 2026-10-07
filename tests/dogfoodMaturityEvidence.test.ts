@@ -78,7 +78,7 @@ describe("dogfood maturity evidence", () => {
   test("seeded evidence never raises a diagnostic level", async () => {
     process.env.AMC_DEV_DOGFOOD = "1";
     const ws = workspace();
-    const agents = [3, 5].map((target) => DOGFOOD_MATURITY_AGENTS.find((agent) => agent.targetMaturity === target)!);
+    const agents = [0, 3, 5].map((target) => DOGFOOD_MATURITY_AGENTS.find((agent) => agent.targetMaturity === target)!);
     for (const agent of agents) {
       generateDogfoodMaturityEvidence({ workspace: ws, agent });
       const report = await runDiagnostic({ workspace: ws, agentId: agent.id, window: "14d", targetName: "default", claimMode: "auto" });
