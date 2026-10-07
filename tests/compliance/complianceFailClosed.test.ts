@@ -201,6 +201,19 @@ describe("compliance fails closed (P0-17)", () => {
     expect(row.notEvaluatedReasons.join(" ")).toContain("absence of violations proves nothing");
   });
 
+  test("synthetic rows leave the report's trust-tier coverage unchanged (P0-18)", () => {
+    const workspace = newWorkspace();
+    initComplianceMaps(workspace, FIXTURE_MAPS);
+    appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A } });
+    const before = report(workspace, AGENT_A).trustTierCoverage;
+    for (let i = 0; i < 3; i += 1) {
+      appendEvent(workspace, { eventType: "metric", meta: { agentId: AGENT_A, trustTier: "SELF_REPORTED", claimKind: "synthetic_example",
+        provenance: "dogfood", source: "dogfood-maturity" } });
+    }
+    expect(before).toEqual({ observed: 1, attested: 0, selfReported: 0 });
+    expect(report(workspace, AGENT_A).trustTierCoverage).toEqual(before);
+  });
+
   test("no activity for agent A: requires_no_audit is not evaluated, absence of violations proves nothing", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace, FIXTURE_MAPS);

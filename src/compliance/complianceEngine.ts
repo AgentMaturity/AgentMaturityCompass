@@ -22,7 +22,7 @@ import {
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
-import { effectiveTrustTier, eventMeta, evidenceProducer, readerTrustList } from "../claims/evidenceProvenance.js";
+import { effectiveTrustTier, eventMeta, evidenceProducer, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { auditTypeOf, isBoundToControl, subjectRole, verifiedAssuranceByPack, type VerifiedAssurance } from "./evidenceBinding.js";
 
@@ -46,9 +46,11 @@ interface SignedDigest {
   };
 }
 
-function inferTrustTier(event: EvidenceEvent, meta: Record<string, unknown>): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
+function inferTrustTier(
+  event: EvidenceEvent, meta: Record<string, unknown>, reader: () => ReaderTrust = readerTrustFor()
+): "OBSERVED" | "ATTESTED" | "SELF_REPORTED" {
   // P0-18: the tier comes from provenance; effectiveTrustTier reads the same cached parse as `meta`.
-  const tier = effectiveTrustTier(event, { trustList: readerTrustList });
+  const tier = effectiveTrustTier(event, reader);
   if (tier === "OBSERVED" || tier === "OBSERVED_HARDENED") return "OBSERVED";
   return tier === "ATTESTED" ? "ATTESTED" : "SELF_REPORTED";
 }
@@ -433,8 +435,10 @@ export function generateComplianceReport(params: {
       attested: 0,
       selfReported: 0
     };
-    for (const event of events.filter((row) => subjectRole(row, agentId, "agent") === "positive")) {
-      const tier = inferTrustTier(event, eventMeta(event));
+    // Synthetic rows count for nothing, not even as SELF_REPORTED (P0-18); the workspace's own keys never attest.
+    const reader = readerTrustFor(workspace);
+    for (const event of events.filter((row) => subjectRole(row, agentId, "agent") === "positive" && evidenceProducer(row) !== "synthetic")) {
+      const tier = inferTrustTier(event, eventMeta(event), reader);
       if (tier === "OBSERVED") trustCounts.observed += 1;
       else if (tier === "ATTESTED") trustCounts.attested += 1;
       else trustCounts.selfReported += 1;

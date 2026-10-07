@@ -1,29 +1,40 @@
-import { rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  effectiveTrustTier, evidenceProducer, verifyThirdPartyAttestation, type ThirdPartyAttestation
+  bundleDigest, effectiveTrustTier, evidenceProducer, readerTrustFor, trustTierByEventId, verifyThirdPartyAttestation,
+  type ThirdPartyAttestation
 } from "../../src/claims/evidenceProvenance.js";
-import { signHexDigest } from "../../src/crypto/keys.js";
+import { getPrivateKeyPem, signHexDigest } from "../../src/crypto/keys.js";
 import { evaluateGate, parseEvidenceEvent } from "../../src/diagnostic/gates.js";
 import type { EvidenceEvent, Gate } from "../../src/types.js";
 import { sha256Hex } from "../../src/utils/hash.js";
-import type { KeyPurpose, TrustContext } from "../../src/trust/index.js";
-import { operatorTrustHome } from "../helpers/trustContext.js";
+import { ed25519KeyId, type KeyPurpose, type TrustContext } from "../../src/trust/index.js";
+import { initWorkspace } from "../../src/workspace.js";
+import { operatorTrustHome, workspaceKeyPem } from "../helpers/trustContext.js";
 import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } from "../trust/trustFixtures.js";
 
 /**
  * P0-18: the tier a reader uses comes from who produced the row, not from what the row says. The producer table and
  * the source-literal enumeration are pinned in tests/compliance/evidenceBinding.test.ts (P0-17 shares the table).
  */
-const DIGEST = sha256Hex("ingest bundle");
+const PAYLOAD_SHA = sha256Hex("user: hello");
+const BUNDLE = [{ id: "orig-1", sha256: PAYLOAD_SHA, ts: 1 }, { id: "orig-2", sha256: sha256Hex("user: bye"), ts: 2 }];
+const DIGEST = bundleDigest(BUNDLE);
 const ATTESTER = testKey();
 
-function row(meta: Record<string, unknown>): { meta_json: string } {
-  return { meta_json: JSON.stringify(meta) };
+function row(meta: Record<string, unknown>, payloadSha256 = PAYLOAD_SHA): { meta_json: string; payload_sha256: string } {
+  return { meta_json: JSON.stringify(meta), payload_sha256: payloadSha256 };
 }
 
 function attestation(key: TestKey = ATTESTER, digest = DIGEST): ThirdPartyAttestation {
-  return { keyId: key.keyId, sigB64: signHexDigest(digest, key.privateKeyPem), digestSha256: digest, attestedBy: "Example Audit LLP" };
+  return { keyId: key.keyId, sigB64: signHexDigest(digest, key.privateKeyPem), digestSha256: digest, attestedBy: "Example Audit LLP", bundle: BUNDLE };
+}
+
+/** The attested copy of bundle entry orig-1, as attestIngestSession writes it. */
+function attestedMeta(record: ThirdPartyAttestation = attestation()): Record<string, unknown> {
+  return { source: "attested_ingest", trustTier: "ATTESTED", ingestSessionId: "session-a", originalEventId: "orig-1", attestation: record };
 }
 
 function trustFor(key: TestKey, purposes: KeyPurpose[] = ["independent-attestation"], overrides: Parameters<typeof listEntry>[1] = {}): TrustContext {
@@ -62,7 +73,7 @@ describe("effectiveTrustTier", () => {
   });
 
   test("ATTESTED needs a third-party attestation that verifies against the trust list now", () => {
-    const attested = row({ source: "attested_ingest", trustTier: "ATTESTED", attestation: attestation() });
+    const attested = row(attestedMeta());
     expect(effectiveTrustTier(attested, { trustList: trust })).toBe("ATTESTED");
     expect(effectiveTrustTier(attested, { trustList: null })).toBe("SELF_REPORTED");
     expect(effectiveTrustTier(attested, { trustList: context() })).toBe("SELF_REPORTED");
@@ -70,12 +81,75 @@ describe("effectiveTrustTier", () => {
     expect(effectiveTrustTier(row({ trustTier: "ATTESTED", attestation: { kind: "self_attested" } }), { trustList: trust })).toBe("SELF_REPORTED");
   });
 
-  test("the trust list is loaded only for a row that claims ATTESTED", () => {
-    const load = vi.fn(() => trust);
-    expect(effectiveTrustTier(row({ trustTier: "OBSERVED" }), { trustList: load })).toBe("OBSERVED");
+  test("the trust list is loaded only for a row that claims ATTESTED with an attestation bound to it", () => {
+    const load = vi.fn(() => ({ trustList: trust }));
+    expect(effectiveTrustTier(row({ trustTier: "OBSERVED" }), load)).toBe("OBSERVED");
+    // Every 1.x eval import and `amc attest` row claims ATTESTED with no record; none of them may cost a trust-list read.
+    expect(effectiveTrustTier(row({ source: "eval_import", trustTier: "ATTESTED" }), load)).toBe("SELF_REPORTED");
     expect(load).not.toHaveBeenCalled();
-    expect(effectiveTrustTier(row({ trustTier: "ATTESTED", attestation: attestation() }), { trustList: load })).toBe("ATTESTED");
+    expect(effectiveTrustTier(row(attestedMeta()), load)).toBe("ATTESTED");
     expect(load).toHaveBeenCalledTimes(1);
+  });
+
+  test("readerTrustFor loads once per evaluation", () => {
+    const home = operatorTrustHome([{ publicKeyPem: ATTESTER.publicKeyPem, purposes: ["independent-attestation"] }]);
+    try {
+      vi.stubEnv("AMC_HOME", home);
+      const reader = readerTrustFor();
+      expect(reader()).toBe(reader());
+      expect(effectiveTrustTier(row(attestedMeta()), reader)).toBe("ATTESTED");
+    } finally {
+      vi.unstubAllEnvs();
+      rmSync(home, { recursive: true, force: true });
+    }
+  });
+
+  // A genuine signature copied onto another row must not make that row ATTESTED (replay).
+  const replays: Array<[string, () => { meta_json: string; payload_sha256?: string }]> = [
+    ["a row with another payload", () => row(attestedMeta(), sha256Hex("fabricated"))],
+    ["a row claiming another original event", () => row({ ...attestedMeta(), originalEventId: "fabricated" })],
+    ["an eval import row", () => row({ source: "eval_import", trustTier: "ATTESTED", attestation: attestation() })],
+    ["a runtime row with no source", () => row({ trustTier: "ATTESTED", attestation: attestation() })],
+    ["a row whose record lost its bundle", () => row(attestedMeta({ ...attestation(), bundle: undefined }))],
+    ["a row whose bundle was extended", () => row({ ...attestedMeta({ ...attestation(), bundle: [...BUNDLE, { id: "x", sha256: sha256Hex("fabricated"), ts: 3 }] }),
+      originalEventId: "x" }, sha256Hex("fabricated"))],
+    ["a row without its payload hash", () => ({ meta_json: JSON.stringify(attestedMeta()) })]
+  ];
+  test.each(replays)("a copied attestation on %s reads SELF_REPORTED", (_label, make) => {
+    expect(effectiveTrustTier(make(), { trustList: trust })).toBe("SELF_REPORTED");
+  });
+
+  test("the workspace's own key never reads ATTESTED, even when the operator's trust list pins it", () => {
+    process.env.AMC_VAULT_PASSPHRASE = "evidence-provenance-test-passphrase";
+    const workspace = mkdtempSync(join(tmpdir(), "amc-provenance-own-key-"));
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    const auditorPem = workspaceKeyPem(workspace, "auditor");
+    const home = operatorTrustHome([{ publicKeyPem: auditorPem, purposes: ["independent-attestation"] }]);
+    try {
+      vi.stubEnv("AMC_HOME", home);
+      const own = { keyId: ed25519KeyId(auditorPem)!, sigB64: signHexDigest(DIGEST, getPrivateKeyPem(workspace, "auditor")), digestSha256: DIGEST, bundle: BUNDLE };
+      expect(effectiveTrustTier(row(attestedMeta(own)), readerTrustFor())).toBe("ATTESTED");
+      expect(effectiveTrustTier(row(attestedMeta(own)), readerTrustFor(workspace))).toBe("SELF_REPORTED");
+    } finally {
+      vi.unstubAllEnvs();
+      rmSync(home, { recursive: true, force: true });
+      rmSync(workspace, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("trustTierByEventId", () => {
+  test("bundle and certificate maps use the provenance tier, never the stored one", () => {
+    const rows = [
+      { id: "legacy", meta_json: JSON.stringify({ source: "eval_import", trustTier: "OBSERVED" }) },
+      { id: "no-tier", meta_json: JSON.stringify({ source: "eval_import" }) },
+      { id: "seed", meta_json: JSON.stringify({ provenance: "dogfood", trustTier: "OBSERVED" }) },
+      { id: "runtime-no-tier", meta_json: JSON.stringify({ source: "gateway" }) },
+      { id: "runtime", meta_json: JSON.stringify({ source: "gateway", trustTier: "OBSERVED" }) }
+    ];
+    expect(Object.fromEntries(trustTierByEventId(rows))).toEqual({
+      legacy: "SELF_REPORTED", "no-tier": "SELF_REPORTED", seed: "SELF_REPORTED", "runtime-no-tier": "SELF_REPORTED", runtime: "OBSERVED"
+    });
   });
 });
 
@@ -117,7 +191,7 @@ describe("diagnostic readers", () => {
 
   function raw(meta: Record<string, unknown>, fields: Partial<EvidenceEvent> = {}): EvidenceEvent {
     return { id: "ev", ts: Date.now(), session_id: "s1", runtime: "unknown", event_type: "artifact", payload_path: "agents/a/report.json",
-      payload_inline: null, payload_sha256: "0".repeat(64), meta_json: JSON.stringify(meta), prev_event_hash: "", event_hash: "1".repeat(64),
+      payload_inline: null, payload_sha256: PAYLOAD_SHA, meta_json: JSON.stringify(meta), prev_event_hash: "", event_hash: "1".repeat(64),
       writer_sig: "", ...fields } as EvidenceEvent;
   }
 
@@ -133,7 +207,7 @@ describe("diagnostic readers", () => {
     const home = operatorTrustHome([{ publicKeyPem: ATTESTER.publicKeyPem, purposes: ["independent-attestation"] }]);
     homes.push(home);
     vi.stubEnv("AMC_HOME", home);
-    const meta = { source: "attested_ingest", trustTier: "ATTESTED", attestation: attestation() };
+    const meta = attestedMeta();
     expect(parseEvidenceEvent(raw(meta)).trustTier).toBe("ATTESTED");
     expect(parseEvidenceEvent(raw(meta, { ts: Date.now() - 95 * 86_400_000 })).trustTier).toBe("SELF_REPORTED");
     expect(parseEvidenceEvent(raw({ ...meta, attestation: attestation(testKey()) })).trustTier).toBe("SELF_REPORTED");

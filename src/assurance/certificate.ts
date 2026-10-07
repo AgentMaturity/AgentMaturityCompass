@@ -1,4 +1,3 @@
-import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { exportEvidenceBundle, verifyEvidenceBundle } from "../bundles/bundle.js";
+import { trustTierByEventIdFromBundle } from "../bundles/bundleEvidence.js";
 import type { AssurancePackResult, AssuranceReport, DiagnosticReport, GatePolicy } from "../types.js";
 import { runBundleGate, parseGatePolicy, evaluateGatePolicy } from "../ci/gate.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -126,42 +126,6 @@ function overall(report: DiagnosticReport): number {
     return 0;
   }
   return Number((report.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / report.layerScores.length).toFixed(4));
-}
-
-function trustTierMapFromDb(dbPath: string): Map<string, string> {
-  const db = new Database(dbPath, { readonly: true });
-  try {
-    const rows = db.prepare("SELECT id, event_type, meta_json FROM evidence_events ORDER BY rowid ASC").all() as Array<{
-      id: string;
-      event_type: string;
-      meta_json: string;
-    }>;
-    const map = new Map<string, string>();
-    for (const row of rows) {
-      let tier = "OBSERVED";
-      try {
-        const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
-        if (
-          meta.trustTier === "OBSERVED" ||
-          meta.trustTier === "OBSERVED_HARDENED" ||
-          meta.trustTier === "ATTESTED" ||
-          meta.trustTier === "SELF_REPORTED"
-        ) {
-          tier = meta.trustTier;
-        } else if (row.event_type === "review") {
-          tier = "SELF_REPORTED";
-        }
-      } catch {
-        if (row.event_type === "review") {
-          tier = "SELF_REPORTED";
-        }
-      }
-      map.set(row.id, tier);
-    }
-    return map;
-  } finally {
-    db.close();
-  }
 }
 
 function materializeCertWorkspace(root: string): string {
@@ -569,7 +533,7 @@ export async function verifyCertificate(params: {
       errors.push("gate policy signature invalid");
     }
 
-    const trustMap = trustTierMapFromDb(join(extracted, "evidence", "evidence.sqlite"));
+    const trustMap = trustTierByEventIdFromBundle(extracted);
     const gate = evaluateGatePolicy({
       report: run,
       policy,

@@ -84,6 +84,8 @@ describe("dogfood maturity evidence", () => {
       const report = await runDiagnostic({ workspace: ws, agentId: agent.id, window: "14d", targetName: "default", claimMode: "auto" });
       expect(avgLevel(report), agent.id).toBe(0);
       expect(report.questionScores.every((score) => score.finalLevel === 0 && score.evidenceEventIds.length === 0), agent.id).toBe(true);
+      // Synthetic rows are dropped before the diagnostic reads them, so they do not even count as SELF_REPORTED coverage.
+      expect(report.evidenceTrustCoverage, agent.id).toEqual({ observed: 0, attested: 0, selfReported: 0 });
     }
   }, 120_000);
 });

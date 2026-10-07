@@ -1,14 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
-import { verifyThirdPartyAttestation } from "../claims/evidenceProvenance.js";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { bundleDigest, verifyThirdPartyAttestation, workspaceOwnKeyIds, type BundleEntry } from "../claims/evidenceProvenance.js";
 import { openLedger, hashBinaryOrPath } from "../ledger/ledger.js";
+import { readEventPayload } from "../session/eventPayload.js";
 import type { TrustContext } from "../trust/trustContext.js";
-import { ed25519KeyId } from "../trust/trustList.js";
 import type { EvidenceEvent } from "../types.js";
-import { canonicalize } from "../utils/json.js";
-import { sha256Hex } from "../utils/hash.js";
 import { resolveAgentId } from "../fleet/paths.js";
 
 export type IngestType = "chatgpt" | "claude_console" | "gemini_ui" | "generic_json" | "generic_text";
@@ -103,38 +100,35 @@ export function ingestEvidence(params: {
   }
 }
 
-function payloadForEvent(workspace: string, event: { payload_inline: string | null; payload_path: string | null }): string {
-  if (event.payload_inline !== null) {
-    return event.payload_inline;
-  }
-  if (event.payload_path !== null) {
-    return readFileSync(resolve(workspace, event.payload_path), "utf8");
-  }
-  return "";
+/** The original's plaintext payload (blobs are stored encrypted), so the copy keeps the payload hash the bundle lists. */
+function payloadForEvent(workspace: string, event: EvidenceEvent): Buffer {
+  const read = readEventPayload(workspace, event);
+  if (read.status !== "ok") throw new Error(`cannot attest event ${event.id}: its payload is ${read.status === "pruned" ? "pruned" : read.detail}`);
+  return read.bytes;
 }
 
-/** The ingest session's original review events (not earlier attestation copies), oldest first. */
-function ingestSourceEvents(ledger: ReturnType<typeof openLedger>, ingestSessionId: string): EvidenceEvent[] {
-  const sourceEvents = ledger
-    .getAllEvents()
-    .filter((event) => event.session_id === ingestSessionId && event.event_type === "review"
-      && (JSON.parse(event.meta_json) as { source?: unknown }).source !== "attested_ingest")
-    .sort((a, b) => a.ts - b.ts);
-  if (sourceEvents.length === 0) {
+type IngestMeta = { source?: unknown; trustTier?: unknown; attestation?: { keyId?: unknown; digestSha256?: unknown } };
+
+/** The ingest session's review events: the originals, oldest first, and earlier attestation copies. */
+function ingestSessionEvents(ledger: ReturnType<typeof openLedger>, ingestSessionId: string): { sources: EvidenceEvent[]; copies: IngestMeta[] } {
+  const review = ledger.getAllEvents().filter((event) => event.session_id === ingestSessionId && event.event_type === "review")
+    .map((event) => ({ event, meta: JSON.parse(event.meta_json) as IngestMeta }));
+  const sources = review.filter(({ meta }) => meta.source !== "attested_ingest").map(({ event }) => event).sort((a, b) => a.ts - b.ts);
+  if (sources.length === 0) {
     throw new Error(`No ingest review events found for session ${ingestSessionId}`);
   }
-  return sourceEvents;
+  return { sources, copies: review.filter(({ meta }) => meta.source === "attested_ingest").map(({ meta }) => meta) };
 }
 
-function bundleHashOf(sourceEvents: EvidenceEvent[]): string {
-  return sha256Hex(canonicalize(sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts }))));
+function bundleOf(sourceEvents: EvidenceEvent[]): BundleEntry[] {
+  return sourceEvents.map((event) => ({ id: event.id, sha256: event.payload_sha256, ts: event.ts }));
 }
 
 /** The digest a third-party attester signs for `amc attest --attester-signature` (printed by `amc attest` as the bundle hash). */
 export function ingestBundleHash(workspace: string, ingestSessionId: string): string {
   const ledger = openLedger(workspace);
   try {
-    return bundleHashOf(ingestSourceEvents(ledger, ingestSessionId));
+    return bundleDigest(bundleOf(ingestSessionEvents(ledger, ingestSessionId).sources));
   } finally {
     ledger.close();
   }
@@ -177,19 +171,23 @@ export function attestIngestSession(params: {
   const agentId = resolveAgentId(workspace, params.agentId);
   const ledger = openLedger(workspace);
   try {
-    const sourceEvents = ingestSourceEvents(ledger, params.ingestSessionId);
-    const bundleHash = bundleHashOf(sourceEvents);
-    const ownKeyIds = (["monitor", "auditor"] as const).flatMap((role) => getPublicKeyHistory(workspace, role))
-      .map((pem) => ed25519KeyId(pem)).filter((keyId): keyId is string => keyId !== null);
+    const { sources: sourceEvents, copies } = ingestSessionEvents(ledger, params.ingestSessionId);
+    const bundle = bundleOf(sourceEvents);
+    const bundleHash = bundleDigest(bundle);
     const thirdParty = params.attesterSignature
       ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
       : null;
     const verdict = thirdParty
-      ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, ownKeyIds)
+      ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, workspaceOwnKeyIds(workspace))
       : { verified: false, reason: "self-attested: no third-party signature was given" };
+    // One signature attests the bundle once: replaying it would only multiply the same ATTESTED rows.
+    if (verdict.verified && thirdParty && copies.some((meta) => meta.trustTier === "ATTESTED"
+      && meta.attestation?.keyId === thirdParty.keyId && meta.attestation?.digestSha256 === bundleHash)) {
+      throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} over bundle ${bundleHash}`);
+    }
     const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
     const attestation = verdict.verified && thirdParty
-      ? { ...thirdParty, attestedBy, statement }
+      ? { ...thirdParty, attestedBy, statement, bundle }
       : { kind: "self_attested", attestedBy, statement };
     const attestationSig = ledger.signRunHash(bundleHash);
 

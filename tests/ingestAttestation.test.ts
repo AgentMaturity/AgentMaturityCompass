@@ -2,10 +2,12 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
+import { effectiveTrustTier } from "../src/claims/evidenceProvenance.js";
 import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { attestIngestSession, ingestBundleHash, ingestEvidence } from "../src/ingest/ingest.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { ed25519KeyId, type KeyPurpose, type TrustContext } from "../src/trust/index.js";
+import type { EvidenceEvent } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 import { workspaceKeyPem } from "./helpers/trustContext.js";
 import { context, distrustEntry, listEntry, testKey, trustList, type TestKey } from "./trust/trustFixtures.js";
@@ -29,16 +31,18 @@ function ingested(): { workspace: string; sessionId: string; bundleHash: string 
   return { workspace, sessionId: ingestSessionId, bundleHash: ingestBundleHash(workspace, ingestSessionId) };
 }
 
-function attestedRows(workspace: string, sessionId: string): Array<Record<string, unknown>> {
+function attestedEvents(workspace: string, sessionId: string): EvidenceEvent[] {
   const ledger = openLedger(workspace);
   try {
-    return ledger.getAllEvents()
-      .filter((event) => event.session_id === sessionId)
-      .map((event) => JSON.parse(event.meta_json) as Record<string, unknown>)
-      .filter((meta) => meta.source === "attested_ingest");
+    return ledger.getAllEvents().filter((event) => event.session_id === sessionId
+      && (JSON.parse(event.meta_json) as Record<string, unknown>).source === "attested_ingest");
   } finally {
     ledger.close();
   }
+}
+
+function attestedRows(workspace: string, sessionId: string): Array<Record<string, unknown>> {
+  return attestedEvents(workspace, sessionId).map((event) => JSON.parse(event.meta_json) as Record<string, unknown>);
 }
 
 // The real clock: attestIngestSession checks admission now, so the list must be valid around Date.now().
@@ -76,8 +80,22 @@ describe("ingest attestation", () => {
     for (const meta of rows) {
       expect(meta.trustTier).toBe("ATTESTED");
       expect(meta.attestation).toEqual({ kind: "third_party", keyId: attester.keyId, sigB64, digestSha256: bundleHash,
-        attestedBy: "Example Audit LLP", statement: "export matches source" });
+        attestedBy: "Example Audit LLP", statement: "export matches source", bundle: [expect.objectContaining({ id: expect.any(String) })] });
     }
+    // Readers re-verify the copy against the trust list, bound to the original event it copies.
+    const [copy] = attestedEvents(workspace, sessionId).filter((event) => event.event_type === "review");
+    expect(effectiveTrustTier(copy!, { trustList: pinned(attester) })).toBe("ATTESTED");
+    expect(effectiveTrustTier(copy!, { trustList: pinned(attester), ownKeyIds: [attester.keyId] })).toBe("SELF_REPORTED");
+  });
+
+  test("one third-party signature attests a session once: replaying it is refused", () => {
+    const { workspace, sessionId, bundleHash } = ingested();
+    const attester = testKey();
+    const signature = { keyId: attester.keyId, sigB64: signHexDigest(bundleHash, attester.privateKeyPem) };
+    expect(attest(workspace, sessionId, { attesterSignature: signature, trust: pinned(attester) }).trustTier).toBe("ATTESTED");
+    expect(() => attest(workspace, sessionId, { attesterSignature: signature, trust: pinned(attester) }))
+      .toThrow(`ingest session ${sessionId} is already attested by key ${attester.keyId} over bundle ${bundleHash}`);
+    expect(attestedRows(workspace, sessionId).filter((meta) => meta.trustTier === "ATTESTED").length).toBe(2);
   });
 
   const refused: Array<[string, (key: TestKey, digest: string) => { sigB64: string; trust: TrustContext }, RegExp]> = [

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
-import { effectiveTrustTier, readerTrustList } from "../claims/evidenceProvenance.js";
+import { effectiveTrustTier, readerTrustFor } from "../claims/evidenceProvenance.js";
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
@@ -1885,6 +1885,7 @@ export function evalImportCoverageStatus(params: {
     }>();
     const allMappedQuestions = new Set<string>();
     let totalImportedCases = 0;
+    const reader = readerTrustFor(params.workspace);
 
     for (const row of rows) {
       const meta = parseMetaRecord(row.meta_json);
@@ -1893,7 +1894,7 @@ export function evalImportCoverageStatus(params: {
         continue;
       }
       // Rows 1.1.x stored as ATTESTED read SELF_REPORTED here too; the ledger is not rewritten.
-      const trustTier = effectiveTrustTier(row, { trustList: readerTrustList }) ?? "SELF_REPORTED";
+      const trustTier = effectiveTrustTier(row, reader) ?? "SELF_REPORTED";
       const questionIdsForEvent = parseMetaQuestionIds(meta);
       const framework = frameworkValue;
       const state = frameworkState.get(framework) ?? {

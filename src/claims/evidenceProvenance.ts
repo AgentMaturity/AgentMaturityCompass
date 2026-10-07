@@ -1,7 +1,10 @@
-import { verifyHexDigest } from "../crypto/keys.js";
+import { getPublicKeyHistory, verifyHexDigest } from "../crypto/keys.js";
 import { admitKey } from "../trust/admission.js";
 import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
+import { ed25519KeyId } from "../trust/trustList.js";
 import type { EvidenceEvent, TrustTier } from "../types.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 
 /**
  * Who produced a ledger event. Only "amc-runtime" evidence (AMC observed it itself) may support a
@@ -57,12 +60,39 @@ export function producerOfMeta(meta: Record<string, unknown>): EvidenceProducer 
   return producer ?? "amc-runtime";
 }
 
-/** A third party's Ed25519 signature over a sha256 digest (an ingest bundle hash), as stored in `meta.attestation`. */
+/** One source event of an ingest bundle; the bundle hash is sha256 of the canonical list of these. */
+export interface BundleEntry {
+  id: string;
+  sha256: string;
+  ts: number;
+}
+
+/**
+ * A third party's Ed25519 signature over a sha256 digest (an ingest bundle hash), as stored in `meta.attestation`.
+ * `bundle` is the signed list itself, so a reader can tie the signature to the row it sits on.
+ */
 export interface ThirdPartyAttestation {
   keyId: string;
   sigB64: string;
   digestSha256: string;
   attestedBy?: string;
+  bundle?: BundleEntry[];
+}
+
+/** The ingest bundle hash: what a third-party attester signs. */
+export function bundleDigest(bundle: readonly BundleEntry[]): string {
+  return sha256Hex(canonicalize(bundle));
+}
+
+/** Key ids of the workspace's monitor and auditor keys, current and historical. They never attest as a third party. */
+export function workspaceOwnKeyIds(workspace: string): string[] {
+  return (["monitor", "auditor"] as const).flatMap((role) => {
+    try {
+      return getPublicKeyHistory(workspace, role);
+    } catch {
+      return []; // a role without a key has nothing to exclude
+    }
+  }).map((pem) => ed25519KeyId(pem)).filter((keyId): keyId is string => keyId !== null);
 }
 
 const TIERS: readonly string[] = ["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED"];
@@ -76,11 +106,8 @@ export function verifyThirdPartyAttestation(
   attestation: unknown, trustList: TrustContext | null, ownKeyIds: readonly string[] = []
 ): { verified: boolean; reason: string } {
   const refuse = (reason: string) => ({ verified: false, reason });
-  const record = attestation as Partial<Record<keyof ThirdPartyAttestation, unknown>> | null;
-  if (!record || typeof record !== "object" || typeof record.keyId !== "string" || typeof record.sigB64 !== "string"
-    || typeof record.digestSha256 !== "string") {
-    return refuse("malformed attestation: keyId, sigB64 and digestSha256 are required");
-  }
+  if (!hasAttestationShape(attestation)) return refuse("malformed attestation: keyId, sigB64 and digestSha256 are required");
+  const record = attestation;
   if (ownKeyIds.includes(record.keyId)) return refuse(`key ${record.keyId} is one of the operator's own keys, not a third party`);
   if (!trustList) return refuse("no trust list is loaded, so no attester key is pinned");
   const entry = trustList.lists.flatMap(list => list.entries).find(candidate => candidate.keyId === record.keyId);
@@ -95,7 +122,7 @@ export function verifyThirdPartyAttestation(
 }
 
 /** The operator's trust lists for readers, or null when none load (then no row reads ATTESTED). */
-export function readerTrustList(): TrustContext | null {
+function readerTrustList(): TrustContext | null {
   try {
     return loadTrustContext();
   } catch {
@@ -103,23 +130,62 @@ export function readerTrustList(): TrustContext | null {
   }
 }
 
+/** What a reader checks an ATTESTED row against: the pinned trust lists and the workspace's own key ids. */
+export interface ReaderTrust {
+  trustList: TrustContext | null;
+  ownKeyIds?: readonly string[];
+}
+
+/** Reader trust for one evaluation, loaded on the first row that carries an attestation and then reused. */
+export function readerTrustFor(workspace?: string): () => ReaderTrust {
+  let loaded: ReaderTrust | undefined;
+  return () => (loaded ??= { trustList: readerTrustList(), ownKeyIds: workspace ? workspaceOwnKeyIds(workspace) : [] });
+}
+
+function hasAttestationShape(value: unknown): value is ThirdPartyAttestation {
+  const record = value as Record<string, unknown> | null;
+  return !!record && typeof record === "object" && ["keyId", "sigB64", "digestSha256"].every((field) => typeof record[field] === "string");
+}
+
 /**
- * The tier a reader may use. Synthetic rows are excluded (null). ATTESTED counts only while its attestation verifies
- * against the trust list. Imported, manual and external rows are otherwise SELF_REPORTED, and AMC runtime rows keep
- * their declared tier, a missing or unknown one reading SELF_REPORTED. Stored rows are never rewritten.
- * `trustList` may be a loader, which runs only for a row that claims ATTESTED.
+ * Whether the attestation was made over this row: its signed bundle hashes to the signed digest and lists the row's
+ * original event with this row's payload hash. Without that, one genuine signature could be copied onto any row.
+ */
+function attestationBindsRow(attestation: ThirdPartyAttestation, meta: Record<string, unknown>, payloadSha256: string | undefined): boolean {
+  const bundle = attestation.bundle;
+  if (!Array.isArray(bundle) || typeof meta.originalEventId !== "string" || typeof payloadSha256 !== "string") return false;
+  // ponytail: every copy stores the whole bundle (quadratic in session size); store a Merkle path if sessions get large.
+  return bundleDigest(bundle) === attestation.digestSha256
+    && bundle.some((entry) => entry?.id === meta.originalEventId && entry?.sha256 === payloadSha256);
+}
+
+/**
+ * The tier a reader may use. Synthetic rows are excluded (null). ATTESTED counts only while its attestation is bound
+ * to this row and verifies against the trust list by a key that is not the workspace's own. Imported, manual and
+ * external rows are otherwise SELF_REPORTED, and AMC runtime rows keep their declared tier, a missing or unknown one
+ * reading SELF_REPORTED. Stored rows are never rewritten. `reader` may be a loader, which runs only for a row that
+ * claims ATTESTED with an attestation bound to it.
  */
 export function effectiveTrustTier(
-  event: Pick<EvidenceEvent, "meta_json">, opts: { trustList: TrustContext | null | (() => TrustContext | null) }
+  event: Pick<EvidenceEvent, "meta_json"> & { payload_sha256?: string }, reader: ReaderTrust | (() => ReaderTrust)
 ): TrustTier | null {
   const meta = eventMeta(event);
   const producer = producerOfMeta(meta);
   if (producer === "synthetic") return null;
   const declared = typeof meta.trustTier === "string" && TIERS.includes(meta.trustTier) ? meta.trustTier as TrustTier : "SELF_REPORTED";
   if (declared === "ATTESTED") {
-    // ponytail: the loader reads the trust list once per ATTESTED row; cache it per evaluation if such rows get common.
-    const trustList = typeof opts.trustList === "function" ? opts.trustList() : opts.trustList;
-    return verifyThirdPartyAttestation(meta.attestation, trustList).verified ? "ATTESTED" : "SELF_REPORTED";
+    const attestation = meta.attestation;
+    if (!hasAttestationShape(attestation) || !attestationBindsRow(attestation, meta, event.payload_sha256)) return "SELF_REPORTED";
+    const { trustList, ownKeyIds } = typeof reader === "function" ? reader() : reader;
+    return verifyThirdPartyAttestation(attestation, trustList, ownKeyIds).verified ? "ATTESTED" : "SELF_REPORTED";
   }
   return producer === "amc-runtime" ? declared : "SELF_REPORTED";
+}
+
+/**
+ * Event id to provenance tier for bundle and certificate readers, which only ask whether a row is OBSERVED. No trust
+ * list loads, so ATTESTED rows read SELF_REPORTED, as do synthetic rows.
+ */
+export function trustTierByEventId(rows: ReadonlyArray<Pick<EvidenceEvent, "id" | "meta_json">>): Map<string, string> {
+  return new Map(rows.map((row) => [row.id, effectiveTrustTier(row, { trustList: null }) ?? "SELF_REPORTED"]));
 }

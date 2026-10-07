@@ -1,4 +1,4 @@
-import { effectiveTrustTier, producerOfMeta, readerTrustList } from "../claims/evidenceProvenance.js";
+import { effectiveTrustTier, producerOfMeta, readerTrustFor, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { EvidenceEvent, Gate, TrustTier } from "../types.js";
 import { dayKey } from "../utils/time.js";
 
@@ -26,6 +26,11 @@ function degradeTrustTierForStaleness(trustTier: TrustTier): TrustTier {
 }
 
 export function parseEvidenceEvent(event: EvidenceEvent): ParsedEvidenceEvent {
+  return parseEvidenceEventWith(event, readerTrustFor());
+}
+
+/** parseEvidenceEvent with the trust an ATTESTED row is checked against; share one reader per evaluation. */
+export function parseEvidenceEventWith(event: EvidenceEvent, reader: () => ReaderTrust): ParsedEvidenceEvent {
   let meta: Record<string, unknown> = {};
   try {
     meta = JSON.parse(event.meta_json) as Record<string, unknown>;
@@ -33,9 +38,9 @@ export function parseEvidenceEvent(event: EvidenceEvent): ParsedEvidenceEvent {
     meta = {};
   }
 
-  // P0-18: the tier comes from provenance, not from the row. Synthetic rows read SELF_REPORTED here and evaluateGate
-  // drops them.
-  const baselineTrustTier = effectiveTrustTier(event, { trustList: readerTrustList }) ?? "SELF_REPORTED";
+  // P0-18: the tier comes from provenance, not from the row. Synthetic rows read SELF_REPORTED here; the runner and
+  // evaluateGate drop them.
+  const baselineTrustTier = effectiveTrustTier(event, reader) ?? "SELF_REPORTED";
   const staleEvidence =
     Number.isFinite(event.ts) && event.ts > 0 && Date.now() - event.ts > EVIDENCE_STALE_AFTER_MS;
   const trustTier = staleEvidence ? degradeTrustTierForStaleness(baselineTrustTier) : baselineTrustTier;
