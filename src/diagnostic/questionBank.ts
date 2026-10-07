@@ -148,7 +148,7 @@ function buildBaseGate(level: 0 | 1 | 2 | 3 | 4 | 5): Gate {
   const acceptedTrustTiers =
     level >= 5
       ? (["OBSERVED"] as const)
-      : level >= 4
+      : level >= 2 // P0-21: self-reported evidence caps at L1
         ? (["OBSERVED", "ATTESTED"] as const)
         : (["OBSERVED", "ATTESTED", "SELF_REPORTED"] as const);
   return {

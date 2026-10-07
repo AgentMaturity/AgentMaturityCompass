@@ -159,8 +159,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -182,8 +181,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -447,8 +445,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -470,8 +467,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -725,8 +721,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -748,8 +743,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -1003,8 +997,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -1026,8 +1019,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -1281,8 +1273,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -1566,8 +1557,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -1589,8 +1579,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -1844,8 +1833,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -1868,8 +1856,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -2140,8 +2127,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -2163,8 +2149,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -2418,8 +2403,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -2441,8 +2425,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -2710,8 +2693,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -2733,8 +2715,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -3008,8 +2989,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -3031,8 +3011,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -3286,8 +3265,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -3309,8 +3287,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -3564,8 +3541,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -3587,8 +3563,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -3842,8 +3817,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -3865,8 +3839,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -4120,8 +4093,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -4143,8 +4115,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -4398,8 +4369,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -4421,8 +4391,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -4676,8 +4645,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -4699,8 +4667,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -4969,8 +4936,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -4992,8 +4958,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -5247,8 +5212,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -5270,8 +5234,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -5525,8 +5488,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -5548,8 +5510,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -5803,8 +5764,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -5826,8 +5786,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -6081,8 +6040,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -6104,8 +6062,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -6359,8 +6316,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -6382,8 +6338,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -6637,8 +6592,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -6660,8 +6614,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -6915,8 +6868,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -6938,8 +6890,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -7193,8 +7144,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -7475,8 +7425,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -7498,8 +7447,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -7753,8 +7701,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -7776,8 +7723,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -8031,8 +7977,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -8054,8 +7999,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -8324,8 +8268,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -8347,8 +8290,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -8602,8 +8544,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -8625,8 +8566,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -8880,8 +8820,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -8903,8 +8842,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -9158,8 +9096,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -9181,8 +9118,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -9436,8 +9372,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -9459,8 +9394,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -9714,8 +9648,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -9737,8 +9670,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -9992,8 +9924,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -10015,8 +9946,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -10270,8 +10200,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -10293,8 +10222,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -10548,8 +10476,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -10571,8 +10498,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -10826,8 +10752,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -10849,8 +10774,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -11104,8 +11028,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -11127,8 +11050,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -11382,8 +11304,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -11405,8 +11326,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -11660,8 +11580,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -11683,8 +11602,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -11938,8 +11856,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -11961,8 +11878,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -12216,8 +12132,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -12239,8 +12154,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -12494,8 +12408,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -12517,8 +12430,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -12772,8 +12684,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -12795,8 +12706,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -13050,8 +12960,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -13073,8 +12982,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -13328,8 +13236,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -13351,8 +13258,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -13606,8 +13512,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -13629,8 +13534,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -13884,8 +13788,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -13907,8 +13810,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -14162,8 +14064,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -14185,8 +14086,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -14440,8 +14340,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -14463,8 +14362,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -14724,8 +14622,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -14747,8 +14644,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -15022,8 +14918,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -15045,8 +14940,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -15300,8 +15194,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -15323,8 +15216,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -15577,8 +15469,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -15600,8 +15491,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -15855,8 +15745,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -15878,8 +15767,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -16133,8 +16021,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -16156,8 +16043,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -16411,8 +16297,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -16434,8 +16319,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -16689,8 +16573,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -16712,8 +16595,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -16967,8 +16849,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -16990,8 +16871,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -17245,8 +17125,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -17268,8 +17147,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -17523,8 +17401,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -17546,8 +17423,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -17801,8 +17677,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -17824,8 +17699,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -18079,8 +17953,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -18102,8 +17975,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -18357,8 +18229,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -18380,8 +18251,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -18634,8 +18504,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -18657,8 +18526,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -18912,8 +18780,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -18936,8 +18803,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -19205,8 +19071,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -19228,8 +19093,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -19494,8 +19358,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -19517,8 +19380,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -19784,8 +19646,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -19807,8 +19668,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -20061,8 +19921,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -20084,8 +19943,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -20338,8 +20196,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -20361,8 +20218,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -20615,8 +20471,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -20638,8 +20493,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -20892,8 +20746,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -21180,8 +21033,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -21468,8 +21320,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -21756,8 +21607,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -22044,8 +21894,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -22332,8 +22181,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -22620,8 +22468,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -22644,8 +22491,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -22910,8 +22756,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -22934,8 +22779,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -23200,8 +23044,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -23224,8 +23067,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -23490,8 +23332,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -23780,8 +23621,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -24070,8 +23910,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -24360,8 +24199,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -24384,8 +24222,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -24652,8 +24489,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -24676,8 +24512,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -24944,8 +24779,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -24968,8 +24802,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -25236,8 +25069,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -25260,8 +25092,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -25528,8 +25359,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -25552,8 +25382,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -25820,8 +25649,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -25844,8 +25672,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -26112,8 +25939,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -26136,8 +25962,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -26404,8 +26229,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -26428,8 +26252,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -26696,8 +26519,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -26720,8 +26542,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -26988,8 +26809,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -27012,8 +26832,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -27281,8 +27100,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -27307,8 +27125,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -27589,8 +27406,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -27615,8 +27431,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -27898,8 +27713,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -27924,8 +27738,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -28208,8 +28021,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -28231,8 +28043,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -28492,8 +28303,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -28515,8 +28325,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -28776,8 +28585,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -28799,8 +28607,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -29061,8 +28868,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -29084,8 +28890,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -29346,8 +29151,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -29369,8 +29173,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -29643,8 +29446,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -29666,8 +29468,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -29920,8 +29721,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -29943,8 +29743,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -30198,8 +29997,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -30223,8 +30021,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -30482,8 +30279,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -30507,8 +30303,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -30784,8 +30579,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -30809,8 +30603,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -31087,8 +30880,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -31112,8 +30904,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -31371,8 +31162,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -31396,8 +31186,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -31655,8 +31444,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -31680,8 +31468,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -31939,8 +31726,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -31964,8 +31750,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -32223,8 +32008,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -32246,8 +32030,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -32502,8 +32285,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -32525,8 +32307,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -32781,8 +32562,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -32804,8 +32584,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -33060,8 +32839,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -33083,8 +32861,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -33338,8 +33115,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -33361,8 +33137,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -33616,8 +33391,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -33639,8 +33413,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -33894,8 +33667,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -33917,8 +33689,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -34172,8 +33943,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -34195,8 +33965,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -34450,8 +34219,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -34473,8 +34241,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -34728,8 +34495,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -34751,8 +34517,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -35006,8 +34771,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -35029,8 +34793,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -35284,8 +35047,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -35307,8 +35069,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -35562,8 +35323,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -35585,8 +35345,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -35840,8 +35599,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -35863,8 +35621,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -36118,8 +35875,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -36141,8 +35897,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -36396,8 +36151,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -36419,8 +36173,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -36674,8 +36427,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -36697,8 +36449,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -36952,8 +36703,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -36975,8 +36725,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -37230,8 +36979,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -37253,8 +37001,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -37508,8 +37255,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -37531,8 +37277,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -37786,8 +37531,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -37809,8 +37553,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -38064,8 +37807,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -38087,8 +37829,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -38342,8 +38083,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -38365,8 +38105,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -38620,8 +38359,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -38643,8 +38381,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -38898,8 +38635,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -38921,8 +38657,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -39176,8 +38911,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -39199,8 +38933,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -39454,8 +39187,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -39477,8 +39209,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -39732,8 +39463,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -39755,8 +39485,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -40010,8 +39739,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -40033,8 +39761,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -40288,8 +40015,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -40311,8 +40037,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -40566,8 +40291,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -40589,8 +40313,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -40845,8 +40568,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -40868,8 +40590,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -41123,8 +40844,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -41146,8 +40866,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -41401,8 +41120,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -41424,8 +41142,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -41679,8 +41396,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -41702,8 +41418,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -41957,8 +41672,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -41980,8 +41694,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -42235,8 +41948,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -42258,8 +41970,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -42513,8 +42224,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -42536,8 +42246,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -42791,8 +42500,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -42814,8 +42522,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -43069,8 +42776,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -43092,8 +42798,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -43347,8 +43052,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -43370,8 +43074,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -43625,8 +43328,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -43648,8 +43350,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -43903,8 +43604,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -43926,8 +43626,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -44181,8 +43880,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -44204,8 +43902,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -44459,8 +44156,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -44482,8 +44178,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -44737,8 +44432,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -44760,8 +44454,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -45015,8 +44708,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -45038,8 +44730,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -45293,8 +44984,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -45316,8 +45006,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -45571,8 +45260,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -45594,8 +45282,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -45849,8 +45536,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -45872,8 +45558,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -46127,8 +45812,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -46150,8 +45834,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -46405,8 +46088,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -46428,8 +46110,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -46683,8 +46364,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -46706,8 +46386,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -46961,8 +46640,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -46984,8 +46662,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -47239,8 +46916,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -47262,8 +46938,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -47517,8 +47192,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -47540,8 +47214,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -47795,8 +47468,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -47818,8 +47490,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -48073,8 +47744,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -48096,8 +47766,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -48351,8 +48020,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -48374,8 +48042,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -48629,8 +48296,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -48652,8 +48318,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -48907,8 +48572,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -48930,8 +48594,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -49185,8 +48848,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -49208,8 +48870,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -49463,8 +49124,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -49486,8 +49146,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -49741,8 +49400,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -49764,8 +49422,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -50019,8 +49676,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -50042,8 +49698,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -50297,8 +49952,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -50320,8 +49974,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -50575,8 +50228,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -50598,8 +50250,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -50853,8 +50504,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -50876,8 +50526,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -51131,8 +50780,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -51154,8 +50802,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -51409,8 +51056,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -51432,8 +51078,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -51687,8 +51332,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -51710,8 +51354,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -51965,8 +51608,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -51988,8 +51630,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -52243,8 +51884,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -52266,8 +51906,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -52521,8 +52160,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -52544,8 +52182,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -52799,8 +52436,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -52822,8 +52458,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -53077,8 +52712,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -53100,8 +52734,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -53355,8 +52988,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -53378,8 +53010,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -53633,8 +53264,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -53656,8 +53286,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -53911,8 +53540,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -53934,8 +53562,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -54189,8 +53816,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -54212,8 +53838,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -54467,8 +54092,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -54490,8 +54114,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -54745,8 +54368,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -54768,8 +54390,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -55023,8 +54644,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -55046,8 +54666,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -55301,8 +54920,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -55324,8 +54942,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -55579,8 +55196,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -55602,8 +55218,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -55857,8 +55472,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -55880,8 +55494,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -56135,8 +55748,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -56158,8 +55770,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -56413,8 +56024,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -56436,8 +56046,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -56691,8 +56300,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -56714,8 +56322,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -56969,8 +56576,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -56992,8 +56598,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -57247,8 +56852,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -57270,8 +56874,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -57525,8 +57128,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -57548,8 +57150,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -57803,8 +57404,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -57826,8 +57426,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -58081,8 +57680,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -58104,8 +57702,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -58359,8 +57956,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -58382,8 +57978,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -58637,8 +58232,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -58660,8 +58254,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -58915,8 +58508,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -58938,8 +58530,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -59193,8 +58784,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -59216,8 +58806,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -59471,8 +59060,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -59494,8 +59082,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -59749,8 +59336,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -59772,8 +59358,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -60027,8 +59612,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -60050,8 +59634,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -60305,8 +59888,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -60328,8 +59910,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -60583,8 +60164,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -60606,8 +60186,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -60861,8 +60440,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -60884,8 +60462,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -61139,8 +60716,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -61162,8 +60738,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -61417,8 +60992,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -61440,8 +61014,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -61695,8 +61268,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -61718,8 +61290,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -61973,8 +61544,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -61996,8 +61566,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -62251,8 +61820,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -62274,8 +61842,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -62529,8 +62096,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -62552,8 +62118,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -62807,8 +62372,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -62830,8 +62394,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -63085,8 +62648,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -63108,8 +62670,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -63363,8 +62924,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -63386,8 +62946,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -63641,8 +63200,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -63664,8 +63222,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -63919,8 +63476,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -63942,8 +63498,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -64197,8 +63752,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -64220,8 +63774,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -64475,8 +64028,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -64498,8 +64050,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -64753,8 +64304,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -64776,8 +64326,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -65031,8 +64580,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -65054,8 +64602,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -65309,8 +64856,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -65332,8 +64878,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -65587,8 +65132,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -65610,8 +65154,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -65865,8 +65408,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -65888,8 +65430,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -66143,8 +65684,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -66166,8 +65706,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -66421,8 +65960,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -66444,8 +65982,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -66699,8 +66236,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -66722,8 +66258,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -66977,8 +66512,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -67000,8 +66534,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -67275,8 +66808,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -67299,8 +66831,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -67579,8 +67110,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -67602,8 +67132,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -67857,8 +67386,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -67880,8 +67408,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -68135,8 +67662,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -68158,8 +67684,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [
@@ -68413,8 +67938,7 @@
           "minDistinctDays": 2,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [],
@@ -68436,8 +67960,7 @@
           "minDistinctDays": 3,
           "acceptedTrustTiers": [
             "OBSERVED",
-            "ATTESTED",
-            "SELF_REPORTED"
+            "ATTESTED"
           ],
           "mustInclude": {
             "metaKeys": [

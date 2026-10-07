@@ -84,6 +84,24 @@ describe("score industry-adjust current score fallback", () => {
     expect(result.stdout).not.toContain("No --score provided");
   });
 
+  test("--score is a percentage 0-100: 75 means 75%", () => {
+    const workspace = tempWorkspace();
+
+    const result = runCli(workspace, ["score", "industry-adjust", "--industry", "healthcare", "--score", "75", "--json"]);
+
+    expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    expect((JSON.parse(result.stdout) as { rawScore: number }).rawScore).toBe(75);
+  });
+
+  test.each(["1.5", "0.75", "101", "-5", "abc"])("--score %s is refused instead of being reinterpreted", (score) => {
+    const workspace = tempWorkspace();
+
+    const result = runCli(workspace, ["score", "industry-adjust", "--industry", "healthcare", "--score", score]);
+
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("pass --score as a percentage 0-100");
+  });
+
   test("explains how adjusted score differs from raw score", () => {
     const workspace = tempWorkspace();
 

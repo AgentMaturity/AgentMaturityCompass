@@ -3,7 +3,9 @@
  * Organized across 7 domain stations
  * 7 stations: Environment, Health, Wealth, Education, Mobility, Technology, Governance
  */
+import { likertToPercent } from "../score/units.js";
 import type { Domain } from "./domainRegistry.js";
+import { selfAssessPack, type SelfAssessedPack } from "./packSelfAssessment.js";
 import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./packs/regulatorySchema.js";
 
 // ---------------------------------------------------------------------------
@@ -71,6 +73,7 @@ export interface IndustryPack {
   description: string;
   regulatoryBasis: string[];
   questions: IndustryPackQuestion[];
+  /** A self-assessment target in percent. Meeting it certifies nothing. */
   certificationThreshold: number;
   complianceFrameworks: string[];
   /**
@@ -2507,13 +2510,10 @@ export function getPackById(packId: string): IndustryPack | undefined {
   return (INDUSTRY_PACKS as Record<string, IndustryPack | undefined>)[packId];
 }
 
-export interface IndustryPackScoreResult {
+export interface IndustryPackScoreResult extends Omit<SelfAssessedPack, "answers"> {
   packId: IndustryPackId;
   packName: string;
   stationId: Domain;
-  percentage: number;
-  level: number;
-  certified: boolean;
   questionResults: Array<{
     id: string;
     dimension: string;
@@ -2530,40 +2530,30 @@ export function scoreIndustryPack(
   responses: Record<string, number>
 ): IndustryPackScoreResult {
   const pack = INDUSTRY_PACKS[packId];
-  let totalEarned = 0;
-  let totalPossible = 0;
+  const { answers, ...assessed } = selfAssessPack(pack, responses, Date.now());
   const questionResults: IndustryPackScoreResult["questionResults"] = [];
   const complianceGaps: string[] = [];
 
-  for (const q of pack.questions) {
-    const level = Math.min(5, Math.max(1, responses[q.id] ?? 1));
-    const levelPct = (level - 1) / 4;
-    const earned = q.weight * levelPct;
-    totalEarned += earned;
-    totalPossible += q.weight;
+  pack.questions.forEach((q, i) => {
+    const level = answers[i]!;
+    const levelPct = likertToPercent(level);
     questionResults.push({
       id: q.id,
       dimension: q.dimension,
-      score: Math.round(earned * 10) / 10,
+      score: Math.round(q.weight * levelPct / 10) / 10,
       weight: q.weight,
-      percentage: Math.round(levelPct * 100),
+      percentage: Math.round(levelPct),
     });
     if (level < 3) {
       complianceGaps.push(`${q.id} (${q.dimension}): L${level} — below minimum. Ref: ${q.regulatoryRef}`);
     }
-  }
-
-  const percentage = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
-  const level = percentage >= 90 ? 5 : percentage >= 75 ? 4 : percentage >= 55 ? 3 : percentage >= 30 ? 2 : 1;
-  const certified = percentage >= pack.certificationThreshold && complianceGaps.length === 0;
+  });
 
   return {
     packId,
     packName: pack.name,
     stationId: pack.stationId,
-    percentage,
-    level,
-    certified,
+    ...assessed,
     questionResults,
     complianceGaps,
     riskTier: pack.riskTier,

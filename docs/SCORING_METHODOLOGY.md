@@ -37,6 +37,35 @@ Prior no-bloat boundaries remain active: No Lunary adapter, SDK/importer, trace 
 
 Every generated diagnostic report now includes a `methodology` object with the methodology id, version, release date, question-set summary, public documentation link, and SHA-256 hash of the canonical manifest. Reports also include a `methodologyVersioning` receipt that binds public comparability to changelog, deprecation, migration, telemetry, benchmark, calibration, archive, export-sanitization, and badge-assurance proof. Badge URLs include `amc_methodology`, `amc_methodology_hash`, and `amc_methodology_assurance` query parameters, and badge HTML/Markdown includes a title containing the same method reference.
 
+## Units, Levels and Claim Kinds
+
+Every AMC score has one unit, and `src/score/units.ts` converts between units explicitly. A raw number is never reinterpreted by its size: a value outside its unit throws a `RangeError`.
+
+| Unit | Range | Used for |
+|---|---|---|
+| `Likert1to5` | integer 1-5 | A self-declared answer to an industry-pack or rubric-pack question |
+| `Percent0to100` | 0-100 | Pack, rubric and domain scores; `amc score industry-adjust --score` (a whole percentage) |
+| `Level0to5` | integer 0-5 | A maturity level, including the base levels the domain engine takes |
+| `Fraction0to1` | 0-1 | Integrity index, evidence shares and industry trust-model inputs |
+
+Conversions: Likert to percent is (answer − 1) / 4 × 100, level to percent is level / 5 × 100, and percent to fraction is percent / 100.
+
+One level table turns a percentage into a level for industry packs, pack audits, rubric packs and the domain engine. L2 starts at 30%, the boundary packs and pack audits already used; the domain engine previously used 35% (and 40% for its label) and the rubric packs 25%.
+
+| Percent | Level |
+|---|---|
+| below 30 | L1 |
+| 30 to below 55 | L2 |
+| 55 to below 75 | L3 |
+| 75 to below 90 | L4 |
+| 90 and above | L5 |
+
+The diagnostic level ranges in the table above apply to averaged diagnostic levels and are unchanged.
+
+**Self-reported results cap at L1.** Diagnostic gates at L2 and above accept `OBSERVED` and `ATTESTED` evidence only, so self-reported events alone cannot support L2 or higher. Numeric self-answers (industry packs, pack audits, rubric packs) carry the claim kind `self_reported`, an eligible level of at most 1 and never a positive regulated status. Their percentage and level are reported as self-reported.
+
+**No certification wording.** AMC output is evidence of conformity. No self-computed result says "certified", "certification ready" or "MCP-Certified": industry packs report `selfAssessment` (complete, answered, total) and treat the pack's `certificationThreshold` field as a self-assessment target, the transparency report shows an evidence standing, the cross-framework map reports `targetMet`, and MCP compliance bands read `MCP-Full`, `MCP-Partial`, `MCP-Minimal` and `Not-MCP`. A certification can come only from a registry-issued attestation. See [CLAIM_KINDS.md](CLAIM_KINDS.md) for claim kinds and status dimensions.
+
 ## Artifact Validity vs Evidence Readiness
 
 AMC reports two independent trust signals:
@@ -2178,16 +2207,17 @@ An integrity index below 0.9 triggers a warning. Below 0.7 marks the report as `
 
 ## 6. Trust Labels
 
-Based on the integrity index and evidence composition, AMC assigns a trust label:
+AMC assigns a trust label from the integrity index. The labels are the `TrustLabel` values in `src/types.ts`.
 
 | Label | Criteria |
 |-------|---------|
-| `VERIFIED` | integrityIndex ≥ 0.95, ≥70% OBSERVED evidence |
-| `HIGH TRUST` | integrityIndex ≥ 0.9, ≥50% OBSERVED evidence |
-| `MODERATE TRUST` | integrityIndex ≥ 0.7 |
-| `LOW TRUST` | integrityIndex ≥ 0.5 |
-| `UNVERIFIED` | integrityIndex < 0.5 or insufficient evidence |
-| `DEGRADED` | Hash chain broken or signatures invalid |
+| `HIGH TRUST` | Diagnostic run: integrityIndex ≥ 0.6 and no untrusted configuration. Assurance run: integrityIndex ≥ 0.6 |
+| `LOW TRUST` | Diagnostic run: 0.4 ≤ integrityIndex < 0.6, or any untrusted configuration |
+| `UNRELIABLE — DO NOT USE FOR CLAIMS` | Diagnostic run: integrityIndex < 0.4 |
+| `DEVELOPING — some evidence, needs more coverage` | Assurance run: 0.4 ≤ integrityIndex < 0.6 |
+| `LOW — collect more evidence to increase trust` | Assurance run: integrityIndex < 0.4 |
+
+A trust label is not claim eligibility: only a `READY` evidence-readiness result is claim-eligible (see Artifact Validity vs Evidence Readiness).
 
 ## 7. Anti-Gaming Defenses
 

@@ -1,12 +1,17 @@
 import { getDomainPackQuestions, type DomainQuestion } from "../score/domainPacks.js";
+import {
+  level, levelToPercent, likert, likertToPercent, percent, percentToLevel, type Level0to5, type Likert1to5
+} from "../score/units.js";
 import { getDomainMetadata, type Domain, type DomainMetadata } from "./domainRegistry.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
 
 export interface DomainAssessmentInput {
   agentId: string;
   domain: Domain;
-  baseScores: Record<string, number>;
-  domainQuestionScores: Record<string, number>;
+  /** Diagnostic levels per base question. */
+  baseScores: Record<string, Level0to5>;
+  /** Self-declared answers per domain question; an unanswered question counts as 1. Any other number throws. */
+  domainQuestionScores: Record<string, Likert1to5>;
 }
 
 export interface DomainAssessmentResult {
@@ -16,7 +21,6 @@ export interface DomainAssessmentResult {
   domainScore: number;
   compositeScore: number;
   level: "L1" | "L2" | "L3" | "L4" | "L5";
-  certificationReadiness: boolean;
   complianceGaps: ComplianceGap[];
   activeModules: ActiveModuleProfile[];
   roadmap: DomainRoadmapItem[];
@@ -48,16 +52,6 @@ export interface DomainRoadmapItem {
   regulatoryImpact: string;
 }
 
-const CERTIFICATION_THRESHOLDS: Record<Domain, number> = {
-  health: 75,
-  education: 72,
-  environment: 78,
-  mobility: 80,
-  governance: 74,
-  technology: 70,
-  wealth: 76
-};
-
 const CRITICAL_QUESTION_IDS = new Set<string>([
   "HC-1", "HC-2", "HC-7",
   "FIN-1", "FIN-3", "FIN-7",
@@ -70,43 +64,24 @@ const CRITICAL_QUESTION_IDS = new Set<string>([
   "WLT-1", "WLT-2", "WLT-6"
 ]);
 
-function clampScore(value: number): number {
-  return Math.min(100, Math.max(0, value));
+/** The answer to a domain question, validated again because callers may pass untyped JSON. */
+function answerFor(question: DomainQuestion, domainQuestionScores: Record<string, Likert1to5>): Likert1to5 {
+  return likert(domainQuestionScores[question.id] ?? 1);
 }
 
-function normalizeScore(raw: number): number {
-  if (!Number.isFinite(raw)) return 0;
-  if (raw <= 5) {
-    const boundedLevel = Math.max(1, Math.min(5, raw));
-    return ((boundedLevel - 1) / 4) * 100;
-  }
-  return clampScore(raw);
-}
-
-function levelFromRaw(raw: number): number {
-  if (!Number.isFinite(raw)) return 1;
-  if (raw <= 5) return Math.max(1, Math.min(5, Math.round(raw)));
-  const score = normalizeScore(raw);
-  if (score >= 90) return 5;
-  if (score >= 75) return 4;
-  if (score >= 55) return 3;
-  if (score >= 35) return 2;
-  return 1;
-}
-
-function averageScores(scores: Record<string, number>): number {
-  const values = Object.values(scores).filter((value) => Number.isFinite(value));
+function averageScores(scores: Record<string, Level0to5>): number {
+  const values = Object.values(scores);
   if (values.length === 0) return 0;
-  const total = values.reduce((sum, value) => sum + normalizeScore(value), 0);
+  const total = values.reduce((sum, value) => sum + levelToPercent(level(value)), 0);
   return Math.round(total / values.length);
 }
 
-function calculateDomainScore(questions: DomainQuestion[], domainQuestionScores: Record<string, number>): number {
+function calculateDomainScore(questions: DomainQuestion[], domainQuestionScores: Record<string, Likert1to5>): number {
   if (questions.length === 0) return 0;
   let weightedTotal = 0;
   let totalWeight = 0;
   for (const question of questions) {
-    const score = normalizeScore(domainQuestionScores[question.id] ?? 0);
+    const score = likertToPercent(answerFor(question, domainQuestionScores));
     weightedTotal += score * question.weight;
     totalWeight += question.weight;
   }
@@ -115,11 +90,7 @@ function calculateDomainScore(questions: DomainQuestion[], domainQuestionScores:
 }
 
 function toMaturityLevel(score: number): DomainAssessmentResult["level"] {
-  if (score >= 90) return "L5";
-  if (score >= 75) return "L4";
-  if (score >= 60) return "L3";
-  if (score >= 40) return "L2";
-  return "L1";
+  return `L${percentToLevel(percent(score))}` as DomainAssessmentResult["level"];
 }
 
 function requiredLevelForQuestion(question: DomainQuestion): number {
@@ -130,12 +101,12 @@ function requiredLevelForQuestion(question: DomainQuestion): number {
 
 function buildComplianceGaps(
   questions: DomainQuestion[],
-  domainQuestionScores: Record<string, number>
+  domainQuestionScores: Record<string, Likert1to5>
 ): ComplianceGap[] {
   const gaps: ComplianceGap[] = [];
 
   for (const question of questions) {
-    const currentLevel = levelFromRaw(domainQuestionScores[question.id] ?? 0);
+    const currentLevel: number = answerFor(question, domainQuestionScores);
     const requiredLevel = requiredLevelForQuestion(question);
     if (currentLevel >= requiredLevel) continue;
 
@@ -238,16 +209,6 @@ function buildRegulatoryWarnings(complianceGaps: ComplianceGap[]): string[] {
   return [...warnings];
 }
 
-function isCertificationReady(
-  domain: Domain,
-  compositeScore: number,
-  complianceGaps: ComplianceGap[]
-): boolean {
-  const threshold = CERTIFICATION_THRESHOLDS[domain];
-  const hasCriticalL1Gap = complianceGaps.some((gap) => CRITICAL_QUESTION_IDS.has(gap.questionId) && gap.currentLevel <= 1);
-  return compositeScore >= threshold && !hasCriticalL1Gap;
-}
-
 export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResult {
   const metadata = getDomainMetadata(input.domain);
   const questions = getDomainPackQuestions(input.domain);
@@ -267,7 +228,6 @@ export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResu
     domainScore,
     compositeScore,
     level: toMaturityLevel(compositeScore),
-    certificationReadiness: isCertificationReady(input.domain, compositeScore, complianceGaps),
     complianceGaps,
     activeModules,
     roadmap,

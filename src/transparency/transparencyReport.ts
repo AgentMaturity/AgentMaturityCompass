@@ -20,7 +20,8 @@ import { formatMaturityOrdinal } from "../score/maturityTaxonomy.js";
 // Types
 // ---------------------------------------------------------------------------
 
-export type CertificationStatus = "certified" | "not-certified" | "pending";
+/** How far the latest run's evidence supports its level. A self-computed standing, never a certification. */
+export type EvidenceStanding = "evidence_supported" | "partial_evidence" | "insufficient_evidence";
 export type AutonomyLevel = "supervised" | "semi-autonomous" | "autonomous";
 export type RiskSeverity = "critical" | "high" | "medium";
 
@@ -39,7 +40,7 @@ export interface AgentTransparencyReport {
     maturityLevel: number;
     maturityLabel: string;
     trustScore: number;
-    certificationStatus: CertificationStatus;
+    evidenceStanding: EvidenceStanding;
     lastAssessed: string;
   };
 
@@ -238,12 +239,12 @@ export function generateTransparencyReport(
   const level = overallLevel(layerScores);
   const trustScore = trustScoreFrom(level);
   const integrityIndex = run?.integrityIndex ?? bom?.integrityIndex ?? 0;
-  const certificationStatus: CertificationStatus =
+  const evidenceStanding: EvidenceStanding =
     integrityIndex >= 0.9 && level >= 4
-      ? "certified"
+      ? "evidence_supported"
       : integrityIndex >= 0.6 || level >= 2
-      ? "pending"
-      : "not-certified";
+      ? "partial_evidence"
+      : "insufficient_evidence";
 
   // ---------- capabilities ----------
   // Action classes come from freeze engine data embedded in BOM
@@ -343,7 +344,7 @@ export function generateTransparencyReport(
       maturityLevel: Math.round(level * 10) / 10,
       maturityLabel: levelLabel(level),
       trustScore,
-      certificationStatus,
+      evidenceStanding,
       lastAssessed: run
         ? new Date(run.ts).toISOString()
         : bom
@@ -406,10 +407,10 @@ const AUTONOMY_ICONS: Record<AutonomyLevel, string> = {
   autonomous: "🤖 Autonomous",
 };
 
-const CERT_ICONS: Record<CertificationStatus, string> = {
-  certified: "✅ Certified",
-  pending: "⏳ Pending",
-  "not-certified": "❌ Not Certified",
+const EVIDENCE_STANDING_LABELS: Record<EvidenceStanding, string> = {
+  evidence_supported: "Evidence supported",
+  partial_evidence: "Partial evidence",
+  insufficient_evidence: "Insufficient evidence",
 };
 
 export function renderTransparencyReportMarkdown(
@@ -437,7 +438,7 @@ export function renderTransparencyReportMarkdown(
   lines.push(`|--------|-------|`);
   lines.push(`| Maturity Level | **${report.identity.maturityLabel}** |`);
   lines.push(`| Trust Score | **${report.identity.trustScore}/100** |`);
-  lines.push(`| Certification | ${CERT_ICONS[report.identity.certificationStatus]} |`);
+  lines.push(`| Evidence standing | ${EVIDENCE_STANDING_LABELS[report.identity.evidenceStanding]} |`);
   lines.push(`| Risk Tier | ${report.identity.riskTier.toUpperCase()} |`);
   lines.push(`| Framework | ${report.identity.framework} |`);
   lines.push(`| Last Assessed | ${report.identity.lastAssessed} |`);
