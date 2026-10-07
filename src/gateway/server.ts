@@ -8,7 +8,7 @@ import {
   type ServerResponse
 } from "node:http";
 import { request as httpsRequest } from "node:https";
-import { connect as netConnect } from "node:net";
+import { connect as netConnect, type LookupFunction } from "node:net";
 import { join } from "node:path";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
@@ -32,7 +32,7 @@ import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
-import { guardedUpstreamHostRefused, refusedFieldsForUpstream, requestFieldRefusal } from "./requestFieldGuard.js";
+import { pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -247,6 +247,7 @@ async function requestUpstreamWithResilience(params: {
   maxRetries: number;
   retryBaseDelayMs: number;
   retryNonIdempotent: boolean;
+  lookup?: LookupFunction;
 }): Promise<IncomingMessage> {
   const totalAttempts = params.maxRetries + 1;
   const canRetry = isRetryableMethod(params.method, params.retryNonIdempotent);
@@ -261,10 +262,7 @@ async function requestUpstreamWithResilience(params: {
             const impl = params.targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
             const outgoing = impl(
               params.targetUrl,
-              {
-                method: params.method,
-                headers: params.headers
-              },
+              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup } : {}) },
               (res) => resolvePromise(res)
             );
             outgoing.setTimeout(params.timeoutMs, () => {
@@ -624,7 +622,6 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
 }
 
 function hostAllowed(config: GatewayConfig, host: string): boolean {
-  if (guardedUpstreamHostRefused(config, host)) return false; // a tunnel cannot be field-checked
   if (!config.proxy.enabled || !config.proxy.denyByDefault) {
     return true;
   }
@@ -676,6 +673,7 @@ function createProxyServer(params: {
   config: GatewayConfig;
   gatewaySessionId: string;
   allowedCidrs?: string[];
+  fieldGuard: FieldGuard;
   appendEvidence: (input: {
     eventType: "gateway" | "audit";
     payload: string;
@@ -802,7 +800,9 @@ function createProxyServer(params: {
 
     const host = targetUrl.hostname;
     const port = Number(targetUrl.port || (targetUrl.protocol === "https:" ? 443 : 80));
-    if (!hostAllowed(params.config, host)) {
+    // A host outside the allowlist is refused before any DNS query; a guarded upstream's host is refused by address.
+    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
+    if (checked.refused) {
       appendNetworkBlockedAudit(
         ({ payload, meta }) =>
           params.appendEvidence({
@@ -847,7 +847,8 @@ function createProxyServer(params: {
         timeoutMs: resilience.upstreamTimeoutMs,
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
-        retryNonIdempotent: resilience.retryNonIdempotent
+        retryNonIdempotent: resilience.retryNonIdempotent,
+        lookup: pinnedLookup(checked.addresses)
       });
     } catch (error) {
       const status = gatewayErrorStatusCode(error);
@@ -913,7 +914,7 @@ function createProxyServer(params: {
     });
   });
 
-  proxy.on("connect", (req, clientSocket, head) => {
+  proxy.on("connect", async (req, clientSocket, head) => {
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
@@ -1024,7 +1025,9 @@ function createProxyServer(params: {
       return;
     }
 
-    if (!hostAllowed(params.config, host)) {
+    clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
+    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
+    if (checked.refused) {
       appendNetworkBlockedAudit(
         ({ payload, meta }) =>
           params.appendEvidence({
@@ -1044,7 +1047,7 @@ function createProxyServer(params: {
       return;
     }
 
-    const upstreamSocket = netConnect(port, host, () => {
+    const upstreamSocket = netConnect(port, checked.addresses[0] ?? host, () => { // the checked address, never a fresh lookup
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {
         upstreamSocket.write(head);
@@ -1121,6 +1124,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       allowQueryCarrier: options.allowQueryCarrierOverride ?? config.lease.allowQueryCarrier
     }
   });
+  const fieldGuard = await prepareFieldGuard(resolvedConfig); // resolves upstreams once, only when a route refuses fields
   const runtimeListenHost = options.listenHost ?? resolvedConfig.listen.host;
   const runtimeListenPort = options.listenPort ?? resolvedConfig.listen.port;
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
@@ -1369,7 +1373,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
 
       // Refused fields (e.g. dsh_session_log) belong to the upstream, and an unreadable body is refused; the audit keeps names and size, never content.
-      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, refusedFieldsForUpstream(resolvedConfig, route.upstream));
+      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, fieldGuard.fieldsFor(route.upstream));
       if (fieldRefusal) {
         const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream,
           agentId: attributedAgentId, reason: fieldRefusal.reason, fields: fieldRefusal.fields, requestBytes: requestBody.byteLength };
@@ -1719,6 +1723,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       config: resolvedConfig,
       gatewaySessionId,
       allowedCidrs: options.allowedCidrs,
+      fieldGuard,
       appendEvidence
     });
     await new Promise<void>((resolvePromise, rejectPromise) => {
