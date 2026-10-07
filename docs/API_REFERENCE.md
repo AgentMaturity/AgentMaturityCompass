@@ -451,7 +451,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 432 | `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) |
 | 433 | `amc export` | Export policy packs and badges |
 | 434 | `amc export badge` | Export deterministic maturity badge SVG for a run |
-| 435 | `amc export grc` | Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF |
+| 435 | `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) |
 | 436 | `amc export policy` | Export framework-agnostic North Star policy integration pack |
 | 437 | `amc federate` | Offline federation sync operations |
 | 438 | `amc federate export` | Export offline federation sync package (.amcfed) |
@@ -4602,7 +4602,7 @@ Export deterministic maturity badge SVG for a run
 
 #### `amc export grc`
 
-Export the latest run as a GRC control-evidence manifest (Vanta/Drata/OneTrust-ingestible) + SARIF
+Export the latest run as labelled GRC evidence (+ SARIF developer findings)
 
 
 | Option | Description |
