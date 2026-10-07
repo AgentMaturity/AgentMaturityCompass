@@ -408,16 +408,20 @@ export function inspectCertificate(certFile: string): {
   cert: CertificatePayload;
   fileCount: number;
   files: string[];
+  /** The run the certificate carries (unverified here), for its claim label. */
+  run: DiagnosticReport | null;
 } {
   const extracted = mkTmp("amc-cert-inspect-");
   try {
     runTarExtract(certFile, extracted);
     const cert = JSON.parse(readUtf8(join(extracted, "cert.json"))) as CertificatePayload;
     const files = listFiles(extracted);
+    const runPath = join(extracted, "run.json");
     return {
       cert,
       fileCount: files.length,
-      files
+      files,
+      run: pathExists(runPath) ? JSON.parse(readUtf8(runPath)) as DiagnosticReport : null
     };
   } finally {
     rmSync(extracted, { recursive: true, force: true });

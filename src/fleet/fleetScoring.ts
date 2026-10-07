@@ -25,6 +25,8 @@ import { writeLifecycleChangeReceipts } from "../lifecycle/changeReceipt.js";
 import { writeLifecycleRunArtifact } from "../lifecycle/lifecycleRunArtifact.js";
 import { writeObservabilityLaneRecord } from "../lifecycle/observabilityLane.js";
 import type { DiagnosticReport, LayerScore, QuestionScore } from "../types.js";
+import { envelopeForAggregate, envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend, type ClaimEnvelope } from "../claims/eligibility/index.js";
 import { detectFleetCascadeFailures, writeFleetLifecycleRunArtifact, type FleetCascadeFailure } from "./fleetLifecycle.js";
 import {
   loadLatestTypedMultiAgentGraph,
@@ -669,10 +671,12 @@ export async function evaluateFleet(opts: FleetScoringOptions): Promise<FleetSco
 
 /* ── Markdown Renderer ─────────────────────────────── */
 
-export function renderFleetScoringMarkdown(result: FleetScoringResult): string {
+/** Pass `claims` from seal-checked runs; without them every run is treated as unverified (self-reported). */
+export function renderFleetScoringMarkdown(result: FleetScoringResult, claims: ReadonlyMap<string, ClaimEnvelope> = new Map(
+  result.diagnosticReports.map((report) => [report.agentId, envelopeForStoredRun(report, { sealVerified: false, now: result.ts })]))): string {
   const lines: string[] = [
     "# Fleet Scoring Report",
-    "",
+    "", formatClaimLabel(renderClaimLabel(envelopeForAggregate("fleet:score", [...claims.values()], result.ts)), "report"), "",
     `- **Run ID:** ${result.runId}`,
     `- **Timestamp:** ${new Date(result.ts).toISOString()}`,
     `- **Window:** ${result.window}`,
@@ -706,11 +710,11 @@ export function renderFleetScoringMarkdown(result: FleetScoringResult): string {
   }
 
   lines.push("", "## Per-Agent Scores", "");
-  lines.push("| Agent | Overall | First Result | SLA | Integrity | Trust | Evidence Coverage | Status |");
-  lines.push("|-------|--------:|-------------:|-----|----------:|-------|------------------:|--------|");
+  lines.push("| Agent | Overall | First Result | SLA | Integrity | Trust | Evidence Coverage | Status | Claim |");
+  lines.push("|-------|--------:|-------------:|-----|----------:|-------|------------------:|--------|-------|");
   for (const a of result.agents) {
     lines.push(
-      `| ${a.agentId} | ${a.overallScore} | ${a.firstResultMs}ms | ${a.slaStatus} | ${a.integrityIndex.toFixed(3)} | ${a.trustLabel} | ${(a.evidenceCoverage * 100).toFixed(1)}% | ${a.status} |`
+      `| ${a.agentId} | ${a.overallScore} | ${a.firstResultMs}ms | ${a.slaStatus} | ${a.integrityIndex.toFixed(3)} | ${a.trustLabel} | ${(a.evidenceCoverage * 100).toFixed(1)}% | ${a.status} | ${claims.get(a.agentId)?.claimKind ?? "-"} |`
     );
   }
 
@@ -789,6 +793,6 @@ export function renderFleetScoringMarkdown(result: FleetScoringResult): string {
     }
   }
 
-  lines.push("");
+  lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
 }

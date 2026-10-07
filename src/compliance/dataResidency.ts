@@ -15,6 +15,9 @@
 
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
+import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 // Redaction lives in privacyRedaction.ts; re-exported so the public surface is
 // unchanged.
 import {
@@ -655,12 +658,22 @@ function createDefaultPolicy(region: DataRegion): ResidencyPolicy {
 // ---------------------------------------------------------------------------
 
 /**
+ * The report checks the tenant's own configured policy and data: self-reported, and a regulated result, so with no
+ * applicability decision it can fail but never pass (docs/CLAIM_KINDS.md).
+ */
+export function residencyReportClaim(report: ResidencyComplianceReport): ClaimEnvelope {
+  return envelopeForUnverifiedResult({ producer: `residency:${report.tenantId}`, recordCount: report.isolationChecks.length + 1,
+    result: report.compliant ? "pass" : "fail", regulated: true, now: report.generatedTs });
+}
+
+/**
  * Render a residency compliance report as markdown.
  */
 export function renderResidencyReportMarkdown(report: ResidencyComplianceReport): string {
   const lines: string[] = [];
 
   lines.push("# Data Residency Compliance Report");
+  lines.push(formatClaimLabel(renderClaimLabel(residencyReportClaim(report)), "report"));
   lines.push(`Report ID: ${report.reportId}`);
   lines.push(`Tenant: ${report.tenantId} | Region: ${report.region}`);
   lines.push(`Generated: ${new Date(report.generatedTs).toISOString()}`);
@@ -743,5 +756,6 @@ export function renderResidencyReportMarkdown(report: ResidencyComplianceReport)
     lines.push("");
   }
 
+  lines.push("## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
 }

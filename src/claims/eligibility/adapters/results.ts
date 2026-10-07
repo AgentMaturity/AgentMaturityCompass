@@ -2,10 +2,14 @@
  * Adapters for results the CLI and reports print (P0-22). Like ../adapters.ts they only shape
  * inputs for evaluateClaimEligibility; every rule stays there. See docs/CLAIM_KINDS.md, "CLI and reports".
  */
-import type { DiagnosticReport } from "../../../types.js";
+import type { ComplianceCategoryResult, ComplianceReportJson } from "../../../compliance/mappingSchema.js";
+import type { AssuranceReport, DiagnosticReport } from "../../../types.js";
 import { envelopeForDiagnosticReport, envelopeForLegacyResult } from "../adapters.js";
 import { evaluateClaimEligibility } from "../evaluate.js";
-import { CLAIM_KINDS, type Applicability, type ClaimEnvelope, type ClaimReasonCode, type EvidenceState, type ResultState } from "../types.js";
+import {
+  CLAIM_KINDS, type Applicability, type ClaimEnvelope, type ClaimKind, type ClaimReasonCode, type EvidenceState, type ResultState,
+  type StatusDimensions
+} from "../types.js";
 
 /** True for a result stored by AMC 1.x: no version, an unparsable one, or one below 1.2.0. */
 export function isLegacyAmcVersion(version: string | null | undefined): boolean {
@@ -47,11 +51,14 @@ export function envelopeForStoredRun(report: DiagnosticReport, options: { sealVe
  */
 export function envelopeForUnverifiedResult(input: {
   producer: string; recordCount: number; result?: ResultState; level?: number | null; regulated?: boolean;
-  applicability?: Applicability; signatureValid?: boolean | null; evidenceRefs?: readonly string[]; now: number;
+  applicability?: Applicability; signatureValid?: boolean | null; evidenceRefs?: readonly string[];
+  /** A static scan of files or text is a keyword match: level 1 at most, never a regulated pass. */
+  method?: "runtime_observation" | "keyword_match";
+  now: number;
 }): ClaimEnvelope {
   return evaluateClaimEligibility({
     producer: input.producer,
-    method: "runtime_observation",
+    method: input.method ?? "runtime_observation",
     regulated: input.regulated ?? false,
     proposed: { result: input.result ?? "not_evaluated", level: input.level ?? null },
     evidence: { eventCount: input.recordCount, tiers: ["SELF_REPORTED"], newestTs: null, boundToControl: true,
@@ -60,6 +67,79 @@ export function envelopeForUnverifiedResult(input: {
     applicability: input.applicability,
     now: input.now
   });
+}
+
+/**
+ * An executed test AMC ran against the agent (assurance packs, red-team plugins, benchmarks): observed when at
+ * least one scenario reached the agent. A result read back from disk whose seal does not verify is untrusted and
+ * self-reported; `sealVerified` is null for a result produced in this process.
+ */
+export function envelopeForExecutedTest(input: {
+  producer: string; measured: number; result: ResultState; level?: number | null; sealVerified: boolean | null;
+  evidenceRefs?: readonly string[]; now: number;
+}): ClaimEnvelope {
+  const envelope = evaluateClaimEligibility({
+    producer: input.producer,
+    method: "executed_test",
+    regulated: false,
+    proposed: { result: input.result, level: input.level ?? null },
+    evidence: { eventCount: input.measured, tiers: ["OBSERVED"], newestTs: null, boundToControl: true, sameScope: true,
+      contradictory: false, signatureValid: input.sealVerified === false ? false : null, issuerPinned: null },
+    evidenceRefs: input.evidenceRefs,
+    now: input.now
+  });
+  return input.sealVerified === false ? { ...envelope, claimKind: "self_reported" } : envelope;
+}
+
+/** An assurance run: one executed-test envelope per pack (inconclusive scenarios excluded), joined as an aggregate. */
+export function envelopeForAssuranceReport(report: Pick<AssuranceReport, "assuranceRunId" | "packResults">,
+  options: { sealVerified: boolean | null; now: number }): ClaimEnvelope {
+  return envelopeForAggregate(`assurance:${report.assuranceRunId}`, report.packResults.map((pack) => envelopeForAssurancePack(
+    report.assuranceRunId, pack, options)), options.now);
+}
+
+export function envelopeForAssurancePack(assuranceRunId: string, pack: AssuranceReport["packResults"][number],
+  options: { sealVerified: boolean | null; now: number }): ClaimEnvelope {
+  return envelopeForExecutedTest({ producer: `assurance:${pack.packId}`,
+    measured: pack.scenarioResults.filter((scenario) => !scenario.inconclusive).length,
+    result: pack.failCount > 0 ? "fail" : "pass", sealVerified: options.sealVerified, evidenceRefs: [assuranceRunId], now: options.now });
+}
+
+type ComplianceReportClaimInput = Pick<ComplianceReportJson, "framework" | "trustTierCoverage" | "configTrusted" | "windowEndTs">;
+
+/**
+ * A compliance category is a regulated result on control-bound runtime evidence. With no applicability decision it
+ * cannot pass (rule 9), and untrusted compliance maps make its evidence untrusted.
+ */
+export function envelopeForComplianceCategory(report: ComplianceReportClaimInput, category: ComplianceCategoryResult,
+  now: number): ClaimEnvelope {
+  return evaluateClaimEligibility({
+    producer: `compliance:${report.framework}:${category.id}`,
+    method: "runtime_observation",
+    regulated: true,
+    proposed: { result: category.result, level: null },
+    evidence: { eventCount: category.evidenceRefs.length, tiers: report.trustTierCoverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"],
+      newestTs: report.windowEndTs, boundToControl: true, sameScope: true, contradictory: category.evidence === "contradictory",
+      signatureValid: report.configTrusted ? null : false, issuerPinned: null },
+    evidenceRefs: category.evidenceRefs.map((ref) => ref.eventId),
+    now
+  });
+}
+
+export function envelopeForComplianceReport(report: ComplianceReportClaimInput & Pick<ComplianceReportJson, "categories">,
+  now: number): ClaimEnvelope {
+  return envelopeForAggregate(`compliance:${report.framework}`,
+    report.categories.map((category) => envelopeForComplianceCategory(report, category, now)), now);
+}
+
+/**
+ * A result that already carries the kind and dimensions the service decided (domain outcomes store those two
+ * fields, not the envelope): rebuilt for the label. Reason codes are not stored, so "not evaluated" prints bare.
+ */
+export function envelopeFromDimensions(producer: string, claimKind: ClaimKind, statusDimensions: StatusDimensions): ClaimEnvelope {
+  return { claimKind, statusDimensions,
+    provenance: { producer, method: claimKind === "synthetic_example" ? "synthetic" : "runtime_observation", evidenceRefs: [] },
+    eligibleLevel: null, reasons: [] };
 }
 
 const EVIDENCE_ORDER: readonly EvidenceState[] = ["sufficient", "incomplete", "stale", "contradictory", "untrusted"];

@@ -1,5 +1,7 @@
 import { dirname, resolve } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
+import { envelopeForComplianceCategory, envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ComplianceReportJson } from "./mappingSchema.js";
 
 function shortEvidenceHash(hash: string): string {
@@ -48,6 +50,8 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   const lines: string[] = [];
   lines.push(`# AMC Compliance Report (${report.framework})`);
   lines.push("");
+  lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceReport(report, report.ts)), "report"));
+  lines.push("");
   lines.push(`- Agent: ${report.agentId}`);
   lines.push(`- Window: ${new Date(report.windowStartTs).toISOString()} -> ${new Date(report.windowEndTs).toISOString()}`);
   lines.push(
@@ -76,6 +80,8 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push("");
   for (const category of report.categories) {
     lines.push(`### ${category.category} (${category.status})`);
+    lines.push("");
+    lines.push(formatClaimLabel(renderClaimLabel(envelopeForComplianceCategory(report, category, report.ts)), "report"));
     lines.push("");
     lines.push(category.description);
     lines.push("");
@@ -122,7 +128,7 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   for (const line of report.nonClaims) {
     lines.push(`- ${line}`);
   }
-  lines.push("");
+  lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
 }
 

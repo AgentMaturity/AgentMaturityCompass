@@ -2,6 +2,8 @@ import type { ComplianceFramework } from "./frameworks.js";
 import { generateComplianceReport, initComplianceMaps, verifyComplianceMapsSignature } from "./complianceEngine.js";
 import { writeComplianceReport, diffComplianceReports } from "./complianceReport.js";
 import { listAgents } from "../fleet/registry.js";
+import { envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 
 export function initComplianceMapsCli(workspace: string): { path: string; sigPath: string } {
   return initComplianceMaps(workspace);
@@ -63,6 +65,8 @@ export function complianceFleetReportCli(params: {
     unknown: number;
     notEvaluated: number;
     configTrusted: boolean;
+    /** The agent's report claim: no more than its weakest category. */
+    claim: ClaimEnvelope;
   }>;
 } {
   const agents = [...new Set([...listAgents(params.workspace).map((row) => row.id), "default"])];
@@ -84,7 +88,8 @@ export function complianceFleetReportCli(params: {
         missing: report.coverage.missing,
         unknown: report.coverage.unknown,
         notEvaluated: report.coverage.notEvaluated,
-        configTrusted: report.configTrusted
+        configTrusted: report.configTrusted,
+        claim: envelopeForComplianceReport(report, report.ts)
       };
     })
   };
