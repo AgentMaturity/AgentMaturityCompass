@@ -143,7 +143,8 @@ describe("AMC-1469 verified control projection", () => {
     ]);
     expect(family(projection, "action-policy").controls).toEqual([]);
     expect(family(projection, "approval-policy").controls).toEqual([]);
-    expect(family(projection, "runtime-traffic").unboundGuardrails).toHaveLength(11);
+    // 14 guardrails less the 3 Runtime Firewall bindings and the 2 the native tool pipeline enforces (P1-12).
+    expect(family(projection, "runtime-traffic").unboundGuardrails).toHaveLength(9);
     expect(readdirSync(root)).toEqual([]);
     expect(JSON.stringify(projection)).not.toContain(root);
     expect(JSON.stringify(projection)).not.toContain("amc-control-projection-test-passphrase");

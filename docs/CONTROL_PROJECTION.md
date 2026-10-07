@@ -27,7 +27,7 @@ The three families are:
 2. Action authorization controls owned by the existing Action Policy and Autonomy Governor.
 3. Human approval controls owned by the existing Approval Policy and Approval Engine.
 
-Guardrails that exist only in the catalog are listed as unbound. They are not counted or described as active protection.
+Guardrails that the guardrail enforcement table (`guardrailRuntimeTable`) reports with no binding are listed as unbound. They are not counted or described as active protection. These are the catalog-only guardrails and `human-approval-gate`, which is enforced only in a session whose compiled policy requires approvals. `tool-call-allowlist` and `cost-budget-limit` are enforced by the native tool pipeline, so they are not listed as unbound; this projection does not yet show tool-pipeline guards as controls.
 
 ## Integrity and safe outcomes
 
