@@ -17,6 +17,7 @@ import { assertContract } from "../contracts/index.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
+import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
@@ -30,6 +31,7 @@ import {
   AUTHZ_SCHEMA, authorizationRecordDigest, intentDifferences, intentHashFor, intentPayloadFor,
   type AuthorizationIntent, type AuthorizationRecordV1, type RecheckFailure, type RecheckResult
 } from "./authorizationRecord.js";
+import { mintIdempotencyKey } from "./idempotency.js";
 import { normalizeArguments } from "./normalizeArguments.js";
 
 /** A record with no shorter-lived authority expires this soon after it is bound. */
@@ -65,12 +67,16 @@ export interface AuthorizationContext {
 }
 
 type Failed = { readonly ok: false; readonly failures: readonly RecheckFailure[]; readonly reason: string };
-export type BindResult = { readonly ok: true; readonly record: AuthorizationRecordV1; readonly digest: string } | Failed;
+/** `effects` is the signed tool definition's declaration (P1-04), or null when it declares none. */
+export type BindResult =
+  | { readonly ok: true; readonly record: AuthorizationRecordV1; readonly digest: string; readonly effects: EffectDeclaration | null }
+  | Failed;
 export type AuthorizationIntentResult =
   | { readonly ok: true; readonly payload: AuthorizationIntent; readonly question: string } | Failed;
 type Call = Pick<ToolExecution, "workspace" | "name" | "actionClass" | "effectiveMode" | "arguments">;
 type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindings"> & {
   readonly agentSuppliedMetadata: Record<string, unknown> | null;
+  readonly effects: EffectDeclaration | null;
 };
 
 const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
@@ -113,7 +119,8 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
         actionClass: call.actionClass, mode: call.effectiveMode, argumentsDigest: args.argumentsDigest, normalizer: args.normalizer },
       bindings: args.bindings,
-      agentSuppliedMetadata: args.agentSuppliedMetadata
+      agentSuppliedMetadata: args.agentSuppliedMetadata,
+      effects: signed?.effects ?? null
     } };
   } catch (error) {
     return failed("authority_store_unavailable", `policy files could not be read: ${message(error)}`);
@@ -221,11 +228,12 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       resource: { purpose: null, dataClasses: [] },
       bindings: facts.facts.bindings,
       authority: { approvals, exceptions: [] },
-      idempotencyKey: null,
+      // Minted here, before dispatch, never taken from a caller (P1-04).
+      idempotencyKey: mintIdempotencyKey(),
       evidenceRefs: [...(ctx.evidenceRefs ?? [])],
       ...(facts.facts.agentSuppliedMetadata === null ? {} : { agentSuppliedMetadata: facts.facts.agentSuppliedMetadata })
     });
-    return { ok: true, record, digest: authorizationRecordDigest(record) };
+    return { ok: true, record, digest: authorizationRecordDigest(record), effects: facts.facts.effects };
   } catch (error) {
     return failed("authority_store_unavailable", `the authorization record could not be built: ${message(error)}`);
   }

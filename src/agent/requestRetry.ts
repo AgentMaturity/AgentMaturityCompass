@@ -47,6 +47,7 @@
  * its `finally`, and the turn ends `error` with exactly one request in it.
  * Evidence first: AMC does not take an action it cannot record.
  */
+import { recordProviderOutage } from "../actions/actionRecovery.js";
 import type { SettledStream } from "../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../llm/llmFailure.js";
 import type { LlmFailure } from "../llm/llmFailure.js";
@@ -185,6 +186,19 @@ function retryDelay(
   return { ms: Math.max(0, Math.min(ms, policy.maxDelayMs)), source: "backoff" };
 }
 
+/**
+ * Failure row 7 (P1-03): a final request failure in a session that journaled actions is recorded as an incident. The
+ * turn ends with `error` either way, so no journaled action starts after it. A failed incident write is reported and
+ * never replaces the provider's error.
+ */
+function noteFinalFailure(session: SessionService, outcomeEventId: string, reason: string): void {
+  try {
+    recordProviderOutage({ workspace: session.workspace, sessionId: session.sessionId, outcomeEventId, reason });
+  } catch (failure: unknown) {
+    process.stderr.write(`[amc] the provider-outage incident could not be recorded: ${failure instanceof Error ? failure.message : String(failure)}\n`);
+  }
+}
+
 /** Everything one step's model request needs, minus the turn machine. */
 export interface StepRequestInit {
   readonly session: SessionService;
@@ -262,7 +276,10 @@ export async function dispatchStepRequest(
         attemptsRemaining: verdict.attemptsRemaining
       });
       init.notify({ kind: "retry", turn, step, attempt, decision: verdict.decision, delayMs: verdict.delayMs });
-      if (verdict.decision === "give-up") throw error;
+      if (verdict.decision === "give-up") {
+        noteFinalFailure(init.session, settled.outcomeEventId, verdict.reason);
+        throw error;
+      }
       await init.retry.sleep(verdict.delayMs ?? 0, signal);
       // A cancel that landed during the wait ends the turn here rather than
       // spending another request on an agent somebody already stopped.

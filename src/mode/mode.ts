@@ -95,6 +95,9 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "guardrails profile",
     "approvals approve",
     "approvals deny",
+    "action resolve",
+    // The reconcile() API (P1-04); it has no CLI path yet.
+    "action reconcile",
     "whatif targets",
     "whatif equalizer",
     "benchmark ingest",

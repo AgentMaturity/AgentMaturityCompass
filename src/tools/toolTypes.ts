@@ -1,4 +1,5 @@
 import type { AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
+import type { ReceiptState } from "../actions/receiptStates.js";
 import type { ActionClass } from "../types.js";
 
 /**
@@ -70,6 +71,12 @@ export interface ToolExecution {
     readonly digest: string;
     readonly record: AuthorizationRecordV1;
   };
+  /** The record's execution id (P1-04), present once a record binds. */
+  readonly executionId?: string;
+  /** AMC's idempotency key for this execution (P1-04), for the body to pass to the system of record. */
+  readonly idempotencyKey?: string;
+  /** The header the signed `effects.idempotency` names when its carrier is `http-header`; the body sets it to the key. */
+  readonly idempotencyHeader?: string;
 }
 
 /**
@@ -115,6 +122,12 @@ export interface ToolOutcome {
   readonly denied: ToolDenial | null;
   readonly output: string;
   readonly bytes: number;
+  /**
+   * A journaled call's receipt state (P1-03), absent for a call outside the journaled classes. `started` means the
+   * outcome could not be recorded: the execution stays in the journal for recovery and blocks this agent's journaled
+   * calls. Reported state, not a claim the effect did or did not happen.
+   */
+  readonly action?: { readonly executionId: string; readonly state: ReceiptState; readonly evidenceComplete: boolean };
 }
 
 /** What a tool body receives and returns. */
@@ -125,6 +138,24 @@ export interface ToolBodyResult {
   readonly bytes?: number;
   readonly exitCode?: number | null;
   readonly timedOut?: boolean;
+  /**
+   * What the adapter knows about the effect (P1-03). `unknown` records `outcome_unknown`. Undeclared is `completed`
+   * with no effect stated, except for FINANCIAL, DATA_EXPORT and IDENTITY, where it is `outcome_unknown`.
+   */
+  readonly effect?: "applied" | "not_applied" | "unknown";
+  /** The system of record's reference for the effect, e.g. a payment id. Recorded as given. */
+  readonly externalRef?: string;
+}
+
+/**
+ * Thrown by a body that PROVED no effect happened (the system of record refused the request, say). Any other throw
+ * from a journaled body is `outcome_unknown`, because the effect may have happened before the throw.
+ */
+export class DefiniteFailureError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "DefiniteFailureError";
+  }
 }
 
 export type ToolBody = (execution: ToolExecution) => Promise<ToolBodyResult> | ToolBodyResult;

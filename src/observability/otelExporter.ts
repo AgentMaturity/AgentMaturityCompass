@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Incident } from "../incidents/incidentTypes.js";
 import type { EvidenceEvent, TrustTier } from "../types.js";
+import { noteTelemetryDropped } from "./telemetryDrops.js";
 
 export type ObservabilitySignal = "traces" | "metrics" | "logs";
 export type ObservabilityExporterKind = "otlp" | "jaeger" | "zipkin";
@@ -849,7 +850,7 @@ export function queueEvidenceEventSpan(event: EvidenceEvent): void {
     exporter.recordEvidenceEvent(event);
     maybeFlushSharedExporter(exporter);
   } catch {
-    // Observability must never block core workflows.
+    noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
   }
 }
 
@@ -859,38 +860,30 @@ export function queueScoreComputationMetric(metric: ScoreComputationMetric): voi
     exporter.recordScoreComputation(metric);
     maybeFlushSharedExporter(exporter);
   } catch {
-    // Observability must never block core workflows.
+    noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
   }
 }
 
 export function queueIncidentLog(input: Incident | IncidentLogInput): void {
   const normalized: IncidentLogInput = "createdTs" in input
-    ? {
-      incidentId: input.incidentId,
-      agentId: input.agentId,
-      severity: input.severity,
-      state: input.state,
-      title: input.title,
-      description: input.description,
-      triggerType: input.triggerType,
-      triggerId: input.triggerId,
-      ts: input.updatedTs || input.createdTs
-    }
+    ? { incidentId: input.incidentId, agentId: input.agentId, severity: input.severity, state: input.state, title: input.title,
+      description: input.description, triggerType: input.triggerType, triggerId: input.triggerId, ts: input.updatedTs || input.createdTs }
     : input;
   try {
     const exporter = getSharedObservabilityExporter();
     exporter.recordIncident(normalized);
     maybeFlushSharedExporter(exporter);
   } catch {
-    // Observability must never block core workflows.
+    noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
   }
 }
 
 function maybeFlushSharedExporter(exporter: ObservabilityOTELExporter): void {
   const stats = exporter.getBufferStats();
-  if (stats.traces + stats.metrics + stats.logs >= SHARED_FLUSH_THRESHOLD) {
-    void exporter.flush();
-  }
+  const buffered = stats.traces + stats.metrics + stats.logs;
+  if (buffered < SHARED_FLUSH_THRESHOLD) return;
+  void exporter.flush().then((result) => noteTelemetryDropped(result.requests.reduce(
+    (count, request) => count + (request.ok ? 0 : result.exported[request.signal]), 0)), () => noteTelemetryDropped(buffered));
 }
 
 export function classifyTrustTierRank(tier: TrustTier): number {

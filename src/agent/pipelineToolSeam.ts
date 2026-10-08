@@ -36,10 +36,26 @@ export interface PipelineToolSeamInit {
   readonly agentId: string;
 }
 
-/** Map a pipeline outcome onto the loop's four independent facts. */
+/**
+ * Map a pipeline outcome onto the loop's four independent facts.
+ *
+ * A journaled call (P1-03) reports its receipt, not the signal: CANCELLED only for a `cancelled` receipt, so a call
+ * aborted after `started` is OK, ERROR or TOOL_OUTCOME_UNKNOWN. Its effect may have happened.
+ */
 function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutcome {
-  if (aborted) {
+  const state = outcome.action?.state;
+  if (state === undefined ? aborted : state === "cancelled") {
     return { outcome: "CANCELLED", content: "", exitCode: null, timedOut: false, denied: false };
+  }
+  if (outcome.denied === null && (state === "outcome_unknown" || state === "started")) {
+    return {
+      outcome: "TOOL_OUTCOME_UNKNOWN",
+      // Said to the model, so it does not retry on its own an effect that may already have happened.
+      content: `[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. ${outcome.output}`,
+      exitCode: outcome.exitCode,
+      timedOut: outcome.timedOut,
+      denied: false
+    };
   }
   if (outcome.denied !== null) {
     return {

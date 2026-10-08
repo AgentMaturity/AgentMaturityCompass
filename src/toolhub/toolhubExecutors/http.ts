@@ -2,12 +2,20 @@ import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { URL } from "node:url";
 
+function withIdempotencyKey(headers: Record<string, string> | undefined, idempotency?: { header: string; key: string }): Record<string, string> | undefined {
+  if (idempotency === undefined) return headers;
+  const name = idempotency.header.toLowerCase();
+  return { ...Object.fromEntries(Object.entries(headers ?? {}).filter(([key]) => key.toLowerCase() !== name)), [idempotency.header]: idempotency.key };
+}
+
 export async function executeHttpFetch(params: {
   url: string;
   method?: string;
   headers?: Record<string, string>;
   body?: string;
   simulate: boolean;
+  /** AMC's idempotency key (P1-04) on the header the signed tool definition declares; it replaces any value passed. */
+  idempotency?: { header: string; key: string };
 }): Promise<{ status: number; headers: Record<string, string>; body: string }> {
   if (params.simulate) {
     return {
@@ -24,7 +32,7 @@ export async function executeHttpFetch(params: {
       url,
       {
         method: params.method ?? "GET",
-        headers: params.headers
+        headers: withIdempotencyKey(params.headers, params.idempotency)
       },
       (res) => {
         const chunks: Buffer[] = [];

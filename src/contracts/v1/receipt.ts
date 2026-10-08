@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ReceiptKind, ReceiptPayloadV1 } from "../../receipts/receipt.js";
 import { enforcementLevelSchema, isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 
-const RECEIPT_KINDS = ["llm_request", "llm_response", "tool_action", "tool_result", "guard_check", "work_accepted"] as const satisfies readonly ReceiptKind[];
+const RECEIPT_KINDS = ["llm_request", "llm_response", "tool_action", "tool_result", "guard_check", "work_accepted", "action_state"] as const satisfies readonly ReceiptKind[];
 true satisfies ([ReceiptKind] extends [(typeof RECEIPT_KINDS)[number]] ? true : false);
 
 const payloadFields = {
@@ -19,7 +19,8 @@ const payloadFields = {
 
 /**
  * The signed payload AMC mints today (`mintReceipt`): a kind, no state. Not strict: `mintChainedReceipt` signs two
- * more members into the same v1 payload, and AMC's receipt check accepts any signed member it does not know.
+ * more members into the same v1 payload. AMC's receipt check (`parseReceipt`, P1-03) parses with this schema, so it
+ * still accepts a signed member it does not know and drops it from the payload it returns.
  */
 export const receiptV1Schema = z.object({
   v: z.literal(1),
@@ -41,7 +42,7 @@ const v2Fields = {
   v: z.literal(2),
   ...payloadFields,
   executionId: nonEmpty,
-  /** Null until P1-04 issues idempotency keys. */
+  /** AMC's per-execution key (P1-04); null only for an execution whose authorization record did not bind. */
   idempotencyKey: nonEmpty.nullable(),
   authorizationRecordDigest: sha256HexSchema.nullable(),
   enforcement: enforcementLevelSchema

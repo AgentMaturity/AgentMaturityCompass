@@ -68,7 +68,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
       "name": "legacy-receipt.schema.json",
-      "sha256": "ca6d3edac1871d0c24c1bc0a9904a23071376dd4006656f4df79b963df8beca5"
+      "sha256": "785f6e6fb9c69e7c27d7dabc2d1e6346d482908e15f511a313aeb23e83fbd9fb"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/pack-manifest.schema.json",
@@ -78,7 +78,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
       "name": "receipt.schema.json",
-      "sha256": "cca6d15e3ac4dc4c78fd99ab32cdb499ba88f5db498c62d7e6be6d25dcbaa7c8"
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",

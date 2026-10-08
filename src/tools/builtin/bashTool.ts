@@ -2,7 +2,7 @@ import { z } from "zod";
 import { runProcess } from "../../exec/runProcess.js";
 import { stripProviderKeys } from "../../utils/providerKeys.js";
 import { defineTool } from "../toolRegistry.js";
-import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
+import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
 
 /**
@@ -59,7 +59,10 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       required: ["command"]
     },
     body: async (execution) => {
-      const args = bashArgs.parse(execution.arguments);
+      // Invalid arguments start no process: a definite failure, never an unknown outcome (P1-03).
+      const parsed = bashArgs.safeParse(execution.arguments);
+      if (!parsed.success) throw new DefiniteFailureError(parsed.error.message, { cause: parsed.error });
+      const args = parsed.data;
       if (execution.effectiveMode === "SIMULATE") {
         return { output: `SIMULATE bash: ${args.command}`, exitCode: null };
       }

@@ -8,6 +8,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
 import { verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
+import { executionIdsForCalls, recoverActionJournal } from "../actions/actionRecovery.js";
 import { assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused } from "./sessionOwnership.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import { openHistoryReader } from "./sessionHistoryReader.js";
@@ -430,6 +431,9 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   const force = params.force ?? false;
   const close = params.close ?? false;
+  // P1-03: settle the action journal first (it never dispatches), so a synthetic unknown result can name its execution.
+  recoverActionJournal(params.workspace, { staleAfterMs });
+  const executions = executionIdsForCalls(params.workspace, params.sessionId);
   // Strict backend/identity selection precedes writer open. Empty operations
   // SQLite never stands in for the original native JSONL history.
   const reader = openHistoryReader(params.workspace);
@@ -585,7 +589,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
           exitCode: null,
           timedOut: false,
           denied: false,
-          recoveredBy: claim.eventId
+          recoveredBy: claim.eventId,
+          ...(executions.has(call.toolCallId) ? { executionId: executions.get(call.toolCallId) } : {})
         },
         surface: {
           op: "append",

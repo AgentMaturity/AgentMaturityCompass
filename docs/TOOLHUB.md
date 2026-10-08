@@ -126,6 +126,38 @@ Agent tokens cannot perform admin actions (service lifecycle, signing, target up
 - Direct host actions outside ToolHub are treated as bypass attempts and reduce maturity ceilings when detected.
 - MCP context is declared policy metadata. Use AMC's separate signed MCP server risk attestation for capability, sandbox, signer, and scan proof.
 
+## Protected facts and effects
+
+A consequential tool's signed entry names the argument that carries each protected fact an approval binds
+(`bindingFields`, P1-02) and may declare its effect (`effects`, P1-04):
+
+```yaml
+tools:
+  allowedTools:
+    - name: payments.send
+      actionClass: FINANCIAL
+      bindingFields: { amount: amount, currency: currency, recipient: payee }
+      effects:
+        repeatable: false
+        idempotency: { carrier: http-header, name: Idempotency-Key }
+        reconcile: { adapterId: payments-ledger }
+```
+
+- `bindingFields` maps the roles `amount`, `currency`, `recipient`, `destination`, `resourceId` and `resourceVersion` to
+  argument names. `FINANCIAL` tools must name amount, currency and recipient, and `DATA_EXPORT` tools destination, or
+  every call is denied `binding_fields_missing`. An amount is a decimal string, never a JSON number.
+- `effects.repeatable` is true only when repeating the effect is harmless. It is recorded for the resume rules (P2-12);
+  AMC dispatches an execution at most once either way.
+- `effects.idempotency` names where AMC's per-execution key travels. With `http-header`, the body receives
+  `idempotencyKey` and `idempotencyHeader` on its execution and sends the key on that header; `http.fetch` does so,
+  replacing any value passed. With `argument`, AMC writes the key into the named argument, overwriting what the model
+  passed (kept as agent-supplied metadata), and leaves that argument out of the arguments digest. It may not be a
+  binding field.
+- `effects.reconcile.adapterId` names the adapter `reconcile()` asks when an execution's outcome is unknown. Without
+  one, an operator settles it with `amc action resolve` under dual control ([RECEIPTS](RECEIPTS.md#reconciliation-and-operator-resolution)).
+
+ToolHub's own `runTool` path is not journaled yet and carries no keys (P1-54).
+
 ## Native shell mount grants
 
 A native `bash` tool accepts `command` and optional `timeoutMs`; it does not supply a file path to the generic path validator. Configure reviewed shell write mounts separately in its existing signed entry:

@@ -32,6 +32,7 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
+import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
@@ -253,6 +254,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
   }
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
+  // Opened on the first journaled call (P1-03), which also recovers what crashed runs left. One that cannot open
+  // denies that call `journal_unavailable` and is tried again on the next.
+  let journal: ActionJournal | null = null;
   const readiness = checkToolsetReadiness(workspace, { additionalCapabilities: [
     ...(options.additionalCapabilities ?? []), ...(options.subagents ? NATIVE_DELEGATION_CAPABILITIES : [])
   ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }),
@@ -394,6 +398,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
+    journal: () => (journal ??= openActionJournal(workspace)),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.
@@ -487,6 +492,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     close: (): void => {
       ledgerHandle?.close();
       ledgerHandle = null;
+      journal?.close();
+      journal = null;
     }
   };
 }

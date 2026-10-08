@@ -581,6 +581,8 @@ export {
   verifyApprovalForExecution,
   approvalStatusPayload
 } from "./approvals/approvalEngine.js";
+export { reconcile, requestManualResolution, resolveManually, type ReconcileAdapter, type ReconcileResult, type SystemOfRecordObservation } from "./actions/reconcile.js";
+export { mintIdempotencyKey } from "./actions/idempotency.js";
 export {
   getApprovalInboxItem,
   listApprovalInbox,

@@ -10,6 +10,10 @@ interface CacheEntry {
   expiresAt: number;
 }
 
+/**
+ * @deprecated In-memory and lost on restart, keyed by key-order-sensitive JSON: not a durable mechanism. Consequential
+ * actions get durable keys from `mintIdempotencyKey` (src/actions/idempotency.ts, P1-04); do not build on this.
+ */
 export class IdempotencyStore {
   private cache = new Map<string, CacheEntry>();
 

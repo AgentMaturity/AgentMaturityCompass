@@ -24,7 +24,7 @@ import { listWorkOrders, verifyWorkOrder } from "../workorders/workorderEngine.j
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { mintReceipt, verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
+import { mintReceipt, verifyReceipt, type MintReceiptInput } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import type { SqliteConnectionLease } from "../storage/sqlitePool.js";
@@ -35,7 +35,6 @@ import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/reten
 import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
 import type { SessionWriteFence } from "../session/sessionOwnership.js";
 import { assertLedgerSessionAppend, assertLedgerSessionBatch, runImmediateTransaction } from "./ledgerSessionTransactions.js";
-
 
 export interface AppendEvidenceInput {
   sessionId: string;
@@ -60,21 +59,14 @@ export interface AppendEvidenceResult {
 }
 
 export interface AppendEvidenceWithReceiptInput extends AppendEvidenceInput {
-  receipt: {
-    kind: ReceiptKind;
-    agentId: string;
-    providerId: string;
-    model: string | null;
-    bodySha256: string;
-  };
+  /** With `action`, the receipt is a v2 action-state receipt (P1-03). */
+  receipt: Pick<MintReceiptInput, "kind" | "agentId" | "providerId" | "model" | "bodySha256" | "action">;
 }
-
 
 export interface EvidenceLedgerReader {
   readonly workspace: string;
   readonly db: Database.Database;
 }
-
 
 export interface AppendOutcomeEventInput {
   ts?: number;
@@ -735,13 +727,9 @@ export class Ledger {
       });
       const eventHash = sha256Hex(`${prevHash}${baseCanonicalMetadata}${payloadSha256}`);
       const minted = mintReceipt({
-        kind: input.receipt.kind,
+        ...input.receipt,
         ts,
-        agentId: input.receipt.agentId,
-        providerId: input.receipt.providerId,
-        model: input.receipt.model,
         eventHash,
-        bodySha256: input.receipt.bodySha256,
         sessionId: input.sessionId,
         privateKeyPem: this.monitorPrivateKey(),
         receiptId
@@ -1264,7 +1252,6 @@ export {
 export function openLedger(workspacePath: string, options: { readonly?: boolean; store?: LedgerStore } = {}): Ledger {
   return new Ledger(workspacePath, options);
 }
-
 
 export function hashBinaryOrPath(binaryPath: string, versionOutput: string | null): string {
   if (pathExists(binaryPath)) {

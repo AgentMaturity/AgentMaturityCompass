@@ -88,7 +88,8 @@
             "tool_action",
             "tool_result",
             "guard_check",
-            "work_accepted"
+            "work_accepted",
+            "action_state"
           ],
           "type": "string"
         },
@@ -236,7 +237,8 @@
             "tool_action",
             "tool_result",
             "guard_check",
-            "work_accepted"
+            "work_accepted",
+            "action_state"
           ],
           "type": "string"
         },
@@ -414,7 +416,8 @@
             "tool_action",
             "tool_result",
             "guard_check",
-            "work_accepted"
+            "work_accepted",
+            "action_state"
           ],
           "type": "string"
         },
