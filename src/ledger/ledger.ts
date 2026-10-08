@@ -36,7 +36,6 @@ import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
 import type { SessionWriteFence } from "../session/sessionOwnership.js";
 import { assertLedgerSessionAppend, assertLedgerSessionBatch, runImmediateTransaction } from "./ledgerSessionTransactions.js";
 
-
 export interface AppendEvidenceInput {
   sessionId: string;
   runtime: RuntimeName;
@@ -64,12 +63,10 @@ export interface AppendEvidenceWithReceiptInput extends AppendEvidenceInput {
   receipt: Pick<MintReceiptInput, "kind" | "agentId" | "providerId" | "model" | "bodySha256" | "action">;
 }
 
-
 export interface EvidenceLedgerReader {
   readonly workspace: string;
   readonly db: Database.Database;
 }
-
 
 export interface AppendOutcomeEventInput {
   ts?: number;
@@ -1255,7 +1252,6 @@ export {
 export function openLedger(workspacePath: string, options: { readonly?: boolean; store?: LedgerStore } = {}): Ledger {
   return new Ledger(workspacePath, options);
 }
-
 
 export function hashBinaryOrPath(binaryPath: string, versionOutput: string | null): string {
   if (pathExists(binaryPath)) {
