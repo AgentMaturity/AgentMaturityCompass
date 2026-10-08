@@ -15,3 +15,4 @@ Consequential actions get idempotency keys, and an operator can clear a blocked 
 AMC never promises exactly-once delivery. Receipt signatures are checked against the workspace's own monitor keys: a local audit trail, not a portable verdict.
 
 freeze-exception: P1-04 — amc action resolve, the operator's way to clear an agent blocked by an unreconciled consequential action
+- Dual control for an operator resolution follows the signed approval policy: a class whose rule sets `requireDistinctUsers` needs an approver other than the operator; a single-user workspace sets it false for that class. The resolution stays self-reported.

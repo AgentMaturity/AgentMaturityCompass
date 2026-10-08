@@ -24,8 +24,12 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
+import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
@@ -242,6 +246,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // and src/agent/delegationIdentity.ts. Passing `runAs` reads more natural and
   // is the escape; tests/subagentSpawn.test.ts turns red if it happens.
   const { workspace, agentId } = options;
+  // P1-12: an active compiled plan makes this a regulated profile. One that does not verify refuses the session.
+  let compiled: ReturnType<typeof loadActiveCompiledPolicy>;
+  try {
+    compiled = loadActiveCompiledPolicy(workspace);
+  } catch (error) {
+    throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
+  }
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   // Opened on the first journaled call (P1-03), which also recovers what crashed runs left. One that cannot open
   // denies that call `journal_unavailable` and is tried again on the next.
@@ -259,13 +270,26 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   for (const tool of searchTools()) registry.define(tool);
   // Use the actual native session writer. An owned session refuses raw
   // ledger appends; a receipt write failure also prevents tool success.
-  const recordAudit = (receipt: Record<string, unknown>): void => {
+  // Returns the row's evidence event id when the writer reports one.
+  const recordAudit = (receipt: Record<string, unknown>): string | null => {
     const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
-    if (options.recorder) options.recorder.recordProjectedEvidence(row);
-    else {
+    if (!options.recorder) {
       ledgerHandle ??= openLedger(workspace);
-      ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
+      return ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
     }
+    const ref = options.recorder.recordProjectedEvidence(row) as { readonly eventId?: unknown } | null | undefined;
+    return typeof ref?.eventId === "string" ? ref.eventId : null;
+  };
+  // P1-12: one effective-policy receipt per session and guard set, written before the session's first governed
+  // call (the CLI binds its writer after composing). A receipt that cannot be written denies the call.
+  let receipt: { readonly key: string; readonly ref: string } | null = null;
+  const ensureReceipt = (guardLabels: readonly string[]): string => {
+    const sessionId = options.sessionId;
+    const key = `${sessionId}\0${guardLabels.join(",")}`;
+    if (receipt?.key !== key) {
+      receipt = { key, ref: writeEffectivePolicyReceipt({ workspace, sessionId, agentId, policy: compiled, guardLabels, record: recordAudit }).evidenceRef };
+    }
+    return receipt.ref;
   };
   // Refused means no `bash` at all: a guessed call is an unknown tool, never an unconfined one.
   const shell = readiness.shell;
@@ -339,6 +363,16 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // whichever denies first is simply the one named. Policy engines come before
   // the allowlist so a denial reads as "the firewall stopped this" rather than
   // "this tool is not listed", which is the more actionable of two true answers.
+  // The compiled policy goes first so its receipt exists before any guard decides.
+  const policyGuard = compiledPolicyGuard(workspace, compiled);
+  registry.guard("compiled-policy", execution => {
+    try {
+      ensureReceipt(registry.guardLabelsFor(execution));
+    } catch (error) {
+      return `effective-policy receipt could not be recorded: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    return policyGuard(execution);
+  });
   registry.guard("prompt-injection", promptInjectionGuard());
   registry.guard("runtime-firewall", runtimeFirewallGuard(workspace));
   // CLI binds the native writer after constructing the toolset; forks can
@@ -359,14 +393,25 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       ? undefined : "native tool is absent or its signed action class/context does not match the implementation";
   });
 
+  const facts = compiled ? compiledPolicyFacts(compiled) : null;
   const pipeline = new ToolPipeline({
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
+    // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
+    ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.
-    authorizationContext: () => ({ sessionId: options.sessionId,
-      ...(options.delegation === undefined ? {} : { runAs: options.delegation.runAs, delegation: options.delegation }) }),
+    authorizationContext: () => {
+      let evidenceRefs: string[] = [];
+      try {
+        evidenceRefs = [ensureReceipt(registry.guardLabelsFor({ agentId } as ToolExecution))];
+      } catch {
+        // Not swallowed: the compiled-policy guard retries the write and denies the call with the reason.
+      }
+      return { sessionId: options.sessionId, evidenceRefs, ...(facts ? { compiledPolicy: facts } : {}),
+        ...(options.delegation === undefined ? {} : { runAs: options.delegation.runAs, delegation: options.delegation }) };
+    },
     // Enforcement that leaves no trace is advisory again at the only moment
     // that matters. Every governed call — allowed, denied or failed — lands in
     // the signed spine.
@@ -436,8 +481,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       const selected = new Set(selectSupportedNativeTools(snapshot, NATIVE_DELEGATION_CAPABILITIES).map(tool => tool.name));
       // Keep bodies registered for recorded refusals of guessed built-in calls.
       // Visibility still honors registry restrictions, late mounts and run_code.
-      const schemas = seam.schemas()?.filter(schema => !nativeIdentities.has(schema.name)
-        || (selected.has(schema.name) && registry.visible(agentId).get(schema.name)?.actionClass === nativeIdentities.get(schema.name)?.actionClass));
+      // P1-12: the plan pinned at start also hides what its visibleTools omit; the compiled-policy guard still denies them.
+      const schemas = seam.schemas()?.filter(schema => (!compiled || compiledPolicyShows(compiled, schema.name)) && (!nativeIdentities.has(schema.name)
+        || (selected.has(schema.name) && registry.visible(agentId).get(schema.name)?.actionClass === nativeIdentities.get(schema.name)?.actionClass)));
       return schemas?.length ? schemas : null;
     } },
     registry,

@@ -6,10 +6,14 @@
  * - What's missing to reach L5
  * - What evidence would be needed
  * - Which controls are synthetic vs architectural
+ *
+ * Levels are cumulative (P1-07): when AMC cannot evaluate a level between the current one and L5, the item says so
+ * and why, instead of listing L5 requirements no evidence can satisfy yet.
  */
 
 import { join, dirname } from "node:path";
 import { questionBank } from "./questionBank.js";
+import { notEvaluatedLevel } from "./levelSemantics.js";
 import { classifyControls, type ControlEnforcementLevel } from "./controlClassification.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { readdirSync } from "node:fs";
@@ -36,6 +40,8 @@ export interface L5DeltaItem {
   dominantEnforcement: ControlEnforcementLevel;
   confidence: number;
   flags: string[];
+  /** The first level up to L5 that AMC cannot evaluate, and why; missing capabilities and evidence are then empty. */
+  notEvaluated?: string;
 }
 
 export interface L5DeltaReport {
@@ -178,6 +184,7 @@ export function generateL5DeltaReport(params: {
     const gap = 5 - currentLevel;
     const reqs = getL5Requirements(q.id);
     const ctrl = classificationMap.get(q.id);
+    const notEvaluated = notEvaluatedLevel(q, currentLevel, 5)?.notice;
 
     items.push({
       questionId: q.id,
@@ -186,8 +193,8 @@ export function generateL5DeltaReport(params: {
       currentLevel,
       targetLevel: 5,
       gap,
-      missingCapabilities: gap > 0 ? reqs.missing : [],
-      requiredEvidence: gap > 0 ? reqs.evidence : [],
+      missingCapabilities: gap > 0 && !notEvaluated ? reqs.missing : [],
+      requiredEvidence: gap > 0 && !notEvaluated ? reqs.evidence : [],
       controlEnforcement: ctrl?.subControls.map((sc) => ({
         subControlId: sc.id,
         label: sc.label,
@@ -196,6 +203,7 @@ export function generateL5DeltaReport(params: {
       dominantEnforcement: ctrl?.dominantLevel ?? "CONVENTION",
       confidence: score?.confidence ?? 0,
       flags: score?.flags ?? [],
+      ...(notEvaluated ? { notEvaluated } : {}),
     });
   }
 
@@ -248,6 +256,7 @@ function renderL5DeltaMarkdown(report: L5DeltaReport): string {
     lines.push(`- Current: L${item.currentLevel} → Target: L5 (${status})`);
     lines.push(`- Confidence: ${(item.confidence * 100).toFixed(0)}%`);
     lines.push(`- Enforcement: ${item.dominantEnforcement}`);
+    if (item.notEvaluated) lines.push(`- ${item.notEvaluated}`);
 
     if (item.missingCapabilities.length > 0) {
       lines.push("");

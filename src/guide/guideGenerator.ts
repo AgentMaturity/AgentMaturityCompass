@@ -10,6 +10,7 @@
 
 import type { LayerName, DiagnosticQuestion, QuestionScore } from "../types.js";
 import { questionBank } from "../diagnostic/questionBank.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import { builtInComplianceMappings } from "../compliance/builtInMappings.js";
 import type { ComplianceMapping } from "../compliance/mappingSchema.js";
 import type { EvalScoreExplainabilityPack } from "../diagnostic/questionScoreExplainability.js";
@@ -230,6 +231,8 @@ export interface GuideSection {
   agentInstruction: string;
   complianceGaps: ComplianceGap[];
   scoreExplainabilityProof?: GuideScoreExplainabilityProof;
+  /** Set when AMC cannot evaluate a level up to the target (P1-07): why, in place of advice that would promise it. */
+  notEvaluated?: string;
 }
 
 export interface Guide {
@@ -360,7 +363,7 @@ function evidenceNeededForGap(q: DiagnosticQuestion, targetLevel: number, baseEv
 
 /* ── Agent instruction generator ───────────────────── */
 
-function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, targetLevel: number): string {
+function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, targetLevel: number, notEvaluated?: string): string {
   const targetOption = q.options.find(o => o.level === targetLevel);
   const signals = targetOption?.observableSignals ?? [];
 
@@ -377,19 +380,12 @@ function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, t
     parts.push("");
   }
 
-  // What the agent should do
-  parts.push("### What you must do");
-  if (signals.length > 0) {
-    for (const s of signals) {
-      parts.push(`- ${s}`);
-    }
-  } else {
-    parts.push(`- ${q.upgradeHints}`);
-  }
-  parts.push("");
+  // What the agent should do, unless AMC cannot evaluate the level: then why, never that gate's old requirements
+  if (notEvaluated) parts.push("### Not evaluated", `- ${notEvaluated}`, "");
+  else parts.push("### What you must do", ...(signals.length > 0 ? signals : [q.upgradeHints]).map((s) => `- ${s}`), "");
 
   // Evidence the agent needs to produce
-  const targetGate = q.gates.find(g => g.level === targetLevel);
+  const targetGate = notEvaluated ? undefined : q.gates.find(g => g.level === targetLevel);
   if (targetGate) {
     parts.push("### Evidence you must produce");
     if (targetGate.requiredEvidenceTypes.length > 0) {
@@ -405,15 +401,15 @@ function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, t
       parts.push(`- Must NOT have: ${targetGate.mustNotInclude.auditTypes.join(", ")}`);
     }
     parts.push("");
-
-    // Per-question verification command
-    parts.push("### Verify this question");
-    parts.push(`\`\`\`bash`);
-    parts.push(`amc explain ${q.id}`);
-    parts.push(`amc score formal-spec --question ${q.id}`);
-    parts.push(`\`\`\``);
-    parts.push("");
   }
+
+  // Per-question verification command
+  parts.push("### Verify this question");
+  parts.push(`\`\`\`bash`);
+  parts.push(`amc explain ${q.id}`);
+  parts.push(`amc score formal-spec --question ${q.id}`);
+  parts.push(`\`\`\``);
+  parts.push("");
 
   return parts.join("\n");
 }
@@ -449,6 +445,9 @@ export function generateGuide(input: GuideInput): Guide {
 
     const targetOption = q.options.find(o => o.level === targetLevel);
     const currentOption = q.options.find(o => o.level === qs.finalLevel);
+    // P1-07: past a level AMC cannot evaluate, say why; commands cover only the evaluable levels below it.
+    const blocked = notEvaluatedLevel(q, qs.finalLevel, targetLevel);
+    const reachable = blocked ? blocked.level - 1 : targetLevel;
 
     const gap = targetLevel - qs.finalLevel;
     const severity: "critical" | "high" | "medium" = gap >= 3 ? "critical" : gap >= 2 ? "high" : "medium";
@@ -460,17 +459,18 @@ export function generateGuide(input: GuideInput): Guide {
       currentLevel: qs.finalLevel,
       targetLevel,
       severity,
-      whatToFix: currentOption
+      whatToFix: blocked?.notice ?? (currentOption
         ? `Currently at "${currentOption.label}". Need "${targetOption?.label ?? `L${targetLevel}`}".`
-        : `Currently at L${qs.finalLevel}. Need L${targetLevel}.`,
-      howToFix: [q.upgradeHints, q.evidenceGateHints].filter(Boolean),
-      evidenceNeeded: evidenceNeededForGap(q, targetLevel, targetOption?.typicalEvidence ?? []),
-      cliCommands: cliCommandsForGap(q, qs.finalLevel, targetLevel),
-      agentInstruction: generateAgentInstruction(q, qs.finalLevel, targetLevel),
+        : `Currently at L${qs.finalLevel}. Need L${targetLevel}.`),
+      howToFix: blocked ? [] : [q.upgradeHints, q.evidenceGateHints].filter(Boolean),
+      evidenceNeeded: blocked ? [] : evidenceNeededForGap(q, targetLevel, targetOption?.typicalEvidence ?? []),
+      cliCommands: reachable > qs.finalLevel ? cliCommandsForGap(q, qs.finalLevel, reachable) : [],
+      agentInstruction: generateAgentInstruction(q, qs.finalLevel, targetLevel, blocked?.notice),
       complianceGaps: complianceMappingsForQuestion(qs.questionId, input.complianceFrameworks),
       ...(scoreExplainabilityProofByQuestion.has(qs.questionId)
         ? { scoreExplainabilityProof: scoreExplainabilityProofByQuestion.get(qs.questionId)! }
         : {}),
+      ...(blocked ? { notEvaluated: blocked.notice } : {}),
     });
   }
 
@@ -491,10 +491,11 @@ export function generateGuide(input: GuideInput): Guide {
   const gapCount = gaps.length;
   const totalQuestions = input.questionScores.length;
   const passingCount = totalQuestions - gapCount;
+  const notEvaluatedCount = gaps.filter((s) => s.notEvaluated).length;
 
   const summary = gapCount === 0
     ? `Agent "${agentId}" meets all requirements for ${formatMaturityOrdinal(targetLevel)}. No gaps found.`
-    : `Agent "${agentId}" has ${gapCount} gap${gapCount === 1 ? "" : "s"} to close for ${formatMaturityOrdinal(targetLevel)}. ${passingCount}/${totalQuestions} questions already at target.`;
+    : `Agent "${agentId}" has ${gapCount} gap${gapCount === 1 ? "" : "s"} to close for ${formatMaturityOrdinal(targetLevel)}. ${passingCount}/${totalQuestions} questions already at target.${notEvaluatedCount > 0 ? ` ${notEvaluatedCount} of the gaps need a level AMC does not evaluate yet; no action closes those.` : ""}`;
 
   return {
     agentId,
@@ -535,7 +536,7 @@ export function guideToHumanMarkdown(guide: Guide): string {
     lines.push("3. After fixing, run `amc quickscore` to see your new score");
     lines.push("4. Run `amc guide --diff` to see what improved");
     lines.push("");
-    lines.push("Most agents jump a full level just by running `amc evidence collect`. Start there.");
+    lines.push("Start with `amc evidence collect`: AMC levels a question only on evidence it observes.");
     lines.push("");
   }
 
@@ -604,7 +605,7 @@ export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
   lines.push("# AMC Trust Improvement Instructions");
   lines.push("");
   lines.push("> These instructions were generated by AMC (Agent Maturity Compass) based on");
-  lines.push(`> your actual execution scores. Follow them to improve from L${guide.currentLevel} to L${guide.targetLevel}.`);
+  lines.push(`> your actual execution scores, toward L${guide.targetLevel}. A "Not evaluated" section names a level AMC cannot award yet.`);
   lines.push(`> Generated: ${new Date(guide.generatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`);
   lines.push("");
 
@@ -764,18 +765,7 @@ export function guideToGuardrails(guide: Guide, framework?: string): string {
   }
 
   // Prohibited behaviors
-  const prohibitions: string[] = [];
-  for (const s of guide.sections) {
-    const q = questionBank.find(bq => bq.id === s.questionId);
-    if (!q) continue;
-    const targetGate = q.gates.find(g => g.level === s.targetLevel);
-    if (targetGate?.mustNotInclude?.auditTypes?.length) {
-      for (const t of targetGate.mustNotInclude.auditTypes) {
-        if (!prohibitions.includes(t)) prohibitions.push(t);
-      }
-    }
-  }
-
+  const prohibitions = prohibitedAuditTypes(guide);
   if (prohibitions.length > 0) {
     lines.push("## Prohibited Behaviors");
     lines.push("");
@@ -809,7 +799,7 @@ export function guideToGuardrails(guide: Guide, framework?: string): string {
     const q = questionBank.find(bq => bq.id === s.questionId);
     if (!q) continue;
     const gate = q.gates.find(g => g.level === s.targetLevel);
-    if (gate) {
+    if (gate && !s.notEvaluated) {
       for (const t of gate.requiredEvidenceTypes) allEvidenceTypes.add(t);
       if (gate.minEvents > maxEvents) maxEvents = gate.minEvents;
       if (gate.minSessions > maxSessions) maxSessions = gate.minSessions;
@@ -825,6 +815,8 @@ export function guideToGuardrails(guide: Guide, framework?: string): string {
   if (maxSessions > 0) {
     lines.push(`- Minimum sessions: ${maxSessions}`);
   }
+  const notEvaluatedCount = guide.sections.filter(s => s.notEvaluated).length;
+  if (notEvaluatedCount > 0) lines.push(`- None for ${notEvaluatedCount} question(s): AMC does not evaluate a level they need yet (run \`amc guide\` for why).`);
   lines.push("");
 
   lines.push("## Verification");
@@ -1058,24 +1050,25 @@ export interface GuideJSON {
     targetLevel: number;
     cliCommands: string[];
     evidenceTypes: string[];
+    notEvaluated?: string;
   }>;
   prohibitedBehaviors: string[];
   supportedFrameworks: string[];
 }
 
-export function guideToJSON(guide: Guide, framework?: string): GuideJSON {
-  const prohibitions: string[] = [];
+/** Audit types the sections' target gates forbid; never from a gate AMC does not evaluate (P1-07). */
+function prohibitedAuditTypes(guide: Guide): string[] {
+  const prohibitions = new Set<string>();
   for (const s of guide.sections) {
-    const q = questionBank.find(bq => bq.id === s.questionId);
-    if (!q) continue;
-    const targetGate = q.gates.find(g => g.level === s.targetLevel);
-    if (targetGate?.mustNotInclude?.auditTypes?.length) {
-      for (const t of targetGate.mustNotInclude.auditTypes) {
-        if (!prohibitions.includes(t)) prohibitions.push(t);
-      }
-    }
+    if (s.notEvaluated) continue;
+    const targetGate = questionBank.find(bq => bq.id === s.questionId)?.gates.find(g => g.level === s.targetLevel);
+    for (const t of targetGate?.mustNotInclude?.auditTypes ?? []) prohibitions.add(t);
   }
+  return [...prohibitions];
+}
 
+export function guideToJSON(guide: Guide, framework?: string): GuideJSON {
+  const prohibitions = prohibitedAuditTypes(guide);
   return {
     version: "1.0",
     agentId: guide.agentId,
@@ -1096,6 +1089,7 @@ export function guideToJSON(guide: Guide, framework?: string): GuideJSON {
       targetLevel: s.targetLevel,
       cliCommands: s.cliCommands,
       evidenceTypes: s.evidenceNeeded,
+      ...(s.notEvaluated ? { notEvaluated: s.notEvaluated } : {}),
     })),
     prohibitedBehaviors: prohibitions,
     supportedFrameworks: Object.keys(FRAMEWORK_HINTS),

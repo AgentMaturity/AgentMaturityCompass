@@ -56,7 +56,7 @@ A question's supported level is the highest n for which the gates for every leve
 | L4 | Continuity, anchoring and sampling | Not evaluated until anchoring (P1-25, P1-26) and a sampling record exist. |
 | L5 | Independently attested | Not evaluated until a registry issues scoped attestations signed by a key with purpose `attestation` in the pinned trust list (P0-09, P3-04). |
 
-A level that cannot be evaluated is reported as not evaluated, with its reason, and never as a pass. In the published question bank such a gate carries `notEvaluated` and keeps its earlier requirements as a description of what the level would need. The final level is `min(claimedLevel, supportedMaxLevel)` after the documented caps; no question can exceed L2 under r226, and only the four mapped questions can exceed L1.
+A level that cannot be evaluated is reported as not evaluated, with its reason, and never as a pass. In the published question bank such a gate carries `notEvaluated` and keeps its earlier requirements as a description of what the level would need. Guidance never recommends those earlier requirements. When an upgrade plan (`amc upgrade`), improvement guide (`amc guide`, `amc fix`), question explanation (`amc explain`), L5 delta report (`amc delta-to-l5`), repair hint, prioritized upgrade action, why-capped view, rapid quickscore recommendation, mechanic gap, transformation task or org commitment plan would need a level whose gate is not evaluated, it names the lowest such level, says it is not evaluated, gives the gate's reason (the evidence the question still needs, or the plan issue it waits on) and promises no level gain. The final level is `min(claimedLevel, supportedMaxLevel)` after the documented caps; no question can exceed L2 under r226, and only the four mapped questions can exceed L1.
 
 ### Gate vocabulary
 
@@ -122,7 +122,7 @@ Evidence older than 90 days loses trust: `OBSERVED_HARDENED` becomes `OBSERVED`,
 
 ### No opt-out
 
-`STRICT_EVIDENCE_BINDING` no longer exists as an opt-out. Setting it prints `STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level` once per run and changes nothing.
+`STRICT_EVIDENCE_BINDING` no longer exists as an opt-out. Setting it prints `STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level` once per run and changes nothing. Because no value can turn binding off, no profile, regulated or not, has a strict-binding downgrade to refuse or record: every native session's effective-policy receipt (P1-12) states `strictEvidenceBinding: { enabled: true, source: "default" }`.
 
 ### Reachability
 
@@ -2250,6 +2250,9 @@ Tag evidence with `meta.questionId` or `meta.questionIds` to bind it to a
 question at L1. Above L1, `2026.10.08-r226` binds rows only through the
 question's evidence map. The `STRICT_EVIDENCE_BINDING=false` fallback was
 removed in r226; setting the variable now only prints a deprecation warning.
+Each native session's effective-policy receipt (P1-12) records strict binding as
+enabled from the default, so a session can never carry a strict-binding
+downgrade.
 
 ## 4. Scoring Pipeline
 

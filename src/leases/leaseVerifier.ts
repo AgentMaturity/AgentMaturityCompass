@@ -74,7 +74,10 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
       return { ok: false, payload, error: `lease scope denied: toolhub:execute does not cover ${input.actionClass}` };
     }
     if (input.routePath) {
-      const allowed = payload.routeAllowlist.some((prefix) => input.routePath!.startsWith(prefix));
+      // A route entry covers its own path and paths below it, on a segment boundary: `/dsh` never covers `/dsh2`.
+      const path = input.routePath;
+      const allowed = payload.routeAllowlist.some((prefix) =>
+        path === prefix || path.startsWith(prefix.endsWith("/") ? prefix : `${prefix}/`));
       if (!allowed) {
         return { ok: false, payload, error: "lease route denied" };
       }

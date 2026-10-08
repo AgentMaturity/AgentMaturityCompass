@@ -82,6 +82,7 @@ import {
   obsStudioDrilldownProofHashes,
   replayableLensStatus,
 } from "./explainabilityContracts.js";
+import { notEvaluatedLevel } from "./levelSemantics.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -2577,6 +2578,11 @@ function statusFor(score: QuestionScore, acceptedEvidenceIds: string[], missingG
 
 function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {
   const nextLevel = Math.min(score.finalLevel + 1, 5);
+  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.
+  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);
+  if (notEvaluated) {
+    return `Target L${nextLevel}: ${notEvaluated.notice}`;
+  }
   const upgrade = firstSentence(question.upgradeHints);
   const gateHint = firstSentence(question.evidenceGateHints);
   if (upgrade && gateHint) {

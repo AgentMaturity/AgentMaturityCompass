@@ -1,5 +1,6 @@
 import type { DiagnosticQuestion } from "../types.js";
 import { questionBank } from "./questionBank.js";
+import { notEvaluatedLevel } from "./levelSemantics.js";
 
 const LAYER_EXPLANATIONS: Record<string, string> = {
   "Strategic Agent Operations":
@@ -57,7 +58,11 @@ function buildEvidenceExamples(question: DiagnosticQuestion): string[] {
   if (level3Option) {
     examples.push(...level3Option.typicalEvidence.slice(0, 2).map((row) => compactSentence(row)));
   }
-  if (level3Gate?.requiredEvidenceTypes.length) {
+  // P1-07: a level AMC cannot evaluate gets its reason, never that gate's earlier requirements.
+  const notEvaluated = notEvaluatedLevel(question, 0, 3);
+  if (notEvaluated) {
+    examples.push(notEvaluated.notice);
+  } else if (level3Gate?.requiredEvidenceTypes.length) {
     examples.push(`Required evidence types for L3 include: ${level3Gate.requiredEvidenceTypes.join(", ")}.`);
   }
   if (question.evidenceGateHints.trim().length > 0) {

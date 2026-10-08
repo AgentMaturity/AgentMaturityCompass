@@ -20,6 +20,7 @@ import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { listApprovalInbox } from "../approvals/approvalInbox.js";
 import type {
   DiagnosticEvidenceReadiness,
+  DiagnosticQuestion,
   DiagnosticReport,
   EvidenceEvent,
   EvidenceEventType,
@@ -38,6 +39,7 @@ import {
   computeLayerScores,
   evaluateLevels,
   eventQuestionIds,
+  notEvaluatedLevel,
   overallScore,
   trustLabelFromIntegrity,
   UNTRUSTED_CONFIG_INTEGRITY_CAP
@@ -303,7 +305,7 @@ function summarizeNarrative(questionId: string, supported: number, claimed: numb
 function prioritizeUpgradeActions(
   questionScores: QuestionScore[],
   targetProfile: TargetProfile | null,
-  questions: Array<{ id: string; title: string }>
+  questions: ReadonlyArray<Pick<DiagnosticQuestion, "id" | "title" | "gates">>
 ): {
   actions: string[];
   recommendationControls: NonNullable<DiagnosticReport["recommendationControls"]>;
@@ -311,12 +313,7 @@ function prioritizeUpgradeActions(
 } {
   const targetDiff = questionScores.map((score) => {
     const target = targetProfile ? targetProfile.mapping[score.questionId] ?? 0 : 5;
-    return {
-      questionId: score.questionId,
-      current: score.finalLevel,
-      target,
-      gap: target - score.finalLevel
-    };
+    return { questionId: score.questionId, current: score.finalLevel, target, gap: target - score.finalLevel };
   });
 
   targetDiff.sort((a, b) => b.gap - a.gap || a.questionId.localeCompare(b.questionId));
@@ -327,7 +324,10 @@ function prioritizeUpgradeActions(
     .map((row) => {
       const question = questions.find((q) => q.id === row.questionId);
       const score = questionScores.find((item) => item.questionId === row.questionId)!;
-      const action = `${row.questionId} (${question?.title ?? "unknown"}): raise from ${row.current} to ${row.target} by satisfying gate requirements and adding missing evidence.`;
+      const blocked = notEvaluatedLevel(question, row.current, row.target);
+      const to = blocked ? blocked.level - 1 : row.target;
+      const raise = to > row.current ? `raise from ${row.current} to ${to} by satisfying gate requirements and adding missing evidence.` : "";
+      const action = `${row.questionId} (${question?.title ?? "unknown"}): ${[raise, blocked?.notice].filter(Boolean).join(" ")}`;
       return recommendationControlForScore({ action, score });
     });
   const actions = recommendationControls.map((control) => control.action);

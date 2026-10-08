@@ -38,7 +38,8 @@ const artifactKindSchema = z.enum([
     "exploit-confirmation-proof",
     "neutral-import-artifact",
     "inference-strategy-run",
-    "evaluator-registry-manifest"
+    "evaluator-registry-manifest",
+    "effective-policy-receipt"
 ]);
 
 const artifactSignatureFields = {

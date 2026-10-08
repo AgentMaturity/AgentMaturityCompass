@@ -38,6 +38,13 @@ import { normalizeArguments } from "./normalizeArguments.js";
 const DEFAULT_RECORD_TTL_MS = 5 * 60_000;
 const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
 
+/** The verified compiled policy a session pinned (P1-12): its digest (64 hex), journal revision, and admitting control. */
+export interface CompiledPolicyFacts {
+  readonly digest: string;
+  readonly revision: number;
+  controlFor(actionClass: ActionClass): { readonly controlId: string; readonly controlVersion: string | null } | null;
+}
+
 /** Who is acting. Composition sets it; nothing here comes from the model's arguments. */
 export interface AuthorizationContext {
   readonly sessionId?: string | null;
@@ -53,6 +60,10 @@ export interface AuthorizationContext {
   readonly leaseToken?: string;
   /** Approvals named through the trusted channel: the approval gate, the pipeline's own stage, or ToolHub. */
   readonly authority?: { readonly approvalRequestIds: readonly string[] };
+  /** The compiled policy the session runs under (P1-12); absent means none. */
+  readonly compiledPolicy?: CompiledPolicyFacts;
+  /** Evidence the record cites: the session's effective-policy receipt (P1-12). */
+  readonly evidenceRefs?: readonly string[];
 }
 
 type Failed = { readonly ok: false; readonly failures: readonly RecheckFailure[]; readonly reason: string };
@@ -81,8 +92,8 @@ function fileDigest(workspace: string, rel: string, missing: string): string {
   }
 }
 
-/** Everything about the call itself, from the signed tools config and the policy files as they are now. */
-function actionFacts(call: Call): { readonly ok: true; readonly facts: Facts } | Failed {
+/** Everything about the call itself, from the signed tools config, the policy files as they are now and the pinned compiled policy. */
+function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok: true; readonly facts: Facts } | Failed {
   try {
     const snapshot = loadVerifiedToolsConfigSnapshot(call.workspace);
     // Binding fields come from the SIGNED entry only; an unverifiable config has none.
@@ -91,8 +102,8 @@ function actionFacts(call: Call): { readonly ok: true; readonly facts: Facts } |
     const args = normalizeArguments(signed, call.actionClass, call.arguments);
     if (!args.ok) return failed(args.failure, args.reason);
     const policy = {
-      compiledPolicyDigest: null,
-      policyRevision: null,
+      compiledPolicyDigest: compiled?.digest ?? null,
+      policyRevision: compiled?.revision ?? null,
       toolsConfigDigest: snapshot.digestSha256 ?? fileDigest(call.workspace, ".amc/tools.yaml", "missing-tools"),
       actionPolicyDigest: fileDigest(call.workspace, ".amc/action-policy.yaml", "missing-action-policy"),
       approvalPolicyDigest: fileDigest(call.workspace, ".amc/approval-policy.yaml", "missing-approval-policy"),
@@ -100,9 +111,9 @@ function actionFacts(call: Call): { readonly ok: true; readonly facts: Facts } |
     };
     const deploymentDigest = sha256Hex(canonicalize({ amcVersion, toolsConfigDigest: policy.toolsConfigDigest,
       actionPolicyDigest: policy.actionPolicyDigest, approvalPolicyDigest: policy.approvalPolicyDigest,
-      budgetsDigest: policy.budgetsDigest, compiledPolicyDigest: null, agentConfigDigest: null }));
+      budgetsDigest: policy.budgetsDigest, compiledPolicyDigest: policy.compiledPolicyDigest, agentConfigDigest: null }));
     return { ok: true, facts: {
-      // ponytail: tenant and deployment id stay unregistered until P1-12 compiles a policy that names them.
+      // ponytail: tenant and deployment id stay unregistered; the compiled plan does not carry them (P1-10 schema).
       scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: null, deploymentId: "unregistered", deploymentDigest },
       policy,
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
@@ -127,8 +138,8 @@ function questionFor(intent: AuthorizationIntent): string {
 }
 
 /** The intent an approval for this call must bind, and the question to ask about it. */
-export function authorizationIntentFor(call: Call): AuthorizationIntentResult {
-  const facts = actionFacts(call);
+export function authorizationIntentFor(call: Call, ctx: Pick<AuthorizationContext, "compiledPolicy"> = {}): AuthorizationIntentResult {
+  const facts = actionFacts(call, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const payload = intentPayloadFor(facts.facts);
   return { ok: true, payload, question: questionFor(payload) };
@@ -176,7 +187,7 @@ function osUser(): string {
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
-  const facts = actionFacts(execution);
+  const facts = actionFacts(execution, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const approvals: AuthorizationRecordV1["authority"]["approvals"][number][] = [];
   for (const id of ctx.authority?.approvalRequestIds ?? []) {
@@ -211,7 +222,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
         leaseId: lease?.payload.leaseId ?? null },
       session: { sessionId: ctx.sessionId ?? null, runId: null, callId: execution.callId, rootCallId: execution.rootCallId,
         parentToken: execution.parentToken },
-      control: { controlId: null, controlVersion: null },
+      control: ctx.compiledPolicy?.controlFor(execution.actionClass) ?? { controlId: null, controlVersion: null },
       policy: facts.facts.policy,
       action: facts.facts.action,
       resource: { purpose: null, dataClasses: [] },
@@ -219,7 +230,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       authority: { approvals, exceptions: [] },
       // Minted here, before dispatch, never taken from a caller (P1-04).
       idempotencyKey: mintIdempotencyKey(),
-      evidenceRefs: [],
+      evidenceRefs: [...(ctx.evidenceRefs ?? [])],
       ...(facts.facts.agentSuppliedMetadata === null ? {} : { agentSuppliedMetadata: facts.facts.agentSuppliedMetadata })
     });
     return { ok: true, record, digest: authorizationRecordDigest(record), effects: facts.facts.effects };
@@ -280,7 +291,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   const failures = new Set<RecheckFailure>();
   const add = (...found: readonly RecheckFailure[]): void => { for (const failure of found) failures.add(failure); };
   if (record.session.callId !== execution.callId || record.subject.governedAs !== execution.agentId) add("approval_intent_mismatch");
-  const current = actionFacts(execution);
+  const current = actionFacts(execution, ctx.compiledPolicy);
   if (!current.ok) add(...current.failures);
   else {
     add(...intentDifferences(intentPayloadFor(record), intentPayloadFor(current.facts)));

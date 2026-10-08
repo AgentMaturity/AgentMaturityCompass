@@ -216,7 +216,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc casebook list` | List casebooks | `--agent <agentId>` | - |
 | `amc casebook verify` | Verify signed casebook and case files | `--casebook <id>`<br>`--agent <agentId>` | - |
 | `amc catalog` | Regulated Control Catalog (experimental): compile deployment profiles into control plans | - | - |
-| `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) | `--profile <file>`<br>`--previous <plan.json>`<br>`--lock <catalog.lock.json>`<br>`--out <dir>`<br>`--request-review`<br>`--allow-weakening`<br>`--json` | - |
+| `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) | `--profile <file>`<br>`--previous <plan.json>`<br>`--lock <catalog.lock.json>`<br>`--out <dir>`<br>`--request-review`<br>`--allow-weakening`<br>`--activate <approvalRequestId>`<br>`--json` | - |
 | `amc cert` | Certificate operations | - | - |
 | `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
 | `amc cert inspect` | Inspect any AMC certificate (.amccert bundle or trust-certificate JSON) | - | - |
@@ -336,6 +336,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--profile-out <path>`<br>`--sign-profile <path>`<br>`--activate-profile <path>`<br>`--allow-widening`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--no-sign`<br>`--json` | `sector apply` |
 | `amc domain assess` | Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assess` |
 | `amc domain assurance` | Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assurance` |
+| `amc domain conformance` | Check a station's derived requirements against sealed, fresh evidence; writes a sealed run (evidence of conformity) | `--station <station>`<br>`--agent <id>`<br>`--max-evidence-age <duration>`<br>`--responses <file.json>`<br>`--profile <operating-profile.json>`<br>`--out <dir>`<br>`--json` | `sector conformance` |
 | `amc domain gaps` | Show compliance gaps for an agent and domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector gaps` |
 | `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
@@ -443,6 +444,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc export` | Export policy packs and badges | - | - |
 | `amc export badge` | Export deterministic maturity badge SVG for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc export grc` | Export the latest run as labelled GRC evidence (+ SARIF developer findings) | `--framework <framework>`<br>`--out <file>`<br>`--sarif <file>`<br>`--agent <agentId>`<br>`--json` | - |
+| `amc export oscal` | Export the control catalog, a compiled plan and its control results as OSCAL 1.2.3, with a loss report (experimental) | `--out <dir>`<br>`--plan <plan.json>`<br>`--results <file>` | - |
 | `amc export policy` | Export framework-agnostic North Star policy integration pack | `--target <name>`<br>`--out <dir>`<br>`--agent <agentId>` | - |
 | `amc federate` | Offline federation sync operations | - | - |
 | `amc federate export` | Export offline federation sync package (.amcfed) | `--out <file>` | - |

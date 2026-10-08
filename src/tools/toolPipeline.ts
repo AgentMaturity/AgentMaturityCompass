@@ -235,7 +235,7 @@ export class ToolPipeline {
     const definition = this.init.registry.visible(input.agentId).get(input.name);
     if (!definition || !this.authorizes(definition.actionClass)) return null;
     return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
-      effectiveMode: input.requestedMode, arguments: input.arguments });
+      effectiveMode: input.requestedMode, arguments: input.arguments }, this.init.authorizationContext?.());
   }
 
   private authorizes(actionClass: string): boolean {
@@ -353,7 +353,7 @@ export class ToolPipeline {
     const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
     let authority = supplied;
     if (gate !== undefined && draft.parentToken !== null) {
-      const intent = authorizes ? authorizationIntentFor(draft) : null;
+      const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
       // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
       const granted = intent?.ok === false ? undefined : await gate.ask(draft, intent).catch((): null => null);
       if (granted === null) {

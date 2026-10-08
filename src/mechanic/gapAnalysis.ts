@@ -1,4 +1,5 @@
 import { questionBank } from "../diagnostic/questionBank.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import type { AutoAnswerOutput } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { getForecastLatestForApi } from "../forecast/forecastApi.js";
 import type { MechanicTargets } from "./targetSchema.js";
@@ -62,6 +63,12 @@ export function buildGapAnalysis(params: {
       if (gap > 0 && dim === "DIM-1" && desired >= 4 && measured <= 2) {
         status = "BLOCKED";
         reasons.push("target requires stronger governance baseline before autonomy increase");
+      }
+      // P1-07: a target past a level AMC cannot evaluate is blocked, with that level's reason.
+      const notEvaluated = gap > 0 ? notEvaluatedLevel(question, measured, desired) : undefined;
+      if (notEvaluated) {
+        status = status === "OK" ? "BLOCKED" : status;
+        reasons.push(notEvaluated.notice);
       }
       return {
         qId: question.id,

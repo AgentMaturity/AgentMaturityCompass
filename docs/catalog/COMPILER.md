@@ -118,8 +118,9 @@ for every control in the catalog, applicable or not.
 | `deletion.retentionDays.auditLog`, `deletion.retentionDays.payloads` | `deletion_executor` | `none` | integer >= 1 |
 
 Guard ids are those the native tool pipeline registers (`prompt-injection`, `runtime-firewall`, `budgets`,
-`network-egress`, `tool-allowlist`, `native-tool-identity`) plus `identity-binding`, which P1-12 adds. A control whose
-parameters need a guard that is not registered yet is listed as `unsupported` with `enforcement_point_absent`.
+`network-egress`, `tool-allowlist`, `native-tool-identity`) plus `identity-binding`, which the `compiled-policy` guard
+enforces (P1-12). A control whose parameters need a guard that is not registered is listed as `unsupported` with
+`enforcement_point_absent`.
 
 ## Outputs
 
@@ -135,7 +136,7 @@ parameters need a guard that is not registered yet is listed as `unsupported` wi
   with its roles, and no common role leaves nobody able to approve), egress (deny by default,
   allowed hosts), deletion (an unknown legal hold denies; retention days), `proposedSignedConfigs` and `policyDigest`.
   `proposedSignedConfigs` start from the defaults and zod schemas F1's operating-profile builders use. The compiler
-  writes nothing under `.amc/`; activating the policy is P1-12's.
+  writes nothing under `.amc/`; activation is described below.
 - `evidencePlan`: one test entry per control test (run at `activation` and on each `invalidatedBy` trigger; drills
   and document reviews on the manual duty's cadence), one request per evidence contract, the manual duties, and
   release gates for runtime-enforced, configuration-check and adversarial tests, blocking when the control is
@@ -169,8 +170,8 @@ sits outside the digest with the diff, the signature and the review.
 
 With `--request-review`, an approval request is created through `createApprovalForIntent` under the profile's first
 agent id (sorted), bound to the intent `planReviewIntent(plan)`: tool `catalog.plan.activate`, action class
-`SECURITY`, payload `{ planDigest, policyDigest, profileId }`. P1-12 checks the decision with
-`verifyApprovalForExecution` before activation. The plan's `review.status` stays `pending`.
+`SECURITY`, payload `{ planDigest, policyDigest, profileId }`. Activation checks the decision with
+`verifyApprovalForExecution` and consumes it. The plan's `review.status` stays `pending`.
 
 ## Diff
 
@@ -178,19 +179,74 @@ agent id (sorted), bound to the intent `planReviewIntent(plan)`: tool `catalog.p
 leaf-level runtime-policy and evidence-plan changes (rows matched by id, not position). `renderPlanDiffMarkdown`
 renders it as `plan.diff.md`.
 
+## Activation and enforcement
+
+`activateControlPlan` (`src/catalog/compiler/activate.ts`, P1-12) makes a signed plan the workspace's active compiled
+policy. It is blocked in agent mode and refuses unless all of these hold: the plan's digest recomputes from its content
+and its `CONTROL_PLAN` signature verifies; the plan is `ready`; the shipped catalog matches the plan's lockfile; the
+plan review named by `--activate` approved exactly this plan's intent (it is consumed, so one review activates once);
+and, against the plan already active, there is no weakening, by the same rules signing applies, unless
+`--allow-weakening`. The plan is appended to a signed control journal (`.amc/control-plan/heads/`, kind
+`compiled-control-plan`) with a host-local checkpoint and signer pin outside the workspace, the same primitive the
+Runtime Firewall policy uses, so deleting, truncating or rolling back the journal is an integrity failure, never "no
+policy".
+
+An active plan is what makes a workspace a regulated profile. Every native session (`agentToolset`) and the kernel
+tool service load it when they start. The load verifies the journal whole, then the plan inside the entry it read
+(digest and signature in the same read), then the shipped catalog against the plan's lockfile. Anything that does not
+verify refuses the session. With no plan ever activated, the session runs and its receipt records the downgrade
+`no_compiled_policy`.
+
+The `compiled-policy` guard runs first in the native pipeline and fails closed:
+
+- a call whose tool is not in `toolPipeline.visibleTools` is denied (`run_code` is exempt; each sub-call is checked).
+  Native sessions also leave those tools out of the tool list offered to the model, using the plan pinned at
+  start; the guard stays the enforcement point;
+- `identity-binding` (`requireAgentLease`, `requirePrincipal`) reads the authorization record bound for the call:
+  no verified lease denies `IDENTITY_UNRESOLVED`, and no authenticated principal (an OS user name is self-reported)
+  denies `PRINCIPAL_UNRESOLVED`. Native sessions carry no lease yet, so under a plan with `L0-IDN-01` every native
+  call is denied until a composition supplies one;
+- any other compiled guard id denies, because this pipeline does not implement it;
+- for an action class with a compiled approval rule, the live signed approval policy must be at least as strict
+  (approvals, distinct users, roles, TTL), read and verified in one read, or the call is denied;
+- a different active plan than the one the session pinned at start (changed, or activated since) denies; start a
+  new session.
+
+A denial names the control: `compiled policy denied this call (control <id>@<version>): <reason>`. Under a plan every
+call is bound to an authorization record, and `toolPipeline.approvalRequiredFor` sets the record's
+`boundApprovalRequiredFor`. Each record carries `control.controlId` and `control.controlVersion` of the rule that
+admitted the call, `policy.compiledPolicyDigest` and `policy.policyRevision` (the journal revision), and the session's
+effective-policy receipt in `evidenceRefs`. Egress and deletion rules stay on the policy object for P2-01; nothing
+enforces them yet, and receipts say so.
+
+Each native session writes an effective-policy receipt (`amc.effective-policy-receipt/v1`,
+`src/policy/effectivePolicyReceipt.ts`) before its first governed call, and again when its guard set changes: an
+`EFFECTIVE_POLICY` audit row through the session's writer and a signed artifact (`effective-policy-receipt`) under
+`.amc/effective-policy/`. It lists the policy, plan and lock digests and the journal revision; each control in force
+per binding (`tool-pipeline`, `approvals`, `egress`, `deletion-executor`, `manual`) with its enforcement, boundary and
+catalog review status; the composed guard labels; the 14 guardrails as that session ran them; the domain-apply rules
+with `enforcement: "none"`; strict evidence binding; and the downgrades `no_compiled_policy` and
+`unenforced_domain_rules`. A receipt that cannot be written denies the call. A receipt for one policy digest is no
+evidence for a session that ran another, and an experimental control stays `review: "pending"` however it is enforced.
+
 ## CLI
 
 ```
 amc catalog compile --profile <file> [--previous <plan.json>] [--lock <catalog.lock.json>] [--out <dir>]
-                    [--request-review] [--allow-weakening] [--json]
+                    [--request-review] [--allow-weakening] [--activate <approvalRequestId>] [--json]
 ```
+
+`--activate <approvalRequestId>` activates the plan just compiled once that review approved it. Compiling is
+deterministic, so the usual flow is `--request-review`, an approver's `amc approvals approve`, then the same compile
+with `--activate <approvalRequestId>`. It cannot be combined with `--request-review`.
 
 It compiles against the shipped catalog and writes `plan.json` (the `CompiledPlan`), `plan.sig.json` (`compiledAt`,
 `diff`, `signature`, `review`), `plan.diff.md` and `catalog.lock.json` to `--out`, by default
 `amc-control-plans/<profileId>/<first 12 hex of the digest>/`. An `--out` under `.amc/` is refused. `--previous` reads
 `plan.json` and the `plan.sig.json` beside it. `--lock` refuses to compile when the loaded catalog differs from the
-lockfile. Exit codes: 0 ready, 2 blocked, 1 error or refusal. Only `--request-review` writes under `.amc/`, through
-the approval engine's own request store (which creates a default signed approval policy when none exists).
+lockfile. Exit codes: 0 ready, 2 blocked, 1 error or refusal. Only `--request-review` and `--activate` write under
+`.amc/`: the first through the approval engine's own request store (which creates a default signed approval policy
+when none exists), the second to the control-plan journal.
 
 Example, with the synthetic sample profile:
 
@@ -205,5 +261,4 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 
 ## Not in this step
 
-Activating the plan in the tool pipeline and effective-policy receipts (P1-12), evidence evaluation (P1-11), the
-review workflow UI (P2-22), reassessment on `invalidatedBy` (P2-23) and cross-station profile definitions (P2-28).
+Evidence evaluation (P1-11), egress and deletion enforcement (P2-01), the review workflow UI (P2-22), reassessment on `invalidatedBy` (P2-23) and cross-station profile definitions (P2-28).

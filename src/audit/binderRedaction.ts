@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { binderPiiScanSchema, type AuditBinderJson } from "./binderSchema.js";
+import { binderPiiScanSchema } from "./binderSchema.js";
 
 interface Rule {
   severity: "LOW" | "MEDIUM" | "HIGH";
@@ -96,7 +96,8 @@ function walk(path: string, value: unknown, findings: Array<{ severity: "HIGH" |
   }
 }
 
-export function scanBinderForPii(binder: AuditBinderJson): {
+/** Scans binder.json, or an allowlisted projection the binder carries beside it (binderConformanceRun.ts). */
+export function scanBinderForPii(binder: object): {
   v: 1;
   status: "PASS" | "FAIL";
   findings: Array<{ severity: "HIGH" | "MEDIUM" | "LOW"; type: "EMAIL" | "URL" | "FILE_PATH" | "TOKEN" | "PRIVATE_KEY" | "FREE_TEXT"; path: string; snippetRedacted: string }>;

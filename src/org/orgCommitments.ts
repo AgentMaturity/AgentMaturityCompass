@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { questionBank } from "../diagnostic/questionBank.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import { openLedger } from "../ledger/ledger.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -255,6 +256,11 @@ export function generateOrgCommitmentPlan(params: {
   const node = findNode(params.scorecard, params.nodeId);
   const commitId = `commit_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const topGaps = node.topGapQuestions.slice(0, 10);
+  // P1-07: a gap that crosses a level AMC cannot evaluate gets that level's reason, never a promise to unlock it.
+  const notEvaluated = (gap: (typeof topGaps)[number]): string | undefined => {
+    const blocked = notEvaluatedLevel(questionBank.find((q) => q.id === gap.questionId), gap.currentMedian, gap.targetMedian);
+    return blocked ? `${gap.questionId}: ${blocked.notice}` : undefined;
+  };
   const lines = [
     `# Org Commitment Plan — ${node.name}`,
     "",
@@ -264,10 +270,10 @@ export function generateOrgCommitmentPlan(params: {
     `Trust: ${node.trustLabel}`,
     "",
     "## Prioritized Initiatives",
-    ...topGaps.map((gap) => `- [ ] Close ${gap.questionId} gap ${gap.gap.toFixed(2)} by collecting missing evidence.`),
+    ...topGaps.map((gap) => `- [ ] ${notEvaluated(gap) ?? `Close ${gap.questionId} gap ${gap.gap.toFixed(2)} by collecting missing evidence.`}`),
     "",
     "## Required Evidence To Unlock Next Levels",
-    ...topGaps.map((gap) => `- [ ] ${gap.questionId}: at least 5 sessions across 7 days with OBSERVED evidence and stable correlation.`),
+    ...topGaps.map((gap) => `- [ ] ${notEvaluated(gap) ?? `${gap.questionId}: at least 5 sessions across 7 days with OBSERVED evidence and stable correlation.`}`),
     "",
     "## Commands",
     "- amc verify",

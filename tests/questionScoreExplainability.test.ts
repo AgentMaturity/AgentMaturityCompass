@@ -5000,7 +5000,9 @@ describe("question score explainability receipts", () => {
       })
     ]);
     expect(row.missingGateReasons[0]).toContain("failed gate 4");
-    expect(row.repairHint).toContain("Create mission");
+    // P1-07: AMC-1.1's L4 is not evaluated, so the hint names it and its reason instead of advising toward it.
+    expect(row.repairHint).toContain("Target L4: Not evaluated: L4 needs continuity");
+    expect(row.repairHint).not.toContain("Create mission");
     expect(row.rowHash).toMatch(/^[a-f0-9]{64}$/);
 
     const second = buildQuestionExplainabilityReport({
@@ -6138,7 +6140,8 @@ describe("question score explainability receipts", () => {
       "rejected-evidence-review",
       "maturity-level-gate"
     ]);
-    expect(row?.repairHint).toContain("Create mission");
+    // P1-07: L2 is not evaluated without an evidence map, so the hint gives that reason instead of advice.
+    expect(row?.repairHint).toContain("Target L2: Not evaluated: L2 not evaluable on runtime evidence");
 
     const markdown = generateReport(report, "md") as string;
     expect(markdown).toContain("## Question Score Explainability");

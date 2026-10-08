@@ -7,9 +7,11 @@
 import { z } from "zod";
 import { consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { listApprovalDecisions } from "../approvals/approvalChainStore.js";
+import { approvalRuleForAction, loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { authorizationRecordV1Schema } from "../contracts/v1/authorizationRecord.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { openActionJournal, type ActionJournal } from "./actionJournal.js";
@@ -260,7 +262,7 @@ export function requestManualResolution(executionId: string, input: ManualResolu
  * Record an operator's resolution of an unsettled execution: a `completed` receipt with `resolution: "operator"`,
  * written in the verified chain at AMC's clock, on a `SELF_REPORTED` evidence row. Requires the granted approval filed
  * by `requestManualResolution` for exactly this head and statement, under the action class's quorum, with an approver
- * other than the operator; the approval is consumed. Refused in agent mode. Never dispatches anything.
+ * other than the operator when the class's approval rule requires distinct users; the approval is consumed. Refused in agent mode. Never dispatches anything.
  */
 export function resolveManually(executionId: string, input: ManualResolutionInput & { readonly approvalRequestId: string }): ActionReceiptV1 {
   assertOwnerMode(input.workspace, "action resolve");
@@ -274,8 +276,11 @@ export function resolveManually(executionId: string, input: ManualResolutionInpu
     if (!approval.ok) throw new Error(`resolution_not_approved: ${approval.error ?? approval.status ?? "unknown"}`);
     const approverIds = [...new Set(listApprovalDecisions({ workspace: input.workspace, agentId: head.agentId,
       approvalRequestId: input.approvalRequestId }).filter((decision) => decision.decision === "APPROVE_EXECUTE").map((decision) => decision.userId))].sort();
-    if (!approverIds.some((id) => id !== stated.operatorId)) {
-      throw new Error("dual_control: the resolution must be approved by someone other than the operator who states it");
+    // Dual control follows the signed approval policy: a class whose rule requires distinct users needs an approver other
+    // than the operator who states the resolution. A single-user workspace sets requireDistinctUsers false for that class.
+    const rule = approvalRuleForAction(loadApprovalPolicy(input.workspace), payload.actionClass as ActionClass);
+    if (rule.requireDistinctUsers && !approverIds.some((id) => id !== stated.operatorId)) {
+      throw new Error("dual_control: this action class requires an approver other than the operator who states the resolution (approval policy requireDistinctUsers)");
     }
     const spent = consumeApprovedExecution({ workspace: input.workspace, approvalId: input.approvalRequestId,
       expectedAgentId: head.agentId, executionId });

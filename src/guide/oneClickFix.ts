@@ -123,7 +123,7 @@ function gapsFromGuide(guide: Guide, rapid: ReturnType<typeof scoreRapidAssessme
     currentLevel: s.currentLevel,
     targetLevel: s.targetLevel,
     why: whyByQuestion.get(s.questionId) ?? "It directly affects your trust posture and production reliability.",
-    how: howByQuestion.get(s.questionId) ?? firstSentence(s.howToFix[0] ?? "")
+    how: s.notEvaluated ?? howByQuestion.get(s.questionId) ?? firstSentence(s.howToFix[0] ?? "")
   }));
 }
 

@@ -2,9 +2,13 @@ import { AVAILABLE_GUARDRAILS, type GuardrailDefinition } from "./guardrailProfi
 import {
   GUARDRAIL_RUNTIME_BINDINGS,
   isBoundGuardrailName,
-  readGuardrailControlState
+  readGuardrailControlState,
+  type GuardrailControlSnapshot
 } from "./guardrailControlState.js";
-import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
+import { inspectRuntimeFirewallPolicy, type RuntimeFirewallPolicyInspection } from "../runtime/firewall.js";
+
+/** P0-08's enforcement vocabulary. `boundary` is null exactly when enforcement is "none". */
+export type Enforcement = "enforced" | "observed" | "advisory" | "none";
 
 export interface GuardrailRuntimeStatus extends GuardrailDefinition {
   requestedEnabled: boolean;
@@ -13,10 +17,29 @@ export interface GuardrailRuntimeStatus extends GuardrailDefinition {
   mutable: boolean;
   trusted: boolean;
   binding: string | null;
-  source: "none" | "catalog-only" | "guardrail-control-state" | "runtime-firewall-policy" | "combined";
+  source: "none" | "catalog-only" | "tool-pipeline" | "guardrail-control-state" | "runtime-firewall-policy" | "combined";
   reason: string;
   stateRevision: number | null;
+  /** Whether AMC enforces this guardrail here, and where (P1-12). */
+  enforcement: Enforcement;
+  boundary: string | null;
 }
+
+/**
+ * Guardrails the native tool pipeline enforces itself (P1-12). Not toggled by guardrail control state.
+ * `human-approval-gate` is enforced only in a session whose effective-policy receipt lists a compiled approval rule,
+ * so the workspace listing reports it "none"; `audit-trail-enforcer` joins at `tool-pipeline:journal` once P1-03 lands.
+ */
+export const GUARDRAIL_PIPELINE_BINDINGS = {
+  "tool-call-allowlist": { guard: "tool-allowlist", boundary: "tool-pipeline:guard:tool-allowlist" },
+  "cost-budget-limit": { guard: "budgets", boundary: "tool-pipeline:guard:budgets" },
+  "human-approval-gate": { guard: null, boundary: "approvals" }
+} as const;
+
+const CATALOG_ONLY = "Catalog reference; not enforced by AMC.";
+type PipelineBinding = typeof GUARDRAIL_PIPELINE_BINDINGS[keyof typeof GUARDRAIL_PIPELINE_BINDINGS];
+const pipelineBinding = (name: string): PipelineBinding | null =>
+  Object.hasOwn(GUARDRAIL_PIPELINE_BINDINGS, name) ? GUARDRAIL_PIPELINE_BINDINGS[name as keyof typeof GUARDRAIL_PIPELINE_BINDINGS] : null;
 
 export function listGuardrailsWithRuntimeStatus(workspace: string): GuardrailRuntimeStatus[] {
   const control = readGuardrailControlState(workspace);
@@ -24,21 +47,37 @@ export function listGuardrailsWithRuntimeStatus(workspace: string): GuardrailRun
   if (firewall.integrity === "invalid") {
     throw new Error(`Runtime Firewall policy integrity check failed: ${firewall.reason}`);
   }
+  return guardrailRuntimeTable(control, firewall);
+}
+
+/**
+ * The 14-row enforcement table over snapshots the caller already read: no lock, no throw, so a read-only projection
+ * derives its rows from the same read it reports integrity from. Callers that need trusted state check integrity first.
+ */
+export function guardrailRuntimeTable(control: GuardrailControlSnapshot, firewall: RuntimeFirewallPolicyInspection): GuardrailRuntimeStatus[] {
   const requested = new Set(control.state?.requestedGuardrails ?? []);
 
   return AVAILABLE_GUARDRAILS.map((guardrail): GuardrailRuntimeStatus => {
     if (!isBoundGuardrailName(guardrail.name)) {
+      const pipeline = pipelineBinding(guardrail.name);
+      const enforced = pipeline !== null && pipeline.guard !== null;
       return {
         ...guardrail,
         requestedEnabled: false,
-        effective: false,
-        enabled: false,
+        effective: enforced,
+        enabled: enforced,
         mutable: false,
-        trusted: false,
-        binding: null,
-        source: "catalog-only",
-        reason: "Catalog reference only; no AMC runtime binding exists, so this control cannot be activated here.",
-        stateRevision: control.state?.revision ?? null
+        trusted: enforced,
+        binding: enforced ? pipeline.boundary : null,
+        source: pipeline ? "tool-pipeline" : "catalog-only",
+        reason: !pipeline
+          ? CATALOG_ONLY
+          : enforced
+            ? `Enforced at ${pipeline.boundary} in every native session, over its signed config; guardrail control state cannot change it.`
+            : "Enforced at approvals only in a session whose effective-policy receipt lists a compiled approval rule.",
+        stateRevision: control.state?.revision ?? null,
+        enforcement: enforced ? "enforced" : "none",
+        boundary: enforced ? pipeline.boundary : null
       };
     }
 
@@ -67,6 +106,8 @@ export function listGuardrailsWithRuntimeStatus(workspace: string): GuardrailRun
         : source === "runtime-firewall-policy"
           ? "The signed Runtime Firewall policy keeps this rule enabled; guardrail control state cannot weaken it."
           : "No signed control state or Runtime Firewall policy currently enables this rule.";
+    // Only a trusted, enabled rule in block mode refuses; any other mode records what it saw.
+    const enforcement: Enforcement = !effective || !trusted ? "none" : firewall.policy?.mode === "block" ? "enforced" : "observed";
 
     return {
       ...guardrail,
@@ -78,7 +119,23 @@ export function listGuardrailsWithRuntimeStatus(workspace: string): GuardrailRun
       binding: `runtime-firewall.rules.${rule}`,
       source,
       reason,
-      stateRevision: control.state?.revision ?? null
+      stateRevision: control.state?.revision ?? null,
+      enforcement,
+      boundary: enforcement === "none" ? null : `runtime-firewall.rules.${rule}`
     };
+  });
+}
+
+/**
+ * The 14 guardrails as one session ran them: the pipeline-bound ones are enforced only when that session composed
+ * their guard, and the approval gate only when its compiled policy requires approvals.
+ */
+export function sessionGuardrailEnforcement(workspace: string, session: { guardLabels: readonly string[]; approvalRequired: boolean }):
+  Array<{ name: string; enforcement: Enforcement; boundary: string | null }> {
+  return listGuardrailsWithRuntimeStatus(workspace).map((row) => {
+    const pipeline = pipelineBinding(row.name);
+    if (!pipeline) return { name: row.name, enforcement: row.enforcement, boundary: row.boundary };
+    const enforced = pipeline.guard === null ? session.approvalRequired : session.guardLabels.includes(pipeline.guard);
+    return { name: row.name, enforcement: enforced ? "enforced" : "none", boundary: enforced ? pipeline.boundary : null };
   });
 }

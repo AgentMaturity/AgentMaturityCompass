@@ -92,6 +92,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/ops/retention/retentionEngine.ts", why: "AMC retention operations" },
   { module: "src/org/orgCommitments.ts", why: "organisation bookkeeping" },
   { module: "src/outcomes/outcomeApi.ts", why: "webhook outcome ingestion; external reports are self-reported" },
+  { module: "src/policy/effectivePolicyReceipt.ts", why: "the compiled policy a session ran under (P1-12); AMC configuration, untagged, never maturity evidence" },
   { module: "src/policyPacks/packApply.ts", why: "policy pack applied; untagged, so it binds to no question" },
   { module: "src/sandbox/sandbox.ts", why: "sandbox enablement; untagged, read by the L5 sandbox cap" },
   { module: "src/session/sessionResume.ts", why: "AMC's own session-log boundary record (instrumentation, not maturity)" },

@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { readdirSync } from "node:fs";
 import YAML from "yaml";
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
 import { computeOrgScorecard } from "../org/orgEngine.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -542,6 +543,8 @@ function planForScope(params: {
       correlationRatio: baseline.correlationRatio
     });
     const gap = target - current;
+    // P1-07: a gap that crosses a level AMC cannot evaluate gets that level's reason, never a promise to close it.
+    const notEvaluated = notEvaluatedLevel(question, current, target);
     const priority = priorityForTask(gap, phase, baseline.integrityIndex);
     const taskId = `tsk_${question.id.replace(/[^A-Za-z0-9]/g, "_").toLowerCase()}_${randomUUID().slice(0, 6)}`;
     const owners = ownerRolesForFourC(mapping.primary);
@@ -563,7 +566,9 @@ function planForScope(params: {
     tasks.push({
       taskId,
       title: `${question.id} ${current.toFixed(1)} -> ${target.toFixed(1)} (${mapping.primary})`,
-      description: `Improve ${question.title} by closing a ${gap.toFixed(1)} level gap with evidence-gated checkpoints.`,
+      description: notEvaluated
+        ? `${question.title}: ${notEvaluated.notice}`
+        : `Improve ${question.title} by closing a ${gap.toFixed(1)} level gap with evidence-gated checkpoints.`,
       fourC: mapping.primary,
       questionIds: [question.id],
       fromLevel: Number(current.toFixed(3)),

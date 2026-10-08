@@ -1,5 +1,6 @@
 import type { DiagnosticQuestion } from "../types.js";
 import { questionBank } from "./questionBank.js";
+import { notEvaluatedLevel } from "./levelSemantics.js";
 
 const RAPID_QUESTION_IDS = [
   "AMC-1.1",
@@ -117,13 +118,15 @@ export function scoreRapidAssessment(answers: Record<string, number>): RapidQuic
     .slice(0, 3)
     .map<RapidImprovementRecommendation>((row) => {
       const question = findQuestionOrThrow(row.questionId);
+      const targetLevel = Math.max(3, row.level + 1);
       return {
         questionId: row.questionId,
         title: row.title,
         currentLevel: row.level,
-        targetLevel: Math.max(3, row.level + 1),
+        targetLevel,
         whyItMatters: LAYER_VALUE_MAP[row.layerName] ?? "It directly affects your trust posture and production reliability.",
-        howToImprove: firstSentence(question.upgradeHints)
+        // P1-07: a target AMC cannot evaluate gets its reason, not advice that would promise it.
+        howToImprove: notEvaluatedLevel(question, row.level, targetLevel)?.notice ?? firstSentence(question.upgradeHints)
       };
     });
 

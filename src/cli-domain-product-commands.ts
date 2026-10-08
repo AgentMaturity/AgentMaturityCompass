@@ -8,6 +8,7 @@ import { envelopeFromDimensions } from "./claims/eligibility/adapters/results.js
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "./claims/eligibility/types.js";
 import { printClaimResult, selfAnswerClaim, withClaimFields } from "./cli/claimOutput.js";
 import type { Station } from "./domains/stations.js";
+import type { ConformanceStationProfile, PackResponseEvidence } from "./domains/conformance/index.js";
 
 type DomainProductCliDeps = {
   product: Command;
@@ -551,6 +552,123 @@ export function registerDomainProductCliCommands({ product, productGlossary, dom
         printExampleFooter(assessment);
       } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
     });
+
+  // P1-16 (freeze exception): never named `certify`, which is the diagnostic certificate bundle command.
+  domainCmd
+    .command("conformance")
+    .description("Check a station's derived requirements against sealed, fresh evidence; writes a sealed run (evidence of conformity)")
+    .option("--station <station>", "Station: education|environment|health|wealth|technology|mobility|governance")
+    .option("--agent <id>", "Agent ID")
+    .option("--max-evidence-age <duration>", "Required: refuse evidence older than <n>h or <n>d")
+    .option("--responses <file.json>", "Questionnaire answers: a JSON array of { questionId, level, sessionId, responseId? }")
+    .option("--profile <operating-profile.json>", "Signed station operating profile: adds its assurance packs, selects its industry packs")
+    .option("--out <dir>", "Directory for the run JSON and Markdown (default: the agent's reports/conformance/)")
+    .option("--json", "Output as JSON")
+    .action(async (opts: ConformanceCliOpts) => {
+      // Exit 0: a run was written (any status); 1: every input was refused, or the run failed; 2: usage.
+      process.exitCode = await domainConformance(opts);
+    });
+}
+
+type ConformanceCliOpts = {
+  station?: string; agent?: string; maxEvidenceAge?: string; responses?: string; profile?: string; out?: string; json?: boolean;
+};
+
+const EVIDENCE_AGE_UNIT_MS = { h: 3_600_000, d: 86_400_000 } as const;
+
+/** `<n>h` or `<n>d` with n a positive whole number, in milliseconds; anything else is null. */
+function parseEvidenceAge(value: string): number | null {
+  const match = /^([1-9]\d{0,5})([hd])$/.exec(value);
+  return match ? Number(match[1]) * EVIDENCE_AGE_UNIT_MS[match[2] as "h" | "d"] : null;
+}
+
+function readConformanceResponses(file: string): PackResponseEvidence[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(resolve(file), "utf8"));
+  } catch (e: unknown) {
+    throw new Error(`invalid --responses: ${toErrorMessage(e)}`);
+  }
+  if (!Array.isArray(parsed) || !parsed.every((row) => typeof row === "object" && row !== null && !Array.isArray(row))) {
+    throw new Error("invalid --responses: expected a JSON array of { questionId, level, sessionId, responseId? }");
+  }
+  return parsed as PackResponseEvidence[];
+}
+
+/** A signed operating profile (verified and parsed from one read) for this station and agent, in the run's shape. */
+async function conformanceProfile(workspace: string, file: string, station: Station, agentId: string): Promise<ConformanceStationProfile> {
+  const { loadSignedOperatingProfile } = await import("./domains/operatingProfiles/index.js");
+  let signed: ReturnType<typeof loadSignedOperatingProfile>;
+  try {
+    signed = loadSignedOperatingProfile(workspace, file);
+  } catch (e: unknown) {
+    throw new Error(`invalid --profile: ${toErrorMessage(e)}`);
+  }
+  const { profile } = signed;
+  if (profile.station !== station) throw new Error(`invalid --profile: it is for station ${profile.station}, not ${station}`);
+  if (profile.agentId !== agentId) throw new Error(`invalid --profile: it is for agent ${profile.agentId}, not ${agentId}`);
+  return {
+    id: `operating-profile:${profile.station}:${profile.agentId}`,
+    source: `sha256:${signed.digestSha256}`,
+    industryPackIds: profile.derivedFrom.industryPacks.map((pack) => pack.id),
+    requiredAssurancePacks: profile.derivedFrom.assurancePacks.map((pack) => pack.id)
+  };
+}
+
+async function domainConformance(opts: ConformanceCliOpts): Promise<number> {
+  const usage = (message: string): number => {
+    console.error(chalk.red(message));
+    return 2;
+  };
+  if (!opts.station) return usage("--station is required");
+  if (!opts.agent) return usage("--agent is required");
+  if (opts.maxEvidenceAge === undefined) return usage("--max-evidence-age is required: <n>h or <n>d");
+  const maxEvidenceAgeMs = parseEvidenceAge(opts.maxEvidenceAge);
+  if (maxEvidenceAgeMs === null) return usage(`invalid --max-evidence-age: ${opts.maxEvidenceAge} (expected <n>h or <n>d)`);
+  const { parseStation } = await import("./domains/stations.js");
+  const { resolveAgentId } = await import("./fleet/paths.js");
+  const conformance = await import("./domains/conformance/index.js");
+  const workspace = process.cwd();
+  const agentId = resolveAgentId(workspace, opts.agent);
+  let station: Station;
+  let packResponses: PackResponseEvidence[];
+  let profile: ConformanceStationProfile | undefined;
+  try {
+    station = parseStation(opts.station);
+    packResponses = opts.responses ? readConformanceResponses(opts.responses) : [];
+    profile = opts.profile ? await conformanceProfile(workspace, opts.profile, station, agentId) : undefined;
+  } catch (e: unknown) {
+    return usage(toErrorMessage(e));
+  }
+  let result: ReturnType<typeof conformance.runIndustryConformance>;
+  try {
+    result = conformance.runIndustryConformance({ workspace, agentId, station, packResponses, profile, maxEvidenceAgeMs, outDir: opts.out });
+  } catch (e: unknown) {
+    if (e instanceof conformance.ConformanceProvenanceError) return usage(`invalid --responses: ${e.message}`);
+    console.error(chalk.red(toErrorMessage(e)));
+    return 1;
+  }
+  const { run } = result;
+  const everyInputRefused = run.refusedInputs.length > 0 && run.inputs.assuranceRuns.length + run.inputs.packResponseCount === 0;
+  const claim = envelopeFromDimensions(`conformance:${run.station}`, run.claimKind, run.statusDimensions);
+  if (opts.json) {
+    console.log(JSON.stringify(withClaimFields({ ...run, jsonPath: result.jsonPath, markdownPath: result.markdownPath }, claim), null, 2));
+    return everyInputRefused ? 1 : 0;
+  }
+  console.log(chalk.bold.cyan(`\nConformance run (${run.station}, agent ${run.agentId})`));
+  printClaimResult(claim, {});
+  console.log(chalk.gray("Status:"), run.status, chalk.gray("(evidence of conformity within the derived requirement set)"));
+  console.log(chalk.gray("Requirements:"), `${run.counts.total} total, PASS ${run.counts.pass}, FAIL ${run.counts.fail}, NOT_EVALUATED ${run.counts.notEvaluated}`);
+  for (const status of ["FAIL", "NOT_EVALUATED"] as const) {
+    const rows = run.requirements.filter((row) => row.status === status);
+    if (rows.length > 0) console.log(chalk.bold(`${status}:`));
+    for (const row of rows) console.log(`  ${row.id} — ${row.reason}`);
+  }
+  console.log(chalk.bold(run.refusedInputs.length === 0 ? "Refused inputs: none" : "Refused inputs:"));
+  for (const row of run.refusedInputs) console.log(`  ${row.source} — ${row.reason}`);
+  console.log(chalk.gray("Export:"), result.jsonPath);
+  console.log(chalk.gray("Summary:"), result.markdownPath);
+  return everyInputRefused ? 1 : 0;
 }
 
 type DomainCommandOpts = { agent: string; domain: string; example?: boolean; json?: boolean };

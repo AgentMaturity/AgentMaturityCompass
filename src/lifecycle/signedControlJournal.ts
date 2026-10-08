@@ -13,7 +13,7 @@ import { isWithin } from "../utils/pathSafety.js";
 
 export const SIGNED_CONTROL_JOURNAL_SCHEMA_VERSION = "2026-07-10" as const;
 
-const controlKindSchema = z.enum(["guardrail-control", "runtime-firewall-policy"]);
+const controlKindSchema = z.enum(["guardrail-control", "runtime-firewall-policy", "compiled-control-plan"]);
 export type SignedControlKind = z.infer<typeof controlKindSchema>;
 
 const embeddedSignatureSchema = z.object({
