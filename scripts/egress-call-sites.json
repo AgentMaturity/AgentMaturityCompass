@@ -259,20 +259,28 @@
       "reason": "Generated policy-export source text, not executed by AMC here; generated application needs its own deployment controls."
     },
     {
-      "siteId": "src/gateway/server.ts:265:1",
+      "siteId": "src/gateway/server.ts:258:1",
       "path": "src/gateway/server.ts",
-      "line": 265,
+      "line": 258,
       "call": "impl(",
+      "status": "gated",
+      "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
+    },
+    {
+      "siteId": "src/gateway/server.ts:1014:1",
+      "path": "src/gateway/server.ts",
+      "line": 1014,
+      "call": "netConnect(",
       "status": "deferred",
-      "reason": "Final provider hop and health probe are not residency-gated in this slice. Claude released a separate net-zero integration follow-up after P1-66."
+      "reason": "CONNECT tunnel: hostname/IP checks do not provide residency admission or protected encrypted-payload classification. No HTTP-hop coverage claim."
     },
     {
       "siteId": "src/gateway/server.ts:1760:1",
       "path": "src/gateway/server.ts",
       "line": 1760,
       "call": "httpRequest(",
-      "status": "deferred",
-      "reason": "Final provider hop and health probe are not residency-gated in this slice. Claude released a separate net-zero integration follow-up after P1-66."
+      "status": "exempt",
+      "reason": "gatewayStatus probes the gateway health endpoint with a GET and no protected agent body or credentials; final provider requests are separate gated rows."
     },
     {
       "siteId": "src/identity/oidc/jwtVerify.ts:59:1",
@@ -411,9 +419,9 @@
       "reason": "residencyFetch checks each attempt using captured trusted workspace or ALS scope."
     },
     {
-      "siteId": "src/residency/checkEgress.ts:115:1",
+      "siteId": "src/residency/checkEgress.ts:120:1",
       "path": "src/residency/checkEgress.ts",
-      "line": 115,
+      "line": 120,
       "call": "fetch(",
       "status": "gated",
       "reason": "The helper checks the selected workspace registry/profile before native fetch; redirects do not forward automatically."
@@ -539,12 +547,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/toolhub/toolhubExecutors/http.ts:45:1",
+      "siteId": "src/toolhub/toolhubExecutors/http.ts:56:1",
       "path": "src/toolhub/toolhubExecutors/http.ts",
-      "line": 45,
+      "line": 56,
       "call": "reqImpl(",
-      "status": "deferred",
-      "reason": "Direct ToolHub dispatch bypasses the native pipeline residency guard. Released executor follow-up is required."
+      "status": "gated",
+      "reason": "The executor checks trusted workspace or ALS scope before socket construction; both AMC callers supply workspace. Preflight denials are definite failures, not unknown effects."
     },
     {
       "siteId": "src/tools/builtin/nativeToolBreadth/governedFetch.ts:144:1",
@@ -555,9 +563,9 @@
       "reason": "Native pipeline guard checks residency before body dispatch, but this DNS-awaiting transport needs a final-hop recheck and direct-call review."
     },
     {
-      "siteId": "src/trust/trustConfig.ts:192:1",
+      "siteId": "src/trust/trustConfig.ts:193:1",
       "path": "src/trust/trustConfig.ts",
-      "line": 192,
+      "line": 193,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."

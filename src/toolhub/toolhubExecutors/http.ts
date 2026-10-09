@@ -1,6 +1,8 @@
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { URL } from "node:url";
+import { checkScopedEgress, EgressBlocked } from "../../residency/checkEgress.js";
+import { DefiniteFailureError } from "../../tools/toolTypes.js";
 
 const HTTP_FETCH_IDLE_TIMEOUT_MS = 30_000;
 const HTTP_FETCH_TOTAL_TIMEOUT_MS = 60_000;
@@ -17,6 +19,10 @@ export async function executeHttpFetch(params: {
   headers?: Record<string, string>;
   body?: string;
   simulate: boolean;
+  /** Trusted service/call workspace, never read from agent-supplied tool arguments. */
+  workspace?: string;
+  dataClasses?: readonly string[] | null;
+  purpose?: string | null;
   /** AMC's idempotency key (P1-04) on the header the signed tool definition declares; it replaces any value passed. */
   idempotency?: { header: string; key: string };
 }): Promise<{ status: number; headers: Record<string, string>; body: string }> {
@@ -28,6 +34,11 @@ export async function executeHttpFetch(params: {
     };
   }
 
+  try { checkScopedEgress(params.workspace, "network-tool", params.url, { dataClasses: params.dataClasses, purpose: params.purpose }); }
+  catch (error) {
+    if (error instanceof EgressBlocked) throw new DefiniteFailureError(error.message, { cause: error });
+    throw error;
+  }
   const url = new URL(params.url);
   const reqImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
   const response = await new Promise<{ status: number; headers: Record<string, string>; body: string }>((resolvePromise, rejectPromise) => {
