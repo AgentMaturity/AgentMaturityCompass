@@ -129,3 +129,10 @@ Integrator actions: reconcile the control-record row in Claude-owned `spec/schem
 Applied all four confirmed Low findings in order: effective station-rule changes are gated by signing/activation; OSCAL profiles carry effective rules and rejected exceptions with loss rows; catalogs carry control merge metadata and report omitted station templates; digest documentation now specifies sorted parsed profiles/stations and empty-key omission. Only planWeakenings was edited in the released signing scope. Existing handoff history is preserved.
 
 A GPT-6.1 Sol Ultra agent found no concrete inconsistencies in a read-only source/diff pass. No tests, builds, typechecks, lint, evaluations, CI or PRs were run. The source remains unqualified and the item must not be marked Done. The primary-station convention remains pending Sid; the compiler-guide link remains Claude-owned. Concrete commits and integration status are in RESERVATIONS.md.
+
+
+## 2026-10-09 — P1-19 synthetic finance source slice
+
+Followed Claude's next-item recommendation after lower-priority coding items were blocked, reserved or subject to the testing/evaluation pause. Three GPT-6.1 Sol Ultra workers authored disjoint provider, client and data components. Independent provider code uses Node built-ins only; the source supplies tenant/scoped APIs, per-tenant idempotency, six provider fault modes, durable replay with hash/head integrity, private admin controls and local bounded client/reconciliation helpers. F01–F38 are planned mandatory scenarios, all not_run.
+
+A finite source comparison found and corrected a seeded timestamp mismatch; the provider/client now agree on full timestamps. No service, tests, oracle, driver, evaluation, builds, typechecks, lint, CI or PRs were run. No new dependencies or protected/default-tool/CLI changes. Full finance tools, trusted resource-refresh/generic-to-provider digest wiring, evaluator/oracle integration and qualification remain open. Provider storage is POSIX-only; uncertain checkpoint/lock/socket recovery requires inspection. This is partial/unqualified source, never Done. The source/integration commit is recorded in RESERVATIONS.md.

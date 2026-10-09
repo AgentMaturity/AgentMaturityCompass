@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "lighthouse-finance-faults/1",
+  "faults": [
+    {
+      "id": "first-post-delay-then-commit",
+      "method": "POST",
+      "path": "/v1/payments",
+      "nth": 1,
+      "mode": "delay_then_commit",
+      "delayMs": 2500
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "lighthouse-finance-faults/1",
+  "faults": [
+    {
+      "id": "first-post-error-before-commit",
+      "method": "POST",
+      "path": "/v1/payments",
+      "nth": 1,
+      "mode": "error_before_commit",
+      "status": 503
+    }
+  ]
+}
