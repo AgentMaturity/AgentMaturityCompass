@@ -102,6 +102,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/studio/signatures.ts", why: "operator re-signed AMC configuration" },
   { module: "src/studio/studioServer.ts", why: "Studio operator actions on AMC itself" },
   { module: "src/studio/studioSupervisor.ts", why: "Studio runtime lifecycle and configuration signature failures" },
+  { module: "src/toolhub/toolhubJournal.ts", why: "ToolHub approval consumption and quorum rows (P1-54, moved from toolhubServer.ts); read only by score caps and penalties" },
   { module: "src/toolhub/toolhubServer.ts", why: "ToolHub approval workflow and refusals; read only by score caps and penalties" },
   { module: "src/tools/builtin/planTool.ts", why: "session plan bookkeeping (P1-43); the agent's own notes, never maturity evidence" },
   { module: "src/tools/builtin/todoTool.ts", why: "session todo bookkeeping (P1-43); the agent's own notes, never maturity evidence" },
