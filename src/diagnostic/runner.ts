@@ -518,7 +518,8 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
   try {
     if (unsignedStore && pathExists(join(workspace, ".amc", "evidence.sqlite"))) signedEvidence = openLedger(workspace, { readonly: true });
-    const verification = unsignedStore ? { ok: false, errors: ["unsigned evidence store: nobody verified its rows"] } : await verifyLedgerIntegrity(workspace);
+    // P0-55: verify the signed rows an unsigned run reads; its own unverified rows read UNSIGNED, never a ledger failure.
+    const verification = unsignedStore && !signedEvidence ? { ok: true } : await verifyLedgerIntegrity(workspace);
     const now = Date.now();
     const windowMs = parseWindowToMs(input.window || "14d");
     const windowStartTs = now - windowMs;
@@ -1130,7 +1131,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       traceReceiptInvalidCount + traceEventNotFoundCount + traceBodyMismatchCount + traceAgentMismatchCount;
     const traceInvalidPenalty = Math.min(0.3, traceInvalidReceiptCount * 0.05);
 
-    const integrityIndex = verification.ok
+    const integrityIndex = verification.ok && !unsignedStore
       ? clamp(
           evidenceCoverage -
             contradictionPenalty -
@@ -1306,7 +1307,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       windowStartTs,
       windowEndTs: now,
       status,
-      verificationPassed: verification.ok,
+      verificationPassed: verification.ok && !unsignedStore, // unsigned rows: NOT CRYPTOGRAPHICALLY VERIFIED
       trustBoundaryViolated: trustBoundary.violated,
       trustBoundaryMessage: trustBoundary.message,
       integrityIndex: Number(integrityIndex.toFixed(4)),
