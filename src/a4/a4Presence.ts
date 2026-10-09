@@ -15,6 +15,8 @@ export function touchPresence(projectId: string, principalKey: string, username:
   if (entries.size >= MAX_PER_PROJECT && !entries.has(principalKey)) return;
   entries.set(principalKey, { username, card, ts: now });
   presence.set(projectId, entries);
+  // Projects nobody has looked at within the TTL are dropped, so the map holds only live projects.
+  for (const [id, other] of presence) if ([...other.values()].every((entry) => now - entry.ts > A4_PRESENCE_TTL_MS)) presence.delete(id);
 }
 
 /** The live presence of a project: `{ username, card }` per principal seen within the TTL. */

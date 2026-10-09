@@ -402,6 +402,8 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
     case "/presence": {
       // Never deduplicated, journaled or signed; members only (read roles suffice, membership is checked here).
       const { body } = await readJson(route, z.strictObject({ card: z.string().regex(/^[A-Za-z0-9_.:-]{1,128}$/) }));
+      // Only a project that exists gets a presence entry (the map is per process memory).
+      headOf();
       assertVisible(route, store.membersOf(projectId));
       touchPresence(projectId, principal.key, principal.username, body.card);
       apiSuccess(route.res, { presence: presenceOf(projectId) });
