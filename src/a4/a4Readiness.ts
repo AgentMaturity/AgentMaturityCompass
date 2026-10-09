@@ -441,6 +441,21 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 };
 
 /**
+ * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
+ * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
+ * Activate takes an owner.
+ */
+export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
+  const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
+  if (principal.roles.includes("OWNER")) held.add("owner");
+  if (principal.roles.includes("AUDITOR")) held.add("reviewer");
+  const [projectRoles, workspaceRoles] = action === "progress" && (stage === "adapt" || stage === "activate")
+    ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
+  return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
+    ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
+}
+
+/**
  * Per-principal permission map: role classes on live roles and membership, then the global and action-specific blockers.
  * `decide` covers approve and deny alike, so it carries every refusal recordDecision applies to both: the regulated
  * live-identity refusal and, for the stage's open gate, its own `rolesAllowed` (GATE_ROLE_NOT_ALLOWED, written as 403
@@ -451,9 +466,6 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: readonly A4ReadinessItem[],
   gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }, regulated: boolean): A4ReadinessV1["allowed"] {
   const { principal, live } = query;
-  const held = new Set<string>(state.members.find((member) => member.principalKey === principal?.key)?.roles ?? []);
-  if (principal?.roles.includes("OWNER")) held.add("owner");
-  if (principal?.roles.includes("AUDITOR")) held.add("reviewer");
   const ids = (predicate: (candidate: A4ReadinessItem) => boolean): string[] => items.filter(predicate).map((candidate) => candidate.id);
   const nonGate = (candidate: A4ReadinessItem): boolean => candidate.mandatory && !GATE_DERIVED.has(candidate.id);
   const blocked = ids((candidate) => nonGate(candidate) && candidate.status === "BLOCKED");
@@ -483,11 +495,8 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     ]
   };
   return Object.fromEntries(A4_ACTIONS.map((action) => {
-    const [projectRoles, workspaceRoles] = action === "progress" && (query.stage === "adapt" || query.stage === "activate")
-      ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
     const reasons = principal === null ? ["ADMIN_TOKEN_REFUSED"] : [
-      ...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
-      ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"]),
+      ...roleRefusals(state, query.stage, action, principal),
       ...(live.integrity.valid ? [] : ["A4_INTEGRITY_FAILED"]),
       ...(state.project.stage === "retired" ? ["RETIRED"] : []),
       ...(live.readOnly === false ? [] : ["READ_ONLY_MODE"]),

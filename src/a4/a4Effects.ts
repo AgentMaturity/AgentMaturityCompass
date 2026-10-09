@@ -21,8 +21,8 @@ import {
   A4_RUNTIME, assertAllowed, autoHold, consumeGate, driftedSlots, effectOwnerLost, engineRiskTier, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State,
   signedA4Floor, withFullIntegrity, type A4Call
 } from "./a4Gates.js";
-import { assertMember, liveRolesFor } from "./a4Identity.js";
-import { gateStatus, isRegulated, redoneStages, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
+import { assertMember, liveRolesFor, memberCandidates } from "./a4Identity.js";
+import { gateStatus, isRegulated, redoneStages, roleRefusals, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import type { A4ChainLink, A4Principal, A4RefKind, A4Stage } from "./a4Schema.js";
 import { buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -131,12 +131,28 @@ function deniedOnlyByNonMembers(store: A4Store, state: A4ReadinessState, approva
 }
 
 /**
+ * Whether a principal live now who may `complete` the gate (progress on its stage: an owner at Adapt and Activate) cast
+ * no APPROVE_EXECUTE on the engine request: a `complete` caller's own key joins the SoD exclusions, so a voter can never
+ * consume it. An unreadable population counts as such a caller (re-open never stands on a guess).
+ * ponytail: "live now" leaves out a host principal with no live session who could sign in later and complete; count
+ * the host's membership once A4 can read it.
+ */
+function nonVoterMayComplete(store: A4Store, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string): boolean {
+  const { candidates, limited } = memberCandidates(store.workspace, false);
+  if (limited) return true;
+  const voters = new Set(listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId })
+    .filter((decision) => decision.decision === "APPROVE_EXECUTE").map((decision) => resolveApprover(store.workspace, decision.userId)?.key));
+  return candidates.some((candidate) => !voters.has(candidate.principalKey)
+    && roleRefusals(state, gate.stage, "progress", { key: candidate.principalKey, roles: liveRolesFor(store.workspace, candidate) }).length === 0);
+}
+
+/**
  * Re-open is allowed only while the previous engine request is EXPIRED or CANCELLED, after an executor that consumes its
  * own grant failed (activateControlPlan: the only path after its failure), when it is DENIED only by principals A4 never
  * counts, or when it is QUORUM_MET on a grant `complete` would refuse (an uncounted or digest-less vote, too few bound
- * keys, a moved intent, a project regulated since the open): either would otherwise lock the effect until its TTL, or for
- * good on a DENY. Never over a live or consumed grant some caller could consume. `complete` always reads the latest
- * opened request.
+ * keys, a moved intent, a project regulated since the open) or that only its own voters could complete (a lone owner
+ * who voted at Adapt or Activate): either would otherwise lock the effect until its TTL, or for good on a DENY. Never
+ * over a live or consumed grant some caller could consume. `complete` always reads the latest opened request.
  */
 function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef, regulated: boolean): void {
   const opened = latestOpened(state, gate.gate_id, def.id);
@@ -148,13 +164,15 @@ function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateR
   if (status === "DENIED" && deniedOnlyByNonMembers(store, state, approvalId)) return;
   if (status === "QUORUM_MET") {
     // A dry run of consumption (it only reads; consumeGate consumes). The requester is already excluded, so the dry run
-    // adds no exclusion of its own: it re-opens only when no `complete` caller could consume the grant.
+    // adds no exclusion of its own; a caller adds only their own key, so the grant is consumable exactly when it passes
+    // and some live principal who may complete did not vote on it.
     try {
       verifyAndConsumeEffect(store, state, { def, gate, approvalRequestId: approvalId, callerKey: gate.requested_by_key, regulated });
     } catch (error) {
       if (error instanceof A4StoreError) return;
       throw error;
     }
+    if (!nonVoterMayComplete(store, state, gate, approvalId)) return;
   }
   throw fail(409, "EFFECT_GATE_OPEN", `the effect's engine request is ${status}`, { approvalRequestId: approvalId });
 }
