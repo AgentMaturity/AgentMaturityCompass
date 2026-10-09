@@ -204,8 +204,17 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   start; the guard stays the enforcement point;
 - `identity-binding` (`requireAgentLease`, `requirePrincipal`) reads the authorization record bound for the call:
   no verified lease denies `IDENTITY_UNRESOLVED`, and no authenticated principal (an OS user name is self-reported)
-  denies `PRINCIPAL_UNRESOLVED`. Native sessions carry no lease yet, so under a plan with `L0-IDN-01` every native
-  call is denied until a composition supplies one;
+  denies `PRINCIPAL_UNRESOLVED`. A Studio native task started or resumed while a plan is active runs under a lease
+  Studio mints for that runtime alone (P1-67): the task's agent, the task id as the work order, `toolhub:execute`
+  narrowed to the action classes of its pinned signed tools, the task's step and token caps as its rate fields (the
+  tool pipeline does not read them), and at most the runtime's one-hour lifetime. Only the lease id is recorded on the signed task descriptor; the token reaches the
+  `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child unsets before anything runs and scrubs from tool
+  output. Every call binds it to the authorization record through the pipeline's own lease verifier (signature,
+  expiry, agent, scope, class, signed revocations), so `identity-binding` admits the call with the lease as its
+  principal. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, shutdown, a
+  failed start, cold verification), before minting the next one on resume, and at archive. A native session without a verified lease (a
+  task started before this change or while no plan was active, a CLI agent session, an `amc acp` process nobody
+  handed a lease) is still denied every call under a plan with `L0-IDN-01`. Without a plan the lease is never bound;
 - any other compiled guard id denies, because this pipeline does not implement it;
 - for an action class with a compiled approval rule, the live signed approval policy must be at least as strict
   (approvals, distinct users, roles, TTL), read and verified in one read, or the call is denied;
@@ -225,8 +234,9 @@ Each native session writes an effective-policy receipt (`amc.effective-policy-re
 `.amc/effective-policy/`. It lists the policy, plan and lock digests and the journal revision; each control in force
 per binding (`tool-pipeline`, `approvals`, `egress`, `deletion-executor`, `manual`) with its enforcement, boundary and
 catalog review status; the composed guard labels; the 14 guardrails as that session ran them; the domain-apply rules
-with `enforcement: "none"`; strict evidence binding; and the downgrades `no_compiled_policy` and
-`unenforced_domain_rules`. A receipt that cannot be written denies the call. A receipt for one policy digest is no
+with `enforcement: "none"`; strict evidence binding; the downgrades `no_compiled_policy` and
+`unenforced_domain_rules`; and `leaseId`, the lease the session's calls are bound to, named only when the pipeline's
+lease verifier accepted it as the receipt was written (`null` otherwise; every call verifies it again). A receipt that cannot be written denies the call. A receipt for one policy digest is no
 evidence for a session that ran another, and an experimental control stays `review: "pending"` however it is enforced.
 
 ## CLI
