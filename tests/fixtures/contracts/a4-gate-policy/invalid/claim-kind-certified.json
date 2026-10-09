@@ -1,0 +1,58 @@
+{
+  "schema": "amc.a4-gate-policy/v1",
+  "gates": {
+    "aspire.direction": {
+      "actionClass": "WRITE_LOW",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "aspire.completion": {
+      "actionClass": "WRITE_LOW",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "assemble.direction": {
+      "actionClass": "WRITE_LOW",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "assemble.completion": {
+      "actionClass": "WRITE_HIGH",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "adapt.direction": {
+      "actionClass": "WRITE_HIGH",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "adapt.completion": {
+      "actionClass": "SECURITY",
+      "ttlDays": 14,
+      "requiredReviews": [
+        {
+          "kind": "role_vote",
+          "role": "AUDITOR",
+          "label": "applicability output acknowledged by a workspace auditor (not an expert review; D-08 pending)"
+        }
+      ]
+    },
+    "activate.direction": {
+      "actionClass": "DEPLOY",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "activate.completion": {
+      "actionClass": "DEPLOY",
+      "ttlDays": 14,
+      "requiredReviews": []
+    },
+    "policy": {
+      "actionClass": "WRITE_HIGH",
+      "requireDistinctUsers": true,
+      "ttlDays": 14,
+      "requiredReviews": []
+    }
+  },
+  "claimKind": "certified"
+}

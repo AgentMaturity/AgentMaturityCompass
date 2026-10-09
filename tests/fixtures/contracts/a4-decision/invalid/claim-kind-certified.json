@@ -1,0 +1,46 @@
+{
+  "schema": "amc.a4-decision/v1",
+  "decisionId": "a4d_example",
+  "gateId": "a4gate_example",
+  "projectId": "a4p_example",
+  "decision": "APPROVE_EXECUTE",
+  "reason": "direction agreed",
+  "requestDigestSha256": "6666666666666666666666666666666666666666666666666666666666666666",
+  "approverKey": "LOCAL_USER:u-approver",
+  "authSource": "LOCAL_USER",
+  "userId": "u-approver",
+  "username": "approver",
+  "roles": [
+    "APPROVER"
+  ],
+  "admission": "browser_csrf",
+  "identityCheck": "users_yaml",
+  "identityProvenance": {
+    "usersYamlSignerFingerprint": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "createdTs": 1791504000000,
+    "createdBy": {
+      "principalKey": "LOCAL_USER:u-owner",
+      "admission": "browser_csrf"
+    },
+    "hostMembershipId": null
+  },
+  "selfApproved": false,
+  "selfApprovalFacts": {
+    "activeUserCount": 2,
+    "hostPrincipals": 0,
+    "hostedRouter": false,
+    "ratcheted": true,
+    "regulated": false,
+    "selfApprovalAllowed": false
+  },
+  "evaluatedItems": [
+    {
+      "id": "members.present",
+      "status": "READY",
+      "reasonCodes": []
+    }
+  ],
+  "claimKind": "certified",
+  "evidenceEventId": "ev-example",
+  "ts": 1791504000000
+}

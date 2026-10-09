@@ -1,0 +1,65 @@
+{
+  "schema": "amc.a4-revision/v1",
+  "projectId": "a4p_example",
+  "revisionNo": 1,
+  "stage": "aspire",
+  "parentRevisionNo": null,
+  "spec": {
+    "goal": "answer billing questions"
+  },
+  "specDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "resourceDigests": {
+    "schema": "amc.a4-resource-digests/v1",
+    "brief": {
+      "contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "agentConfigSha256": null
+    },
+    "enforce": {
+      "manifestId": null,
+      "resourcesSha256": null,
+      "snapshotBundleSha256": null
+    },
+    "composition": {
+      "compositionDigest": null,
+      "policyDigest": null,
+      "presetSha256": null
+    },
+    "graph": {
+      "typedGraphDigest": null
+    },
+    "signedConfigs": {
+      "tools": null,
+      "approvalPolicy": null,
+      "budgets": null,
+      "firewall": null,
+      "actionPolicy": null,
+      "opsPolicy": null
+    },
+    "plan": {
+      "planDigest": null,
+      "lockDigest": null,
+      "journalEntrySha256": null
+    },
+    "operatingProfile": {
+      "sha256": null,
+      "activationSha256": null
+    },
+    "context": {
+      "contextPluginSha256": null,
+      "promptPackSha256": null,
+      "memoryPolicySha256": null
+    },
+    "release": {
+      "packageDigest": null,
+      "imageDigest": null,
+      "chartOrComposeDigest": null,
+      "valuesDigest": null
+    },
+    "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "resourceDigestsSha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "operatingScope": null,
+  "createdByKey": "LOCAL_USER:u-owner",
+  "evidenceEventId": "ev-example",
+  "ts": 1791504000000
+}

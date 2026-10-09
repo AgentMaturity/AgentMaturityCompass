@@ -1,0 +1,19 @@
+{
+  "schema": "amc.a4-transition/v1",
+  "projectId": "a4p_example",
+  "seq": 0,
+  "kind": "CREATED",
+  "stage": "aspire",
+  "revisionNo": 0,
+  "actorKey": "LOCAL_USER:u-owner",
+  "actorUsername": "owner",
+  "body": {
+    "agentId": "default"
+  },
+  "bodyDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "prevDigest": "GENESIS",
+  "readinessSha256": null,
+  "evidenceEventId": "ev-example",
+  "ts": 1791504000000,
+  "claimKind": "certified"
+}

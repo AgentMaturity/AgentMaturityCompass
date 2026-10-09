@@ -1,0 +1,108 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-intent.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "boundItemIds": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "evidenceRefDigests": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "excludedKeys": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "gate": {
+      "enum": [
+        "direction",
+        "completion",
+        "policy"
+      ],
+      "type": "string"
+    },
+    "gatePolicyDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "memberSetDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "readinessBindingDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "resourceDigests": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-intent/v1",
+      "type": "string"
+    },
+    "specDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "aspire",
+        "assemble",
+        "adapt",
+        "activate"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "stage",
+    "gate",
+    "revisionNo",
+    "specDigest",
+    "resourceDigests",
+    "memberSetDigest",
+    "evidenceRefDigests",
+    "readinessBindingDigest",
+    "boundItemIds",
+    "gatePolicyDigest",
+    "excludedKeys"
+  ],
+  "title": "AMC A4 Gate Intent",
+  "type": "object"
+}

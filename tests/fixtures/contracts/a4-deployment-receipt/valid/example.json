@@ -1,0 +1,24 @@
+{
+  "schema": "amc.a4-deployment-receipt/v1",
+  "deploymentId": "a4dep_example",
+  "releaseId": "a4r_example",
+  "projectId": "a4p_example",
+  "kind": "deploy",
+  "environment": "staging",
+  "target": "compose",
+  "receipt": {
+    "imageDigest": null,
+    "overlayDigest": "1111111111111111111111111111111111111111111111111111111111111111",
+    "restartedAt": "2026-10-09T00:00:00.000Z",
+    "helmRevision": null,
+    "destinationRef": null,
+    "note": "restarted the hosted Studio"
+  },
+  "receiptSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "recordedStatus": "succeeded",
+  "amcCheckStatus": "not_evaluated",
+  "amcCheck": null,
+  "recordedByKey": "LOCAL_USER:u-owner",
+  "claimKind": "self_reported",
+  "ts": 1791504000000
+}

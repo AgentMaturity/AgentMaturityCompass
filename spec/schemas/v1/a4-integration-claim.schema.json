@@ -1,0 +1,104 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "conformanceReceipt": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "pinnedVersion": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sha256": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "sha256",
+            "pinnedVersion"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "enforcementBoundary": {
+      "enum": [
+        "tool_pipeline",
+        "hook:PreToolUse",
+        "pi:tool_call",
+        "gateway",
+        "none"
+      ],
+      "type": "string"
+    },
+    "evidenceTier": {
+      "enum": [
+        "observed",
+        "self_reported"
+      ],
+      "type": "string"
+    },
+    "notCovered": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "path": {
+      "enum": [
+        "native",
+        "claude-code",
+        "pi",
+        "langgraph",
+        "langchain",
+        "crewai",
+        "openai-agents",
+        "vercel-ai",
+        "generic-http",
+        "other"
+      ],
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "supported": {
+      "enum": [
+        "supported",
+        "preview",
+        "unsupported"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "path",
+    "enforcementBoundary",
+    "evidenceTier",
+    "supported",
+    "reason",
+    "notCovered",
+    "source",
+    "conformanceReceipt"
+  ],
+  "title": "AMC A4 Integration Claim",
+  "type": "object"
+}

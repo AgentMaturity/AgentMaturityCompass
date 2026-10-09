@@ -1,0 +1,261 @@
+{
+  "schema": "amc.a4-release/v1",
+  "releaseId": "a4r_example",
+  "projectId": "a4p_example",
+  "revisionNo": 4,
+  "revisionDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "version": "1.0.0",
+  "packageDigest": "9999999999999999999999999999999999999999999999999999999999999999",
+  "packagePath": "a4-releases/a4p_example/a4r_example/package.json",
+  "signaturePath": "a4-releases/a4p_example/a4r_example/package.json.sig",
+  "transparencyEntryId": null,
+  "previousReleaseId": null,
+  "baseReleaseId": null,
+  "resources": {
+    "schema": "amc.a4-resource-digests/v1",
+    "brief": {
+      "contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "agentConfigSha256": null
+    },
+    "enforce": {
+      "manifestId": null,
+      "resourcesSha256": null,
+      "snapshotBundleSha256": null
+    },
+    "composition": {
+      "compositionDigest": null,
+      "policyDigest": null,
+      "presetSha256": null
+    },
+    "graph": {
+      "typedGraphDigest": null
+    },
+    "signedConfigs": {
+      "tools": null,
+      "approvalPolicy": null,
+      "budgets": null,
+      "firewall": null,
+      "actionPolicy": null,
+      "opsPolicy": null
+    },
+    "plan": {
+      "planDigest": null,
+      "lockDigest": null,
+      "journalEntrySha256": null
+    },
+    "operatingProfile": {
+      "sha256": null,
+      "activationSha256": null
+    },
+    "context": {
+      "contextPluginSha256": null,
+      "promptPackSha256": null,
+      "memoryPolicySha256": null
+    },
+    "release": {
+      "packageDigest": null,
+      "imageDigest": null,
+      "chartOrComposeDigest": null,
+      "valuesDigest": null
+    },
+    "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "approvals": [
+    {
+      "gateId": "a4gate_example",
+      "decisionId": "a4d_example",
+      "approverKey": "LOCAL_USER:u-approver",
+      "bindingDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+      "stage": "activate",
+      "gate": "direction"
+    }
+  ],
+  "integration": {
+    "path": "native",
+    "enforcementBoundary": "tool_pipeline",
+    "evidenceTier": "observed",
+    "supported": "supported",
+    "reason": null,
+    "notCovered": [],
+    "source": "src/tools/toolPipeline.ts",
+    "conformanceReceipt": null
+  },
+  "quality": {
+    "targets": [
+      {
+        "dimension": "reliability",
+        "statement": "answers cite the policy",
+        "measure": "not instrumented",
+        "target": "every answer",
+        "evidenceSource": null,
+        "evidenceMethod": "not_yet_decided",
+        "source": "aspire brief r1"
+      }
+    ]
+  },
+  "updatePolicySha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "deploymentTarget": {
+    "kind": "compose",
+    "sameHost": true,
+    "imageDigest": null,
+    "chartOrComposeDigest": null,
+    "valuesDigest": null,
+    "hostHint": null
+  },
+  "rollback": {
+    "releaseId": null,
+    "enforceManifestId": null,
+    "leaseIds": [],
+    "preparedCommands": []
+  },
+  "leases": [
+    {
+      "leaseId": "lease_example",
+      "scope": "staging",
+      "scopes": [
+        "gateway:llm"
+      ],
+      "expiresAt": "2026-10-09T00:00:00.000Z",
+      "status": "active"
+    }
+  ],
+  "lifecycle": {
+    "from": "development",
+    "to": "testing",
+    "controls": [
+      {
+        "controlId": "unit_tests_passing",
+        "status": "not_evaluated",
+        "evidenceRef": null,
+        "claimKind": null,
+        "satisfiedBy": null,
+        "reason": "no executed test"
+      }
+    ]
+  },
+  "approvalsLineage": {
+    "selfApprovedGates": [],
+    "degraded": [],
+    "acknowledgement": null
+  },
+  "surfaces": {
+    "score": {
+      "contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "latestSealedRunId": null
+    },
+    "shield": {
+      "assuranceRunIds": [],
+      "firewallPolicyDigest": null
+    },
+    "enforce": {
+      "manifestId": null,
+      "applyReceiptSha256": null,
+      "restoreReceiptSha256": null
+    },
+    "vault": {
+      "signingRoute": "vault",
+      "vaultStatusAtRelease": "unlocked"
+    },
+    "watch": {
+      "deploymentReceiptRef": null,
+      "runtimeRunIds": [],
+      "sloReportSha256": null
+    },
+    "comply": {
+      "planDigest": null,
+      "controlResultsSha256": null,
+      "conformanceStatementSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "fleet": {
+      "agentConfigSha256": null,
+      "typedGraphDigest": null,
+      "lifecycleTransitionId": null
+    },
+    "passport": {
+      "artifactSha256": null,
+      "attestationSha256": null,
+      "claim": {
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "incomplete",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "provenance": {
+          "producer": "a4-store",
+          "method": "human_review",
+          "evidenceRefs": []
+        },
+        "eligibleLevel": null,
+        "reasons": [
+          "SELF_REPORTED_NO_POSITIVE_STATUS",
+          "REVIEW_NOT_INDEPENDENT"
+        ]
+      },
+      "rawStatus": "not_evaluated",
+      "claimBoundary": "signature verified; statements not evaluated"
+    }
+  },
+  "enforcementBoundaries": [
+    {
+      "boundary": "tool_pipeline",
+      "status": "enforced",
+      "note": "native tools"
+    }
+  ],
+  "claim": {
+    "claimKind": "self_reported",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "incomplete",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending"
+    },
+    "provenance": {
+      "producer": "a4-store",
+      "method": "human_review",
+      "evidenceRefs": []
+    },
+    "eligibleLevel": null,
+    "reasons": [
+      "SELF_REPORTED_NO_POSITIVE_STATUS",
+      "REVIEW_NOT_INDEPENDENT"
+    ]
+  },
+  "createdBy": {
+    "key": "LOCAL_USER:u-owner",
+    "authSource": "LOCAL_USER",
+    "userId": "u-owner",
+    "username": "owner",
+    "roles": [
+      "OWNER"
+    ],
+    "admission": "browser_csrf",
+    "identityCheck": "users_yaml",
+    "provenance": {
+      "usersYamlSignerFingerprint": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "createdTs": 1791504000000,
+      "createdBy": null,
+      "hostMembershipId": null
+    }
+  },
+  "createdAt": "2026-10-09T00:00:00.000Z",
+  "envelope": {
+    "digestSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "signature": "c2lnbmF0dXJl",
+    "signedTs": 1791504000000,
+    "signer": "auditor"
+  },
+  "claimKind": "certified"
+}

@@ -1,0 +1,22 @@
+{
+  "schema": "amc.a4-rollback-receipt/v1",
+  "rollbackId": "a4rb_example",
+  "releaseId": "a4r_example",
+  "toReleaseId": null,
+  "projectId": "a4p_example",
+  "environment": "staging",
+  "target": "compose",
+  "enforceManifestId": null,
+  "preparedCommands": [
+    "docker compose up -d"
+  ],
+  "leaseIdsRevoked": [
+    "lease_example"
+  ],
+  "receiptSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "recordedStatus": "succeeded",
+  "amcCheckStatus": "not_evaluated",
+  "recordedByKey": "LOCAL_USER:u-owner",
+  "claimKind": "self_reported",
+  "ts": 1791504000000
+}

@@ -1,0 +1,10 @@
+{
+  "path": "native",
+  "enforcementBoundary": "tool_pipeline",
+  "evidenceTier": "observed",
+  "supported": "supported",
+  "reason": null,
+  "notCovered": [],
+  "source": "src/tools/toolPipeline.ts",
+  "conformanceReceipt": null
+}

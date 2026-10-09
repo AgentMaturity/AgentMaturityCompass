@@ -1,0 +1,530 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-revision.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "createdByKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidenceEventId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "operatingScope": {
+      "anyOf": [
+        {
+          "additionalProperties": {},
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "parentRevisionNo": {
+      "anyOf": [
+        {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "resourceDigests": {
+      "additionalProperties": false,
+      "properties": {
+        "brief": {
+          "additionalProperties": false,
+          "properties": {
+            "agentConfigSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "contextGraphSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "contextGraphSha256",
+            "agentConfigSha256"
+          ],
+          "type": "object"
+        },
+        "composition": {
+          "additionalProperties": false,
+          "properties": {
+            "compositionDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "policyDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "presetSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "compositionDigest",
+            "policyDigest",
+            "presetSha256"
+          ],
+          "type": "object"
+        },
+        "context": {
+          "additionalProperties": false,
+          "properties": {
+            "contextPluginSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "memoryPolicySha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "promptPackSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "contextPluginSha256",
+            "promptPackSha256",
+            "memoryPolicySha256"
+          ],
+          "type": "object"
+        },
+        "enforce": {
+          "additionalProperties": false,
+          "properties": {
+            "manifestId": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "resourcesSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "snapshotBundleSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "manifestId",
+            "resourcesSha256",
+            "snapshotBundleSha256"
+          ],
+          "type": "object"
+        },
+        "gatePolicyDigest": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "graph": {
+          "additionalProperties": false,
+          "properties": {
+            "typedGraphDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "typedGraphDigest"
+          ],
+          "type": "object"
+        },
+        "operatingProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "activationSha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "sha256",
+            "activationSha256"
+          ],
+          "type": "object"
+        },
+        "plan": {
+          "additionalProperties": false,
+          "properties": {
+            "journalEntrySha256": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lockDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "planDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "planDigest",
+            "lockDigest",
+            "journalEntrySha256"
+          ],
+          "type": "object"
+        },
+        "release": {
+          "additionalProperties": false,
+          "properties": {
+            "chartOrComposeDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "imageDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "packageDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "valuesDigest": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "packageDigest",
+            "imageDigest",
+            "chartOrComposeDigest",
+            "valuesDigest"
+          ],
+          "type": "object"
+        },
+        "schema": {
+          "const": "amc.a4-resource-digests/v1",
+          "type": "string"
+        },
+        "signedConfigs": {
+          "additionalProperties": false,
+          "properties": {
+            "actionPolicy": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "approvalPolicy": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "budgets": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "firewall": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "opsPolicy": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "tools": {
+              "anyOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "tools",
+            "approvalPolicy",
+            "budgets",
+            "firewall",
+            "actionPolicy",
+            "opsPolicy"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema",
+        "brief",
+        "enforce",
+        "composition",
+        "graph",
+        "signedConfigs",
+        "plan",
+        "operatingProfile",
+        "context",
+        "release",
+        "gatePolicyDigest"
+      ],
+      "type": "object"
+    },
+    "resourceDigestsSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-revision/v1",
+      "type": "string"
+    },
+    "spec": {
+      "additionalProperties": {},
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "specDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "aspire",
+        "assemble",
+        "adapt",
+        "activate"
+      ],
+      "type": "string"
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "revisionNo",
+    "stage",
+    "parentRevisionNo",
+    "spec",
+    "specDigest",
+    "resourceDigests",
+    "resourceDigestsSha256",
+    "operatingScope",
+    "createdByKey",
+    "evidenceEventId",
+    "ts"
+  ],
+  "title": "AMC A4 Revision",
+  "type": "object"
+}

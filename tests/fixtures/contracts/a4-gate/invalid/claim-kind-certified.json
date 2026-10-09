@@ -1,0 +1,148 @@
+{
+  "schema": "amc.a4-gate/v1",
+  "gateId": "a4gate_example",
+  "projectId": "a4p_example",
+  "revisionNo": 1,
+  "stage": "aspire",
+  "gate": "direction",
+  "request": {
+    "v": 1,
+    "approvalRequestId": "a4gate_example",
+    "agentId": "default",
+    "intentId": "a4-a4p_example-aspire-direction-r1",
+    "toolName": "a4.aspire.direction",
+    "actionClass": "WRITE_LOW",
+    "requestedMode": "EXECUTE",
+    "effectiveMode": "EXECUTE",
+    "riskTier": "medium",
+    "createdTs": 1791504000000,
+    "expiresTs": 1792713600000,
+    "status": "PENDING",
+    "requiredApprovals": 1,
+    "requireDistinctUsers": true,
+    "rolesAllowed": [
+      "OWNER",
+      "APPROVER"
+    ],
+    "boundHashes": {
+      "intentHash": "7777777777777777777777777777777777777777777777777777777777777777",
+      "policyHash": "8888888888888888888888888888888888888888888888888888888888888888",
+      "toolsHash": "9999999999999999999999999999999999999999999999999999999999999999",
+      "budgetsHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "leaseConstraintsHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "authorizationIntent": {
+      "schema": "amc.a4-intent/v1",
+      "projectId": "a4p_example",
+      "stage": "aspire",
+      "gate": "direction",
+      "revisionNo": 1,
+      "specDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+      "resourceDigests": {
+        "brief.contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "brief.agentConfigSha256": null
+      },
+      "memberSetDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "evidenceRefDigests": [],
+      "readinessBindingDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+      "boundItemIds": [
+        "members.present",
+        "approvals.policy_signed"
+      ],
+      "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "excludedKeys": []
+    }
+  },
+  "bindingDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+  "intent": {
+    "schema": "amc.a4-intent/v1",
+    "projectId": "a4p_example",
+    "stage": "aspire",
+    "gate": "direction",
+    "revisionNo": 1,
+    "specDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+    "resourceDigests": {
+      "brief.contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "brief.agentConfigSha256": null
+    },
+    "memberSetDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "evidenceRefDigests": [],
+    "readinessBindingDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+    "boundItemIds": [
+      "members.present",
+      "approvals.policy_signed"
+    ],
+    "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+    "excludedKeys": []
+  },
+  "readinessSha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "boundItems": [
+    "members.present",
+    "approvals.policy_signed"
+  ],
+  "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+  "requestedByKey": "LOCAL_USER:u-owner",
+  "excludedKeys": [],
+  "expiresTs": 1792713600000,
+  "decisions": [
+    {
+      "schema": "amc.a4-decision/v1",
+      "decisionId": "a4d_example",
+      "gateId": "a4gate_example",
+      "projectId": "a4p_example",
+      "decision": "APPROVE_EXECUTE",
+      "reason": "direction agreed",
+      "requestDigestSha256": "6666666666666666666666666666666666666666666666666666666666666666",
+      "approverKey": "LOCAL_USER:u-approver",
+      "authSource": "LOCAL_USER",
+      "userId": "u-approver",
+      "username": "approver",
+      "roles": [
+        "APPROVER"
+      ],
+      "admission": "browser_csrf",
+      "identityCheck": "users_yaml",
+      "identityProvenance": {
+        "usersYamlSignerFingerprint": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "createdTs": 1791504000000,
+        "createdBy": {
+          "principalKey": "LOCAL_USER:u-owner",
+          "admission": "browser_csrf"
+        },
+        "hostMembershipId": null
+      },
+      "selfApproved": false,
+      "selfApprovalFacts": {
+        "activeUserCount": 2,
+        "hostPrincipals": 0,
+        "hostedRouter": false,
+        "ratcheted": true,
+        "regulated": false,
+        "selfApprovalAllowed": false
+      },
+      "evaluatedItems": [
+        {
+          "id": "members.present",
+          "status": "READY",
+          "reasonCodes": []
+        }
+      ],
+      "claimKind": "self_reported",
+      "evidenceEventId": "ev-example",
+      "ts": 1791504000000
+    }
+  ],
+  "quorum": {
+    "status": "QUORUM_MET",
+    "approvals": 1,
+    "required": 1
+  },
+  "integrity": {
+    "bindingDigestValid": true,
+    "decisionsBound": true,
+    "envelopeValid": null
+  },
+  "supersededBy": null,
+  "ts": 1791504000000,
+  "claimKind": "certified"
+}

@@ -1,0 +1,214 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-project.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "agentId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "baseReleaseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "createdByKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "createdTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "deployedReleaseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "headDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "headSeq": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "hold": {
+      "type": "boolean"
+    },
+    "holdReason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "members": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "authSource": {
+            "enum": [
+              "LOCAL_USER",
+              "WORKSPACE_ROUTER"
+            ],
+            "type": "string"
+          },
+          "principalKey": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "enum": [
+                "owner",
+                "builder",
+                "reviewer",
+                "approver",
+                "viewer"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "userId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "principalKey",
+          "authSource",
+          "userId",
+          "username",
+          "roles"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "readiness": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "bindingDigest": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "READY",
+                "BLOCKED",
+                "WAITING",
+                "COMPLETE",
+                "ON_HOLD"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "bindingDigest"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-project/v1",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "aspire",
+        "assemble",
+        "adapt",
+        "activate",
+        "retired"
+      ],
+      "type": "string"
+    },
+    "step": {
+      "enum": [
+        "asked",
+        "understood",
+        "explained",
+        "proposed",
+        "direction_approved",
+        "built",
+        "reviewed",
+        "completion_approved"
+      ],
+      "type": "string"
+    },
+    "updatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "workspaceId": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "workspaceId",
+    "agentId",
+    "name",
+    "stage",
+    "step",
+    "hold",
+    "holdReason",
+    "revisionNo",
+    "headSeq",
+    "headDigest",
+    "deployedReleaseId",
+    "baseReleaseId",
+    "createdByKey",
+    "createdTs",
+    "updatedTs",
+    "members",
+    "readiness"
+  ],
+  "title": "AMC A4 Project",
+  "type": "object"
+}
