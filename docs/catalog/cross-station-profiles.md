@@ -8,6 +8,7 @@ Station overlays must exist and apply to the deployment before they can contribu
 
 `catalog/profiles/cross-station.json` contains nine two-station templates and one three-station example. The loader
 validates each template using the canonical station taxonomy and includes these records in the catalog digest.
+The exact digest input and empty-list convention are defined in [Control Record digests](CONTROL_RECORD.md#digests).
 Use a template's `primary` and `stations` in the existing deployment profile facts. Keep their provenance and source
 explicit; selecting a template does not turn an asserted fact into an observed or reviewed one.
 
