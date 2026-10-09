@@ -22,7 +22,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { resolveRefs } from "./a4Evidence.js";
 import {
-  DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, gatePolicyDigestOf, ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow
+  A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, gatePolicyDigestOf, ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow
 } from "./a4Schema.js";
 import { A4StoreError, readA4Store } from "./a4Store.js";
 
@@ -73,7 +73,11 @@ function checkTransitions(ledger: Ledger, rows: ReturnType<typeof chainOf>["rows
       const tier = eventMeta(event).trustTier;
       if (typeof tier === "string" && OBSERVED_TIERS.has(tier)) out.errors.push(`TRUST_TIER_INFLATED: transition ${row.seq} is an A4_STATE row claiming ${tier}`);
     }
-    if (row.envelope_json === null) continue;
+    // envelope_json is outside the body digest and the audit row, so a kind the store always signs must carry one.
+    if (row.envelope_json === null) {
+      if (A4_ENVELOPE_KINDS.includes(row.kind)) out.errors.push(`A4_ENVELOPE_MISSING: transition ${row.seq} (${row.kind}) carries no A4_RECORD envelope`);
+      continue;
+    }
     const envelope = object(row.envelope_json) as { digestSha256?: unknown; signature?: unknown; signedTs?: unknown; envelope?: unknown } | null;
     if (envelope?.digestSha256 !== row.body_digest || typeof envelope.signature !== "string") {
       out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not sign its body`);
