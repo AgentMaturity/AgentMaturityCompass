@@ -42,7 +42,9 @@ function profileLosses(signed: SignedPlan): OscalLoss[] {
   return [
     ...decisions,
     p("requirements[]", plan.requirements.length, "one AMC prop requirement per decision (applicability, reasons, exclusion, missing facts, citations in scope, pulledInBy), as canonical JSON"),
-    p("conflicts[]", plan.conflicts.length, "one AMC prop conflict per parameter conflict, as canonical JSON"),
+    p("conflicts[]", plan.conflicts.length, "one AMC prop conflict per parameter or station-merge conflict, as canonical JSON"),
+    p("effectiveMergeRules[]", plan.effectiveMergeRules?.length ?? 0, "one AMC prop merge-rule per effective station merge rule, as canonical JSON"),
+    p("mergeExceptionRejected[]", plan.mergeExceptionRejected?.length ?? 0, "one AMC prop merge-exception-rejected per rejected station exception, as canonical JSON"),
     p("unsupported[]", plan.unsupported.length, "one AMC prop unsupported per unsupported control, as canonical JSON"),
     p("crosswalkLinks[]", plan.crosswalkLinks.length, "one AMC prop crosswalk-link each, as canonical JSON; informational, a crosswalk never satisfies its target"),
     p("profile", 1, "AMC props deployment-profile-id, deployment-profile-sha256 and fact-provenance"),
@@ -76,6 +78,8 @@ export function toOscalProfile(signed: SignedPlan, catalogHref: string): { docum
     prop("catalog-digest", plan.lock.catalog.digest),
     ...plan.requirements.map((r) => jsonProp("requirement", r)),
     ...plan.conflicts.map((c) => jsonProp("conflict", c)),
+    ...(plan.effectiveMergeRules ?? []).map((r) => jsonProp("merge-rule", r)),
+    ...(plan.mergeExceptionRejected ?? []).map((e) => jsonProp("merge-exception-rejected", e)),
     ...plan.unsupported.map((u) => jsonProp("unsupported", u)),
     ...plan.crosswalkLinks.map((x) => jsonProp("crosswalk-link", x))
   ];

@@ -146,7 +146,7 @@ params, because an OSCAL param value asserts a setting.
 | --- | --- |
 | `profile.uuid` (`oscal-profile-oscal-profile:profile`) | `oscalUuid("profile", planDigest)` |
 | `metadata.title`, `version`, `last-modified`, `remarks` | `AMC control plan <profileId>`, the plan digest, `compiledAt` from `plan.sig.json` (not covered by the signature), the planning notice |
-| `metadata.props` | `plan-digest`, `policy-digest`, `plan-status`, `deployment-profile-id`, `deployment-profile-sha256`, `fact-provenance`, `compiler`, `catalog-digest`, `requirement` (one per decision), `conflict`, `unsupported`, `crosswalk-link` |
+| `metadata.props` | `plan-digest`, `policy-digest`, `plan-status`, `deployment-profile-id`, `deployment-profile-sha256`, `fact-provenance`, `compiler`, `catalog-digest`, `requirement` (one per decision), `conflict` (parameter or station merge), `merge-rule` (one per effective station rule), `merge-exception-rejected` (one per rejected station exception), `unsupported`, `crosswalk-link` |
 | `imports[].href`, `include-controls[].with-ids` (`oscal-profile-oscal-profile:import`, `…:select-control-by-id`) | `catalog.json`; exactly the plan's `applicable` control ids |
 | `back-matter.resources[]` | the plan (`oscalUuid("plan", planDigest)`; props `plan-digest`, `policy-digest`, `plan-status`) and the lockfile (`oscalUuid("catalog-lock", catalogDigest)`; props `catalog-digest`, `catalog-lock`) |
 
@@ -198,7 +198,7 @@ JSON that OSCAL tools see as an opaque string), `remarks`, `omitted`.
 | Model | Fields |
 | --- | --- |
 | catalog | `controls[].version`, `support`, `layer`, `family`, `stations`, `mandatory`, `levels`, `riskRationale`, `applicability`, `tests`, `evidence`, `binding`, `invalidatedBy`, `owner`, `clock`, `crosswalk`, `review`, `provenance`, `citations` (beyond title, URL and hash); `manifest`, `packs[]` (prop); `fixtures[]`, `producers[]`, `vocabulary`, `publisherHosts[]` (omitted; the catalog digest covers them) |
-| profile | one `requirements[<controlId>]` entry per not-applicable control (with its exclusion source and reason) and per unresolved control (with its missing facts); `requirements[]`, `conflicts[]`, `unsupported[]`, `crosswalkLinks[]`, `profile`, `compiler`, `status`, `lock`, `digest` (prop); `runtimePolicy`, `evidencePlan`, `signature.signature`, `signature.review` (not covered by the signature), `signature.diff` (omitted) |
+| profile | one `requirements[<controlId>]` entry per not-applicable control (with its exclusion source and reason) and per unresolved control (with its missing facts); `requirements[]`, `conflicts[]`, `effectiveMergeRules[]`, `mergeExceptionRejected[]`, `unsupported[]`, `crosswalkLinks[]`, `profile`, `compiler`, `status`, `lock`, `digest` (prop); `runtimePolicy`, `evidencePlan`, `signature.signature`, `signature.review` (not covered by the signature), `signature.diff` (omitted) |
 | assessment-results | `results[].dimensions.result=not_evaluated` and `results[].dimensions.result=pass (self_reported)` with the control ids; `results[].claimKind`, `dimensions`, `claimReasons`, `admitted`, `rejected`, `subject`, the digests, `evaluator` (prop); `plan (as assessment plan)` (remarks) |
 
 ## Validation
