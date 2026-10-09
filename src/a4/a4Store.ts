@@ -16,7 +16,7 @@ import { randomBytes } from "node:crypto";
 import type Database from "better-sqlite3";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
-import { eventMeta } from "../claims/evidenceProvenance.js";
+import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
@@ -33,6 +33,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
+import { resolveLedgerEvent } from "./a4Evidence.js";
 import { memberCandidates, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
@@ -638,18 +639,22 @@ function createStore(workspace: string, ledger: Ledger) {
     },
 
     /**
-     * An EVIDENCE_REF transition. The lane is derived, never chosen: the writer names only the self-reported column; a
-     * ledger_event ref's trust tier is read from the referenced row, and a dangling ledger ref is refused.
+     * An EVIDENCE_REF transition. The lane is derived, never chosen: the writer names only the self-reported column. A
+     * ledger_event ref is resolved before anything is signed: a missing row is 409 EVIDENCE_REF_DANGLING, a row whose
+     * digests are not the ref's or whose signature or chain does not verify is 409 EVIDENCE_REF_UNVERIFIED, and the tier
+     * is the row's `effectiveTrustTier`, never its declared tier.
      */
     addEvidenceRef(projectId: string, input: { actor: A4Actor; refKind: A4RefKind; refId: string; sha256: string; claimKind: ClaimKind;
       method: string | null; label: string; column: "recommendation" | "implementation"; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
       if (!/^[0-9a-f]{64}$/.test(input.sha256)) throw new A4StoreError(400, "INPUT_INVALID", "sha256 must be 64 lowercase hex characters.");
       let trustTier: string | null = null;
       if (input.refKind === "ledger_event") {
-        const event = ledger.getEventById(input.refId);
-        if (!event) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
-        const tier = eventMeta(event).trustTier;
-        trustTier = typeof tier === "string" ? tier : null;
+        const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
+        if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
+        if (resolved.status !== "resolved" && resolved.status !== "payload_pruned") {
+          throw new A4StoreError(409, "EVIDENCE_REF_UNVERIFIED", `ledger row ${input.refId} does not match that sha256 or does not verify`);
+        }
+        trustTier = resolved.tier;
       }
       const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
       return commit(projectId, input.actor, ({ head, seq, ts }) => ({
