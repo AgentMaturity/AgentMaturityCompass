@@ -296,10 +296,11 @@ type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness
  * unmoved and still signed (`verifyIncremental`), so no transition is new. What the project lock does not cover is read
  * again there (design §7 rule 8): each evidence ref's ledger row, digest, pruning, tier and admission against the trust
  * list, with the row's O(ledger prefix) chain verdict reused per (id, event_hash) from this attempt's check before the
- * lock; the live facts (`collectFacts`: freeze, read-only, population, vault, notary, resources, lost effects); and an
- * effect's engine decisions.
+ * lock; the live facts (`collectFacts`: freeze, read-only, population, vault, notary, resources, lost effects); an
+ * effect's engine decisions; and the actor's live roles, which the plan took from `livePrincipal` before the lock and
+ * fullDigest does not cover: a revocation is 403 A4_USER_DISABLED, any other role change 409 A4_STALE_HEAD.
  */
-export function governed(store: A4Store, projectId: string, actor: A4Actor, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
+export function governed(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
   plan: Plan): A4TransitionResult {
   refuseOnFreeze(store, projectId);
   let planned: string | null = null;
@@ -314,6 +315,9 @@ export function governed(store: A4Store, projectId: string, actor: A4Actor, opti
       planned = result.readiness.fullDigest;
       return result.specs;
     }, { ...options, readiness: () => {
+      const roles = liveRolesFor(store.workspace, actor);
+      if (roles.length === 0) throw fail(403, "A4_USER_DISABLED", "This user has no live roles; a membership row is history, not authority.");
+      if (canonicalize([...roles].sort()) !== canonicalize([...actor.roles].sort())) throw fail(409, "A4_STALE_HEAD", "Your roles changed while this was signed; reload and retry.");
       const digest = planned ?? plan(Date.now(), load).readiness.fullDigest;
       planned = null;
       return digest;
