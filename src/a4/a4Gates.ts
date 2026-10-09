@@ -9,6 +9,7 @@ import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ownerAlive } from "../actions/actionJournal.js";
+import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { a4FloorFor, approvalRuleForAction, loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
@@ -176,7 +177,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
     driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : [],
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
-    usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0)
+    usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
+    lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id)
   };
 }
 

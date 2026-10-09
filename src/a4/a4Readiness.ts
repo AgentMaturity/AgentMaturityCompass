@@ -79,6 +79,8 @@ export interface A4LiveFacts {
   readonly driftedSlots: readonly string[] | null;
   /** users.yaml records (any status) created since the project's CREATED transition; null when unreadable. */
   readonly usersAddedSinceCreated: number | null;
+  /** Running effect attempts whose owner is lost under the sweeper's liveness rule (a4Gates.effectOwnerLost). */
+  readonly lostEffects: readonly string[];
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -273,7 +275,7 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
         : state.project.hold === 1 ? item("hold.none", "WAITING", { kind: "hold", reasonCodes: ["ON_HOLD"] }) : item("hold.none", "READY"),
     state.members.some((member) => member.authSource === "WORKSPACE_ROUTER")
       ? item("identity.check", "WAITING", { kind: "source_unavailable", reasonCodes: ["IDENTITY_CHECK_LIMITED"], mandatory: false }) : item("identity.check", "READY"),
-    effectsItem(state),
+    effectsItem(state, live.lostEffects),
     live.driftedSlots === null ? unread("resources.current", "RESOURCE_MISSING")
       : live.driftedSlots.length > 0 ? item("resources.current", "BLOCKED", { kind: "scope_changed", reasonCodes: ["RESOURCE_DRIFTED", ...live.driftedSlots] })
         : item("resources.current", "READY"),
@@ -310,9 +312,11 @@ function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) | null {
  * A failed effect blocks until it is retried or re-run, or its stage is redone; a running one keeps the project waiting
  * (BUILD_RUNNING). A later REOPEN or TUNE back to the effect's stage or earlier, or a new revision of that stage, clears
  * a settled outcome: that stage's gates, and so its effect, must complete again (design §6.5: a second failure requires
- * a new revision). A revision of a later stage clears nothing, and a running attempt is never cleared.
+ * a new revision). A revision of a later stage clears nothing, and a running attempt is never cleared. A running
+ * attempt whose owner is lost is BLOCKED (PROCESS_LOST) with retry as the next action: retry settles it first, since
+ * nothing else runs the sweeper.
  */
-function effectsItem(state: A4ReadinessState): A4ReadinessItem {
+function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4ReadinessItem {
   const latest = new Map<string, A4ChainLink>();
   for (const link of state.chain) {
     const executionId = link.body.executionId;
@@ -326,6 +330,10 @@ function effectsItem(state: A4ReadinessState): A4ReadinessItem {
   }
   const states = [...latest.values()].map((link) => link.kind);
   if (states.includes("EFFECT_FAILED")) return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED"] });
+  if ([...latest.values()].some((link) => link.kind === "EFFECT_STARTED" && lost.includes(String(link.body.effectId)))) {
+    return item("effects.failed", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["PROCESS_LOST"], nextAction: {
+      label: "Retry the effect: the retry first settles the lost attempt as process_lost (an effect that consumes its own grant is then re-opened and completed)" } });
+  }
   if (states.includes("EFFECT_STARTED")) return item("effects.failed", "WAITING", { kind: "outcome_unknown", reasonCodes: ["BUILD_RUNNING"] });
   return item("effects.failed", "READY");
 }
