@@ -13,6 +13,8 @@ import { A4_ADMISSIONS, A4_GATES, A4_LANES, A4_STAGE_STATES, A4_STAGES, A4_STEPS
 import { A4_TRANSITION_KINDS, type A4TransitionKind } from "../contracts/v1/a4Transition.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import type { A4EffectDef } from "./a4Effects.js";
+import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "./a4Readiness.js";
 
 export * from "../contracts/v1/a4ConformanceStatement.js";
 export * from "../contracts/v1/a4Decision.js";
@@ -224,9 +226,14 @@ export function gatePolicyFloorViolations(next: A4GatePolicyV1, floor: ApprovalA
   ];
 }
 
-/** What a stage module (src/a4/stages/*.ts) adds to the router's tables; P1-57 gives the entries their shape. */
+/**
+ * What a stage module's `register(registry)` (src/a4/stages/*.ts) receives, once, from src/a4/a4Stages.ts: its stage, the
+ * stage's readiness item builders to append to (`STAGE_ITEMS[stage]`) and the effect table (`registerA4Effect`).
+ */
 export interface A4StageRegistry {
-  readonly items: Map<string, unknown>;
+  readonly stage: A4Stage;
+  readonly items: Array<(state: A4ReadinessState, query: A4ReadinessQuery) => A4ReadinessItem[]>;
+  readonly registerEffect: (def: A4EffectDef) => void;
 }
 
 /** The brief's "med" is the approval engine's "medium" (C-25). */

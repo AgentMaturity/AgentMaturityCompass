@@ -1,16 +1,13 @@
 /**
  * The A4 stage, gate and effect routes (P1-57; design §6, §9, §12.1). The six generic stage routes (understand,
- * confirm-understanding, explain, propose, build, review) plus answers run the fixed step order; until a stage lane
- * registers its producers (P1-59…P1-62) they take the "no producer registered" path: the human-authored content goes
- * to the project's encrypted blob store, is signed as an `a4-stage-output` artifact outside any transaction and is
- * recorded as a `stage_output` ref (self_reported, lane implementation), so `built` and `reviewed` are reachable now.
- * Every write is governed (src/a4/a4Gates.ts): freeze refusal, readiness on rows read inside the transaction, signing
- * outside it. Decisions, consumption and effects reuse the slice A functions unchanged.
+ * confirm-understanding, explain, propose, build, review) plus answers run the fixed step order; while a stage has no
+ * producer (its spec module's PRODUCERS is empty, until P1-59…P1-62) they take the "no producer registered" path: the
+ * human-authored content goes to the project's encrypted blob store, is signed as an `a4-stage-output` artifact outside
+ * any transaction and is recorded as a `stage_output` ref (self_reported, lane implementation), so `built` and `reviewed`
+ * are reachable now. Every write is governed (src/a4/a4Gates.ts): freeze refusal, readiness on rows read inside the
+ * transaction, signing outside it. Decisions, consumption and effects reuse the slice A functions unchanged. Stage
+ * modules register through src/a4/a4Stages.ts, which evaluation and effect lookups run first.
  */
-import "./stages/aspire.js";
-import "./stages/assemble.js";
-import "./stages/adapt.js";
-import "./stages/activate.js";
 import { join, relative, sep } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
@@ -31,15 +28,19 @@ import { a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay,
 import {
   A4_STAGES, a4AnswerSchema, a4HypothesisSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
-import { QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
-import { QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
-import { QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
-import { QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
+import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
+import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
+import { PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
+import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 
 /** Each stage's question bank as its lane publishes it (empty until P1-59…P1-62). */
 export const STAGE_QUESTIONS: Readonly<Record<A4Stage, readonly A4Question[]>> = {
   aspire: ASPIRE_QUESTIONS, assemble: ASSEMBLE_QUESTIONS, adapt: ADAPT_QUESTIONS, activate: ACTIVATE_QUESTIONS
+};
+/** Each stage's output producers; the generic no-producer path serves only a stage that has none. */
+const STAGE_PRODUCERS: Readonly<Record<A4Stage, ReadonlyArray<{ readonly id: string }>>> = {
+  aspire: ASPIRE_PRODUCERS, assemble: ASSEMBLE_PRODUCERS, adapt: ADAPT_PRODUCERS, activate: ACTIVATE_PRODUCERS
 };
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 const NO_PRODUCER = "NO_PRODUCER_REGISTERED";
@@ -129,6 +130,10 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   const { body, request } = await readJson(route, STEP_SCHEMAS[kind]);
   const replay = priorReplay(route.store, request, projectId);
   if (replay) return (apiSuccess(route.res, replay), true);
+  // The output is labelled NO_PRODUCER_REGISTERED, so the generic path serves only a stage whose lane registered none.
+  if (def.output !== null && STAGE_PRODUCERS[stage].length > 0) {
+    throw a4Fail(409, "A4_PRODUCER_REGISTERED", `${stage} has registered producers; its lane records ${kind}, not the no-producer path.`);
+  }
   const fields = body as { content?: string; level?: string; spec?: Record<string, unknown>; parentRevisionNo?: number;
     answers?: Array<{ questionId: string; value?: unknown }>; expectedHeadSeq: number };
   if (fields.spec !== undefined && Object.hasOwn(fields.spec, "answers")) throw a4Fail(400, "INPUT_INVALID", "Answers are carried by the server; record them through …/answers.");

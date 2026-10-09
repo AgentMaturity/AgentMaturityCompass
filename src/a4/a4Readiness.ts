@@ -88,7 +88,10 @@ export interface A4ReadinessQuery {
   readonly live: A4LiveFacts;
 }
 
-/** Stage lanes (P1-59…P1-62) append their item builders here from src/a4/stages/*.ts; governance items are built below. */
+/**
+ * Stage lanes (P1-59…P1-62) append their item builders here through `register(registry)` in src/a4/stages/*.ts, which
+ * src/a4/a4Stages.ts runs before the first evaluation (a4Gates.evaluateFor); governance items are built below.
+ */
 export const STAGE_ITEMS: Record<A4Stage, Array<(state: A4ReadinessState, query: A4ReadinessQuery) => A4ReadinessItem[]>> = {
   aspire: [], assemble: [], adapt: [], activate: []
 };

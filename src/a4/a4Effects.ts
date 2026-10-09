@@ -26,6 +26,7 @@ import { assertMember, liveRolesFor } from "./a4Identity.js";
 import { gateStatus, isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import type { A4ChainLink, A4Principal, A4RefKind, A4Stage } from "./a4Schema.js";
 import { buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
+import { ensureA4Stages } from "./a4Stages.js";
 import { A4StoreError, refreshVolatileFacts, type A4Store, type A4TransitionResult } from "./a4Store.js";
 
 const HEARTBEAT_MS = 5_000;
@@ -70,8 +71,13 @@ export function registerA4Effect(def: A4EffectDef): void {
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
+/** A registered effect, after the stage lanes registered theirs. */
+const lookupEffect = (id: string): A4EffectDef | undefined => {
+  ensureA4Stages();
+  return EFFECTS.get(id);
+};
 const effectDef = (id: string): A4EffectDef => {
-  const def = EFFECTS.get(id);
+  const def = lookupEffect(id);
   if (def === undefined) throw fail(404, "A4_EFFECT_UNKNOWN", `no A4 effect ${id} is registered`);
   return def;
 };
@@ -240,7 +246,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
   const executionId = String(started.body.executionId);
   const approvalRequestId = String(started.body.approvalRequestId);
   const failWith = (error: string): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FAILED", { error: error.slice(0, 500) });
-  const def = EFFECTS.get(String(started.body.effect));
+  const def = lookupEffect(String(started.body.effect));
   if (def === undefined) return failWith("EFFECT_UNKNOWN");
   try {
     if (def.consumes === "A4") {

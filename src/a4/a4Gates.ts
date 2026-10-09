@@ -31,6 +31,7 @@ import {
   type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
+import { ensureA4Stages } from "./a4Stages.js";
 import {
   A4StoreError, collectLiveFacts, refreshVolatileFacts, type A4Actor, type A4ChangeSpec, type A4RequestKey, type A4Store, type A4TransitionResult
 } from "./a4Store.js";
@@ -151,6 +152,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
 /** One evaluation for `principal` at `stage` on `state`, with the signed policy and the in-force gate policy. */
 export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts,
   stage: A4Stage, now: number): { readiness: A4ReadinessV1; query: A4ReadinessQuery } {
+  ensureA4Stages();
   const policy = loadApprovalPolicy(store.workspace);
   const query: A4ReadinessQuery = { stage, principal, policy, gatePolicy: gatePolicyOf(state.chain), floor: a4FloorFor(policy), now,
     live: collectFacts(store, state, call) };
