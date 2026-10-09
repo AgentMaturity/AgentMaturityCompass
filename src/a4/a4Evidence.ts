@@ -2,7 +2,8 @@
  * A4 Forge evidence-ref resolution (P1-56; design §4.2). Computed at every read, never stored, never trusted from the
  * ref row: the trust tier is recomputed from the referenced ledger row's meta (a stored tier that differs is
  * TRUST_TIER_INFLATED), the lane is re-derived through `laneForClaimKind` and may only go down, and a verified-lane
- * ref is re-admitted against the current trust list on every call.
+ * ref is re-admitted against the current trust list on every call. A verified or observed ref whose target is dangling
+ * or unsigned falls to implementation/self_reported (REF_DANGLING, REF_UNSIGNED).
  */
 import { isAbsolute, relative, resolve } from "node:path";
 import { eventMeta, workspaceOwnKeyIds } from "../claims/evidenceProvenance.js";
@@ -112,7 +113,9 @@ export function resolveRefs(ledger: Ledger, refs: readonly A4EvidenceRefRow[], t
     let derived = laneForClaimKind(ref.claim_kind, tier, ref.method, fallback);
     let downgradeReason: string | null = null;
     if (ref.lane === "verified") {
-      downgradeReason = verifiedDowngradeReason(ledger.workspace, externalRecord(ref), trust, now);
+      // A review over bytes that are gone, changed or unsigned reviews nothing that is here now; the record is not consulted.
+      downgradeReason = ref.ref_kind !== "external" && (status === "dangling" || status === "unsigned") ? `REF_${status.toUpperCase()}`
+        : verifiedDowngradeReason(ledger.workspace, externalRecord(ref), trust, now);
       if (downgradeReason !== null) derived = { lane: "implementation", claimKind: "self_reported" };
       else if (ref.ref_kind === "external") status = "resolved";
     } else if (ref.lane === "observed" && (status === "dangling" || status === "unsigned")) {
