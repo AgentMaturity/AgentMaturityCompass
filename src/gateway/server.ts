@@ -10,6 +10,7 @@ import {
 import { request as httpsRequest } from "node:https";
 import { connect as netConnect, isIP, type LookupFunction } from "node:net";
 import { join } from "node:path";
+import type { Duplex } from "node:stream";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
@@ -663,6 +664,7 @@ function createProxyServer(params: {
   gatewaySessionId: string;
   allowedCidrs?: string[];
   fieldGuard: FieldGuard;
+  logger: Pick<Console, "error">;
   appendEvidence: (input: {
     eventType: "gateway" | "audit";
     payload: string;
@@ -670,7 +672,7 @@ function createProxyServer(params: {
   }) => void;
 }): Server {
   const resilience = gatewayResilienceConfig();
-  const proxy = createServer(async (req, res) => {
+  const onRequest = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
@@ -842,29 +844,10 @@ function createProxyServer(params: {
       res.statusCode = status;
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify(gatewayErrorBody(error)));
-      params.appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          proxyType: "http",
-          destinationHost: host,
-          destinationPort: port,
-          method,
-          stage: "request_error",
-          status,
-          error: error instanceof Error ? error.message : String(error)
-        }),
-        meta: {
-          request_id: requestId,
-          proxyMode: true,
-          destinationHost: host,
-          destinationPort: port,
-          method,
-          stage: "request_error",
-          status,
-          trustTier: "OBSERVED"
-        }
-      });
+      // resolvedAddresses: the checked addresses the failed connection was pinned to.
+      const row = { request_id: requestId, destinationHost: host, destinationPort: port, resolvedAddresses: egress.addresses, method, stage: "request_error", status };
+      params.appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...row, proxyType: "http", error: error instanceof Error ? error.message : String(error) }),
+        meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } });
       return;
     }
     const responseBody = await readAll(upstream);
@@ -901,9 +884,14 @@ function createProxyServer(params: {
         trustTier: "OBSERVED"
       }
     });
+  };
+  // A rejected handler (a client reset during a body read, a ledger write failure) ends its own connection, never the gateway process.
+  const contain = (end: () => void) => (error: unknown): void => { params.logger.error(`gateway proxy error: ${String(error)}`); end(); };
+  const proxy = createServer((req, res) => {
+    onRequest(req, res).catch(contain(() => { if (res.headersSent || req.destroyed) res.destroy(); else res.writeHead(502).end("gateway proxy failure"); }));
   });
 
-  proxy.on("connect", async (req, clientSocket, head) => {
+  const onConnect = async (req: IncomingMessage, clientSocket: Duplex, head: Buffer): Promise<void> => {
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
@@ -980,7 +968,7 @@ function createProxyServer(params: {
       requiredScope: "proxy:connect"
     });
 
-    if (!host || Number.isNaN(port)) {
+    if (!host || !Number.isInteger(port) || port < 1 || port > 65535) {
       clientSocket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
       clientSocket.destroy();
       return;
@@ -1033,9 +1021,12 @@ function createProxyServer(params: {
       clientSocket.destroy();
       return;
     }
+    if (clientSocket.destroyed) return; // the client left during the lookup: open nothing
 
     // Only the checked addresses (a pinned lookup keeps every one as a fallback), never a fresh resolution.
+    let connectedAddress: string | null = null;
     const upstreamSocket = netConnect({ port, host: canonicalHost(host), lookup: pinnedLookup(egress.addresses) }, () => {
+      connectedAddress = upstreamSocket.remoteAddress ?? null; // which checked address the tunnel reached
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {
         upstreamSocket.write(head);
@@ -1057,49 +1048,28 @@ function createProxyServer(params: {
     });
 
     const finalize = (reason: string): void => {
-      if (finalized) {
-        return;
-      }
+      if (finalized) return;
       finalized = true;
-      params.appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          proxyType: "connect",
-          destinationHost: host,
-          destinationPort: port,
-          resolvedAddresses: egress.addresses,
-          bytesIn,
-          bytesOut,
-          durationMs: Date.now() - startedTs,
-          reason
-        }),
-        meta: {
-          request_id: requestId,
-          proxyMode: true,
-          destinationHost: host,
-          destinationPort: port,
-          resolvedAddresses: egress.addresses,
-          bytesIn,
-          bytesOut,
-          reason,
-          trustTier: "OBSERVED"
-        }
-      });
+      const row = { request_id: requestId, destinationHost: host, destinationPort: port, resolvedAddresses: egress.addresses, connectedAddress, bytesIn, bytesOut, reason };
+      params.appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...row, proxyType: "connect", durationMs: Date.now() - startedTs }),
+        meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } });
     };
 
-    const onSocketError = (socket: { destroy: () => void }, reason: string): void => {
+    // An error or an idle timeout on either side ends both sockets; a client that goes away closes the upstream too.
+    const closeBoth = (reason: string): void => {
       finalize(reason);
-      socket.destroy();
+      clientSocket.destroy();
+      upstreamSocket.destroy();
     };
 
-    (upstreamSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(clientSocket, "upstream_timeout"));
-    (clientSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(upstreamSocket, "client_timeout"));
-    upstreamSocket.on("error", () => onSocketError(clientSocket, "upstream_error"));
-    clientSocket.on("error", () => onSocketError(upstreamSocket, "client_error"));
+    (upstreamSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => closeBoth("upstream_timeout"));
+    (clientSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => closeBoth("client_timeout"));
+    upstreamSocket.on("error", () => closeBoth("upstream_error"));
+    clientSocket.on("error", () => closeBoth("client_error"));
     upstreamSocket.on("close", () => finalize("upstream_close"));
-    clientSocket.on("close", () => finalize("client_close"));
-  });
+    clientSocket.on("close", () => { finalize("client_close"); upstreamSocket.destroy(); });
+  };
+  proxy.on("connect", (req: IncomingMessage, clientSocket: Duplex, head: Buffer) => { onConnect(req, clientSocket, head).catch(contain(() => clientSocket.destroy())); });
 
   return proxy;
 }
@@ -1716,6 +1686,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       gatewaySessionId,
       allowedCidrs: options.allowedCidrs,
       fieldGuard,
+      logger,
       appendEvidence
     });
     await new Promise<void>((resolvePromise, rejectPromise) => {
