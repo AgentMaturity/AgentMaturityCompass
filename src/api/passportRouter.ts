@@ -1,6 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
-import { apiError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam } from "./apiHelpers.js";
+import { apiError, apiRequestError, apiSuccess, bodyJsonSchema, isRequestBodyError, pathParam } from "./apiHelpers.js";
+import { requestTrustOverride } from "../trust/requestTrust.js";
+import { sha256Hex } from "../utils/hash.js";
 import {
   passportPublicForApi,
   passportRegistryForApi,
@@ -12,6 +14,14 @@ const passportRevokeBodySchema = z.object({
   reason: z.string().trim().min(1).optional(),
   revokedBy: z.string().trim().min(1).optional()
 }).strict();
+
+const trustTokenVerifyBodySchema = z.object({ token: z.record(z.string(), z.unknown()) }).passthrough();
+const SECRET_REFUSED = 'request field "secret" is refused: a verdict never rests on a secret the caller supplies';
+/**
+ * P0-51/P0-55: a trust token is an HMAC under a shared secret. A match proves only that someone knows the secret, and it
+ * names no signer the server operator's trust list can admit, so the token's statements are never evaluated here.
+ */
+const TOKEN_NOT_EVALUATED = "a trust token is an HMAC under a shared secret and names no signer the server operator's trust list can admit; its statements are not evaluated";
 
 function firstHeader(value: string | string[] | undefined): string | null {
   if (Array.isArray(value)) {
@@ -148,22 +158,16 @@ export async function handlePassportRoute(
     return true;
   }
 
-  // POST /api/v1/passport/trust-token/verify — verify a trust token
+  // POST /api/v1/passport/trust-token/verify — a trust token's verdict, which is never valid
   if (pathname === "/api/v1/passport/trust-token/verify" && method === "POST") {
     try {
-      const body = await import("./apiHelpers.js").then(m => m.bodyJson<{ token?: Record<string, unknown>; secret?: string }>(req));
-      if (!body.token || !body.secret) { apiError(res, 400, "token and secret required"); return true; }
-      const { verifyTrustToken } = await import("../passport/trustInterchange.js");
-      const { loadTrustContext, unsignedArtifactReport } = await import("../trust/index.js");
-      const { sha256Hex } = await import("../utils/hash.js");
-      const result = verifyTrustToken(body.token as unknown as Parameters<typeof verifyTrustToken>[0], body.secret);
-      // P0-51: the token is an HMAC under a secret the caller supplies, so a match proves only that the caller knows
-      // that secret. It names no signer the server's trust can admit, so it is never valid; `integrityValid` is the HMAC.
-      const report = unsignedArtifactReport({ kind: "trust-token", path: "<request body>", sha256: sha256Hex(JSON.stringify(body.token)) },
-        loadTrustContext(), result.reasons, "signature");
-      apiSuccess(res, { ...result, valid: false, integrityValid: result.valid, report });
+      const body = await bodyJsonSchema(req, trustTokenVerifyBodySchema);
+      // P0-55: secrets, like pins, never come from a request body (requestTrustOverride), so the HMAC is not checked.
+      const refused = Object.hasOwn(body, "secret") ? SECRET_REFUSED : requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
+      apiSuccess(res, { status: "not_evaluated", valid: false, tokenSha256: sha256Hex(JSON.stringify(body.token)), reason: TOKEN_NOT_EVALUATED });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : "Trust token verification failed");
+      apiRequestError(res, err, "Trust token verification failed", 500);
     }
     return true;
   }
