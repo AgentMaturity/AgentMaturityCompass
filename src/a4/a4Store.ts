@@ -40,7 +40,7 @@ import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4B
 import { resolveLedgerEvent } from "./a4Evidence.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
-  A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
+  A4_ENVELOPE_KINDS, A4_STAGE_STATES, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
   a4RevisionRowSchema, a4TransitionRowSchema, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gatePolicyWeakenings,
   laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
   type A4Member, type A4Principal, type A4ProjectRow, type A4RefKind, type A4ResourceDigests, type A4Stage, type A4TransitionKind,
@@ -674,7 +674,7 @@ function createStore(workspace: string, ledger: Ledger) {
       const population = principalPopulation(workspace);
       const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal: population.activeLocal, hostPrincipals: population.hostPrincipals,
         hostedRouter: input.hostedRouter, regulated: false, workspaceFloor: undefined, ratcheted: false, decidingPrincipal: input.actor });
-      const gatePolicy: A4GatePolicyV1 = DEFAULT_A4_GATE_POLICY;
+      const gatePolicy = defaultGatePolicyFor(a4FloorFor(signed.policy));
       let projectPublicKeySha256: string | null = null;
       return commit(projectId, input.actor, ({ seq, ts }) => {
         if (db.prepare("SELECT 1 FROM a4_projects WHERE agent_id = ? AND stage <> 'retired'").get(input.agentId)) {

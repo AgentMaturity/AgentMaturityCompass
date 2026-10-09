@@ -179,6 +179,13 @@ export const DEFAULT_A4_GATE_POLICY: A4GatePolicyV1 = a4GatePolicyV1Schema.parse
   }
 });
 
+/** The D-16 defaults with every TTL moved inside the signed workspace `a4` bounds, so a new project starts within its floor. */
+export function defaultGatePolicyFor(floor: ApprovalA4Floor): A4GatePolicyV1 {
+  const ttl = (days: number): number => Math.min(Math.max(days, floor.minTtlDays ?? 1), floor.maxTtlDays ?? 90);
+  return { ...DEFAULT_A4_GATE_POLICY, gates: Object.fromEntries(A4_GATE_POLICY_KEYS.map((key) => [key,
+    { ...DEFAULT_A4_GATE_POLICY.gates[key], ttlDays: ttl(DEFAULT_A4_GATE_POLICY.gates[key].ttlDays) }])) as A4GatePolicyV1["gates"] };
+}
+
 const policySource = (chain: readonly A4ChainLink[]): A4ChainLink | undefined =>
   [...chain].sort((a, b) => b.seq - a.seq).find((link) => link.kind === "GATE_POLICY_CHANGED" || (link.kind === "CREATED" && link.seq === 0));
 /** The in-force gate policy's digest: the latest GATE_POLICY_CHANGED payload, else the seq-0 CREATED's (design §4.4). */

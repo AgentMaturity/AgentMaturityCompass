@@ -409,6 +409,9 @@ export function requestGate(store: A4Store, projectId: string, input: A4Call & {
     if (stage === "retired") throw fail(409, "A4_RETIRED", "The project is retired.");
     const { readiness, query } = evaluateFor(store, state, principal, input, stage, now);
     assertAllowed(readiness, input.gate === "policy" ? "changeGatePolicy" : "requestGate");
+    // A policy gate binds the stage's items too, so it waits on the same blockers and self-settling items as any gate,
+    // all but the floor item: a policy gate is how a project left below a newly signed floor is brought back within it.
+    if (input.gate === "policy") assertAllowed(readiness, "requestGate", ["gate.policy_floor"]);
     const revision = state.revisions.find((row) => row.revision_no === project.revision_no && row.stage === stage) ?? null;
     if (input.gate !== "policy" && (project.stage !== stage || project.step !== (input.gate === "direction" ? "proposed" : "reviewed") || revision === null)) {
       throw fail(409, "A4_STEP_ORDER", `a ${input.gate} gate opens at step ${input.gate === "direction" ? "proposed" : "reviewed"} of the current stage`);
@@ -488,8 +491,9 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
       throw fail(409, "A4_DUPLICATE_DECISION", "You already decided this gate.");
     }
     if (gate.status !== "PENDING") throw fail(409, "A4_GATE_CLOSED", `the gate is ${gate.status}`);
-    // A policy gate is not one of the stage's direction/completion gates; its openness was just checked.
-    assertAllowed(readiness, "decide", row.gate === "policy" ? ["GATE_NOT_OPEN"] : []);
+    // A policy gate is not one of the stage's direction/completion gates; its openness was just checked. Its proposal was
+    // floor-checked at request and is again at GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it.
+    assertAllowed(readiness, "decide", row.gate === "policy" ? ["GATE_NOT_OPEN", "gate.policy_floor"] : []);
     if (!principal.roles.some((role) => gate.request.rolesAllowed.includes(role))) {
       throw fail(403, "PRINCIPAL_ROLE_INSUFFICIENT", `this gate accepts ${gate.request.rolesAllowed.join(", ")}`);
     }
