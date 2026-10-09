@@ -1,4 +1,6 @@
-import { request as httpRequest, type ClientRequest } from "node:http";
+import { request as httpRequest, type ClientRequest, type RequestOptions } from "node:http";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import type { DoctorCheck } from "./doctorRules.js";
 
 export interface DoctorHttpOutcome {
@@ -8,9 +10,12 @@ export interface DoctorHttpOutcome {
 export const DOCTOR_HTTP_DEADLINE_MS = 5_000;
 
 /** Absolute deadline, including a stalled/trickling response body; no body retained. */
-export function requestDoctorStatus(url: string, headers: Record<string, string>, body: string, deadlineMs = DOCTOR_HTTP_DEADLINE_MS): Promise<DoctorHttpOutcome> {
-  if (!Number.isSafeInteger(deadlineMs) || deadlineMs <= 0) throw new Error("Doctor HTTP deadline must be a positive integer");
-  return new Promise(resolve => {
+export function requestDoctorStatus(url: string, headers: Record<string, string>, body: string, deadlineMs = DOCTOR_HTTP_DEADLINE_MS, workspace?: string): Promise<DoctorHttpOutcome> {
+  const endpoint = url, payload = body, deadline = deadlineMs;
+  if (!Number.isSafeInteger(deadline) || deadline <= 0) throw new Error("Doctor HTTP deadline must be a positive integer");
+  const scope = workspace === undefined ? getWorkspaceScope() : workspace;
+  const capturedHeaders = { ...headers };
+  return new Promise((resolve, reject) => {
     let settled = false;
     let request: ClientRequest | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -22,9 +27,11 @@ export function requestDoctorStatus(url: string, headers: Record<string, string>
       resolve(result);
     };
     try {
-      request = httpRequest(url, { method: "POST", agent: false,
-        headers: { ...headers, "content-type": "application/json", "content-length": Buffer.byteLength(body), connection: "close" }
-      }, response => {
+      const options: RequestOptions = { method: "POST", agent: false,
+        headers: { ...capturedHeaders, "content-type": "application/json", "content-length": Buffer.byteLength(payload), connection: "close" }
+      };
+      checkScopedEgress(scope, "bridge", endpoint, { dataClasses: null, purpose: null, agentId: capturedHeaders["x-amc-agent-id"] || "system" });
+      request = httpRequest(endpoint, options, response => {
         response.on("error", () => finish({ status: null, failure: "incomplete" }));
         response.on("aborted", () => finish({ status: null, failure: "incomplete" }));
         response.on("end", () => finish({ status: response.statusCode ?? null, failure: response.statusCode === undefined ? "incomplete" : null }));
@@ -32,9 +39,18 @@ export function requestDoctorStatus(url: string, headers: Record<string, string>
         response.resume();
       });
       request.on("error", () => finish({ status: null, failure: "connection" }));
-      timer = setTimeout(() => finish({ status: null, failure: "deadline" }), deadlineMs);
-      request.end(body);
-    } catch { finish({ status: null, failure: "connection" }); }
+      timer = setTimeout(() => finish({ status: null, failure: "deadline" }), deadline);
+      request.end(payload);
+    } catch (error) {
+      if (error instanceof EgressBlocked) {
+        settled = true;
+        if (timer !== undefined) clearTimeout(timer);
+        request?.destroy();
+        reject(error);
+        return;
+      }
+      finish({ status: null, failure: "connection" });
+    }
   });
 }
 

@@ -11,6 +11,7 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { verifyAdaptersConfigSignature } from "../adapters/adapterConfigStore.js";
 import { loadGatewayConfig, routeBaseUrls } from "../gateway/config.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
+import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { adaptersDetectCli } from "../adapters/adapterCli.js";
 import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
@@ -307,6 +308,8 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         const studioHost = studio.state.host === "0.0.0.0" || studio.state.host === "::" ? "127.0.0.1" : studio.state.host;
         const gatewayBase = `http://${studioHost}:${studio.state.gatewayPort}`;
         const route = routes[0]?.prefix ?? "/openai";
+        const probeUrl = `${gatewayBase}${route}/v1/chat/completions`;
+        checkScopedEgress(workspace, "bridge", probeUrl, { dataClasses: null, purpose: null, agentId: "default" });
         const lease = issueLeaseForCli({
           workspace,
           workspaceId: workspaceIdFromDirectory(workspace),
@@ -323,9 +326,9 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
           model: "gpt-4o-mini",
           messages: [{ role: "user", content: "doctor" }]
         });
-        const statusAuth = await requestDoctorStatus(`${gatewayBase}${route}/v1/chat/completions`, { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload);
+        const statusAuth = await requestDoctorStatus(probeUrl, { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload, undefined, workspace);
         checks.push(doctorCarrierCheck("lease-carrier-authorization", "Authorization carrier", statusAuth));
-        const statusXApi = await requestDoctorStatus(`${gatewayBase}${route}/v1/chat/completions`, { "x-amc-agent-id": "default", "x-api-key": lease }, payload);
+        const statusXApi = await requestDoctorStatus(probeUrl, { "x-amc-agent-id": "default", "x-api-key": lease }, payload, undefined, workspace);
         checks.push(doctorCarrierCheck("lease-carrier-x-api-key", "x-api-key carrier", statusXApi));
       } else {
         checks.push({
@@ -336,12 +339,21 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         });
       }
     } catch (error) {
-      checks.push({
-        id: "gateway-config",
-        status: "FAIL",
-        message: `Gateway config invalid: ${safeDoctorError(error, workspace)}`,
-        fixHint: "Run: amc gateway init"
-      });
+      if (error instanceof EgressBlocked) {
+        checks.push({
+          id: "lease-carriers-live",
+          status: "FAIL",
+          message: `Live lease carrier probes blocked by residency: ${safeDoctorError(error, workspace)}`,
+          fixHint: "Review the signed residency destination registry and routing policy before deliberately retrying amc doctor --live-probes."
+        });
+      } else {
+        checks.push({
+          id: "gateway-config",
+          status: "FAIL",
+          message: `Gateway config invalid: ${safeDoctorError(error, workspace)}`,
+          fixHint: "Run: amc gateway init"
+        });
+      }
     }
   }
 

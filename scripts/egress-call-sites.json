@@ -171,12 +171,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorLiveProbe.ts:25:1",
+      "siteId": "src/doctor/doctorLiveProbe.ts:34:1",
       "path": "src/doctor/doctorLiveProbe.ts",
-      "line": 25,
+      "line": 34,
       "call": "httpRequest(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Doctor rules capture one bridge probe URL and check known workspace before diagnostic lease issuance; both sequential carrier POSTs pass that scope to helper. Copied headers/prepared native options and body precede a final same-URL bridge gate; null resource facts, caller-declared agent header (system if absent), no independent actor/lease proof. Typed refusal rejects before connection mapping and becomes residency FAIL, not invalid config. Source-only; a late denial can follow lease/first POST and earlier local effects; ordinary deadline/draining and DNS/HTTP/proof limitations remain."
     },
     {
       "siteId": "src/domains/industryPackEntitlement.ts:489:1",
