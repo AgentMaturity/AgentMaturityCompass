@@ -124,10 +124,13 @@ export function driftedSlots(workspace: string, slots: Record<string, string | n
   }).map(([slot]) => slot);
 }
 
-/** The rows of one verified snapshot as readiness reads them; refs resolved against the ledger and the trust list now. */
-function stateOf(store: A4Store, snapshot: ReturnType<A4Store["snapshot"]>, now: number): A4ReadinessState {
+/**
+ * The rows of one verified snapshot as readiness reads them; refs resolved against the ledger and the trust list now.
+ * `integrity` reuses a ledger row's chain verdict within one governed attempt (resolveLedgerEvent).
+ */
+function stateOf(store: A4Store, snapshot: ReturnType<A4Store["snapshot"]>, now: number, integrity?: Map<string, boolean>): A4ReadinessState {
   const refRows = snapshot.rows.a4_evidence_refs.map((row) => a4EvidenceRefRowSchema.parse(row));
-  const resolved = resolveRefs(store.ledger, refRows, loadTrustContext(), now);
+  const resolved = resolveRefs(store.ledger, refRows, loadTrustContext(), now, undefined, integrity);
   return {
     project: snapshot.head, chain: snapshot.links, members: snapshot.members,
     revisions: snapshot.rows.a4_revisions.map((row) => a4RevisionRowSchema.parse(row)),
@@ -288,22 +291,25 @@ type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness
  * envelope signing outside the transaction, and the same plan again inside it. The transition records that evaluation's
  * fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the automatic hold; a
  * notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
- * Inside the transaction the plan reuses the rows this attempt verified before it (design §7 rule 2: never a chain walk
- * under the ledger write lock): the store has just checked that the head is unmoved and still signed
- * (`verifyIncremental`), so no transition is new. What the project lock does not cover is read again there: the
- * evidence refs are re-resolved against the ledger and the trust list (design §7 rule 8), and the live facts
- * (`collectFacts`: freeze, read-only, population, vault, notary, resources, lost effects) and an effect's engine
- * decisions are re-read.
+ * Inside the transaction the plan reuses the rows this attempt verified before it (never a chain walk under the ledger
+ * write lock, which the runtime action journal shares; design §4.3): the store has just checked that the head is
+ * unmoved and still signed (`verifyIncremental`), so no transition is new. What the project lock does not cover is read
+ * again there (design §7 rule 8): each evidence ref's ledger row, digest, pruning, tier and admission against the trust
+ * list, with the row's O(ledger prefix) chain verdict reused per (id, event_hash) from this attempt's check before the
+ * lock; the live facts (`collectFacts`: freeze, read-only, population, vault, notary, resources, lost effects); and an
+ * effect's engine decisions.
  */
 export function governed(store: A4Store, projectId: string, actor: A4Actor, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
   plan: Plan): A4TransitionResult {
   refuseOnFreeze(store, projectId);
   let planned: string | null = null;
   let snapshot: ReturnType<A4Store["snapshot"]> | null = null;
-  const load = (now: number): A4ReadinessState => stateOf(store, snapshot ??= store.snapshot(projectId), now);
+  const integrity = new Map<string, boolean>();
+  const load = (now: number): A4ReadinessState => stateOf(store, snapshot ??= store.snapshot(projectId), now, integrity);
   try {
     return store.transition(projectId, actor, ({ ts }) => {
       snapshot = null; // each attempt (a moved head rebuilds once) loads the rows it verified afresh
+      integrity.clear();
       const result = plan(ts, load);
       planned = result.readiness.fullDigest;
       return result.specs;
