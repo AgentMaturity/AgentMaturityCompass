@@ -484,8 +484,10 @@ export function requestGate(store: A4Store, projectId: string, input: A4Call & {
 /**
  * Records one APPROVE or DENY on a documentary gate (design §6.4). The server derives the gate's seq from its own
  * GATE_REQUESTED row and refuses a body naming another; the request digest, the rebuilt intent, the resources and the
- * expiry guard are checked on rows read inside the transaction; SoD is refused at write; the decision row carries the
- * binding digest (mandatory), the identity provenance, the self-approval facts and the bound items the approver saw.
+ * expiry guard are checked on rows read inside the transaction; SoD is refused at write; an approval that would meet
+ * the quorum with fewer places left than pending `role_vote` roles it cannot cast is 409 REQUIRED_REVIEW_PENDING; the
+ * decision row carries the binding digest (mandatory), the identity provenance, the self-approval facts and the bound
+ * items the approver saw.
  */
 export function recordDecision(store: A4Store, projectId: string, input: A4Call & { gateId: string; decision: "approve" | "deny"; reason: string;
   expectedRequestDigestSha256: string; expectedGateSeq: number; expectedReadinessBindingDigest?: string }): A4TransitionResult {
@@ -531,6 +533,13 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
       requestDigestSha256: row.binding_digest, decisionTs: ts });
     const quorum = evaluateApprovalQuorum({ request: gate.request, now, policy: query.policy,
       decisions: [...gate.counted.map((decision) => approvalDecisionSchema.parse(JSON.parse(decision.decision_json))), record] });
+    // A closed gate takes no vote, so each pending role_vote this approver cannot cast keeps a quorum place open for it;
+    // otherwise other roles would close the gate first and `complete` would wait on a vote nobody can record (design §6.3).
+    const unmet = pendingReviews(state, gate).filter((entry) => entry.kind === "role_vote" && entry.role !== undefined && !principal.roles.includes(entry.role));
+    if (approve && new Set(unmet.map((entry) => entry.role)).size > quorum.remainingRequired) {
+      throw fail(409, "A4_NOT_READY", `this approval would close the gate before: ${unmet.map((entry) => entry.label).join("; ")}`,
+        { reasonCodes: ["REQUIRED_REVIEW_PENDING"], pending: unmet });
+    }
     const selfApproved = approve && sod.degraded.includes("SOD_DEGRADED_SINGLE_USER");
     const degraded = approve ? sod.degraded : [];
     return { readiness, specs: {
