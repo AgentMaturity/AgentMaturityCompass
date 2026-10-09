@@ -25,8 +25,8 @@ const BUNDLE = [{ id: "orig-1", sha256: PAYLOAD_SHA, ts: 1, ...SUBJECT }, { id: 
 const DIGEST = bundleDigest(BUNDLE);
 const ATTESTER = testKey();
 
-function row(meta: Record<string, unknown>, payloadSha256 = PAYLOAD_SHA): { meta_json: string; payload_sha256: string; session_id: string } {
-  return { meta_json: JSON.stringify(meta), payload_sha256: payloadSha256, session_id: SUBJECT.sessionId };
+function row(meta: Record<string, unknown>, payloadSha256 = PAYLOAD_SHA): { meta_json: string; payload_sha256: string; session_id: string; ts: number } {
+  return { meta_json: JSON.stringify(meta), payload_sha256: payloadSha256, session_id: SUBJECT.sessionId, ts: 10 };
 }
 
 function attestation(key: TestKey = ATTESTER, digest = DIGEST, bundle: unknown[] = BUNDLE): ThirdPartyAttestation {
@@ -120,7 +120,10 @@ describe("effectiveTrustTier", () => {
     ["another agent's row", () => row({ ...attestedMeta(), agentId: "agent-b" })],
     ["a row with no agent", () => row({ ...attestedMeta(), agentId: undefined })],
     ["a row in another session", () => ({ ...row(attestedMeta()), session_id: "session-b" })],
-    ["a row without its session", () => ({ meta_json: JSON.stringify(attestedMeta()), payload_sha256: PAYLOAD_SHA })]
+    ["a row without its session", () => ({ meta_json: JSON.stringify(attestedMeta()), payload_sha256: PAYLOAD_SHA })],
+    // P0-55: the attested event's time binds too; it cannot postdate the row that copies it beyond the skew bound.
+    ["a row without its time", () => ({ meta_json: JSON.stringify(attestedMeta()), payload_sha256: PAYLOAD_SHA, session_id: SUBJECT.sessionId })],
+    ["a row written before the event it copies", () => ({ ...row(attestedMeta()), ts: 1 - 5 * 60_000 - 1 })]
   ];
   test.each(replays)("a copied attestation on %s reads SELF_REPORTED", (_label, make) => {
     expect(effectiveTrustTier(make(), { trustList: trust })).toBe("SELF_REPORTED");

@@ -152,21 +152,27 @@ function hasAttestationShape(value: unknown): value is ThirdPartyAttestation {
   return !!record && typeof record === "object" && ["keyId", "sigB64", "digestSha256"].every((field) => typeof record[field] === "string");
 }
 
-type ReadRow = Pick<EvidenceEvent, "meta_json"> & { payload_sha256?: string; session_id?: string };
+type ReadRow = Pick<EvidenceEvent, "meta_json"> & { payload_sha256?: string; session_id?: string; ts?: number };
+
+/** P0-55: how far an attested event's own time may lie after the row that copies it (the incident-clock skew bound). */
+const ATTESTED_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
 /**
  * The bundle entry the attestation binds to this row, if any: the signed bundle hashes to the signed digest and lists
- * the row's original event with this row's payload hash, agent (`meta.agentId`) and session. Without that, one genuine
- * signature could be copied onto any row, or onto another agent's. A bundle whose entries name no subject binds nothing.
+ * the row's original event with this row's payload hash, agent (`meta.agentId`) and session, at a time no later than
+ * the row itself (beyond the skew bound). Without that, one genuine signature could be copied onto any row, onto
+ * another agent's, or claim an event the ledger had not yet recorded. A bundle whose entries name no subject binds nothing.
  */
 function boundEntry(attestation: ThirdPartyAttestation, meta: Record<string, unknown>, row: ReadRow): BundleEntry | undefined {
   const bundle = attestation.bundle;
   if (!Array.isArray(bundle) || typeof meta.originalEventId !== "string" || typeof row.payload_sha256 !== "string"
-    || typeof meta.agentId !== "string" || typeof row.session_id !== "string") return undefined;
+    || typeof meta.agentId !== "string" || typeof row.session_id !== "string" || typeof row.ts !== "number") return undefined;
   // ponytail: every copy stores the whole bundle (quadratic in session size); store a Merkle path if sessions get large.
   if (bundleDigest(bundle) !== attestation.digestSha256) return undefined;
+  const rowTs = row.ts;
   return bundle.find((entry) => entry?.id === meta.originalEventId && entry?.sha256 === row.payload_sha256
-    && entry?.agentId === meta.agentId && entry?.sessionId === row.session_id);
+    && entry?.agentId === meta.agentId && entry?.sessionId === row.session_id
+    && typeof entry?.ts === "number" && entry.ts <= rowTs + ATTESTED_FUTURE_SKEW_MS);
 }
 
 /**
@@ -192,10 +198,10 @@ export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => 
 
 /**
  * The rows a reader counts over [startTs, endTs] (P0-18). A row that reads ATTESTED (`tierOf`) counts once per attested
- * event (original event id, payload hash, agent and session), as its earliest copy, whichever key or bundle attests it,
- * and only while the attested event's own time lies in the window, so a copy appended later never carries attested
- * evidence into a later window. Other
- * rows, and rows read ATTESTED without a bound attestation (stale OBSERVED in the diagnostic), pass unchanged.
+ * event and subject (original event id and agent, P0-55), as its earliest copy, whichever key, bundle or session attests
+ * it, and only while the attested event's own time lies in the window, so a copy appended later never carries attested
+ * evidence into a later window. Other rows, and rows read ATTESTED without a bound attestation (stale OBSERVED in the
+ * diagnostic), pass unchanged.
  */
 export function countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent, "ts">>(
   rows: readonly T[], tierOf: (row: T) => string | null | undefined, window: { startTs: number; endTs: number }
@@ -208,7 +214,7 @@ export function countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent, "ts">>
     if (tierOf(row) !== "ATTESTED" || !hasAttestationShape(attestation)) continue;
     const entry = boundEntry(attestation, meta, row);
     if (!entry) continue;
-    const key = `${entry.id}\n${entry.sha256}\n${entry.agentId}\n${entry.sessionId}`;
+    const key = `${entry.id}\n${entry.agentId}`;
     attested.set(row, { key, ts: entry.ts });
     const kept = earliest.get(key);
     if (!kept || row.ts < kept.ts) earliest.set(key, row);
