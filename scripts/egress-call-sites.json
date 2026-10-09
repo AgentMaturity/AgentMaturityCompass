@@ -80,7 +80,7 @@
       "line": 283,
       "call": "residencyFetch(",
       "status": "gated",
-      "reason": "residencyFetch checks the immediate gateway hop; the gateway final upstream hop is separately deferred."
+      "reason": "residencyFetch checks the immediate gateway hop; final gateway HTTP and CONNECT hops have separate gated rows."
     },
     {
       "siteId": "src/cli-eval-dataset-commands.ts:188:1",

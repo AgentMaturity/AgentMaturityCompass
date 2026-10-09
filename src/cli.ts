@@ -19134,34 +19134,34 @@ program
   .option("--issue", "issue a new legal hold", false)
   .option("--release <holdId>", "release a legal hold by ID")
   .option("--list", "list active legal holds", false)
+  .option("--init", "initialize the verified legal-hold register", false)
+  .option("--rebind", "rebind a verified register with --init", false)
+  .option("--accept-unverified-legacy", "acknowledge an unverified legacy record with --release", false)
   .option("--tenant <id>", "tenant ID")
   .option("--reason <text>", "reason for hold")
   .option("--issued-by <name>", "issuer name")
-  .action(async (opts: { issue: boolean; release?: string; list: boolean; tenant?: string; reason?: string; issuedBy?: string }) => {
-    const dr = await import("./compliance/dataResidency.js");
-    if (opts.list) {
-      const holds = dr.getActiveLegalHolds(opts.tenant, process.cwd());
-      if (holds.length === 0) {
-        console.log(chalk.green("No active legal holds."));
-        return;
-      }
-      for (const h of holds) {
-        console.log(`  ${chalk.bold(h.holdId)} — Tenant: ${h.tenantId} — ${h.reason} (by ${h.issuedBy})`);
-      }
-      return;
-    }
-    if (opts.release) {
-      const released = dr.releaseLegalHold(opts.release, process.cwd());
-      console.log(released ? chalk.green(`Legal hold ${opts.release} released.`) : chalk.red("Hold not found or already released."));
-      return;
-    }
-    if (opts.issue && opts.tenant && opts.reason && opts.issuedBy) {
-      const hold = dr.issueLegalHold({ tenantId: opts.tenant, reason: opts.reason, issuedBy: opts.issuedBy }, process.cwd());
-      console.log(chalk.green(`Legal hold issued: ${hold.holdId}`));
-      return;
-    }
-    console.log(chalk.red("Use --issue with --tenant/--reason/--issued-by, --release <id>, or --list."));
+  .action(async (opts: import("./cli-legal-hold.js").LegalHoldCommandOptions) => {
+    const { runLegalHoldCommand } = await import("./cli-legal-hold.js");
+    await runLegalHoldCommand(opts, process.cwd());
   });
+// Preserve the frozen CLI line budget while the legal-hold handler lives in its own module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 program
   .command("redaction-test")
