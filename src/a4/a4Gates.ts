@@ -517,11 +517,15 @@ function headTransition(store: A4Store, projectId: string, input: A4Call & { exp
   });
 }
 
-/** CHANGES_REQUESTED (reviewer/approver/owner): supersedes the gate; the step returns to proposed or built (design §6.6). */
+/**
+ * CHANGES_REQUESTED (reviewer/approver/owner): supersedes the gate; the step returns to proposed or built (design §6.6).
+ * A `policy` gate has no step to return to: its proposal is approved or denied (an approver), never sent back.
+ */
 export function requestChanges(store: A4Store, projectId: string, input: A4Call & { gateId: string; reason: string;
   findings?: ReadonlyArray<{ severity: "info" | "low" | "medium" | "high" | "critical"; message: string }>; expectedHeadSeq: number }): A4TransitionResult {
   return headTransition(store, projectId, input, "requestChanges", (state) => {
     const row = gateRowOf(state, input.gateId);
+    if (row.gate === "policy") throw fail(409, "A4_STEP_ORDER", "A gate-policy proposal is approved or denied; deny it instead of requesting changes.");
     const status = gateStatus(state, row, loadApprovalPolicy(store.workspace), Date.now()).status;
     if (status !== "PENDING" && status !== "QUORUM_MET") throw fail(409, "A4_GATE_CLOSED", `the gate is ${status}`);
     return { kind: "CHANGES_REQUESTED", stage: row.stage, payload: { gateId: row.gate_id, reason: input.reason, findings: [...(input.findings ?? [])] },
