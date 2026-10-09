@@ -23,6 +23,8 @@ export const taskDescriptorSchema = z.object({
   revision: z.number().int().min(1).max(32), pendingTurn: z.boolean(), closed: z.boolean(),
   // As with validation, omission must preserve the body of existing signed descriptors.
   archivedAt: z.number().int().nonnegative().optional(),
+  // P1-67: the id (never the token) of the lease minted for the latest runtime under a compiled plan; omitted likewise.
+  leaseId: z.string().regex(/^lease_[a-f0-9]{32}$/).optional(),
   submissions: z.array(z.object({ clientRequestId: id, bodyHash: z.string().regex(/^[a-f0-9]{64}$/), revision: z.number().int().min(1).max(32) }).strict()).min(1).max(32)
 }).strict().superRefine((value, ctx) => {
   if (value.submissions.length !== value.revision || value.submissions.some((s, i) => s.revision !== i + 1)

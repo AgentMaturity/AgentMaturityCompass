@@ -18,6 +18,12 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
+import { activeControlPlanHead } from "../catalog/compiler/activate.js";
+import { isActionClass } from "../governor/actionCatalog.js";
+import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
@@ -149,12 +155,38 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
     }
   }
-  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed">>): void {
+  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed" | "leaseId">>): void {
     descriptors.lock(() => {
       const current = descriptors.read(entry.descriptor.taskId);
       if (!current || current.revision !== entry.descriptor.revision || current.sessionId !== entry.descriptor.sessionId) throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task descriptor changed during execution.");
       entry.descriptor = { ...current, ...patch, updatedAt: Date.now() }; descriptors.write(entry.descriptor);
     });
+  }
+  /** P1-67: revoke the recorded lease once. Throws when the signed revocation store cannot be verified or written. */
+  function revokeTaskLease(d: NativeTaskDescriptor, reason: string): void {
+    if (d.leaseId !== undefined && !revokedLeaseIdSet(workspace).has(d.leaseId)) revokeLease(workspace, d.leaseId, reason);
+  }
+  /** After the runtime is gone: revoke its lease, or say on the task why it still lapses on its own. */
+  function retireLease(entry: Entry): void {
+    try { revokeTaskLease(entry.descriptor, "native task runtime stopped"); }
+    catch { entry.error = `${entry.error ? `${entry.error} ` : ""}The runtime's lease could not be revoked: the signed lease revocation store did not verify. It lapses within an hour of start; restore the store, then archive the task to revoke it.`; }
+  }
+  /**
+   * P1-67: under a compiled plan, a lease for this runtime alone (its agent, this task as the work order, the classes of
+   * its pinned signed tools, its own caps, at most the runtime's lifetime) so identity-binding (L0-IDN-01) can admit its
+   * calls. The previous runtime's lease is revoked first; only the id is recorded; the token goes to the child alone.
+   */
+  function runtimeLeaseEnv(entry: Entry, scope: NativeTaskConfiguration["scope"]): NodeJS.ProcessEnv {
+    const d = entry.descriptor;
+    if (d.tools !== "workspace" || activeControlPlanHead(workspace) === null) return {};
+    if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
+      "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
+    revokeTaskLease(d, "superseded by a new native task runtime");
+    const lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+      ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
+      routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
+    persist(entry, { leaseId: lease.payload.leaseId });
+    return { [NATIVE_TASK_LEASE_ENV]: lease.token };
   }
   function refresh(entry: Entry): void {
     if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return;
@@ -273,7 +305,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (d.provider !== "stub" && !config.providers.find(p => p.id === d.provider)?.credential?.configured)
       throw new NativeTaskServiceError("CREDENTIAL_MISSING", 409, "The selected provider's operator credential reference is not configured.");
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
-    entry.client = await AMCNativeClient.start({ workspace, command, env: childEnvironment(d.provider), provider: d.provider,
+    const leaseEnv = runtimeLeaseEnv(entry, config.scope);
+    entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...leaseEnv }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,
       ...(credentialed(d.provider) ? { credential: REFS[d.provider] } : {}),
       ...(d.tools === "workspace" ? { approveTools: "WRITE_HIGH", approveRisk: "high" as const } : {}),
@@ -311,7 +344,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.state = entry.descriptor.closed ? "closed" : "released";
       } catch { entry.state = "failed"; entry.error = "The native writer did not release cleanly. Inspect signed evidence before attempting recovery."; }
       finally { try { await entry.client?.close(); entry.processCleanupConfirmed = true; } catch { entry.state = "failed"; entry.error = "Native process cleanup did not complete cleanly."; }
-        finally { entry.client = undefined; entry.session = undefined; entry.turn = undefined; entry.finishing = undefined; entry.projectionAt = 0; } }
+        finally { retireLease(entry); entry.client = undefined; entry.session = undefined; entry.turn = undefined; entry.finishing = undefined; entry.projectionAt = 0; } }
     })();
     return entry.finishing;
   }
@@ -479,6 +512,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         try { projection = readNativeTaskProjection(workspace, d.sessionId, d.agentId); }
         catch { throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "Native evidence did not authenticate; this task was not archived."); }
         if (!projection.closed) throw new NativeTaskServiceError("ARCHIVE_NOT_CLOSED", 409, "The authenticated native session is still open. Close it before archiving.");
+        try { revokeTaskLease(d, "native task archived"); }
+        catch { throw new NativeTaskServiceError("LEASE_UNREVOKED", 409, "The task's lease could not be revoked: the signed lease revocation store did not verify. Restore it, then archive; nothing was archived."); }
         if (d.archivedAt === undefined) {
           const now = Date.now();
           const archived = { ...d, closed: true, archivedAt: now, updatedAt: now };
@@ -513,7 +548,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
           : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
         if (report.ok && !sameHead) entry.error = "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current.";
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
-      finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; }
+      finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; retireLease(entry); }
       return view(entry);
     },
     close() {
