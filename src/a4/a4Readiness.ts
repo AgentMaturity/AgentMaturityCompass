@@ -144,14 +144,25 @@ export interface A4GateStatus {
   readonly required: number;
 }
 
-/** One gate's state from the chain and its decisions; the inner quorum EXPIRED surfaces as the gate's status. */
+/**
+ * One gate's state from the chain and its decisions; the inner quorum EXPIRED surfaces as the gate's status. An open gate
+ * that a later request of the same gate (stage, kind, revision) replaced is superseded by that GATE_REQUESTED and reads
+ * STALE for good: requestGate replaces an open gate only once its bound readiness moved, and readiness moving back must
+ * not revive it beside its replacement (one live gate per stage, kind and revision, the one readiness shows).
+ */
 export function gateStatus(state: A4ReadinessState, row: A4GateRow, policy: ApprovalPolicy, now: number): A4GateStatus {
   const request = gateRequestOf(row);
   const requestedSeq = state.chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === row.gate_id)?.seq ?? Number.MAX_SAFE_INTEGER;
-  const supersededBy = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq });
+  const superseding = gateSupersededBy(state.chain, { gateId: row.gate_id, revisionNo: row.revision_no, requestedSeq });
   const counted = state.decisions.filter((decision) => decision.gate_id === row.gate_id && decision.request_digest === row.binding_digest
     && decisionRecordOf(decision)?.requestDigestSha256 === row.binding_digest);
   const quorum = evaluateApprovalQuorum({ request, decisions: counted.map((decision) => decisionRecordOf(decision)!), policy, now });
+  const sameGate = new Set(state.gates.filter((other) => other.stage === row.stage && other.gate === row.gate && other.revision_no === row.revision_no)
+    .map((other) => other.gate_id));
+  // Only an open status is replaced: DENIED (terminal for the revision), EXPIRED and CONSUMED read as they are.
+  const replacedBy = superseding === null && (quorum.status === "PENDING" || quorum.status === "QUORUM_MET")
+    ? state.chain.find((link) => link.kind === "GATE_REQUESTED" && link.seq > requestedSeq && sameGate.has(String(link.body.gateId))) ?? null : null;
+  const supersededBy = superseding ?? replacedBy;
   const status = supersededBy === null ? (["PENDING", "QUORUM_MET", "DENIED", "EXPIRED"].includes(quorum.status) ? quorum.status : "STALE")
     : supersededBy.kind === "GATE_CONSUMED" ? "CONSUMED" : supersededBy.kind === "CHANGES_REQUESTED" ? "CHANGES_REQUESTED" : "STALE";
   return { row, request, requestedSeq, status: status as A4GateStatus["status"], supersededBy, counted, approvals: quorum.received, required: quorum.required };

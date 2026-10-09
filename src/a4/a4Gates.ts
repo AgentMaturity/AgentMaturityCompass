@@ -68,7 +68,7 @@ const SLOT_NAMES: Record<string, string> = { memberSetDigest: "memberSet", evide
   gatePolicyDigest: "policy", excludedKeys: "excludedKeys", specDigest: "spec", resourceDigests: "resources" };
 /** A superseding transition as the slot it moves, so a superseded gate's 409 names `moved` like a rebuilt intent's. */
 const SLOT_OF_KIND: Record<string, string> = { MEMBER: "memberSet", EVIDENCE_REF: "evidenceRefs", ACKNOWLEDGED: "readiness", REVISION: "spec",
-  GATE_POLICY_CHANGED: "policy", GATE_CONSUMED: "consumed" };
+  GATE_POLICY_CHANGED: "policy", GATE_CONSUMED: "consumed", GATE_REQUESTED: "readiness" };
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
