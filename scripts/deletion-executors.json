@@ -1126,24 +1126,24 @@
       "reason": "rotateLogs resolves explicit or ALS workspace, refuses an unrelated directory for an unscoped compatibility call, and performs each unlink inside a fresh withDeletionGate callback for logs. maintenanceRotateLogsCli supplies its trusted workspace."
     },
     {
-      "siteId": "src/ops/retention/retentionEngine.ts:235:indirect-payload",
+      "siteId": "src/ops/retention/retentionEngine.ts:237:indirect-payload",
       "path": "src/ops/retention/retentionEngine.ts",
-      "line": 235,
+      "line": 237,
       "call": "ledger.pruneEventPayloadColumns(",
       "category": "indirect-payload-erasure",
-      "source": "() => ledger.pruneEventPayloadColumns(ids, nowMs())",
+      "source": "() => ledger.pruneEventPayloadColumns(ids, nowMs()));",
       "status": "gated",
       "reason": "runRetention calls the protected ledger method inside a fresh withDeletionGate callback. params.workspace is trusted; ids are grouped by their workspace-local evidence session_id before payload columns are erased. The ledger module itself was not modified."
     },
     {
-      "siteId": "src/ops/retention/retentionEngine.ts:270:1",
+      "siteId": "src/ops/retention/retentionEngine.ts:285:1",
       "path": "src/ops/retention/retentionEngine.ts",
-      "line": 270,
+      "line": 285,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
       "status": "gated",
-      "reason": "runRetention performs the blob unlink inside a fresh withDeletionGate callback using params.workspace. The session set comes from all workspace-local evidence rows referring to the blob; held or unknown groups are retained."
+      "reason": "runRetention performs the blob unlink inside a fresh withDeletionGate callback using params.workspace. The session set comes from all workspace-local evidence rows referring to the blob; held or unknown groups are retained. An immediate transaction compares the current reference snapshot with the admitted snapshot and rechecks retention eligibility before unlinking. Changed or ineligible references and a missing file return an explicit removed: false outcome and produce an acknowledged RETENTION_BLOB_DELETE_SKIPPED audit row."
     },
     {
       "siteId": "src/packs/packRegistry.ts:92:1",
