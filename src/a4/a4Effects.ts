@@ -116,38 +116,27 @@ function assertNotRedone(state: A4ReadinessState, stage: A4Stage, failure: A4Cha
 }
 
 /**
- * Whether the engine request closed on a decision A4 never counts (/console/approvals lets any workspace APPROVER decide
- * it), judged by the status that closed it. DENIED: every DENY is from a principal that does not resolve or is no project
- * approver or owner; one valid member's DENY keeps it closed, whatever approvals came before. QUORUM_MET: some
- * APPROVE_EXECUTE is one `effectApprovalOf` refuses, which makes the request unconsumable.
+ * Whether a DENIED engine request closed on decisions A4 never counts (/console/approvals lets any workspace APPROVER
+ * decide it): every DENY is from a principal that does not resolve or is no project approver or owner. One valid
+ * member's DENY keeps it closed, whatever approvals came before.
  */
-function holdsRefusedDecision(store: A4Store, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string, regulated: boolean,
-  status: "QUORUM_MET" | "DENIED"): boolean {
-  const decisions = listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
-  if (status === "DENIED") {
-    const denies = decisions.filter((decision) => decision.decision === "DENY");
-    // No readable DENY behind a DENIED status stays closed (fail closed).
-    return denies.length > 0 && denies.every((decision) => {
-      const approver = resolveApprover(store.workspace, decision.userId);
-      return approver === null || !isProjectApprover(state, approver);
-    });
-  }
-  const checked: SodDecision[] = [];
-  for (const decision of decisions) {
-    if (decision.decision === "DENY") continue;
-    // The `complete` caller is not known yet; consumption checks it.
-    const entry = effectApprovalOf(store.workspace, state, gate, decision, checked, [gate.requested_by_key], regulated);
-    if (entry instanceof A4StoreError) return true;
-    checked.push(entry);
-  }
-  return false;
+function deniedOnlyByNonMembers(store: A4Store, state: A4ReadinessState, approvalRequestId: string): boolean {
+  const denies = listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId })
+    .filter((decision) => decision.decision === "DENY");
+  // No readable DENY behind a DENIED status stays closed (fail closed).
+  return denies.length > 0 && denies.every((decision) => {
+    const approver = resolveApprover(store.workspace, decision.userId);
+    return approver === null || !isProjectApprover(state, approver);
+  });
 }
 
 /**
  * Re-open is allowed only while the previous engine request is EXPIRED or CANCELLED, after an executor that consumes its
- * own grant failed (activateControlPlan: the only path after its failure), or when the request closed (QUORUM_MET or
- * DENIED) on a decision A4 never counts, which would otherwise lock the effect until its TTL, or for good on a DENY;
- * never over a live, countable or consumed grant. `complete` always reads the latest opened request.
+ * own grant failed (activateControlPlan: the only path after its failure), when it is DENIED only by principals A4 never
+ * counts, or when it is QUORUM_MET on a grant `complete` would refuse (an uncounted or digest-less vote, too few bound
+ * keys, a moved intent, a project regulated since the open): either would otherwise lock the effect until its TTL, or for
+ * good on a DENY. Never over a live or consumed grant some caller could consume. `complete` always reads the latest
+ * opened request.
  */
 function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef, regulated: boolean): void {
   const opened = latestOpened(state, gate.gate_id, def.id);
@@ -156,7 +145,17 @@ function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateR
   const status = approvalStatusPayload({ workspace: store.workspace, agentId: state.project.agent_id, approvalId }).status;
   if (status === "EXPIRED" || status === "CANCELLED") return;
   if (def.consumes === "executor" && state.chain.some((link) => link.kind === "EFFECT_FAILED" && link.body.approvalRequestId === approvalId)) return;
-  if ((status === "QUORUM_MET" || status === "DENIED") && holdsRefusedDecision(store, state, gate, approvalId, regulated, status)) return;
+  if (status === "DENIED" && deniedOnlyByNonMembers(store, state, approvalId)) return;
+  if (status === "QUORUM_MET") {
+    // A dry run of consumption (it only reads; consumeGate consumes). The requester is already excluded, so the dry run
+    // adds no exclusion of its own: it re-opens only when no `complete` caller could consume the grant.
+    try {
+      verifyAndConsumeEffect(store, state, { def, gate, approvalRequestId: approvalId, callerKey: gate.requested_by_key, regulated });
+    } catch (error) {
+      if (error instanceof A4StoreError) return;
+      throw error;
+    }
+  }
   throw fail(409, "EFFECT_GATE_OPEN", `the effect's engine request is ${status}`, { approvalRequestId: approvalId });
 }
 
