@@ -146,7 +146,7 @@ export function renderSpecEditor(ctx) {
   if (stage !== project.stage) {
     // Another stage's view: the head revision belongs to the project's current stage, so it is shown, never proposed here.
     return `<p class="muted">${esc(stageTitle(stage))} is not this project's current stage (${esc(stageTitle(project.stage))}).
-      ${revision ? `This is r${esc(revision.revisionNo)}, a ${esc(stageTitle(revision.stage))} specification, shown read-only.` : "No specification yet."}
+      ${revision ? `This is r${esc(revision.revisionNo)}${revision.stage ? `, a ${esc(stageTitle(revision.stage))} specification` : ""}, shown read-only.` : "No specification yet."}
       Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? studioJson(revision.spec ?? {}) : ""}`;
   }
   return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
