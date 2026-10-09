@@ -229,12 +229,20 @@ export function renderLanes(readiness) {
     <p><code>valid: ${esc(readiness.integrity.valid)}</code> ${codes(readiness.integrity.reasonCodes)}</p>${checks.join("")}</section></div>`;
 }
 
-/** The open, met and superseded gates of one stage; a4.js reads the same selection when it posts a decision. */
+const STAGE_GATES = new Set(["direction", "completion"]);
+const isLive = (gate) => !gate.supersededBy && (gate.quorum?.status === "PENDING" || gate.quorum?.status === "QUORUM_MET");
+
+/**
+ * The open, met and superseded direction/completion gates of one stage; a4.js reads the same selection when it posts a
+ * decision. `policy` gates (opened at the project's stage) are never among them: this page does not show the proposed
+ * gate policy, so it lists the live ones only to say they are decided elsewhere.
+ */
 export function currentGates(gates, stage) {
-  const live = gates.filter((gate) => gate.stage === stage && !gate.supersededBy);
+  const own = gates.filter((gate) => gate.stage === stage && STAGE_GATES.has(gate.gate));
+  const live = own.filter((gate) => !gate.supersededBy);
   return { open: live.filter((gate) => gate.quorum?.status === "PENDING").at(-1) ?? null,
     met: live.filter((gate) => gate.quorum?.status === "QUORUM_MET").at(-1) ?? null,
-    stale: gates.filter((gate) => gate.stage === stage && gate.supersededBy) };
+    stale: own.filter((gate) => gate.supersededBy), policy: gates.filter((gate) => gate.gate === "policy" && isLive(gate)) };
 }
 
 /**
@@ -252,12 +260,16 @@ export const gateReview = (gate, readiness) => (gate ? { gateId: gate.gateId, bi
 export const sameReview = (a, b) => a !== null && b !== null && a.gateId === b.gateId && a.bindingDigest === b.bindingDigest
   && a.readinessBindingDigest === b.readinessBindingDigest;
 
-/** A decision Studio does not count (readiness.staleApprovals) is struck through with its reason codes. */
-function decisionRow(decision, uncounted) {
-  const who = `${esc(decision.username)} <code>${esc(decision.decision)}</code>`;
-  return `<li>${uncounted ? `<s>${who}</s> ${codes(uncounted)} <span class="muted">does not count</span>` : who}
+/**
+ * A decision readiness.staleApprovals lists shows Studio's reason codes as received. Only GATE_STALE, the reason Studio
+ * gives for a decision its quorum excludes, is struck through; a RESOURCE_DRIFTED decision still counts until it goes stale.
+ */
+const strikeIfStale = (html, reasonCodes) => (reasonCodes.includes("GATE_STALE") ? `<s>${html}</s>` : html);
+function decisionRow(decision, reasonCodes = []) {
+  return `<li>${strikeIfStale(`${esc(decision.username)} <code>${esc(decision.decision)}</code>`, reasonCodes)} ${codes(reasonCodes)}
     <span class="muted">${time(decision.ts)}</span>${decision.selfApproved ? ` <span class="muted">${TRUTH.selfApproved}</span>` : ""}</li>`;
 }
+export const POLICY_ELSEWHERE = "A gate-policy change is open. This page does not show the proposed policy, so it cannot be decided here";
 
 function gateChangeBanner({ from, to }) {
   const what = from.gateId === to.gateId && from.bindingDigest === to.bindingDigest
@@ -269,23 +281,24 @@ function gateChangeBanner({ from, to }) {
 
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange } = ctx;
-  const { open, met, stale } = currentGates(gates, stage);
+  const { open, met, stale, policy } = currentGates(gates, stage);
   const gate = open ?? met;
-  const uncounted = new Map(readiness.staleApprovals.map((row) => [row.decisionId, row.reasonCodes]));
+  const staleCodes = new Map(readiness.staleApprovals.map((row) => [row.decisionId, Array.isArray(row.reasonCodes) ? row.reasonCodes : []]));
   const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
   const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : offer);
   const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
     bound to r${esc(old.revisionNo)}</li>`));
-  const staleCodes = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
-    .map((row) => `<li><s><code>${esc(row.decisionId)}</code></s> ${codes(row.reasonCodes)}</li>`);
+  const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
+    .map((row) => `<li>${strikeIfStale(`<code>${esc(row.decisionId)}</code>`, staleCodes.get(row.decisionId))} ${codes(row.reasonCodes)}</li>`);
   return `<section class="card a4-approvals"><h4>Approvals</h4>${gateChange ? gateChangeBanner(gateChange) : ""}
     ${gate ? `<p><code>${esc(gate.gate)}</code> gate r${esc(gate.revisionNo)} · <code>${esc(gate.quorum.status)}</code> ·
       ${esc(gate.quorum.approvals)} of ${esc(gate.quorum.required)} required approvals</p>
       <p class="muted">Valid while the specification and resources are unchanged. ${TRUTH.vote}.</p>
       ${gate.excludedKeys.length ? `<p>Excluded from deciding (separation of duties): ${codes(gate.excludedKeys)}</p>` : ""}
-      ${list(gate.decisions.map((decision) => decisionRow(decision, uncounted.get(decision.decisionId))), "No decisions yet.")}`
+      ${list(gate.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`
       : `<p class="muted">No open gate for this stage.</p>`}
-    ${history.length || staleCodes.length ? `<details><summary>Stale decisions</summary>${list([...history, ...staleCodes], "")}</details>` : ""}
+    ${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}: ${policy.map((row) => `<code>${esc(row.gateId)}</code> <code>${esc(row.quorum.status)}</code>`).join(", ")}.</p>` : ""}
+    ${history.length || otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list([...history, ...otherStale], "")}</details>` : ""}
     <label>Reason <input name="reason" maxlength="2000" /></label>
     <div class="row wrap">
       ${actionButton("Approve", "approve", open ? pinned(allowed.decide) : null)}
