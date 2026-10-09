@@ -24,9 +24,11 @@ import {
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
-import { a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import {
-  A4_STAGES, a4AnswerSchema, a4HypothesisSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Question, type A4Stage, type A4Step
+  a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
+} from "./a4Router.js";
+import {
+  a4AnswerSchema, a4HypothesisSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
@@ -281,10 +283,10 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
   if (route.method !== "POST") return false;
   const { store } = route;
   const step = /^\/stages\/([a-z]+)\/(answers|understand|confirm-understanding|explain|propose|build|review)$/.exec(tail);
-  if (step !== null) return stageStep(route, projectId, z.enum(A4_STAGES).parse(step[1]), step[2] as StepRoute);
+  if (step !== null) return stageStep(route, projectId, stageInput(step[1]), step[2] as StepRoute);
   const gateRequest = /^\/stages\/([a-z]+)\/gates\/(direction|completion)\/request$/.exec(tail);
   if (gateRequest !== null) {
-    const stage = z.enum(A4_STAGES).parse(gateRequest[1]);
+    const stage = stageInput(gateRequest[1]);
     const gate = gateRequest[2] as "direction" | "completion";
     const { body, request } = await readJson(route, z.strictObject(base));
     return respond(route, projectId, request, () => {
@@ -324,7 +326,7 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
   }
   const complete = /^\/stages\/([a-z]+)\/complete$/.exec(tail);
   if (complete !== null) {
-    const stage = z.enum(A4_STAGES).parse(complete[1]);
+    const stage = stageInput(complete[1]);
     const { body, request } = await readJson(route, completeSchema);
     let attemptId: string | null = null;
     return respond(route, projectId, request, () => {
@@ -337,7 +339,7 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
   }
   const effect = /^\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/(open|retry)$/.exec(tail);
   if (effect !== null) {
-    z.enum(A4_STAGES).parse(effect[1]);
+    stageInput(effect[1]);
     const effectId = effect[2]!;
     if (effect[3] === "open") {
       const { body, request } = await readJson(route, z.strictObject({ ...base, gateId: gateIdSchema }));

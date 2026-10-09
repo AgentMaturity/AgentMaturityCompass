@@ -83,6 +83,21 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
   }
 }
 
+/**
+ * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
+ * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
+ */
+export function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
+  const parsed = schema.safeParse(value);
+  if (parsed.success) return parsed.data;
+  const issue = parsed.error.issues[0];
+  throw a4Fail(400, "INPUT_INVALID", `Invalid A4 request: ${issue ? `${issue.path.join(".") || what}: ${issue.message}` : "schema mismatch"}`);
+}
+/** A stage named by a path segment or query parameter. */
+export function stageInput(value: unknown): A4Stage {
+  return parseInput(z.enum(A4_STAGES), value, "stage");
+}
+
 /** The body as sent: lossless UTF-8 JSON (native admission hashes the exact bytes), at most 1 MiB. */
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -129,7 +144,7 @@ export async function readJson<S extends z.ZodType>(route: A4Route, schema: S): 
   if (named !== undefined) throw a4Fail(400, "IDENTITY_FIELD_REFUSED", `"${named}" is refused: identity comes only from your signed-in session.`);
   const trust = requestTrustOverride(value);
   if (trust !== null) throw a4Fail(400, "TRUST_FIELD_REFUSED", trust);
-  const body = schema.parse(value);
+  const body = parseInput(schema, value);
   const clientRequestId = (body as { clientRequestId?: unknown }).clientRequestId;
   const request = typeof clientRequestId === "string" && route.principal !== null
     ? { principalKey: route.principal.key, clientRequestId, bodyHash: sha256Hex(`${route.method} ${route.pathname}\n${text}`) } : undefined;
@@ -221,8 +236,9 @@ function sendError(res: ServerResponse, error: unknown, projectId: string | null
     res.end(JSON.stringify({ ok: false, error: message, code, ...extra }));
   };
   if (error instanceof ZodError) {
+    // Client input is parsed through parseInput (400); a ZodError here is a stored row or record that does not parse.
     const issue = error.issues[0];
-    return send(400, "INPUT_INVALID", `Invalid A4 request: ${issue ? `${issue.path.join(".") || "body"}: ${issue.message}` : "schema mismatch"}`);
+    return send(409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
   }
   if (error instanceof A4StoreError) {
     const stale = error.code === "A4_STALE_HEAD" && projectId !== null
@@ -511,7 +527,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   }
   if (rest === "/readiness") {
     assertQuery(params, params.has("stage") ? ["stage"] : []);
-    apiSuccess(route.res, readinessAt(params.has("stage") ? z.enum(A4_STAGES).parse(params.get("stage")) : headStage(state.project)));
+    apiSuccess(route.res, readinessAt(params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project)));
     return true;
   }
   if (rest === "/events") {
@@ -603,7 +619,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (unproduced !== undefined) {
     // The producers land with Adapt (P1-61, conformance) and Activate (P1-62, value and monitor); until then nothing is evaluated.
     assertQuery(params, unproduced === "conformance" && params.has("stage") ? ["stage"] : []);
-    if (params.has("stage")) z.enum(A4_STAGES).parse(params.get("stage"));
+    if (params.has("stage")) stageInput(params.get("stage"));
     apiSuccess(route.res, { projectId, view: unproduced, status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
       claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
     return true;
