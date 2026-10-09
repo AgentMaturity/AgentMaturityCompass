@@ -1477,12 +1477,17 @@ describe("AMC API routers", () => {
       ["/api/v1/crypto/cert/verify-revocation", "POST", { file: "revocation.json" }, undefined, 200],
       ["/api/v1/crypto/merkle/rebuild", "POST", undefined, undefined, 200],
       ["/api/v1/crypto/merkle/root", "GET", undefined, undefined, 200],
-      ["/api/v1/crypto/merkle/prove", "POST", { entryHash: "abc", outFile: "proof.json" }, undefined, 201],
+      ["/api/v1/crypto/merkle/prove", "POST", { entryHash: "abc", outFile: ".amc/transparency/proofs/proof.amcproof" }, undefined, 201],
       ["/api/v1/crypto/merkle/verify-proof", "POST", { file: "proof.json" }, undefined, 200],
       ["/api/v1/crypto/receipts-chain/receipt-1", "GET", undefined, undefined, 200]
     ] as const;
     for (const [pathname, method, body, url, status] of cases) {
       await assertJsonRoute(handleCryptoRoute, { pathname, method, body, url, workspace: ws }, status);
+    }
+    // P0-51: prove writes only under .amc/transparency/proofs/.
+    for (const outFile of ["proof.json", "../proof.amcproof", "/tmp/proof.amcproof", ".amc/transparency/proofs"]) {
+      const refused = await callRoute(handleCryptoRoute, { pathname: "/api/v1/crypto/merkle/prove", method: "POST", body: { entryHash: "abc", outFile }, workspace: ws });
+      expect(refused.status).toBe(400);
     }
   });
 
