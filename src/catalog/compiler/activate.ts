@@ -52,6 +52,7 @@ export interface ActiveCompiledPolicy {
   /** Identity of the journal head this was loaded from; a session pins it. */
   readonly entrySha256: string;
   readonly planDigest: string;
+  readonly profileSha256: string;
   readonly lockDigest: string;
   readonly runtimePolicy: EffectiveRuntimePolicy;
   readonly controls: readonly ActiveControl[];
@@ -98,7 +99,7 @@ export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolic
     const compiledPoints = [...new Set(record.binding.parameters.flatMap((p) => PARAMETERS.find((spec) => spec.pattern.test(p.name))?.point ?? []))];
     return { controlId: r.controlId, controlVersion: r.controlVersion, points: record.binding.points, compiledPoints, review: record.review.status };
   });
-  return { revision: journal.revision, entrySha256: journal.entrySha256 ?? "", planDigest: plan.digest,
+  return { revision: journal.revision, entrySha256: journal.entrySha256 ?? "", planDigest: plan.digest, profileSha256: plan.profile.sha256,
     lockDigest: digestOf(plan.lock), runtimePolicy: plan.runtimePolicy, controls };
 }
 

@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { admitNativeSandboxPolicy } from "../../sandbox/nativeSandboxBinding.js";
 import { reserveNativeToolBudget } from "../../budgets/nativeBudgetAdmission.js";
 import { evaluateRuntimeFirewall } from "../../runtime/firewall.js";
@@ -10,6 +11,7 @@ import {
 import { BLOCK_CONFIDENCE, matchInjection } from "../../shield/injection/injectionMatcher.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolDefinition, ToolExecution, ToolGuard } from "../toolTypes.js";
+import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 
 /**
  * AMC's existing policy engines, wired in as monotonic guards (P4.1, ADR-4).
@@ -157,6 +159,7 @@ export function toolhubAllowlistGuard(workspace: string,
  * let it go.
  */
 export function networkEgressGuard(workspace: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
+  workspace = resolve(workspace);
   return (execution) => {
     if (execution.actionClass !== "NETWORK_EXTERNAL") return undefined;
 
@@ -181,9 +184,16 @@ export function networkEgressGuard(workspace: string, argumentsFor: GovernedArgu
       // which is a denial rather than a blank cheque.
       return `"${execution.name}" is not in the signed tool allowlist, so its egress is ungoverned`;
     }
-    return hostAllowedForTool(definition, host)
-      ? undefined
-      : `egress denied: ${host} is not on the allowlist for ${execution.name}`;
+    if (!hostAllowedForTool(definition, host)) return `egress denied: ${host} is not on the allowlist for ${execution.name}`;
+    try {
+      // Guards may run before authorization binds. Missing trusted classes remain unknown, never model-declared.
+      checkEgress({ workspace, channel: "network-tool", url: raw, agentId: execution.agentId,
+        dataClasses: execution.authorization?.record.resource.dataClasses ?? null,
+        purpose: execution.authorization?.record.resource.purpose ?? null });
+      return undefined;
+    } catch (error) {
+      return error instanceof EgressBlocked ? `residency egress denied: ${error.decision.reason}` : "residency egress check unavailable";
+    }
   };
 }
 

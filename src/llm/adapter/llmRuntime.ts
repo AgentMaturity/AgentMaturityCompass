@@ -38,6 +38,7 @@
  * row records both the provider's facts and the retry verdict the route's frozen
  * policy reached.
  */
+import { resolve } from "node:path";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import { credentialRefName } from "../../credentials/credentialRef.js";
 import type { RecordedCredential } from "../../session/requestOutcomeMeta.js";
@@ -61,6 +62,7 @@ import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js
 import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js";
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
+import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -167,11 +169,14 @@ export class LlmRuntime {
 
   private readonly transport: HttpTransport;
 
+  private readonly workspace: string;
+
   private readonly now: () => number;
 
   constructor(init: LlmRuntimeInit) {
     this.init = init;
     this.transport = init.transport ?? fetchTransport;
+    this.workspace = resolve(init.session.workspace);
     this.now = init.now ?? Date.now;
   }
 
@@ -315,8 +320,10 @@ export class LlmRuntime {
 
     let response: HttpResponse;
     try {
+      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes.
+      checkEgress({ workspace: this.workspace, channel: "provider", url: request.url });
       dispatchAttempted = true;
-      response = await this.transport(request);
+      response = await this.transport({ ...request, redirect: "error" });
     } catch (error: unknown) {
       throw settle(recorder.fail(this.transportFailure(error, spec.signal)));
     }
@@ -407,6 +414,10 @@ export class LlmRuntime {
     error: unknown,
     signal: AbortSignal | undefined
   ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string } {
+    if (error instanceof EgressBlocked) {
+      return { failure: { message: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" },
+        kind: "error", httpStatus: null, cause: "residency_blocked" };
+    }
     if (signal?.aborted === true) {
       return {
         failure: { message: "request aborted before the provider responded", code: LLM_FAILURE_CODE.ABORTED },

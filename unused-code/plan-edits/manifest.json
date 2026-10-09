@@ -122,6 +122,13 @@
       "sha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5"
     },
     {
+      "path": "src/bridge/bridgeServer.ts",
+      "issue": "P2-01",
+      "baseCommit": "f60406454b94e213290587911e6b8066c4126869",
+      "archivePath": "unused-code/plan-edits/P2-01/src/bridge/bridgeServer.ts.landed",
+      "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f"
+    },
+    {
       "path": "src/ci/gate.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",

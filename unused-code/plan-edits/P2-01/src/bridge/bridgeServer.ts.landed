@@ -1,5 +1,4 @@
 import { writeControlJson, writeControlError } from "../utils/controlHttpResponses.js";
-import { residencyFetch } from "../residency/checkEgress.js";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { once } from "node:events";
@@ -38,6 +37,7 @@ import {
   evaluateProviderHookControl,
   type HookProvider,
 } from "./hookControl.js";
+
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;
@@ -251,7 +251,6 @@ function appendBridgeFirewallAudit(params: {
 }
 
 async function forwardToGateway(params: {
-  workspace: string;
   gatewayBaseUrl: string;
   gatewayPath: string;
   search: string;
@@ -280,7 +279,7 @@ async function forwardToGateway(params: {
   if (params.contentType) {
     headers.set("content-type", params.contentType);
   }
-  const response = await residencyFetch(params.workspace, "bridge", target, {
+  const response = await fetch(target, {
     method: params.method,
     headers,
     body: params.requestBody.byteLength > 0 ? new Uint8Array(params.requestBody) : undefined
@@ -291,6 +290,7 @@ async function forwardToGateway(params: {
     body: response.body
   };
 }
+
 export async function handleBridgeRequest(options: HandleBridgeRequestOptions): Promise<boolean> {
   if (!options.pathname.startsWith("/bridge/")) {
     return false;
@@ -988,7 +988,6 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     }
 
     const response = await forwardToGateway({
-      workspace: options.workspace,
       gatewayBaseUrl: options.gatewayBaseUrl,
       gatewayPath: route.gatewayPath,
       search: options.url.search,
@@ -1001,6 +1000,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       correlationId,
       runId
     });
+
     if (streamPassthrough) {
       options.res.statusCode = response.status;
       const contentType = response.headers.get("content-type");

@@ -4,6 +4,9 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
+import { getWorkspaceScope } from '../enforce/evidenceEmitter.js';
+import { residencyFetch, EgressBlocked } from '../residency/checkEgress.js';
 
 export interface CallbackEntry {
   id: string;
@@ -41,6 +44,13 @@ export class CallbackRegistry {
   private callbacks = new Map<string, CallbackEntry>();
   private webhooks = new Map<string, WebhookConfig>();
   private deliveryLog: DeliveryResult[] = [];
+  private readonly workspace: string | undefined;
+
+  /** Capture trusted delivery scope; webhook payloads never choose their policy workspace. */
+  constructor(workspace?: string) {
+    const scoped = workspace ?? getWorkspaceScope();
+    this.workspace = scoped === undefined ? undefined : resolve(scoped);
+  }
 
   registerCallback(eventType: string, fn: (payload: unknown) => void, filter?: (payload: unknown) => boolean): string {
     const id = randomUUID();
@@ -50,7 +60,7 @@ export class CallbackRegistry {
 
   registerWebhook(config: WebhookConfig): string {
     const id = randomUUID();
-    this.webhooks.set(id, config);
+    this.webhooks.set(id, { ...config, eventTypes: [...config.eventTypes] });
     return id;
   }
 
@@ -86,8 +96,8 @@ export class CallbackRegistry {
           // Simple HMAC signature (would use crypto in real impl)
           headers['X-AMC-Signature'] = `sha256=${config.secret.slice(0, 8)}`;
         }
-        // Use dynamic import for fetch compatibility
-        const response = await fetch(config.url, { method: 'POST', headers, body, signal: AbortSignal.timeout(10_000) });
+        const response = await residencyFetch(this.workspace, 'callback', config.url,
+          { method: 'POST', headers, body, redirect: 'error', signal: AbortSignal.timeout(10_000) });
         if (response.ok) {
           this.deliveryLog.push({ webhookUrl: config.url, eventType, status: 'delivered', attempts });
           return;
@@ -95,6 +105,7 @@ export class CallbackRegistry {
         lastError = `HTTP ${response.status}`;
       } catch (err) {
         lastError = err instanceof Error ? err.message : String(err);
+        if (err instanceof EgressBlocked) break;
       }
 
       if (attempts <= config.maxRetries) {
@@ -111,7 +122,7 @@ export class CallbackRegistry {
   }
 
   listCallbacks(): CallbackEntry[] { return [...this.callbacks.values()]; }
-  listWebhooks(): WebhookConfig[] { return [...this.webhooks.values()]; }
+  listWebhooks(): WebhookConfig[] { return [...this.webhooks.values()].map(config => ({ ...config, eventTypes: [...config.eventTypes] })); }
   getDeliveryLog(): DeliveryResult[] { return [...this.deliveryLog]; }
   clearDeliveryLog(): void { this.deliveryLog.length = 0; }
 }
