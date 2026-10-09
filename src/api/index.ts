@@ -51,6 +51,7 @@ import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
 import { handleDomainProofRoute } from './domainProofRouter.js';
 import { handleNativeTasksRoute, type NativeTaskApiContext } from './nativeTasksRouter.js';
+import { handleA4Route } from '../a4/a4Router.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
 export type ApiValidationPolicy = 'schema-validated' | 'router-local' | 'passthrough';
@@ -114,6 +115,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'schema-validated',
     handler: handleNativeTasksRoute
+  },
+  {
+    id: 'a4',
+    description: 'A4 Forge projects and gates (preview: 404 A4_PREVIEW_DISABLED unless AMC_A4_PREVIEW=1)',
+    prefixes: ['/api/v1/a4'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: handleA4Route
   },
   {
     id: 'score',
