@@ -347,13 +347,19 @@ function mountProject(projectId, options) {
       if (!text) throw new Error(`Write ${what} first. Nothing was sent.`);
       return text;
     };
-    const reason = root.querySelector('.a4-approvals [name="reason"]')?.value.trim() ?? "";
+    // Studio refuses an empty reason on decisions, Hold, Resume and Acknowledge.
+    const reason = () => {
+      const text = root.querySelector('.a4-approvals [name="reason"]')?.value.trim() ?? "";
+      if (!text) throw new Error("Write a reason in the Approvals card first. Nothing was sent.");
+      return text;
+    };
     const post = (label, path, body, clears = [], got = undefined) => ({ label, path, body, clears, got });
     const REASON = ["page:reason"];
     const repin = () => { reviewed = null; }; // the user's own gate request: the next load pins the gate it opened
     const decide = (verb, label, extra) => {
+      const why = reason();
       const { gateId, ...binding } = decisionBinding();
-      return post(label, projectPath(`/gates/${encodeURIComponent(gateId)}/${verb}`), { reason, ...extra(binding) }, REASON);
+      return post(label, projectPath(`/gates/${encodeURIComponent(gateId)}/${verb}`), { reason: why, ...extra(binding) }, REASON);
     };
     switch (name) {
       case "answers": {
@@ -401,9 +407,10 @@ function mountProject(projectId, options) {
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
         return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
-      case "hold": return post("Hold", projectPath("/hold"), { reason, ...headBinding() }, REASON);
-      case "resume": return post("Resume", projectPath("/resume"), { reason, ...headBinding() }, REASON);
-      case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, reason, ...headBinding() }, REASON);
+      case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
+      case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
+      // The item was listed by the viewed stage's readiness, so it is acknowledged at that stage, not the head's.
+      case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, stage, reason: reason(), ...headBinding() }, REASON);
       case "add-member": {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.

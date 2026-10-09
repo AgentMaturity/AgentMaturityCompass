@@ -356,7 +356,7 @@ export function renderApprovalsBar(ctx) {
       : `<p class="muted">No open gate for this stage.</p>`}
     ${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}: ${policy.map((row) => `<code>${esc(row.gateId)}</code> <code>${esc(row.quorum.status)}</code>`).join(", ")}.</p>` : ""}
     ${history.length || otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list([...history, ...otherStale], "")}</details>` : ""}
-    <label>Reason <input name="reason" maxlength="2000" /></label>
+    <label>Reason (required to decide, hold, resume or acknowledge) <input name="reason" required maxlength="2000" /></label>
     <div class="row wrap">
       ${actionButton("Approve", "approve", open ? pinned(allowed.decide) : null)}
       ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
