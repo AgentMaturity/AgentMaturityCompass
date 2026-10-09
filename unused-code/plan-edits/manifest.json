@@ -185,6 +185,13 @@
       "sha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294"
     },
     {
+      "path": "src/drift/alerts.ts",
+      "issue": "P2-01",
+      "baseCommit": "29118e02e5ae3c1ea46d2df04a7dc4838134a852",
+      "archivePath": "unused-code/plan-edits/P2-01/src/drift/alerts.ts.landed",
+      "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a"
+    },
+    {
       "path": "src/evidence/exporter.ts",
       "issue": "P0-27",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",

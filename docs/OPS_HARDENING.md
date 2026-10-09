@@ -68,6 +68,8 @@ The DUAL_WRITE and CUTOVER stages keep their existing behavior; this change sele
 
 CLI `score collect-evidence` and `score operational-independence` scope their guard reads to the current workspace. Their command paths and output contracts are unchanged. Other CLI assessment paths, legacy Studio entrypoints, and external callers of the scoring APIs still need explicit workspace/scope integration before complete multi-workspace coverage can be claimed.
 
+Drift-alert delivery captures workspace and agent attribution before its sequential channel loop. Each prepared webhook request checks callback residency immediately before native HTTP dispatch; resource classes and purpose remain unknown. Typed refusal rejects that channel without opening its request. An earlier channel may already have completed, and some monitor callers suppress or stringify failures, so neither whole-operation no-effect nor successful delivery is implied. Native HTTP still follows no redirects. DNS pinning, timeouts, response handling and an atomic verified config snapshot are not added by this source slice.
+
 ## Remaining P2-01 work
 
 `scripts/egress-call-sites.json` records gated sites, justified exemptions, and explicitly deferred routes. It is a source inventory, not executed coverage evidence. Native DNS-awaiting final-hop transports, shell proxy traffic, telemetry/webhook exporters, and other out-of-slice callers must be reviewed before claiming complete egress enforcement.
