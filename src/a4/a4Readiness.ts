@@ -229,13 +229,19 @@ const METHODS = new Set<ClaimMethod>(["synthetic", "numeric_self_answer", "keywo
   "runtime_observation", "executed_test", "human_review"]);
 const TIERS = new Set<string>(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED", "UNVERIFIED"]);
 
-/** A resolved ref's envelope, through the eligibility service: the method and tier are the referenced row's. */
+/**
+ * A resolved ref's envelope, through the eligibility service: the method is the referenced row's, and so is the tier
+ * only on a lane the ref earned at this read (observed or verified). A ref resolveRefs downgraded (dangling, unsigned) or
+ * stored as self_reported never lends its row's OBSERVED tier to the claim.
+ */
 function refEnvelope(ref: A4ResolvedRef, regulated: boolean, now: number): ClaimEnvelope {
   const method: ClaimMethod = ref.claimKind === "synthetic_example" ? "synthetic"
     : ref.method !== null && METHODS.has(ref.method as ClaimMethod) ? ref.method as ClaimMethod : "human_review";
+  const earned = ref.lane === "observed" || ref.lane === "verified";
   return evaluateClaimEligibility({
     producer: `a4-ref:${ref.refKind}:${ref.refId}`, method, regulated, proposed: { result: "not_evaluated", level: null },
-    evidence: { eventCount: ref.status === "dangling" ? 0 : 1, tiers: [(ref.trustTier !== null && TIERS.has(ref.trustTier) ? ref.trustTier : "UNVERIFIED") as ClaimEvidenceTier],
+    evidence: { eventCount: ref.status === "dangling" ? 0 : 1,
+      tiers: [(earned && ref.trustTier !== null && TIERS.has(ref.trustTier) ? ref.trustTier : "UNVERIFIED") as ClaimEvidenceTier],
       newestTs: null, boundToControl: true, sameScope: true, contradictory: false,
       signatureValid: ref.status === "unsigned" ? false : ref.status === "dangling" ? null : true, issuerPinned: ref.lane === "verified" ? true : null },
     evidenceRefs: [ref.sha256], review: ref.lane === "verified" ? { state: "approved", independent: true } : undefined, now
