@@ -31,7 +31,7 @@ import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { A4BlobError, a4ProjectsRoot, ensureA4Kek, putPrivate } from "./a4Blobs.js";
+import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
@@ -215,6 +215,18 @@ function createStore(workspace: string, ledger: Ledger) {
       problems.push(`transition ${row.seq} signed receipt does not bind it`);
     }
     return problems;
+  };
+
+  /** sha256 of the project's key.pub as its CREATED transition records it, read only when that row verifies now. */
+  const createdKeySha256 = (projectId: string): string => {
+    const raw = db.prepare("SELECT * FROM a4_transitions WHERE project_id = ? AND seq = 0").get(projectId);
+    const row = raw === undefined ? null : a4TransitionRowSchema.parse(raw);
+    const problems = row === null || row.kind !== "CREATED" ? ["no CREATED transition"] : transitionProblems(row, getPublicKeyHistory(workspace, "monitor"));
+    const keySha256 = row === null ? undefined : (JSON.parse(row.body_json) as { privateKeySha256?: unknown }).privateKeySha256;
+    if (problems.length > 0 || typeof keySha256 !== "string") {
+      throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId}'s CREATED record does not verify`, problems.length > 0 ? problems : ["no key fingerprint"]);
+    }
+    return keySha256;
   };
 
   /**
@@ -422,8 +434,9 @@ function createStore(workspace: string, ledger: Ledger) {
       .all(workspaceId) as unknown[]).map((row) => a4ProjectRowSchema.parse(row)),
 
     /**
-     * Refused without a signed approval policy. CREATED carries the default gate policy and the derived single-user
-     * self-approval facts; the creator becomes the first owner. One active project per agent (partial unique index).
+     * Refused without a signed approval policy. CREATED carries the default gate policy, the derived single-user
+     * self-approval facts and the sha256 of the project's blob key; the creator becomes the first owner. One active
+     * project per agent (partial unique index; checked first under the `a4-requests` lock so a refusal leaves no key).
      */
     createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey }): A4TransitionResult {
       const policy = verifyApprovalPolicySignature(workspace);
@@ -433,25 +446,31 @@ function createStore(workspace: string, ledger: Ledger) {
       if (!policy.valid) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${policy.reason ?? "unknown"}`);
       if (!/^[a-z0-9][a-z0-9_-]{0,127}$/.test(input.agentId)) throw new A4StoreError(400, "INPUT_INVALID", "Choose a valid agent ID.");
       if (input.name.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "Name the project.");
-      try {
-        ensureA4Kek(workspace);
-      } catch (error) {
-        if (error instanceof A4BlobError) throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault once so the workspace's A4 key can be created.");
-        throw error;
-      }
       const projectId = randomId("a4p");
       const population = principalPopulation(workspace);
       const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal: population.activeLocal, hostPrincipals: population.hostPrincipals,
         hostedRouter: input.hostedRouter, regulated: false, workspaceFloor: undefined, ratcheted: false, decidingPrincipal: input.actor });
       const gatePolicy: A4GatePolicyV1 = DEFAULT_A4_GATE_POLICY;
-      return commit(projectId, ({ seq, ts }) => ({
-        kind: "CREATED", actor: input.actor, stage: "aspire", revisionNo: 0,
-        payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)),
-          selfApprovalAllowed, selfApprovalFacts: { activeUserCount: population.activeLocal?.length ?? null, hostPrincipals: population.hostPrincipals,
-            hostedRouter: input.hostedRouter, ratcheted: false, regulated: false, selfApprovalAllowed } },
-        sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
-          { principalKey: input.actor.key, authSource: input.actor.authSource, userId: input.actor.userId, username: input.actor.username }, ["owner"])]
-      }), { request: input.request }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
+      let privateKeySha256: string | null = null;
+      return commit(projectId, ({ seq, ts }) => {
+        if (db.prepare("SELECT 1 FROM a4_projects WHERE workspace_id = ? AND agent_id = ? AND stage <> 'retired'").get(workspaceId, input.agentId)) {
+          throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${input.agentId} already has an active A4 project; retire it first`);
+        }
+        try {
+          privateKeySha256 ??= createProjectKey(workspace, projectId);
+        } catch (error) {
+          if (error instanceof A4BlobError && error.code === "VAULT_LOCKED") throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault to create an A4 project.");
+          throw error;
+        }
+        return {
+          kind: "CREATED", actor: input.actor, stage: "aspire", revisionNo: 0,
+          payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), privateKeySha256,
+            selfApprovalAllowed, selfApprovalFacts: { activeUserCount: population.activeLocal?.length ?? null, hostPrincipals: population.hostPrincipals,
+              hostedRouter: input.hostedRouter, ratcheted: false, regulated: false, selfApprovalAllowed } },
+          sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
+            { principalKey: input.actor.key, authSource: input.actor.authSource, userId: input.actor.userId, username: input.actor.username }, ["owner"])]
+        };
+      }, { request: input.request }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
         created_by_key: input.actor.key });
     },
 
@@ -484,12 +503,14 @@ function createStore(workspace: string, ledger: Ledger) {
     },
 
     /**
-     * The body goes to the project's encrypted blob store (no vault needed to write); the row keeps only the salted
-     * hash and the ciphertext reference. ponytail: a blob whose transition then fails stays as an unreferenced file.
+     * The body goes to the project's encrypted blob store, sealed to the key CREATED names (the blob write needs no
+     * vault; the transition's audit row does); the row keeps only the salted hash and the ciphertext reference.
+     * ponytail: a blob whose transition then fails stays as an unreferenced file.
      */
     addComment(projectId: string, input: { actor: A4Actor; body: string; cardId: string; inReplyTo?: string | null; request?: A4RequestKey }): A4TransitionResult {
       if (input.body.trim().length === 0 || input.cardId.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "A comment needs text and a card.");
-      const blob = putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"));
+      if (readHead(projectId) === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
+      const blob = putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"), createdKeySha256(projectId));
       const commentId = randomId("a4c");
       return commit(projectId, ({ head, ts }) => ({
         kind: "COMMENT", actor: input.actor, payload: { commentId, cardId: input.cardId, bodySha256: blob.bodySha256, blobRef: blob.blobRef },

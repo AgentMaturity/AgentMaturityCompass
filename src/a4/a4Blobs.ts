@@ -1,14 +1,18 @@
 /**
  * A4 Forge private blob store (P1-56; design §4.2): comment bodies and personal context never enter the ledger.
  *
- * Each body is sealed to its project's public key (`a4-projects/<projectId>/private/key.pub`), so writes never need
- * an unlocked vault. The project's private key lives in `key.enc`, sealed to the workspace KEK, whose private half is
- * the vault secret `a4:kek`; reads unwrap through the vault and report VAULT_LOCKED when they cannot. The salted
- * `bodySha256 = sha256(salt || body)` keeps a short body from being confirmed by dictionary after erasure; the salt
- * travels inside the ciphertext, and `blobRef = sha256(ciphertext)` names the file.
+ * `createProjectKey` (called by createProject, which needs the vault anyway to sign its audit row) makes the project's
+ * RSA key pair: `key.pub` seals bodies, and `key.enc` holds the private half under AES-256-GCM with the project's wrap
+ * secret, the vault secret `a4:<projectId>:wrap`. Sealing needs only `key.pub`, so the blob write itself needs no vault
+ * (the transition recording it still signs with the vault's monitor key). `key.pub` is an unauthenticated file, so
+ * `putPrivate` seals only to a key whose sha256 matches the one the caller read from the signed CREATED transition.
+ * Reads unwrap through the vault and report VAULT_LOCKED when they cannot. The salted `bodySha256 = sha256(salt ||
+ * body)` keeps a short body from being confirmed by dictionary after erasure; the salt travels inside the ciphertext,
+ * and `blobRef = sha256(ciphertext)` names the file.
  *
- * Erasure is deleting `key.enc` (`destroyProjectKey`). It is effective only once every backup older than it is
- * rotated: an earlier backup still holds the old key file and vault envelope.
+ * Erasure (`destroyProjectKey`) leaves a tombstone, deletes the wrap secret and `key.enc`; nothing re-keys the project
+ * afterwards (an explicit re-key belongs to P2-36). It is effective only once every backup older than it is rotated: an
+ * earlier backup still holds key.enc and a vault envelope with the wrap secret.
  */
 import { constants, createCipheriv, createDecipheriv, generateKeyPairSync, privateDecrypt, publicEncrypt, randomBytes } from "node:crypto";
 import { readFileSync, rmSync } from "node:fs";
@@ -17,12 +21,14 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { getVaultSecretReadOnly, setVaultSecret, unlockVault, vaultStatus } from "../vault/vault.js";
+import { deleteVaultSecret, getVaultSecretReadOnly, setVaultSecret, unlockVault, vaultStatus } from "../vault/vault.js";
 
-const KEK_SECRET = "a4:kek";
 const SALT_BYTES = 32;
+const TOMBSTONE = "key.destroyed";
+const wrapSecret = (projectId: string): string => `a4:${projectId}:wrap`;
 
-export type A4BlobErrorCode = "VAULT_LOCKED" | "A4_KEK_MISSING" | "SECRET_SCAN_REFUSED" | "BLOB_MISSING" | "BLOB_INTEGRITY" | "PROJECT_KEY_DESTROYED";
+export type A4BlobErrorCode = "VAULT_LOCKED" | "SECRET_SCAN_REFUSED" | "BLOB_MISSING" | "BLOB_INTEGRITY" | "PROJECT_KEY_DESTROYED"
+  | "PROJECT_KEY_EXISTS" | "PROJECT_KEY_MISSING" | "PROJECT_KEY_UNVERIFIED";
 export class A4BlobError extends Error {
   constructor(readonly code: A4BlobErrorCode, message: string) {
     super(`${code}: ${message}`);
@@ -39,78 +45,76 @@ function privateDir(workspace: string, projectId: string): string {
   return join(a4ProjectsRoot(workspace), projectId, "private");
 }
 
-const kekPublicPath = (workspace: string): string => join(a4ProjectsRoot(workspace), "kek.pub.pem");
+type AesParts = { iv: string; tag: string; ciphertext: string };
+function aesSeal(key: Buffer, plaintext: Buffer): AesParts {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  return { iv: iv.toString("base64"), tag: cipher.getAuthTag().toString("base64"), ciphertext: ciphertext.toString("base64") };
+}
+function aesOpen(key: Buffer, parts: Partial<AesParts>): Buffer {
+  const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(parts.iv ?? "", "base64"));
+  decipher.setAuthTag(Buffer.from(parts.tag ?? "", "base64"));
+  return Buffer.concat([decipher.update(Buffer.from(parts.ciphertext ?? "", "base64")), decipher.final()]);
+}
 
 /** RSA-OAEP(sha256) wraps a fresh AES-256-GCM key; only the private half opens it. */
 function sealTo(publicKeyPem: string, plaintext: Buffer): Buffer {
   const key = randomBytes(32);
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", key, iv);
-  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
   const wrappedKey = publicEncrypt({ key: publicKeyPem, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, key);
-  return Buffer.from(JSON.stringify({ v: 1, alg: "RSA-OAEP-256+A256GCM", wrappedKey: wrappedKey.toString("base64"),
-    iv: iv.toString("base64"), tag: cipher.getAuthTag().toString("base64"), ciphertext: ciphertext.toString("base64") }), "utf8");
+  return Buffer.from(JSON.stringify({ v: 1, alg: "RSA-OAEP-256+A256GCM", wrappedKey: wrappedKey.toString("base64"), ...aesSeal(key, plaintext) }), "utf8");
 }
 
 function openWith(privateKeyPem: string, sealed: Buffer): Buffer {
   const parsed = JSON.parse(sealed.toString("utf8")) as Record<string, string>;
-  const key = privateDecrypt({ key: privateKeyPem, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, Buffer.from(parsed.wrappedKey ?? "", "base64"));
-  const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(parsed.iv ?? "", "base64"));
-  decipher.setAuthTag(Buffer.from(parsed.tag ?? "", "base64"));
-  return Buffer.concat([decipher.update(Buffer.from(parsed.ciphertext ?? "", "base64")), decipher.final()]);
+  return aesOpen(privateDecrypt({ key: privateKeyPem, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, Buffer.from(parsed.wrappedKey ?? "", "base64")), parsed);
 }
 
-function rsaKeyPair(): { publicPem: string; privatePem: string } {
+/** Opens the vault for a write; only a vault that cannot be unlocked is VAULT_LOCKED, every other failure keeps its own error. */
+function unlockForWrite(workspace: string, purpose: string): void {
+  if (vaultStatus(workspace).unlocked) return;
+  try {
+    unlockVault(workspace);
+  } catch (error) {
+    throw new A4BlobError("VAULT_LOCKED", `unlock the vault to ${purpose} (${error instanceof Error ? error.message : String(error)})`);
+  }
+}
+
+/** A4's vault writes share one lock: setVaultSecret rewrites the whole envelope from this process's copy. */
+const withVaultLock = <T>(workspace: string, operation: () => T): T => withControlFileLock({ root: a4ProjectsRoot(workspace), name: "a4-vault", operation });
+
+/** Makes the project's key pair and wrap secret once; needs the vault. Returns sha256(key.pub), which CREATED signs. */
+export function createProjectKey(workspace: string, projectId: string): string {
+  const dir = privateDir(workspace, projectId);
+  unlockForWrite(workspace, "create the project's key");
+  if (pathExists(join(dir, "key.pub")) || pathExists(join(dir, TOMBSTONE))) throw new A4BlobError("PROJECT_KEY_EXISTS", `project ${projectId} already has a key`);
   const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 3072 });
-  return { publicPem: publicKey.export({ type: "spki", format: "pem" }).toString(), privatePem: privateKey.export({ type: "pkcs8", format: "pem" }).toString() };
+  const publicPem = publicKey.export({ type: "spki", format: "pem" }).toString();
+  const wrap = randomBytes(32);
+  withVaultLock(workspace, () => setVaultSecret(workspace, wrapSecret(projectId), wrap.toString("base64")));
+  ensureDir(dir);
+  writeFileAtomic(join(dir, "key.enc"), JSON.stringify({ v: 1, alg: "A256GCM", ...aesSeal(wrap, Buffer.from(privateKey.export({ type: "pkcs8", format: "pem" }).toString(), "utf8")) }), 0o600);
+  writeFileAtomic(join(dir, "key.pub"), publicPem, 0o644);
+  return sha256Hex(publicPem);
 }
 
 /**
- * The workspace KEK's public half; creating it once needs an unlocked vault (or AMC_VAULT_PASSPHRASE). Created under
- * a lock so two first projects in two processes cannot leave the vault holding one KEK and kek.pub naming another.
+ * Encrypts `bytes` to the project's key.pub, read once and refused unless its sha256 is `keySha256` (from the signed
+ * CREATED transition); refuses on any HIGH release secret-scan hit in the plaintext. Touches no ledger row.
  */
-export function ensureA4Kek(workspace: string): string {
-  const path = kekPublicPath(workspace);
-  if (pathExists(path)) return readFileSync(path, "utf8");
-  return withControlFileLock({ root: a4ProjectsRoot(workspace), name: "a4-kek", operation: () => {
-    if (pathExists(path)) return readFileSync(path, "utf8");
-    try {
-      if (!vaultStatus(workspace).unlocked) unlockVault(workspace);
-      const pair = rsaKeyPair();
-      setVaultSecret(workspace, KEK_SECRET, pair.privatePem);
-      writeFileAtomic(path, pair.publicPem, 0o644);
-      return pair.publicPem;
-    } catch (error) {
-      throw new A4BlobError("VAULT_LOCKED", `the A4 key-encryption key is created once with an unlocked vault (${error instanceof Error ? error.message : String(error)})`);
-    }
-  } });
-}
-
-/** The project's public key, created on first use from the KEK's public half alone (encrypt-only: no vault needed). */
-function projectPublicKey(workspace: string, projectId: string): string {
-  const dir = privateDir(workspace, projectId);
-  const publicPath = join(dir, "key.pub");
-  if (pathExists(publicPath)) return readFileSync(publicPath, "utf8");
-  // Locked like the KEK: two first writers must not leave key.enc and key.pub from two different pairs.
-  return withControlFileLock({ root: a4ProjectsRoot(workspace), name: `key-${projectId}`, operation: () => {
-    if (pathExists(publicPath)) return readFileSync(publicPath, "utf8");
-    if (!pathExists(kekPublicPath(workspace))) throw new A4BlobError("A4_KEK_MISSING", "no A4 key-encryption key exists in this workspace yet");
-    const pair = rsaKeyPair();
-    ensureDir(dir);
-    writeFileAtomic(join(dir, "key.enc"), sealTo(readFileSync(kekPublicPath(workspace), "utf8"), Buffer.from(pair.privatePem, "utf8")), 0o600);
-    writeFileAtomic(publicPath, pair.publicPem, 0o644);
-    return pair.publicPem;
-  } });
-}
-
-/** Encrypts `bytes` for the project; refuses on any HIGH release secret-scan hit in the plaintext. Touches no ledger row. */
-export function putPrivate(workspace: string, projectId: string, bytes: Buffer): { bodySha256: string; blobRef: string } {
+export function putPrivate(workspace: string, projectId: string, bytes: Buffer, keySha256: string): { bodySha256: string; blobRef: string } {
   const hits = highSeveritySecretTypes(bytes.toString("utf8"));
   if (hits.length > 0) throw new A4BlobError("SECRET_SCAN_REFUSED", `the text matches ${hits.join(", ")}; remove the secret and retry`);
+  const dir = privateDir(workspace, projectId);
+  if (pathExists(join(dir, TOMBSTONE))) throw new A4BlobError("PROJECT_KEY_DESTROYED", `project ${projectId}'s key was destroyed; nothing more is stored for it`);
+  const publicPem = pathExists(join(dir, "key.pub")) ? readFileSync(join(dir, "key.pub"), "utf8") : null;
+  if (publicPem === null || sha256Hex(publicPem) !== keySha256) {
+    throw new A4BlobError("PROJECT_KEY_UNVERIFIED", `project ${projectId}'s key.pub is not the key its CREATED record names`);
+  }
   const plaintext = Buffer.concat([randomBytes(SALT_BYTES), bytes]);
-  const sealed = sealTo(projectPublicKey(workspace, projectId), plaintext);
+  const sealed = sealTo(publicPem, plaintext);
   const blobRef = sha256Hex(sealed);
-  writeFileAtomic(join(privateDir(workspace, projectId), `${blobRef}.enc`), sealed, 0o600);
+  writeFileAtomic(join(dir, `${blobRef}.enc`), sealed, 0o600);
   return { bodySha256: sha256Hex(plaintext), blobRef };
 }
 
@@ -118,21 +122,23 @@ export function putPrivate(workspace: string, projectId: string, bytes: Buffer):
 export function getPrivate(workspace: string, projectId: string, blobRef: string, bodySha256?: string): Buffer {
   if (!/^[0-9a-f]{64}$/.test(blobRef)) throw new A4BlobError("BLOB_MISSING", "invalid blob reference");
   const dir = privateDir(workspace, projectId);
+  // After the tombstone no blob is written, so every blob of the project predates the erasure.
+  if (pathExists(join(dir, TOMBSTONE))) throw new A4BlobError("PROJECT_KEY_DESTROYED", `project ${projectId}'s key was destroyed`);
   const path = join(dir, `${blobRef}.enc`);
   if (!pathExists(path)) throw new A4BlobError("BLOB_MISSING", `blob ${blobRef} is not in this workspace`);
   const sealed = readFileSync(path);
   if (sha256Hex(sealed) !== blobRef) throw new A4BlobError("BLOB_INTEGRITY", `blob ${blobRef} does not match its name`);
-  if (!pathExists(join(dir, "key.enc"))) throw new A4BlobError("PROJECT_KEY_DESTROYED", `project ${projectId}'s key was destroyed`);
-  let kek: string | null;
+  let wrap: string | null;
   try {
-    kek = getVaultSecretReadOnly(workspace, KEK_SECRET);
+    wrap = getVaultSecretReadOnly(workspace, wrapSecret(projectId));
   } catch {
     throw new A4BlobError("VAULT_LOCKED", "unlock the vault to read this");
   }
-  if (kek === null) throw new A4BlobError("A4_KEK_MISSING", "the vault holds no A4 key-encryption key");
+  if (wrap === null || !pathExists(join(dir, "key.enc"))) throw new A4BlobError("PROJECT_KEY_MISSING", `project ${projectId}'s key is missing without an erasure record`);
   let plaintext: Buffer;
   try {
-    plaintext = openWith(openWith(kek, readFileSync(join(dir, "key.enc"))).toString("utf8"), sealed);
+    const privatePem = aesOpen(Buffer.from(wrap, "base64"), JSON.parse(readFileSync(join(dir, "key.enc"), "utf8")) as Partial<AesParts>).toString("utf8");
+    plaintext = openWith(privatePem, sealed);
   } catch {
     throw new A4BlobError("BLOB_INTEGRITY", `blob ${blobRef} did not decrypt`);
   }
@@ -140,9 +146,19 @@ export function getPrivate(workspace: string, projectId: string, blobRef: string
   return plaintext.subarray(SALT_BYTES);
 }
 
-/** Erasure (P2-36 calls it as an owner action): without key.enc no blob of the project decrypts again. */
+/**
+ * Erasure (P2-36 calls it as an owner action): the tombstone first, so an erasure interrupted halfway still refuses new
+ * writes and reports PROJECT_KEY_DESTROYED; then the wrap secret and key.enc. Needs the vault; idempotent.
+ */
 export function destroyProjectKey(workspace: string, projectId: string): void {
   const dir = privateDir(workspace, projectId);
+  unlockForWrite(workspace, "destroy the project's key");
+  const publicPem = pathExists(join(dir, "key.pub")) ? readFileSync(join(dir, "key.pub"), "utf8") : null;
+  ensureDir(dir);
+  if (!pathExists(join(dir, TOMBSTONE))) {
+    writeFileAtomic(join(dir, TOMBSTONE), JSON.stringify({ keySha256: publicPem === null ? null : sha256Hex(publicPem), destroyedTs: Date.now() }), 0o644);
+  }
+  withVaultLock(workspace, () => deleteVaultSecret(workspace, wrapSecret(projectId)));
   rmSync(join(dir, "key.enc"), { force: true });
   rmSync(join(dir, "key.pub"), { force: true });
 }
