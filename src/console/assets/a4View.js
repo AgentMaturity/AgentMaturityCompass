@@ -68,6 +68,9 @@ export function stageBanner(stage) {
   return "";
 }
 
+/** Studio's role check refuses a create from anyone without OPERATOR or OWNER (accessPolicy), and A4 refuses it in a read-only workspace. */
+export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATOR or OWNER role in a workspace that is not read-only";
+
 export function renderCreateForm(open) {
   return `<details class="card" id="a4Create"${open ? " open" : ""}><summary>Start an agent project</summary>
     <form id="a4CreateForm" class="a4-form">
@@ -86,6 +89,12 @@ export function renderProjectList(projects) {
     ${project.readiness ? `<code>${esc(project.readiness.status)}</code>` : ""}
     <span class="muted">agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</span>${holdBanner(project)}</li>`),
   "No agent projects yet.")}</section>`;
+}
+
+/** The page keeps the stage it opened on (a4.js); when the project is at another stage, it says so. */
+export function movedNote(project, stage) {
+  return stage === project.stage ? "" : `<p>The project is at ${esc(stageTitle(project.stage))} · ${esc(STEP_TITLES[project.step] ?? project.step)};
+    this page shows ${esc(stageTitle(stage))}. Open a stage above to work there.</p>`;
 }
 
 export function stageLinks(project, stage) {
@@ -116,8 +125,8 @@ export function stepRows(project, stage) {
  */
 const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"], propose: ["explained"], build: ["direction_approved"],
   review: ["built"], "request-direction": ["proposed"], "request-completion": ["reviewed"] };
-/** `offer` held, with `code` added to Studio's reason codes. */
-const refuse = (offer, code) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), code])] });
+/** `offer` held, with `codes` added to Studio's reason codes. */
+const refuse = (offer, ...codes) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), ...codes])] });
 export function stepOffer(offer, ctx, route) {
   const from = STEP_FROM[route];
   if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
@@ -303,13 +312,22 @@ function laneItem(item) {
     ${codes(item.reasonCodes)}<div>${renderEvidenceRefList(item.evidence.map((ref) => `${ref.refKind}:${ref.refId} ${ref.status} ${ref.claimKind}`))}</div></li>`;
 }
 
-/** Four lane columns and, beside them, the Integrity panel: AMC's own checks, no claim badge, report verbatim. */
-export function renderLanes(readiness) {
-  const lanes = LANES.map(([lane, title]) => `<section class="card a4-lane"><h4>${title}</h4>${list(readiness.items
-    .filter((item) => item.section === lane).map(laneItem), "Nothing recorded.")}</section>`).join("");
+/** An evidence ref as GET …/evidence returns it; Studio derives its lane, claim kind and trust tier. */
+const refRow = (ref) => `<li><code>${esc(ref.refKind)}:${esc(ref.refId)}</code> <code>${esc(ref.status)}</code> <code>${esc(ref.claimKind)}</code>${
+  ref.trustTier ? ` <code>${esc(ref.trustTier)}</code>` : ""} ${codes(ref.reasonCodes)}</li>`;
+
+/**
+ * Four lane columns, each with readiness's items and the revision's evidence refs in that lane (the Understand, Explain,
+ * Build and Review outputs among them), and beside them the Integrity panel: AMC's own checks, no claim badge, verbatim.
+ */
+export function renderLanes(readiness, refs, revisionNo) {
+  const lanes = LANES.map(([lane, title]) => `<section class="card a4-lane"><h4>${title}</h4>${list([
+    ...readiness.items.filter((item) => item.section === lane).map(laneItem), ...refs.filter((ref) => ref.lane === lane).map(refRow)],
+  "Nothing recorded.")}</section>`).join("");
   const checks = readiness.items.filter((item) => item.section === "integrity").map((item) => `<details data-a4-open="integrity:${esc(item.id)}"><summary><code>${esc(item.id)}</code>
     <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}</summary><pre class="scroll">${esc(JSON.stringify(item.report, null, 2))}</pre></details>`);
-  return `<div class="a4-lanes"><div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
+  return `<p class="muted">Readiness items for this stage and the evidence refs Studio lists for r${esc(revisionNo)}, as recorded.</p>
+    <div class="a4-lanes"><div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
     <p class="muted">Integrity of bytes; not evidence about the agent. ${TRUTH.signatures}.</p>
     <p><code>valid: ${esc(readiness.integrity.valid)}</code> ${codes(readiness.integrity.reasonCodes)}</p>${checks.join("")}</section></div>`;
 }
@@ -402,14 +420,19 @@ export function approveOffer(decide, gate, readiness, me) {
 /**
  * readiness.allowed.requestGate leaves out the kind's own gate: requestGate (src/a4/a4Gates.ts) refuses a second request
  * while it reads PENDING or QUORUM_MET (409 A4_GATE_OPEN) and after a Deny of the current revision (409 A4_GATE_DENIED).
- * A STALE, CHANGES_REQUESTED or EXPIRED gate is replaced, so those stay offered.
+ * A STALE, CHANGES_REQUESTED or EXPIRED gate is replaced, so those stay offered. It also leaves out the mandatory items
+ * still WAITING for an owner's acknowledgement: progress refuses until they are acknowledged, and the ACKNOWLEDGED
+ * transition supersedes the gate (A4_SUPERSEDING_KINDS, src/a4/a4Schema.ts), so a gate requested first loses its
+ * approvals. The request is held, naming those items, until the owner acknowledges them under Missing requirements.
  */
 function requestOffer(ctx, kind) {
-  const offer = stepOffer(ctx.allowed.requestGate, ctx, `request-${kind}`);
+  let offer = stepOffer(ctx.allowed.requestGate, ctx, `request-${kind}`);
   const gate = ctx.readiness.gates?.[kind];
-  if (gate?.status === "PENDING" || gate?.status === "QUORUM_MET") return refuse(offer, "A4_GATE_OPEN");
-  if (gate?.status === "DENIED" && gate.revisionNo === ctx.project.revisionNo) return refuse(offer, "A4_GATE_DENIED");
-  return offer;
+  if (gate?.status === "PENDING" || gate?.status === "QUORUM_MET") offer = refuse(offer, "A4_GATE_OPEN");
+  else if (gate?.status === "DENIED" && gate.revisionNo === ctx.project.revisionNo) offer = refuse(offer, "A4_GATE_DENIED");
+  const unacknowledged = ctx.readiness.items.filter((item) => item.mandatory && item.status === "WAITING" && item.acknowledged === null
+    && ACKNOWLEDGEABLE.has(item.id)).map((item) => item.id);
+  return unacknowledged.length ? refuse(offer, ...unacknowledged) : offer;
 }
 
 export function renderApprovalsBar(ctx) {
@@ -476,10 +499,11 @@ export function renderPresence(presence, error) {
 export function renderConflict(conflict) {
   const same = conflict.headRevisionNo === conflict.baseRevisionNo;
   const clashes = conflict.clashes ?? [];
-  return `<section class="card a4-conflict"><h4>${same ? "The project changed while you were editing" : "The specification changed while you were editing"}</h4>
-    ${same ? `<p>Studio refused your proposal because the head moved to seq ${esc(conflict.headSeq)} without a new revision (still
-      r${esc(conflict.headRevisionNo)}): evidence, an acknowledgement, a gate request, a member or a comment was recorded. Review
-      the page below before you apply your changes on top.</p>` : `<p>The head is r${esc(conflict.headRevisionNo)}; you started from
+  // What Studio returned, verbatim: the page does not know which transitions moved the head.
+  return `<section class="card a4-conflict"><h4>${same ? "Studio refused your proposal" : "The specification changed while you were editing"}</h4>
+    ${same ? `<p>Studio answered <code>${esc(conflict.code)}</code>. The head is at seq ${esc(conflict.headSeq)} (still
+      r${esc(conflict.headRevisionNo)}; now <code>${esc(conflict.headStage)}</code> <code>${esc(conflict.headStep)}</code>). Review
+      the page below before you act.</p>` : `<p>The head is r${esc(conflict.headRevisionNo)}; you started from
       r${esc(conflict.baseRevisionNo)}. Changes on the head:</p>
     ${conflict.theirs.length ? renderPromptDiffViewer({ status: "ok", changes: conflict.theirs }) : `<p class="muted">No specification changes on the head.</p>`}`}
     ${conflict.proposable ? "" : `<p>Studio takes a proposal only at step <code>explained</code> of the project's current stage; the head is at

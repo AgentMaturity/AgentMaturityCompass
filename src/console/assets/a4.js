@@ -108,11 +108,20 @@ async function previewOptions() {
   }
 }
 
+/**
+ * Studio's role check answers 403 with no A4 code to anyone else, which the page cannot tell from a lost acknowledgement,
+ * so the create form and the home card are offered only to OPERATOR or OWNER in a workspace Studio reports writable.
+ */
+const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
+  && options?.workspace?.readOnly === false;
+
 /** Home: the card and the nav link exist only when the preview answers; the card only while no project exists. */
 async function showHomeEntry() {
   try {
-    if (!(await previewOptions())) return;
+    const options = await previewOptions();
+    if (!options) return;
     document.getElementById("a4NavLink")?.removeAttribute("hidden");
+    if (!canCreate(await whoami(), options)) return;
     const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
     document.getElementById("a4HomeCard")?.toggleAttribute("hidden", projects.length > 0);
   } catch {
@@ -120,13 +129,14 @@ async function showHomeEntry() {
   }
 }
 
-async function renderListPage() {
+async function renderListPage(options) {
   claimSink = [];
   const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
   showClaims(claimSink);
   claimSink = null;
-  root.innerHTML = `${view.renderCreateForm(params.has("new") || projects.length === 0)}${view.renderProjectList(projects)}`;
-  root.querySelector("#a4CreateForm").addEventListener("submit", (event) => {
+  root.innerHTML = `${canCreate(me, options) ? view.renderCreateForm(params.has("new") || projects.length === 0)
+    : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
+  root.querySelector("#a4CreateForm")?.addEventListener("submit", (event) => {
     event.preventDefault();
     void guarded(async () => {
       const form = new FormData(event.target);
@@ -143,7 +153,7 @@ async function renderListPage() {
 
 function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
-  const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, options };
+  const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
   let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
@@ -151,7 +161,7 @@ function mountProject(projectId, options) {
   // never whatever the newest poll loaded; a change disables deciding until the user shows the new gate.
   let reviewed = null;
   // This page's last Understand and Explain responses: P1-57 publishes no read route for them yet, so they are shown
-  // only to the member who ran them, until the page reloads.
+  // only to the member who ran them, until the page reloads or the project's stage or revision changes (loadOnce).
   let reflection = null, explanation = null;
   const drafts = new Map();
   // Save answers binds the head the first answer edit began on, and each edited answer remembers Studio's value then:
@@ -169,8 +179,12 @@ function mountProject(projectId, options) {
   // this key, and every other section follows its rendered default (a thread opens when its first comment arrives).
   const toggled = new Map();
   const detailsKey = (details) => `${details.closest("[data-card]")?.dataset.card ?? "page"}:${details.dataset.a4Open}`;
-  const draftKey = (field) => (field.name && !field.closest("[data-principal]")
-    ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
+  // A candidate's role select is kept per principal, so a poll's re-render never resets it to the first role.
+  const draftKey = (field) => {
+    if (!field.name) return null;
+    const principal = field.closest("[data-principal]")?.dataset.principal;
+    return principal !== undefined ? `member:${principal}:${field.name}` : `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}`;
+  };
   // Answers come from the newest revision recorded at the viewed stage, the revision Studio's own Ask merges into: after
   // the next stage opens, or after a reopen, that is not the head revision. A stage with no revision shows none.
   const shownAnswers = () => listOf(state.stageRevision?.spec?.answers, "answers");
@@ -232,11 +246,18 @@ function mountProject(projectId, options) {
       claimSink = [];
       const read = await readProject();
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
+        // A statement binds the head it was recorded at: once the stage or revision moves, Confirm could only be refused.
+        if (state.project && (read.project.stage !== state.project.stage || read.project.revisionNo !== state.project.revisionNo)) {
+          reflection = null;
+          explanation = null;
+        }
         Object.assign(state, read);
         stage = read.stage;
         break;
       }
     }
+    // Everything up to the head is rendered now, so a poll reports only what comes after it.
+    cursor = Math.max(cursor, state.project.headSeq + 1);
     const shown = shownReview();
     if (reviewed === null && pinnable(shown)) reviewed = shown;
     render();
@@ -245,9 +266,11 @@ function mountProject(projectId, options) {
 
   async function readProject() {
     const project = one(await apiNativeRequest(projectPath("")), "project");
-    const viewStage = view.STAGES.includes(params.get("stage")) ? params.get("stage")
-      : view.STAGES.includes(project.stage) ? project.stage : "activate";
-    const [readiness, gates, revision, comments, members, diff, revisions] = await Promise.all([
+    // The page keeps the stage it opened on: following the head would put one stage's drafts, answers and statements
+    // under the next one. The header says when the project is at another stage (movedNote).
+    const viewStage = stage ?? (view.STAGES.includes(params.get("stage")) ? params.get("stage")
+      : view.STAGES.includes(project.stage) ? project.stage : "activate");
+    const [readiness, gates, revision, comments, members, diff, revisions, refs] = await Promise.all([
       apiNativeRequest(projectPath(`/readiness?stage=${viewStage}`)).then((data) => one(data, "readiness")),
       apiNativeRequest(projectPath("/gates")).then((data) => listOf(data, "gates")),
       project.revisionNo > 0 ? apiNativeRequest(projectPath(`/revisions/${project.revisionNo}`)).then((data) => one(data, "revision")) : null,
@@ -256,7 +279,8 @@ function mountProject(projectId, options) {
       project.revisionNo > 1
         ? apiNativeRequest(projectPath(`/revisions/diff?from=${project.revisionNo - 1}&to=${project.revisionNo}`)).catch((error) => ({ error: errorText(error) }))
         : null,
-      apiNativeRequest(projectPath("/revisions")).then((data) => listOf(data, "revisions"))
+      apiNativeRequest(projectPath("/revisions")).then((data) => listOf(data, "revisions")),
+      apiNativeRequest(projectPath(`/evidence?revision=${project.revisionNo}`)).then((data) => listOf(data, "refs"))
     ]);
     // A revision past the head read above landed between the reads; the next load shows it.
     const atStage = revisions.filter((row) => row.stage === viewStage && Number.isSafeInteger(row.revisionNo) && row.revisionNo <= project.revisionNo)
@@ -264,7 +288,7 @@ function mountProject(projectId, options) {
     const stageNo = atStage.length > 0 ? Math.max(...atStage) : null;
     const stageRevision = stageNo === null ? null : stageNo === revision?.revisionNo ? revision
       : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}`)), "revision");
-    return { project, readiness, gates, revision, stageRevision, comments, members, diff, stage: viewStage };
+    return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage };
   }
 
   function render() {
@@ -282,14 +306,14 @@ function mountProject(projectId, options) {
       questions: listOf(state.options?.questions?.[stage], "questions"), answers: shownAnswers() };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
-        r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}
+        r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
         <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
       <div id="a4Rail"></div><section class="card"><h4>Steps</h4><div id="a4Steps"></div></section>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
       <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness)}</section>
-      ${view.renderLanes(readiness)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
+      ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
@@ -433,7 +457,7 @@ function mountProject(projectId, options) {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
-          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() });
+          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() }, [`member:${row.dataset.principal}:role`]);
       }
       case "comment": {
         const body = value("comment");
@@ -447,15 +471,15 @@ function mountProject(projectId, options) {
     }
   }
 
-  async function openConflict(action) {
+  async function openConflict(action, error) {
     const head = one(await apiNativeRequest(projectPath("")), "project");
     // P1-57 takes a proposal only at step `explained` (409 A4_STEP_ORDER otherwise, before it compares the parent), so
     // once another member has proposed, the card offers Reload only. Nothing is re-sent unseen: a head that moved without
-    // a new revision (evidence, an acknowledgement, a gate request) still shows the card, and the member applies on top.
+    // a new revision still shows the card, with Studio's code and the head it read, and the member applies on top.
     const proposable = head.stage === stage && head.step === "explained";
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
     const headSpec = view.editableSpec(headRevision?.spec);
-    conflict = { baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
+    conflict = { code: error.code, baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
       headStage: head.stage, headStep: head.step, proposable, mineSpec: action.spec,
       theirs: view.jsonDiff(action.base.spec, headSpec), mine: view.jsonDiff(action.base.spec, action.spec) };
     await load();
@@ -471,7 +495,7 @@ function mountProject(projectId, options) {
     try {
       data = await send(action);
     } catch (error) {
-      if (error?.status === 409 && (error.code === "A4_STALE_HEAD" || error.code === "A4_STEP_ORDER") && action.spec) return openConflict(action);
+      if (error?.status === 409 && (error.code === "A4_STALE_HEAD" || error.code === "A4_STEP_ORDER") && action.spec) return openConflict(action, error);
       if (error?.status === 409) await load().catch(showError);
       // Another write moved the head while the member typed: never re-sent unseen (a new revision would supersede gates and
       // decisions they have not seen). Save binds the head shown now, once they press it again.
@@ -636,7 +660,7 @@ async function main() {
     strip?.reset();
     if (claims.length > 0) deliver?.(claims);
   };
-  if (page === "a4") return renderListPage();
+  if (page === "a4") return renderListPage(options);
   const projectId = params.get("project");
   if (!projectId) {
     root.innerHTML = `<section class="card"><p>Choose a project from <a href="./a4">agent projects</a>.</p></section>`;
