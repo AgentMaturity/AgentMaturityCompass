@@ -156,7 +156,21 @@ tools:
 - `effects.reconcile.adapterId` names the adapter `reconcile()` asks when an execution's outcome is unknown. Without
   one, an operator settles it with `amc action resolve` under dual control ([RECEIPTS](RECEIPTS.md#reconciliation-and-operator-resolution)).
 
-ToolHub's own `runTool` path is not journaled yet and carries no keys (P1-54).
+### Consequential Studio dispatch (P1-54)
+
+ToolHub journals every `EXECUTE` above `READ_ONLY` and `WRITE_LOW` before dispatch. `SIMULATE`, reads and low-impact writes retain their existing execution path. The journal opens once per service and runs its existing startup recovery. If it cannot open or write before dispatch, the call is denied with `journal_unavailable`; it never falls back to an unjournaled effect. The service exposes `close()` for callers that own its lifetime; the existing Studio process owns it until process exit.
+
+Each intent has a deterministic execution ID: `exec_` plus the first 32 hexadecimal characters of SHA-256 over `toolhub:<workspaceId>:<intentId>`. The journal's unique execution row provides at-most-once dispatch per intent, including concurrent attempts. A repeated intent is denied with `intent_already_dispatched:<executionId>`. The existing journal guards refuse unresolved executions and possible duplicate argument digests; an unknown effect is settled through reconciliation or operator resolution, never by retrying the intent.
+
+Approval creation binds the normalized arguments and protected facts from `authorizationIntentFor`. Dispatch builds the existing authorization record locally, persists `requested` and `authorized`, rechecks authority and consumes approvals, then commits `started` before invoking the executor. Execution tickets are checked again immediately before start. The shared authorization contract has no execution-ticket authority member: ticket facts remain in ToolHub evidence, and ticket-only records retain the helper's local OS principal attribution. This does not establish an authenticated Studio human identity. Cross-store approval consumption and journal start retain the existing pipeline's crash boundary; writer fencing and resume rules remain P2-12 work.
+
+The journal mints and records the key. The built-in `http.fetch` executor delivers a declared `http-header` key and replaces a caller's header with the same name, case-insensitively. The overwrite is labelled as agent-supplied metadata. Header carriers on other built-in executors are denied with `idempotency_http_header_carrier_unsupported:<tool>`. Built-in ToolHub executors do not deliver arbitrary named argument keys, so argument carriers are denied before approval consumption or start with `idempotency_argument_carrier_unsupported:<tool>:<name>`. The dispatch helper can inject a declared argument for an explicitly capable run adapter; this is not a delivery claim for today's built-ins. A tool without a carrier still receives a journal key; AMC does not promise exactly-once delivery.
+
+The execute response adds `action: { executionId, state, evidenceComplete }`. A body exception whose effect is uncertain returns HTTP 200 through the existing route with `allowed: true` and `result.outcomeUnknown: true`; `allowed` means admitted, not successful. `FINANCIAL`, `DATA_EXPORT` and `IDENTITY` results without an effect declaration also remain `outcome_unknown`. A proven pre-request HTTP failure (`ENOTFOUND`, `EAI_AGAIN`, `ECONNREFUSED`) or `DefiniteFailureError` records `completed` with `effect: not_applied`. Unknown result evidence uses `success: null` and emits no success measurement.
+
+A result recorder or heartbeat failure sets `evidenceComplete: false`. A post-dispatch journal write failure leaves the durable row for recovery and blocks further consequential calls in the process. An action response with `evidenceComplete: false`, including a denial before a journal row could be written, is not proof of a persisted transition. ToolHub still attempts the existing denial audit and refuses the effect even if that recorder is unavailable.
+
+**Qualification pending:** this is coding-only source work. No tests, evaluations, builds, typechecks, lint, CI, live effects or interoperability checks have been executed for P1-54. At-most-once, fault, recovery, carrier and recorder behavior await qualification.
 
 ## Native shell mount grants
 

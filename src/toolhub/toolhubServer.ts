@@ -26,6 +26,8 @@ import {
   type ToolBlastRadiusConsent,
   type ToolBlastRadiusReviewerDecision
 } from "./blastRadiusConsent.js";
+import { ToolhubJournal, isJournaledToolhubExecution, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, type JournaledToolhubOutcome } from "./toolhubJournal.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { executeFsRead, executeFsWrite } from "./toolhubExecutors/fs.js";
 import { executeGit } from "./toolhubExecutors/git.js";
 import { executeHttpFetch } from "./toolhubExecutors/http.js";
@@ -88,6 +90,7 @@ export interface ToolExecutionResponse {
   result: Record<string, unknown>;
   actionReceipt?: string;
   resultReceipt?: string;
+  action?: JournaledToolhubOutcome["action"];
   blastRadiusReceipt?: string;
   blastRadiusConsent?: ToolBlastRadiusConsent;
   reasons: string[];
@@ -147,7 +150,11 @@ export class ToolHubService {
   private readonly intents = new Map<string, IntentRecord>();
   private readonly executions = new Map<string, ExecutionRecord>();
 
-  constructor(private readonly workspace: string) {}
+  private readonly actionJournal: ToolhubJournal;
+
+  constructor(private readonly workspace: string) { this.actionJournal = new ToolhubJournal(workspace); }
+
+  close(): void { this.actionJournal.close(); }
 
   listToolContext(): ToolHubContextProjection {
     return inspectToolhubContext(this.workspace);
@@ -390,6 +397,9 @@ export class ToolHubService {
       approvalRequired,
       blastRadiusConsent
     };
+    const boundIntent = isJournaledToolhubExecution(decision.effectiveMode, record.actionClass)
+      ? toolhubApprovalIntent({ workspace: this.workspace, intentId, agentId: input.agentId, toolName: input.toolName,
+          actionClass: record.actionClass, args: input.args, requestedMode: record.request.requestedMode, effectiveMode: decision.effectiveMode }) : null;
     if (approvalRequired) {
       const approval = createApprovalForIntent({
         workspace: this.workspace,
@@ -401,7 +411,7 @@ export class ToolHubService {
         requestedMode: record.request.requestedMode,
         effectiveMode: decision.effectiveMode,
         riskTier: workOrderContext?.riskTier === "med" ? "medium" : (workOrderContext?.riskTier ?? "medium"),
-        intentPayload: {
+        intentPayload: boundIntent ?? {
           intentId,
           agentId: input.agentId,
           toolName: input.toolName,
@@ -679,7 +689,8 @@ export class ToolHubService {
       });
     }
 
-    const executionId = `exec_${randomUUID().replace(/-/g, "")}`;
+    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass);
+    const executionId = journaled ? toolhubExecutionId(workspaceIdFromDirectory(this.workspace), intent.intentId) : `exec_${randomUUID().replace(/-/g, "")}`;
     const blastRadiusReviewerDecision: ToolBlastRadiusReviewerDecision =
       approvalUsedId !== null
         ? {
@@ -724,248 +735,56 @@ export class ToolHubService {
         }
       );
     }
+    const evidenceInput: Parameters<typeof openToolhubExecutionEvidence>[0] = {
+      workspace: this.workspace, executionId, intentId: intent.intentId, agentId: intent.request.agentId,
+      toolName: intent.request.toolName, actionClass: intent.actionClass, requestedMode, effectiveMode,
+      args: intent.request.args, workOrderId: intent.request.workOrderId ?? null, execTicketProvided: !!input.execTicket,
+      execTicketValid: ticketValid, approvalId: approvalUsedId, approvalDecisionReceiptId, blastRadiusConsent,
+      signal: signal => this.appendOutcomeSignal({ ...signal, intent })
+    };
+    if (journaled) {
+      let evidence: ReturnType<typeof openToolhubExecutionEvidence> | undefined;
+      const outcome = await this.actionJournal.dispatch({
+        workspace: this.workspace, intentId: intent.intentId, agentId: intent.request.agentId, toolName: tool.name,
+        actionClass: intent.actionClass, args: intent.request.args, requestedMode, effectiveMode, tool, approvalId: approvalUsedId,
+        argumentCarrierSupported: false,
+        recheckTicket: () => !input.execTicket || approvalUsedId !== null || verifyExecTicket({ workspace: this.workspace,
+          ticket: input.execTicket, expectedAgentId: intent.request.agentId, expectedWorkOrderId: intent.request.workOrderId,
+          expectedActionClass: intent.actionClass, expectedToolName: tool.name }).ok,
+        recordAction: metadata => { evidence = openToolhubExecutionEvidence(evidenceInput, metadata); },
+        recordResult: result => { if (!evidence) throw new Error("toolhub evidence recorder unavailable"); evidence.recordResult(result); },
+        closeEvidence: () => evidence?.close(),
+        run: (args, key) => this.runTool(tool.name, args, false, key)
+      });
+      if (outcome.state === "denied") {
+        try { return { ...this.auditDenied(intent, "ACTION_DISPATCH_DENIED", outcome.reasonCode, { executeAttempted: true, executionId }), action: outcome.action }; }
+        catch { return { executionId, agentId: intent.request.agentId, allowed: false, effectiveMode,
+          result: outcome.result, reasons: [outcome.reasonCode], action: { ...outcome.action, evidenceComplete: false } }; }
+      }
+      this.executions.set(executionId, { executionId, ts: Date.now(), intentId: intent.intentId, agentId: intent.request.agentId,
+        toolName: tool.name, requestedMode, effectiveMode, allowed: true, reasons, result: outcome.result, eventIds: evidence?.eventIds ?? [] });
+      return { executionId, agentId: intent.request.agentId, allowed: true, effectiveMode, result: outcome.result, reasons,
+        action: outcome.action, actionReceipt: evidence?.actionReceipt, resultReceipt: evidence?.resultReceipt,
+        blastRadiusReceipt: evidence?.actionReceipt, blastRadiusConsent };
+    }
     if (approvalUsedId) {
-      // Spent before any effect, by exclusive create (P1-02): a replay or a racing second execute is denied here.
+      // Non-journaled compatibility path: consume before its effect as before P1-54.
       let consume: ReturnType<typeof consumeApprovedExecution> | null = null;
       try { consume = consumeApprovedExecution({ workspace: this.workspace, approvalId: approvalUsedId, expectedAgentId: intent.request.agentId, executionId }); } catch { /* unreadable: denied below */ }
       if (!consume?.consumed) return this.auditDenied(intent, consume ? "APPROVAL_REPLAY_ATTEMPTED" : "APPROVAL_QUORUM_FAILED", consume?.reason ?? "approval consumption could not be recorded", { executeAttempted: true, executeWithoutTicketAttempted: true });
     }
-    const blastRadiusConsentHash = hashToolBlastRadiusConsent(blastRadiusConsent);
-    const ledger = openLedger(this.workspace);
-    const sessionId = `toolhub-exec-${randomUUID()}`;
-    const eventIds: string[] = [];
-    let actionReceipt: string | undefined;
-    let resultReceipt: string | undefined;
-
+    const evidence = openToolhubExecutionEvidence(evidenceInput);
     try {
-      ledger.startSession({
-        sessionId,
-        runtime: "unknown",
-        binaryPath: "amc-toolhub",
-        binarySha256: "toolhub"
-      });
-
-      const action = appendToolEvidenceWithReceipt({
-        ledger,
-        workspace: this.workspace,
-        sessionId,
-        agentId: intent.request.agentId,
-        toolName: intent.request.toolName,
-        eventType: "tool_action",
-        extraMeta: {
-          requestedMode,
-          effectiveMode,
-          actionClass: intent.actionClass,
-          execTicketValid: ticketValid,
-          approvalId: approvalUsedId,
-          approvalDecisionReceiptId,
-          blastRadiusConsent,
-          blastRadiusConsentHash
-        },
-        payload: {
-          executionId,
-          intentId: intent.intentId,
-          requestedMode,
-          effectiveMode,
-          args: intent.request.args,
-          workOrderId: intent.request.workOrderId ?? null,
-          execTicketProvided: !!input.execTicket,
-          execTicketValid: ticketValid,
-          actionClass: intent.actionClass,
-          approvalId: approvalUsedId,
-          approvalDecisionReceiptId,
-          blastRadiusConsent,
-          blastRadiusConsentHash
-        }
-      });
-      eventIds.push(action.eventId);
-      actionReceipt = action.receipt;
-
       const resultPayload = await this.runTool(tool.name, intent.request.args, simulate);
-      const result = appendToolEvidenceWithReceipt({
-        ledger,
-        workspace: this.workspace,
-        sessionId,
-        agentId: intent.request.agentId,
-        toolName: intent.request.toolName,
-        eventType: "tool_result",
-        extraMeta: {
-          requestedMode,
-          effectiveMode,
-          actionClass: intent.actionClass,
-          approvalId: approvalUsedId,
-          blastRadiusConsentHash
-        },
-        payload: {
-          executionId,
-          intentId: intent.intentId,
-          requestedMode,
-          effectiveMode,
-          simulated: simulate,
-          success: true,
-          result: resultPayload,
-          denied: false,
-          actionClass: intent.actionClass,
-          approvalId: approvalUsedId,
-          blastRadiusConsentHash
-        }
-      });
-      eventIds.push(result.eventId);
-      resultReceipt = result.receipt;
-
-      this.appendOutcomeSignal({
-        ledger,
-        sessionId,
-        intent,
-        category: "Functional",
-        metricId: "toolhub.execute_success",
-        value: true,
-        meta: {
-          executionId,
-          requestedMode,
-          effectiveMode
-        }
-      });
-      this.appendOutcomeSignal({
-        ledger,
-        sessionId,
-        intent,
-        category: "Economic",
-        metricId: "toolhub.exec_count",
-        value: 1,
-        unit: intent.actionClass,
-        meta: {
-          executionId,
-          actionClass: intent.actionClass
-        }
-      });
-      if (intent.request.workOrderId) {
-        this.appendOutcomeSignal({
-          ledger,
-          sessionId,
-          intent,
-          category: "Functional",
-          metricId: "workorder.completed",
-          value: true,
-          meta: {
-            executionId
-          }
-        });
-      }
-
-      if (approvalUsedId) {
-        const approvalPayload = {
-          auditType: "APPROVAL_CONSUMED",
-          severity: "MEDIUM",
-          approvalId: approvalUsedId,
-          executionId,
-          intentId: intent.intentId,
-          agentId: intent.request.agentId
-        };
-        const approvalPayloadText = JSON.stringify(approvalPayload);
-        const approvalBodySha = sha256Hex(Buffer.from(approvalPayloadText, "utf8"));
-        const consumedAudit = ledger.appendEvidenceWithReceipt({
-          sessionId,
-          runtime: "unknown",
-          eventType: "audit",
-          payload: approvalPayloadText,
-          payloadExt: "json",
-          inline: true,
-          meta: {
-            ...approvalPayload,
-            trustTier: "OBSERVED",
-            bodySha256: approvalBodySha
-          },
-          receipt: {
-            kind: "guard_check",
-            agentId: intent.request.agentId,
-            providerId: "toolhub",
-            model: null,
-            bodySha256: approvalBodySha
-          }
-        });
-        eventIds.push(consumedAudit.id);
-
-        const quorumPayload = {
-          auditType: "APPROVAL_QUORUM_MET",
-          severity: "MEDIUM",
-          approvalRequestId: approvalUsedId,
-          executionId,
-          intentId: intent.intentId,
-          agentId: intent.request.agentId
-        };
-        const quorumText = JSON.stringify(quorumPayload);
-        const quorumBodySha = sha256Hex(Buffer.from(quorumText, "utf8"));
-        const quorumAudit = ledger.appendEvidenceWithReceipt({
-          sessionId,
-          runtime: "unknown",
-          eventType: "audit",
-          payload: quorumText,
-          payloadExt: "json",
-          inline: true,
-          meta: {
-            ...quorumPayload,
-            trustTier: "OBSERVED",
-            bodySha256: quorumBodySha
-          },
-          receipt: {
-            kind: "guard_check",
-            agentId: intent.request.agentId,
-            providerId: "toolhub",
-            model: null,
-            bodySha256: quorumBodySha
-          }
-        });
-        eventIds.push(quorumAudit.id);
-
-        this.appendOutcomeSignal({
-          ledger,
-          sessionId,
-          intent,
-          category: "Brand",
-          metricId: "approval.consumed",
-          value: true,
-          meta: {
-            approvalRequestId: approvalUsedId,
-            executionId
-          }
-        });
-      }
-
-      ledger.sealSession(sessionId);
-
-      const execution: ExecutionRecord = {
-        executionId,
-        ts: Date.now(),
-        intentId: intent.intentId,
-        agentId: intent.request.agentId,
-        toolName: intent.request.toolName,
-        requestedMode,
-        effectiveMode,
-        allowed: true,
-        reasons,
-        result: resultPayload,
-        eventIds
-      };
-      this.executions.set(executionId, execution);
-      return {
-        executionId,
-        agentId: intent.request.agentId,
-        allowed: true,
-        effectiveMode,
-        result: resultPayload,
-        actionReceipt,
-        resultReceipt,
-        blastRadiusReceipt: actionReceipt,
-        blastRadiusConsent,
-        reasons
-      };
-    } finally {
-      ledger.close();
-    }
+      evidence.recordResult({ state: "completed", effect: null, reasonCode: "completed", result: resultPayload, bodySucceeded: true });
+      this.executions.set(executionId, { executionId, ts: Date.now(), intentId: intent.intentId, agentId: intent.request.agentId,
+        toolName: intent.request.toolName, requestedMode, effectiveMode, allowed: true, reasons, result: resultPayload, eventIds: evidence.eventIds });
+      return { executionId, agentId: intent.request.agentId, allowed: true, effectiveMode, result: resultPayload,
+        actionReceipt: evidence.actionReceipt, resultReceipt: evidence.resultReceipt, blastRadiusReceipt: evidence.actionReceipt, blastRadiusConsent, reasons };
+    } finally { evidence.close(); }
   }
 
-  private async runTool(toolName: string, args: Record<string, unknown>, simulate: boolean): Promise<Record<string, unknown>> {
+  private async runTool(toolName: string, args: Record<string, unknown>, simulate: boolean, key?: { idempotencyKey: string; header: string | null }): Promise<Record<string, unknown>> {
     const cwd = resolve(this.workspace, String(args.cwd ?? this.workspace));
     if (toolName === "fs.read") {
       const targetPath = resolve(this.workspace, String(args.path ?? ""));
@@ -1021,7 +840,8 @@ export class ToolHubService {
         method,
         headers,
         body,
-        simulate
+        simulate,
+        ...(key?.header ? { idempotency: { header: key.header, key: key.idempotencyKey } } : {})
       });
       return out;
     }
@@ -1052,12 +872,13 @@ export class ToolHubService {
     auditType: string,
     message: string,
     opts?: {
+      executionId?: string;
       executeAttempted?: boolean;
       executeWithoutTicketAttempted?: boolean;
       blastRadiusConsent?: ToolBlastRadiusConsent;
     }
   ): ToolExecutionResponse {
-    const executionId = `exec_${randomUUID().replace(/-/g, "")}`;
+    const executionId = opts?.executionId ?? `exec_${randomUUID().replace(/-/g, "")}`;
     const ledger = openLedger(this.workspace);
     const sessionId = `toolhub-deny-${randomUUID()}`;
     const eventIds: string[] = [];
