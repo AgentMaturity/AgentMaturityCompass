@@ -4007,8 +4007,6 @@ components:
       properties:
         gateId:
           type: string
-        effectId:
-          type: string
         expectedHeadSeq:
           type: integer
           minimum: 0
@@ -12415,7 +12413,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/A4MutationResponse"
+                $ref: "#/components/schemas/A4Response"
         "400":
           description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
             HYPOTHESIS_SOURCE_MISMATCH.
@@ -13323,7 +13321,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/complete:
     post:
-      summary: "Consume the stage's approved gate once (adapt and activate: owner)"
+      summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it runs
+        its effect and the response names the attempt"
       tags:
         - Studio
         - A4 Forge
