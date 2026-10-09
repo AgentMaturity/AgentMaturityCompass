@@ -363,12 +363,12 @@
       "reason": "OAuth discovery/token requests use pinned network policy; identity-region applicability and trusted workspace scope need integration."
     },
     {
-      "siteId": "src/observability/otelExporter.ts:523:1",
-      "path": "src/observability/otelExporter.ts",
-      "line": 523,
+      "siteId": "src/observability/otelExportTransport.ts:75:1",
+      "path": "src/observability/otelExportTransport.ts",
+      "line": 75,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Internal exporter POST uses privately captured record-time workspace and native context, batches by captured workspace including absence, and prepares endpoint/headers/body before awaits. Each manual-redirect attempt checks network-tool residency inside that context immediately before fetch; typed refusal returns a failed dispatch without retry. No resource-class/purpose or caller-scope proof is inferred. Source-only; bounded retries, prior POST effects, missing caller scope, unpinned DNS, global-fetch contract and response limits remain. Public ops SDK exporter is a separate deferred site."
     },
     {
       "siteId": "src/ops/otelExporter.ts:327:1",
@@ -376,7 +376,7 @@
       "line": 327,
       "call": "fetch(",
       "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "reason": "Deferred: library API, no AMC caller, caller-owned destination. Revisit with SDK integration; neither exempt nor covered by the internal observability exporter gate. Trusted workspace, payload facts, secondary transport behavior and destination applicability remain unresolved."
     },
     {
       "siteId": "src/packs/packCli.ts:293:1",
