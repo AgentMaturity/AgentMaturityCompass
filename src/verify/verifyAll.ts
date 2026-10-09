@@ -40,6 +40,7 @@ import { verifyAuditBinderFile, verifyAuditWorkspace } from "../audit/binderVeri
 import { listPassportExportFiles, verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { verifyPassportWorkspace } from "../passport/passportVerifier.js";
 import { verifyStandardSchemas } from "../standard/standardGenerator.js";
+import { verifyA4Projects } from "../a4/a4Verify.js";
 
 type VerifyStatus = "PASS" | "FAIL" | "SKIP";
 
@@ -351,6 +352,15 @@ export async function verifyAll(params: {
         : fail("ledger-trust-root", true, [LEDGER_UNANCHORED_MESSAGE]));
   } catch (error) {
     checks.push(fail("ledger-hash-chain", true, [String(error)]));
+  }
+
+  // P1-57: each A4 project's chain, side rows and envelopes (integrity of bytes; never a claim about the agent).
+  try {
+    for (const row of verifyA4Projects(workspace, params.trust)) {
+      checks.push((row.status === "PASS" ? pass : row.status === "FAIL" ? fail : skip)("a4-projects", true, row.details));
+    }
+  } catch (error) {
+    checks.push(fail("a4-projects", true, [String(error)]));
   }
 
   const forecast = verifyForecastWorkspaceArtifacts(workspace);

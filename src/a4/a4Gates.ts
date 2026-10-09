@@ -20,6 +20,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { liveRolesFor } from "./a4Identity.js";
+import { verifyA4Chain } from "./a4Verify.js";
 import {
   A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, readinessBindingDigest,
   riskTierOf, selfApprovalFacts, type A4Action, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
@@ -41,7 +42,10 @@ export interface A4Call {
   /** The request reached this workspace through the hosted router (`/w/<id>/…`). */
   readonly hostedRouter?: boolean;
   readonly hostMode?: boolean;
+  /** Integrity from the full verifyA4Chain (GET, complete, verify) rather than the snapshot's incremental check. */
+  readonly fullIntegrity?: boolean;
 }
+type Facts = Pick<A4Call, "hostedRouter" | "hostMode" | "fullIntegrity">;
 /** Writes the server makes on its own behalf (automatic hold, effect outcomes); never a person. */
 export const A4_RUNTIME: A4Actor = { key: "amc-runtime", username: "amc-runtime" };
 const DAY_MS = 86_400_000;
@@ -105,6 +109,12 @@ export function loadA4State(store: A4Store, projectId: string, now: number): A4R
   };
 }
 
+/** The full chain verification as readiness's integrity section: valid only when every byte check passes. */
+const fullIntegrity = (store: A4Store, projectId: string): A4LiveFacts["integrity"] => {
+  const report = verifyA4Chain(store.ledger, projectId);
+  return { valid: report.integrity.status === "pass", problems: report.integrity.errors, report };
+};
+
 const vaultUnlocked = (workspace: string): boolean | null => {
   try {
     getPrivateKeyPem(workspace, "auditor");
@@ -115,7 +125,7 @@ const vaultUnlocked = (workspace: string): boolean | null => {
 };
 
 /** Everything readiness reads that is not a row; each unreadable source is null. */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Pick<A4Call, "hostedRouter" | "hostMode">): A4LiveFacts {
+export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
   const policy = verifyApprovalPolicySignature(workspace);
@@ -133,13 +143,13 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Pick
     vaultUnlocked: vaultUnlocked(workspace), signingRoute: route,
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
-    integrity: { valid: true, problems: [] },
+    integrity: call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] },
     driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : []
   };
 }
 
 /** One evaluation for `principal` at `stage` on `state`, with the signed policy and the in-force gate policy. */
-export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Pick<A4Call, "hostedRouter" | "hostMode">,
+export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts,
   stage: A4Stage, now: number): { readiness: A4ReadinessV1; query: A4ReadinessQuery } {
   const policy = loadApprovalPolicy(store.workspace);
   const query: A4ReadinessQuery = { stage, principal, policy, gatePolicy: gatePolicyOf(state.chain), floor: a4FloorFor(policy), now,
@@ -589,11 +599,11 @@ export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call
     const target = readiness.items.find((entry) => entry.id === input.itemId);
     if (target?.status !== "WAITING") throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", `${input.itemId} is ${target?.status ?? "absent"}; only a WAITING item is acknowledged`);
     return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS } };
-  });
+  }, "a4 acknowledge");
 }
 
 /** The readiness view for GET (design §7 rule 8): evaluated on a fresh snapshot for exactly this principal. */
-export function readinessFor(store: A4Store, projectId: string, principal: A4Principal | null, call: Pick<A4Call, "hostedRouter" | "hostMode">,
+export function readinessFor(store: A4Store, projectId: string, principal: A4Principal | null, call: Facts,
   stage?: A4Stage): A4ReadinessV1 {
   const now = Date.now();
   const state = loadA4State(store, projectId, now);

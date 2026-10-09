@@ -14,6 +14,7 @@ import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
 import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js";
 import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
 import type { ClaimEnvelope, ClaimEvidenceTier, ClaimMethod } from "../claims/eligibility/types.js";
+import type { VerifierReportV1 } from "../trust/verifierReport.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
@@ -72,7 +73,8 @@ export interface A4LiveFacts {
   readonly vaultUnlocked: boolean | null;
   readonly signingRoute: "vault" | "notary" | null;
   readonly notaryReachable: boolean | null;
-  readonly integrity: { readonly valid: boolean; readonly problems: readonly string[] };
+  /** `report` is verifyA4Chain's full report (GET, complete, verify); incremental writes carry none. */
+  readonly integrity: { readonly valid: boolean; readonly problems: readonly string[]; readonly report?: VerifierReportV1 | null };
   /** Slots of the head revision whose live recomputation differs; null when they could not be recomputed. */
   readonly driftedSlots: readonly string[] | null;
 }
@@ -250,7 +252,7 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     live.signingRoute === "notary" && live.notaryReachable === false
       ? item("signing.notary_reachable", "WAITING", { kind: "source_unavailable", reasonCodes: ["NOTARY_UNREACHABLE"] }) : item("signing.notary_reachable", "READY"),
     // Integrity of bytes, checked against this workspace's own keys: a self-check, never anchored, never a claim.
-    item("store.integrity", live.integrity.valid ? "READY" : "BLOCKED", { section: "integrity",
+    item("store.integrity", live.integrity.valid ? "READY" : "BLOCKED", { section: "integrity", report: live.integrity.report ?? null,
       reasonCodes: live.integrity.valid ? ["SELF_CHECK", "UNANCHORED"] : ["A4_INTEGRITY_FAILED", ...live.integrity.problems.slice(0, 8)] }),
     live.approvalPolicy === "valid" ? item("approvals.policy_signed", "READY") : item("approvals.policy_signed", "BLOCKED", {
       kind: "evidence_missing", reasonCodes: [live.approvalPolicy === "missing" ? "APPROVAL_POLICY_MISSING" : "APPROVAL_POLICY_UNSIGNED"],
@@ -439,5 +441,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     selfApproved: stageDecisions.some((decision) => decision.self_approved === 1), selfApprovalAllowed: facts.selfApprovalAllowed,
     identityCheck: query.principal?.identityCheck ?? "users_yaml", bindingDigest: readinessBindingDigest(items, boundIds)
   };
-  return { ...body, allowed: allowedFor(state, query, items, gates), evaluatedAt: new Date(now).toISOString(), fullDigest: sha256Hex(canonicalize(body)) };
+  // The attached verifier report is timestamped per read; the digest covers the evaluation, not the report.
+  const digested = { ...body, items: items.map((entry) => ({ ...entry, report: null })) };
+  return { ...body, allowed: allowedFor(state, query, items, gates), evaluatedAt: new Date(now).toISOString(), fullDigest: sha256Hex(canonicalize(digested)) };
 }

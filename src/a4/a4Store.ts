@@ -198,6 +198,9 @@ export function openA4Store(workspace: string): A4Store {
   return createStore(workspace, ledger);
 }
 
+/** The store's readers and verifiers over a ledger opened elsewhere (read-only for `verifyA4Chain`); never for writes. */
+export const readA4Store = (ledger: Ledger): A4Store => createStore(ledger.workspace, ledger);
+
 function createStore(workspace: string, ledger: Ledger) {
   const db = ledger.db;
   /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
@@ -650,7 +653,8 @@ function createStore(workspace: string, ledger: Ledger) {
      * first owner. One active project per agent (partial unique index; checked first under the `a4-requests` lock so a
      * refusal leaves no key).
      */
-    createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey }): A4TransitionResult {
+    createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey;
+      profile?: { expertise: string; archetype: string | null } }): A4TransitionResult {
       // A VIEWER, APPROVER or AUDITOR would otherwise become the owner of a project it may not build (live roles, not the caller's).
       if (!liveRolesFor(workspace, input.actor).some((role) => role === "OPERATOR" || role === "OWNER")) {
         throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", "Creating an A4 project needs a live OPERATOR or OWNER role.");
@@ -680,7 +684,7 @@ function createStore(workspace: string, ledger: Ledger) {
         }
         return {
           kind: "CREATED", stage: "aspire", revisionNo: 0,
-          payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), projectPublicKeySha256,
+          payload: { ...input.profile, workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), projectPublicKeySha256,
             selfApprovalAllowed, selfApprovalFacts: { activeUserCount: population.activeLocal?.length ?? null, hostPrincipals: population.hostPrincipals,
               hostedRouter: input.hostedRouter, ratcheted: false, regulated: false, selfApprovalAllowed } },
           sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
@@ -759,7 +763,9 @@ function createStore(workspace: string, ledger: Ledger) {
      * and the tier is the row's `effectiveTrustTier`, never its declared tier.
      */
     addEvidenceRef(projectId: string, input: { actor: A4Actor; refKind: A4RefKind; refId: string; sha256: string; claimKind: ClaimKind;
-      method: string | null; label: string; column: "recommendation" | "implementation"; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
+      method: string | null; label: string; column: "recommendation" | "implementation"; expectedHeadSeq: number; request?: A4RequestKey;
+      /** Signed beside the ref, e.g. a hypothesis verdict (a human statement, self_reported); never a store field. */
+      note?: Record<string, unknown> }): A4TransitionResult {
       if (!/^[0-9a-f]{64}$/.test(input.sha256)) throw new A4StoreError(400, "INPUT_INVALID", "sha256 must be 64 lowercase hex characters.");
       return commit(projectId, input.actor, ({ head, seq, ts }) => {
         let trustTier: string | null = null;
@@ -775,7 +781,7 @@ function createStore(workspace: string, ledger: Ledger) {
           trustTier = resolved.tier;
         }
         const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
-        return { kind: "EVIDENCE_REF", payload: { refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
+        return { kind: "EVIDENCE_REF", payload: { ...input.note, refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
           sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage, lane: derived.lane,
             ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: trustTier, method: input.method,
             label: input.label, actor_key: input.actor.key, ts } }] };
