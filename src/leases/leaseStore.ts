@@ -98,24 +98,32 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
   }
 }
 
+/**
+ * The store, verified and parsed from the same bytes (never verify-then-reread). Empty only when neither the list nor
+ * its signature exists; throws the reason otherwise.
+ */
+function readVerifiedRevocations(workspace: string): LeaseRevocations {
+  const paths = leaseRevocationPaths(workspace);
+  if (!pathExists(paths.file) && !pathExists(paths.sig)) return defaultLeaseRevocations();
+  if (!pathExists(paths.file)) throw new Error("revocation list missing but signature present");
+  if (!pathExists(paths.sig)) throw new Error("revocation signature missing");
+  const bytes = readFileSync(paths.file);
+  const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
+  const digest = sha256Hex(bytes);
+  if (signed.digestSha256 !== digest) throw new Error("digest mismatch");
+  if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) throw new Error("signature verification failed");
+  return leaseRevocationsSchema.parse(JSON.parse(bytes.toString("utf8")));
+}
+
 export function revokeLease(workspace: string, leaseId: string, reason: string): LeaseRevocations {
   const paths = leaseRevocationPaths(workspace);
   let current: LeaseRevocations;
   // Revoke is not the deliberate repair command. Authenticate the exact bytes
   // used for this update, not a later second load of potentially different data.
-  if (!pathExists(paths.file) && !pathExists(paths.sig)) current = defaultLeaseRevocations();
-  else {
-    try {
-      const bytes = readFileSync(paths.file);
-      const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
-      const digest = sha256Hex(bytes);
-      if (signed.digestSha256 !== digest || !verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) {
-        throw new Error("Unverifiable revocation snapshot");
-      }
-      current = leaseRevocationsSchema.parse(JSON.parse(bytes.toString("utf8")));
-    } catch {
-      throw new Error("lease revocation store unverifiable; revoke made no changes. Restore and review the approved revocation history before a deliberate repair; revoking another lease must not re-sign damaged state.");
-    }
+  try {
+    current = readVerifiedRevocations(workspace);
+  } catch {
+    throw new Error("lease revocation store unverifiable; revoke made no changes. Restore and review the approved revocation history before a deliberate repair; revoking another lease must not re-sign damaged state.");
   }
   const next = leaseRevocationsSchema.parse({
     ...current,
@@ -151,12 +159,13 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
  * and every caller then refuses every lease until the store is repaired.
  */
 export function revokedLeaseIdSet(workspace: string): Set<string> {
-  const verify = verifyLeaseRevocationsSignature(workspace);
-  if (!verify.valid) {
+  let revocations: LeaseRevocations;
+  try {
+    revocations = readVerifiedRevocations(workspace);
+  } catch (error) {
     throw new Error(
-      `lease revocation store unverifiable (${verify.reason ?? "unknown"}); refusing to treat it as empty`
+      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`
     );
   }
-  const revocations = loadLeaseRevocations(workspace);
   return new Set(revocations.revocations.map((row) => row.leaseId));
 }
