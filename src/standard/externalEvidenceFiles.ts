@@ -20,10 +20,15 @@ export function boundedFile(path: string, limit: number): Buffer {
   } finally { closeSync(fd); }
 }
 
-/** File adapter only; authority configuration belongs to the verifier operator, never to the evidence. */
+/**
+ * File adapter only; authority configuration belongs to the verifier operator, never to the evidence. `listedAuthorities`
+ * are the evidence authorities the operator's trust lists name (P0-55); `signerFromFile` says the signer came from the
+ * `--authorities` file, whose keys the caller pins, while a listed signer's key is admitted by its list.
+ */
 export function verifyExternalEvidenceFile(input: {
   path: string; authoritiesPath?: string; originalPath?: string; expectedNormalizedDigest?: string;
-}): ReturnType<typeof verifyExternalEvidence> & { signerPublicKeyPem: string | null } {
+  listedAuthorities?: readonly ExternalEvidenceAuthority[];
+}): ReturnType<typeof verifyExternalEvidence> & { signerPublicKeyPem: string | null; signerFromFile: boolean } {
   const profile = JSON.parse(boundedFile(input.path, 16 * 1024 * 1024).toString("utf8")) as unknown;
   let authorities: ExternalEvidenceAuthority[] | undefined;
   if (input.authoritiesPath !== undefined) {
@@ -41,11 +46,14 @@ export function verifyExternalEvidenceFile(input: {
     })) throw new Error("Invalid independent authority configuration");
     authorities = parsed as ExternalEvidenceAuthority[];
   }
-  const result = verifyExternalEvidence(profile, { authorities,
+  // An id named twice (in the file and a list, or in two lists) matches nothing, so no authority wins by shadowing.
+  const all = [...(authorities ?? []), ...(input.listedAuthorities ?? [])];
+  const result = verifyExternalEvidence(profile, { authorities: all,
     originalBytes: input.originalPath === undefined ? undefined : boundedFile(input.originalPath, 64 * 1024 * 1024),
     expectedNormalizedDigest: input.expectedNormalizedDigest });
   // The operator authority key the signature names, for the caller's issuer admission (P0-51); null when unsigned or unmatched.
   const authorityId = (profile as { signature?: { authorityId?: unknown } | null } | null)?.signature?.authorityId;
-  const named = (authorities ?? []).filter((authority) => authority.id === authorityId);
-  return { ...result, signerPublicKeyPem: named.length === 1 ? named[0]!.publicKeyPem : null };
+  const named = all.filter((authority) => authority.id === authorityId);
+  const signer = named.length === 1 ? named[0]! : null;
+  return { ...result, signerPublicKeyPem: signer?.publicKeyPem ?? null, signerFromFile: signer !== null && (authorities ?? []).includes(signer) };
 }
