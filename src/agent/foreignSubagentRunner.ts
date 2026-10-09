@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import { join } from "node:path";
+import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { spawnGovernedChild } from "../ledger/monitor.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
 
@@ -70,7 +71,8 @@ function foldChildOutput(
   workspace: string,
   sessionId: string
 ): { text: string; truncated: boolean } {
-  const db = new Database(join(workspace, ".amc", "evidence.sqlite"), { readonly: true });
+  // P0-55: under AMC_NO_SIGN=1 the monitor wrote the child into the unsigned store, so its answer is read from there.
+  const db = new Database(join(workspace, process.env.AMC_NO_SIGN === "1" ? UNSIGNED_EVIDENCE_STORE : ".amc/evidence.sqlite"), { readonly: true });
   try {
     const rows = db
       .prepare(

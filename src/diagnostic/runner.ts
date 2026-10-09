@@ -500,6 +500,8 @@ export function enforceHighRiskSandboxRequirement(params: {
 }
 
 export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string): Promise<DiagnosticReport> {
+  const unsignedStore = process.env.AMC_NO_SIGN === "1"; // P0-55, as runAssurance: unsigned whatever the caller passed
+  if (unsignedStore) input = { ...input, noSign: true };
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const agentPaths = getAgentPaths(workspace, agentId);
@@ -510,11 +512,14 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     applyIndustryPackWeights: input.applyIndustryPackWeights
   });
   const activeQuestions = selectedQuestionSet.questions;
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
   const runId = randomUUID();
+  let signedEvidence: ReturnType<typeof openLedger> | null = null; // an unsigned run still reads signed evidence, read-only
 
   try {
-    const verification = await verifyLedgerIntegrity(workspace);
+    if (unsignedStore && pathExists(join(workspace, ".amc", "evidence.sqlite"))) signedEvidence = openLedger(workspace, { readonly: true });
+    // P0-55: verify the signed rows an unsigned run reads; its own unverified rows read UNSIGNED, never a ledger failure.
+    const verification = unsignedStore && !signedEvidence ? { ok: true } : await verifyLedgerIntegrity(workspace);
     const now = Date.now();
     const windowMs = parseWindowToMs(input.window || "14d");
     const windowStartTs = now - windowMs;
@@ -545,14 +550,11 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     let _cachedAllEvents: ParsedEvidenceEvent[] | null = null;
     const reader = readerTrustFor(workspace); // P0-18: trust lists and own keys load once per run
     function getCachedEvents(): ParsedEvidenceEvent[] { // P0-18: no synthetic rows; an attested event once, in its window
-      return (_cachedAllEvents ??= countAttestedOnce(ledger.getEventsBetween(windowStartTs, now).filter((event) => evidenceProducer(event) !== "synthetic")
+      return (_cachedAllEvents ??= countAttestedOnce([...(signedEvidence?.getEventsBetween(windowStartTs, now) ?? []), ...ledger.getEventsBetween(windowStartTs, now)].filter((event) => evidenceProducer(event) !== "synthetic")
         .map((event) => parseEventForRunner(workspace, event, reader)), (event) => event.trustTier, { startTs: windowStartTs, endTs: now }));
     }
 
-    const initialEvents = filterEventsForAgent(
-      getCachedEvents(),
-      agentId
-    );
+    const initialEvents = filterEventsForAgent(getCachedEvents(), agentId);
     const derivedAudits = deriveDeterministicAudits(initialEvents, {
       gatewayConfigPresent,
       gatewayConfigSignatureValid: gatewaySignatureValid,
@@ -565,22 +567,19 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       agentId,
       riskTier: configuredRiskTier
     });
-    if (!input.noSign) {
+    if (!input.noSign || unsignedStore) { // P0-55: an unsigned run's audits land in its own store, so the caps still apply
       persistAuditFindings(ledger, derivedAudits, runId);
       _cachedAllEvents = null;
     }
 
-    let events = filterEventsForAgent(
-      getCachedEvents(),
-      agentId
-    );
+    let events = filterEventsForAgent(getCachedEvents(), agentId);
     const monitorKeys = getPublicKeyHistory(workspace, "monitor");
     const correlation = correlateTracesAgainstEvidence({
       events,
       monitorPublicKeys: monitorKeys,
       expectedAgentId: agentId
     });
-    const correlationAuditIds = input.noSign
+    const correlationAuditIds = input.noSign && !unsignedStore
       ? []
       : persistCorrelationAudits({
           ledger,
@@ -1132,7 +1131,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       traceReceiptInvalidCount + traceEventNotFoundCount + traceBodyMismatchCount + traceAgentMismatchCount;
     const traceInvalidPenalty = Math.min(0.3, traceInvalidReceiptCount * 0.05);
 
-    const integrityIndex = verification.ok
+    const integrityIndex = verification.ok && !unsignedStore
       ? clamp(
           evidenceCoverage -
             contradictionPenalty -
@@ -1308,7 +1307,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       windowStartTs,
       windowEndTs: now,
       status,
-      verificationPassed: verification.ok,
+      verificationPassed: verification.ok && !unsignedStore, // unsigned rows: NOT CRYPTOGRAPHICALLY VERIFIED
       trustBoundaryViolated: trustBoundary.violated,
       trustBoundaryMessage: trustBoundary.message,
       integrityIndex: Number(integrityIndex.toFixed(4)),
@@ -1383,7 +1382,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const runJsonPath = join(agentPaths.runsDir, `${runId}.json`);
     writeFileAtomic(runJsonPath, JSON.stringify(report, null, 2), 0o644);
 
-    ledger.insertRun({
+    if (!input.noSign || unsignedStore) ledger.insertRun({ // P0-27: an unsigned seal never enters the signed store
       run_id: runId,
       window_start_ts: windowStartTs,
       window_end_ts: now,
@@ -1401,6 +1400,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
     return report;
   } finally {
+    signedEvidence?.close();
     ledger.close();
   }
 }

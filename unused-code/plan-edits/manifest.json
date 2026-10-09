@@ -59,6 +59,13 @@
       "sha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b"
     },
     {
+      "path": "src/api/scoreRouter.ts",
+      "issue": "P0-55",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P0-55/src/api/scoreRouter.ts.landed",
+      "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951"
+    },
+    {
       "path": "src/assurance/assuranceCertificates.ts",
       "issue": "P0-15",
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",

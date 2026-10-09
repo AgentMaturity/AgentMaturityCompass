@@ -8,7 +8,7 @@ import {
   auditBinderExportExecuteForApi,
   auditBinderExportForApi,
   auditBinderExportRequestForApi,
-  auditBinderVerifyForApi,
+  auditBinderVerifyFile,
   auditBindersForApi,
   auditInitForApi,
   auditMapApplyForApi,
@@ -145,7 +145,7 @@ export function auditBinderVerifyCli(params: {
   pubkeyPath?: string;
   trust: TrustContext;
 }) {
-  return auditBinderVerifyForApi({
+  return auditBinderVerifyFile({
     workspace: params.workspace,
     file: params.file,
     publicKeyPath: params.pubkeyPath,

@@ -4,7 +4,7 @@ import {
   readSignedArtifactInclusionProofs,
   verifySignedArtifactPiiScan
 } from "../utils/signedArtifactVerification.js";
-import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -60,10 +60,12 @@ function digestFile(path: string): string {
 /**
  * Verifies a .amcaudit offline. signer.pub, the signature envelope and --pubkey only locate the signer: the binder
  * and its signed Merkle root need keys the trust context admits for artifact-seal, and inclusion proofs must resolve
- * to that signed root (P0-09). ok equals report.trusted.
+ * to that signed root (P0-09). ok equals report.trusted. The archive is read once: its digest and the tree verified
+ * come from the same bytes (`bytes` when the caller already read them, P0-55), extracted from a private copy.
  */
 export function verifyAuditBinderFile(params: {
   file: string;
+  bytes?: Buffer;
   workspace?: string;
   publicKeyPath?: string;
   trust: TrustContext;
@@ -72,8 +74,10 @@ export function verifyAuditBinderFile(params: {
   const errors: AuditBinderVerifyError[] = [];
   const signatures: IssuerAdmission[] = [];
   let anchoring: VerifierReportV1["anchoring"] = { status: "not-applicable", detail: null };
-  const fileSha256 = digestFile(file);
+  const bytes = params.bytes ?? readFileSync(file);
+  const fileSha256 = sha256Hex(bytes);
   const tmp = mkdtempSync(join(tmpdir(), "amc-audit-verify-"));
+  const tree = join(tmp, "tree");
   let binder: AuditBinderJson | null = null;
   const finish = (): AuditBinderVerifyResult => {
     const report = buildVerifierReport({ artifact: { kind: "audit-binder", path: file, sha256: fileSha256 }, context: params.trust,
@@ -81,8 +85,11 @@ export function verifyAuditBinderFile(params: {
     return { ok: report.trusted, binder, errors, fileSha256, report };
   };
   try {
-    tarExtract(file, tmp);
-    const root = resolveSignedArtifactRoot(tmp, "amc-audit", "binder.json", "binder.sig");
+    const archive = join(tmp, "binder.amcaudit");
+    writeFileSync(archive, bytes, { mode: 0o600 });
+    mkdirSync(tree);
+    tarExtract(archive, tree);
+    const root = resolveSignedArtifactRoot(tree, "amc-audit", "binder.json", "binder.sig");
     const binderPath = join(root, "binder.json");
     const sigPath = join(root, "binder.sig");
     const pubPath = join(root, "signer.pub");

@@ -4,7 +4,6 @@ import chalk from "chalk";
 import { emitClaimResult, unverifiedClaim } from "./cli/claimOutput.js";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
-import { fileSha256 } from "./trust/signatureCheck.js";
 
 type ImportOriginalRef = import("./importers/importOriginals.js").ImportOriginalRef;
 function renderOriginals(originals: ImportOriginalRef[] | undefined): void {
@@ -106,15 +105,20 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
       const trust = trustFromFlags(opts, ["evidence-authority"]);
       try {
         const { verifyExternalEvidenceFile } = await import("./standard/externalEvidenceFiles.js");
-        const result = verifyExternalEvidenceFile({ path: resolve(path), authoritiesPath: opts.authorities,
+        // P0-55: an evidence-authority entry of the operator's trust lists is an authority too, under its key id.
+        const listedAuthorities = trust.lists.flatMap((list) => list.entries).flatMap((entry) =>
+          entry.authority && entry.purposes.includes("evidence-authority") ? [{ id: entry.keyId, publicKeyPem: entry.publicKeyPem, ...entry.authority }] : []);
+        const verified = verifyExternalEvidenceFile({ path: resolve(path), authoritiesPath: opts.authorities, listedAuthorities,
           originalPath: opts.original, expectedNormalizedDigest: opts.expectedDigest });
-        // --authorities is the operator's own file, so the key it names for this signature is pinned like --pubkey; distrust
-        // still beats it. An unsigned profile names no signer and is never trusted (P0-51).
-        const keyId = result.signerPublicKeyPem === null ? null : ed25519KeyId(result.signerPublicKeyPem);
+        // --authorities is the operator's own file, so the key it names for this signature is pinned like --pubkey; a listed
+        // key is admitted by its list (validity, revocation). Distrust beats both. An unsigned profile is never trusted (P0-51).
+        const keyId = verified.signerPublicKeyPem === null || !verified.signerFromFile ? null : ed25519KeyId(verified.signerPublicKeyPem);
         const context = keyId === null ? trust : withPins(trust, [{ keyId, purposes: ["evidence-authority"], origin: `--authorities ${opts.authorities}` }]);
-        const report = buildVerifierReport({ artifact: { kind: "external-evidence-profile", path: resolve(path), sha256: fileSha256(resolve(path)) },
-          context, integrityErrors: result.errors, anchoring: { status: "not-applicable", detail: null },
-          signatures: [admitKey({ publicKeyPem: result.signerPublicKeyPem, purpose: "evidence-authority", signature: "profile signature", context })] });
+        const report = buildVerifierReport({ artifact: { kind: "external-evidence-profile", path: resolve(path), sha256: verified.profileSha256 },
+          context, integrityErrors: verified.errors, anchoring: { status: "not-applicable", detail: null },
+          signatures: [admitKey({ publicKeyPem: verified.signerPublicKeyPem, purpose: "evidence-authority", signature: "profile signature", context })] });
+        // A tier an unadmitted key supports is not a tier: untrusted reads SELF_REPORTED.
+        const result = { ...verified, trustTier: report.trusted ? verified.trustTier : "SELF_REPORTED" as const };
         if (!opts.json) {
           console.log(`Profile: ${result.ok ? "well-formed" : "refused"}; source trust: ${result.trustTier}`);
           console.log(`Original digest: ${result.originalDigest}; signature verified: ${result.signatureVerified}; parent session: ${result.parentSession}`);

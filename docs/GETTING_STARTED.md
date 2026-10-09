@@ -397,6 +397,8 @@ amc evidence verify
 amc bundle export --out evidence.amcbundle
 ```
 
+Without `AMC_VAULT_PASSPHRASE` (or with `AMC_NO_SIGN=1`) the first-run capture is unsigned and goes to `.amc/unsigned/evidence.sqlite`, never to the signed `.amc/evidence.sqlite`; score it with `AMC_NO_SIGN=1 amc quickscore --auto`, and capture again with the vault unlocked when you need verifier-ready evidence.
+
 ### Ingesting from external eval systems
 
 Already running evals elsewhere? Import them:

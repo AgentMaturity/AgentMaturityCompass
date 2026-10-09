@@ -96,7 +96,8 @@ function recordSandboxAttestation(params: {
   gatewayRoute?: string;
   gatewayProxyUrl?: string;
 }): void {
-  const ledger = openLedger(params.workspace);
+  // P0-55: under AMC_NO_SIGN=1 the attestation shares the unsigned store with the docker session wrapAny records.
+  const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = randomUUID();
   try {
     const version = spawnSync("docker", ["--version"], { encoding: "utf8" });
@@ -212,7 +213,7 @@ export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
     };
   } finally {
     const cleanup = spawnSync("docker", ["network", "rm", networkName], { encoding: "utf8" });
-    const ledger = openLedger(opts.workspace);
+    const ledger = openLedger(opts.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
     const cleanupSession = randomUUID();
     try {
       ledger.startSession({

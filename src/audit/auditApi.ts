@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { join, resolve } from "node:path";
-import { rmSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
+import { closeSync, constants, fstatSync, openSync, readFileSync, realpathSync, rmSync, statSync } from "node:fs";
 import { z } from "zod";
 import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -18,6 +18,7 @@ import {
   verifyAuditMapBuiltinSignature
 } from "./auditMapStore.js";
 import {
+  auditBindersExportsDir,
   initAuditPolicy,
   loadAuditPolicy,
   saveAuditPolicy,
@@ -29,7 +30,8 @@ import {
   listExportedAuditBinders
 } from "./binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "./binderVerifier.js";
-import { verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
+import { unreadableAuditResult, verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
+import { isWithin } from "../utils/pathSafety.js";
 import { loadBinderCache } from "./binderStore.js";
 import {
   createAuditEvidenceRequest,
@@ -393,8 +395,55 @@ export function auditBindersForApi(workspace: string) {
   };
 }
 
-export function auditBinderVerifyForApi(params: {
+/**
+ * The bytes of `file` when it is a regular, singly linked file whose real path lies under the workspace's own
+ * `.amc/audit/binders/exports/` with no symbolic link on the way there (P0-55), read through one descriptor that is
+ * re-checked against that path after opening; else null. A FIFO, device, hard link or swapped path reads nothing.
+ */
+function readExportedBinderBytes(workspace: string, file: string): Buffer | null {
+  try {
+    const root = join(realpathSync(workspace), ".amc", "audit", "binders", "exports");
+    if (realpathSync(auditBindersExportsDir(workspace)) !== root) return null;
+    // The real path must be the requested path re-rooted at the real exports dir: no link anywhere below exports.
+    const unlinked = join(root, relative(resolve(auditBindersExportsDir(workspace)), file));
+    const inside = () => {
+      const real = realpathSync(file);
+      return real === unlinked && isWithin(root, real) ? real : null;
+    };
+    const real = inside();
+    if (real === null) return null;
+    const fd = openSync(real, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    try {
+      const opened = fstatSync(fd);
+      const again = inside();
+      const now = again === null ? null : statSync(again);
+      if (!opened.isFile() || opened.nlink !== 1 || now === null || now.dev !== opened.dev || now.ino !== opened.ino) return null;
+      return readFileSync(fd);
+    } finally {
+      closeSync(fd);
+    }
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Studio's binder verify (P0-20): the route confines `file` to the binder exports directory by path, and only bytes
+ * read under that directory's real path are verified (P0-55). A file reached through a link, or not a regular file,
+ * reads as the same generic UNREADABLE as a missing one. A request never names a public key.
+ */
+export function auditBinderVerifyForApi(params: { file: string; workspace: string; trust: TrustContext }) {
+  const file = resolve(params.file);
+  const bytes = readExportedBinderBytes(params.workspace, file);
+  if (bytes === null) return unreadableAuditResult(file, params.trust);
+  return auditBinderVerifyFile({ file, bytes, workspace: params.workspace, trust: params.trust });
+}
+
+/** `amc audit binder verify`: the operator names any file, and may pin a key. */
+export function auditBinderVerifyFile(params: {
   file: string;
+  /** The file's bytes, already read; verified in place of re-reading `file`, which then only labels the report. */
+  bytes?: Buffer;
   workspace?: string;
   publicKeyPath?: string;
   trust: TrustContext;
@@ -402,8 +451,8 @@ export function auditBinderVerifyForApi(params: {
   const file = resolve(params.file);
   const publicKeyPath = params.publicKeyPath ? resolve(params.publicKeyPath) : undefined;
   // P0-20: a .json industry-pack audit verifies here too, under the same pinned trust as a binder.
-  return verifyIndustryPackAuditFile({ file, publicKeyPath, trust: params.trust })
-    ?? verifyAuditBinderFile({ file, workspace: params.workspace, publicKeyPath, trust: params.trust });
+  return verifyIndustryPackAuditFile({ file, bytes: params.bytes, publicKeyPath, trust: params.trust })
+    ?? verifyAuditBinderFile({ file, bytes: params.bytes, workspace: params.workspace, publicKeyPath, trust: params.trust });
 }
 
 export function auditRequestCreateForApi(params: {

@@ -60,7 +60,7 @@ describe("first-run evidence capture", () => {
     expect(result.stdout).toContain("First-run evidence capture");
     expect(result.stdout).toContain("No prompt choices needed");
     expect(result.stdout).toContain("amc evidence collect --first-run --agent demo-agent --runtime any -- node agent.js");
-    expect(result.stdout).toContain("Next: amc quickscore --auto");
+    expect(result.stdout).toContain("Next: AMC_NO_SIGN=1 amc quickscore --auto");
     expect(result.stdout).not.toContain("How does your agent run?");
   });
 
@@ -97,8 +97,9 @@ describe("first-run evidence capture", () => {
     expect(result.stdout).toContain("Signing: UNSIGNED first-run capture");
     expect(result.stdout).toContain("amc first-run evidence smoke");
     expect(result.stdout).toContain("Session sealed:");
-    expect(result.stdout).toContain("Next: amc quickscore --auto");
-    expect(existsSync(join(dir, ".amc", "evidence.sqlite"))).toBe(true);
+    // P0-55: an unsigned capture lives in the unsigned store, so the next step scores that store.
+    expect(result.stdout).toContain("Next: AMC_NO_SIGN=1 amc quickscore --auto");
+    expect(existsSync(join(dir, ".amc", "unsigned", "evidence.sqlite"))).toBe(true);
   });
 
   test("keeps onboarding docs and UX audit aligned with the first-run capture path", () => {

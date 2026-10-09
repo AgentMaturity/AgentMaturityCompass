@@ -423,26 +423,31 @@ export function verifyIndustryPackAuditSignature(audit: IndustryPackAudit, opts:
   return { ok: report.trusted, signed: raw !== null && raw !== undefined, checksumOk, signatureOk, keyFingerprint, errors, report };
 }
 
+/** A file that cannot be read, or that a Studio request may not read (P0-55): the same generic result, no OS error text. */
+export function unreadableAuditResult(file: string, trust: TrustContext): IndustryPackAuditVerification & { audit: null; fileSha256: string } {
+  const fileSha256 = "0".repeat(64);
+  const report = buildVerifierReport({ artifact: { kind: "industry-pack-audit", path: file, sha256: fileSha256 }, context: trust,
+    integrityErrors: ["UNREADABLE: cannot read audit file"], signatures: [], anchoring: { status: "not-applicable", detail: null } });
+  return { ok: false, signed: false, checksumOk: false, signatureOk: false, keyFingerprint: null,
+    errors: [{ code: "UNREADABLE", message: "cannot read audit file" }], report, audit: null, fileSha256 };
+}
+
 /**
  * For `amc audit binder verify`: verifies `file` when it is a .json industry-pack audit (any schema version, so
  * older unsigned bundles report UNSIGNED), else returns null and the caller treats it as a binder. A file or key that
  * cannot be read is a generic UNREADABLE result: no OS error text, so a caller learns nothing about other paths.
+ * `bytes`, when given, are the file's contents already read and are verified instead of re-reading `file`.
  */
-export function verifyIndustryPackAuditFile(params: { file: string; publicKeyPath?: string; trust: TrustContext }):
+export function verifyIndustryPackAuditFile(params: { file: string; bytes?: Buffer; publicKeyPath?: string; trust: TrustContext }):
   (IndustryPackAuditVerification & { audit: IndustryPackAudit | null; fileSha256: string }) | null {
   if (!params.file.toLowerCase().endsWith(".json")) return null;
   let bytes: Buffer;
   let publicKeyPem: string | null;
   try {
-    bytes = readFileSync(params.file);
+    bytes = params.bytes ?? readFileSync(params.file);
     publicKeyPem = params.publicKeyPath ? readFileSync(params.publicKeyPath, "utf8") : null;
   } catch {
-    const errors = [{ code: "UNREADABLE" as const, message: "cannot read audit file" }];
-    const fileSha256 = "0".repeat(64);
-    const report = buildVerifierReport({ artifact: { kind: "industry-pack-audit", path: params.file, sha256: fileSha256 },
-      context: params.trust, integrityErrors: ["UNREADABLE: cannot read audit file"], signatures: [],
-      anchoring: { status: "not-applicable", detail: null } });
-    return { ok: false, signed: false, checksumOk: false, signatureOk: false, keyFingerprint: null, errors, report, audit: null, fileSha256 };
+    return unreadableAuditResult(params.file, params.trust);
   }
   let audit: unknown;
   try {

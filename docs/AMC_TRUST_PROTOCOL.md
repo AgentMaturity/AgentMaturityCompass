@@ -771,6 +771,7 @@ amc trust decay --preset healthcare --score 80 --age 6h
 
 **Mitigations:**
 - HMAC-SHA256 signing with `sharedSecret` prevents forgery without the secret.
+- Over the API, an HMAC proves only that the caller holds a shared secret, so it is never a verdict (P0-55): `POST /api/v1/score/trust/verify-claim` and `POST /api/v1/passport/trust-token/verify` refuse a body that carries `sharedSecret` or `secret` (400) and answer `status: "not_evaluated"` (verify-claim also `trusted: false`, `trustLevel: "untrusted"`, `grantedScopes: []`). `POST /api/v1/score/trust/create-claim` has no default secret: it needs `sharedSecret` or the server's `AMC_TRUST_SECRET`.
 - The `issuer.publicKeyHash` enables out-of-band verification of the issuer's key.
 - AMC Passports with Ed25519 signatures provide non-repudiable proof of issuance.
 
