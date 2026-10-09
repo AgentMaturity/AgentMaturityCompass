@@ -105,8 +105,23 @@ export function stepRows(project, stage) {
     body: current < 0 ? "" : index === current ? "current step" : index < current ? "earlier step" : "" }));
 }
 
+const NO_REFLECTION = "No reflection shown yet";
+const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
+
+/** Understand's reflection as Studio returned it; Confirm and Correct stay disabled until one is shown here. */
+function reflectionHtml(reflection, allowed) {
+  const bound = Number.isSafeInteger(reflection?.headSeq);
+  const offer = bound ? allowed.understand : held(reflection ? "Studio did not say which head this reflection belongs to" : NO_REFLECTION);
+  return `${reflection ? `<p class="muted">What AMC understood, as Studio returned it${bound ? ` (head ${esc(reflection.headSeq)})` : ""}.
+    Yes and Correct bind this head: if the project changes first, Studio refuses them and you run Understand again.</p>
+    ${studioJson(reflection.data)}` : `<p class="muted">${NO_REFLECTION}. Run Understand to see what AMC
+    understood before you confirm it.</p>`}
+    <div class="row wrap">${actionButton("Yes, that's it", "confirm", offer)}</div>
+    <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", offer)}`;
+}
+
 export function renderConversation(ctx) {
-  const { questions, answers, allowed } = ctx;
+  const { questions, answers, allowed, reflection, explanation } = ctx;
   const answered = new Map(answers.map((answer) => [answer.questionId, answer]));
   const carried = answers.filter((answer) => answer.source === "carried");
   const open = questions.filter((question) => !answered.has(question.id)).length;
@@ -118,16 +133,22 @@ export function renderConversation(ctx) {
     ${questions.length ? `<form class="a4-form">${fields.join("")}${actionButton("Save answers", "answers", allowed.ask)}</form>`
       : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
-    <div class="row wrap">${actionButton("Run Understand", "understand", allowed.understand)}
-      ${actionButton("Yes, that's it", "confirm", allowed.understand)}</div>
-    <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", allowed.understand)}
+    <div class="row wrap">${actionButton("Run Understand", "understand", allowed.understand)}</div>
+    ${reflectionHtml(reflection, allowed)}
     <h4>Explain</h4>
     <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
-      ${actionButton("Explain at this level", "explain", allowed.explain)}</div>`;
+      ${actionButton("Explain at this level", "explain", allowed.explain)}</div>
+    ${explanation ? `<p class="muted">Explanation at the ${esc(explanation.level)} level, as Studio returned it.</p>${studioJson(explanation.data)}` : ""}`;
 }
 
 export function renderSpecEditor(ctx) {
-  const { revision, allowed } = ctx;
+  const { revision, allowed, project, stage } = ctx;
+  if (stage !== project.stage) {
+    // Another stage's view: the head revision belongs to the project's current stage, so it is shown, never proposed here.
+    return `<p class="muted">${esc(stageTitle(stage))} is not this project's current stage (${esc(stageTitle(project.stage))}).
+      ${revision ? `This is r${esc(revision.revisionNo)}, a ${esc(stageTitle(revision.stage))} specification, shown read-only.` : "No specification yet."}
+      Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? studioJson(revision.spec ?? {}) : ""}`;
+  }
   return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
     spec <code>${esc(revision.specDigest)}</code>)` : ""}. ${RETAINED}</p>
     <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(revision?.spec ?? {}, null, 2))}</textarea>
@@ -145,11 +166,12 @@ export function renderReviewCard(ctx) {
     <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review", ctx.allowed.review)}</div>`;
 }
 
+/** One thread per stage-qualified card id (`aspire:specification`), the key a4.js posts and presence uses. */
 export function renderComments(cardId, comments) {
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
     <span class="pill">SELF_REPORTED</span> <strong>${esc(comment.authorUsername ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
-      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes ?? ["VAULT_LOCKED"])}`}</div></li>`);
+      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes)}`}</div></li>`);
   return `<details class="a4-comments"${rows.length ? " open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
     <button type="button" data-a4-action="comment">Comment</button>
@@ -160,7 +182,7 @@ export function renderCard(card, ctx, comments) {
   let body;
   try { body = card.render(ctx); }
   catch (error) { body = `<p class="status-bad">This card could not render: ${esc(error?.message ?? error)}</p>`; }
-  return `<section class="card a4-card" data-card="${esc(card.id)}"><h4>${esc(card.title)}</h4>${body}${renderComments(card.id, comments)}</section>`;
+  return `<section class="card a4-card" data-card="${esc(card.id)}"><h4>${esc(card.title)}</h4>${body}${renderComments(`${ctx.stage}:${card.id}`, comments)}</section>`;
 }
 
 export function renderDifferences(diff, project) {

@@ -86,6 +86,9 @@ notice?.addEventListener("click", (event) => {
   void guarded(async () => action.after?.(await send(action, true))).catch(showError);
 });
 
+/** The head a transition response names (its seq, or a head it returns); null when Studio named none. */
+const headSeqOf = (data) => [data?.seq, data?.headSeq, data?.head?.headSeq, data?.project?.headSeq].find(Number.isSafeInteger) ?? null;
+
 async function previewOptions() {
   try {
     return await apiNativeRequest(`${API}/options`);
@@ -131,6 +134,9 @@ function mountProject(projectId, options, strip) {
   // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
   // never whatever the newest poll loaded; a change disables deciding until the user shows the new gate.
   let reviewed = null;
+  // This page's last Understand and Explain responses: P1-57 publishes no read route for them yet, so they are shown
+  // only to the member who ran them, until the page reloads.
+  let reflection = null, explanation = null;
   const drafts = new Map();
 
   const stagePath = (sub) => projectPath(`/stages/${stage}/${sub}`);
@@ -138,7 +144,6 @@ function mountProject(projectId, options, strip) {
   const presenceCard = () => `${stage}:${activeCard}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
-  const clearDrafts = (prefix) => { for (const key of [...drafts.keys()]) if (key.startsWith(prefix)) drafts.delete(key); };
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
   const shownReview = () => {
     const { open, met } = view.currentGates(state.gates, stage);
@@ -180,8 +185,10 @@ function mountProject(projectId, options, strip) {
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = shown && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
-    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange,
-      questions: listOf(state.options?.questions?.[stage], "questions"), answers: listOf(state.revision?.spec?.answers, "answers") };
+    // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
+    const answersHere = stage === project.stage || state.revision?.stage === stage;
+    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation,
+      questions: listOf(state.options?.questions?.[stage], "questions"), answers: answersHere ? listOf(state.revision?.spec?.answers, "answers") : [] };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}
@@ -219,7 +226,8 @@ function mountProject(projectId, options, strip) {
   }
 
   function specAction(spec, base) {
-    return { label: "Propose this specification", path: stagePath("propose"), spec, base, card: "specification",
+    return { label: "Propose this specification", path: stagePath("propose"), spec, base, clears: ["specification:spec"],
+      got: () => { specBase = null; },
       body: { spec, parentRevisionNo: base.revisionNo > 0 ? base.revisionNo : null, expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
@@ -232,30 +240,48 @@ function mountProject(projectId, options, strip) {
     return specAction(spec, specBase ?? { revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: state.revision?.spec ?? {} });
   }
 
-  /** Each action: its POST path and body. Decisions bind the gate's open seq and both digests, never the head seq. */
+  /** Confirm and Correct bind the head of the reflection this page shows, so a newer reflection makes Studio answer 409. */
+  function reflectionBinding() {
+    if (!Number.isSafeInteger(reflection?.headSeq)) throw new Error("No reflection is shown yet. Run Understand first; nothing was sent.");
+    return { expectedHeadSeq: reflection.headSeq, clientRequestId: uuid() };
+  }
+
+  /**
+   * Each action: its POST path and body, the draft keys it consumed (`clears`, dropped on success) and `got(data)`, which
+   * keeps what the response shows. Decisions bind the reviewed gate's open seq and both digests, never the head seq.
+   */
   function actionFor(name, button) {
     const scope = button.closest("[data-card]") ?? button.closest("section") ?? root;
+    const card = scope.dataset?.card ?? "page";
     const value = (field) => scope.querySelector(`[name="${field}"]`)?.value.trim() ?? "";
     const reason = root.querySelector('.a4-approvals [name="reason"]')?.value.trim() ?? "";
-    const post = (label, path, body, card = scope.dataset?.card ?? "page") => ({ label, path, body, card });
+    const post = (label, path, body, clears = [], got = undefined) => ({ label, path, body, clears, got });
+    const REASON = ["page:reason"];
+    const repin = () => { reviewed = null; }; // the user's own gate request: the next load pins the gate it opened
     const decide = (verb, label, extra) => {
       const { gateId, ...binding } = decisionBinding();
-      return post(label, projectPath(`/gates/${encodeURIComponent(gateId)}/${verb}`), { reason, ...extra(binding) });
+      return post(label, projectPath(`/gates/${encodeURIComponent(gateId)}/${verb}`), { reason, ...extra(binding) }, REASON);
     };
     switch (name) {
-      case "answers": return post("Save answers", stagePath("answers"), { ...headBinding(),
-        answers: [...scope.querySelectorAll("form textarea[name]")].filter((field) => field.value.trim())
-          .map((field) => ({ questionId: field.name, value: field.value.trim() })) });
-      case "understand": return post("Run Understand", stagePath("understand"), headBinding());
-      case "confirm": return post("Confirm understanding", stagePath("confirm-understanding"), { confirmed: true, ...headBinding() });
+      case "answers": {
+        const fields = [...scope.querySelectorAll("form textarea[name]")].filter((field) => field.value.trim());
+        return post("Save answers", stagePath("answers"), { ...headBinding(),
+          answers: fields.map((field) => ({ questionId: field.name, value: field.value.trim() })) }, fields.map(draftKey));
+      }
+      case "understand": return post("Run Understand", stagePath("understand"), headBinding(), [],
+        (data) => { reflection = { data, headSeq: headSeqOf(data) }; });
+      case "confirm": return post("Confirm understanding", stagePath("confirm-understanding"), { confirmed: true, ...reflectionBinding() });
       case "correct": return post("Correct understanding", stagePath("confirm-understanding"),
-        { confirmed: false, corrections: value("corrections"), ...headBinding() });
-      case "explain": return post("Explain", stagePath("explain"), { level: value("level"), ...headBinding() });
+        { confirmed: false, corrections: value("corrections"), ...reflectionBinding() }, [`${card}:corrections`], () => { reflection = null; });
+      case "explain": {
+        const level = value("level");
+        return post("Explain", stagePath("explain"), { level, ...headBinding() }, [], (data) => { explanation = { level, data }; });
+      }
       case "propose": return proposeAction(scope);
-      case "build": return post("Build", stagePath("build"), { content: value("content"), ...headBinding() });
-      case "review": return post("Review", stagePath("review"), { content: value("content"), ...headBinding() });
-      case "request-direction": return post("Request direction approval", stagePath("gates/direction/request"), headBinding());
-      case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding());
+      case "build": return post("Build", stagePath("build"), { content: value("content"), ...headBinding() }, [`${card}:content`]);
+      case "review": return post("Review", stagePath("review"), { content: value("content"), ...headBinding() }, [`${card}:content`]);
+      case "request-direction": return post("Request direction approval", stagePath("gates/direction/request"), headBinding(), [], repin);
+      case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding(), [], repin);
       case "approve": return decide("approve", "Approve", (binding) => binding);
       case "deny": return decide("deny", "Deny", (binding) => binding);
       case "request-changes": return decide("request-changes", "Request changes",
@@ -267,9 +293,9 @@ function mountProject(projectId, options, strip) {
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
         return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
-      case "hold": return post("Hold", projectPath("/hold"), { reason, ...headBinding() });
-      case "resume": return post("Resume", projectPath("/resume"), { reason, ...headBinding() });
-      case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, reason, ...headBinding() });
+      case "hold": return post("Hold", projectPath("/hold"), { reason, ...headBinding() }, REASON);
+      case "resume": return post("Resume", projectPath("/resume"), { reason, ...headBinding() }, REASON);
+      case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, reason, ...headBinding() }, REASON);
       case "add-member": {
         const row = button.closest("[data-principal]");
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
@@ -279,8 +305,9 @@ function mountProject(projectId, options, strip) {
         const body = value("comment");
         if (!body) throw new Error("Write a comment first.");
         if (new TextEncoder().encode(body).byteLength > view.COMMENT_MAX_BYTES) throw new Error("Comments are limited to 8 KiB. Nothing was sent.");
-        return post("Comment", projectPath("/comments"), { revisionNo: state.project.revisionNo, stage, cardId: scope.dataset.card, body,
-          clientRequestId: uuid() });
+        // Card ids repeat across stages, so the thread key is stage-qualified, as presence is.
+        return post("Comment", projectPath("/comments"), { revisionNo: state.project.revisionNo, stage, cardId: `${stage}:${card}`, body,
+          clientRequestId: uuid() }, [`${card}:comment`]);
       }
       default: throw new Error(`Unknown A4 action ${name}.`);
     }
@@ -288,6 +315,10 @@ function mountProject(projectId, options, strip) {
 
   async function openConflict(action) {
     const head = one(await apiNativeRequest(projectPath("")), "project");
+    // A comment, member or evidence transition moves the head without a new revision: re-post once on the new head.
+    if (head.revisionNo === action.base.revisionNo && !action.rebased) {
+      return run({ ...specAction(action.spec, { ...action.base, headSeq: head.headSeq }), rebased: true });
+    }
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
     const headSpec = isObject(headRevision?.spec) ? headRevision.spec : {};
     conflict = { baseRevisionNo: action.base.revisionNo, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
@@ -296,9 +327,9 @@ function mountProject(projectId, options, strip) {
   }
 
   async function run(action) {
-    action.after = async () => {
-      clearDrafts(`${action.card}:`);
-      if (action.spec) specBase = null;
+    action.after = async (data) => {
+      for (const key of action.clears ?? []) drafts.delete(key);
+      action.got?.(data);
       await load();
     };
     let data;
@@ -318,7 +349,7 @@ function mountProject(projectId, options, strip) {
       return render();
     }
     if (name === "reload") {
-      conflict = null; specBase = null; clearDrafts("specification:");
+      conflict = null; specBase = null; drafts.delete("specification:spec");
       return load();
     }
     if (name === "apply-on-top") {
