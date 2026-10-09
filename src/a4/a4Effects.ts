@@ -20,7 +20,8 @@ import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  A4_RUNTIME, assertAllowed, autoHold, consumeGate, driftedSlots, engineRiskTier, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, type A4Call
+  A4_RUNTIME, assertAllowed, autoHold, consumeGate, driftedSlots, effectOwnerLost, engineRiskTier, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State,
+  type A4Call
 } from "./a4Gates.js";
 import { assertMember, liveRolesFor } from "./a4Identity.js";
 import { gateStatus, isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
@@ -286,11 +287,19 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     const bound = (JSON.parse(gate.intent_json) as { resourceDigests: Record<string, string | null> }).resourceDigests;
     const drifted = driftedSlots(workspace, bound);
     if (drifted.length > 0) return failWith(`RESOURCE_DRIFTED ${drifted.join(" ")}`);
-    const timer = setInterval(() => store.heartbeatEffect(attemptId), HEARTBEAT_MS);
+    // A beat that throws (SQLITE_BUSY, a closed ledger) is a missed beat, never an uncaught timer exception that exits Studio.
+    const beat = (): void => {
+      try {
+        store.heartbeatEffect(attemptId);
+      } catch {
+        // The sweeper's liveness rule decides; a live local owner is never swept for a stale heartbeat.
+      }
+    };
+    const timer = setInterval(beat, HEARTBEAT_MS);
     timer.unref();
     let outcome: A4EffectOutcome;
     try {
-      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: () => store.heartbeatEffect(attemptId) });
+      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat });
     } finally {
       clearInterval(timer);
     }
@@ -303,14 +312,15 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
 }
 
 /**
- * The liveness sweeper (the action-journal rule): a running effect whose owner process is gone on this host, or whose
- * heartbeat is older than `staleAfterMs`, is written EFFECT_FAILED: process_lost. A live executor heartbeats every 5 s
- * and is never swept, however long it runs. Returns the swept attempt ids.
+ * The liveness sweeper (the action-journal rule, `recoverUnsettled`): a running effect whose owner process is gone on
+ * this host, or whose owner's liveness cannot be read (another host) and whose heartbeat is older than `staleAfterMs`,
+ * is written EFFECT_FAILED: process_lost. A live local owner is never swept, however long a synchronous step keeps its
+ * heartbeat from firing. Returns the swept attempt ids.
  */
 export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS, only?: { projectId: string; executionId: string }): string[] {
   const staleBefore = Date.now() - staleAfterMs;
   return store.runningEffects().filter((row) => (only === undefined || (row.project_id === only.projectId && row.execution_id === only.executionId))
-    && (ownerAlive(row.owner_pid, row.owner_host) === false || row.heartbeat_ts < staleBefore)).flatMap((row) => {
+    && effectOwnerLost(row, staleBefore)).flatMap((row) => {
     try {
       settleEffect(store, row.project_id, row.effect_id, "EFFECT_FAILED", { error: "process_lost" });
       return [row.effect_id];

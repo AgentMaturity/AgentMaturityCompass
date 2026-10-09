@@ -8,6 +8,7 @@
 import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { ownerAlive } from "../actions/actionJournal.js";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { a4FloorFor, approvalRuleForAction, loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
@@ -23,7 +24,7 @@ import { liveRolesFor } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
   A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, readinessBindingDigest,
-  riskTierOf, selfApprovalFacts, type A4Action, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
+  riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
@@ -111,6 +112,16 @@ export function loadA4State(store: A4Store, projectId: string, now: number): A4R
     decisions: snapshot.rows.a4_decisions.map((row) => a4DecisionRowSchema.parse(row)),
     refs: resolved.map((ref, index) => ({ ...ref, revisionNo: refRows[index]!.revision_no })), effects: snapshot.effects
   };
+}
+
+/**
+ * The action journal's liveness rule (`recoverUnsettled`), shared by the sweeper and readiness: a running attempt is
+ * lost when its owner is dead on this host, or its owner cannot be checked (another host) and its heartbeat is older
+ * than `staleBefore`. A live local owner is never lost, however stale its heartbeat.
+ */
+export function effectOwnerLost(row: Pick<A4EffectRow, "owner_pid" | "owner_host" | "heartbeat_ts">, staleBefore: number): boolean {
+  const alive = ownerAlive(row.owner_pid, row.owner_host);
+  return alive === false || (alive === null && row.heartbeat_ts < staleBefore);
 }
 
 /** The full chain verification as readiness's integrity section: valid only when every byte check passes. */
