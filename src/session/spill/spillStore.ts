@@ -178,9 +178,11 @@ function publishObject(workspace: string, locator: string, encoded: Buffer, root
     if (!complete) {
       // Remove only the inode this invocation created; never a replacement.
       try {
-        const named = lstatSync(path);
-        if (created && sameIdentity(created, named) && named.isFile() && named.nlink === 1) unlinkSync(path);
-      } catch { /* The signed commitment remains an explicit missing object. */ }
+        withDeletionGate({ workspace, executor: "spill-store.publication-failure-unlink", target: { kind: "spills" } }, () => {
+          const named = lstatSync(path);
+          if (created && sameIdentity(created, named) && named.isFile() && named.nlink === 1) unlinkSync(path);
+        });
+      } catch { /* Denial can retain incomplete orphan bytes; preserve the original publication failure. */ }
     }
   }
 }

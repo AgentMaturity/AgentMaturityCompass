@@ -1417,19 +1417,19 @@
       "reason": "eraseSessionSpills wraps the selected effect in a fresh withDeletionGate callback using input.workspace and complete SHA-256 sessionHashes derived from the inventory entry's authenticated session IDs, without a target hash count cap or truncation. The direct store adds a conservative broad spill gate as described in the notes."
     },
     {
-      "siteId": "src/session/spill/spillStore.ts:182:1",
+      "siteId": "src/session/spill/spillStore.ts:183:1",
       "path": "src/session/spill/spillStore.ts",
-      "line": 182,
+      "line": 183,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "if (created && sameIdentity(created, named) && named.isFile() && named.nlink === 1) unlinkSync(path);",
-      "status": "deferred",
-      "reason": "Failure cleanup removes only the inode this publication attempt created, but a signed spill commitment already precedes publication. It is not classified as an exclusively unpublished temporary object; this cleanup has no fresh withDeletionGate and remains deferred."
+      "status": "gated",
+      "reason": "Failed spill publication cleanup wraps the existing lstat/inode/type/link check and unlink inside a fresh synchronous withDeletionGate using explicit workspace and broad spills scope. Signed commitment can already precede publication, so there is no staging exemption or owning-session shortcut. Hold or audit denial retains incomplete orphan bytes while the existing catch preserves the original publication failure. Admission is not proof of unlink; filesystem and same-uid directory-replacement limits remain. Source-only and unqualified."
     },
     {
-      "siteId": "src/session/spill/spillStore.ts:196:1",
+      "siteId": "src/session/spill/spillStore.ts:198:1",
       "path": "src/session/spill/spillStore.ts",
-      "line": 196,
+      "line": 198,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(path);",
@@ -1437,9 +1437,9 @@
       "reason": "The private removeObjectAtPath helper is called by the source-visible purge and removeSpillObject paths only inside fresh synchronous withDeletionGate callbacks. Direct-store callers use broad workspace spill scope because a locator owner cannot prove complete shared-session references; lifecycle callers also supply complete SHA-256 sessionHashes derived from authenticated entry.sessionIds."
     },
     {
-      "siteId": "src/session/spill/spillStore.ts:264:indirect-purge-object",
+      "siteId": "src/session/spill/spillStore.ts:266:indirect-purge-object",
       "path": "src/session/spill/spillStore.ts",
-      "line": 264,
+      "line": 266,
       "call": "removeObjectAtPath(",
       "category": "indirect-spill-erasure",
       "source": "() => removeObjectAtPath(join(session, name))",
@@ -1447,9 +1447,9 @@
       "reason": "SessionSpillStore.purge places each private object unlink inside a fresh withDeletionGate callback using this.workspace. Scope is deliberately broad because the owning session alone cannot prove every shared reference."
     },
     {
-      "siteId": "src/session/spill/spillStore.ts:266:1",
+      "siteId": "src/session/spill/spillStore.ts:268:1",
       "path": "src/session/spill/spillStore.ts",
-      "line": 266,
+      "line": 268,
       "call": "rmdirSync(",
       "category": "filesystem-sync",
       "source": "target: { kind: \"spills\" } }, () => rmdirSync(session));",
@@ -1457,9 +1457,9 @@
       "reason": "SessionSpillStore.purge removes this checked session directory inside a fresh withDeletionGate callback using this.workspace and broad spill scope. The gate conservatively considers all session holds rather than trusting only the locator owner."
     },
     {
-      "siteId": "src/session/spill/spillStore.ts:343:indirect-direct-object",
+      "siteId": "src/session/spill/spillStore.ts:345:indirect-direct-object",
       "path": "src/session/spill/spillStore.ts",
-      "line": 343,
+      "line": 345,
       "call": "removeObjectAtPath(",
       "category": "indirect-spill-erasure",
       "source": "() => removeObjectAtPath(path)",
