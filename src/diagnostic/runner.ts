@@ -1381,7 +1381,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     const runJsonPath = join(agentPaths.runsDir, `${runId}.json`);
     writeFileAtomic(runJsonPath, JSON.stringify(report, null, 2), 0o644);
 
-    ledger.insertRun({
+    if (!input.noSign || unsignedStore) ledger.insertRun({ // P0-27: an unsigned seal never enters the signed store
       run_id: runId,
       window_start_ts: windowStartTs,
       window_end_ts: now,
