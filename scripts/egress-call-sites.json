@@ -67,12 +67,12 @@
       "reason": "Benchmark registry GET uses captured private workspace scope and endpoint, prepared manual-redirect options, and network-tool residency immediately before fetch. API/CLI browse install explicit ALS scope; import passes captured explicit workspace and snapshots request/persistence inputs. Resource classes/purpose stay unknown; no payload-free exemption. Source-only; concurrent/prior requests, self-key browse integrity versus pinned import, global trust/environment timing, DNS, body/timeout and cache/temp limits remain."
     },
     {
-      "siteId": "src/bootstrap/bootstrap.ts:208:1",
+      "siteId": "src/bootstrap/bootstrap.ts:210:1",
       "path": "src/bootstrap/bootstrap.ts",
-      "line": 208,
+      "line": 210,
       "call": "httpRequest(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Bootstrap public-key GET uses captured absolute workspace and notary URL, prepared native GET options, network-tool admission before notary/auth persistence and again immediately before the same-URL native constructor. Unknown resource classes/purpose and system actor; native redirects are not followed. Source-only: earlier workspace/vault/owner/config/LAN effects and a late secret write remain possible. Later trustConfig/signer transports remain deferred; no complete notary, HTTPS, response-bound, region or legal qualification claim."
     },
     {
       "siteId": "src/bridge/bridgeServer.ts:283:1",
