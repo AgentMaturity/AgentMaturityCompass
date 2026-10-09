@@ -120,18 +120,31 @@ function reflectionHtml(reflection, allowed) {
     <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", offer)}`;
 }
 
+/**
+ * Ask: unanswered questions are open fields. Answers so far are listed read-only and collapsed, carried and inferred
+ * ones with Confirm (records that value, unchanged, as the user's); "Change my answers" holds their fields. Save sends
+ * only the fields the user changed, and a non-text answer is edited as JSON and sent parsed (a4.js).
+ */
 export function renderConversation(ctx) {
   const { questions, answers, allowed, reflection, explanation } = ctx;
   const answered = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const carried = answers.filter((answer) => answer.source === "carried");
-  const open = questions.filter((question) => !answered.has(question.id)).length;
-  const fields = questions.map((question) => `<label>${esc(question.prompt)}${question.required ? " (required)" : ""}
-    <textarea name="${esc(question.id)}" rows="2">${esc(answered.has(question.id) ? shown(answered.get(question.id).value) : "")}</textarea></label>`);
+  const open = questions.filter((question) => !answered.has(question.id));
+  const field = (question) => {
+    const answer = answered.get(question.id);
+    const json = answer !== undefined && typeof answer.value !== "string";
+    return `<label>${esc(question.prompt)}${question.required ? " (required)" : ""}${json ? " (JSON)" : ""}
+      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}>${esc(answer === undefined ? "" : shown(answer.value))}</textarea></label>`;
+  };
+  const answerRow = (answer) => `<li><code>${esc(answer.questionId)}</code> <code>${esc(answer.source)}</code>: ${esc(shown(answer.value))}${
+    answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", allowed.ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
+  const notMine = answers.filter((answer) => answer.source !== "user").length;
+  const change = questions.filter((question) => answered.has(question.id));
   return `<h4>Ask</h4>
-    ${carried.length ? `<details><summary>${carried.length} answers carried; ${open} still need an answer</summary>${list(carried
-      .map((answer) => `<li><code>${esc(answer.questionId)}</code>: ${esc(shown(answer.value))}</li>`), "")}</details>` : ""}
-    ${questions.length ? `<form class="a4-form">${fields.join("")}${actionButton("Save answers", "answers", allowed.ask)}</form>`
-      : `<p class="muted">No questions are registered for this stage yet.</p>`}
+    ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
+      ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
+    ${questions.length ? `<form class="a4-form">${open.map(field).join("")}${change.length
+      ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
+      ${actionButton("Save answers", "answers", allowed.ask)}</form>` : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
     <div class="row wrap">${actionButton("Run Understand", "understand", allowed.understand)}</div>
     ${reflectionHtml(reflection, allowed)}

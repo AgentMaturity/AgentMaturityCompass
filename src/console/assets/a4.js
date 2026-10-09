@@ -143,6 +143,8 @@ function mountProject(projectId, options, strip) {
   const presenceCard = () => `${stage}:${activeCard}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
+  // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
+  const shownAnswers = () => (stage === state.project.stage || state.revision?.stage === stage ? listOf(state.revision?.spec?.answers, "answers") : []);
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
   const shownReview = () => {
     const { open, met } = view.currentGates(state.gates, stage);
@@ -204,10 +206,8 @@ function mountProject(projectId, options, strip) {
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
-    // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
-    const answersHere = stage === project.stage || state.revision?.stage === stage;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation,
-      questions: listOf(state.options?.questions?.[stage], "questions"), answers: answersHere ? listOf(state.revision?.spec?.answers, "answers") : [] };
+      questions: listOf(state.options?.questions?.[stage], "questions"), answers: shownAnswers() };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         r${view.esc(project.revisionNo)} · head ${view.esc(project.headSeq)}</p>${view.stageLinks(project, stage)}
@@ -242,6 +242,12 @@ function mountProject(projectId, options, strip) {
     const pin = reviewedFor(open); // both digests checked there: a decision never goes out unbound
     return { gateId: pin.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: pin.bindingDigest,
       expectedReadinessBindingDigest: pin.readinessBindingDigest, clientRequestId: uuid() };
+  }
+
+  /** A changed answer as typed; a non-text answer (data-json) goes back parsed, never as its display string. */
+  function answerValue(field) {
+    if (!field.hasAttribute("data-json")) return field.value.trim();
+    try { return JSON.parse(field.value); } catch { throw new Error(`The answer to ${field.name} is structured: edit it as JSON. Nothing was sent.`); }
   }
 
   function specAction(spec, base) {
@@ -283,9 +289,17 @@ function mountProject(projectId, options, strip) {
     };
     switch (name) {
       case "answers": {
-        const fields = [...scope.querySelectorAll("form textarea[name]")].filter((field) => field.value.trim());
+        // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement.
+        const edited = [...scope.querySelectorAll("form textarea[name]")]
+          .filter((field) => field.value.trim() && field.value.trim() !== field.defaultValue.trim());
+        if (edited.length === 0) throw new Error("No answer was changed. Nothing was sent.");
         return post("Save answers", stagePath("answers"), { ...headBinding(),
-          answers: fields.map((field) => ({ questionId: field.name, value: field.value.trim() })) }, fields.map(draftKey));
+          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, edited.map(draftKey));
+      }
+      case "confirm-answer": {
+        const answer = shownAnswers().find((row) => row.questionId === button.dataset.question);
+        if (!answer) throw new Error("That answer is no longer shown. Nothing was sent.");
+        return post("Confirm answer", stagePath("answers"), { ...headBinding(), answers: [{ questionId: answer.questionId, value: answer.value }] });
       }
       case "understand": return post("Run Understand", stagePath("understand"), headBinding(), [],
         (data) => { reflection = { data, headSeq: headSeqOf(data) }; });
