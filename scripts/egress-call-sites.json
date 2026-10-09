@@ -392,7 +392,7 @@
       "line": 65,
       "call": "fetch(",
       "status": "gated",
-      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. API browse/install and CLI search install trusted scope without DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. Known AMC callers carry scope through pluginApi browse/install, CLI search, POST /api/v1/plugins/search and marketplace buildCatalog; public library calls retain conservative unscoped behavior. No DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
       "siteId": "src/plugins/pluginRegistryClient.ts:83:1",
@@ -400,7 +400,7 @@
       "line": 83,
       "call": "fetch(",
       "status": "gated",
-      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. API browse/install and CLI search install trusted scope without DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. Known AMC callers carry scope through pluginApi browse/install, CLI search, POST /api/v1/plugins/search and marketplace buildCatalog; public library calls retain conservative unscoped behavior. No DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
       "siteId": "src/product/apiWrapperGenerator.ts:332:1",
