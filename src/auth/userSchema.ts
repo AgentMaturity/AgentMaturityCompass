@@ -11,7 +11,9 @@ export const userRecordSchema = z.object({
   roles: z.array(userRoleSchema).min(1),
   passwordHash: z.string().min(1),
   createdTs: z.number().int(),
-  status: userStatusSchema
+  status: userStatusSchema,
+  /** Who created this user, when an authenticated principal did (P1-56). Absent or null means self-provisioned. */
+  createdBy: z.object({ principalKey: z.string().min(1), admission: z.enum(["browser_csrf", "native_login_token"]) }).strict().nullable().optional()
 });
 
 export const usersFileSchema = z.object({
