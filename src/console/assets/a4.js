@@ -378,10 +378,10 @@ function mountProject(projectId, options) {
       case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding(), [], repin);
       case "approve": return decide("approve", "Approve", (binding) => binding);
       case "deny": return decide("deny", "Deny", (binding) => binding);
-      // Design §6.4 gives request-changes the gate seq and both digests; P1-57's handler reads expectedHeadSeq instead.
-      // The body carries all of them until the two sides agree, so neither side's stale check is skipped.
+      // P1-57's request-changes body is { reason, expectedGateSeq, clientRequestId, findings } and takes neither digest;
+      // the pinned review is still checked here (decisionBinding) before anything is sent.
       case "request-changes": return decide("request-changes", "Request changes",
-        (binding) => ({ ...binding, findings: [], expectedHeadSeq: state.project.headSeq }));
+        ({ expectedGateSeq, clientRequestId }) => ({ findings: [], expectedGateSeq, clientRequestId }));
       case "complete": {
         // Completing activate delivers the production lease token once (design §10.4); this generic action would drop it.
         if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
@@ -394,16 +394,17 @@ function mountProject(projectId, options) {
       case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, reason, ...headBinding() }, REASON);
       case "add-member": {
         const row = button.closest("[data-principal]");
+        // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.
         return post("Add member", projectPath("/members"), { principalKey: row.dataset.principal,
-          roles: [row.querySelector('[name="role"]').value], ...headBinding() });
+          projectRoles: [row.querySelector('[name="role"]').value], ...headBinding() });
       }
       case "comment": {
         const body = value("comment");
         if (!body) throw new Error("Write a comment first.");
         if (new TextEncoder().encode(body).byteLength > view.COMMENT_MAX_BYTES) throw new Error("Comments are limited to 8 KiB. Nothing was sent.");
-        // Card ids repeat across stages, so the thread key is stage-qualified, as presence is.
-        return post("Comment", projectPath("/comments"), { revisionNo: state.project.revisionNo, stage, cardId: `${stage}:${card}`, body,
-          clientRequestId: uuid() }, [`${card}:comment`]);
+        // Card ids repeat across stages, so the thread key is stage-qualified, as presence is. Studio records the
+        // revision and stage from the head.
+        return post("Comment", projectPath("/comments"), { cardId: `${stage}:${card}`, body, clientRequestId: uuid() }, [`${card}:comment`]);
       }
       default: throw new Error(`Unknown A4 action ${name}.`);
     }
