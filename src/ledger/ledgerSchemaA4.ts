@@ -27,7 +27,8 @@ export const A4_MIGRATION_SQL = `
         deployed_release_id TEXT, base_release_id TEXT, verified_seq INTEGER, verified_digest TEXT,
         created_by_key TEXT NOT NULL, created_ts INTEGER NOT NULL, updated_ts INTEGER NOT NULL
       );
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_a4_active_agent ON a4_projects(workspace_id, agent_id) WHERE stage <> 'retired';
+      -- One active project per agent. The ledger is the workspace's own, so the path-derived workspace_id is recorded, never keyed.
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_a4_active_agent ON a4_projects(agent_id) WHERE stage <> 'retired';
       CREATE TRIGGER IF NOT EXISTS protect_a4_projects_head BEFORE UPDATE ON a4_projects
       WHEN NEW.project_id IS NOT OLD.project_id OR NEW.workspace_id IS NOT OLD.workspace_id OR NEW.agent_id IS NOT OLD.agent_id
         OR NEW.name IS NOT OLD.name OR NEW.created_by_key IS NOT OLD.created_by_key OR NEW.created_ts IS NOT OLD.created_ts

@@ -198,6 +198,7 @@ export function openA4Store(workspace: string): A4Store {
 
 function createStore(workspace: string, ledger: Ledger) {
   const db = ledger.db;
+  /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
   const workspaceId = workspaceIdFromDirectory(workspace);
 
   /** The unsigned head row as stored; only `verified` and the write path, which verifies it, read it. */
@@ -533,7 +534,7 @@ function createStore(workspace: string, ledger: Ledger) {
             if (attempt === 0) continue;
             throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved twice while this change was signed; reload and retry.");
           }
-          if (create && /UNIQUE constraint failed: a4_projects\.workspace_id, a4_projects\.agent_id/.test(String(error))) {
+          if (create && /UNIQUE constraint failed: a4_projects\.agent_id/.test(String(error))) {
             throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${create.agent_id} already has an active A4 project; retire it first`);
           }
           throw error;
@@ -576,8 +577,8 @@ function createStore(workspace: string, ledger: Ledger) {
       return row === undefined ? null : a4RevisionRowSchema.parse(row);
     },
     /** Every project's verified head, in one snapshot; one that does not verify fails the list with A4_INTEGRITY_FAILED. */
-    listProjects: (): A4ProjectRow[] => db.transaction(() => (db.prepare("SELECT project_id FROM a4_projects WHERE workspace_id = ? ORDER BY created_ts")
-      .all(workspaceId) as Array<{ project_id: string }>).map((row) => verified(row.project_id).head!))(),
+    listProjects: (): A4ProjectRow[] => db.transaction(() => (db.prepare("SELECT project_id FROM a4_projects ORDER BY created_ts")
+      .all() as Array<{ project_id: string }>).map((row) => verified(row.project_id).head!))(),
 
     /**
      * Refused without a signed approval policy. CREATED carries the default gate policy, the derived single-user
@@ -600,7 +601,7 @@ function createStore(workspace: string, ledger: Ledger) {
       const gatePolicy: A4GatePolicyV1 = DEFAULT_A4_GATE_POLICY;
       let projectPublicKeySha256: string | null = null;
       return commit(projectId, input.actor, ({ seq, ts }) => {
-        if (db.prepare("SELECT 1 FROM a4_projects WHERE workspace_id = ? AND agent_id = ? AND stage <> 'retired'").get(workspaceId, input.agentId)) {
+        if (db.prepare("SELECT 1 FROM a4_projects WHERE agent_id = ? AND stage <> 'retired'").get(input.agentId)) {
           throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${input.agentId} already has an active A4 project; retire it first`);
         }
         try {
