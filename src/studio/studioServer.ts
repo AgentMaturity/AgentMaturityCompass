@@ -197,9 +197,9 @@ import {
   currentTransparencyMerkleRoot,
   exportTransparencyProofBundle,
   listTransparencyMerkleRoots,
-  verifyTransparencyMerkle,
-  verifyTransparencyProofBundle
+  verifyTransparencyMerkle
 } from "../transparency/merkleIndexStore.js";
+import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
 import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
 import { appendHumanActionEvent } from "../auth/humanLog.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
@@ -8210,7 +8210,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: refused });
           return;
         }
-        json(res, 200, verifyTransparencyProofBundle(parsed.file, loadTrustContext()));
+        json(res, 200, verifyWorkspaceProofBundle(options.workspace, parsed.file, loadTrustContext()));
         return;
       }
 

@@ -12,6 +12,7 @@ import {
   verifyTransparencyProofBundle,
   writeMerkleMigrationRecord
 } from "./merkleIndexStore.js";
+export { verifyWorkspaceProofBundle } from "./workspaceProofBundle.js";
 
 /**
  * Rebuilds the index in the workspace's tree. `--algorithm rfc9162-sha256` on a legacy log migrates it (P1-26): a

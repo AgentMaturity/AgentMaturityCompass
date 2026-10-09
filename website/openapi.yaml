@@ -5931,6 +5931,7 @@ paths:
                   type: string
                 outFile:
                   type: string
+                  description: Bundle path, resolved against the workspace. It must lie under .amc/transparency/proofs/ (for example .amc/transparency/proofs/<entryHash>.amcproof), where verify-proof reads; any other path is refused with 400 before anything is written.
       responses:
         '201':
           description: Proof exported
@@ -5948,6 +5949,7 @@ paths:
               properties:
                 file:
                   type: string
+                  description: Proof bundle path, relative to the workspace (or the absolute outFile prove returned); it must lie under .amc/transparency/proofs/. Anything outside that directory, a missing file, a link or a non-regular file verifies as UNREADABLE.
       responses:
         '200':
           description: Proof verification

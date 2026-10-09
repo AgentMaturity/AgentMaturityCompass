@@ -7,6 +7,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
+import { containedPath } from '../utils/pathSafety.js';
 
 export async function handleCryptoRoute(
   pathname: string,
@@ -283,15 +284,20 @@ export async function handleCryptoRoute(
         apiError(res, 400, 'Required: entryHash, outFile');
         return true;
       }
+      // P0-51: prove writes only under .amc/transparency/proofs/, where verify-proof reads; outFile resolves against the workspace.
+      let outFile: string;
+      try {
+        outFile = containedPath(resolve(workspace, '.amc', 'transparency', 'proofs'), 'the proofs directory', resolve(workspace, body.outFile));
+      } catch {
+        apiError(res, 400, 'outFile must lie under .amc/transparency/proofs/');
+        return true;
+      }
       const { transparencyMerkleProofCli } = await import('../transparency/transparencyMerkleCli.js');
-      const out = transparencyMerkleProofCli({
-        workspace,
-        entryHash: body.entryHash,
-        outFile: body.outFile
-      });
+      const out = transparencyMerkleProofCli({ workspace, entryHash: body.entryHash, outFile });
       apiSuccess(res, out, 201);
-    } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Merkle prove failed');
+    } catch {
+      // P0-51: a fixed message; mkdir and tar errors name server paths.
+      apiError(res, 500, 'Merkle prove failed');
     }
     return true;
   }
@@ -305,11 +311,11 @@ export async function handleCryptoRoute(
       const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
       const refused = requestTrustOverride(body);
       if (refused) { apiError(res, 400, refused); return true; }
-      const { transparencyMerkleVerifyProofCli } = await import('../transparency/transparencyMerkleCli.js');
-      const result = transparencyMerkleVerifyProofCli(resolve(workspace, body.file), loadTrustContext());
-      apiSuccess(res, result);
-    } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Merkle verify-proof failed');
+      // P0-51: only a bundle under .amc/transparency/proofs/ is read; anything else verifies as UNREADABLE.
+      const { verifyWorkspaceProofBundle } = await import('../transparency/transparencyMerkleCli.js');
+      apiSuccess(res, verifyWorkspaceProofBundle(workspace, body.file, loadTrustContext()));
+    } catch {
+      apiError(res, 500, 'Merkle verify-proof failed');
     }
     return true;
   }
