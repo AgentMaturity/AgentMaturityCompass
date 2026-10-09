@@ -186,6 +186,8 @@ function mountProject(projectId, options) {
     if (!view.boundReview(review)) throw new Error(`${view.UNBOUND}. Nothing was sent.`);
     if (!view.sameReview(reviewed, review)) throw new Error(`${view.GATE_CHANGED}. Show the current gate and review it first.`);
     if (reviewed.revisionNo !== state.revision?.revisionNo) throw new Error(`${view.OTHER_REVISION}. Nothing was sent.`);
+    // The editor then shows the member's own draft, not the revision the gate binds.
+    if (specBase !== null) throw new Error(`${view.specDraftNote(reviewed.revisionNo)}. Nothing was sent.`);
     return reviewed;
   };
   /** Only a bound gate whose revision the specification card shows can become the reviewed one. */
@@ -258,7 +260,7 @@ function mountProject(projectId, options) {
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
-    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(),
+    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(), specDraft: specBase !== null,
       questions: listOf(state.options?.questions?.[stage], "questions"), answers: shownAnswers() };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·

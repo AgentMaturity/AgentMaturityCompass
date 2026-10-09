@@ -188,7 +188,8 @@ export function renderSpecEditor(ctx) {
     spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
     <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
-    <div class="row wrap">${actionButton("Propose this specification", "propose", allowed.propose)}</div>`;
+    <div class="row wrap">${actionButton("Propose this specification", "propose", allowed.propose)}${ctx.specDraft
+      ? ` <button type="button" class="secondary" data-a4-action="reload">Discard my edits</button>` : ""}</div>`;
 }
 
 export function renderBuildCard(ctx) {
@@ -300,6 +301,7 @@ export const sameReview = (a, b) => boundReview(a) && boundReview(b) && a.gateId
   && a.readinessBindingDigest === b.readinessBindingDigest;
 export const UNBOUND = "Studio did not publish the gate or readiness digest";
 export const OTHER_REVISION = "The specification shown is not the revision this gate binds; reload the page";
+export const specDraftNote = (revisionNo) => `Your unsaved specification edits are shown instead of r${revisionNo}; propose or discard them before deciding`;
 
 /**
  * True when one load's separate reads describe one revision: the specification card's revision and every live gate the
@@ -333,13 +335,13 @@ function gateChangeBanner({ from, to }) {
 }
 
 export function renderApprovalsBar(ctx) {
-  const { readiness, gates, stage, allowed, gateChange } = ctx;
+  const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
   const { open, met, stale, policy } = currentGates(gates, stage);
   const gate = open ?? met;
   const staleCodes = new Map(readiness.staleApprovals.map((row) => [row.decisionId, Array.isArray(row.reasonCodes) ? row.reasonCodes : []]));
   const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
   const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND)
-    : gate && gate.revisionNo !== ctx.revision?.revisionNo ? held(OTHER_REVISION) : offer);
+    : gate && gate.revisionNo !== ctx.revision?.revisionNo ? held(OTHER_REVISION) : gate && specDraft ? held(specDraftNote(gate.revisionNo)) : offer);
   const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
     bound to r${esc(old.revisionNo)}</li>`));
   const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
