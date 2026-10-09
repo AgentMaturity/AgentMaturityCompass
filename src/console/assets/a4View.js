@@ -172,8 +172,10 @@ export function renderSpecEditor(ctx) {
       ${revision ? `This is r${esc(revision.revisionNo)}${revision.stage ? `, a ${esc(stageTitle(revision.stage))} specification` : ""}, shown read-only.` : "No specification yet."}
       Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? studioJson(revision.spec ?? {}) : ""}`;
   }
+  const seeded = revision && revision.stage !== stage ? ` No ${esc(stageTitle(stage))} specification yet: the editor starts from
+    r${esc(revision.revisionNo)}, ${revision.stage ? `the ${esc(stageTitle(revision.stage))} specification` : "whose stage Studio did not name"}.` : "";
   return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
-    spec <code>${esc(revision.specDigest)}</code>)` : ""}. ${RETAINED}</p>
+    spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
     <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
     <div class="row wrap">${actionButton("Propose this specification", "propose", allowed.propose)}</div>`;

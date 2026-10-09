@@ -159,8 +159,9 @@ function mountProject(projectId, options) {
   const detailsKey = (details) => `${details.closest("[data-card]")?.dataset.card ?? "page"}:${details.dataset.a4Open}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
-  // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
-  const shownAnswers = () => (stage === state.project.stage || state.revision?.stage === stage ? listOf(state.revision?.spec?.answers, "answers") : []);
+  // Answers are the head revision's only when that revision was recorded at the viewed stage, as Studio's own Ask reads
+  // them: a completed stage's revision stays the head after the next stage opens. A revision naming no stage shows none.
+  const shownAnswers = () => (state.revision?.stage === stage ? listOf(state.revision?.spec?.answers, "answers") : []);
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
   const shownReview = () => {
     const { open, met } = view.currentGates(state.gates, stage);
