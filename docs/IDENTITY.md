@@ -48,3 +48,12 @@ SSO claims do not directly grant roles. AMC applies signed mapping rules from:
 
 This prevents claim-string privilege escalation and keeps role grants deterministic.
 
+## OIDC admission and pending state
+
+OIDC uses the existing host database for bounded, expiring, single-use pending logins. It stores state hashes and protects persisted PKCE material with owner-only filesystem access. Restarting the process does not discard a pending login; consuming a state prevents a second callback from using it. Failed callbacks require a new login.
+
+Token admission requires finite expiry and issuance claims, a non-empty subject, exact issuer/nonce, audience/authorized-party checks, and compatible RS256/PS256/ES256 signing keys. Identity HTTP fetches use pinned public addresses, HTTPS, bounded response bodies/time and no redirects. Invalid discovery or provider responses produce fixed browser-facing errors.
+
+No new settings or CLI paths are introduced, so existing signed identity YAML is preserved. Private-network or HTTP identity endpoints and previously accepted EdDSA tokens now fail OIDC admission. See [SSO OIDC](SSO_OIDC.md) for the exact loopback-development exception, key rotation and remaining browser/session boundaries.
+
+Standard SAML remains separate work. [ADR 014](adr/014-saml-library.md) is a proposed library direction awaiting review; this OIDC implementation does not change the compact SAML runtime or SCIM behavior.
