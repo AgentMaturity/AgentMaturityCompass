@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import type { Incident } from "../incidents/incidentTypes.js";
 import type { EvidenceEvent, TrustTier } from "../types.js";
+import { dispatchTelemetryRequest, type PreparedTelemetryRequest } from "./otelExportTransport.js";
 import { noteTelemetryDropped } from "./telemetryDrops.js";
 
 export type ObservabilitySignal = "traces" | "metrics" | "logs";
@@ -93,12 +96,32 @@ interface BufferedLog {
   attributes: OTelAttribute[];
 }
 
+interface BufferedBatch {
+  spans: BufferedSpan[];
+  metrics: BufferedMetric[];
+  logs: BufferedLog[];
+}
+interface CapturedWorkspace {
+  workspace: string | undefined;
+  run: ReturnType<typeof AsyncLocalStorage.snapshot>;
+}
+
+type ScopedBufferedBatch = BufferedBatch & { scope: CapturedWorkspace };
+type SignalCounts = Record<ObservabilitySignal, number>;
+
 interface DispatchRequest {
   targetKind: ObservabilityExporterKind;
   signal: ObservabilitySignal;
   endpoint: string;
   headers: Record<string, string>;
   payload: unknown;
+  counts: SignalCounts;
+}
+
+interface PreparedDispatchRequest extends PreparedTelemetryRequest {
+  targetKind: ObservabilityExporterKind;
+  signal: ObservabilitySignal;
+  counts: SignalCounts;
 }
 
 export interface ObservabilityDispatchResult {
@@ -279,43 +302,12 @@ function sortByTs<T extends { ts: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.ts - b.ts);
 }
 
-function isRetryableStatus(status: number): boolean {
-  return status === 429 || status === 502 || status === 503 || status === 504 || status >= 500;
-}
-
-function isRetryableError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-  if (error.name === "AbortError" || error.name === "TimeoutError") {
-    return true;
-  }
-  const message = error.message.toLowerCase();
-  return (
-    message.includes("timeout") ||
-    message.includes("fetch failed") ||
-    message.includes("network") ||
-    message.includes("econnreset") ||
-    message.includes("etimedout") ||
-    message.includes("econnrefused")
-  );
-}
-
-function backoffMs(baseDelayMs: number, attempt: number): number {
-  const factor = Math.pow(2, Math.max(0, attempt - 1));
-  const jitter = 0.8 + Math.random() * 0.4;
-  return Math.floor(baseDelayMs * factor * jitter);
-}
-
-async function sleep(ms: number): Promise<void> {
-  await new Promise<void>((resolvePromise) => setTimeout(resolvePromise, ms));
-}
-
 export class ObservabilityOTELExporter {
   private readonly config: ObservabilityOTELConfig;
   private spans: BufferedSpan[] = [];
   private metrics: BufferedMetric[] = [];
   private logs: BufferedLog[] = [];
+  private readonly itemScopes = new WeakMap<object, CapturedWorkspace>();
   private inFlightFlush: Promise<ObservabilityFlushResult> | null = null;
 
   constructor(config: Partial<ObservabilityOTELConfig> = {}) {
@@ -327,7 +319,10 @@ export class ObservabilityOTELExporter {
   }
 
   recordEvidenceEvent(event: EvidenceEvent): void {
+    const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const meta = parseMeta(event.meta_json);
+    if (event.event_type === "audit" && meta.auditType === "TELEMETRY_DROPPED"
+      && event.session_id.startsWith("telemetry-dropped-")) return;
     const agentId = getString(meta, ["agentId", "agent_id"]) ?? "unknown";
     const trustTier = toTrustTier(meta.trustTier, event.event_type);
     const severity = getString(meta, ["severity"]) ?? "INFO";
@@ -353,7 +348,7 @@ export class ObservabilityOTELExporter {
       if (candidate) attributes.push(candidate);
     }
 
-    this.spans.push({
+    this.spans.push(this.captureItem({
       traceId: generateTraceId(event.session_id),
       spanId: generateSpanId(event.id),
       name: `amc.evidence.${event.event_type}`,
@@ -363,12 +358,13 @@ export class ObservabilityOTELExporter {
       attributes,
       status: { code: 1 },
       events: []
-    });
+    }, scope));
 
     this.enforceBufferLimits();
   }
 
   recordScoreComputation(metric: ScoreComputationMetric): void {
+    const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = metric.ts ?? Date.now();
     const percentage = metric.percentage ?? (
       typeof metric.maxScore === "number" && metric.maxScore > 0
@@ -388,34 +384,35 @@ export class ObservabilityOTELExporter {
       if (candidate) commonAttrs.push(candidate);
     }
 
-    this.metrics.push({
+    this.metrics.push(this.captureItem({
       metricName: "amc.score.value",
       unit: "score",
       ts,
       value: metric.score,
       attributes: [...commonAttrs]
-    });
-    this.metrics.push({
+    }, scope));
+    this.metrics.push(this.captureItem({
       metricName: "amc.score.percentage",
       unit: "percent",
       ts,
       value: percentage,
       attributes: [...commonAttrs]
-    });
+    }, scope));
     if (typeof metric.level === "number") {
-      this.metrics.push({
+      this.metrics.push(this.captureItem({
         metricName: "amc.score.level",
         unit: "level",
         ts,
         value: metric.level,
         attributes: [...commonAttrs]
-      });
+      }, scope));
     }
 
     this.enforceBufferLimits();
   }
 
   recordIncident(incident: IncidentLogInput): void {
+    const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = incident.ts ?? Date.now();
     const severityText = incident.severity.toUpperCase();
     const severityNumber = toSeverityNumber(severityText);
@@ -435,13 +432,13 @@ export class ObservabilityOTELExporter {
     for (const candidate of values) {
       if (candidate) attributes.push(candidate);
     }
-    this.logs.push({
+    this.logs.push(this.captureItem({
       ts,
       severityText,
       severityNumber,
       body,
       attributes
-    });
+    }, scope));
     this.enforceBufferLimits();
   }
 
@@ -483,87 +480,63 @@ export class ObservabilityOTELExporter {
   }
 
   private async flushInternal(): Promise<ObservabilityFlushResult> {
-    const requests = this.buildDispatchRequests();
-    const exported = {
-      traces: this.spans.length,
-      metrics: this.metrics.length,
-      logs: this.logs.length
-    };
+    const exported: SignalCounts = { traces: 0, metrics: 0, logs: 0 };
+    if (!this.config.enabled || this.config.targets.length === 0) {
+      this.spans = [];
+      this.metrics = [];
+      this.logs = [];
+      return { ts: Date.now(), exported, requests: [] };
+    }
+
+    const requests: PreparedDispatchRequest[] = [];
+    for (const batch of this.groupBuffers()) {
+      for (const request of this.buildDispatchRequests(batch)) {
+        const body = JSON.stringify(request.payload);
+        if (body === undefined) throw new Error("telemetry payload is not serializable");
+        requests.push({
+          targetKind: request.targetKind,
+          signal: request.signal,
+          endpoint: request.endpoint,
+          headers: Object.fromEntries(Object.entries(request.headers).map(([key, value]) => [key, String(value)])),
+          body,
+          workspace: batch.scope.workspace,
+          run: batch.scope.run,
+          counts: request.counts
+        });
+      }
+    }
+    // A preparation failure leaves the buffered items and their captured scopes intact.
     this.spans = [];
     this.metrics = [];
     this.logs = [];
 
-    if (!this.config.enabled || requests.length === 0) {
-      return {
-        ts: Date.now(),
-        exported,
-        requests: requests.map((request) => ({
-          targetKind: request.targetKind,
-          signal: request.signal,
-          endpoint: request.endpoint,
-          ok: true,
-          status: 0
-        }))
-      };
-    }
-
+    const options = {
+      timeoutMs: toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS),
+      maxRetries: toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES),
+      retryBaseDelayMs: toInt(process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS, DEFAULT_FLUSH_RETRY_BASE_DELAY_MS)
+    };
     const out: ObservabilityDispatchResult[] = [];
-    const flushTimeoutMs = toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS);
-    const maxRetries = toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES);
-    const retryBaseDelayMs = toInt(
-      process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS,
-      DEFAULT_FLUSH_RETRY_BASE_DELAY_MS
-    );
+    const countedSignals = new Map<string | undefined, Set<ObservabilitySignal>>();
+    let dropped = 0;
     for (const request of requests) {
-      const totalAttempts = maxRetries + 1;
-      let dispatched = false;
-      let lastError: string | undefined;
-      for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
-        try {
-          const response = await fetch(request.endpoint, {
-            method: "POST",
-            headers: request.headers,
-            body: JSON.stringify(request.payload),
-            signal: AbortSignal.timeout(flushTimeoutMs)
-          });
-          if (attempt < totalAttempts && isRetryableStatus(response.status)) {
-            try {
-              await response.body?.cancel();
-            } catch {
-              // best effort cleanup before retry
-            }
-            await sleep(backoffMs(retryBaseDelayMs, attempt));
-            continue;
+      const result = await dispatchTelemetryRequest(request, options).catch((error: unknown) => ({
+        ok: false, error: error instanceof Error ? error.message : String(error)
+      }));
+      out.push({ targetKind: request.targetKind, signal: request.signal, endpoint: request.endpoint, ...result });
+      if (result.ok) {
+        const counted = countedSignals.get(request.workspace) ?? new Set<ObservabilitySignal>();
+        for (const signal of ["traces", "metrics", "logs"] as const) {
+          if (request.counts[signal] > 0 && !counted.has(signal)) {
+            exported[signal] += request.counts[signal];
+            counted.add(signal);
           }
-          out.push({
-            targetKind: request.targetKind,
-            signal: request.signal,
-            endpoint: request.endpoint,
-            ok: response.ok,
-            status: response.status,
-            error: response.ok ? undefined : `HTTP ${response.status}`
-          });
-          dispatched = true;
-          break;
-        } catch (error) {
-          lastError = error instanceof Error ? error.message : String(error);
-          if (attempt < totalAttempts && isRetryableError(error)) {
-            await sleep(backoffMs(retryBaseDelayMs, attempt));
-            continue;
-          }
-          break;
         }
-      }
-      if (!dispatched) {
-        out.push({
-          targetKind: request.targetKind,
-          signal: request.signal,
-          endpoint: request.endpoint,
-          ok: false,
-          error: lastError ?? "dispatch failed"
-        });
+        countedSignals.set(request.workspace, counted);
+      } else {
+        dropped += request.counts.traces + request.counts.metrics + request.counts.logs;
       }
     }
+    if (dropped > 0) noteTelemetryDropped(dropped);
 
     return {
       ts: Date.now(),
@@ -584,13 +557,37 @@ export class ObservabilityOTELExporter {
     }
   }
 
-  private buildDispatchRequests(): DispatchRequest[] {
+  private captureItem<T extends object>(item: T, scope: CapturedWorkspace): T {
+    this.itemScopes.set(item, scope);
+    return item;
+  }
+
+  private groupBuffers(): ScopedBufferedBatch[] {
+    const groups = new Map<string | undefined, ScopedBufferedBatch>();
+    const groupFor = (item: object): ScopedBufferedBatch => {
+      const scope = this.itemScopes.get(item);
+      if (!scope) throw new Error("telemetry buffer scope is missing");
+      let batch = groups.get(scope.workspace);
+      if (!batch) {
+        batch = { scope, spans: [], metrics: [], logs: [] };
+        groups.set(scope.workspace, batch);
+      }
+      return batch;
+    };
+    for (const span of this.spans) groupFor(span).spans.push(span);
+    for (const metric of this.metrics) groupFor(metric).metrics.push(metric);
+    for (const log of this.logs) groupFor(log).logs.push(log);
+    return [...groups.values()];
+  }
+
+  private buildDispatchRequests(batch: BufferedBatch = { spans: this.spans, metrics: this.metrics, logs: this.logs }): DispatchRequest[] {
     if (this.config.targets.length === 0) {
       return [];
     }
 
     const resourceAttributes = toResourceAttributes(this.config);
     const requests: DispatchRequest[] = [];
+    const { spans, metrics, logs } = batch;
 
     for (const target of this.config.targets) {
       const headers = {
@@ -599,19 +596,20 @@ export class ObservabilityOTELExporter {
       };
 
       if (target.kind === "zipkin") {
-        const payload = this.toZipkinSpans();
+        const payload = this.toZipkinSpans(batch);
         if (payload.length === 0) continue;
         requests.push({
           targetKind: target.kind,
           signal: "traces",
           endpoint: zipkinEndpoint(target.endpoint),
           headers,
-          payload
+          payload,
+          counts: { traces: spans.length, metrics: metrics.length, logs: logs.length }
         });
         continue;
       }
 
-      if (this.spans.length > 0 && enabledForSignal(target, "traces")) {
+      if (spans.length > 0 && enabledForSignal(target, "traces")) {
         requests.push({
           targetKind: target.kind,
           signal: "traces",
@@ -624,26 +622,28 @@ export class ObservabilityOTELExporter {
                 scopeSpans: [
                   {
                     scope: { name: "amc.observability", version: this.config.serviceVersion },
-                    spans: this.spans
+                    spans
                   }
                 ]
               }
             ]
-          }
+          },
+          counts: { traces: spans.length, metrics: 0, logs: 0 }
         });
       }
 
-      if (this.metrics.length > 0 && enabledForSignal(target, "metrics")) {
+      if (metrics.length > 0 && enabledForSignal(target, "metrics")) {
         requests.push({
           targetKind: target.kind,
           signal: "metrics",
           endpoint: otlpEndpoint(target.endpoint, "metrics"),
           headers,
-          payload: this.toOTLPMetricsPayload(resourceAttributes)
+          payload: this.toOTLPMetricsPayload(resourceAttributes, metrics),
+          counts: { traces: 0, metrics: metrics.length, logs: 0 }
         });
       }
 
-      if (this.logs.length > 0 && enabledForSignal(target, "logs")) {
+      if (logs.length > 0 && enabledForSignal(target, "logs")) {
         requests.push({
           targetKind: target.kind,
           signal: "logs",
@@ -656,7 +656,7 @@ export class ObservabilityOTELExporter {
                 scopeLogs: [
                   {
                     scope: { name: "amc.observability", version: this.config.serviceVersion },
-                    logRecords: this.logs.map((entry) => ({
+                    logRecords: logs.map((entry) => ({
                       timeUnixNano: msToNanos(entry.ts),
                       severityNumber: entry.severityNumber,
                       severityText: entry.severityText,
@@ -667,7 +667,8 @@ export class ObservabilityOTELExporter {
                 ]
               }
             ]
-          }
+          },
+          counts: { traces: 0, metrics: 0, logs: logs.length }
         });
       }
     }
@@ -675,9 +676,9 @@ export class ObservabilityOTELExporter {
     return requests;
   }
 
-  private toOTLPMetricsPayload(resourceAttributes: OTelAttribute[]): unknown {
+  private toOTLPMetricsPayload(resourceAttributes: OTelAttribute[], entries: BufferedMetric[]): unknown {
     const byName = new Map<string, BufferedMetric[]>();
-    for (const metric of this.metrics) {
+    for (const metric of entries) {
       const key = `${metric.metricName}::${metric.unit}`;
       const current = byName.get(key) ?? [];
       current.push(metric);
@@ -714,9 +715,9 @@ export class ObservabilityOTELExporter {
     };
   }
 
-  private toZipkinSpans(): Array<Record<string, unknown>> {
+  private toZipkinSpans(batch: BufferedBatch): Array<Record<string, unknown>> {
     const localEndpoint = { serviceName: this.config.serviceName };
-    const spans = this.spans.map((span) => {
+    const spans = batch.spans.map((span) => {
       const tags: Record<string, string> = {};
       for (const attribute of span.attributes) {
         const value = attribute.value.stringValue
@@ -737,7 +738,7 @@ export class ObservabilityOTELExporter {
       };
     });
 
-    for (const metric of this.metrics) {
+    for (const metric of batch.metrics) {
       const tags: Record<string, string> = {
         "amc.metric.name": metric.metricName,
         "amc.metric.unit": metric.unit,
@@ -762,7 +763,7 @@ export class ObservabilityOTELExporter {
       });
     }
 
-    for (const entry of this.logs) {
+    for (const entry of batch.logs) {
       const tags: Record<string, string> = {
         "amc.log.severity": entry.severityText,
         "amc.log.message": entry.body
@@ -882,8 +883,7 @@ function maybeFlushSharedExporter(exporter: ObservabilityOTELExporter): void {
   const stats = exporter.getBufferStats();
   const buffered = stats.traces + stats.metrics + stats.logs;
   if (buffered < SHARED_FLUSH_THRESHOLD) return;
-  void exporter.flush().then((result) => noteTelemetryDropped(result.requests.reduce(
-    (count, request) => count + (request.ok ? 0 : result.exported[request.signal]), 0)), () => noteTelemetryDropped(buffered));
+  void exporter.flush().catch(() => { /* Preparation failures retain the batch for a later flush. */ });
 }
 
 export function classifyTrustTierRank(tier: TrustTier): number {
