@@ -60,7 +60,7 @@ describe("first-run evidence capture", () => {
     expect(result.stdout).toContain("First-run evidence capture");
     expect(result.stdout).toContain("No prompt choices needed");
     expect(result.stdout).toContain("amc evidence collect --first-run --agent demo-agent --runtime any -- node agent.js");
-    expect(result.stdout).toContain("Next: amc quickscore --auto");
+    expect(result.stdout).toContain("Next: AMC_NO_SIGN=1 amc quickscore --auto");
     expect(result.stdout).not.toContain("How does your agent run?");
   });
 

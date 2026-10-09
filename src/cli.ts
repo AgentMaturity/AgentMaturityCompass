@@ -7300,7 +7300,7 @@ Use --dry-run to preview the exact capture command and next score step.
 
       if (opts.dryRun) {
         console.log(chalk.yellow("Dry run: no agent command was executed."));
-        console.log(chalk.hex('#4AEF79')("Next: amc quickscore --auto"));
+        console.log(chalk.hex('#4AEF79')(shouldUseUnsignedFirstRun ? "Next: AMC_NO_SIGN=1 amc quickscore --auto (the capture is in .amc/unsigned/evidence.sqlite)" : "Next: amc quickscore --auto"));
         return;
       }
 
