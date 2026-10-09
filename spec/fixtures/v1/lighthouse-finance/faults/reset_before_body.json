@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "lighthouse-finance-faults/1",
+  "faults": [
+    {
+      "id": "first-post-reset-before-body",
+      "method": "POST",
+      "path": "/v1/payments",
+      "nth": 1,
+      "mode": "reset_before_body"
+    }
+  ]
+}

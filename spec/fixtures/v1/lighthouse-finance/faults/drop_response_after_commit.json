@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "lighthouse-finance-faults/1",
+  "faults": [
+    {
+      "id": "first-post-drop-response-after-commit",
+      "method": "POST",
+      "path": "/v1/payments",
+      "nth": 1,
+      "mode": "drop_response_after_commit"
+    }
+  ]
+}
