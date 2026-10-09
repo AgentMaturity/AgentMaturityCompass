@@ -65,6 +65,8 @@ export interface AgentSessionInit {
   readonly expectedToolsDigest?: string;
   /** Explicit acceptance of an unconfined macOS shell; see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: ExplicitShellOptIn;
+  /** The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Never in a digest. */
+  readonly leaseToken?: string;
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
   readonly maxSteps?: number;
@@ -146,6 +148,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
     ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
     ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
+    ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
     // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
     // rows at the right session id was only half of it: written through the raw
     // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to

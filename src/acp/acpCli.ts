@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
+import { NATIVE_TASK_LEASE_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
 /**
@@ -75,9 +76,14 @@ export function registerAcpCommands(program: Command): void {
       systemPrompt: string;
     }) => {
       let handle;
+      // P1-67: Studio hands a native task's lease to this process alone. Unset before anything runs, so no tool,
+      // check or MCP child inherits it; the toolset also scrubs it from tool output.
+      const leaseToken = process.env[NATIVE_TASK_LEASE_ENV];
+      delete process.env[NATIVE_TASK_LEASE_ENV];
       try {
         const compaction = compactionFromFlags(opts);
         handle = startAcpStdio({
+          ...(leaseToken ? { leaseToken } : {}),
           ...(compaction === undefined ? {} : { compaction }),
           workspace: process.cwd(),
           agentId: opts.agentId,
