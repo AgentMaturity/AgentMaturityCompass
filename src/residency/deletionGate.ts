@@ -10,7 +10,7 @@ type Clear = Extract<HoldVerdict, { verdict: "clear" }>;
 type Refused = Exclude<HoldVerdict, Clear>;
 const term = z.string().min(1).max(128).regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]*$/);
 const requestSchema = z.strictObject({ workspace: z.string().min(1).refine(value => value.trim().length > 0), executor: term,
-  target: deletionTargetSchema });
+  target: z.lazy(() => deletionTargetSchema) });
 export class DeletionDenied extends Error {
   readonly verdict: Refused;
   readonly auditPersisted: boolean;
