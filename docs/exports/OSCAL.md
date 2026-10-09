@@ -134,9 +134,9 @@ validation command below runs against copies fetched by hand.
 | `back-matter.resources[].uuid`, `title`, `props`, `rlinks[].href`, `rlinks[].hashes[]` (`oscal-catalog-oscal-metadata:back-matter`, `…:hash`) | one per citation: `oscalUuid("citation", "<controlId>/<key>")`, instrument and clause, props `control-id` and `citation`, the URL, and `SHA-256` of the retrieved content once the citation is verified (none while unverified) |
 
 Control props: `version`, `support`, `layer`, `family`, `station` (one per station), `mandatory`, `level` (one per
-level), `applicability`, `test` (one per test), `evidence-contract` (one per contract), `binding`, `invalidated-by`
+level), `applicability`, `test` (one per test), `evidence-contract` (one per contract), `binding`, `merge`, `invalidated-by`
 (one per trigger), `owner-role`, `clock`, `crosswalk` (one per entry; informational), `review`, `provenance`,
-`control-digest`. `applicability`, `test`, `evidence-contract`, `binding`, `clock`, `crosswalk`, `review`,
+`control-digest`. `applicability`, `test`, `evidence-contract`, `binding`, `merge`, `clock`, `crosswalk`, `review`,
 `provenance`, `citation`, `pack` and `catalog-manifest` hold canonical JSON. AMC binding parameters are not OSCAL
 params, because an OSCAL param value asserts a setting.
 
@@ -197,7 +197,7 @@ JSON that OSCAL tools see as an opaque string), `remarks`, `omitted`.
 
 | Model | Fields |
 | --- | --- |
-| catalog | `controls[].version`, `support`, `layer`, `family`, `stations`, `mandatory`, `levels`, `riskRationale`, `applicability`, `tests`, `evidence`, `binding`, `invalidatedBy`, `owner`, `clock`, `crosswalk`, `review`, `provenance`, `citations` (beyond title, URL and hash); `manifest`, `packs[]` (prop); `fixtures[]`, `producers[]`, `vocabulary`, `publisherHosts[]` (omitted; the catalog digest covers them) |
+| catalog | `controls[].version`, `support`, `layer`, `family`, `stations`, `mandatory`, `levels`, `riskRationale`, `applicability`, `tests`, `evidence`, `binding`, `merge`, `invalidatedBy`, `owner`, `clock`, `crosswalk`, `review`, `provenance`, `citations` (beyond title, URL and hash); `manifest`, `packs[]` (prop); `fixtures[]`, `producers[]`, `vocabulary`, `publisherHosts[]`, `crossStationProfiles[]` (omitted; the catalog digest covers them) |
 | profile | one `requirements[<controlId>]` entry per not-applicable control (with its exclusion source and reason) and per unresolved control (with its missing facts); `requirements[]`, `conflicts[]`, `effectiveMergeRules[]`, `mergeExceptionRejected[]`, `unsupported[]`, `crosswalkLinks[]`, `profile`, `compiler`, `status`, `lock`, `digest` (prop); `runtimePolicy`, `evidencePlan`, `signature.signature`, `signature.review` (not covered by the signature), `signature.diff` (omitted) |
 | assessment-results | `results[].dimensions.result=not_evaluated` and `results[].dimensions.result=pass (self_reported)` with the control ids; `results[].claimKind`, `dimensions`, `claimReasons`, `admitted`, `rejected`, `subject`, the digests, `evaluator` (prop); `plan (as assessment plan)` (remarks) |
 

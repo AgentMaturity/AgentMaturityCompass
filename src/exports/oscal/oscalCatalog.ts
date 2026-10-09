@@ -31,6 +31,7 @@ function controlProps(r: ControlRecord) {
     ...r.tests.map((t) => jsonProp("test", t)),
     ...r.evidence.map((e) => jsonProp("evidence-contract", e)),
     jsonProp("binding", r.binding),
+    ...(r.merge ? [jsonProp("merge", r.merge)] : []),
     ...r.invalidatedBy.map((t) => prop("invalidated-by", t)),
     prop("owner-role", r.owner.role),
     ...(r.clock ? [jsonProp("clock", r.clock)] : []),
@@ -77,6 +78,7 @@ function catalogLosses(cat: LoadedCatalog, controls: ControlRecord[]): OscalLoss
     asProp("tests", n((r) => r.tests.length), `AMC prop test, ${json}`),
     asProp("evidence", n((r) => r.evidence.length), `AMC prop evidence-contract, ${json}`),
     asProp("binding", controls.length, `AMC prop binding, ${json}; OSCAL params would assert values, so AMC parameters are not params`),
+    asProp("merge", n((r) => Number(r.merge !== undefined)), `AMC prop merge, ${json}`),
     asProp("invalidatedBy", n((r) => r.invalidatedBy.length), "one AMC prop invalidated-by per trigger"),
     asProp("owner", controls.length, "AMC prop owner-role"),
     asProp("clock", n((r) => Number(r.clock !== null)), `AMC prop clock, ${json}`),
@@ -90,7 +92,8 @@ function catalogLosses(cat: LoadedCatalog, controls: ControlRecord[]): OscalLoss
     loss("catalog", "fixtures[]", cat.fixtures.size, "omitted", "fixture files are not exported; metadata AMC prop catalog-digest covers their bytes"),
     loss("catalog", "producers[]", cat.producers.length, "omitted", "producers.yaml is not exported; catalog-digest covers it"),
     loss("catalog", "vocabulary", Number(cat.vocabulary !== null), "omitted", "vocabulary.yaml is not exported; catalog-digest covers it"),
-    loss("catalog", "publisherHosts[]", cat.publisherHosts.length, "omitted", "publisher-hosts.yaml is not exported; catalog-digest covers it")
+    loss("catalog", "publisherHosts[]", cat.publisherHosts.length, "omitted", "publisher-hosts.yaml is not exported; catalog-digest covers it"),
+    loss("catalog", "crossStationProfiles[]", cat.crossStationProfiles?.length ?? 0, "omitted", "profiles/cross-station.json is not exported; catalog-digest covers it")
   ];
 }
 
