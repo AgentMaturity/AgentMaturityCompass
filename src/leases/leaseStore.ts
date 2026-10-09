@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { sha256Hex } from "../utils/hash.js";
 import { leaseRevocationsSchema, type LeaseRevocations } from "./leaseSchema.js";
 
@@ -115,38 +116,44 @@ function readVerifiedRevocations(workspace: string): LeaseRevocations {
   return leaseRevocationsSchema.parse(JSON.parse(bytes.toString("utf8")));
 }
 
+/**
+ * Append one revocation and re-sign. Serialized across processes (Studio retires native task leases on every runtime
+ * stop while an operator may run `amc lease revoke`), so a concurrent writer cannot republish a list without this row.
+ */
 export function revokeLease(workspace: string, leaseId: string, reason: string): LeaseRevocations {
   const paths = leaseRevocationPaths(workspace);
-  let current: LeaseRevocations;
-  // Revoke is not the deliberate repair command. Authenticate the exact bytes
-  // used for this update, not a later second load of potentially different data.
-  try {
-    current = readVerifiedRevocations(workspace);
-  } catch {
-    throw new Error("lease revocation store unverifiable; revoke made no changes. Restore and review the approved revocation history before a deliberate repair; revoking another lease must not re-sign damaged state.");
-  }
-  const next = leaseRevocationsSchema.parse({
-    ...current,
-    updatedTs: Date.now(),
-    revocations: [
-      ...current.revocations.filter((row) => row.leaseId !== leaseId),
-      {
-        leaseId,
-        revokedTs: Date.now(),
-        reason
-      }
-    ]
-  });
-  const bytes = JSON.stringify(next, null, 2);
-  const digest = sha256Hex(Buffer.from(bytes, "utf8"));
-  // Prepare the intended signature before publishing either file. Signer failure
-  // must not replace the old list while leaving its previous signature behind.
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-  const signed: SignedDigest = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
-  mkdirSync(dirname(paths.file), { recursive: true });
-  writeFileAtomic(paths.file, bytes, 0o644);
-  writeFileAtomic(paths.sig, JSON.stringify(signed, null, 2), 0o644);
-  return next;
+  return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
+    let current: LeaseRevocations;
+    // Revoke is not the deliberate repair command. Authenticate the exact bytes
+    // used for this update, not a later second load of potentially different data.
+    try {
+      current = readVerifiedRevocations(workspace);
+    } catch {
+      throw new Error("lease revocation store unverifiable; revoke made no changes. Restore and review the approved revocation history before a deliberate repair; revoking another lease must not re-sign damaged state.");
+    }
+    const next = leaseRevocationsSchema.parse({
+      ...current,
+      updatedTs: Date.now(),
+      revocations: [
+        ...current.revocations.filter((row) => row.leaseId !== leaseId),
+        {
+          leaseId,
+          revokedTs: Date.now(),
+          reason
+        }
+      ]
+    });
+    const bytes = JSON.stringify(next, null, 2);
+    const digest = sha256Hex(Buffer.from(bytes, "utf8"));
+    // Prepare the intended signature before publishing either file. Signer failure
+    // must not replace the old list while leaving its previous signature behind.
+    const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+    const signed: SignedDigest = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
+    mkdirSync(dirname(paths.file), { recursive: true });
+    writeFileAtomic(paths.file, bytes, 0o644);
+    writeFileAtomic(paths.sig, JSON.stringify(signed, null, 2), 0o644);
+    return next;
+  } });
 }
 
 /**
