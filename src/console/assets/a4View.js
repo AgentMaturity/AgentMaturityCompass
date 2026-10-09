@@ -119,8 +119,8 @@ function reflectionHtml(reflection, allowed) {
   return `${reflection ? `${recorded("your statement", reflection)}<p class="muted">Yes and Correct bind this head: if the project
     changes first, Studio refuses them and you run Understand again.</p>` : `<p class="muted">${NO_REFLECTION}. Run Understand to
     record your statement before you confirm it.</p>`}
-    <div class="row wrap">${actionButton("Yes, that's it", "confirm", offer)}</div>
-    <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", offer)}`;
+    <div class="row wrap">${actionButton("Yes, that's it", "confirm", offer)} ${actionButton("Correct this", "correct", offer)}</div>
+    <p class="muted">Correct this sends nothing: change your answers or your statement, then run Understand again.</p>`;
 }
 
 export const ANSWER_CHANGED = "Another member changed an answer you are editing since you began; discard your edits to see theirs";

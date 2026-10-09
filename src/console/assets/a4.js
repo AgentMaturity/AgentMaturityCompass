@@ -326,7 +326,7 @@ function mountProject(projectId, options) {
     return specAction(parseSpec(field.value), specBase ?? specBaseNow());
   }
 
-  /** Confirm and Correct bind the head of the reflection this page shows, so a newer reflection makes Studio answer 409. */
+  /** Confirm binds the head of the statement this page shows, so a newer one makes Studio answer 409. */
   function reflectionBinding() {
     if (!Number.isSafeInteger(reflection?.headSeq)) throw new Error("No reflection is shown yet. Run Understand first; nothing was sent.");
     return { expectedHeadSeq: reflection.headSeq, clientRequestId: uuid() };
@@ -375,8 +375,6 @@ function mountProject(projectId, options) {
           (data) => { reflection = { data, text: content, headSeq: headSeqOf(data) }; });
       }
       case "confirm": return post("Confirm understanding", stagePath("confirm-understanding"), { confirmed: true, ...reflectionBinding() });
-      case "correct": return post("Correct understanding", stagePath("confirm-understanding"),
-        { confirmed: false, corrections: value("corrections"), ...reflectionBinding() }, [`${card}:corrections`], () => { reflection = null; });
       case "explain": {
         const level = value("level");
         const content = written("explanation", "your explanation");
@@ -463,6 +461,16 @@ function mountProject(projectId, options) {
       if (!pinnable(shown)) throw new Error(`${view.OTHER_REVISION}.`);
       reviewed = shown;
       return render();
+    }
+    if (name === "correct") {
+      // A correction is new answers or a new statement, then Understand again (design §9.3); P1-57 confirms only.
+      const card = button.closest("[data-card]")?.dataset.card ?? "page";
+      if (reflection) drafts.set(`${card}:understanding`, reflection.text);
+      reflection = null;
+      render();
+      root.querySelector('details[data-a4-open="change-answers"]')?.setAttribute("open", "");
+      root.querySelector('[name="understanding"]')?.focus();
+      return tell("Change your answers under Ask or your statement under Understand, then run Understand again. Nothing was sent.");
     }
     if (name === "discard-answers") {
       dropAnswerDrafts(button.closest("[data-card]")?.dataset.card ?? "page");
