@@ -511,6 +511,7 @@ const flatSpec = (value: unknown, prefix = ""): Record<string, string> => value 
 /** Project-scoped GETs. Returns false when none matches. */
 function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   const { store, params } = route;
+  if (rest === "/verify") return verifyRead(route, projectId);
   const now = Date.now();
   const state = loadA4State(store, projectId, now);
   assertVisible(route, state.members);
@@ -624,15 +625,38 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
     return true;
   }
-  if (rest === "/verify") {
-    // No query parameters at all: trust comes from the server operator's trust list only (`?trustList=` is 400).
-    assertQuery(params, []);
-    apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId),
-      boundary: "Integrity of bytes under this workspace's keys and the operator's trust list; not evidence about the agent.",
-      claim: unboundClaim(projectId, "verify", false) });
-    return true;
-  }
   return false;
+}
+
+/**
+ * GET …/verify, before any verified snapshot: it exists to show a failing chain. No query parameters at all (trust
+ * comes from the server operator's trust list only; `?trustList=` is 400). Workspace OWNERs, AUDITORs and the admin
+ * token read every project; anyone else proves membership through the verified chain, so a chain that fails to verify
+ * is 403 for them rather than a report hidden from privileged readers.
+ */
+function verifyRead(route: A4Route, projectId: string): true {
+  const { store, principal } = route;
+  assertQuery(route.params, []);
+  let head: A4ProjectRow | null | undefined;
+  try {
+    head = store.readHead(projectId);
+  } catch {
+    head = undefined; // Rows exist and do not verify: report them.
+  }
+  if (head === null) throw a4Fail(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
+  if (principal !== null && !principal.roles.includes("OWNER") && !principal.roles.includes("AUDITOR")) {
+    let members: A4Member[];
+    try {
+      members = store.membersOf(projectId);
+    } catch {
+      throw a4Fail(403, "A4_NOT_A_MEMBER", "Membership cannot be read from a chain that fails verification; a workspace OWNER or AUDITOR can read the report.");
+    }
+    assertVisible(route, members);
+  }
+  apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId),
+    boundary: "Integrity of bytes under this workspace's keys and the operator's trust list; not evidence about the agent.",
+    claim: unboundClaim(projectId, "verify", false) });
+  return true;
 }
 
 async function dispatch(route: A4Route): Promise<void> {
