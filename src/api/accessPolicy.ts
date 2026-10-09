@@ -123,7 +123,8 @@ function isPassportRevocation(pathname: string): boolean {
 const A4_APPROVAL = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/(approve|deny)$/;
 const A4_REVIEW = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/request-changes$/;
 const A4_MEMBER = /^\/api\/v1\/a4\/projects\/[^/]+\/(comments|presence)$/;
-const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|retire|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete)$/;
+// `retire` is not here: the creator of a never-proposed draft may retire it (retireProject enforces owner-or-creator).
+const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete)$/;
 
 /** P1-57: an A4 gate decision takes the approve class (APPROVER_PATHS holds exact paths only). */
 export function isA4ApprovalPath(pathname: string): boolean {
