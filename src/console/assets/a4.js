@@ -294,7 +294,7 @@ function mountProject(projectId, options) {
   function decisionBinding() {
     const { open } = view.currentGates(state.gates, stage);
     const gateView = state.readiness.gates?.[open?.gate];
-    const seq = open ? view.gateSeq(gateView?.gateId === open.gateId ? gateView : open) : null;
+    const seq = open ? view.gateSeq(gateView?.gateId === open.gateId ? gateView : open, state.project.headSeq) : null;
     if (!open || seq === null) throw new Error("No open gate with its open sequence is shown. Refresh before deciding.");
     const pin = reviewedFor(open); // both digests checked there: a decision never goes out unbound
     return { gateId: pin.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: pin.bindingDigest,

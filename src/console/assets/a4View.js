@@ -284,11 +284,12 @@ export function currentGates(gates, stage) {
 
 /**
  * The gate's open seq (the GATE_REQUESTED seq P1-57's decide path compares `expectedGateSeq` with), read only from
- * `requestedSeq`: a generic `seq` could be a decided or superseding seq. null when Studio did not publish it.
+ * `requestedSeq`: a generic `seq` could be a decided or superseding seq. null when Studio did not publish it, or
+ * published a seq the head has not reached (P1-57 writes Number.MAX_SAFE_INTEGER when the request link is missing).
  */
-export function gateSeq(gateView) {
+export function gateSeq(gateView, headSeq) {
   const value = gateView?.requestedSeq;
-  return Number.isSafeInteger(value) && value >= 0 ? value : null;
+  return Number.isSafeInteger(value) && value >= 0 && Number.isSafeInteger(headSeq) && value <= headSeq ? value : null;
 }
 
 /** What a decision binds: the gate and readiness the approvals bar showed. a4.js pins the first bound one it renders. */
