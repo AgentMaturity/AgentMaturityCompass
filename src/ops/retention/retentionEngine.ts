@@ -1,5 +1,5 @@
 import { unlinkSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { openLedger, verifyLedgerIntegrity } from "../../ledger/ledger.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../policy.js";
@@ -22,6 +22,7 @@ import { pruneGuardEvents } from "../../enforce/evidenceEmitter.js";
 import type { EvidenceEvent } from "../../types.js";
 import { inventorySessionSpills, eraseSessionSpills } from "../../session/spill/spillLifecycle.js";
 import { spillLifecycleEventAuthenticityError } from "../../session/spill/spillEvidence.js";
+import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.js";
 
 export interface RetentionRunResult {
   dryRun: boolean;
@@ -128,6 +129,7 @@ export function retentionStatus(workspace: string): {
 }
 
 export function runRetention(params: { workspace: string; dryRun: boolean }): RetentionRunResult {
+  params = { ...params, workspace: resolve(params.workspace) };
   const verifyPolicy = verifyOpsPolicySignature(params.workspace);
   if (!verifyPolicy.valid) {
     throw new Error(`ops policy invalid: ${verifyPolicy.reason ?? "unknown reason"}`);
@@ -219,9 +221,22 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       );
     }
 
-    const pruneIds = pruneEvents.map((row) => row.id);
-    if (pruneIds.length > 0) {
-      ledger.pruneEventPayloadColumns(pruneIds, nowMs());
+    const pruneIds: string[] = [];
+    const payloadsBySession = new Map<string, string[]>();
+    for (const row of pruneEvents) {
+      const ids = payloadsBySession.get(row.session_id) ?? [];
+      ids.push(row.id);
+      payloadsBySession.set(row.session_id, ids);
+    }
+    for (const [sessionId, ids] of payloadsBySession) {
+      try {
+        withDeletionGate({ workspace: params.workspace, executor: "retention.payload-prune",
+          target: { kind: "evidence-payloads", sessionIds: [sessionId], before: new Date(pruneBeforeTs).toISOString() } },
+        () => ledger.pruneEventPayloadColumns(ids, nowMs()));
+        pruneIds.push(...ids);
+      } catch (error) {
+        if (!(error instanceof DeletionDenied)) throw error;
+      }
     }
 
     let prunedBlobCount = 0;
@@ -235,8 +250,11 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       list.push(row);
       byBlob.set(row.blob_ref, list);
     }
-    for (const [blobId, rows] of byBlob.entries()) {
-      const eligibleForDelete = rows.every((row) => row.payload_pruned === 1 && row.ts < pruneBeforeTs);
+    for (const blobId of byBlob.keys()) {
+      // Include every current reference, not just the expired rows selected earlier.
+      const rows = ledger.db.prepare("SELECT session_id, ts, payload_pruned FROM evidence_events WHERE blob_ref = ?")
+        .all(blobId) as Array<{ session_id: string; ts: number; payload_pruned: number }>;
+      const eligibleForDelete = rows.length > 0 && rows.every((row) => row.payload_pruned === 1 && row.ts < pruneBeforeTs);
       if (!eligibleForDelete) {
         continue;
       }
@@ -245,10 +263,17 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       if (!pathExists(full)) {
         continue;
       }
-      const bytes = readFileSync(full);
-      unlinkSync(full);
-      appendPrunedRow(params.workspace, blobId, sha256Hex(bytes));
-      prunedBlobCount += 1;
+      try {
+        withDeletionGate({ workspace: params.workspace, executor: "retention.blob-unlink",
+          target: { kind: "blobs", sessionIds: [...new Set(rows.map(row => row.session_id))], before: new Date(pruneBeforeTs).toISOString() } }, () => {
+          const bytes = readFileSync(full);
+          unlinkSync(full);
+          appendPrunedRow(params.workspace, blobId, sha256Hex(bytes));
+        });
+        prunedBlobCount += 1;
+      } catch (error) {
+        if (!(error instanceof DeletionDenied)) throw error;
+      }
     }
 
     // Signed spill commitments are metadata references, not ledger blob_ref.
@@ -288,7 +313,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       });
       auditEventIds.push(...erased.auditEventIds);
       prunedSpillCount += erased.entries.filter((entry) => entry.status === "removed").length;
-      if (!erased.ok) throw new Error("Spill retention incomplete; inspect signed SESSION_SPILL_ERASURE_FINISHED audit events");
+      if (erased.entries.some(entry => entry.status === "failed")) throw new Error("Spill retention incomplete; inspect signed SESSION_SPILL_ERASURE_FINISHED audit events");
     }
 
     const createdAudit = appendOpsAuditEvent({

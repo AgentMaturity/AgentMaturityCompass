@@ -14,6 +14,7 @@ import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
 import Database from 'better-sqlite3';
 import { writeConsolidatedGuardEvent, currentStage } from '../storage/consolidation/guardEventConsolidation.js';
+import { withDeletionGate } from '../residency/deletionGate.js';
 
 let _db: import('better-sqlite3').Database | null = null;
 let _insertStmt: import('better-sqlite3').Statement | null = null;
@@ -605,7 +606,8 @@ export function pruneGuardEvents(workspaceOrBefore: string, beforeIso?: string):
     if (!Number.isFinite(Date.parse(cutoff))) return 0;
     const db = getDb(databasePath(target));
     if (!db) return 0;
-    const result = db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(cutoff);
+    const result = withDeletionGate({ workspace: target.workspace, executor: 'guard-events.prune',
+      target: { kind: 'guard-events', before: new Date(cutoff).toISOString() } }, () => db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(cutoff));
     return Number(result.changes ?? 0);
   } catch {
     return 0;

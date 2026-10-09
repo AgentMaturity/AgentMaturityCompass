@@ -6,20 +6,20 @@
  */
 import { createInterface } from "node:readline/promises";
 import chalk from "chalk";
-import { getActiveLegalHolds } from "./compliance/dataResidency.js";
+import { holdVerdict } from "./residency/legalHoldRegistry.js";
 import { signDigestWithPolicy } from "./crypto/signing/signer.js";
 import {
   applyVerifyRepair, archivedStores, planVerifyRepair, QUARANTINE_DIR, RepairRefused, type HoldState, type RepairPlan
 } from "./ledger/verifyRepair.js";
 
-/** Unexpired active holds anywhere in the workspace (the isTenantUnderLegalHold rule); a throw means unknown. */
+/** All workspace data kinds and sessions; registry uncertainty remains unknown. */
 function workspaceLegalHolds(workspace: string): HoldState {
   try {
-    const now = Date.now();
-    const holdIds = getActiveLegalHolds(undefined, workspace)
-      .filter((hold) => hold.expiresTs === null || hold.expiresTs > now)
-      .map((hold) => hold.holdId);
-    return holdIds.length > 0 ? { state: "active", holdIds } : { state: "none" };
+    // Preserve the repair executor's existing active/none/unknown contract.
+    const verdict = holdVerdict({ workspace });
+    if (verdict.verdict === "held") return { state: "active", holdIds: [...verdict.holdIds] };
+    if (verdict.verdict === "clear") return { state: "none" };
+    return { state: "unknown", reason: verdict.reason };
   } catch (error) {
     return { state: "unknown", reason: error instanceof Error ? error.message : String(error) };
   }
