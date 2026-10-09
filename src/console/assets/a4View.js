@@ -194,12 +194,12 @@ export function renderSpecEditor(ctx) {
 
 export function renderBuildCard(ctx) {
   return `<p class="muted">${TRUTH.admission}. With no producer registered for this stage, what you write here is recorded
-    as a self-reported implementation output.</p><textarea name="content" rows="4"></textarea>
+    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4"></textarea>
     <div class="row wrap">${actionButton("Build", "build", ctx.allowed.build)}</div>`;
 }
 
 export function renderReviewCard(ctx) {
-  return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel.</p>
+  return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel. ${RETAINED}</p>
     <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review", ctx.allowed.review)}</div>`;
 }
 
@@ -208,7 +208,7 @@ export function renderComments(cardId, comments) {
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
     <span class="pill">SELF_REPORTED</span> <strong>${esc(comment.authorUsername ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
-      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes)}`}</div></li>`);
+      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes ?? (comment.reasonCode ? [comment.reasonCode] : []))}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
     <button type="button" data-a4-action="comment">Comment</button>
@@ -376,7 +376,7 @@ export function renderMembers(ctx) {
   return `<section class="card"><h4>Members</h4>
     ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
     ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
-    ${members?.limited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
+    ${(members?.candidatesLimited ?? members?.limited) === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
     ${candidates.length ? `<h4>Candidates</h4>${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
       ${esc(candidate.username)} <select name="role">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
