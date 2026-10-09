@@ -382,10 +382,15 @@ function settleEffect(store: A4Store, projectId: string, attemptId: string, kind
  * whose executionId is this effect's means "already consumed by this effect"), then the preamble — freeze and read-only
  * re-read (a freeze is EFFECT_FAILED: FREEZE_ACTIVE plus the automatic hold), every bound resource slot recomputed
  * (EFFECT_FAILED: RESOURCE_DRIFTED <slot>) — then the registered executor with 5 s heartbeats, then the outcome row.
+ * Only a throw before the executor resolves is EFFECT_FAILED. Once it resolved, EFFECT_FINISHED is written (one retry
+ * for a transient store error); if that still throws, the attempt stays unsettled and reads as lost (PROCESS_LOST /
+ * outcome_unknown), never as a definite failure of an effect that ran.
  */
 export async function runA4Effect(store: A4Store, projectId: string, attemptId: string): Promise<A4TransitionResult> {
   const { workspace } = store;
   const failWith = (error: string): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FAILED", { error: error.slice(0, 500) });
+  let outcome: A4EffectOutcome;
+  let bound: Record<string, string | null>;
   try {
     const state = loadA4State(store, projectId, Date.now());
     const started = startedLink(state.chain, attemptId);
@@ -407,7 +412,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     }
     if (volatile.readOnly !== false) return failWith("READ_ONLY_MODE");
     const gate = gateRowOf(state, String(started.body.gateId));
-    const bound = boundSlots(gate);
+    bound = boundSlots(gate);
     const drifted = driftedSlots(workspace, bound);
     if (drifted.length > 0) return failWith(`RESOURCE_DRIFTED ${drifted.join(" ")}`);
     // A beat that throws (SQLITE_BUSY, a closed ledger) is a missed beat, never an uncaught timer exception that exits Studio.
@@ -420,17 +425,22 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     };
     const timer = setInterval(beat, HEARTBEAT_MS);
     timer.unref();
-    let outcome: A4EffectOutcome;
     try {
       outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat });
     } finally {
       clearInterval(timer);
     }
-    return settleEffect(store, projectId, attemptId, "EFFECT_FINISHED", { consumedExecutionId: outcome.consumedExecutionId ?? null,
-      receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })) },
-    outcome.receipt);
   } catch (error) {
     return failWith(error instanceof Error ? error.message : String(error));
+  }
+  const finish = (): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FINISHED", { consumedExecutionId: outcome.consumedExecutionId ?? null,
+    receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })) },
+  outcome.receipt);
+  try {
+    return finish();
+  } catch {
+    // A second throw propagates and leaves the attempt unsettled (lost), never EFFECT_FAILED.
+    return finish();
   }
 }
 
