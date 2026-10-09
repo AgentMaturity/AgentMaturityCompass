@@ -3,17 +3,21 @@
  *
  * Native Studio admission (`isNativeStudioPath` covers /api/v1/a4) already ran Host, Origin, intent and CSRF checks
  * and handed the router `NativeTaskApiContext.principalId`. This module parses that id and re-reads the live record:
- * a LOCAL_USER from the signed users.yaml (`identityCheck: users_yaml`), a WORKSPACE_ROUTER user from the newest live
- * tracked session record (`identityCheck: session_record`, not a live check: a host deprovisioning is invisible until
- * the record expires, so readiness says IDENTITY_CHECK_LIMITED until P2-33). It also re-runs the route's role class
+ * a LOCAL_USER from the signed users.yaml (`identityCheck: users_yaml`), a WORKSPACE_ROUTER user from the live tracked
+ * session records (`identityCheck: session_record`, not a live check: a host deprovisioning is invisible until the
+ * record expires, so readiness says IDENTITY_CHECK_LIMITED until P2-33). The records are unsigned files, so a router
+ * user holds only the roles every live record for that user grants: Studio admitted the request on the record its
+ * signed token names, which is among them, so a planted record can narrow the roles but never widen them (P2-33 passes
+ * the token-verified roles through instead). It also re-runs the route's role class
  * against the live roles, because the native path admits `local-demo` as VIEWER. Identity never comes from a body.
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { z } from "zod";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
-import { listUsers, usersConfigPath, usersConfigSigPath, type SessionStoreRecord } from "../auth/authApi.js";
-import type { UserRole } from "../auth/roles.js";
+import { listUsers, usersConfigPath, usersConfigSigPath } from "../auth/authApi.js";
+import { USER_ROLES, type UserRole } from "../auth/roles.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { A4Member, A4Principal } from "./a4Schema.js";
@@ -42,34 +46,51 @@ function usersYamlSignerFingerprint(workspace: string): string | null {
   }
 }
 
-/** Live, unrevoked WORKSPACE_ROUTER session records for this workspace, newest first. */
-function liveRouterSessions(workspace: string, now: number): SessionStoreRecord[] {
+/** The `SessionStoreRecord` fields A4 reads (src/auth/authApi.ts), checked rather than cast. */
+const sessionRecordSchema = z.object({
+  userId: z.string().min(1), username: z.string().min(1), roles: z.array(z.enum(USER_ROLES)), issuedTs: z.number(), expiresTs: z.number(),
+  revoked: z.boolean(), authSource: z.enum(["LOCAL_USER", "WORKSPACE_ROUTER"]).optional()
+});
+type SessionRecord = z.infer<typeof sessionRecordSchema>;
+
+/**
+ * Live, unrevoked WORKSPACE_ROUTER session records. Null, never "none", when the directory cannot be listed for any
+ * reason but absence, or when any record in it does not parse: an unreadable source is not an empty one.
+ */
+function liveRouterSessions(workspace: string, now: number): SessionRecord[] | null {
   const dir = join(workspace, ".amc", "studio", "sessions");
   let names: string[];
   try {
     names = readdirSync(dir).filter((name) => name.endsWith(".json"));
-  } catch {
-    return [];
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "ENOENT" ? [] : null;
   }
-  const records: SessionStoreRecord[] = [];
+  const records: SessionRecord[] = [];
   for (const name of names) {
+    let record: SessionRecord;
     try {
-      const record = JSON.parse(readFileSync(join(dir, name), "utf8")) as SessionStoreRecord;
-      if (record.authSource === "WORKSPACE_ROUTER" && !record.revoked && record.expiresTs > now && typeof record.userId === "string") records.push(record);
+      record = sessionRecordSchema.parse(JSON.parse(readFileSync(join(dir, name), "utf8")));
     } catch {
-      continue;
+      return null;
     }
+    if (record.authSource === "WORKSPACE_ROUTER" && !record.revoked && record.expiresTs > now) records.push(record);
   }
-  return records.sort((a, b) => b.issuedTs - a.issuedTs);
+  return records;
 }
 
 /** A LOCAL_USER or WORKSPACE_ROUTER principal resolved from live records, or the reason it cannot be. */
 function livePrincipal(workspace: string, authSource: A4Principal["authSource"], userId: string, admission: A4Principal["admission"],
   now: number): A4Principal | A4Refusal {
   if (authSource === "WORKSPACE_ROUTER") {
-    const session = liveRouterSessions(workspace, now).find((record) => record.userId === userId);
-    if (!session || session.roles.length === 0) return refuse(401, "A4_SESSION_EXPIRED", "No live workspace session for this user; reopen the console.");
-    return { key: `WORKSPACE_ROUTER:${userId}`, authSource, userId, username: session.username, roles: [...session.roles], admission,
+    const sessions = liveRouterSessions(workspace, now);
+    if (sessions === null) return refuse(401, "A4_SESSION_UNREADABLE", "The workspace session records could not be read; reopen the console.");
+    const mine = sessions.filter((record) => record.userId === userId);
+    if (mine.length === 0) return refuse(401, "A4_SESSION_EXPIRED", "No live workspace session for this user; reopen the console.");
+    const roles = mine[0]!.roles.filter((role) => mine.every((record) => record.roles.includes(role)));
+    if (roles.length === 0 || new Set(mine.map((record) => record.username)).size !== 1) {
+      return refuse(401, "A4_SESSION_INCONSISTENT", "This user's live workspace sessions disagree; sign in again.");
+    }
+    return { key: `WORKSPACE_ROUTER:${userId}`, authSource, userId, username: mine[0]!.username, roles, admission,
       identityCheck: "session_record", provenance: { usersYamlSignerFingerprint: null, createdTs: null, createdBy: null, hostMembershipId: null } };
   }
   let users;
@@ -131,7 +152,7 @@ export function assertMember(members: readonly A4Member[], principal: A4Principa
   if (!roles.some((role) => held.has(role))) throw Object.assign(new Error(`A4_NOT_A_MEMBER: ${principal.username} holds none of ${roles.join(", ")} on this project`), { code: "A4_NOT_A_MEMBER", status: 403 });
 }
 
-/** Who can be added: ACTIVE users.yaml users plus live tracked host sessions, keyed by principal key. `limited` in host mode. */
+/** Who can be added: ACTIVE users.yaml users plus live tracked host sessions, keyed by principal key. `limited` in host mode or when the sessions are unreadable. */
 export function memberCandidates(workspace: string, hostMode: boolean, now = Date.now()): {
   candidates: Array<{ principalKey: string; authSource: A4Principal["authSource"]; userId: string; username: string }>; limited: boolean;
 } {
@@ -142,18 +163,20 @@ export function memberCandidates(workspace: string, hostMode: boolean, now = Dat
   } catch {
     local = [];
   }
-  const hosted = new Map(liveRouterSessions(workspace, now).map((record) => [`WORKSPACE_ROUTER:${record.userId}`,
+  const sessions = liveRouterSessions(workspace, now);
+  const hosted = new Map((sessions ?? []).map((record) => [`WORKSPACE_ROUTER:${record.userId}`,
     { principalKey: `WORKSPACE_ROUTER:${record.userId}`, authSource: "WORKSPACE_ROUTER" as const, userId: record.userId, username: record.username }]));
-  return { candidates: [...local, ...hosted.values()], limited: hostMode };
+  return { candidates: [...local, ...hosted.values()], limited: hostMode || sessions === null };
 }
 
 /** Distinct live host principals and the ACTIVE local user ids, the inputs `deriveSelfApprovalAllowed` reads; null when unreadable. */
-export function principalPopulation(workspace: string, now = Date.now()): { activeLocal: string[] | null; hostPrincipals: number } {
+export function principalPopulation(workspace: string, now = Date.now()): { activeLocal: string[] | null; hostPrincipals: number | null } {
   let activeLocal: string[] | null;
   try {
     activeLocal = listUsers(workspace).filter((user) => user.status === "ACTIVE").map((user) => user.userId);
   } catch {
     activeLocal = null;
   }
-  return { activeLocal, hostPrincipals: new Set(liveRouterSessions(workspace, now).map((record) => record.userId)).size };
+  const sessions = liveRouterSessions(workspace, now);
+  return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
 }

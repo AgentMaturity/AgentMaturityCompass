@@ -132,7 +132,7 @@ export function refreshVolatileFacts(workspace: string, project: Pick<A4ProjectR
 
 /** The live facts readiness reads; each source the store cannot read is null, never "all clear". Stage lanes add theirs. */
 export function collectLiveFacts(workspace: string, project: Pick<A4ProjectRow, "agent_id">, options: { hostedRouter: boolean }): {
-  activeLocal: string[] | null; hostPrincipals: number; hostedRouter: boolean
+  activeLocal: string[] | null; hostPrincipals: number | null; hostedRouter: boolean
 } & ReturnType<typeof refreshVolatileFacts> {
   return { ...principalPopulation(workspace), hostedRouter: options.hostedRouter, ...refreshVolatileFacts(workspace, project) };
 }
