@@ -33,6 +33,9 @@ export async function runLegalHoldCommand(opts: LegalHoldCommandOptions, workspa
     console.log(snapshot.unverifiedLegacy.length > 0
       ? chalk.yellow(`Legal hold registry: ${snapshot.holdsChecked} records checked; existing records preserved. ${snapshot.unverifiedLegacy.length} unverified legacy records still block deletion.`)
       : chalk.green(`Legal hold registry ready: ${snapshot.holdsChecked} records checked; existing records preserved.`));
+    for (const legacy of snapshot.unverifiedLegacy) {
+      console.log(`  Unverified legacy hold: ${legacy.holdId} — raw SHA-256: ${legacy.sha256}`);
+    }
     return;
   }
 

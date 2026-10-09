@@ -94,6 +94,46 @@ function domainSeparatedArtifactDigest(input: {
   ));
 }
 
+/** Sign exact bytes using existing workspace keys, without publishing an artifact or signature file. */
+export function signArtifactBytes(input: {
+  workspace: string;
+  artifactKind: ArtifactSignature["artifactKind"];
+  bytes: Buffer;
+}): ArtifactSignature {
+  const artifactSha256 = sha256Hex(Buffer.from(input.bytes));
+  const digestHex = domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 });
+  const signed = signDigestWithPolicy({ workspace: input.workspace, kind: "BUNDLE", digestHex });
+  return artifactSignatureSchema.parse({
+    schemaVersion: "2026-07-10",
+    artifactKind: input.artifactKind,
+    artifactSha256,
+    signature: signed.signature,
+    signedTs: signed.signedTs,
+    signer: "auditor",
+    envelope: signed.envelope
+  });
+}
+
+/** Verify a prepared signature against its exact bytes before publishing either file. */
+export function verifyArtifactBytesSignature(input: {
+  workspace: string;
+  artifactKind: ArtifactSignature["artifactKind"];
+  bytes: Buffer;
+  signature: ArtifactSignature;
+}): boolean {
+  try {
+    const signature = artifactSignatureSchema.parse(input.signature);
+    const artifactSha256 = sha256Hex(Buffer.from(input.bytes));
+    if (signature.schemaVersion !== "2026-07-10" || signature.artifactKind !== input.artifactKind ||
+        signature.artifactSha256 !== artifactSha256) return false;
+    return verifySignedDigest({
+      workspace: input.workspace,
+      digestHex: domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 }),
+      signed: signature
+    });
+  } catch { return false; }
+}
+
 export function signArtifactFile(input: {
   workspace: string;
   path: string;
@@ -103,24 +143,10 @@ export function signArtifactFile(input: {
 }): { sigPath: string; signature: ArtifactSignature } {
   const publicationBytes = input.bytes === undefined ? undefined : Buffer.from(input.bytes);
   ensureSigningKeys(input.workspace);
-  const artifactSha256 = sha256Hex(publicationBytes ?? readFileSync(input.path));
-  const digestHex = domainSeparatedArtifactDigest({
-    artifactKind: input.artifactKind,
-    artifactSha256
-  });
-  const signed = signDigestWithPolicy({
+  const signature = signArtifactBytes({
     workspace: input.workspace,
-    kind: "BUNDLE",
-    digestHex
-  });
-  const signature = artifactSignatureSchema.parse({
-    schemaVersion: "2026-07-10",
     artifactKind: input.artifactKind,
-    artifactSha256,
-    signature: signed.signature,
-    signedTs: signed.signedTs,
-    signer: "auditor",
-    envelope: signed.envelope
+    bytes: publicationBytes ?? readFileSync(input.path)
   });
   const sigPath = artifactSigPath(input.path);
   writeFileAtomic(sigPath, `${JSON.stringify(signature, null, 2)}\n`, 0o644);

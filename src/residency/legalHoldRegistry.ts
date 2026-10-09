@@ -3,8 +3,8 @@ import { chmodSync, closeSync, constants, fstatSync, lstatSync, mkdirSync, openS
 import { join, resolve } from "node:path";
 import { z } from "zod";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { artifactSigPath, readAndVerifyArtifactFileSignature, signArtifactFile } from "../lifecycle/artifactSignature.js";
+import { ensureSigningKeys, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { artifactSigPath, readAndVerifyArtifactFileSignature, signArtifactBytes, verifyArtifactBytesSignature } from "../lifecycle/artifactSignature.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { appendSignedControlJournal, readSignedControlJournal, SignedControlJournalError,
   type SignedControlJournalSnapshot } from "../lifecycle/signedControlJournal.js";
@@ -155,11 +155,11 @@ function identityPair(identity: Head["identity"]): Identity | null {
 function anchorOf(head: Pick<Head, "count" | "recordsDigest" | "identity">): Anchor {
   return { count: head.count, recordsDigest: head.recordsDigest, identity: identityPair(head.identity) };
 }
-function readJournal(workspace: string): SignedControlJournalSnapshot<Anchor> {
+function readJournal(workspace: string, recover = false): SignedControlJournalSnapshot<Anchor> {
   try {
     safeDirectory(workspace, journalPath(workspace));
     return readSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace),
-      parsePayload: value => anchorSchema.parse(value), recoverPendingPublication: false });
+      parsePayload: value => anchorSchema.parse(value), recoverPendingPublication: recover });
   } catch (error) { return fail(error instanceof SignedControlJournalError ? "record_corrupt" : "registry_unreadable"); }
 }
 export interface LegalHoldRegistrySnapshot {
@@ -177,6 +177,7 @@ interface State extends LegalHoldRegistrySnapshot {
   readonly head: Head | null;
   readonly journal: SignedControlJournalSnapshot<Anchor>;
   readonly bindingMismatch: boolean;
+  readonly headStale: boolean;
 }
 function readUnlocked(workspace: string, options: { initialize?: boolean; rebind?: boolean } = {}): State {
   try {
@@ -200,17 +201,32 @@ function readUnlocked(workspace: string, options: { initialize?: boolean; rebind
         rows.push({ source: "legacy-unverified", holdId, sha256 });
       }
     }
-    const registryDigest = recordDigest(rows), journal = readJournal(workspace), path = headPath(workspace), headMissing = !present(path);
-    if (headMissing && present(artifactSigPath(path))) fail("record_corrupt");
-    let head: Head | null = null, bindingMismatch = false;
-    if (headMissing) {
-      if (journal.integrity !== "uninitialized" || rows.some(row => row.source === "record") || (tenant.regulated && !options.initialize)) fail("head_missing");
+    const registryDigest = recordDigest(rows), journal = readJournal(workspace, options.initialize === true);
+    const path = headPath(workspace), headMissing = !present(path);
+    let head: Head | null = null, bindingMismatch = false, headStale = false;
+    if (journal.integrity === "trusted") {
+      const anchor = journal.payload;
+      if (!anchor || anchor.count !== rows.length || anchor.recordsDigest !== registryDigest) fail("record_corrupt");
+      if (anchor.identity !== null && canonicalize(anchor.identity) !== canonicalize(tenant.identity)) fail("tenant_unmapped");
+      try {
+        if (headMissing) fail(present(artifactSigPath(path)) ? "record_corrupt" : "head_missing");
+        head = signed(workspace, path, headSchema).value;
+        if (head.updatedTs > now || canonicalize(anchorOf(head)) !== canonicalize(anchor)) fail("record_corrupt");
+      } catch (error) {
+        if (options.initialize !== true || !(error instanceof LegalHoldRegistryError)
+          || !["head_missing", "signature_invalid", "record_corrupt"].includes(error.verdict.reason)) throw error;
+        head = null; headStale = true;
+      }
+      bindingMismatch = canonicalize(anchor.identity) !== canonicalize(tenant.identity)
+        || (head !== null && head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)));
+      if (bindingMismatch && !options.rebind) fail("tenant_unmapped");
+    } else if (headMissing) {
+      if (present(artifactSigPath(path))) fail("record_corrupt");
+      if (rows.some(row => row.source === "record") || (tenant.regulated && !options.initialize)) fail("head_missing");
     } else {
       head = signed(workspace, path, headSchema).value;
       if (head.updatedTs > now || head.count !== rows.length || head.recordsDigest !== registryDigest) fail("record_corrupt");
-      if (journal.integrity === "trusted") {
-        if (canonicalize(journal.payload) !== canonicalize(anchorOf(head))) fail("record_corrupt");
-      } else if (!options.initialize || (head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) && options.rebind !== true)) fail("record_corrupt");
+      if (!options.initialize || (head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) && options.rebind !== true)) fail("record_corrupt");
       bindingMismatch = head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) || canonicalize(identityPair(head.identity)) !== canonicalize(tenant.identity);
       if (bindingMismatch) {
         const previous = identityPair(head.identity);
@@ -244,11 +260,11 @@ function readUnlocked(workspace: string, options: { initialize?: boolean; rebind
       effective.set(row.holdId, next);
     }
     return freeze({ holds: [...effective.values()], identity: tenant.identity, registryDigest, holdsChecked: rows.length, headMissing,
-      regulated: tenant.regulated, unverifiedLegacy: [...unresolved.values()], journalRevision: journal.revision, rows, head, journal, bindingMismatch });
+      regulated: tenant.regulated, unverifiedLegacy: [...unresolved.values()], journalRevision: journal.revision, rows, head, journal, bindingMismatch, headStale });
   } catch (error) { if (error instanceof LegalHoldRegistryError) throw error; return fail("registry_unreadable"); }
 }
 function view(state: State): LegalHoldRegistrySnapshot {
-  const { rows: _rows, head: _head, journal: _journal, bindingMismatch: _binding, ...snapshot } = state; return freeze(snapshot);
+  const { rows: _rows, head: _head, journal: _journal, bindingMismatch: _binding, headStale: _stale, ...snapshot } = state; return freeze(snapshot);
 }
 export function readLegalHoldRegistry(workspace: string): LegalHoldRegistrySnapshot { return view(readUnlocked(workspacePath(workspace))); }
 /** Listing is a verified view, never deletion admission; untrusted legacy fields are not promoted into hold DTOs. */
@@ -287,7 +303,7 @@ export function withLegalHoldLock<T>(workspace: string, operation: () => T): T {
   } });
 }
 function assertWriter(workspace: string): void {
-  if (getMode(workspace) !== "owner" || typeof process.getuid !== "function") fail("registry_unreadable");
+  if (process.env.AMC_NO_SIGN === "1" || getMode(workspace) !== "owner" || typeof process.getuid !== "function") fail("registry_unreadable");
   const mode = join(workspacePath(workspace), ".amc", "mode.json");
   if (present(mode) && !z.strictObject({ mode: z.literal("owner"), updatedTs: timestamp }).safeParse(json(bounded(mode))).success) fail("registry_unreadable");
   const root = legalHoldRegistryRoot(workspace); safeDirectory(workspace, root); mkdirSync(root, { recursive: true, mode: 0o700 });
@@ -299,21 +315,55 @@ function acknowledgedAudit(workspace: string, auditType: string, payload: Record
     if (!audit.eventId || !digest.safeParse(audit.eventHash).success) fail("registry_unreadable");
   } catch { return fail("registry_unreadable"); }
 }
-function publishHead(workspace: string, previous: State, rows: readonly Entry[], identity = previous.identity): void {
-  const head = headSchema.parse({ schemaVersion: "amc.legal-hold-head/v1", workspacePathSha256: sha256Hex(workspacePath(workspace)), identity,
-    count: rows.length, recordsDigest: recordDigest(rows), updatedTs: Date.now() });
-  const bytes = Buffer.from(canonicalize(head) + "\n", "utf8");
-  writeFileAtomic(headPath(workspace), bytes, 0o600);
-  signArtifactFile({ workspace, path: headPath(workspace), artifactKind: "legal-hold", bytes }); chmodSync(artifactSigPath(headPath(workspace)), 0o600);
-  // The external signer pin and checkpoint make rollback or a replaced local auditor key an integrity failure.
-  appendSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace), previous: previous.journal, payload: anchorOf(head) });
+interface PreparedArtifact { bytes: Buffer; signatureBytes: Buffer }
+interface PreparedHead extends PreparedArtifact { value: Head }
+function prepareArtifact(workspace: string, bytes: Buffer): PreparedArtifact {
+  if (bytes.length > MAX_RECORD_BYTES) fail("record_corrupt");
+  try {
+    ensureSigningKeys(workspace);
+    const signature = signArtifactBytes({ workspace, artifactKind: "legal-hold", bytes });
+    if (!verifyArtifactBytesSignature({ workspace, artifactKind: "legal-hold", bytes, signature })) fail("registry_unreadable");
+    const signatureBytes = Buffer.from(JSON.stringify(signature, null, 2) + "\n", "utf8");
+    if (signatureBytes.length > 16_384) fail("registry_unreadable");
+    return { bytes, signatureBytes };
+  } catch { return fail("registry_unreadable"); }
 }
-/** Explicit initialization/rebinding never repairs row, signature, timestamp, digest or checkpoint mismatches. */
+function prepareHead(workspace: string, rows: readonly Entry[], identity: Identity | null): PreparedHead {
+  const value = headSchema.parse({ schemaVersion: "amc.legal-hold-head/v1", workspacePathSha256: sha256Hex(workspacePath(workspace)), identity,
+    count: rows.length, recordsDigest: recordDigest(rows), updatedTs: Date.now() });
+  return { value, ...prepareArtifact(workspace, Buffer.from(canonicalize(value) + "\n", "utf8")) };
+}
+function writePreparedArtifact(path: string, artifact: PreparedArtifact): void {
+  writeFileAtomic(path, artifact.bytes, 0o600);
+  writeFileAtomic(artifactSigPath(path), artifact.signatureBytes, 0o600);
+}
+function publishHead(workspace: string, previous: State, rows: readonly Entry[], identity = previous.identity,
+  record?: { path: string; artifact: PreparedArtifact }): void {
+  const head = prepareHead(workspace, rows, identity);
+  try {
+    // Both signatures verify before the journal can commit; registry files follow its authority.
+    appendSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace), previous: previous.journal, payload: anchorOf(head.value) });
+    if (record) writePreparedArtifact(record.path, record.artifact);
+    writePreparedArtifact(headPath(workspace), head);
+  } catch { return fail("registry_unreadable"); }
+}
+/** Owner initialization can repair only HEAD from a trusted journal that exactly matches the verified row snapshot. */
 export function initLegalHoldRegistry(workspace: string, options: { rebind?: boolean } = {}): LegalHoldRegistrySnapshot {
   const root = workspacePath(workspace); assertWriter(root);
   return withLegalHoldLock(root, () => {
     assertWriter(root);
-    const snapshot = readUnlocked(root, { initialize: true, rebind: options.rebind === true });
+    let snapshot = readUnlocked(root, { initialize: true, rebind: options.rebind === true });
+    if (snapshot.headStale) {
+      const anchor = snapshot.journal.payload;
+      if (snapshot.journal.integrity !== "trusted" || !anchor) fail("record_corrupt");
+      const head = prepareHead(root, snapshot.rows, anchor.identity);
+      if (canonicalize(anchorOf(head.value)) !== canonicalize(anchor)) fail("record_corrupt");
+      acknowledgedAudit(root, "LEGAL_HOLD_REGISTRY_HEAD_REPUBLISHED", { count: snapshot.holdsChecked,
+        recordsDigest: snapshot.registryDigest, journalRevision: snapshot.journalRevision });
+      try { writePreparedArtifact(headPath(root), head); } catch { return fail("registry_unreadable"); }
+      // A null-to-known identity change still requires the separate audited rebind below.
+      snapshot = readUnlocked(root, { initialize: true, rebind: options.rebind === true });
+    }
     if (!snapshot.headMissing && !snapshot.bindingMismatch && snapshot.journal.integrity === "trusted") return view(snapshot);
     acknowledgedAudit(root, snapshot.bindingMismatch ? "LEGAL_HOLD_REGISTRY_REBOUND" : "LEGAL_HOLD_REGISTRY_INITIALIZED", {
       count: snapshot.holdsChecked, recordsDigest: snapshot.registryDigest, unverifiedLegacyCount: snapshot.unverifiedLegacy.length,
@@ -326,9 +376,9 @@ function publish(workspace: string, previous: State, record: LegalHoldV1 | Legac
   if (bytes.length > MAX_RECORD_BYTES) fail("record_corrupt");
   const rows: Entry[] = previous.rows.filter(row => row.source !== "record" || row.holdId !== value.holdId);
   rows.push({ source: "record", holdId: value.holdId, record: value, sha256: sha256Hex(bytes) }); recordDigest(rows);
-  writeFileAtomic(path, bytes, 0o600); signArtifactFile({ workspace, path, artifactKind: "legal-hold", bytes }); chmodSync(artifactSigPath(path), 0o600);
   // Preserve the verified row descriptors. Never sign a directory reread narrowed during the signing window.
-  publishHead(workspace, previous, rows); readLegalHoldRegistry(workspace);
+  const artifact = prepareArtifact(workspace, bytes);
+  publishHead(workspace, previous, rows, previous.identity, { path, artifact }); readLegalHoldRegistry(workspace);
 }
 export function issueScopedLegalHold(input: { workspace: string; scope: LegalHoldScopeV1; reason: string; issuedBy: string; expiresTs?: number | null }): LegalHoldV1 {
   const workspace = workspacePath(input.workspace); assertWriter(workspace);
