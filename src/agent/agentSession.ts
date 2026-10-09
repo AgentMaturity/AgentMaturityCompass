@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { AgentDriver } from "./agentDriver.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
@@ -126,160 +128,164 @@ export function resumeAgentSession(init: AgentSessionInit & { readonly sessionId
 }
 
 function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant): OrderedAgentSession {
-  if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
-  if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
-  if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
-  const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
-  const sessionId = init.sessionId ?? randomUUID();
-  const session = claimant === undefined ? new SessionService(init.workspace) : resumeSession({
-    workspace: init.workspace, sessionId, agentId: init.agentId,
-    harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
-    policyDigest: init.policyDigest, claimant
-  }).service;
-  // The toolset writes its tool evidence into THIS session rather than into
-  // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
-  // so a run that actually called a tool left rows referencing a session with no
-  // row of its own, and `amc verify` reported "references missing session". Tool
-  // evidence also simply belongs to the session whose turn caused it.
-  const makeToolset = () => agentToolset({
-    workspace: init.workspace,
-    agentId: init.agentId,
-    sessionId,
-    ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
-    ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-    ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
-    ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
-    // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
-    // rows at the right session id was only half of it: written through the raw
-    // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to
-    // anchor the session because its root would cover less than the session does.
-    recorder: session
-  });
-
-  let closed = false;
-  let running = false;
-  let toolset: ReturnType<typeof agentToolset> | undefined;
-  /**
-   * How much assistant text the caller has already been told.
-   *
-   * `readAgentRunSummary` folds the WHOLE session, so without this cursor the
-   * second prompt would return everything said so far -- the first answer quoted
-   * back as though it were the new one.
-   */
-  let reported = 0;
-  let reportedEndings = 0;
-
-  const finish = (release: boolean): void => {
-    if (closed) return;
-    if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
-    try {
-      if (release) session.releaseWithoutClosing();
-      else {
-        if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
-        session.close({ reason: "completed" });
-      }
-    } catch (error) {
-      session.disposeWithoutClosing();
-      throw error;
-    } finally {
-      closed = true;
-      toolset?.close();
-    }
-  };
-
-  let driver!: AgentDriver;
-  try {
-    if (claimant !== undefined) {
-      const history = readAgentRunSummary(init.workspace, sessionId, "idle");
-      reported = history.assistantText.length;
-      reportedEndings = history.endings.length;
-    }
-    if (claimant === undefined) session.open({
-      sessionId,
+  const workspace = resolve(init.workspace);
+  return withWorkspaceScope(workspace, (): OrderedAgentSession => {
+    if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
+    if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
+    if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
+    const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    const sessionId = init.sessionId ?? randomUUID();
+    const session = claimant === undefined ? new SessionService(workspace) : resumeSession({
+      workspace, sessionId, agentId: init.agentId,
+      harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
+      policyDigest: init.policyDigest, claimant
+    }).service;
+    // The toolset writes its tool evidence into THIS session rather than into
+    // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
+    // so a run that actually called a tool left rows referencing a session with no
+    // row of its own, and `amc verify` reported "references missing session". Tool
+    // evidence also simply belongs to the session whose turn caused it.
+    const makeToolset = () => agentToolset({
+      workspace,
       agentId: init.agentId,
-      harnessVersion: init.harnessVersion,
-      compositionDigest: init.compositionDigest,
-      policyDigest: init.policyDigest
+      sessionId,
+      ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
+      ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
+      ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
+      // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
+      // rows at the right session id was only half of it: written through the raw
+      // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to
+      // anchor the session because its root would cover less than the session does.
+      recorder: session
     });
-    toolset = init.tools === "none" ? undefined : makeToolset();
-    const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
-    const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-    driver = new AgentDriver({
-      session,
-      llm: init.makeLlm(session),
-      route: init.route,
-      systemPromptEventId,
-      tools,
-      ...(init.validation === undefined ? {} : { validation: init.validation }),
-      config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
-    });
-  } catch (error) {
-    // A half-composed session would otherwise be left open and unsealed, which
-    // verification reports as an interrupted run that never actually started.
-    try { finish(claimant !== undefined); } catch { /* retain the original composition error; evidence stays unsealed on failure */ }
-    throw error;
-  }
 
-  const runPrompt = async (enqueue: () => void): Promise<AgentPromptResult> => {
-      if (closed) return { ok: false, reason: "session is closed" };
-      // Claimed before any await. Checking after one would let two callers both
-      // pass the check and then interleave on a serial driver.
-      if (running) return { ok: false, reason: "a prompt is already running on this session" };
-      running = true;
+    let closed = false;
+    let running = false;
+    let toolset: ReturnType<typeof agentToolset> | undefined;
+    /**
+     * How much assistant text the caller has already been told.
+     *
+     * `readAgentRunSummary` folds the WHOLE session, so without this cursor the
+     * second prompt would return everything said so far -- the first answer quoted
+     * back as though it were the new one.
+     */
+    let reported = 0;
+    let reportedEndings = 0;
+
+    const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
+      if (closed) return;
+      if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
       try {
-        enqueue();
-        await driver.whenIdle();
-
-        const status = driver.status;
-        const summary = readAgentRunSummary(init.workspace, sessionId, status);
-        const fresh = summary.assistantText.slice(reported);
-        const endings = summary.endings.slice(reportedEndings);
-        // Retire this prompt's text even on a failed outcome. A later successful
-        // prompt must not receive an earlier failed turn's observations as its own.
-        reported = summary.assistantText.length;
-        reportedEndings = summary.endings.length;
-
-        // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
-        // the log has an open turn nothing may build on. The text may look
-        // complete; the run it came from is not.
-        if (status === "failed") {
-          return { ok: false, reason: "driver failed; the session log has an open turn" };
+        if (release) session.releaseWithoutClosing();
+        else {
+          if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
+          session.close({ reason: "completed" });
         }
-        // Output with no provenance is not output this surface will hand on:
-        // quoting it to a client would launder it into whatever the client signs.
-        if (summary.unsignedRows > 0) {
-          return {
-            ok: false,
-            reason: `session wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`
-          };
-        }
-
-        const knownEndings: readonly TurnEndReason[] = ["complete", "cancelled", "max_tokens", "max_steps", "blocked", "error", "interrupted"];
-        const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
-          || !knownEndings.some(reason => reason === ending.reason));
-        if (failed) return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion` };
-        const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
-        if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
-        return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };
+      } catch (error) {
+        session.disposeWithoutClosing();
+        throw error;
       } finally {
-        running = false;
+        closed = true;
+        toolset?.close();
       }
-  };
+    });
 
-  return {
-    sessionId,
-    prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
-    promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
-    promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
-    readEvents: () => session.readEvents(),
+    let driver!: AgentDriver;
+    try {
+      if (claimant !== undefined) {
+        const history = readAgentRunSummary(workspace, sessionId, "idle");
+        reported = history.assistantText.length;
+        reportedEndings = history.endings.length;
+      }
+      if (claimant === undefined) session.open({
+        sessionId,
+        agentId: init.agentId,
+        harnessVersion: init.harnessVersion,
+        compositionDigest: init.compositionDigest,
+        policyDigest: init.policyDigest
+      });
+      toolset = init.tools === "none" ? undefined : makeToolset();
+      const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
+      const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
+      driver = new AgentDriver({
+        session,
+        llm: init.makeLlm(session),
+        route: init.route,
+        systemPromptEventId,
+        tools,
+        ...(init.validation === undefined ? {} : { validation: init.validation }),
+        config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
+      });
+    } catch (error) {
+      // A half-composed session would otherwise be left open and unsealed, which
+      // verification reports as an interrupted run that never actually started.
+      try { finish(claimant !== undefined); } catch { /* retain the original composition error; evidence stays unsealed on failure */ }
+      throw error;
+    }
 
-    cancel(cause: TurnCancelCause, by: string): void {
-      // `keepInbox` so a cancelled prompt does not discard anything queued
-      // behind it -- the caller cancelled one prompt, not the conversation.
-      driver.cancel(cause, { by, keepInbox: true });
-    },
+    const runPrompt = (enqueue: () => void): Promise<AgentPromptResult> =>
+      withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
+        if (closed) return { ok: false, reason: "session is closed" };
+        // Claimed before any await. Checking after one would let two callers both
+        // pass the check and then interleave on a serial driver.
+        if (running) return { ok: false, reason: "a prompt is already running on this session" };
+        running = true;
+        try {
+          enqueue();
+          await driver.whenIdle();
 
-    close: () => finish(false),
-    release: () => finish(true)
-  };
+          const status = driver.status;
+          const summary = readAgentRunSummary(workspace, sessionId, status);
+          const fresh = summary.assistantText.slice(reported);
+          const endings = summary.endings.slice(reportedEndings);
+          // Retire this prompt's text even on a failed outcome. A later successful
+          // prompt must not receive an earlier failed turn's observations as its own.
+          reported = summary.assistantText.length;
+          reportedEndings = summary.endings.length;
+
+          // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
+          // the log has an open turn nothing may build on. The text may look
+          // complete; the run it came from is not.
+          if (status === "failed") {
+            return { ok: false, reason: "driver failed; the session log has an open turn" };
+          }
+          // Output with no provenance is not output this surface will hand on:
+          // quoting it to a client would launder it into whatever the client signs.
+          if (summary.unsignedRows > 0) {
+            return {
+              ok: false,
+              reason: `session wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`
+            };
+          }
+
+          const knownEndings: readonly TurnEndReason[] = ["complete", "cancelled", "max_tokens", "max_steps", "blocked", "error", "interrupted"];
+          const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
+            || !knownEndings.some(reason => reason === ending.reason));
+          if (failed) return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion` };
+          const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
+          if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
+          return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };
+        } finally {
+          running = false;
+        }
+      });
+
+    return {
+      sessionId,
+      prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
+      promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
+      promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
+      readEvents: () => withWorkspaceScope(workspace, () => session.readEvents()),
+
+      cancel(cause: TurnCancelCause, by: string): void {
+        // `keepInbox` so a cancelled prompt does not discard anything queued
+        // behind it -- the caller cancelled one prompt, not the conversation.
+        withWorkspaceScope(workspace, () => driver.cancel(cause, { by, keepInbox: true }));
+      },
+
+      close: () => finish(false),
+      release: () => finish(true)
+    };
+  });
 }

@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 1,
+  "source": "AMC Strategic Plan — Gaps, Competitors & Regulated-Industry Packs; What's missing; doc df2f49d2-c861-4a27-b368-e7f35526b7c1; tab 7ac61d95-002a; block mg4sf4j6wvz.66975; document revision 132; extracted 2026-10-09 by Claude to scratchpad/plan/strategy-gaps-and-metrics.md; original artifact https://claude.ai/artifact/UZUAqpS3bmo2b5dxKz1E72. Historical source findings, not refreshed verdicts.",
+  "gaps": [
+    {
+      "id": "G1",
+      "title": "Verifiers trust keys shipped inside the artifact, so anyone can mint a \"valid\" AMC certificate, bundle, passport or assurance certificate",
+      "severity": "Critical",
+      "evidence": "`bundles/bundle.ts:557-574`, `assurance/certificate.ts:456-490`, `passport/passportVerifier.ts:116,151-160`, `assurance/assuranceVerifier.ts:115-119`; ledger verify defaults to UNANCHORED",
+      "fix": "Issuer pinning, a published trust list, refuse unanchored by default",
+      "ownerKeys": [
+        "P0-09",
+        "P1-06",
+        "P1-08",
+        "P0-36"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G2",
+      "title": "Operators choose trust tiers and timestamps: `eval import` defaults all 7 formats to ATTESTED, accepts `--trust-tier OBSERVED` and backdated times; `amc attest` signs with the operator's own key",
+      "severity": "Critical",
+      "evidence": "`eval/evalImporters.ts:77-85`, `ingest/ingest.ts:123-183`, `dogfood/maturityEvidence.ts`",
+      "fix": "Tiers derived from provenance; ATTESTED requires a third-party key",
+      "ownerKeys": [
+        "P0-18",
+        "P0-09",
+        "P0-36"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G3",
+      "title": "Shipping commands fabricate results: `amc domain assess/gaps/report/roadmap` use `pseudoRandomScore`; domain assurance grades a canned reply and passes when a pack is missing; reports print \"Certification Readiness\"; the \"signed\" audit bundle is a bare SHA-256",
+      "severity": "Critical",
+      "evidence": "`domains/domainCliIntegration.ts:58-138,184-230`, `cli-domain-product-commands.ts:401-550`, `domainReportBuilder.ts:65,94`, `industryPackAudit.ts:292-299`; still present in candidate 019e32b5",
+      "fix": "Delete; return \"not evaluated\" without evidence; keep a labelled example mode outside attestations",
+      "ownerKeys": [
+        "P0-15",
+        "P0-16",
+        "P0-20",
+        "P0-36"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G4",
+      "title": "Release 1.1.1 grades a synthetic refusal, stores it as OBSERVED red-team evidence and encrypts with a constant fallback key",
+      "severity": "Critical",
+      "evidence": "Fixed in source on 21–22 Aug (`fba5824e`, `3a7c4752`); unpublished, no advisory",
+      "fix": "Publish 1.2.0, issue an advisory, deprecate 1.1.1",
+      "ownerKeys": [
+        "P0-36",
+        "P0-39",
+        "P0-40"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G5",
+      "title": "L3–L5 are unreachable on real evidence: 218 of 244 L3 gates need an audit event only the dogfood seeder emits, and levels aren't cumulative",
+      "severity": "Critical",
+      "evidence": "`diagnostic/questionBank.ts:107-199`",
+      "fix": "Rebuild gates from evidence the runtime emits; make levels cumulative",
+      "ownerKeys": [
+        "P1-07"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G6",
+      "title": "No normative spec matches the code: published schemas are deliberately permissive while AMC enforces stricter private ones, and licence statements conflict (MIT, Apache-2.0, CC BY 4.0, \"proprietary\")",
+      "severity": "Critical",
+      "evidence": "`AMC_STANDARD_RFC.md`; `SCORING_METHODOLOGY.md` revised 224 times in 75 days; `standard/standardGenerator.ts:39-52`",
+      "fix": "Publish a Core Spec 1.0 draft with its acceptance rules; settle licensing",
+      "ownerKeys": [
+        "P1-01",
+        "P1-30",
+        "D-04"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G7",
+      "title": "Unsafe harness defaults: the shell is unconfined on macOS (argv deny-patterns only) and missing on Windows; `$` corruption in `fs.edit`; non-atomic writes",
+      "severity": "Critical",
+      "evidence": "`agentToolset.ts:221`, `bashTool.ts:83`, `fsTools.ts:161-205`",
+      "fix": "Refuse the unconfined shell by default; literal edits; atomic writes; per-OS containment with a domain egress allowlist follows in Play 1",
+      "ownerKeys": [
+        "P0-05",
+        "P0-06",
+        "P1-05"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G8",
+      "title": "Packs are self-scored questionnaires; assurance validators are keyword lists that leak the expected answer in the prompt",
+      "severity": "High",
+      "evidence": "`industryPacks.ts`; `euAiActArticlePack.ts:139-141`; `assurance/validators.ts:42,110`; `healthcarePHIPack.ts:3-24`",
+      "fix": "Executed tests on tool calls and traces; calibrated judges",
+      "ownerKeys": [
+        "P0-19",
+        "P2-27"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G9",
+      "title": "Citations wrong or stale: an AI review judged about 27 of 41 EU AI Act classes wrong; NIST, ISO 42001 Annex A and ATLAS IDs wrong; superseded instruments cited as live (OMB M-24-10, SR 11-7), while SR 26-2 appears nowhere",
+      "severity": "High",
+      "evidence": "`industryPackAudit.ts:94-105`, `crossFrameworkMapping.ts:137-145`, `score/domainPacks.ts:516,759`; unchanged in candidate 019e32b5",
+      "fix": "Citation linter, effective dates, expert review",
+      "ownerKeys": [
+        "P0-24",
+        "P0-25",
+        "P1-34"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G10",
+      "title": "Sector and jurisdiction holes: no insurance, telecom, legal, defense or aviation pack; banking and markets shallow; UK, India and Singapore nearly empty",
+      "severity": "High",
+      "evidence": "See \"Industry packs and domains today\"",
+      "fix": "Sector and jurisdiction overlays",
+      "ownerKeys": [
+        "P1-18",
+        "P2-10",
+        "P2-11",
+        "P2-30",
+        "P2-31",
+        "P2-32",
+        "P3-09",
+        "P3-10",
+        "P3-11",
+        "P3-12",
+        "P3-13",
+        "P3-14",
+        "P3-15",
+        "P3-16",
+        "P3-17"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G11",
+      "title": "No validity evidence: \"κ = 1.0\" measures determinism, whitepaper statistics conflict, and the real-model pilot had 0 qualified passes",
+      "severity": "High",
+      "evidence": "`VALIDITY_FRAMEWORK.md:236-317`, `AMC_1512_EVIDENCE_PROTOCOL.md:220-227`",
+      "fix": "Independent inter-rater and outcome studies",
+      "ownerKeys": [
+        "P0-28",
+        "P2-21",
+        "P3-18"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G12",
+      "title": "No trusted time or public transparency: caller-supplied timestamps, a local self-sealed log, a non-standard Merkle tree",
+      "severity": "High",
+      "evidence": "`ledger.ts:588`, `transparency/merkle.ts:29-44`",
+      "fix": "RFC 3161 timestamps; anchor to a public log such as Sigstore Rekor or SCITT",
+      "ownerKeys": [
+        "P1-25",
+        "P1-26"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G13",
+      "title": "Enterprise identity fails procurement: \"SAML\" is JSON, and OIDC `exp` is optional",
+      "severity": "High",
+      "evidence": "`identity/saml/samlVerify.ts:23-60`, `identity/oidc/jwtVerify.ts:97-150`",
+      "fix": "Real SAML and OIDC with identity-provider interop tests",
+      "ownerKeys": [
+        "P2-07"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G14",
+      "title": "No machine-readable control or assessment exchange; SARIF is the only GRC export",
+      "severity": "High",
+      "evidence": "`exports/grcEvidenceExport.ts:114-117`",
+      "fix": "OSCAL catalog, profiles and assessment results",
+      "ownerKeys": [
+        "P1-28",
+        "P2-18"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G15",
+      "title": "No independent assessors, mark policy or registry; the README invites self-made badges",
+      "severity": "High",
+      "evidence": "`docs/CERTIFICATION.md`, `README.md:642-645`",
+      "fix": "Assessor program, trademark, public registry",
+      "ownerKeys": [
+        "P1-50",
+        "P3-02",
+        "P3-04",
+        "P0-28"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G16",
+      "title": "Key management below regulated grade: a passphrase-encrypted vault holding the four signing keys sat in public history Feb–Aug 2026, open to offline brute force; break-glass overrides are saved \"unsigned\" when no key is present",
+      "severity": "High",
+      "evidence": "Commit `cb6bba21`; `governor/emergencyOverride.ts:145-148`; no KMS or HSM code",
+      "fix": "Rotate, distrust the old keys and prove it; refuse unsigned overrides; KMS, HSM and PKCS#11",
+      "ownerKeys": [
+        "P0-37",
+        "P0-10",
+        "P1-08",
+        "P2-08",
+        "P0-36"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G17",
+      "title": "Release pipeline not ready: no publish or signing credentials, CI not green, unsigned containers on floating base images, 0 of 73 third-party Action references (16 distinct actions) pinned to a SHA",
+      "severity": "High",
+      "evidence": "`release.yml:193-236`; `Dockerfile:4`, `docker/Dockerfile.quickstart:1`; Helm `change-me` secrets on `main` (removed in the candidate)",
+      "fix": "Release secrets, SLSA provenance, signed images pinned by digest",
+      "ownerKeys": [
+        "P0-33",
+        "P0-35",
+        "P0-38",
+        "P2-15"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G21",
+      "title": "The compliance engine passes on nothing: \"no violation\" checks pass with zero events, any event of a matching type counts, and \"system\"-session events are credited to every agent",
+      "severity": "High",
+      "evidence": "`compliance/complianceEngine.ts:227-264,293-320,344-348`; byte-identical in the candidate, where 65 of 149 mappings use `requires_no_audit`",
+      "fix": "Bind evidence to control, scope, producer and window; empty means not evaluated",
+      "ownerKeys": [
+        "P0-17",
+        "P1-11"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G22",
+      "title": "Packs certify by arithmetic and score units disagree: answering 5 everywhere \"certifies\", MCP prints \"Certified: Yes\", and a raw 5 reads as 100% but a raw 6 as 6%",
+      "severity": "High",
+      "evidence": "`industryPacks.ts:2471`, `tests/logisticsIndustryPack.test.ts:29-49`, `mcp/amcMcpServer.ts:446`, `domainAssessmentEngine.ts:77-83`",
+      "fix": "Typed units, one methodology; no certification label from self-assessment",
+      "ownerKeys": [
+        "P0-21",
+        "P0-23"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G23",
+      "title": "Residency and legal holds aren't enforced where data moves: the residency hook compares caller-supplied regions and nothing calls it; retention deletes without checking holds; guard events resolve to the current directory and prune globally",
+      "severity": "High",
+      "evidence": "`ops/productionWiring.ts:211`, `ops/retention/retentionEngine.ts:130,222-250`, `enforce/evidenceEmitter.ts:205-209,533`",
+      "fix": "Intercept real egress and storage routes; check holds at every delete; scope evidence to a workspace",
+      "ownerKeys": [
+        "P2-01"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G24",
+      "title": "No durable intent or \"outcome unknown\" state for actions with external effects; a recorder failure after the effect leaves only a missing row",
+      "severity": "High",
+      "evidence": "`tools/toolPipeline.ts:161-172`",
+      "fix": "Persist intent before dispatch; receipts with outcome unknown; idempotency keys and reconciliation",
+      "ownerKeys": [
+        "P1-03",
+        "P1-04"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G25",
+      "title": "Configured isn't enforced: domain apply writes \"enabled\" guardrail rules that nothing reads, and strict evidence binding turns off with one environment variable",
+      "severity": "High",
+      "evidence": "`domains/domainApply.ts:223-254` (no other `domainRules` reference); `diagnostic/runner.ts:251-256`",
+      "fix": "Compile into the tool pipeline with an effective-policy receipt; no silent opt-out in regulated profiles",
+      "ownerKeys": [
+        "P1-12",
+        "P1-07"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G18",
+      "title": "Surface sprawl: 1,228 CLI paths, 1,015 docs, a dozen overlapping pack, mapping and scoring systems",
+      "severity": "Medium",
+      "evidence": "\"AMC today\"",
+      "fix": "Freeze, consolidate, ship profiles",
+      "ownerKeys": [
+        "P0-01",
+        "P1-53",
+        "P2-29"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G26",
+      "title": "Each surface makes its own claims: CLI, MCP, API and Studio compute or show status separately, behind a paid gate, without a shared synthetic label; an uncommitted reviewer-independence helper accepts any non-empty decision",
+      "severity": "Medium",
+      "evidence": "`cli-domain-product-commands.ts:401-550`, `studio/studioServer.ts:8487-8616`, `audit/reviewerIndependence.ts:149-165` (uncommitted)",
+      "fix": "One shared claim-eligibility service behind every surface; reuse the signed approval engine",
+      "ownerKeys": [
+        "P0-08",
+        "P0-22",
+        "P0-23",
+        "P2-29"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G19",
+      "title": "Records management: plaintext ledger, single-replica SQLite, no WORM export",
+      "severity": "Medium",
+      "evidence": "`ledgerConnection.ts:42-47`",
+      "fix": "Encrypted store, WORM export, HA option",
+      "ownerKeys": [
+        "P2-09"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    },
+    {
+      "id": "G20",
+      "title": "No adoption proof: no design partners or users recorded; simulated-persona ratings in public docs",
+      "severity": "Medium",
+      "evidence": "`AGENT_COUNCIL_100_RATINGS.md`, `HUMAN_FIRST_USE_STUDY.md:15`",
+      "fix": "Design partners and published case studies",
+      "ownerKeys": [
+        "P1-29",
+        "P1-49",
+        "P0-28"
+      ],
+      "status": "open",
+      "closedBy": null,
+      "closingEvidence": null,
+      "closedAt": null
+    }
+  ]
+}

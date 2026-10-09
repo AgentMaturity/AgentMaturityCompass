@@ -97,6 +97,8 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/policy/effectivePolicyReceipt.ts", why: "the compiled policy a session ran under (P1-12); AMC configuration, untagged, never maturity evidence" },
   { module: "src/policyPacks/packApply.ts", why: "policy pack applied; untagged, so it binds to no question" },
   { module: "src/residency/checkEgress.ts", why: "residency route refusals (P2-01): AMC enforcement bookkeeping; the control result is not_evaluated and makes no pass claim" },
+  { module: "src/residency/deletionGate.ts", why: "deletion admission records (P2-01): legal-hold enforcement bookkeeping, never maturity evidence" },
+  { module: "src/residency/legalHoldRegistry.ts", why: "legal-hold register initialization, rebind and legacy-release acknowledgements (P2-01): owner governance bookkeeping, never maturity evidence" },
   { module: "src/sandbox/sandbox.ts", why: "sandbox enablement; untagged, read by the L5 sandbox cap" },
   { module: "src/session/sessionResume.ts", why: "AMC's own session-log boundary record (instrumentation, not maturity)" },
   { module: "src/session/spill/spillLifecycle.ts", why: "AMC's own spill erasure records (instrumentation, not maturity)" },

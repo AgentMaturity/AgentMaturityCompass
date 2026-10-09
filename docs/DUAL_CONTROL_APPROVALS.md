@@ -18,6 +18,12 @@ Example high-impact posture:
 - `DEPLOY`: `requiredApprovals: 2`, `requireDistinctUsers: true`
 - `SECURITY`: `requiredApprovals: 2`, roles constrained to `OWNER|AUDITOR`
 
+An optional `a4` section is the floor for A4 Forge gate policies (preview, behind `AMC_A4_PREVIEW=1`): `regulated` (`auto` or `true`; `true` treats every project as regulated), `allowSelfApproval` (default `true`; `false` turns single-user self-approval off), `allowedGateChanges`, `minTtlDays`, `maxTtlDays` and `maxTtlMinutes`. A project's gate policy may only tighten it. A policy without the section reads as these defaults.
+
+An approval request can carry a `quorumFloor` (A4 effect gates, and plan activation in a regulated project) that may only raise the signed class rule: at least as many approvals, distinct users if either asks, only the roles both allow, and a TTL no longer than `a4.maxTtlMinutes` (without that field, no longer than the class rule).
+
+A Studio decision bound to a request digest (the A4 card) must carry the reviewer's verified user id and live roles. It is refused with 403 otherwise and never defaults to `OWNER`; unbound decisions behave as before.
+
 ## Binding Hashes
 Approval requests bind execution context:
 - `intentHash`

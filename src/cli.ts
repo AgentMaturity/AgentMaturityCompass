@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import "./storage/nativeGuard.js";
+import { withWorkspaceScope } from "./enforce/evidenceEmitter.js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { basename, dirname, join, relative, resolve } from "node:path";
@@ -4854,10 +4855,10 @@ plugin
   .requiredOption("--registry <base>", "registry path or URL")
   .option("--query <text>", "query text")
   .action(async (opts: { registry: string; query?: string }) => {
-    const out = await pluginSearchCli({
+    const out = await withWorkspaceScope(process.cwd(), () => pluginSearchCli({
       registry: opts.registry,
       query: opts.query
-    });
+    }));
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -17606,10 +17607,10 @@ bench
   .requiredOption("--registry <pathOrUrl>", "registry path or URL")
   .option("--query <text>", "optional search text")
   .action(async (opts: { registry: string; query?: string }) => {
-    const out = await benchSearchCli({
+    const out = await withWorkspaceScope(process.cwd(), () => benchSearchCli({
       registry: opts.registry,
       query: opts.query
-    });
+    }));
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -19133,34 +19134,34 @@ program
   .option("--issue", "issue a new legal hold", false)
   .option("--release <holdId>", "release a legal hold by ID")
   .option("--list", "list active legal holds", false)
+  .option("--init", "initialize the verified legal-hold register", false)
+  .option("--rebind", "rebind a verified register with --init", false)
+  .option("--accept-unverified-legacy", "acknowledge an unverified legacy record with --release", false)
   .option("--tenant <id>", "tenant ID")
   .option("--reason <text>", "reason for hold")
   .option("--issued-by <name>", "issuer name")
-  .action(async (opts: { issue: boolean; release?: string; list: boolean; tenant?: string; reason?: string; issuedBy?: string }) => {
-    const dr = await import("./compliance/dataResidency.js");
-    if (opts.list) {
-      const holds = dr.getActiveLegalHolds(opts.tenant, process.cwd());
-      if (holds.length === 0) {
-        console.log(chalk.green("No active legal holds."));
-        return;
-      }
-      for (const h of holds) {
-        console.log(`  ${chalk.bold(h.holdId)} — Tenant: ${h.tenantId} — ${h.reason} (by ${h.issuedBy})`);
-      }
-      return;
-    }
-    if (opts.release) {
-      const released = dr.releaseLegalHold(opts.release, process.cwd());
-      console.log(released ? chalk.green(`Legal hold ${opts.release} released.`) : chalk.red("Hold not found or already released."));
-      return;
-    }
-    if (opts.issue && opts.tenant && opts.reason && opts.issuedBy) {
-      const hold = dr.issueLegalHold({ tenantId: opts.tenant, reason: opts.reason, issuedBy: opts.issuedBy }, process.cwd());
-      console.log(chalk.green(`Legal hold issued: ${hold.holdId}`));
-      return;
-    }
-    console.log(chalk.red("Use --issue with --tenant/--reason/--issued-by, --release <id>, or --list."));
+  .action(async (opts: import("./cli-legal-hold.js").LegalHoldCommandOptions) => {
+    const { runLegalHoldCommand } = await import("./cli-legal-hold.js");
+    await runLegalHoldCommand(opts, process.cwd());
   });
+// Preserve the frozen CLI line budget while the legal-hold handler lives in its own module.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 program
   .command("redaction-test")
@@ -20197,12 +20198,11 @@ shield
       const { resolveAgentResponder, AgentResponderUnavailableError } = await import(
         "./assurance/agentResponder.js"
       );
+      const { EgressBlocked } = await import("./residency/checkEgress.js");
       const { detectJailbreak } = await import("./redteam/jailbreak/detector.js");
       const rounds = parseInt(opts.rounds ?? "1", 10);
       const targetId = opts.target ?? "demo";
-
-      // Attack the real agent. This evaluator previously returned
-      // Math.random() < 0.2, so every reported success rate was noise.
+      // Use the real agent; the earlier random evaluator produced meaningless success rates.
       let attackResponder;
       try {
         attackResponder = await resolveAgentResponder({
@@ -20250,8 +20250,8 @@ shield
                   bypassConfidence: verdict.confidence,
                 };
               } catch (error) {
-                // A failed invocation is not a defended attack; report it as
-                // unsuccessful with zero confidence rather than a silent pass.
+                if (error instanceof EgressBlocked) throw error;
+                // Other invocation failures retain legacy reporting; reconciliation is separate.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
@@ -20266,6 +20266,7 @@ shield
           },
         ],
       });
+      rt.on("error", (event: { error: unknown }) => { throw event.error; });
       console.log(chalk.bold.red(`\n🔴  Red Team Campaign`));
       console.log(chalk.dim("Tip: For full red-team suite with strategies, use `amc redteam run`"));
       console.log(chalk.gray("Target:"), targetId);
@@ -22327,7 +22328,7 @@ score
       // collectEvidence({[agentId]: {collected: true}}), fabricating a single
       // artifact from a literal and labelling it OBSERVED.
       const { collectEvidenceFromLedger } = await import("./score/evidenceCollector.js");
-      const result = collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14));
+      const result = withWorkspaceScope(process.cwd(), () => collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14)));
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"), result, unverifiedClaim("score:evidenceCollector", result.artifacts.length), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Artifacts:"), result.artifacts.length);
@@ -22339,7 +22340,6 @@ score
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
-
 score
   .command("production-ready [agentId]")
   .description("Run production readiness gate for an agent")
@@ -22370,7 +22370,7 @@ score
   .action(async (agentId: string, opts: { window: string; domain?: string; json?: boolean }) => {
     try {
       const { scoreOperationalIndependence } = await import("./score/operationalIndependence.js");
-      const result = scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain });
+      const result = withWorkspaceScope(process.cwd(), () => scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain }));
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"), result, unverifiedClaim("score:operationalIndependence", result.telemetryConfidence > 0 ? 1 : 0), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Context:"), result.context);

@@ -144,3 +144,164 @@ Followed Claude's next coding recommendation and profile-path feedback. Three GP
 The source wires LLM runtime, native MCP HTTP, the bridge's gateway hop, callbacks and native network guards. It preserves MCP outcome uncertainty when a later recovery request is refused. Guard events and receipts use explicit workspace or asynchronous scope; legacy unscoped fallback is refused for active or unverifiable regulated profiles. Chain verification reads without migration and treats missing/unreadable stores as unverified. DUAL_WRITE and CUTOVER behavior remains unchanged.
 
 No tests, builds, typechecks, lint, runtime, evaluations, CI, PRs or qualification were run. The egress inventory deliberately separates deferred routes from exemptions. Gateway final-hop and direct ToolHub integration are released follow-ups; native DNS-awaiting transports, shell egress, other exporters, full entrypoint/reader scope wiring, legal holds and expert review remain open. The storage region is an operator declaration, not observation of the actual backend. No dependencies or protected signing/API/Studio/A4 files changed. Claude owns the NON_MATURITY_AUDIT_MODULES classification during integration. This remains partial and unqualified, never Done.
+
+## 2026-10-09 — P2-01 released final HTTP-hop follow-up
+
+Completed Claude's separately released final gateway HTTP and direct ToolHub executor hooks after slice 1 was integrated. Both gateway HTTP paths recheck the signed registry/profile before every attempt and before circuit-breaker accounting; local policy denials are terminal and map to sanitized 403 errors. Gateway source remains at its original line count. ToolHub and native callers pass trusted workspace values, and the shared executor checks before creating a socket. Residency denials use the existing DefiniteFailureError contract, preserving no-effect classification; other network errors retain their prior ambiguity.
+
+The shared scoped preflight reuses the original gate without changing its authority semantics. The updated inventory keeps CONNECT tunnels explicitly deferred and distinguishes the gateway's payload-free health probe. Native mount/pipeline/reader scope integration, other outbound channels, holds, expert approval and qualification remain open. Existing author history is preserved. No tests, executable checks, runtime, CI or PRs were run; this is partial, unqualified source.
+
+## 2026-10-09 — P2-01 released workspace-entrypoint scope slice
+
+After final HTTP-hop integration, Claude released four narrow source seams. The tool pipeline's complete asynchronous execution runs in its trusted workspace scope, preserving stage order and every existing return/failure path. Native session composition and later prompts/lifetime callbacks carry one captured absolute workspace. Native HTTP MCP discovery/mounting passes workspace at construction. Two CLI scoring callers install scope around their reads; command paths remain unchanged and the CLI keeps its line budget. D-15 source metadata found no unregistered freeze for these files.
+
+No tests/test edits, executable checks, build/typecheck/lint, runtime, evaluations, CI, PRs or qualification were performed. Other CLI/Studio/external assessment entrypoints, deferred egress and legal-hold work remain open. The existing handoff history is retained; current wave-2 A4/approval/API/Studio ownership stays untouched. This is partial, unqualified source.
+
+## 2026-10-09 — P2-01 legal-hold/deletion source slice
+
+Followed Claude's post-P1-56 release. Three Sol Ultra workers authored separate strict registry/gate, executor and compatibility components; root added the existing artifact signature's legal-hold kind and optional bounded snapshot reads. Existing callers retain their default reads, and no new signing kind, trust pin, dependency or CLI command was introduced. Owner initialization signs the actual register rather than creating an artificial hold. HEAD covers all records, identity and count; unknown never means clear, and valid legacy release evidence is preserved.
+
+Released delete edges share a synchronous writer lock and require acknowledged admission audit before effects. Retention separates payload groups by session, and current blob references participate in the check. Scoped and direct spill removal, guard pruning, caches and logs are gated. Direct spill APIs use conservative workspace-wide protection because the owner hash cannot prove complete shared-reference coverage; extra spill retention is deliberate. Other deletion paths and concurrent ledger-reference writes remain unqualified. Explicit workspace wrappers and the repair adapter propagate the registry's three outcomes. Guard pruning retains its existing best-effort zero contract.
+
+No real deletions, tests/test edits, executable checks, builds, typechecks, lint, runtime, evaluations, CI, PRs or qualification ran. The source inventory distinguishes gated, exempt and deferred routes. Current limits include POSIX writers, bounded row/snapshot sizes, no rollback checkpoint or automatic legacy repair, and no legal approval. Claude owns classification of DELETION_ALLOWED, DELETION_DENIED_HELD and DELETION_DENIED_HOLD_UNKNOWN from src/residency/deletionGate.ts through src/ops/audit.ts. Existing role history and all reserved A4/approval/API/Studio/ledger code remain intact. This is partial, unqualified source.
+
+## 2026-10-09 — P2-01 blob-reference transaction feedback
+
+Claude recommended using the existing immediate evidence-database transaction for retention's final reference check and unlink. Admission audit remains before that transaction because its helper uses a separate connection. Under the existing hold lock, a fresh ordered reference snapshot must match the admitted snapshot and remain eligible; changed references retain the blob and contribute no pruning count. Claude's follow-up also requires an explicit skipped outcome after the transaction, so admission is not mistaken for deletion. No ledger or transaction-helper edits were needed.
+
+This source change does not claim filesystem and SQL atomicity. External publication, uncoordinated import paths, rollback after unlink and concurrency qualification remain open. No tests/test edits, executable checks, runtime, evaluations, CI or PRs were run. The work follows Claude's suggested sequence and preserves its active A4/Studio files.
+
+## 2026-10-09 — P2-01 Doctor stale-cache deletion group
+
+Following Claude's recommendation to work deferred deletion routes in small groups, Doctor's stale-cache unlink now uses the trusted runDoctorFix workspace and a sessionless caches gate. Both existing catch layers propagate DeletionDenied to the existing FAILED action report rather than claiming the cache was empty. Dry-run and ordinary filesystem errors retain their previous behavior. Broken-symlink cleanup is still deferred; a later denial does not reverse earlier admitted removals.
+
+Only the existing stale-cache source seam, inventory metadata, guide, changeset and this appended note changed. No CLI, doctor rules, A4/Studio/approval/API/ledger edits, tests/test edits, executable checks, runtime, evaluations, CI or PRs. Source remains partial and unqualified.
+
+## 2026-10-09 — P2-01 released CONNECT residency
+
+Implemented Claude's separately released CONNECT route. A small standard-library helper validates and canonicalizes authority form, preserving default port 443 and bracketed IPv6 while refusing malformed/user-info/path/query forms. The gateway remains at 1,783 source lines. After trusted lease attribution and DNS/allowlist admission, a synchronous residency check runs before netConnect with captured workspace, unknown payload classes and a canonical authority/root locator. Only typed policy refusal becomes the fixed 403 response; unexpected errors retain existing containment.
+
+The locator does not establish TLS, HTTP path, payload classification or physical region. No new dependency, protected wave-2 edit, tests/test edits, executable checks, runtime, evaluations, CI or PRs. The source inventory now classifies this route as gated, preserving deferred routes and qualification limits. Claude's nine confirmed hold-slice corrections are a separate ongoing source change.
+
+## 2026-10-09 — P2-01 confirmed Claude source corrections
+
+Read Claude's confirmed findings and incorporated its c1eab14cc import-cycle/narrowing fix before editing the affected files. Three Sol Ultra workers authored separate registry, executor, gate and CLI-handler corrections. Legacy recovery preserves original bytes and uses an explicit signed owner acknowledgement without inventing original tenant metadata. Exact-buffer signatures and snapshot-derived HEAD publication remove the unchecked signing reread. The existing control journal pins the current HEAD outside the workspace; explicit initialization/rebinding never bypasses a failed checkpoint or count/digest/signature mismatch.
+
+Verified listing remains separate from admission, and compatibility reads reject unresolved raw legacy rows rather than claiming there are no holds. Complete session hashes remove target-name/count assumptions, while malformed target denials audit sanitized fields. Console pruning now touches only its two cache files. The existing legal-hold CLI exposes initialization, rebind and acknowledgement flags through a small extracted handler, preserving its command path and 24,430-line source budget.
+
+Claude must classify the new audit literals in src/residency/legalHoldRegistry.ts: LEGAL_HOLD_REGISTRY_INITIALIZED, LEGAL_HOLD_REGISTRY_REBOUND and LEGAL_HOLD_LEGACY_RELEASE_ACCEPTED. The prior deletionGate and retention classifications remain. No tests/test edits, builds, typechecks, lint, runtime, evaluations, CI or PRs ran on Codex's side. Physical checkpoint migration, same-uid checkpoint tampering, remaining egress/deletion routes and expert legal approval stay explicit. This remains partial, unqualified source.
+
+
+## 2026-10-09 — P2-01 publication and owner recovery corrections
+
+Continuing the existing unfinished P2-01 issue, followed Claude's confirmed HIGH and two MEDIUM source findings. Exact byte signatures are now prepared and verified before journal commitment; registry files publish only afterward. Owner initialization, under existing writer validation and lock, is the only path allowed to recover pending journal state. A forward HEAD repair uses a trusted anchor matching verified disk-row count, digest and compatible identity, with acknowledged LEGAL_HOLD_REGISTRY_HEAD_REPUBLISHED and no new journal append. Initialization reports unresolved legacy IDs and raw digests without printing their untrusted tenant/reason fields.
+
+The updated plan explicitly pauses Graphify and keeps qualification separate. All eight Low rows have owner, expert or dependency blockers; this continues the active correction before selecting another issue. No active A4/Studio/approval/API/ledger files changed. Claude owns integration and classification in the already-classified legalHoldRegistry module. Signing and normal pin failures leave registry artifacts unchanged; local I/O after journal commitment can still leave an unrecoverable incomplete record pair. Changed identity pairs, portable checkpoint migration, same-uid checkpoint tampering and shared-journal signer rotation remain explicit. No tests/test edits, builds, typechecks, lint, runtime, evaluations, CI, PRs or qualification ran on Codex's side. Status remains partial and unqualified.
+
+
+## 2026-10-09 — P0-41 canonical program-metrics source
+
+Read the complete updated plan, skipped eight Low rows with explicit owner/expert/dependency blockers, and asked Claude to reconcile a ready Medium coding contract. Claude confirmed P0-41 comes before further P2-01 egress groups and released the five new source/input assets; P0-54 had not created metrics.json. Following the P2-01 publication correction source handoff and integration on main f7bb67fc2, three Sol 6.1 Ultra workers handled source orientation, script authoring and canonical data extraction on disjoint files.
+
+The standalone script uses standard-library APIs and existing yaml. Its pure computeMetrics export consumes supplied records; CLI modes read registered local sources, and an npm query exists only behind explicit --online. No dependency, package script, AMC CLI path, src/ module or active A4/Studio file changed. Missing reports, jobs, registered result files and manual provenance remain not measured. Configured runner declarations cannot establish shell containment; structural closure references cannot establish receipt signatures or merged history. Source qualification stays separate from program counts.
+
+The current Plan has 15 exact metric rows, including A4, while older prose still says 14. Targets remain verbatim string proposals and targetColumn remains funded. The strategy's original 14 cells agree with the first 14 current rows. Claude supplied the remote canonical G1–G26 table from strategy revision 132; all 26 titles, severity, evidence and fix cells are preserved as historical findings, with all statuses open and closing fields null. The owner's provisional map was reconciled against named issue Plan refs, with additive references documented in the template. Other metric sources are null and manual entries empty. No measured results or gap closure was invented.
+
+No tests/test edits, script import/run, metrics check, measurement, builds, typechecks, lint, runtime, evaluations, CI, PRs or outward status post ran on Codex's side. Pending-checks records P2-35 qualification debt. The first Monday post and receipt/merge verification remain with the integrator. This is partial, unqualified source, not Done.
+
+
+## 2026-10-09 — P2-01 native web egress group
+
+After P0-41 source integration on main f402c81df, followed Claude's next lowest-ready recommendation to continue deferred egress groups. The shared native GET now snapshots trusted context/policy before DNS and checks residency synchronously before its pinned socket. Both native tools pass explicit workspace/agent and authorization-record resource facts; search captures them before provider execution. The existing signed origins, DNS pinning, fixed headers, caps, redirect refusal and SIMULATE behavior remain. Typed refusal is a native denial and is rethrown; an earlier search GET may already have dispatched, so no blanket definite-failure conversion was added.
+
+The egress inventory's one shared native socket row is now source-gated; all other statuses remain. No metric, frozen parent CLI, active A4/Studio, dependency or provider-selection edit. No tests/test edits, executable application checks, builds, typechecks, lint, runtime requests, measurements, evaluations, CI, PRs or qualification ran. Legacy direct-helper fallback, physical region/payload proof and remaining routes stay explicit. Claude's P0-41 source feedback arrived during this group and is queued for the next separate correction boundary; requested test fixtures stay deferred under Sid's coding-only rule.
+
+
+## 2026-10-09 — P0-41 confirmed source feedback
+
+After the separate native-web source handoff, addressed Claude's medium and five low findings in the program-metrics script and template. Claim-label file status cannot pass without a nonempty all-passed assertion list; observed failures dominate absent sibling files. Runner versions map to distinct configured OS families, unresolved matrix labels stay pending, and this declaration does not establish containment. The critical-gap display includes open IDs. CLI gap data and closure references come from committed HEAD, with declared SHA ancestry checked under bounded read-only Git calls; pure computation still consumes supplied data only.
+
+The template now cites canonical Ready-to-Deploy Plan document/tab/table IDs and the public artifact instead of a machine-specific attachment path. It documents full-history requirements and the remaining possibility of forged evidence using a real ancestor; neither receipt signatures nor merge approval are verified. All 26 gaps remain open, all 15 proposed targets stay unchanged and no measurements were authored. Requested test fixtures stay pending under Sid's no-test-edit instruction. No test, script import/mode/query, metrics check, build/typecheck/lint, runtime, evaluation, CI, PR or outward posting ran on Codex's side. Source is partial and unqualified; Claude owns integration and any corresponding issue-contract wording update.
+
+
+## 2026-10-09 — P2-01 responder egress group
+
+After P0-41 corrections integrated on main `16361774b` and Claude confirmed all six source findings fixed with no new confirmed findings, continued the next released egress group. The responder captures explicit workspace/caller attribution and endpoint before awaits, prepares a request and checks residency immediately before injected fetch. Direct POST uses provider and gateway POST/probe use bridge. Typed denial escapes both catches and cannot become ordinary unavailability or a direct fallback. Automatic redirects are refused; ordinary availability behavior and payload dialects remain.
+
+Parsed configs are not called cryptographically verified; opaque prompt/probe resource facts stay unknown. The injected transport contract, unpinned DNS, uncapped response bodies and timeout ending after headers remain explicit. This adds no audit literal, public API, dependency, CLI or protected wave-2 edit. Inventory now has 74 rows: 13 gated, 9 exempt, 52 deferred; qualified false. No scan, test/fixture edit, product check/build/typecheck/lint, import/runtime request, measurement, evaluation, CI, PR or qualification ran on Codex's side. Claude owns source integration/feedback.
+
+
+## 2026-10-09 — P2-01 confirmed responder corrections
+
+Claude's source review found a gateway probe locator mismatch and a CLI evaluator swallowing typed residency refusals. The probe and POST now reuse one full gateway endpoint, so a narrow path-prefix registration does not require a root-path grant. Any HTTP answer still establishes listener reachability; a denied full-route probe remains terminal. The expressly released CLI catch now rethrows EgressBlocked to its outer error handler instead of recording a defended attack. Two local comment/blank lines fund the import and guard; CLI remains 24,430 lines with identical command paths.
+
+ContinuousRedTeam and generic invocation-failure handling remain unchanged debt. Probe GETs can appear as unauthenticated gateway requests; a dedicated health destination is future explicit registration work. No other caller or protected wave-2 code changed. Inventory stays 74 rows: 13 gated, 9 exempt, 52 deferred, qualified false. No scan, test/fixture edit, product check/build/typecheck/lint, import/runtime request, measurement, evaluation, CI, PR or qualification ran. This is partial source; Claude owns integration/feedback.
+
+Finite source tracing also showed runAllTargets catches round errors and emits an error event. The CLI action adds a local forwarding listener so the original refusal reaches its outer handler without relying on Node's unhandled-event wrapper. One condensed local historical comment funds that line, keeping 24,430 lines. The shared ContinuousRedTeam module remains unchanged; no evaluation was run.
+
+
+## 2026-10-09 — P2-01 Industry Packs activation request
+
+After Claude confirmed both responder findings fixed and released this source seam, the existing activation POST now captures its scope separately from the persistence fallback. Unknown scope cannot become explicit cwd authority. Key, expiry, verification endpoint and injected transport are captured before awaits; a prepared manual-redirect request checks network-tool residency immediately before sending to that same endpoint. The existing request-free local-valid shortcut and license verifier are preserved. No pricing, plan, commercial-model or A4 behavior changed; D-06 remains undecided.
+
+License classes and purpose remain unknown. Injected transport behavior, unpinned DNS, uncapped/parsing-sensitive responses, environment changes in final entitlement evaluation and persistence failure after a dispatched request remain limits. No new audit literal, dependency, public API, CLI or protected wave-2 edit. Inventory now has 74 source rows: 14 gated, 9 exempt, 51 deferred; qualified false. No tests/test edits/fixtures, scans, product imports/requests/checks/build/typecheck/lint, measurements, evaluations, CI, PR or qualification ran. Source is partial and unqualified; Claude owns integration and source feedback.
+
+
+## 2026-10-09 — P2-01 drift-alert webhook
+
+After activation integration and Claude's explicit drift scope release, the private webhook receives dispatchAlert's captured workspace and agent attribution. URL, options and secret headers are prepared before a callback residency check immediately before native HTTP request construction. Unknown classes/purpose stay conservative; blank scope is not converted into cwd authority. Sequential channel behavior, signature helpers, secret values and public interfaces are preserved. D-15 archived the exact pre-edit baseline with the existing source authoring helper.
+
+A later denial can follow earlier channel effects. Monitor callers may suppress or stringify errors; no whole-operation no-effect or delivery-success claim is made. DNS pinning, timeouts, response caps and an atomic config/signature snapshot remain separate limits. Inventory now has 74 source rows: 15 gated, 9 exempt, 50 deferred; qualified false. No new audit literal, dependency, CLI or protected wave-2 edit. No tests/test edits/fixtures, scans, product imports/requests/checks/build/typecheck/lint, measurements, evaluations, CI, PR or qualification ran. Partial and unqualified source; Claude owns integration/feedback.
+
+Claude's activation source review confirmed one low finding: a manual 3xx response was parsed as JSON and could become Studio's misleading invalid-JSON error. This handoff also adds an explicit redirect error before parsing, preserving manual mode and no entitlement writes after a redirect. The dispatched POST remains a real effect. No other activation behavior or executable qualification changed.
+
+
+## 2026-10-09 — P2-01 benchmark registry transport and carriers
+
+Following drift integration and Claude's benchmark recommendation, two Sol 6.1 Ultra workers owned separate client and caller seams. The two physical GETs use captured workspace/endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. API/CLI browse carry trusted scope through the existing asynchronous helper; import snapshots explicit workspace/reference and API transparency workspace before awaits. Local registries, verification, pins, cache/temp/store sequence and public interfaces remain. The bare bench search wrapper adds no lines or command paths. Existing P0-09 archive registration is preserved.
+
+Unknown classes/purpose remain conservative; payload-free GETs gain no exemption. Concurrent index GETs and earlier retrieved data prevent a blanket no-effect claim. Browse integrity under a supplied key differs from pinned import admission. Global trust/environment timing, DNS, timeout/body caps and existing cache/temp behavior remain limits. Inventory74:17 gated,9 exempt,48 deferred; qualified false. No new audit literal, dependency, public API or protected wave-2 edit. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source; Claude owns integration and source feedback.
+
+
+## 2026-10-09 — P2-01 queued-webhook transport and refusal propagation
+
+Claude integrated the benchmark group and recommended/released the existing shared webhook and queue seams. Two Sol 6.1 Ultra workers owned separate transport and queue changes. The transport snapshots scope and request inputs, prepares native requests and checks callback residency immediately before native dispatch and each supplied-client invocation. The actual client method is captured before waits. The queue snapshots its trusted operation inputs, installs workspace scope and rethrows typed refusal before retry/round accounting; local blanks fund every added line within its 1055-line baseline. Public DTOs, state types, HMAC/header precedence/backoff/socket timeout and ordinary failure handling remain.
+
+ALS has no verified actor carrier; audit actor stays system/unknown, with unknown classes/purpose. A denied head remains PENDING and eligible on later drains, blocking ordered followers. Earlier attempts or callback failure after 2xx can have real effects; partial receipts/duplicate-delivery and durable policy-block accounting remain debt. Native HTTP follows no redirects, while supplied-client endpoints/secondary hops remain a trusted contract. DNS/default-agent/body caps are unchanged limits. Inventory74:18 gated,9 exempt,47 deferred; qualified false. No new audit literal, dependency, public API, CLI or protected wave-2 edit. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source; Claude owns integration/feedback.
+
+
+## 2026-10-09 — P2-01 confirmed webhook dispatcher correction
+
+Claude's source review confirmed that the queue's typed refusal escaped both dispatcher loops, skipping other channels and terminal finalization and falsely reporting FAILED despite saved PENDING rows. Following the expressly released correction, the existing locked shared processChannelQueue catches only EgressBlocked and returns no processed rows for that channel; unrelated errors still propagate. The queue and transport retain their typed rethrows. Existing finalization/status queries now continue, so pending is reported truthfully as queued without touching protected approvalDelivery or Studio. No public skip marker, return shape or state redesign was added.
+
+Per-tick rechecks/guard events, earlier rows/attempts, callback refusal after2xx, partial return-detail loss and duplicate delivery remain debt. Inventory74/18/9/47 and all source qualification flags remain unchanged. Plugin source4b2611538 is preserved on its held branch; this correction is integrated first, then plugin is rebased/reconfirmed. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source.
+
+
+## 2026-10-09 — P2-01 plugin registry transport and carriers
+
+Following queued-webhook integration and Claude's plugin recommendation, separate Sol 6.1 Ultra workers owned client and caller source. Private registry readers receive captured ALS and prepared manual-redirect GETs with final network-tool checks. Both public client DTOs keep their shape; API browse and install resolution provide captured explicit workspace through existing scope, and bare CLI search uses a net-zero wrapper. Client reference/pin/publisher/risk selections are snapshotted before waits. Install reuses captured workspace/agent/registry/action for existing approval and pending paths; approval helpers, verification/pin ordering, lock/cleanup and local reads remain. The P0-09 archive is preserved.
+
+No payload-free exemption or actor/class/purpose claim is introduced. Earlier downloads/temp effects, separate config verification/load, global trust timing, DNS/body/timeout and post-download approval/persistence/cleanup failure remain limits. Inventory74:20 gated,9 exempt,45 deferred; qualified false. CLI remains24430 with same command paths. No new audit literal, dependency, public API or protected A4/approval/src/api/Studio/ledger edit. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source; Claude owns integration/feedback.
+
+
+## 2026-10-09 — P2-01 confirmed plugin caller scope corrections
+
+Claude's source review found two known callers that reached the guarded plugin GETs without carrying their supplied workspace: the search API route and marketplace catalogue builder. The two expressly released call sites now use the existing workspace scope helper. Necessary imports and wrappers are the sole source changes; client guards, route bodies, trust/selection and marketplace catches remain. This covers the known router and CLI catalogue paths without expanding public DTOs or other protected API files. Source navigation and OPS wording now name those callers precisely; public library scope remains its conservative compatibility contract.
+
+The marketplace can still omit a refused remote registry under its existing catch; no complete catalogue or exported-success claim is made. Inventory74/20/9/45 remains partial and unqualified. No new audit literal, dependency, CLI/approval/Studio/ledger/index change or cleanup. No tests/test edits/fixtures, imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Actual telemetry remains design-only until this correction boundary is integrated.
+
+
+## 2026-10-09 — P2-01 internal observability export
+
+Following plugin caller integration and Claude's explicit telemetry release, two Sol 6.1 Ultra workers own disjoint exporter and private transport source. Records privately capture workspace plus native asynchronous snapshot; each flush groups by captured workspace, including absence. All dispatch strings are prepared before waits, and the transport checks network-tool residency inside that captured runner immediately before every prepared manual-redirect POST attempt. Typed denial returns the existing failed-request shape without retry. Public DTOs, OTLP/Jaeger wire formats and Zipkin's three-signal conversion remain. The transport extraction creates headroom inside the legacy exporter budget without a dependency or barrel change.
+
+Export counts include actual successful items once per workspace and original signal across targets; final target losses are counted once inside the shared flush. Preparation failure retains inputs. Disabled or targetless export intentionally discards with zero exported and no outage-count noise. Only the exporter's own TELEMETRY_DROPPED audit spans are excluded from export; their ledger rows remain. Bounded buffers, retries and discard behavior remain, with no requeue. The SDK ops exporter stays deferred as a library API with no AMC caller and a caller-owned destination.
+
+Unknown caller scope/resource facts, global-fetch behavior, DNS/response limits, global drop accounting and prior POST effects remain debt. Inventory74:21 gated,9 exempt,44 deferred; qualified false. No ledger/API/index/A4 edits, new audit literal/dependency/public field or cleanup. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source; Claude owns integration and source feedback.
+
+
+## 2026-10-09 — P2-01 confirmed observability loss corrections
+
+Claude confirmed that first dispatch could synchronously run a blocked-route audit on a recording ledger transaction's stack, self-blocking its second database connection and losing guard evidence. The exporter now yields after successful preparation and buffer clear, with retry settings captured first. Metric and incident timestamps are validated before buffering; queue and direct eval adapter catches count record failures without aborting core work. The shared trim path counts actual removed items while preserving the original slices. Drop accounting still lives once in shared flush; retained preparation failures are not mislabeled as lost.
+
+The confirmed caller-scope gap remains for a separately released net-zero ledger/JSONL/API/eval slice. Until then, the internal transport's inventory row is deferred rather than overstating ALS capture as complete caller coverage. Inventory74:20 gated,9 exempt,45 deferred; qualified false. No ledger/API/index/helper/A4 edits or dependencies, public fields or cleanup. No tests/test edits/fixtures, product imports/runtime/requests/checks/build/typecheck/lint, scans, measurements, evaluations, CI, PR or qualification ran. Partial/unqualified source; Claude owns integration/feedback.

@@ -26,9 +26,11 @@ export function evaluateApprovalQuorum(params: {
   request: ApprovalRequestRecord;
   decisions: ApprovalDecisionRecord[];
   policy: ApprovalPolicy;
+  /** The caller's clock, so a display and a progression check agree across the expiry boundary (A4, design §6.4). */
+  now?: number;
 }): QuorumState {
   const request = params.request;
-  const now = Date.now();
+  const now = params.now ?? Date.now();
   if (request.status === "CONSUMED") {
     return {
       status: "CONSUMED",

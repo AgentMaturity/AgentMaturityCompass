@@ -19,6 +19,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { sha256Hex } from "../../utils/hash.js";
 import { decryptSpillBytes, encryptSpillBytes, SPILL_ENVELOPE_OVERHEAD, SpillKeyUnavailableError, validateSpillEnvelope } from "./spillEncryption.js";
 import { formatSpillLocator, isSpillRef, parseSpillLocator, type SpillRef } from "./spillTypes.js";
+import { withDeletionGate } from "../../residency/deletionGate.js";
 
 const SESSION_DIR_MODE = 0o700;
 const OBJECT_FILE_MODE = 0o600;
@@ -204,10 +205,10 @@ export class SessionSpillStore {
   private readonly root: string;
 
   constructor(workspace: string, sessionId: string, root: string = spillRoot(workspace)) {
-    this.workspace = workspace;
+    this.workspace = resolve(workspace);
     this.sessionId = sessionId;
     this.sessionHash = sessionSpillDirName(sessionId).slice("session-".length);
-    this.root = root;
+    this.root = resolve(root);
   }
 
   /** Reads existing keys and encrypts in memory; creates no directories or files. */
@@ -258,8 +259,11 @@ export class SessionSpillStore {
       if (parseSpillLocator(`amc-spill:v1:${this.sessionHash}:${name}`) === null) throw new Error("invalid spill object name");
       stableObject(join(session, name));
     }
-    for (const name of names) removeObjectAtPath(join(session, name));
-    rmdirSync(session);
+    // The owner id alone cannot identify other sessions' references to these objects.
+    for (const name of names) withDeletionGate({ workspace: this.workspace, executor: "spill-store.purge-object",
+      target: { kind: "spills" } }, () => removeObjectAtPath(join(session, name)));
+    withDeletionGate({ workspace: this.workspace, executor: "spill-store.purge-directory",
+      target: { kind: "spills" } }, () => rmdirSync(session));
   }
 }
 
@@ -328,12 +332,15 @@ export function restoreSpillObject(workspace: string, ref: SpillRef, encoded: Bu
 
 /** Caller supplies an authenticated, explicitly selected reference for erasure. */
 export function removeSpillObject(workspace: string, ref: SpillRef, root: string = spillRoot(workspace)): "removed" | "missing" {
+  workspace = resolve(workspace);
+  root = resolve(root);
   if (!isSpillRef(ref)) throw new Error("erasure requires a valid spill reference");
   if (ref.locator === null) return "missing";
   if (!locatorMatches(ref)) throw new Error("erasure requires a valid spill reference");
   try {
     const path = checkedObjectPath(workspace, ref.locator, root, false);
-    removeObjectAtPath(path);
+    // Direct callers cannot prove complete shared-reference coverage from the locator's owning session hash.
+    withDeletionGate({ workspace, executor: "spill-store.remove-object", target: { kind: "spills" } }, () => removeObjectAtPath(path));
     return "removed";
   } catch (error) {
     if (isMissing(error)) return "missing";

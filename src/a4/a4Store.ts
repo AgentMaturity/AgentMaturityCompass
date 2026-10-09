@@ -15,8 +15,9 @@
  * keys: a local audit trail, not a portable verdict.
  */
 import { randomBytes } from "node:crypto";
+import { hostname } from "node:os";
 import type Database from "better-sqlite3";
-import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
@@ -28,6 +29,7 @@ import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/led
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
@@ -36,10 +38,11 @@ import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { resolveLedgerEvent } from "./a4Evidence.js";
-import { memberCandidates, principalPopulation } from "./a4Identity.js";
+import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
-  A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
-  a4TransitionRowSchema, deriveSelfApprovalAllowed, laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
+  A4_ENVELOPE_KINDS, A4_STAGE_STATES, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
+  a4RevisionRowSchema, a4TransitionRowSchema, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gatePolicyWeakenings,
+  laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
   type A4Member, type A4Principal, type A4ProjectRow, type A4RefKind, type A4ResourceDigests, type A4Stage, type A4TransitionKind,
   type A4TransitionRow, a4ResourceDigestsSchema
 } from "./a4Schema.js";
@@ -92,6 +95,10 @@ export interface A4ChangeSpec {
   readonly payload: Record<string, unknown>;
   readonly sideRows?: readonly A4SideRow[];
   readonly head?: Partial<A4HeadState>;
+  /** EFFECT_STARTED: the a4_effects liveness row inserted beside it (this process is its owner). */
+  readonly startEffect?: { readonly effectId: string; readonly gateId: string; readonly executionId: string; readonly approvalRequestId: string | null };
+  /** EFFECT_FINISHED / EFFECT_FAILED: the liveness row's state set in the same transaction. */
+  readonly settleEffect?: { readonly effectId: string; readonly state: "finished" | "failed" };
 }
 export interface A4RequestKey {
   readonly principalKey: string;
@@ -110,16 +117,19 @@ export interface A4TransitionOptions {
   readonly request?: A4RequestKey;
   /** P1-57's readiness, as the fullDigest of an evaluation on rows read here; evaluated before signing and again inside the tx. */
   readonly readiness?: (db: Database.Database, projectId: string) => string;
+  /** What the caller answers beside the transition (an attempt id, a minted agent id), stored so a replay answers it too. */
+  readonly response?: Readonly<Record<string, unknown>>;
 }
 export type A4TransitionResult =
   | { readonly replay: false; readonly projectId: string; readonly seq: number; readonly kind: A4TransitionKind; readonly bodyDigest: string;
       readonly evidenceEventId: string; readonly envelope: SignedDigest | null }
   | { readonly replay: true; readonly response: Record<string, unknown> };
-type Build = (ctx: { head: A4ProjectRow | null; seq: number; ts: number }) => A4ChangeSpec;
+/** One change, or several recorded in one transaction (each its own chained row, in order); `seq` is the first one's. */
+type Build = (ctx: { head: A4ProjectRow | null; seq: number; ts: number }) => A4ChangeSpec | readonly A4ChangeSpec[];
 type NewHead = Pick<A4ProjectRow, "project_id" | "workspace_id" | "agent_id" | "name" | "created_by_key">;
 
 const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256",
-  "headAfter", "sideRows"]);
+  "headAfter", "sideRows", "population"]);
 const COLUMN = /^[a-z][a-z0-9_]*$/;
 /** The minted id shape (`randomId("a4p")`); it names a lock file and a blob directory, so nothing else is accepted. */
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
@@ -174,12 +184,6 @@ export function collectLiveFacts(workspace: string, project: Pick<A4ProjectRow, 
   return { ...principalPopulation(workspace), hostedRouter: options.hostedRouter, ...refreshVolatileFacts(workspace, project) };
 }
 
-/** The in-force gate policy's digest: the latest GATE_POLICY_CHANGED payload, else the seq-0 CREATED's (design §4.4). */
-export function gatePolicyDigestOf(chain: readonly A4ChainLink[]): string | null {
-  const source = [...chain].sort((a, b) => b.seq - a.seq).find((link) => link.kind === "GATE_POLICY_CHANGED" || (link.kind === "CREATED" && link.seq === 0));
-  return source?.body.gatePolicy === undefined ? null : sha256Hex(canonicalize(source.body.gatePolicy));
-}
-
 export type A4Store = ReturnType<typeof createStore>;
 
 /** Opens the store on the workspace's evidence ledger. Refuses unsigned, non-durable and evaluated-agent processes. */
@@ -195,6 +199,9 @@ export function openA4Store(workspace: string): A4Store {
   }
   return createStore(workspace, ledger);
 }
+
+/** The store's readers and verifiers over a ledger opened elsewhere (read-only for `verifyA4Chain`); never for writes. */
+export const readA4Store = (ledger: Ledger): A4Store => createStore(ledger.workspace, ledger);
 
 function createStore(workspace: string, ledger: Ledger) {
   const db = ledger.db;
@@ -443,6 +450,31 @@ function createStore(workspace: string, ledger: Ledger) {
     }
   };
 
+  /** 403 unless `actor` holds live workspace roles and is a current project owner (design §5.2; defence in depth beside the router). */
+  const assertOwner = (projectId: string, actor: A4Actor): void => {
+    const parsed = /^(LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(actor.key);
+    const roles = parsed ? liveRolesFor(workspace, { authSource: parsed[1] as A4Principal["authSource"], userId: parsed[2]! }) : [];
+    try {
+      if (roles.length === 0) throw new Error("no live roles");
+      assertMember(membersOf(projectId), { ...actor, roles }, ["owner"]);
+    } catch {
+      throw new A4StoreError(403, "A4_NOT_A_MEMBER", "Only a current project owner can do this.");
+    }
+  };
+
+  /** GATE_POLICY_CHANGED: never below the D-16 defaults or the signed `a4` floor; loosening the policy in force needs owner mode and an owner. */
+  const assertGatePolicyChange = (projectId: string, actor: A4Actor, next: A4GatePolicyV1): void => {
+    const prev = gatePolicyOf(readChain(projectId));
+    const { policy, reason } = loadVerifiedApprovalPolicy(workspace);
+    if (policy === null) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify, so its a4 floor is unread: ${reason ?? "unknown"}`);
+    const below = gatePolicyFloorViolations(next, a4FloorFor(policy), prev);
+    if (below.length > 0) throw new A4StoreError(409, "GATE_POLICY_BELOW_FLOOR", below.join("; "), below);
+    if (gatePolicyWeakenings(prev, next).length > 0) {
+      assertOwnerMode(workspace, "a4 gate-policy");
+      assertOwner(projectId, actor);
+    }
+  };
+
   const commit = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
     assertProjectId(projectId);
     // The replay namespace is the actor's own: a request key naming anyone else would read or block their replays.
@@ -461,73 +493,95 @@ function createStore(workspace: string, ledger: Ledger) {
           throw new A4StoreError(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: head0?.head_seq ?? null });
         }
         // (a) Build and sign outside the ledger transaction: a notary round trip must never hold the ledger write lock.
+        // One commit may record several transitions (GATE_CONSUMED + EFFECT_STARTED), each its own chained, signed row.
         const ts = Date.now();
-        const seq = head0 === null ? 0 : head0.head_seq + 1;
-        const spec = build({ head: head0, seq, ts });
-        if ((spec.kind === "CREATED") !== (create !== null)) throw new Error("CREATED is a project's first transition and only that");
-        for (const key of Object.keys(spec.payload)) if (RESERVED_BODY_KEYS.has(key)) throw new Error(`A4 payload may not set ${key}`);
-        if ((spec.kind === "CREATED" || spec.kind === "GATE_POLICY_CHANGED") && !a4GatePolicyV1Schema.safeParse(spec.payload.gatePolicy).success) {
-          throw new A4StoreError(400, "INPUT_INVALID", "The gate policy is not an amc.a4-gate-policy/v1 document.");
-        }
-        const sideRows = spec.sideRows ?? [];
-        // The store is the completeness root: a row filed under another project would break both projects' counts for good.
-        for (const row of sideRows) if (row.values.project_id !== projectId) throw new Error(`A4 side row in ${row.table} names another project`);
-        const stage = spec.stage !== undefined ? spec.stage : head0?.stage ?? "aspire";
-        const revisionNo = spec.revisionNo ?? head0?.revision_no ?? 0;
+        const seq0 = head0 === null ? 0 : head0.head_seq + 1;
+        // Signed on every transition, so any write made while two or more principals were active ratchets self-approval (§5.3).
+        const population = populationFacts(workspace);
+        const specs = [build({ head: head0, seq: seq0, ts })].flat();
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
-        const prevDigest = head0?.head_digest ?? "GENESIS";
-        // head0 is the head verifyChain verified; the transaction checks it is unmoved and still signed (verifyIncremental).
-        const headAfter = headStateOf({ ...(head0 ?? NEW_HEAD), ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
-        const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
-          ts, prevDigest, readinessSha256, headAfter, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
-        const bytes = canonicalize(body);
-        const digest = sha256Hex(bytes);
-        const envelope = A4_ENVELOPE_KINDS.includes(spec.kind) ? signEnvelope(digest) : null;
+        let prevDigest = head0?.head_digest ?? "GENESIS";
+        let headState: A4HeadState = head0 ?? NEW_HEAD;
+        const entries = specs.map((spec, index) => {
+          if ((spec.kind === "CREATED") !== (create !== null && index === 0)) throw new Error("CREATED is a project's first transition and only that");
+          for (const key of Object.keys(spec.payload)) if (RESERVED_BODY_KEYS.has(key)) throw new Error(`A4 payload may not set ${key}`);
+          if ((spec.kind === "CREATED" || spec.kind === "GATE_POLICY_CHANGED") && !a4GatePolicyV1Schema.safeParse(spec.payload.gatePolicy).success) {
+            throw new A4StoreError(400, "INPUT_INVALID", "The gate policy is not an amc.a4-gate-policy/v1 document.");
+          }
+          if (spec.kind === "GATE_POLICY_CHANGED") assertGatePolicyChange(projectId, actor, a4GatePolicyV1Schema.parse(spec.payload.gatePolicy));
+          const sideRows = spec.sideRows ?? [];
+          // The store is the completeness root: a row filed under another project would break both projects' counts for good.
+          for (const row of sideRows) if (row.values.project_id !== projectId) throw new Error(`A4 side row in ${row.table} names another project`);
+          const seq = seq0 + index;
+          const stage = spec.stage !== undefined ? spec.stage : headState.stage;
+          const revisionNo = spec.revisionNo ?? headState.revision_no;
+          // head0 is the head verifyChain verified; the transaction checks it is unmoved and still signed (verifyIncremental).
+          headState = headStateOf({ ...headState, ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
+          const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
+            ts, prevDigest, readinessSha256, population, headAfter: headState, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
+          const bytes = canonicalize(body);
+          const digest = sha256Hex(bytes);
+          const entry = { spec, sideRows, seq, stage, revisionNo, prevDigest, bytes, digest, headAfter: headState,
+            envelope: A4_ENVELOPE_KINDS.includes(spec.kind) ? signEnvelope(digest) : null };
+          prevDigest = digest;
+          return entry;
+        });
+        const last = entries.at(-1);
+        if (last === undefined) throw new Error("a commit records at least one transition");
         const agentId = create?.agent_id ?? head0!.agent_id;
         try {
           return runImmediateTransaction(db, (): A4TransitionResult => {
             // (b) One transaction on rows read inside it.
-            const replayed = options.request ? dedupeRequest(options.request, projectId, create !== null, { projectId, seq, kind: spec.kind, bodyDigest: digest }, ts) : null;
+            const replayed = options.request
+              ? dedupeRequest(options.request, projectId, create !== null, { ...options.response, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest }, ts) : null;
             if (replayed) return replayed;
             const head = readHeadRow(projectId);
             if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
             if (head) verifyIncremental(projectId, head);
             if (options.readiness && options.readiness(db, projectId) !== readinessSha256) throw new HeadMoved();
-            const sessionId = `a4-${projectId}-${seq}`;
-            ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
-            let evidence: { id: string };
-            try {
-              evidence = ledger.appendEvidenceWithReceipt({
-                sessionId, runtime: "unknown", eventType: "audit", payload: bytes, inline: true,
-                // Key order is load-bearing for the row hash; these are human statements recorded by AMC, never observations.
-                meta: { source: "a4-store", trustTier: "SELF_REPORTED", auditType: "A4_STATE", a4Kind: spec.kind, projectId, seq, revisionNo, stage,
-                  claimKind: "self_reported", actorKey: actor.key, prevDigest },
-                receipt: { kind: "guard_check", agentId, providerId: A4_STORE_BINARY, model: null, bodySha256: digest }
-              });
-            } finally {
-              ledger.sealSession(sessionId);
+            let evidence: { id: string } | undefined;
+            for (const entry of entries) {
+              const { spec, seq, stage, revisionNo } = entry;
+              const sessionId = `a4-${projectId}-${seq}`;
+              ledger.startSession({ sessionId, runtime: "unknown", binaryPath: A4_STORE_BINARY, binarySha256: A4_STORE_BINARY });
+              try {
+                evidence = ledger.appendEvidenceWithReceipt({
+                  sessionId, runtime: "unknown", eventType: "audit", payload: entry.bytes, inline: true,
+                  // Key order is load-bearing for the row hash; these are human statements recorded by AMC, never observations.
+                  meta: { source: "a4-store", trustTier: "SELF_REPORTED", auditType: "A4_STATE", a4Kind: spec.kind, projectId, seq, revisionNo, stage,
+                    claimKind: "self_reported", actorKey: actor.key, prevDigest: entry.prevDigest },
+                  receipt: { kind: "guard_check", agentId, providerId: A4_STORE_BINARY, model: null, bodySha256: entry.digest }
+                });
+              } finally {
+                ledger.sealSession(sessionId);
+              }
+              if (create && seq === 0) {
+                db.prepare(`INSERT INTO a4_projects (project_id, workspace_id, agent_id, name, stage, step, hold, hold_reason, revision_no, head_seq,
+                    head_digest, created_by_key, created_ts, updated_ts) VALUES (?, ?, ?, ?, 'aspire', 'asked', 0, NULL, 0, 0, ?, ?, ?, ?)`)
+                  .run(create.project_id, create.workspace_id, create.agent_id, create.name, entry.digest, create.created_by_key, ts, ts);
+              }
+              db.prepare(`INSERT INTO a4_transitions (project_id, seq, kind, stage, revision_no, actor_key, actor_username, body_json, body_digest,
+                  prev_digest, readiness_sha256, envelope_json, evidence_event_id, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+                .run(projectId, seq, spec.kind, stage, revisionNo, actor.key, actor.username, entry.bytes, entry.digest, entry.prevDigest, readinessSha256,
+                  entry.envelope ? JSON.stringify(entry.envelope) : null, evidence.id, ts);
+              for (const row of entry.sideRows) {
+                const columns = [...Object.keys(row.values), "evidence_event_id"];
+                if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${row.table}`);
+                db.prepare(`INSERT INTO ${row.table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`).run(...Object.values(row.values), evidence.id);
+                // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
+                if (storedSideRowDigest(row) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
+              }
+              // The liveness index beside EFFECT_STARTED (design §6.5): the sweeper reads its owner; the chain stays the state.
+              const start = spec.startEffect;
+              if (start) db.prepare(`INSERT INTO a4_effects (effect_id, project_id, gate_id, execution_id, approval_request_id, owner_pid, owner_host, started_ts,
+                heartbeat_ts, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'running')`).run(start.effectId, projectId, start.gateId, start.executionId, start.approvalRequestId, process.pid, hostname(), ts, ts);
+              if (spec.settleEffect) db.prepare("UPDATE a4_effects SET state = ? WHERE effect_id = ? AND project_id = ?").run(spec.settleEffect.state, spec.settleEffect.effectId, projectId);
             }
-            if (create) {
-              db.prepare(`INSERT INTO a4_projects (project_id, workspace_id, agent_id, name, stage, step, hold, hold_reason, revision_no, head_seq,
-                  head_digest, created_by_key, created_ts, updated_ts) VALUES (?, ?, ?, ?, 'aspire', 'asked', 0, NULL, 0, 0, ?, ?, ?, ?)`)
-                .run(create.project_id, create.workspace_id, create.agent_id, create.name, digest, create.created_by_key, ts, ts);
-            }
-            db.prepare(`INSERT INTO a4_transitions (project_id, seq, kind, stage, revision_no, actor_key, actor_username, body_json, body_digest,
-                prev_digest, readiness_sha256, envelope_json, evidence_event_id, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-              .run(projectId, seq, spec.kind, stage, revisionNo, actor.key, actor.username, bytes, digest, prevDigest, readinessSha256,
-                envelope ? JSON.stringify(envelope) : null, evidence.id, ts);
-            for (const row of sideRows) {
-              const columns = [...Object.keys(row.values), "evidence_event_id"];
-              if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${row.table}`);
-              db.prepare(`INSERT INTO ${row.table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`).run(...Object.values(row.values), evidence.id);
-              // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
-              if (storedSideRowDigest(row) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
-            }
-            const patch = { ...headAfter, head_seq: seq, head_digest: digest, verified_seq: seq, verified_digest: digest, updated_ts: ts };
+            const patch = { ...last.headAfter, head_seq: last.seq, head_digest: last.digest, verified_seq: last.seq, verified_digest: last.digest, updated_ts: ts };
             db.prepare(`UPDATE a4_projects SET ${Object.keys(patch).map((column) => `${column} = @${column}`).join(", ")} WHERE project_id = @project_id`)
               .run({ ...patch, project_id: projectId });
             db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
-            return { replay: false, projectId, seq, kind: spec.kind, bodyDigest: digest, evidenceEventId: evidence.id, envelope };
+            return { replay: false, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest, evidenceEventId: evidence!.id, envelope: last.envelope };
           });
         } catch (error) {
           if (error instanceof HeadMoved) {
@@ -543,9 +597,10 @@ function createStore(workspace: string, ledger: Ledger) {
     } });
   };
 
-  const membersOf = (projectId: string): A4Member[] => {
+  /** The current members: the latest event per principal of the chain-named member rows. */
+  const membersFrom = (rows: readonly Record<string, Cell>[]): A4Member[] => {
     const latest = new Map<string, A4Member | null>();
-    for (const raw of namedSideRows(projectId, "a4_members")) {
+    for (const raw of rows) {
       const row = a4MemberRowSchema.parse(raw);
       latest.set(row.principal_key, row.event === "removed" ? null : {
         principalKey: row.principal_key, authSource: row.auth_source as A4Member["authSource"], userId: row.user_id, username: row.username,
@@ -554,6 +609,7 @@ function createStore(workspace: string, ledger: Ledger) {
     }
     return [...latest.values()].filter((member): member is A4Member => member !== null);
   };
+  const membersOf = (projectId: string): A4Member[] => membersFrom(namedSideRows(projectId, "a4_members"));
 
   const memberRow = (projectId: string, seq: number, ts: number, actor: A4Actor, event: "added" | "roles_changed" | "removed",
     member: Pick<A4Member, "principalKey" | "authSource" | "userId" | "username">, roles: readonly string[]): A4SideRow => ({
@@ -569,7 +625,24 @@ function createStore(workspace: string, ledger: Ledger) {
     readHead: (projectId: string): A4ProjectRow | null => verified(projectId).head,
     readChain,
     membersOf,
+    assertOwner,
     verifyChain,
+    /** Verified chain, chain-named side rows and members in one snapshot; a4_effects rows ride along unverified (liveness only, never state). */
+    snapshot: (projectId: string) => db.transaction(() => {
+      const { head, links } = verified(projectId);
+      if (head === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
+      const rows = Object.fromEntries((Object.keys(SIDE_TABLE_KEYS) as A4SideTable[]).map((table) => {
+        const { rows: named, mismatched } = matchSideTable(projectId, links, table);
+        if (mismatched.length > 0) throw integrityFailed(projectId, mismatched);
+        return [table, named];
+      })) as Record<A4SideTable, Record<string, Cell>[]>;
+      const effects = (db.prepare("SELECT * FROM a4_effects WHERE project_id = ?").all(projectId) as unknown[]).map((row) => a4EffectRowSchema.parse(row));
+      return { head, links: links as A4ChainLink[], rows, members: membersFrom(rows.a4_members), effects };
+    })(),
+    /** Running effects across projects, for the liveness sweeper. */
+    runningEffects: () => (db.prepare("SELECT * FROM a4_effects WHERE state = 'running'").all() as unknown[]).map((row) => a4EffectRowSchema.parse(row)),
+    /** The executor's 5 s heartbeat; only a running row moves. */
+    heartbeatEffect: (effectId: string): unknown => db.prepare("UPDATE a4_effects SET heartbeat_ts = ? WHERE effect_id = ? AND state = 'running'").run(Date.now(), effectId),
     verifyIncremental,
     transition: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, actor, build, options, null),
     readRevision: (projectId: string, revisionNo: number) => {
@@ -586,19 +659,22 @@ function createStore(workspace: string, ledger: Ledger) {
      * first owner. One active project per agent (partial unique index; checked first under the `a4-requests` lock so a
      * refusal leaves no key).
      */
-    createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey }): A4TransitionResult {
-      const policy = verifyApprovalPolicySignature(workspace);
-      if (!policy.signatureExists && policy.reason === "approval policy missing") {
-        throw new A4StoreError(409, "APPROVAL_POLICY_MISSING", "Run `amc policy approval init` before creating an A4 project.");
+    createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey;
+      profile?: { expertise: string; archetype: string | null } }): A4TransitionResult {
+      // A VIEWER, APPROVER or AUDITOR would otherwise become the owner of a project it may not build (live roles, not the caller's).
+      if (!liveRolesFor(workspace, input.actor).some((role) => role === "OPERATOR" || role === "OWNER")) {
+        throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", "Creating an A4 project needs a live OPERATOR or OWNER role.");
       }
-      if (!policy.valid) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${policy.reason ?? "unknown"}`);
+      const signed = loadVerifiedApprovalPolicy(workspace);
+      if (signed.verdict === "missing") throw new A4StoreError(409, "APPROVAL_POLICY_MISSING", "Run `amc policy approval init` before creating an A4 project.");
+      if (signed.policy === null) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${signed.reason ?? "unknown"}`);
       if (!/^[a-z0-9][a-z0-9_-]{0,127}$/.test(input.agentId)) throw new A4StoreError(400, "INPUT_INVALID", "Choose a valid agent ID.");
       if (input.name.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "Name the project.");
       const projectId = randomId("a4p");
       const population = principalPopulation(workspace);
       const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal: population.activeLocal, hostPrincipals: population.hostPrincipals,
         hostedRouter: input.hostedRouter, regulated: false, workspaceFloor: undefined, ratcheted: false, decidingPrincipal: input.actor });
-      const gatePolicy: A4GatePolicyV1 = DEFAULT_A4_GATE_POLICY;
+      const gatePolicy = defaultGatePolicyFor(a4FloorFor(signed.policy));
       let projectPublicKeySha256: string | null = null;
       return commit(projectId, input.actor, ({ seq, ts }) => {
         if (db.prepare("SELECT 1 FROM a4_projects WHERE agent_id = ? AND stage <> 'retired'").get(input.agentId)) {
@@ -612,13 +688,13 @@ function createStore(workspace: string, ledger: Ledger) {
         }
         return {
           kind: "CREATED", stage: "aspire", revisionNo: 0,
-          payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), projectPublicKeySha256,
+          payload: { ...input.profile, workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), projectPublicKeySha256,
             selfApprovalAllowed, selfApprovalFacts: { activeUserCount: population.activeLocal?.length ?? null, hostPrincipals: population.hostPrincipals,
               hostedRouter: input.hostedRouter, ratcheted: false, regulated: false, selfApprovalAllowed } },
           sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
             { principalKey: input.actor.key, authSource: input.actor.authSource, userId: input.actor.userId, username: input.actor.username }, ["owner"])]
         };
-      }, { request: input.request }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
+      }, { request: input.request, response: { agentId: input.agentId } }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
         created_by_key: input.actor.key });
     },
 
@@ -640,12 +716,14 @@ function createStore(workspace: string, ledger: Ledger) {
     /**
      * A membership event; refused when it would leave the project without an owner. The member's identity is read, never
      * taken from the caller: an add names an ACTIVE users.yaml user or a live host session (503 A4_IDENTITY_UNVERIFIED
-     * when it is not found and either source could not be read), a change or removal a current member. Authorization
-     * is the router's (P1-57).
+     * when it is not found and either source could not be read), a change or removal a current member. Only a current
+     * project owner on live roles may change membership (403), in owner mode; the router checks the route class too.
      */
     recordMember(projectId: string, input: { actor: A4Actor; event: "added" | "roles_changed" | "removed"; principalKey: string;
       roles: A4Member["roles"]; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
+      assertOwnerMode(workspace, "a4 members");
       return commit(projectId, input.actor, ({ seq, ts }) => {
+        assertOwner(projectId, input.actor);
         const members = membersOf(projectId);
         const { candidates, limited } = input.event === "added" ? memberCandidates(workspace, false) : { candidates: members, limited: false };
         const member = candidates.find((candidate) => candidate.principalKey === input.principalKey);
@@ -683,30 +761,35 @@ function createStore(workspace: string, ledger: Ledger) {
 
     /**
      * An EVIDENCE_REF transition. The lane is derived, never chosen: the writer names only the self-reported column. A
-     * ledger_event ref is resolved before anything is signed: a missing row is 409 EVIDENCE_REF_DANGLING, a row whose
-     * digests are not the ref's or whose signature or chain does not verify is 409 EVIDENCE_REF_UNVERIFIED, and the tier
-     * is the row's `effectiveTrustTier`, never its declared tier.
+     * ledger_event ref is resolved under the project lock, before anything is signed: a missing row is 409
+     * EVIDENCE_REF_DANGLING, a row whose digests are not the ref's or whose signature or chain does not verify is 409
+     * EVIDENCE_REF_UNVERIFIED, a row whose signed meta names another agent (or none) is 409 EVIDENCE_REF_FOREIGN_AGENT,
+     * and the tier is the row's `effectiveTrustTier`, never its declared tier.
      */
     addEvidenceRef(projectId: string, input: { actor: A4Actor; refKind: A4RefKind; refId: string; sha256: string; claimKind: ClaimKind;
-      method: string | null; label: string; column: "recommendation" | "implementation"; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
+      method: string | null; label: string; column: "recommendation" | "implementation"; expectedHeadSeq: number; request?: A4RequestKey;
+      /** Signed beside the ref, e.g. a hypothesis verdict (a human statement, self_reported); never a store field. */
+      note?: Record<string, unknown> }): A4TransitionResult {
       if (!/^[0-9a-f]{64}$/.test(input.sha256)) throw new A4StoreError(400, "INPUT_INVALID", "sha256 must be 64 lowercase hex characters.");
-      let trustTier: string | null = null;
-      if (input.refKind === "ledger_event") {
-        const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
-        if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
-        if (resolved.status !== "resolved" && resolved.status !== "payload_pruned") {
-          throw new A4StoreError(409, "EVIDENCE_REF_UNVERIFIED", `ledger row ${input.refId} does not match that sha256 or does not verify`);
+      return commit(projectId, input.actor, ({ head, seq, ts }) => {
+        let trustTier: string | null = null;
+        if (input.refKind === "ledger_event") {
+          const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
+          if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
+          if (resolved.status !== "resolved" && resolved.status !== "payload_pruned") throw new A4StoreError(409, "EVIDENCE_REF_UNVERIFIED", `ledger row ${input.refId} does not match that sha256 or does not verify`);
+          // The row's signed meta must name this project's agent: another agent's OBSERVED rows never fill this project's lanes.
+          const meta = eventMeta(ledger.getEventById(input.refId)!);
+          if ((meta.agentId ?? meta.agent_id) !== head!.agent_id) {
+            throw new A4StoreError(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${input.refId} is not a row of agent ${head!.agent_id}`);
+          }
+          trustTier = resolved.tier;
         }
-        trustTier = resolved.tier;
-      }
-      const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
-      return commit(projectId, input.actor, ({ head, seq, ts }) => ({
-        kind: "EVIDENCE_REF",
-        payload: { refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
-        sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage, lane: derived.lane,
-          ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: trustTier, method: input.method,
-          label: input.label, actor_key: input.actor.key, ts } }]
-      }), { expectedHeadSeq: input.expectedHeadSeq, request: input.request }, null);
+        const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
+        return { kind: "EVIDENCE_REF", payload: { ...input.note, refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
+          sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage, lane: derived.lane,
+            ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: trustTier, method: input.method,
+            label: input.label, actor_key: input.actor.key, ts } }] };
+      }, { expectedHeadSeq: input.expectedHeadSeq, request: input.request }, null);
     },
 
     /** Whether the chain ratchets single-user self-approval off (design §5.3). */

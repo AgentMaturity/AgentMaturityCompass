@@ -5,7 +5,7 @@ import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAn
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
-import { approvalPolicySchema, type ApprovalClassPolicy, type ApprovalPolicy } from "./approvalPolicySchema.js";
+import { approvalA4FloorSchema, approvalPolicySchema, type ApprovalA4Floor, type ApprovalClassPolicy, type ApprovalPolicy } from "./approvalPolicySchema.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 
 interface SignaturePayload {
@@ -205,6 +205,33 @@ export function verifyApprovalPolicySignature(workspace: string, explicitPath?: 
   }
 }
 
+/**
+ * The approval policy and its signature verdict from one read: the `.sig` is checked over exactly the bytes that are
+ * parsed, so a file swapped between a verify and a re-read lends no rules to a valid verdict (A4 Forge reads its floors
+ * and rules only through this). `policy` is null unless the verdict is valid, and a missing file is not the default
+ * policy here. A signed file that does not parse throws, as `loadApprovalPolicy` does.
+ */
+export function loadVerifiedApprovalPolicy(workspace: string): { policy: ApprovalPolicy | null; verdict: "valid" | "missing" | "unsigned"; reason: string | null } {
+  const path = approvalPolicyPath(workspace);
+  const unverified = (reason: string) => ({ policy: null, verdict: "unsigned" as const, reason });
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(path);
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "ENOENT" ? { policy: null, verdict: "missing", reason: "approval policy missing" } : unverified(String(error));
+  }
+  if (!pathExists(`${path}.sig`)) return unverified("approval policy signature missing");
+  try {
+    const sig = JSON.parse(readUtf8(`${path}.sig`)) as SignaturePayload;
+    const digest = sha256Hex(bytes);
+    if (digest !== sig.digestSha256) return unverified("digest mismatch");
+    if (!verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))) return unverified("signature verification failed");
+  } catch (error) {
+    return unverified(String(error));
+  }
+  return { policy: approvalPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown), verdict: "valid", reason: null };
+}
+
 export function evaluateApprovalRequestPolicy(input: {
   actionClass: ActionClass;
   policy: ApprovalPolicy;
@@ -314,4 +341,9 @@ export function evaluateApprovalRequestPolicy(input: {
 
 export function approvalRuleForAction(policy: ApprovalPolicy, actionClass: ActionClass): ApprovalClassPolicy {
   return policy.approvalPolicy.actionClasses[actionClass] ?? defaultApprovalPolicy().approvalPolicy.actionClasses[actionClass]!;
+}
+
+/** The signed policy's `a4` floor with its defaults filled in; a policy without the section reads as the defaults. */
+export function a4FloorFor(policy: ApprovalPolicy): ApprovalA4Floor {
+  return approvalA4FloorSchema.parse(policy.approvalPolicy.a4 ?? {});
 }

@@ -49,3 +49,36 @@ export interface CheckEgressInput {
   readonly purpose?: string | null;
   readonly agentId?: string;
 }
+
+export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches"] as const;
+export type DeletionTargetKind = typeof DELETION_TARGET_KINDS[number];
+export interface LegalHoldScopeV1 {
+  readonly tenantId: string;
+  /** Empty lists cover the whole tenant; sessionless deletion targets match every session scope. */
+  readonly workspaceIds: readonly string[];
+  readonly sessionIds: readonly string[];
+  readonly dataKinds: readonly DeletionTargetKind[];
+}
+/** Operator hold enforcement, never a legal approval or a statement about applicable law. */
+export interface LegalHoldV1 {
+  readonly schemaVersion: "amc.legal-hold/v1";
+  readonly holdId: string;
+  readonly scope: LegalHoldScopeV1;
+  readonly reason: string;
+  readonly issuedBy: string;
+  readonly issuedTs: number;
+  readonly expiresTs: number | null;
+  readonly active: boolean;
+  readonly releasedTs: number | null;
+  /** A signed override preserves, rather than rewrites, the verified legacy record. */
+  readonly legacyRecordSha256: string | null;
+}
+export type HoldVerdict =
+  | { readonly verdict: "clear"; readonly registryDigest: string; readonly holdsChecked: number; readonly warning?: "head_missing_unregulated" }
+  | { readonly verdict: "held"; readonly holdIds: readonly string[] }
+  | { readonly verdict: "unknown"; readonly reason: "registry_unreadable" | "record_corrupt" | "signature_invalid" | "head_missing" | "tenant_unmapped" };
+export interface DeletionRequest {
+  readonly workspace: string;
+  readonly executor: string;
+  readonly target: { readonly kind: DeletionTargetKind; readonly sessionIds?: readonly string[]; readonly sessionHashes?: readonly string[]; readonly before?: string };
+}

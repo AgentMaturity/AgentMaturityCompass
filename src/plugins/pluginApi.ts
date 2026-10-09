@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { copyFileSync, readFileSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { z } from "zod";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -223,17 +224,19 @@ export async function browsePluginRegistryForWorkspace(params: {
   registryFingerprint: string;
   plugins: Awaited<ReturnType<typeof browseRegistry>>["plugins"];
 }> {
-  const registries = loadSignedPluginRegistriesConfig(params.workspace);
+  const { workspace: explicitWorkspace, registryId, query } = params;
+  const workspace = typeof explicitWorkspace === "string" && explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const registries = loadSignedPluginRegistriesConfig(workspace);
   const entry = resolveRegistryConfigForWorkspace({
-    workspace: params.workspace,
+    workspace,
     registries,
-    registryId: params.registryId
+    registryId
   });
-  const browsed = await browseRegistry({
+  const browsed = await withWorkspaceScope(workspace, () => browseRegistry({
     registryBase: entry.base,
-    query: params.query,
+    query,
     trust: registryTrust(entry.pinnedRegistryPubkeyFingerprint)
-  });
+  }));
   return {
     registryId: browsed.registryId,
     registryFingerprint: browsed.registryFingerprint,
@@ -316,30 +319,32 @@ export async function requestPluginInstall(params: {
   version: string;
   riskCategory: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }> {
-  const action = params.action ?? "install";
-  const verify = verifyPluginWorkspace({ workspace: params.workspace });
+  const { workspace: explicitWorkspace, agentId, registryId, pluginRef, action: requestedAction } = params;
+  const workspace = typeof explicitWorkspace === "string" && explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const action = requestedAction ?? "install";
+  const verify = verifyPluginWorkspace({ workspace });
   if (!verify.registries.valid) {
     throw new Error(`plugin registries signature invalid: ${verify.registries.reason ?? "unknown"}`);
   }
-  const registries = loadPluginRegistriesConfig(params.workspace);
+  const registries = loadPluginRegistriesConfig(workspace);
   const registry = resolveRegistryConfigForWorkspace({
-    workspace: params.workspace,
+    workspace,
     registries,
-    registryId: params.registryId
+    registryId
   });
-  const resolved = await resolveRegistryPackage({
+  const resolved = await withWorkspaceScope(workspace, () => resolveRegistryPackage({
     registryBase: registry.base,
-    pluginRef: params.pluginRef,
+    pluginRef,
     pinnedRegistryPubkeyFingerprint: registry.pinnedRegistryPubkeyFingerprint,
     allowPluginPublishers: registry.allowPluginPublishers,
     allowRiskCategories: registry.allowRiskCategories
-  });
+  }));
   const requestId = `plreq_${randomUUID().replace(/-/g, "")}`;
   try {
     const intentId = `plugin-${action}-${requestId}`;
     const approval = createApprovalForIntent({
-      workspace: params.workspace,
-      agentId: params.agentId,
+      workspace,
+      agentId,
       intentId,
       toolName: `plugin.${action}`,
       actionClass: "SECURITY",
@@ -350,7 +355,7 @@ export async function requestPluginInstall(params: {
       intentPayload: {
         requestId,
         action,
-        registryId: params.registryId,
+        registryId,
         registryFingerprint: resolved.registryFingerprint,
         pluginId: resolved.pluginId,
         version: resolved.version,
@@ -370,8 +375,8 @@ export async function requestPluginInstall(params: {
       requestId,
       approvalRequestId: approval.approval.approvalRequestId,
       intentId,
-      agentId: params.agentId,
-      registryId: params.registryId,
+      agentId,
+      registryId,
       registryFingerprint: resolved.registryFingerprint,
       pluginId: resolved.pluginId,
       version: resolved.version,
@@ -380,8 +385,8 @@ export async function requestPluginInstall(params: {
       riskCategory: resolved.riskCategory,
       createdTs: Date.now()
     });
-    savePendingAction(params.workspace, pending);
-    copyFileSync(resolved.packagePath, pendingPackagePath(params.workspace, approval.approval.approvalRequestId));
+    savePendingAction(workspace, pending);
+    copyFileSync(resolved.packagePath, pendingPackagePath(workspace, approval.approval.approvalRequestId));
     return {
       requestId,
       approvalRequestId: approval.approval.approvalRequestId,

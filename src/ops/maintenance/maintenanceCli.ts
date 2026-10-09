@@ -41,6 +41,7 @@ export function maintenanceRotateLogsCli(workspace: string): ReturnType<typeof r
   }
   const policy = loadOpsPolicy(workspace);
   const result = rotateLogs({
+    workspace,
     logDir: join(workspace, ".amc", "studio", "logs"),
     maxDays: policy.opsPolicy.maintenance.rotateLogsDays,
     maxFileMb: policy.opsPolicy.maintenance.maxLogFileMb
@@ -68,4 +69,3 @@ export function maintenancePruneCacheCli(workspace: string): ReturnType<typeof p
     pruneTransformSnapshotsDays: policy.opsPolicy.maintenance.pruneTransformSnapshotsDays
   });
 }
-

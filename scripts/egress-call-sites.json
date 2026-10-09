@@ -35,36 +35,36 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/assurance/agentResponder.ts:353:1",
+      "siteId": "src/assurance/agentResponder.ts:378:1",
       "path": "src/assurance/agentResponder.ts",
-      "line": 353,
+      "line": 378,
       "call": "fetchImpl(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Injected responder POST receives captured explicit workspace and caller attribution; prepared request checks provider/bridge residency immediately before fetchImpl with manual redirects. Opaque prompts carry null resource facts; parsed configs do not establish verified identity. Typed refusals propagate unchanged. Source-only; trusted injected transport, DNS, uncapped body and header-timeout limits remain."
     },
     {
-      "siteId": "src/assurance/agentResponder.ts:413:1",
+      "siteId": "src/assurance/agentResponder.ts:436:1",
       "path": "src/assurance/agentResponder.ts",
-      "line": 413,
+      "line": 436,
       "call": "fetchImpl(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Gateway reachability GET checks and fetches the same full gateway POST endpoint with captured explicit workspace and bridge residency. Restrictive path prefixes need no root-path widening. Typed EgressBlocked escapes availability handling, so denial cannot trigger direct-provider fallback. Ordinary listener failures retain the existing fallback. Source-only; no synthetic/public classification or no-send proof for a multi-request scan."
     },
     {
-      "siteId": "src/bench/benchRegistryClient.ts:23:1",
+      "siteId": "src/bench/benchRegistryClient.ts:27:1",
       "path": "src/bench/benchRegistryClient.ts",
-      "line": 23,
+      "line": 27,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Benchmark registry GET uses captured private workspace scope and endpoint, prepared manual-redirect options, and network-tool residency immediately before fetch. API/CLI browse install explicit ALS scope; import passes captured explicit workspace and snapshots request/persistence inputs. Resource classes/purpose stay unknown; no payload-free exemption. Source-only; concurrent/prior requests, self-key browse integrity versus pinned import, global trust/environment timing, DNS, body/timeout and cache/temp limits remain."
     },
     {
-      "siteId": "src/bench/benchRegistryClient.ts:38:1",
+      "siteId": "src/bench/benchRegistryClient.ts:44:1",
       "path": "src/bench/benchRegistryClient.ts",
-      "line": 38,
+      "line": 44,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Benchmark registry GET uses captured private workspace scope and endpoint, prepared manual-redirect options, and network-tool residency immediately before fetch. API/CLI browse install explicit ALS scope; import passes captured explicit workspace and snapshots request/persistence inputs. Resource classes/purpose stay unknown; no payload-free exemption. Source-only; concurrent/prior requests, self-key browse integrity versus pinned import, global trust/environment timing, DNS, body/timeout and cache/temp limits remain."
     },
     {
       "siteId": "src/bootstrap/bootstrap.ts:208:1",
@@ -80,7 +80,7 @@
       "line": 283,
       "call": "residencyFetch(",
       "status": "gated",
-      "reason": "residencyFetch checks the immediate gateway hop; the gateway final upstream hop is separately deferred."
+      "reason": "residencyFetch checks the immediate gateway hop; final gateway HTTP and CONNECT hops have separate gated rows."
     },
     {
       "siteId": "src/cli-eval-dataset-commands.ts:188:1",
@@ -123,17 +123,17 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli.ts:841:1",
+      "siteId": "src/cli.ts:842:1",
       "path": "src/cli.ts",
-      "line": 841,
+      "line": 842,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli.ts:870:1",
+      "siteId": "src/cli.ts:871:1",
       "path": "src/cli.ts",
-      "line": 870,
+      "line": 871,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
@@ -179,20 +179,20 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/domains/industryPackEntitlement.ts:475:1",
+      "siteId": "src/domains/industryPackEntitlement.ts:489:1",
       "path": "src/domains/industryPackEntitlement.ts",
-      "line": 475,
+      "line": 489,
       "call": "fetcher(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Online activation POST uses captured explicit-or-ALS scope, kept separate from the persistence cwd fallback, and checks network-tool residency immediately before same-endpoint injected fetch with manual redirects. Key and expiry are captured; license classes/purpose remain unknown. Local-valid shortcut and verifier are unchanged. Source-only; trusted injected fetch, DNS, response parsing/caps, environment drift and post-dispatch persistence limits remain."
     },
     {
-      "siteId": "src/drift/alerts.ts:205:1",
+      "siteId": "src/drift/alerts.ts:215:1",
       "path": "src/drift/alerts.ts",
-      "line": 205,
+      "line": 215,
       "call": "requestImpl(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Private drift webhook receives captured explicit workspace and agent from dispatchAlert; prepared URL/options/secret headers are checked as callback immediately before requestImpl. Classes/purpose remain unknown. Native HTTP does not follow redirects; typed refusal rejects unchanged. Source-only; prior channel sends, monitor error suppression, unpinned DNS, no timeout/body cap and separate config/signature reads remain limits."
     },
     {
       "siteId": "src/e2e/smoke.ts:168:1",
@@ -259,20 +259,28 @@
       "reason": "Generated policy-export source text, not executed by AMC here; generated application needs its own deployment controls."
     },
     {
-      "siteId": "src/gateway/server.ts:265:1",
+      "siteId": "src/gateway/server.ts:259:1",
       "path": "src/gateway/server.ts",
-      "line": 265,
+      "line": 259,
       "call": "impl(",
-      "status": "deferred",
-      "reason": "Final provider hop and health probe are not residency-gated in this slice. Claude released a separate net-zero integration follow-up after P1-66."
+      "status": "gated",
+      "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
+    },
+    {
+      "siteId": "src/gateway/server.ts:1014:1",
+      "path": "src/gateway/server.ts",
+      "line": 1014,
+      "call": "netConnect(",
+      "status": "gated",
+      "reason": "Strict CONNECT authority parsing supplies the actual socket host and port and an HTTPS root registry locator. After DNS and allowlist admission, a final synchronous checkEgress precedes netConnect using the trusted gateway workspace, lease-verified agent, network-tool channel and explicit unknown data classes. Typed residency refusal returns before socket creation. This seam does not prove TLS, an encrypted request path or payload classification, or physical region."
     },
     {
       "siteId": "src/gateway/server.ts:1760:1",
       "path": "src/gateway/server.ts",
       "line": 1760,
       "call": "httpRequest(",
-      "status": "deferred",
-      "reason": "Final provider hop and health probe are not residency-gated in this slice. Claude released a separate net-zero integration follow-up after P1-66."
+      "status": "exempt",
+      "reason": "gatewayStatus probes the gateway health endpoint with a GET and no protected agent body or credentials; final provider requests are separate gated rows."
     },
     {
       "siteId": "src/identity/oidc/jwtVerify.ts:59:1",
@@ -291,12 +299,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/integrations/webhookDelivery.ts:224:1",
+      "siteId": "src/integrations/webhookDelivery.ts:241:1",
       "path": "src/integrations/webhookDelivery.ts",
-      "line": 224,
-      "call": "requestImpl(url)(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "line": 241,
+      "call": "request(",
+      "status": "gated",
+      "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. Shared dispatcher isolates only that typed refusal to its channel, letting other drains/finalization and truthful queued status continue. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
     },
     {
       "siteId": "src/lighthouse/finance/paymentServiceClient.ts:108:1",
@@ -355,12 +363,12 @@
       "reason": "OAuth discovery/token requests use pinned network policy; identity-region applicability and trusted workspace scope need integration."
     },
     {
-      "siteId": "src/observability/otelExporter.ts:523:1",
-      "path": "src/observability/otelExporter.ts",
-      "line": 523,
+      "siteId": "src/observability/otelExportTransport.ts:75:1",
+      "path": "src/observability/otelExportTransport.ts",
+      "line": 75,
       "call": "fetch(",
       "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "reason": "Internal POST has a record-time context gate before every manual-redirect attempt, but known ledger, JSONL store, score API and eval callers still omit their owning workspace. They can inherit unregulated cwd behavior rather than their workspace rules; this row is deferred pending the expressly released caller-scope correction. Guard existence is not full coverage. Explicit null resource facts, bounded retries and existing failed-result handling remain. Source-only; prior POST effects, missing external caller scope, global-fetch/DNS/response limits and caller-owned SDK egress remain unresolved."
     },
     {
       "siteId": "src/ops/otelExporter.ts:327:1",
@@ -368,7 +376,7 @@
       "line": 327,
       "call": "fetch(",
       "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "reason": "Deferred: library API, no AMC caller, caller-owned destination. Revisit with SDK integration; neither exempt nor covered by the internal observability exporter gate. Trusted workspace, payload facts, secondary transport behavior and destination applicability remain unresolved."
     },
     {
       "siteId": "src/packs/packCli.ts:293:1",
@@ -379,20 +387,20 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/plugins/pluginRegistryClient.ts:61:1",
+      "siteId": "src/plugins/pluginRegistryClient.ts:65:1",
       "path": "src/plugins/pluginRegistryClient.ts",
-      "line": 61,
+      "line": 65,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. Known AMC callers carry scope through pluginApi browse/install, CLI search, POST /api/v1/plugins/search and marketplace buildCatalog; public library calls retain conservative unscoped behavior. No DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
-      "siteId": "src/plugins/pluginRegistryClient.ts:77:1",
+      "siteId": "src/plugins/pluginRegistryClient.ts:83:1",
       "path": "src/plugins/pluginRegistryClient.ts",
-      "line": 77,
+      "line": 83,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. Known AMC callers carry scope through pluginApi browse/install, CLI search, POST /api/v1/plugins/search and marketplace buildCatalog; public library calls retain conservative unscoped behavior. No DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
       "siteId": "src/product/apiWrapperGenerator.ts:332:1",
@@ -411,9 +419,9 @@
       "reason": "residencyFetch checks each attempt using captured trusted workspace or ALS scope."
     },
     {
-      "siteId": "src/residency/checkEgress.ts:115:1",
+      "siteId": "src/residency/checkEgress.ts:120:1",
       "path": "src/residency/checkEgress.ts",
-      "line": 115,
+      "line": 120,
       "call": "fetch(",
       "status": "gated",
       "reason": "The helper checks the selected workspace registry/profile before native fetch; redirects do not forward automatically."
@@ -539,25 +547,25 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/toolhub/toolhubExecutors/http.ts:45:1",
+      "siteId": "src/toolhub/toolhubExecutors/http.ts:56:1",
       "path": "src/toolhub/toolhubExecutors/http.ts",
-      "line": 45,
+      "line": 56,
       "call": "reqImpl(",
-      "status": "deferred",
-      "reason": "Direct ToolHub dispatch bypasses the native pipeline residency guard. Released executor follow-up is required."
+      "status": "gated",
+      "reason": "The executor checks trusted workspace or ALS scope before socket construction; both AMC callers supply workspace. Preflight denials are definite failures, not unknown effects."
     },
     {
-      "siteId": "src/tools/builtin/nativeToolBreadth/governedFetch.ts:144:1",
+      "siteId": "src/tools/builtin/nativeToolBreadth/governedFetch.ts:152:1",
       "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
-      "line": 144,
+      "line": 152,
       "call": "send(",
-      "status": "deferred",
-      "reason": "Native pipeline guard checks residency before body dispatch, but this DNS-awaiting transport needs a final-hop recheck and direct-call review."
+      "status": "gated",
+      "reason": "Native web_fetch and each web_search GET carry captured execution workspace/agent and authorization resource facts. checkScopedEgress rechecks after DNS/allowlist admission immediately before the pinned socket. Existing no-redirect, fixed-header and byte-cap constraints remain. Legacy direct-helper scope follows the conservative scoped fallback; a search refusal can follow earlier dispatched GETs, so composition uncertainty is retained. Source-only, not physical-region or legal approval evidence."
     },
     {
-      "siteId": "src/trust/trustConfig.ts:192:1",
+      "siteId": "src/trust/trustConfig.ts:193:1",
       "path": "src/trust/trustConfig.ts",
-      "line": 192,
+      "line": 193,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."

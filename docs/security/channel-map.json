@@ -194,7 +194,9 @@
         { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeAllowedBrowserOrigins" },
         { "path": "src/studio/nativeAdmission.ts", "symbol": "isNativeStudioPath" },
         { "path": "src/studio/nativeAdmission.ts", "symbol": "assertNativeBrowserAdmission" },
-        { "path": "src/a4/a4Identity.ts", "symbol": "resolveA4Principal" }
+        { "path": "src/a4/a4Identity.ts", "symbol": "resolveA4Principal" },
+        { "path": "src/a4/a4Router.ts", "symbol": "a4PreviewEnabled" },
+        { "path": "src/a4/a4Router.ts", "symbol": "handleA4Route" }
       ],
       "evidence": "Native task events",
       "status": "enforced",

@@ -5,20 +5,23 @@ import { verifyExternalEvidence, type ExternalEvidenceAuthority } from "./extern
 /** Reads a regular file of at most `limit` bytes without following a final symlink. */
 export function boundedFile(path: string, limit: number): Buffer {
   const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
-  try {
-    const before = fstatSync(fd);
-    if (!before.isFile() || before.size > limit) throw new Error("Evidence input must be a bounded regular file");
-    const buffer = Buffer.alloc(before.size + 1);
-    let count = 0;
-    while (count < buffer.length) {
-      const read = readSync(fd, buffer, count, buffer.length - count, null);
-      if (read === 0) break;
-      count += read;
-    }
-    if (count !== before.size || fstatSync(fd).size !== before.size)
-      throw new Error("Evidence input changed while being read");
-    return buffer.subarray(0, count);
-  } finally { closeSync(fd); }
+  try { return boundedRead(fd, limit); } finally { closeSync(fd); }
+}
+
+/** Reads the whole regular file open on `fd`, of at most `limit` bytes; throws if it grows or shrinks while read. */
+export function boundedRead(fd: number, limit: number): Buffer {
+  const before = fstatSync(fd);
+  if (!before.isFile() || before.size > limit) throw new Error("Evidence input must be a bounded regular file");
+  const buffer = Buffer.alloc(before.size + 1);
+  let count = 0;
+  while (count < buffer.length) {
+    const read = readSync(fd, buffer, count, buffer.length - count, null);
+    if (read === 0) break;
+    count += read;
+  }
+  if (count !== before.size || fstatSync(fd).size !== before.size)
+    throw new Error("Evidence input changed while being read");
+  return buffer.subarray(0, count);
 }
 
 /**

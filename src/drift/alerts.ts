@@ -2,11 +2,12 @@ import { randomBytes } from "node:crypto";
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -198,20 +199,22 @@ export interface AlertPayload {
   };
 }
 
-async function postWebhook(url: string, body: string, secret: string): Promise<void> {
+async function postWebhook(workspace: string, agentId: string, url: string, body: string, secret: string): Promise<void> {
   const parsed = new URL(url);
   const requestImpl = parsed.protocol === "https:" ? httpsRequest : httpRequest;
+  const options = {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "content-length": Buffer.byteLength(body),
+      "x-amc-alert-secret": secret
+    }
+  };
   await new Promise<void>((resolvePromise, rejectPromise) => {
+    checkScopedEgress(workspace, "callback", parsed.href, { agentId, dataClasses: null, purpose: null });
     const req = requestImpl(
       parsed,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "content-length": Buffer.byteLength(body),
-          "x-amc-alert-secret": secret
-        }
-      },
+      options,
       (res) => {
         const status = res.statusCode ?? 500;
         if (status >= 200 && status < 300) {
@@ -228,18 +231,20 @@ async function postWebhook(url: string, body: string, secret: string): Promise<v
 }
 
 export async function dispatchAlert(workspace: string, payload: AlertPayload): Promise<void> {
-  const config = loadAlertsConfig(workspace);
-  const verify = verifyAlertsConfigSignature(workspace);
+  const capturedWorkspace = workspace.trim() ? resolve(workspace) : workspace;
+  const agentId = payload.agentId;
+  const config = loadAlertsConfig(capturedWorkspace);
+  const verify = verifyAlertsConfigSignature(capturedWorkspace);
   if (!verify.valid) {
     throw new Error(`alerts config signature invalid: ${verify.reason ?? "unknown"}`);
   }
   const body = JSON.stringify(payload);
   for (const channel of config.alerts.channels) {
-    const secret = getVaultSecret(workspace, secretKeyFromRef(channel.secretRef));
+    const secret = getVaultSecret(capturedWorkspace, secretKeyFromRef(channel.secretRef));
     if (!secret) {
       throw new Error(`missing vault secret for channel ${channel.name}`);
     }
-    await postWebhook(channel.url, body, secret);
+    await postWebhook(capturedWorkspace, agentId, channel.url, body, secret);
   }
 }
 

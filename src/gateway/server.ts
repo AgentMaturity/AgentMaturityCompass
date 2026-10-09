@@ -9,7 +9,7 @@ import {
 } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { connect as netConnect, isIP, type LookupFunction } from "node:net";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import type { Duplex } from "node:stream";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
@@ -34,7 +34,8 @@ import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
-
+import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
+import { parseConnectAuthority } from "./connectResidency.js";
 export interface StartGatewayOptions {
   workspace: string;
   workspaceId?: string;
@@ -52,7 +53,6 @@ export interface StartGatewayOptions {
    */
   credentials?: CredentialsService;
 }
-
 export interface GatewayHandle {
   gatewaySessionId: string;
   host: string;
@@ -64,14 +64,12 @@ export interface GatewayHandle {
   proxyPort: number | null;
   close: () => Promise<void>;
 }
-
 interface ParsedJsonInfo {
   model?: string;
   usage?: Record<string, unknown>;
   requestKind?: string;
   hasToolCalls?: boolean;
 }
-
 function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | string[] | undefined> {
   const out = Object.create(null) as Record<string, string | string[] | undefined>;
   for (const [key, value] of Object.entries(headers)) {
@@ -79,13 +77,11 @@ function toHeaderObject(headers: IncomingHttpHeaders): Record<string, string | s
   }
   return out;
 }
-
 function selectRoute(pathname: string, config: GatewayConfig): GatewayConfig["routes"][number] | null {
   const sorted = [...config.routes].sort((a, b) => b.prefix.length - a.prefix.length);
   // Match on a path-segment boundary: "/dsh" serves "/dsh" and "/dsh/...", never "/dsh2".
   return sorted.find((route) => pathname === route.prefix || pathname.startsWith(route.prefix.endsWith("/") ? route.prefix : `${route.prefix}/`)) ?? null;
 }
-
 function joinPath(basePathname: string, forwardedPathname: string): string {
   const left = basePathname.endsWith("/") ? basePathname.slice(0, -1) : basePathname;
   const right = forwardedPathname.startsWith("/") ? forwardedPathname : `/${forwardedPathname}`;
@@ -97,7 +93,6 @@ function joinPath(basePathname: string, forwardedPathname: string): string {
   }
   return `${left}${right}`;
 }
-
 async function readAll(stream: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of stream) {
@@ -105,7 +100,6 @@ async function readAll(stream: IncomingMessage): Promise<Buffer> {
   }
   return Buffer.concat(chunks);
 }
-
 function routePath(pathname: string, route: GatewayConfig["routes"][number]): string {
   if (!route.stripPrefix) {
     return pathname;
@@ -116,7 +110,6 @@ function routePath(pathname: string, route: GatewayConfig["routes"][number]): st
   }
   return stripped.startsWith("/") ? stripped : `/${stripped}`;
 }
-
 function normalizeResponseHeaders(headers: IncomingHttpHeaders): Record<string, string> {
   const out = Object.create(null) as Record<string, string>;
   for (const [key, value] of Object.entries(headers)) {
@@ -127,7 +120,6 @@ function normalizeResponseHeaders(headers: IncomingHttpHeaders): Record<string, 
   }
   return out;
 }
-
 interface GatewayResilienceConfig {
   upstreamTimeoutMs: number;
   upstreamMaxRetries: number;
@@ -135,12 +127,10 @@ interface GatewayResilienceConfig {
   retryNonIdempotent: boolean;
   proxyConnectTimeoutMs: number;
 }
-
 const DEFAULT_UPSTREAM_TIMEOUT_MS = 30_000;
 const DEFAULT_UPSTREAM_MAX_RETRIES = 1;
 const DEFAULT_UPSTREAM_RETRY_BASE_DELAY_MS = 250;
 const DEFAULT_PROXY_CONNECT_TIMEOUT_MS = 60_000;
-
 function parsePositiveIntEnv(raw: string | undefined, fallback: number): number {
   if (!raw) {
     return fallback;
@@ -151,7 +141,6 @@ function parsePositiveIntEnv(raw: string | undefined, fallback: number): number 
   }
   return parsed;
 }
-
 function parseBooleanEnv(raw: string | undefined, fallback: boolean): boolean {
   if (!raw) {
     return fallback;
@@ -165,7 +154,6 @@ function parseBooleanEnv(raw: string | undefined, fallback: boolean): boolean {
   }
   return fallback;
 }
-
 function gatewayResilienceConfig(): GatewayResilienceConfig {
   return {
     upstreamTimeoutMs: parsePositiveIntEnv(process.env.AMC_GATEWAY_UPSTREAM_TIMEOUT_MS, DEFAULT_UPSTREAM_TIMEOUT_MS),
@@ -178,7 +166,6 @@ function gatewayResilienceConfig(): GatewayResilienceConfig {
     proxyConnectTimeoutMs: parsePositiveIntEnv(process.env.AMC_GATEWAY_PROXY_CONNECT_TIMEOUT_MS, DEFAULT_PROXY_CONNECT_TIMEOUT_MS)
   };
 }
-
 function isRetryableMethod(method: string, retryNonIdempotent: boolean): boolean {
   if (retryNonIdempotent) {
     return true;
@@ -186,8 +173,8 @@ function isRetryableMethod(method: string, retryNonIdempotent: boolean): boolean
   const normalized = method.toUpperCase();
   return normalized === "GET" || normalized === "HEAD" || normalized === "OPTIONS" || normalized === "DELETE";
 }
-
 function isRetryableTransportError(error: unknown): boolean {
+  if (error instanceof EgressBlocked) return false;
   if (!(error instanceof Error)) {
     return false;
   }
@@ -204,7 +191,6 @@ function isRetryableTransportError(error: unknown): boolean {
     message.includes("network")
   );
 }
-
 function backoffMs(baseDelayMs: number, attempt: number): number {
   const factor = Math.pow(2, Math.max(0, attempt - 1));
   const jitter = 0.8 + Math.random() * 0.4;
@@ -216,6 +202,7 @@ async function sleep(ms: number): Promise<void> {
 }
 
 function gatewayErrorStatusCode(error: unknown): number {
+  if (error instanceof EgressBlocked) return 403;
   if (error instanceof CircuitOpenError) {
     return 503;
   }
@@ -228,7 +215,8 @@ function gatewayErrorStatusCode(error: unknown): number {
   return 502;
 }
 
-function gatewayErrorBody(error: unknown): { error: string } {
+function gatewayErrorBody(error: unknown): { error: string; code?: string } {
+  if (error instanceof EgressBlocked) return { error: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" };
   if (error instanceof CircuitOpenError) {
     return { error: "upstream circuit is open; dependency is unhealthy" };
   }
@@ -239,6 +227,9 @@ function gatewayErrorBody(error: unknown): { error: string } {
 }
 
 async function requestUpstreamWithResilience(params: {
+  workspace: string;
+  channel: "provider" | "network-tool";
+  agentId: string;
   targetUrl: URL;
   method: string;
   headers: Record<string, string>;
@@ -255,6 +246,9 @@ async function requestUpstreamWithResilience(params: {
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+    // Synchronous per-attempt gate precedes breaker accounting and socket creation.
+    checkEgress({ workspace: params.workspace, channel: params.channel, url: params.targetUrl.href,
+      agentId: params.agentId });
     try {
       const response = await withCircuitBreaker(
         params.circuitName,
@@ -829,6 +823,9 @@ function createProxyServer(params: {
     let upstream: IncomingMessage;
     try {
       upstream = await requestUpstreamWithResilience({
+        workspace: params.workspace,
+        channel: "network-tool",
+        agentId: proxyAgentId,
         targetUrl,
         method,
         headers: outboundHeaders,
@@ -920,16 +917,11 @@ function createProxyServer(params: {
       clientSocket.destroy();
       return;
     }
-    const [hostRaw, portRaw] = (req.url ?? "").split(":");
-    const host = hostRaw ?? "";
-    const port = Number(portRaw ?? "443");
+    const authority = parseConnectAuthority(req.url);
+    const host = authority?.host ?? "";
+    const port = authority?.port ?? NaN;
     const proxyAgentId = firstString(req.headers["x-amc-agent-id"] ?? req.headers["amc-agent-id"]);
-    let connectUrl: URL | undefined;
-    try {
-      connectUrl = new URL(`http://${req.url ?? ""}`);
-    } catch {
-      connectUrl = undefined;
-    }
+    const connectUrl = authority?.url;
     const leaseCarrier = extractLeaseCarrier({
       headers: req.headers,
       url: connectUrl,
@@ -969,7 +961,7 @@ function createProxyServer(params: {
       requiredScope: "proxy:connect"
     });
 
-    if (!host || !Number.isInteger(port) || port < 1 || port > 65535) {
+    if (!authority || !host || !Number.isInteger(port) || port < 1 || port > 65535) {
       clientSocket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
       clientSocket.destroy();
       return;
@@ -1002,7 +994,6 @@ function createProxyServer(params: {
       clientSocket.destroy();
       return;
     }
-
     clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
     const egress = await hostAllowed(params, host);
     if (!egress.decision.allowed) {
@@ -1012,10 +1003,15 @@ function createProxyServer(params: {
       return;
     }
     if (clientSocket.destroyed) return; // the client left during the lookup: open nothing
-
+    try { checkEgress({ workspace: params.workspace, channel: "network-tool", url: authority.url.href,
+      agentId: proxyAgentId, dataClasses: null, purpose: "proxy-connect" }); }
+    catch (error) {
+      if (!(error instanceof EgressBlocked)) throw error;
+      clientSocket.end("HTTP/1.1 403 Forbidden\r\nX-AMC-Error-Code: AMC_RESIDENCY_EGRESS_BLOCKED\r\nConnection: close\r\nContent-Length: 0\r\n\r\n", () => clientSocket.destroy()); return;
+    }
     // Only the checked addresses (a pinned lookup keeps every one as a fallback), never a fresh resolution.
     let connectedAddress: string | null = null;
-    const upstreamSocket = netConnect({ port, host: canonicalHost(host), lookup: pinnedLookup(egress.addresses) }, () => {
+    const upstreamSocket = netConnect({ port, host, lookup: pinnedLookup(egress.addresses) }, () => {
       connectedAddress = upstreamSocket.remoteAddress ?? null; // which checked address the tunnel reached
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {
@@ -1065,6 +1061,7 @@ function createProxyServer(params: {
 }
 
 export async function startGateway(options: StartGatewayOptions): Promise<GatewayHandle> {
+  options = { ...options, workspace: resolve(options.workspace) };
   const logger = options.logger ?? console;
   const config = loadGatewayConfig(options.workspace, options.configPath);
   const resolvedConfig = resolveGatewayConfigEnv({
@@ -1548,6 +1545,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       });
 
       const upstreamResponse = await requestUpstreamWithResilience({
+        workspace: options.workspace,
+        channel: "provider",
+        agentId: attributedAgentId,
         targetUrl,
         method,
         headers: outboundHeaders,

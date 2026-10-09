@@ -139,7 +139,8 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "identity provider add",
     "identity mapping add",
     "scim token create",
-    // A4 Forge owner-gated leaves (P0-54). The CLI commands land with P1-65; A4 owner actions pass these paths themselves.
+    // A4 Forge owner-gated leaves (P0-54; P1-57 adds acknowledge). The CLI commands land with P1-65; A4 owner actions pass these paths themselves.
+    "a4 acknowledge",
     "a4 approve",
     "a4 complete",
     "a4 deny",

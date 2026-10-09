@@ -106,12 +106,17 @@ export function checkEgress(input: CheckEgressInput): Accepted {
   const call = { ...input, workspace: resolve(input.workspace) };
   return evaluate(call, context(call, false));
 }
-/** Preflight only. A 3xx response is returned without following, never reported as an undispatched residency denial. */
-export async function residencyFetch(workspace: string | undefined, channel: EgressChannel, url: string, init: RequestInit = {}): Promise<Response> {
+/** Shared preflight for transports; only unregulated workspaces with no registry permit an unscoped cwd fallback. */
+export function checkScopedEgress(workspace: string | undefined, channel: EgressChannel, url: string,
+  details: Pick<CheckEgressInput, "dataClasses" | "purpose" | "agentId"> = {}): Accepted {
   if (workspace !== undefined && (typeof workspace !== "string" || !workspace.trim())) return block({ workspace, channel, url }, "registry_unverifiable", "workspace_scope_required");
   const scoped = workspace ?? getWorkspaceScope();
-  const input: CheckEgressInput = { workspace: resolve(scoped ?? process.cwd()), channel, url };
-  evaluate(input, context(input, scoped === undefined));
+  const input: CheckEgressInput = { ...details, workspace: resolve(scoped ?? process.cwd()), channel, url };
+  return evaluate(input, context(input, scoped === undefined));
+}
+/** Preflight only. A 3xx response is returned without following, never reported as an undispatched residency denial. */
+export async function residencyFetch(workspace: string | undefined, channel: EgressChannel, url: string, init: RequestInit = {}): Promise<Response> {
+  checkScopedEgress(workspace, channel, url);
   return fetch(url, { ...init, redirect: init.redirect === "error" ? "error" : "manual", signal: init.signal ?? AbortSignal.timeout(30_000) });
 }
 /** Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable rule. */

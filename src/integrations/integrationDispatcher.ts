@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
+import { EgressBlocked } from "../residency/checkEgress.js";
 import {
   loadIntegrationsConfig,
   resolveSecretRef,
@@ -304,24 +305,29 @@ async function processChannelQueue(params: {
   now?: () => number;
 }): Promise<ProcessedIntegrationDelivery[]> {
   return withChannelProcessingLock(params.workspace, params.channelId, async () => {
-    const result = await processIntegrationChannelQueue({
-      workspace: params.workspace,
-      channelId: params.channelId,
-      deliveryPolicy: params.policy?.retry ?? {},
-      now: params.now,
-      onDelivered: async (input) => writeIntegrationEvidence({
+    try {
+      const result = await processIntegrationChannelQueue({
         workspace: params.workspace,
-        channelId: input.channelId,
-        eventName: input.eventName,
-        agentId: input.agentId,
-        payloadBody: input.payloadBody,
-        payloadSha256: input.payloadSha256,
-        orderedSequence: input.orderedSequence,
-        attempts: input.receipt.attempts.length,
-        httpStatus: input.httpStatus
-      })
-    });
-    return result.processed;
+        channelId: params.channelId,
+        deliveryPolicy: params.policy?.retry ?? {},
+        now: params.now,
+        onDelivered: async (input) => writeIntegrationEvidence({
+          workspace: params.workspace,
+          channelId: input.channelId,
+          eventName: input.eventName,
+          agentId: input.agentId,
+          payloadBody: input.payloadBody,
+          payloadSha256: input.payloadSha256,
+          orderedSequence: input.orderedSequence,
+          attempts: input.receipt.attempts.length,
+          httpStatus: input.httpStatus
+        })
+      });
+      return result.processed;
+    } catch (error) {
+      if (error instanceof EgressBlocked) return [];
+      throw error;
+    }
   });
 }
 

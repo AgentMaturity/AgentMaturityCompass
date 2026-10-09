@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { closeSync, constants, fstatSync, openSync, readFileSync, readSync } from "node:fs";
 import { z } from "zod";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
@@ -40,7 +40,8 @@ const artifactKindSchema = z.enum([
     "inference-strategy-run",
     "evaluator-registry-manifest",
     "effective-policy-receipt",
-    "a4-stage-output"
+    "a4-stage-output",
+    "legal-hold"
 ]);
 
 const artifactSignatureFields = {
@@ -93,23 +94,16 @@ function domainSeparatedArtifactDigest(input: {
   ));
 }
 
-export function signArtifactFile(input: {
+/** Sign exact bytes using existing workspace keys, without publishing an artifact or signature file. */
+export function signArtifactBytes(input: {
   workspace: string;
-  path: string;
   artifactKind: ArtifactSignature["artifactKind"];
-}): { sigPath: string; signature: ArtifactSignature } {
-  ensureSigningKeys(input.workspace);
-  const artifactSha256 = sha256Hex(readFileSync(input.path));
-  const digestHex = domainSeparatedArtifactDigest({
-    artifactKind: input.artifactKind,
-    artifactSha256
-  });
-  const signed = signDigestWithPolicy({
-    workspace: input.workspace,
-    kind: "BUNDLE",
-    digestHex
-  });
-  const signature = artifactSignatureSchema.parse({
+  bytes: Buffer;
+}): ArtifactSignature {
+  const artifactSha256 = sha256Hex(Buffer.from(input.bytes));
+  const digestHex = domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 });
+  const signed = signDigestWithPolicy({ workspace: input.workspace, kind: "BUNDLE", digestHex });
+  return artifactSignatureSchema.parse({
     schemaVersion: "2026-07-10",
     artifactKind: input.artifactKind,
     artifactSha256,
@@ -117,6 +111,42 @@ export function signArtifactFile(input: {
     signedTs: signed.signedTs,
     signer: "auditor",
     envelope: signed.envelope
+  });
+}
+
+/** Verify a prepared signature against its exact bytes before publishing either file. */
+export function verifyArtifactBytesSignature(input: {
+  workspace: string;
+  artifactKind: ArtifactSignature["artifactKind"];
+  bytes: Buffer;
+  signature: ArtifactSignature;
+}): boolean {
+  try {
+    const signature = artifactSignatureSchema.parse(input.signature);
+    const artifactSha256 = sha256Hex(Buffer.from(input.bytes));
+    if (signature.schemaVersion !== "2026-07-10" || signature.artifactKind !== input.artifactKind ||
+        signature.artifactSha256 !== artifactSha256) return false;
+    return verifySignedDigest({
+      workspace: input.workspace,
+      digestHex: domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 }),
+      signed: signature
+    });
+  } catch { return false; }
+}
+
+export function signArtifactFile(input: {
+  workspace: string;
+  path: string;
+  artifactKind: ArtifactSignature["artifactKind"];
+  /** Optional exact publication bytes; callers that omit them keep the existing file-read path. */
+  bytes?: Buffer;
+}): { sigPath: string; signature: ArtifactSignature } {
+  const publicationBytes = input.bytes === undefined ? undefined : Buffer.from(input.bytes);
+  ensureSigningKeys(input.workspace);
+  const signature = signArtifactBytes({
+    workspace: input.workspace,
+    artifactKind: input.artifactKind,
+    bytes: publicationBytes ?? readFileSync(input.path)
   });
   const sigPath = artifactSigPath(input.path);
   writeFileAtomic(sigPath, `${JSON.stringify(signature, null, 2)}\n`, 0o644);
@@ -135,11 +165,36 @@ export function trySignArtifactFile(input: {
   }
 }
 
+/** Opt-in limits bound the actual descriptor read, including a file that grows after stat. */
+function readArtifactSnapshot(path: string, maxBytes?: number): Buffer {
+  if (maxBytes === undefined) return readFileSync(path);
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 64 * 1024 * 1024) {
+    throw new Error("artifact snapshot bound must be 1 through 67108864 bytes");
+  }
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile() || stat.size > maxBytes) throw new Error("artifact snapshot exceeds its bound or is not a regular file");
+    const bytes = Buffer.alloc(maxBytes + 1);
+    let size = 0;
+    while (size < bytes.length) {
+      const count = readSync(fd, bytes, size, bytes.length - size, null);
+      if (count === 0) break;
+      size += count;
+    }
+    if (size > maxBytes) throw new Error("artifact snapshot exceeds its bound");
+    return bytes.subarray(0, size);
+  } finally { closeSync(fd); }
+}
+
 export function readAndVerifyArtifactFileSignature(input: {
   workspace: string;
   path: string;
   artifactKind?: ArtifactSignature["artifactKind"];
   requireDomainSeparated?: boolean;
+  /** Optional bounds; callers that omit them retain the existing read behavior. */
+  maxArtifactBytes?: number;
+  maxSignatureBytes?: number;
 }): ArtifactSignatureSnapshotVerification {
   const sigPath = artifactSigPath(input.path);
   if (!pathExists(input.path)) {
@@ -167,8 +222,10 @@ export function readAndVerifyArtifactFileSignature(input: {
     };
   }
   try {
-    const artifactBytes = readFileSync(input.path);
-    const signature = artifactSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
+    const artifactBytes = readArtifactSnapshot(input.path, input.maxArtifactBytes);
+    const signatureText = input.maxSignatureBytes === undefined ? readUtf8(sigPath)
+      : readArtifactSnapshot(sigPath, input.maxSignatureBytes).toString("utf8");
+    const signature = artifactSignatureSchema.parse(JSON.parse(signatureText) as unknown);
     if (input.artifactKind && signature.artifactKind !== input.artifactKind) {
       return {
         valid: false,

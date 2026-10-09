@@ -6,6 +6,7 @@ import {
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { freezeToolArguments } from "./toolArguments.js";
@@ -243,90 +244,92 @@ export class ToolPipeline {
   }
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
-    const collapsed = this.collapses(input);
-    if (collapsed) {
-      // Terminates HERE, before pre-execute policy and before guards.
-      //
-      // A collapsed call can only ever fail, and letting the policy pipeline
-      // observe it would mean asking a human to approve — and recording an
-      // approval for — something that was never going to run. It would also
-      // spend budget and produce guard decisions about a call that does not
-      // exist in any meaningful sense.
-      return denialOutcome({
-        stage: "visibility",
-        reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
-        guardLabel: null
-      });
-    }
-
-    const visible = this.init.registry.visible(input.agentId);
-    const definition = visible.get(input.name);
-    if (!definition) {
-      // No execution exists yet, so there is nothing to record against and
-      // nothing for a guard to have seen. An invisible tool is not a policy
-      // decision about a call; it is the absence of a call.
-      return denialOutcome({
-        stage: "visibility",
-        reason: `unknown tool "${input.name}"`,
-        guardLabel: null
-      });
-    }
-
-    const callId = input.callId ?? randomUUID();
-    const draft: ToolExecution = {
-      token: `tok_${randomUUID()}`,
-      callId,
-      rootCallId: input.rootCallId ?? callId,
-      name: definition.name,
-      agentId: input.agentId,
-      workspace: this.init.workspace,
-      actionClass: definition.actionClass,
-      requestedMode: input.requestedMode,
-      effectiveMode: input.requestedMode,
-      arguments: freezeToolArguments(input.arguments),
-      parentToken: input.parentToken ?? null,
-      ...(input.signal === undefined ? {} : { signal: input.signal })
-    };
-
-    const authorization = await this.enter(draft, input.authority);
-    const bound = authorization.bound;
-    const execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
-    selectedDefinitions.set(execution, definition);
-    let outcome: ToolOutcome;
-    try {
-      outcome = this.init.journal !== undefined && this.authorizes(definition.actionClass)
-        ? await this.runJournaled(this.init.journal, execution, definition.body, authorization)
-        : await this.runStages(execution, definition.body, authorization);
-    } finally {
-      selectedDefinitions.delete(execution);
-    }
-    try {
-      this.init.record?.(execution, outcome);
-    } catch {
-      // The guarantee belongs HERE, not to each recorder. A recorder that
-      // threw would turn an evidence problem into a tool failure, and the
-      // model would see a denial that policy never made. The gap shows in the
-      // spine as a missing row rather than as a wrong answer to the caller.
-      //
-      // It was previously the caller's job, which made it untestable: proving
-      // it required a recorder that genuinely failed, and every filesystem
-      // sabotage I tried was survived by SQLite.
-      //
-      // A dispatched journaled call does not leave the gap silent (P1-03): its
-      // chain is marked evidence-incomplete, which blocks this agent's later
-      // journaled calls until reconciled. If even that mark fails, the journal
-      // keeps the execution blocking in this process.
-      const action = outcome.action;
-      if (action !== undefined && (action.state === "completed" || action.state === "outcome_unknown")) {
-        try {
-          this.init.journal?.().markEvidenceIncomplete(action.executionId, "recorder_failed");
-        } catch {
-          // Held by the journal in its in-process unreconciled set.
-        }
-        return { ...outcome, action: { ...action, evidenceComplete: false } };
+    return withWorkspaceScope(this.init.workspace, async () => {
+      const collapsed = this.collapses(input);
+      if (collapsed) {
+        // Terminates HERE, before pre-execute policy and before guards.
+        //
+        // A collapsed call can only ever fail, and letting the policy pipeline
+        // observe it would mean asking a human to approve — and recording an
+        // approval for — something that was never going to run. It would also
+        // spend budget and produce guard decisions about a call that does not
+        // exist in any meaningful sense.
+        return denialOutcome({
+          stage: "visibility",
+          reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
+          guardLabel: null
+        });
       }
-    }
-    return outcome;
+
+      const visible = this.init.registry.visible(input.agentId);
+      const definition = visible.get(input.name);
+      if (!definition) {
+        // No execution exists yet, so there is nothing to record against and
+        // nothing for a guard to have seen. An invisible tool is not a policy
+        // decision about a call; it is the absence of a call.
+        return denialOutcome({
+          stage: "visibility",
+          reason: `unknown tool "${input.name}"`,
+          guardLabel: null
+        });
+      }
+
+      const callId = input.callId ?? randomUUID();
+      const draft: ToolExecution = {
+        token: `tok_${randomUUID()}`,
+        callId,
+        rootCallId: input.rootCallId ?? callId,
+        name: definition.name,
+        agentId: input.agentId,
+        workspace: this.init.workspace,
+        actionClass: definition.actionClass,
+        requestedMode: input.requestedMode,
+        effectiveMode: input.requestedMode,
+        arguments: freezeToolArguments(input.arguments),
+        parentToken: input.parentToken ?? null,
+        ...(input.signal === undefined ? {} : { signal: input.signal })
+      };
+
+      const authorization = await this.enter(draft, input.authority);
+      const bound = authorization.bound;
+      const execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
+      selectedDefinitions.set(execution, definition);
+      let outcome: ToolOutcome;
+      try {
+        outcome = this.init.journal !== undefined && this.authorizes(definition.actionClass)
+          ? await this.runJournaled(this.init.journal, execution, definition.body, authorization)
+          : await this.runStages(execution, definition.body, authorization);
+      } finally {
+        selectedDefinitions.delete(execution);
+      }
+      try {
+        this.init.record?.(execution, outcome);
+      } catch {
+        // The guarantee belongs HERE, not to each recorder. A recorder that
+        // threw would turn an evidence problem into a tool failure, and the
+        // model would see a denial that policy never made. The gap shows in the
+        // spine as a missing row rather than as a wrong answer to the caller.
+        //
+        // It was previously the caller's job, which made it untestable: proving
+        // it required a recorder that genuinely failed, and every filesystem
+        // sabotage I tried was survived by SQLite.
+        //
+        // A dispatched journaled call does not leave the gap silent (P1-03): its
+        // chain is marked evidence-incomplete, which blocks this agent's later
+        // journaled calls until reconciled. If even that mark fails, the journal
+        // keeps the execution blocking in this process.
+        const action = outcome.action;
+        if (action !== undefined && (action.state === "completed" || action.state === "outcome_unknown")) {
+          try {
+            this.init.journal?.().markEvidenceIncomplete(action.executionId, "recorder_failed");
+          } catch {
+            // Held by the journal in its in-process unreconciled set.
+          }
+          return { ...outcome, action: { ...action, evidenceComplete: false } };
+        }
+      }
+      return outcome;
+    });
   }
 
   /**

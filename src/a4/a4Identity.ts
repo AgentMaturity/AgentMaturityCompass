@@ -39,10 +39,10 @@ const sessionRecordSchema = z.object({
 type SessionRecord = z.infer<typeof sessionRecordSchema>;
 
 /**
- * Live, unrevoked WORKSPACE_ROUTER session records. Null, never "none", when the directory cannot be listed for any
- * reason but absence, or when any record in it does not parse: an unreadable source is not an empty one.
+ * Every WORKSPACE_ROUTER session record, revoked and expired included. Null, never "none", when the directory cannot be
+ * listed for any reason but absence, or when any record in it does not parse: an unreadable source is not an empty one.
  */
-function liveRouterSessions(workspace: string, now: number): SessionRecord[] | null {
+function routerSessions(workspace: string): SessionRecord[] | null {
   const dir = join(workspace, ".amc", "studio", "sessions");
   let names: string[];
   try {
@@ -58,10 +58,13 @@ function liveRouterSessions(workspace: string, now: number): SessionRecord[] | n
     } catch {
       return null;
     }
-    if (record.authSource === "WORKSPACE_ROUTER" && !record.revoked && record.expiresTs > now) records.push(record);
+    if (record.authSource === "WORKSPACE_ROUTER") records.push(record);
   }
   return records;
 }
+/** Live, unrevoked WORKSPACE_ROUTER session records; null when unreadable. */
+const liveRouterSessions = (workspace: string, now: number): SessionRecord[] | null =>
+  routerSessions(workspace)?.filter((record) => !record.revoked && record.expiresTs > now) ?? null;
 
 /** A LOCAL_USER or WORKSPACE_ROUTER principal resolved from live records, or the reason it cannot be. */
 function livePrincipal(workspace: string, authSource: A4Principal["authSource"], userId: string, admission: A4Principal["admission"],
@@ -131,7 +134,8 @@ export function liveRolesFor(workspace: string, principal: Pick<A4Principal, "au
  * Throws A4_NOT_A_MEMBER unless the principal holds one of `roles` on the project. Workspace OWNERs are implicit
  * project owners and AUDITORs implicit reviewers (design §5.2).
  */
-export function assertMember(members: readonly A4Member[], principal: A4Principal, roles: readonly A4Member["roles"][number][]): void {
+export function assertMember(members: readonly A4Member[], principal: Pick<A4Principal, "key" | "username" | "roles">,
+  roles: readonly A4Member["roles"][number][]): void {
   const held = new Set(members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
@@ -169,4 +173,32 @@ export function principalPopulation(workspace: string, now = Date.now()): { acti
   }
   const sessions = liveRouterSessions(workspace, now);
   return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
+}
+
+/** The population as a transition records it (`ratchetedFromChain` reads it): counts, null where unreadable. */
+export function populationFacts(workspace: string): { activeUserCount: number | null; hostPrincipals: number | null } {
+  const { activeLocal, hostPrincipals } = principalPopulation(workspace);
+  return { activeUserCount: activeLocal?.length ?? null, hostPrincipals };
+}
+
+/**
+ * users.yaml records of any status created at or after `ts` (a project's CREATED time); null when unreadable. A user
+ * added after a project was created, even one revoked again before any A4 write recorded the population, means two
+ * principals existed: the self-approval ratchet holds (design §5.3, `amc user add` then `amc user revoke`).
+ */
+export function usersCreatedSince(workspace: string, ts: number): number | null {
+  try {
+    return listUsers(workspace).filter((user) => user.createdTs >= ts).length;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * WORKSPACE_ROUTER session records of any state issued at or after `ts`; null when unreadable. A host principal who
+ * signed in after a project was created ratchets it as an added user does, even once that session expired or was
+ * revoked with no A4 write between (design §5.3).
+ */
+export function hostSessionsSince(workspace: string, ts: number): number | null {
+  return routerSessions(workspace)?.filter((record) => record.issuedTs >= ts).length ?? null;
 }

@@ -6,6 +6,7 @@
  */
 
 import { listAssurancePacks } from "../assurance/packs/index.js";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { listPolicyPacks } from "../policyPacks/builtInPacks.js";
 import { browseRegistry, registryTrust } from "../plugins/pluginRegistryClient.js";
 import { listInstalledPlugins, loadSignedPluginRegistriesConfig } from "../plugins/pluginApi.js";
@@ -137,7 +138,7 @@ export async function buildCatalog(
 
       for (const reg of registriesConfig.pluginRegistries.registries) {
         try {
-          const index = await browseRegistry({ registryBase: reg.base, trust: registryTrust(reg.pinnedRegistryPubkeyFingerprint) });
+          const index = await withWorkspaceScope(workspace, () => browseRegistry({ registryBase: reg.base, trust: registryTrust(reg.pinnedRegistryPubkeyFingerprint) }));
           for (const plugin of index.plugins) {
             const latestVersion = plugin.versions[plugin.versions.length - 1];
             if (!latestVersion) continue;

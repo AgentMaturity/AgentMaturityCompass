@@ -6087,6 +6087,9 @@ Issue or manage legal holds
 | `--issue` | - |
 | `--release <holdId>` | - |
 | `--list` | - |
+| `--init` | - |
+| `--rebind` | - |
+| `--accept-unverified-legacy` | - |
 | `--tenant <id>` | - |
 | `--reason <text>` | - |
 | `--issued-by <name>` | - |

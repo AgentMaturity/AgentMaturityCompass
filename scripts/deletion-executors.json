@@ -1,0 +1,1720 @@
+{
+  "schemaVersion": "amc.deletion-executors/v1",
+  "issue": "P2-01",
+  "status": "partial-source-inventory",
+  "qualified": false,
+  "notes": [
+    "Source navigation metadata authored without running deletion, registry, architecture or acceptance checks.",
+    "Gated identifies a source-visible fresh withDeletionGate callback around the effect, not an observed deletion result or a complete architecture proof.",
+    "Deletion admission checks an acknowledged DELETION_ALLOWED ops audit row before the synchronous callback. Audit failure prevents the effect. A denied operation can still have auditPersisted false when its denial audit cannot be written.",
+    "Guard-event pruning uses the resolved workspace, the selected DUAL_WRITE or CUTOVER store and a fresh gate. The gate audit is written through appendOpsAuditEvent, not inferred from the void best-effort emitGuardEvent contract.",
+    "Retention and spill lifecycle targets carry complete SHA-256 sessionHashes derived from workspace-local or authenticated session IDs, without a target hash count cap or truncation. Direct spill-store removal and purge use broad workspace spill scope because the locator owner does not prove all shared-session references; the nested direct-store gate can conservatively block unrelated spill holds.",
+    "Invalid deletion targets produce an unknown hold verdict and attempt DELETION_DENIED_HOLD_UNKNOWN audit only in a valid explicit or ALS workspace. The audit carries a validated executor slug or fallback and an optional recognized kind, omitting session IDs, session hashes, cutoff and raw parse errors. Unknown kinds are not replaced with an asserted category; absent trusted scope denies without a cwd guess. Denial auditPersisted requires an acknowledged event ID and event hash.",
+    "Exempt is limited here to operation-owned unpublished atomic-write staging files and exclusive control-lock coordination cleanup. Other apparent temporary, rollback, quarantine, socket and verification-workspace deletions remain deferred until their ownership and publication boundaries are established.",
+    "Deferred is not an exemption. Out-of-slice routes must be resolved before full deletion coverage can be claimed; protected ledger, A4, approval, API and Studio code was not changed.",
+    "Rows include sync filesystem source occurrences, namespace and literal-require bindings, literal or template SQLite DELETE text, followed indirect erasure calls and the public payload-erasure definition. Several rows trace the same physical effect, so row totals are not counts of distinct deleted resources.",
+    "Line numbers and source excerpts are navigation hints that may move. This inventory does not close computed aliases or SQL, asynchronous filesystem calls, rename-based replacement, schema cascades, external subprocess deletions or third-party storage APIs."
+  ],
+  "sites": [
+    {
+      "siteId": "src/a4/a4Blobs.ts:179:1",
+      "path": "src/a4/a4Blobs.ts",
+      "line": 179,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(join(dir, \"key.enc\"), { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/a4/a4Blobs.ts:180:1",
+      "path": "src/a4/a4Blobs.ts",
+      "line": 180,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(join(dir, \"key.pub\"), { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/a4/a4Store.ts:529:1",
+      "path": "src/a4/a4Store.ts",
+      "line": 529,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "db.prepare(\"DELETE FROM a4_requests WHERE ts < ?\").run(ts - A4_REQUEST_WINDOW_MS);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/deepseekHarnessLaunch.ts:77:1",
+      "path": "src/adapters/deepseekHarnessLaunch.ts",
+      "line": 77,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "dispose: () => rmSync(root, { recursive: true, force: true })",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/deepseekHarnessLaunch.ts:80:1",
+      "path": "src/adapters/deepseekHarnessLaunch.ts",
+      "line": 80,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(root, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:448:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 448,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (existsSync(path)) unlinkSync(path);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:463:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 463,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(paths.lock);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:477:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 477,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "try { unlinkSync(paths.lock); } catch { /* best-effort lock cleanup */ }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:1389:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 1389,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (nextConfig === null) unlinkSync(paths.config);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:1392:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 1392,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (existsSync(paths.ignore)) unlinkSync(paths.ignore);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookIntegration.ts:1408:1",
+      "path": "src/adapters/hookIntegration.ts",
+      "line": 1408,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (existsSync(path)) unlinkSync(path);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/approvals/approvalChainStore.ts:203:1",
+      "path": "src/approvals/approvalChainStore.ts",
+      "line": 203,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/approvals/nativeApprovalLogin.ts:139:1",
+      "path": "src/approvals/nativeApprovalLogin.ts",
+      "line": 139,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "try { unlinkSync(tokenFile); } catch { rollbackFailed = true; }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/assuranceCertificates.ts:42:1",
+      "path": "src/assurance/assuranceCertificates.ts",
+      "line": 42,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/assuranceControlPlane.ts:75:1",
+      "path": "src/assurance/assuranceControlPlane.ts",
+      "line": 75,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/assuranceControlPlane.ts:617:1",
+      "path": "src/assurance/assuranceControlPlane.ts",
+      "line": 617,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/assuranceVerifier.ts:43:1",
+      "path": "src/assurance/assuranceVerifier.ts",
+      "line": 43,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:418:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 418,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(bundleDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:419:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 419,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(certRoot, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:420:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 420,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(extractedBundleDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:444:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 444,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(extracted, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:590:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 590,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(verifyWorkspace, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/assurance/certificate.ts:617:1",
+      "path": "src/assurance/certificate.ts",
+      "line": 617,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(extracted, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/audit/auditApi.ts:87:1",
+      "path": "src/audit/auditApi.ts",
+      "line": 87,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/audit/evidenceRequests.ts:58:1",
+      "path": "src/audit/evidenceRequests.ts",
+      "line": 58,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/autonomy/scheduleStore.ts:109:1",
+      "path": "src/autonomy/scheduleStore.ts",
+      "line": 109,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "finally { try { closeSync(fd); } finally { unlinkSync(scheduleLockPath(workspace)); } }",
+      "status": "exempt",
+      "reason": "The callback entered only after creating the transaction lock with wx. Finally removes that operation's schedule-store lock file, not schedules or schedule-state records."
+    },
+    {
+      "siteId": "src/bench/benchApi.ts:68:1",
+      "path": "src/bench/benchApi.ts",
+      "line": 68,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(file, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bench/benchVerifier.ts:37:1",
+      "path": "src/bench/benchVerifier.ts",
+      "line": 37,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/benchmarks/benchExport.ts:138:1",
+      "path": "src/benchmarks/benchExport.ts",
+      "line": 138,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/benchmarks/benchImport.ts:73:1",
+      "path": "src/benchmarks/benchImport.ts",
+      "line": 73,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/benchmarks/benchVerify.ts:91:1",
+      "path": "src/benchmarks/benchVerify.ts",
+      "line": 91,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/benchmarks/harnessComparison.ts:266:1",
+      "path": "src/benchmarks/harnessComparison.ts",
+      "line": 266,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "try { rmSync(work, { recursive: true, force: true }); }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bridge/hookIngress.ts:488:1",
+      "path": "src/bridge/hookIngress.ts",
+      "line": 488,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "ledger.db.prepare(\"DELETE FROM bridge_request_usage WHERE ts < ?\").run(cutoff);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bundles/bundle.ts:530:1",
+      "path": "src/bundles/bundle.ts",
+      "line": 530,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(root, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bundles/bundle.ts:631:1",
+      "path": "src/bundles/bundle.ts",
+      "line": 631,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(workspace, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bundles/bundle.ts:648:1",
+      "path": "src/bundles/bundle.ts",
+      "line": 648,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "const cleanup = () => rmSync(root, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/bundles/bundle.ts:996:1",
+      "path": "src/bundles/bundle.ts",
+      "line": 996,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(verifyWorkspace, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/cli.ts:1515:1",
+      "path": "src/cli.ts",
+      "line": 1515,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(lockDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/cli.ts:1521:1",
+      "path": "src/cli.ts",
+      "line": 1521,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(lockDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/cli.ts:2239:1",
+      "path": "src/cli.ts",
+      "line": 2239,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(amcDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/credentials/credentialsFileWriter.ts:55:1",
+      "path": "src/credentials/credentialsFileWriter.ts",
+      "line": 55,
+      "call": "unlinkSync(",
+      "category": "unpublished-temp-cleanup",
+      "source": "try { unlinkSync(temporary); } catch { /* nothing to clean up */ }",
+      "status": "exempt",
+      "reason": "This catch removes the operation's random, wx-created credential staging file after failed writing. The staging file has not been renamed into the published credential store."
+    },
+    {
+      "siteId": "src/credentials/credentialsFileWriter.ts:67:1",
+      "path": "src/credentials/credentialsFileWriter.ts",
+      "line": 67,
+      "call": "unlinkSync(",
+      "category": "unpublished-temp-cleanup",
+      "source": "try { unlinkSync(temporary); } catch { /* nothing to clean up */ }",
+      "status": "exempt",
+      "reason": "This catch removes the operation's random, wx-created credential staging file after failed rename. It does not delete the published credential pathname."
+    },
+    {
+      "siteId": "src/demo/demoRun.ts:475:1",
+      "path": "src/demo/demoRun.ts",
+      "line": 475,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(prepared.workspace, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/doctor/doctorFix.ts:123:1",
+      "path": "src/doctor/doctorFix.ts",
+      "line": 123,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(full);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/doctor/doctorFix.ts:127:1",
+      "path": "src/doctor/doctorFix.ts",
+      "line": 127,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(full);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/doctor/doctorFix.ts:160:1",
+      "path": "src/doctor/doctorFix.ts",
+      "line": 160,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "() => unlinkSync(full));",
+      "status": "gated",
+      "reason": "The STALE_CACHE fix performs each unlink inside a fresh withDeletionGate callback using the trusted runDoctorFix workspace and a sessionless caches target. Both local catches rethrow DeletionDenied so executeFixRule reports a FAILED action. Dry-run returns before invoking the fix. The two broken-symlink unlink routes remain deferred."
+    },
+    {
+      "siteId": "src/enforce/actionEvidenceLogic.ts:180:1",
+      "path": "src/enforce/actionEvidenceLogic.ts",
+      "line": 180,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (pathExists(path)) unlinkSync(path);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/evidenceEmitter.ts:610:1",
+      "path": "src/enforce/evidenceEmitter.ts",
+      "line": 610,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "target: { kind: 'guard-events', before: new Date(cutoff).toISOString() } }, () => db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(cutoff));",
+      "status": "gated",
+      "reason": "pruneGuardEvents resolves its workspace and performs this SQL deletion inside a fresh withDeletionGate call for guard-events. The same callback covers the selected DUAL_WRITE or CUTOVER store; the gate requires an acknowledged DELETION_ALLOWED ops audit row before the effect."
+    },
+    {
+      "siteId": "src/enforce/inferenceStrategy.ts:433:1",
+      "path": "src/enforce/inferenceStrategy.ts",
+      "line": 433,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(routeFile, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:830:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 830,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(snapshotBundlePath, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:836:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 836,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(snapshotSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:842:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 842,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(manifestSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:849:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 849,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(snapshotBundlePath, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:852:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 852,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(snapshotPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:854:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 854,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(snapshotSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:856:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 856,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(manifestPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:858:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 858,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(manifestSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:873:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 873,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(transactionRoot, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1227:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1227,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(receiptPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1228:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1228,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(artifactSigPath(receiptPath), { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1289:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1289,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(latestSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1736:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1736,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(staged, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1738:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1738,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(target, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1926:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1926,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(entry.targetPath, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:1994:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 1994,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(entry.targetPath, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2003:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2003,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "else rmSync(latestSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2007:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2007,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (receiptPath) rmSync(receiptPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2008:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2008,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (receiptSigPath) rmSync(receiptSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2009:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2009,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (lifecycleReceiptPath) rmSync(lifecycleReceiptPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2010:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2010,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (lifecycleReceiptSigPath) rmSync(lifecycleReceiptSigPath, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/enforce/resourceManifest.ts:2013:1",
+      "path": "src/enforce/resourceManifest.ts",
+      "line": 2013,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(transactionRoot, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/extensions/nativeExtensionStore.ts:158:1",
+      "path": "src/extensions/nativeExtensionStore.ts",
+      "line": 158,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "} finally { rmSync(temp, { recursive: true, force: true }); }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/extensions/nativeExtensionStore.ts:193:1",
+      "path": "src/extensions/nativeExtensionStore.ts",
+      "line": 193,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "} finally { rmSync(temp, { recursive: true, force: true }); }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/federation/federationSync.ts:265:1",
+      "path": "src/federation/federationSync.ts",
+      "line": 265,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/federation/federationSync.ts:338:1",
+      "path": "src/federation/federationSync.ts",
+      "line": 338,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/federation/federationSync.ts:473:1",
+      "path": "src/federation/federationSync.ts",
+      "line": 473,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(staging, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/federation/federationSync.ts:508:1",
+      "path": "src/federation/federationSync.ts",
+      "line": 508,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/fleet/handoffPacket.ts:332:1",
+      "path": "src/fleet/handoffPacket.ts",
+      "line": 332,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(handoffFilePath(workspace, packetId), { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/fleet/registry.ts:497:1",
+      "path": "src/fleet/registry.ts",
+      "line": 497,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(root, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/gateway/config.ts:360:1",
+      "path": "src/gateway/config.ts",
+      "line": 360,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(sigPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/identity/pendingLoginStore.ts:68:1",
+      "path": "src/identity/pendingLoginStore.ts",
+      "line": 68,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(\"DELETE FROM identity_pending_logins WHERE expires_ts <= ?\").run(now);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/identity/pendingLoginStore.ts:83:1",
+      "path": "src/identity/pendingLoginStore.ts",
+      "line": 83,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "const row = handle.db.prepare(`DELETE FROM identity_pending_logins WHERE state_hash = ? RETURNING",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/importers/neutralImporter.ts:968:1",
+      "path": "src/importers/neutralImporter.ts",
+      "line": 968,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(full, { force: true, recursive: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/importers/neutralImporter.ts:973:1",
+      "path": "src/importers/neutralImporter.ts",
+      "line": 973,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(runDir, { force: true, recursive: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/integrations/integrationDeliveryQueue.ts:167:1",
+      "path": "src/integrations/integrationDeliveryQueue.ts",
+      "line": 167,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": ".prepare(`DELETE FROM integration_delivery_queue WHERE state = 'DELIVERED' AND updated_ts < ?`)",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ledger/ledger.ts:1121:payload-definition",
+      "path": "src/ledger/ledger.ts",
+      "line": 1121,
+      "call": "Ledger.pruneEventPayloadColumns",
+      "category": "payload-erasure-definition",
+      "source": "pruneEventPayloadColumns(eventIds: string[], prunedTs: number): void",
+      "status": "deferred",
+      "reason": "This public method clears payload_path and payload_inline through UPDATE evidence_events without an internal deletion gate. The current retention caller is separately listed as gated; arbitrary direct callers and other payload-update paths are not claimed as covered. ledger.ts remains protected and unchanged."
+    },
+    {
+      "siteId": "src/ledger/verifyRepair.ts:116:1",
+      "path": "src/ledger/verifyRepair.ts",
+      "line": 116,
+      "call": "rmdirSync(",
+      "category": "namespace-filesystem-sync",
+      "source": "fs.rmdirSync(dir);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ledger/verifyRepair.ts:134:1",
+      "path": "src/ledger/verifyRepair.ts",
+      "line": 134,
+      "call": "unlinkSync(",
+      "category": "namespace-filesystem-sync",
+      "source": "fs.unlinkSync(join(quarantineDir, \"repair-plan.json\"));",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ledger/verifyRepair.ts:136:1",
+      "path": "src/ledger/verifyRepair.ts",
+      "line": 136,
+      "call": "rmdirSync(",
+      "category": "namespace-filesystem-sync",
+      "source": "fs.rmdirSync(dirname(quarantineDir));",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:93:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 93,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "unlinkSync(lockPath);",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:100:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 100,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "try { unlinkSync(claimPath); } catch { /* The common lock is gone; this is only an orphan. */ }",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:126:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 126,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "try { unlinkSync(ownContenderPath); } catch { /* Nothing to clean up. */ }",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:138:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 138,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "try { unlinkSync(ownContenderPath); } catch { /* Nothing to clean up. */ }",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:143:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 143,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "try { unlinkSync(ownContenderPath); } catch { /* Nothing to clean up. */ }",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:154:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 154,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "if (lockOwner(lockPath)?.token === token) unlinkSync(lockPath);",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/controlFileLock.ts:158:1",
+      "path": "src/lifecycle/controlFileLock.ts",
+      "line": 158,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "try { unlinkSync(ownContenderPath); } catch { /* A stale-lock reaper may have claimed it. */ }",
+      "status": "exempt",
+      "reason": "This control-file lock path removes only nonce-owned contender, reaper or lock coordination objects. Lock takeover and release verify ownership or inode identity; signed control records and registry HEAD files are not the objects deleted."
+    },
+    {
+      "siteId": "src/lifecycle/signedControlJournal.ts:464:1",
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "line": 464,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(pendingPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/lifecycle/signedControlJournal.ts:508:1",
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "line": 508,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(pendingPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/lifecycle/signedControlJournal.ts:559:1",
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "line": 559,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(pendingPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/lifecycle/signedControlJournal.ts:699:1",
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "line": 699,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(pendingPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/notary/notaryAttestation.ts:118:1",
+      "path": "src/notary/notaryAttestation.ts",
+      "line": 118,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(rootTmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/notary/notaryAttestation.ts:166:1",
+      "path": "src/notary/notaryAttestation.ts",
+      "line": 166,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(rootTmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/notary/notaryExternalSigner.ts:94:1",
+      "path": "src/notary/notaryExternalSigner.ts",
+      "line": 94,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(root, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/notary/notaryServer.ts:349:1",
+      "path": "src/notary/notaryServer.ts",
+      "line": 349,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(listenTarget, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/notary/notaryServer.ts:377:1",
+      "path": "src/notary/notaryServer.ts",
+      "line": 377,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(listenTarget, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ops/backup/backupEngine.ts:242:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 242,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ops/backup/backupEngine.ts:268:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 268,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "cleanup: () => rmSync(temp, { recursive: true, force: true })",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ops/backup/backupEngine.ts:318:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 318,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ops/backup/backupEngine.ts:507:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 507,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/ops/maintenance/cachePrune.ts:27:1",
+      "path": "src/ops/maintenance/cachePrune.ts",
+      "line": 27,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "target: { kind: \"caches\", before: new Date(olderThanMs).toISOString() } }, () => unlinkSync(full));",
+      "status": "gated",
+      "reason": "pruneFilesOlderThan performs each unlink inside a fresh withDeletionGate callback for caches. pruneOpsCaches supplies its explicit workspace and uses this recursive helper only for agent transform snapshots and .amc/cache, not the Studio directory. No session identity is inferred from cache names."
+    },
+    {
+      "siteId": "src/ops/maintenance/cachePrune.ts:60:1",
+      "path": "src/ops/maintenance/cachePrune.ts",
+      "line": 60,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "target: { kind: \"caches\", before: new Date(consoleCutoff).toISOString() } }, () => unlinkSync(full));",
+      "status": "gated",
+      "reason": "pruneOpsCaches uses its resolved explicit workspace and a fresh sessionless caches gate for each console snapshot unlink. This loop selects only .amc/studio/console-snapshot.json and .amc/studio/console-snapshot.json.sig, requires a file older than consoleCutoff and never recurses through other Studio files. Held or unknown targets are retained."
+    },
+    {
+      "siteId": "src/ops/maintenance/logRotation.ts:46:1",
+      "path": "src/ops/maintenance/logRotation.ts",
+      "line": 46,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "target: { kind: \"logs\", before: new Date(cutoff).toISOString() } }, () => unlinkSync(full));",
+      "status": "gated",
+      "reason": "rotateLogs resolves explicit or ALS workspace, refuses an unrelated directory for an unscoped compatibility call, and performs each unlink inside a fresh withDeletionGate callback for logs. maintenanceRotateLogsCli supplies its trusted workspace."
+    },
+    {
+      "siteId": "src/ops/retention/retentionEngine.ts:237:indirect-payload",
+      "path": "src/ops/retention/retentionEngine.ts",
+      "line": 237,
+      "call": "ledger.pruneEventPayloadColumns(",
+      "category": "indirect-payload-erasure",
+      "source": "() => ledger.pruneEventPayloadColumns(ids, nowMs()));",
+      "status": "gated",
+      "reason": "runRetention calls the protected ledger method inside a fresh withDeletionGate callback. params.workspace is trusted; event IDs are grouped by their workspace-local evidence session_id and the complete SHA-256 sessionHashes for each group are supplied without truncation before payload columns are erased. The ledger module itself was not modified."
+    },
+    {
+      "siteId": "src/ops/retention/retentionEngine.ts:286:1",
+      "path": "src/ops/retention/retentionEngine.ts",
+      "line": 286,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(full);",
+      "status": "gated",
+      "reason": "runRetention performs the blob unlink inside a fresh withDeletionGate callback using params.workspace. Complete SHA-256 sessionHashes come from all workspace-local evidence rows referring to the blob, without a target hash count cap or truncation; held or unknown groups are retained. An immediate transaction compares the current reference snapshot with the admitted snapshot and rechecks retention eligibility before unlinking. Changed or ineligible references and a missing file return an explicit removed: false outcome and produce an acknowledged RETENTION_BLOB_DELETE_SKIPPED audit row."
+    },
+    {
+      "siteId": "src/packs/packRegistry.ts:92:1",
+      "path": "src/packs/packRegistry.ts",
+      "line": 92,
+      "call": "unlinkSync(",
+      "category": "literal-require-filesystem-sync",
+      "source": "require(\"fs\").unlinkSync(packageFile);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/packs/packRegistry.ts:130:1",
+      "path": "src/packs/packRegistry.ts",
+      "line": 130,
+      "call": "unlinkSync(",
+      "category": "literal-require-filesystem-sync",
+      "source": "require(\"fs\").unlinkSync(tarballFile);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/passport/passportApi.ts:68:1",
+      "path": "src/passport/passportApi.ts",
+      "line": 68,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/persistence/jsonl/jsonlWriterLock.ts:114:1",
+      "path": "src/persistence/jsonl/jsonlWriterLock.ts",
+      "line": 114,
+      "call": "unlinkSync(",
+      "category": "control-lock-cleanup",
+      "source": "unlinkSync(this.path); // Only this token, while the exclusive mutex is held.",
+      "status": "exempt",
+      "reason": "release first verifies this token, process, host and coordinator inode while its exclusive SQLite mutex is held. Only the owned writer-lease control file is unlinked; no session journal or evidence record is deleted."
+    },
+    {
+      "siteId": "src/plugins/nativeExecutablePackage.ts:79:1",
+      "path": "src/plugins/nativeExecutablePackage.ts",
+      "line": 79,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "} finally { rmSync(temporary, { recursive: true, force: true }); }",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/nativeExecutablePolicy.ts:92:1",
+      "path": "src/plugins/nativeExecutablePolicy.ts",
+      "line": 92,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (staged) rmSync(staged, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/nativeExecutablePolicy.ts:93:1",
+      "path": "src/plugins/nativeExecutablePolicy.ts",
+      "line": 93,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(lock, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/nativeExecutableRunner.ts:179:1",
+      "path": "src/plugins/nativeExecutableRunner.ts",
+      "line": 179,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (directory) rmSync(directory, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/pluginApi.ts:270:1",
+      "path": "src/plugins/pluginApi.ts",
+      "line": 270,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(file, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/pluginApi.ts:536:1",
+      "path": "src/plugins/pluginApi.ts",
+      "line": 536,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(pluginDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/pluginLoader.ts:351:1",
+      "path": "src/plugins/pluginLoader.ts",
+      "line": 351,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/pluginPackage.ts:45:1",
+      "path": "src/plugins/pluginPackage.ts",
+      "line": 45,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/plugins/pluginRegistryClient.ts:307:1",
+      "path": "src/plugins/pluginRegistryClient.ts",
+      "line": 307,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(dirname(path), { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/product/scratchpad.ts:94:1",
+      "path": "src/product/scratchpad.ts",
+      "line": 94,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "db.prepare('DELETE FROM scratchpad_entries WHERE session_id = ? AND key = ?').run(sessionId, key);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/product/scratchpad.ts:118:1",
+      "path": "src/product/scratchpad.ts",
+      "line": 118,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "const result = db.prepare('DELETE FROM scratchpad_entries WHERE session_id = ? AND key = ?').run(sessionId, key);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/product/scratchpad.ts:125:1",
+      "path": "src/product/scratchpad.ts",
+      "line": 125,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "const result = db.prepare('DELETE FROM scratchpad_entries WHERE session_id = ? AND expires_at IS NOT NULL AND expires_at < ?').run(sessionId, now);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/prompt/promptPackApi.ts:424:1",
+      "path": "src/prompt/promptPackApi.ts",
+      "line": 424,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(dirname(built.outFile), { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/prompt/promptPackArtifact.ts:47:1",
+      "path": "src/prompt/promptPackArtifact.ts",
+      "line": 47,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/release/releaseUtils.ts:32:1",
+      "path": "src/release/releaseUtils.ts",
+      "line": 32,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/sandbox/bwrapBackend.ts:217:1",
+      "path": "src/sandbox/bwrapBackend.ts",
+      "line": 217,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (temporary) rmSync(temporary, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/sandbox/processConfinement.ts:128:1",
+      "path": "src/sandbox/processConfinement.ts",
+      "line": 128,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(path);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/sandbox/seatbeltBackend.ts:152:1",
+      "path": "src/sandbox/seatbeltBackend.ts",
+      "line": 152,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(profileDir, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/sandbox/seatbeltNativeShell.ts:186:1",
+      "path": "src/sandbox/seatbeltNativeShell.ts",
+      "line": 186,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (launcher) rmSync(launcher, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/scanner/repoScanner.ts:34:1",
+      "path": "src/scanner/repoScanner.ts",
+      "line": 34,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "try { rmSync(tmpDir, { recursive: true, force: true }); } catch {}",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/scanner/repoScanner.ts:40:1",
+      "path": "src/scanner/repoScanner.ts",
+      "line": 40,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "try { rmSync(result.clonedTo, { recursive: true, force: true }); } catch {}",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/session/spill/spillLifecycle.ts:159:indirect-object",
+      "path": "src/session/spill/spillLifecycle.ts",
+      "line": 159,
+      "call": "removeSpillObject(",
+      "category": "indirect-spill-erasure",
+      "source": "() => removeSpillObject(input.workspace, entry.ref, input.options?.root));",
+      "status": "gated",
+      "reason": "eraseSessionSpills wraps the selected effect in a fresh withDeletionGate callback using input.workspace and complete SHA-256 sessionHashes derived from the inventory entry's authenticated session IDs, without a target hash count cap or truncation. The direct store adds a conservative broad spill gate as described in the notes."
+    },
+    {
+      "siteId": "src/session/spill/spillStore.ts:182:1",
+      "path": "src/session/spill/spillStore.ts",
+      "line": 182,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "if (created && sameIdentity(created, named) && named.isFile() && named.nlink === 1) unlinkSync(path);",
+      "status": "deferred",
+      "reason": "Failure cleanup removes only the inode this publication attempt created, but a signed spill commitment already precedes publication. It is not classified as an exclusively unpublished temporary object; this cleanup has no fresh withDeletionGate and remains deferred."
+    },
+    {
+      "siteId": "src/session/spill/spillStore.ts:196:1",
+      "path": "src/session/spill/spillStore.ts",
+      "line": 196,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(path);",
+      "status": "gated",
+      "reason": "The private removeObjectAtPath helper is called by the source-visible purge and removeSpillObject paths only inside fresh synchronous withDeletionGate callbacks. Direct-store callers use broad workspace spill scope because a locator owner cannot prove complete shared-session references; lifecycle callers also supply complete SHA-256 sessionHashes derived from authenticated entry.sessionIds."
+    },
+    {
+      "siteId": "src/session/spill/spillStore.ts:264:indirect-purge-object",
+      "path": "src/session/spill/spillStore.ts",
+      "line": 264,
+      "call": "removeObjectAtPath(",
+      "category": "indirect-spill-erasure",
+      "source": "() => removeObjectAtPath(join(session, name))",
+      "status": "gated",
+      "reason": "SessionSpillStore.purge places each private object unlink inside a fresh withDeletionGate callback using this.workspace. Scope is deliberately broad because the owning session alone cannot prove every shared reference."
+    },
+    {
+      "siteId": "src/session/spill/spillStore.ts:266:1",
+      "path": "src/session/spill/spillStore.ts",
+      "line": 266,
+      "call": "rmdirSync(",
+      "category": "filesystem-sync",
+      "source": "target: { kind: \"spills\" } }, () => rmdirSync(session));",
+      "status": "gated",
+      "reason": "SessionSpillStore.purge removes this checked session directory inside a fresh withDeletionGate callback using this.workspace and broad spill scope. The gate conservatively considers all session holds rather than trusting only the locator owner."
+    },
+    {
+      "siteId": "src/session/spill/spillStore.ts:343:indirect-direct-object",
+      "path": "src/session/spill/spillStore.ts",
+      "line": 343,
+      "call": "removeObjectAtPath(",
+      "category": "indirect-spill-erasure",
+      "source": "() => removeObjectAtPath(path)",
+      "status": "gated",
+      "reason": "removeSpillObject places the private unlink inside a fresh withDeletionGate callback after validating the reference and checked object path. It supplies explicit workspace and broad spill scope, without inferring shared-session coverage from the locator hash."
+    },
+    {
+      "siteId": "src/studio/studioState.ts:102:1",
+      "path": "src/studio/studioState.ts",
+      "line": 102,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(file, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/studio/studioSupervisor.ts:91:1",
+      "path": "src/studio/studioSupervisor.ts",
+      "line": 91,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(filePath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/terminal/nativePtySandbox.ts:113:1",
+      "path": "src/terminal/nativePtySandbox.ts",
+      "line": 113,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temporary, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/tools/builtin/atomicWrite.ts:42:1",
+      "path": "src/tools/builtin/atomicWrite.ts",
+      "line": 42,
+      "call": "unlinkSync(",
+      "category": "unpublished-temp-cleanup",
+      "source": "try { unlinkSync(temporary); } catch { /* never created, or already gone */ }",
+      "status": "exempt",
+      "reason": "Failure cleanup addresses only this atomic-write invocation's random temporary pathname, created with wx and not successfully renamed into the published target. It does not unlink the published target."
+    },
+    {
+      "siteId": "src/transparency/logChain.ts:304:1",
+      "path": "src/transparency/logChain.ts",
+      "line": 304,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/transparency/logChain.ts:380:1",
+      "path": "src/transparency/logChain.ts",
+      "line": 380,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(temp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/transparency/merkleIndexState.ts:224:1",
+      "path": "src/transparency/merkleIndexState.ts",
+      "line": 224,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(path);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/transparency/merkleIndexStore.ts:552:1",
+      "path": "src/transparency/merkleIndexStore.ts",
+      "line": 552,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/transparency/merkleIndexStore.ts:667:1",
+      "path": "src/transparency/merkleIndexStore.ts",
+      "line": 667,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/transparency/workspaceProofBundle.ts:57:1",
+      "path": "src/transparency/workspaceProofBundle.ts",
+      "line": 57,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tmp, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/utils/archiveFiles.ts:7:1",
+      "path": "src/utils/archiveFiles.ts",
+      "line": 7,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/utils/fs.ts:20:1",
+      "path": "src/utils/fs.ts",
+      "line": 20,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "try { unlinkSync(tmp); } catch { /* ignore cleanup */ }",
+      "status": "deferred",
+      "reason": "This is failed atomic-write temporary cleanup, but the source uses writeFileSync without exclusive creation. Ownership and unpublished-object treatment remain deferred before an exemption is claimed."
+    },
+    {
+      "siteId": "src/utils/signedArtifactVerification.ts:10:1",
+      "path": "src/utils/signedArtifactVerification.ts",
+      "line": 10,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/vault/vault.ts:304:1",
+      "path": "src/vault/vault.ts",
+      "line": 304,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(paths.legacyMonitorPrivate, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/vault/vault.ts:307:1",
+      "path": "src/vault/vault.ts",
+      "line": 307,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(paths.legacyAuditorPrivate, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/vault/vault.ts:461:1",
+      "path": "src/vault/vault.ts",
+      "line": 461,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(paths.legacyMonitorPrivate, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/vault/vault.ts:464:1",
+      "path": "src/vault/vault.ts",
+      "line": 464,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(paths.legacyAuditorPrivate, { force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/wire/wireListener.ts:234:1",
+      "path": "src/wire/wireListener.ts",
+      "line": 234,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "unlinkSync(socketPath);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostCli.ts:90:1",
+      "path": "src/workspaces/hostCli.ts",
+      "line": 90,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(join(deletedBase, entry.name), { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:737:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 737,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(`DELETE FROM memberships WHERE user_id = ? AND workspace_id = ?`).run(user.userId, workspaceId);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:1092:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 1092,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": ".prepare(`DELETE FROM membership_sources WHERE user_id = ? AND source_type = ? AND source_id = ?`)",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:1128:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 1128,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(`DELETE FROM memberships WHERE user_id = ? AND workspace_id = ?`).run(row.userId, row.workspaceId);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:1186:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 1186,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(`DELETE FROM scim_group_members WHERE group_id = ?`).run(params.groupId);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:1213:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 1213,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(`DELETE FROM scim_group_members WHERE group_id = ?`).run(groupId);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/workspaces/hostDb.ts:1214:1",
+      "path": "src/workspaces/hostDb.ts",
+      "line": 1214,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "handle.db.prepare(`DELETE FROM scim_groups WHERE group_id = ?`).run(groupId);",
+      "status": "deferred",
+      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    }
+  ]
+}

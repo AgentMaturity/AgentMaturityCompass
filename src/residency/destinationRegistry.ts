@@ -74,7 +74,8 @@ export function loadPinnedResidencyProfile(workspace: string, registry: Destinat
     const bytes = readBounded(path, MAX_REGISTRY_BYTES);
     const profile = parseDeploymentProfile(YAML.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes), { maxAliasCount: 0, uniqueKeys: true }));
     if (sha256Hex(canonicalize(profile)) !== expectedSha256) throw new Error();
-    return freeze({ dataClasses: profile.dataClasses.value, jurisdictions: profile.jurisdictions.value, storageUrl: registry.profile.storageUrl });
+    return freeze({ dataClasses: profile.dataClasses.value, jurisdictions: profile.jurisdictions.value, storageUrl: registry.profile.storageUrl,
+      tenantId: profile.deployment.tenantId, workspaceId: profile.deployment.workspaceId });
   } catch { throw new Error("profile_unverifiable"); }
 }
 /** Verifies and parses one bounded byte snapshot. A present broken registry never becomes a missing registry. */

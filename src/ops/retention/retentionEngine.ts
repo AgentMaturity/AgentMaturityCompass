@@ -1,12 +1,14 @@
 import { unlinkSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { openLedger, verifyLedgerIntegrity } from "../../ledger/ledger.js";
+import { runImmediateTransaction } from "../../ledger/ledgerSessionTransactions.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../policy.js";
 import { appendTransparencyEntry } from "../../transparency/logChain.js";
 import { rebuildTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
+import { canonicalize } from "../../utils/json.js";
 import { blobPathFromId } from "../../storage/blobs/blobStore.js";
 import { appendOpsAuditEvent } from "../audit.js";
 import {
@@ -22,6 +24,7 @@ import { pruneGuardEvents } from "../../enforce/evidenceEmitter.js";
 import type { EvidenceEvent } from "../../types.js";
 import { inventorySessionSpills, eraseSessionSpills } from "../../session/spill/spillLifecycle.js";
 import { spillLifecycleEventAuthenticityError } from "../../session/spill/spillEvidence.js";
+import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.js";
 
 export interface RetentionRunResult {
   dryRun: boolean;
@@ -128,6 +131,7 @@ export function retentionStatus(workspace: string): {
 }
 
 export function runRetention(params: { workspace: string; dryRun: boolean }): RetentionRunResult {
+  params = { ...params, workspace: resolve(params.workspace) };
   const verifyPolicy = verifyOpsPolicySignature(params.workspace);
   if (!verifyPolicy.valid) {
     throw new Error(`ops policy invalid: ${verifyPolicy.reason ?? "unknown reason"}`);
@@ -219,9 +223,22 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       );
     }
 
-    const pruneIds = pruneEvents.map((row) => row.id);
-    if (pruneIds.length > 0) {
-      ledger.pruneEventPayloadColumns(pruneIds, nowMs());
+    const pruneIds: string[] = [];
+    const payloadsBySession = new Map<string, string[]>();
+    for (const row of pruneEvents) {
+      const ids = payloadsBySession.get(row.session_id) ?? [];
+      ids.push(row.id);
+      payloadsBySession.set(row.session_id, ids);
+    }
+    for (const [sessionId, ids] of payloadsBySession) {
+      try {
+        withDeletionGate({ workspace: params.workspace, executor: "retention.payload-prune",
+          target: { kind: "evidence-payloads", sessionHashes: [sha256Hex(Buffer.from(sessionId, "utf8"))], before: new Date(pruneBeforeTs).toISOString() } },
+        () => ledger.pruneEventPayloadColumns(ids, nowMs()));
+        pruneIds.push(...ids);
+      } catch (error) {
+        if (!(error instanceof DeletionDenied)) throw error;
+      }
     }
 
     let prunedBlobCount = 0;
@@ -235,8 +252,16 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       list.push(row);
       byBlob.set(row.blob_ref, list);
     }
-    for (const [blobId, rows] of byBlob.entries()) {
-      const eligibleForDelete = rows.every((row) => row.payload_pruned === 1 && row.ts < pruneBeforeTs);
+    const blobReferences = ledger.db.prepare(`SELECT id, session_id, ts, event_hash, writer_sig, blob_ref,
+      canonical_payload_path, payload_pruned, payload_pruned_ts FROM evidence_events WHERE blob_ref = ? ORDER BY id ASC`);
+    type BlobDeleteOutcome = { removed: true } | { removed: false;
+      reason: "references_changed" | "references_ineligible" | "file_missing" };
+    for (const blobId of byBlob.keys()) {
+      // Include every current reference, not just the expired rows selected earlier.
+      const rows = blobReferences.all(blobId) as Array<Pick<EvidenceEvent, "id" | "session_id" | "ts" | "event_hash" | "writer_sig"
+        | "blob_ref" | "canonical_payload_path" | "payload_pruned" | "payload_pruned_ts">>;
+      const admittedReferences = canonicalize(rows);
+      const eligibleForDelete = rows.length > 0 && rows.every((row) => row.payload_pruned === 1 && row.ts < pruneBeforeTs);
       if (!eligibleForDelete) {
         continue;
       }
@@ -245,10 +270,37 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       if (!pathExists(full)) {
         continue;
       }
-      const bytes = readFileSync(full);
-      unlinkSync(full);
-      appendPrunedRow(params.workspace, blobId, sha256Hex(bytes));
-      prunedBlobCount += 1;
+      let outcome: BlobDeleteOutcome;
+      try {
+        outcome = withDeletionGate({ workspace: params.workspace, executor: "retention.blob-unlink",
+          target: { kind: "blobs", sessionHashes: [...new Set(rows.map(row => sha256Hex(Buffer.from(row.session_id, "utf8"))))],
+            before: new Date(pruneBeforeTs).toISOString() } },
+        () => runImmediateTransaction<BlobDeleteOutcome>(ledger.db, () => {
+          // Admission/audit uses another connection; acquire the DB write lock only after it returns.
+          const current = blobReferences.all(blobId) as typeof rows;
+          if (canonicalize(current) !== admittedReferences) return { removed: false, reason: "references_changed" };
+          if (current.length === 0 || !current.every(row => row.payload_pruned === 1 && row.ts < pruneBeforeTs))
+            return { removed: false, reason: "references_ineligible" };
+          if (!pathExists(full)) return { removed: false, reason: "file_missing" };
+          const bytes = readFileSync(full);
+          unlinkSync(full);
+          appendPrunedRow(params.workspace, blobId, sha256Hex(bytes));
+          return { removed: true };
+        }));
+      } catch (error) {
+        if (!(error instanceof DeletionDenied)) throw error;
+        continue;
+      }
+      if (outcome.removed) {
+        prunedBlobCount += 1;
+      } else {
+        const skippedAudit = appendOpsAuditEvent({ workspace: params.workspace, auditType: "RETENTION_BLOB_DELETE_SKIPPED",
+          payload: { blobId, executor: "retention.blob-unlink", admittedReferenceSha256: sha256Hex(admittedReferences),
+            removed: false, reason: outcome.reason } });
+        if (!skippedAudit.eventId || !/^[a-f0-9]{64}$/.test(skippedAudit.eventHash))
+          throw new Error("retention_blob_delete_skipped_audit_unacknowledged");
+        auditEventIds.push(skippedAudit.eventId);
+      }
     }
 
     // Signed spill commitments are metadata references, not ledger blob_ref.
@@ -288,7 +340,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       });
       auditEventIds.push(...erased.auditEventIds);
       prunedSpillCount += erased.entries.filter((entry) => entry.status === "removed").length;
-      if (!erased.ok) throw new Error("Spill retention incomplete; inspect signed SESSION_SPILL_ERASURE_FINISHED audit events");
+      if (erased.entries.some(entry => entry.status === "failed")) throw new Error("Spill retention incomplete; inspect signed SESSION_SPILL_ERASURE_FINISHED audit events");
     }
 
     const createdAudit = appendOpsAuditEvent({
