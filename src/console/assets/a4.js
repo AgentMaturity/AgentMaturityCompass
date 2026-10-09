@@ -159,7 +159,9 @@ function mountProject(projectId, options) {
   const specBaseNow = () => ({ revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: view.editableSpec(state.revision?.spec) });
   const headBinding = () => ({ expectedHeadSeq: state.project.headSeq, clientRequestId: uuid() });
   const presenceCard = () => `${stage}:${activeCard}`;
-  // Every <details> the page renders carries data-a4-open; a re-render keeps the user's open/closed choice by this key.
+  // Every <details> the page renders carries data-a4-open; a re-render keeps the open/closed state the user chose by
+  // this key, and every other section follows its rendered default (a thread opens when its first comment arrives).
+  const toggled = new Map();
   const detailsKey = (details) => `${details.closest("[data-card]")?.dataset.card ?? "page"}:${details.dataset.a4Open}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
@@ -256,7 +258,10 @@ function mountProject(projectId, options) {
     const fields = () => new Map([...root.querySelectorAll("[name]")].map((field) => [draftKey(field), field]).filter(([key]) => key));
     const focused = document.activeElement && root.contains(document.activeElement) ? draftKey(document.activeElement) : null;
     const caret = focused ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
-    const opened = new Map([...root.querySelectorAll("details[data-a4-open]")].map((details) => [detailsKey(details), details.open]));
+    for (const details of root.querySelectorAll("details[data-a4-open]")) {
+      if (details.open === details.hasAttribute("data-a4-default-open")) toggled.delete(detailsKey(details));
+      else toggled.set(detailsKey(details), details.open);
+    }
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
@@ -277,7 +282,7 @@ function mountProject(projectId, options) {
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
     renderPresenceChips();
     for (const details of root.querySelectorAll("details[data-a4-open]")) {
-      if (opened.has(detailsKey(details))) details.open = opened.get(detailsKey(details));
+      if (toggled.has(detailsKey(details))) details.open = toggled.get(detailsKey(details));
     }
     for (const [key, field] of fields()) {
       if (drafts.has(key)) field.value = drafts.get(key);

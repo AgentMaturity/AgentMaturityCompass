@@ -209,7 +209,7 @@ export function renderComments(cardId, comments) {
     <span class="pill">SELF_REPORTED</span> <strong>${esc(comment.authorUsername ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes ?? (comment.reasonCode ? [comment.reasonCode] : []))}`}</div></li>`);
-  return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
+  return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
     <button type="button" data-a4-action="comment">Comment</button>
     <p class="muted">Discussion, never evidence; up to 8 KiB. ${RETAINED}</p></details>`;
