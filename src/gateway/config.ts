@@ -20,7 +20,7 @@ const upstreamSchema = z.object({
   baseUrl: z.string().min(1),
   auth: authSchema,
   allowLocalhost: z.boolean().optional(),
-  /** Non-public IP literals this upstream may resolve to (P1-66), e.g. a private endpoint reached by name; any other non-public address is refused. */
+  /** Non-public IP literals this upstream may resolve to (P1-66), e.g. a private endpoint reached by name; any other non-public address is refused. Honoured only while gateway.yaml is validly signed. */
   allowNonPublicAddresses: z.array(z.string().refine((value) => isIP(value) !== 0, "must be an IP literal")).optional(),
   providerId: z.string().optional()
 });
