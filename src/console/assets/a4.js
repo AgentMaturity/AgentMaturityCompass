@@ -286,13 +286,17 @@ function mountProject(projectId, options) {
       body: { spec, parentRevisionNo: base.revisionNo > 0 ? base.revisionNo : null, expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
+  function parseSpec(text) {
+    let spec;
+    try { spec = JSON.parse(text); } catch { throw new Error("The specification is not valid JSON. Nothing was sent."); }
+    if (!isObject(spec)) throw new Error("The specification must be a JSON object. Nothing was sent.");
+    return spec;
+  }
+
   function proposeAction(scope) {
     const field = scope.querySelector('[name="spec"]');
     if (!field) return { label: "Propose", path: stagePath("propose"), body: headBinding() };
-    let spec;
-    try { spec = JSON.parse(field.value); } catch { throw new Error("The specification is not valid JSON. Nothing was sent."); }
-    if (!isObject(spec)) throw new Error("The specification must be a JSON object. Nothing was sent.");
-    return specAction(spec, specBase ?? { revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: state.revision?.spec ?? {} });
+    return specAction(parseSpec(field.value), specBase ?? { revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: state.revision?.spec ?? {} });
   }
 
   /** Confirm and Correct bind the head of the reflection this page shows, so a newer reflection makes Studio answer 409. */
@@ -386,7 +390,7 @@ function mountProject(projectId, options) {
     }
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
     const headSpec = isObject(headRevision?.spec) ? headRevision.spec : {};
-    conflict = { baseRevisionNo: action.base.revisionNo, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
+    conflict = { baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
       theirs: view.jsonDiff(action.base.spec, headSpec), mine: view.jsonDiff(action.base.spec, action.spec) };
     await load();
   }
@@ -419,7 +423,10 @@ function mountProject(projectId, options) {
     }
     if (name === "apply-on-top") {
       if (!conflict) return load();
-      const merged = view.applyChanges(conflict.headSpec, conflict.mine);
+      // The editor stays editable under the conflict card: merge what it holds now, not what it held when Studio refused.
+      const draft = drafts.get("specification:spec");
+      const mine = draft === undefined ? conflict.mine : view.jsonDiff(conflict.baseSpec, parseSpec(draft));
+      const merged = view.applyChanges(conflict.headSpec, mine);
       const base = { revisionNo: conflict.headRevisionNo, headSeq: conflict.headSeq, spec: conflict.headSpec };
       conflict = null;
       return run(specAction(merged, base));

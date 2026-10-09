@@ -366,7 +366,8 @@ export function renderConflict(conflict) {
   return `<section class="card a4-conflict"><h4>The specification changed while you were editing</h4>
     <p>The head is r${esc(conflict.headRevisionNo)}; you started from r${esc(conflict.baseRevisionNo)}. Changes on the head:</p>
     ${conflict.theirs.length ? renderPromptDiffViewer({ status: "ok", changes: conflict.theirs }) : `<p class="muted">No specification changes on the head.</p>`}
-    <p>Your changes:</p>${renderPromptDiffViewer({ status: "ok", changes: conflict.mine })}
+    <p>Your changes when Studio refused them (Apply my changes on top uses the editor as it is now):</p>
+    ${renderPromptDiffViewer({ status: "ok", changes: conflict.mine })}
     <div class="row wrap"><button type="button" data-a4-action="apply-on-top">Apply my changes on top</button>
       <button type="button" class="secondary" data-a4-action="reload">Reload</button></div></section>`;
 }
