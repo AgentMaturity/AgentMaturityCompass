@@ -6,6 +6,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
 import { bodyJson, apiSuccess, apiError, isRequestBodyError, queryParam, pathParam } from './apiHelpers.js';
+import { withWorkspaceScope } from '../enforce/evidenceEmitter.js';
 
 const guardrailMutationBodySchema = z.object({
   name: z.string().trim().min(1)
@@ -380,7 +381,7 @@ export async function handleToolsRoute(
         const body = await bodyJson<{ registry: string; query?: string }>(req);
         if (!body.registry) { apiError(res, 400, 'Required: registry'); return true; }
         const { pluginSearchCli } = await import('../plugins/pluginCli.js');
-        const out = await pluginSearchCli(body);
+        const out = await withWorkspaceScope(workspace, () => pluginSearchCli(body));
         apiSuccess(res, out);
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Plugin search failed');
