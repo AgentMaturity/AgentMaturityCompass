@@ -76,7 +76,8 @@ const parseList = (json: string): string[] => JSON.parse(json) as string[];
 
 /**
  * Slot recomputers (design §8): A4 recomputes a producer's digest only to compare it. Stage lanes add theirs; a filled
- * slot without one counts as drifted (fail closed). The gate-policy slot is bound through the intent instead.
+ * slot without one counts as drifted (fail closed). A recomputer answers null exactly when the resource is absent, the
+ * value a revision binds for it then. The gate-policy slot is bound through the intent instead.
  */
 export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null> = {
   "signedConfigs.tools": (workspace) => fileSha(join(workspace, ".amc", "tools.yaml")),
@@ -95,9 +96,16 @@ export function flatSlots(digests: unknown, prefix = ""): Record<string, string 
       : [[`${prefix}${key}`, typeof value === "string" ? value : null]]));
 }
 
-/** Filled slots whose live recomputation differs (or that nothing can recompute). */
+/**
+ * Slots whose live recomputation differs from the bound value, including a recomputable slot bound null (a signed config
+ * absent at propose) whose resource now exists; a filled slot nothing can recompute counts too. Only an unfilled slot
+ * with no recomputer (not produced) is skipped. Decide, complete and the executor preamble all read this.
+ */
 export function driftedSlots(workspace: string, slots: Record<string, string | null>): string[] {
-  return Object.entries(slots).filter(([slot, value]) => value !== null && RESOURCE_SLOTS[slot]?.(workspace) !== value).map(([slot]) => slot);
+  return Object.entries(slots).filter(([slot, value]) => {
+    const recompute = RESOURCE_SLOTS[slot];
+    return recompute === undefined ? value !== null : recompute(workspace) !== value;
+  }).map(([slot]) => slot);
 }
 
 /** The project's rows, read in one verified snapshot; refs resolved against the ledger and the trust list now. */
