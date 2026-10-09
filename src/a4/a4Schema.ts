@@ -63,8 +63,9 @@ export const A4_ENVELOPE_KINDS: readonly A4TransitionKind[] = ["GATE_REQUESTED",
 const GOVERNANCE_BOUND_ITEMS = [
   "members.present", "signing.notary_route", "signing.notary_reachable",
   "store.integrity", "approvals.policy_signed", "gate.policy_floor", "hold.none", "identity.check", "effects.failed",
-  // Member-derived, not vote-derived (P1-57): a regulated quorum of LOCAL_USER keys is foreseeable before the request, and
-  // its owner acknowledgement must precede the request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
+  // Derived from the regulated status, not from votes (P1-57): while host sessions cannot decide on a regulated project,
+  // its every quorum is LOCAL_USER keys, foreseeable before the request, and the owner acknowledgement must precede the
+  // request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
   "sod.self_provisioned"
 ] as const;
 export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {

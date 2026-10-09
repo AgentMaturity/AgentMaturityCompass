@@ -271,7 +271,9 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     live.driftedSlots === null ? unread("resources.current", "RESOURCE_MISSING")
       : live.driftedSlots.length > 0 ? item("resources.current", "BLOCKED", { kind: "scope_changed", reasonCodes: ["RESOURCE_DRIFTED", ...live.driftedSlots] })
         : item("resources.current", "READY"),
-    regulated && approvers.length > 0 && approvers.every((member) => member.authSource === "LOCAL_USER")
+    // A regulated project refuses WORKSPACE_ROUTER decisions until P2-33 (recordDecision, verifyAndConsumeEffect), so every
+    // quorum it can count is LOCAL_USER keys, whoever the members are. Derive it from the counted quorum once that lifts.
+    regulated && approvers.length > 0
       ? item("sod.self_provisioned", "WAITING", { kind: "review_pending", reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT"] })
       : item("sod.self_provisioned", "READY", { mandatory: regulated })
   ];
