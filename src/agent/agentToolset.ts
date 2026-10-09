@@ -24,7 +24,7 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
-import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows } from "../tools/guards/compiledPolicyGuard.js";
+import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -63,8 +63,8 @@ export interface AgentToolsetOptions {
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
   /**
-   * A signed lease the composer minted for this runtime (P1-67: a Studio native task). Under a compiled plan every
-   * call binds it, so `identity-binding` (L0-IDN-01) can admit the call; with no plan it is unused. Scrubbed from output.
+   * A signed lease the composer minted for this runtime (P1-67: a Studio native task). Under a compiled plan whose
+   * `identity-binding` requires a lease (L0-IDN-01) every call binds it; otherwise it is unused. Scrubbed from output.
    */
   readonly leaseToken?: string;
   /** Explicit operator acceptance of an unconfined macOS shell (P0-06); ignored on Linux and refused elsewhere. */
@@ -259,8 +259,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   } catch (error) {
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
   }
-  // P1-67: only a plan's identity-binding needs the lease; without one, records bind as before.
-  const leaseToken = compiled ? options.leaseToken : undefined;
+  // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
+  const leaseToken = planRequiresAgentLease(compiled) ? options.leaseToken : undefined;
   const scrubValues = [...(options.scrubValues ?? []), ...(options.leaseToken ? [options.leaseToken] : [])];
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   // Opened on the first journaled call (P1-03), which also recovers what crashed runs left. One that cannot open
