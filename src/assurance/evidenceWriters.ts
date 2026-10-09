@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Ledger } from "../ledger/ledger.js";
 import { hashBinaryOrPath } from "../ledger/ledger.js";
+import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import type { RuntimeName, TrustTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -14,34 +15,25 @@ export function startAssuranceSession(params: {
   trustTier: TrustTier;
 }): string {
   const sessionId = randomUUID();
-  params.ledger.startSession({
-    sessionId,
-    runtime: "unknown",
-    binaryPath: "amc-assurance-runner",
-    binarySha256: hashBinaryOrPath("amc-assurance-runner", "1")
-  });
-
-  params.ledger.appendEvidence({
-    sessionId,
-    runtime: "unknown",
-    eventType: "audit",
-    payload: JSON.stringify({
-      auditType: "ASSURANCE_RUN_STARTED",
-      severity: "LOW",
-      mode: params.mode,
-      agentId: params.agentId,
-      packIds: params.packIds
-    }),
-    payloadExt: "json",
-    inline: true,
-    meta: {
-      auditType: "ASSURANCE_RUN_STARTED",
-      severity: "LOW",
-      mode: params.mode,
-      agentId: params.agentId,
-      packIds: params.packIds,
-      trustTier: params.trustTier
-    }
+  // P0-55: the session and its "run started" row commit together, so a failed first row leaves no unsealed session
+  // (the run's own catch seals everything after this).
+  runImmediateTransaction(params.ledger.db, () => {
+    params.ledger.startSession({
+      sessionId,
+      runtime: "unknown",
+      binaryPath: "amc-assurance-runner",
+      binarySha256: hashBinaryOrPath("amc-assurance-runner", "1")
+    });
+    const run = { auditType: "ASSURANCE_RUN_STARTED", severity: "LOW", mode: params.mode, agentId: params.agentId, packIds: params.packIds };
+    params.ledger.appendEvidence({
+      sessionId,
+      runtime: "unknown",
+      eventType: "audit",
+      payload: JSON.stringify(run),
+      payloadExt: "json",
+      inline: true,
+      meta: { ...run, trustTier: params.trustTier }
+    });
   });
 
   return sessionId;
