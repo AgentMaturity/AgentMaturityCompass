@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
+import { EgressBlocked } from "../residency/checkEgress.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import {
   anchorReceiptPath, anchorsDir, checkpointNotePath, checkpointNoteText, loadTransparencyConfig, pinnedTransparencyLogs, verifyAnchorReceipt,
@@ -208,32 +209,35 @@ function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
 }
 
 async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, anchor: TransparencyConfig["anchors"][number], trust: TrustContext): Promise<AnchorResult> {
-  const result = (status: AnchorResult["status"], detail: string | null): AnchorResult => ({ anchor: anchor.name, sequence: entry.checkpoint.sequence, status, detail });
-  const logs = pinnedTransparencyLogs(trust).filter(log => anchor.logIds.includes(log.logId));
-  if (!logs.length) return result("failed", `none of its logIds (${anchor.logIds.join(", ")}) is in a verified trust list`);
+  const selected = { name: anchor.name, url: anchor.url, logIds: [...anchor.logIds] };
+  const sequence = entry.checkpoint.sequence;
+  const result = (status: AnchorResult["status"], detail: string | null): AnchorResult => ({ anchor: selected.name, sequence, status, detail });
+  const logs = pinnedTransparencyLogs(trust).filter(log => selected.logIds.includes(log.logId));
+  if (!logs.length) return result("failed", `none of its logIds (${selected.logIds.join(", ")}) is in a verified trust list`);
   try {
     const note = checkpointNote(workspace, entry);
     const digest = sha256Hex(note);
     // The token first: a public log entry is permanent, so nothing is submitted that the anchor could not complete.
     const { grant, failures } = await timestampDigest(workspace, digest, trust);
     if (!grant) return result("failed", `no RFC 3161 token for the checkpoint note: ${failures.join("; ") || "no time.tsa configured"}`);
-    const response = await submitRekorV2Entry(new URL(anchor.url), note);
-    const receipt: AnchorReceiptV1 = { type: "amc.anchor-receipt", version: 1, backend: "rekor-v2", service: anchor.url, checkpointSha256: digest,
+    const response = await submitRekorV2Entry(new URL(selected.url), note, workspace);
+    const receipt: AnchorReceiptV1 = { type: "amc.anchor-receipt", version: 1, backend: "rekor-v2", service: selected.url, checkpointSha256: digest,
       submittedAt: new Date().toISOString(), responseB64: response.toString("base64"), timestampTokenB64: grant.tokenDer.toString("base64") };
     const bytes = Buffer.from(`${JSON.stringify(receipt, null, 2)}\n`, "utf8");
     // Kept whatever it says: the entry is public now, and a verifier reports a bad anchor instead of never seeing it.
-    writeFileSync(anchorReceiptPath(workspace, entry.checkpoint.sequence, anchor.name), bytes, { flag: "wx", mode: 0o644 });
+    writeFileSync(anchorReceiptPath(workspace, sequence, selected.name), bytes, { flag: "wx", mode: 0o644 });
     const verified = verifyAnchorReceipt(bytes, note, trust, logs);
     return result(verified.status, verified.detail);
   } catch (error) {
+    if (error instanceof EgressBlocked) throw error;
     return result("failed", error instanceof Error ? error.message : String(error));
   }
 }
 
 /**
  * P1-26: anchors the newest ledger checkpoint in each log of `transparency.anchors` (`anchorEvery`: every checkpoint,
- * or at most daily per log). A no-op without anchors. Failures are returned, never thrown; the checkpoint stays
- * unanchored and a later tick tries the then-newest checkpoint.
+ * or at most daily per log). A no-op without anchors. Failures are returned unless every selected anchor is denied by
+ * residency, which throws the original typed denial. An unanchored checkpoint is retried by a later tick.
  */
 export async function anchorCheckpoints(workspace: string, trust?: TrustContext, now = Date.now()): Promise<AnchorResult[]> {
   const config = loadTransparencyConfig(workspace);
@@ -242,12 +246,25 @@ export async function anchorCheckpoints(workspace: string, trust?: TrustContext,
   if (!config.anchors.length || !latest) return [];
   const context = trust ?? loadTrustContext();
   const results: AnchorResult[] = [];
+  let selected = 0;
+  let denied = 0;
+  let firstDenial: EgressBlocked | undefined;
   for (const anchor of config.anchors) {
-    if (pathExists(anchorReceiptPath(workspace, latest.checkpoint.sequence, anchor.name))) continue;
-    const lastAnchored = [...chain].reverse().find(entry => pathExists(anchorReceiptPath(workspace, entry.checkpoint.sequence, anchor.name)));
+    const name = anchor.name;
+    if (pathExists(anchorReceiptPath(workspace, latest.checkpoint.sequence, name))) continue;
+    const lastAnchored = [...chain].reverse().find(entry => pathExists(anchorReceiptPath(workspace, entry.checkpoint.sequence, name)));
     if (config.anchorEvery === "daily" && lastAnchored && now - Date.parse(lastAnchored.checkpoint.claimedAt) < 86_400_000) continue;
-    results.push(await anchorCheckpoint(workspace, latest, anchor, context));
+    selected += 1;
+    try {
+      results.push(await anchorCheckpoint(workspace, latest, anchor, context));
+    } catch (error) {
+      if (!(error instanceof EgressBlocked)) throw error;
+      denied += 1;
+      firstDenial ??= error;
+      results.push({ anchor: name, sequence: latest.checkpoint.sequence, status: "failed", detail: error.message });
+    }
   }
+  if (firstDenial && denied === selected) throw firstDenial;
   return results;
 }
 
@@ -266,6 +283,10 @@ export async function timeCheckpointTick(workspace: string, now = Date.now()): P
     const due = checkpointDue(workspace, config, readCheckpointChain(workspace).at(-1)?.checkpoint, now);
     if (due) await checkpointLedger(workspace);
     return { ran: due, anchors: await anchorCheckpoints(workspace, undefined, now) };
+  } catch (error) {
+    if (!(error instanceof EgressBlocked)) throw error;
+    console.error(error.message);
+    return { ran: false, anchors: [] };
   } finally {
     inFlight.delete(workspace);
   }

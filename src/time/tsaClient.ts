@@ -7,6 +7,8 @@ import { join } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { canonicalHost, decideEgress } from "../enforce/egressAllowlist.js";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
 import type { TimestampAuthority } from "../trust/trustList.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
@@ -86,47 +88,53 @@ async function checkedAddress(host: string): Promise<string> {
  */
 export async function postToConfiguredUrl(url: URL, body: Buffer, expect: {
   contentType: string; accept: string; status: number; maxBytes: number; timeoutMs: number;
-}): Promise<Buffer> {
-  if (url.username || url.password) throw new Error("a configured URL must not carry credentials");
-  const host = canonicalHost(url.hostname);
+}, workspace?: string): Promise<Buffer> {
+  const scope = workspace === undefined ? getWorkspaceScope() : workspace;
+  const capturedUrl = url.href;
+  const target = new URL(capturedUrl);
+  const payload = Buffer.from(body);
+  const { contentType, accept, status: expectedStatus, maxBytes, timeoutMs } = expect;
+  if (target.username || target.password) throw new Error("a configured URL must not carry credentials");
+  const host = canonicalHost(target.hostname);
   const address = await checkedAddress(host);
-  const https = url.protocol === "https:";
+  const https = target.protocol === "https:";
   const options: RequestOptions & { servername?: string } = {
-    host: address, port: url.port || (https ? 443 : 80), method: "POST", path: `${url.pathname}${url.search}`, agent: false, setHost: false,
-    headers: { host: url.host, "content-type": expect.contentType, accept: expect.accept, "content-length": body.length },
-    signal: AbortSignal.timeout(expect.timeoutMs),
+    host: address, port: target.port || (https ? 443 : 80), method: "POST", path: `${target.pathname}${target.search}`, agent: false, setHost: false,
+    headers: { host: target.host, "content-type": contentType, accept, "content-length": payload.length },
+    signal: AbortSignal.timeout(timeoutMs),
     // TLS checks the certificate against the configured name, not the address it resolved to.
     ...(https && isIP(host) === 0 ? { servername: host } : {})
   };
   return await new Promise<Buffer>((resolve, reject) => {
+    checkScopedEgress(scope, "network-tool", capturedUrl, { dataClasses: null, purpose: null, agentId: "system" });
     const request = (https ? httpsRequest : httpRequest)(options, (response: IncomingMessage) => {
       const type = (response.headers["content-type"] ?? "").split(";")[0]!.trim().toLowerCase();
       const status = response.statusCode ?? 0;
-      if (status !== expect.status || type !== expect.accept) {
+      if (status !== expectedStatus || type !== accept) {
         response.resume();
         reject(new Error(status >= 300 && status < 400 ? `redirect (HTTP ${status}) refused`
-          : status !== expect.status ? `HTTP ${status}` : `content type "${type}" is not ${expect.accept}`));
+          : status !== expectedStatus ? `HTTP ${status}` : `content type "${type}" is not ${accept}`));
         return;
       }
       const chunks: Buffer[] = [];
       let size = 0;
       response.on("data", (chunk: Buffer) => {
         size += chunk.length;
-        if (size > expect.maxBytes) request.destroy(new Error(`reply exceeds ${expect.maxBytes} bytes`));
+        if (size > maxBytes) request.destroy(new Error(`reply exceeds ${maxBytes} bytes`));
         else chunks.push(chunk);
       });
       response.on("end", () => resolve(Buffer.concat(chunks)));
       response.on("error", reject);
     });
     request.on("error", reject);
-    request.end(body);
+    request.end(payload);
   });
 }
 
 /** POSTs a timestamp query and returns the reply body. Redirects, other statuses and other content types are refused. */
-export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA_TIMEOUT_MS): Promise<Buffer> {
+export async function postTimestampQuery(url: URL, body: Buffer, timeoutMs = TSA_TIMEOUT_MS, workspace?: string): Promise<Buffer> {
   return await postToConfiguredUrl(url, body, { contentType: "application/timestamp-query", accept: "application/timestamp-reply",
-    status: 200, maxBytes: TIMESTAMP_TOKEN_MAX_BYTES, timeoutMs });
+    status: 200, maxBytes: TIMESTAMP_TOKEN_MAX_BYTES, timeoutMs }, workspace);
 }
 
 export interface TimestampGrant { tsa: string; tokenDer: Buffer; attested: AttestedTime }
@@ -137,36 +145,46 @@ export async function requestTimestamp(input: {
   config: Pick<TimeConfig, "tsa">;
   anchors: readonly TimestampAuthority[];
   timeoutMs?: number;
-}): Promise<{ grant: TimestampGrant | null; failures: string[] }> {
+}, workspace?: string): Promise<{ grant: TimestampGrant | null; failures: string[] }> {
+  const scope = workspace === undefined ? getWorkspaceScope() : workspace;
+  const { digestHex, timeoutMs } = input;
+  const tsas = input.config.tsa.map(tsa => ({ name: tsa.name, url: tsa.url, reqPolicy: tsa.reqPolicy, anchorIds: [...tsa.anchorIds] }));
+  const pinned = input.anchors.map(anchor => ({ anchorId: anchor.anchorId, name: anchor.name, rootCertificatePem: anchor.rootCertificatePem,
+    policyOids: anchor.policyOids ? [...anchor.policyOids] : undefined }));
   const failures: string[] = [];
-  for (const tsa of input.config.tsa) {
-    const anchors = input.anchors.filter(anchor => tsa.anchorIds.includes(anchor.anchorId));
+  let firstBlocked: EgressBlocked | undefined;
+  let denied = 0;
+  for (const tsa of tsas) {
+    const anchors = pinned.filter(anchor => tsa.anchorIds.includes(anchor.anchorId));
     if (!anchors.length) {
       failures.push(`${tsa.name}: none of its anchorIds (${tsa.anchorIds.join(", ")}) is in a verified trust list`);
       continue;
     }
     try {
-      const { der, nonceHex } = buildTimestampRequest(input.digestHex, tsa.reqPolicy);
-      const reply = await postTimestampQuery(new URL(tsa.url), der, input.timeoutMs);
-      const verified = verifyTimestampToken({ token: reply, expectedDigestHex: input.digestHex, nonceHex, anchors });
+      const { der, nonceHex } = buildTimestampRequest(digestHex, tsa.reqPolicy);
+      const reply = await postTimestampQuery(new URL(tsa.url), der, timeoutMs, scope);
+      const verified = verifyTimestampToken({ token: reply, expectedDigestHex: digestHex, nonceHex, anchors });
       if (!verified.ok) failures.push(`${tsa.name}: ${verified.code}: ${verified.detail}`);
       else if (tsa.reqPolicy && verified.attested.policyOid !== tsa.reqPolicy) failures.push(`${tsa.name}: token policy ${verified.attested.policyOid} is not the requested ${tsa.reqPolicy}`);
       else return { grant: { tsa: tsa.name, tokenDer: Buffer.from(verified.attested.tokenDerB64, "base64"), attested: verified.attested }, failures };
     } catch (error) {
+      if (error instanceof EgressBlocked) { firstBlocked ??= error; denied += 1; }
       failures.push(`${tsa.name}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  if (firstBlocked && denied === tsas.length) throw firstBlocked;
   return { grant: null, failures };
 }
 
 /**
  * Timestamps `digestHex` with the workspace's configured TSAs and the operator's TSA anchors. `grant` is null when no
  * TSA is configured or none granted a verified token; the caller decides, with `config.required`, whether that fails.
+ * When residency denies every configured TSA, the original typed refusal propagates.
  */
 export async function timestampDigest(workspace: string, digestHex: string, trust?: TrustContext): Promise<{
   config: TimeConfig; grant: TimestampGrant | null; failures: string[];
 }> {
   const config = loadTimeConfig(workspace);
   if (!config.tsa.length) return { config, grant: null, failures: [] };
-  return { config, ...await requestTimestamp({ digestHex, config, anchors: timestampAnchors(trust ?? loadTrustContext()) }) };
+  return { config, ...await requestTimestamp({ digestHex, config, anchors: timestampAnchors(trust ?? loadTrustContext()) }, workspace) };
 }

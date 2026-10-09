@@ -531,12 +531,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/time/tsaClient.ts:102:1",
+      "siteId": "src/time/tsaClient.ts:110:1",
       "path": "src/time/tsaClient.ts",
-      "line": 102,
+      "line": 110,
       "call": "(https ? httpsRequest : httpRequest)(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Shared TSA/Rekor POST carries known timestampDigest/anchorCheckpoint workspace through backward-compatible trailing arguments, or captures existing ALS for library calls. URL/Buffer/expectation are copied before DNS; prepared pinned options retain checked address, Host/TLS, timeout/type/status/cap and no redirects. Adjacent network-tool check precedes native constructor with null facts/system actor. Every configured alternative is independently gated; all-denied TSA/selected-anchor sets surface original typed refusal, scheduler logs/catches it and clears inFlight. Source-only; DNS queries/local notes/checkpoints/earlier posts may predate refusal, external scope and best-effort audit/transport/trust limits remain."
     },
     {
       "siteId": "src/toolhub/toolhubClient.ts:84:1",

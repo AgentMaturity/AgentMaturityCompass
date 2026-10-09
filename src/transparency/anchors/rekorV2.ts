@@ -35,10 +35,10 @@ export function rekorV2EntryRequest(note: Buffer): Buffer {
 }
 
 /** POSTs the entry to `<url>/api/v2/log/entries` through the egress check; Rekor answers 201 with a TransparencyLogEntry. */
-export async function submitRekorV2Entry(url: URL, note: Buffer): Promise<Buffer> {
+export async function submitRekorV2Entry(url: URL, note: Buffer, workspace?: string): Promise<Buffer> {
   return await postToConfiguredUrl(new URL(`${url.pathname.replace(/\/+$/, "")}/api/v2/log/entries`, url), rekorV2EntryRequest(note), {
     contentType: "application/json", accept: "application/json", status: 201, maxBytes: REKOR_V2_RESPONSE_MAX_BYTES, timeoutMs: REKOR_V2_TIMEOUT_MS
-  });
+  }, workspace);
 }
 
 // protojson: int64 as a decimal string (a number is accepted too), bytes as base64, zero values omitted.
