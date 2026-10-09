@@ -111,6 +111,8 @@ proxy:
   denyByDefault: true
 ```
 
+Every request to an upstream resolves the `baseUrl` host again and connects only to an address it checked. A host that resolves to a loopback, private, link-local or otherwise non-public address is refused (HTTP 403 and a `NETWORK_EGRESS_BLOCKED` audit event naming the address) unless the upstream opts in: write the IP literal as the `baseUrl` host, list the addresses under `allowNonPublicAddresses` (for example a private endpoint reached by name over TLS), or set `allowLocalhost: true` for 127.0.0.1 and ::1. A `baseUrl` expanded from an environment variable (`${OPENAI_BASE_URL}`) opts nothing in by its literal host, because the configuration signature does not cover the variable.
+
 ## Harness Mode Notes
 
 `amc run --claim-mode harness --harness-runtime claude`

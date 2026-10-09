@@ -33,7 +33,7 @@ import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
-import { pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
+import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -1332,9 +1332,16 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      // Refused fields (e.g. dsh_session_log) belong to the upstream, and an unreadable body is refused; the audit keeps names and size, never content.
-      const upstreamFields = await fieldGuard.fieldsFor(route.upstream); // resolved now; the upstream connection below is pinned to these addresses
-      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, upstreamFields.fields);
+      // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
+      // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
+      const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved);
+      if (!upstreamEgress.decision.allowed) {
+        appendNetworkBlockedAudit(({ payload, meta }) => appendEvidence({ eventType: "audit", payload, meta: { ...meta, upstreamId: route.upstream } }),
+          requestId, upstreamUrl.hostname, Number(upstreamUrl.port || (upstreamUrl.protocol === "https:" ? 443 : 80)), upstreamEgress);
+        res.writeHead(403, { "content-type": "application/json" }).end(JSON.stringify({ error: `upstream ${route.upstream} refused by the gateway egress check` }));
+        return;
+      }
+      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, await fieldGuard.fieldsFor(route.upstream, upstreamEgress.addresses));
       if (fieldRefusal) {
         const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream,
           agentId: attributedAgentId, reason: fieldRefusal.reason, fields: fieldRefusal.fields, requestBytes: requestBody.byteLength };
@@ -1550,7 +1557,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(upstreamFields.addresses)
+        lookup: pinnedLookup(upstreamEgress.addresses)
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);

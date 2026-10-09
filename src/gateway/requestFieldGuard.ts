@@ -6,24 +6,24 @@
  * upstream may read a field from a body this parser cannot. Field values are never read or kept.
  *
  * Hosts are compared by identity, not spelling: the canonical name (canonicalAddress) and every address it
- * resolves to. Guarded upstreams are resolved again for every request and every proxied connection (P1-66), and a
- * request's upstream connection is pinned to the addresses its fields were decided on.
+ * resolves to. Guarded upstreams are resolved again for every request and every proxied connection (P1-66); a
+ * request's own upstream is identified by the addresses its egress check (checkUpstreamEgress) resolved, and its
+ * connection is pinned to them.
  */
 import type { IncomingHttpHeaders } from "node:http";
 import { isIP, type LookupFunction } from "node:net";
-import { canonicalAddress, canonicalHost, resolveAddresses } from "../enforce/egressAllowlist.js";
+import { canonicalAddress, canonicalHost, isNonPublicAddress, resolveAddresses, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import type { GatewayConfig } from "./config.js";
 
 export type FieldRefusalReason = "refused-field" | "content-encoding" | "charset" | "byte-order-mark" | "invalid-utf8" | "not-json" | "not-object";
 export interface FieldRefusal { reason: FieldRefusalReason; fields: string[] }
 export type HostResolver = (host: string) => Promise<string[]>;
-export interface UpstreamFields { fields: string[]; addresses: string[] }
 export interface FieldGuard {
   /**
-   * The union of refused fields over every guarded upstream sharing this upstream's name or an address (all of them when an
-   * identity is unknown), and the addresses that decision used, for the connection to pin (none when no route refuses fields).
+   * The union of refused fields over every guarded upstream sharing this upstream's name or one of `addresses` (what its
+   * egress check resolved); all of them when an identity is unknown.
    */
-  fieldsFor(upstream: string): Promise<UpstreamFields>;
+  fieldsFor(upstream: string, addresses: readonly string[]): Promise<string[]>;
   /** Forward proxy: whether a target already resolved to `addresses` is, or is under, a guarded upstream and must be refused. */
   targetRefused(host: string, addresses: readonly string[]): Promise<boolean>;
 }
@@ -32,8 +32,8 @@ const BOMS = [Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from([0xfe, 0xff]), Buffer
 // Some upstream JSON decoders match keys case-insensitively with Unicode folding; compare folded names (refuses more, never less).
 const fold = (key: string): string => key.normalize("NFKC").toLowerCase();
 
-interface HostIdentity { name: string; addresses: Set<string>; connect: string[] }
-const identityOf = (host: string, connect: string[]): HostIdentity => ({ name: canonicalAddress(host), addresses: new Set(connect.map(canonicalAddress)), connect });
+interface HostIdentity { name: string; addresses: Set<string> }
+const identityOf = (host: string, addresses: readonly string[]): HostIdentity => ({ name: canonicalAddress(host), addresses: new Set(addresses.map(canonicalAddress)) });
 
 /** null when the host is missing or does not resolve, so its identity is unknown. IP literals in any form are resolved too. */
 async function identify(host: string, resolve: HostResolver): Promise<HostIdentity | null> {
@@ -58,7 +58,7 @@ export function prepareFieldGuard(config: GatewayConfig, resolve: HostResolver =
   for (const route of config.routes) {
     if (route.refuseRequestFields?.length) fieldsByUpstream.set(route.upstream, [...(fieldsByUpstream.get(route.upstream) ?? []), ...route.refuseRequestFields]);
   }
-  if (fieldsByUpstream.size === 0) return { fieldsFor: async () => ({ fields: [], addresses: [] }), targetRefused: async () => false };
+  if (fieldsByUpstream.size === 0) return { fieldsFor: async () => [], targetRefused: async () => false };
   const allFields = [...new Set([...fieldsByUpstream.values()].flat())];
   // A guarded upstream that does not resolve could be reached under any name, so every upstream and every proxied host is refused (null).
   const guardedNow = async (): Promise<{ identity: HostIdentity; fields: string[] }[] | null> => {
@@ -66,19 +66,36 @@ export function prepareFieldGuard(config: GatewayConfig, resolve: HostResolver =
     return guarded.every((guard) => guard.identity !== null) ? guarded.map(({ identity, fields }) => ({ identity: identity!, fields })) : null;
   };
   return {
-    async fieldsFor(upstream) {
-      const [guarded, self] = await Promise.all([guardedNow(), identify(upstreamHost(config, upstream), resolve)]);
-      if (guarded === null || self === null) return { fields: allFields, addresses: self?.connect ?? [] };
-      return { fields: [...new Set(guarded.filter((guard) => sameHost(guard.identity, self)).flatMap((guard) => guard.fields))], addresses: self.connect };
+    async fieldsFor(upstream, addresses) {
+      const guarded = await guardedNow();
+      const self = identityOf(upstreamHost(config, upstream), addresses);
+      if (guarded === null || self.name === "" || addresses.length === 0) return allFields;
+      return [...new Set(guarded.filter((guard) => sameHost(guard.identity, self)).flatMap((guard) => guard.fields))];
     },
     async targetRefused(host, addresses) {
       const guarded = await guardedNow();
-      const target = identityOf(host, [...addresses]);
+      const target = identityOf(host, addresses);
       // A tunnel cannot be field-checked: refuse a guarded upstream's name, its subdomains and every address it resolves to.
       return guarded === null || addresses.length === 0 || guarded.some(({ identity: guard }) => sameHost(guard, target)
         || (isIP(guard.name) === 0 && target.name.endsWith(`.${guard.name}`)));
     }
   };
+}
+
+type Upstream = GatewayConfig["upstreams"][string];
+
+/**
+ * The reverse proxy's egress check for one request to an upstream (P1-66), made as the request is forwarded; the caller
+ * pins the connection to the returned addresses. The upstream's name passes by name, and every address it resolves to
+ * meets the non-public rule unless gateway.yaml opts in: the non-public IP literal written as a baseUrl's host with no
+ * environment template, one listed in allowNonPublicAddresses, or 127.0.0.1 and ::1 with allowLocalhost. A template's
+ * expansion comes from the environment, which the configuration signature does not cover, so it opts nothing in.
+ */
+export function checkUpstreamEgress(configured: Upstream, resolved: Upstream, resolve: HostResolver = resolveAddresses): Promise<EgressCheck> {
+  const name = canonicalHost(new URL(resolved.baseUrl).hostname);
+  const passesByName = isIP(name) === 0 || configured.baseUrl === resolved.baseUrl || !isNonPublicAddress(name);
+  const optIn = [...(configured.allowNonPublicAddresses ?? []), ...(configured.allowLocalhost === true ? ["127.0.0.1", "::1"] : [])];
+  return resolveAndCheck(name, { allowHosts: [...(passesByName ? [name] : []), ...optIn] }, resolve);
 }
 
 /** Answers only with the checked addresses, so a DNS change between the check and the connection cannot redirect it. */

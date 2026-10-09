@@ -78,13 +78,14 @@
         { "path": "src/gateway/server.ts", "symbol": "createProxyServer" },
         { "path": "src/sandbox/egress/shellEgressProxy.ts", "symbol": "startShellEgressProxy" },
         { "path": "src/gateway/requestFieldGuard.ts", "symbol": "prepareFieldGuard" },
+        { "path": "src/gateway/requestFieldGuard.ts", "symbol": "checkUpstreamEgress" },
         { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "governedGet" }
       ],
-      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows (reason and resolved addresses) and proxy rows recording the resolved addresses; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
+      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows (reason and resolved addresses; upstreamId when an upstream is refused) and proxy rows recording the resolved addresses and the address a tunnel reached; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
       "status": "enforced",
       "bypasses": [
         "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; MCP servers and extensions open sockets directly",
-        "The gateway's reverse-proxy upstreams are signed configuration and are not held to the non-public address rule; the forward proxy resolves and checks every connection with resolveAndCheck and pins it to a checked address (P1-66)",
+        "Gateway upstreams pass by name, and their non-public addresses are allowed when gateway.yaml opts in (the baseUrl's literal host without an environment template, allowNonPublicAddresses, or loopback with allowLocalhost); the gateway still runs on an unsigned or invalid gateway.yaml (CONFIG_UNSIGNED), so the opt-ins are only as trustworthy as that file (P1-66)",
         "A host allowlist cannot stop domain fronting through a listed host; the shell proxy pins the Host header for plain HTTP only",
         "src/enforce/egressProxy.ts (checkEgressRequest) is not a proxy, is called only by tests/enforce-full.test.ts, allows every host when its list is empty and logs every decision as agentId system",
         "There is no workspace-wide egress allowlist for in-process tools: web_fetch and web_search apply decideEgress to their own signed hosts, and the shell's allowlist governs only the shell (P2-13)"

@@ -121,6 +121,7 @@ All LLM traffic is routed through the AMC Gateway, which:
 - Mints receipts for each event
 - Redacts secrets before storage (configurable deny patterns)
 - Seals evidence with monitor signature
+- Resolves the upstream host again for every request and connects only to an address it checked; a loopback, private, link-local or otherwise non-public address is refused (HTTP 403 and a `NETWORK_EGRESS_BLOCKED` audit event naming it) unless `gateway.yaml` opts in (the IP literal written as the baseUrl host, `allowNonPublicAddresses`, or `allowLocalhost` for 127.0.0.1 and ::1)
 
 ### Proxy Mode (Egress Control)
 
