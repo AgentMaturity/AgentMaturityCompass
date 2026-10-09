@@ -487,6 +487,7 @@ export async function activateIndustryPackAccessOnline(params: {
   };
   checkScopedEgress(gateWorkspace, "network-tool", verifyUrl, { dataClasses: null, purpose: null });
   const response = await fetcher(verifyUrl, request);
+  if (response.status >= 300 && response.status < 400) throw new Error(`Industry Packs license verification endpoint returned redirect ${response.status}; redirects are not followed.`);
   const payload = await response.json() as {
     valid?: boolean;
     reason?: string;

@@ -187,12 +187,12 @@
       "reason": "Online activation POST uses captured explicit-or-ALS scope, kept separate from the persistence cwd fallback, and checks network-tool residency immediately before same-endpoint injected fetch with manual redirects. Key and expiry are captured; license classes/purpose remain unknown. Local-valid shortcut and verifier are unchanged. Source-only; trusted injected fetch, DNS, response parsing/caps, environment drift and post-dispatch persistence limits remain."
     },
     {
-      "siteId": "src/drift/alerts.ts:205:1",
+      "siteId": "src/drift/alerts.ts:215:1",
       "path": "src/drift/alerts.ts",
-      "line": 205,
+      "line": 215,
       "call": "requestImpl(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Private drift webhook receives captured explicit workspace and agent from dispatchAlert; prepared URL/options/secret headers are checked as callback immediately before requestImpl. Classes/purpose remain unknown. Native HTTP does not follow redirects; typed refusal rejects unchanged. Source-only; prior channel sends, monitor error suppression, unpinned DNS, no timeout/body cap and separate config/signature reads remain limits."
     },
     {
       "siteId": "src/e2e/smoke.ts:168:1",
