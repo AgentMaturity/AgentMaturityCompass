@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -186,15 +187,17 @@ export async function benchRegistryBrowseForApi(params: {
   registryId: string;
   query?: string;
 }) {
-  const config = loadBenchRegistriesConfig(params.workspace);
-  const entry = config.benchRegistries.registries.find((row) => row.id === params.registryId);
+  const { workspace: explicitWorkspace, registryId, query } = params;
+  const workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const config = loadBenchRegistriesConfig(workspace);
+  const entry = config.benchRegistries.registries.find((row) => row.id === registryId);
   if (!entry) {
-    throw new Error(`bench registry not configured: ${params.registryId}`);
+    throw new Error(`bench registry not configured: ${registryId}`);
   }
-  return browseBenchRegistry({
-    base: entry.type === "file" ? resolve(params.workspace, entry.base) : entry.base,
-    query: params.query
-  });
+  return withWorkspaceScope(workspace, () => browseBenchRegistry({
+    base: entry.type === "file" ? resolve(workspace, entry.base) : entry.base,
+    query
+  }));
 }
 
 export async function benchImportForApi(params: {
@@ -202,9 +205,11 @@ export async function benchImportForApi(params: {
   registryId: string;
   benchRef: string;
 }) {
-  const imported = await importBenchFromRegistry(params);
+  const { workspace: explicitWorkspace, registryId, benchRef } = params;
+  const workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const imported = await importBenchFromRegistry({ workspace, registryId, benchRef });
   appendTransparencyEntry({
-    workspace: params.workspace,
+    workspace,
     type: "BENCH_IMPORTED",
     agentId: "workspace",
     artifact: {

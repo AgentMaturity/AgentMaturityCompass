@@ -17607,10 +17607,10 @@ bench
   .requiredOption("--registry <pathOrUrl>", "registry path or URL")
   .option("--query <text>", "optional search text")
   .action(async (opts: { registry: string; query?: string }) => {
-    const out = await benchSearchCli({
+    const out = await withWorkspaceScope(process.cwd(), () => benchSearchCli({
       registry: opts.registry,
       query: opts.query
-    });
+    }));
     console.log(JSON.stringify(out, null, 2));
   });
 
