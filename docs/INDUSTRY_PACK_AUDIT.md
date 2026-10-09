@@ -99,8 +99,7 @@ it prints each error and exits 1:
 `--allow-unpinned` gives an integrity-only result with exit code 2, never a
 trusted one. Studio's binder verify route (`GET /audit/binders/:id/verify`)
 verifies a `?file=` only inside `.amc/audit/binders/exports/`, so copy a bundle
-there to verify it from Studio. It does not check whether that file exists
-before verifying it, and never shows operating-system error text. The checksum alone is
+there to verify it from Studio. The checksum alone is
 `sha256(canonicalize(bundle without receiptHash and signature))`; recomputing it
 detects accidental edits, not deliberate ones.
 
