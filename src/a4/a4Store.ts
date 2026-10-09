@@ -198,9 +198,20 @@ function createStore(workspace: string, ledger: Ledger) {
   const db = ledger.db;
   const workspaceId = workspaceIdFromDirectory(workspace);
 
-  const readHead = (projectId: string): A4ProjectRow | null => {
+  /** The unsigned head row as stored; only `verified` and the write path, which verifies it, read it. */
+  const readHeadRow = (projectId: string): A4ProjectRow | null => {
     const row = db.prepare("SELECT * FROM a4_projects WHERE project_id = ?").get(projectId);
     return row === undefined ? null : a4ProjectRowSchema.parse(row);
+  };
+  /**
+   * Whether the ledger holds the session or audit row of transition `seq` (`a4-<projectId>-<seq>`). Both are written in
+   * the transaction that inserts the transition; sessions are append-only by trigger and the audit row is in the
+   * ledger's hash chain, so they witness a transition that a4_transitions no longer shows.
+   */
+  const auditSessionExists = (projectId: string, seq: number): boolean => {
+    const sessionId = `a4-${projectId}-${seq}`;
+    return db.prepare("SELECT 1 FROM sessions WHERE session_id = ? UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? LIMIT 1")
+      .get(sessionId, sessionId) !== undefined;
   };
   type Link = A4ChainLink & { readonly row: A4TransitionRow };
   /** The project's transition rows in seq order; a row that does not parse is an integrity failure. */
@@ -284,13 +295,20 @@ function createStore(workspace: string, ledger: Ledger) {
   /**
    * The chain readers use, read in one snapshot. A committed write leaves head = verified = the last row, so the chain
    * must end there, hash-link from seq 0 and end at a row whose signed audit row verifies, which authenticates every
-   * body. Anything else is A4_INTEGRITY_FAILED, never a shorter chain or a skipped row. A tail cut back to an earlier
-   * signed row together with the head is not visible here; the ledger's own hash chain still holds the cut audit rows.
+   * body. Anything else is A4_INTEGRITY_FAILED, never a shorter chain or a skipped row: a tail cut back to an earlier
+   * signed row together with the head fails on the next transition's ledger session, and transitions or a seq-0
+   * session without a head row fail rather than read as an empty project.
    */
   const readChain = (projectId: string): Link[] => db.transaction((): Link[] => {
-    const head = readHead(projectId);
-    if (head === null) return [];
+    const head = readHeadRow(projectId);
+    if (head === null) {
+      if (db.prepare("SELECT 1 FROM a4_transitions WHERE project_id = ? LIMIT 1").get(projectId) !== undefined || auditSessionExists(projectId, 0)) {
+        throw integrityFailed(projectId, ["transitions exist without a head"]);
+      }
+      return [];
+    }
     const problems: string[] = [];
+    if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     const links = walk(readRows(projectId), problems);
     const last = links.at(-1);
     if (last === undefined || last.seq !== head.head_seq || last.row.body_digest !== head.head_digest
@@ -322,6 +340,7 @@ function createStore(workspace: string, ledger: Ledger) {
     const problems: string[] = [];
     const keys = getPublicKeyHistory(workspace, "monitor");
     const links = walk(readRows(projectId), problems);
+    if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     const anchor = head.verified_seq ?? -1;
     if (head.verified_seq !== null && links[head.verified_seq]?.row.body_digest !== head.verified_digest) problems.push(`verified row ${head.verified_seq} changed`);
     for (const link of links.slice(Math.max(anchor, 0))) {
@@ -417,7 +436,7 @@ function createStore(workspace: string, ledger: Ledger) {
       for (let attempt = 0; ; attempt += 1) {
         const replay = options.request ? dedupeRequest(options.request, projectId, create !== null, null, 0) : null;
         if (replay) return replay;
-        const head0 = readHead(projectId);
+        const head0 = readHeadRow(projectId);
         if (create === null && head0 === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
         if (create !== null && head0 !== null) throw new A4StoreError(409, "A4_PROJECT_EXISTS", projectId);
         if (options.expectedHeadSeq !== undefined && head0?.head_seq !== options.expectedHeadSeq) {
@@ -452,7 +471,7 @@ function createStore(workspace: string, ledger: Ledger) {
             // (b) One transaction on rows read inside it.
             const replayed = options.request ? dedupeRequest(options.request, projectId, create !== null, { projectId, seq, kind: spec.kind, bodyDigest: digest }, ts) : null;
             if (replayed) return replayed;
-            const head = readHead(projectId);
+            const head = readHeadRow(projectId);
             if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
             if (head) verifyIncremental(projectId, head);
             if (options.readiness && options.readiness(db, projectId) !== readinessSha256) throw new HeadMoved();
@@ -528,7 +547,7 @@ function createStore(workspace: string, ledger: Ledger) {
   return {
     workspace,
     ledger,
-    readHead,
+    readHead: readHeadRow,
     readChain,
     membersOf,
     verifyIncremental,
