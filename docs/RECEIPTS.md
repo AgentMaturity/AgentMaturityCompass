@@ -155,3 +155,13 @@ When correlation is weak or invalid:
 - AMC emits `TRACE_RECEIPT_INVALID`, `TRACE_EVENT_HASH_NOT_FOUND`, `TRACE_BODY_HASH_MISMATCH`, `TRACE_AGENT_MISMATCH`, `TRACE_CORRELATION_LOW`.
 - IntegrityIndex is penalized.
 - maturity caps are applied for observability/verification/honesty questions.
+
+## ToolHub consequential executions (P1-54)
+
+Studio ToolHub uses the same action journal and reconciliation APIs for every consequential `EXECUTE` above `WRITE_LOW`. Its deterministic execution ID binds one dispatch attempt to one workspace and intent. `requested` and `authorized` precede authority recheck/consumption and `started`; the effect runs only after start commits. Same-intent races are refused by the journal, whose existing atomic start guards also check unresolved executions and duplicate argument digests. This is at-most-once dispatch per intent, not exactly-once delivery to an external system.
+
+`ToolExecutionResponse.action` carries the recorded state and evidence completeness. An ambiguous executor exception is `outcome_unknown`, returned as an admitted call with `result.outcomeUnknown: true`; an undeclared financial, export or identity effect remains unknown. A result that cannot be recorded, a failed heartbeat, or a post-effect journal failure is evidence incomplete and blocks further consequential calls. Existing reconciliation/operator resolution and startup recovery apply. A process-only block may require process exit as described above.
+
+Read-only, low-impact and simulated calls keep their existing path. Journal unavailability refuses consequential effects; a denial with `evidenceComplete: false` must not be counted as a persisted receipt. Header keys are delivered only by the existing HTTP executor. Unsupported argument carriers are explicitly refused before consumption/start; no transport is invented. Ticket-only authorization records retain the shared helper's local OS principal attribution because the current contract has no ticket authority member.
+
+**Qualification pending:** P1-54 source was implemented under the coding-only order. No tests, evaluations, builds, typechecks, lint, CI or effect/recovery checks were run, and no acceptance receipt is claimed.
