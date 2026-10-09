@@ -2,6 +2,9 @@ import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { URL } from "node:url";
 
+const HTTP_FETCH_IDLE_TIMEOUT_MS = 30_000;
+const HTTP_FETCH_TOTAL_TIMEOUT_MS = 60_000;
+
 function withIdempotencyKey(headers: Record<string, string> | undefined, idempotency?: { header: string; key: string }): Record<string, string> | undefined {
   if (idempotency === undefined) return headers;
   const name = idempotency.header.toLowerCase();
@@ -28,6 +31,17 @@ export async function executeHttpFetch(params: {
   const url = new URL(params.url);
   const reqImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
   const response = await new Promise<{ status: number; headers: Record<string, string>; body: string }>((resolvePromise, rejectPromise) => {
+    let settled = false;
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    const fail = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(deadline);
+      rejectPromise(error);
+      req.destroy();
+    };
+    const incomplete = () => fail(Object.assign(new Error("http.fetch response incomplete"), { code: "ECONNRESET" }));
+    const timeout = () => fail(Object.assign(new Error("http.fetch timed out"), { code: "ETIMEDOUT" }));
     const req = reqImpl(
       url,
       {
@@ -36,8 +50,13 @@ export async function executeHttpFetch(params: {
       },
       (res) => {
         const chunks: Buffer[] = [];
+        res.on("error", fail);
+        res.on("aborted", incomplete);
+        res.on("close", () => { if (!res.complete) incomplete(); });
         res.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
         res.on("end", () => {
+          if (settled) return;
+          if (!res.complete) { incomplete(); return; }
           const headers: Record<string, string> = {};
           for (const [key, value] of Object.entries(res.headers)) {
             if (typeof value === "undefined") {
@@ -45,6 +64,9 @@ export async function executeHttpFetch(params: {
             }
             headers[key] = Array.isArray(value) ? value.join(",") : value;
           }
+          settled = true;
+          clearTimeout(deadline);
+          req.setTimeout(0);
           resolvePromise({
             status: res.statusCode ?? 0,
             headers,
@@ -53,7 +75,9 @@ export async function executeHttpFetch(params: {
         });
       }
     );
-    req.on("error", rejectPromise);
+    req.on("error", fail);
+    req.setTimeout(HTTP_FETCH_IDLE_TIMEOUT_MS, timeout);
+    deadline = setTimeout(timeout, HTTP_FETCH_TOTAL_TIMEOUT_MS);
     if (params.body) {
       req.write(params.body);
     }
