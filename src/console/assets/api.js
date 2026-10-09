@@ -159,7 +159,7 @@ export async function apiGet(path, options) {
 
 /** Native task writes use the authenticated inspection token, never a URL credential. */
 export async function apiNativeRequest(path, options = {}) {
-  if (!/^\/api\/v1\/native-tasks(?:[/?]|$)/.test(path)) throw new Error("Invalid native task API path");
+  if (!/^\/api\/v1\/(?:native-tasks|a4)(?:[/?]|$)/.test(path)) throw new Error("Invalid native task API path");
   const method = options.method || "GET";
   const headers = {};
   if (method !== "GET") {
