@@ -505,6 +505,9 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     if (row.stage !== input.stage || row.gate === "policy") throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
     const { readiness, query } = evaluateFor(store, state, principal, call, row.stage, now);
     const gate = gateStatus(state, row, query.policy, now);
+    // store.integrity is bound from the incremental check at request and decide but from the full verifier here, so a
+    // failure only the full verifier finds would otherwise read as a moved readiness digest; answer what GET shows.
+    if (!readiness.integrity.valid) assertAllowed(readiness, "progress");
     assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
     assertAllowed(readiness, "progress");
