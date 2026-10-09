@@ -212,7 +212,9 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   output. Every call binds it to the authorization record through the pipeline's own lease verifier (signature,
   expiry, agent, scope, class, signed revocations), so `identity-binding` admits the call with the lease as its
   principal. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, shutdown, a
-  failed start, cold verification), before minting the next one on resume, and at archive. A native session without a verified lease (a
+  failed start, cold verification, a runtime process that exited on its own), before minting the next one on resume,
+  and at archive; when the lease cannot be minted (lease signing key or signed revocation store unavailable), the runtime
+  is not started. A native session without a verified lease (a
   task started before this change or while no plan was active, a CLI agent session, an `amc acp` process nobody
   handed a lease) is still denied every call under a plan with `L0-IDN-01`. Without a plan the lease is never bound;
 - any other compiled guard id denies, because this pipeline does not implement it;

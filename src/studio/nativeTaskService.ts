@@ -181,10 +181,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (d.tools !== "workspace" || activeControlPlanHead(workspace) === null) return {};
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
-    revokeTaskLease(d, "superseded by a new native task runtime");
-    const lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
-      ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
-      routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
+    let lease: ReturnType<typeof issueLeaseToken>;
+    try {
+      revokeTaskLease(d, "superseded by a new native task runtime");
+      lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+        ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
+        routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
+    } catch {
+      throw new NativeTaskServiceError("LEASE_UNAVAILABLE", 409, "The active compiled plan requires a lease for this runtime, and none could be minted: the lease signing key or the signed lease revocation store is unavailable. Nothing was started.");
+    }
     persist(entry, { leaseId: lease.payload.leaseId });
     return { [NATIVE_TASK_LEASE_ENV]: lease.token };
   }
@@ -212,6 +217,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     entry.error = "The native runtime process exited. No successful writer release or completed side effect is inferred. Refresh the original evidence and explicitly resume an eligible session before submitting a new turn.";
     entry.projection = undefined; entry.projectionAt = 0;
     entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
+    retireLease(entry); // P1-67: a runtime that exited also stops holding a live lease.
     // Keep the signed descriptor, pendingTurn and every submission untouched.
     // Only resume() may rebuild the fixed native approval/validation controller.
   }
