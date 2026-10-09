@@ -20,7 +20,7 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { resolveRefs } from "./a4Evidence.js";
-import { liveRolesFor } from "./a4Identity.js";
+import { liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
   A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, readinessBindingDigest,
@@ -159,6 +159,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     route = null;
   }
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
+  const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   return {
     activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
@@ -167,7 +168,9 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
     integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
-    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : []
+    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : [],
+    // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
+    usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0)
   };
 }
 

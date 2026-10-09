@@ -77,6 +77,8 @@ export interface A4LiveFacts {
   readonly integrity: { readonly valid: boolean; readonly problems: readonly string[]; readonly report?: VerifierReportV1 | null };
   /** Slots of the head revision whose live recomputation differs; null when they could not be recomputed. */
   readonly driftedSlots: readonly string[] | null;
+  /** users.yaml records (any status) created since the project's CREATED transition; null when unreadable. */
+  readonly usersAddedSinceCreated: number | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -177,10 +179,14 @@ export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): bo
   return typeof digests?.plan?.journalEntrySha256 === "string";
 }
 
-/** The single-user facts of design §5.3, derived now for `principal`; recorded on CREATED and on every decision row. */
+/**
+ * The single-user facts of design §5.3, derived now for `principal`; recorded on CREATED and on every decision row. A
+ * user added since the project was created ratchets too (null: unreadable, which is not "none"), so an add and a revoke
+ * with no A4 write between them gain nothing.
+ */
 export function selfApprovalFacts(state: A4ReadinessState, query: A4ReadinessQuery, principal: A4Principal | null) {
   const regulated = isRegulated(state, query.floor);
-  const ratcheted = ratchetedFromChain(state.chain);
+  const ratcheted = ratchetedFromChain(state.chain) || query.live.usersAddedSinceCreated !== 0;
   const { activeLocal, hostPrincipals, hostedRouter } = query.live;
   const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated,
     workspaceFloor: query.floor.allowSelfApproval, ratcheted, decidingPrincipal: principal });

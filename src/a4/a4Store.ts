@@ -129,7 +129,7 @@ type Build = (ctx: { head: A4ProjectRow | null; seq: number; ts: number }) => A4
 type NewHead = Pick<A4ProjectRow, "project_id" | "workspace_id" | "agent_id" | "name" | "created_by_key">;
 
 const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256",
-  "headAfter", "sideRows"]);
+  "headAfter", "sideRows", "population"]);
 const COLUMN = /^[a-z][a-z0-9_]*$/;
 /** The minted id shape (`randomId("a4p")`); it names a lock file and a blob directory, so nothing else is accepted. */
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
@@ -494,6 +494,10 @@ function createStore(workspace: string, ledger: Ledger) {
         // One commit may record several transitions (GATE_CONSUMED + EFFECT_STARTED), each its own chained, signed row.
         const ts = Date.now();
         const seq0 = head0 === null ? 0 : head0.head_seq + 1;
+        // Every transition signs the live principal population it was written under, so any write made while two or more
+        // principals were active ratchets single-user self-approval off for good (design §5.3; ratchetedFromChain).
+        const live = principalPopulation(workspace);
+        const population = { activeUserCount: live.activeLocal?.length ?? null, hostPrincipals: live.hostPrincipals };
         const specs = [build({ head: head0, seq: seq0, ts })].flat();
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
         let prevDigest = head0?.head_digest ?? "GENESIS";
@@ -514,7 +518,7 @@ function createStore(workspace: string, ledger: Ledger) {
           // head0 is the head verifyChain verified; the transaction checks it is unmoved and still signed (verifyIncremental).
           headState = headStateOf({ ...headState, ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
           const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
-            ts, prevDigest, readinessSha256, headAfter: headState, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
+            ts, prevDigest, readinessSha256, population, headAfter: headState, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
           const bytes = canonicalize(body);
           const digest = sha256Hex(bytes);
           const entry = { spec, sideRows, seq, stage, revisionNo, prevDigest, bytes, digest, headAfter: headState,

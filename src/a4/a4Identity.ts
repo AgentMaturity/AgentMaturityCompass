@@ -171,3 +171,16 @@ export function principalPopulation(workspace: string, now = Date.now()): { acti
   const sessions = liveRouterSessions(workspace, now);
   return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
 }
+
+/**
+ * users.yaml records of any status created at or after `ts` (a project's CREATED time); null when unreadable. A user
+ * added after a project was created, even one revoked again before any A4 write recorded the population, means two
+ * principals existed: the self-approval ratchet holds (design §5.3, `amc user add` then `amc user revoke`).
+ */
+export function usersCreatedSince(workspace: string, ts: number): number | null {
+  try {
+    return listUsers(workspace).filter((user) => user.createdTs >= ts).length;
+  } catch {
+    return null;
+  }
+}
