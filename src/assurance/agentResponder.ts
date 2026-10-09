@@ -18,10 +18,12 @@
  * request and captures each reply itself, so it is OBSERVED too (P0-18).
  */
 
+import { resolve } from "node:path";
 import type { TrustTier } from "../types.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 
 /** How the agent under test was reached. */
@@ -318,8 +320,14 @@ export function completionsPathFor(openaiCompatible: boolean): string {
   return openaiCompatible ? "/v1/chat/completions" : "/v1/messages";
 }
 
+/** Injected fetch is trusted: DNS is not pinned, response bodies are uncapped,
+ * and the request timeout ends after response headers.
+ */
 class HttpAgentResponder implements AgentResponder {
   readonly target: AgentResponderTarget;
+  private readonly workspace: string;
+  private readonly auditAgentId: string | undefined;
+  private readonly channel: "provider" | "bridge";
   private readonly headers: Record<string, string>;
   private readonly body: (prompt: string, tools?: AgentToolDefinition[]) => Record<string, unknown>;
   private readonly timeoutMs: number;
@@ -327,12 +335,17 @@ class HttpAgentResponder implements AgentResponder {
 
   constructor(params: {
     target: AgentResponderTarget;
+    workspace: string;
+    agentId: string | undefined;
     headers: Record<string, string>;
     openaiCompatible: boolean;
     timeoutMs: number;
     fetchImpl: typeof fetch;
   }) {
     this.target = params.target;
+    this.workspace = params.workspace;
+    this.auditAgentId = params.agentId;
+    this.channel = params.target.transport === "direct" ? "provider" : "bridge";
     this.headers = params.headers;
     this.timeoutMs = params.timeoutMs;
     this.fetchImpl = params.fetchImpl;
@@ -346,21 +359,29 @@ class HttpAgentResponder implements AgentResponder {
   }
 
   async respond(prompt: string, options?: AgentRespondOptions): Promise<AgentResponse> {
+    const endpoint = this.target.endpoint;
     const started = Date.now();
     let response: Response;
     try {
-      response = await withTimeout(this.timeoutMs, (signal) =>
-        this.fetchImpl(this.target.endpoint, {
+      response = await withTimeout(this.timeoutMs, (signal) => {
+        const init: RequestInit = {
           method: "POST",
           headers: { "content-type": "application/json", ...this.headers },
           body: JSON.stringify(this.body(prompt, options?.tools)),
+          redirect: "manual",
           signal
-        })
-      );
+        };
+        // Opaque prompts remain unclassified; the verified profile supplies jurisdiction facts.
+        checkScopedEgress(this.workspace, this.channel, endpoint, {
+          agentId: this.auditAgentId, dataClasses: null, purpose: null
+        });
+        return this.fetchImpl(endpoint, init);
+      });
     } catch (error) {
+      if (error instanceof EgressBlocked) throw error;
       const detail = error instanceof Error ? error.message : String(error);
       throw new AgentResponderInvocationError(
-        `request to ${this.target.endpoint} failed: ${detail}`
+        `request to ${endpoint} failed: ${detail}`
       );
     }
 
@@ -406,14 +427,17 @@ class HttpAgentResponder implements AgentResponder {
   }
 }
 
-async function gatewayReachable(baseUrl: string, fetchImpl: typeof fetch): Promise<boolean> {
+async function gatewayReachable(endpoint: string, fetchImpl: typeof fetch, workspace: string, agentId: string | undefined): Promise<boolean> {
   try {
     return await withTimeout(2_000, async (signal) => {
       // Any HTTP answer proves the listener is up; a 401/404 still means "reachable".
-      await fetchImpl(baseUrl, { method: "GET", signal });
+      const init: RequestInit = { method: "GET", redirect: "manual", signal };
+      checkScopedEgress(workspace, "bridge", endpoint, { agentId, dataClasses: null, purpose: null });
+      await fetchImpl(endpoint, init);
       return true;
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof EgressBlocked) throw error;
     return false;
   }
 }
@@ -426,6 +450,10 @@ async function gatewayReachable(baseUrl: string, fetchImpl: typeof fetch): Promi
 export async function resolveAgentResponder(
   input: ResolveAgentResponderInput
 ): Promise<AgentResponder> {
+  // Capture explicit scope and caller attribution before probing or awaiting any provider.
+  const explicitWorkspace = input.workspace;
+  const workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const agentId = input.agentId;
   const fetchImpl = input.fetchImpl ?? globalThis.fetch;
   if (typeof fetchImpl !== "function") {
     throw new AgentResponderUnavailableError(
@@ -436,16 +464,15 @@ export async function resolveAgentResponder(
 
   const timeoutMs = input.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
-  // A signed agent config names the provider to scan. Workspaces that have not
-  // been configured yet can still be scanned when the operator names the
-  // endpoint explicitly, so fall back to an OpenAI-compatible shape rather than
-  // refusing outright.
+  // The parsed agent config names the provider; this loader does not verify its signature.
+  // Unconfigured workspaces can still be scanned when the operator names the
+  // endpoint explicitly, using an OpenAI-compatible shape.
   let agentConfig: Pick<ReturnType<typeof loadAgentConfig>, "id" | "provider">;
   try {
-    agentConfig = loadAgentConfig(input.workspace, input.agentId);
+    agentConfig = loadAgentConfig(workspace, agentId);
   } catch {
     agentConfig = {
-      id: input.agentId ?? "default",
+      id: agentId ?? "default",
       provider: {
         templateId: "openai",
         routePrefix: "/openai",
@@ -467,7 +494,7 @@ export async function resolveAgentResponder(
   // fallback condition, not a failure.
   let gatewayBase: string | null = null;
   try {
-    const gatewayConfig = loadGatewayConfig(input.workspace);
+    const gatewayConfig = loadGatewayConfig(workspace);
     const gatewayHost = gatewayConfig.listen.host === "0.0.0.0" ? "127.0.0.1" : gatewayConfig.listen.host;
     gatewayBase = `http://${gatewayHost}:${gatewayConfig.listen.port}`;
   } catch {
@@ -479,12 +506,12 @@ export async function resolveAgentResponder(
   // scan the wrong target.
   const explicitEndpoint = process.env.AMC_AGENT_BASE_URL?.trim();
   const useGateway =
-    !explicitEndpoint && gatewayBase !== null && (await gatewayReachable(gatewayBase, fetchImpl));
+    !explicitEndpoint && gatewayBase !== null && (await gatewayReachable(gatewayBase, fetchImpl, workspace, agentId));
 
   if (useGateway && gatewayBase !== null) {
     const lease = issueLeaseToken({
-      workspace: input.workspace,
-      workspaceId: workspaceIdFromDirectory(input.workspace),
+      workspace,
+      workspaceId: workspaceIdFromDirectory(workspace),
       agentId: agentConfig.id,
       ttlMs: LEASE_TTL_MS,
       scopes: ["gateway:llm"],
@@ -496,6 +523,8 @@ export async function resolveAgentResponder(
     });
 
     return new HttpAgentResponder({
+      workspace,
+      agentId,
       target: {
         agentId: agentConfig.id,
         transport: "gateway",
@@ -539,14 +568,15 @@ export async function resolveAgentResponder(
   // Operators may point a scan at a staging or self-hosted endpoint that speaks
   // the same dialect as the configured provider. This still requires a real,
   // reachable endpoint — it is an address override, not a stub.
-  const baseUrlOverride = process.env.AMC_AGENT_BASE_URL?.trim();
-  const effectiveBaseUrl = baseUrlOverride && baseUrlOverride.length > 0 ? baseUrlOverride : provider.baseUrl;
+  const effectiveBaseUrl = explicitEndpoint || provider.baseUrl;
 
   if (!provider.openaiCompatible) {
     headers["anthropic-version"] = process.env.ANTHROPIC_VERSION ?? "2023-06-01";
   }
 
   return new HttpAgentResponder({
+    workspace,
+    agentId,
     target: {
       agentId: agentConfig.id,
       transport: "direct",
