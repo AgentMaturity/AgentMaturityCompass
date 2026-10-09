@@ -1,6 +1,6 @@
 import { generateKeyPairSync } from "node:crypto";
-import { request as httpRequest } from "node:http";
-import { dirname, join } from "node:path";
+import { request as httpRequest, type RequestOptions } from "node:http";
+import { dirname, join, resolve } from "node:path";
 import { initWorkspace } from "../workspace.js";
 import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
@@ -33,6 +33,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { signFileWithAuditor } from "../org/orgSigner.js";
 import { enableLanMode } from "../pairing/lanMode.js";
 import { enableNotaryTrust } from "../trust/trustConfig.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 
 export interface BootstrapOptions {
   workspace: string;
@@ -203,9 +204,10 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
   return created;
 }
 
-async function fetchNotaryPubkey(baseUrl: string): Promise<{ pubkeyPem: string; fingerprint: string }> {
+async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions): Promise<{ pubkeyPem: string; fingerprint: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
-    const req = httpRequest(new URL("/pubkey", baseUrl), { method: "GET" }, (res) => {
+    checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+    const req = httpRequest(endpoint, requestOptions, (res) => {
       const chunks: Buffer[] = [];
       res.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
       res.on("end", () => {
@@ -245,17 +247,18 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
   }
 
   try {
+    const workspace = resolve(options.workspace);
     initWorkspace({
-      workspacePath: options.workspace,
+      workspacePath: workspace,
       trustBoundaryMode: "isolated"
     });
 
-    const vault = ensureVault(options);
-    const owner = ensureOwnerUser(options);
-    const createdConfigs = ensureSignedConfigs(options.workspace);
+    const vault = ensureVault({ ...options, workspace });
+    const owner = ensureOwnerUser({ ...options, workspace });
+    const createdConfigs = ensureSignedConfigs(workspace);
     if (options.lanMode) {
       enableLanMode({
-        workspace: options.workspace,
+        workspace,
         bind: options.bind,
         port: options.studioPort,
         allowedCIDRs: options.allowedCidrs,
@@ -268,33 +271,38 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
         throw new Error("AMC_ENABLE_NOTARY requires AMC_NOTARY_AUTH_SECRET_FILE (or AMC_NOTARY_AUTH_SECRET).");
       }
       const notarySecret = options.notaryAuthSecret.trim();
-      setVaultSecret(options.workspace, "notary/auth", notarySecret);
-      const notary = await fetchNotaryPubkey(options.notaryBaseUrl);
-      const pubPath = join(options.workspace, ".amc", "bootstrap", "notary.pub");
+      const notaryBaseUrl = options.notaryBaseUrl;
+      const requiredAttestationLevel = options.notaryRequiredAttestation;
+      const endpoint = new URL("/pubkey", notaryBaseUrl).toString();
+      const requestOptions: RequestOptions = { method: "GET" };
+      checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+      setVaultSecret(workspace, "notary/auth", notarySecret);
+      const notary = await fetchNotaryPubkey(endpoint, workspace, requestOptions);
+      const pubPath = join(workspace, ".amc", "bootstrap", "notary.pub");
       ensureDir(dirname(pubPath));
       writeFileAtomic(pubPath, notary.pubkeyPem, 0o644);
       await enableNotaryTrust({
-        workspace: options.workspace,
-        baseUrl: options.notaryBaseUrl,
+        workspace,
+        baseUrl: notaryBaseUrl,
         pinPubkeyPath: pubPath,
-        requiredAttestationLevel: options.notaryRequiredAttestation
+        requiredAttestationLevel
       });
       createdConfigs["trust.yaml"] = true;
     }
-    initTransparencyLog(options.workspace);
-    rebuildTransparencyMerkle(options.workspace);
+    initTransparencyLog(workspace);
+    rebuildTransparencyMerkle(workspace);
 
-    const bootstrapDir = join(options.workspace, ".amc", "bootstrap");
+    const bootstrapDir = join(workspace, ".amc", "bootstrap");
     ensureDir(bootstrapDir);
     const ts = Date.now();
     const reportPath = join(bootstrapDir, `bootstrap_${ts}.json`);
     const report = {
       v: 1,
       ts,
-      workspace: options.workspace,
+      workspace,
       vaultCreated: vault.created,
       ownerCreated: owner.created,
-      vaultUnlocked: vaultStatus(options.workspace).unlocked,
+      vaultUnlocked: vaultStatus(workspace).unlocked,
       createdConfigs,
       requirements: {
         passphraseFromFileRequired: true,
@@ -303,11 +311,11 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       }
     };
     writeFileAtomic(reportPath, JSON.stringify(report, null, 2), 0o644);
-    const reportSigPath = signFileWithAuditor(options.workspace, reportPath);
+    const reportSigPath = signFileWithAuditor(workspace, reportPath);
 
     const reportDigest = sha256Hex(Buffer.from(JSON.stringify(report), "utf8"));
     const entry = appendTransparencyEntry({
-      workspace: options.workspace,
+      workspace,
       type: "BOOTSTRAP_COMPLETED",
       agentId: "system",
       artifact: {
@@ -316,10 +324,10 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
         sha256: reportDigest
       }
     });
-    rebuildTransparencyMerkle(options.workspace);
+    rebuildTransparencyMerkle(workspace);
 
     return {
-      workspace: options.workspace,
+      workspace,
       reportPath,
       reportSigPath,
       transparencyHash: entry.hash
