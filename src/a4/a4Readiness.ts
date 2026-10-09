@@ -176,22 +176,27 @@ export const latestGate = (state: A4ReadinessState, stage: string, gate: string)
 const latestRevision = (state: A4ReadinessState, stage: A4Stage): A4RevisionRow | null =>
   state.revisions.filter((revision) => revision.stage === stage).at(-1) ?? null;
 
-/** The brief's risk tier from the newest Aspire revision; null when none states one. */
+/**
+ * The brief's risk tier from the newest Aspire revision (`riskTier`, `brief.riskTier`); null when none states one, when
+ * one is not a string, or when the two disagree (fail closed: neither may hide the other).
+ */
 export function riskTierOf(state: A4ReadinessState): string | null {
   const brief = latestRevision(state, "aspire");
   const spec = brief ? parseJson(brief.spec_json) as { riskTier?: unknown; brief?: { riskTier?: unknown } } | null : null;
-  const tier = spec?.riskTier ?? spec?.brief?.riskTier;
-  return typeof tier === "string" ? tier : null;
+  const declared = [spec?.riskTier, spec?.brief?.riskTier].filter((tier) => tier !== undefined);
+  const tier = declared[0];
+  return typeof tier === "string" && declared.every((other) => other === tier) ? tier : null;
 }
 
 /**
- * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier of high or critical
- * (an unstated tier counts: unknown risk is not low risk), or a head Adapt revision carrying an activated plan.
+ * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier other than low or
+ * medium (an unstated, unknown or differently spelled tier counts: unknown risk is not low risk, as engineRiskTier maps
+ * it to high), or a head Adapt revision carrying an activated plan.
  */
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
-  if (tier === null || tier === "high" || tier === "critical") return true;
+  if (tier !== "low" && tier !== "med" && tier !== "medium") return true;
   const adapt = latestRevision(state, "adapt");
   const digests = adapt ? parseJson(adapt.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null : null;
   return typeof digests?.plan?.journalEntrySha256 === "string";
