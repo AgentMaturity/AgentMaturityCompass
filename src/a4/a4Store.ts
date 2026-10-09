@@ -17,7 +17,7 @@
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
-import { a4FloorFor, loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
@@ -465,7 +465,9 @@ function createStore(workspace: string, ledger: Ledger) {
   /** GATE_POLICY_CHANGED: never below the D-16 defaults or the signed `a4` floor; loosening the policy in force needs owner mode and an owner. */
   const assertGatePolicyChange = (projectId: string, actor: A4Actor, next: A4GatePolicyV1): void => {
     const prev = gatePolicyOf(readChain(projectId));
-    const below = gatePolicyFloorViolations(next, a4FloorFor(loadApprovalPolicy(workspace)), prev);
+    const { policy, reason } = loadVerifiedApprovalPolicy(workspace);
+    if (policy === null) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify, so its a4 floor is unread: ${reason ?? "unknown"}`);
+    const below = gatePolicyFloorViolations(next, a4FloorFor(policy), prev);
     if (below.length > 0) throw new A4StoreError(409, "GATE_POLICY_BELOW_FLOOR", below.join("; "), below);
     if (gatePolicyWeakenings(prev, next).length > 0) {
       assertOwnerMode(workspace, "a4 gate-policy");
@@ -663,11 +665,9 @@ function createStore(workspace: string, ledger: Ledger) {
       if (!liveRolesFor(workspace, input.actor).some((role) => role === "OPERATOR" || role === "OWNER")) {
         throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", "Creating an A4 project needs a live OPERATOR or OWNER role.");
       }
-      const policy = verifyApprovalPolicySignature(workspace);
-      if (!policy.signatureExists && policy.reason === "approval policy missing") {
-        throw new A4StoreError(409, "APPROVAL_POLICY_MISSING", "Run `amc policy approval init` before creating an A4 project.");
-      }
-      if (!policy.valid) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${policy.reason ?? "unknown"}`);
+      const signed = loadVerifiedApprovalPolicy(workspace);
+      if (signed.verdict === "missing") throw new A4StoreError(409, "APPROVAL_POLICY_MISSING", "Run `amc policy approval init` before creating an A4 project.");
+      if (signed.policy === null) throw new A4StoreError(409, "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${signed.reason ?? "unknown"}`);
       if (!/^[a-z0-9][a-z0-9_-]{0,127}$/.test(input.agentId)) throw new A4StoreError(400, "INPUT_INVALID", "Choose a valid agent ID.");
       if (input.name.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "Name the project.");
       const projectId = randomId("a4p");

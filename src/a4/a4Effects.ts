@@ -14,14 +14,13 @@ import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed } from "../approvals/approvalChainStore.js";
 import { approvalStatusPayload, consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
-import { a4FloorFor, loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
   A4_RUNTIME, assertAllowed, autoHold, consumeGate, driftedSlots, effectOwnerLost, engineRiskTier, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State,
-  withFullIntegrity, type A4Call
+  signedA4Floor, withFullIntegrity, type A4Call
 } from "./a4Gates.js";
 import { assertMember, liveRolesFor } from "./a4Identity.js";
 import { gateStatus, isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
@@ -132,7 +131,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   }
   assertReopenable(store, state0, gate0, def);
   const intentPayload = effectIntent(def, state0, gate0);
-  const quorumFloor = isRegulated(state0, a4FloorFor(loadApprovalPolicy(store.workspace))) ? { requiredApprovals: 2, requireDistinctUsers: true } : undefined;
+  const quorumFloor = isRegulated(state0, signedA4Floor(store.workspace)) ? { requiredApprovals: 2, requireDistinctUsers: true } : undefined;
   const approvalRequestId = def.openRequest?.({ workspace: store.workspace, state: state0, gate: gate0, intentPayload, quorumFloor })
     ?? createApprovalForIntent({ workspace: store.workspace, agentId: state0.project.agent_id, intentId: `a4-${projectId}-${def.id}-${gate0.gate_id}`,
       toolName: def.toolName, actionClass: def.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: engineRiskTier(state0),

@@ -11,7 +11,8 @@ import { join } from "node:path";
 import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
-import { a4FloorFor, approvalRuleForAction, loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { a4FloorFor, approvalRuleForAction, defaultApprovalPolicy, loadApprovalPolicy, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import type { ApprovalA4Floor } from "../approvals/approvalPolicySchema.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
@@ -158,11 +159,10 @@ const vaultUnlocked = (workspace: string): boolean | null => {
   }
 };
 
-/** Everything readiness reads that is not a row; each unreadable source is null. */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts): A4LiveFacts {
+/** Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the read evaluateFor used. */
+export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"]): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
-  const policy = verifyApprovalPolicySignature(workspace);
   let route: "vault" | "notary" | null;
   try {
     route = signingRoute(workspace, "A4_RECORD");
@@ -174,7 +174,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
   return {
     activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
-    approvalPolicy: policy.valid ? "valid" : !policy.signatureExists && policy.reason === "approval policy missing" ? "missing" : "unsigned",
+    approvalPolicy,
     vaultUnlocked: vaultUnlocked(workspace), signingRoute: route,
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
@@ -186,13 +186,27 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
   };
 }
 
-/** One evaluation for `principal` at `stage` on `state`, with the signed policy and the in-force gate policy. */
+/** The floor read while the signed policy does not verify: the strictest (every project regulated, no self-approval, no gate change). */
+const UNVERIFIED_FLOOR: ApprovalA4Floor = { ...a4FloorFor(defaultApprovalPolicy()), regulated: true, allowSelfApproval: false, allowedGateChanges: [] };
+
+/** The signed policy's `a4` floor from one verified read; 409 APPROVAL_POLICY_MISSING / _UNSIGNED, never the defaults, when it does not verify. */
+export function signedA4Floor(workspace: string): ApprovalA4Floor {
+  const { policy, verdict, reason } = loadVerifiedApprovalPolicy(workspace);
+  if (policy === null) throw fail(409, verdict === "missing" ? "APPROVAL_POLICY_MISSING" : "APPROVAL_POLICY_UNSIGNED", `the approval policy does not verify: ${reason ?? "unknown"}`);
+  return a4FloorFor(policy);
+}
+
+/**
+ * One evaluation for `principal` at `stage` on `state`, with the signed policy and the in-force gate policy. The rules,
+ * the floor and `approvals.policy_signed` come from one verified read; an unverified policy lends nothing: the defaults
+ * stand in for display under the strictest floor, and the BLOCKED item refuses every gate request, decision and progress.
+ */
 export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts,
   stage: A4Stage, now: number): { readiness: A4ReadinessV1; query: A4ReadinessQuery } {
   ensureA4Stages();
-  const policy = loadApprovalPolicy(store.workspace);
-  const query: A4ReadinessQuery = { stage, principal, policy, gatePolicy: gatePolicyOf(state.chain), floor: a4FloorFor(policy), now,
-    live: collectFacts(store, state, call) };
+  const signed = loadVerifiedApprovalPolicy(store.workspace);
+  const query: A4ReadinessQuery = { stage, principal, policy: signed.policy ?? defaultApprovalPolicy(), gatePolicy: gatePolicyOf(state.chain),
+    floor: signed.policy ? a4FloorFor(signed.policy) : UNVERIFIED_FLOOR, now, live: collectFacts(store, state, call, signed.verdict) };
   return { readiness: evaluateA4Readiness(state, query), query };
 }
 
