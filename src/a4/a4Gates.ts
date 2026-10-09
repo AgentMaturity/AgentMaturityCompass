@@ -63,6 +63,9 @@ const NEXT_STAGE: Partial<Record<A4Stage, A4Stage>> = { aspire: "assemble", asse
 /** Intent fields as the 409 names them. */
 const SLOT_NAMES: Record<string, string> = { memberSetDigest: "memberSet", evidenceRefDigests: "evidenceRefs", readinessBindingDigest: "readiness",
   gatePolicyDigest: "policy", excludedKeys: "excludedKeys", specDigest: "spec", resourceDigests: "resources" };
+/** A superseding transition as the slot it moves, so a superseded gate's 409 names `moved` like a rebuilt intent's. */
+const SLOT_OF_KIND: Record<string, string> = { MEMBER: "memberSet", EVIDENCE_REF: "evidenceRefs", ACKNOWLEDGED: "readiness", REVISION: "spec",
+  GATE_POLICY_CHANGED: "policy", GATE_CONSUMED: "consumed" };
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
@@ -329,7 +332,8 @@ function assertIntentUnchanged(state: A4ReadinessState, row: A4GateRow, request:
 function assertGateLive(state: A4ReadinessState, row: A4GateRow, gate: ReturnType<typeof gateStatus>, readiness: A4ReadinessV1, drifted: readonly string[] | null,
   now: number): void {
   if (gate.supersededBy !== null) {
-    throw fail(409, "A4_GATE_STALE", gate.status === "CONSUMED" ? "consumed" : `superseded by ${gate.supersededBy.kind}`, { supersededBy: gate.supersededBy.kind });
+    const { kind } = gate.supersededBy;
+    throw fail(409, "A4_GATE_STALE", gate.status === "CONSUMED" ? "consumed" : `superseded by ${kind}`, { supersededBy: kind, moved: [SLOT_OF_KIND[kind] ?? kind] });
   }
   if (row.revision_no !== state.project.revision_no) throw fail(409, "A4_GATE_STALE", "the gate is bound to an earlier revision", { moved: ["revision"] });
   assertIntentUnchanged(state, row, gate.request, readiness);
