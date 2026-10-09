@@ -497,9 +497,13 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
       ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
   });
   const mandatory = items.filter((candidate) => candidate.mandatory && candidate.section !== "integrity");
+  // A mandatory BLOCKED item (a failed or lost effect, a freeze, an unsigned policy) outranks COMPLETE; once both gates are
+  // consumed only a running effect or an unread freeze keeps the stage WAITING, so a past stage is not held by other waits.
   const status: A4ReadinessV1["status"] = !live.integrity.valid ? "BLOCKED" : state.project.hold === 1 ? "ON_HOLD"
-    : gates.direction?.status === "CONSUMED" && gates.completion?.status === "CONSUMED" ? "COMPLETE"
-      : mandatory.some((candidate) => candidate.status === "BLOCKED") ? "BLOCKED"
+    : mandatory.some((candidate) => candidate.status === "BLOCKED") ? "BLOCKED"
+      : gates.direction?.status === "CONSUMED" && gates.completion?.status === "CONSUMED"
+        ? (mandatory.some((candidate) => (candidate.id === "effects.failed" && candidate.status === "WAITING")
+          || (candidate.id === "hold.none" && candidate.status === "NOT_EVALUATED")) ? "WAITING" : "COMPLETE")
         : mandatory.some((candidate) => (candidate.status === "WAITING" || candidate.status === "NOT_EVALUATED") && candidate.acknowledged === null) ? "WAITING" : "READY";
   const stageDecisions = state.decisions.filter((decision) => decision.gate_id === direction?.gate_id || decision.gate_id === completion?.gate_id);
   const members = [...state.refs.filter((ref) => ref.revisionNo === state.project.revision_no).map((ref) => refEnvelope(ref, regulated, now)),
