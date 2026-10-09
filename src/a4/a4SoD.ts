@@ -62,7 +62,8 @@ export function evaluateSod(input: {
   if (!/^(LOCAL_USER|WORKSPACE_ROUTER):./.test(approver.key)) violations.add(/demo/i.test(approver.key) ? "no_demo" : "no_admin_token");
   const selfRules = new Set<SodRule>();
   if (gate.requesterKeys.includes(approver.key)) selfRules.add("requester_not_approver");
-  if (authorOf(input.transitions, gate.revisionNo) === approver.key) selfRules.add("author_not_approver");
+  // The revision under approval: a policy gate approves its proposal (authored by the requester), not the head revision.
+  if (gate.gate !== "policy" && authorOf(input.transitions, gate.revisionNo) === approver.key) selfRules.add("author_not_approver");
   if ((gate.gate === "completion" || input.effect === true) && buildersOf(input.transitions, gate.revisionNo).includes(approver.key)) {
     selfRules.add("builder_not_completion_approver");
   }

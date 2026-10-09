@@ -287,7 +287,8 @@ const collectRoute = (workspace: string): "vault" | "notary" | null => {
 export function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: "direction" | "completion" | "policy"; revisionNo: number;
   requesterKey: string; specDigest: string; boundItemIds: readonly string[] }, readiness: A4ReadinessV1): A4IntentV1 {
   const revision = state.revisions.find((row) => row.revision_no === gate.revisionNo) ?? null;
-  const author = authorOf(state.chain, gate.revisionNo);
+  // A policy gate approves the proposed policy, whose author is its requester, not the head revision (design §5.3).
+  const author = gate.gate === "policy" ? null : authorOf(state.chain, gate.revisionNo);
   const excluded = [gate.requesterKey, ...(author === null ? [] : [author]), ...(gate.gate === "completion" ? buildersOf(state.chain, gate.revisionNo) : [])];
   return a4IntentV1Schema.parse({
     schema: "amc.a4-intent/v1", projectId: state.project.project_id, stage: gate.stage, gate: gate.gate, revisionNo: gate.revisionNo,
