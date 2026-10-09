@@ -205,12 +205,16 @@ export function renderReviewCard(ctx) {
     <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review", ctx.allowed.review)}</div>`;
 }
 
-/** One thread per stage-qualified card id (`aspire:specification`), the key a4.js posts and presence uses. */
-export function renderComments(cardId, comments) {
+/**
+ * One thread per stage-qualified card id (`aspire:specification`), the key a4.js posts and presence uses. Studio names a
+ * comment's author by principal key only; a current member's key is shown as their username.
+ */
+export function renderComments(cardId, comments, members = []) {
+  const names = new Map(members.map((member) => [member.principalKey, member.username]));
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
-    <span class="pill">SELF_REPORTED</span> <strong>${esc(comment.authorUsername ?? comment.authorKey)}</strong>
+    <span class="pill">SELF_REPORTED</span> <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
-      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes ?? (comment.reasonCode ? [comment.reasonCode] : []))}`}</div></li>`);
+      : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCode ? [comment.reasonCode] : [])}`}</div></li>`);
   return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open data-a4-default-open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
     <button type="button" data-a4-action="comment">Comment</button>
@@ -221,7 +225,7 @@ export function renderCard(card, ctx, comments) {
   let body;
   try { body = card.render(ctx); }
   catch (error) { body = `<p class="status-bad">This card could not render: ${esc(error?.message ?? error)}</p>`; }
-  return `<section class="card a4-card" data-card="${esc(card.id)}"><h4>${esc(card.title)}</h4>${body}${renderComments(`${ctx.stage}:${card.id}`, comments)}</section>`;
+  return `<section class="card a4-card" data-card="${esc(card.id)}"><h4>${esc(card.title)}</h4>${body}${renderComments(`${ctx.stage}:${card.id}`, comments, ctx.project.members)}</section>`;
 }
 
 export function renderDifferences(diff, project) {
@@ -390,7 +394,7 @@ export function renderMembers(ctx) {
   return `<section class="card"><h4>Members</h4>
     ${list(project.members.map((member) => `<li>${esc(member.username)} <code>${esc(member.authSource)}</code> ${codes(member.roles)}</li>`), "No members.")}
     ${readiness.identityCheck === "session_record" ? `<p><code>IDENTITY_CHECK_LIMITED</code> Host-mode roles come from session records, not a live check.</p>` : ""}
-    ${(members?.candidatesLimited ?? members?.limited) === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
+    ${members?.candidatesLimited === true ? `<p class="muted">Host mode: candidates come from tracked session records, so this list may be incomplete.</p>` : ""}
     ${members?.error ? `<p class="status-bad">${esc(members.error)}</p>` : ""}
     ${candidates.length ? `<h4>Candidates</h4>${list(candidates.map((candidate) => `<li data-principal="${esc(candidate.principalKey)}">
       ${esc(candidate.username)} <select name="role">${roles.map((role) => `<option>${role}</option>`).join("")}</select>
@@ -447,7 +451,7 @@ const POLL_EVENT_BYTES = 2 * 1024 * 1024;
 
 /** Presence rows as Studio returned them (the poll's or the heartbeat's), keeping only well-formed ones. */
 export const presenceRows = (rows) => (Array.isArray(rows) ? rows.slice(0, 256) : []).filter((row) => isObject(row) && typeof row.username === "string")
-  .map((row) => ({ username: row.username, card: row.card ?? row.cardId ?? "" }));
+  .map((row) => ({ username: row.username, card: typeof row.card === "string" ? row.card : "" }));
 
 export function validateA4Poll(value, current, cursor) {
   const int = (number) => Number.isSafeInteger(number) && number >= 0;
