@@ -4,7 +4,8 @@
  * audit row (a pruned inline payload is `payload_pruned`, bound by digest, never a failure), the A4_RECORD envelopes,
  * every gate's binding digest and in-force gate-policy digest, every decision's request digest (a decision not bound to
  * its gate is `freshness: fail` and counts for nothing), self-approval re-derived with its ratchet, trust tiers
- * recomputed from the referenced rows (TRUST_TIER_INFLATED), the lane/claim-kind rule, verified-lane re-admission, the
+ * recomputed from the referenced rows (TRUST_TIER_INFLATED above what the row can read under any trust list; a
+ * trust-list change is the warning TRUST_TIER_CHANGED), the lane/claim-kind rule, verified-lane re-admission, the
  * per-slot checks of every EFFECT_FINISHED, and credentials in stored request responses. Every verdict is an integrity
  * statement about bytes under this workspace's own keys and the operator's trust list: never a lane, a ref or a claim.
  */
@@ -29,6 +30,8 @@ import { A4StoreError, readA4Store } from "./a4Store.js";
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
 export const A4_MIGRATION = 13;
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
+/** Lowest first, as src/a4/a4Evidence.ts ranks them; a missing or unknown tier ranks below all of them. */
+const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
 const ROTATED_OUT = new Set(["expired", "revoked", "distrusted", "not-yet-valid"]);
 /** A lease token as src/a4/a4Store.ts refuses to store one. */
 const LEASE_TOKEN = /\beyJ[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{40,}/;
@@ -137,7 +140,16 @@ function checkRefs(ledger: Ledger, projectId: string, trust: TrustContext, now: 
   resolveRefs(ledger, refs, trust, now).forEach((resolved, index) => {
     const ref = refs[index]!;
     if (resolved.reasonCodes.includes("TRUST_TIER_INFLATED") || resolved.reasonCodes.includes("TRUST_TIER_CHANGED")) {
-      out.errors.push(`TRUST_TIER_INFLATED: evidence ref ${ref.seq} stores ${ref.trust_tier ?? "no tier"}, the referenced row reads ${resolved.trustTier ?? "none"}`);
+      // ATTESTED holds only while the row's attestation verifies under the trust list in force, so a row that declares
+      // ATTESTED with an attestation reads ATTESTED or SELF_REPORTED as the list changes: its ceiling is ATTESTED, and a
+      // stored tier within the ceiling is a trust-list change (a warning; the read-time lane downgrade covers the claim).
+      const event = ledger.getEventById(ref.ref_id);
+      const meta = event ? eventMeta(event) : {};
+      const ceiling = resolved.trustTier !== null && meta.trustTier === "ATTESTED" && typeof meta.attestation === "object" && meta.attestation !== null
+        ? "ATTESTED" : resolved.trustTier;
+      const stated = `evidence ref ${ref.seq} stores ${ref.trust_tier ?? "no tier"}, the referenced row reads ${resolved.trustTier ?? "none"}`;
+      if (TIER_ORDER.indexOf(ref.trust_tier ?? "") > TIER_ORDER.indexOf(ceiling ?? "")) out.errors.push(`TRUST_TIER_INFLATED: ${stated}`);
+      else out.warnings.push(`TRUST_TIER_CHANGED: ${stated} under the current trust list (not evaluated as tampering)`);
     }
     if (resolved.downgrade !== null) out.warnings.push(`A4_REF_DOWNGRADED: evidence ref ${ref.seq} ${resolved.downgrade.from} -> ${resolved.lane} (${resolved.downgrade.reason})`);
   });
