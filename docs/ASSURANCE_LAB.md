@@ -97,9 +97,9 @@ Use unsigned mode only for local exploration, onboarding, and first-run remediat
 amc assurance run --demo --no-sign
 ```
 
-That run is intentionally not verifier-ready. An unsigned run (`--no-sign`, or any run under `AMC_NO_SIGN=1`) records its ledger session in `.amc/unsigned/evidence.sqlite`, never in `.amc/evidence.sqlite`, so it cannot make the signed workspace ledger unverifiable. The run prints that path as `Evidence store:` and its report carries it as `evidenceStore`. Signed readers never open the unsigned store: `amc assurance history` lists signed runs only.
+That run is intentionally not verifier-ready. An unsigned run (`--no-sign`, or any run under `AMC_NO_SIGN=1`) records its ledger session in `.amc/unsigned/evidence.sqlite`, never in `.amc/evidence.sqlite`, so it cannot make the signed workspace ledger unverifiable. The run prints that path as `Evidence store:` and its report carries it as `evidenceStore`. Signed readers never open the unsigned store: `amc assurance history` lists signed runs only. Since P0-55 the same store holds every maturity diagnostic run under `AMC_NO_SIGN=1` (the instant `amc` score when the vault cannot be unlocked, `amc run`, `amc quickscore --auto`) and every monitored process under it (`amc wrap`, `amc supervise`, `amc evidence collect --first-run`), so those runs score the unsigned store's evidence and their runs and rows never enter `.amc/evidence.sqlite`.
 
-A scan that aborts after it starts (for example because no agent under test is reachable, exit code 2) seals its ledger session with an `ASSURANCE_RUN_ABORTED` audit row naming the error class, and records no assurance run. Sessions left unsealed by aborted runs before this change stay unsealed, and `amc verify` keeps reporting them.
+A scan that aborts after it starts (for example because no agent under test is reachable, exit code 2) seals its ledger session with an `ASSURANCE_RUN_ABORTED` audit row naming the error class, and records no assurance run. A scan whose `ASSURANCE_RUN_STARTED` row cannot be written leaves no session at all: the session and that row commit together. Sessions left unsealed by aborted runs before this change stay unsealed, and `amc verify` keeps reporting them.
 
 Graduate to signed assurance when the result will be used for release approval, customer evidence, compliance review, or audit evidence:
 

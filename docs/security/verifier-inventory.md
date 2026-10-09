@@ -49,7 +49,7 @@ Every portable row is wired. P0-09 wired its issue table; P0-51 wired the ten po
 | `amc forecast verify` | Verify forecast policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc gateway verify-config` | Verify .amc/gateway.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc identity verify` | Verify identity.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | portable artifact | Wired (P0-51): the `--authorities` key the signature names is pinned for `evidence-authority`, and the operator's distrust beats it; an unsigned profile is refused as `not-pinned` |
+| `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | portable artifact | Wired (P0-51): the `--authorities` key the signature names is pinned for `evidence-authority`; since P0-55 an `evidence-authority` entry of a loaded trust list (matched by `keyId`) is admitted by its list; the operator's distrust beats both; an unsigned profile is refused as `not-pinned` |
 | `amc integrations verify` | Verify integrations config signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc lease verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc mechanic profile verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
