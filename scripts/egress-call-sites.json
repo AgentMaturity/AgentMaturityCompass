@@ -83,12 +83,12 @@
       "reason": "residencyFetch checks the immediate gateway hop; final gateway HTTP and CONNECT hops have separate gated rows."
     },
     {
-      "siteId": "src/cli-eval-dataset-commands.ts:188:1",
+      "siteId": "src/cli-eval-dataset-commands.ts:204:1",
       "path": "src/cli-eval-dataset-commands.ts",
-      "line": 188,
+      "line": 204,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Dataset-run POST captures action-entry cwd for dataset/policy and endpoint/model selection before waits. Omitted endpoint uses bridge; explicit endpoint uses provider. Prepared manual-redirect POST is checked at same URL immediately before fetch with null resource facts/system actor. Per-case catch rethrows typed refusal to outer command error, preventing grades/aggregate score for blocked invocation. Source-only; earlier cases, ordinary error scoring, unpinned DNS/no timeout/body bounds and actual source/region qualification remain."
     },
     {
       "siteId": "src/cli-late-stage-commands.ts:316:1",
