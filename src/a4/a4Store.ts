@@ -68,6 +68,17 @@ const SIDE_TABLE_KEYS = {
 export type A4SideTable = keyof typeof SIDE_TABLE_KEYS;
 /** Every column except `evidence_event_id`, which the store fills from the transition's audit row. */
 export interface A4SideRow { readonly table: A4SideTable; readonly values: Readonly<Record<string, Cell>> }
+/** The head's mutable state. Every body signs it as `headAfter`, so readers and writes never trust the unsigned head row. */
+const HEAD_COLUMNS = ["stage", "step", "hold", "hold_reason", "revision_no", "deployed_release_id", "base_release_id"] as const;
+type A4HeadState = Pick<A4ProjectRow, (typeof HEAD_COLUMNS)[number]>;
+/** The state a new project's head row is inserted with. */
+const NEW_HEAD: A4HeadState = { stage: "aspire", step: "asked", hold: 0, hold_reason: null, revision_no: 0, deployed_release_id: null, base_release_id: null };
+const headStateOf = (row: A4HeadState): A4HeadState => Object.fromEntries(HEAD_COLUMNS.map((column) => [column, row[column]])) as A4HeadState;
+/** Which head columns differ from the state the last signed body left. */
+const headProblems = (head: A4ProjectRow, body: Record<string, unknown>): string[] => {
+  const after = (body.headAfter ?? {}) as Record<string, unknown>;
+  return HEAD_COLUMNS.filter((column) => head[column] !== after[column]).map((column) => `head column ${column} differs from the signed head`);
+};
 
 export interface A4ChangeSpec {
   readonly kind: A4TransitionKind;
@@ -77,7 +88,7 @@ export interface A4ChangeSpec {
   /** Merged into the signed body; it may not reuse a field the store sets. */
   readonly payload: Record<string, unknown>;
   readonly sideRows?: readonly A4SideRow[];
-  readonly head?: Partial<Pick<A4ProjectRow, "stage" | "step" | "hold" | "hold_reason" | "revision_no" | "deployed_release_id" | "base_release_id">>;
+  readonly head?: Partial<A4HeadState>;
 }
 export interface A4RequestKey {
   readonly principalKey: string;
@@ -104,7 +115,8 @@ export type A4TransitionResult =
 type Build = (ctx: { head: A4ProjectRow | null; seq: number; ts: number }) => A4ChangeSpec;
 type NewHead = Pick<A4ProjectRow, "project_id" | "workspace_id" | "agent_id" | "name" | "created_by_key">;
 
-const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256", "sideRows"]);
+const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256",
+  "headAfter", "sideRows"]);
 const COLUMN = /^[a-z][a-z0-9_]*$/;
 /** The minted id shape (`randomId("a4p")`); it names a lock file and a blob directory, so nothing else is accepted. */
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
@@ -284,7 +296,7 @@ function createStore(workspace: string, ledger: Ledger) {
       || head.verified_seq !== head.head_seq || head.verified_digest !== head.head_digest) {
       problems.push("the chain does not end at the verified head");
     } else {
-      problems.push(...auditProblems(last.row, getPublicKeyHistory(workspace, "monitor")));
+      problems.push(...auditProblems(last.row, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, last.body));
     }
     if (problems.length > 0) throw integrityFailed(projectId, problems);
     return links;
@@ -318,6 +330,7 @@ function createStore(workspace: string, ledger: Ledger) {
     }
     const last = links.at(-1);
     if (head.head_seq !== (last?.seq ?? -1) || head.head_digest !== last?.row.body_digest) problems.push("head does not equal the last transition");
+    if (last !== undefined) problems.push(...headProblems(head, last.body));
     const named = new Map<string, number>();
     for (const link of links) for (const ref of namesIn(link.body)) named.set(ref.table, (named.get(ref.table) ?? 0) + 1);
     for (const table of Object.keys(SIDE_TABLE_KEYS)) {
@@ -417,8 +430,10 @@ function createStore(workspace: string, ledger: Ledger) {
         const revisionNo = spec.revisionNo ?? head0?.revision_no ?? 0;
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
         const prevDigest = head0?.head_digest ?? "GENESIS";
+        // head0 is checked inside the transaction to equal the head the last signed body left (verifyIncremental).
+        const headAfter = headStateOf({ ...(head0 ?? NEW_HEAD), ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
         const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: spec.actor.key, actorUsername: spec.actor.username,
-          ts, prevDigest, readinessSha256, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
+          ts, prevDigest, readinessSha256, headAfter, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
         const bytes = canonicalize(body);
         const digest = sha256Hex(bytes);
         const envelope = A4_ENVELOPE_KINDS.includes(spec.kind) ? signEnvelope(digest) : null;
@@ -429,7 +444,7 @@ function createStore(workspace: string, ledger: Ledger) {
             const replayed = options.request ? dedupeRequest(options.request, projectId, create !== null, { projectId, seq, kind: spec.kind, bodyDigest: digest }, ts) : null;
             if (replayed) return replayed;
             const head = readHead(projectId);
-            if (head?.head_seq !== head0?.head_seq || head?.head_digest !== head0?.head_digest) throw new HeadMoved();
+            if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
             if (head) verifyIncremental(projectId, head);
             if (options.readiness && options.readiness(db, projectId) !== readinessSha256) throw new HeadMoved();
             const sessionId = `a4-${projectId}-${seq}`;
@@ -462,7 +477,7 @@ function createStore(workspace: string, ledger: Ledger) {
               // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
               if (storedSideRowDigest({ table: row.table, key: keyOf(row) }) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
             }
-            const patch = { ...spec.head, head_seq: seq, head_digest: digest, verified_seq: seq, verified_digest: digest, updated_ts: ts };
+            const patch = { ...headAfter, head_seq: seq, head_digest: digest, verified_seq: seq, verified_digest: digest, updated_ts: ts };
             db.prepare(`UPDATE a4_projects SET ${Object.keys(patch).map((column) => `${column} = @${column}`).join(", ")} WHERE project_id = @project_id`)
               .run({ ...patch, project_id: projectId });
             db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
