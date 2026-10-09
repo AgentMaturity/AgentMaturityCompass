@@ -102,7 +102,7 @@ async function renderListPage() {
   });
 }
 
-function mountProject(projectId, options) {
+function mountProject(projectId, options, strip) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
   const state = { project: null, readiness: null, gates: [], revision: null, comments: [], members: null, diff: null, options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null, generation = 0;
@@ -119,6 +119,7 @@ function mountProject(projectId, options) {
 
   async function load() {
     const mine = ++generation;
+    strip?.reset(); // the strip shows only the claims this load returns
     const project = one(await apiNativeRequest(projectPath("")), "project");
     const viewStage = view.STAGES.includes(params.get("stage")) ? params.get("stage")
       : view.STAGES.includes(project.stage) ? project.stage : "activate";
@@ -369,14 +370,19 @@ async function main() {
     return;
   }
   document.getElementById("a4NavLink")?.removeAttribute("hidden");
-  installClaimStrip(page, onClaims);
+  // The strip prints claimLabel verbatim. A bare envelope (a readiness item's `claim`) carries no server label, so it
+  // stays off the strip rather than being shown with a result word the page would have to supply.
+  const strip = installClaimStrip(page, (listener) => onClaims((claims) => {
+    const labelled = claims.filter((claim) => typeof claim?.claimLabel === "string");
+    if (labelled.length > 0) listener(labelled);
+  }));
   if (page === "a4") return renderListPage();
   const projectId = params.get("project");
   if (!projectId) {
     root.innerHTML = `<section class="card"><p>Choose a project from <a href="./a4">agent projects</a>.</p></section>`;
     return;
   }
-  return mountProject(projectId, options);
+  return mountProject(projectId, options, strip);
 }
 
 main().catch(showError);

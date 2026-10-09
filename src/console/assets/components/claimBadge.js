@@ -59,7 +59,10 @@ export function claimLegend(open) {
     + `<summary>How to read claim kinds</summary>${claimLegendHtml()}</details>`;
 }
 
-/** Shows every claim the page's API calls returned above #app; `onClaims` is api.js's subscription. */
+/**
+ * Shows every claim the page's API calls returned above #app; `onClaims` is api.js's subscription. A page that reloads
+ * its results calls the returned reset() first, so a claim the server has since lowered does not stay on the strip.
+ */
 export function installClaimStrip(page, onClaims) {
   const app = typeof document === "undefined" ? null : document.getElementById("app");
   if (!CLAIM_PAGES.has(page) || !app) return;
@@ -78,4 +81,5 @@ export function installClaimStrip(page, onClaims) {
     for (const claim of claims) seen.set(claim.claimLabel, claim);
     render();
   });
+  return { reset() { seen.clear(); render(); } };
 }
