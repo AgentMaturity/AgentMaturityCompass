@@ -5,8 +5,10 @@
  */
 
 import { randomUUID, createHash } from "node:crypto";
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync } from 'node:fs';
+import { activeControlPlanHead, loadActiveCompiledPolicy } from '../catalog/compiler/activate.js';
 import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
 import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
@@ -16,8 +18,62 @@ import { writeConsolidatedGuardEvent, currentStage } from '../storage/consolidat
 let _db: import('better-sqlite3').Database | null = null;
 let _insertStmt: import('better-sqlite3').Statement | null = null;
 let _dbPath: string | null = null;
+const workspaceScope = new AsyncLocalStorage<string>();
+
+function absoluteWorkspace(workspace: string): string {
+  if (typeof workspace !== 'string' || !workspace.trim()) throw new Error('guard event workspace is required');
+  return resolve(workspace);
+}
+
+/** Pins a workspace for synchronous work and asynchronous continuations created by `fn`. */
+export function withWorkspaceScope<T>(workspace: string, fn: () => T): T {
+  return workspaceScope.run(absoluteWorkspace(workspace), fn);
+}
+
+/** The caller's workspace scope only; this never guesses from the process environment or cwd. */
+export function getWorkspaceScope(): string | undefined {
+  return workspaceScope.getStore();
+}
+
+interface GuardWorkspace {
+  workspace: string;
+  legacyDbPath: string;
+  cwdFallback: boolean;
+  legacyDbOverride: boolean;
+}
+
+function assertLegacyWorkspaceAllowed(workspace: string): void {
+  // Both reads verify the existing signed activation seam. An active plan or
+  // any integrity failure refuses legacy guessing; do not turn unreadable into
+  // "no regulated profile" or import checkEgress, which emits events itself.
+  if (activeControlPlanHead(workspace) !== null || loadActiveCompiledPolicy(workspace) !== null) {
+    throw new Error('guard event workspace scope is required for a regulated profile');
+  }
+}
+
+function resolveGuardWorkspace(workspace?: string, receiptWorkspace?: string): GuardWorkspace {
+  const scoped = workspace !== undefined ? absoluteWorkspace(workspace) : getWorkspaceScope();
+  if (scoped !== undefined) {
+    return { workspace: scoped, legacyDbPath: join(scoped, '.amc', 'guard_events.sqlite'), cwdFallback: false, legacyDbOverride: false };
+  }
+
+  // Labelled non-regulated compatibility fallback only. Check both cwd and an
+  // env-selected target so a global override cannot bypass a regulated profile.
+  const cwd = absoluteWorkspace(process.cwd());
+  assertLegacyWorkspaceAllowed(cwd);
+  const configured = receiptWorkspace === undefined ? process.env.AMC_GUARD_EVENTS_DB_PATH : undefined;
+  const legacyDbPath = configured ? resolve(configured) : join(receiptWorkspace === undefined ? cwd : absoluteWorkspace(receiptWorkspace), '.amc', 'guard_events.sqlite');
+  const target = receiptWorkspace !== undefined ? absoluteWorkspace(receiptWorkspace) : configured ? resolve(dirname(legacyDbPath), '..') : cwd;
+  if (target !== cwd) assertLegacyWorkspaceAllowed(target);
+  return { workspace: target, legacyDbPath, cwdFallback: true, legacyDbOverride: Boolean(configured) };
+}
+
+function databasePath(target: GuardWorkspace): string {
+  return currentStage() === 'CUTOVER' ? join(dirname(target.legacyDbPath), 'evidence.sqlite') : target.legacyDbPath;
+}
 
 export interface GuardEventInput {
+  workspace?: string;
   agentId: string;
   moduleCode: string;
   decision: 'allow' | 'deny' | 'stepup' | 'warn';
@@ -91,7 +147,7 @@ function isSha256Hex(value: unknown): value is string {
 }
 
 function guardReceiptWorkspace(input?: string): string {
-  return resolve(input ?? process.env.AMC_GUARD_RECEIPTS_WORKSPACE ?? process.env.AMC_WORKSPACE ?? process.cwd());
+  return resolveGuardWorkspace(input, process.env.AMC_GUARD_RECEIPTS_WORKSPACE ?? process.env.AMC_WORKSPACE).workspace;
 }
 
 function mapReceiptDecisionToEventDecision(decision: GuardDecisionReceiptDecision): GuardEventInput['decision'] {
@@ -184,7 +240,7 @@ export function verifyGuardDecisionReceipt(
   }
 
   let publicKeys = options.publicKeys;
-  if (!publicKeys && options.workspace) {
+  if (!publicKeys && (options.workspace !== undefined || getWorkspaceScope() !== undefined)) {
     try {
       publicKeys = getPublicKeyHistory(guardReceiptWorkspace(options.workspace), payload.signer);
     } catch {
@@ -202,21 +258,18 @@ export function verifyGuardDecisionReceipt(
   return { ok: reasons.length === 0, reasons, payload };
 }
 
-function guardEventsDbPath(): string {
-  const legacyPath = process.env.AMC_GUARD_EVENTS_DB_PATH
-    ? resolve(process.env.AMC_GUARD_EVENTS_DB_PATH)
-    : join(process.cwd(), '.amc', 'guard_events.sqlite');
-  return currentStage() === 'CUTOVER' ? join(dirname(legacyPath), 'evidence.sqlite') : legacyPath;
+/** Explicit/ALS scope ignores the global DB override; only verified non-regulated legacy calls may use it. */
+export function guardEventsDbPath(workspace?: string): string {
+  return databasePath(resolveGuardWorkspace(workspace));
 }
 
-function getDb(): import('better-sqlite3').Database | null {
+function getDb(desiredPath: string): import('better-sqlite3').Database | null {
   try {
     // P2.1 consolidation. Under CUTOVER the emitter opens the evidence store
     // instead of the separate file, so every reader here — the query path, the
     // chain verifier, the retention prune — follows without knowing about the
     // move. The legacy file is left untouched and complete, which is what makes
     // reverting a setting change rather than a restore.
-    const desiredPath = guardEventsDbPath();
     const dir = dirname(desiredPath);
     if (_db && _dbPath === desiredPath) {
       return _db;
@@ -291,11 +344,17 @@ function getDb(): import('better-sqlite3').Database | null {
 
 export function emitGuardEvent(input: GuardEventInput): void {
   try {
-    const db = getDb();
+    const target = resolveGuardWorkspace(input.workspace);
+    const db = getDb(databasePath(target));
     if (!db || !_insertStmt) return;
     const id = randomUUID();
     const now = new Date().toISOString();
-    const metaJson = input.meta ? JSON.stringify(input.meta) : null;
+    const meta = target.cwdFallback ? {
+      ...(input.meta ?? {}),
+      workspaceResolution: 'cwd-fallback',
+      ...(target.legacyDbOverride ? { workspaceDbPathSource: 'legacy-env' } : {}),
+    } : input.meta;
+    const metaJson = meta ? JSON.stringify(meta) : null;
     // Guard decisions are read back by collectEvidenceFromLedger and scored as
     // OBSERVED (trust 1.0), but this store had no chain, no signature and no
     // immutability trigger, so an edit to the file was undetectable. Each row
@@ -322,7 +381,7 @@ export function emitGuardEvent(input: GuardEventInput): void {
     // reads until parity has been verified and cutover is switched on, so this
     // stage cannot change any answer — it can only make the second store
     // complete enough to be compared against the first.
-    if (currentStage() !== 'CUTOVER') writeConsolidatedGuardEvent(guardEventsWorkspace(), {
+    if (currentStage() !== 'CUTOVER') writeConsolidatedGuardEvent(target.workspace, {
       id,
       agent_id: input.agentId,
       module_code: input.moduleCode,
@@ -335,33 +394,25 @@ export function emitGuardEvent(input: GuardEventInput): void {
       event_hash: eventHash
     });
   } catch (_e) {
-    // Never throw
+    // Never throw. Missing scope in a regulated/unverifiable profile writes no
+    // row; it must not scatter evidence into another workspace to log failure.
   }
-}
-
-/**
- * The workspace whose evidence store receives the consolidated copy.
- *
- * Derived from the legacy database path so the two stores always belong to the
- * same workspace: AMC_GUARD_EVENTS_DB_PATH is honoured by tests and by
- * multi-workspace hosts, and writing the copy to process.cwd() regardless would
- * scatter rows across whichever directory the process happened to start in.
- */
-function guardEventsWorkspace(): string {
-  const configured = process.env.AMC_GUARD_EVENTS_DB_PATH;
-  // .amc/guard_events.sqlite -> the workspace is two levels up.
-  return configured ? resolve(dirname(configured), '..') : process.cwd();
 }
 
 export function emitGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput): GuardDecisionReceipt | null {
   try {
-    const receipt = buildGuardDecisionReceipt(input);
+    // Resolve once, then pass the same explicit workspace to signing,
+    // verification and persistence rather than letting each guess a target.
+    const target = resolveGuardWorkspace(input.workspace, process.env.AMC_GUARD_RECEIPTS_WORKSPACE ?? process.env.AMC_WORKSPACE);
+    const workspace = target.workspace;
+    const receipt = buildGuardDecisionReceipt({ ...input, workspace });
     const verified = verifyGuardDecisionReceipt(receipt, {
-      workspace: guardReceiptWorkspace(input.workspace),
+      workspace,
     });
     if (!verified.ok) return null;
 
     emitGuardEvent({
+      workspace,
       agentId: input.agentId,
       moduleCode: input.moduleCode,
       decision: mapReceiptDecisionToEventDecision(input.decision),
@@ -369,6 +420,7 @@ export function emitGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput): 
       severity: input.severity ?? defaultReceiptSeverity(input.decision),
       meta: {
         ...(input.meta ?? {}),
+        ...(target.cwdFallback ? { workspaceResolution: 'cwd-fallback' } : {}),
         guardDecisionReceipt: receipt,
         guardDecisionReceiptHash: receipt.receiptHash,
         guardDecisionReceiptPayloadHash: receipt.payloadHash,
@@ -386,7 +438,7 @@ export function emitGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput): 
 }
 
 /** Read events for a given agent within a time window. Used by scoring engine and SIEM exporter. */
-export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
+export function readGuardEvents(agentId?: string, windowHours?: number, workspace?: string): Array<{
   id: string; agent_id: string; module_code: string; decision: string;
   reason: string; severity: string; meta_json: string | null; created_at: string;
 }> {
@@ -394,7 +446,7 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
   try {
     // Assessment reads must not initialize or migrate the assessed workspace.
     // Missing or legacy-incompatible stores yield no evidence, not a new store.
-    db = new Database(guardEventsDbPath(), { readonly: true, fileMustExist: true });
+    db = new Database(guardEventsDbPath(workspace), { readonly: true, fileMustExist: true });
     let sql = 'SELECT * FROM amc_guard_events';
     const params: unknown[] = [];
     const clauses: string[] = [];
@@ -413,9 +465,9 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
   }
 }
 
-export function readGuardDecisionReceipts(agentId?: string, windowHours?: number): GuardDecisionReceipt[] {
+export function readGuardDecisionReceipts(agentId?: string, windowHours?: number, workspace?: string): GuardDecisionReceipt[] {
   const receipts: GuardDecisionReceipt[] = [];
-  for (const row of readGuardEvents(agentId, windowHours)) {
+  for (const row of readGuardEvents(agentId, windowHours, workspace)) {
     if (!row.meta_json) continue;
     try {
       const meta = JSON.parse(row.meta_json) as { guardDecisionReceipt?: GuardDecisionReceipt };
@@ -466,21 +518,29 @@ function lastGuardEventHash(db: import('better-sqlite3').Database): string {
  * Rows written before the chain migration carry NULL hashes. They are counted
  * as `unchained` rather than verified: this store predates tamper-evidence and
  * claiming otherwise would be exactly the inflation AMC exists to catch.
+ * Missing, unreadable or corrupt stores are not verified and return `ok: false`.
  */
-export function verifyGuardEventChain(): {
+export function verifyGuardEventChain(workspace?: string): {
   ok: boolean;
   chained: number;
   unchained: number;
   brokenAt: string | null;
 } {
-  const db = getDb();
-  if (!db) return { ok: true, chained: 0, unchained: 0, brokenAt: null };
+  let desiredPath: string;
   try {
+    desiredPath = guardEventsDbPath(workspace);
+  } catch {
+    return { ok: false, chained: 0, unchained: 0, brokenAt: null };
+  }
+  let db: import('better-sqlite3').Database | undefined;
+  try {
+    // Verification must not initialize or migrate the assessed workspace.
+    db = new Database(desiredPath, { readonly: true, fileMustExist: true });
     const rows = db
       .prepare(
-        `SELECT id, agent_id, module_code, decision, reason, severity, meta_json,
-                created_at, prev_hash, event_hash
-         FROM amc_guard_events ORDER BY created_at ASC, rowid ASC`
+        // SELECT * also reads stores predating the chain columns without an
+        // ALTER: absent event_hash values are counted as unchained below.
+        `SELECT * FROM amc_guard_events ORDER BY created_at ASC, rowid ASC`
       )
       .all() as Array<Record<string, string | null>>;
 
@@ -515,7 +575,9 @@ export function verifyGuardEventChain(): {
     }
     return { ok: true, chained, unchained, brokenAt: null };
   } catch {
-    return { ok: true, chained: 0, unchained: 0, brokenAt: null };
+    return { ok: false, chained: 0, unchained: 0, brokenAt: null };
+  } finally {
+    try { db?.close(); } catch { /* best-effort reader cleanup */ }
   }
 }
 
@@ -530,11 +592,20 @@ export function verifyGuardEventChain(): {
  * Pruning breaks the chain at the cut point by construction, which
  * verifyGuardEventChain reports as unchained rows rather than as tampering.
  */
-export function pruneGuardEvents(beforeIso: string): number {
-  const db = getDb();
-  if (!db) return 0;
+export function pruneGuardEvents(workspace: string, beforeIso: string): number;
+/** @deprecated Non-regulated compatibility only. Production callers must pass `(workspace, beforeIso)`. */
+export function pruneGuardEvents(beforeIso: string): number;
+export function pruneGuardEvents(workspaceOrBefore: string, beforeIso?: string): number {
   try {
-    const result = db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(beforeIso);
+    const target = resolveGuardWorkspace(beforeIso === undefined ? undefined : workspaceOrBefore);
+    // The one-argument form may use an ALS scope, but never prune a regulated
+    // workspace through a deprecated call that supplies no workspace itself.
+    if (beforeIso === undefined) assertLegacyWorkspaceAllowed(target.workspace);
+    const cutoff = beforeIso ?? workspaceOrBefore;
+    if (!Number.isFinite(Date.parse(cutoff))) return 0;
+    const db = getDb(databasePath(target));
+    if (!db) return 0;
+    const result = db.prepare(`DELETE FROM amc_guard_events WHERE created_at < ?`).run(cutoff);
     return Number(result.changes ?? 0);
   } catch {
     return 0;

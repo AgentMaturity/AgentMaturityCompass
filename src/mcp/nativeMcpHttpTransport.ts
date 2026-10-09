@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import type { Transport, TransportSendOptions } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { isJSONRPCRequest, type JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
@@ -11,6 +12,8 @@ import { MCP_PROTOCOL_VERSION_META, MCP_STATELESS_PROTOCOL_VERSION } from "./pro
 import { mcpHeaderValue, mcpParamHeaders, type McpParamHeader } from "./protocol/headers.js";
 import { NATIVE_MCP_AUTHORIZE_HINT, parseNativeMcpBearerChallenge, type NativeMcpOAuthChallenge } from "./oauth/discovery.js";
 import type { NativeMcpOAuthReceipt } from "./oauth/authorize.js";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { residencyFetch, EgressBlocked } from "../residency/checkEgress.js";
 
 export { NativeMcpHttpRefused } from "./nativeMcpReconnect.js";
 
@@ -19,6 +22,8 @@ export interface NativeMcpHttpServer {
   readonly id: string;
   readonly url: string;
   readonly origin: string;
+  /** Trusted mount scope supplied by AMC's caller, never learned from the remote server. */
+  readonly workspace?: string;
   /** Private resolved values. Configuration files must use headerRefs instead. */
   readonly headers?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
@@ -112,6 +117,7 @@ export class NativeMcpHttpTransport implements Transport {
   private readonly inner: StreamableHTTPClientTransport;
   private readonly endpoint: URL;
   private readonly headers: Headers;
+  private readonly workspace: string | undefined;
   private readonly secrets: string[] = [];
   private readonly lifetime = new AbortController();
   private readonly cursors = new NativeMcpReconnectCursors();
@@ -149,6 +155,8 @@ export class NativeMcpHttpTransport implements Transport {
     }
     this.notificationLifetime = nativeMcpNotificationLifetime(server.notificationLifetimeMs);
     this.oauth = server.auth !== undefined;
+    const workspace = server.workspace ?? getWorkspaceScope();
+    this.workspace = workspace === undefined ? undefined : resolve(workspace);
     this.endpoint = nativeMcpHttpEndpoint(server.url, server.origin);
     validateNativeMcpHeaderNames(Object.keys(server.headers ?? {}));
     this.headers = new Headers();
@@ -339,7 +347,7 @@ export class NativeMcpHttpTransport implements Transport {
       const pinned = new Headers(headers);
       this.headers.forEach((value, name) => pinned.set(name, value));
       pinned.set("origin", this.endpoint.origin);
-      response = await fetch(this.endpoint, { method, headers: pinned, ...(body === undefined ? {} : { body }),
+      response = await residencyFetch(this.workspace, "mcp-http", this.endpoint.href, { method, headers: pinned, ...(body === undefined ? {} : { body }),
         signal: controller.signal, redirect: "manual", credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer" });
       clearTimeout(timer);
       if (scope.controller.signal.aborted || this.closing) throw nativeMcpAbortFailure();
@@ -372,6 +380,9 @@ export class NativeMcpHttpTransport implements Transport {
       return { response, release, cancel };
     } catch (error) {
       cancel();
+      if (error instanceof EgressBlocked) {
+        throw new NativeMcpHttpRefused(`MCP HTTP residency denied this outbound request (${error.decision.reason}).`, "REFUSED");
+      }
       if (scope.controller.signal.aborted) throw nativeMcpAbortFailure();
       if (error instanceof NativeMcpHttpRefused) throw error;
       throw new NativeMcpReconnectTransient(openTimedOut);
@@ -641,13 +652,17 @@ export class NativeMcpHttpTransport implements Transport {
       headers.set("mcp-session-id", this.pinnedSession);
       if (this.inner.protocolVersion) headers.set("mcp-protocol-version", this.inner.protocolVersion);
       try {
-        const response = await fetch(this.endpoint, { method: "DELETE", headers, redirect: "manual", credentials: "omit",
+        const response = await residencyFetch(this.workspace, "mcp-http", this.endpoint.href, { method: "DELETE", headers, redirect: "manual", credentials: "omit",
           referrerPolicy: "no-referrer", signal: AbortSignal.timeout(Math.min(this.timeout, 3000)) });
         await response.body?.cancel();
         if (response.redirected || response.url !== this.endpoint.href || (!response.ok && ![404, 405].includes(response.status))) {
           throw new Error("termination refused");
         }
-      } catch { throw new NativeMcpHttpRefused("MCP HTTP local connection closed, but remote session termination could not be confirmed."); }
+      } catch (error) {
+        throw new NativeMcpHttpRefused(error instanceof EgressBlocked
+          ? `MCP HTTP local connection closed, but residency policy denied remote session termination (${error.decision.reason}).`
+          : "MCP HTTP local connection closed, but remote session termination could not be confirmed.");
+      }
       finally { this.pinnedSession = undefined; }
     });
     this.lifetime.abort();

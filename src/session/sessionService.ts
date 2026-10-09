@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { assertStorageAdmission } from "../residency/checkEgress.js";
 import type { EvidenceEvent } from "../types.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
@@ -43,8 +44,6 @@ import type {
   TurnRef,
   TurnStartParams
 } from "./sessionApiTypes.js";
-
-
 // A monitor digest is a 64-char lowercase hex sha256. compositionDigest is
 // already one in normal use; anything else is hashed so the sessions row's
 // binary_sha256 column is always well-formed.
@@ -144,6 +143,7 @@ export class SessionService extends SessionEventWriter {
     if (this.sessionIdValue !== null) {
       throw new Error("SessionService.open called twice");
     }
+    assertStorageAdmission(this.workspace);
     const sessionId = params.sessionId ?? randomUUID();
     this.sessionIdValue = sessionId;
     this.runtime = params.runtime ?? "amc";

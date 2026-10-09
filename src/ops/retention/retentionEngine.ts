@@ -142,7 +142,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
   const guardEventDays = policy.opsPolicy.retention.pruneGuardEventsAfterDays;
   let prunedGuardEventCount = 0;
   if (guardEventDays !== undefined && !params.dryRun) {
-    prunedGuardEventCount = pruneGuardEvents(new Date(cutoffTs(guardEventDays)).toISOString());
+    prunedGuardEventCount = pruneGuardEvents(params.workspace, new Date(cutoffTs(guardEventDays)).toISOString());
   }
   const ledger = openLedger(params.workspace);
   try {
