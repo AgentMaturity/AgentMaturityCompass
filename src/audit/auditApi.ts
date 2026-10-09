@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { closeSync, constants, fstatSync, openSync, readFileSync, realpathSync, rmSync, statSync } from "node:fs";
 import { z } from "zod";
 import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
@@ -404,9 +404,11 @@ function readExportedBinderBytes(workspace: string, file: string): Buffer | null
   try {
     const root = join(realpathSync(workspace), ".amc", "audit", "binders", "exports");
     if (realpathSync(auditBindersExportsDir(workspace)) !== root) return null;
+    // The real path must be the requested path re-rooted at the real exports dir: no link anywhere below exports.
+    const unlinked = join(root, relative(resolve(auditBindersExportsDir(workspace)), file));
     const inside = () => {
       const real = realpathSync(file);
-      return isWithin(root, real) ? real : null;
+      return real === unlinked && isWithin(root, real) ? real : null;
     };
     const real = inside();
     if (real === null) return null;
@@ -427,8 +429,8 @@ function readExportedBinderBytes(workspace: string, file: string): Buffer | null
 
 /**
  * Studio's binder verify (P0-20): the route confines `file` to the binder exports directory by path, and only bytes
- * read under that directory's real path are verified (P0-55). A missing file and one outside both read as the same
- * generic UNREADABLE, so a request learns nothing about other paths. A request never names a public key.
+ * read under that directory's real path are verified (P0-55). A file reached through a link, or not a regular file,
+ * reads as the same generic UNREADABLE as a missing one. A request never names a public key.
  */
 export function auditBinderVerifyForApi(params: { file: string; workspace: string; trust: TrustContext }) {
   const file = resolve(params.file);
