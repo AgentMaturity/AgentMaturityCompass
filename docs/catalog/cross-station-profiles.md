@@ -79,6 +79,10 @@ changed-candidate records are rejected and listed; the normal strict comparison 
 choices remain unresolved. Existing plan-signing and activation weakening checks still apply to `reviewer_exception`.
 Signing identifies a key and preserves bytes; it does not establish independent legal review.
 
+Signing and activation also gate removed or renamed effective merge keys and any changed comparator, value or chosen
+control. Tightenings are conservatively flagged as unclassified changes too. Added keys and changes only to candidate
+control IDs or exception IDs do not count as weakening; reviewer exceptions still appear in the waiver list.
+
 The readable plan diff includes conflicts, effective comparison rules and rejected exceptions. It shows a changed
 choice or expired exception even when the independently enforced runtime parameters remain unchanged.
 

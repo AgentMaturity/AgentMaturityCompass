@@ -69,7 +69,8 @@ const evidenceView = (e: EvidencePlan) => ({
 
 /**
  * Every way `next` is weaker than `prev`; any change no rule classifies counts (fail closed). Reviewer exceptions are
- * listed on every signing, with or without a previous plan: each lowers what the catalog demands.
+ * listed on every signing, with or without a previous plan: each lowers what the catalog demands. Effective station
+ * rules gate removed keys and changed comparator/value/choice; control-id and exception-id bookkeeping is ignored.
  */
 export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): string[] {
   const waived = [
@@ -88,12 +89,18 @@ export function planWeakenings(prev: CompiledPlan | null, next: CompiledPlan): s
     return [];
   });
   const fragments = (p: CompiledPlan) => p.runtimePolicy.proposedSignedConfigs as OperatingProfile["proposedSignedConfigs"];
+  const mergeRules: Rules = [
+    [/\.(controlIds|exceptionId)$/, { kind: "ignore" }],
+    [/^\[[^\]]+\]$/, { kind: "removedIsWeaker" }]
+  ];
   return [
     ...waived,
     ...dropped,
     ...weakenings("runtimePolicy", RUNTIME_RULES, policyView(prev.runtimePolicy), policyView(next.runtimePolicy)),
     ...fragmentWeakenings(fragments(prev), fragments(next)),
-    ...weakenings("evidencePlan", EVIDENCE_RULES, evidenceView(prev.evidencePlan), evidenceView(next.evidencePlan))
+    ...weakenings("evidencePlan", EVIDENCE_RULES, evidenceView(prev.evidencePlan), evidenceView(next.evidencePlan)),
+    ...weakenings("effectiveMergeRules", mergeRules,
+      keyed(prev.effectiveMergeRules ?? [], (r) => r.mergeKey), keyed(next.effectiveMergeRules ?? [], (r) => r.mergeKey))
   ];
 }
 
