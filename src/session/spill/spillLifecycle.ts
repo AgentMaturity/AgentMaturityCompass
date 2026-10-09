@@ -9,6 +9,7 @@ import { createSpillReferenceAuthenticator, type SpillRetrievalOptions } from ".
 import { inspectSpillObject, removeSpillObject, restoreSpillObject } from "./spillStore.js";
 import { isSpillRef, type SpillRef } from "./spillTypes.js";
 import { validateSpillEnvelope } from "./spillEncryption.js";
+import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.js";
 
 export type SpillInventoryStatus = "retained" | "missing" | "unretrievable" | "legacy-plaintext" | "tampered";
 export interface SpillInventoryEntry {
@@ -100,7 +101,7 @@ function requireInventory(input: SpillLifecycleInput): SpillInventory {
 }
 
 export interface SpillEraseScope { readonly eventIds?: readonly string[]; readonly sessionIds?: readonly string[] }
-export interface SpillEraseEntry { readonly locator: string | null; readonly eventIds: readonly string[]; readonly status: "removed" | "missing" | "unretrievable" | "failed"; readonly detail: string | null }
+export interface SpillEraseEntry { readonly locator: string | null; readonly eventIds: readonly string[]; readonly status: "removed" | "missing" | "unretrievable" | "failed" | "held" | "hold_unknown"; readonly detail: string | null }
 export interface SpillEraseResult { readonly ok: boolean; readonly entries: readonly SpillEraseEntry[]; readonly auditEventIds: readonly string[] }
 function exactIds(values: readonly string[] | undefined, label: string): Set<string> {
   if (values !== undefined && !Array.isArray(values)) throw new Error(`Spill erasure ${label} must be an array`);
@@ -114,6 +115,7 @@ function exactIds(values: readonly string[] | undefined, label: string): Set<str
 
 /** Local referenced objects only. This does not infer subjects or erase backup/remote copies. */
 export function eraseSessionSpills(input: SpillLifecycleInput & { readonly scope: SpillEraseScope; readonly reason: string }): SpillEraseResult {
+  input = { ...input, workspace: resolve(input.workspace) };
   const eventIds = exactIds(input.scope?.eventIds, "event IDs"), sessionIds = exactIds(input.scope?.sessionIds, "session IDs");
   if (eventIds.size + sessionIds.size === 0) throw new Error("Spill erasure requires an explicit event or session scope");
   if (typeof input.reason !== "string" || !input.reason.trim() || input.reason.length > 2048) throw new Error("Spill erasure requires a bounded reason");
@@ -152,13 +154,15 @@ export function eraseSessionSpills(input: SpillLifecycleInput & { readonly scope
       outcomes.push({ locator: null, eventIds: entry.eventIds, status: "unretrievable", detail: entry.ref.unretrievable?.slice(0, 512) ?? null }); continue;
     }
     try {
-      const status = removeSpillObject(input.workspace, entry.ref, input.options?.root);
+      const status = withDeletionGate({ workspace: input.workspace, executor: "spill-lifecycle.remove-object",
+        target: { kind: "spills", sessionIds: entry.sessionIds } }, () => removeSpillObject(input.workspace, entry.ref, input.options?.root));
       outcomes.push({ locator: entry.locator, eventIds: entry.eventIds, status, detail: null });
     } catch (error) {
-      outcomes.push({ locator: entry.locator, eventIds: entry.eventIds, status: "failed", detail: String(error).slice(0, 512) });
+      const status = error instanceof DeletionDenied ? error.verdict.verdict === "held" ? "held" : "hold_unknown" : "failed";
+      outcomes.push({ locator: entry.locator, eventIds: entry.eventIds, status, detail: String(error).slice(0, 512) });
     }
   }
-  const ok = outcomes.every(entry => entry.status !== "failed");
+  const ok = outcomes.every(entry => entry.status !== "failed" && entry.status !== "held" && entry.status !== "hold_unknown");
   const outcome = appendOpsAuditEvent({ workspace: input.workspace, auditType: "SESSION_SPILL_ERASURE_FINISHED",
     payload: finishedPayload(intention.eventId, ok, outcomes) });
   auditEventIds.push(outcome.eventId);

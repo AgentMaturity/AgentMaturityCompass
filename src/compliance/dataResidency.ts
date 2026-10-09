@@ -18,6 +18,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
+import { issueScopedLegalHold, releaseScopedLegalHold, listLegalHolds } from "../residency/legalHoldRegistry.js";
 // Redaction lives in privacyRedaction.ts; re-exported so the public surface is
 // unchanged.
 import {
@@ -30,15 +31,13 @@ export { getBuiltInRedactionRules, applyRedaction, runRedactionTests };
 
 import {
   saveWorkspaceRecord,
-  loadWorkspaceRecords,
-  updateWorkspaceRecord
+  loadWorkspaceRecords
 } from "../storage/workspaceRecordStore.js";
 
 /** Where each residency register lives under .amc/. */
 const RESIDENCY_AREA = ["compliance", "residency"];
 const POLICIES_AT = { area: RESIDENCY_AREA, kind: "policies" };
 const TENANTS_AT = { area: RESIDENCY_AREA, kind: "tenants" };
-const LEGAL_HOLDS_AT = { area: RESIDENCY_AREA, kind: "legal-holds" };
 
 // ---------------------------------------------------------------------------
 // Types
@@ -414,6 +413,16 @@ export function checkAllTenantIsolation(workspace?: string): TenantIsolationChec
 // Legal hold management
 // ---------------------------------------------------------------------------
 
+function legacyLegalHold(hold: ReturnType<typeof issueScopedLegalHold>): LegalHold {
+  const legacy: LegalHold = {
+    holdId: hold.holdId, tenantId: hold.scope.tenantId, reason: hold.reason,
+    issuedBy: hold.issuedBy, issuedTs: hold.issuedTs, expiresTs: hold.expiresTs,
+    active: hold.active, holdHash: "",
+  };
+  legacy.holdHash = sha256Hex(JSON.stringify({ ...legacy, holdHash: "" }));
+  return legacy;
+}
+
 /**
  * Issue a legal hold on a tenant's data.
  */
@@ -423,6 +432,12 @@ export function issueLegalHold(opts: {
   issuedBy: string;
   expiresTs?: number | null;
 }, workspace?: string): LegalHold {
+  if (workspace !== undefined) return legacyLegalHold(issueScopedLegalHold({
+    workspace, reason: opts.reason, issuedBy: opts.issuedBy,
+    scope: { tenantId: opts.tenantId, workspaceIds: [], sessionIds: [],
+      dataKinds: [] },
+    ...(opts.expiresTs === undefined ? {} : { expiresTs: opts.expiresTs }),
+  }));
   const hold: LegalHold = {
     holdId: `lh_${randomUUID().slice(0, 12)}`,
     tenantId: opts.tenantId,
@@ -435,11 +450,6 @@ export function issueLegalHold(opts: {
   };
   hold.holdHash = sha256Hex(JSON.stringify({ ...hold, holdHash: "" }));
   legalHolds.push(hold);
-  if (workspace) {
-    // A legal hold that silently disappears is spoliation-relevant, so a hold
-    // that cannot be written must not report success.
-    saveWorkspaceRecord(workspace, LEGAL_HOLDS_AT, hold.holdId, { ...hold }, hold.issuedTs);
-  }
   return hold;
 }
 
@@ -447,19 +457,10 @@ export function issueLegalHold(opts: {
  * Release a legal hold by ID.
  */
 export function releaseLegalHold(holdId: string, workspace?: string): boolean {
-  const live = legalHolds.find((h) => h.holdId === holdId);
-  const stored = workspace
-    ? loadWorkspaceRecords<LegalHold>(workspace, LEGAL_HOLDS_AT).find((h) => h.holdId === holdId)
-    : undefined;
-  const hold = live ?? stored;
+  if (workspace !== undefined) return releaseScopedLegalHold(workspace, holdId);
+  const hold = legalHolds.find((h) => h.holdId === holdId);
   if (!hold || !hold.active) return false;
   hold.active = false;
-  if (live) live.active = false;
-  if (workspace) {
-    // The release is itself a record: rewrite the hold with active:false so a
-    // later process sees the release rather than the original hold.
-    updateWorkspaceRecord(workspace, LEGAL_HOLDS_AT, hold.holdId, { ...hold, active: false }, Date.now());
-  }
   return true;
 }
 
@@ -467,12 +468,10 @@ export function releaseLegalHold(holdId: string, workspace?: string): boolean {
  * Get all active legal holds for a tenant.
  */
 export function getActiveLegalHolds(tenantId?: string, workspace?: string): LegalHold[] {
-  const all = mergeById(
-    legalHolds,
-    workspace ? loadWorkspaceRecords<LegalHold>(workspace, LEGAL_HOLDS_AT) : [],
-    (h) => h.holdId
-  );
-  return all.filter((h) => h.active && (!tenantId || h.tenantId === tenantId));
+  // Explicit workspace reads are authoritative and propagate unknown instead
+  // of merging another workspace's process-global compatibility cache.
+  if (workspace !== undefined) return listLegalHolds(workspace, { ...(tenantId ? { tenantId } : {}), activeOnly: true }).map(legacyLegalHold);
+  return legalHolds.filter((h) => h.active && (!tenantId || h.tenantId === tenantId));
 }
 
 /**
@@ -611,7 +610,7 @@ export function generateResidencyReport(
     }
   }
 
-  if (policy.legalHoldEnabled && holds.length === 0 && isTenantUnderLegalHold(tenantId)) {
+  if (policy.legalHoldEnabled && holds.length === 0 && isTenantUnderLegalHold(tenantId, workspace)) {
     violations.push("[HIGH] Legal hold is active but policy is not configured for legal hold.");
   }
 
