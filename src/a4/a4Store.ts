@@ -38,7 +38,7 @@ import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { resolveLedgerEvent } from "./a4Evidence.js";
-import { assertMember, liveRolesFor, memberCandidates, principalPopulation } from "./a4Identity.js";
+import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
   a4RevisionRowSchema, a4TransitionRowSchema, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gatePolicyWeakenings,
@@ -494,10 +494,8 @@ function createStore(workspace: string, ledger: Ledger) {
         // One commit may record several transitions (GATE_CONSUMED + EFFECT_STARTED), each its own chained, signed row.
         const ts = Date.now();
         const seq0 = head0 === null ? 0 : head0.head_seq + 1;
-        // Every transition signs the live principal population it was written under, so any write made while two or more
-        // principals were active ratchets single-user self-approval off for good (design §5.3; ratchetedFromChain).
-        const live = principalPopulation(workspace);
-        const population = { activeUserCount: live.activeLocal?.length ?? null, hostPrincipals: live.hostPrincipals };
+        // Signed on every transition, so any write made while two or more principals were active ratchets self-approval (§5.3).
+        const population = populationFacts(workspace);
         const specs = [build({ head: head0, seq: seq0, ts })].flat();
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
         let prevDigest = head0?.head_digest ?? "GENESIS";

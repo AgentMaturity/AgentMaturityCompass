@@ -172,6 +172,12 @@ export function principalPopulation(workspace: string, now = Date.now()): { acti
   return { activeLocal, hostPrincipals: sessions === null ? null : new Set(sessions.map((record) => record.userId)).size };
 }
 
+/** The population as a transition records it (`ratchetedFromChain` reads it): counts, null where unreadable. */
+export function populationFacts(workspace: string): { activeUserCount: number | null; hostPrincipals: number | null } {
+  const { activeLocal, hostPrincipals } = principalPopulation(workspace);
+  return { activeUserCount: activeLocal?.length ?? null, hostPrincipals };
+}
+
 /**
  * users.yaml records of any status created at or after `ts` (a project's CREATED time); null when unreadable. A user
  * added after a project was created, even one revoked again before any A4 write recorded the population, means two
