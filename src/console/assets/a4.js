@@ -567,12 +567,17 @@ function mountProject(projectId, options) {
   root.addEventListener("input", (event) => {
     const key = draftKey(event.target);
     if (!key) return;
-    if (key === "specification:spec" && !specBase) specBase = specBaseNow();
     if (event.target.closest("form[data-a4-answers]") && !answerStarts.has(event.target.name)) {
       answerBase ??= state.project.headSeq;
       answerStarts.set(event.target.name, view.answerText(shownAnswers(), event.target.name));
     }
     drafts.set(key, event.target.value);
+    // The first specification edit holds deciding at once (the card now shows a draft, not the bound revision); the
+    // re-render keeps the draft, the focus and the caret.
+    if (key === "specification:spec" && !specBase) {
+      specBase = specBaseNow();
+      render();
+    }
   });
   document.addEventListener("visibilitychange", () => (document.hidden ? clearTimeout(timer) : schedule(0)));
 
