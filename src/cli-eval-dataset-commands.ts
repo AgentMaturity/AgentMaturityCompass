@@ -9,6 +9,7 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import { printClaimResult, runClaimEnvelope, withClaimFields } from "./cli/claimOutput.js";
+import { checkScopedEgress, EgressBlocked } from "./residency/checkEgress.js";
 
 export function registerEvalDatasetCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const dataset = program
@@ -157,10 +158,15 @@ export function registerEvalDatasetCommands(program: Command, activeAgent: (p: C
     .option("--json", "JSON output")
     .action(async (name: string, opts: { agent?: string; endpoint?: string; model?: string; json?: boolean }) => {
       try {
+        const workspace = process.cwd();
+        const explicitEndpoint = opts.endpoint;
+        const endpoint = explicitEndpoint ?? "http://127.0.0.1:3210/openai/v1/chat/completions";
+        const channel = explicitEndpoint !== undefined ? "provider" : "bridge";
+        const model = opts.model ?? "default";
         const { join } = await import("node:path");
         const { readFileSync, existsSync } = await import("node:fs");
         
-        const datasetPath = join(process.cwd(), ".amc", "datasets", `${name}.json`);
+        const datasetPath = join(workspace, ".amc", "datasets", `${name}.json`);
         if (!existsSync(datasetPath)) {
           console.error(chalk.red(`Dataset "${name}" not found.`));
           process.exit(1);
@@ -180,20 +186,22 @@ export function registerEvalDatasetCommands(program: Command, activeAgent: (p: C
         
         for (const tc of dataset.cases) {
           // Run against endpoint
-          const endpoint = opts.endpoint ?? "http://127.0.0.1:3210/openai/v1/chat/completions";
           let output = "";
           let error: string | null = null;
           
           try {
-            const resp = await fetch(endpoint, {
+            const request: RequestInit = {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                model: opts.model ?? "default",
+                model,
                 messages: [{ role: "user", content: tc.prompt }],
                 max_tokens: 500,
               }),
-            });
+              redirect: "manual",
+            };
+            checkScopedEgress(workspace, channel, endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+            const resp = await fetch(endpoint, request);
             
             if (resp.ok) {
               const data = await resp.json() as any;
@@ -202,6 +210,7 @@ export function registerEvalDatasetCommands(program: Command, activeAgent: (p: C
               error = `HTTP ${resp.status}`;
             }
           } catch (e: any) {
+            if (e instanceof EgressBlocked) throw e;
             error = e.message;
           }
           
