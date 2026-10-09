@@ -128,6 +128,9 @@ function mountProject(projectId, options, strip) {
   const state = { project: null, readiness: null, gates: [], revision: null, comments: [], members: null, diff: null, options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null, generation = 0;
   let presence = [], presenceError = "", conflict = null, specBase = null;
+  // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
+  // never whatever the newest poll loaded; a change disables deciding until the user shows the new gate.
+  let reviewed = null;
   const drafts = new Map();
 
   const stagePath = (sub) => projectPath(`/stages/${stage}/${sub}`);
@@ -137,6 +140,15 @@ function mountProject(projectId, options, strip) {
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
   const clearDrafts = (prefix) => { for (const key of [...drafts.keys()]) if (key.startsWith(prefix)) drafts.delete(key); };
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
+  const shownReview = () => {
+    const { open, met } = view.currentGates(state.gates, stage);
+    return view.gateReview(open ?? met, state.readiness);
+  };
+  /** The pinned review of `gate`; refuses when the page now shows a different gate or readiness than the user reviewed. */
+  const reviewedFor = (gate) => {
+    if (!view.sameReview(reviewed, view.gateReview(gate, state.readiness))) throw new Error(`${view.GATE_CHANGED}. Show the current gate and review it first.`);
+    return reviewed;
+  };
 
   async function load() {
     const mine = ++generation;
@@ -157,6 +169,7 @@ function mountProject(projectId, options, strip) {
     if (mine !== generation) return;
     Object.assign(state, { project, readiness, gates, revision, comments, members, diff });
     stage = viewStage;
+    reviewed ??= shownReview();
     render();
   }
 
@@ -165,7 +178,9 @@ function mountProject(projectId, options, strip) {
     const focused = document.activeElement && root.contains(document.activeElement) ? draftKey(document.activeElement) : null;
     const caret = focused ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
     const { project, readiness } = state;
-    const ctx = { ...state, stage, allowed: readiness.allowed, me,
+    const shown = shownReview();
+    const gateChange = shown && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
+    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange,
       questions: listOf(state.options?.questions?.[stage], "questions"), answers: listOf(state.revision?.spec?.answers, "answers") };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
@@ -192,12 +207,15 @@ function mountProject(projectId, options, strip) {
     if (target) target.innerHTML = view.renderPresence(presence, presenceError);
   }
 
+  /** Binds the gate the user reviewed; the open seq comes from readiness's view of that same gate (or its record). */
   function decisionBinding() {
     const { open } = view.currentGates(state.gates, stage);
-    const seq = open ? view.gateSeq(state.readiness.gates?.[open.gate], open) : null;
+    const gateView = state.readiness.gates?.[open?.gate];
+    const seq = open ? view.gateSeq(gateView?.gateId === open.gateId ? gateView : open) : null;
     if (!open || seq === null) throw new Error("No open gate with its open sequence is shown. Refresh before deciding.");
-    return { gateId: open.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: open.bindingDigest,
-      expectedReadinessBindingDigest: state.readiness.bindingDigest, clientRequestId: uuid() };
+    const pin = reviewedFor(open);
+    return { gateId: pin.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: pin.bindingDigest,
+      expectedReadinessBindingDigest: pin.readinessBindingDigest, clientRequestId: uuid() };
   }
 
   function specAction(spec, base) {
@@ -243,9 +261,11 @@ function mountProject(projectId, options, strip) {
       case "request-changes": return decide("request-changes", "Request changes",
         ({ expectedGateSeq, clientRequestId }) => ({ findings: [], expectedGateSeq, clientRequestId }));
       case "complete": {
+        // Completing activate delivers the production lease token once (design §10.4); this generic action would drop it.
+        if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
         const { met } = view.currentGates(state.gates, stage);
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
-        return post("Complete stage", stagePath("complete"), { gateId: met.gateId, ...headBinding() });
+        return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason, ...headBinding() });
       case "resume": return post("Resume", projectPath("/resume"), { reason, ...headBinding() });
@@ -293,6 +313,10 @@ function mountProject(projectId, options, strip) {
   }
 
   async function act(name, button) {
+    if (name === "show-gate") {
+      reviewed = shownReview();
+      return render();
+    }
     if (name === "reload") {
       conflict = null; specBase = null; clearDrafts("specification:");
       return load();

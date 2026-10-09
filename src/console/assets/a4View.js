@@ -36,12 +36,19 @@ const codes = (list) => (Array.isArray(list) ? list.map((code) => `<code>${esc(c
 const shown = (value) => (typeof value === "string" ? value : JSON.stringify(value));
 const list = (rows, empty) => (rows.length ? `<ul class="a4-rows">${rows.join("")}</ul>` : `<p class="muted">${empty}</p>`);
 
-/** A disabled button names Studio's reason codes; Studio re-checks every action, so this is a convenience only. */
+/**
+ * A disabled button names Studio's reason codes; Studio re-checks every action, so this is a convenience only. `held`
+ * builds the one other kind of disabled state: a page-side hold whose note says why (for example, the gate changed).
+ */
 export function actionButton(label, action, allowed, attributes = "") {
   const ok = allowed?.allowed === true;
-  const why = allowed?.reasonCodes?.length ? allowed.reasonCodes.join(", ") : "Studio did not offer this action";
+  const why = allowed?.reasonCodes?.length ? allowed.reasonCodes.join(", ") : allowed?.note ?? "Studio did not offer this action";
   return `<button type="button" data-a4-action="${esc(action)}" ${attributes}${ok ? "" : ` disabled title="${esc(why)}"`}>${esc(label)}</button>`;
 }
+
+export const held = (note) => ({ allowed: false, reasonCodes: [], note });
+export const GATE_CHANGED = "The gate changed while you were on this page";
+export const ACTIVATE_COMPLETE = "Activate completion is handled by the release card";
 
 export const cardLabel = (card) => {
   const [stage, id] = String(card ?? "").split(":");
@@ -208,43 +215,65 @@ export function currentGates(gates, stage) {
     stale: gates.filter((gate) => gate.stage === stage && gate.supersededBy) };
 }
 
-/** The gate's open seq as Studio rendered it (readiness gate view first, then the gate record); null when absent. */
-export function gateSeq(...views) {
-  for (const view of views) {
-    for (const value of [view?.requestedSeq, view?.seq]) if (Number.isSafeInteger(value) && value >= 0) return value;
-  }
-  return null;
+/**
+ * The gate's open seq (the GATE_REQUESTED seq P1-57's decide path compares `expectedGateSeq` with), read only from
+ * `requestedSeq`: a generic `seq` could be a decided or superseding seq. null when Studio did not publish it.
+ */
+export function gateSeq(gateView) {
+  const value = gateView?.requestedSeq;
+  return Number.isSafeInteger(value) && value >= 0 ? value : null;
 }
 
-function decisionRow(decision) {
-  return `<li>${esc(decision.username)} <code>${esc(decision.decision)}</code> <span class="muted">${time(decision.ts)}</span>${
-    decision.selfApproved ? ` <span class="muted">${TRUTH.selfApproved}</span>` : ""}</li>`;
+/** What a decision binds: the gate and readiness the approvals bar showed. a4.js pins the first one it renders. */
+export const gateReview = (gate, readiness) => (gate ? { gateId: gate.gateId, bindingDigest: gate.bindingDigest,
+  revisionNo: gate.revisionNo, readinessBindingDigest: readiness.bindingDigest } : null);
+export const sameReview = (a, b) => a !== null && b !== null && a.gateId === b.gateId && a.bindingDigest === b.bindingDigest
+  && a.readinessBindingDigest === b.readinessBindingDigest;
+
+/** A decision Studio does not count (readiness.staleApprovals) is struck through with its reason codes. */
+function decisionRow(decision, uncounted) {
+  const who = `${esc(decision.username)} <code>${esc(decision.decision)}</code>`;
+  return `<li>${uncounted ? `<s>${who}</s> ${codes(uncounted)} <span class="muted">does not count</span>` : who}
+    <span class="muted">${time(decision.ts)}</span>${decision.selfApproved ? ` <span class="muted">${TRUTH.selfApproved}</span>` : ""}</li>`;
+}
+
+function gateChangeBanner({ from, to }) {
+  const what = from.gateId === to.gateId && from.bindingDigest === to.bindingDigest
+    ? `The readiness this gate binds changed while you were on this page (r${esc(to.revisionNo)}).`
+    : `The gate changed from r${esc(from.revisionNo)} to r${esc(to.revisionNo)} while you were on this page.`;
+  return `<div class="banner a4-conflict"><p>${what} Approve, Deny, Request changes and Complete stay disabled until you
+    show the current gate and review it.</p><button type="button" data-a4-action="show-gate">Show r${esc(to.revisionNo)}</button></div>`;
 }
 
 export function renderApprovalsBar(ctx) {
-  const { readiness, gates, stage, allowed } = ctx;
+  const { readiness, gates, stage, allowed, gateChange } = ctx;
   const { open, met, stale } = currentGates(gates, stage);
   const gate = open ?? met;
+  const uncounted = new Map(readiness.staleApprovals.map((row) => [row.decisionId, row.reasonCodes]));
+  const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
+  const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : offer);
   const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
     bound to r${esc(old.revisionNo)}</li>`));
-  const staleCodes = readiness.staleApprovals.map((row) => `<li><s><code>${esc(row.decisionId)}</code></s> ${codes(row.reasonCodes)}</li>`);
-  return `<section class="card a4-approvals"><h4>Approvals</h4>
+  const staleCodes = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
+    .map((row) => `<li><s><code>${esc(row.decisionId)}</code></s> ${codes(row.reasonCodes)}</li>`);
+  return `<section class="card a4-approvals"><h4>Approvals</h4>${gateChange ? gateChangeBanner(gateChange) : ""}
     ${gate ? `<p><code>${esc(gate.gate)}</code> gate r${esc(gate.revisionNo)} · <code>${esc(gate.quorum.status)}</code> ·
       ${esc(gate.quorum.approvals)} of ${esc(gate.quorum.required)} required approvals</p>
       <p class="muted">Valid while the specification and resources are unchanged. ${TRUTH.vote}.</p>
       ${gate.excludedKeys.length ? `<p>Excluded from deciding (separation of duties): ${codes(gate.excludedKeys)}</p>` : ""}
-      ${list(gate.decisions.map(decisionRow), "No decisions yet.")}` : `<p class="muted">No open gate for this stage.</p>`}
+      ${list(gate.decisions.map((decision) => decisionRow(decision, uncounted.get(decision.decisionId))), "No decisions yet.")}`
+      : `<p class="muted">No open gate for this stage.</p>`}
     ${history.length || staleCodes.length ? `<details><summary>Stale decisions</summary>${list([...history, ...staleCodes], "")}</details>` : ""}
     <label>Reason <input name="reason" maxlength="2000" /></label>
     <div class="row wrap">
-      ${actionButton("Approve", "approve", open ? allowed.decide : null)}
-      ${actionButton("Request changes", "request-changes", open ? allowed.requestChanges : null)}
+      ${actionButton("Approve", "approve", open ? pinned(allowed.decide) : null)}
+      ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", allowed.requestGate)}
       ${actionButton("Request completion approval", "request-completion", allowed.requestGate)}
-      ${actionButton("Complete stage", "complete", met ? allowed.progress : null)}
+      ${actionButton("Complete stage", "complete", stage === "activate" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
-    <details><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? allowed.decide : null)}
+    <details><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
 }
 
