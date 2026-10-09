@@ -105,7 +105,6 @@ interface CapturedWorkspace {
   workspace: string | undefined;
   run: ReturnType<typeof AsyncLocalStorage.snapshot>;
 }
-
 type ScopedBufferedBatch = BufferedBatch & { scope: CapturedWorkspace };
 type SignalCounts = Record<ObservabilitySignal, number>;
 
@@ -123,7 +122,6 @@ interface PreparedDispatchRequest extends PreparedTelemetryRequest {
   signal: ObservabilitySignal;
   counts: SignalCounts;
 }
-
 export interface ObservabilityDispatchResult {
   targetKind: ObservabilityExporterKind;
   signal: ObservabilitySignal;
@@ -366,6 +364,7 @@ export class ObservabilityOTELExporter {
   recordScoreComputation(metric: ScoreComputationMetric): void {
     const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = metric.ts ?? Date.now();
+    msToNanos(ts);
     const percentage = metric.percentage ?? (
       typeof metric.maxScore === "number" && metric.maxScore > 0
         ? (metric.score / metric.maxScore) * 100
@@ -414,6 +413,7 @@ export class ObservabilityOTELExporter {
   recordIncident(incident: IncidentLogInput): void {
     const scope = { workspace: getWorkspaceScope(), run: AsyncLocalStorage.snapshot() };
     const ts = incident.ts ?? Date.now();
+    msToNanos(ts);
     const severityText = incident.severity.toUpperCase();
     const severityNumber = toSeverityNumber(severityText);
     const body = incident.description
@@ -505,16 +505,17 @@ export class ObservabilityOTELExporter {
         });
       }
     }
-    // A preparation failure leaves the buffered items and their captured scopes intact.
-    this.spans = [];
-    this.metrics = [];
-    this.logs = [];
-
     const options = {
       timeoutMs: toInt(process.env.AMC_OTEL_FLUSH_TIMEOUT_MS, DEFAULT_FLUSH_TIMEOUT_MS),
       maxRetries: toInt(process.env.AMC_OTEL_FLUSH_MAX_RETRIES, DEFAULT_FLUSH_MAX_RETRIES),
       retryBaseDelayMs: toInt(process.env.AMC_OTEL_FLUSH_RETRY_BASE_DELAY_MS, DEFAULT_FLUSH_RETRY_BASE_DELAY_MS)
     };
+    // A preparation failure leaves the buffered items and their captured scopes intact.
+    this.spans = [];
+    this.metrics = [];
+    this.logs = [];
+    await Promise.resolve();
+
     const out: ObservabilityDispatchResult[] = [];
     const countedSignals = new Map<string | undefined, Set<ObservabilitySignal>>();
     let dropped = 0;
@@ -546,15 +547,14 @@ export class ObservabilityOTELExporter {
   }
 
   private enforceBufferLimits(): void {
-    if (this.spans.length > this.config.maxBufferSize) {
-      this.spans = this.spans.slice(this.spans.length - this.config.maxBufferSize);
-    }
-    if (this.metrics.length > this.config.maxBufferSize) {
-      this.metrics = this.metrics.slice(this.metrics.length - this.config.maxBufferSize);
-    }
-    if (this.logs.length > this.config.maxBufferSize) {
-      this.logs = this.logs.slice(this.logs.length - this.config.maxBufferSize);
-    }
+    const trim = <T>(items: T[]): T[] => {
+      const retained = items.length > this.config.maxBufferSize ? items.slice(items.length - this.config.maxBufferSize) : items;
+      noteTelemetryDropped(items.length - retained.length);
+      return retained;
+    };
+    this.spans = trim(this.spans);
+    this.metrics = trim(this.metrics);
+    this.logs = trim(this.logs);
   }
 
   private captureItem<T extends object>(item: T, scope: CapturedWorkspace): T {

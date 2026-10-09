@@ -367,8 +367,8 @@
       "path": "src/observability/otelExportTransport.ts",
       "line": 75,
       "call": "fetch(",
-      "status": "gated",
-      "reason": "Internal exporter POST uses privately captured record-time workspace and native context, batches by captured workspace including absence, and prepares endpoint/headers/body before awaits. Each manual-redirect attempt checks network-tool residency inside that context immediately before fetch; typed refusal returns a failed dispatch without retry. No resource-class/purpose or caller-scope proof is inferred. Source-only; bounded retries, prior POST effects, missing caller scope, unpinned DNS, global-fetch contract and response limits remain. Public ops SDK exporter is a separate deferred site."
+      "status": "deferred",
+      "reason": "Internal POST has a record-time context gate before every manual-redirect attempt, but known ledger, JSONL store, score API and eval callers still omit their owning workspace. They can inherit unregulated cwd behavior rather than their workspace rules; this row is deferred pending the expressly released caller-scope correction. Guard existence is not full coverage. Explicit null resource facts, bounded retries and existing failed-result handling remain. Source-only; prior POST effects, missing external caller scope, global-fetch/DNS/response limits and caller-owned SDK egress remain unresolved."
     },
     {
       "siteId": "src/ops/otelExporter.ts:327:1",

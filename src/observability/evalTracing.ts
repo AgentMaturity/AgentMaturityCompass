@@ -12,9 +12,11 @@
 
 import { getSharedObservabilityExporter } from "./otelExporter.js";
 import type {
+  IncidentLogInput,
   ObservabilityOTELExporter,
   ScoreComputationMetric,
 } from "./otelExporter.js";
+import { noteTelemetryDropped } from "./telemetryDrops.js";
 import type { DiagnosticReport } from "../types.js";
 
 export interface EvalTraceContext {
@@ -109,7 +111,7 @@ export function emitEvalRunTelemetry(
 
   // 6. Log if verification failed or trust boundary violated
   if (!report.verificationPassed) {
-    exporter.recordIncident({
+    emitIncident(exporter, {
       incidentId: `${runId}-verification-fail`,
       agentId,
       severity: "HIGH",
@@ -123,7 +125,7 @@ export function emitEvalRunTelemetry(
   }
 
   if (report.trustBoundaryViolated) {
-    exporter.recordIncident({
+    emitIncident(exporter, {
       incidentId: `${runId}-trust-boundary`,
       agentId,
       severity: "CRITICAL",
@@ -144,6 +146,19 @@ function emitMetric(
   try {
     exporter.recordScoreComputation(metric);
   } catch {
+    noteTelemetryDropped(1);
+    // Observability must never block eval.
+  }
+}
+
+function emitIncident(
+  exporter: ObservabilityOTELExporter,
+  incident: IncidentLogInput,
+): void {
+  try {
+    exporter.recordIncident(incident);
+  } catch {
+    noteTelemetryDropped(1);
     // Observability must never block eval.
   }
 }

@@ -1,6 +1,6 @@
 /**
- * Telemetry the exporter dropped since the last take (P1-03, failure row `telemetry-exporter-down`): a record that
- * threw, or an item in a batch whose dispatch failed, counted once per failed target. Observability still never blocks
+ * Telemetry the exporter dropped since the last take (P1-03, failure row `telemetry-exporter-down`): failed recordings
+ * and items trimmed from full buffers count once; items whose dispatch failed count once per failed target. Observability still never blocks
  * core workflows; the count lets the action journal write a `TELEMETRY_DROPPED` audit row, so a drop is not silent.
  */
 let dropped = 0;
