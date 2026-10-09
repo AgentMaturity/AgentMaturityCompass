@@ -631,8 +631,8 @@ async function hostAllowed(params: { config: GatewayConfig; fieldGuard: FieldGua
   // A gateway entry covers the host and its subdomains. A leading-dot entry matched nothing here before and still does.
   const allowHosts = [...params.config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]), ...(anyHost ? [name] : [])];
   const egress = await resolveAndCheck(host, { allowHosts });
-  if (!egress.decision.allowed || !(await params.fieldGuard.targetRefused(host, egress.addresses))) return egress;
-  return { addresses: egress.addresses, decision: { allowed: false, reason: `${name} shares a name or an address with an upstream whose route refuses request fields` } };
+  const guarded = egress.decision.allowed ? await params.fieldGuard.targetRefused(host, egress.addresses) : null;
+  return guarded === null ? egress : { addresses: egress.addresses, decision: { allowed: false, reason: guarded } };
 }
 
 function extractAgentId(route: GatewayConfig["routes"][number], headers: IncomingHttpHeaders): string {
