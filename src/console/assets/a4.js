@@ -512,8 +512,10 @@ function mountProject(projectId, options) {
     if (name === "apply-on-top") {
       if (!conflict) return load();
       // The editor stays editable under the conflict card: merge what it holds now, not what it held when Studio refused.
+      // The draft is diffed against the base it was written from (specBase, kept until it is proposed or discarded), never
+      // a refused apply's base: that head's own edits would otherwise be reverted on top of the next one.
       const draft = drafts.get("specification:spec");
-      const mine = draft === undefined ? conflict.mine : view.jsonDiff(conflict.baseSpec, parseSpec(draft));
+      const mine = draft === undefined ? conflict.mine : view.jsonDiff(specBase?.spec ?? conflict.baseSpec, parseSpec(draft));
       const merged = view.applyChanges(conflict.headSpec, mine);
       const base = { revisionNo: conflict.headRevisionNo, headSeq: conflict.headSeq, spec: conflict.headSpec };
       conflict = null;
