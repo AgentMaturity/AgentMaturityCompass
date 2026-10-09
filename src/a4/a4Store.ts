@@ -33,7 +33,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
-import { principalPopulation } from "./a4Identity.js";
+import { memberCandidates, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
   a4TransitionRowSchema, deriveSelfApprovalAllowed, laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
@@ -80,9 +80,9 @@ const headProblems = (head: A4ProjectRow, body: Record<string, unknown>): string
   return HEAD_COLUMNS.filter((column) => head[column] !== after[column]).map((column) => `head column ${column} differs from the signed head`);
 };
 
+/** What a change records; the actor is the one `transition` was called with, never part of the built change. */
 export interface A4ChangeSpec {
   readonly kind: A4TransitionKind;
-  readonly actor: A4Actor;
   readonly stage?: A4StageState | null;
   readonly revisionNo?: number;
   /** Merged into the signed body; it may not reuse a field the store sets. */
@@ -304,7 +304,7 @@ function createStore(workspace: string, ledger: Ledger) {
 
   /** sha256 of the project's key.pub as its verified CREATED transition records it. */
   const createdKeySha256 = (projectId: string): string => {
-    const keySha256 = readChain(projectId)[0]?.body.privateKeySha256;
+    const keySha256 = readChain(projectId)[0]?.body.projectPublicKeySha256;
     if (typeof keySha256 !== "string") throw integrityFailed(projectId, ["the CREATED record names no key fingerprint"]);
     return keySha256;
   };
@@ -407,8 +407,10 @@ function createStore(workspace: string, ledger: Ledger) {
     }
   };
 
-  const commit = (projectId: string, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
+  const commit = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
     assertProjectId(projectId);
+    // The replay namespace is the actor's own: a request key naming anyone else would read or block their replays.
+    if (options.request && options.request.principalKey !== actor.key) throw new A4StoreError(400, "INPUT_INVALID", "The request key names another principal.");
     requireSigningKey();
     return withControlFileLock({ root: a4ProjectsRoot(workspace), name: create ? "a4-requests" : `project-${projectId}`, operation: () => {
       for (let attempt = 0; ; attempt += 1) {
@@ -438,7 +440,7 @@ function createStore(workspace: string, ledger: Ledger) {
         const prevDigest = head0?.head_digest ?? "GENESIS";
         // head0 is checked inside the transaction to equal the head the last signed body left (verifyIncremental).
         const headAfter = headStateOf({ ...(head0 ?? NEW_HEAD), ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
-        const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: spec.actor.key, actorUsername: spec.actor.username,
+        const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
           ts, prevDigest, readinessSha256, headAfter, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
         const bytes = canonicalize(body);
         const digest = sha256Hex(bytes);
@@ -461,7 +463,7 @@ function createStore(workspace: string, ledger: Ledger) {
                 sessionId, runtime: "unknown", eventType: "audit", payload: bytes, inline: true,
                 // Key order is load-bearing for the row hash; these are human statements recorded by AMC, never observations.
                 meta: { source: "a4-store", trustTier: "SELF_REPORTED", auditType: "A4_STATE", a4Kind: spec.kind, projectId, seq, revisionNo, stage,
-                  claimKind: "self_reported", actorKey: spec.actor.key, prevDigest },
+                  claimKind: "self_reported", actorKey: actor.key, prevDigest },
                 receipt: { kind: "guard_check", agentId, providerId: A4_STORE_BINARY, model: null, bodySha256: digest }
               });
             } finally {
@@ -474,7 +476,7 @@ function createStore(workspace: string, ledger: Ledger) {
             }
             db.prepare(`INSERT INTO a4_transitions (project_id, seq, kind, stage, revision_no, actor_key, actor_username, body_json, body_digest,
                 prev_digest, readiness_sha256, envelope_json, evidence_event_id, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-              .run(projectId, seq, spec.kind, stage, revisionNo, spec.actor.key, spec.actor.username, bytes, digest, prevDigest, readinessSha256,
+              .run(projectId, seq, spec.kind, stage, revisionNo, actor.key, actor.username, bytes, digest, prevDigest, readinessSha256,
                 envelope ? JSON.stringify(envelope) : null, evidence.id, ts);
             for (const row of sideRows) {
               const columns = [...Object.keys(row.values), "evidence_event_id"];
@@ -529,7 +531,7 @@ function createStore(workspace: string, ledger: Ledger) {
     readChain,
     membersOf,
     verifyIncremental,
-    transition: (projectId: string, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, build, options, null),
+    transition: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, actor, build, options, null),
     readRevision: (projectId: string, revisionNo: number) => {
       const row = namedSideRows(projectId, "a4_revisions").find((candidate) => candidate.revision_no === revisionNo);
       return row === undefined ? null : a4RevisionRowSchema.parse(row);
@@ -539,8 +541,9 @@ function createStore(workspace: string, ledger: Ledger) {
 
     /**
      * Refused without a signed approval policy. CREATED carries the default gate policy, the derived single-user
-     * self-approval facts and the sha256 of the project's blob key; the creator becomes the first owner. One active
-     * project per agent (partial unique index; checked first under the `a4-requests` lock so a refusal leaves no key).
+     * self-approval facts and `projectPublicKeySha256`, the sha256 of the project's key.pub PEM; the creator becomes the
+     * first owner. One active project per agent (partial unique index; checked first under the `a4-requests` lock so a
+     * refusal leaves no key).
      */
     createProject(input: { actor: A4Principal; agentId: string; name: string; hostedRouter: boolean; request?: A4RequestKey }): A4TransitionResult {
       const policy = verifyApprovalPolicySignature(workspace);
@@ -555,20 +558,20 @@ function createStore(workspace: string, ledger: Ledger) {
       const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal: population.activeLocal, hostPrincipals: population.hostPrincipals,
         hostedRouter: input.hostedRouter, regulated: false, workspaceFloor: undefined, ratcheted: false, decidingPrincipal: input.actor });
       const gatePolicy: A4GatePolicyV1 = DEFAULT_A4_GATE_POLICY;
-      let privateKeySha256: string | null = null;
-      return commit(projectId, ({ seq, ts }) => {
+      let projectPublicKeySha256: string | null = null;
+      return commit(projectId, input.actor, ({ seq, ts }) => {
         if (db.prepare("SELECT 1 FROM a4_projects WHERE workspace_id = ? AND agent_id = ? AND stage <> 'retired'").get(workspaceId, input.agentId)) {
           throw new A4StoreError(409, "A4_AGENT_HAS_ACTIVE_PROJECT", `agent ${input.agentId} already has an active A4 project; retire it first`);
         }
         try {
-          privateKeySha256 ??= createProjectKey(workspace, projectId);
+          projectPublicKeySha256 ??= createProjectKey(workspace, projectId);
         } catch (error) {
           if (error instanceof A4BlobError && error.code === "VAULT_LOCKED") throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault to create an A4 project.");
           throw error;
         }
         return {
-          kind: "CREATED", actor: input.actor, stage: "aspire", revisionNo: 0,
-          payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), privateKeySha256,
+          kind: "CREATED", stage: "aspire", revisionNo: 0,
+          payload: { workspaceId, agentId: input.agentId, name: input.name.trim(), gatePolicy, gatePolicyDigest: sha256Hex(canonicalize(gatePolicy)), projectPublicKeySha256,
             selfApprovalAllowed, selfApprovalFacts: { activeUserCount: population.activeLocal?.length ?? null, hostPrincipals: population.hostPrincipals,
               hostedRouter: input.hostedRouter, ratcheted: false, regulated: false, selfApprovalAllowed } },
           sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
@@ -582,48 +585,56 @@ function createStore(workspace: string, ledger: Ledger) {
     appendRevision(projectId: string, input: { actor: A4Actor; stage: A4Stage; spec: Record<string, unknown>; resourceDigests: A4ResourceDigests;
       operatingScope?: Record<string, unknown> | null; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
       const resourceDigests = a4ResourceDigestsSchema.parse(input.resourceDigests);
-      return commit(projectId, ({ head, ts }) => {
+      return commit(projectId, input.actor, ({ head, ts }) => {
         const revisionNo = head!.revision_no + 1;
         const values = { project_id: projectId, revision_no: revisionNo, stage: input.stage, parent_revision_no: head!.revision_no === 0 ? null : head!.revision_no,
           spec_json: canonicalize(input.spec), spec_digest: sha256Hex(canonicalize(input.spec)), resource_digests_json: canonicalize(resourceDigests),
           resource_digests_sha256: sha256Hex(canonicalize(resourceDigests)), operating_scope_json: input.operatingScope ? canonicalize(input.operatingScope) : null,
           created_by_key: input.actor.key, ts };
-        return { kind: "REVISION", actor: input.actor, stage: input.stage, revisionNo, payload: { specDigest: values.spec_digest,
+        return { kind: "REVISION", stage: input.stage, revisionNo, payload: { specDigest: values.spec_digest,
           resourceDigestsSha256: values.resource_digests_sha256 }, sideRows: [{ table: "a4_revisions", values }], head: { revision_no: revisionNo } };
       }, { expectedHeadSeq: input.expectedHeadSeq, request: input.request }, null);
     },
 
-    /** A membership event; refused when it would leave the project without an owner. Authorization is the router's (P1-57). */
-    recordMember(projectId: string, input: { actor: A4Actor; event: "added" | "roles_changed" | "removed";
-      member: Pick<A4Member, "principalKey" | "authSource" | "userId" | "username">; roles: A4Member["roles"]; expectedHeadSeq: number;
-      request?: A4RequestKey }): A4TransitionResult {
-      return commit(projectId, ({ seq, ts }) => {
-        const after = membersOf(projectId).filter((member) => member.principalKey !== input.member.principalKey);
-        if (input.event !== "removed") after.push({ ...input.member, roles: input.roles });
-        if (!after.some((member) => member.roles.includes("owner"))) throw new A4StoreError(409, "A4_LAST_OWNER", "A project keeps at least one owner.");
-        return { kind: "MEMBER", actor: input.actor, payload: { event: input.event, principalKey: input.member.principalKey, roles: [...input.roles] },
-          sideRows: [memberRow(projectId, seq, ts, input.actor, input.event, input.member, input.event === "removed" ? [] : input.roles)] };
+    /**
+     * A membership event; refused when it would leave the project without an owner. The member's identity is read, never
+     * taken from the caller: an add names an ACTIVE users.yaml user or a live host session, a change or removal a
+     * current member. Authorization is the router's (P1-57).
+     */
+    recordMember(projectId: string, input: { actor: A4Actor; event: "added" | "roles_changed" | "removed"; principalKey: string;
+      roles: A4Member["roles"]; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
+      return commit(projectId, input.actor, ({ seq, ts }) => {
+        const members = membersOf(projectId);
+        const member = input.event === "added" ? memberCandidates(workspace, false).candidates.find((candidate) => candidate.principalKey === input.principalKey)
+          : members.find((current) => current.principalKey === input.principalKey);
+        if (member === undefined) {
+          throw input.event === "added" ? new A4StoreError(409, "A4_PRINCIPAL_UNKNOWN", "No ACTIVE user or live host session has that principal key.")
+            : new A4StoreError(409, "A4_NOT_A_MEMBER", "That principal is not a member of this project.");
+        }
+        const after = members.filter((current) => current.principalKey !== member.principalKey);
+        if (input.event !== "removed") after.push({ ...member, roles: input.roles });
+        if (!after.some((current) => current.roles.includes("owner"))) throw new A4StoreError(409, "A4_LAST_OWNER", "A project keeps at least one owner.");
+        return { kind: "MEMBER", payload: { event: input.event, principalKey: member.principalKey, roles: [...input.roles] },
+          sideRows: [memberRow(projectId, seq, ts, input.actor, input.event, member, input.event === "removed" ? [] : input.roles)] };
       }, { expectedHeadSeq: input.expectedHeadSeq, request: input.request }, null);
     },
 
     /**
      * The body goes to the project's encrypted blob store, sealed to the key CREATED names (the blob write needs no
-     * vault; the transition's audit row does); the row keeps only the salted hash and the ciphertext reference.
+     * vault; the transition's audit row does); the row keeps only the salted hash and the ciphertext reference. The blob
+     * is written inside the build, so a missing project, a vault that cannot sign or a request replay writes none.
      * ponytail: a blob whose transition then fails stays as an unreferenced file.
      */
     addComment(projectId: string, input: { actor: A4Actor; body: string; cardId: string; inReplyTo?: string | null; request?: A4RequestKey }): A4TransitionResult {
-      assertProjectId(projectId);
       if (input.body.trim().length === 0 || input.cardId.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "A comment needs text and a card.");
-      if (readHead(projectId) === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
-      // Before the blob: a vault that cannot sign the transition must not leave an orphan file behind.
-      requireSigningKey();
-      const blob = putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"), createdKeySha256(projectId));
       const commentId = randomId("a4c");
-      return commit(projectId, ({ head, ts }) => ({
-        kind: "COMMENT", actor: input.actor, payload: { commentId, cardId: input.cardId, bodySha256: blob.bodySha256, blobRef: blob.blobRef },
-        sideRows: [{ table: "a4_comments", values: { comment_id: commentId, project_id: projectId, revision_no: head!.revision_no, stage: head!.stage,
-          card_id: input.cardId, author_key: input.actor.key, body_sha256: blob.bodySha256, blob_ref: blob.blobRef, in_reply_to: input.inReplyTo ?? null, ts } }]
-      }), { request: input.request }, null);
+      let blob: { bodySha256: string; blobRef: string } | undefined;
+      return commit(projectId, input.actor, ({ head, ts }) => {
+        blob ??= putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"), createdKeySha256(projectId));
+        return { kind: "COMMENT", payload: { commentId, cardId: input.cardId, bodySha256: blob.bodySha256, blobRef: blob.blobRef },
+          sideRows: [{ table: "a4_comments", values: { comment_id: commentId, project_id: projectId, revision_no: head!.revision_no, stage: head!.stage,
+            card_id: input.cardId, author_key: input.actor.key, body_sha256: blob.bodySha256, blob_ref: blob.blobRef, in_reply_to: input.inReplyTo ?? null, ts } }] };
+      }, { request: input.request }, null);
     },
 
     /**
@@ -641,8 +652,8 @@ function createStore(workspace: string, ledger: Ledger) {
         trustTier = typeof tier === "string" ? tier : null;
       }
       const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
-      return commit(projectId, ({ head, seq, ts }) => ({
-        kind: "EVIDENCE_REF", actor: input.actor,
+      return commit(projectId, input.actor, ({ head, seq, ts }) => ({
+        kind: "EVIDENCE_REF",
         payload: { refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
         sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage, lane: derived.lane,
           ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: trustTier, method: input.method,
