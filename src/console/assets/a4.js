@@ -447,13 +447,17 @@ function mountProject(projectId, options) {
 
   async function openConflict(action) {
     const head = one(await apiNativeRequest(projectPath("")), "project");
+    // P1-57 takes a proposal only at step `explained` (409 A4_STEP_ORDER otherwise, before it compares the parent), so
+    // once another member has proposed, the card offers Reload only.
+    const proposable = head.stage === stage && head.step === "explained";
     // A comment, member or evidence transition moves the head without a new revision: re-post once on the new head.
-    if (head.revisionNo === action.base.revisionNo && !action.rebased) {
+    if (proposable && head.revisionNo === action.base.revisionNo && !action.rebased) {
       return run({ ...specAction(action.spec, { ...action.base, headSeq: head.headSeq }), rebased: true });
     }
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
     const headSpec = view.editableSpec(headRevision?.spec);
     conflict = { baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
+      headStage: head.stage, headStep: head.step, proposable,
       theirs: view.jsonDiff(action.base.spec, headSpec), mine: view.jsonDiff(action.base.spec, action.spec) };
     await load();
   }
@@ -468,7 +472,7 @@ function mountProject(projectId, options) {
     try {
       data = await send(action);
     } catch (error) {
-      if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.spec) return openConflict(action);
+      if (error?.status === 409 && (error.code === "A4_STALE_HEAD" || error.code === "A4_STEP_ORDER") && action.spec) return openConflict(action);
       if (error?.status === 409) await load().catch(showError);
       // Another write moved the head but changed none of the answers being edited: re-sent once on the new head.
       if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.answers && !action.rebased && !answerDrift()) {

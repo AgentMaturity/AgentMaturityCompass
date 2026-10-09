@@ -105,6 +105,19 @@ export function stepRows(project, stage) {
     body: current < 0 ? "" : index === current ? "current step" : index < current ? "earlier step" : "" }));
 }
 
+/**
+ * The step each step route starts from, at the project's current stage only: P1-57's STEP_ROUTES
+ * (src/a4/a4RouterStages.ts) and requestGate (src/a4/a4Gates.ts); `null` takes any step. readiness.allowed carries no
+ * step order, so a route Studio would refuse with 409 A4_STEP_ORDER is held with that code.
+ */
+const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"], propose: ["explained"], build: ["direction_approved"],
+  review: ["built"], "request-direction": ["proposed"], "request-completion": ["reviewed"] };
+export function stepOffer(offer, ctx, route) {
+  const from = STEP_FROM[route];
+  if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
+  return { allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), "A4_STEP_ORDER"])] };
+}
+
 const NO_REFLECTION = "No statement recorded from this page yet";
 const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
@@ -113,9 +126,9 @@ const recorded = (what, entry) => `<p class="muted">Studio recorded ${what} as s
   ? ` at seq ${esc(entry.headSeq)}` : ""}. What you sent:</p><p>${esc(entry.text)}</p>${studioJson(entry.data)}`;
 
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
-function reflectionHtml(reflection, allowed) {
+function reflectionHtml(reflection, understand) {
   const bound = Number.isSafeInteger(reflection?.headSeq);
-  const offer = bound ? allowed.understand : held(reflection ? "Studio did not say which head this statement was recorded at" : NO_REFLECTION);
+  const offer = bound ? understand : held(reflection ? "Studio did not say which head this statement was recorded at" : NO_REFLECTION);
   return `${reflection ? `${recorded("your statement", reflection)}<p class="muted">Yes and Correct bind this head: if the project
     changes first, Studio refuses them and you run Understand again.</p>` : `<p class="muted">${NO_REFLECTION}. Run Understand to
     record your statement before you confirm it.</p>`}
@@ -137,6 +150,8 @@ export function answerText(answers, questionId) {
  */
 export function renderConversation(ctx) {
   const { questions, answers, allowed, reflection, explanation, answerDrift } = ctx;
+  const ask = stepOffer(allowed.ask, ctx, "answers");
+  const understand = stepOffer(allowed.understand, ctx, "understand");
   const answered = new Map(answers.map((answer) => [answer.questionId, answer]));
   const open = questions.filter((question) => !answered.has(question.id));
   const field = (question) => {
@@ -146,7 +161,7 @@ export function renderConversation(ctx) {
       <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
   };
   const answerRow = (answer) => `<li><code>${esc(answer.questionId)}</code> <code>${esc(answer.source)}</code>: ${esc(shown(answer.value))}${
-    answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", allowed.ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
+    answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
   const notMine = answers.filter((answer) => answer.source !== "user").length;
   const change = questions.filter((question) => answered.has(question.id));
   return `<h4>Ask</h4>
@@ -155,19 +170,19 @@ export function renderConversation(ctx) {
     ${questions.length ? `<form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
-      <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : allowed.ask)}${answerDrift
+      <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${answerDrift
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>`
       : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
-    <div class="row wrap">${actionButton("Run Understand", "understand", allowed.understand)}</div>
-    ${reflectionHtml(reflection, allowed)}
+    <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
+    ${reflectionHtml(reflection, understand)}
     <h4>Explain</h4>
     <label>Your explanation <textarea name="explanation" rows="3"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
-      ${actionButton("Explain at this level", "explain", allowed.explain)}</div>
+      ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
     ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
 }
 
@@ -186,23 +201,27 @@ export function renderSpecEditor(ctx) {
   const seeded = revision && revision.stage !== stage ? ` ${ctx.stageRevision ? `The newest ${esc(stageTitle(stage))} specification is
     r${esc(ctx.stageRevision.revisionNo)};` : `No ${esc(stageTitle(stage))} specification yet:`} the editor starts from the head revision
     r${esc(revision.revisionNo)}, ${revision.stage ? `the ${esc(stageTitle(revision.stage))} specification` : "whose stage Studio did not name"}.` : "";
-  return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
-    spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
+  // P1-57 takes a proposal only at step `explained`; a re-proposal from `proposed` is not routed yet.
+  const proposable = project.step === "explained";
+  return `<p class="muted">${proposable ? "Editing after Propose creates a new revision"
+    : `Studio takes a proposal only at step <code>explained</code>; this project is at <code>${esc(project.step)}</code>`}${revision
+    ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
     <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
-    <div class="row wrap">${actionButton("Propose this specification", "propose", allowed.propose)}${ctx.specDraft
+    <div class="row wrap">${actionButton("Propose this specification", "propose", stepOffer(allowed.propose, ctx, "propose"))}${ctx.specDraft
       ? ` <button type="button" class="secondary" data-a4-action="reload">Discard my edits</button>` : ""}</div>`;
 }
 
 export function renderBuildCard(ctx) {
   return `<p class="muted">${TRUTH.admission}. With no producer registered for this stage, what you write here is recorded
     as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4"></textarea>
-    <div class="row wrap">${actionButton("Build", "build", ctx.allowed.build)}</div>`;
+    <div class="row wrap">${actionButton("Build", "build", stepOffer(ctx.allowed.build, ctx, "build"))}</div>`;
 }
 
 export function renderReviewCard(ctx) {
   return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel. ${RETAINED}</p>
-    <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review", ctx.allowed.review)}</div>`;
+    <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review",
+      stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }
 
 /**
@@ -379,8 +398,8 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null)}
       ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
       ${actionButton("Hold", "hold", allowed.hold)}
-      ${actionButton("Request direction approval", "request-direction", allowed.requestGate)}
-      ${actionButton("Request completion approval", "request-completion", allowed.requestGate)}
+      ${actionButton("Request direction approval", "request-direction", stepOffer(allowed.requestGate, ctx, "request-direction"))}
+      ${actionButton("Request completion approval", "request-completion", stepOffer(allowed.requestGate, ctx, "request-completion"))}
       ${actionButton("Complete stage", "complete", stage === "activate" && met?.gate === "completion" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
@@ -408,14 +427,18 @@ export function renderPresence(presence, error) {
     <p class="muted">Presence is held in memory for 30 seconds; it is not durable and not evidence.</p>`;
 }
 
+/** "Apply my changes on top" only while the head takes a proposal (`conflict.proposable`, step `explained`; a4.js). */
 export function renderConflict(conflict) {
   return `<section class="card a4-conflict"><h4>The specification changed while you were editing</h4>
     <p>The head is r${esc(conflict.headRevisionNo)}; you started from r${esc(conflict.baseRevisionNo)}. Changes on the head:</p>
     ${conflict.theirs.length ? renderPromptDiffViewer({ status: "ok", changes: conflict.theirs }) : `<p class="muted">No specification changes on the head.</p>`}
-    <p>Your changes when Studio refused them (Apply my changes on top uses the editor as it is now):</p>
+    ${conflict.proposable ? "" : `<p>Studio takes a proposal only at step <code>explained</code> of the project's current stage; the head is at
+      <code>${esc(conflict.headStage)}</code> <code>${esc(conflict.headStep)}</code>, so your changes cannot be applied on top of it.
+      Reload shows the head and discards your edits.</p>`}
+    <p>Your changes when Studio refused them${conflict.proposable ? " (Apply my changes on top uses the editor as it is now)" : ""}:</p>
     ${renderPromptDiffViewer({ status: "ok", changes: conflict.mine })}
-    <div class="row wrap"><button type="button" data-a4-action="apply-on-top">Apply my changes on top</button>
-      <button type="button" class="secondary" data-a4-action="reload">Reload</button></div></section>`;
+    <div class="row wrap">${conflict.proposable ? `<button type="button" data-a4-action="apply-on-top">Apply my changes on top</button> ` : ""}<button
+      type="button" class="secondary" data-a4-action="reload">Reload</button></div></section>`;
 }
 
 /** Structural JSON diff: one row per differing leaf; arrays compare whole. */
