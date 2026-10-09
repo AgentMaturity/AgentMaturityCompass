@@ -107,15 +107,17 @@ export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: 
 
 /**
  * Once any transition recorded two or more active principals, or any gate holds two distinct decision keys, the
- * project never self-approves again (design §5.3 ratchet), whatever later revocations do.
+ * project never self-approves again (design §5.3 ratchet), whatever later revocations do. Recorded facts with a count
+ * that is not a number (null: the source could not be read) ratchet too: an unknown population is not a small one.
  */
 export function ratchetedFromChain(chain: readonly A4ChainLink[]): boolean {
   const votersByGate = new Map<string, Set<string>>();
   for (const link of chain) {
-    const facts = link.body.selfApprovalFacts as { activeUserCount?: unknown; hostPrincipals?: unknown } | undefined;
-    const active = (typeof facts?.activeUserCount === "number" ? facts.activeUserCount : 0)
-      + (typeof facts?.hostPrincipals === "number" ? facts.hostPrincipals : 0);
-    if (active >= 2) return true;
+    const facts = link.body.selfApprovalFacts as { activeUserCount?: unknown; hostPrincipals?: unknown } | null | undefined;
+    if (facts !== undefined) {
+      if (typeof facts?.activeUserCount !== "number" || typeof facts.hostPrincipals !== "number") return true;
+      if (facts.activeUserCount + facts.hostPrincipals >= 2) return true;
+    }
     if (link.kind === "GATE_DECIDED" && typeof link.body.gateId === "string" && typeof link.body.approverKey === "string") {
       const voters = votersByGate.get(link.body.gateId) ?? new Set<string>();
       voters.add(link.body.approverKey);
