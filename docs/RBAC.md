@@ -32,6 +32,8 @@ Studio authorizes protected `/api/v1` requests before dispatching them to a modu
 | Operational state change | `OPERATOR`, `OWNER` |
 | Secret, identity, signing, key, policy, certificate, or control-plane change | `OWNER` |
 
+A4 Forge routes (`/api/v1/a4`, served only with `AMC_A4_PREVIEW=1`) add pattern-matched classes beside these sets (`src/api/accessPolicy.ts`). `POST …/comments` and `POST …/presence` take the read roles, and the A4 router then requires project membership. `POST …/gates/:gateId/request-changes` takes `APPROVER`, `AUDITOR` or `OWNER`. `POST …/gates/:gateId/approve` and `…/deny` take `APPROVER` or `OWNER`. Hold, resume, reopen, tune, members, gate-policy, acknowledge, effect open and retry, releases, and Adapt or Activate completion take `OWNER`. Retire takes `OPERATOR` or `OWNER`, and the router then requires a workspace `OWNER` or the creator of a project that never reached `proposed`.
+
 Vault secret reads are owner-only. Studio log reads require `OPERATOR`, `AUDITOR`, or `OWNER`. Unknown state-changing routes default to `OPERATOR`/`OWNER`, and unsupported methods require `OWNER`; neither case falls back to viewer access.
 
 ## Commands

@@ -25,6 +25,7 @@ Auth and stability:
 | Operate | `OPERATOR`, `OWNER` | diagnostics, assurance runs, imports, runtime runs, and exports |
 | Owner control | `OWNER` | secrets, vault/key changes, identity, signing, policy, certificates, and control-plane configuration |
 
+- A4 Forge routes (`/api/v1/a4`, served only with `AMC_A4_PREVIEW=1`) add pattern-matched classes beside these sets (`src/api/accessPolicy.ts`). `POST …/comments` and `POST …/presence` take the read roles, and the A4 router then requires project membership. `POST …/gates/:gateId/request-changes` takes `APPROVER`, `AUDITOR` or `OWNER`. `POST …/gates/:gateId/approve` and `…/deny` take `APPROVER` or `OWNER`. Hold, resume, reopen, tune, members, gate-policy, acknowledge, effect open and retry, releases, and Adapt or Activate completion take `OWNER`. Retire takes `OPERATOR` or `OWNER`, and the router then requires a workspace `OWNER` or the creator of a project that never reached `proposed`.
 - sensitive read exceptions also fail closed: vault secret values require `OWNER`, while Studio logs require `OPERATOR`, `AUDITOR`, or `OWNER`
 - unsupported HTTP methods require `OWNER` before normal route handling, and unknown state-changing routes default to `OPERATOR`/`OWNER`
 - only the explicit public compatibility paths in `PUBLIC_API_V1_PATHS` bypass Studio auth
