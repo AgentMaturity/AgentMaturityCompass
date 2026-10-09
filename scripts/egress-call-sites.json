@@ -99,28 +99,28 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli-trace-commands.ts:261:1",
+      "siteId": "src/cli-trace-commands.ts:271:1",
       "path": "src/cli-trace-commands.ts",
-      "line": 261,
+      "line": 271,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Alert send POST uses action-entry cwd workspace, captured endpoint and prepared JSON/options, followed by adjacent synchronous network-tool admission and manual-redirect fetch. Null resource classes/purpose and system actor; test/watch config and watch timeline use captured workspace. Typed denial reaches existing command error/exit path. Source-only; earlier channel effects, unsigned/reloaded config, global-fetch/DNS/timeout/response limits and actual source/region qualification remain."
     },
     {
-      "siteId": "src/cli-trace-commands.ts:324:1",
+      "siteId": "src/cli-trace-commands.ts:344:1",
       "path": "src/cli-trace-commands.ts",
-      "line": 324,
+      "line": 344,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Alert test POST uses action-entry cwd workspace, captured endpoint and prepared JSON/options, followed by adjacent synchronous network-tool admission and manual-redirect fetch. Null resource classes/purpose and system actor; test/watch config and watch timeline use captured workspace. Each denied channel is reported and other channels continue; any typed refusal makes final exit nonzero. Source-only; earlier channel effects, unsigned/reloaded config, global-fetch/DNS/timeout/response limits and actual source/region qualification remain."
     },
     {
-      "siteId": "src/cli-trace-commands.ts:360:1",
+      "siteId": "src/cli-trace-commands.ts:395:1",
       "path": "src/cli-trace-commands.ts",
-      "line": 360,
+      "line": 395,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Alert watch POST uses action-entry cwd workspace, captured endpoint and prepared JSON/options, followed by adjacent synchronous network-tool admission and manual-redirect fetch. Null resource classes/purpose and system actor; test/watch config and watch timeline use captured workspace. Typed refusal is logged inside the callback without throwing; response.ok controls sent reporting and other legacy swallowed errors/timer overlap remain. Source-only; earlier channel effects, unsigned/reloaded config, global-fetch/DNS/timeout/response limits and actual source/region qualification remain."
     },
     {
       "siteId": "src/cli.ts:842:1",
