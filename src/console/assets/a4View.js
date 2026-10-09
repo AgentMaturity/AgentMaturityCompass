@@ -69,7 +69,8 @@ export function renderCreateForm(open) {
   return `<details class="card" id="a4Create"${open ? " open" : ""}><summary>Start an agent project</summary>
     <form id="a4CreateForm" class="a4-form">
       <label>Project name <input name="name" required maxlength="200" /></label>
-      <label>Existing agent id (optional) <input name="agentId" maxlength="200" /></label>
+      <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}"
+        title="Lowercase letters, digits, _ and -, starting with a letter or digit" /></label>
       <label>Your expertise <select name="expertise">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select></label>
       <button type="submit">Start an agent project</button>
     </form></details>`;
@@ -117,6 +118,8 @@ export function stepOffer(offer, ctx, route) {
   if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
   return { allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), "A4_STEP_ORDER"])] };
 }
+/** Studio's content cap on Understand, Explain, Build and Review (P1-57, src/a4/a4RouterStages.ts). */
+const CONTENT_MAX = 65_536;
 
 const NO_REFLECTION = "No statement recorded from this page yet";
 const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
@@ -174,12 +177,12 @@ export function renderConversation(ctx) {
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>`
       : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
-    <label>What this stage should achieve, in your words <textarea name="understanding" rows="3"></textarea></label>
+    <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
     ${reflectionHtml(reflection, understand)}
     <h4>Explain</h4>
-    <label>Your explanation <textarea name="explanation" rows="3"></textarea></label>
+    <label>Your explanation <textarea name="explanation" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
@@ -214,13 +217,13 @@ export function renderSpecEditor(ctx) {
 
 export function renderBuildCard(ctx) {
   return `<p class="muted">${TRUTH.admission}. With no producer registered for this stage, what you write here is recorded
-    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4"></textarea>
+    as a self-reported implementation output. ${RETAINED}</p><textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea>
     <div class="row wrap">${actionButton("Build", "build", stepOffer(ctx.allowed.build, ctx, "build"))}</div>`;
 }
 
 export function renderReviewCard(ctx) {
   return `<p class="muted">Human findings are recorded as self-reported; AMC's own checks appear in the Integrity panel. ${RETAINED}</p>
-    <textarea name="content" rows="4"></textarea><div class="row wrap">${actionButton("Review", "review",
+    <textarea name="content" rows="4" maxlength="${CONTENT_MAX}"></textarea><div class="row wrap">${actionButton("Review", "review",
       stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;
 }
 
@@ -259,12 +262,16 @@ function nextActionHtml(next) {
     typeof next.command === "string" ? ` <code>${esc(next.command)}</code> <button type="button" class="secondary" data-a4-copy="${esc(next.command)}">Copy</button>` : ""}`;
 }
 
+/** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
+const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
+  "plan_unresolved"]);
+
 function itemRow(item, allowed) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
       still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${
-    !ack && item.status === "WAITING" && allowed.acknowledge?.allowed === true
+    !ack && item.status === "WAITING" && ACKNOWLEDGEABLE.has(item.id) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 

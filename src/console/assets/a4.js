@@ -131,8 +131,10 @@ async function renderListPage() {
     void guarded(async () => {
       const form = new FormData(event.target);
       const agentId = String(form.get("agentId") ?? "").trim();
+      const name = String(form.get("name") ?? "").trim();
+      if (!name) throw new Error("Write a project name. Nothing was sent.");
       const action = { label: "Start an agent project", path: `${API}/projects`,
-        body: { clientRequestId: uuid(), name: String(form.get("name") ?? "").trim(), expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
+        body: { clientRequestId: uuid(), name, expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
       action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}`; };
       action.after(await send(action));
     }).catch(showError);
@@ -161,7 +163,8 @@ function mountProject(projectId, options) {
   // The editor's base: the spec without the answers Studio carries, so the merge and the proposal never name them.
   const specBaseNow = () => ({ revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: view.editableSpec(state.revision?.spec) });
   const headBinding = () => ({ expectedHeadSeq: state.project.headSeq, clientRequestId: uuid() });
-  const presenceCard = () => `${stage}:${activeCard}`;
+  // ?card= is user-editable: only a card registered for the viewed stage is sent, so Studio never refuses every heartbeat and poll.
+  const presenceCard = () => `${stage}:${stageCards(stage).some((card) => card.id === activeCard) ? activeCard : "specification"}`;
   // Every <details> the page renders carries data-a4-open; a re-render keeps the open/closed state the user chose by
   // this key, and every other section follows its rendered default (a thread opens when its first comment arrives).
   const toggled = new Map();
