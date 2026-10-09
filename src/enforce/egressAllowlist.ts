@@ -1,3 +1,4 @@
+import { lookup } from "node:dns/promises";
 import { BlockList, isIP } from "node:net";
 
 /**
@@ -17,7 +18,8 @@ import { BlockList, isIP } from "node:net";
  * exact IP literal is listed. A listed name that resolves inward is denied, which stops
  * DNS rebinding and metadata SSRF through an allowed name. The caller passes
  * the addresses it will actually connect to; an empty list means the caller
- * resolves nothing and only IP-literal hosts meet the address rule.
+ * resolves nothing and only IP-literal hosts meet the address rule, which is
+ * why a caller that connects by name uses resolveAndCheck (P1-66).
  */
 const NON_PUBLIC = new BlockList();
 // 240.0.0.0/4 includes the 255.255.255.255 broadcast address.
@@ -51,6 +53,12 @@ function embeddedIPv4(words: readonly number[]): string | null {
 export interface EgressDecision {
   readonly allowed: boolean;
   readonly reason: string;
+}
+
+export interface EgressCheck {
+  /** What the host resolved to (an IP literal is its own only address). Connect only to one of these, and only when allowed. */
+  readonly addresses: readonly string[];
+  readonly decision: EgressDecision;
 }
 
 /** Lowercase and without IPv6 brackets; IPv6 literals in canonical form so `::1` and `0:0::1` compare equal. */
@@ -99,4 +107,27 @@ export function decideEgress(host: string, resolved: readonly string[], policy: 
   const inward = resolved.map(canonicalHost).find(address => isNonPublicAddress(address) && !entries.has(address));
   return inward === undefined ? { allowed: true, reason: `${name} matches ${entry}` }
     : { allowed: false, reason: `${name} resolves to non-public address ${inward}, which is not listed as an IP literal` };
+}
+
+/** Every A and AAAA address of `host`, in resolver order. */
+export async function resolveAddresses(host: string): Promise<string[]> {
+  return (await lookup(host, { all: true, verbatim: true })).map(entry => entry.address);
+}
+
+/**
+ * decideEgress on the addresses `host` resolves to now (P1-66). A name the allowlist does not cover is refused before
+ * any DNS query, so lookups carry nothing out; a name that resolves to nothing is refused (EGRESS_UNRESOLVED), never
+ * allowed. The caller connects only to a returned address (a pinned lookup, or a connect to the address with the
+ * original name as Host and TLS servername) and calls this again for every new connection, so the name cannot rebind
+ * between the check and the socket.
+ */
+export async function resolveAndCheck(host: string, policy: { readonly allowHosts: readonly string[] },
+  resolve: (name: string) => Promise<readonly string[]> = resolveAddresses): Promise<EgressCheck> {
+  const name = canonicalHost(host);
+  const byName = decideEgress(name, [], policy);
+  if (isIP(name) !== 0) return { addresses: [name], decision: byName };
+  if (!byName.allowed) return { addresses: [], decision: byName };
+  let addresses: readonly string[] = [];
+  try { addresses = await resolve(name); } catch { /* refused below */ }
+  return { addresses, decision: addresses.length === 0 ? { allowed: false, reason: `${name} did not resolve (EGRESS_UNRESOLVED)` } : decideEgress(name, addresses, policy) };
 }
