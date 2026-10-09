@@ -335,21 +335,28 @@ export function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) |
  * A failed effect blocks until it is retried or re-run, or its stage is redone; a running one keeps the project waiting
  * (BUILD_RUNNING). A later REOPEN or TUNE back to the effect's stage or earlier, or a new revision of that stage, clears
  * a settled outcome: that stage's gates, and so its effect, must complete again (design §6.5: a second failure requires
- * a new revision). A revision of a later stage clears nothing, and a running attempt is never cleared. A running
- * attempt whose owner is lost is BLOCKED (PROCESS_LOST) with retry as the next action: retry settles it first, since
- * nothing else runs the sweeper.
+ * a new revision). One that lands while the attempt runs clears its outcome once it settles, as retry refuses it
+ * (a4Effects.assertNotRedone). A revision of a later stage clears nothing, and a running attempt is never cleared. A
+ * running attempt whose owner is lost is BLOCKED (PROCESS_LOST) with retry as the next action: retry settles it first,
+ * since nothing else runs the sweeper.
  */
 function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4ReadinessItem {
   const latest = new Map<string, A4ChainLink>();
+  const redoneWhileRunning = new Set<unknown>();
   for (const link of state.chain) {
     const executionId = link.body.executionId;
     if (EFFECT_KINDS.has(link.kind) && typeof executionId === "string") {
-      if (latest.get(executionId)?.kind !== "EFFECT_FINISHED") latest.set(executionId, link);
+      if (link.kind !== "EFFECT_STARTED" && redoneWhileRunning.has(link.body.effectId)) latest.delete(executionId);
+      else if (latest.get(executionId)?.kind !== "EFFECT_FINISHED") latest.set(executionId, link);
       continue;
     }
     const redone = redoneStages(link);
     if (redone === null) continue;
-    for (const [executionId, outcome] of latest) if (outcome.kind !== "EFFECT_STARTED" && redone(outcome.body.stage)) latest.delete(executionId);
+    for (const [executionId, outcome] of latest) {
+      if (!redone(outcome.body.stage)) continue;
+      if (outcome.kind === "EFFECT_STARTED") redoneWhileRunning.add(outcome.body.effectId);
+      else latest.delete(executionId);
+    }
   }
   const states = [...latest.values()].map((link) => link.kind);
   if (states.includes("EFFECT_FAILED")) return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED"] });

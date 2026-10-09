@@ -97,20 +97,23 @@ const failuresOf = (chain: readonly A4ChainLink[], gateId: string, effect: strin
   const attempts = new Set(chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gateId && link.body.effect === effect).map((link) => link.body.effectId));
   return chain.filter((link) => link.kind === "EFFECT_FAILED" && attempts.has(link.body.effectId));
 };
-/**
- * 409 A4_GATE_STALE once a REOPEN, TUNE or new revision after `failure` sends `stage` back through its gates: readiness
- * has cleared that failure (effectsItem), and retry, re-open and re-run refuse it by the same rule.
- */
-function assertNotRedone(state: A4ReadinessState, stage: A4Stage, failure: A4ChainLink | undefined): void {
-  if (failure !== undefined && state.chain.some((link) => link.seq > failure.seq && redoneStages(link)?.(stage) === true)) {
-    throw fail(409, "A4_GATE_STALE", "the effect's stage was redone after it failed; its gates complete again", { moved: ["revision"] });
-  }
-}
 const startedLink = (chain: readonly A4ChainLink[], attemptId: string): A4ChainLink => {
   const link = chain.find((candidate) => candidate.kind === "EFFECT_STARTED" && candidate.body.effectId === attemptId);
   if (link === undefined) throw fail(404, "A4_EFFECT_NOT_FOUND", `no effect attempt ${attemptId}`);
   return link;
 };
+/**
+ * 409 A4_GATE_STALE once a REOPEN, TUNE or new revision since the failed attempt started (while it ran counts too) sends
+ * `stage` back through its gates: readiness has cleared that failure (effectsItem), and retry, re-open and re-run refuse
+ * it by the same rule.
+ */
+function assertNotRedone(state: A4ReadinessState, stage: A4Stage, failure: A4ChainLink | undefined): void {
+  if (failure === undefined) return;
+  const since = startedLink(state.chain, String(failure.body.effectId)).seq;
+  if (state.chain.some((link) => link.seq > since && redoneStages(link)?.(stage) === true)) {
+    throw fail(409, "A4_GATE_STALE", "the effect's stage was redone since the failed attempt started; its gates complete again", { moved: ["revision"] });
+  }
+}
 
 /**
  * Whether the engine request holds a decision A4 never counts (/console/approvals lets any workspace APPROVER decide it):
@@ -455,7 +458,7 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
  * Retry (owner; design §6.5): only for effects A4 consumes, and only when the chain has a failure and no finish for
  * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
  * consumed, was consumed by this execution id. A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
- * failure whose stage was redone since is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
+ * failure whose stage was redone since its attempt started is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
  * id; executors that consume their own grant re-open the effect gate instead, and `complete` on the consumed gate runs
  * them again (`rerunExecutorEffect`).
  */
