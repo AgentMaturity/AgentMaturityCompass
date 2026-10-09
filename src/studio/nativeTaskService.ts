@@ -39,6 +39,7 @@ const REFS = { openai: "OPENAI_API_KEY", "openai-responses": "OPENAI_API_KEY", a
 const CREDENTIALED = ["openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio"] as const;
 type CredentialedProvider = typeof CREDENTIALED[number];
 const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is CredentialedProvider => (CREDENTIALED as readonly string[]).includes(provider);
+const SWEEP_MS = 10_000;
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
@@ -321,6 +322,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       throw new NativeTaskServiceError("CREDENTIAL_MISSING", 409, "The selected provider's operator credential reference is not configured.");
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
     const previousLeases = new Set([d.leaseId, entry.leaseId].filter((id): id is string => id !== undefined));
+    // The lifetime clock starts no later than the lease, so the sweeper stops the runtime before the lease expires.
+    entry.runtimeStartedAt = Date.now();
     const lease = runtimeLease(entry, config.scope);
     entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}) }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,
@@ -342,7 +345,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     try { for (const leaseId of previousLeases) revokeTaskLease(leaseId, "superseded by a new native task runtime"); }
     catch (error) { throw new NativeTaskServiceError("LEASE_UNREVOKED", 409, `The previous runtime's lease could not be revoked (${reasonOf(error)}), so this runtime was stopped.`); }
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
-    entry.state = "idle"; entry.error = null; entry.touchedAt = Date.now(); entry.runtimeStartedAt = Date.now(); entry.projectionAt = 0;
+    entry.state = "idle"; entry.error = null; entry.touchedAt = Date.now(); entry.projectionAt = 0;
   }
   async function stop(entry: Entry): Promise<void> {
     if (entry.finishing) return entry.finishing;
@@ -391,9 +394,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     })();
   }
   const sweep = setInterval(() => {
+    // One sweep early on lifetime, so a runtime never outlives its lease (minted with the full lifetime).
     for (const entry of entries.values()) if (entry.client && !entry.finishing
-      && (Date.now() - entry.runtimeStartedAt >= LIMITS.lifetimeMs || (!entry.turn && Date.now() - entry.touchedAt >= LIMITS.idleTimeoutMs))) void stop(entry);
-  }, 10_000);
+      && (Date.now() - entry.runtimeStartedAt >= LIMITS.lifetimeMs - SWEEP_MS || (!entry.turn && Date.now() - entry.touchedAt >= LIMITS.idleTimeoutMs))) void stop(entry);
+  }, SWEEP_MS);
   sweep.unref();
 
   return {
