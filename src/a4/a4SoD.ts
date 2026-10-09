@@ -24,10 +24,13 @@ export interface SodGate {
 export interface SodDecision { readonly approverKey: string; readonly authSource: string; readonly decision: "APPROVE_EXECUTE" | "DENY" }
 export interface SodApprover { readonly key: string; readonly authSource: string }
 
-/** Principals who built this revision: STEP(built) and EFFECT_STARTED actors (the build manifest's author is amc-runtime). */
+/**
+ * Principals who built this revision: STEP actors whose body moves `to: "built"` (the STEP body records from/to, design
+ * §9.1) and EFFECT_STARTED actors (the build manifest's author is amc-runtime).
+ */
 export function buildersOf(transitions: readonly A4ChainLink[], revisionNo: number): string[] {
   return [...new Set(transitions.filter((link) => link.revisionNo === revisionNo
-    && ((link.kind === "STEP" && link.body.step === "built") || link.kind === "EFFECT_STARTED"))
+    && ((link.kind === "STEP" && link.body.to === "built") || link.kind === "EFFECT_STARTED"))
     .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string" && key !== "amc-runtime"))];
 }
 
