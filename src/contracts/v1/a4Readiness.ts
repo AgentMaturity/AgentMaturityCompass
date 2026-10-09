@@ -13,16 +13,20 @@ export const A4_BLOCKER_KINDS = [
 
 const nextActionSchema = z.strictObject({ label: nonEmpty, route: z.string().optional(), command: z.string().optional() });
 
-export const a4EvidenceRefViewSchema = z.strictObject({
+const evidenceRefFields = {
   refKind: nonEmpty,
   refId: nonEmpty,
   sha256: sha256HexSchema,
   status: z.enum(["resolved", "dangling", "payload_pruned", "unsigned"]),
-  lane: z.enum(A4_LANES),
-  claimKind: z.enum(["synthetic_example", "self_reported", "observed", "independently_reviewed"]),
   trustTier: z.string().nullable(),
   reasonCodes: z.array(nonEmpty)
-});
+};
+/** Lane and claim kind pair as the migration's lane CHECK pairs them, so the four lanes never collapse into one another. */
+export const a4EvidenceRefViewSchema = z.union([
+  z.strictObject({ ...evidenceRefFields, lane: z.literal("observed"), claimKind: z.literal("observed") }),
+  z.strictObject({ ...evidenceRefFields, lane: z.literal("verified"), claimKind: z.literal("independently_reviewed") }),
+  z.strictObject({ ...evidenceRefFields, lane: z.enum(["recommendation", "implementation"]), claimKind: z.enum(["self_reported", "synthetic_example"]) })
+]);
 
 const itemFields = {
   id: nonEmpty,

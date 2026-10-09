@@ -708,76 +708,200 @@
               },
               "evidence": {
                 "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "claimKind": {
-                      "enum": [
-                        "synthetic_example",
-                        "self_reported",
-                        "observed",
-                        "independently_reviewed"
-                      ],
-                      "type": "string"
-                    },
-                    "lane": {
-                      "enum": [
-                        "recommendation",
-                        "implementation",
-                        "observed",
-                        "verified"
-                      ],
-                      "type": "string"
-                    },
-                    "reasonCodes": {
-                      "items": {
-                        "minLength": 1,
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "refId": {
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "refKind": {
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "sha256": {
-                      "pattern": "^[0-9a-f]{64}$",
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": [
-                        "resolved",
-                        "dangling",
-                        "payload_pruned",
-                        "unsigned"
-                      ],
-                      "type": "string"
-                    },
-                    "trustTier": {
-                      "anyOf": [
-                        {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "observed",
                           "type": "string"
                         },
-                        {
-                          "type": "null"
+                        "lane": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
-                      ]
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "independently_reviewed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "verified",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "enum": [
+                            "self_reported",
+                            "synthetic_example"
+                          ],
+                          "type": "string"
+                        },
+                        "lane": {
+                          "enum": [
+                            "recommendation",
+                            "implementation"
+                          ],
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
                     }
-                  },
-                  "required": [
-                    "refKind",
-                    "refId",
-                    "sha256",
-                    "status",
-                    "lane",
-                    "claimKind",
-                    "trustTier",
-                    "reasonCodes"
-                  ],
-                  "type": "object"
+                  ]
                 },
                 "type": "array"
               },
@@ -1512,76 +1636,200 @@
               },
               "evidence": {
                 "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "claimKind": {
-                      "enum": [
-                        "synthetic_example",
-                        "self_reported",
-                        "observed",
-                        "independently_reviewed"
-                      ],
-                      "type": "string"
-                    },
-                    "lane": {
-                      "enum": [
-                        "recommendation",
-                        "implementation",
-                        "observed",
-                        "verified"
-                      ],
-                      "type": "string"
-                    },
-                    "reasonCodes": {
-                      "items": {
-                        "minLength": 1,
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "refId": {
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "refKind": {
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "sha256": {
-                      "pattern": "^[0-9a-f]{64}$",
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": [
-                        "resolved",
-                        "dangling",
-                        "payload_pruned",
-                        "unsigned"
-                      ],
-                      "type": "string"
-                    },
-                    "trustTier": {
-                      "anyOf": [
-                        {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "observed",
                           "type": "string"
                         },
-                        {
-                          "type": "null"
+                        "lane": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
-                      ]
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "independently_reviewed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "verified",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "enum": [
+                            "self_reported",
+                            "synthetic_example"
+                          ],
+                          "type": "string"
+                        },
+                        "lane": {
+                          "enum": [
+                            "recommendation",
+                            "implementation"
+                          ],
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
                     }
-                  },
-                  "required": [
-                    "refKind",
-                    "refId",
-                    "sha256",
-                    "status",
-                    "lane",
-                    "claimKind",
-                    "trustTier",
-                    "reasonCodes"
-                  ],
-                  "type": "object"
+                  ]
                 },
                 "maxItems": 0,
                 "type": "array"
