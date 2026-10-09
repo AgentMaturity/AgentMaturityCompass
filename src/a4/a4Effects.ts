@@ -156,7 +156,8 @@ function resolveApprover(workspace: string, userId: string): Pick<A4Principal, "
  * APPROVE_EXECUTE resolves to one live principal and plane, holds no recorded role it no longer has, is a project
  * approver or owner and passes A4's SoD with the gate's exclusions plus the `complete` caller and every builder of the
  * revision (else 400 SOD_VIOLATION); only decisions bound to the request's digest count, and a regulated effect needs
- * two distinct keys in one plane (else 409 EFFECT_QUORUM_INSUFFICIENT). Returns the counted keys.
+ * two distinct keys in one plane (else 409 EFFECT_QUORUM_INSUFFICIENT) and takes LOCAL_USER decisions only (else 403
+ * IDENTITY_CHECK_LIMITED, as on documentary gates). Returns the counted keys.
  */
 export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, input: { def: A4EffectDef; gate: A4GateRow; approvalRequestId: string;
   callerKey: string; regulated: boolean }): string[] {
@@ -174,6 +175,10 @@ export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, 
     const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
     const approver = resolveApprover(workspace, decision.userId);
     if (approver === null) throw refuse("the approver does not resolve to exactly one live principal");
+    // The documentary rule (recordDecision): a session record is not a live check, so a regulated effect counts no host session.
+    if (input.regulated && approver.authSource !== "LOCAL_USER") {
+      throw fail(403, "IDENTITY_CHECK_LIMITED", `${decision.username}: a regulated effect takes decisions from live-checked identities only (host sessions wait for P2-33)`);
+    }
     if (!decision.roles.every((role) => approver.roles.includes(role))) throw refuse("recorded roles exceed the approver's live roles");
     try {
       assertMember(state.members, approver, ["approver", "owner"]);
