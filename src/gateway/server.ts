@@ -8,12 +8,12 @@ import {
   type ServerResponse
 } from "node:http";
 import { request as httpsRequest } from "node:https";
-import { connect as netConnect, type LookupFunction } from "node:net";
+import { connect as netConnect, isIP, type LookupFunction } from "node:net";
 import { join } from "node:path";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
-import { decideEgress } from "../enforce/egressAllowlist.js";
+import { canonicalHost, isNonPublicAddress, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import {
   loadGatewayConfig,
   resolveGatewayConfigEnv,
@@ -621,15 +621,16 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
   }
 }
 
-function hostAllowed(config: GatewayConfig, host: string): boolean {
-  if (!config.proxy.enabled || !config.proxy.denyByDefault) {
-    return true;
-  }
-  // A gateway entry covers the host and its subdomains. A leading-dot entry
-  // matched nothing here before and still does. The gateway resolves nothing,
-  // so the private-address rule reaches IP-literal hosts only.
-  const allowHosts = config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]);
-  return decideEgress(host, [], { allowHosts }).allowed;
+/** One proxied connection's egress check, made as it opens (P1-66); the caller connects only to the returned addresses. */
+async function hostAllowed(params: { config: GatewayConfig; fieldGuard: FieldGuard }, host: string): Promise<EgressCheck> {
+  // Without deny-by-default any name or public IP literal passes by name; every address still meets the non-public rule.
+  const name = canonicalHost(host);
+  const anyHost = !params.config.proxy.denyByDefault && (isIP(name) === 0 || !isNonPublicAddress(name));
+  // A gateway entry covers the host and its subdomains. A leading-dot entry matched nothing here before and still does.
+  const allowHosts = [...params.config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]), ...(anyHost ? [name] : [])];
+  const egress = await resolveAndCheck(host, { allowHosts });
+  if (!egress.decision.allowed || !(await params.fieldGuard.targetRefused(host, egress.addresses))) return egress;
+  return { addresses: egress.addresses, decision: { allowed: false, reason: `${name} shares a name or an address with an upstream whose route refuses request fields` } };
 }
 
 function extractAgentId(route: GatewayConfig["routes"][number], headers: IncomingHttpHeaders): string {
@@ -645,26 +646,13 @@ function appendNetworkBlockedAudit(
   }) => void,
   requestId: string,
   destinationHost: string,
-  destinationPort: number
+  destinationPort: number,
+  egress: EgressCheck
 ): void {
-  appendEvidence({
-    eventType: "audit",
-    payload: JSON.stringify({
-      auditType: "NETWORK_EGRESS_BLOCKED",
-      severity: "HIGH",
-      request_id: requestId,
-      destinationHost,
-      destinationPort
-    }),
-    meta: {
-      auditType: "NETWORK_EGRESS_BLOCKED",
-      severity: "HIGH",
-      request_id: requestId,
-      destinationHost,
-      destinationPort,
-      trustTier: "OBSERVED"
-    }
-  });
+  // The reason names the refused address; resolvedAddresses is what the name resolved to when the connection opened.
+  const row = { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", request_id: requestId, destinationHost, destinationPort,
+    reason: egress.decision.reason, resolvedAddresses: egress.addresses };
+  appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row, trustTier: "OBSERVED" } });
 }
 
 function createProxyServer(params: {
@@ -800,9 +788,9 @@ function createProxyServer(params: {
 
     const host = targetUrl.hostname;
     const port = Number(targetUrl.port || (targetUrl.protocol === "https:" ? 443 : 80));
-    // A host outside the allowlist is refused before any DNS query; a guarded upstream's host is refused by address.
-    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
-    if (checked.refused) {
+    // A host outside the allowlist is refused before any DNS query; a listed one is resolved now and checked by address.
+    const egress = await hostAllowed(params, host);
+    if (!egress.decision.allowed) {
       appendNetworkBlockedAudit(
         ({ payload, meta }) =>
           params.appendEvidence({
@@ -814,9 +802,7 @@ function createProxyServer(params: {
               sessionId: params.gatewaySessionId
             }
           }),
-        requestId,
-        host,
-        port
+        requestId, host, port, egress
       );
       res.statusCode = 403;
       res.end("blocked by AMC proxy allowlist");
@@ -848,7 +834,7 @@ function createProxyServer(params: {
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(checked.addresses)
+        lookup: pinnedLookup(egress.addresses)
       });
     } catch (error) {
       const status = gatewayErrorStatusCode(error);
@@ -896,6 +882,7 @@ function createProxyServer(params: {
         proxyType: "http",
         destinationHost: host,
         destinationPort: port,
+        resolvedAddresses: egress.addresses,
         method,
         bytesIn: body.length,
         bytesOut: responseBody.length,
@@ -906,6 +893,7 @@ function createProxyServer(params: {
         proxyMode: true,
         destinationHost: host,
         destinationPort: port,
+        resolvedAddresses: egress.addresses,
         method,
         bytesIn: body.length,
         bytesOut: responseBody.length,
@@ -1026,8 +1014,8 @@ function createProxyServer(params: {
     }
 
     clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
-    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
-    if (checked.refused) {
+    const egress = await hostAllowed(params, host);
+    if (!egress.decision.allowed) {
       appendNetworkBlockedAudit(
         ({ payload, meta }) =>
           params.appendEvidence({
@@ -1038,16 +1026,15 @@ function createProxyServer(params: {
               proxyMode: true
             }
           }),
-        requestId,
-        host,
-        port
+        requestId, host, port, egress
       );
       clientSocket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
       clientSocket.destroy();
       return;
     }
 
-    const upstreamSocket = netConnect(port, checked.addresses[0] ?? host, () => { // the checked address, never a fresh lookup
+    // Only the checked addresses (a pinned lookup keeps every one as a fallback), never a fresh resolution.
+    const upstreamSocket = netConnect({ port, host: canonicalHost(host), lookup: pinnedLookup(egress.addresses) }, () => {
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {
         upstreamSocket.write(head);
@@ -1080,6 +1067,7 @@ function createProxyServer(params: {
           proxyType: "connect",
           destinationHost: host,
           destinationPort: port,
+          resolvedAddresses: egress.addresses,
           bytesIn,
           bytesOut,
           durationMs: Date.now() - startedTs,
@@ -1090,6 +1078,7 @@ function createProxyServer(params: {
           proxyMode: true,
           destinationHost: host,
           destinationPort: port,
+          resolvedAddresses: egress.addresses,
           bytesIn,
           bytesOut,
           reason,
@@ -1124,7 +1113,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       allowQueryCarrier: options.allowQueryCarrierOverride ?? config.lease.allowQueryCarrier
     }
   });
-  const fieldGuard = await prepareFieldGuard(resolvedConfig); // resolves upstreams once, only when a route refuses fields
+  const fieldGuard = prepareFieldGuard(resolvedConfig); // resolves guarded upstreams per request, only when a route refuses fields
   const runtimeListenHost = options.listenHost ?? resolvedConfig.listen.host;
   const runtimeListenPort = options.listenPort ?? resolvedConfig.listen.port;
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
@@ -1373,7 +1362,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       }
 
       // Refused fields (e.g. dsh_session_log) belong to the upstream, and an unreadable body is refused; the audit keeps names and size, never content.
-      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, fieldGuard.fieldsFor(route.upstream));
+      const upstreamFields = await fieldGuard.fieldsFor(route.upstream); // resolved now; the upstream connection below is pinned to these addresses
+      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, upstreamFields.fields);
       if (fieldRefusal) {
         const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream,
           agentId: attributedAgentId, reason: fieldRefusal.reason, fields: fieldRefusal.fields, requestBytes: requestBody.byteLength };
@@ -1588,7 +1578,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         timeoutMs: resilience.upstreamTimeoutMs,
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
-        retryNonIdempotent: resilience.retryNonIdempotent
+        retryNonIdempotent: resilience.retryNonIdempotent,
+        lookup: pinnedLookup(upstreamFields.addresses)
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);

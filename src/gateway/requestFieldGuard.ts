@@ -6,31 +6,34 @@
  * upstream may read a field from a body this parser cannot. Field values are never read or kept.
  *
  * Hosts are compared by identity, not spelling: the canonical name (canonicalAddress) and every address it
- * resolves to. Guarded upstreams are resolved once when the gateway starts.
+ * resolves to. Guarded upstreams are resolved again for every request and every proxied connection (P1-66), and a
+ * request's upstream connection is pinned to the addresses its fields were decided on.
  */
-import { lookup } from "node:dns/promises";
 import type { IncomingHttpHeaders } from "node:http";
 import { isIP, type LookupFunction } from "node:net";
-import { canonicalAddress, canonicalHost } from "../enforce/egressAllowlist.js";
+import { canonicalAddress, canonicalHost, resolveAddresses } from "../enforce/egressAllowlist.js";
 import type { GatewayConfig } from "./config.js";
 
 export type FieldRefusalReason = "refused-field" | "content-encoding" | "charset" | "byte-order-mark" | "invalid-utf8" | "not-json" | "not-object";
 export interface FieldRefusal { reason: FieldRefusalReason; fields: string[] }
 export type HostResolver = (host: string) => Promise<string[]>;
-export interface ProxyTargetDecision { refused: boolean; addresses: string[] }
+export interface UpstreamFields { fields: string[]; addresses: string[] }
 export interface FieldGuard {
-  /** The union of refused fields over every upstream sharing this upstream's name or an address; all of them when an identity is unknown. */
-  fieldsFor(upstream: string): string[];
-  /** Forward-proxy decision; an allowed target carries the checked addresses to connect to (none when no upstream is guarded). */
-  checkTarget(host: string): Promise<ProxyTargetDecision>;
+  /**
+   * The union of refused fields over every guarded upstream sharing this upstream's name or an address (all of them when an
+   * identity is unknown), and the addresses that decision used, for the connection to pin (none when no route refuses fields).
+   */
+  fieldsFor(upstream: string): Promise<UpstreamFields>;
+  /** Forward proxy: whether a target already resolved to `addresses` is, or is under, a guarded upstream and must be refused. */
+  targetRefused(host: string, addresses: readonly string[]): Promise<boolean>;
 }
 
 const BOMS = [Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from([0xfe, 0xff]), Buffer.from([0xff, 0xfe])];
 // Some upstream JSON decoders match keys case-insensitively with Unicode folding; compare folded names (refuses more, never less).
 const fold = (key: string): string => key.normalize("NFKC").toLowerCase();
-const resolveAll: HostResolver = async (host) => (await lookup(host, { all: true, verbatim: true })).map((entry) => entry.address);
 
 interface HostIdentity { name: string; addresses: Set<string>; connect: string[] }
+const identityOf = (host: string, connect: string[]): HostIdentity => ({ name: canonicalAddress(host), addresses: new Set(connect.map(canonicalAddress)), connect });
 
 /** null when the host is missing or does not resolve, so its identity is unknown. IP literals in any form are resolved too. */
 async function identify(host: string, resolve: HostResolver): Promise<HostIdentity | null> {
@@ -39,7 +42,7 @@ async function identify(host: string, resolve: HostResolver): Promise<HostIdenti
   try {
     // An IP literal is connected to as written; its canonical form (IPv4 for an embedded address) is only for comparison.
     const connect = isIP(name) !== 0 ? [canonicalHost(host.replace(/\.+$/, ""))] : await resolve(name);
-    return connect.length > 0 ? { name, addresses: new Set(connect.map(canonicalAddress)), connect } : null;
+    return connect.length > 0 ? identityOf(host, connect) : null;
   } catch { return null; }
 }
 
@@ -49,31 +52,31 @@ function upstreamHost(config: GatewayConfig, upstream: string): string {
 
 const sameHost = (a: HostIdentity, b: HostIdentity): boolean => a.name === b.name || [...a.addresses].some((address) => b.addresses.has(address));
 
-/** Resolves every upstream once when any route refuses fields; with none, nothing is resolved and nothing changes. */
-export async function prepareFieldGuard(config: GatewayConfig, resolve: HostResolver = resolveAll): Promise<FieldGuard> {
+/** Resolves the guarded upstreams again at every call when any route refuses fields; with none, nothing is resolved and nothing changes. */
+export function prepareFieldGuard(config: GatewayConfig, resolve: HostResolver = resolveAddresses): FieldGuard {
   const fieldsByUpstream = new Map<string, string[]>();
   for (const route of config.routes) {
     if (route.refuseRequestFields?.length) fieldsByUpstream.set(route.upstream, [...(fieldsByUpstream.get(route.upstream) ?? []), ...route.refuseRequestFields]);
   }
-  if (fieldsByUpstream.size === 0) return { fieldsFor: () => [], checkTarget: async () => ({ refused: false, addresses: [] }) };
+  if (fieldsByUpstream.size === 0) return { fieldsFor: async () => ({ fields: [], addresses: [] }), targetRefused: async () => false };
   const allFields = [...new Set([...fieldsByUpstream.values()].flat())];
-  const names = [...new Set([...Object.keys(config.upstreams), ...config.routes.map((route) => route.upstream)])];
-  const identities = new Map(await Promise.all(names.map(async (name) => [name, await identify(upstreamHost(config, name), resolve)] as const)));
-  const guarded = [...fieldsByUpstream].map(([name, fields]) => ({ identity: identities.get(name) ?? null, fields }));
-  // A guarded upstream that did not resolve could be reached under any name, so every upstream and every proxied host is refused.
-  const guardUnknown = guarded.some((guard) => guard.identity === null);
+  // A guarded upstream that does not resolve could be reached under any name, so every upstream and every proxied host is refused (null).
+  const guardedNow = async (): Promise<{ identity: HostIdentity; fields: string[] }[] | null> => {
+    const guarded = await Promise.all([...fieldsByUpstream].map(async ([name, fields]) => ({ identity: await identify(upstreamHost(config, name), resolve), fields })));
+    return guarded.every((guard) => guard.identity !== null) ? guarded.map(({ identity, fields }) => ({ identity: identity!, fields })) : null;
+  };
   return {
-    fieldsFor(upstream) {
-      const self = identities.get(upstream) ?? null;
-      if (guardUnknown || self === null) return allFields;
-      return [...new Set(guarded.filter((guard) => sameHost(guard.identity!, self)).flatMap((guard) => guard.fields))];
+    async fieldsFor(upstream) {
+      const [guarded, self] = await Promise.all([guardedNow(), identify(upstreamHost(config, upstream), resolve)]);
+      if (guarded === null || self === null) return { fields: allFields, addresses: self?.connect ?? [] };
+      return { fields: [...new Set(guarded.filter((guard) => sameHost(guard.identity, self)).flatMap((guard) => guard.fields))], addresses: self.connect };
     },
-    async checkTarget(host) {
-      const target = guardUnknown ? null : await identify(host, resolve);
-      // A tunnel cannot be field-checked: refuse a guarded upstream's name, its subdomains and every address it resolved to.
-      const refused = target === null || guarded.some(({ identity }) => sameHost(identity!, target)
-        || (isIP(identity!.name) === 0 && target.name.endsWith(`.${identity!.name}`)));
-      return refused ? { refused: true, addresses: [] } : { refused: false, addresses: target.connect };
+    async targetRefused(host, addresses) {
+      const guarded = await guardedNow();
+      const target = identityOf(host, [...addresses]);
+      // A tunnel cannot be field-checked: refuse a guarded upstream's name, its subdomains and every address it resolves to.
+      return guarded === null || addresses.length === 0 || guarded.some(({ identity: guard }) => sameHost(guard, target)
+        || (isIP(guard.name) === 0 && target.name.endsWith(`.${guard.name}`)));
     }
   };
 }
