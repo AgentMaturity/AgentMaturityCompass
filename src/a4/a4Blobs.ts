@@ -71,21 +71,28 @@ function openWith(privateKeyPem: string, sealed: Buffer): Buffer {
   return aesOpen(privateDecrypt({ key: privateKeyPem, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, Buffer.from(parsed.wrappedKey ?? "", "base64")), parsed);
 }
 
-/** VAULT_LOCKED only when no passphrase is available; a wrong passphrase or a damaged vault is VAULT_UNREADABLE with the vault's message. */
-function vaultFailure(workspace: string, purpose: string, error: unknown): A4BlobError {
+/** Whether this process holds a vault credential: an unlocked session or AMC_VAULT_PASSPHRASE. */
+const holdsVaultCredential = (workspace: string): boolean => vaultStatus(workspace).unlocked || Boolean(process.env.AMC_VAULT_PASSPHRASE);
+
+/**
+ * VAULT_LOCKED only when no credential was held before the vault call; a wrong passphrase or a damaged vault is
+ * VAULT_UNREADABLE with the vault's message. The state is taken before the call because a failed refresh locks the vault.
+ */
+function vaultFailure(hadCredential: boolean, purpose: string, error: unknown): A4BlobError {
   const message = error instanceof Error ? error.message : String(error);
-  return !vaultStatus(workspace).unlocked && !process.env.AMC_VAULT_PASSPHRASE
-    ? new A4BlobError("VAULT_LOCKED", `unlock the vault to ${purpose} (${message})`)
-    : new A4BlobError("VAULT_UNREADABLE", `the vault did not open to ${purpose} (${message})`);
+  return hadCredential
+    ? new A4BlobError("VAULT_UNREADABLE", `the vault did not open to ${purpose} (${message})`)
+    : new A4BlobError("VAULT_LOCKED", `unlock the vault to ${purpose} (${message})`);
 }
 
 /** Opens the vault for a write. */
 function unlockForWrite(workspace: string, purpose: string): void {
   if (vaultStatus(workspace).unlocked) return;
+  const hadCredential = holdsVaultCredential(workspace);
   try {
     unlockVault(workspace);
   } catch (error) {
-    throw vaultFailure(workspace, purpose, error);
+    throw vaultFailure(hadCredential, purpose, error);
   }
 }
 
@@ -138,10 +145,11 @@ export function getPrivate(workspace: string, projectId: string, blobRef: string
   const sealed = readFileSync(path);
   if (sha256Hex(sealed) !== blobRef) throw new A4BlobError("BLOB_INTEGRITY", `blob ${blobRef} does not match its name`);
   let wrap: string | null;
+  const hadCredential = holdsVaultCredential(workspace);
   try {
     wrap = getVaultSecretReadOnly(workspace, wrapSecret(projectId));
   } catch (error) {
-    throw vaultFailure(workspace, "read this", error);
+    throw vaultFailure(hadCredential, "read this", error);
   }
   if (wrap === null || !pathExists(join(dir, "key.enc"))) throw new A4BlobError("PROJECT_KEY_MISSING", `project ${projectId}'s key is missing without an erasure record`);
   let plaintext: Buffer;
