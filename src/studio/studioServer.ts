@@ -4542,9 +4542,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "binder export not found" });
           return;
         }
-        // P0-09: the server operator's trust context decides, never the workspace's own keys. No public-key path is
-        // taken from a request. P0-55: no existence check here, which would follow links; a missing file and one
-        // outside the exports directory both read as the same UNREADABLE.
+        // P0-09: the operator's trust context decides, never workspace keys; no public-key path comes from a request.
+        // P0-55: no existence check (it followed links); a missing file and one outside both read as UNREADABLE.
         const verify = auditBinderVerifyForApi({ file, workspace: options.workspace, trust: loadTrustContext() });
         json(res, verify.ok ? 200 : 422, verify);
         return;
