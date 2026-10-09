@@ -8,9 +8,10 @@ import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import type { z } from "zod";
+import type { CrossStationProfile } from "../domains/stations.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
-  catalogManifestSchema, controlRecordSchema, fixtureEnvelopeSchema, packManifestSchema, producersFileSchema,
+  catalogManifestSchema, controlRecordSchema, crossStationProfilesSchema, fixtureEnvelopeSchema, packManifestSchema, producersFileSchema,
   publisherHostsSchema, vocabularySchema, zodToCatalogIssues, type CatalogIssue, type CatalogManifest, type Vocabulary
 } from "./schema.js";
 import type { ControlRecord, FixtureEnvelope, PackManifest, ProducerRecord } from "./types.js";
@@ -38,6 +39,8 @@ export interface LoadedCatalog {
   /** Keyed by the path relative to catalog/fixtures/, as control tests name them. */
   fixtures: Map<string, LoadedFixture>;
   issues: CatalogIssue[];
+  /** Descriptive composition templates, not additional controls or legal coverage. */
+  crossStationProfiles?: CrossStationProfile[];
 }
 
 const TOP_FILES = new Set(["README.md", "LICENSE.md", "catalog.yaml", "vocabulary.yaml", "producers.yaml", "publisher-hosts.yaml"]);
@@ -147,6 +150,13 @@ export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
       else if (rel === "vocabulary.yaml") cat.vocabulary = parseWith(vocabularySchema, read(rel), rel, issues);
       else if (rel === "producers.yaml") cat.producers = parseWith(producersFileSchema, read(rel), rel, issues)?.producers ?? [];
       else if (rel === "publisher-hosts.yaml") cat.publisherHosts = parseWith(publisherHostsSchema, read(rel), rel, issues)?.hosts.map((h) => h.host) ?? [];
+    } else if (rel === "profiles/cross-station.json") {
+      try {
+        const value: unknown = JSON.parse(readFileSync(join(root, rel), "utf8"));
+        cat.crossStationProfiles = parseWith(crossStationProfilesSchema, value, rel, issues) ?? [];
+      } catch (err) {
+        issues.push(issue("CAT_SCHEMA", rel, `not JSON: ${(err as Error).message}`));
+      }
     } else if (parts.length === 3 && parts[0] === "layers" && parts[2] === "pack.yaml") {
       const manifest = parseWith(packManifestSchema, read(rel), rel, issues);
       if (!manifest) continue;

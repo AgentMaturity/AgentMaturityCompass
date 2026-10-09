@@ -889,6 +889,79 @@
     "mandatory": {
       "type": "boolean"
     },
+    "merge": {
+      "additionalProperties": false,
+      "properties": {
+        "comparator": {
+          "enum": [
+            "duration-max",
+            "duration-min",
+            "count-min",
+            "enum-order",
+            "boolean-required"
+          ],
+          "type": "string"
+        },
+        "key": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "type": "string"
+        },
+        "order": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "unit": {
+                  "enum": [
+                    "hours",
+                    "calendarDays",
+                    "workDays",
+                    "months"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "amount",
+                "unit"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "comparator",
+        "value"
+      ],
+      "type": "object"
+    },
     "owner": {
       "additionalProperties": false,
       "properties": {

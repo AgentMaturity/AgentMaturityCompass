@@ -12,6 +12,7 @@ import type { Command } from "commander";
 import { assertOutsideSignedConfigTree } from "../domains/operatingProfiles/operatingProfileEmit.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { loadTrustContext } from "../trust/trustContext.js";
 import { activateControlPlan } from "./compiler/activate.js";
 import { compilePlan, parseDeploymentProfile } from "./compiler/compile.js";
 import { renderPlanDiffMarkdown } from "./compiler/diff.js";
@@ -46,7 +47,9 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     }
   }
   const previous = opts.previous ? readSignedPlan(resolve(workspace, opts.previous)) : null;
-  const plan = compilePlan({ profile, catalog, asOf: new Date().toISOString() });
+  const now = new Date();
+  const plan = compilePlan({ profile, catalog, asOf: now.toISOString(),
+    ...(profile.mergeExceptions?.length ? { mergeExceptionTrust: loadTrustContext({ now }) } : {}) });
   const outDir = resolve(workspace, opts.out ?? join("amc-control-plans", plan.profile.profileId, plan.digest.slice("sha256:".length, "sha256:".length + 12)));
   try {
     assertOutsideSignedConfigTree(workspace, outDir);
@@ -74,6 +77,8 @@ export function runCatalogCompile(workspace: string, opts: CompileFlags): number
     console.log(`  ${plan.digest}; ${count("applicable")} applicable, ${count("unresolved")} unresolved, ${count("not_applicable")} not applicable`);
     for (const r of plan.requirements.filter((x) => x.applicability === "unresolved")) console.log(chalk.yellow(`  unresolved ${r.controlId}: missing ${r.missingFacts.join(", ")}`));
     for (const c of plan.conflicts.filter((x) => x.resolution === "unresolved")) console.log(chalk.yellow(`  unresolved conflict ${c.parameter}: ${JSON.stringify(c.values)}`));
+    for (const c of plan.conflicts.filter((x) => x.mergeKey && x.resolution !== "unresolved")) console.log(chalk.gray(`  station merge ${c.mergeKey}: ${c.resolution}, chosen ${c.chosenControlId}`));
+    for (const e of plan.mergeExceptionRejected ?? []) console.log(chalk.yellow(`  rejected station exception ${e.id} (${e.mergeKey}): ${e.reason}`));
     for (const u of plan.unsupported) console.log(chalk.gray(`  unsupported ${u.controlId} (${u.reason}): ${u.detail}`));
     for (const w of weakenings) console.log(chalk.yellow(`  weakens (allowed) ${w}`));
     console.log(`  review: pending${signed.review.approvalRequestId ? ` (approval request ${signed.review.approvalRequestId})` : "; no approval requested (--request-review)"}`);

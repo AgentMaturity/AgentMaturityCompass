@@ -15,6 +15,7 @@ import { validateCatalog } from "../validate.js";
 import { checkExceptions, decideApplicability } from "./applicability.js";
 import { buildEvidencePlan, plannedProducers } from "./evidencePlan.js";
 import { mergeParameters } from "./merge.js";
+import { mergeStations } from "./mergeStations.js";
 import { absentEnforcement, buildRuntimePolicy, checkParameters } from "./runtimePolicy.js";
 import {
   CompileError, deploymentProfileSchema, type CompileInput, type CompiledPlan, type DeploymentProfile, type Fact, type FactProvenance,
@@ -40,7 +41,8 @@ export function parseDeploymentProfile(raw: unknown): DeploymentProfile {
     stations,
     domains: list(p.domains), jurisdictions: list(p.jurisdictions), roles: list(p.roles), entityTypes: list(p.entityTypes),
     useCases: list(p.useCases), dataClasses: list(p.dataClasses),
-    exceptions: [...p.exceptions].sort((a, b) => (a.id < b.id ? -1 : 1))
+    exceptions: [...p.exceptions].sort((a, b) => (a.id < b.id ? -1 : 1)),
+    ...(p.mergeExceptions === undefined ? {} : { mergeExceptions: [...p.mergeExceptions].sort((a, b) => a.id < b.id ? -1 : 1) })
   };
 }
 
@@ -61,8 +63,22 @@ export function compilePlan(input: CompileInput): CompiledPlan {
   checkParameters(cat);
   checkExceptions(profile, cat);
   const { requirements, retired } = decideApplicability(profile, cat, asOfMs);
-  const active = requirements.filter((r) => r.applicability !== "not_applicable").flatMap((r) => cat.controls.get(r.controlId) ?? []);
-  const { parameters, conflicts } = mergeParameters(active, profile.exceptions.filter((e) => Date.parse(e.expiresAt) > asOfMs));
+  const candidates = requirements.filter((r) => r.applicability !== "not_applicable").flatMap((r) => cat.controls.get(r.controlId) ?? []);
+  const scope = profile.primaryStation.value !== null && profile.stations.value !== null
+    ? { primary: profile.primaryStation.value, stations: profile.stations.value } : null;
+  const stationMerge = mergeStations(scope, candidates.filter((c) => c.layer === 0), candidates.filter((c) => c.layer > 0), {
+    profile, asOfMs, exceptions: profile.mergeExceptions, trust: input.mergeExceptionTrust
+  });
+  const active = stationMerge.controls;
+  const parameterMerge = mergeParameters(active, profile.exceptions.filter((e) => Date.parse(e.expiresAt) > asOfMs));
+  const parameters = parameterMerge.parameters;
+  const conflicts = [...parameterMerge.conflicts, ...stationMerge.conflicts].sort((a, b) => a.parameter < b.parameter ? -1 : a.parameter > b.parameter ? 1 : 0);
+  for (const conflict of stationMerge.conflicts) {
+    for (const requirement of requirements.filter((r) => conflict.controlIds.includes(r.controlId))) {
+      requirement.reasons.push(`station merge ${conflict.mergeKey}: ${conflict.resolution}; chosen ${conflict.chosenControlId ?? "none"}; independent binding and evidence duties retained`);
+      if (conflict.resolution === "unresolved") requirement.applicability = "unresolved";
+    }
+  }
   const blocked = conflicts.some((c) => c.resolution === "unresolved") || requirements.some((r) => r.mandatory && r.applicability === "unresolved");
   const factProvenance = Object.fromEntries(FACT_NAMES.map((name) => {
     const fact = profile[name] as Fact<unknown>;
@@ -76,6 +92,8 @@ export function compilePlan(input: CompileInput): CompiledPlan {
     status: blocked ? "blocked" : "ready",
     requirements,
     conflicts,
+    ...(stationMerge.rules.length ? { effectiveMergeRules: stationMerge.rules } : {}),
+    ...(stationMerge.exceptionRejected.length ? { mergeExceptionRejected: stationMerge.exceptionRejected } : {}),
     unsupported: [...retired, ...absentEnforcement(active), ...plannedProducers(active, cat.producers)].sort(order),
     crosswalkLinks: active.flatMap((c) => c.crosswalk.map((x) => ({ controlId: c.id, framework: x.framework, clause: x.clause, relation: x.relation }))),
     runtimePolicy: buildRuntimePolicy(parameters, profile.deployment.agentIds),

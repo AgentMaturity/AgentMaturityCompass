@@ -1,0 +1,82 @@
+[
+  {
+    "id": "banking-and-payments",
+    "name": "Banking and payments",
+    "primary": "wealth",
+    "stations": ["wealth", "technology"],
+    "exampleAgents": ["Finance-operations agent", "Payment and purchasing agent"],
+    "adds": "Combine financial authorization and payment workflows with platform security. Applicable duties come from the scoped catalog, not this description."
+  },
+  {
+    "id": "self-driving-connected-vehicles",
+    "name": "Self-driving and connected vehicles",
+    "primary": "mobility",
+    "stations": ["mobility", "technology"],
+    "exampleAgents": ["Fleet-operations agent", "Vehicle-software agent"],
+    "adds": "Combine vehicle-operation safety and incident handling with cybersecurity and software-update controls."
+  },
+  {
+    "id": "digital-health-devices",
+    "name": "Digital health and devices",
+    "primary": "health",
+    "stations": ["health", "technology"],
+    "exampleAgents": ["Healthcare-administration agent", "AI scribe", "Device-software agent"],
+    "adds": "Combine health-data handling and clinical context with device change control and platform security."
+  },
+  {
+    "id": "payers-prior-authorization",
+    "name": "Payers and prior authorization",
+    "primary": "health",
+    "stations": ["health", "wealth"],
+    "exampleAgents": ["Utilization-review assistant"],
+    "adds": "Combine health-service review and human oversight with insurance and financial fairness considerations."
+  },
+  {
+    "id": "public-sector-ai",
+    "name": "Public-sector AI",
+    "primary": "governance",
+    "stations": ["governance", "technology"],
+    "exampleAgents": ["Caseworker assistant", "Agency chatbot"],
+    "adds": "Combine public-service accountability and procurement context with AI-platform security."
+  },
+  {
+    "id": "education-technology",
+    "name": "Education technology",
+    "primary": "education",
+    "stations": ["education", "technology"],
+    "exampleAgents": ["Tutoring assistant", "Grading assistant"],
+    "adds": "Combine student and learning-record safeguards with platform security and audience-specific AI controls."
+  },
+  {
+    "id": "sustainable-finance",
+    "name": "Sustainable finance",
+    "primary": "wealth",
+    "stations": ["wealth", "environment"],
+    "exampleAgents": ["ESG-scoring agent", "Green-bond agent"],
+    "adds": "Combine financial disclosures with traceable environmental source data and claim limitations."
+  },
+  {
+    "id": "grid-utility-operations",
+    "name": "Grid and utility operations",
+    "primary": "environment",
+    "stations": ["environment", "technology"],
+    "exampleAgents": ["Energy-operations assistant", "Water-operations assistant"],
+    "adds": "Combine utility-operation and environmental context with industrial security and safe manual operation."
+  },
+  {
+    "id": "ports-and-freight",
+    "name": "Ports and freight",
+    "primary": "mobility",
+    "stations": ["mobility", "environment"],
+    "exampleAgents": ["Port-logistics agent", "Freight-emissions agent"],
+    "adds": "Combine port and freight-operation safeguards with emissions and environmental reporting context."
+  },
+  {
+    "id": "insurer-connected-cars",
+    "name": "Insurer claims agent for connected cars",
+    "primary": "wealth",
+    "stations": ["wealth", "mobility", "technology"],
+    "exampleAgents": ["Connected-car insurance-claims agent"],
+    "adds": "A three-station composition joining insurance decisions, vehicle evidence and connected-system security."
+  }
+]

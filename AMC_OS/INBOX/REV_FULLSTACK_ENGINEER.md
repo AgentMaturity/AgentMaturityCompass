@@ -111,3 +111,14 @@ Fresh macOS 26.6.2 arm64 clones used Node 22.22.0 and pnpm 10.33.0 with offline 
 Two quality captures are retained, including the original failed 1316 duplicates/2409 Knip result. Main explicitly authorized renaming only four inactive historical test snapshots to .test.ts.original, with exact bytes/history preserved. The disclosed corrective capture measured 1316 duplicate findings (baseline 1336; 24 removed/4 added, all owned paths) and 2386 Knip findings (baseline 2386; no fingerprint changes). Both strict quality checks FAIL; no scanner/config/floor/waiver changes or additive combined-lane claim.
 
 Full originals, correction histories, inverse text, failed attempts, raw quality payloads and process records remain under unused-code/2026-10-02-native/api-router-responses. Independent observation found all 43 recorded pre-delivery stages/groups/wrappers absent; final commit closure belongs in root http2-receipt.json. Early short source/read shells and the preliminary unused clone lacked full process telemetry and are not acceptance. Main owns integration, full combined suite/gate, any historical freeze extension and release/platform/provider qualification; no HTTP2 extension is needed by the passing scoped helper-visibility tests.
+
+
+## REV_FULLSTACK_ENGINEER — 2026-10-09 P2-28 coding handoff
+
+Scope: cross-station composition in the existing catalog compiler. Worktree `/Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass`, branch `codex/p2-28-cross-station-merge`, base `2a592a00`. Claude reserved this item in its integrator scratchpad `RESERVATIONS.md`; all E17 paths remain Claude-owned.
+
+Deliverables: ten descriptive profiles; exact-path loader/schema support and catalog digest binding; optional control merge metadata; deterministic duration/count/enum/boolean comparison with unresolved refusal; signed exceptions binding normalized deployment scope and every candidate digest under operator-pinned config-signature keys; conflict/rule/rejection diffs. Independent runtime bindings, evidence duties and the existing activation/weakening guards remain intact.
+
+Evidence: current source and callers inspected; only `control-record.schema.json` generated from the modified source Zod schema, with SHA-256 `bb8a3a363a8091b3c0cf9283d3bafc39ff43a908818ff08d8da6de8ff83da0d2`. No tests, evaluations, builds, lint, CI, PR or runtime qualification executed. The item is implementation-ready, not Done or qualified.
+
+Integrator actions: reconcile the control-record row in Claude-owned `spec/schemas/index.json` using that hash alongside the A4 schema additions; add the compiler-guide link after Claude's P1-67 guide change lands; review the first-listed-station primary convention with Sid. No overlay content or absent legacy blueprint module was invented. Golden outputs and qualification remain deferred.
