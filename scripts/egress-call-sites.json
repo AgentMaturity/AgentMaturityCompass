@@ -379,12 +379,12 @@
       "reason": "Deferred: library API, no AMC caller, caller-owned destination. Revisit with SDK integration; neither exempt nor covered by the internal observability exporter gate. Trusted workspace, payload facts, secondary transport behavior and destination applicability remain unresolved."
     },
     {
-      "siteId": "src/packs/packCli.ts:293:1",
+      "siteId": "src/packs/packCli.ts:302:1",
       "path": "src/packs/packCli.ts",
-      "line": 293,
+      "line": 302,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Pack registry PUT uses captured params.workspace, the existing CLI-supplied operation carrier. Existing payload/options are prepared before an adjacent synchronous network-tool check and manual-redirect fetch at the same endpoint, with explicit null resource facts and system actor. Dry-run and local-bundle paths remain request-free; no filesystem path is used to infer scope. Source-only; tarball writes precede admission, failed/3xx PUTs may already have effects and existing catch omits the persisted bundle path. DNS/timeout/response bounds and actual content-origin/region qualification remain unresolved."
     },
     {
       "siteId": "src/plugins/pluginRegistryClient.ts:65:1",

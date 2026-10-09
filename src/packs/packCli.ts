@@ -30,6 +30,7 @@ import {
 import { ensureDir, pathExists, readUtf8, writeUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 
 /* ── Default registry configuration ──────────────────────────── */
 
@@ -180,6 +181,7 @@ export async function packPublishCli(params: {
   nextSteps: string[];
   message: string;
 }> {
+  const workspace = params.workspace;
   const packDir = params.packDir ? resolve(params.packDir) : process.cwd();
   const manifestFile = join(packDir, "package.json");
   
@@ -290,11 +292,14 @@ export async function packPublishCli(params: {
       }
     };
     const publishUrl = new URL(encodeURIComponent(validatedManifest.name), registryUrl.endsWith("/") ? registryUrl : `${registryUrl}/`).toString();
-    const response = await fetch(publishUrl, {
+    const publishOptions: RequestInit = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(publishPayload)
-    });
+      body: JSON.stringify(publishPayload),
+      redirect: "manual"
+    };
+    checkScopedEgress(workspace, "network-tool", publishUrl, { dataClasses: null, purpose: null, agentId: "system" });
+    const response = await fetch(publishUrl, publishOptions);
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => response.statusText);
