@@ -49,10 +49,12 @@ export const A4_ENVELOPE_KINDS: readonly A4TransitionKind[] = ["GATE_REQUESTED",
 /**
  * The governance items present at every stage that a gate binds (design §7 items 7 and 11). Stage lanes append their
  * own ids. Gate-derived items (`gate.direction`, `gate.completion`, `approvals.fresh`, `sod`) are never bound: the first
- * APPROVE would otherwise change the digest and every second vote would be stale.
+ * APPROVE would otherwise change the digest and every second vote would be stale. Nor are the three environment facts
+ * of item 7 — VAULT_LOCKED on envelope writes (`signing.available`), READ_ONLY_MODE and presence — so an approval does not
+ * go stale because the vault was locked at render time. Do not add them back.
  */
 const GOVERNANCE_BOUND_ITEMS = [
-  "members.present", "members.candidates", "signing.available", "signing.notary_route", "signing.notary_reachable",
+  "members.present", "members.candidates", "signing.notary_route", "signing.notary_reachable",
   "store.integrity", "approvals.policy_signed", "gate.policy_floor", "hold.none", "identity.check", "effects.failed"
 ] as const;
 export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {

@@ -1,7 +1,7 @@
 /**
  * Ledger migration 13: the A4 Forge project record (P1-56; design §4.2).
  *
- * `a4_transitions` is the chain every other row derives from: each transition names the signed `A4_STATE` audit row
+ * `a4_transitions` is the chain every other row derives from: each transition names the signed A4 audit row
  * written in the same transaction and, in its body, every side row it inserted with that row's sha256, so the chain
  * is the completeness root. `a4_projects` is the mutable head index (its protect trigger lists the only columns that
  * may change); `a4_requests` is idempotency bookkeeping and `a4_effects` a liveness index; every other table is
