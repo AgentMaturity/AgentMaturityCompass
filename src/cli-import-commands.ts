@@ -4,7 +4,6 @@ import chalk from "chalk";
 import { emitClaimResult, unverifiedClaim } from "./cli/claimOutput.js";
 import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
-import { fileSha256 } from "./trust/signatureCheck.js";
 
 type ImportOriginalRef = import("./importers/importOriginals.js").ImportOriginalRef;
 function renderOriginals(originals: ImportOriginalRef[] | undefined): void {
@@ -115,7 +114,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         // key is admitted by its list (validity, revocation). Distrust beats both. An unsigned profile is never trusted (P0-51).
         const keyId = verified.signerPublicKeyPem === null || !verified.signerFromFile ? null : ed25519KeyId(verified.signerPublicKeyPem);
         const context = keyId === null ? trust : withPins(trust, [{ keyId, purposes: ["evidence-authority"], origin: `--authorities ${opts.authorities}` }]);
-        const report = buildVerifierReport({ artifact: { kind: "external-evidence-profile", path: resolve(path), sha256: fileSha256(resolve(path)) },
+        const report = buildVerifierReport({ artifact: { kind: "external-evidence-profile", path: resolve(path), sha256: verified.profileSha256 },
           context, integrityErrors: verified.errors, anchoring: { status: "not-applicable", detail: null },
           signatures: [admitKey({ publicKeyPem: verified.signerPublicKeyPem, purpose: "evidence-authority", signature: "profile signature", context })] });
         // A tier an unadmitted key supports is not a tier: untrusted reads SELF_REPORTED.

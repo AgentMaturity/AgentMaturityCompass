@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import { verifyExternalEvidence, type ExternalEvidenceAuthority } from "./externalEvidenceProfile.js";
 
@@ -23,13 +24,15 @@ export function boundedFile(path: string, limit: number): Buffer {
 /**
  * File adapter only; authority configuration belongs to the verifier operator, never to the evidence. `listedAuthorities`
  * are the evidence authorities the operator's trust lists name (P0-55); `signerFromFile` says the signer came from the
- * `--authorities` file, whose keys the caller pins, while a listed signer's key is admitted by its list.
+ * `--authorities` file, whose keys the caller pins, while a listed signer's key is admitted by its list. `profileSha256`
+ * is the digest of the bytes verified, from the same read (a second read of `path` could be another file).
  */
 export function verifyExternalEvidenceFile(input: {
   path: string; authoritiesPath?: string; originalPath?: string; expectedNormalizedDigest?: string;
   listedAuthorities?: readonly ExternalEvidenceAuthority[];
-}): ReturnType<typeof verifyExternalEvidence> & { signerPublicKeyPem: string | null; signerFromFile: boolean } {
-  const profile = JSON.parse(boundedFile(input.path, 16 * 1024 * 1024).toString("utf8")) as unknown;
+}): ReturnType<typeof verifyExternalEvidence> & { profileSha256: string; signerPublicKeyPem: string | null; signerFromFile: boolean } {
+  const bytes = boundedFile(input.path, 16 * 1024 * 1024);
+  const profile = JSON.parse(bytes.toString("utf8")) as unknown;
   let authorities: ExternalEvidenceAuthority[] | undefined;
   if (input.authoritiesPath !== undefined) {
     const parsed: unknown = JSON.parse(boundedFile(input.authoritiesPath, 1024 * 1024).toString("utf8"));
@@ -55,5 +58,5 @@ export function verifyExternalEvidenceFile(input: {
   const authorityId = (profile as { signature?: { authorityId?: unknown } | null } | null)?.signature?.authorityId;
   const named = all.filter((authority) => authority.id === authorityId);
   const signer = named.length === 1 ? named[0]! : null;
-  return { ...result, signerPublicKeyPem: signer?.publicKeyPem ?? null, signerFromFile: signer !== null && (authorities ?? []).includes(signer) };
+  return { ...result, profileSha256: createHash("sha256").update(bytes).digest("hex"), signerPublicKeyPem: signer?.publicKeyPem ?? null, signerFromFile: signer !== null && (authorities ?? []).includes(signer) };
 }
