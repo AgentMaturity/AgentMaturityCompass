@@ -304,7 +304,7 @@
       "line": 241,
       "call": "request(",
       "status": "gated",
-      "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
+      "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. Shared dispatcher isolates only that typed refusal to its channel, letting other drains/finalization and truthful queued status continue. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
     },
     {
       "siteId": "src/lighthouse/finance/paymentServiceClient.ts:108:1",
