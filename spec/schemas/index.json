@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",
       "name": "control-record.schema.json",
-      "sha256": "571fc4bb269bec1d86291832a0842ac20b3e6d379d68238bf2349d799119e87c"
+      "sha256": "bb8a3a363a8091b3c0cf9283d3bafc39ff43a908818ff08d8da6de8ff83da0d2"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",
