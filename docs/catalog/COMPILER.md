@@ -99,6 +99,10 @@ Every difference is listed in `conflicts` with its resolution (`stricter_applied
 
 The plan is `blocked` when a conflict is unresolved or a mandatory control is unresolved; otherwise `ready`.
 
+Controls from different stations that carry `merge` metadata are also composed into `effectiveMergeRules` and
+station conflicts; see [Cross-station profiles](cross-station-profiles.md). A changed effective rule counts as a weakening
+when the plan is signed.
+
 ## Parameters and enforcement points
 
 Only these parameter names exist. Any other name (`UNKNOWN_PARAMETER`), another strictness (`STRICTNESS_MISMATCH`),
@@ -279,4 +283,4 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 
 ## Not in this step
 
-Evidence evaluation (P1-11), egress and deletion enforcement (P2-01), the review workflow UI (P2-22), reassessment on `invalidatedBy` (P2-23) and cross-station profile definitions (P2-28).
+Evidence evaluation (P1-11), egress and deletion enforcement (P2-01), the review workflow UI (P2-22) and reassessment on `invalidatedBy` (P2-23). Cross-station profile definitions landed in P2-28.
