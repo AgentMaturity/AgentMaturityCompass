@@ -1,6 +1,7 @@
-import { closeSync, constants, fstatSync, mkdtempSync, openSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { closeSync, constants, fstatSync, mkdtempSync, openSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
+import { boundedRead } from "../standard/externalEvidenceFiles.js";
 import type { TrustContext } from "../trust/index.js";
 import { containedPath } from "../utils/pathSafety.js";
 import { AMC_ARCHIVE_LIMITS, verifyTransparencyProofBundle } from "./merkleIndexStore.js";
@@ -8,8 +9,9 @@ import { AMC_ARCHIVE_LIMITS, verifyTransparencyProofBundle } from "./merkleIndex
 /**
  * The bytes of the proof bundle a Studio or API request names (P0-51): `file` resolved under
  * `<workspace>/.amc/transparency/proofs/` (where Studio's prove writes), a regular, singly linked file with no symbolic
- * link anywhere from `.amc` down, read through one no-follow descriptor that is re-checked against that path after
- * opening; else null. An absolute path or `..` that leaves the directory is refused by name, before anything is read.
+ * link anywhere from `.amc` down, read through one no-follow descriptor that is re-checked against that path
+ * after opening, and never past the archive size cap; else null. A path that leaves the directory is refused by name,
+ * before anything is read.
  */
 function readRequestedProofBundle(workspace: string, file: string): Buffer | null {
   try {
@@ -22,9 +24,11 @@ function readRequestedProofBundle(workspace: string, file: string): Buffer | nul
     try {
       const opened = fstatSync(fd);
       const now = inside() ? statSync(unlinked) : null;
-      if (!opened.isFile() || opened.nlink !== 1 || opened.size > AMC_ARCHIVE_LIMITS.maxCompressedBytes
-        || now === null || now.dev !== opened.dev || now.ino !== opened.ino) return null;
-      return readFileSync(fd);
+      if (!opened.isFile() || opened.nlink !== 1 || now === null || now.dev !== opened.dev || now.ino !== opened.ino) return null;
+      // ponytail: Linux names the opened file, which closes a parent directory swapped between the checks; elsewhere
+      // Node has no race-free check, so the link refusal is best effort against a workspace writer racing swaps.
+      if (process.platform === "linux" && readlinkSync(`/proc/self/fd/${fd}`) !== unlinked) return null;
+      return boundedRead(fd, AMC_ARCHIVE_LIMITS.maxCompressedBytes);
     } finally {
       closeSync(fd);
     }
