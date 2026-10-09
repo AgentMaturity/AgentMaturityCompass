@@ -8,10 +8,13 @@ import type { SignedDigest } from "../../crypto/signing/signerTypes.js";
 import { validateStationScope } from "../../domains/stations.js";
 import { LEGACY_OPERATING_PROFILE_SCHEMA_VERSION, OPERATING_PROFILE_SCHEMA_VERSION } from "../../domains/operatingProfiles/operatingProfileTypes.js";
 import type { ActionClass } from "../../types.js";
+import type { TrustContext } from "../../trust/trustContext.js";
 import type { CatalogLockfile } from "../lockfile.js";
 import type { LoadedCatalog } from "../loader.js";
 import { STATIONS } from "../schema.js";
-import type { BindingField, FactName, Strictness, SupportLevel, TestType } from "../types.js";
+import type { BindingField, FactName, MergeComparator, MergeValue, Strictness, SupportLevel, TestType } from "../types.js";
+import type { EffectiveMergeRule } from "./mergeStations.js";
+import { stationMergeExceptionSchema, type ExceptionRejection } from "./stationException.js";
 
 /** A compile refusal; `code` is stable (docs/catalog/COMPILER.md lists every code). */
 export class CompileError extends Error {
@@ -71,7 +74,8 @@ export const deploymentProfileSchema = z.strictObject({
   operatingProfile: z.strictObject({
     path: text, sha256, schemaVersion: z.enum([OPERATING_PROFILE_SCHEMA_VERSION, LEGACY_OPERATING_PROFILE_SCHEMA_VERSION])
   }).nullable(),
-  exceptions: z.array(reviewerExceptionSchema)
+  exceptions: z.array(reviewerExceptionSchema),
+  mergeExceptions: z.array(stationMergeExceptionSchema).optional()
 }).superRefine((p, ctx) => {
   if (p.primaryStation.value !== null && p.stations.value !== null) {
     for (const message of validateStationScope({ primary: p.primaryStation.value, stations: p.stations.value })) {
@@ -80,6 +84,8 @@ export const deploymentProfileSchema = z.strictObject({
   }
   const ids = p.exceptions.map((e) => e.id);
   if (new Set(ids).size !== ids.length) ctx.addIssue({ code: "custom", path: ["exceptions"], message: "exception ids must be unique" });
+  const mergeIds = (p.mergeExceptions ?? []).map((e) => e.id);
+  if (new Set(mergeIds).size !== mergeIds.length) ctx.addIssue({ code: "custom", path: ["mergeExceptions"], message: "merge exception ids must be unique" });
 });
 export type DeploymentProfile = z.infer<typeof deploymentProfileSchema>;
 
@@ -87,7 +93,11 @@ export type DeploymentProfile = z.infer<typeof deploymentProfileSchema>;
  * `asOf` (ISO time) decides which reviewer exceptions have expired: the caller reads the clock, the compiler never
  * does. The previous plan is not an input: diffs and the weakening check run at signing (sign.ts).
  */
-export interface CompileInput { profile: DeploymentProfile; catalog: LoadedCatalog; asOf: string }
+export interface CompileInput {
+  profile: DeploymentProfile; catalog: LoadedCatalog; asOf: string;
+  /** Operator-loaded pins at asOf, never a trust list supplied by the profile. Missing pins reject exceptions. */
+  mergeExceptionTrust?: TrustContext;
+}
 
 export type Applicability = "applicable" | "not_applicable" | "unresolved";
 export interface RequirementDecision {
@@ -101,10 +111,15 @@ export interface RequirementDecision {
   pulledInBy: string[];                 // "layer0", "station:wealth", "jurisdiction:US", "profile:<pack>"
 }
 export interface Conflict {
-  parameter: string; controlIds: string[]; values: ParamValue[];
-  strictness: Strictness;
+  parameter: string; controlIds: string[]; values: Array<ParamValue | MergeValue>;
+  strictness: Strictness | MergeComparator;
   resolution: "stricter_applied" | "reviewer_exception" | "unresolved";
-  appliedValue: ParamValue | null; exceptionId: string | null;
+  appliedValue: ParamValue | MergeValue | null; exceptionId: string | null;
+  mergeKey?: string;
+  candidates?: Array<{ controlId: string; stations: string[]; value: MergeValue }>;
+  chosenControlId?: string | null;
+  exceptionRejected?: ExceptionRejection[];
+  reason?: string;
 }
 export interface UnsupportedControl {
   controlId: string;
@@ -138,6 +153,8 @@ export interface CompiledPlan {
   status: "ready" | "blocked";          // blocked: unresolved conflict or unresolved mandatory control
   requirements: RequirementDecision[];  // sorted by controlId
   conflicts: Conflict[];
+  effectiveMergeRules?: EffectiveMergeRule[];
+  mergeExceptionRejected?: ExceptionRejection[];
   unsupported: UnsupportedControl[];
   crosswalkLinks: Array<{ controlId: string; framework: string; clause: string; relation: string }>;  // informational
   runtimePolicy: EffectiveRuntimePolicy;
@@ -149,6 +166,9 @@ export interface PlanDiff {
   requirements: Array<{ controlId: string; change: "added" | "removed" | "applicability" | "version"; before: string | null; after: string | null; reason: string }>;
   runtimePolicy: Array<{ path: string; before: unknown; after: unknown }>;
   evidencePlan: Array<{ path: string; before: unknown; after: unknown }>;
+  conflicts?: Array<{ path: string; before: unknown; after: unknown }>;
+  mergeRules?: Array<{ path: string; before: unknown; after: unknown }>;
+  mergeExceptionRejected?: Array<{ path: string; before: unknown; after: unknown }>;
 }
 export interface SignedPlan {
   plan: CompiledPlan; compiledAt: string;

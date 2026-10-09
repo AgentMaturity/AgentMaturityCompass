@@ -39,5 +39,7 @@ export function catalogDigest(cat: LoadedCatalog): string {
   const packs = [...cat.packs.values()]
     .map(({ manifest }) => ({ id: manifest.id, version: manifest.version, digest: packDigest(cat, manifest) }))
     .sort(byKey((p) => p.id));
-  return digestOf({ manifest: cat.manifest, packs, producers: producersDigest(cat), vocabulary: digestOf(cat.vocabulary) });
+  const profiles = cat.crossStationProfiles?.map((p) => ({ ...p, stations: [...p.stations].sort() })).sort(byKey((p) => p.id));
+  return digestOf({ manifest: cat.manifest, packs, producers: producersDigest(cat), vocabulary: digestOf(cat.vocabulary),
+    ...(profiles?.length ? { crossStationProfiles: profiles } : {}) });
 }

@@ -7,6 +7,7 @@
  */
 import type { CitationStatusType } from "../compliance/citations/citationRecord.js";
 import type { Domain as Station } from "../domains/domainRegistry.js";
+import type { ClockDuration } from "../incidents/regulatoryClocksTable.js";
 
 export type { CitationStatusType, Station };
 export type SupportLevel = "experimental" | "reviewed" | "qualified" | "retired";
@@ -17,6 +18,15 @@ export type TestType = "runtime_enforced" | "executed_adversarial" | "drill"
 export type OracleKind = "enforcement_receipt" | "system_of_record" | "external_observer"
   | "ledger_state" | "signed_config" | "human_assessor";
 export type Strictness = "max" | "min" | "true_wins" | "union" | "intersection" | "none";
+export type MergeComparator = "duration-max" | "duration-min" | "count-min" | "enum-order" | "boolean-required";
+export type MergeValue = string | number | boolean | ClockDuration;
+export interface ControlMerge {
+  key: string;
+  comparator: MergeComparator;
+  value: MergeValue;
+  /** Weakest first; present only for enum-order. */
+  order?: string[];
+}
 export type InvalidationTrigger = "model_version" | "prompt_version" | "tool_version"
   | "corpus_version" | "policy_version" | "deployment_version";
 export type FactName = "stations" | "primaryStation" | "domains" | "jurisdictions" | "roles"
@@ -87,6 +97,8 @@ export interface ControlRecord {
   applicability: { predicate: Predicate; reasons: string[]; exclusions: Array<{ when: Predicate; reason: string }> };
   citations: Citation[];
   binding: Binding;
+  /** Comparison metadata; independent bindings and evidence duties are never removed by a merge. */
+  merge?: ControlMerge;
   tests: ControlTest[];
   evidence: EvidenceContract[];
   invalidatedBy: InvalidationTrigger[];

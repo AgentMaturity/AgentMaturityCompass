@@ -6,6 +6,7 @@
 import semver from "semver";
 import { z } from "zod";
 import { CITATION_STATUS_TYPES } from "../compliance/citations/citationRecord.js";
+import { validateStationScope } from "../domains/stations.js";
 import type {
   Binding, Citation, ControlRecord, ControlTest, EvidenceContract, FactName, FixtureEnvelope, PackManifest, Predicate,
   ProducerRecord, Station
@@ -34,6 +35,34 @@ const station = z.enum(STATIONS);
 const layer = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
 const supportLevel = z.enum(["experimental", "reviewed", "qualified", "retired"]);
 const term = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.-]*$/, "must be a vocabulary term");
+
+export const crossStationProfileSchema = z.strictObject({
+  id: term, name: text, primary: station, stations: z.array(station).min(2),
+  exampleAgents: z.array(text).min(1), adds: text
+}).superRefine((p, ctx) => {
+  for (const message of validateStationScope(p, { minStations: 2 })) flag(ctx, "CAT_SCHEMA", ["stations"], message);
+});
+export const crossStationProfilesSchema = z.array(crossStationProfileSchema).superRefine((profiles, ctx) => {
+  unique(ctx, profiles.map((p) => p.id), [], "profile id", "CAT_DUPLICATE_ID");
+});
+
+export const controlMergeSchema = z.strictObject({
+  key: term,
+  comparator: z.enum(["duration-max", "duration-min", "count-min", "enum-order", "boolean-required"]),
+  value: z.union([text, int.min(0), z.boolean(), z.strictObject({
+    amount: int.min(1), unit: z.enum(["hours", "calendarDays", "workDays", "months"])
+  })]),
+  order: z.array(text).min(1).optional()
+}).superRefine((m, ctx) => {
+  const duration = typeof m.value === "object";
+  if (m.comparator.startsWith("duration-") && !duration) flag(ctx, "CAT_SCHEMA", ["value"], "duration comparisons need a ClockDuration");
+  if (m.comparator === "count-min" && typeof m.value !== "number") flag(ctx, "CAT_SCHEMA", ["value"], "count-min needs a non-negative integer");
+  if (m.comparator === "boolean-required" && typeof m.value !== "boolean") flag(ctx, "CAT_SCHEMA", ["value"], "boolean-required needs a boolean");
+  if (m.comparator === "enum-order") {
+    if (typeof m.value !== "string" || !m.order?.includes(m.value)) flag(ctx, "CAT_SCHEMA", ["value"], "enum-order needs a value in its weakest-first order");
+    unique(ctx, m.order ?? [], ["order"], "enum value");
+  } else if (m.order !== undefined) flag(ctx, "CAT_SCHEMA", ["order"], "order is only valid for enum-order");
+});
 
 /** Adds a refinement issue that keeps its own catalog code. */
 function flag(ctx: z.RefinementCtx, code: string, path: PropertyKey[], message: string): void {
@@ -202,6 +231,7 @@ export const controlRecordSchema = z.strictObject({
   }),
   citations: z.array(citationSchema),
   binding: bindingSchema,
+  merge: controlMergeSchema.optional(),
   tests: z.array(controlTestSchema),
   evidence: z.array(evidenceContractSchema),
   invalidatedBy: z.array(z.enum(["model_version", "prompt_version", "tool_version", "corpus_version", "policy_version", "deployment_version"])),

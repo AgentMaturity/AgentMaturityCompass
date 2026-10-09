@@ -19,6 +19,7 @@ catalog/
                                  domains, ownerRoles, frameworks
   producers.yaml                 admitted evidence producers (ProducerRecord[] under `producers:`)
   publisher-hosts.yaml           standards-body hosts for voluntary-standard citations (`hosts:`)
+  profiles/cross-station.json    descriptive station-composition templates (P2-28)
   layers/<pack>/pack.yaml        pack manifest
   layers/<pack>/controls/<id>.yaml   one control record; the file name is the control id
   fixtures/<id>/positive/*.json  fixture envelopes a test must allow or pass
@@ -65,6 +66,7 @@ only with no errors. Each issue is `{ code, severity, file, controlId, path, mes
 | `applicability` | `predicate`, at least one `reasons` entry, and `exclusions` of `{ when, reason }`. |
 | `citations` | Law-as-data citations; see below. Keys are unique within the control. |
 | `binding` | `kind: enforcement_point` needs non-empty `points` and `manualDuty: null`; `kind: manual` needs empty `points` and a full `manualDuty`. `parameters[].value` is a string, integer, boolean or string list, with a `strictness`. |
+| `merge` | Optional comparison metadata: `key`, `comparator`, `value`, and weakest-first `order` only for `enum-order`. See [cross-station profiles](cross-station-profiles.md). It never removes independent bindings or evidence duties. |
 | `tests` | Ids start with `<id>-T` and are unique. `attempts` ≥ 1; `executed_adversarial` needs ≥ 25. Fixture paths are `<id>/<positive or negative>/<name>.json`. A mandatory control with an enforcement binding needs a test with at least one positive and one negative fixture. |
 | `evidence` | Ids start with `<id>-E` and are unique. `bindingFields` include `controlId` and one of `tenantId`, `workspaceId`, `deploymentId` or `agentId`. `freshness.maxAgeDays` ≥ 1; `sampling.ratePercent` 1–100 or null; `retention` is `regime_max` or `fixed` with `days` and `basis`; `residency` is `inherit_deployment` or `pinned` with `regions` and `basis`. |
 | `invalidatedBy` | Triggers that invalidate prior evidence; no repeats. |

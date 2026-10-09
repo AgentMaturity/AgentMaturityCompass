@@ -6,7 +6,7 @@
 import { canonicalize } from "../../utils/json.js";
 import type { CompiledPlan, PlanDiff, RequirementDecision } from "./types.js";
 
-const ROW_KEYS = ["testId", "contractId", "id", "name", "actionClass", "controlId"];
+const ROW_KEYS = ["testId", "contractId", "id", "name", "actionClass", "controlId", "mergeKey", "parameter"];
 
 function rowKey(row: unknown): string {
   if (row && typeof row === "object") {
@@ -56,7 +56,10 @@ export function diffPlans(prev: CompiledPlan, next: CompiledPlan): PlanDiff {
     previousDigest: prev.digest,
     requirements,
     runtimePolicy: leafDiff(policy(prev), policy(next)),
-    evidencePlan: leafDiff(prev.evidencePlan, next.evidencePlan)
+    evidencePlan: leafDiff(prev.evidencePlan, next.evidencePlan),
+    conflicts: leafDiff(prev.conflicts, next.conflicts),
+    mergeRules: leafDiff(prev.effectiveMergeRules ?? [], next.effectiveMergeRules ?? []),
+    mergeExceptionRejected: leafDiff(prev.mergeExceptionRejected ?? [], next.mergeExceptionRejected ?? [])
   };
 }
 
@@ -70,6 +73,9 @@ export function renderPlanDiffMarkdown(diff: PlanDiff | null): string {
     ...section("Requirements added, removed or changed", diff.requirements.map((r) =>
       `- \`${r.controlId}\` ${r.change}: ${r.before ?? "absent"} -> ${r.after ?? "absent"} (${r.reason})`)),
     ...section("Runtime policy changes", diff.runtimePolicy.map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`)),
-    ...section("Evidence plan changes", diff.evidencePlan.map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`))
+    ...section("Evidence plan changes", diff.evidencePlan.map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`)),
+    ...section("Conflict resolution changes", (diff.conflicts ?? []).map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`)),
+    ...section("Effective station rules", (diff.mergeRules ?? []).map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`)),
+    ...section("Rejected station exceptions", (diff.mergeExceptionRejected ?? []).map((c) => `- \`${c.path}\`: ${show(c.before)} -> ${show(c.after)}`))
   ].join("\n");
 }
