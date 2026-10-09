@@ -293,7 +293,7 @@ async function requestUpstreamWithResilience(params: {
 function isLocalhostUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
+    const host = canonicalHost(parsed.hostname); // URL keeps IPv6 brackets ("[::1]"); canonicalHost drops them
     return host === "127.0.0.1" || host === "localhost" || host === "::1";
   } catch {
     return false;
