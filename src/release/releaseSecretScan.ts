@@ -98,6 +98,11 @@ const RULES: Rule[] = [
 
 const SECRET_FILENAMES = [/\.env/i, /\.pem$/i, /\.key$/i, /\.p12$/i];
 
+/** The release scan's HIGH-severity content rules that match in-memory `text` (A4 blob and request-row scans, P1-56). */
+export function highSeveritySecretTypes(text: string): string[] {
+  return RULES.filter((rule) => rule.severity === "HIGH" && text.search(rule.pattern) >= 0).map((rule) => rule.type);
+}
+
 function redactSnippet(value: string): string {
   if (value.length <= 8) {
     return "<REDACTED>";
