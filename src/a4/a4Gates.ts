@@ -190,7 +190,7 @@ export function autoHold(store: A4Store, projectId: string, incidentIds: readonl
 }
 
 /** Refuses under an active or unreadable freeze, writing the automatic hold first. */
-function refuseOnFreeze(store: A4Store, projectId: string): void {
+export function refuseOnFreeze(store: A4Store, projectId: string): void {
   const head = store.readHead(projectId);
   if (head === null) throw fail(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
   const { freeze } = refreshVolatileFacts(store.workspace, head);

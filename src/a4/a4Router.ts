@@ -190,10 +190,12 @@ export function assertVisible(route: A4Route, members: readonly A4Member[]): voi
 export const headStage = (project: Pick<A4ProjectRow, "stage">): A4Stage => project.stage === "retired" ? "activate" : project.stage;
 
 /**
- * The readiness refusal for a write that does not go through a governed gate function (members, evidence): the same
- * evaluator on freshly loaded rows; a freeze writes the automatic hold before refusing, as governed writes do.
+ * The readiness refusal for a write that does not go through a governed gate function (members, evidence, observe): the
+ * same evaluator on freshly loaded rows; a freeze writes the automatic hold before refusing, as governed writes do. The
+ * evaluated head must be `expectedHeadSeq`, the head the store then commits on (it refuses any other), so the write
+ * lands on exactly the rows this evaluation read.
  */
-export function precheck(route: A4Route, projectId: string, action: A4Action): A4ReadinessState {
+export function precheck(route: A4Route, projectId: string, action: A4Action, expectedHeadSeq: number): A4ReadinessState {
   const now = Date.now();
   const state = loadA4State(route.store, projectId, now);
   const { readiness } = evaluateFor(route.store, state, requirePrincipal(route), callOf(route), headStage(state.project), now);
@@ -204,6 +206,9 @@ export function precheck(route: A4Route, projectId: string, action: A4Action): A
       autoHold(route.store, projectId, refreshVolatileFacts(route.workspace, state.project).freeze?.incidentIds ?? []);
     }
     throw error;
+  }
+  if (state.project.head_seq !== expectedHeadSeq) {
+    throw a4Fail(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: state.project.head_seq });
   }
   return state;
 }
@@ -395,14 +400,14 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
     case "/members":
       return mutate(route, projectId, membersSchema, (body, request) => {
         if (body.event !== "removed" && body.projectRoles.length === 0) throw a4Fail(400, "INPUT_INVALID", "A member holds at least one project role.");
-        precheck(route, projectId, "addMember");
+        precheck(route, projectId, "addMember", body.expectedHeadSeq);
         // The store re-checks owner mode and a current project owner on live roles (defence in depth).
         return store.recordMember(projectId, { actor: principal, event: body.event, principalKey: body.principalKey,
           roles: body.event === "removed" ? [] : body.projectRoles, expectedHeadSeq: body.expectedHeadSeq, request });
       });
     case "/evidence":
       return mutate(route, projectId, evidenceSchema, (body, request) => {
-        const state = precheck(route, projectId, "build");
+        const state = precheck(route, projectId, "build", body.expectedHeadSeq);
         const event = body.refKind === "ledger_event" ? store.ledger.getEventById(body.refId) : undefined;
         const meta = event ? eventMeta(event) : null;
         // The store refuses it again under the project lock; refusing here first means nothing is planned on another agent's row.

@@ -22,7 +22,8 @@ import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeWithEffect, openEffectGate, retryEffect, runA4Effect, sweepA4Effects } from "./a4Effects.js";
 import {
-  assertAllowed, consumeGate, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, requestChanges, requestGate, RESOURCE_SLOTS
+  assertAllowed, consumeGate, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, refuseOnFreeze, requestChanges, requestGate,
+  RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
@@ -147,6 +148,8 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     }
     return readiness;
   };
+  // The pre-flight refusal writes the automatic hold under a freeze, as governed() does, before any blob is written.
+  refuseOnFreeze(route.store, projectId);
   check(loadA4State(route.store, projectId, now));
   const output = def.output !== null ? writeStageOutput(route, projectId, fields.content!) : null;
   const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request }, (ts) => {
@@ -239,7 +242,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
   const principal = requirePrincipal(route);
   const { body, request } = await readJson(route, observeSchema);
   return respond(route, projectId, request, () => {
-    const state = precheck(route, projectId, "observeHypothesis");
+    const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
     const { spec } = stageSpec(state, "aspire");
     const hypothesis = (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).map((entry) => a4HypothesisSchema.safeParse(entry))
       .find((parsed) => parsed.success && parsed.data.id === hypothesisId)?.data;
