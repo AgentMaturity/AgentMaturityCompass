@@ -225,10 +225,16 @@ export const a4CommentRowSchema = z.object({
   comment_id: text, project_id: text, revision_no: int, stage: text.nullable(), card_id: text, author_key: text, body_sha256: sha256HexSchema,
   blob_ref: sha256HexSchema, in_reply_to: text.nullable(), evidence_event_id: text, ts: int
 });
+/** The migration's lane CHECK, mirrored: the stored lane and claim kind are what `laneForClaimKind` derives from the row. */
 export const a4EvidenceRefRowSchema = z.object({
   project_id: text, seq: int, revision_no: int, stage: text.nullable(), lane: z.enum(A4_LANES), ref_kind: z.enum(A4_REF_KINDS), ref_id: text,
   sha256: sha256HexSchema, claim_kind: claimKindSchema, trust_tier: text.nullable(), method: text.nullable(), label: text, actor_key: text,
   evidence_event_id: text, ts: int
+}).superRefine((row, ctx) => {
+  const derived = laneForClaimKind(row.claim_kind, row.trust_tier, row.method, row.lane === "recommendation" ? "recommendation" : "implementation");
+  if (derived.lane !== row.lane || derived.claimKind !== row.claim_kind) {
+    ctx.addIssue({ code: "custom", path: ["lane"], message: `lane ${row.lane} with claim kind ${row.claim_kind} is not what the row earns` });
+  }
 });
 export type A4EvidenceRefRow = z.infer<typeof a4EvidenceRefRowSchema>;
 export const a4GateRowSchema = z.object({

@@ -92,8 +92,9 @@ export const A4_MIGRATION_SQL = `
         ref_id TEXT NOT NULL, sha256 TEXT NOT NULL, claim_kind TEXT NOT NULL, trust_tier TEXT, method TEXT, label TEXT NOT NULL,
         actor_key TEXT NOT NULL, evidence_event_id TEXT NOT NULL, ts INTEGER NOT NULL,
         PRIMARY KEY (project_id, seq),
-        CHECK ((lane = 'observed' AND claim_kind = 'observed' AND trust_tier IN ('OBSERVED','OBSERVED_HARDENED')
-            AND method IN ('runtime_observation','executed_test'))
+        -- NULL-safe: a CHECK whose expression is NULL passes, and x IN (...) is NULL for a NULL x.
+        CHECK ((lane = 'observed' AND claim_kind = 'observed' AND trust_tier IS NOT NULL AND trust_tier IN ('OBSERVED','OBSERVED_HARDENED')
+            AND method IS NOT NULL AND method IN ('runtime_observation','executed_test'))
           OR (lane = 'verified' AND claim_kind = 'independently_reviewed')
           OR (lane IN ('recommendation','implementation') AND claim_kind IN ('self_reported','synthetic_example')))
       );${appendOnly("a4_evidence_refs")}
