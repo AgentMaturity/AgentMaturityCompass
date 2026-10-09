@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { join, resolve } from "node:path";
-import { rmSync } from "node:fs";
+import { realpathSync, rmSync } from "node:fs";
 import { z } from "zod";
 import { createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -18,6 +18,7 @@ import {
   verifyAuditMapBuiltinSignature
 } from "./auditMapStore.js";
 import {
+  auditBindersExportsDir,
   initAuditPolicy,
   loadAuditPolicy,
   saveAuditPolicy,
@@ -29,7 +30,8 @@ import {
   listExportedAuditBinders
 } from "./binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "./binderVerifier.js";
-import { verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
+import { unreadableAuditResult, verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
+import { isWithin } from "../utils/pathSafety.js";
 import { loadBinderCache } from "./binderStore.js";
 import {
   createAuditEvidenceRequest,
@@ -393,7 +395,22 @@ export function auditBindersForApi(workspace: string) {
   };
 }
 
-export function auditBinderVerifyForApi(params: {
+/**
+ * Studio's binder verify (P0-20): the route confines `file` to the binder exports directory by path; its real path must
+ * stay there too (P0-55), so a symlink planted under it reads nothing outside. A request never names a public key.
+ */
+export function auditBinderVerifyForApi(params: { file: string; workspace: string; trust: TrustContext }) {
+  let real: string | null = null;
+  try {
+    const candidate = realpathSync(resolve(params.file));
+    if (isWithin(realpathSync(auditBindersExportsDir(params.workspace)), candidate)) real = candidate;
+  } catch { /* unreadable, below */ }
+  if (real === null) return unreadableAuditResult(resolve(params.file), params.trust);
+  return auditBinderVerifyFile({ file: real, workspace: params.workspace, trust: params.trust });
+}
+
+/** `amc audit binder verify`: the operator names any file, and may pin a key. */
+export function auditBinderVerifyFile(params: {
   file: string;
   workspace?: string;
   publicKeyPath?: string;
