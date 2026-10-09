@@ -48,7 +48,7 @@
       "line": 436,
       "call": "fetchImpl(",
       "status": "gated",
-      "reason": "Gateway reachability GET checks captured explicit workspace through bridge residency before injected fetchImpl and refuses automatic redirects. Typed EgressBlocked escapes availability handling, so denial cannot trigger direct-provider fallback. Ordinary listener failures retain the existing fallback. No synthetic/public classification or no-send proof for a multi-request scan."
+      "reason": "Gateway reachability GET checks and fetches the same full gateway POST endpoint with captured explicit workspace and bridge residency. Restrictive path prefixes need no root-path widening. Typed EgressBlocked escapes availability handling, so denial cannot trigger direct-provider fallback. Ordinary listener failures retain the existing fallback. Source-only; no synthetic/public classification or no-send proof for a multi-request scan."
     },
     {
       "siteId": "src/bench/benchRegistryClient.ts:23:1",
