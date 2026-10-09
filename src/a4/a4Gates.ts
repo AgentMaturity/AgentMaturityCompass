@@ -25,7 +25,7 @@ import { resolveRefs } from "./a4Evidence.js";
 import { liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
-  A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, readinessBindingDigest,
+  A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, readinessBindingDigest,
   riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
@@ -352,6 +352,14 @@ function assertGateLive(state: A4ReadinessState, row: A4GateRow, gate: ReturnTyp
   if (gate.status === "EXPIRED" || now >= row.expires_ts) throw fail(409, "GATE_EXPIRED", "The gate expired; request it again.");
 }
 
+/** 409 A4_NOT_READY (REQUIRED_REVIEW_PENDING) while an entry of the gate's `requiredReviews` is unsatisfied (design §6.3). */
+function assertReviewsMet(state: A4ReadinessState, gate: ReturnType<typeof gateStatus>): void {
+  const pending = pendingReviews(state, gate);
+  if (pending.length > 0) {
+    throw fail(409, "A4_NOT_READY", `required reviews pending: ${pending.map((entry) => entry.label).join("; ")}`, { reasonCodes: ["REQUIRED_REVIEW_PENDING"], pending });
+  }
+}
+
 export const gateRowOf = (state: A4ReadinessState, gateId: string): A4GateRow => {
   const row = state.gates.find((candidate) => candidate.gate_id === gateId);
   if (row === undefined) throw fail(404, "A4_GATE_NOT_FOUND", `no gate ${gateId} on this project`);
@@ -505,7 +513,8 @@ const headAfterConsume = (row: A4GateRow): { stage?: A4Stage; step: "direction_a
 
 /**
  * Consumes a documentary gate once (design §6.5) on rows read inside the transaction: freeze and read-only re-read,
- * readiness must allow `progress`, the intent and the resources must be unchanged, the quorum met. `extra` adds the
+ * readiness must allow `progress`, the intent and the resources must be unchanged, the quorum met and every
+ * `requiredReviews` entry of the gate's rule satisfied. `extra` adds the
  * EFFECT_STARTED that src/a4/a4Effects.ts writes in the same transaction. Returns the consumed gate's approver keys.
  */
 export function consumeGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number;
@@ -526,6 +535,7 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     if (!readiness.integrity.valid) assertAllowed(readiness, "progress");
     assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
+    assertReviewsMet(state, gate);
     assertAllowed(readiness, "progress");
     // An opened effect gate is consumed only with its effect, or its approved engine grant would be orphaned.
     if (extra === undefined && state.chain.some((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === row.gate_id)) {
@@ -556,6 +566,7 @@ export function changeGatePolicy(store: A4Store, projectId: string, input: A4Cal
     const gate = gateStatus(state, row, query.policy, now);
     assertGateLive(state, row, gate, readiness, [], now);
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
+    assertReviewsMet(state, gate);
     assertAllowed(readiness, "changeGatePolicy");
     return { readiness, specs: [
       { kind: "GATE_CONSUMED", payload: { gateId: row.gate_id, gate: "policy", approverKeys: approverKeys(gate), readinessBindingDigest: readiness.bindingDigest } },

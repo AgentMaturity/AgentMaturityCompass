@@ -19,7 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
+  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gatePolicyOf, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
   type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
@@ -33,6 +33,7 @@ export type A4GateRow = z.infer<typeof a4GateRowSchema>;
 export type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
 export type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
 export type A4EffectRow = z.infer<typeof a4EffectRowSchema>;
+export type A4RequiredReview = A4GatePolicyV1["gates"]["policy"]["requiredReviews"][number];
 
 export const A4_ACTIONS = [
   "ask", "understand", "explain", "propose", "requestGate", "decide", "requestChanges", "build", "review", "progress", "hold", "resume",
@@ -46,7 +47,7 @@ export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_ap
   "deployment.amc_check", "plan_unresolved"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
-const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "approvals.fresh", "sod"]);
+const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
 const EXPIRING_GUARD_MS = 60_000;
 
 /** The rows one evaluation reads; loaded by the caller (inside the write transaction for writes). */
@@ -152,6 +153,19 @@ export function gateStatus(state: A4ReadinessState, row: A4GateRow, policy: Appr
   const status = supersededBy === null ? (["PENDING", "QUORUM_MET", "DENIED", "EXPIRED"].includes(quorum.status) ? quorum.status : "STALE")
     : supersededBy.kind === "GATE_CONSUMED" ? "CONSUMED" : supersededBy.kind === "CHANGES_REQUESTED" ? "CHANGES_REQUESTED" : "STALE";
   return { row, request, requestedSeq, status: status as A4GateStatus["status"], supersededBy, counted, approvals: quorum.received, required: quorum.required };
+}
+
+/**
+ * The `requiredReviews` entries of the rule in force when the gate was requested that it does not satisfy yet (design
+ * §6.3): a `role_vote` by a counted APPROVE whose recorded roles hold that role (an acknowledgement, never a review); a
+ * `review_record` by a verified-lane ref on the gate's revision (an admitted external record, re-admitted at every read).
+ */
+export function pendingReviews(state: A4ReadinessState, gate: A4GateStatus): A4RequiredReview[] {
+  const key = gate.row.gate === "policy" ? "policy" : `${gate.row.stage}.${gate.row.gate}` as `${A4Stage}.${"direction" | "completion"}`;
+  const rule = gatePolicyOf(state.chain.filter((link) => link.seq < gate.requestedSeq)).gates[key];
+  const roles = gate.counted.map(decisionRecordOf).flatMap((record) => record?.decision === "APPROVE_EXECUTE" ? record.roles : []);
+  const reviewed = state.refs.some((ref) => ref.revisionNo === gate.row.revision_no && ref.lane === "verified");
+  return rule.requiredReviews.filter((entry) => entry.kind === "role_vote" ? entry.role === undefined || !roles.includes(entry.role) : !reviewed);
 }
 
 /** The newest gate of a kind at a stage (side rows arrive in chain order). */
@@ -292,6 +306,10 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     items.push(item(`gate.${kind}`, status, { kind: blocker, reasonCodes: [reason, expiring ? "GATE_EXPIRING" : null].filter((code): code is string => code !== null) }));
   }
   const open = [gates.direction, gates.completion].filter((gate): gate is A4GateStatus => gate !== null && (gate.status === "PENDING" || gate.status === "QUORUM_MET"));
+  const pending = open.flatMap((gate) => pendingReviews(state, gate));
+  items.push(pending.length > 0 ? item("gate.required_reviews", "WAITING", { kind: "review_pending",
+    reasonCodes: ["REQUIRED_REVIEW_PENDING", ...pending.map((entry) => entry.role === undefined ? entry.kind : `${entry.kind}:${entry.role}`)],
+    nextAction: { label: `Required on this gate: ${pending.map((entry) => entry.label).join("; ")}` } }) : item("gate.required_reviews", "READY"));
   const stale = open.some((gate) => gate.counted.length < state.decisions.filter((decision) => decision.gate_id === gate.row.gate_id).length);
   items.push(stale ? item("approvals.fresh", "WAITING", { kind: "evidence_stale", reasonCodes: ["GATE_STALE"], mandatory: false }) : item("approvals.fresh", "READY", { mandatory: false }));
   items.push(sodItem(state, open, regulated));
@@ -402,7 +420,8 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     ],
     progress: [
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
-      ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod") && candidate.status !== "READY" && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
+      ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod" || candidate.id === "gate.required_reviews") && candidate.status !== "READY"
+        && candidate.status !== "COMPLETE" && candidate.acknowledged === null)
     ]
   };
   return Object.fromEntries(A4_ACTIONS.map((action) => {
