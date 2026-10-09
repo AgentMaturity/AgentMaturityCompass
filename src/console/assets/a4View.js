@@ -363,7 +363,7 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", allowed.requestGate)}
       ${actionButton("Request completion approval", "request-completion", allowed.requestGate)}
-      ${actionButton("Complete stage", "complete", stage === "activate" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
+      ${actionButton("Complete stage", "complete", stage === "activate" && met?.gate === "completion" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
