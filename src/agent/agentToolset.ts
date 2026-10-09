@@ -24,7 +24,7 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
-import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows } from "../tools/guards/compiledPolicyGuard.js";
+import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -33,6 +33,7 @@ import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js
 import { ToolRegistry } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
+import { checkLease } from "../actions/authorize.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
@@ -61,6 +62,11 @@ export interface AgentToolsetOptions {
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
+  /**
+   * A signed lease the composer minted for this runtime (P1-67: a Studio native task). Under a compiled plan whose
+   * `identity-binding` requires a lease (L0-IDN-01) every call binds it; otherwise it is unused. Scrubbed from output.
+   */
+  readonly leaseToken?: string;
   /** Explicit operator acceptance of an unconfined macOS shell (P0-06); ignored on Linux and refused elsewhere. */
   readonly unconfinedShell?: ExplicitShellOptIn;
   /** Set only for a delegated child: the parent's decision (null when unknown), which the child can never widen. */
@@ -253,6 +259,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   } catch (error) {
     throw new Error(`Refusing to start: the active compiled policy cannot be verified (${error instanceof Error ? error.message : String(error)}). Restore .amc/control-plan/ from backup, or recompile and reactivate with amc catalog compile --activate (docs/catalog/COMPILER.md)`);
   }
+  // P1-67: bound only when the pinned plan's identity-binding requires a lease (L0-IDN-01); otherwise records bind as before.
+  const leaseToken = planRequiresAgentLease(compiled) ? options.leaseToken : undefined;
+  const scrubValues = [...(options.scrubValues ?? []), ...(options.leaseToken ? [options.leaseToken] : [])];
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   // Opened on the first journaled call (P1-03), which also recovers what crashed runs left. One that cannot open
   // denies that call `journal_unavailable` and is tried again on the next.
@@ -287,7 +296,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     const sessionId = options.sessionId;
     const key = `${sessionId}\0${guardLabels.join(",")}`;
     if (receipt?.key !== key) {
-      receipt = { key, ref: writeEffectivePolicyReceipt({ workspace, sessionId, agentId, policy: compiled, guardLabels, record: recordAudit }).evidenceRef };
+      // Named only when the pipeline's own verifier accepts the lease now; every call still verifies it again.
+      const lease = leaseToken === undefined ? null : checkLease({ workspace, agentId }, leaseToken);
+      const leaseId = lease !== null && !("ok" in lease) ? lease.payload.leaseId : null;
+      receipt = { key, ref: writeEffectivePolicyReceipt({ workspace, sessionId, agentId, policy: compiled, guardLabels, leaseId, record: recordAudit }).evidenceRef };
     }
     return receipt.ref;
   };
@@ -303,7 +315,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   };
   if (shell.decision === "confined") registry.define(createNativeSandboxBash({
     workspace,
-    scrubValues: options.scrubValues,
+    scrubValues,
     // The per-call refusal stays: availability at composition is a prerequisite, not proof.
     record: (execution, outcome) => recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
@@ -322,7 +334,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   }));
   if (shell.decision === "unconfined-opt-in") {
     process.stderr.write(`${shell.reason}\n`);
-    const unconfined = bashTool({ scrubValues: options.scrubValues });
+    const unconfined = bashTool({ scrubValues });
     registry.define({ ...unconfined, body: execution => {
       // Recorded before the command runs, so no unconfined execution goes unreceipted.
       if (execution.effectiveMode !== "SIMULATE") {
@@ -409,7 +421,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       } catch {
         // Not swallowed: the compiled-policy guard retries the write and denies the call with the reason.
       }
-      return { sessionId: options.sessionId, evidenceRefs, ...(facts ? { compiledPolicy: facts } : {}),
+      return { sessionId: options.sessionId, evidenceRefs, ...(facts ? { compiledPolicy: facts } : {}), ...(leaseToken === undefined ? {} : { leaseToken }),
         ...(options.delegation === undefined ? {} : { runAs: options.delegation.runAs, delegation: options.delegation }) };
     },
     // Enforcement that leaves no trace is advisory again at the only moment

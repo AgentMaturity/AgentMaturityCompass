@@ -46,6 +46,8 @@ export interface EffectivePolicyReceiptV1 {
   /** P1-07 removed the opt-out: STRICT_EVIDENCE_BINDING only prints a warning, so binding is always on. */
   readonly strictEvidenceBinding: { readonly enabled: true; readonly source: "default" };
   readonly downgrades: readonly PolicyDowngrade[];
+  /** The lease the session's calls are bound to, accepted by the pipeline's verifier when this was written (P1-67); else null. */
+  readonly leaseId: string | null;
 }
 
 const BINDING: Record<EnforcementPoint, Binding> = {
@@ -75,6 +77,8 @@ export interface ReceiptInput {
   readonly agentId: string;
   readonly policy: ActiveCompiledPolicy | null;
   readonly guardLabels: readonly string[];
+  /** A verified lease id only; the caller verifies (P1-67). */
+  readonly leaseId?: string | null;
 }
 
 export function buildEffectivePolicyReceipt(input: ReceiptInput): EffectivePolicyReceiptV1 {
@@ -102,7 +106,8 @@ export function buildEffectivePolicyReceipt(input: ReceiptInput): EffectivePolic
     guardrails: sessionGuardrailEnforcement(input.workspace, { guardLabels: input.guardLabels, approvalRequired }),
     domainRules,
     strictEvidenceBinding: { enabled: true, source: "default" },
-    downgrades: [...(policy ? [] : ["no_compiled_policy" as const]), ...(domainRules.length > 0 ? ["unenforced_domain_rules" as const] : [])]
+    downgrades: [...(policy ? [] : ["no_compiled_policy" as const]), ...(domainRules.length > 0 ? ["unenforced_domain_rules" as const] : [])],
+    leaseId: input.leaseId ?? null
   };
 }
 

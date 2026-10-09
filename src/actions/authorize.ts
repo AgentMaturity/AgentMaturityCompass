@@ -164,8 +164,12 @@ const LEASE_ERRORS: Record<string, RecheckFailure> = {
   "lease revoked": "lease_revoked", "lease expired": "capability_expired", "signature verification failed": "authority_store_unavailable"
 };
 
-/** The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list. */
-function checkLease(execution: ToolExecution, token: string): { readonly payload: LeasePayload } | Failed {
+/**
+ * The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list.
+ * Without an action class it checks everything but the class (the effective-policy receipt, P1-67).
+ */
+export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId"> & { readonly actionClass?: ActionClass },
+  token: string): { readonly payload: LeasePayload } | Failed {
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",

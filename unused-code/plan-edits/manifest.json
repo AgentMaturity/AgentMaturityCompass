@@ -213,6 +213,13 @@
       "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
     },
     {
+      "path": "src/leases/leaseStore.ts",
+      "issue": "P1-67",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-67/src/leases/leaseStore.ts.landed",
+      "sha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c"
+    },
+    {
       "path": "src/ledger/ledger.ts",
       "issue": "P0-18",
       "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",

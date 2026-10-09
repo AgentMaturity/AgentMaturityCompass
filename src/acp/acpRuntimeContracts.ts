@@ -11,6 +11,8 @@ import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInpu
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
 export const ACP_RUNTIME_FORMAT = "amc-acp-runtime@1";
 export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
+/** Where a spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process. */
+export const NATIVE_TASK_LEASE_ENV = "AMC_NATIVE_TASK_LEASE";
 export const ACP_RUNTIME_LIMITS = Object.freeze({
   inputFrameBytes: MAX_WIRE_LINE_BYTES,
   updateParamsBytes: ACP_MAX_UPDATE_PARAMS_BYTES,

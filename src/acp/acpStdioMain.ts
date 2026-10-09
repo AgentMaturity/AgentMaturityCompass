@@ -100,6 +100,8 @@ export interface AcpStdioInit {
   /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: boolean;
   readonly expectedToolsDigest?: string;
+  /** A lease the spawning composer minted for this process (P1-67, Studio native tasks); see `AgentToolsetOptions.leaseToken`. */
+  readonly leaseToken?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
   readonly validate?: readonly string[];
@@ -229,7 +231,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-      ...(validation === undefined ? {} : { validation })
+      ...(validation === undefined ? {} : { validation }), ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken })
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };

@@ -18,6 +18,13 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
+import { isActionClass } from "../governor/actionCatalog.js";
+import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
@@ -32,10 +39,14 @@ const REFS = { openai: "OPENAI_API_KEY", "openai-responses": "OPENAI_API_KEY", a
 const CREDENTIALED = ["openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio"] as const;
 type CredentialedProvider = typeof CREDENTIALED[number];
 const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is CredentialedProvider => (CREDENTIALED as readonly string[]).includes(provider);
+const SWEEP_MS = 10_000;
+const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
   client?: AMCNativeClient; session?: AMCNativeSession; turn?: AMCNativeTurn; work?: Promise<void>;
   preparation?: Promise<void>; runtimeStartedAt: number;
+  /** P1-67: the lease this process minted for its runtime, until it is revoked (another process may record a newer one). */
+  leaseId?: string;
   startupCancelled: boolean; startupAbort: AbortController;
   validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
@@ -149,12 +160,48 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
     }
   }
-  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed">>): void {
+  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed" | "leaseId">>): void {
     descriptors.lock(() => {
       const current = descriptors.read(entry.descriptor.taskId);
       if (!current || current.revision !== entry.descriptor.revision || current.sessionId !== entry.descriptor.sessionId) throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task descriptor changed during execution.");
       entry.descriptor = { ...current, ...patch, updatedAt: Date.now() }; descriptors.write(entry.descriptor);
     });
+  }
+  /** P1-67: revoke a lease once. Throws when the signed revocation store cannot be verified or written, or no key signs it. */
+  function revokeTaskLease(leaseId: string, reason: string): void {
+    if (!revokedLeaseIdSet(workspace).has(leaseId)) revokeLease(workspace, leaseId, reason);
+  }
+  /** After the runtime is gone: revoke the lease this process minted for it, or say on the task why it still lapses on its own. */
+  function retireLease(entry: Entry): void {
+    if (entry.leaseId === undefined) return;
+    try { revokeTaskLease(entry.leaseId, "native task runtime stopped"); entry.leaseId = undefined; }
+    catch (error) { entry.error = `${entry.error ? `${entry.error} ` : ""}The runtime's lease could not be revoked (${reasonOf(error)}). It lapses within an hour of the runtime's start; fix that, then archive the task to revoke it.`; }
+  }
+  /**
+   * P1-67: under a compiled plan whose identity-binding requires a lease (L0-IDN-01), a lease for this runtime alone (its
+   * agent, this task as the work order, the classes of its pinned signed tools, its own caps, at most the runtime's
+   * lifetime). The token goes to the child alone. prepare records the id, and revokes the previous runtime's lease, only
+   * once this runtime holds the session's writer claim, so a refused resume never touches another process's runtime.
+   */
+  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueLeaseToken> | null {
+    const d = entry.descriptor;
+    if (d.tools !== "workspace") return null;
+    let plan: ReturnType<typeof loadActiveCompiledPolicy>;
+    try { plan = loadActiveCompiledPolicy(workspace); }
+    catch (error) { throw new NativeTaskServiceError("POLICY_UNVERIFIED", 409, `The active compiled policy cannot be verified (${reasonOf(error)}). Nothing was started. Restore .amc/control-plan/ from backup, or recompile and reactivate.`); }
+    if (!planRequiresAgentLease(plan)) return null;
+    if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
+      "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
+    let lease: ReturnType<typeof issueLeaseToken>;
+    try {
+      lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+        ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
+        routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
+    } catch (error) {
+      throw new NativeTaskServiceError("LEASE_UNAVAILABLE", 409, `The active compiled plan requires an agent lease for this runtime, and none could be minted (${reasonOf(error)}). Nothing was started.`);
+    }
+    entry.leaseId = lease.payload.leaseId; // From here stop() revokes it.
+    return lease;
   }
   function refresh(entry: Entry): void {
     if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return;
@@ -180,6 +227,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     entry.error = "The native runtime process exited. No successful writer release or completed side effect is inferred. Refresh the original evidence and explicitly resume an eligible session before submitting a new turn.";
     entry.projection = undefined; entry.projectionAt = 0;
     entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
+    retireLease(entry); // P1-67: a runtime that exited also stops holding a live lease.
     // Keep the signed descriptor, pendingTurn and every submission untouched.
     // Only resume() may rebuild the fixed native approval/validation controller.
   }
@@ -273,7 +321,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (d.provider !== "stub" && !config.providers.find(p => p.id === d.provider)?.credential?.configured)
       throw new NativeTaskServiceError("CREDENTIAL_MISSING", 409, "The selected provider's operator credential reference is not configured.");
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
-    entry.client = await AMCNativeClient.start({ workspace, command, env: childEnvironment(d.provider), provider: d.provider,
+    const previousLeases = new Set([d.leaseId, entry.leaseId].filter((id): id is string => id !== undefined));
+    // The lifetime clock starts no later than the lease, so the sweeper stops the runtime before the lease expires.
+    entry.runtimeStartedAt = Date.now();
+    const lease = runtimeLease(entry, config.scope);
+    entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}) }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,
       ...(credentialed(d.provider) ? { credential: REFS[d.provider] } : {}),
       ...(d.tools === "workspace" ? { approveTools: "WRITE_HIGH", approveRisk: "high" as const } : {}),
@@ -288,9 +340,12 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     entry.startupAbort.signal.addEventListener("abort", abortSetup, { once: true });
     try { entry.session = resume ? await entry.client.resumeSession(d.sessionId!) : await entry.client.newSession(); }
     finally { entry.startupAbort.signal.removeEventListener("abort", abortSetup); }
-    if (!resume) persist(entry, { sessionId: entry.session.sessionId });
+    if (!resume || lease) persist(entry, { ...(resume ? {} : { sessionId: entry.session.sessionId }), ...(lease ? { leaseId: lease.payload.leaseId } : {}) });
+    // P1-67: this runtime now holds the writer claim, so the previous one is gone; its lease must not stay live.
+    try { for (const leaseId of previousLeases) revokeTaskLease(leaseId, "superseded by a new native task runtime"); }
+    catch (error) { throw new NativeTaskServiceError("LEASE_UNREVOKED", 409, `The previous runtime's lease could not be revoked (${reasonOf(error)}), so this runtime was stopped.`); }
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
-    entry.state = "idle"; entry.error = null; entry.touchedAt = Date.now(); entry.runtimeStartedAt = Date.now(); entry.projectionAt = 0;
+    entry.state = "idle"; entry.error = null; entry.touchedAt = Date.now(); entry.projectionAt = 0;
   }
   async function stop(entry: Entry): Promise<void> {
     if (entry.finishing) return entry.finishing;
@@ -311,7 +366,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.state = entry.descriptor.closed ? "closed" : "released";
       } catch { entry.state = "failed"; entry.error = "The native writer did not release cleanly. Inspect signed evidence before attempting recovery."; }
       finally { try { await entry.client?.close(); entry.processCleanupConfirmed = true; } catch { entry.state = "failed"; entry.error = "Native process cleanup did not complete cleanly."; }
-        finally { entry.client = undefined; entry.session = undefined; entry.turn = undefined; entry.finishing = undefined; entry.projectionAt = 0; } }
+        finally { retireLease(entry); entry.client = undefined; entry.session = undefined; entry.turn = undefined; entry.finishing = undefined; entry.projectionAt = 0; } }
     })();
     return entry.finishing;
   }
@@ -339,9 +394,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     })();
   }
   const sweep = setInterval(() => {
+    // One sweep early on lifetime, so a runtime never outlives its lease (minted with the full lifetime).
     for (const entry of entries.values()) if (entry.client && !entry.finishing
-      && (Date.now() - entry.runtimeStartedAt >= LIMITS.lifetimeMs || (!entry.turn && Date.now() - entry.touchedAt >= LIMITS.idleTimeoutMs))) void stop(entry);
-  }, 10_000);
+      && (Date.now() - entry.runtimeStartedAt >= LIMITS.lifetimeMs - SWEEP_MS || (!entry.turn && Date.now() - entry.touchedAt >= LIMITS.idleTimeoutMs))) void stop(entry);
+  }, SWEEP_MS);
   sweep.unref();
 
   return {
@@ -460,7 +516,12 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
       try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
-      catch { await stop(entry); entry.state = "failed"; entry.error = "Native resume was refused. Restore the original execution settings and signed policies, confirm the prior writer has exited, then refresh. No replacement session or provider request was created."; }
+      catch (error) {
+        // A named refusal keeps its reason; stop() then appends any lease it could not revoke.
+        entry.error = error instanceof NativeTaskServiceError ? `Native resume was refused: ${error.message}`
+          : "Native resume was refused. Restore the original execution settings and signed policies, confirm the prior writer has exited, then refresh. No replacement session or provider request was created.";
+        await stop(entry); entry.state = "failed";
+      }
       finally { entry.preparation = undefined; }
       return view(entry);
     },
@@ -479,6 +540,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         try { projection = readNativeTaskProjection(workspace, d.sessionId, d.agentId); }
         catch { throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "Native evidence did not authenticate; this task was not archived."); }
         if (!projection.closed) throw new NativeTaskServiceError("ARCHIVE_NOT_CLOSED", 409, "The authenticated native session is still open. Close it before archiving.");
+        try { for (const leaseId of new Set([d.leaseId, entry.leaseId])) if (leaseId !== undefined) revokeTaskLease(leaseId, "native task archived"); }
+        catch (error) { throw new NativeTaskServiceError("LEASE_UNREVOKED", 409, `The task's lease could not be revoked (${reasonOf(error)}). Fix that, then archive; nothing was archived.`); }
+        entry.leaseId = undefined;
         if (d.archivedAt === undefined) {
           const now = Date.now();
           const archived = { ...d, closed: true, archivedAt: now, updatedAt: now };
@@ -513,7 +577,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
           : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
         if (report.ok && !sameHead) entry.error = "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current.";
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
-      finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; }
+      finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; retireLease(entry); }
       return view(entry);
     },
     close() {

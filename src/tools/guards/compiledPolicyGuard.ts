@@ -36,6 +36,11 @@ function identityDenial(params: Readonly<Record<string, ParamValue>>, execution:
   return null;
 }
 
+/** Whether the plan's `identity-binding` requires a verified agent lease (L0-IDN-01); only then is one minted or bound (P1-67). */
+export function planRequiresAgentLease(policy: ActiveCompiledPolicy | null): boolean {
+  return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requireAgentLease === true) ?? false;
+}
+
 /** The live signed approval policy must be at least as strict as the compiled rule; read and verified in one read. */
 function approvalDenial(workspace: string, actionClass: ActionClass, rule: ApprovalRule): string | null {
   const path = approvalPolicyPath(workspace);

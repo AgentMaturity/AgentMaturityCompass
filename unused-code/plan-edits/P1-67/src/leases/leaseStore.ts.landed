@@ -2,7 +2,6 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
-import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { sha256Hex } from "../utils/hash.js";
 import { leaseRevocationsSchema, type LeaseRevocations } from "./leaseSchema.js";
 
@@ -99,61 +98,47 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
   }
 }
 
-/**
- * The store, verified and parsed from the same bytes (never verify-then-reread). Empty only when neither the list nor
- * its signature exists; throws the reason otherwise.
- */
-function readVerifiedRevocations(workspace: string): LeaseRevocations {
-  const paths = leaseRevocationPaths(workspace);
-  if (!pathExists(paths.file) && !pathExists(paths.sig)) return defaultLeaseRevocations();
-  if (!pathExists(paths.file)) throw new Error("revocation list missing but signature present");
-  if (!pathExists(paths.sig)) throw new Error("revocation signature missing");
-  const bytes = readFileSync(paths.file);
-  const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
-  const digest = sha256Hex(bytes);
-  if (signed.digestSha256 !== digest) throw new Error("digest mismatch");
-  if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) throw new Error("signature verification failed");
-  return leaseRevocationsSchema.parse(JSON.parse(bytes.toString("utf8")));
-}
-
-/**
- * Append one revocation and re-sign. Serialized across processes (Studio retires native task leases on every runtime
- * stop while an operator may run `amc lease revoke`), so a concurrent writer cannot republish a list without this row.
- */
 export function revokeLease(workspace: string, leaseId: string, reason: string): LeaseRevocations {
   const paths = leaseRevocationPaths(workspace);
-  return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
-    let current: LeaseRevocations;
-    // Revoke is not the deliberate repair command. Authenticate the exact bytes
-    // used for this update, not a later second load of potentially different data.
+  let current: LeaseRevocations;
+  // Revoke is not the deliberate repair command. Authenticate the exact bytes
+  // used for this update, not a later second load of potentially different data.
+  if (!pathExists(paths.file) && !pathExists(paths.sig)) current = defaultLeaseRevocations();
+  else {
     try {
-      current = readVerifiedRevocations(workspace);
+      const bytes = readFileSync(paths.file);
+      const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
+      const digest = sha256Hex(bytes);
+      if (signed.digestSha256 !== digest || !verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) {
+        throw new Error("Unverifiable revocation snapshot");
+      }
+      current = leaseRevocationsSchema.parse(JSON.parse(bytes.toString("utf8")));
     } catch {
       throw new Error("lease revocation store unverifiable; revoke made no changes. Restore and review the approved revocation history before a deliberate repair; revoking another lease must not re-sign damaged state.");
     }
-    const next = leaseRevocationsSchema.parse({
-      ...current,
-      updatedTs: Date.now(),
-      revocations: [
-        ...current.revocations.filter((row) => row.leaseId !== leaseId),
-        {
-          leaseId,
-          revokedTs: Date.now(),
-          reason
-        }
-      ]
-    });
-    const bytes = JSON.stringify(next, null, 2);
-    const digest = sha256Hex(Buffer.from(bytes, "utf8"));
-    // Prepare the intended signature before publishing either file. Signer failure
-    // must not replace the old list while leaving its previous signature behind.
-    const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-    const signed: SignedDigest = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
-    mkdirSync(dirname(paths.file), { recursive: true });
-    writeFileAtomic(paths.file, bytes, 0o644);
-    writeFileAtomic(paths.sig, JSON.stringify(signed, null, 2), 0o644);
-    return next;
-  } });
+  }
+  const next = leaseRevocationsSchema.parse({
+    ...current,
+    updatedTs: Date.now(),
+    revocations: [
+      ...current.revocations.filter((row) => row.leaseId !== leaseId),
+      {
+        leaseId,
+        revokedTs: Date.now(),
+        reason
+      }
+    ]
+  });
+  const bytes = JSON.stringify(next, null, 2);
+  const digest = sha256Hex(Buffer.from(bytes, "utf8"));
+  // Prepare the intended signature before publishing either file. Signer failure
+  // must not replace the old list while leaving its previous signature behind.
+  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signed: SignedDigest = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
+  mkdirSync(dirname(paths.file), { recursive: true });
+  writeFileAtomic(paths.file, bytes, 0o644);
+  writeFileAtomic(paths.sig, JSON.stringify(signed, null, 2), 0o644);
+  return next;
 }
 
 /**
@@ -166,13 +151,12 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
  * and every caller then refuses every lease until the store is repaired.
  */
 export function revokedLeaseIdSet(workspace: string): Set<string> {
-  let revocations: LeaseRevocations;
-  try {
-    revocations = readVerifiedRevocations(workspace);
-  } catch (error) {
+  const verify = verifyLeaseRevocationsSignature(workspace);
+  if (!verify.valid) {
     throw new Error(
-      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`
+      `lease revocation store unverifiable (${verify.reason ?? "unknown"}); refusing to treat it as empty`
     );
   }
+  const revocations = loadLeaseRevocations(workspace);
   return new Set(revocations.revocations.map((row) => row.leaseId));
 }
