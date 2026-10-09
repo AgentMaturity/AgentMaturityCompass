@@ -204,19 +204,25 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   start; the guard stays the enforcement point;
 - `identity-binding` (`requireAgentLease`, `requirePrincipal`) reads the authorization record bound for the call:
   no verified lease denies `IDENTITY_UNRESOLVED`, and no authenticated principal (an OS user name is self-reported)
-  denies `PRINCIPAL_UNRESOLVED`. A Studio native task started or resumed while a plan is active runs under a lease
-  Studio mints for that runtime alone (P1-67): the task's agent, the task id as the work order, `toolhub:execute`
-  narrowed to the action classes of its pinned signed tools, the task's step and token caps as its rate fields (the
-  tool pipeline does not read them), and at most the runtime's one-hour lifetime. Only the lease id is recorded on the signed task descriptor; the token reaches the
-  `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child unsets before anything runs and scrubs from tool
-  output. Every call binds it to the authorization record through the pipeline's own lease verifier (signature,
-  expiry, agent, scope, class, signed revocations), so `identity-binding` admits the call with the lease as its
-  principal. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, shutdown, a
-  failed start, cold verification, a runtime process that exited on its own), before minting the next one on resume,
-  and at archive; when the lease cannot be minted (lease signing key or signed revocation store unavailable), the runtime
-  is not started. A native session without a verified lease (a
-  task started before this change or while no plan was active, a CLI agent session, an `amc acp` process nobody
-  handed a lease) is still denied every call under a plan with `L0-IDN-01`. Without a plan the lease is never bound;
+  denies `PRINCIPAL_UNRESOLVED`. A Studio workspace-tools task started or resumed while the active plan's
+  `identity-binding` requires a lease (`L0-IDN-01`) runs under a lease Studio mints for that runtime alone (P1-67): the
+  task's agent, the task id as the work order, `toolhub:execute` narrowed to the action classes of its pinned signed
+  tools, the task's step and token caps as its rate fields (the tool pipeline does not read them), and at most the
+  runtime's one-hour lifetime. The token reaches the `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child
+  unsets before anything runs and scrubs from tool output; only the lease id is recorded on the signed task
+  descriptor, once the runtime holds the session's writer claim. Every call binds the lease to its authorization
+  record through the pipeline's own lease verifier (signature, expiry, agent, scope, class, signed revocations), so
+  `identity-binding` admits the call: the record's `delegation.leaseId` names the verified lease, and its principal is
+  the approvers for an approved call (every Studio workspace-tool call is approval-gated) or `lease:<id>` when no
+  approval is named. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
+  stops a runtime before its lease expires, shutdown, a failed start or resume, cold verification, a runtime process
+  that exited on its own) and at archive; a resumed runtime revokes the previous runtime's lease only after it holds
+  the writer claim, so a refused resume leaves another process's live runtime alone. When the active plan does not
+  verify or no lease can be minted (the lease signing key is unavailable), the runtime is not started; when the
+  previous lease cannot be revoked, the resumed runtime is stopped. A native session without a verified lease (a task
+  started before this change or under a plan that did not require one, a CLI agent session, an `amc acp` process
+  nobody handed a lease) is still denied every call under a plan with `L0-IDN-01`. Under a plan that does not require
+  a lease, no lease is minted or bound;
 - any other compiled guard id denies, because this pipeline does not implement it;
 - for an action class with a compiled approval rule, the live signed approval policy must be at least as strict
   (approvals, distinct users, roles, TTL), read and verified in one read, or the call is denied;
