@@ -11,7 +11,7 @@
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
-import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed } from "../approvals/approvalChainStore.js";
+import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
 import { approvalStatusPayload, consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ActionClass } from "../types.js";
@@ -113,16 +113,41 @@ const startedLink = (chain: readonly A4ChainLink[], attemptId: string): A4ChainL
 };
 
 /**
- * Re-open is allowed only while the previous engine request is EXPIRED or CANCELLED, or after an executor that consumes
- * its own grant failed (activateControlPlan: the only path after its failure); never over a live or consumed grant.
+ * Whether the engine request holds a decision A4 never counts (/console/approvals lets any workspace APPROVER decide it):
+ * an APPROVE_EXECUTE that `effectApprovalOf` refuses, which makes the request unconsumable, or a DENY from a principal
+ * that does not resolve or is no project approver or owner. A valid member's DENY is not one.
  */
-function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef): void {
+function holdsRefusedDecision(store: A4Store, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string, regulated: boolean): boolean {
+  const checked: SodDecision[] = [];
+  for (const decision of listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId })) {
+    if (decision.decision === "DENY") {
+      const approver = resolveApprover(store.workspace, decision.userId);
+      if (approver === null || !isProjectApprover(state, approver)) return true;
+      continue;
+    }
+    // The `complete` caller is not known yet; consumption checks it.
+    const entry = effectApprovalOf(store.workspace, state, gate, decision, checked, [gate.requested_by_key], regulated);
+    if (entry instanceof A4StoreError) return true;
+    checked.push(entry);
+  }
+  return false;
+}
+
+/**
+ * Re-open is allowed only while the previous engine request is EXPIRED or CANCELLED, after an executor that consumes its
+ * own grant failed (activateControlPlan: the only path after its failure), or when the request closed (QUORUM_MET or
+ * DENIED) on a decision A4 never counts, which would otherwise lock the effect until its TTL, or for good on a DENY;
+ * never over a live, countable or consumed grant. `complete` always reads the latest opened request.
+ */
+function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef, regulated: boolean): void {
   const opened = latestOpened(state, gate.gate_id, def.id);
   if (opened === undefined) return;
   const approvalId = String(opened.body.approvalRequestId);
   const status = approvalStatusPayload({ workspace: store.workspace, agentId: state.project.agent_id, approvalId }).status;
-  const executorFailed = def.consumes === "executor" && state.chain.some((link) => link.kind === "EFFECT_FAILED" && link.body.approvalRequestId === approvalId);
-  if (status !== "EXPIRED" && status !== "CANCELLED" && !executorFailed) throw fail(409, "EFFECT_GATE_OPEN", `the effect's engine request is ${status}`, { approvalRequestId: approvalId });
+  if (status === "EXPIRED" || status === "CANCELLED") return;
+  if (def.consumes === "executor" && state.chain.some((link) => link.kind === "EFFECT_FAILED" && link.body.approvalRequestId === approvalId)) return;
+  if ((status === "QUORUM_MET" || status === "DENIED") && holdsRefusedDecision(store, state, gate, approvalId, regulated)) return;
+  throw fail(409, "EFFECT_GATE_OPEN", `the effect's engine request is ${status}`, { approvalRequestId: approvalId });
 }
 
 /**
@@ -144,9 +169,10 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   if (gate0.stage !== input.stage || def.completes !== `${gate0.stage}.${gate0.gate}`) {
     throw fail(409, "A4_STEP_ORDER", `effect ${def.id} is not opened on the ${gate0.stage} ${gate0.gate} gate`);
   }
-  assertReopenable(store, state0, gate0, def);
+  const regulated0 = isRegulated(state0, signedA4Floor(store.workspace));
+  assertReopenable(store, state0, gate0, def, regulated0);
   const intentPayload = effectIntent(def, state0, gate0);
-  const quorumFloor = isRegulated(state0, signedA4Floor(store.workspace)) ? { requiredApprovals: 2, requireDistinctUsers: true } : undefined;
+  const quorumFloor = regulated0 ? { requiredApprovals: 2, requireDistinctUsers: true } : undefined;
   const approvalRequestId = def.openRequest?.({ workspace: store.workspace, state: state0, gate: gate0, intentPayload, quorumFloor })
     ?? createApprovalForIntent({ workspace: store.workspace, agentId: state0.project.agent_id, intentId: `a4-${projectId}-${def.id}-${gate0.gate_id}`,
       toolName: def.toolName, actionClass: def.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: engineRiskTier(state0),
@@ -160,7 +186,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
     if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
     if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
-    assertReopenable(store, state, row, def);
+    assertReopenable(store, state, row, def, isRegulated(state, query.floor));
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
   });
@@ -173,6 +199,39 @@ function resolveApprover(workspace: string, userId: string): Pick<A4Principal, "
   if ((local.length > 0) === (router.length > 0)) return null;
   const authSource = local.length > 0 ? "LOCAL_USER" : "WORKSPACE_ROUTER";
   return { key: `${authSource}:${userId}`, username: userId, roles: local.length > 0 ? local : router, authSource };
+}
+
+const isProjectApprover = (state: A4ReadinessState, approver: Pick<A4Principal, "key" | "username" | "roles">): boolean => {
+  try {
+    assertMember(state.members, approver, ["approver", "owner"]);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Design §6.1 steps 2–3 for one engine APPROVE_EXECUTE: it resolves to one live principal and plane (LOCAL_USER only
+ * when regulated, else 403 IDENTITY_CHECK_LIMITED), holds no recorded role it no longer has, is a project approver or
+ * owner, and passes A4's SoD with the gate's exclusions plus `requesterKeys` and every builder of the revision, given the
+ * decisions `checked` before it (else 400 SOD_VIOLATION). Returns the refusal, or the decision as SoD counts it.
+ */
+function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4GateRow, decision: ApprovalDecisionRecord, checked: readonly SodDecision[],
+  requesterKeys: readonly string[], regulated: boolean): SodDecision | A4StoreError {
+  const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
+  const approver = resolveApprover(workspace, decision.userId);
+  if (approver === null) return refuse("the approver does not resolve to exactly one live principal");
+  // The documentary rule (recordDecision): a session record is not a live check, so a regulated effect counts no host session.
+  if (regulated && approver.authSource !== "LOCAL_USER") {
+    return fail(403, "IDENTITY_CHECK_LIMITED", `${decision.username}: a regulated effect takes decisions from live-checked identities only (host sessions wait for P2-33)`);
+  }
+  if (!decision.roles.every((role) => approver.roles.includes(role))) return refuse("recorded roles exceed the approver's live roles");
+  if (!isProjectApprover(state, approver)) return refuse("not an approver or owner of this project");
+  const excludedKeys = [...(JSON.parse(gate.excluded_keys_json) as string[]), ...buildersOf(state.chain, gate.revision_no)];
+  const sod = evaluateSod({ gate: { gateId: gate.gate_id, gate: gate.gate, revisionNo: gate.revision_no, requesterKeys, excludedKeys },
+    decisions: checked, transitions: state.chain, regulated, selfApprovalAllowed: false, approver, effect: true });
+  if (!sod.ok) return refuse(sod.violations.map((rule) => rule === "one_plane" ? "CROSS_PLANE" : rule).join(", "));
+  return { approverKey: approver.key, authSource: approver.authSource, decision: "APPROVE_EXECUTE" };
 }
 
 /**
@@ -191,29 +250,12 @@ export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, 
     expectedIntentHash: sha256Hex(canonicalize(effectIntent(input.def, state, input.gate))), expectedToolName: input.def.toolName, expectedActionClass: input.def.actionClass });
   if (!verified.ok || verified.approval === null) throw fail(409, "EFFECT_QUORUM_INSUFFICIENT", verified.error ?? "the effect is not approved");
   const binding = approvalRequestBindingDigest(verified.approval);
-  const excludedKeys = [...(JSON.parse(input.gate.excluded_keys_json) as string[]), ...buildersOf(state.chain, input.gate.revision_no)];
   const counted: SodDecision[] = [];
   const checked: SodDecision[] = [];
   for (const decision of listApprovalDecisions({ workspace, agentId, approvalRequestId: input.approvalRequestId })) {
     if (decision.decision !== "APPROVE_EXECUTE") continue;
-    const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
-    const approver = resolveApprover(workspace, decision.userId);
-    if (approver === null) throw refuse("the approver does not resolve to exactly one live principal");
-    // The documentary rule (recordDecision): a session record is not a live check, so a regulated effect counts no host session.
-    if (input.regulated && approver.authSource !== "LOCAL_USER") {
-      throw fail(403, "IDENTITY_CHECK_LIMITED", `${decision.username}: a regulated effect takes decisions from live-checked identities only (host sessions wait for P2-33)`);
-    }
-    if (!decision.roles.every((role) => approver.roles.includes(role))) throw refuse("recorded roles exceed the approver's live roles");
-    try {
-      assertMember(state.members, approver, ["approver", "owner"]);
-    } catch {
-      throw refuse("not an approver or owner of this project");
-    }
-    const sod = evaluateSod({ gate: { gateId: input.gate.gate_id, gate: input.gate.gate, revisionNo: input.gate.revision_no,
-      requesterKeys: [input.gate.requested_by_key, input.callerKey], excludedKeys }, decisions: checked, transitions: state.chain,
-      regulated: input.regulated, selfApprovalAllowed: false, approver, effect: true });
-    if (!sod.ok) throw refuse(sod.violations.map((rule) => rule === "one_plane" ? "CROSS_PLANE" : rule).join(", "));
-    const entry: SodDecision = { approverKey: approver.key, authSource: approver.authSource, decision: "APPROVE_EXECUTE" };
+    const entry = effectApprovalOf(workspace, state, input.gate, decision, checked, [input.gate.requested_by_key, input.callerKey], input.regulated);
+    if (entry instanceof A4StoreError) throw entry;
     checked.push(entry);
     if (decision.requestDigestSha256 === binding) counted.push(entry);
   }
