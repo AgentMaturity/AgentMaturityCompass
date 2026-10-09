@@ -639,16 +639,19 @@ function createStore(workspace: string, ledger: Ledger) {
 
     /**
      * A membership event; refused when it would leave the project without an owner. The member's identity is read, never
-     * taken from the caller: an add names an ACTIVE users.yaml user or a live host session, a change or removal a
-     * current member. Authorization is the router's (P1-57).
+     * taken from the caller: an add names an ACTIVE users.yaml user or a live host session (503 A4_IDENTITY_UNVERIFIED
+     * when it is not found and either source could not be read), a change or removal a current member. Authorization
+     * is the router's (P1-57).
      */
     recordMember(projectId: string, input: { actor: A4Actor; event: "added" | "roles_changed" | "removed"; principalKey: string;
       roles: A4Member["roles"]; expectedHeadSeq: number; request?: A4RequestKey }): A4TransitionResult {
       return commit(projectId, input.actor, ({ seq, ts }) => {
         const members = membersOf(projectId);
-        const member = input.event === "added" ? memberCandidates(workspace, false).candidates.find((candidate) => candidate.principalKey === input.principalKey)
-          : members.find((current) => current.principalKey === input.principalKey);
+        const { candidates, limited } = input.event === "added" ? memberCandidates(workspace, false) : { candidates: members, limited: false };
+        const member = candidates.find((candidate) => candidate.principalKey === input.principalKey);
         if (member === undefined) {
+          // An unreadable identity source is not an empty one: "unknown principal" only when every source was read.
+          if (limited) throw new A4StoreError(503, "A4_IDENTITY_UNVERIFIED", "users.yaml or the session records could not be read");
           throw input.event === "added" ? new A4StoreError(409, "A4_PRINCIPAL_UNKNOWN", "No ACTIVE user or live host session has that principal key.")
             : new A4StoreError(409, "A4_NOT_A_MEMBER", "That principal is not a member of this project.");
         }
