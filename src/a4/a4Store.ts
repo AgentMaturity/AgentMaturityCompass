@@ -1,9 +1,10 @@
 /**
  * A4 Forge project store (P1-56; design §4.2–§4.3). One write path, copied from the action journal: under the
- * project's control-file lock, build the transition body on a pre-read head and sign any A4_RECORD envelope OUTSIDE
- * the ledger transaction; then, in one `BEGIN IMMEDIATE`, dedupe the request, check the head has not moved (else
- * rebuild and re-sign once, then 409 A4_STALE_HEAD), verify the chain (`verifyIncremental`), append the signed audit
- * row, insert the transition and the side rows its body names, and advance the head. Readers (`readHead`,
+ * project's control-file lock, verify the whole chain and every side table (`verifyChain`), build the transition body
+ * on the head it verified and sign any A4_RECORD envelope OUTSIDE the ledger transaction; then, in one `BEGIN
+ * IMMEDIATE`, dedupe the request, check the head has not moved (else rebuild and re-sign once, then 409
+ * A4_STALE_HEAD) and that its own row is still signed (`verifyIncremental`, O(1)), append the signed audit row,
+ * insert the transition and the side rows its body names, and advance the head. Readers (`readHead`,
  * `listProjects`, `readChain`, `membersOf`, `readRevision`, `ratcheted`) use only a chain that verifies whole up to its
  * signed head.
  *
@@ -223,20 +224,13 @@ function createStore(workspace: string, ledger: Ledger) {
       return parsed.data;
     });
 
-  /** The side row a name points at, as stored now; null when the name is malformed or no row has that key. */
-  const storedSideRow = (ref: { table: string; key: Record<string, unknown> }): Record<string, Cell> | null => {
-    if (!Object.hasOwn(SIDE_TABLE_KEYS, ref.table) || ref.key === null || typeof ref.key !== "object") return null;
-    const columns = SIDE_TABLE_KEYS[ref.table as A4SideTable];
-    const values = columns.map((column) => ref.key[column]);
-    if (!values.every((value) => typeof value === "string" || typeof value === "number")) return null;
-    return (db.prepare(`SELECT * FROM ${ref.table} WHERE ${columns.map((column) => `${column} = ?`).join(" AND ")}`)
-      .get(...values) as Record<string, Cell> | undefined) ?? null;
-  };
-  /** The side row as stored now, minus its evidence id, hashed the way the body named it. */
-  const storedSideRowDigest = (ref: { table: string; key: Record<string, unknown> }): string | null => {
-    const row = storedSideRow(ref);
-    if (row === null) return null;
-    const { evidence_event_id: _evidenceEventId, ...values } = row;
+  /** A side row this write just inserted, as stored, minus its evidence id, hashed the way the body names it. */
+  const storedSideRowDigest = (row: A4SideRow): string | null => {
+    const columns = SIDE_TABLE_KEYS[row.table];
+    const stored = db.prepare(`SELECT * FROM ${row.table} WHERE ${columns.map((column) => `${column} = ?`).join(" AND ")}`)
+      .get(...columns.map((column) => row.values[column] ?? null)) as Record<string, Cell> | undefined;
+    if (stored === undefined) return null;
+    const { evidence_event_id: _evidenceEventId, ...values } = stored;
     return sideRowDigest(values);
   };
 
@@ -331,34 +325,66 @@ function createStore(workspace: string, ledger: Ledger) {
   };
 
   /**
-   * Before every write, under the ledger write lock: the whole chain hash-links from seq 0, the verified anchor and
-   * every row after it verify against their signed audit rows (so the unsigned `verified_seq` cannot be moved over a
-   * forged tail, and no write builds on an edited prefix), every side row a body after the anchor names is stored as
-   * named, the head equals the last row, and side tables hold no row the chain does not name.
-   * ponytail: the hash walk is O(chain) sha256 under the write lock; design §7 rule 2 keeps only the signature checks
-   * O(new rows). Add a signed checkpoint every N rows if long chains show in write latency.
+   * One side table against the verified chain, in one indexed scan of the project's rows: the rows the chain names, as
+   * stored, in chain order; each name whose row is missing, changed or tied to another transition; and each stored key
+   * no transition names. Compared as key sets, never as counts.
+   */
+  const matchSideTable = (projectId: string, links: readonly Link[], table: A4SideTable): { rows: Record<string, Cell>[]; mismatched: string[]; unnamed: string[] } => {
+    const columns = SIDE_TABLE_KEYS[table];
+    const keyText = (key: Readonly<Record<string, unknown>>): string => JSON.stringify(columns.map((column) => key[column] ?? null));
+    const stored = new Map((db.prepare(`SELECT * FROM ${table} WHERE project_id = ?`).all(projectId) as Record<string, Cell>[]).map((row) => [keyText(row), row]));
+    const rows: Record<string, Cell>[] = [];
+    const mismatched: string[] = [];
+    for (const link of links) {
+      for (const ref of namesIn(link.body)) {
+        if (ref.table !== table) continue;
+        const key = keyText(ref.key ?? {});
+        const row = stored.get(key);
+        stored.delete(key);
+        const { evidence_event_id: evidenceEventId, ...values } = row ?? {};
+        if (row === undefined || evidenceEventId !== link.row.evidence_event_id || sideRowDigest(values) !== ref.sha256) {
+          mismatched.push(`A4_SIDE_ROW_MISMATCH ${table} ${key}`);
+        } else {
+          rows.push(row);
+        }
+      }
+    }
+    return { rows, mismatched, unnamed: [...stored.keys()].map((key) => `A4_SIDE_ROW_UNNAMED ${table} ${key}`) };
+  };
+
+  /**
+   * The full check before every write, under the project's control-file lock (which serialises the project's writers)
+   * but outside the ledger transaction: the chain verifies whole up to its head (`verified`), and every side table holds
+   * exactly the rows the chain names, as named. Returns the head it verified.
+   * ponytail: O(chain) sha256 and side-row scans per write, though never under the ledger write lock; add a signed
+   * checkpoint every N rows if long chains show in write latency.
+   */
+  const verifyChain = (projectId: string): A4ProjectRow | null => db.transaction(() => {
+    const { head, links } = verified(projectId);
+    const problems = (Object.keys(SIDE_TABLE_KEYS) as A4SideTable[]).flatMap((table) => {
+      const { mismatched, unnamed } = matchSideTable(projectId, links, table);
+      return [...mismatched, ...unnamed];
+    });
+    if (problems.length > 0) throw integrityFailed(projectId, problems);
+    return head;
+  })();
+
+  /**
+   * Inside the write transaction, O(1) (design §7 rule 2: O(new rows), never O(chain), under the ledger write lock the
+   * action journal shares). `verifyChain` verified this head before the transaction and the caller has seen it unmoved,
+   * so no transition is new: only the head's own row is re-read, which must hash to the head digest, be the verified
+   * row, state its columns, carry a verifying signed audit row and sign this head state, with no later A4 session.
    */
   const verifyIncremental = (projectId: string, head: A4ProjectRow): void => {
     const problems: string[] = [];
-    const keys = getPublicKeyHistory(workspace, "monitor");
-    const links = walk(readRows(projectId), problems);
+    const parsed = a4TransitionRowSchema.safeParse(db.prepare("SELECT * FROM a4_transitions WHERE project_id = ? AND seq = ?").get(projectId, head.head_seq));
+    if (!parsed.success || parsed.data.body_digest !== head.head_digest || head.verified_seq !== head.head_seq || head.verified_digest !== head.head_digest) {
+      problems.push("head does not equal the last verified transition");
+    } else {
+      const body = parseBody(parsed.data.body_json);
+      problems.push(...bodyProblems(parsed.data, body), ...auditProblems(parsed.data, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, body ?? {}));
+    }
     if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
-    const anchor = head.verified_seq ?? -1;
-    if (head.verified_seq !== null && links[head.verified_seq]?.row.body_digest !== head.verified_digest) problems.push(`verified row ${head.verified_seq} changed`);
-    for (const link of links.slice(Math.max(anchor, 0))) {
-      problems.push(...auditProblems(link.row, keys));
-      if (link.seq <= anchor) continue;
-      for (const ref of namesIn(link.body)) if (storedSideRowDigest(ref) !== ref.sha256) problems.push(`A4_SIDE_ROW_MISMATCH ${ref.table} ${JSON.stringify(ref.key)}`);
-    }
-    const last = links.at(-1);
-    if (head.head_seq !== (last?.seq ?? -1) || head.head_digest !== last?.row.body_digest) problems.push("head does not equal the last transition");
-    if (last !== undefined) problems.push(...headProblems(head, last.body));
-    const named = new Map<string, number>();
-    for (const link of links) for (const ref of namesIn(link.body)) named.set(ref.table, (named.get(ref.table) ?? 0) + 1);
-    for (const table of Object.keys(SIDE_TABLE_KEYS)) {
-      const { n } = db.prepare(`SELECT COUNT(*) AS n FROM ${table} WHERE project_id = ?`).get(projectId) as { n: number };
-      if (n !== (named.get(table) ?? 0)) problems.push(`A4_SIDE_ROW_UNNAMED ${table}: ${n} rows, ${named.get(table) ?? 0} named`);
-    }
     if (problems.length > 0) throw integrityFailed(projectId, problems);
   };
 
@@ -368,21 +394,8 @@ function createStore(workspace: string, ledger: Ledger) {
    * no transition names is never returned (the chain is the completeness root for readers too).
    */
   const namedSideRows = (projectId: string, table: A4SideTable): Record<string, Cell>[] => {
-    const rows: Record<string, Cell>[] = [];
-    const problems: string[] = [];
-    for (const link of readChain(projectId)) {
-      for (const ref of namesIn(link.body)) {
-        if (ref.table !== table) continue;
-        const row = storedSideRow(ref);
-        const { evidence_event_id: evidenceEventId, ...values } = row ?? {};
-        if (row === null || evidenceEventId !== link.row.evidence_event_id || sideRowDigest(values) !== ref.sha256) {
-          problems.push(`A4_SIDE_ROW_MISMATCH ${table} ${JSON.stringify(ref.key)}`);
-        } else {
-          rows.push(row);
-        }
-      }
-    }
-    if (problems.length > 0) throw integrityFailed(projectId, problems);
+    const { rows, mismatched } = matchSideTable(projectId, readChain(projectId), table);
+    if (mismatched.length > 0) throw integrityFailed(projectId, mismatched);
     return rows;
   };
 
@@ -438,7 +451,9 @@ function createStore(workspace: string, ledger: Ledger) {
       for (let attempt = 0; ; attempt += 1) {
         const replay = options.request ? dedupeRequest(options.request, projectId, create !== null, null, 0) : null;
         if (replay) return replay;
-        const head0 = readHeadRow(projectId);
+        // A write to an existing project verifies the whole chain and every side table first, under the project lock but
+        // outside the ledger transaction (design §7 rule 2); the transaction then checks that this head has not moved.
+        const head0 = create === null ? verifyChain(projectId) : readHeadRow(projectId);
         if (create === null && head0 === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
         if (create !== null && head0 !== null) throw new A4StoreError(409, "A4_PROJECT_EXISTS", projectId);
         if (options.expectedHeadSeq !== undefined && head0?.head_seq !== options.expectedHeadSeq) {
@@ -460,7 +475,7 @@ function createStore(workspace: string, ledger: Ledger) {
         const revisionNo = spec.revisionNo ?? head0?.revision_no ?? 0;
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
         const prevDigest = head0?.head_digest ?? "GENESIS";
-        // head0 is checked inside the transaction to equal the head the last signed body left (verifyIncremental).
+        // head0 is the head verifyChain verified; the transaction checks it is unmoved and still signed (verifyIncremental).
         const headAfter = headStateOf({ ...(head0 ?? NEW_HEAD), ...Object.fromEntries(Object.entries(spec.head ?? {}).filter(([, value]) => value !== undefined)) });
         const body = { ...spec.payload, kind: spec.kind, projectId, seq, stage, revisionNo, actorKey: actor.key, actorUsername: actor.username,
           ts, prevDigest, readinessSha256, headAfter, sideRows: sideRows.map((row) => ({ table: row.table, key: keyOf(row), sha256: sideRowDigest(row.values) })) };
@@ -505,7 +520,7 @@ function createStore(workspace: string, ledger: Ledger) {
               if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${row.table}`);
               db.prepare(`INSERT INTO ${row.table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`).run(...Object.values(row.values), evidence.id);
               // A column the writer left to a default, or a value SQLite coerced, would make the signed name unverifiable.
-              if (storedSideRowDigest({ table: row.table, key: keyOf(row) }) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
+              if (storedSideRowDigest(row) !== sideRowDigest(row.values)) throw new Error(`A4_SIDE_ROW_MISMATCH: ${row.table} must name every column`);
             }
             const patch = { ...headAfter, head_seq: seq, head_digest: digest, verified_seq: seq, verified_digest: digest, updated_ts: ts };
             db.prepare(`UPDATE a4_projects SET ${Object.keys(patch).map((column) => `${column} = @${column}`).join(", ")} WHERE project_id = @project_id`)
@@ -553,6 +568,7 @@ function createStore(workspace: string, ledger: Ledger) {
     readHead: (projectId: string): A4ProjectRow | null => verified(projectId).head,
     readChain,
     membersOf,
+    verifyChain,
     verifyIncremental,
     transition: (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, actor, build, options, null),
     readRevision: (projectId: string, revisionNo: number) => {

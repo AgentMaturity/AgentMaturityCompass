@@ -116,6 +116,14 @@ export const A4_MIGRATION_SQL = `
         amc_check_json TEXT, recorded_by_key TEXT NOT NULL, envelope_json TEXT, evidence_event_id TEXT NOT NULL, ts INTEGER NOT NULL
       );${appendOnly("a4_deployments")}
 
+      -- The store compares each side table's project rows with the chain before every write; these are the side tables
+      -- whose primary key does not already start with project_id.
+      CREATE INDEX IF NOT EXISTS idx_a4_gates_project ON a4_gates(project_id);
+      CREATE INDEX IF NOT EXISTS idx_a4_decisions_project ON a4_decisions(project_id);
+      CREATE INDEX IF NOT EXISTS idx_a4_comments_project ON a4_comments(project_id);
+      CREATE INDEX IF NOT EXISTS idx_a4_releases_project ON a4_releases(project_id);
+      CREATE INDEX IF NOT EXISTS idx_a4_deployments_project ON a4_deployments(project_id);
+
       CREATE TABLE IF NOT EXISTS a4_requests (
         principal_key TEXT NOT NULL, client_request_id TEXT NOT NULL, body_hash TEXT NOT NULL, project_id TEXT,
         response_json TEXT NOT NULL, redacted INTEGER NOT NULL DEFAULT 0 CHECK (redacted IN (0, 1)), ts INTEGER NOT NULL,
