@@ -132,6 +132,7 @@
       "ts": 1791504000000
     }
   ],
+  "status": "QUORUM_MET",
   "quorum": {
     "status": "QUORUM_MET",
     "approvals": 1,

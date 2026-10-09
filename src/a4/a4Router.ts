@@ -11,7 +11,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
 import { z, ZodError } from "zod";
-import { approvalDecisionSchema } from "../approvals/approvalChainStore.js";
+import { approvalDecisionSchema, approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { apiError, apiSuccess, isRequestBodyError } from "../api/apiHelpers.js";
@@ -499,9 +499,10 @@ function gateViews(route: A4Route, state: A4ReadinessState) {
     return { schema: "amc.a4-gate/v1", gateId: row.gate_id, projectId: row.project_id, revisionNo: row.revision_no, stage: row.stage, gate: row.gate,
       request: status.request, bindingDigest: row.binding_digest, intent: JSON.parse(row.intent_json) as unknown, readinessSha256: row.readiness_sha256,
       boundItems: JSON.parse(row.bound_items_json) as unknown, gatePolicyDigest: row.gate_policy_digest, requestedByKey: row.requested_by_key,
-      excludedKeys: JSON.parse(row.excluded_keys_json) as unknown, expiresTs: row.expires_ts, decisions,
-      quorum: { status: ["PENDING", "QUORUM_MET", "DENIED", "EXPIRED"].includes(quorum.status) ? quorum.status : "PENDING", approvals: quorum.received, required: quorum.required },
-      integrity: { bindingDigestValid: true, decisionsBound: decisions.every((decision) => decision.requestDigestSha256 === row.binding_digest), envelopeValid: null },
+      excludedKeys: JSON.parse(row.excluded_keys_json) as unknown, expiresTs: row.expires_ts, decisions, status: status.status,
+      quorum: { status: quorum.status, approvals: quorum.received, required: quorum.required },
+      integrity: { bindingDigestValid: approvalRequestBindingDigest(status.request) === row.binding_digest,
+        decisionsBound: decisions.every((decision) => decision.requestDigestSha256 === row.binding_digest), envelopeValid: null },
       supersededBy: status.supersededBy ? { seq: status.supersededBy.seq, kind: status.supersededBy.kind } : null, ts: row.ts };
   });
 }
