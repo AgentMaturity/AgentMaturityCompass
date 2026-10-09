@@ -1324,7 +1324,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
 
       // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
       // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
-      const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved);
+      const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved, signature.valid);
       // An upstream that did not resolve is a transport failure, as before P1-66 (502, request_error, no audit).
       if (upstreamEgress.unresolved === true) {
         logger.error(`gateway error: ${upstreamEgress.decision.reason}`);

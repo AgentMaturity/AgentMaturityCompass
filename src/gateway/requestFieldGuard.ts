@@ -103,14 +103,19 @@ type Upstream = GatewayConfig["upstreams"][string];
  * The reverse proxy's egress check for one request to an upstream (P1-66), made as the request is forwarded; the caller
  * pins the connection to the returned addresses. The upstream's name passes by name, and every address it resolves to
  * meets the non-public rule unless gateway.yaml opts in: the non-public IP literal written as a baseUrl's host with no
- * environment template, one listed in allowNonPublicAddresses, or 127.0.0.1 and ::1 with allowLocalhost. A template's
- * expansion comes from the environment, which the configuration signature does not cover, so it opts nothing in.
+ * environment template, one listed in allowNonPublicAddresses (only when `signed`, gateway.yaml's signature is valid), or
+ * 127.0.0.1 and ::1 with allowLocalhost. A template's expansion comes from the environment, which the configuration
+ * signature does not cover, so it opts nothing in.
  */
-export function checkUpstreamEgress(configured: Upstream, resolved: Upstream, resolve: HostResolver = resolveAddresses): Promise<EgressCheck> {
+export async function checkUpstreamEgress(configured: Upstream, resolved: Upstream, signed: boolean, resolve: HostResolver = resolveAddresses): Promise<EgressCheck> {
   const name = canonicalHost(new URL(resolved.baseUrl).hostname);
   const passesByName = isIP(name) === 0 || configured.baseUrl === resolved.baseUrl || !isNonPublicAddress(name);
-  const optIn = [...(configured.allowNonPublicAddresses ?? []), ...(configured.allowLocalhost === true ? ["127.0.0.1", "::1"] : [])];
-  return resolveAndCheck(name, { allowHosts: [...(passesByName ? [name] : []), ...optIn] }, resolve);
+  // The gateway still runs on an unsigned or invalid gateway.yaml (CONFIG_UNSIGNED); the allowNonPublicAddresses list opts nothing in then.
+  const listed = configured.allowNonPublicAddresses ?? [];
+  const optIn = [...(signed ? listed : []), ...(configured.allowLocalhost === true ? ["127.0.0.1", "::1"] : [])];
+  const check = await resolveAndCheck(name, { allowHosts: [...(passesByName ? [name] : []), ...optIn] }, resolve);
+  return check.decision.allowed || check.unresolved === true || signed || listed.length === 0 ? check
+    : { ...check, decision: { allowed: false, reason: `${check.decision.reason}; allowNonPublicAddresses is ignored because the gateway.yaml signature is not valid` } };
 }
 
 /** Answers only with the checked addresses, so a DNS change between the check and the connection cannot redirect it. */
