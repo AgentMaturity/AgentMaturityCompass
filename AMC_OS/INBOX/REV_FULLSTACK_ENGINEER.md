@@ -170,3 +170,9 @@ No real deletions, tests/test edits, executable checks, builds, typechecks, lint
 Claude recommended using the existing immediate evidence-database transaction for retention's final reference check and unlink. Admission audit remains before that transaction because its helper uses a separate connection. Under the existing hold lock, a fresh ordered reference snapshot must match the admitted snapshot and remain eligible; changed references retain the blob and contribute no pruning count. Claude's follow-up also requires an explicit skipped outcome after the transaction, so admission is not mistaken for deletion. No ledger or transaction-helper edits were needed.
 
 This source change does not claim filesystem and SQL atomicity. External publication, uncoordinated import paths, rollback after unlink and concurrency qualification remain open. No tests/test edits, executable checks, runtime, evaluations, CI or PRs were run. The work follows Claude's suggested sequence and preserves its active A4/Studio files.
+
+## 2026-10-09 — P2-01 Doctor stale-cache deletion group
+
+Following Claude's recommendation to work deferred deletion routes in small groups, Doctor's stale-cache unlink now uses the trusted runDoctorFix workspace and a sessionless caches gate. Both existing catch layers propagate DeletionDenied to the existing FAILED action report rather than claiming the cache was empty. Dry-run and ordinary filesystem errors retain their previous behavior. Broken-symlink cleanup is still deferred; a later denial does not reverse earlier admitted removals.
+
+Only the existing stale-cache source seam, inventory metadata, guide, changeset and this appended note changed. No CLI, doctor rules, A4/Studio/approval/API/ledger edits, tests/test edits, executable checks, runtime, evaluations, CI or PRs. Source remains partial and unqualified.

@@ -446,9 +446,9 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:122:1",
+      "siteId": "src/doctor/doctorFix.ts:123:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 122,
+      "line": 123,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
@@ -456,9 +456,9 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:126:1",
+      "siteId": "src/doctor/doctorFix.ts:127:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 126,
+      "line": 127,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
@@ -466,14 +466,14 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:158:1",
+      "siteId": "src/doctor/doctorFix.ts:160:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 158,
+      "line": 160,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
-      "source": "unlinkSync(full);",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "source": "() => unlinkSync(full));",
+      "status": "gated",
+      "reason": "The STALE_CACHE fix performs each unlink inside a fresh withDeletionGate callback using the trusted runDoctorFix workspace and a sessionless caches target. Both local catches rethrow DeletionDenied so executeFixRule reports a FAILED action. Dry-run returns before invoking the fix. The two broken-symlink unlink routes remain deferred."
     },
     {
       "siteId": "src/enforce/actionEvidenceLogic.ts:180:1",

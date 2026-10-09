@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import type { DoctorCheck } from "./doctorRules.js";
 import { runDoctorRules } from "./doctorRules.js";
+import { withDeletionGate, DeletionDenied } from "../residency/deletionGate.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -155,13 +156,16 @@ function fixRules(): FixRule[] {
             for (const entry of readdirSync(cacheDir)) {
               const full = join(cacheDir, entry);
               try {
-                unlinkSync(full);
+                withDeletionGate({ workspace, executor: "doctor.stale-cache-unlink", target: { kind: "caches" } },
+                  () => unlinkSync(full));
                 cleared++;
-              } catch {
+              } catch (error) {
+                if (error instanceof DeletionDenied) throw error;
                 // skip
               }
             }
-          } catch {
+          } catch (error) {
+            if (error instanceof DeletionDenied) throw error;
             // skip
           }
         }
