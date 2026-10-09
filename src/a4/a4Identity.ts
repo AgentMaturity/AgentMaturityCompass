@@ -39,10 +39,10 @@ const sessionRecordSchema = z.object({
 type SessionRecord = z.infer<typeof sessionRecordSchema>;
 
 /**
- * Live, unrevoked WORKSPACE_ROUTER session records. Null, never "none", when the directory cannot be listed for any
- * reason but absence, or when any record in it does not parse: an unreadable source is not an empty one.
+ * Every WORKSPACE_ROUTER session record, revoked and expired included. Null, never "none", when the directory cannot be
+ * listed for any reason but absence, or when any record in it does not parse: an unreadable source is not an empty one.
  */
-function liveRouterSessions(workspace: string, now: number): SessionRecord[] | null {
+function routerSessions(workspace: string): SessionRecord[] | null {
   const dir = join(workspace, ".amc", "studio", "sessions");
   let names: string[];
   try {
@@ -58,10 +58,13 @@ function liveRouterSessions(workspace: string, now: number): SessionRecord[] | n
     } catch {
       return null;
     }
-    if (record.authSource === "WORKSPACE_ROUTER" && !record.revoked && record.expiresTs > now) records.push(record);
+    if (record.authSource === "WORKSPACE_ROUTER") records.push(record);
   }
   return records;
 }
+/** Live, unrevoked WORKSPACE_ROUTER session records; null when unreadable. */
+const liveRouterSessions = (workspace: string, now: number): SessionRecord[] | null =>
+  routerSessions(workspace)?.filter((record) => !record.revoked && record.expiresTs > now) ?? null;
 
 /** A LOCAL_USER or WORKSPACE_ROUTER principal resolved from live records, or the reason it cannot be. */
 function livePrincipal(workspace: string, authSource: A4Principal["authSource"], userId: string, admission: A4Principal["admission"],
@@ -189,4 +192,13 @@ export function usersCreatedSince(workspace: string, ts: number): number | null 
   } catch {
     return null;
   }
+}
+
+/**
+ * WORKSPACE_ROUTER session records of any state issued at or after `ts`; null when unreadable. A host principal who
+ * signed in after a project was created ratchets it as an added user does, even once that session expired or was
+ * revoked with no A4 write between (design §5.3).
+ */
+export function hostSessionsSince(workspace: string, ts: number): number | null {
+  return routerSessions(workspace)?.filter((record) => record.issuedTs >= ts).length ?? null;
 }

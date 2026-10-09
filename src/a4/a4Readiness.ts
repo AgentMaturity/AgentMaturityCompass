@@ -80,6 +80,8 @@ export interface A4LiveFacts {
   readonly driftedSlots: readonly string[] | null;
   /** users.yaml records (any status) created since the project's CREATED transition; null when unreadable. */
   readonly usersAddedSinceCreated: number | null;
+  /** WORKSPACE_ROUTER session records (any state) issued since the project's CREATED transition; null when unreadable. */
+  readonly hostSessionsSinceCreated: number | null;
   /** Running effect attempts whose owner is lost under the sweeper's liveness rule (a4Gates.effectOwnerLost). */
   readonly lostEffects: readonly string[];
 }
@@ -197,12 +199,12 @@ export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): bo
 
 /**
  * The single-user facts of design §5.3, derived now for `principal`; recorded on CREATED and on every decision row. A
- * user added since the project was created ratchets too (null: unreadable, which is not "none"), so an add and a revoke
- * with no A4 write between them gain nothing.
+ * user added, or a host session issued, since the project was created ratchets too (null: unreadable, which is not
+ * "none"), so an add and a revoke, or a host sign-in that expires, with no A4 write between them gain nothing.
  */
 export function selfApprovalFacts(state: A4ReadinessState, query: A4ReadinessQuery, principal: A4Principal | null) {
   const regulated = isRegulated(state, query.floor);
-  const ratcheted = ratchetedFromChain(state.chain) || query.live.usersAddedSinceCreated !== 0;
+  const ratcheted = ratchetedFromChain(state.chain) || query.live.usersAddedSinceCreated !== 0 || query.live.hostSessionsSinceCreated !== 0;
   const { activeLocal, hostPrincipals, hostedRouter } = query.live;
   const selfApprovalAllowed = deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated,
     workspaceFloor: query.floor.allowSelfApproval, ratcheted, decidingPrincipal: principal });
