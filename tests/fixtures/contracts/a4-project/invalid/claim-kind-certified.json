@@ -1,0 +1,32 @@
+{
+  "schema": "amc.a4-project/v1",
+  "projectId": "a4p_example",
+  "workspaceId": "default",
+  "agentId": "default",
+  "name": "Support agent",
+  "stage": "aspire",
+  "step": "asked",
+  "hold": false,
+  "holdReason": null,
+  "revisionNo": 0,
+  "headSeq": 0,
+  "headDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "deployedReleaseId": null,
+  "baseReleaseId": null,
+  "createdByKey": "LOCAL_USER:u-owner",
+  "createdTs": 1791504000000,
+  "updatedTs": 1791504000000,
+  "members": [
+    {
+      "principalKey": "LOCAL_USER:u-owner",
+      "authSource": "LOCAL_USER",
+      "userId": "u-owner",
+      "username": "owner",
+      "roles": [
+        "owner"
+      ]
+    }
+  ],
+  "readiness": null,
+  "claimKind": "certified"
+}

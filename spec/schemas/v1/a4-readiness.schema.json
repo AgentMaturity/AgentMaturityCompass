@@ -1,0 +1,2614 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed": {
+            "type": "boolean"
+          },
+          "reasonCodes": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "allowed",
+          "reasonCodes"
+        ],
+        "type": "object"
+      },
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "bindingDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claimKind": {
+          "enum": [
+            "synthetic_example",
+            "self_reported",
+            "observed",
+            "independently_reviewed"
+          ],
+          "type": "string"
+        },
+        "eligibleLevel": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entitlement": {
+          "additionalProperties": false,
+          "properties": {
+            "active": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "active"
+          ],
+          "type": "object"
+        },
+        "provenance": {
+          "additionalProperties": false,
+          "properties": {
+            "evidenceRefs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "legacy": {
+              "additionalProperties": false,
+              "properties": {
+                "notice": {
+                  "type": "string"
+                },
+                "originalTier": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "version"
+              ],
+              "type": "object"
+            },
+            "method": {
+              "enum": [
+                "synthetic",
+                "numeric_self_answer",
+                "keyword_match",
+                "unkeyed_checksum",
+                "path_presence",
+                "runtime_observation",
+                "executed_test",
+                "human_review"
+              ],
+              "type": "string"
+            },
+            "producer": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "producer",
+            "method",
+            "evidenceRefs"
+          ],
+          "type": "object"
+        },
+        "reasons": {
+          "items": {
+            "enum": [
+              "SYNTHETIC_VALUES",
+              "SELF_REPORTED_NO_POSITIVE_STATUS",
+              "SELF_REPORTED_LEVEL_CAP",
+              "WEAK_METHOD",
+              "EMPTY_EVIDENCE",
+              "UNBOUND_EVIDENCE",
+              "STALE_EVIDENCE",
+              "CONTRADICTORY_EVIDENCE",
+              "CROSS_SCOPE_EVIDENCE",
+              "SIGNATURE_INVALID",
+              "ISSUER_NOT_PINNED",
+              "REVIEW_NOT_INDEPENDENT",
+              "LEGACY_1X_UNVERIFIED",
+              "NOT_APPLICABLE",
+              "APPLICABILITY_UNRESOLVED",
+              "EVIDENCE_NOT_CLAIM_READY",
+              "RESULT_NOT_BOUND"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "statusDimensions": {
+          "additionalProperties": false,
+          "properties": {
+            "applicability": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "applicable",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "rationale": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "not_applicable",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "rationale"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "reason": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "unresolved",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "reason"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "enforcement": {
+              "oneOf": [
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "none",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "advisory",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "state": {
+                      "const": "observed",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "boundary": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "const": "enforced",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "boundary"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "evidence": {
+              "enum": [
+                "sufficient",
+                "incomplete",
+                "stale",
+                "contradictory",
+                "untrusted"
+              ],
+              "type": "string"
+            },
+            "result": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_evaluated"
+              ],
+              "type": "string"
+            },
+            "review": {
+              "enum": [
+                "pending",
+                "approved",
+                "rejected",
+                "expired"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "applicability",
+            "evidence",
+            "result",
+            "enforcement",
+            "review"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "claimKind",
+        "statusDimensions",
+        "provenance",
+        "eligibleLevel",
+        "reasons"
+      ],
+      "type": "object"
+    },
+    "claimBoundary": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evaluatedAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "fullDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "gates": {
+      "additionalProperties": false,
+      "properties": {
+        "completion": {
+          "anyOf": [
+            {
+              "additionalProperties": {},
+              "propertyNames": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "additionalProperties": {},
+              "propertyNames": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "direction",
+        "completion"
+      ],
+      "type": "object"
+    },
+    "identityCheck": {
+      "enum": [
+        "users_yaml",
+        "session_record"
+      ],
+      "type": "string"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "reasonCodes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "valid",
+        "reasonCodes"
+      ],
+      "type": "object"
+    },
+    "items": {
+      "items": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "acknowledged": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "by": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "expiresTs": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      "reason": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "ts": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "by",
+                      "ts",
+                      "expiresTs",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "bound": {
+                "type": "boolean"
+              },
+              "claim": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "claimKind": {
+                        "enum": [
+                          "synthetic_example",
+                          "self_reported",
+                          "observed",
+                          "independently_reviewed"
+                        ],
+                        "type": "string"
+                      },
+                      "eligibleLevel": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "entitlement": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "active": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "active"
+                        ],
+                        "type": "object"
+                      },
+                      "provenance": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "evidenceRefs": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "legacy": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "notice": {
+                                "type": "string"
+                              },
+                              "originalTier": {
+                                "type": "string"
+                              },
+                              "version": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "version"
+                            ],
+                            "type": "object"
+                          },
+                          "method": {
+                            "enum": [
+                              "synthetic",
+                              "numeric_self_answer",
+                              "keyword_match",
+                              "unkeyed_checksum",
+                              "path_presence",
+                              "runtime_observation",
+                              "executed_test",
+                              "human_review"
+                            ],
+                            "type": "string"
+                          },
+                          "producer": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "producer",
+                          "method",
+                          "evidenceRefs"
+                        ],
+                        "type": "object"
+                      },
+                      "reasons": {
+                        "items": {
+                          "enum": [
+                            "SYNTHETIC_VALUES",
+                            "SELF_REPORTED_NO_POSITIVE_STATUS",
+                            "SELF_REPORTED_LEVEL_CAP",
+                            "WEAK_METHOD",
+                            "EMPTY_EVIDENCE",
+                            "UNBOUND_EVIDENCE",
+                            "STALE_EVIDENCE",
+                            "CONTRADICTORY_EVIDENCE",
+                            "CROSS_SCOPE_EVIDENCE",
+                            "SIGNATURE_INVALID",
+                            "ISSUER_NOT_PINNED",
+                            "REVIEW_NOT_INDEPENDENT",
+                            "LEGACY_1X_UNVERIFIED",
+                            "NOT_APPLICABLE",
+                            "APPLICABILITY_UNRESOLVED",
+                            "EVIDENCE_NOT_CLAIM_READY",
+                            "RESULT_NOT_BOUND"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "statusDimensions": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "applicability": {
+                            "oneOf": [
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "state": {
+                                    "const": "applicable",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "rationale": {
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "const": "not_applicable",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state",
+                                  "rationale"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "reason": {
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "const": "unresolved",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state",
+                                  "reason"
+                                ],
+                                "type": "object"
+                              }
+                            ]
+                          },
+                          "enforcement": {
+                            "oneOf": [
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "state": {
+                                    "const": "none",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "state": {
+                                    "const": "advisory",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "state": {
+                                    "const": "observed",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "boundary": {
+                                    "type": "string"
+                                  },
+                                  "state": {
+                                    "const": "enforced",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "state",
+                                  "boundary"
+                                ],
+                                "type": "object"
+                              }
+                            ]
+                          },
+                          "evidence": {
+                            "enum": [
+                              "sufficient",
+                              "incomplete",
+                              "stale",
+                              "contradictory",
+                              "untrusted"
+                            ],
+                            "type": "string"
+                          },
+                          "result": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not_evaluated"
+                            ],
+                            "type": "string"
+                          },
+                          "review": {
+                            "enum": [
+                              "pending",
+                              "approved",
+                              "rejected",
+                              "expired"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "applicability",
+                          "evidence",
+                          "result",
+                          "enforcement",
+                          "review"
+                        ],
+                        "type": "object"
+                      }
+                    },
+                    "required": [
+                      "claimKind",
+                      "statusDimensions",
+                      "provenance",
+                      "eligibleLevel",
+                      "reasons"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "evidence": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "independently_reviewed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "verified",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "enum": [
+                            "self_reported",
+                            "synthetic_example"
+                          ],
+                          "type": "string"
+                        },
+                        "lane": {
+                          "enum": [
+                            "recommendation",
+                            "implementation"
+                          ],
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "not_evaluated",
+                      "evidence_missing",
+                      "evidence_stale",
+                      "evidence_contradictory",
+                      "evidence_untrusted",
+                      "review_pending",
+                      "exception_expiring",
+                      "waiver_expiring",
+                      "outcome_unknown",
+                      "source_unavailable",
+                      "unsupported_integration",
+                      "scope_changed",
+                      "self_approved",
+                      "effect_failed",
+                      "hold",
+                      "sod_violation",
+                      "plan_denies_native_session"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "mandatory": {
+                "type": "boolean"
+              },
+              "nextAction": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "command": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "route": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reasonCodes": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "report": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "anchoring": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "detail": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "public": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "backend": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "rekor-v2"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "detail": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "logIndex": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "enum": [
+                                  "anchored",
+                                  "not-anchored",
+                                  "invalid"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "backend",
+                              "logIndex",
+                              "detail"
+                            ],
+                            "type": "object"
+                          },
+                          "status": {
+                            "enum": [
+                              "anchored",
+                              "unanchored",
+                              "not-applicable"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "detail"
+                        ],
+                        "type": "object"
+                      },
+                      "artifact": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "path",
+                          "sha256"
+                        ],
+                        "type": "object"
+                      },
+                      "asOf": {
+                        "type": "string"
+                      },
+                      "completeness": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "freshness": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "integrity": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "errors": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "errors"
+                        ],
+                        "type": "object"
+                      },
+                      "issuerAdmission": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "signatures": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "detail": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "keyId": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "listId": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "purpose": {
+                                  "enum": [
+                                    "ledger-row",
+                                    "receipt",
+                                    "artifact-seal",
+                                    "revocation-list",
+                                    "config-signature",
+                                    "lease",
+                                    "session",
+                                    "release",
+                                    "notary",
+                                    "evidence-authority",
+                                    "independent-attestation",
+                                    "trust-list-root"
+                                  ],
+                                  "type": "string"
+                                },
+                                "signature": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "anyOf": [
+                                    {
+                                      "enum": [
+                                        "explicit-key",
+                                        "trust-list",
+                                        "trust-list-history",
+                                        "workspace-self"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "status": {
+                                  "enum": [
+                                    "admitted",
+                                    "not-pinned",
+                                    "wrong-purpose",
+                                    "not-yet-valid",
+                                    "expired",
+                                    "revoked",
+                                    "distrusted",
+                                    "unpinned-allowed"
+                                  ],
+                                  "type": "string"
+                                },
+                                "timeBasis": {
+                                  "anyOf": [
+                                    {
+                                      "const": "claimed",
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "signature",
+                                "purpose",
+                                "keyId",
+                                "status",
+                                "source",
+                                "listId",
+                                "timeBasis",
+                                "detail"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "signatures"
+                        ],
+                        "type": "object"
+                      },
+                      "overrides": {
+                        "items": {
+                          "enum": [
+                            "allow-unpinned",
+                            "allow-unanchored"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "satisfaction": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "scope": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "time": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "attested": {
+                            "anyOf": [
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "accuracyMs": {
+                                    "anyOf": [
+                                      {
+                                        "minimum": 0,
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "genTime": {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "const": "rfc3161",
+                                    "type": "string"
+                                  },
+                                  "messageImprint": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "digest": {
+                                        "pattern": "^[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "hashAlgorithm": {
+                                        "const": "sha256",
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "hashAlgorithm",
+                                      "digest"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "policyOid": {
+                                    "type": "string"
+                                  },
+                                  "revocationChecked": {
+                                    "const": false,
+                                    "type": "boolean"
+                                  },
+                                  "serialNumber": {
+                                    "pattern": "^[0-9a-f]+$",
+                                    "type": "string"
+                                  },
+                                  "tokenDerB64": {
+                                    "type": "string"
+                                  },
+                                  "tsa": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "anchorId": {
+                                        "type": "string"
+                                      },
+                                      "certSha256": {
+                                        "pattern": "^[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "subject": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "subject",
+                                      "certSha256",
+                                      "anchorId"
+                                    ],
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "tsa",
+                                  "genTime",
+                                  "accuracyMs",
+                                  "policyOid",
+                                  "serialNumber",
+                                  "messageImprint",
+                                  "tokenDerB64",
+                                  "revocationChecked"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "basis": {
+                            "enum": [
+                              "claimed",
+                              "attested-upper-bound",
+                              "attested-window"
+                            ],
+                            "type": "string"
+                          },
+                          "claimedAt": {
+                            "type": "string"
+                          },
+                          "window": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "notAfter": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "notBefore": {
+                                "anyOf": [
+                                  {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "notBefore",
+                              "notAfter"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "claimedAt",
+                          "attested",
+                          "basis"
+                        ],
+                        "type": "object"
+                      },
+                      "trusted": {
+                        "type": "boolean"
+                      },
+                      "type": {
+                        "const": "amc.verifier-report",
+                        "type": "string"
+                      },
+                      "verifiedAt": {
+                        "type": "string"
+                      },
+                      "verifier": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "const": "agent-maturity-compass",
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "version": {
+                        "const": 1,
+                        "type": "number"
+                      },
+                      "warnings": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "version",
+                      "artifact",
+                      "verifier",
+                      "verifiedAt",
+                      "asOf",
+                      "integrity",
+                      "issuerAdmission",
+                      "anchoring",
+                      "scope",
+                      "freshness",
+                      "completeness",
+                      "satisfaction",
+                      "trusted",
+                      "overrides",
+                      "warnings"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "section": {
+                "enum": [
+                  "recommendation",
+                  "implementation",
+                  "observed",
+                  "verified",
+                  "governance"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "WAITING",
+                  "READY",
+                  "COMPLETE",
+                  "BLOCKED",
+                  "NOT_EVALUATED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "kind",
+              "reasonCodes",
+              "report",
+              "acknowledged",
+              "nextAction",
+              "mandatory",
+              "bound",
+              "section",
+              "evidence",
+              "claim"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "acknowledged": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "by": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "expiresTs": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      "reason": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "ts": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "by",
+                      "ts",
+                      "expiresTs",
+                      "reason"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "bound": {
+                "type": "boolean"
+              },
+              "claim": {
+                "type": "null"
+              },
+              "evidence": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "observed",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "const": "independently_reviewed",
+                          "type": "string"
+                        },
+                        "lane": {
+                          "const": "verified",
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claimKind": {
+                          "enum": [
+                            "self_reported",
+                            "synthetic_example"
+                          ],
+                          "type": "string"
+                        },
+                        "lane": {
+                          "enum": [
+                            "recommendation",
+                            "implementation"
+                          ],
+                          "type": "string"
+                        },
+                        "reasonCodes": {
+                          "items": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "refId": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "refKind": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "resolved",
+                            "dangling",
+                            "payload_pruned",
+                            "unsigned"
+                          ],
+                          "type": "string"
+                        },
+                        "trustTier": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "refKind",
+                        "refId",
+                        "sha256",
+                        "status",
+                        "trustTier",
+                        "reasonCodes",
+                        "lane",
+                        "claimKind"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "maxItems": 0,
+                "type": "array"
+              },
+              "id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "kind": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "not_evaluated",
+                      "evidence_missing",
+                      "evidence_stale",
+                      "evidence_contradictory",
+                      "evidence_untrusted",
+                      "review_pending",
+                      "exception_expiring",
+                      "waiver_expiring",
+                      "outcome_unknown",
+                      "source_unavailable",
+                      "unsupported_integration",
+                      "scope_changed",
+                      "self_approved",
+                      "effect_failed",
+                      "hold",
+                      "sod_violation",
+                      "plan_denies_native_session"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "mandatory": {
+                "type": "boolean"
+              },
+              "nextAction": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "command": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "route": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "reasonCodes": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "report": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "anchoring": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "detail": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "public": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "backend": {
+                                "anyOf": [
+                                  {
+                                    "enum": [
+                                      "rekor-v2"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "detail": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "logIndex": {
+                                "anyOf": [
+                                  {
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0,
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "status": {
+                                "enum": [
+                                  "anchored",
+                                  "not-anchored",
+                                  "invalid"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "backend",
+                              "logIndex",
+                              "detail"
+                            ],
+                            "type": "object"
+                          },
+                          "status": {
+                            "enum": [
+                              "anchored",
+                              "unanchored",
+                              "not-applicable"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "detail"
+                        ],
+                        "type": "object"
+                      },
+                      "artifact": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "path",
+                          "sha256"
+                        ],
+                        "type": "object"
+                      },
+                      "asOf": {
+                        "type": "string"
+                      },
+                      "completeness": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "freshness": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "integrity": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "errors": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "errors"
+                        ],
+                        "type": "object"
+                      },
+                      "issuerAdmission": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "signatures": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "detail": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "keyId": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "listId": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "purpose": {
+                                  "enum": [
+                                    "ledger-row",
+                                    "receipt",
+                                    "artifact-seal",
+                                    "revocation-list",
+                                    "config-signature",
+                                    "lease",
+                                    "session",
+                                    "release",
+                                    "notary",
+                                    "evidence-authority",
+                                    "independent-attestation",
+                                    "trust-list-root"
+                                  ],
+                                  "type": "string"
+                                },
+                                "signature": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "anyOf": [
+                                    {
+                                      "enum": [
+                                        "explicit-key",
+                                        "trust-list",
+                                        "trust-list-history",
+                                        "workspace-self"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                },
+                                "status": {
+                                  "enum": [
+                                    "admitted",
+                                    "not-pinned",
+                                    "wrong-purpose",
+                                    "not-yet-valid",
+                                    "expired",
+                                    "revoked",
+                                    "distrusted",
+                                    "unpinned-allowed"
+                                  ],
+                                  "type": "string"
+                                },
+                                "timeBasis": {
+                                  "anyOf": [
+                                    {
+                                      "const": "claimed",
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "signature",
+                                "purpose",
+                                "keyId",
+                                "status",
+                                "source",
+                                "listId",
+                                "timeBasis",
+                                "detail"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "signatures"
+                        ],
+                        "type": "object"
+                      },
+                      "overrides": {
+                        "items": {
+                          "enum": [
+                            "allow-unpinned",
+                            "allow-unanchored"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "satisfaction": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "scope": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "reasons": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "status": {
+                            "enum": [
+                              "pass",
+                              "fail",
+                              "not-evaluated"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "status",
+                          "reasons"
+                        ],
+                        "type": "object"
+                      },
+                      "time": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "attested": {
+                            "anyOf": [
+                              {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "accuracyMs": {
+                                    "anyOf": [
+                                      {
+                                        "minimum": 0,
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "genTime": {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "const": "rfc3161",
+                                    "type": "string"
+                                  },
+                                  "messageImprint": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "digest": {
+                                        "pattern": "^[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "hashAlgorithm": {
+                                        "const": "sha256",
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "hashAlgorithm",
+                                      "digest"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "policyOid": {
+                                    "type": "string"
+                                  },
+                                  "revocationChecked": {
+                                    "const": false,
+                                    "type": "boolean"
+                                  },
+                                  "serialNumber": {
+                                    "pattern": "^[0-9a-f]+$",
+                                    "type": "string"
+                                  },
+                                  "tokenDerB64": {
+                                    "type": "string"
+                                  },
+                                  "tsa": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "anchorId": {
+                                        "type": "string"
+                                      },
+                                      "certSha256": {
+                                        "pattern": "^[0-9a-f]{64}$",
+                                        "type": "string"
+                                      },
+                                      "subject": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "subject",
+                                      "certSha256",
+                                      "anchorId"
+                                    ],
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "tsa",
+                                  "genTime",
+                                  "accuracyMs",
+                                  "policyOid",
+                                  "serialNumber",
+                                  "messageImprint",
+                                  "tokenDerB64",
+                                  "revocationChecked"
+                                ],
+                                "type": "object"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "basis": {
+                            "enum": [
+                              "claimed",
+                              "attested-upper-bound",
+                              "attested-window"
+                            ],
+                            "type": "string"
+                          },
+                          "claimedAt": {
+                            "type": "string"
+                          },
+                          "window": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "notAfter": {
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                "type": "string"
+                              },
+                              "notBefore": {
+                                "anyOf": [
+                                  {
+                                    "format": "date-time",
+                                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "notBefore",
+                              "notAfter"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "claimedAt",
+                          "attested",
+                          "basis"
+                        ],
+                        "type": "object"
+                      },
+                      "trusted": {
+                        "type": "boolean"
+                      },
+                      "type": {
+                        "const": "amc.verifier-report",
+                        "type": "string"
+                      },
+                      "verifiedAt": {
+                        "type": "string"
+                      },
+                      "verifier": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "const": "agent-maturity-compass",
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "version": {
+                        "const": 1,
+                        "type": "number"
+                      },
+                      "warnings": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "version",
+                      "artifact",
+                      "verifier",
+                      "verifiedAt",
+                      "asOf",
+                      "integrity",
+                      "issuerAdmission",
+                      "anchoring",
+                      "scope",
+                      "freshness",
+                      "completeness",
+                      "satisfaction",
+                      "trusted",
+                      "overrides",
+                      "warnings"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "section": {
+                "const": "integrity",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "WAITING",
+                  "READY",
+                  "COMPLETE",
+                  "BLOCKED",
+                  "NOT_EVALUATED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "kind",
+              "reasonCodes",
+              "report",
+              "acknowledged",
+              "nextAction",
+              "mandatory",
+              "bound",
+              "section",
+              "evidence",
+              "claim"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "nextAction": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "command": {
+              "type": "string"
+            },
+            "label": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "route": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "label"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "schema": {
+      "const": "amc.a4-readiness/v1",
+      "type": "string"
+    },
+    "selfApprovalAllowed": {
+      "type": "boolean"
+    },
+    "selfApproved": {
+      "type": "boolean"
+    },
+    "staleApprovals": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "decisionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gateId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reasonCodes": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "gateId",
+          "decisionId",
+          "reasonCodes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "BLOCKED",
+        "WAITING",
+        "COMPLETE",
+        "ON_HOLD"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "items",
+    "nextAction",
+    "allowed",
+    "gates",
+    "staleApprovals",
+    "integrity",
+    "claim",
+    "claimBoundary",
+    "selfApproved",
+    "selfApprovalAllowed",
+    "identityCheck",
+    "evaluatedAt",
+    "bindingDigest",
+    "fullDigest"
+  ],
+  "title": "AMC A4 Readiness",
+  "type": "object"
+}

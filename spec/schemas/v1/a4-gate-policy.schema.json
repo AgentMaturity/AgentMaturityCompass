@@ -1,0 +1,817 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate-policy.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "gates": {
+      "additionalProperties": false,
+      "properties": {
+        "activate.completion": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "activate.direction": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "adapt.completion": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "adapt.direction": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "aspire.completion": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "aspire.direction": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "assemble.completion": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "assemble.direction": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        },
+        "policy": {
+          "additionalProperties": false,
+          "properties": {
+            "actionClass": {
+              "enum": [
+                "READ_ONLY",
+                "WRITE_LOW",
+                "WRITE_HIGH",
+                "DEPLOY",
+                "SECURITY",
+                "FINANCIAL",
+                "NETWORK_EXTERNAL",
+                "DATA_EXPORT",
+                "IDENTITY"
+              ],
+              "type": "string"
+            },
+            "minApprovals": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "requireDistinctUsers": {
+              "type": "boolean"
+            },
+            "requiredReviews": {
+              "default": [],
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "role_vote",
+                      "review_record"
+                    ],
+                    "type": "string"
+                  },
+                  "label": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "OWNER",
+                      "AUDITOR",
+                      "APPROVER",
+                      "OPERATOR",
+                      "VIEWER",
+                      "AGENT"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "label"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "rolesAllowed": {
+              "items": {
+                "enum": [
+                  "OWNER",
+                  "AUDITOR",
+                  "APPROVER",
+                  "OPERATOR",
+                  "VIEWER",
+                  "AGENT"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ttlDays": {
+              "default": 14,
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "actionClass"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "aspire.direction",
+        "aspire.completion",
+        "assemble.direction",
+        "assemble.completion",
+        "adapt.direction",
+        "adapt.completion",
+        "activate.direction",
+        "activate.completion",
+        "policy"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "amc.a4-gate-policy/v1",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "gates"
+  ],
+  "title": "AMC A4 Gate Policy",
+  "type": "object"
+}

@@ -1,0 +1,191 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-deployment-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "amcCheck": {
+      "anyOf": [
+        {
+          "additionalProperties": {},
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "amcCheckStatus": {
+      "enum": [
+        "not_evaluated",
+        "reachable",
+        "passed",
+        "failed"
+      ],
+      "type": "string"
+    },
+    "claimKind": {
+      "const": "self_reported",
+      "type": "string"
+    },
+    "deploymentId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "environment": {
+      "enum": [
+        "staging",
+        "production"
+      ],
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "deploy",
+        "verify",
+        "monitor"
+      ],
+      "type": "string"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt": {
+      "additionalProperties": false,
+      "properties": {
+        "destinationRef": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "helmRevision": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "imageDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "overlayDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "restartedAt": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "imageDigest",
+        "overlayDigest",
+        "restartedAt",
+        "helmRevision",
+        "destinationRef",
+        "note"
+      ],
+      "type": "object"
+    },
+    "receiptSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "recordedByKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recordedStatus": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "partial"
+      ],
+      "type": "string"
+    },
+    "releaseId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "amc.a4-deployment-receipt/v1",
+      "type": "string"
+    },
+    "target": {
+      "enum": [
+        "compose",
+        "helm"
+      ],
+      "type": "string"
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "deploymentId",
+    "releaseId",
+    "projectId",
+    "kind",
+    "environment",
+    "target",
+    "receipt",
+    "receiptSha256",
+    "recordedStatus",
+    "amcCheckStatus",
+    "amcCheck",
+    "recordedByKey",
+    "claimKind",
+    "ts"
+  ],
+  "title": "AMC A4 Deployment Receipt",
+  "type": "object"
+}

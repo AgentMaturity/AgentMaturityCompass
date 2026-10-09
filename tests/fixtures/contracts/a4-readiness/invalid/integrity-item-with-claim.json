@@ -1,0 +1,138 @@
+{
+  "schema": "amc.a4-readiness/v1",
+  "status": "WAITING",
+  "items": [
+    {
+      "id": "approvals.policy_signed",
+      "status": "READY",
+      "kind": null,
+      "reasonCodes": [],
+      "section": "governance",
+      "evidence": [],
+      "claim": {
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "incomplete",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "provenance": {
+          "producer": "a4-store",
+          "method": "human_review",
+          "evidenceRefs": []
+        },
+        "eligibleLevel": null,
+        "reasons": [
+          "SELF_REPORTED_NO_POSITIVE_STATUS",
+          "REVIEW_NOT_INDEPENDENT"
+        ]
+      },
+      "report": null,
+      "acknowledged": null,
+      "nextAction": null,
+      "mandatory": true,
+      "bound": true
+    },
+    {
+      "id": "store.integrity",
+      "status": "NOT_EVALUATED",
+      "kind": "not_evaluated",
+      "reasonCodes": [
+        "SELF_CHECK"
+      ],
+      "section": "integrity",
+      "evidence": [],
+      "claim": {
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "incomplete",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "provenance": {
+          "producer": "a4-store",
+          "method": "human_review",
+          "evidenceRefs": []
+        },
+        "eligibleLevel": null,
+        "reasons": [
+          "SELF_REPORTED_NO_POSITIVE_STATUS",
+          "REVIEW_NOT_INDEPENDENT"
+        ]
+      },
+      "report": null,
+      "acknowledged": null,
+      "nextAction": {
+        "label": "Verify the project",
+        "route": "/api/v1/a4/projects/a4p_example/verify"
+      },
+      "mandatory": true,
+      "bound": true
+    }
+  ],
+  "nextAction": null,
+  "allowed": {
+    "propose": {
+      "allowed": true,
+      "reasonCodes": []
+    },
+    "decide": {
+      "allowed": false,
+      "reasonCodes": [
+        "GATE_PENDING"
+      ]
+    }
+  },
+  "gates": {
+    "direction": null,
+    "completion": null
+  },
+  "staleApprovals": [],
+  "integrity": {
+    "valid": true,
+    "reasonCodes": []
+  },
+  "claim": {
+    "claimKind": "self_reported",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "incomplete",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending"
+    },
+    "provenance": {
+      "producer": "a4-store",
+      "method": "human_review",
+      "evidenceRefs": []
+    },
+    "eligibleLevel": null,
+    "reasons": [
+      "SELF_REPORTED_NO_POSITIVE_STATUS",
+      "REVIEW_NOT_INDEPENDENT"
+    ]
+  },
+  "claimBoundary": "readiness of an A4 project as recorded in this workspace; not evidence about the agent's behaviour",
+  "selfApproved": false,
+  "selfApprovalAllowed": true,
+  "identityCheck": "users_yaml",
+  "evaluatedAt": "2026-10-09T00:00:00.000Z",
+  "bindingDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+  "fullDigest": "6666666666666666666666666666666666666666666666666666666666666666"
+}

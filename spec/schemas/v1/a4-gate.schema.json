@@ -1,0 +1,792 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "bindingDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "boundItems": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "decisions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "admission": {
+            "enum": [
+              "browser_csrf",
+              "native_login_token"
+            ],
+            "type": "string"
+          },
+          "approverKey": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "authSource": {
+            "enum": [
+              "LOCAL_USER",
+              "WORKSPACE_ROUTER"
+            ],
+            "type": "string"
+          },
+          "claimKind": {
+            "const": "self_reported",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "APPROVE_EXECUTE",
+              "DENY"
+            ],
+            "type": "string"
+          },
+          "decisionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "evaluatedItems": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "reasonCodes": {
+                  "items": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "status": {
+                  "enum": [
+                    "WAITING",
+                    "READY",
+                    "COMPLETE",
+                    "BLOCKED",
+                    "NOT_EVALUATED"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "reasonCodes"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "evidenceEventId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gateId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "identityCheck": {
+            "enum": [
+              "users_yaml",
+              "session_record"
+            ],
+            "type": "string"
+          },
+          "identityProvenance": {
+            "additionalProperties": false,
+            "properties": {
+              "createdBy": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "admission": {
+                        "enum": [
+                          "browser_csrf",
+                          "native_login_token"
+                        ],
+                        "type": "string"
+                      },
+                      "principalKey": {
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "principalKey",
+                      "admission"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdTs": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": -9007199254740991,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hostMembershipId": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "usersYamlSignerFingerprint": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "usersYamlSignerFingerprint",
+              "createdTs",
+              "createdBy",
+              "hostMembershipId"
+            ],
+            "type": "object"
+          },
+          "projectId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "requestDigestSha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "enum": [
+                "OWNER",
+                "AUDITOR",
+                "APPROVER",
+                "OPERATOR",
+                "VIEWER",
+                "AGENT"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "schema": {
+            "const": "amc.a4-decision/v1",
+            "type": "string"
+          },
+          "selfApprovalFacts": {
+            "additionalProperties": false,
+            "properties": {
+              "activeUserCount": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hostPrincipals": {
+                "anyOf": [
+                  {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hostedRouter": {
+                "type": "boolean"
+              },
+              "ratcheted": {
+                "type": "boolean"
+              },
+              "regulated": {
+                "type": "boolean"
+              },
+              "selfApprovalAllowed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "activeUserCount",
+              "hostPrincipals",
+              "hostedRouter",
+              "ratcheted",
+              "regulated",
+              "selfApprovalAllowed"
+            ],
+            "type": "object"
+          },
+          "selfApproved": {
+            "type": "boolean"
+          },
+          "ts": {
+            "maximum": 9007199254740991,
+            "minimum": -9007199254740991,
+            "type": "integer"
+          },
+          "userId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema",
+          "decisionId",
+          "gateId",
+          "projectId",
+          "decision",
+          "reason",
+          "requestDigestSha256",
+          "approverKey",
+          "authSource",
+          "userId",
+          "username",
+          "roles",
+          "admission",
+          "identityCheck",
+          "identityProvenance",
+          "selfApproved",
+          "selfApprovalFacts",
+          "evaluatedItems",
+          "claimKind",
+          "evidenceEventId",
+          "ts"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "excludedKeys": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expiresTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "gate": {
+      "enum": [
+        "direction",
+        "completion",
+        "policy"
+      ],
+      "type": "string"
+    },
+    "gateId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gatePolicyDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "integrity": {
+      "additionalProperties": false,
+      "properties": {
+        "bindingDigestValid": {
+          "type": "boolean"
+        },
+        "decisionsBound": {
+          "type": "boolean"
+        },
+        "envelopeValid": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "bindingDigestValid",
+        "decisionsBound",
+        "envelopeValid"
+      ],
+      "type": "object"
+    },
+    "intent": {
+      "additionalProperties": false,
+      "properties": {
+        "boundItemIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "evidenceRefDigests": {
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "excludedKeys": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "gate": {
+          "enum": [
+            "direction",
+            "completion",
+            "policy"
+          ],
+          "type": "string"
+        },
+        "gatePolicyDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "memberSetDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "projectId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "readinessBindingDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "resourceDigests": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "revisionNo": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "schema": {
+          "const": "amc.a4-intent/v1",
+          "type": "string"
+        },
+        "specDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "aspire",
+            "assemble",
+            "adapt",
+            "activate"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema",
+        "projectId",
+        "stage",
+        "gate",
+        "revisionNo",
+        "specDigest",
+        "resourceDigests",
+        "memberSetDigest",
+        "evidenceRefDigests",
+        "readinessBindingDigest",
+        "boundItemIds",
+        "gatePolicyDigest",
+        "excludedKeys"
+      ],
+      "type": "object"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "quorum": {
+      "additionalProperties": false,
+      "properties": {
+        "approvals": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "required": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "PENDING",
+            "QUORUM_MET",
+            "DENIED",
+            "EXPIRED"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "approvals",
+        "required"
+      ],
+      "type": "object"
+    },
+    "readinessSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request": {
+      "properties": {
+        "actionClass": {
+          "enum": [
+            "READ_ONLY",
+            "WRITE_LOW",
+            "WRITE_HIGH",
+            "DEPLOY",
+            "SECURITY",
+            "FINANCIAL",
+            "NETWORK_EXTERNAL",
+            "DATA_EXPORT",
+            "IDENTITY"
+          ],
+          "type": "string"
+        },
+        "agentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approvalRequestId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "authorizationIntent": {
+          "additionalProperties": {},
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "boundHashes": {
+          "properties": {
+            "budgetsHash": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "intentHash": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "leaseConstraintsHash": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "policyHash": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "toolsHash": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "workOrderHash": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "intentHash",
+            "policyHash",
+            "toolsHash",
+            "budgetsHash",
+            "leaseConstraintsHash"
+          ],
+          "type": "object"
+        },
+        "createdTs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "effectiveMode": {
+          "enum": [
+            "SIMULATE",
+            "EXECUTE"
+          ],
+          "type": "string"
+        },
+        "expiresTs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "intentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "requestedMode": {
+          "enum": [
+            "SIMULATE",
+            "EXECUTE"
+          ],
+          "type": "string"
+        },
+        "requireDistinctUsers": {
+          "type": "boolean"
+        },
+        "requiredApprovals": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "requiredAssurancePacks": {
+          "additionalProperties": {
+            "properties": {
+              "maxSucceeded": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "minScore": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              }
+            },
+            "required": [
+              "minScore",
+              "maxSucceeded"
+            ],
+            "type": "object"
+          },
+          "propertyNames": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "riskTier": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "type": "string"
+        },
+        "rolesAllowed": {
+          "items": {
+            "enum": [
+              "OWNER",
+              "AUDITOR",
+              "APPROVER",
+              "OPERATOR",
+              "VIEWER",
+              "AGENT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "PENDING",
+            "QUORUM_MET",
+            "DENIED",
+            "EXPIRED",
+            "CANCELLED",
+            "CONSUMED"
+          ],
+          "type": "string"
+        },
+        "toolName": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "v": {
+          "const": 1,
+          "type": "number"
+        },
+        "workOrderId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "v",
+        "approvalRequestId",
+        "agentId",
+        "intentId",
+        "toolName",
+        "actionClass",
+        "requestedMode",
+        "effectiveMode",
+        "riskTier",
+        "createdTs",
+        "expiresTs",
+        "status",
+        "requiredApprovals",
+        "requireDistinctUsers",
+        "rolesAllowed",
+        "boundHashes"
+      ],
+      "type": "object"
+    },
+    "requestedByKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-gate/v1",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "aspire",
+        "assemble",
+        "adapt",
+        "activate"
+      ],
+      "type": "string"
+    },
+    "supersededBy": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "seq": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "seq",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "gateId",
+    "projectId",
+    "revisionNo",
+    "stage",
+    "gate",
+    "request",
+    "bindingDigest",
+    "intent",
+    "readinessSha256",
+    "boundItems",
+    "gatePolicyDigest",
+    "requestedByKey",
+    "excludedKeys",
+    "expiresTs",
+    "decisions",
+    "quorum",
+    "integrity",
+    "supersededBy",
+    "ts"
+  ],
+  "title": "AMC A4 Gate",
+  "type": "object"
+}

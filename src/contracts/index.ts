@@ -13,12 +13,42 @@ import { STANDARD_ARTIFACT_SCHEMAS } from "../standard/standardSchema.js";
 import { signedTrustListSchema } from "../trust/trustList.js";
 import { verifierReportSchema } from "../trust/verifierReport.js";
 import { canonicalize } from "../utils/json.js";
+import { a4ConformanceStatementV1Schema } from "./v1/a4ConformanceStatement.js";
+import { a4DecisionV1Schema } from "./v1/a4Decision.js";
+import { a4DeploymentReceiptV1Schema } from "./v1/a4DeploymentReceipt.js";
+import { a4GateV1Schema } from "./v1/a4Gate.js";
+import { a4GatePolicyV1Schema } from "./v1/a4GatePolicy.js";
+import { a4IntegrationClaimV1Schema } from "./v1/a4IntegrationClaim.js";
+import { a4IntentV1Schema } from "./v1/a4Intent.js";
+import { a4PackageV1Schema } from "./v1/a4Package.js";
+import { a4ProjectV1Schema } from "./v1/a4Project.js";
+import { a4ReadinessV1Schema } from "./v1/a4Readiness.js";
+import { a4ReleaseV1Schema } from "./v1/a4Release.js";
+import { a4RevisionV1Schema } from "./v1/a4Revision.js";
+import { a4RollbackReceiptV1Schema } from "./v1/a4RollbackReceipt.js";
+import { a4TransitionV1Schema } from "./v1/a4Transition.js";
+import { a4ValueClaimV1Schema } from "./v1/a4ValueClaim.js";
 import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
 import { scopedAttestationV1Schema } from "./v1/scopedAttestation.js";
 
+export * from "./v1/a4ConformanceStatement.js";
+export * from "./v1/a4Decision.js";
+export * from "./v1/a4DeploymentReceipt.js";
+export * from "./v1/a4Gate.js";
+export * from "./v1/a4GatePolicy.js";
+export * from "./v1/a4IntegrationClaim.js";
+export * from "./v1/a4Intent.js";
+export * from "./v1/a4Package.js";
+export * from "./v1/a4Project.js";
+export * from "./v1/a4Readiness.js";
+export * from "./v1/a4Release.js";
+export * from "./v1/a4Revision.js";
+export * from "./v1/a4RollbackReceipt.js";
+export * from "./v1/a4Transition.js";
+export * from "./v1/a4ValueClaim.js";
 export * from "./v1/authorizationRecord.js";
 export * from "./v1/controlResult.js";
 export * from "./v1/evidenceEvent.js";
@@ -44,7 +74,23 @@ export const CONTRACTS = {
   // Regulated Control Catalog (P1-09); refinements are in docs/catalog/CONTROL_RECORD.md.
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
-  "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema }
+  "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema },
+  // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md once P1-63 lands.
+  "a4-project": { title: "AMC A4 Project", schema: a4ProjectV1Schema },
+  "a4-revision": { title: "AMC A4 Revision", schema: a4RevisionV1Schema },
+  "a4-gate": { title: "AMC A4 Gate", schema: a4GateV1Schema },
+  "a4-decision": { title: "AMC A4 Gate Decision", schema: a4DecisionV1Schema },
+  "a4-transition": { title: "AMC A4 Transition", schema: a4TransitionV1Schema },
+  "a4-intent": { title: "AMC A4 Gate Intent", schema: a4IntentV1Schema },
+  "a4-readiness": { title: "AMC A4 Readiness", schema: a4ReadinessV1Schema },
+  "a4-gate-policy": { title: "AMC A4 Gate Policy", schema: a4GatePolicyV1Schema },
+  "a4-integration-claim": { title: "AMC A4 Integration Claim", schema: a4IntegrationClaimV1Schema },
+  "a4-package": { title: "AMC A4 Agent Package", schema: a4PackageV1Schema },
+  "a4-release": { title: "AMC A4 Release Record", schema: a4ReleaseV1Schema },
+  "a4-deployment-receipt": { title: "AMC A4 Deployment Receipt", schema: a4DeploymentReceiptV1Schema },
+  "a4-rollback-receipt": { title: "AMC A4 Rollback Receipt", schema: a4RollbackReceiptV1Schema },
+  "a4-value-claim": { title: "AMC A4 Value Claim", schema: a4ValueClaimV1Schema },
+  "a4-conformance-statement": { title: "AMC A4 Conformance Statement", schema: a4ConformanceStatementV1Schema }
 } as const;
 export type ContractName = keyof typeof CONTRACTS;
 

@@ -1,0 +1,125 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-rollback-receipt.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "amcCheckStatus": {
+      "enum": [
+        "not_evaluated",
+        "reachable",
+        "passed",
+        "failed"
+      ],
+      "type": "string"
+    },
+    "claimKind": {
+      "const": "self_reported",
+      "type": "string"
+    },
+    "enforceManifestId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "environment": {
+      "enum": [
+        "staging",
+        "production"
+      ],
+      "type": "string"
+    },
+    "leaseIdsRevoked": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "preparedCommands": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receiptSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "recordedByKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recordedStatus": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "partial"
+      ],
+      "type": "string"
+    },
+    "releaseId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rollbackId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "amc.a4-rollback-receipt/v1",
+      "type": "string"
+    },
+    "target": {
+      "enum": [
+        "compose",
+        "helm"
+      ],
+      "type": "string"
+    },
+    "toReleaseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "rollbackId",
+    "releaseId",
+    "toReleaseId",
+    "projectId",
+    "environment",
+    "target",
+    "enforceManifestId",
+    "preparedCommands",
+    "leaseIdsRevoked",
+    "receiptSha256",
+    "recordedStatus",
+    "amcCheckStatus",
+    "recordedByKey",
+    "claimKind",
+    "ts"
+  ],
+  "title": "AMC A4 Rollback Receipt",
+  "type": "object"
+}

@@ -94,6 +94,13 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/auth/authApi.ts",
+      "issue": "P1-56",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-56/src/auth/authApi.ts.landed",
+      "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df"
+    },
+    {
       "path": "src/bench/benchRegistryClient.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",

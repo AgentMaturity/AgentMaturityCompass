@@ -28,7 +28,9 @@ export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProduce
   manual: "manual",
   operator: "manual",
   "feedback.ingest": "manual",
-  webhook: "external-report"
+  webhook: "external-report",
+  // A4 Forge rows are human statements recorded by AMC, never runtime observations (P1-56).
+  "a4-store": "manual"
 });
 
 const metaCache = new WeakMap<object, Record<string, unknown>>();

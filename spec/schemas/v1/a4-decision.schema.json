@@ -1,0 +1,283 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-decision.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission": {
+      "enum": [
+        "browser_csrf",
+        "native_login_token"
+      ],
+      "type": "string"
+    },
+    "approverKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authSource": {
+      "enum": [
+        "LOCAL_USER",
+        "WORKSPACE_ROUTER"
+      ],
+      "type": "string"
+    },
+    "claimKind": {
+      "const": "self_reported",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "APPROVE_EXECUTE",
+        "DENY"
+      ],
+      "type": "string"
+    },
+    "decisionId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evaluatedItems": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reasonCodes": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "WAITING",
+              "READY",
+              "COMPLETE",
+              "BLOCKED",
+              "NOT_EVALUATED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "reasonCodes"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "evidenceEventId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gateId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "identityCheck": {
+      "enum": [
+        "users_yaml",
+        "session_record"
+      ],
+      "type": "string"
+    },
+    "identityProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "createdBy": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "admission": {
+                  "enum": [
+                    "browser_csrf",
+                    "native_login_token"
+                  ],
+                  "type": "string"
+                },
+                "principalKey": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "principalKey",
+                "admission"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "createdTs": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hostMembershipId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "usersYamlSignerFingerprint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "usersYamlSignerFingerprint",
+        "createdTs",
+        "createdBy",
+        "hostMembershipId"
+      ],
+      "type": "object"
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "requestDigestSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "roles": {
+      "items": {
+        "enum": [
+          "OWNER",
+          "AUDITOR",
+          "APPROVER",
+          "OPERATOR",
+          "VIEWER",
+          "AGENT"
+        ],
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema": {
+      "const": "amc.a4-decision/v1",
+      "type": "string"
+    },
+    "selfApprovalFacts": {
+      "additionalProperties": false,
+      "properties": {
+        "activeUserCount": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hostPrincipals": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "hostedRouter": {
+          "type": "boolean"
+        },
+        "ratcheted": {
+          "type": "boolean"
+        },
+        "regulated": {
+          "type": "boolean"
+        },
+        "selfApprovalAllowed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "activeUserCount",
+        "hostPrincipals",
+        "hostedRouter",
+        "ratcheted",
+        "regulated",
+        "selfApprovalAllowed"
+      ],
+      "type": "object"
+    },
+    "selfApproved": {
+      "type": "boolean"
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "userId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "username": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "decisionId",
+    "gateId",
+    "projectId",
+    "decision",
+    "reason",
+    "requestDigestSha256",
+    "approverKey",
+    "authSource",
+    "userId",
+    "username",
+    "roles",
+    "admission",
+    "identityCheck",
+    "identityProvenance",
+    "selfApproved",
+    "selfApprovalFacts",
+    "evaluatedItems",
+    "claimKind",
+    "evidenceEventId",
+    "ts"
+  ],
+  "title": "AMC A4 Gate Decision",
+  "type": "object"
+}

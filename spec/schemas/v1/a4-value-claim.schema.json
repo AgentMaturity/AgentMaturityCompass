@@ -1,0 +1,1217 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "createdAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "envelope": {
+      "additionalProperties": false,
+      "properties": {
+        "digestSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "envelope": {
+          "properties": {
+            "alg": {
+              "const": "ed25519",
+              "type": "string"
+            },
+            "fingerprint": {
+              "maxLength": 64,
+              "minLength": 64,
+              "type": "string"
+            },
+            "pubkeyB64": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "sigB64": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "signedTs": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "signer": {
+              "properties": {
+                "attestationLevel": {
+                  "enum": [
+                    "SOFTWARE",
+                    "HARDWARE"
+                  ],
+                  "type": "string"
+                },
+                "notaryFingerprint": {
+                  "maxLength": 64,
+                  "minLength": 64,
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "VAULT",
+                    "NOTARY"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "attestationLevel"
+              ],
+              "type": "object"
+            },
+            "v": {
+              "const": 1,
+              "type": "number"
+            }
+          },
+          "required": [
+            "v",
+            "alg",
+            "pubkeyB64",
+            "fingerprint",
+            "sigB64",
+            "signedTs",
+            "signer"
+          ],
+          "type": "object"
+        },
+        "signature": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "signedTs": {
+          "maximum": 9007199254740991,
+          "minimum": -9007199254740991,
+          "type": "integer"
+        },
+        "signer": {
+          "const": "auditor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "digestSha256",
+        "signature",
+        "signedTs",
+        "signer"
+      ],
+      "type": "object"
+    },
+    "implemented": {
+      "additionalProperties": false,
+      "properties": {
+        "claimKind": {
+          "const": "self_reported",
+          "type": "string"
+        },
+        "contractDigest": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrumentation": {
+          "enum": [
+            "value_contract",
+            "outcome_contract",
+            "none"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "instrumentation",
+        "contractDigest",
+        "claimKind"
+      ],
+      "type": "object"
+    },
+    "kpiId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "label": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "objective": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "business",
+            "sustainability",
+            "social"
+          ],
+          "type": "string"
+        },
+        "statement": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "statement",
+        "basis"
+      ],
+      "type": "object"
+    },
+    "observed": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "claim": {
+              "additionalProperties": false,
+              "properties": {
+                "claimKind": {
+                  "enum": [
+                    "synthetic_example",
+                    "self_reported",
+                    "observed",
+                    "independently_reviewed"
+                  ],
+                  "type": "string"
+                },
+                "eligibleLevel": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "entitlement": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "active": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "active"
+                  ],
+                  "type": "object"
+                },
+                "provenance": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "evidenceRefs": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "legacy": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "notice": {
+                          "type": "string"
+                        },
+                        "originalTier": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "version"
+                      ],
+                      "type": "object"
+                    },
+                    "method": {
+                      "enum": [
+                        "synthetic",
+                        "numeric_self_answer",
+                        "keyword_match",
+                        "unkeyed_checksum",
+                        "path_presence",
+                        "runtime_observation",
+                        "executed_test",
+                        "human_review"
+                      ],
+                      "type": "string"
+                    },
+                    "producer": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "producer",
+                    "method",
+                    "evidenceRefs"
+                  ],
+                  "type": "object"
+                },
+                "reasons": {
+                  "items": {
+                    "enum": [
+                      "SYNTHETIC_VALUES",
+                      "SELF_REPORTED_NO_POSITIVE_STATUS",
+                      "SELF_REPORTED_LEVEL_CAP",
+                      "WEAK_METHOD",
+                      "EMPTY_EVIDENCE",
+                      "UNBOUND_EVIDENCE",
+                      "STALE_EVIDENCE",
+                      "CONTRADICTORY_EVIDENCE",
+                      "CROSS_SCOPE_EVIDENCE",
+                      "SIGNATURE_INVALID",
+                      "ISSUER_NOT_PINNED",
+                      "REVIEW_NOT_INDEPENDENT",
+                      "LEGACY_1X_UNVERIFIED",
+                      "NOT_APPLICABLE",
+                      "APPLICABILITY_UNRESOLVED",
+                      "EVIDENCE_NOT_CLAIM_READY",
+                      "RESULT_NOT_BOUND"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "statusDimensions": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicability": {
+                      "oneOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "applicable",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "rationale": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "not_applicable",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "rationale"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "reason": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "unresolved",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "reason"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "enforcement": {
+                      "oneOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "none",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "advisory",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "observed",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "boundary": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "enforced",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "boundary"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "enum": [
+                        "sufficient",
+                        "incomplete",
+                        "stale",
+                        "contradictory",
+                        "untrusted"
+                      ],
+                      "type": "string"
+                    },
+                    "result": {
+                      "enum": [
+                        "pass",
+                        "fail",
+                        "not_evaluated"
+                      ],
+                      "type": "string"
+                    },
+                    "review": {
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "rejected",
+                        "expired"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "applicability",
+                    "evidence",
+                    "result",
+                    "enforcement",
+                    "review"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "claimKind",
+                "statusDimensions",
+                "provenance",
+                "eligibleLevel",
+                "reasons"
+              ],
+              "type": "object"
+            },
+            "danglingRefs": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "evidenceRefs": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "resolvedRefs": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "value": {
+              "type": "null"
+            },
+            "window": {
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "to": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "window",
+            "evidenceRefs",
+            "claim",
+            "value",
+            "resolvedRefs",
+            "danglingRefs"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "claim": {
+              "additionalProperties": false,
+              "properties": {
+                "claimKind": {
+                  "enum": [
+                    "synthetic_example",
+                    "self_reported",
+                    "observed",
+                    "independently_reviewed"
+                  ],
+                  "type": "string"
+                },
+                "eligibleLevel": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "entitlement": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "active": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "active"
+                  ],
+                  "type": "object"
+                },
+                "provenance": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "evidenceRefs": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "legacy": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "notice": {
+                          "type": "string"
+                        },
+                        "originalTier": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "version"
+                      ],
+                      "type": "object"
+                    },
+                    "method": {
+                      "enum": [
+                        "synthetic",
+                        "numeric_self_answer",
+                        "keyword_match",
+                        "unkeyed_checksum",
+                        "path_presence",
+                        "runtime_observation",
+                        "executed_test",
+                        "human_review"
+                      ],
+                      "type": "string"
+                    },
+                    "producer": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "producer",
+                    "method",
+                    "evidenceRefs"
+                  ],
+                  "type": "object"
+                },
+                "reasons": {
+                  "items": {
+                    "enum": [
+                      "SYNTHETIC_VALUES",
+                      "SELF_REPORTED_NO_POSITIVE_STATUS",
+                      "SELF_REPORTED_LEVEL_CAP",
+                      "WEAK_METHOD",
+                      "EMPTY_EVIDENCE",
+                      "UNBOUND_EVIDENCE",
+                      "STALE_EVIDENCE",
+                      "CONTRADICTORY_EVIDENCE",
+                      "CROSS_SCOPE_EVIDENCE",
+                      "SIGNATURE_INVALID",
+                      "ISSUER_NOT_PINNED",
+                      "REVIEW_NOT_INDEPENDENT",
+                      "LEGACY_1X_UNVERIFIED",
+                      "NOT_APPLICABLE",
+                      "APPLICABILITY_UNRESOLVED",
+                      "EVIDENCE_NOT_CLAIM_READY",
+                      "RESULT_NOT_BOUND"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "statusDimensions": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "applicability": {
+                      "oneOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "applicable",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "rationale": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "not_applicable",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "rationale"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "reason": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "unresolved",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "reason"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "enforcement": {
+                      "oneOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "none",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "advisory",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "state": {
+                              "const": "observed",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "boundary": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "const": "enforced",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "state",
+                            "boundary"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "evidence": {
+                      "enum": [
+                        "sufficient",
+                        "incomplete",
+                        "stale",
+                        "contradictory",
+                        "untrusted"
+                      ],
+                      "type": "string"
+                    },
+                    "result": {
+                      "enum": [
+                        "pass",
+                        "fail",
+                        "not_evaluated"
+                      ],
+                      "type": "string"
+                    },
+                    "review": {
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "rejected",
+                        "expired"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "applicability",
+                    "evidence",
+                    "result",
+                    "enforcement",
+                    "review"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "claimKind",
+                "statusDimensions",
+                "provenance",
+                "eligibleLevel",
+                "reasons"
+              ],
+              "type": "object"
+            },
+            "danglingRefs": {
+              "const": 0,
+              "type": "number"
+            },
+            "evidenceRefs": {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "resolvedRefs": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "value": {
+              "type": "number"
+            },
+            "window": {
+              "additionalProperties": false,
+              "properties": {
+                "from": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "to": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "window",
+            "evidenceRefs",
+            "claim",
+            "value",
+            "resolvedRefs",
+            "danglingRefs"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "recommended": {
+      "additionalProperties": false,
+      "properties": {
+        "claimKind": {
+          "const": "self_reported",
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "aspire_brief",
+            "value_contract",
+            "outcome_contract"
+          ],
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "target",
+        "source",
+        "note",
+        "claimKind"
+      ],
+      "type": "object"
+    },
+    "releaseId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-value-claim/v1",
+      "type": "string"
+    },
+    "unit": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "verified": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "additionalProperties": false,
+          "properties": {
+            "claimKind": {
+              "enum": [
+                "synthetic_example",
+                "self_reported",
+                "observed",
+                "independently_reviewed"
+              ],
+              "type": "string"
+            },
+            "eligibleLevel": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "entitlement": {
+              "additionalProperties": false,
+              "properties": {
+                "active": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "active"
+              ],
+              "type": "object"
+            },
+            "provenance": {
+              "additionalProperties": false,
+              "properties": {
+                "evidenceRefs": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "legacy": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "notice": {
+                      "type": "string"
+                    },
+                    "originalTier": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "version"
+                  ],
+                  "type": "object"
+                },
+                "method": {
+                  "enum": [
+                    "synthetic",
+                    "numeric_self_answer",
+                    "keyword_match",
+                    "unkeyed_checksum",
+                    "path_presence",
+                    "runtime_observation",
+                    "executed_test",
+                    "human_review"
+                  ],
+                  "type": "string"
+                },
+                "producer": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "producer",
+                "method",
+                "evidenceRefs"
+              ],
+              "type": "object"
+            },
+            "reasons": {
+              "items": {
+                "enum": [
+                  "SYNTHETIC_VALUES",
+                  "SELF_REPORTED_NO_POSITIVE_STATUS",
+                  "SELF_REPORTED_LEVEL_CAP",
+                  "WEAK_METHOD",
+                  "EMPTY_EVIDENCE",
+                  "UNBOUND_EVIDENCE",
+                  "STALE_EVIDENCE",
+                  "CONTRADICTORY_EVIDENCE",
+                  "CROSS_SCOPE_EVIDENCE",
+                  "SIGNATURE_INVALID",
+                  "ISSUER_NOT_PINNED",
+                  "REVIEW_NOT_INDEPENDENT",
+                  "LEGACY_1X_UNVERIFIED",
+                  "NOT_APPLICABLE",
+                  "APPLICABILITY_UNRESOLVED",
+                  "EVIDENCE_NOT_CLAIM_READY",
+                  "RESULT_NOT_BOUND"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "statusDimensions": {
+              "additionalProperties": false,
+              "properties": {
+                "applicability": {
+                  "oneOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "state": {
+                          "const": "applicable",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "rationale": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "const": "not_applicable",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "rationale"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "reason": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "const": "unresolved",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "reason"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "enforcement": {
+                  "oneOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "state": {
+                          "const": "none",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "state": {
+                          "const": "advisory",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "state": {
+                          "const": "observed",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "boundary": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "const": "enforced",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "boundary"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "evidence": {
+                  "enum": [
+                    "sufficient",
+                    "incomplete",
+                    "stale",
+                    "contradictory",
+                    "untrusted"
+                  ],
+                  "type": "string"
+                },
+                "result": {
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "not_evaluated"
+                  ],
+                  "type": "string"
+                },
+                "review": {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected",
+                    "expired"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "applicability",
+                "evidence",
+                "result",
+                "enforcement",
+                "review"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "claimKind",
+            "statusDimensions",
+            "provenance",
+            "eligibleLevel",
+            "reasons"
+          ],
+          "type": "object"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "not_evaluated",
+            "reviewed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "reviewer",
+        "reason",
+        "claim"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "revisionNo",
+    "releaseId",
+    "kpiId",
+    "label",
+    "unit",
+    "recommended",
+    "implemented",
+    "observed",
+    "verified",
+    "objective",
+    "createdAt",
+    "envelope"
+  ],
+  "title": "AMC A4 Value Claim",
+  "type": "object"
+}

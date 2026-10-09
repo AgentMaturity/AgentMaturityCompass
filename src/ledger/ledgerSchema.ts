@@ -12,6 +12,7 @@
  * leaves a schema that matches no version number and cannot be reasoned about.
  */
 import type Database from "better-sqlite3";
+import { A4_MIGRATION_SQL } from "./ledgerSchemaA4.js";
 
 export interface Migration {
   version: number;
@@ -527,7 +528,9 @@ const migrations: Migration[] = [
       CREATE TRIGGER IF NOT EXISTS action_transitions_no_delete BEFORE DELETE ON action_transitions
       BEGIN SELECT RAISE(ABORT, 'action_transitions is append-only'); END;
     `
-  }
+  },
+  // P1-56 A4 Forge project record; the DDL and its rules are in ledgerSchemaA4.ts.
+  { version: 13, sql: A4_MIGRATION_SQL }
 ];
 
 export function reconcileLegacyMigrationState(db: Database.Database): void {

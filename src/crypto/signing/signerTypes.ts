@@ -14,7 +14,8 @@ export const SIGN_KINDS = [
   "REPAIR_RECEIPT",
   "MIGRATION_RECEIPT",
   "CONTROL_PLAN",
-  "CONTROL_RESULT"
+  "CONTROL_RESULT",
+  "A4_RECORD"
 ] as const;
 
 export type SignKind = (typeof SIGN_KINDS)[number];

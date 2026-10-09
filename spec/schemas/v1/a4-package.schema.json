@@ -1,0 +1,472 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-package.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approvals": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "approverKey": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "bindingDigest": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "decisionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gate": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gateId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "stage": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "gateId",
+          "decisionId",
+          "approverKey",
+          "bindingDigest",
+          "stage",
+          "gate"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "artifacts": {
+      "additionalProperties": false,
+      "properties": {
+        "aibomSha256": {
+          "type": "null"
+        },
+        "compiledPlanSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contextPluginSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "enforceSnapshotSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "memoryPolicySha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "presetSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sbomSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secretScanSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "signedConfigsSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "updatePolicySha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enforceSnapshotSha256",
+        "compiledPlanSha256",
+        "signedConfigsSha256",
+        "presetSha256",
+        "contextPluginSha256",
+        "memoryPolicySha256",
+        "updatePolicySha256",
+        "secretScanSha256",
+        "sbomSha256",
+        "aibomSha256"
+      ],
+      "type": "object"
+    },
+    "claimBoundary": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "size": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "size",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "generatedTs": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    },
+    "integration": {
+      "additionalProperties": false,
+      "properties": {
+        "conformanceReceipt": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "pinnedVersion": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "sha256",
+                "pinnedVersion"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "enforcementBoundary": {
+          "enum": [
+            "tool_pipeline",
+            "hook:PreToolUse",
+            "pi:tool_call",
+            "gateway",
+            "none"
+          ],
+          "type": "string"
+        },
+        "evidenceTier": {
+          "enum": [
+            "observed",
+            "self_reported"
+          ],
+          "type": "string"
+        },
+        "notCovered": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "path": {
+          "enum": [
+            "native",
+            "claude-code",
+            "pi",
+            "langgraph",
+            "langchain",
+            "crewai",
+            "openai-agents",
+            "vercel-ai",
+            "generic-http",
+            "other"
+          ],
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "supported": {
+          "enum": [
+            "supported",
+            "preview",
+            "unsupported"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "enforcementBoundary",
+        "evidenceTier",
+        "supported",
+        "reason",
+        "notCovered",
+        "source",
+        "conformanceReceipt"
+      ],
+      "type": "object"
+    },
+    "kind": {
+      "const": "a4-agent-package",
+      "type": "string"
+    },
+    "package": {
+      "additionalProperties": false,
+      "properties": {
+        "amcVersion": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "node": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "projectId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "revisionDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "revisionNo": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "projectId",
+        "revisionNo",
+        "revisionDigest",
+        "amcVersion",
+        "node"
+      ],
+      "type": "object"
+    },
+    "provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "builtFrom": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "note": {
+          "const": "AMC provenance record (not a formal SLSA claim)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "note",
+        "builtFrom"
+      ],
+      "type": "object"
+    },
+    "quality": {
+      "additionalProperties": false,
+      "properties": {
+        "targets": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dimension": {
+                "enum": [
+                  "capability",
+                  "reliability",
+                  "security",
+                  "privacy",
+                  "latency",
+                  "cost",
+                  "maintainability",
+                  "impact"
+                ],
+                "type": "string"
+              },
+              "evidenceMethod": {
+                "enum": [
+                  "runtime_observation",
+                  "executed_test",
+                  "human_review",
+                  "not_yet_decided"
+                ],
+                "type": "string"
+              },
+              "evidenceSource": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "measure": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "source": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "statement": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "target": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "dimension",
+              "statement",
+              "measure",
+              "target",
+              "evidenceSource",
+              "evidenceMethod",
+              "source"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "targets"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "amc.a4-package/v1",
+      "type": "string"
+    },
+    "signing": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "ed25519",
+          "type": "string"
+        },
+        "kind": {
+          "const": "A4_PACKAGE",
+          "type": "string"
+        },
+        "pubkeyFingerprint": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "kind",
+        "pubkeyFingerprint"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "kind",
+    "package",
+    "files",
+    "artifacts",
+    "approvals",
+    "integration",
+    "quality",
+    "provenance",
+    "signing",
+    "generatedTs",
+    "claimBoundary"
+  ],
+  "title": "AMC A4 Agent Package",
+  "type": "object"
+}

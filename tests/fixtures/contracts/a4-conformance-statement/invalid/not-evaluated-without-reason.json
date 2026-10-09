@@ -1,0 +1,66 @@
+{
+  "schema": "amc.a4-conformance-statement/v1",
+  "stage": "aspire",
+  "revisionDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "planDigest": null,
+  "evaluatedAt": "2026-10-09T00:00:00.000Z",
+  "controls": [
+    {
+      "controlId": "owner_charter_defined",
+      "version": "1",
+      "support": "experimental",
+      "reviewStatus": "pending",
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "incomplete",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending",
+      "claimKind": "self_reported",
+      "evidenceRefs": []
+    }
+  ],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "not_evaluated": 1,
+    "not_applicable": 0,
+    "unresolved": 0
+  },
+  "ownerOutOfScope": [],
+  "unsupported": [],
+  "missingFacts": [],
+  "expertReview": {
+    "required": false,
+    "records": [],
+    "acknowledgement": null
+  },
+  "claim": {
+    "claimKind": "self_reported",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "incomplete",
+      "result": "not_evaluated",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending"
+    },
+    "provenance": {
+      "producer": "a4-store",
+      "method": "human_review",
+      "evidenceRefs": []
+    },
+    "eligibleLevel": null,
+    "reasons": [
+      "SELF_REPORTED_NO_POSITIVE_STATUS",
+      "REVIEW_NOT_INDEPENDENT"
+    ]
+  },
+  "claimBoundary": "evidence of conformity recorded in this workspace; not evaluated by an independent reviewer"
+}

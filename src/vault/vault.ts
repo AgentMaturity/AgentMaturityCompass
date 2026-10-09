@@ -652,6 +652,17 @@ export function setVaultSecret(workspace: string, secretKey: string, value: stri
   session.payload = payload;
 }
 
+/** Rewrites the vault envelope without `secretKey`; refuses when the vault is locked. True when a secret was removed. */
+export function deleteVaultSecret(workspace: string, secretKey: string): boolean {
+  assertSafeSecretKey(secretKey);
+  const payload = requireUnlockedPayload(workspace);
+  if (!Object.hasOwn(payload.secrets, secretKey)) return false;
+  const next = { ...payload, secrets: Object.fromEntries(Object.entries(payload.secrets).filter(([key]) => key !== secretKey)) };
+  rewriteUnlockedVault(workspace, next);
+  sessionFor(workspace).payload = next;
+  return true;
+}
+
 export function getVaultSecret(workspace: string, secretKey: string): string | null {
   assertSafeSecretKey(secretKey);
   const payload = requireUnlockedPayload(workspace);

@@ -1,0 +1,21 @@
+{
+  "schema": "amc.a4-intent/v1",
+  "projectId": "a4p_example",
+  "stage": "aspire",
+  "gate": "direction",
+  "revisionNo": 1,
+  "specDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+  "resourceDigests": {
+    "brief.contextGraphSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "brief.agentConfigSha256": null
+  },
+  "memberSetDigest": "4444444444444444444444444444444444444444444444444444444444444444",
+  "evidenceRefDigests": [],
+  "readinessBindingDigest": "5555555555555555555555555555555555555555555555555555555555555555",
+  "boundItemIds": [
+    "members.present",
+    "approvals.policy_signed"
+  ],
+  "gatePolicyDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+  "excludedKeys": []
+}

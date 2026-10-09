@@ -45,8 +45,10 @@ export function nativeAllowedBrowserOrigins(host: string, port: number, extra: r
   return Object.freeze([...new Set(origins.filter((value): value is string => value !== null))]);
 }
 
+/** Native task routes and, since P1-56, A4 Forge routes: both carry a human principal through native admission. */
 export function isNativeStudioPath(pathname: string): boolean {
-  return pathname === "/api/v1/native-tasks" || pathname.startsWith("/api/v1/native-tasks/");
+  return pathname === "/api/v1/native-tasks" || pathname.startsWith("/api/v1/native-tasks/")
+    || pathname === "/api/v1/a4" || pathname.startsWith("/api/v1/a4/");
 }
 
 /** Existing aliases all reach the same signed approval engine; none is a weaker granting path. */

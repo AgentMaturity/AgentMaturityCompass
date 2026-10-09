@@ -1,0 +1,80 @@
+{
+  "schema": "amc.a4-package/v1",
+  "kind": "a4-agent-package",
+  "package": {
+    "name": "support-agent",
+    "version": "1.0.0",
+    "projectId": "a4p_example",
+    "revisionNo": 4,
+    "revisionDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+    "amcVersion": "2.0.0",
+    "node": ">=20"
+  },
+  "files": [
+    {
+      "path": "enforce/snapshot.json",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "size": 120,
+      "kind": "enforce-snapshot"
+    }
+  ],
+  "artifacts": {
+    "enforceSnapshotSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "compiledPlanSha256": null,
+    "signedConfigsSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "presetSha256": null,
+    "contextPluginSha256": null,
+    "memoryPolicySha256": null,
+    "updatePolicySha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "secretScanSha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "sbomSha256": null,
+    "aibomSha256": null
+  },
+  "approvals": [
+    {
+      "gateId": "a4gate_example",
+      "decisionId": "a4d_example",
+      "approverKey": "LOCAL_USER:u-approver",
+      "bindingDigest": "6666666666666666666666666666666666666666666666666666666666666666",
+      "stage": "activate",
+      "gate": "direction"
+    }
+  ],
+  "integration": {
+    "path": "native",
+    "enforcementBoundary": "tool_pipeline",
+    "evidenceTier": "observed",
+    "supported": "supported",
+    "reason": null,
+    "notCovered": [],
+    "source": "src/tools/toolPipeline.ts",
+    "conformanceReceipt": null
+  },
+  "quality": {
+    "targets": [
+      {
+        "dimension": "reliability",
+        "statement": "answers cite the policy",
+        "measure": "not instrumented",
+        "target": "every answer",
+        "evidenceSource": null,
+        "evidenceMethod": "not_yet_decided",
+        "source": "aspire brief r1"
+      }
+    ]
+  },
+  "provenance": {
+    "note": "AMC provenance record (not a formal SLSA claim)",
+    "builtFrom": {
+      "revision": "r4"
+    }
+  },
+  "signing": {
+    "algorithm": "ed25519",
+    "kind": "A4_PACKAGE",
+    "pubkeyFingerprint": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "generatedTs": 1791504000000,
+  "claimBoundary": "what this workspace held at the release digest; not evidence about the agent's behaviour",
+  "claimKind": "certified"
+}

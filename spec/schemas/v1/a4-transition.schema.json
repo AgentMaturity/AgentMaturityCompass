@@ -1,0 +1,141 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actorKey": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "actorUsername": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "body": {
+      "additionalProperties": {},
+      "propertyNames": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "bodyDigest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "evidenceEventId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "CREATED",
+        "STEP",
+        "REVISION",
+        "GATE_REQUESTED",
+        "GATE_DECIDED",
+        "GATE_CONSUMED",
+        "EFFECT_GATE_OPENED",
+        "EFFECT_STARTED",
+        "EFFECT_FINISHED",
+        "EFFECT_FAILED",
+        "CHANGES_REQUESTED",
+        "HOLD",
+        "RESUME",
+        "REOPEN",
+        "MEMBER",
+        "GATE_POLICY_CHANGED",
+        "EVIDENCE_REF",
+        "ACKNOWLEDGED",
+        "RELEASE",
+        "DEPLOYMENT",
+        "VERIFICATION",
+        "ROLLBACK",
+        "TUNE",
+        "RETIRE",
+        "COMMENT"
+      ],
+      "type": "string"
+    },
+    "prevDigest": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "const": "GENESIS",
+          "type": "string"
+        }
+      ]
+    },
+    "projectId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "readinessSha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "revisionNo": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "schema": {
+      "const": "amc.a4-transition/v1",
+      "type": "string"
+    },
+    "seq": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "stage": {
+      "anyOf": [
+        {
+          "enum": [
+            "aspire",
+            "assemble",
+            "adapt",
+            "activate",
+            "retired"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "maximum": 9007199254740991,
+      "minimum": -9007199254740991,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "seq",
+    "kind",
+    "stage",
+    "revisionNo",
+    "actorKey",
+    "actorUsername",
+    "body",
+    "bodyDigest",
+    "prevDigest",
+    "readinessSha256",
+    "evidenceEventId",
+    "ts"
+  ],
+  "title": "AMC A4 Transition",
+  "type": "object"
+}
