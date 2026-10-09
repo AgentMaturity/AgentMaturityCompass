@@ -149,15 +149,39 @@ function mountProject(projectId, options, strip) {
     const { open, met } = view.currentGates(state.gates, stage);
     return view.gateReview(open ?? met, state.readiness);
   };
-  /** The pinned review of `gate`; refuses when the page now shows a different gate or readiness than the user reviewed. */
+  /**
+   * The pinned review of `gate`; refuses when Studio published no digest, when the page now shows a different gate or
+   * readiness than the user reviewed, or when the specification card shows another revision than the one the gate binds.
+   */
   const reviewedFor = (gate) => {
-    if (!view.sameReview(reviewed, view.gateReview(gate, state.readiness))) throw new Error(`${view.GATE_CHANGED}. Show the current gate and review it first.`);
+    const review = view.gateReview(gate, state.readiness);
+    if (!view.boundReview(review)) throw new Error(`${view.UNBOUND}. Nothing was sent.`);
+    if (!view.sameReview(reviewed, review)) throw new Error(`${view.GATE_CHANGED}. Show the current gate and review it first.`);
+    if (reviewed.revisionNo !== state.revision?.revisionNo) throw new Error("The specification shown is not the revision this gate binds. Reload before deciding; nothing was sent.");
     return reviewed;
   };
 
   async function load() {
     const mine = ++generation;
     strip?.reset(); // the strip shows only the claims this load returns
+    // The reads are separate requests: a write landing between them (a new revision and its gate) would show one
+    // revision's gate under another revision's specification. Read again until they agree, three times at most.
+    for (let attempt = 1; ; attempt += 1) {
+      const read = await readProject();
+      if (mine !== generation) return;
+      if (view.oneRevision(read.project, read.revision, read.gates, read.readiness)) {
+        Object.assign(state, read);
+        stage = read.stage;
+        break;
+      }
+      if (attempt === 3) throw new Error("The project kept changing while this page read it. Reload the page.");
+    }
+    const shown = shownReview();
+    if (reviewed === null && view.boundReview(shown)) reviewed = shown;
+    render();
+  }
+
+  async function readProject() {
     const project = one(await apiNativeRequest(projectPath("")), "project");
     const viewStage = view.STAGES.includes(params.get("stage")) ? params.get("stage")
       : view.STAGES.includes(project.stage) ? project.stage : "activate";
@@ -171,11 +195,7 @@ function mountProject(projectId, options, strip) {
         ? apiNativeRequest(projectPath(`/revisions/diff?from=${project.revisionNo - 1}&to=${project.revisionNo}`)).catch((error) => ({ error: errorText(error) }))
         : null
     ]);
-    if (mine !== generation) return;
-    Object.assign(state, { project, readiness, gates, revision, comments, members, diff });
-    stage = viewStage;
-    reviewed ??= shownReview();
-    render();
+    return { project, readiness, gates, revision, comments, members, diff, stage: viewStage };
   }
 
   function render() {
@@ -184,7 +204,7 @@ function mountProject(projectId, options, strip) {
     const caret = focused ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
     const { project, readiness } = state;
     const shown = shownReview();
-    const gateChange = shown && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
+    const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
     // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
     const answersHere = stage === project.stage || state.revision?.stage === stage;
     const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation,
@@ -220,7 +240,7 @@ function mountProject(projectId, options, strip) {
     const gateView = state.readiness.gates?.[open?.gate];
     const seq = open ? view.gateSeq(gateView?.gateId === open.gateId ? gateView : open) : null;
     if (!open || seq === null) throw new Error("No open gate with its open sequence is shown. Refresh before deciding.");
-    const pin = reviewedFor(open);
+    const pin = reviewedFor(open); // both digests checked there: a decision never goes out unbound
     return { gateId: pin.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: pin.bindingDigest,
       expectedReadinessBindingDigest: pin.readinessBindingDigest, clientRequestId: uuid() };
   }

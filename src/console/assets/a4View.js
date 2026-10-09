@@ -254,11 +254,27 @@ export function gateSeq(gateView) {
   return Number.isSafeInteger(value) && value >= 0 ? value : null;
 }
 
-/** What a decision binds: the gate and readiness the approvals bar showed. a4.js pins the first one it renders. */
+/** What a decision binds: the gate and readiness the approvals bar showed. a4.js pins the first bound one it renders. */
 export const gateReview = (gate, readiness) => (gate ? { gateId: gate.gateId, bindingDigest: gate.bindingDigest,
   revisionNo: gate.revisionNo, readinessBindingDigest: readiness.bindingDigest } : null);
-export const sameReview = (a, b) => a !== null && b !== null && a.gateId === b.gateId && a.bindingDigest === b.bindingDigest
+const HEX64 = /^[0-9a-f]{64}$/;
+/** A review a decision can bind: Studio published both digests. A missing one never reads as bound. */
+export const boundReview = (review) => review != null && HEX64.test(String(review.bindingDigest)) && HEX64.test(String(review.readinessBindingDigest));
+export const sameReview = (a, b) => boundReview(a) && boundReview(b) && a.gateId === b.gateId && a.bindingDigest === b.bindingDigest
   && a.readinessBindingDigest === b.readinessBindingDigest;
+export const UNBOUND = "Studio did not publish the gate or readiness digest";
+
+/**
+ * True when one load's separate reads describe one revision: the specification card's revision and every live gate the
+ * page could bind (from /gates and from readiness) belong to the project's head revision. A new revision supersedes
+ * every earlier gate, so a consistent Studio always passes; a write landing between the reads fails it.
+ */
+export function oneRevision(project, revision, gates, readiness) {
+  const at = project.revisionNo;
+  const liveView = (gateView) => isObject(gateView) && (gateView.status === "PENDING" || gateView.status === "QUORUM_MET");
+  return (revision === null || revision.revisionNo === at) && gates.every((gate) => !isLive(gate) || gate.revisionNo === at)
+    && Object.values(readiness.gates ?? {}).every((gateView) => !liveView(gateView) || gateView.revisionNo === at);
+}
 
 /**
  * A decision readiness.staleApprovals lists shows Studio's reason codes as received. Only GATE_STALE, the reason Studio
@@ -285,7 +301,7 @@ export function renderApprovalsBar(ctx) {
   const gate = open ?? met;
   const staleCodes = new Map(readiness.staleApprovals.map((row) => [row.decisionId, Array.isArray(row.reasonCodes) ? row.reasonCodes : []]));
   const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
-  const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : offer);
+  const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND) : offer);
   const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
     bound to r${esc(old.revisionNo)}</li>`));
   const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
