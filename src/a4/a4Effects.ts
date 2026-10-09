@@ -54,7 +54,10 @@ export interface A4EffectDef {
   readonly actionClass: ActionClass;
   /** "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried. */
   readonly consumes: "A4" | "executor";
-  /** The documentary gate whose consumption runs this effect: `complete` refuses to consume that gate without it. */
+  /**
+   * The documentary gate whose consumption runs this effect: the only gate it may be opened on, and `complete` refuses to
+   * consume that gate without it. An effect without one cannot be opened.
+   */
   readonly completes?: `${A4Stage}.${"direction" | "completion"}`;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
@@ -110,17 +113,23 @@ function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateR
 
 /**
  * Opens (or re-opens) an effect gate (owner): a second engine request, created with `quorumFloor { requiredApprovals: 2,
- * requireDistinctUsers: true }` when the project is regulated, and an EFFECT_GATE_OPENED transition naming it.
+ * requireDistinctUsers: true }` when the project is regulated, and an EFFECT_GATE_OPENED transition naming it. Only on
+ * the gate the effect `completes`, named under its own stage: `complete` runs whatever effect is opened on the gate, so
+ * any other effect would stand in for the stage's own (409 A4_STEP_ORDER).
  * ponytail: the engine request is written before the project lock (files and a signature); one whose transition then
  * fails stays PENDING until it expires and is never consumed.
  */
-export function openEffectGate(store: A4Store, projectId: string, input: A4Call & { effectId: string; gateId: string; expectedHeadSeq: number }): A4TransitionResult {
+export function openEffectGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; effectId: string; gateId: string;
+  expectedHeadSeq: number }): A4TransitionResult {
   const def = effectDef(input.effectId);
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
   const state0 = loadA4State(store, projectId, now);
   const gate0 = gateRowOf(state0, input.gateId);
+  if (gate0.stage !== input.stage || def.completes !== `${gate0.stage}.${gate0.gate}`) {
+    throw fail(409, "A4_STEP_ORDER", `effect ${def.id} is not opened on the ${gate0.stage} ${gate0.gate} gate`);
+  }
   assertReopenable(store, state0, gate0, def);
   const intentPayload = effectIntent(def, state0, gate0);
   const quorumFloor = isRegulated(state0, a4FloorFor(loadApprovalPolicy(store.workspace))) ? { requiredApprovals: 2, requireDistinctUsers: true } : undefined;

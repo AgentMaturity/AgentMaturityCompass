@@ -339,11 +339,11 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
   }
   const effect = /^\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/(open|retry)$/.exec(tail);
   if (effect !== null) {
-    stageInput(effect[1]);
+    const stage = stageInput(effect[1]);
     const effectId = effect[2]!;
     if (effect[3] === "open") {
       const { body, request } = await readJson(route, z.strictObject({ ...base, gateId: gateIdSchema }));
-      return respond(route, projectId, request, () => openEffectGate(store, projectId, { ...callOf(route, request), effectId, gateId: body.gateId,
+      return respond(route, projectId, request, () => openEffectGate(store, projectId, { ...callOf(route, request), stage, effectId, gateId: body.gateId,
         expectedHeadSeq: body.expectedHeadSeq }), 201);
     }
     const { body, request } = await readJson(route, z.strictObject({ ...base, attemptId: z.string().regex(/^a4e_[0-9a-f]{32}$/) }));
