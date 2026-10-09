@@ -76,7 +76,8 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/members`]: { get: read("Members; owners also see who can be added"), post: write("Add, change or remove a member (owner)", "A4Members") },
     [`${p}/comments`]: { get: read("Comments (bodies read from the encrypted blob store; VAULT_LOCKED when it is locked)", [query("card", string, "Only this card.")]),
       post: write("Comment (project members, read roles suffice)", "A4Comment", [], "201") },
-    [`${p}/presence`]: { post: write("Show presence on a card for 30 s (never journaled)", "A4Presence") },
+    // Presence answers { presence: [{ username, card }] }, not a transition.
+    [`${p}/presence`]: { post: operation("Show presence on a card for 30 s (never journaled)", "A4Response", { write: true, body: "A4Presence", parameters: [project] }) },
     [`${p}/evidence`]: { get: read("Evidence refs of a revision, resolved now (tier recomputed, lane re-derived)", [query("revision", integer, "Defaults to the head revision.")]),
       post: write("Attach an evidence ref (builder or owner; self_reported unless a runtime-written ledger row earns observed)", "A4Evidence", [], "201") },
     [`${p}/value`]: { get: read("Value view: not evaluated until Activate's producer (P1-62)") },
