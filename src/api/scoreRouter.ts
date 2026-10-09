@@ -342,7 +342,7 @@ export async function handleScoreRoute(
           : 0,
         ts: Date.now(),
         source: 'api.score.run',
-      });
+      }, workspace);
       apiSuccess(res, result, 200);
     } catch (err) {
       scoreRouteError(res, err, 'Diagnostic run failed');
@@ -497,7 +497,7 @@ export async function handleScoreRoute(
         level: Math.round(score / Math.max(result.layerScores?.length ?? 1, 1)),
         ts: Date.now(),
         source: 'api.score.formal-spec',
-      });
+      }, workspace);
       apiSuccess(res, result, 200);
     } catch (err) {
       scoreRouteError(res, err, 'Score failed');
@@ -694,7 +694,7 @@ export async function handleScoreRoute(
     const percentage = maxPossible > 0 ? Math.round((totalScore / maxPossible) * 100) : 0;
     const level = percentage >= 80 ? 5 : percentage >= 60 ? 4 : percentage >= 40 ? 3 : percentage >= 20 ? 2 : 1;
     apiSuccess(res, { sessionId: session.id, agentId: session.agentId, answeredCount, totalScore, maxPossible, percentage, level, createdAt: session.createdAt });
-    queueScoreComputationMetric({ agentId: session.agentId, runId: session.id, sessionId: session.id, score: totalScore, maxScore: maxPossible, percentage, level, ts: Date.now(), source: 'api.score.result' });
+    queueScoreComputationMetric({ agentId: session.agentId, runId: session.id, sessionId: session.id, score: totalScore, maxScore: maxPossible, percentage, level, ts: Date.now(), source: 'api.score.result' }, workspace);
     markScoreSessionCompleted(workspace, session.id);
     return true;
   }

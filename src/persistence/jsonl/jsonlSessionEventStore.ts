@@ -314,7 +314,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
     // at the last durable row so a retry re-chains from the truth.
     this.headHash = eventHash;
     this.knownEventIds.add(id);
-    queueEvidenceEventSpan(row);
+    queueEvidenceEventSpan(row, this.workspace);
 
     return { id, ts, payloadSha256: stored.sha, eventHash, writerSig };
   }

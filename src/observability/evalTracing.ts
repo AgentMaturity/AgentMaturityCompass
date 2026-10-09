@@ -17,6 +17,7 @@ import type {
   ScoreComputationMetric,
 } from "./otelExporter.js";
 import { noteTelemetryDropped } from "./telemetryDrops.js";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import type { DiagnosticReport } from "../types.js";
 
 export interface EvalTraceContext {
@@ -36,6 +37,19 @@ export function emitEvalRunTelemetry(
   report: DiagnosticReport,
   ctx?: Partial<EvalTraceContext>,
 ): void {
+  const workspace = ctx?.workspace;
+  if (workspace !== undefined) {
+    if (typeof workspace !== "string" || !workspace.trim()) {
+      noteTelemetryDropped(1);
+      return;
+    }
+    return withWorkspaceScope(workspace, () => emitEvalRunTelemetry(report, {
+      agentId: ctx?.agentId,
+      runId: ctx?.runId,
+      sessionId: ctx?.sessionId,
+      workspace: undefined,
+    }));
+  }
   const exporter = getSharedObservabilityExporter();
   const agentId = ctx?.agentId ?? report.agentId;
   const runId = ctx?.runId ?? report.runId;

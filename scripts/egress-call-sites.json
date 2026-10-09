@@ -367,8 +367,8 @@
       "path": "src/observability/otelExportTransport.ts",
       "line": 75,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Internal POST has a record-time context gate before every manual-redirect attempt, but known ledger, JSONL store, score API and eval callers still omit their owning workspace. They can inherit unregulated cwd behavior rather than their workspace rules; this row is deferred pending the expressly released caller-scope correction. Guard existence is not full coverage. Explicit null resource facts, bounded retries and existing failed-result handling remain. Source-only; prior POST effects, missing external caller scope, global-fetch/DNS/response limits and caller-owned SDK egress remain unresolved."
+      "status": "gated",
+      "reason": "Internal POST prepares endpoints/header strings/JSON bodies and groups items by privately captured record-time workspace/native context. Known ledger (three calls), JSONL store, score API (three calls) and eval context now carry their owning workspace; explicit scope overrides ambient ALS, and invalid explicit scope is dropped by best-effort adapters. Every fresh-timeout manual-redirect attempt checks network-tool residency inside the captured runner with null resource classes/purpose, and typed refusal is not retried or counted as successful. Dispatch yields off the recording ledger stack. Source-only; external caller scope, prior POST effects, global-fetch/DNS/response limits, global loss attribution and separate caller-owned SDK egress remain unresolved."
     },
     {
       "siteId": "src/ops/otelExporter.ts:327:1",
