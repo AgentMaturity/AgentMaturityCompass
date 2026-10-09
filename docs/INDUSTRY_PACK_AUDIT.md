@@ -102,8 +102,8 @@ verifies a `?file=` only inside `.amc/audit/binders/exports/`, so copy a bundle
 there to verify it from Studio (a copy, not a link). A file reached through a
 symbolic link (the file itself, or `.amc/audit`, `.amc/audit/binders`,
 `exports` or a directory under it), a hard-linked file, and anything that is
-not a regular file all read as the same `UNREADABLE` (a path that does not
-exist is 404), and the bytes verified are the bytes read once from that file. The checksum alone is
+not a regular file all read as the same `UNREADABLE`, and so does a path that
+does not exist, so the answer never tells whether a linked target exists. The bytes verified are the bytes read once from that file. The checksum alone is
 `sha256(canonicalize(bundle without receiptHash and signature))`; recomputing it
 detects accidental edits, not deliberate ones.
 
