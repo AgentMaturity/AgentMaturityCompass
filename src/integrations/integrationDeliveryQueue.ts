@@ -2,6 +2,8 @@ import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { writeFileSync } from "node:fs";
+import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { EgressBlocked } from "../residency/checkEgress.js";
 import {
   getPrivateKeyPem,
   getPublicKeyHistory,
@@ -741,17 +743,17 @@ export async function processIntegrationChannelQueue(params: {
     receipt: WebhookDeliveryReceipt;
   }) => Promise<IntegrationDeliveryArtifacts | null>;
 }): Promise<ProcessIntegrationQueueResult> {
-  const maxRows = Math.max(1, Math.min(500, Math.floor(params.maxRows ?? DEFAULT_MAX_PROCESS_ROWS)));
-  const now = params.now ?? Date.now;
+  const input = { ...params };
+  const workspace = input.workspace.trim() ? resolve(input.workspace) : input.workspace;
+  const maxRows = Math.max(1, Math.min(500, Math.floor(input.maxRows ?? DEFAULT_MAX_PROCESS_ROWS)));
+  const now = input.now ?? Date.now;
   const policy = {
     ...DEFAULT_WEBHOOK_POLICY,
-    ...(params.deliveryPolicy ?? {})
+    ...(input.deliveryPolicy ?? {})
   };
-
-  const db = openIntegrationQueueDb(params.workspace);
+  const db = openIntegrationQueueDb(workspace);
   const processed: ProcessedIntegrationDelivery[] = [];
   let blockedByOrdering = false;
-
   try {
     const loadNext = db.prepare(
       `SELECT * FROM integration_delivery_queue
@@ -802,7 +804,7 @@ export async function processIntegrationChannelQueue(params: {
     );
 
     for (let processedCount = 0; processedCount < maxRows; processedCount += 1) {
-      const row = loadNext.get(params.channelId) as IntegrationQueueRow | undefined;
+      const row = loadNext.get(input.channelId) as IntegrationQueueRow | undefined;
       if (!row) {
         break;
       }
@@ -816,15 +818,14 @@ export async function processIntegrationChannelQueue(params: {
       const attemptRound = row.attempt_round + 1;
 
       try {
-        if (!verifyQueueBinding(params.workspace, row)) {
+        if (!verifyQueueBinding(workspace, row)) {
           throw new Error("DELIVERY_QUEUE_BINDING_INVALID");
         }
         const deliveryRequest = buildDeliveryRequest({
-          workspace: params.workspace,
+          workspace,
           row
         });
-
-        const receipt = await deliverWebhookWithRetry({
+        const receipt = await withWorkspaceScope(workspace, () => deliverWebhookWithRetry({
           request: {
             url: deliveryRequest.url,
             eventType: row.event_name,
@@ -834,13 +835,12 @@ export async function processIntegrationChannelQueue(params: {
           },
           policy,
           deliveryId: `int_${row.queue_id}`
-        });
-
+        }));
         const lastHttpStatus = receipt.attempts[receipt.attempts.length - 1]?.httpStatus ?? null;
 
         if (receipt.delivered) {
           const artifacts =
-            (await params.onDelivered?.({
+            (await input.onDelivered?.call(params, {
               queueId: row.queue_id,
               channelId: row.channel_id,
               eventName: row.event_name,
@@ -922,6 +922,7 @@ export async function processIntegrationChannelQueue(params: {
         blockedByOrdering = true;
         break;
       } catch (error) {
+        if (error instanceof EgressBlocked) throw error;
         const message = normalizeWebhookDeliveryError(error);
         const updatedTs = now();
         if (message === "DELIVERY_QUEUE_BINDING_INVALID" || attemptRound >= row.max_rounds) {
@@ -961,9 +962,8 @@ export async function processIntegrationChannelQueue(params: {
         break;
       }
     }
-
     return {
-      channelId: params.channelId,
+      channelId: input.channelId,
       processed,
       blockedByOrdering
     };

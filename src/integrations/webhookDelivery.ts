@@ -1,6 +1,9 @@
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
+import { resolve } from "node:path";
+import { getWorkspaceScope, withWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { sha256Hex } from "../utils/hash.js";
 
 export interface WebhookHttpResponse {
@@ -219,17 +222,25 @@ export function buildWebhookHeaders(params: {
 
 export const defaultWebhookHttpClient: WebhookHttpClient = {
   async post(params): Promise<WebhookHttpResponse> {
-    const url = new URL(params.url);
+    const rawWorkspace = getWorkspaceScope();
+    const workspace = rawWorkspace?.trim() ? resolve(rawWorkspace) : rawWorkspace;
+    const destination = params.url;
+    const body = params.body;
+    const timeoutMs = params.timeoutMs;
+    const url = new URL(destination);
+    const request = requestImpl(url);
+    const options = {
+      method: "POST",
+      headers: {
+        ...params.headers,
+        "content-length": String(Buffer.byteLength(body))
+      }
+    };
     return new Promise<WebhookHttpResponse>((resolvePromise, rejectPromise) => {
-      const req = requestImpl(url)(
+      checkScopedEgress(workspace, "callback", destination, { dataClasses: null, purpose: null });
+      const req = request(
         url,
-        {
-          method: "POST",
-          headers: {
-            ...params.headers,
-            "content-length": String(Buffer.byteLength(params.body))
-          }
-        },
+        options,
         (res) => {
           const chunks: Buffer[] = [];
           res.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
@@ -241,11 +252,11 @@ export const defaultWebhookHttpClient: WebhookHttpClient = {
           });
         }
       );
-      req.setTimeout(params.timeoutMs, () => {
-        req.destroy(new Error(`webhook timeout after ${params.timeoutMs}ms`));
+      req.setTimeout(timeoutMs, () => {
+        req.destroy(new Error(`webhook timeout after ${timeoutMs}ms`));
       });
       req.on("error", rejectPromise);
-      req.write(params.body);
+      req.write(body);
       req.end();
     });
   }
@@ -257,16 +268,19 @@ export async function deliverWebhookWithRetry(params: {
   dependencies?: WebhookDeliveryDependencies;
   deliveryId?: string;
 }): Promise<WebhookDeliveryReceipt> {
-  const policy = normalizePolicy(params.policy);
-  const client = params.dependencies?.client ?? defaultWebhookHttpClient;
-  const sleep = params.dependencies?.sleep ?? defaultSleep;
-  const now = params.dependencies?.now ?? defaultNow;
-  const rng = params.dependencies?.rng ?? defaultRng;
+  const rawWorkspace = getWorkspaceScope();
+  const workspace = rawWorkspace?.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const { url, eventType, secret, payload, headers: requestHeaders } = params.request;
+  const extraHeaders = { ...requestHeaders };
+  const policy = normalizePolicy({ ...params.policy });
+  const dependencies = { ...params.dependencies };
+  const client = dependencies.client ?? defaultWebhookHttpClient;
+  const post = client.post.bind(client);
+  const sleep = dependencies.sleep ?? defaultSleep;
+  const now = dependencies.now ?? defaultNow;
+  const rng = dependencies.rng ?? defaultRng;
   const deliveryId = params.deliveryId ?? `wh_${randomUUID().replace(/-/g, "")}`;
-  const payloadBody =
-    typeof params.request.payload === "string"
-      ? params.request.payload
-      : JSON.stringify(params.request.payload);
+  const payloadBody = typeof payload === "string" ? payload : JSON.stringify(payload);
   const payloadSha256 = sha256Hex(payloadBody);
   const createdTs = now();
   const attempts: WebhookAttemptReceipt[] = [];
@@ -275,7 +289,7 @@ export async function deliverWebhookWithRetry(params: {
     const startedTs = now();
     const timestampSeconds = Math.floor(startedTs / 1000);
     const signature = signWebhookPayload({
-      secret: params.request.secret,
+      secret,
       payload: payloadBody,
       timestamp: timestampSeconds
     });
@@ -284,16 +298,23 @@ export async function deliverWebhookWithRetry(params: {
       attempt,
       timestamp: timestampSeconds,
       signature,
-      extraHeaders: params.request.headers
+      extraHeaders
     });
 
     try {
-      const response = await client.post({
-        url: params.request.url,
+      const request = {
+        url,
         body: payloadBody,
         headers,
         timeoutMs: policy.timeoutMs
-      });
+      };
+      const send = () => {
+        checkScopedEgress(workspace, "callback", url, { dataClasses: null, purpose: null });
+        return post(request);
+      };
+      const response = await (workspace !== undefined && workspace.trim()
+        ? withWorkspaceScope(workspace, send)
+        : send());
       const delivered = response.status >= 200 && response.status < 300;
       const backoffMs = !delivered && attempt < policy.maxAttempts
         ? computeBackoffDelayMs({
@@ -317,8 +338,8 @@ export async function deliverWebhookWithRetry(params: {
       if (delivered) {
         return {
           deliveryId,
-          eventType: params.request.eventType,
-          url: params.request.url,
+          eventType,
+          url,
           payloadSha256,
           createdTs,
           completedTs: now(),
@@ -330,6 +351,7 @@ export async function deliverWebhookWithRetry(params: {
         await sleep(backoffMs);
       }
     } catch (error) {
+      if (error instanceof EgressBlocked) throw error;
       const message = error instanceof Error ? error.message : String(error);
       const backoffMs = attempt < policy.maxAttempts
         ? computeBackoffDelayMs({
@@ -358,8 +380,8 @@ export async function deliverWebhookWithRetry(params: {
 
   return {
     deliveryId,
-    eventType: params.request.eventType,
-    url: params.request.url,
+    eventType,
+    url,
     payloadSha256,
     createdTs,
     completedTs: now(),

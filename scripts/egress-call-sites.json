@@ -299,12 +299,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/integrations/webhookDelivery.ts:224:1",
+      "siteId": "src/integrations/webhookDelivery.ts:241:1",
       "path": "src/integrations/webhookDelivery.ts",
-      "line": 224,
-      "call": "requestImpl(url)(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "line": 241,
+      "call": "request(",
+      "status": "gated",
+      "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
     },
     {
       "siteId": "src/lighthouse/finance/paymentServiceClient.ts:108:1",
