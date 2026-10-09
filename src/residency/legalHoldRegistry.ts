@@ -50,7 +50,7 @@ export class LegalHoldRegistryError extends Error {
     this.verdict = Object.freeze({ verdict: "unknown", reason });
   }
 }
-const fail = (reason: Unknown["reason"]): never => { throw new LegalHoldRegistryError(reason); };
+function fail(reason: Unknown["reason"]): never { throw new LegalHoldRegistryError(reason); }
 const workspacePath = (workspace: string): string => typeof workspace === "string" && workspace.trim() ? resolve(workspace) : fail("registry_unreadable");
 export const legalHoldRegistryRoot = (workspace: string): string => join(workspacePath(workspace), ".amc", "residency", "legal-holds");
 const legacyRoot = (workspace: string, kind: string): string => join(workspacePath(workspace), ".amc", "compliance", "residency", kind);
