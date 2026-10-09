@@ -151,6 +151,8 @@ function mountProject(projectId, options) {
   const drafts = new Map();
 
   const stagePath = (sub) => projectPath(`/stages/${stage}/${sub}`);
+  // The editor's base: the spec without the answers Studio carries, so the merge and the proposal never name them.
+  const specBaseNow = () => ({ revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: view.editableSpec(state.revision?.spec) });
   const headBinding = () => ({ expectedHeadSeq: state.project.headSeq, clientRequestId: uuid() });
   const presenceCard = () => `${stage}:${activeCard}`;
   // Every <details> the page renders carries data-a4-open; a re-render keeps the user's open/closed choice by this key.
@@ -295,20 +297,22 @@ function mountProject(projectId, options) {
   function specAction(spec, base) {
     return { label: "Propose this specification", path: stagePath("propose"), spec, base, clears: ["specification:spec"],
       got: () => { specBase = null; },
-      body: { spec, parentRevisionNo: base.revisionNo > 0 ? base.revisionNo : null, expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
+      // P1-57 takes no parent for a first revision (a null is refused).
+      body: { spec, ...(base.revisionNo > 0 ? { parentRevisionNo: base.revisionNo } : {}), expectedHeadSeq: base.headSeq, clientRequestId: uuid() } };
   }
 
   function parseSpec(text) {
     let spec;
     try { spec = JSON.parse(text); } catch { throw new Error("The specification is not valid JSON. Nothing was sent."); }
     if (!isObject(spec)) throw new Error("The specification must be a JSON object. Nothing was sent.");
+    if (Object.hasOwn(spec, "answers")) throw new Error("Answers are recorded through Save answers. Nothing was sent.");
     return spec;
   }
 
   function proposeAction(scope) {
     const field = scope.querySelector('[name="spec"]');
-    if (!field) return { label: "Propose", path: stagePath("propose"), body: headBinding() };
-    return specAction(parseSpec(field.value), specBase ?? { revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: state.revision?.spec ?? {} });
+    if (!field) throw new Error("No specification is shown on this card. Nothing was sent.");
+    return specAction(parseSpec(field.value), specBase ?? specBaseNow());
   }
 
   /** Confirm and Correct bind the head of the reflection this page shows, so a newer reflection makes Studio answer 409. */
@@ -412,7 +416,7 @@ function mountProject(projectId, options) {
       return run({ ...specAction(action.spec, { ...action.base, headSeq: head.headSeq }), rebased: true });
     }
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
-    const headSpec = isObject(headRevision?.spec) ? headRevision.spec : {};
+    const headSpec = view.editableSpec(headRevision?.spec);
     conflict = { baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
       theirs: view.jsonDiff(action.base.spec, headSpec), mine: view.jsonDiff(action.base.spec, action.spec) };
     await load();
@@ -513,9 +517,7 @@ function mountProject(projectId, options) {
   root.addEventListener("input", (event) => {
     const key = draftKey(event.target);
     if (!key) return;
-    if (key === "specification:spec" && !specBase) {
-      specBase = { revisionNo: state.project.revisionNo, headSeq: state.project.headSeq, spec: state.revision?.spec ?? {} };
-    }
+    if (key === "specification:spec" && !specBase) specBase = specBaseNow();
     drafts.set(key, event.target.value);
   });
   document.addEventListener("visibilitychange", () => (document.hidden ? clearTimeout(timer) : schedule(0)));

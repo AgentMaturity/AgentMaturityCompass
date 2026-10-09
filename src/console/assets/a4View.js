@@ -161,6 +161,9 @@ export function renderConversation(ctx) {
     ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
 }
 
+/** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */
+export const editableSpec = (spec) => Object.fromEntries(Object.entries(isObject(spec) ? spec : {}).filter(([key]) => key !== "answers"));
+
 export function renderSpecEditor(ctx) {
   const { revision, allowed, project, stage } = ctx;
   if (stage !== project.stage) {
@@ -171,7 +174,8 @@ export function renderSpecEditor(ctx) {
   }
   return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
     spec <code>${esc(revision.specDigest)}</code>)` : ""}. ${RETAINED}</p>
-    <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(revision?.spec ?? {}, null, 2))}</textarea>
+    <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
+    <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
     <div class="row wrap">${actionButton("Propose this specification", "propose", allowed.propose)}</div>`;
 }
 
