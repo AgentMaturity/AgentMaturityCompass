@@ -505,10 +505,11 @@ export async function resolveAgentResponder(
   // at a specific address, silently routing through the gateway instead would
   // scan the wrong target.
   const explicitEndpoint = process.env.AMC_AGENT_BASE_URL?.trim();
+  const gatewayEndpoint = gatewayBase === null ? null : `${gatewayBase}${routePrefix}${completionsPath}`;
   const useGateway =
-    !explicitEndpoint && gatewayBase !== null && (await gatewayReachable(gatewayBase, fetchImpl, workspace, agentId));
+    !explicitEndpoint && gatewayEndpoint !== null && (await gatewayReachable(gatewayEndpoint, fetchImpl, workspace, agentId));
 
-  if (useGateway && gatewayBase !== null) {
+  if (useGateway && gatewayEndpoint !== null) {
     const lease = issueLeaseToken({
       workspace,
       workspaceId: workspaceIdFromDirectory(workspace),
@@ -528,7 +529,7 @@ export async function resolveAgentResponder(
       target: {
         agentId: agentConfig.id,
         transport: "gateway",
-        endpoint: `${gatewayBase}${routePrefix}${completionsPath}`,
+        endpoint: gatewayEndpoint,
         model,
         routePrefix,
         upstreamId: provider.upstreamId,

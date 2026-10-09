@@ -20198,12 +20198,11 @@ shield
       const { resolveAgentResponder, AgentResponderUnavailableError } = await import(
         "./assurance/agentResponder.js"
       );
+      const { EgressBlocked } = await import("./residency/checkEgress.js");
       const { detectJailbreak } = await import("./redteam/jailbreak/detector.js");
       const rounds = parseInt(opts.rounds ?? "1", 10);
       const targetId = opts.target ?? "demo";
-
-      // Attack the real agent. This evaluator previously returned
-      // Math.random() < 0.2, so every reported success rate was noise.
+      // Use the real agent; the earlier random evaluator produced meaningless success rates.
       let attackResponder;
       try {
         attackResponder = await resolveAgentResponder({
@@ -20251,8 +20250,8 @@ shield
                   bypassConfidence: verdict.confidence,
                 };
               } catch (error) {
-                // A failed invocation is not a defended attack; report it as
-                // unsuccessful with zero confidence rather than a silent pass.
+                if (error instanceof EgressBlocked) throw error;
+                // Other invocation failures retain legacy reporting; reconciliation is separate.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
@@ -20267,6 +20266,7 @@ shield
           },
         ],
       });
+      rt.on("error", (event: { error: unknown }) => { throw event.error; });
       console.log(chalk.bold.red(`\n🔴  Red Team Campaign`));
       console.log(chalk.dim("Tip: For full red-team suite with strategies, use `amc redteam run`"));
       console.log(chalk.gray("Target:"), targetId);
