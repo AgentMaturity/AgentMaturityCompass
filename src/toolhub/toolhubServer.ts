@@ -838,6 +838,7 @@ export class ToolHubService {
       }
       const body = typeof args.body === "string" ? args.body : undefined;
       const out = await executeHttpFetch({
+        workspace: this.workspace,
         url,
         method,
         headers,
