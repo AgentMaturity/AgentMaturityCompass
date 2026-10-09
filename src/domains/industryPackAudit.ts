@@ -436,14 +436,15 @@ export function unreadableAuditResult(file: string, trust: TrustContext): Indust
  * For `amc audit binder verify`: verifies `file` when it is a .json industry-pack audit (any schema version, so
  * older unsigned bundles report UNSIGNED), else returns null and the caller treats it as a binder. A file or key that
  * cannot be read is a generic UNREADABLE result: no OS error text, so a caller learns nothing about other paths.
+ * `bytes`, when given, are the file's contents already read and are verified instead of re-reading `file`.
  */
-export function verifyIndustryPackAuditFile(params: { file: string; publicKeyPath?: string; trust: TrustContext }):
+export function verifyIndustryPackAuditFile(params: { file: string; bytes?: Buffer; publicKeyPath?: string; trust: TrustContext }):
   (IndustryPackAuditVerification & { audit: IndustryPackAudit | null; fileSha256: string }) | null {
   if (!params.file.toLowerCase().endsWith(".json")) return null;
   let bytes: Buffer;
   let publicKeyPem: string | null;
   try {
-    bytes = readFileSync(params.file);
+    bytes = params.bytes ?? readFileSync(params.file);
     publicKeyPem = params.publicKeyPath ? readFileSync(params.publicKeyPath, "utf8") : null;
   } catch {
     return unreadableAuditResult(params.file, params.trust);
