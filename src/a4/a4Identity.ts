@@ -16,10 +16,8 @@ import { join } from "node:path";
 import { z } from "zod";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
-import { listUsers, usersConfigPath, usersConfigSigPath } from "../auth/authApi.js";
+import { listUsers, listVerifiedUsers } from "../auth/authApi.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { sha256Hex } from "../utils/hash.js";
 import type { A4Member, A4Principal } from "./a4Schema.js";
 
 export type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
@@ -32,19 +30,6 @@ export type A4Resolution =
 
 const refuse = (status: 401 | 403, code: string, message: string): A4Refusal => ({ ok: false, status, code, message });
 const isMutation = (method: string): boolean => !["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase());
-
-/** The fingerprint (sha256 of the PEM) of the auditor key that signed users.yaml, or null when none verifies. */
-function usersYamlSignerFingerprint(workspace: string): string | null {
-  try {
-    const sig = JSON.parse(readFileSync(usersConfigSigPath(workspace), "utf8")) as { digestSha256?: string; signature?: string };
-    const digest = sha256Hex(readFileSync(usersConfigPath(workspace)));
-    if (sig.digestSha256 !== digest || typeof sig.signature !== "string") return null;
-    const signer = getPublicKeyHistory(workspace, "auditor").find((pem) => verifyHexDigestAny(digest, sig.signature!, [pem]));
-    return signer === undefined ? null : sha256Hex(Buffer.from(signer, "utf8"));
-  } catch {
-    return null;
-  }
-}
 
 /** The `SessionStoreRecord` fields A4 reads (src/auth/authApi.ts), checked rather than cast. */
 const sessionRecordSchema = z.object({
@@ -93,17 +78,18 @@ function livePrincipal(workspace: string, authSource: A4Principal["authSource"],
     return { key: `WORKSPACE_ROUTER:${userId}`, authSource, userId, username: mine[0]!.username, roles, admission,
       identityCheck: "session_record", provenance: { usersYamlSignerFingerprint: null, createdTs: null, createdBy: null, hostMembershipId: null } };
   }
-  let users;
+  // Roles, status and the signer fingerprint all come from the one read whose signature verified.
+  let verified;
   try {
-    users = listUsers(workspace);
+    verified = listVerifiedUsers(workspace);
   } catch (error) {
     return refuse(403, "A4_IDENTITY_UNVERIFIED", `users.yaml could not be verified: ${error instanceof Error ? error.message : String(error)}`);
   }
-  const user = users.find((row) => row.userId === userId);
+  const user = verified.users.find((row) => row.userId === userId);
   if (!user) return refuse(401, "A4_PRINCIPAL_UNKNOWN", "This session's user is not in users.yaml.");
   if (user.status !== "ACTIVE") return refuse(403, "A4_USER_DISABLED", "This user is revoked; a project membership row is history, not authority.");
   return { key: `LOCAL_USER:${userId}`, authSource, userId, username: user.username, roles: [...user.roles], admission, identityCheck: "users_yaml",
-    provenance: { usersYamlSignerFingerprint: usersYamlSignerFingerprint(workspace), createdTs: user.createdTs,
+    provenance: { usersYamlSignerFingerprint: verified.signerFingerprint, createdTs: user.createdTs,
       createdBy: user.createdBy ?? null, hostMembershipId: null } };
 }
 

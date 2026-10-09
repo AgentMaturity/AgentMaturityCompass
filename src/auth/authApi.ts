@@ -62,54 +62,39 @@ export function verifyUsersConfigSignature(workspace: string): {
   path: string;
   sigPath: string;
 } {
+  return readSignedUsersConfig(workspace).verdict;
+}
+
+/**
+ * One read of users.yaml and its .sig: the verdict over exactly these bytes, the bytes themselves (null when the file
+ * is missing) and the auditor key that verified them. Callers parse these bytes, never a second read of the file.
+ */
+function readSignedUsersConfig(workspace: string): {
+  verdict: ReturnType<typeof verifyUsersConfigSignature>;
+  bytes: Buffer | null;
+  signerPem: string | null;
+} {
   const path = usersPath(workspace);
   const sigPath = usersSigPath(workspace);
+  const verdict = (valid: boolean, signatureExists: boolean, reason: string | null) => ({ valid, signatureExists, reason, path, sigPath });
   if (!pathExists(path)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "users config missing",
-      path,
-      sigPath
-    };
+    return { verdict: verdict(false, false, "users config missing"), bytes: null, signerPem: null };
   }
-  if (!pathExists(sigPath)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "users signature missing",
-      path,
-      sigPath
-    };
-  }
+  let bytes: Buffer | null = null;
   try {
-    const sig = JSON.parse(readUtf8(sigPath)) as UsersSignature;
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return {
-        valid: false,
-        signatureExists: true,
-        reason: "digest mismatch",
-        path,
-        sigPath
-      };
+    bytes = readFileSync(path);
+    if (!pathExists(sigPath)) {
+      return { verdict: verdict(false, false, "users signature missing"), bytes, signerPem: null };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      path,
-      sigPath
-    };
+    const sig = JSON.parse(readUtf8(sigPath)) as UsersSignature;
+    const digest = sha256Hex(bytes);
+    if (digest !== sig.digestSha256) {
+      return { verdict: verdict(false, true, "digest mismatch"), bytes, signerPem: null };
+    }
+    const signerPem = getPublicKeyHistory(workspace, "auditor").find((pem) => verifyHexDigestAny(digest, sig.signature, [pem])) ?? null;
+    return { verdict: verdict(signerPem !== null, true, signerPem !== null ? null : "signature verification failed"), bytes, signerPem };
   } catch (error) {
-    return {
-      valid: false,
-      signatureExists: true,
-      reason: String(error),
-      path,
-      sigPath
-    };
+    return { verdict: verdict(false, true, String(error)), bytes, signerPem: null };
   }
 }
 
@@ -132,17 +117,19 @@ function signUsersConfig(workspace: string): string {
 }
 
 function loadUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }): UsersFile {
-  const path = usersPath(workspace);
-  if (!pathExists(path)) {
+  return loadSignedUsersConfig(workspace, options).config;
+}
+
+/** users.yaml parsed from the bytes its signature was verified over, in the same read, and the verifying auditor key. */
+function loadSignedUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }): { config: UsersFile; signerPem: string | null } {
+  const { verdict, bytes, signerPem } = readSignedUsersConfig(workspace);
+  if (verdict.reason === "users config missing") {
     throw new Error("users config missing");
   }
-  if (options?.requireValidSignature !== false) {
-    const verify = verifyUsersConfigSignature(workspace);
-    if (!verify.valid) {
-      throw new Error(`users signature invalid: ${verify.reason ?? "unknown"}`);
-    }
+  if ((options?.requireValidSignature !== false && !verdict.valid) || bytes === null) {
+    throw new Error(`users signature invalid: ${verdict.reason ?? "unknown"}`);
   }
-  return usersFileSchema.parse(YAML.parse(readUtf8(path)) as unknown);
+  return { config: usersFileSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown), signerPem };
 }
 
 function saveUsersConfig(workspace: string, users: UsersFile): void {
@@ -175,7 +162,16 @@ export function initUsersConfig(params: {
 }
 
 export function listUsers(workspace: string): UserRecord[] {
-  return loadUsersConfig(workspace).users.slice().sort((a, b) => a.username.localeCompare(b.username));
+  return listVerifiedUsers(workspace).users;
+}
+
+/**
+ * The users of a users.yaml whose signature verifies, parsed from the verified bytes, with the sha256 of the auditor
+ * public key PEM that verified them. Throws when the file is missing or its signature does not verify.
+ */
+export function listVerifiedUsers(workspace: string): { users: UserRecord[]; signerFingerprint: string } {
+  const { config, signerPem } = loadSignedUsersConfig(workspace);
+  return { users: config.users.slice().sort((a, b) => a.username.localeCompare(b.username)), signerFingerprint: sha256Hex(Buffer.from(signerPem!, "utf8")) };
 }
 
 export function addUser(params: {
