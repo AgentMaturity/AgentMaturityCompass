@@ -68,7 +68,9 @@ Teredo and local-use NAT64 fail closed. The gateway's `hostAllowed` calls it and
 keeps its semantics, except that an IP-literal host no longer matches an entry
 by suffix. The gateway resolves nothing, so an allowed name there can still
 resolve inward; making it resolve and connect to a checked address is proposed
-follow-up P1-59.
+follow-up P1-59. (Amended: done as P1-66, which re-keyed P1-59; the gateway
+forward proxy now calls `resolveAndCheck` for every connection and connects
+only to a checked address.)
 
 **Shell egress proxy.** With `egress`, each shell call starts an HTTP forward
 proxy (CONNECT and plain HTTP) for that call only, so every decision binds to a

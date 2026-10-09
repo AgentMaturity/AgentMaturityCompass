@@ -246,7 +246,8 @@ curl and git over HTTPS read `http_proxy`/`HTTPS_PROXY`, npm and pip read
 `HTTPS_PROXY`, and Node's built-in `fetch` does not read them by default.
 Check other tools' own proxy settings. A tool that ignores the variables, such as git over SSH, cannot
 reach the network. The gateway forward proxy uses the same host decision
-(`decideEgress`). This is available on macOS; on Linux a signed `egress` is
+(`decideEgress`, through `resolveAndCheck`): it resolves a listed name for every
+connection and connects only to an address it checked. This is available on macOS; on Linux a signed `egress` is
 refused until the relay in ADR-008 is reviewed and built.
 
 ## Command

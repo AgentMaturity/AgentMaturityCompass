@@ -127,8 +127,9 @@ All LLM traffic is routed through the AMC Gateway, which:
 AMC Gateway includes an HTTP proxy that:
 - Supports CONNECT tunneling
 - Enforces allowlist/denyByDefault for outbound connections
-- Records `NETWORK_EGRESS_BLOCKED` audit events for denied connections
-- Does NOT perform TLS MITM — records only destination, bytes, timestamps
+- Resolves the destination for every connection, refuses it when any address is loopback, private, link-local (including 169.254.169.254) or otherwise non-public unless that exact IP literal is in `allowlistHosts`, refuses a name that does not resolve, and connects only to an address it checked (no second lookup, so DNS rebinding cannot switch the target)
+- Records `NETWORK_EGRESS_BLOCKED` audit events for denied connections, with the reason and the resolved addresses
+- Does NOT perform TLS MITM — records only destination, resolved addresses, bytes, timestamps
 
 ### Sandbox Mode (Network Isolation)
 
