@@ -387,20 +387,20 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/plugins/pluginRegistryClient.ts:61:1",
+      "siteId": "src/plugins/pluginRegistryClient.ts:65:1",
       "path": "src/plugins/pluginRegistryClient.ts",
-      "line": 61,
+      "line": 65,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. API browse/install and CLI search install trusted scope without DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
-      "siteId": "src/plugins/pluginRegistryClient.ts:77:1",
+      "siteId": "src/plugins/pluginRegistryClient.ts:83:1",
       "path": "src/plugins/pluginRegistryClient.ts",
-      "line": 77,
+      "line": 83,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Plugin registry GET uses captured ALS workspace and endpoint with prepared manual-redirect options and network-tool residency immediately before fetch. API browse/install and CLI search install trusted scope without DTO changes. Reference/pin/publisher/risk filters and later caller persistence fields are captured; classes/purpose/actor remain unknown. Source-only; prior requests/temp effects, separate config reads, global trust, DNS/body/timeout and later approval/persistence/cleanup limits remain."
     },
     {
       "siteId": "src/product/apiWrapperGenerator.ts:332:1",
