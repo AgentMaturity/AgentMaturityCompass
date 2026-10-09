@@ -411,9 +411,15 @@ export function applyChanges(base, changes) {
 
 // P1-52: validateNativeTaskPoll (nativeTasks.js) is exported, but it validates the native-task view (task, truncated,
 // event kinds), not A4's { events, nextCursor, firstCursor, droppedEvents, head, presence }. This copy keeps its refusals:
-// a malformed or oversized page, a cursor or event order that moves backwards, and a head that regresses or does not
-// name this project (a missing projectId counts as a mismatch).
+// a malformed or oversized page, a cursor or event order that moves backwards, and a head that regresses or names
+// another project. P1-57's head names no projectId (the request path names the project), so only a present, different
+// one is refused.
 const POLL_EVENT_BYTES = 2 * 1024 * 1024;
+
+/** Presence rows as Studio returned them (the poll's or the heartbeat's), keeping only well-formed ones. */
+export const presenceRows = (rows) => (Array.isArray(rows) ? rows.slice(0, 256) : []).filter((row) => isObject(row) && typeof row.username === "string")
+  .map((row) => ({ username: row.username, card: row.card ?? row.cardId ?? "" }));
+
 export function validateA4Poll(value, current, cursor) {
   const int = (number) => Number.isSafeInteger(number) && number >= 0;
   if (!isObject(value) || !Array.isArray(value.events) || !Array.isArray(value.presence) || !int(value.nextCursor)
@@ -422,20 +428,20 @@ export function validateA4Poll(value, current, cursor) {
     || new TextEncoder().encode(JSON.stringify(value.events)).byteLength > POLL_EVENT_BYTES) {
     throw new Error("Studio returned an unsupported A4 update. No updates were applied.");
   }
-  if (value.head.projectId !== current.projectId || value.head.headSeq < current.headSeq) {
+  if ((value.head.projectId !== undefined && value.head.projectId !== current.projectId) || value.head.headSeq < current.headSeq) {
     throw new Error("The project head moved backwards or changed identity. No updates were applied; reload the page.");
   }
   if (value.nextCursor < cursor || value.firstCursor > value.nextCursor + 1) {
     throw new Error("The event cursor moved backwards. No updates were applied; reload the page.");
   }
-  let previous = 0;
+  let previous = -1; // a project's CREATED transition is seq 0
   for (const event of value.events) {
     if (!isObject(event) || !int(event.cursor) || event.cursor <= previous || event.cursor < value.firstCursor || event.cursor > value.nextCursor) {
       throw new Error("Studio returned out-of-order A4 updates. No updates were applied.");
     }
     previous = event.cursor;
   }
-  return { head: value.head, nextCursor: value.nextCursor, events: value.events.filter((event) => event.cursor > cursor),
-    presence: value.presence.filter((row) => isObject(row) && typeof row.username === "string")
-      .map((row) => ({ username: row.username, card: row.card ?? row.cardId ?? "" })) };
+  // The cursor is the next seq to read, so an event at the cursor is new.
+  return { head: value.head, nextCursor: value.nextCursor, events: value.events.filter((event) => event.cursor >= cursor),
+    presence: presenceRows(value.presence) };
 }

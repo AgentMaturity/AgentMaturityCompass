@@ -495,7 +495,9 @@ function mountProject(projectId, options) {
   async function heartbeat() {
     if (document.hidden) return;
     try {
-      await apiNativeRequest(projectPath("/presence"), { method: "POST", body: { card: presenceCard() }, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
+      // The heartbeat's answer carries the presence too, so presence does not depend on the poll alone.
+      const data = await apiNativeRequest(projectPath("/presence"), { method: "POST", body: { card: presenceCard() }, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
+      presence = view.presenceRows(data?.presence);
       presenceError = "";
     } catch (error) {
       presenceError = errorText(error);
