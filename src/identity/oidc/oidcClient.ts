@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { IdentityProvider } from "../identityConfig.js";
-import { discoverOidcWellKnown } from "./jwtVerify.js";
+import { discoverOidcWellKnown, oidcFetchJson, validateOidcUrl } from "./jwtVerify.js";
 import { generatePkceVerifier, pkceChallengeS256 } from "./pkce.js";
 
 export interface OidcAuthStart {
@@ -21,13 +21,7 @@ export async function buildOidcAuthStart(params: {
   const verifier = generatePkceVerifier();
   const challenge = pkceChallengeS256(verifier);
 
-  const endpoints = params.provider.oidc.discovery.useWellKnown
-    ? await discoverOidcWellKnown(params.provider.oidc.issuer)
-    : {
-        authorizationEndpoint: params.provider.oidc.discovery.authorizationEndpoint ?? "",
-        tokenEndpoint: params.provider.oidc.discovery.tokenEndpoint ?? "",
-        jwksUri: params.provider.oidc.discovery.jwksUri ?? ""
-      };
+  const endpoints = await resolveProviderEndpoints(params.provider);
   if (!endpoints.authorizationEndpoint) {
     throw new Error(`missing authorization endpoint for provider ${params.provider.id}`);
   }
@@ -54,20 +48,13 @@ export async function exchangeOidcCode(params: {
   code: string;
   verifier: string;
   clientSecret: string;
+  tokenEndpoint?: string;
 }): Promise<{ idToken: string; accessToken: string | null }> {
   if (params.provider.type !== "OIDC") {
     throw new Error("provider is not OIDC");
   }
-  const endpoints = params.provider.oidc.discovery.useWellKnown
-    ? await discoverOidcWellKnown(params.provider.oidc.issuer)
-    : {
-        authorizationEndpoint: params.provider.oidc.discovery.authorizationEndpoint ?? "",
-        tokenEndpoint: params.provider.oidc.discovery.tokenEndpoint ?? "",
-        jwksUri: params.provider.oidc.discovery.jwksUri ?? ""
-      };
-  if (!endpoints.tokenEndpoint) {
-    throw new Error(`missing token endpoint for provider ${params.provider.id}`);
-  }
+  const tokenEndpoint = params.tokenEndpoint ?? (await resolveProviderEndpoints(params.provider)).tokenEndpoint;
+  validateOidcUrl(tokenEndpoint);
   const body = new URLSearchParams();
   body.set("grant_type", "authorization_code");
   body.set("code", params.code);
@@ -76,18 +63,9 @@ export async function exchangeOidcCode(params: {
   body.set("client_secret", params.clientSecret);
   body.set("code_verifier", params.verifier);
 
-  const response = await fetch(endpoints.tokenEndpoint, {
-    method: "POST",
-    headers: {
-      "content-type": "application/x-www-form-urlencoded"
-    },
-    body: body.toString()
-  });
-  const text = await response.text();
-  if (!response.ok) {
-    throw new Error(`OIDC token exchange failed: ${response.status} ${text}`);
-  }
-  const parsed = JSON.parse(text) as Record<string, unknown>;
+  let parsed: Record<string, unknown>;
+  try { parsed = await oidcFetchJson(tokenEndpoint, { method: "POST", form: body }); }
+  catch { throw new Error("OIDC token exchange failed"); }
   const idToken = typeof parsed.id_token === "string" ? parsed.id_token : "";
   if (!idToken) {
     throw new Error("OIDC token response missing id_token");
@@ -106,6 +84,7 @@ export async function resolveProviderEndpoints(provider: IdentityProvider): Prom
   if (provider.type !== "OIDC") {
     throw new Error("provider is not OIDC");
   }
+  validateOidcUrl(provider.oidc.issuer);
   if (provider.oidc.discovery.useWellKnown) {
     return discoverOidcWellKnown(provider.oidc.issuer);
   }
@@ -115,5 +94,6 @@ export async function resolveProviderEndpoints(provider: IdentityProvider): Prom
   if (!authorizationEndpoint || !tokenEndpoint || !jwksUri) {
     throw new Error("OIDC discovery disabled but endpoints incomplete");
   }
+  for (const endpoint of [authorizationEndpoint, tokenEndpoint, jwksUri]) validateOidcUrl(endpoint);
   return { authorizationEndpoint, tokenEndpoint, jwksUri };
 }
