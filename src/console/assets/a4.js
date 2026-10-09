@@ -25,6 +25,18 @@ for (const register of [registerAspire, registerAssemble, registerAdapt, registe
 
 let me = null;
 let pending = null; // the unconfirmed mutation; a retry repeats its clientRequestId so Studio returns the recorded result
+let busy = false; // one write in flight at a time, so a double click cannot mint a second, non-deduplicable request id
+
+/** Runs one user-started write; a click or submit while another is in flight is ignored. */
+async function guarded(work) {
+  if (busy) return undefined;
+  busy = true;
+  try {
+    return await work();
+  } finally {
+    busy = false;
+  }
+}
 
 function uuid() {
   if (typeof crypto?.randomUUID !== "function") throw new Error("Open Studio over HTTPS or localhost before changing a project.");
@@ -39,22 +51,31 @@ function errorText(error) {
 function showError(error) {
   if (!notice || error?.name === "AbortError") return;
   notice.innerHTML = `<span class="status-bad">${view.esc(errorText(error))}</span>${pending ? ` Studio did not confirm "${view.esc(pending.label)}".
-    Retry repeats the same request id, so Studio returns the recorded result if the first attempt was admitted.
-    <button type="button" id="a4Retry">Retry</button>` : ""}`;
+    Retry repeats the same request id, so Studio returns the recorded result if the first attempt was admitted. A refused
+    retry does not show that the first attempt failed: reload the page and check the project, its decisions and its
+    comments before doing it again. <button type="button" id="a4Retry">Retry</button>` : ""}`;
 }
 
 function tell(message) {
   if (notice) notice.textContent = message;
 }
 
-async function send(action) {
+/**
+ * POSTs one action. Only a definite refusal of a first attempt clears the unconfirmed action: a refused retry says
+ * nothing about the first attempt (auth, rate and ownership checks run before Studio's idempotent lookup), and an
+ * unrelated action's outcome never clears or replaces it.
+ */
+async function send(action, retry = false) {
   try {
     const data = await apiNativeRequest(action.path, { method: "POST", body: action.body, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
-    pending = null;
-    tell("");
+    if (pending === action) pending = null;
+    if (pending === null) tell("");
     return data;
   } catch (error) {
-    pending = error?.code === "NATIVE_CSRF_REQUIRED" || definiteNativeSubmissionRefusal(error) ? null : action;
+    if (pending === null || pending === action) {
+      const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
+      pending = refused ? null : action;
+    }
     throw error;
   }
 }
@@ -62,11 +83,9 @@ async function send(action) {
 notice?.addEventListener("click", (event) => {
   if (event.target.id !== "a4Retry" || !pending) return;
   const action = pending;
-  void send(action).then((data) => action.after?.(data)).catch(showError);
+  void guarded(async () => action.after?.(await send(action, true))).catch(showError);
 });
 
-// TODO(P1-57): consoleServer.ts serves every page file, so without AMC_A4_PREVIEW=1 the A4 pages still load and show
-// the preview notice (design §11, D-20). If the HTML itself must 404, serveConsolePath needs P1-57's a4PreviewEnabled hook.
 async function previewOptions() {
   try {
     return await apiNativeRequest(`${API}/options`);
@@ -93,12 +112,14 @@ async function renderListPage() {
   root.innerHTML = `${view.renderCreateForm(params.has("new") || projects.length === 0)}${view.renderProjectList(projects)}`;
   root.querySelector("#a4CreateForm").addEventListener("submit", (event) => {
     event.preventDefault();
-    const form = new FormData(event.target);
-    const agentId = String(form.get("agentId") ?? "").trim();
-    const action = { label: "Start an agent project", path: `${API}/projects`,
-      body: { clientRequestId: uuid(), name: String(form.get("name") ?? "").trim(), expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
-    action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}`; };
-    void send(action).then(action.after, showError);
+    void guarded(async () => {
+      const form = new FormData(event.target);
+      const agentId = String(form.get("agentId") ?? "").trim();
+      const action = { label: "Start an agent project", path: `${API}/projects`,
+        body: { clientRequestId: uuid(), name: String(form.get("name") ?? "").trim(), expertise: form.get("expertise"), ...(agentId ? { agentId } : {}) } };
+      action.after = (data) => { location.href = `./a4Project?project=${encodeURIComponent(one(data, "project").projectId)}`; };
+      action.after(await send(action));
+    }).catch(showError);
   });
 }
 
@@ -331,7 +352,7 @@ function mountProject(projectId, options, strip) {
     if (button.dataset.a4Copy) { void navigator.clipboard?.writeText(button.dataset.a4Copy).catch(showError); return; }
     const card = button.closest("[data-card]")?.dataset.card;
     if (card) focusCard(card);
-    void act(button.dataset.a4Action, button).catch(showError);
+    void guarded(() => act(button.dataset.a4Action, button)).catch(showError);
   });
   root.addEventListener("focusin", (event) => {
     const card = event.target.closest?.("[data-card]")?.dataset.card;
