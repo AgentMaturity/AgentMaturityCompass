@@ -8,12 +8,13 @@ import {
   type ServerResponse
 } from "node:http";
 import { request as httpsRequest } from "node:https";
-import { connect as netConnect, type LookupFunction } from "node:net";
+import { connect as netConnect, isIP, type LookupFunction } from "node:net";
 import { join } from "node:path";
+import type { Duplex } from "node:stream";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
-import { decideEgress } from "../enforce/egressAllowlist.js";
+import { canonicalHost, isNonPublicAddress, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
 import {
   loadGatewayConfig,
   resolveGatewayConfigEnv,
@@ -32,7 +33,7 @@ import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
-import { pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
+import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 
 export interface StartGatewayOptions {
   workspace: string;
@@ -260,9 +261,10 @@ async function requestUpstreamWithResilience(params: {
         () =>
           new Promise<IncomingMessage>((resolvePromise, rejectPromise) => {
             const impl = params.targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
+            // A pinned lookup needs a new socket: the keep-alive pool is keyed by name and would reuse a socket to another address.
             const outgoing = impl(
               params.targetUrl,
-              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup } : {}) },
+              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup, agent: false } : {}) },
               (res) => resolvePromise(res)
             );
             outgoing.setTimeout(params.timeoutMs, () => {
@@ -291,7 +293,7 @@ async function requestUpstreamWithResilience(params: {
 function isLocalhostUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
+    const host = canonicalHost(parsed.hostname); // URL keeps IPv6 brackets ("[::1]"); canonicalHost drops them
     return host === "127.0.0.1" || host === "localhost" || host === "::1";
   } catch {
     return false;
@@ -621,15 +623,16 @@ function bestEffortJsonInfo(bytes: Buffer, pathname?: string, openaiCompatible =
   }
 }
 
-function hostAllowed(config: GatewayConfig, host: string): boolean {
-  if (!config.proxy.enabled || !config.proxy.denyByDefault) {
-    return true;
-  }
-  // A gateway entry covers the host and its subdomains. A leading-dot entry
-  // matched nothing here before and still does. The gateway resolves nothing,
-  // so the private-address rule reaches IP-literal hosts only.
-  const allowHosts = config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]);
-  return decideEgress(host, [], { allowHosts }).allowed;
+/** One proxied connection's egress check, made as it opens (P1-66); the caller connects only to the returned addresses. */
+async function hostAllowed(params: { config: GatewayConfig; fieldGuard: FieldGuard }, host: string): Promise<EgressCheck> {
+  // Without deny-by-default any name or public IP literal passes by name; every address still meets the non-public rule.
+  const name = canonicalHost(host);
+  const anyHost = !params.config.proxy.denyByDefault && (isIP(name) === 0 || !isNonPublicAddress(name));
+  // A gateway entry covers the host and its subdomains. A leading-dot entry matched nothing here before and still does.
+  const allowHosts = [...params.config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]), ...(anyHost ? [name] : [])];
+  const egress = await resolveAndCheck(host, { allowHosts });
+  const guarded = egress.decision.allowed ? await params.fieldGuard.targetRefused(host, egress.addresses) : null;
+  return guarded === null ? egress : { addresses: egress.addresses, unresolved: guarded.unresolved, decision: { allowed: false, reason: guarded.reason } };
 }
 
 function extractAgentId(route: GatewayConfig["routes"][number], headers: IncomingHttpHeaders): string {
@@ -644,27 +647,16 @@ function appendNetworkBlockedAudit(
     meta: Record<string, unknown>;
   }) => void,
   requestId: string,
+  agentId: string,
   destinationHost: string,
-  destinationPort: number
+  destinationPort: number,
+  egress: EgressCheck
 ): void {
-  appendEvidence({
-    eventType: "audit",
-    payload: JSON.stringify({
-      auditType: "NETWORK_EGRESS_BLOCKED",
-      severity: "HIGH",
-      request_id: requestId,
-      destinationHost,
-      destinationPort
-    }),
-    meta: {
-      auditType: "NETWORK_EGRESS_BLOCKED",
-      severity: "HIGH",
-      request_id: requestId,
-      destinationHost,
-      destinationPort,
-      trustTier: "OBSERVED"
-    }
-  });
+  // The reason names the refused address; resolvedAddresses is what the name resolved to when the connection opened.
+  // agentId is the lease-verified requester, so the row counts only against that agent.
+  const row = { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", request_id: requestId, agentId, destinationHost, destinationPort,
+    reason: egress.decision.reason, resolvedAddresses: egress.addresses };
+  appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row, trustTier: "OBSERVED" } });
 }
 
 function createProxyServer(params: {
@@ -674,6 +666,7 @@ function createProxyServer(params: {
   gatewaySessionId: string;
   allowedCidrs?: string[];
   fieldGuard: FieldGuard;
+  logger: Pick<Console, "error">;
   appendEvidence: (input: {
     eventType: "gateway" | "audit";
     payload: string;
@@ -681,7 +674,18 @@ function createProxyServer(params: {
   }) => void;
 }): Server {
   const resilience = gatewayResilienceConfig();
-  const proxy = createServer(async (req, res) => {
+  // A refusal by name, address or guarded target is a NETWORK_EGRESS_BLOCKED audit for the lease-verified agent. A DNS failure (the
+  // target's, or a guarded upstream's) is not an egress attempt: HTTP 502 and an egress_unresolved gateway row for that agent, no audit.
+  const recordRefusal = (requestId: string, agentId: string, host: string, port: number, egress: EgressCheck, meta: Record<string, unknown>): void => {
+    if (egress.unresolved !== true) {
+      appendNetworkBlockedAudit(({ payload, meta: row }) => params.appendEvidence({ eventType: "audit", payload, meta: { ...row, ...meta } }),
+        requestId, agentId, host, port, egress);
+      return;
+    }
+    const row = { request_id: requestId, agentId, destinationHost: host, destinationPort: port, stage: "egress_unresolved", status: 502, reason: egress.decision.reason };
+    params.appendEvidence({ eventType: "gateway", payload: JSON.stringify(row), meta: { ...row, ...meta, proxyMode: true, trustTier: "OBSERVED" } });
+  };
+  const onRequest = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
@@ -800,26 +804,12 @@ function createProxyServer(params: {
 
     const host = targetUrl.hostname;
     const port = Number(targetUrl.port || (targetUrl.protocol === "https:" ? 443 : 80));
-    // A host outside the allowlist is refused before any DNS query; a guarded upstream's host is refused by address.
-    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
-    if (checked.refused) {
-      appendNetworkBlockedAudit(
-        ({ payload, meta }) =>
-          params.appendEvidence({
-            eventType: "audit",
-            payload,
-            meta: {
-              ...meta,
-              sessionType: "proxy",
-              sessionId: params.gatewaySessionId
-            }
-          }),
-        requestId,
-        host,
-        port
-      );
-      res.statusCode = 403;
-      res.end("blocked by AMC proxy allowlist");
+    // A host outside the allowlist is refused before any DNS query; a listed one is resolved now and checked by address.
+    const egress = await hostAllowed(params, host);
+    if (!egress.decision.allowed) {
+      recordRefusal(requestId, proxyAgentId, host, port, egress, { sessionType: "proxy", sessionId: params.gatewaySessionId });
+      res.statusCode = egress.unresolved === true ? 502 : 403;
+      res.end(egress.unresolved === true ? "proxy target not checked: a name did not resolve" : "blocked by AMC proxy allowlist");
       return;
     }
 
@@ -848,36 +838,17 @@ function createProxyServer(params: {
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
         retryNonIdempotent: resilience.retryNonIdempotent,
-        lookup: pinnedLookup(checked.addresses)
+        lookup: pinnedLookup(egress.addresses)
       });
     } catch (error) {
       const status = gatewayErrorStatusCode(error);
       res.statusCode = status;
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify(gatewayErrorBody(error)));
-      params.appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          proxyType: "http",
-          destinationHost: host,
-          destinationPort: port,
-          method,
-          stage: "request_error",
-          status,
-          error: error instanceof Error ? error.message : String(error)
-        }),
-        meta: {
-          request_id: requestId,
-          proxyMode: true,
-          destinationHost: host,
-          destinationPort: port,
-          method,
-          stage: "request_error",
-          status,
-          trustTier: "OBSERVED"
-        }
-      });
+      // resolvedAddresses: the checked addresses the failed connection was pinned to.
+      const row = { request_id: requestId, destinationHost: host, destinationPort: port, resolvedAddresses: egress.addresses, method, stage: "request_error", status };
+      params.appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...row, proxyType: "http", error: error instanceof Error ? error.message : String(error) }),
+        meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } });
       return;
     }
     const responseBody = await readAll(upstream);
@@ -896,6 +867,7 @@ function createProxyServer(params: {
         proxyType: "http",
         destinationHost: host,
         destinationPort: port,
+        resolvedAddresses: egress.addresses,
         method,
         bytesIn: body.length,
         bytesOut: responseBody.length,
@@ -906,15 +878,21 @@ function createProxyServer(params: {
         proxyMode: true,
         destinationHost: host,
         destinationPort: port,
+        resolvedAddresses: egress.addresses,
         method,
         bytesIn: body.length,
         bytesOut: responseBody.length,
         trustTier: "OBSERVED"
       }
     });
+  };
+  // A rejected handler (a client reset during a body read, a ledger write failure) ends its own connection, never the gateway process.
+  const contain = (end: () => void) => (error: unknown): void => { params.logger.error(`gateway proxy error: ${String(error)}`); end(); };
+  const proxy = createServer((req, res) => {
+    onRequest(req, res).catch(contain(() => { if (res.headersSent || req.destroyed) res.destroy(); else res.writeHead(502).end("gateway proxy failure"); }));
   });
 
-  proxy.on("connect", async (req, clientSocket, head) => {
+  const onConnect = async (req: IncomingMessage, clientSocket: Duplex, head: Buffer): Promise<void> => {
     const requestId = randomUUID();
     const clientIp = normalizeRemoteIp(req.socket.remoteAddress);
     if (!ipAllowedByCidrs(clientIp, params.allowedCidrs ?? [])) {
@@ -991,7 +969,7 @@ function createProxyServer(params: {
       requiredScope: "proxy:connect"
     });
 
-    if (!host || Number.isNaN(port)) {
+    if (!host || !Number.isInteger(port) || port < 1 || port > 65535) {
       clientSocket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
       clientSocket.destroy();
       return;
@@ -1026,28 +1004,19 @@ function createProxyServer(params: {
     }
 
     clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
-    const checked = hostAllowed(params.config, host) ? await params.fieldGuard.checkTarget(host) : { refused: true, addresses: [] };
-    if (checked.refused) {
-      appendNetworkBlockedAudit(
-        ({ payload, meta }) =>
-          params.appendEvidence({
-            eventType: "audit",
-            payload,
-            meta: {
-              ...meta,
-              proxyMode: true
-            }
-          }),
-        requestId,
-        host,
-        port
-      );
-      clientSocket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+    const egress = await hostAllowed(params, host);
+    if (!egress.decision.allowed) {
+      recordRefusal(requestId, proxyAgentId, host, port, egress, { proxyMode: true });
+      clientSocket.write(egress.unresolved === true ? "HTTP/1.1 502 Bad Gateway\r\n\r\n" : "HTTP/1.1 403 Forbidden\r\n\r\n");
       clientSocket.destroy();
       return;
     }
+    if (clientSocket.destroyed) return; // the client left during the lookup: open nothing
 
-    const upstreamSocket = netConnect(port, checked.addresses[0] ?? host, () => { // the checked address, never a fresh lookup
+    // Only the checked addresses (a pinned lookup keeps every one as a fallback), never a fresh resolution.
+    let connectedAddress: string | null = null;
+    const upstreamSocket = netConnect({ port, host: canonicalHost(host), lookup: pinnedLookup(egress.addresses) }, () => {
+      connectedAddress = upstreamSocket.remoteAddress ?? null; // which checked address the tunnel reached
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {
         upstreamSocket.write(head);
@@ -1069,47 +1038,28 @@ function createProxyServer(params: {
     });
 
     const finalize = (reason: string): void => {
-      if (finalized) {
-        return;
-      }
+      if (finalized) return;
       finalized = true;
-      params.appendEvidence({
-        eventType: "gateway",
-        payload: JSON.stringify({
-          request_id: requestId,
-          proxyType: "connect",
-          destinationHost: host,
-          destinationPort: port,
-          bytesIn,
-          bytesOut,
-          durationMs: Date.now() - startedTs,
-          reason
-        }),
-        meta: {
-          request_id: requestId,
-          proxyMode: true,
-          destinationHost: host,
-          destinationPort: port,
-          bytesIn,
-          bytesOut,
-          reason,
-          trustTier: "OBSERVED"
-        }
-      });
+      const row = { request_id: requestId, destinationHost: host, destinationPort: port, resolvedAddresses: egress.addresses, connectedAddress, bytesIn, bytesOut, reason };
+      params.appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...row, proxyType: "connect", durationMs: Date.now() - startedTs }),
+        meta: { ...row, proxyMode: true, trustTier: "OBSERVED" } });
     };
 
-    const onSocketError = (socket: { destroy: () => void }, reason: string): void => {
+    // An error or an idle timeout on either side ends both sockets; a client that goes away closes the upstream too.
+    const closeBoth = (reason: string): void => {
       finalize(reason);
-      socket.destroy();
+      clientSocket.destroy();
+      upstreamSocket.destroy();
     };
 
-    (upstreamSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(clientSocket, "upstream_timeout"));
-    (clientSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => onSocketError(upstreamSocket, "client_timeout"));
-    upstreamSocket.on("error", () => onSocketError(clientSocket, "upstream_error"));
-    clientSocket.on("error", () => onSocketError(upstreamSocket, "client_error"));
+    (upstreamSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => closeBoth("upstream_timeout"));
+    (clientSocket as unknown as { setTimeout: (ms: number, cb: () => void) => void }).setTimeout(resilience.proxyConnectTimeoutMs, () => closeBoth("client_timeout"));
+    upstreamSocket.on("error", () => closeBoth("upstream_error"));
+    clientSocket.on("error", () => closeBoth("client_error"));
     upstreamSocket.on("close", () => finalize("upstream_close"));
-    clientSocket.on("close", () => finalize("client_close"));
-  });
+    clientSocket.on("close", () => { finalize("client_close"); upstreamSocket.destroy(); });
+  };
+  proxy.on("connect", (req: IncomingMessage, clientSocket: Duplex, head: Buffer) => { onConnect(req, clientSocket, head).catch(contain(() => clientSocket.destroy())); });
 
   return proxy;
 }
@@ -1124,7 +1074,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       allowQueryCarrier: options.allowQueryCarrierOverride ?? config.lease.allowQueryCarrier
     }
   });
-  const fieldGuard = await prepareFieldGuard(resolvedConfig); // resolves upstreams once, only when a route refuses fields
+  const fieldGuard = prepareFieldGuard(resolvedConfig); // resolves guarded upstreams per request, only when a route refuses fields
   const runtimeListenHost = options.listenHost ?? resolvedConfig.listen.host;
   const runtimeListenPort = options.listenPort ?? resolvedConfig.listen.port;
   const runtimeProxyPort = options.proxyPort ?? config.proxy.port;
@@ -1372,8 +1322,26 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      // Refused fields (e.g. dsh_session_log) belong to the upstream, and an unreadable body is refused; the audit keeps names and size, never content.
-      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, fieldGuard.fieldsFor(route.upstream));
+      // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
+      // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
+      const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved, signature.valid);
+      // An upstream that did not resolve is a transport failure, as before P1-66 (502, request_error, no audit).
+      if (upstreamEgress.unresolved === true) {
+        logger.error(`gateway error: ${upstreamEgress.decision.reason}`);
+        const failure = { stage: "request_error", request_id: requestId, status: 502, upstreamId: route.upstream, agentId: attributedAgentId };
+        appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...failure, error: upstreamEgress.decision.reason }), meta: failure });
+        res.writeHead(502, { "content-type": "application/json" }).end(JSON.stringify({ error: `upstream ${route.upstream} did not resolve` }));
+        return;
+      }
+      // A non-public address the configuration does not opt in is this route's fault, not an egress attempt by the agent.
+      if (!upstreamEgress.decision.allowed) {
+        const unsafe = { auditType: "UNSAFE_PROVIDER_ROUTE", severity: "HIGH", request_id: requestId, upstreamId: route.upstream, agentId: attributedAgentId,
+          destinationHost: upstreamUrl.hostname, reason: upstreamEgress.decision.reason, resolvedAddresses: upstreamEgress.addresses };
+        appendEvidence({ eventType: "audit", payload: JSON.stringify(unsafe), meta: unsafe });
+        res.writeHead(403, { "content-type": "application/json" }).end(JSON.stringify({ error: `upstream ${route.upstream} refused by the gateway egress check` }));
+        return;
+      }
+      const fieldRefusal = requestFieldRefusal(requestBody, req.headers, await fieldGuard.fieldsFor(route.upstream, upstreamEgress.addresses));
       if (fieldRefusal) {
         const refusal = { auditType: "REQUEST_FIELD_REFUSED", severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream,
           agentId: attributedAgentId, reason: fieldRefusal.reason, fields: fieldRefusal.fields, requestBytes: requestBody.byteLength };
@@ -1588,7 +1556,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         timeoutMs: resilience.upstreamTimeoutMs,
         maxRetries: resilience.upstreamMaxRetries,
         retryBaseDelayMs: resilience.upstreamRetryBaseDelayMs,
-        retryNonIdempotent: resilience.retryNonIdempotent
+        retryNonIdempotent: resilience.retryNonIdempotent,
+        lookup: pinnedLookup(upstreamEgress.addresses)
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
@@ -1724,6 +1693,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       gatewaySessionId,
       allowedCidrs: options.allowedCidrs,
       fieldGuard,
+      logger,
       appendEvidence
     });
     await new Promise<void>((resolvePromise, rejectPromise) => {

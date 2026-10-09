@@ -144,7 +144,7 @@ export function deriveDeterministicAudits(
           severity: "HIGH",
           sessionId: event.session_id,
           runtime: event.runtime,
-          message: "Proxy blocked a non-allowlisted network egress attempt.",
+          message: `Gateway refused a network egress attempt${typeof event.meta.reason === "string" ? `: ${event.meta.reason}` : ""}.`,
           relatedEventIds: [event.id]
         });
       }
