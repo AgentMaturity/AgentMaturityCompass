@@ -97,7 +97,9 @@ function reportNameMatches(name, path) {
 }
 function validReport(report) {
   return object(report) && Array.isArray(report.testResults) && report.testResults.every(result => object(result) && text(result.name)
-    && ["passed", "failed", "pending", "skipped", "todo"].includes(result.status));
+    && ["passed", "failed", "pending", "skipped", "todo"].includes(result.status)
+    && (result.assertionResults === undefined || Array.isArray(result.assertionResults)
+      && Array.from(result.assertionResults).every(assertion => object(assertion) && typeof assertion.status === "string")));
 }
 function vitestValue(metric, report, errors) {
   const surfaces = metric.source.surfaces;
@@ -117,11 +119,13 @@ function vitestValue(metric, report, errors) {
     for (const path of surfaces[surface]) {
       const matches = report.testResults.filter(result => reportNameMatches(result.name, path));
       if (matches.length > 1) { errors.push(`${metric.id}: duplicate results for ${path}`); return pending(metric); }
-      if (matches.length === 0 || ["pending", "skipped", "todo"].includes(matches[0].status)) { complete = false; continue; }
-      if (matches[0].status !== "passed") allPassed = false;
+      if (matches.length === 0) { complete = false; continue; }
+      const file = matches[0], assertions = file.assertionResults;
+      if (file.status === "failed" || assertions?.some(assertion => assertion.status === "failed")) { allPassed = false; continue; }
+      if (file.status !== "passed" || !assertions?.length || assertions.some(assertion => assertion.status !== "passed")) complete = false;
     }
-    surfaceStatuses[surface] = !complete ? "not_measured" : allPassed ? "passed" : "failed";
-    if (complete) { evaluated += 1; if (allPassed) passed += 1; }
+    surfaceStatuses[surface] = !allPassed ? "failed" : complete ? "passed" : "not_measured";
+    if (!allPassed || complete) { evaluated += 1; if (allPassed) passed += 1; }
   }
   if (evaluated === 0) return { ...pending(metric), surfaceStatuses };
   const notMeasured = SURFACES.length - evaluated;
@@ -144,14 +148,23 @@ function matrixCombinations(matrix) {
 }
 function runnerLabels(runsOn, row) {
   if (Array.isArray(runsOn)) {
-    if (!runsOn.length) return null;
-    const labels = runsOn.map(label => runnerLabels(label, row));
-    return labels.some(label => label === null) ? null : JSON.stringify([...new Set(labels)].sort());
+    if (!runsOn.length || runsOn.some(label => !text(label))) return null;
+    const labels = runsOn.map(label => {
+      const expression = /^\$\{\{\s*matrix\.([A-Za-z_][A-Za-z0-9_-]*)\s*\}\}$/.exec(label);
+      return expression ? row?.[expression[1]] : label;
+    });
+    if (labels.some(label => !text(label) || label.includes("${{"))) return null;
+    const families = new Set(labels.map(label => runnerLabels(label, row)).filter(family => family !== null));
+    return families.size === 1 ? [...families][0] : null;
   }
   if (!text(runsOn)) return null;
   const expression = /^\$\{\{\s*matrix\.([A-Za-z_][A-Za-z0-9_-]*)\s*\}\}$/.exec(runsOn);
-  if (expression) return text(row?.[expression[1]]) && !row[expression[1]].includes("${{") ? row[expression[1]] : null;
-  return runsOn.includes("${{") ? null : runsOn;
+  const label = expression ? row?.[expression[1]] : runsOn;
+  if (!text(label) || label.includes("${{")) return null;
+  if (/^(ubuntu|linux)/i.test(label)) return "linux";
+  if (/^macos/i.test(label)) return "macos";
+  if (/^windows/i.test(label)) return "windows";
+  return null;
 }
 function ciValue(metric, workflowYaml, workflowPaths, errors) {
   const source = metric.source;
@@ -173,8 +186,8 @@ function ciValue(metric, workflowYaml, workflowPaths, errors) {
   const labels = rows.map(row => runnerLabels(job["runs-on"], row));
   if (labels.some(label => label === null)) return pending(metric);
   const count = new Set(labels).size;
-  return measured(count, `${source.workflow}#jobs.${source.job}; configured declaration only, not containment qualification; date: not supplied`,
-    null, `${count} configured runner declarations`);
+  return measured(count, `${source.workflow}#jobs.${source.job}; configured OS families only, not containment qualification; date: not supplied`,
+    null, `${count} configured OS families`);
 }
 function jsonPointer(value, pointer) {
   if (typeof pointer !== "string" || pointer !== "" && !pointer.startsWith("/") || /~(?![01])/.test(pointer)) throw new Error("invalid JSON pointer");
@@ -204,8 +217,12 @@ export function computeMetrics({ gaps, metrics, manual, vitestReport, workflowYa
       if (entry) result = measured(entry.value, `${entry.source}; recorded by ${entry.recordedBy}; as of ${entry.asOf}`, entry.asOf);
     } else if (object(source)) {
       if (source.type === "gaps") {
-        if (gapsValid) result = measured(gaps.gaps.filter(gap => String(gap.severity).toLowerCase() === "critical"
-          && !(gap.status === "closed" && closingEvidence(gap))).length, `${gaps.source}; declared closures require qualification path and merged SHA; merge/signatures not verified`);
+        if (gapsValid) {
+          const open = gaps.gaps.filter(gap => gap.severity.toLowerCase() === "critical"
+            && !(gap.status === "closed" && closingEvidence(gap))).map(gap => gap.id);
+          result = measured(open.length, `${gaps.source}; declared closures require qualification path and merged SHA; merge/signatures not verified`,
+            null, `${open.length} open (${open.join(", ") || "none"})`);
+        }
       } else if (source.type === "vitest") result = vitestValue(metric, vitestReport, errors);
       else if (source.type === "ci-matrix") result = ciValue(metric, workflowYaml, workflowPaths, errors);
       else if (source.type === "json") {
@@ -280,10 +297,17 @@ function options(argv) {
 }
 async function main(argv) {
   const opts = options(argv), root = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
-  const gaps = parseJson(repoFile(root, "docs/program/gaps.json"), "docs/program/gaps.json");
+  const loadingErrors = [], gitOptions = { cwd: root, encoding: "utf8", timeout: 5000, maxBuffer: MAX_BYTES, stdio: ["ignore", "pipe", "pipe"] };
+  let gapsRaw;
+  try { gapsRaw = execFileSync("git", ["show", "HEAD:docs/program/gaps.json"], gitOptions); }
+  catch {
+    loadingErrors.push("gaps: committed HEAD registration unavailable; working-tree fallback cannot verify closures");
+    gapsRaw = repoFile(root, "docs/program/gaps.json");
+  }
+  const gaps = parseJson(gapsRaw, "docs/program/gaps.json");
   const metrics = parseJson(repoFile(root, "docs/program/metrics.json"), "docs/program/metrics.json");
   const manual = parseJson(repoFile(root, "docs/program/metrics-manual.json"), "docs/program/metrics-manual.json");
-  const loadingErrors = [], workflowYaml = Object.create(null), jsonSources = Object.create(null);
+  const workflowYaml = Object.create(null), jsonSources = Object.create(null);
   let vitestReport;
   if (opts.vitest) {
     const raw = repoFile(root, opts.vitest, true);
@@ -297,7 +321,7 @@ async function main(argv) {
         if (!localPath(source.path)) throw new Error(`invalid repository path: ${source.path}`);
         // Local committed bytes do not depend on an untracked or deleted working-tree copy.
         let committed;
-        try { committed = execFileSync("git", ["show", `HEAD:${source.path}`], { cwd: root, encoding: "utf8", timeout: 5000, maxBuffer: MAX_BYTES, stdio: ["ignore", "pipe", "pipe"] }); }
+        try { committed = execFileSync("git", ["show", `HEAD:${source.path}`], gitOptions); }
         catch { committed = undefined; }
         jsonSources[source.path] = committed === undefined ? undefined : parseJson(committed, source.path);
       }
@@ -313,8 +337,11 @@ async function main(argv) {
   }
   for (const gap of Array.isArray(gaps?.gaps) ? gaps.gaps : []) {
     if (gap?.status !== "closed" || !closingEvidence(gap)) continue;
-    try { if (repoFile(root, gap.closingEvidence.path, true) === undefined) loadingErrors.push(`${gap.id}: missing closing evidence file`); }
-    catch (error) { loadingErrors.push(error.message); }
+    try {
+      execFileSync("git", ["cat-file", "-e", `HEAD:${gap.closingEvidence.path}`], gitOptions);
+      if (/^0{40}$/.test(gap.closingEvidence.mergedSha)) throw new Error("zero SHA cannot close a gap");
+      execFileSync("git", ["merge-base", "--is-ancestor", gap.closingEvidence.mergedSha, "HEAD"], gitOptions);
+    } catch { loadingErrors.push(`${gap.id}: closing evidence not committed at HEAD or mergedSha not an ancestor of HEAD (shallow history cannot verify)`); }
   }
   if (opts.online) {
     try {
@@ -333,6 +360,7 @@ async function main(argv) {
   result.errors.push(...loadingErrors); result.valid = result.errors.length === 0;
   for (const row of result.rows) {
     const registration = metrics.metrics.find(metric => metric.id === row.id);
+    if (row.status === "measured" && registration?.source?.type === "gaps") row.source = `HEAD:docs/program/gaps.json; ${row.source}`;
     if (row.status === "measured" && registration?.source?.type === "json") row.source = row.source.replace("registered supplied JSON", "committed HEAD JSON");
     if (row.status !== "not_measured" && registration?.source?.type === "vitest") row.source = `${opts.vitest}; ${row.source}`;
   }
