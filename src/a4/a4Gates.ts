@@ -33,7 +33,8 @@ import {
 import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import {
-  A4StoreError, collectLiveFacts, refreshVolatileFacts, type A4Actor, type A4ChangeSpec, type A4RequestKey, type A4Store, type A4TransitionResult
+  A4StoreError, collectLiveFacts, refreshVolatileFacts, type A4Actor, type A4ChangeSpec, type A4RequestKey, type A4Store, type A4TransitionOptions,
+  type A4TransitionResult
 } from "./a4Store.js";
 
 /** The authenticated caller of one gate call. Roles are re-read live; the router resolved the rest (src/a4/a4Identity.ts). */
@@ -212,7 +213,8 @@ type Plan = (ts: number) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | re
  * automatic hold; a notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
  * ponytail: the plan loads and resolves the whole project twice per write; cache the snapshot by head digest if slow.
  */
-export function governed(store: A4Store, projectId: string, actor: A4Actor, options: { expectedHeadSeq?: number; request?: A4RequestKey }, plan: Plan): A4TransitionResult {
+export function governed(store: A4Store, projectId: string, actor: A4Actor, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
+  plan: Plan): A4TransitionResult {
   refuseOnFreeze(store, projectId);
   let planned: string | null = null;
   try {
@@ -453,7 +455,8 @@ const headAfterConsume = (row: A4GateRow): { stage?: A4Stage; step: "direction_a
  * readiness must allow `progress`, the intent and the resources must be unchanged, the quorum met. `extra` adds the
  * EFFECT_STARTED that src/a4/a4Effects.ts writes in the same transaction. Returns the consumed gate's approver keys.
  */
-export function consumeGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number },
+export function consumeGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number;
+  response?: A4TransitionOptions["response"] },
   extra?: (ctx: { state: A4ReadinessState; row: A4GateRow; principal: A4Principal; regulated: boolean; ts: number }) => { payload: Record<string, unknown>; specs: A4ChangeSpec[] }): A4TransitionResult {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");

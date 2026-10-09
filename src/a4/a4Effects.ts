@@ -203,7 +203,7 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
-  const result = consumeGate(store, projectId, input, ({ state, row, principal, regulated, ts }) => {
+  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
     const opened = latestOpened(state, row.gate_id, def.id);
     if (opened === undefined) throw fail(409, "EFFECT_GATE_NOT_OPEN", "An owner opens the effect gate before completing this stage.");
     const approvalRequestId = String(opened.body.approvalRequestId);
@@ -335,7 +335,7 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
   // retry rule sees its failure; the head the client saw moves by exactly those rows (anything else is still stale).
   const executionId0 = String(startedLink(store.readChain(projectId), input.attemptId).body.executionId);
   const swept = sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: executionId0 }).length;
-  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (ts) => {
+  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts) => {
     const state = loadA4State(store, projectId, now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));

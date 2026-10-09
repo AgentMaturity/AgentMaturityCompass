@@ -117,6 +117,8 @@ export interface A4TransitionOptions {
   readonly request?: A4RequestKey;
   /** P1-57's readiness, as the fullDigest of an evaluation on rows read here; evaluated before signing and again inside the tx. */
   readonly readiness?: (db: Database.Database, projectId: string) => string;
+  /** What the caller answers beside the transition (an attempt id, a minted agent id), stored so a replay answers it too. */
+  readonly response?: Readonly<Record<string, unknown>>;
 }
 export type A4TransitionResult =
   | { readonly replay: false; readonly projectId: string; readonly seq: number; readonly kind: A4TransitionKind; readonly bodyDigest: string;
@@ -527,7 +529,7 @@ function createStore(workspace: string, ledger: Ledger) {
           return runImmediateTransaction(db, (): A4TransitionResult => {
             // (b) One transaction on rows read inside it.
             const replayed = options.request
-              ? dedupeRequest(options.request, projectId, create !== null, { projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest }, ts) : null;
+              ? dedupeRequest(options.request, projectId, create !== null, { ...options.response, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest }, ts) : null;
             if (replayed) return replayed;
             const head = readHeadRow(projectId);
             if (canonicalize(head) !== canonicalize(head0)) throw new HeadMoved();
@@ -690,7 +692,7 @@ function createStore(workspace: string, ledger: Ledger) {
           sideRows: [memberRow(projectId, seq, ts, input.actor, "added",
             { principalKey: input.actor.key, authSource: input.actor.authSource, userId: input.actor.userId, username: input.actor.username }, ["owner"])]
         };
-      }, { request: input.request }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
+      }, { request: input.request, response: { agentId: input.agentId } }, { project_id: projectId, workspace_id: workspaceId, agent_id: input.agentId, name: input.name.trim(),
         created_by_key: input.actor.key });
     },
 
