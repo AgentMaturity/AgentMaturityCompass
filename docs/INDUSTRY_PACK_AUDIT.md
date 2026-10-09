@@ -99,11 +99,11 @@ it prints each error and exits 1:
 `--allow-unpinned` gives an integrity-only result with exit code 2, never a
 trusted one. Studio's binder verify route (`GET /audit/binders/:id/verify`)
 verifies a `?file=` only inside `.amc/audit/binders/exports/`, so copy a bundle
-there to verify it from Studio (a copy, not a link). A missing file, a file
-reached through a symbolic link (the file itself, or `.amc/audit`,
-`.amc/audit/binders`, `exports` or a directory under it), a hard-linked file,
-and anything that is not a regular file all read as the same `UNREADABLE`, and
-the bytes verified are the bytes read once from that file. The checksum alone is
+there to verify it from Studio (a copy, not a link). A file reached through a
+symbolic link (the file itself, or `.amc/audit`, `.amc/audit/binders`,
+`exports` or a directory under it), a hard-linked file, and anything that is
+not a regular file all read as the same `UNREADABLE` (a path that does not
+exist is 404), and the bytes verified are the bytes read once from that file. The checksum alone is
 `sha256(canonicalize(bundle without receiptHash and signature))`; recomputing it
 detects accidental edits, not deliberate ones.
 
