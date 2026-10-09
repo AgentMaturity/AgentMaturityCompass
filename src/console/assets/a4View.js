@@ -337,6 +337,18 @@ function gateChangeBanner({ from, to }) {
     show the current gate and review it.</p><button type="button" data-a4-action="show-gate">Show r${esc(to.revisionNo)}</button></div>`;
 }
 
+/**
+ * readiness.allowed.decide covers approve and deny alike and leaves out the gate's separation-of-duties exclusions (an
+ * excluded member may still deny); Studio refuses that member's approval with 400 SOD_VIOLATION unless readiness says
+ * self-approval is open. Approve is held with that code from the gate's own excludedKeys, under the key Studio derives:
+ * a WORKSPACE_ROUTER principal is checked from session records, a LOCAL_USER one from users.yaml.
+ */
+export function approveOffer(decide, gate, readiness, me) {
+  const key = typeof me?.userId === "string" ? `${readiness.identityCheck === "session_record" ? "WORKSPACE_ROUTER" : "LOCAL_USER"}:${me.userId}` : null;
+  if (key === null || readiness.selfApprovalAllowed === true || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
+  return { allowed: false, reasonCodes: [...new Set([...(decide?.reasonCodes ?? []), "SOD_VIOLATION"])] };
+}
+
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
   const { open, met, stale, policy } = currentGates(gates, stage);
@@ -360,7 +372,7 @@ export function renderApprovalsBar(ctx) {
     ${history.length || otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list([...history, ...otherStale], "")}</details>` : ""}
     <label>Reason (required to decide, hold, resume or acknowledge) <input name="reason" required maxlength="2000" /></label>
     <div class="row wrap">
-      ${actionButton("Approve", "approve", open ? pinned(allowed.decide) : null)}
+      ${actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null)}
       ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", allowed.requestGate)}
