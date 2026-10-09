@@ -5931,7 +5931,7 @@ paths:
                   type: string
                 outFile:
                   type: string
-                  description: Bundle path relative to the workspace. verify-proof reads only bundles under .amc/transparency/proofs/, so write there (for example .amc/transparency/proofs/<entryHash>.amcproof) to verify it through the API.
+                  description: Bundle path, resolved against the workspace. It must lie under .amc/transparency/proofs/ (for example .amc/transparency/proofs/<entryHash>.amcproof), where verify-proof reads; any other path is refused with 400 before anything is written.
       responses:
         '201':
           description: Proof exported
