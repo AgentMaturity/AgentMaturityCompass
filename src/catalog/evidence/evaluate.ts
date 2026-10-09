@@ -19,7 +19,8 @@ const itemKey = (item: EvidenceItem): string => `${item.ref.kind}\u0000${item.re
  * Evaluates one control on the items its loader read and verified (P1-11). Deterministic: items are taken in ref order,
  * and `digest` covers the canonical result without `evaluatedAt`, which is this function's own clock. The claim kind
  * and the result come from P0-08's evaluateClaimEligibility, so they can only be as strong as its rules allow:
- * observed only when every admitted item derives OBSERVED, and never independently reviewed here.
+ * observed only when the evidence is sufficient and every admitted item derives OBSERVED, and never independently
+ * reviewed here.
  */
 export function evaluateControl(record: EvaluableControl, items: readonly EvidenceItem[], ctx: EvaluationContext): ControlResult {
   const nowMs = Date.now();
@@ -51,7 +52,9 @@ export function evaluateControl(record: EvaluableControl, items: readonly Eviden
     proposed: { result: decideResult(record, applicability, evidence, admitted, rejected, reasons), level: null },
     evidence: {
       eventCount: admitted.length,
-      tiers: admitted.length > 0 && admitted.every((row) => isObservedTier(row.trustTier)) ? ["OBSERVED"] : ["SELF_REPORTED"],
+      // P0-55: observed only on sufficient evidence, every admitted item OBSERVED; an incomplete, stale or contradictory
+      // set never lifts the kind.
+      tiers: evidence === "sufficient" && admitted.length > 0 && admitted.every((row) => isObservedTier(row.trustTier)) ? ["OBSERVED"] : ["SELF_REPORTED"],
       newestTs: Number.isFinite(newest) ? newest : null,
       boundToControl: true, sameScope: true, contradictory: evidence === "contradictory", signatureValid: null, issuerPinned: null
     },
