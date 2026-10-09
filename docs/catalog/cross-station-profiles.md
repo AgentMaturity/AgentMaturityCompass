@@ -8,6 +8,7 @@ Station overlays must exist and apply to the deployment before they can contribu
 
 `catalog/profiles/cross-station.json` contains nine two-station templates and one three-station example. The loader
 validates each template using the canonical station taxonomy and includes these records in the catalog digest.
+The exact digest input and empty-list convention are defined in [Control Record digests](CONTROL_RECORD.md#digests).
 Use a template's `primary` and `stations` in the existing deployment profile facts. Keep their provenance and source
 explicit; selecting a template does not turn an asserted fact into an observed or reviewed one.
 
@@ -78,6 +79,10 @@ The context must be evaluated at the compile's explicit `asOf`. Expired, unsigne
 changed-candidate records are rejected and listed; the normal strict comparison remains. Conflicting authorized
 choices remain unresolved. Existing plan-signing and activation weakening checks still apply to `reviewer_exception`.
 Signing identifies a key and preserves bytes; it does not establish independent legal review.
+
+Signing and activation also gate removed or renamed effective merge keys and any changed comparator, value or chosen
+control. Tightenings are conservatively flagged as unclassified changes too. Added keys and changes only to candidate
+control IDs or exception IDs do not count as weakening; reviewer exceptions still appear in the waiver list.
 
 The readable plan diff includes conflicts, effective comparison rules and rejected exceptions. It shows a changed
 choice or expired exception even when the independently enforced runtime parameters remain unchanged.

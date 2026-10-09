@@ -206,7 +206,9 @@ RFC 8785; catalog content holds no floats, so another implementation can reprodu
 - `packDigest(cat, manifest)`: the manifest, `[{ id, version, digest }]` of its controls sorted by id, and
   `[{ path, sha256 }]` of those controls' fixture files (raw bytes) sorted by path.
 - `catalogDigest(cat)`: the catalog manifest, `[{ id, version, digest }]` of the packs sorted by id, the producers
-  digest (records sorted by id) and the vocabulary digest.
+  digest (records sorted by id) and the vocabulary digest. When `profiles/cross-station.json` holds at least one
+  profile, the hashed object also contains `crossStationProfiles`: the parsed profile records (all fields) sorted
+  by id, with each record's `stations` sorted. That key is omitted when the list is empty or the file is absent.
 
 ## Lockfile
 
