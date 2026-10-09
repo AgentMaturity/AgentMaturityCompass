@@ -4538,7 +4538,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         } else {
           file = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId)?.file ?? "";
         }
-        if (!file || !pathExists(file)) {
+        if (!file) {
           json(res, 404, { error: "binder export not found" });
           return;
         }
