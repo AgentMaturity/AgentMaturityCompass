@@ -510,7 +510,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     applyIndustryPackWeights: input.applyIndustryPackWeights
   });
   const activeQuestions = selectedQuestionSet.questions;
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {}); // P0-55: as runAssurance
   const runId = randomUUID();
 
   try {

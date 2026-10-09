@@ -95,7 +95,8 @@ async function spawnMonitoredProcess(params: {
    */
   stdinMode?: "forward" | "close";
 }): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
-  const ledger = openLedger(params.workspace);
+  // P0-55: rows written under AMC_NO_SIGN=1 (evidence collect --first-run, amc wrap) go to the unsigned store.
+  const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = params.sessionId ?? randomUUID();
 
   try {
