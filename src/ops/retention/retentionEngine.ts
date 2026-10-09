@@ -233,7 +233,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
     for (const [sessionId, ids] of payloadsBySession) {
       try {
         withDeletionGate({ workspace: params.workspace, executor: "retention.payload-prune",
-          target: { kind: "evidence-payloads", sessionIds: [sessionId], before: new Date(pruneBeforeTs).toISOString() } },
+          target: { kind: "evidence-payloads", sessionHashes: [sha256Hex(Buffer.from(sessionId, "utf8"))], before: new Date(pruneBeforeTs).toISOString() } },
         () => ledger.pruneEventPayloadColumns(ids, nowMs()));
         pruneIds.push(...ids);
       } catch (error) {
@@ -273,7 +273,8 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       let outcome: BlobDeleteOutcome;
       try {
         outcome = withDeletionGate({ workspace: params.workspace, executor: "retention.blob-unlink",
-          target: { kind: "blobs", sessionIds: [...new Set(rows.map(row => row.session_id))], before: new Date(pruneBeforeTs).toISOString() } },
+          target: { kind: "blobs", sessionHashes: [...new Set(rows.map(row => sha256Hex(Buffer.from(row.session_id, "utf8"))))],
+            before: new Date(pruneBeforeTs).toISOString() } },
         () => runImmediateTransaction<BlobDeleteOutcome>(ledger.db, () => {
           // Admission/audit uses another connection; acquire the DB write lock only after it returns.
           const current = blobReferences.all(blobId) as typeof rows;

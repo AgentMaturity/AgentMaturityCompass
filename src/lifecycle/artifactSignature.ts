@@ -98,9 +98,12 @@ export function signArtifactFile(input: {
   workspace: string;
   path: string;
   artifactKind: ArtifactSignature["artifactKind"];
+  /** Optional exact publication bytes; callers that omit them keep the existing file-read path. */
+  bytes?: Buffer;
 }): { sigPath: string; signature: ArtifactSignature } {
+  const publicationBytes = input.bytes === undefined ? undefined : Buffer.from(input.bytes);
   ensureSigningKeys(input.workspace);
-  const artifactSha256 = sha256Hex(readFileSync(input.path));
+  const artifactSha256 = sha256Hex(publicationBytes ?? readFileSync(input.path));
   const digestHex = domainSeparatedArtifactDigest({
     artifactKind: input.artifactKind,
     artifactSha256

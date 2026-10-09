@@ -8,6 +8,7 @@ import type { DeletionRequest, HoldVerdict } from "./types.js";
 
 type Clear = Extract<HoldVerdict, { verdict: "clear" }>;
 type Refused = Exclude<HoldVerdict, Clear>;
+type DenialAuditRequest = Omit<DeletionRequest, "target"> & { target: Partial<Pick<DeletionRequest["target"], "kind">> };
 const term = z.string().min(1).max(128).regex(/^[A-Za-z0-9][A-Za-z0-9_.:-]*$/);
 const requestSchema = z.strictObject({ workspace: z.string().min(1).refine(value => value.trim().length > 0), executor: term,
   target: z.lazy(() => deletionTargetSchema) });
@@ -21,19 +22,34 @@ export class DeletionDenied extends Error {
     this.auditPersisted = auditPersisted;
   }
 }
-function deny(request: DeletionRequest, verdict: Refused): never {
+function deny(request: DenialAuditRequest, verdict: Refused): never {
   let persisted = false;
   try {
-    appendOpsAuditEvent({ workspace: request.workspace,
+    const audit = appendOpsAuditEvent({ workspace: request.workspace,
       auditType: verdict.verdict === "held" ? "DELETION_DENIED_HELD" : "DELETION_DENIED_HOLD_UNKNOWN", severity: "HIGH",
       payload: { executor: request.executor, target: request.target, holdVerdict: verdict } });
-    persisted = true;
+    persisted = Boolean(audit.eventId && /^[a-f0-9]{64}$/.test(audit.eventHash));
   } catch { /* Audit unavailability never permits the deletion. */ }
   throw new DeletionDenied(verdict, persisted);
 }
+function invalidRequestAudit(request: unknown): DenialAuditRequest | undefined {
+  const candidate = request && typeof request === "object" ? request as Partial<DeletionRequest> : undefined;
+  const explicit = requestSchema.shape.workspace.safeParse(candidate?.workspace);
+  const workspace = explicit.success ? explicit : requestSchema.shape.workspace.safeParse(getWorkspaceScope());
+  if (!workspace.success) return undefined;
+  const executor = term.safeParse(candidate?.executor);
+  const kind = deletionTargetSchema.shape.kind.safeParse(candidate?.target?.kind);
+  return { workspace: resolve(workspace.data), executor: executor.success ? executor.data : "invalid-deletion-request",
+    target: kind.success ? { kind: kind.data } : {} };
+}
 function normalized(request: DeletionRequest): DeletionRequest {
   const parsed = requestSchema.safeParse(request);
-  if (!parsed.success) throw new DeletionDenied({ verdict: "unknown", reason: "registry_unreadable" }, false);
+  if (!parsed.success) {
+    const verdict = { verdict: "unknown", reason: "registry_unreadable" } as const;
+    const auditRequest = invalidRequestAudit(request);
+    if (auditRequest) return deny(auditRequest, verdict);
+    throw new DeletionDenied(verdict, false);
+  }
   return { ...parsed.data, workspace: resolve(parsed.data.workspace), target: { ...parsed.data.target,
     ...(parsed.data.target.sessionIds ? { sessionIds: [...new Set(parsed.data.target.sessionIds)].sort() } : {}),
     ...(parsed.data.target.sessionHashes ? { sessionHashes: [...new Set(parsed.data.target.sessionHashes)].sort() } : {}) } };
