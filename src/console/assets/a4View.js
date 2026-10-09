@@ -123,20 +123,27 @@ function reflectionHtml(reflection, allowed) {
     <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", offer)}`;
 }
 
+export const ANSWER_CHANGED = "Another member changed an answer you are editing since you began; discard your edits to see theirs";
+/** An answer as its field shows it ("" when unanswered); a4.js compares it to see another member's change. */
+export function answerText(answers, questionId) {
+  const answer = answers.find((row) => row.questionId === questionId);
+  return answer === undefined ? "" : shown(answer.value);
+}
+
 /**
  * Ask: unanswered questions are open fields. Answers so far are listed read-only and collapsed, carried and inferred
  * ones with Confirm (records that value, unchanged, as the user's); "Change my answers" holds their fields. Save sends
  * only the fields the user changed, and a non-text answer is edited as JSON and sent parsed (a4.js).
  */
 export function renderConversation(ctx) {
-  const { questions, answers, allowed, reflection, explanation } = ctx;
+  const { questions, answers, allowed, reflection, explanation, answerDrift } = ctx;
   const answered = new Map(answers.map((answer) => [answer.questionId, answer]));
   const open = questions.filter((question) => !answered.has(question.id));
   const field = (question) => {
     const answer = answered.get(question.id);
     const json = answer !== undefined && typeof answer.value !== "string";
     return `<label>${esc(question.prompt)}${question.required ? " (required)" : ""}${json ? " (JSON)" : ""}
-      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}>${esc(answer === undefined ? "" : shown(answer.value))}</textarea></label>`;
+      <textarea name="${esc(question.id)}" rows="2"${json ? " data-json" : ""}>${esc(answerText(answers, question.id))}</textarea></label>`;
   };
   const answerRow = (answer) => `<li><code>${esc(answer.questionId)}</code> <code>${esc(answer.source)}</code>: ${esc(shown(answer.value))}${
     answer.source === "user" ? "" : ` ${actionButton("Confirm", "confirm-answer", allowed.ask, `data-question="${esc(answer.questionId)}"`)}`}</li>`;
@@ -145,9 +152,12 @@ export function renderConversation(ctx) {
   return `<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
-    ${questions.length ? `<form class="a4-form">${open.map(field).join("")}${change.length
+    ${questions.length ? `<form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
-      ${actionButton("Save answers", "answers", allowed.ask)}</form>` : `<p class="muted">No questions are registered for this stage yet.</p>`}
+      ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
+      <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : allowed.ask)}${answerDrift
+        ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>`
+      : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>

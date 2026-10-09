@@ -149,6 +149,10 @@ function mountProject(projectId, options) {
   // only to the member who ran them, until the page reloads.
   let reflection = null, explanation = null;
   const drafts = new Map();
+  // Save answers binds the head the first answer edit began on, and each edited answer remembers Studio's value then:
+  // a poll that shows another member's change to one of them holds Save instead of overwriting it.
+  let answerBase = null;
+  const answerStarts = new Map();
 
   const stagePath = (sub) => projectPath(`/stages/${stage}/${sub}`);
   // The editor's base: the spec without the answers Studio carries, so the merge and the proposal never name them.
@@ -162,6 +166,12 @@ function mountProject(projectId, options) {
   // Answers are the head revision's only when that revision was recorded at the viewed stage, as Studio's own Ask reads
   // them: a completed stage's revision stays the head after the next stage opens. A revision naming no stage shows none.
   const shownAnswers = () => (state.revision?.stage === stage ? listOf(state.revision?.spec?.answers, "answers") : []);
+  const answerDrift = () => [...answerStarts].some(([id, start]) => view.answerText(shownAnswers(), id) !== start);
+  const dropAnswerDrafts = (card) => {
+    for (const id of answerStarts.keys()) drafts.delete(`${card}:${id}`);
+    answerStarts.clear();
+    answerBase = null;
+  };
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
   const shownReview = () => {
     const { open, met } = view.currentGates(state.gates, stage);
@@ -248,7 +258,7 @@ function mountProject(projectId, options) {
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
-    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation,
+    const ctx = { ...state, stage, allowed: readiness.allowed, me, gateChange, reflection, explanation, answerDrift: answerDrift(),
       questions: listOf(state.options?.questions?.[stage], "questions"), answers: shownAnswers() };
     root.innerHTML = `${view.holdBanner(project)}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
       <section class="card"><h3>${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
@@ -345,12 +355,13 @@ function mountProject(projectId, options) {
     };
     switch (name) {
       case "answers": {
+        if (answerDrift()) throw new Error(`${view.ANSWER_CHANGED}. Nothing was sent.`);
         // Only the fields the user changed: an untouched carried answer is never re-sent as the user's own statement.
-        const edited = [...scope.querySelectorAll("form textarea[name]")]
+        const edited = [...scope.querySelectorAll("form[data-a4-answers] textarea[name]")]
           .filter((field) => field.value.trim() && field.value.trim() !== field.defaultValue.trim());
         if (edited.length === 0) throw new Error("No answer was changed. Nothing was sent.");
-        return post("Save answers", stagePath("answers"), { ...headBinding(),
-          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, edited.map(draftKey));
+        return { ...post("Save answers", stagePath("answers"), { expectedHeadSeq: answerBase ?? state.project.headSeq, clientRequestId: uuid(),
+          answers: edited.map((field) => ({ questionId: field.name, value: answerValue(field) })) }, [], () => dropAnswerDrafts(card)), answers: true };
       }
       case "confirm-answer": {
         const answer = shownAnswers().find((row) => row.questionId === button.dataset.question);
@@ -436,6 +447,11 @@ function mountProject(projectId, options) {
     } catch (error) {
       if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.spec) return openConflict(action);
       if (error?.status === 409) await load().catch(showError);
+      // Another write moved the head but changed none of the answers being edited: re-sent once on the new head.
+      if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.answers && !action.rebased && !answerDrift()) {
+        answerBase = state.project.headSeq;
+        return run({ ...action, body: { ...action.body, expectedHeadSeq: answerBase, clientRequestId: uuid() }, rebased: true });
+      }
       throw error;
     }
     await action.after(data);
@@ -446,6 +462,10 @@ function mountProject(projectId, options) {
       const shown = shownReview();
       if (!pinnable(shown)) throw new Error(`${view.OTHER_REVISION}.`);
       reviewed = shown;
+      return render();
+    }
+    if (name === "discard-answers") {
+      dropAnswerDrafts(button.closest("[data-card]")?.dataset.card ?? "page");
       return render();
     }
     if (name === "reload") {
@@ -522,6 +542,10 @@ function mountProject(projectId, options) {
     const key = draftKey(event.target);
     if (!key) return;
     if (key === "specification:spec" && !specBase) specBase = specBaseNow();
+    if (event.target.closest("form[data-a4-answers]") && !answerStarts.has(event.target.name)) {
+      answerBase ??= state.project.headSeq;
+      answerStarts.set(event.target.name, view.answerText(shownAnswers(), event.target.name));
+    }
     drafts.set(key, event.target.value);
   });
   document.addEventListener("visibilitychange", () => (document.hidden ? clearTimeout(timer) : schedule(0)));
