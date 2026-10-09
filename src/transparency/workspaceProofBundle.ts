@@ -3,19 +3,20 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { boundedRead } from "../standard/externalEvidenceFiles.js";
 import type { TrustContext } from "../trust/index.js";
-import { containedPath } from "../utils/pathSafety.js";
+import { isWithin } from "../utils/pathSafety.js";
 import { AMC_ARCHIVE_LIMITS, verifyTransparencyProofBundle } from "./merkleIndexStore.js";
 
 /**
- * The bytes of the proof bundle a Studio or API request names (P0-51): `file` resolved under
- * `<workspace>/.amc/transparency/proofs/` (where Studio's prove writes), a regular, singly linked file with no symbolic
- * link anywhere from `.amc` down, read through one no-follow descriptor that is re-checked against that path
+ * The bytes of the proof bundle a Studio or API request names (P0-51): `file` resolved against the workspace (as
+ * prove's `outFile` is) and lying under `<workspace>/.amc/transparency/proofs/`, a regular, singly linked file with no
+ * symbolic link anywhere from `.amc` down, read through one no-follow descriptor that is re-checked against that path
  * after opening, and never past the archive size cap; else null. A path that leaves the directory is refused by name,
  * before anything is read.
  */
 function readRequestedProofBundle(workspace: string, file: string): Buffer | null {
   try {
-    const lexical = containedPath(join(workspace, ".amc", "transparency", "proofs"), "the transparency proofs directory", file);
+    const lexical = resolve(workspace, file);
+    if (!isWithin(resolve(workspace, ".amc", "transparency", "proofs"), lexical)) return null;
     // Its real path must be the lexical one re-rooted at the workspace's real path: no link from .amc down.
     const unlinked = join(realpathSync(workspace), relative(resolve(workspace), lexical));
     const inside = () => realpathSync(lexical) === unlinked;
