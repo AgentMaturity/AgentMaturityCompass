@@ -260,9 +260,10 @@ async function requestUpstreamWithResilience(params: {
         () =>
           new Promise<IncomingMessage>((resolvePromise, rejectPromise) => {
             const impl = params.targetUrl.protocol === "https:" ? httpsRequest : httpRequest;
+            // A pinned lookup needs a new socket: the keep-alive pool is keyed by name and would reuse a socket to another address.
             const outgoing = impl(
               params.targetUrl,
-              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup } : {}) },
+              { method: params.method, headers: params.headers, ...(params.lookup ? { lookup: params.lookup, agent: false } : {}) },
               (res) => resolvePromise(res)
             );
             outgoing.setTimeout(params.timeoutMs, () => {

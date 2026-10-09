@@ -117,9 +117,9 @@ export async function resolveAddresses(host: string): Promise<string[]> {
 /**
  * decideEgress on the addresses `host` resolves to now (P1-66). A name the allowlist does not cover is refused before
  * any DNS query, so lookups carry nothing out; a name that resolves to nothing is refused (EGRESS_UNRESOLVED), never
- * allowed. The caller connects only to a returned address (a pinned lookup, or a connect to the address with the
- * original name as Host and TLS servername) and calls this again for every new connection, so the name cannot rebind
- * between the check and the socket.
+ * allowed. The caller connects only to a returned address (a pinned lookup on a new socket, never a pooled keep-alive
+ * one, or a connect to the address with the original name as Host and TLS servername) and calls this again for every
+ * new connection, so the name cannot rebind between the check and the socket.
  */
 export async function resolveAndCheck(host: string, policy: { readonly allowHosts: readonly string[] },
   resolve: (name: string) => Promise<readonly string[]> = resolveAddresses): Promise<EgressCheck> {
