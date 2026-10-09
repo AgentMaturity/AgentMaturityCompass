@@ -422,9 +422,11 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 
 /**
  * Per-principal permission map: role classes on live roles and membership, then the global and action-specific blockers.
- * `decide` covers approve and deny alike, so it carries the regulated live-identity refusal (both are refused) but not
- * the gate's SoD exclusions: an excluded requester, author or builder may still deny, and recordDecision refuses their
- * approval at write (400 SOD_VIOLATION; `selfApprovalAllowed` says whether self-approval is open).
+ * `decide` covers approve and deny alike, so it carries every refusal recordDecision applies to both: the regulated
+ * live-identity refusal and, for the stage's open gate, its own `rolesAllowed` (GATE_ROLE_NOT_ALLOWED, written as 403
+ * PRINCIPAL_ROLE_INSUFFICIENT), a vote already cast (A4_DUPLICATE_DECISION) and the expiry guard (GATE_EXPIRING). It
+ * leaves out the gate's SoD exclusions: an excluded requester, author or builder may still deny, and recordDecision
+ * refuses their approval at write (400 SOD_VIOLATION; `selfApprovalAllowed` says whether self-approval is open).
  */
 function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: readonly A4ReadinessItem[],
   gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }, regulated: boolean): A4ReadinessV1["allowed"] {
@@ -439,6 +441,8 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   // a gate bound while they wait would go stale on every decision while still reading PENDING, so it waits for them.
   const transient = ids((candidate) => (candidate.id === "effects.failed" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY");
   const gateList = [gates.direction, gates.completion];
+  const pending = gateList.filter((gate): gate is A4GateStatus => gate?.status === "PENDING");
+  const everyPending = (refuses: (gate: A4GateStatus) => boolean): boolean => pending.length > 0 && pending.every(refuses);
   const specific: Partial<Record<A4Action, string[]>> = {
     requestGate: [...blocked, ...transient],
     decide: [
@@ -446,7 +450,11 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
       ...ids((candidate) => candidate.mandatory && candidate.bound && candidate.status === "NOT_EVALUATED"), ...blocked,
       ...ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
       // recordDecision's rule: a regulated project takes decisions from live-checked (users.yaml) identities only, until P2-33.
-      ...(regulated && principal?.identityCheck !== "users_yaml" ? ["IDENTITY_CHECK_LIMITED"] : [])
+      ...(regulated && principal?.identityCheck !== "users_yaml" ? ["IDENTITY_CHECK_LIMITED"] : []),
+      ...(everyPending((gate) => !principal?.roles.some((role) => gate.request.rolesAllowed.includes(role))) ? ["GATE_ROLE_NOT_ALLOWED"] : []),
+      ...(everyPending((gate) => state.decisions.some((decision) => decision.gate_id === gate.row.gate_id && decision.approver_key === principal?.key))
+        ? ["A4_DUPLICATE_DECISION"] : []),
+      ...(everyPending((gate) => query.now >= gate.row.expires_ts - EXPIRING_GUARD_MS) ? ["GATE_EXPIRING"] : [])
     ],
     progress: [
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),

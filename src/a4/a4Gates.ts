@@ -242,9 +242,11 @@ export function livePrincipal(store: A4Store, call: A4Call): A4Principal {
 export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore: readonly string[] = []): void {
   const codes = (readiness.allowed[action]?.reasonCodes ?? ["UNKNOWN_ACTION"]).filter((code) => !ignore.includes(code));
   if (codes.length === 0) return;
-  const role = ["ADMIN_TOKEN_REFUSED", "PRINCIPAL_ROLE_INSUFFICIENT", "PRINCIPAL_NOT_MEMBER", "READ_ONLY_MODE", "IDENTITY_CHECK_LIMITED"].find((code) => codes.includes(code));
+  const role = ["ADMIN_TOKEN_REFUSED", "PRINCIPAL_ROLE_INSUFFICIENT", "GATE_ROLE_NOT_ALLOWED", "PRINCIPAL_NOT_MEMBER", "READ_ONLY_MODE", "IDENTITY_CHECK_LIMITED"]
+    .find((code) => codes.includes(code));
   if (role !== undefined) {
-    throw fail(403, role === "PRINCIPAL_NOT_MEMBER" ? "A4_NOT_A_MEMBER" : role === "READ_ONLY_MODE" ? "NATIVE_READ_ONLY" : role, `refused: ${codes.join(", ")}`, codes);
+    const code = { PRINCIPAL_NOT_MEMBER: "A4_NOT_A_MEMBER", READ_ONLY_MODE: "NATIVE_READ_ONLY", GATE_ROLE_NOT_ALLOWED: "PRINCIPAL_ROLE_INSUFFICIENT" }[role] ?? role;
+    throw fail(403, code, `refused: ${codes.join(", ")}`, codes);
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
   throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
@@ -516,9 +518,11 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
       throw fail(409, "A4_DUPLICATE_DECISION", "You already decided this gate.");
     }
     if (gate.status !== "PENDING") throw fail(409, "A4_GATE_CLOSED", `the gate is ${gate.status}`);
-    // A policy gate is not one of the stage's direction/completion gates; its openness was just checked. Its proposal was
-    // floor-checked at request and is again at GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it.
-    assertAllowed(readiness, "decide", row.gate === "policy" ? ["GATE_NOT_OPEN", "gate.policy_floor"] : []);
+    // A policy gate is not one of the stage's direction/completion gates: their openness, roles, votes and expiry do not
+    // bar it, and its own were just checked (roles just below). Its proposal was floor-checked at request and is again at
+    // GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it.
+    assertAllowed(readiness, "decide", row.gate === "policy"
+      ? ["GATE_NOT_OPEN", "GATE_ROLE_NOT_ALLOWED", "A4_DUPLICATE_DECISION", "GATE_EXPIRING", "gate.policy_floor"] : []);
     if (!principal.roles.some((role) => gate.request.rolesAllowed.includes(role))) {
       throw fail(403, "PRINCIPAL_ROLE_INSUFFICIENT", `this gate accepts ${gate.request.rolesAllowed.join(", ")}`);
     }
