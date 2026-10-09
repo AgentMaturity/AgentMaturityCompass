@@ -22,7 +22,7 @@ import {
   signedA4Floor, withFullIntegrity, type A4Call
 } from "./a4Gates.js";
 import { assertMember, liveRolesFor } from "./a4Identity.js";
-import { gateStatus, isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
+import { gateStatus, isRegulated, redoneStages, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import type { A4ChainLink, A4Principal, A4RefKind, A4Stage } from "./a4Schema.js";
 import { buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -90,6 +90,22 @@ const effectIntent = (def: A4EffectDef, state: A4ReadinessState, gate: A4GateRow
     bindingDigest: gate.binding_digest, executionId: def.executionId(state, gate) };
 const latestOpened = (state: A4ReadinessState, gateId: string, effect: string): A4ChainLink | undefined =>
   [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === gateId && link.body.effect === effect);
+/** The resource slots the gate's intent bound, `group.slot` → value. */
+const boundSlots = (gate: A4GateRow): Record<string, string | null> => (JSON.parse(gate.intent_json) as { resourceDigests: Record<string, string | null> }).resourceDigests;
+/** The EFFECT_FAILED rows of `effect`'s attempts on `gateId`, in chain order. */
+const failuresOf = (chain: readonly A4ChainLink[], gateId: string, effect: string): A4ChainLink[] => {
+  const attempts = new Set(chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gateId && link.body.effect === effect).map((link) => link.body.effectId));
+  return chain.filter((link) => link.kind === "EFFECT_FAILED" && attempts.has(link.body.effectId));
+};
+/**
+ * 409 A4_GATE_STALE once a REOPEN, TUNE or new revision after `failure` sends `stage` back through its gates: readiness
+ * has cleared that failure (effectsItem), and retry, re-open and re-run refuse it by the same rule.
+ */
+function assertNotRedone(state: A4ReadinessState, stage: A4Stage, failure: A4ChainLink | undefined): void {
+  if (failure !== undefined && state.chain.some((link) => link.seq > failure.seq && redoneStages(link)?.(stage) === true)) {
+    throw fail(409, "A4_GATE_STALE", "the effect's stage was redone after it failed; its gates complete again", { moved: ["revision"] });
+  }
+}
 const startedLink = (chain: readonly A4ChainLink[], attemptId: string): A4ChainLink => {
   const link = chain.find((candidate) => candidate.kind === "EFFECT_STARTED" && candidate.body.effectId === attemptId);
   if (link === undefined) throw fail(404, "A4_EFFECT_NOT_FOUND", `no effect attempt ${attemptId}`);
@@ -143,6 +159,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     const gate = gateStatus(state, row, query.policy, now);
     const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
     if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
+    if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
     assertReopenable(store, state, row, def);
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
@@ -233,7 +250,8 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
  * `complete` on a gate already consumed, after an effect whose executor consumes its own grant failed and an owner
  * re-opened its effect gate (design §6.1: the only path after an activateControlPlan failure). The new engine request is
  * verified as at consumption (verifyAndConsumeEffect) and only EFFECT_STARTED is written: the documentary gate is never
- * consumed twice. Without a failure before that re-open, or once it has run, it is 409 A4_GATE_STALE (consumed).
+ * consumed twice. Without a failure before that re-open, or once it has run, it is 409 A4_GATE_STALE (consumed); after a
+ * REOPEN, TUNE or revision that redid the stage, 409 A4_GATE_STALE (revision); on drifted resources, 409 RESOURCE_DRIFTED.
  */
 function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef, input: A4Call & { stage: A4Stage; gateId: string;
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
@@ -257,6 +275,10 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
     const { readiness, query } = evaluateFor(store, state, principal, call, row.stage, now);
     assertAllowed(readiness, "retryEffect");
     if (row.revision_no !== state.project.revision_no) throw fail(409, "A4_GATE_STALE", "the gate is bound to an earlier revision", { moved: ["revision"] });
+    assertNotRedone(state, row.stage, outcomes.filter((link) => link.kind === "EFFECT_FAILED").at(-1));
+    // Drift is refused before anything is written, as consumeGate refuses it (design §6.5), not left to the preamble.
+    const drifted = driftedSlots(store.workspace, boundSlots(row));
+    if (drifted.length > 0) throw fail(409, "RESOURCE_DRIFTED", `resources moved since the gate opened: ${drifted.join(", ")}`, { slots: drifted });
     const approvalRequestId = String(opened.body.approvalRequestId);
     const keys = verifyAndConsumeEffect(store, state, { def, gate: row, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, query.floor) });
     const executionId = def.executionId(state, row);
@@ -340,7 +362,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     }
     if (volatile.readOnly !== false) return failWith("READ_ONLY_MODE");
     const gate = gateRowOf(state, String(started.body.gateId));
-    const bound = (JSON.parse(gate.intent_json) as { resourceDigests: Record<string, string | null> }).resourceDigests;
+    const bound = boundSlots(gate);
     const drifted = driftedSlots(workspace, bound);
     if (drifted.length > 0) return failWith(`RESOURCE_DRIFTED ${drifted.join(" ")}`);
     // A beat that throws (SQLITE_BUSY, a closed ledger) is a missed beat, never an uncaught timer exception that exits Studio.
@@ -390,8 +412,10 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
 /**
  * Retry (owner; design §6.5): only for effects A4 consumes, and only when the chain has a failure and no finish for
  * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
- * consumed, was consumed by this execution id. A new attempt with the same execution id; executors that consume their own grant
- * re-open the effect gate instead, and `complete` on the consumed gate runs them again (`rerunExecutorEffect`).
+ * consumed, was consumed by this execution id. A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
+ * failure whose stage was redone since is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
+ * id; executors that consume their own grant re-open the effect gate instead, and `complete` on the consumed gate runs
+ * them again (`rerunExecutorEffect`).
  */
 export function retryEffect(store: A4Store, projectId: string, input: A4Call & { attemptId: string; expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const principal = livePrincipal(store, input);
@@ -417,9 +441,12 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     if (state.effects.some((row) => row.execution_id === executionId && row.state === "running")) {
       throw fail(409, "EFFECT_RUNNING", "A previous attempt may still be running; the sweeper settles it first.");
     }
+    const row = gateRowOf(state, String(started.body.gateId));
+    const failures = failuresOf(state.chain, row.gate_id, def.id);
+    if (failures.length >= 2) throw fail(409, "EFFECT_NOT_RETRYABLE", "A second failure requires a new revision of the stage (design §6.5); reopen it.");
+    assertNotRedone(state, row.stage, failures.at(-1));
     const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
     if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The engine grant was consumed by another execution.");
-    const row = gateRowOf(state, String(started.body.gateId));
     const { readiness } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "retryEffect");
     return { readiness, specs: { kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,

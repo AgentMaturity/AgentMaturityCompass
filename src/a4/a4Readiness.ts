@@ -318,8 +318,11 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
 }
 
 const EFFECT_KINDS = new Set(["EFFECT_STARTED", "EFFECT_FINISHED", "EFFECT_FAILED"]);
-/** The stages a REOPEN or TUNE (back to its target and later) or a REVISION (its own stage) sends back through their gates. */
-function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) | null {
+/**
+ * The stages a REOPEN or TUNE (back to its target and later) or a REVISION (its own stage) sends back through their gates;
+ * null for any other link. Readiness clears a settled effect outcome on it, and retry, re-open and re-run refuse with it.
+ */
+export function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) | null {
   if (link.kind === "REVISION") return (stage) => stage === link.body.stage;
   if (link.kind !== "REOPEN" && link.kind !== "TUNE") return null;
   const to = A4_STAGES.indexOf((link.body.headAfter as { stage?: unknown } | undefined)?.stage as A4Stage);
