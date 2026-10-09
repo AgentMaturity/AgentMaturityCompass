@@ -105,17 +105,20 @@ export function stepRows(project, stage) {
     body: current < 0 ? "" : index === current ? "current step" : index < current ? "earlier step" : "" }));
 }
 
-const NO_REFLECTION = "No reflection shown yet";
+const NO_REFLECTION = "No statement recorded from this page yet";
+const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
+/** What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. */
+const recorded = (what, entry) => `<p class="muted">Studio recorded ${what} as self-reported${Number.isSafeInteger(entry.headSeq)
+  ? ` at seq ${esc(entry.headSeq)}` : ""}. What you sent:</p><p>${esc(entry.text)}</p>${studioJson(entry.data)}`;
 
-/** Understand's reflection as Studio returned it; Confirm and Correct stay disabled until one is shown here. */
+/** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
 function reflectionHtml(reflection, allowed) {
   const bound = Number.isSafeInteger(reflection?.headSeq);
-  const offer = bound ? allowed.understand : held(reflection ? "Studio did not say which head this reflection belongs to" : NO_REFLECTION);
-  return `${reflection ? `<p class="muted">What AMC understood, as Studio returned it${bound ? ` (head ${esc(reflection.headSeq)})` : ""}.
-    Yes and Correct bind this head: if the project changes first, Studio refuses them and you run Understand again.</p>
-    ${studioJson(reflection.data)}` : `<p class="muted">${NO_REFLECTION}. Run Understand to see what AMC
-    understood before you confirm it.</p>`}
+  const offer = bound ? allowed.understand : held(reflection ? "Studio did not say which head this statement was recorded at" : NO_REFLECTION);
+  return `${reflection ? `${recorded("your statement", reflection)}<p class="muted">Yes and Correct bind this head: if the project
+    changes first, Studio refuses them and you run Understand again.</p>` : `<p class="muted">${NO_REFLECTION}. Run Understand to
+    record your statement before you confirm it.</p>`}
     <div class="row wrap">${actionButton("Yes, that's it", "confirm", offer)}</div>
     <label>Correct this <textarea name="corrections" rows="2"></textarea></label>${actionButton("Correct this", "correct", offer)}`;
 }
@@ -146,12 +149,16 @@ export function renderConversation(ctx) {
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${actionButton("Save answers", "answers", allowed.ask)}</form>` : `<p class="muted">No questions are registered for this stage yet.</p>`}
     <h4>Understand</h4>
+    <label>What this stage should achieve, in your words <textarea name="understanding" rows="3"></textarea></label>
+    <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", allowed.understand)}</div>
     ${reflectionHtml(reflection, allowed)}
     <h4>Explain</h4>
+    <label>Your explanation <textarea name="explanation" rows="3"></textarea></label>
+    <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap"><select name="level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", allowed.explain)}</div>
-    ${explanation ? `<p class="muted">Explanation at the ${esc(explanation.level)} level, as Studio returned it.</p>${studioJson(explanation.data)}` : ""}`;
+    ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
 }
 
 export function renderSpecEditor(ctx) {

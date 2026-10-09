@@ -325,6 +325,11 @@ function mountProject(projectId, options) {
     const scope = button.closest("[data-card]") ?? button.closest("section") ?? root;
     const card = scope.dataset?.card ?? "page";
     const value = (field) => scope.querySelector(`[name="${field}"]`)?.value.trim() ?? "";
+    const written = (field, what) => {
+      const text = value(field);
+      if (!text) throw new Error(`Write ${what} first. Nothing was sent.`);
+      return text;
+    };
     const reason = root.querySelector('.a4-approvals [name="reason"]')?.value.trim() ?? "";
     const post = (label, path, body, clears = [], got = undefined) => ({ label, path, body, clears, got });
     const REASON = ["page:reason"];
@@ -347,18 +352,24 @@ function mountProject(projectId, options) {
         if (!answer) throw new Error("That answer is no longer shown. Nothing was sent.");
         return post("Confirm answer", stagePath("answers"), { ...headBinding(), answers: [{ questionId: answer.questionId, value: answer.value }] });
       }
-      case "understand": return post("Run Understand", stagePath("understand"), headBinding(), [],
-        (data) => { reflection = { data, headSeq: headSeqOf(data) }; });
+      // Until a stage producer lands, Understand and Explain record the member's own text (P1-57's no-producer path).
+      case "understand": {
+        const content = written("understanding", "what this stage should achieve");
+        return post("Run Understand", stagePath("understand"), { content, ...headBinding() }, [`${card}:understanding`],
+          (data) => { reflection = { data, text: content, headSeq: headSeqOf(data) }; });
+      }
       case "confirm": return post("Confirm understanding", stagePath("confirm-understanding"), { confirmed: true, ...reflectionBinding() });
       case "correct": return post("Correct understanding", stagePath("confirm-understanding"),
         { confirmed: false, corrections: value("corrections"), ...reflectionBinding() }, [`${card}:corrections`], () => { reflection = null; });
       case "explain": {
         const level = value("level");
-        return post("Explain", stagePath("explain"), { level, ...headBinding() }, [], (data) => { explanation = { level, data }; });
+        const content = written("explanation", "your explanation");
+        return post("Explain", stagePath("explain"), { content, level, ...headBinding() }, [`${card}:explanation`],
+          (data) => { explanation = { level, text: content, data, headSeq: headSeqOf(data) }; });
       }
       case "propose": return proposeAction(scope);
-      case "build": return post("Build", stagePath("build"), { content: value("content"), ...headBinding() }, [`${card}:content`]);
-      case "review": return post("Review", stagePath("review"), { content: value("content"), ...headBinding() }, [`${card}:content`]);
+      case "build": return post("Build", stagePath("build"), { content: written("content", "the build output"), ...headBinding() }, [`${card}:content`]);
+      case "review": return post("Review", stagePath("review"), { content: written("content", "your findings"), ...headBinding() }, [`${card}:content`]);
       case "request-direction": return post("Request direction approval", stagePath("gates/direction/request"), headBinding(), [], repin);
       case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding(), [], repin);
       case "approve": return decide("approve", "Approve", (binding) => binding);
