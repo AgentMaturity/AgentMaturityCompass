@@ -45,8 +45,10 @@ export interface A4Call {
   readonly hostMode?: boolean;
   /** Integrity from the full verifyA4Chain (GET, complete, verify) rather than the snapshot's incremental check. */
   readonly fullIntegrity?: boolean;
+  /** That full report, computed once before the lock and the transaction so neither plan run repeats it (complete). */
+  readonly integrity?: A4LiveFacts["integrity"];
 }
-type Facts = Pick<A4Call, "hostedRouter" | "hostMode" | "fullIntegrity">;
+type Facts = Pick<A4Call, "hostedRouter" | "hostMode" | "fullIntegrity" | "integrity">;
 /** Writes the server makes on its own behalf (automatic hold, effect outcomes); never a person. */
 export const A4_RUNTIME: A4Actor = { key: "amc-runtime", username: "amc-runtime" };
 const DAY_MS = 86_400_000;
@@ -144,7 +146,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     vaultUnlocked: vaultUnlocked(workspace), signingRoute: route,
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
-    integrity: call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] },
+    integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
     driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : []
   };
 }
@@ -456,11 +458,14 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
+  // The full verifier runs once, here, outside the project lock and the ledger transaction (design §7 rule 2); both plan
+  // runs read this report. The store commits only on expectedHeadSeq and its in-transaction check sees no new row.
+  const call: A4Call = input.fullIntegrity === true && input.integrity === undefined ? { ...input, integrity: fullIntegrity(store, projectId) } : input;
   return governed(store, projectId, principal, input, (ts) => {
     const state = loadA4State(store, projectId, now);
     const row = gateRowOf(state, input.gateId);
     if (row.stage !== input.stage || row.gate === "policy") throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
-    const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
+    const { readiness, query } = evaluateFor(store, state, principal, call, row.stage, now);
     const gate = gateStatus(state, row, query.policy, now);
     assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
