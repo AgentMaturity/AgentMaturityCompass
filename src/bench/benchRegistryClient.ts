@@ -1,6 +1,8 @@
 import { createPublicKey, verify } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import { benchRegistryConfigSchema, benchRegistryIndexSchema, benchRegistryIndexSignatureSchema, type BenchRegistryConfig, type BenchRegistryIndex } from "./benchRegistrySchema.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -18,11 +20,13 @@ function joinUrl(base: string, rel: string): string {
   return `${base.replace(/\/+$/, "")}/${rel.replace(/^\/+/, "")}`;
 }
 
-async function readText(base: string, rel: string): Promise<string> {
+async function readText(base: string, rel: string, workspace?: string): Promise<string> {
   if (isHttp(base)) {
-    const response = await fetch(joinUrl(base, rel), { method: "GET" });
+    const url = joinUrl(base, rel), request: RequestInit = { method: "GET", redirect: "manual" };
+    checkScopedEgress(workspace, "network-tool", url, { dataClasses: null, purpose: null });
+    const response = await fetch(url, request);
     if (!response.ok) {
-      throw new Error(`registry fetch failed (${response.status}): ${joinUrl(base, rel)}`);
+      throw new Error(`registry fetch failed (${response.status}): ${url}`);
     }
     return await response.text();
   }
@@ -33,11 +37,13 @@ async function readText(base: string, rel: string): Promise<string> {
   return readUtf8(file);
 }
 
-async function readBytes(base: string, rel: string): Promise<Buffer> {
+async function readBytes(base: string, rel: string, workspace?: string): Promise<Buffer> {
   if (isHttp(base)) {
-    const response = await fetch(joinUrl(base, rel), { method: "GET" });
+    const url = joinUrl(base, rel), request: RequestInit = { method: "GET", redirect: "manual" };
+    checkScopedEgress(workspace, "network-tool", url, { dataClasses: null, purpose: null });
+    const response = await fetch(url, request);
     if (!response.ok) {
-      throw new Error(`registry fetch failed (${response.status}): ${joinUrl(base, rel)}`);
+      throw new Error(`registry fetch failed (${response.status}): ${url}`);
     }
     return Buffer.from(await response.arrayBuffer());
   }
@@ -77,7 +83,7 @@ function compareVersions(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
-async function fetchBenchRegistryIndex(baseRaw: string): Promise<{
+async function fetchBenchRegistryIndex(baseRaw: string, workspace?: string): Promise<{
   base: string;
   indexRaw: string;
   sigRaw: string;
@@ -87,9 +93,9 @@ async function fetchBenchRegistryIndex(baseRaw: string): Promise<{
 }> {
   const base = isHttp(baseRaw) ? baseRaw.replace(/\/+$/, "") : resolve(baseRaw);
   const [indexRaw, sigRaw, pubRaw] = await Promise.all([
-    readText(base, "index.json"),
-    readText(base, "index.sig"),
-    readText(base, "registry.pub")
+    readText(base, "index.json", workspace),
+    readText(base, "index.sig", workspace),
+    readText(base, "registry.pub", workspace)
   ]);
   const index = benchRegistryIndexSchema.parse(JSON.parse(indexRaw) as unknown);
   const checked = verifyIndexSignature({ index, sigRaw, registryPub: pubRaw });
@@ -118,8 +124,11 @@ export async function browseBenchRegistry(params: {
   registryFingerprint: string;
   benches: BenchRegistryIndex["benches"];
 }> {
-  const fetched = await fetchBenchRegistryIndex(params.base);
-  const query = (params.query ?? "").trim().toLowerCase();
+  const { base: baseRaw, query: queryRaw } = params;
+  const rawWorkspace = getWorkspaceScope();
+  const workspace = typeof rawWorkspace === "string" && rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const fetched = await fetchBenchRegistryIndex(baseRaw, workspace);
+  const query = (queryRaw ?? "").trim().toLowerCase();
   const benches =
     query.length === 0
       ? fetched.index.benches
@@ -190,11 +199,13 @@ export async function importBenchFromRegistry(params: {
   filePath: string;
   registryFingerprint: string;
 }> {
-  const registry = signedBenchRegistry(params.workspace, params.registryId);
-  const base = isHttp(registry.base) ? registry.base : resolve(params.workspace, registry.base);
-  const fetched = await fetchBenchRegistryIndex(base);
+  const { workspace: rawWorkspace, registryId, benchRef } = params;
+  const workspace = typeof rawWorkspace === "string" && rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const registry = signedBenchRegistry(workspace, registryId);
+  const base = isHttp(registry.base) ? registry.base : resolve(workspace, registry.base);
+  const fetched = await fetchBenchRegistryIndex(base, workspace);
   cacheRegistryIndex({
-    workspace: params.workspace,
+    workspace,
     registryId: registry.id,
     indexRaw: fetched.indexRaw,
     sigRaw: fetched.sigRaw,
@@ -206,9 +217,9 @@ export async function importBenchFromRegistry(params: {
   const operator = loadTrustContext();
   admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, operator);
 
-  const at = params.benchRef.lastIndexOf("@");
-  const benchId = at > 0 ? params.benchRef.slice(0, at) : params.benchRef;
-  const requestedVersion = at > 0 ? params.benchRef.slice(at + 1) : "latest";
+  const at = benchRef.lastIndexOf("@");
+  const benchId = at > 0 ? benchRef.slice(0, at) : benchRef;
+  const requestedVersion = at > 0 ? benchRef.slice(at + 1) : "latest";
   const item = fetched.index.benches.find((row) => row.benchId === benchId);
   if (!item) {
     throw new Error(`bench not found in registry: ${benchId}`);
@@ -226,12 +237,12 @@ export async function importBenchFromRegistry(params: {
   if (registry.allowSignerFingerprints.length > 0 && !registry.allowSignerFingerprints.includes(selected.signerFingerprint)) {
     throw new Error(`bench signer not allowlisted: ${selected.signerFingerprint}`);
   }
-  const bytes = await readBytes(fetched.base, selected.url);
+  const bytes = await readBytes(fetched.base, selected.url, workspace);
   const digest = sha256Hex(bytes);
   if (digest !== selected.sha256) {
     throw new Error(`bench sha mismatch for ${benchId}@${selected.version}`);
   }
-  const tmpPath = join(resolve(params.workspace), ".amc", "bench", "imports", "tmp-import.amcbench");
+  const tmpPath = join(resolve(workspace), ".amc", "bench", "imports", "tmp-import.amcbench");
   writeFileAtomic(tmpPath, bytes, 0o644);
   // The signer counts because the pinned registry's signed index names it for this version (P0-09).
   const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
@@ -243,7 +254,7 @@ export async function importBenchFromRegistry(params: {
     throw new Error("bench proofs required by registry policy but artifact has no inclusion proofs");
   }
   const stored = storeImportedBench({
-    workspace: params.workspace,
+    workspace,
     registryId: registry.id,
     registryFingerprint: fetched.registryFingerprint,
     signerFingerprint: selected.signerFingerprint,
