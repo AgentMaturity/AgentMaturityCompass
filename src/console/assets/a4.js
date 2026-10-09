@@ -179,7 +179,7 @@ function mountProject(projectId, options) {
   };
   const buildRunning = () => state.readiness?.items.some((item) => item.reasonCodes.includes("BUILD_RUNNING")) === true;
   const shownReview = () => {
-    const { open, met } = view.currentGates(state.gates, stage);
+    const { open, met } = view.currentGates(state.gates, stage, state.readiness);
     return view.gateReview(open ?? met, state.readiness);
   };
   /**
@@ -305,11 +305,10 @@ function mountProject(projectId, options) {
     if (target) target.innerHTML = view.renderPresence(presence, presenceError);
   }
 
-  /** Binds the gate the user reviewed; the open seq comes from readiness's view of that same gate (or its record). */
+  /** Binds the gate the user reviewed; the open seq is readiness's `requestedSeq` for that gate (currentGates). */
   function decisionBinding() {
-    const { open } = view.currentGates(state.gates, stage);
-    const gateView = state.readiness.gates?.[open?.gate];
-    const seq = open ? view.gateSeq(gateView?.gateId === open.gateId ? gateView : open, state.project.headSeq) : null;
+    const { open } = view.currentGates(state.gates, stage, state.readiness);
+    const seq = open ? view.gateSeq(open, state.project.headSeq) : null;
     if (!open || seq === null) throw new Error("No open gate with its open sequence is shown. Refresh before deciding.");
     const pin = reviewedFor(open); // both digests checked there: a decision never goes out unbound
     return { gateId: pin.gateId, expectedGateSeq: seq, expectedRequestDigestSha256: pin.bindingDigest,
@@ -416,7 +415,7 @@ function mountProject(projectId, options) {
       case "request-changes": return decide("request-changes", "Request changes",
         ({ expectedGateSeq, clientRequestId }) => ({ findings: [], expectedGateSeq, clientRequestId }));
       case "complete": {
-        const { met } = view.currentGates(state.gates, stage);
+        const { met } = view.currentGates(state.gates, stage, state.readiness);
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
         // Activate's completion delivers the production lease token once (design §10.4); this generic action would drop
         // it. Its direction gate carries no token and is consumed here like any other.

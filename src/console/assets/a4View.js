@@ -295,16 +295,20 @@ const STAGE_GATES = new Set(["direction", "completion"]);
 const isLive = (gate) => !gate.supersededBy && (gate.quorum?.status === "PENDING" || gate.quorum?.status === "QUORUM_MET");
 
 /**
- * The open, met and superseded direction/completion gates of one stage; a4.js reads the same selection when it posts a
- * decision. `policy` gates (opened at the project's stage) are never among them: this page does not show the proposed
- * gate policy, so it lists the live ones only to say they are decided elsewhere.
+ * The viewed stage's direction and completion gates as Studio's one evaluator states them (`readiness.gates`: a gate whose
+ * bound items moved reads STALE there, not in /gates), each joined by gateId with its /gates record for the binding
+ * digest, decisions and exclusions. `open` and `met` are the ones readiness reads PENDING and QUORUM_MET; a4.js reads the
+ * same selection when it posts a decision. `earlier` are the stage's other direction/completion gates, with the status
+ * /gates gives them. `policy` gates (opened at the project's stage) are never among them: this page does not show the
+ * proposed gate policy, so it lists the live ones only to say they are decided elsewhere.
  */
-export function currentGates(gates, stage) {
-  const own = gates.filter((gate) => gate.stage === stage && STAGE_GATES.has(gate.gate));
-  const live = own.filter((gate) => !gate.supersededBy);
-  return { open: live.filter((gate) => gate.quorum?.status === "PENDING").at(-1) ?? null,
-    met: live.filter((gate) => gate.quorum?.status === "QUORUM_MET").at(-1) ?? null,
-    stale: own.filter((gate) => gate.supersededBy), policy: gates.filter((gate) => gate.gate === "policy" && isLive(gate)) };
+export function currentGates(gates, stage, readiness) {
+  const shown = ["direction", "completion"].map((kind) => readiness?.gates?.[kind]).filter((gateView) => isObject(gateView) && typeof gateView.gateId === "string")
+    .map((gateView) => ({ decisions: [], excludedKeys: [], ...gates.find((gate) => gate.gateId === gateView.gateId), ...gateView }));
+  return { shown, open: shown.filter((gate) => gate.status === "PENDING").at(-1) ?? null,
+    met: shown.filter((gate) => gate.status === "QUORUM_MET").at(-1) ?? null,
+    earlier: gates.filter((gate) => gate.stage === stage && STAGE_GATES.has(gate.gate) && !shown.some((row) => row.gateId === gate.gateId)),
+    policy: gates.filter((gate) => gate.gate === "policy" && isLive(gate)) };
 }
 
 /**
@@ -374,25 +378,27 @@ export function approveOffer(decide, gate, readiness, me) {
 
 export function renderApprovalsBar(ctx) {
   const { readiness, gates, stage, allowed, gateChange, specDraft } = ctx;
-  const { open, met, stale, policy } = currentGates(gates, stage);
+  const { shown, open, met, earlier, policy } = currentGates(gates, stage, readiness);
   const gate = open ?? met;
   const staleCodes = new Map(readiness.staleApprovals.map((row) => [row.decisionId, Array.isArray(row.reasonCodes) ? row.reasonCodes : []]));
-  const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
+  const shownIds = new Set(shown.flatMap((row) => row.decisions.map((decision) => decision.decisionId)));
   const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND)
     : gate && gate.revisionNo !== ctx.revision?.revisionNo ? held(OTHER_REVISION) : gate && specDraft ? held(specDraftNote(gate.revisionNo)) : offer);
-  const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
-    bound to r${esc(old.revisionNo)}</li>`));
+  // Readiness's status verbatim; only the decisions readiness.staleApprovals lists carry codes (decisionRow).
+  const gateBlock = (row) => `<p><code>${esc(row.gate)}</code> gate r${esc(row.revisionNo)} · <code>${esc(row.status)}</code> ·
+      ${esc(row.approvals)} of ${esc(row.required)} required approvals</p>
+      ${Array.isArray(row.excludedKeys) && row.excludedKeys.length ? `<p>Cannot approve (separation of duties); may still deny: ${codes(row.excludedKeys)}</p>` : ""}
+      ${list(row.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`;
+  const earlierRows = earlier.map((old) => `<li><code>${esc(old.gate)}</code> gate bound to r${esc(old.revisionNo)} · <code>${esc(old.status)}</code>
+    ${list(old.decisions.map((decision) => decisionRow(decision)), "No decisions.")}</li>`);
   const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
     .map((row) => `<li>${strikeIfStale(`<code>${esc(row.decisionId)}</code>`, staleCodes.get(row.decisionId))} ${codes(row.reasonCodes)}</li>`);
   return `<section class="card a4-approvals"><h4>Approvals</h4>${gateChange ? gateChangeBanner(gateChange) : ""}
-    ${gate ? `<p><code>${esc(gate.gate)}</code> gate r${esc(gate.revisionNo)} · <code>${esc(gate.quorum.status)}</code> ·
-      ${esc(gate.quorum.approvals)} of ${esc(gate.quorum.required)} required approvals</p>
-      <p class="muted">Valid while the specification and resources are unchanged. ${TRUTH.vote}.</p>
-      ${gate.excludedKeys.length ? `<p>Excluded from deciding (separation of duties): ${codes(gate.excludedKeys)}</p>` : ""}
-      ${list(gate.decisions.map((decision) => decisionRow(decision, staleCodes.get(decision.decisionId))), "No decisions yet.")}`
-      : `<p class="muted">No open gate for this stage.</p>`}
+    ${shown.length ? `${shown.map(gateBlock).join("")}<p class="muted">Valid while the specification and resources are unchanged. ${TRUTH.vote}.</p>`
+      : `<p class="muted">No direction or completion gate has been requested at this stage.</p>`}
     ${policy.length ? `<p class="muted">${POLICY_ELSEWHERE}: ${policy.map((row) => `<code>${esc(row.gateId)}</code> <code>${esc(row.quorum.status)}</code>`).join(", ")}.</p>` : ""}
-    ${history.length || otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list([...history, ...otherStale], "")}</details>` : ""}
+    ${earlierRows.length ? `<details data-a4-open="earlier-gates"><summary>Earlier gates</summary>${list(earlierRows, "")}</details>` : ""}
+    ${otherStale.length ? `<details data-a4-open="stale-decisions"><summary>Stale decisions</summary>${list(otherStale, "")}</details>` : ""}
     <label>Reason (required to decide, hold, resume or acknowledge) <input name="reason" required maxlength="2000" /></label>
     <div class="row wrap">
       ${actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null)}
