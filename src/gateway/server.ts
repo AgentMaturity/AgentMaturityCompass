@@ -1335,9 +1335,19 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
       // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
       const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved);
+      // The upstream's name always passes by name, so no addresses means it did not resolve: a transport failure, as before P1-66 (502, request_error, no audit).
+      if (upstreamEgress.addresses.length === 0) {
+        logger.error(`gateway error: ${upstreamEgress.decision.reason}`);
+        const failure = { stage: "request_error", request_id: requestId, status: 502, upstreamId: route.upstream, agentId: attributedAgentId };
+        appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...failure, error: upstreamEgress.decision.reason }), meta: failure });
+        res.writeHead(502, { "content-type": "application/json" }).end(JSON.stringify({ error: `upstream ${route.upstream} did not resolve` }));
+        return;
+      }
+      // A non-public address the configuration does not opt in is this route's fault, not an egress attempt by the agent.
       if (!upstreamEgress.decision.allowed) {
-        appendNetworkBlockedAudit(({ payload, meta }) => appendEvidence({ eventType: "audit", payload, meta: { ...meta, upstreamId: route.upstream } }),
-          requestId, upstreamUrl.hostname, Number(upstreamUrl.port || (upstreamUrl.protocol === "https:" ? 443 : 80)), upstreamEgress);
+        const unsafe = { auditType: "UNSAFE_PROVIDER_ROUTE", severity: "HIGH", request_id: requestId, upstreamId: route.upstream, agentId: attributedAgentId,
+          destinationHost: upstreamUrl.hostname, reason: upstreamEgress.decision.reason, resolvedAddresses: upstreamEgress.addresses };
+        appendEvidence({ eventType: "audit", payload: JSON.stringify(unsafe), meta: unsafe });
         res.writeHead(403, { "content-type": "application/json" }).end(JSON.stringify({ error: `upstream ${route.upstream} refused by the gateway egress check` }));
         return;
       }
