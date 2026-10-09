@@ -4538,12 +4538,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         } else {
           file = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId)?.file ?? "";
         }
-        if (!file || !pathExists(file)) {
+        if (!file) {
           json(res, 404, { error: "binder export not found" });
           return;
         }
         // P0-09: the server operator's trust context decides, never the workspace's own keys. No public-key path is
-        // taken from a request.
+        // taken from a request. P0-55: no existence check here, which would follow links; a missing file and one
+        // outside the exports directory both read as the same UNREADABLE.
         const verify = auditBinderVerifyForApi({ file, workspace: options.workspace, trust: loadTrustContext() });
         json(res, verify.ok ? 200 : 422, verify);
         return;
