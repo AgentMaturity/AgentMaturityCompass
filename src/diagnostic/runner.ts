@@ -566,7 +566,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       agentId,
       riskTier: configuredRiskTier
     });
-    if (!input.noSign) {
+    if (!input.noSign || unsignedStore) { // P0-55: an unsigned run's audits land in its own store, so the caps still apply
       persistAuditFindings(ledger, derivedAudits, runId);
       _cachedAllEvents = null;
     }
@@ -578,7 +578,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       monitorPublicKeys: monitorKeys,
       expectedAgentId: agentId
     });
-    const correlationAuditIds = input.noSign
+    const correlationAuditIds = input.noSign && !unsignedStore
       ? []
       : persistCorrelationAudits({
           ledger,
