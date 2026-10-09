@@ -23,7 +23,10 @@ export const TRUTH = {
 };
 export const PREVIEW_NOTICE = "A4 preview is not enabled in this workspace";
 export const COMMENT_MAX_BYTES = 8 * 1024;
+// Understand, Explain, Build, Review and comments go to the project's encrypted blob store (P1-57 writeStageOutput, the
+// comment path); a proposal's spec and the answers are written as they are into the a4_revisions record.
 const RETAINED = "Pasted text is retained until the project's blob key is destroyed.";
+const IN_RECORD = "This is stored as written in the project's record, not in its encrypted blob store, so destroying the project's blob key does not erase it. Do not paste personal data or secrets here.";
 
 export function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
@@ -113,10 +116,12 @@ export function stepRows(project, stage) {
  */
 const STEP_FROM = { answers: null, understand: ["asked"], explain: ["understood"], propose: ["explained"], build: ["direction_approved"],
   review: ["built"], "request-direction": ["proposed"], "request-completion": ["reviewed"] };
+/** `offer` held, with `code` added to Studio's reason codes. */
+const refuse = (offer, code) => ({ allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), code])] });
 export function stepOffer(offer, ctx, route) {
   const from = STEP_FROM[route];
   if (ctx.project.stage === ctx.stage && (from === null || from.includes(ctx.project.step))) return offer;
-  return { allowed: false, reasonCodes: [...new Set([...(offer?.reasonCodes ?? []), "A4_STEP_ORDER"])] };
+  return refuse(offer, "A4_STEP_ORDER");
 }
 /** Studio's content cap on Understand, Explain, Build and Review (P1-57, src/a4/a4RouterStages.ts). */
 const CONTENT_MAX = 65_536;
@@ -147,12 +152,21 @@ export function answerText(answers, questionId) {
 }
 
 /**
+ * While a stage's question bank is empty Studio takes any question id (P1-57 stageStep), so Ask offers this one free-text
+ * answer. Saving any answer records a new revision and returns the stage to `asked`: until Studio accepts a re-proposal
+ * from `proposed`, it is the only way on after Request changes or a Deny.
+ */
+const NOTES = { id: "notes", prompt: "Notes for this stage (no questions are registered for it yet)" };
+const RESTARTS = "Saving answers records a new revision, which supersedes the current revision's gates, and returns this stage to Ask; Understand, Explain and Propose then run again.";
+
+/**
  * Ask: unanswered questions are open fields. Answers so far are listed read-only and collapsed, carried and inferred
  * ones with Confirm (records that value, unchanged, as the user's); "Change my answers" holds their fields. Save sends
  * only the fields the user changed, and a non-text answer is edited as JSON and sent parsed (a4.js).
  */
 export function renderConversation(ctx) {
-  const { questions, answers, allowed, reflection, explanation, answerDrift } = ctx;
+  const { answers, allowed, reflection, explanation, answerDrift } = ctx;
+  const questions = ctx.questions.length ? ctx.questions : [NOTES];
   const ask = stepOffer(allowed.ask, ctx, "answers");
   const understand = stepOffer(allowed.understand, ctx, "understand");
   const answered = new Map(answers.map((answer) => [answer.questionId, answer]));
@@ -170,12 +184,12 @@ export function renderConversation(ctx) {
   return `<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
-    ${questions.length ? `<form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
+    <form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
+      <p class="muted">${RESTARTS} ${IN_RECORD}</p>
       <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${answerDrift
-        ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>`
-      : `<p class="muted">No questions are registered for this stage yet.</p>`}
+        ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>
     <h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
@@ -204,11 +218,13 @@ export function renderSpecEditor(ctx) {
   const seeded = revision && revision.stage !== stage ? ` ${ctx.stageRevision ? `The newest ${esc(stageTitle(stage))} specification is
     r${esc(ctx.stageRevision.revisionNo)};` : `No ${esc(stageTitle(stage))} specification yet:`} the editor starts from the head revision
     r${esc(revision.revisionNo)}, ${revision.stage ? `the ${esc(stageTitle(revision.stage))} specification` : "whose stage Studio did not name"}.` : "";
-  // P1-57 takes a proposal only at step `explained`; a re-proposal from `proposed` is not routed yet.
+  // P1-57 takes a proposal only at step `explained`; a re-proposal from `proposed` is not routed yet, so the way to a new
+  // revision from there is Save answers (NOTES).
   const proposable = project.step === "explained";
   return `<p class="muted">${proposable ? "Editing after Propose creates a new revision"
     : `Studio takes a proposal only at step <code>explained</code>; this project is at <code>${esc(project.step)}</code>`}${revision
-    ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
+    ? ` (current r${esc(revision.revisionNo)}, spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded}${proposable ? ""
+    : " To change the specification from here, save an answer under Ask: that starts this stage's loop again at a new revision."} ${IN_RECORD}</p>
     <textarea name="spec" rows="14" spellcheck="false">${esc(JSON.stringify(editableSpec(revision?.spec), null, 2))}</textarea>
     <p class="muted">Answers are not edited here: they are recorded through Save answers.</p>
     <div class="row wrap">${actionButton("Propose this specification", "propose", stepOffer(allowed.propose, ctx, "propose"))}${ctx.specDraft
@@ -380,7 +396,20 @@ function gateChangeBanner({ from, to }) {
 export function approveOffer(decide, gate, readiness, me) {
   const key = typeof me?.userId === "string" ? `${readiness.identityCheck === "session_record" ? "WORKSPACE_ROUTER" : "LOCAL_USER"}:${me.userId}` : null;
   if (key === null || readiness.selfApprovalAllowed === true || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
-  return { allowed: false, reasonCodes: [...new Set([...(decide?.reasonCodes ?? []), "SOD_VIOLATION"])] };
+  return refuse(decide, "SOD_VIOLATION");
+}
+
+/**
+ * readiness.allowed.requestGate leaves out the kind's own gate: requestGate (src/a4/a4Gates.ts) refuses a second request
+ * while it reads PENDING or QUORUM_MET (409 A4_GATE_OPEN) and after a Deny of the current revision (409 A4_GATE_DENIED).
+ * A STALE, CHANGES_REQUESTED or EXPIRED gate is replaced, so those stay offered.
+ */
+function requestOffer(ctx, kind) {
+  const offer = stepOffer(ctx.allowed.requestGate, ctx, `request-${kind}`);
+  const gate = ctx.readiness.gates?.[kind];
+  if (gate?.status === "PENDING" || gate?.status === "QUORUM_MET") return refuse(offer, "A4_GATE_OPEN");
+  if (gate?.status === "DENIED" && gate.revisionNo === ctx.project.revisionNo) return refuse(offer, "A4_GATE_DENIED");
+  return offer;
 }
 
 export function renderApprovalsBar(ctx) {
@@ -411,8 +440,8 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Approve", "approve", open ? pinned(approveOffer(allowed.decide, open, readiness, ctx.me)) : null)}
       ${actionButton("Request changes", "request-changes", open ? pinned(allowed.requestChanges) : null)}
       ${actionButton("Hold", "hold", allowed.hold)}
-      ${actionButton("Request direction approval", "request-direction", stepOffer(allowed.requestGate, ctx, "request-direction"))}
-      ${actionButton("Request completion approval", "request-completion", stepOffer(allowed.requestGate, ctx, "request-completion"))}
+      ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
+      ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
       ${actionButton("Complete stage", "complete", stage === "activate" && met?.gate === "completion" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
@@ -440,17 +469,30 @@ export function renderPresence(presence, error) {
     <p class="muted">Presence is held in memory for 30 seconds; it is not durable and not evidence.</p>`;
 }
 
-/** "Apply my changes on top" only while the head takes a proposal (`conflict.proposable`, step `explained`; a4.js). */
+/**
+ * "Apply my changes on top" only while the head takes a proposal (`conflict.proposable`, step `explained`; a4.js). Paths
+ * both sides changed (`conflict.clashes`, found when the member applies) are listed and need "Apply mine over theirs".
+ */
 export function renderConflict(conflict) {
-  return `<section class="card a4-conflict"><h4>The specification changed while you were editing</h4>
-    <p>The head is r${esc(conflict.headRevisionNo)}; you started from r${esc(conflict.baseRevisionNo)}. Changes on the head:</p>
-    ${conflict.theirs.length ? renderPromptDiffViewer({ status: "ok", changes: conflict.theirs }) : `<p class="muted">No specification changes on the head.</p>`}
+  const same = conflict.headRevisionNo === conflict.baseRevisionNo;
+  const clashes = conflict.clashes ?? [];
+  return `<section class="card a4-conflict"><h4>${same ? "The project changed while you were editing" : "The specification changed while you were editing"}</h4>
+    ${same ? `<p>Studio refused your proposal because the head moved to seq ${esc(conflict.headSeq)} without a new revision (still
+      r${esc(conflict.headRevisionNo)}): evidence, an acknowledgement, a gate request, a member or a comment was recorded. Review
+      the page below before you apply your changes on top.</p>` : `<p>The head is r${esc(conflict.headRevisionNo)}; you started from
+      r${esc(conflict.baseRevisionNo)}. Changes on the head:</p>
+    ${conflict.theirs.length ? renderPromptDiffViewer({ status: "ok", changes: conflict.theirs }) : `<p class="muted">No specification changes on the head.</p>`}`}
     ${conflict.proposable ? "" : `<p>Studio takes a proposal only at step <code>explained</code> of the project's current stage; the head is at
       <code>${esc(conflict.headStage)}</code> <code>${esc(conflict.headStep)}</code>, so your changes cannot be applied on top of it.
       Reload shows the head and discards your edits.</p>`}
     <p>Your changes when Studio refused them${conflict.proposable ? " (Apply my changes on top uses the editor as it is now)" : ""}:</p>
     ${renderPromptDiffViewer({ status: "ok", changes: conflict.mine })}
-    <div class="row wrap">${conflict.proposable ? `<button type="button" data-a4-action="apply-on-top">Apply my changes on top</button> ` : ""}<button
+    ${clashes.length ? `<p class="status-bad">You and r${esc(conflict.headRevisionNo)} both changed ${codes(clashes.map((row) => JSON.stringify(row.path)))}.
+      Nothing was sent. "Apply mine over theirs" puts your editor's value there in place of r${esc(conflict.headRevisionNo)}'s; or
+      edit those paths and apply again, or Reload to start from r${esc(conflict.headRevisionNo)}.</p>` : ""}
+    <div class="row wrap">${!conflict.proposable ? "" : clashes.length
+      ? `<button type="button" data-a4-action="apply-on-top" data-a4-confirm="${esc(conflict.clashKey)}">Apply mine over theirs</button> `
+      : `<button type="button" data-a4-action="apply-on-top">Apply my changes on top</button> `}<button
       type="button" class="secondary" data-a4-action="reload">Reload</button></div></section>`;
 }
 
@@ -464,18 +506,46 @@ export function jsonDiff(before, after, path = []) {
 
 const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
-/** Applies jsonDiff rows onto another spec ("apply my changes on top"); a missing `after` deletes the key. */
+/**
+ * Applies jsonDiff rows onto another spec ("apply my changes on top"); a missing `after` deletes the key. A row reaching
+ * through a value that is not an object there is refused, never replaced by {} (mergeOnTop avoids it).
+ */
 export function applyChanges(base, changes) {
   let out = structuredClone(isObject(base) ? base : {});
   for (const { path, after } of changes) {
     if (path.some((key) => UNSAFE_KEYS.has(key))) throw new Error("The specification uses a reserved key name.");
     if (path.length === 0) { out = structuredClone(after); continue; }
     let node = out;
-    for (const key of path.slice(0, -1)) { if (!isObject(node[key])) node[key] = {}; node = node[key]; }
+    for (const key of path.slice(0, -1)) {
+      if (!isObject(node[key])) throw new Error(`The head no longer has an object at ${JSON.stringify(path)}. Nothing was sent.`);
+      node = node[key];
+    }
     if (after === undefined) delete node[path.at(-1)];
     else node[path.at(-1)] = structuredClone(after);
   }
   return out;
+}
+
+const within = (path, prefix) => prefix.length <= path.length && prefix.every((key, index) => key === path[index]);
+
+/**
+ * The head's changes (`theirs`) that collide with the draft's (`mine`), both diffed from the revision the draft was
+ * edited from: the same path, or one inside the other, unless both wrote the same value at the same path.
+ */
+export function clashingChanges(theirs, mine) {
+  return theirs.filter((row) => mine.some((own) => (within(own.path, row.path) || within(row.path, own.path))
+    && !(own.path.length === row.path.length && JSON.stringify(own.after) === JSON.stringify(row.after))));
+}
+
+/**
+ * The draft on top of the head, once the member has seen and confirmed `clashes`: the draft's rows win, and where the
+ * draft changed something inside a path the head replaced, the draft's whole value at the head's path is written.
+ */
+export function mergeOnTop(headSpec, mine, draft, clashes) {
+  const outer = clashes.filter((row) => mine.some((own) => own.path.length > row.path.length && within(own.path, row.path)));
+  const at = (path) => path.reduce((node, key) => (isObject(node) ? node[key] : undefined), draft);
+  return applyChanges(headSpec, [...mine.filter((own) => !outer.some((row) => within(own.path, row.path))),
+    ...outer.map((row) => ({ path: row.path, after: at(row.path) }))]);
 }
 
 // P1-52: validateNativeTaskPoll (nativeTasks.js) is exported, but it validates the native-task view (task, truncated,

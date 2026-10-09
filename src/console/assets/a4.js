@@ -450,16 +450,13 @@ function mountProject(projectId, options) {
   async function openConflict(action) {
     const head = one(await apiNativeRequest(projectPath("")), "project");
     // P1-57 takes a proposal only at step `explained` (409 A4_STEP_ORDER otherwise, before it compares the parent), so
-    // once another member has proposed, the card offers Reload only.
+    // once another member has proposed, the card offers Reload only. Nothing is re-sent unseen: a head that moved without
+    // a new revision (evidence, an acknowledgement, a gate request) still shows the card, and the member applies on top.
     const proposable = head.stage === stage && head.step === "explained";
-    // A comment, member or evidence transition moves the head without a new revision: re-post once on the new head.
-    if (proposable && head.revisionNo === action.base.revisionNo && !action.rebased) {
-      return run({ ...specAction(action.spec, { ...action.base, headSeq: head.headSeq }), rebased: true });
-    }
     const headRevision = head.revisionNo > 0 ? one(await apiNativeRequest(projectPath(`/revisions/${head.revisionNo}`)), "revision") : null;
     const headSpec = view.editableSpec(headRevision?.spec);
     conflict = { baseRevisionNo: action.base.revisionNo, baseSpec: action.base.spec, headRevisionNo: head.revisionNo, headSeq: head.headSeq, headSpec,
-      headStage: head.stage, headStep: head.step, proposable,
+      headStage: head.stage, headStep: head.step, proposable, mineSpec: action.spec,
       theirs: view.jsonDiff(action.base.spec, headSpec), mine: view.jsonDiff(action.base.spec, action.spec) };
     await load();
   }
@@ -476,10 +473,11 @@ function mountProject(projectId, options) {
     } catch (error) {
       if (error?.status === 409 && (error.code === "A4_STALE_HEAD" || error.code === "A4_STEP_ORDER") && action.spec) return openConflict(action);
       if (error?.status === 409) await load().catch(showError);
-      // Another write moved the head but changed none of the answers being edited: re-sent once on the new head.
-      if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.answers && !action.rebased && !answerDrift()) {
+      // Another write moved the head while the member typed: never re-sent unseen (a new revision would supersede gates and
+      // decisions they have not seen). Save binds the head shown now, once they press it again.
+      if (error?.status === 409 && error.code === "A4_STALE_HEAD" && action.answers) {
         answerBase = state.project.headSeq;
-        return run({ ...action, body: { ...action.body, expectedHeadSeq: answerBase, clientRequestId: uuid() }, rebased: true });
+        throw new Error(`The project moved since you began (r${state.project.revisionNo}, step ${state.project.step}). Nothing was saved; review it and press Save answers again.`);
       }
       throw error;
     }
@@ -514,11 +512,21 @@ function mountProject(projectId, options) {
     if (name === "apply-on-top") {
       if (!conflict) return load();
       // The editor stays editable under the conflict card: merge what it holds now, not what it held when Studio refused.
-      // The draft is diffed against the base it was written from (specBase, kept until it is proposed or discarded), never
-      // a refused apply's base: that head's own edits would otherwise be reverted on top of the next one.
+      // The draft and the head are both diffed against the base the draft was written from (specBase, kept until it is
+      // proposed or discarded), never a refused apply's base: that head's own edits would otherwise be reverted on top of
+      // the next one. Paths both changed are listed first and written only once the member confirms that exact list.
       const draft = drafts.get("specification:spec");
-      const mine = draft === undefined ? conflict.mine : view.jsonDiff(specBase?.spec ?? conflict.baseSpec, parseSpec(draft));
-      const merged = view.applyChanges(conflict.headSpec, mine);
+      const draftSpec = draft === undefined ? conflict.mineSpec : parseSpec(draft);
+      const from = specBase?.spec ?? conflict.baseSpec;
+      const mine = view.jsonDiff(from, draftSpec);
+      const clashes = view.clashingChanges(view.jsonDiff(from, conflict.headSpec), mine);
+      const clashKey = JSON.stringify(clashes.map((row) => row.path));
+      if (clashes.length > 0 && button.dataset.a4Confirm !== clashKey) {
+        conflict = { ...conflict, clashes, clashKey };
+        render();
+        return tell("Your changes and the head's collide; the conflict card lists where. Nothing was sent.");
+      }
+      const merged = view.mergeOnTop(conflict.headSpec, mine, draftSpec, clashes);
       const base = { revisionNo: conflict.headRevisionNo, headSeq: conflict.headSeq, spec: conflict.headSpec };
       conflict = null;
       return run(specAction(merged, base));
