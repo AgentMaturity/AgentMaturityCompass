@@ -10,7 +10,7 @@ import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 
 const RULES = ["R1", "R2", "R3", "R4"];
-const GUARDED_ROOTS = ["score", "domains", "assurance", "shield", "compliance", "diagnostic", "claims", "exports"]
+const GUARDED_ROOTS = ["score", "domains", "assurance", "shield", "compliance", "diagnostic", "claims", "exports", "a4"]
   .map((dir) => `src/${dir}/`);
 // Matched against the text of a // comment, never against raw lines, so a marker in a string does not count.
 const MARKER = /^\/\/\s*amc-allow-random:\s*(id|fuzz-input)\b/;

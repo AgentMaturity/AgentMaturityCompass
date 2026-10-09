@@ -191,7 +191,10 @@
       "enforcementPoints": [
         { "path": "src/studio/studioServer.ts", "symbol": "authenticate" },
         { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeCsrfTokenForSession" },
-        { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeAllowedBrowserOrigins" }
+        { "path": "src/studio/nativeAdmission.ts", "symbol": "nativeAllowedBrowserOrigins" },
+        { "path": "src/studio/nativeAdmission.ts", "symbol": "isNativeStudioPath" },
+        { "path": "src/studio/nativeAdmission.ts", "symbol": "assertNativeBrowserAdmission" },
+        { "path": "src/a4/a4Identity.ts", "symbol": "resolveA4Principal" }
       ],
       "evidence": "Native task events",
       "status": "enforced",
