@@ -172,9 +172,11 @@ function mountProject(projectId, options) {
     const review = view.gateReview(gate, state.readiness);
     if (!view.boundReview(review)) throw new Error(`${view.UNBOUND}. Nothing was sent.`);
     if (!view.sameReview(reviewed, review)) throw new Error(`${view.GATE_CHANGED}. Show the current gate and review it first.`);
-    if (reviewed.revisionNo !== state.revision?.revisionNo) throw new Error("The specification shown is not the revision this gate binds. Reload before deciding; nothing was sent.");
+    if (reviewed.revisionNo !== state.revision?.revisionNo) throw new Error(`${view.OTHER_REVISION}. Nothing was sent.`);
     return reviewed;
   };
+  /** Only a bound gate whose revision the specification card shows can become the reviewed one. */
+  const pinnable = (review) => view.boundReview(review) && review.revisionNo === state.revision?.revisionNo;
 
   /**
    * One load at a time (polls, actions and conflicts all ask for one): a load asked for while one runs makes that load
@@ -201,19 +203,19 @@ function mountProject(projectId, options) {
 
   async function loadOnce() {
     // The reads are separate requests: a write landing between them (a new revision and its gate) would show one
-    // revision's gate under another revision's specification. Read again until they agree, three times at most.
+    // revision's gate under another revision's specification. Read again until they agree, three times at most; a view
+    // that still disagrees is shown, but its gate is never pinned and deciding stays disabled (pinnable, the bar).
     for (let attempt = 1; ; attempt += 1) {
       claimSink = [];
       const read = await readProject();
-      if (view.oneRevision(read.project, read.revision, read.gates, read.readiness)) {
+      if (view.oneRevision(read.project, read.revision, read.gates, read.readiness) || attempt === 3) {
         Object.assign(state, read);
         stage = read.stage;
         break;
       }
-      if (attempt === 3) throw new Error("The project kept changing while this page read it. Reload the page.");
     }
     const shown = shownReview();
-    if (reviewed === null && view.boundReview(shown)) reviewed = shown;
+    if (reviewed === null && pinnable(shown)) reviewed = shown;
     render();
     showClaims(claimSink); // a failed load leaves the previous load's labels beside the previous load's content
   }
@@ -424,7 +426,9 @@ function mountProject(projectId, options) {
 
   async function act(name, button) {
     if (name === "show-gate") {
-      reviewed = shownReview();
+      const shown = shownReview();
+      if (!pinnable(shown)) throw new Error(`${view.OTHER_REVISION}.`);
+      reviewed = shown;
       return render();
     }
     if (name === "reload") {

@@ -276,6 +276,7 @@ export const boundReview = (review) => review != null && HEX64.test(String(revie
 export const sameReview = (a, b) => boundReview(a) && boundReview(b) && a.gateId === b.gateId && a.bindingDigest === b.bindingDigest
   && a.readinessBindingDigest === b.readinessBindingDigest;
 export const UNBOUND = "Studio did not publish the gate or readiness digest";
+export const OTHER_REVISION = "The specification shown is not the revision this gate binds; reload the page";
 
 /**
  * True when one load's separate reads describe one revision: the specification card's revision and every live gate the
@@ -314,7 +315,8 @@ export function renderApprovalsBar(ctx) {
   const gate = open ?? met;
   const staleCodes = new Map(readiness.staleApprovals.map((row) => [row.decisionId, Array.isArray(row.reasonCodes) ? row.reasonCodes : []]));
   const shownIds = new Set(gate?.decisions.map((decision) => decision.decisionId) ?? []);
-  const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND) : offer);
+  const pinned = (offer) => (gateChange ? held(GATE_CHANGED) : gate && !boundReview(gateReview(gate, readiness)) ? held(UNBOUND)
+    : gate && gate.revisionNo !== ctx.revision?.revisionNo ? held(OTHER_REVISION) : offer);
   const history = stale.flatMap((old) => old.decisions.map((decision) => `<li><s>${esc(decision.username)} <code>${esc(decision.decision)}</code></s>
     bound to r${esc(old.revisionNo)}</li>`));
   const otherStale = readiness.staleApprovals.filter((row) => !shownIds.has(row.decisionId))
