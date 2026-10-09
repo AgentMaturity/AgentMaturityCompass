@@ -304,8 +304,10 @@ function mountProject(projectId, options, strip) {
       case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding(), [], repin);
       case "approve": return decide("approve", "Approve", (binding) => binding);
       case "deny": return decide("deny", "Deny", (binding) => binding);
+      // Design §6.4 gives request-changes the gate seq and both digests; P1-57's handler reads expectedHeadSeq instead.
+      // The body carries all of them until the two sides agree, so neither side's stale check is skipped.
       case "request-changes": return decide("request-changes", "Request changes",
-        ({ expectedGateSeq, clientRequestId }) => ({ findings: [], expectedGateSeq, clientRequestId }));
+        (binding) => ({ ...binding, findings: [], expectedHeadSeq: state.project.headSeq }));
       case "complete": {
         // Completing activate delivers the production lease token once (design §10.4); this generic action would drop it.
         if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
