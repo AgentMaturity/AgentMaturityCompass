@@ -465,6 +465,10 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
     assertAllowed(readiness, "progress");
+    // An opened effect gate is consumed only with its effect, or its approved engine grant would be orphaned.
+    if (extra === undefined && state.chain.some((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === row.gate_id)) {
+      throw fail(409, "EFFECT_REQUIRED", "An effect gate is open on this gate; complete runs its effect.");
+    }
     const effect = extra?.({ state, row, principal, regulated: isRegulated(state, query.floor), ts });
     return { readiness, specs: [{ kind: "GATE_CONSUMED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, gate: row.gate, approverKeys: approverKeys(gate), readinessBindingDigest: readiness.bindingDigest, ...effect?.payload },

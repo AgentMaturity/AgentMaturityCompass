@@ -53,6 +53,8 @@ export interface A4EffectDef {
   readonly actionClass: ActionClass;
   /** "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried. */
   readonly consumes: "A4" | "executor";
+  /** The documentary gate whose consumption runs this effect: `complete` refuses to consume that gate without it. */
+  readonly completes?: `${A4Stage}.${"direction" | "completion"}`;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -212,6 +214,24 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
       startEffect: { effectId: attemptId, gateId: row.gate_id, executionId, approvalRequestId } }] };
   });
   return { result, attemptId };
+}
+
+/**
+ * `complete` (design §6.5; the body names no effect): the effect is the one an owner opened on this gate
+ * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened); a gate
+ * with neither is consumed plainly. consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED).
+ */
+export function completeStage(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number }): {
+  result: A4TransitionResult; attemptId: string | null;
+} {
+  const chain = store.readChain(projectId);
+  const requested = chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === input.gateId);
+  const opened = [...chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === input.gateId);
+  ensureA4Stages();
+  const effectId = opened !== undefined ? String(opened.body.effect)
+    : [...EFFECTS.values()].find((def) => requested !== undefined && def.completes === `${String(requested.body.stage)}.${String(requested.body.gate)}`)?.id;
+  if (effectId === undefined) return { result: consumeGate(store, projectId, input), attemptId: null };
+  return completeWithEffect(store, projectId, { ...input, effectId });
 }
 
 /** EFFECT_FINISHED / EFFECT_FAILED by amc-runtime, settling the liveness row in the same transaction; once per attempt. */

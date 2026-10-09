@@ -89,7 +89,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       [stagePath, path("gate", { type: "string", enum: ["direction", "completion"] })], "201") },
     [`${p}/gates/{gateId}/request-changes`]: { post: write("Request changes (APPROVER, AUDITOR or OWNER); supersedes the gate", "A4RequestChanges",
       [path("gateId", { type: "string", pattern: "^a4gate_[0-9a-f]{32}$" })]) },
-    [`${p}/stages/{stage}/complete`]: { post: write("Consume the stage's approved gate once (adapt and activate: owner)", "A4Complete", [stagePath]) },
+    [`${p}/stages/{stage}/complete`]: { post: write("Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it runs its effect and the response names the attempt", "A4Complete", [stagePath]) },
     [`${p}/hypotheses/{hypothesisId}/observe`]: { post: write("Observe a PMF hypothesis with a runtime-written row inside its window", "A4Observe",
       [path("hypothesisId")], "201") }
   };
@@ -153,7 +153,7 @@ export function a4Schemas(): Record<string, unknown> {
       ["reason", "expectedRequestDigestSha256", "expectedGateSeq", "clientRequestId"]),
     A4RequestChanges: object({ reason, expectedGateSeq: integer, clientRequestId: requestId, findings: { type: "array", items: object({
       severity: { type: "string", enum: ["info", "low", "medium", "high", "critical"] }, message: string }) } }, ["reason", "expectedGateSeq", "clientRequestId"]),
-    A4Complete: control({ gateId: string, effectId: string }, ["gateId"]),
+    A4Complete: control({ gateId: string }),
     A4EffectOpen: control({ gateId: string }),
     A4EffectRetry: control({ attemptId: string }),
     A4Observe: control({ verdict: { type: "string", enum: ["observed", "refuted"] }, evidenceRef: object({ refId: string, sha256: digest }) })

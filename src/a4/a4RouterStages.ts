@@ -17,9 +17,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
-import { completeWithEffect, openEffectGate, retryEffect, runA4Effect, sweepA4Effects } from "./a4Effects.js";
+import { completeStage, openEffectGate, retryEffect, runA4Effect, sweepA4Effects } from "./a4Effects.js";
 import {
-  assertAllowed, consumeGate, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, refuseOnFreeze, requestChanges, requestGate,
+  assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, refuseOnFreeze, requestChanges, requestGate,
   RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
@@ -223,7 +223,7 @@ const decideSchema = z.strictObject({ reason: reasonSchema, expectedRequestDiges
   expectedReadinessBindingDigest: z.string().regex(/^[0-9a-f]{64}$/).optional(), expectedGateSeq: headSeqSchema, clientRequestId: clientRequestIdSchema });
 const changesSchema = z.strictObject({ reason: reasonSchema, expectedGateSeq: headSeqSchema, clientRequestId: clientRequestIdSchema,
   findings: z.array(z.strictObject({ severity: z.enum(["info", "low", "medium", "high", "critical"]), message: z.string().trim().min(1).max(2000) })).max(100).default([]) });
-const completeSchema = z.strictObject({ ...base, gateId: gateIdSchema, effectId: z.string().regex(/^[a-z0-9_.-]{1,128}$/).optional() });
+const completeSchema = z.strictObject({ ...base, gateId: gateIdSchema });
 const observeSchema = z.strictObject({ ...base, verdict: z.enum(["observed", "refuted"]),
   evidenceRef: z.strictObject({ refId: z.string().min(1).max(512), sha256: z.string().regex(/^[0-9a-f]{64}$/) }) });
 
@@ -326,16 +326,14 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
   if (complete !== null) {
     const stage = z.enum(A4_STAGES).parse(complete[1]);
     const { body, request } = await readJson(route, completeSchema);
-    // complete evaluates integrity in full (verifyA4Chain), as GET and verify do (design §7).
-    const input = { ...callOf(route, request, true), stage, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq };
-    if (body.effectId === undefined) return respond(route, projectId, request, () => consumeGate(store, projectId, input));
-    let attemptId = "";
+    let attemptId: string | null = null;
     return respond(route, projectId, request, () => {
-      const started = completeWithEffect(store, projectId, { ...input, effectId: body.effectId! });
+      // complete evaluates integrity in full (verifyA4Chain), as GET and verify do (design §7); the effect comes from the chain.
+      const started = completeStage(store, projectId, { ...callOf(route, request, true), stage, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
       attemptId = started.attemptId;
-      if (!started.result.replay) runEffectAfterResponse(route.workspace, projectId, attemptId);
+      if (attemptId !== null && !started.result.replay) runEffectAfterResponse(route.workspace, projectId, attemptId);
       return started.result;
-    }, 200, () => ({ attemptId }));
+    }, 200, () => (attemptId === null ? {} : { attemptId }));
   }
   const effect = /^\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/(open|retry)$/.exec(tail);
   if (effect !== null) {
