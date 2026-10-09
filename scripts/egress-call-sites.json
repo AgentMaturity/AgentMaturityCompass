@@ -80,7 +80,7 @@
       "line": 283,
       "call": "residencyFetch(",
       "status": "gated",
-      "reason": "residencyFetch checks the immediate gateway hop; the gateway final upstream hop is separately deferred."
+      "reason": "residencyFetch checks the immediate gateway hop; final gateway HTTP and CONNECT hops have separate gated rows."
     },
     {
       "siteId": "src/cli-eval-dataset-commands.ts:188:1",
@@ -259,9 +259,9 @@
       "reason": "Generated policy-export source text, not executed by AMC here; generated application needs its own deployment controls."
     },
     {
-      "siteId": "src/gateway/server.ts:258:1",
+      "siteId": "src/gateway/server.ts:259:1",
       "path": "src/gateway/server.ts",
-      "line": 258,
+      "line": 259,
       "call": "impl(",
       "status": "gated",
       "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
@@ -271,8 +271,8 @@
       "path": "src/gateway/server.ts",
       "line": 1014,
       "call": "netConnect(",
-      "status": "deferred",
-      "reason": "CONNECT tunnel: hostname/IP checks do not provide residency admission or protected encrypted-payload classification. No HTTP-hop coverage claim."
+      "status": "gated",
+      "reason": "Strict CONNECT authority parsing supplies the actual socket host and port and an HTTPS root registry locator. After DNS and allowlist admission, a final synchronous checkEgress precedes netConnect using the trusted gateway workspace, lease-verified agent, network-tool channel and explicit unknown data classes. Typed residency refusal returns before socket creation. This seam does not prove TLS, an encrypted request path or payload classification, or physical region."
     },
     {
       "siteId": "src/gateway/server.ts:1760:1",

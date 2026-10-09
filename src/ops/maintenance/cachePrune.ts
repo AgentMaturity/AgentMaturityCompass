@@ -1,6 +1,6 @@
 import { readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { ensureDir, pathExists } from "../../utils/fs.js";
+import { pathExists } from "../../utils/fs.js";
 import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.js";
 
 function pruneFilesOlderThan(workspace: string, dir: string, olderThanMs: number, extensions?: string[]): string[] {
@@ -49,9 +49,20 @@ export function pruneOpsCaches(params: {
   const transformCutoff = now - Math.max(1, params.pruneTransformSnapshotsDays) * 24 * 60 * 60 * 1000;
 
   const studioDir = join(workspace, ".amc", "studio");
-  const consoleSnapshotsDir = studioDir;
-  ensureDir(studioDir);
-  const removedConsoleSnapshots = pruneFilesOlderThan(workspace, consoleSnapshotsDir, consoleCutoff, [".json", ".sig"]);
+  const removedConsoleSnapshots: string[] = [];
+  for (const name of ["console-snapshot.json", "console-snapshot.json.sig"]) {
+    const full = join(studioDir, name);
+    if (!pathExists(full)) continue;
+    const stat = statSync(full);
+    if (!stat.isFile() || !(stat.mtimeMs < consoleCutoff)) continue;
+    try {
+      withDeletionGate({ workspace, executor: "maintenance.cache-unlink",
+        target: { kind: "caches", before: new Date(consoleCutoff).toISOString() } }, () => unlinkSync(full));
+      removedConsoleSnapshots.push(full);
+    } catch (error) {
+      if (!(error instanceof DeletionDenied)) throw error;
+    }
+  }
 
   const agentsDir = join(workspace, ".amc", "agents");
   const removedTransformSnapshots: string[] = [];

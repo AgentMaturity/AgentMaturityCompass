@@ -155,7 +155,8 @@ export function eraseSessionSpills(input: SpillLifecycleInput & { readonly scope
     }
     try {
       const status = withDeletionGate({ workspace: input.workspace, executor: "spill-lifecycle.remove-object",
-        target: { kind: "spills", sessionIds: entry.sessionIds } }, () => removeSpillObject(input.workspace, entry.ref, input.options?.root));
+        target: { kind: "spills", sessionHashes: entry.sessionIds.map(id => sha256Hex(Buffer.from(id, "utf8"))) } },
+        () => removeSpillObject(input.workspace, entry.ref, input.options?.root));
       outcomes.push({ locator: entry.locator, eventIds: entry.eventIds, status, detail: null });
     } catch (error) {
       const status = error instanceof DeletionDenied ? error.verdict.verdict === "held" ? "held" : "hold_unknown" : "failed";

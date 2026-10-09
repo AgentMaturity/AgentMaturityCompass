@@ -470,7 +470,7 @@ export function releaseLegalHold(holdId: string, workspace?: string): boolean {
 export function getActiveLegalHolds(tenantId?: string, workspace?: string): LegalHold[] {
   // Explicit workspace reads are authoritative and propagate unknown instead
   // of merging another workspace's process-global compatibility cache.
-  if (workspace !== undefined) return listLegalHolds(workspace, { ...(tenantId ? { tenantId } : {}), activeOnly: true }).map(legacyLegalHold);
+  if (workspace !== undefined) return listLegalHolds(workspace, { ...(tenantId === undefined ? {} : { tenantId }), activeOnly: true, rejectUnverifiedLegacy: true }).map(legacyLegalHold);
   return legalHolds.filter((h) => h.active && (!tenantId || h.tenantId === tenantId));
 }
 

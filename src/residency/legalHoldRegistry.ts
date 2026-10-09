@@ -1,12 +1,15 @@
 import { randomUUID } from "node:crypto";
-import { chmodSync, closeSync, constants, fstatSync, lstatSync, mkdirSync, openSync, readSync, readdirSync } from "node:fs";
+import { chmodSync, closeSync, constants, fstatSync, lstatSync, mkdirSync, openSync, readSync, readdirSync, realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { artifactSigPath, readAndVerifyArtifactFileSignature, signArtifactFile } from "../lifecycle/artifactSignature.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { appendSignedControlJournal, readSignedControlJournal, SignedControlJournalError,
+  type SignedControlJournalSnapshot } from "../lifecycle/signedControlJournal.js";
 import { getMode } from "../mode/mode.js";
+import { appendOpsAuditEvent } from "../ops/audit.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -20,7 +23,7 @@ const timestamp = z.number().int().nonnegative().refine(Number.isSafeInteger);
 const digest = z.string().regex(/^[a-f0-9]{64}$/);
 const ids = z.array(term).max(1024).refine(values => new Set(values).size === values.length);
 export const deletionTargetSchema = z.strictObject({ kind: z.enum(DELETION_TARGET_KINDS), sessionIds: ids.optional(),
-  sessionHashes: z.array(digest).max(1024).optional(), before: z.iso.datetime({ offset: true }).optional() });
+  sessionHashes: z.array(digest).optional(), before: z.iso.datetime({ offset: true }).optional() });
 export const legalHoldScopeSchema = z.strictObject({ tenantId: term, workspaceIds: ids, sessionIds: ids,
   dataKinds: z.array(z.enum(DELETION_TARGET_KINDS)).max(DELETION_TARGET_KINDS.length).refine(values => new Set(values).size === values.length) });
 export const legalHoldSchema = z.strictObject({ schemaVersion: z.literal("amc.legal-hold/v1"), holdId: term, scope: legalHoldScopeSchema,
@@ -30,10 +33,20 @@ export const legalHoldSchema = z.strictObject({ schemaVersion: z.literal("amc.le
   if (hold.active !== (hold.releasedTs === null) || (hold.releasedTs !== null && hold.releasedTs < hold.issuedTs))
     context.addIssue({ code: "custom", message: "invalid release state" });
 });
-const identitySchema = z.strictObject({ tenantId: term, workspaceId: term, sourceDigest: digest });
+const legacyReleaseSchema = z.strictObject({ schemaVersion: z.literal("amc.legacy-hold-release/v1"), holdId: term,
+  active: z.literal(false), legacyRecordSha256: digest, releasedTs: timestamp, acceptedBy: z.literal("owner") });
+type LegacyRelease = z.infer<typeof legacyReleaseSchema>;
+const modernSchema = z.union([legalHoldSchema, legacyReleaseSchema]);
+const identitySchema = z.strictObject({ tenantId: term, workspaceId: term });
 type Identity = z.infer<typeof identitySchema>;
+// Read the original signed format, but never let profile or tenant-record revisions change the identity pair.
+const oldIdentitySchema = identitySchema.extend({ sourceDigest: digest });
 const headSchema = z.strictObject({ schemaVersion: z.literal("amc.legal-hold-head/v1"), workspacePathSha256: digest,
-  identity: identitySchema.nullable(), count: z.number().int().nonnegative().max(MAX_RECORDS), recordsDigest: digest, updatedTs: timestamp });
+  identity: z.union([identitySchema, oldIdentitySchema]).nullable(), count: z.number().int().nonnegative().max(MAX_RECORDS),
+  recordsDigest: digest, updatedTs: timestamp });
+type Head = z.infer<typeof headSchema>;
+const anchorSchema = z.strictObject({ count: z.number().int().nonnegative().max(MAX_RECORDS), recordsDigest: digest, identity: identitySchema.nullable() });
+type Anchor = z.infer<typeof anchorSchema>;
 const envelope = { prev_record_hash: z.string().min(1).max(128), record_hash: digest,
   signature: z.string().min(1).max(1024).regex(/^[A-Za-z0-9+/]+={0,2}$/), storedTs: timestamp };
 const legacyHoldSchema = z.strictObject({ holdId: term, tenantId: term, reason: text, issuedBy: text, issuedTs: timestamp,
@@ -46,26 +59,28 @@ type Unknown = Extract<HoldVerdict, { verdict: "unknown" }>;
 export class LegalHoldRegistryError extends Error {
   readonly verdict: Unknown;
   constructor(reason: Unknown["reason"]) {
-    super(`Legal hold registry unavailable: ${reason}`); this.name = "LegalHoldRegistryError";
+    super("Legal hold registry unavailable: " + reason); this.name = "LegalHoldRegistryError";
     this.verdict = Object.freeze({ verdict: "unknown", reason });
   }
 }
 function fail(reason: Unknown["reason"]): never { throw new LegalHoldRegistryError(reason); }
-const workspacePath = (workspace: string): string => typeof workspace === "string" && workspace.trim() ? resolve(workspace) : fail("registry_unreadable");
+function workspacePath(workspace: string): string {
+  if (typeof workspace !== "string" || !workspace.trim()) fail("registry_unreadable");
+  try { return realpathSync(resolve(workspace)); } catch { return fail("registry_unreadable"); }
+}
 export const legalHoldRegistryRoot = (workspace: string): string => join(workspacePath(workspace), ".amc", "residency", "legal-holds");
 const legacyRoot = (workspace: string, kind: string): string => join(workspacePath(workspace), ".amc", "compliance", "residency", kind);
 const headPath = (workspace: string): string => join(legalHoldRegistryRoot(workspace), "HEAD.json");
+const journalPath = (workspace: string): string => join(legalHoldRegistryRoot(workspace), "journal");
 const present = (path: string): boolean => { try { lstatSync(path); return true; } catch (error) {
   if ((error as NodeJS.ErrnoException).code === "ENOENT") return false; return fail("registry_unreadable"); } };
 function freeze<T>(value: T): T {
   if (value && typeof value === "object") { for (const nested of Object.values(value)) freeze(nested); Object.freeze(value); } return value;
 }
 function safeDirectory(workspace: string, path: string): void {
-  const root = workspacePath(workspace);
-  let current = root;
+  const root = workspacePath(workspace); let current = root;
   for (const segment of path.slice(root.length + 1).split(/[\\/]/)) {
-    current = join(current, segment);
-    if (!present(current)) break;
+    current = join(current, segment); if (!present(current)) break;
     const stat = lstatSync(current); if (!stat.isDirectory() || stat.isSymbolicLink()) fail("registry_unreadable");
   }
 }
@@ -81,12 +96,11 @@ function bounded(path: string): Buffer {
 const json = (bytes: Buffer): unknown => { try { return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); } catch { return fail("record_corrupt"); } };
 function files(workspace: string, path: string, modern: boolean): string[] {
   safeDirectory(workspace, path); if (!present(path)) return [];
-  const entries = readdirSync(path);
-  if (entries.length > MAX_RECORDS * 2 + 4) fail("record_corrupt");
+  const entries = readdirSync(path); if (entries.length > MAX_RECORDS * 2 + 5) fail("record_corrupt");
   for (const entry of entries) {
-    if (modern && ["HEAD.json", "HEAD.json.sig", ".holds.lock", ".holds-locks"].includes(entry)) continue;
+    if (modern && ["HEAD.json", "HEAD.json.sig", ".holds.lock", ".holds-locks", "journal"].includes(entry)) continue;
     if (!(modern ? /^[A-Za-z0-9][A-Za-z0-9_.:-]*\.json(?:\.sig)?$/ : /^[A-Za-z0-9][A-Za-z0-9_.:-]*\.json$/).test(entry)) fail("record_corrupt");
-    if (!lstatSync(join(path, entry)).isFile() || lstatSync(join(path, entry)).isSymbolicLink()) fail("record_corrupt");
+    const stat = lstatSync(join(path, entry)); if (!stat.isFile() || stat.isSymbolicLink()) fail("record_corrupt");
     if (entry.endsWith(".sig") && !present(join(path, entry.slice(0, -4)))) fail("record_corrupt");
   }
   const records = entries.filter(entry => entry.endsWith(".json") && (!modern || entry !== "HEAD.json")).sort();
@@ -100,28 +114,54 @@ function signed<T>(workspace: string, path: string, schema: z.ZodType<T>): { val
   return { value: parsed.data, sha256: snapshot.artifactSha256 };
 }
 function legacy<T extends z.infer<typeof legacyTenantSchema> | z.infer<typeof legacyHoldSchema>>(
-  workspace: string, path: string, schema: z.ZodType<T>): { value: T; sha256: string } {
-  const bytes = bounded(path), parsed = schema.safeParse(json(bytes)); if (!parsed.success) fail("record_corrupt");
-  const value = parsed.data;
-  const { record_hash, signature, storedTs: _storedTs, ...body } = value;
-  if (sha256Hex(canonicalize(body)) !== record_hash || !verifyHexDigestAny(record_hash, signature, getPublicKeyHistory(workspace, "auditor"))) fail("signature_invalid");
-  return { value, sha256: sha256Hex(bytes) };
+  workspace: string, bytes: Buffer, schema: z.ZodType<T>): T {
+  const parsed = schema.safeParse(json(bytes)); if (!parsed.success) fail("record_corrupt");
+  const value = parsed.data, { record_hash, signature, storedTs: _storedTs, ...body } = value;
+  let valid = false;
+  try { valid = sha256Hex(canonicalize(body)) === record_hash && verifyHexDigestAny(record_hash, signature, getPublicKeyHistory(workspace, "auditor")); }
+  catch { /* Unavailable legacy keys do not authenticate raw fields. */ }
+  if (!valid) fail("signature_invalid"); return value;
 }
 function mapping(workspace: string): { identity: Identity | null; regulated: boolean } {
   const active = loadActiveCompiledPolicy(workspace);
   if (active) {
     const registry = loadDestinationRegistrySnapshot(workspace); if (registry.state !== "verified") fail("tenant_unmapped");
     const profile = loadPinnedResidencyProfile(workspace, registry.registry, active.profileSha256);
-    return { regulated: true, identity: identitySchema.parse({ tenantId: profile.tenantId, workspaceId: profile.workspaceId, sourceDigest: active.profileSha256 }) };
+    return { regulated: true, identity: identitySchema.parse({ tenantId: profile.tenantId, workspaceId: profile.workspaceId }) };
   }
-  const path = legacyRoot(workspace, "tenants"), identities = files(workspace, path, false).map(file => {
-    const record = legacy(workspace, join(path, file), legacyTenantSchema);
-    if (file !== `${record.value.tenantId}.json`) fail("record_corrupt");
-    return { tenantId: record.value.tenantId, workspaceId: record.value.workspaceId, sourceDigest: record.sha256 };
-  });
-  return { regulated: false, identity: identities.length === 1 ? identities[0]! : null };
+  try {
+    const path = legacyRoot(workspace, "tenants"), identities = files(workspace, path, false).map(file => {
+      const record = legacy(workspace, bounded(join(path, file)), legacyTenantSchema);
+      if (file !== record.tenantId + ".json") fail("record_corrupt");
+      return { tenantId: record.tenantId, workspaceId: record.workspaceId };
+    });
+    return { regulated: false, identity: identities.length === 1 ? identities[0]! : null };
+  } catch { return { regulated: false, identity: null }; }
 }
-interface Entry { hold: LegalHoldV1; sha256: string; source: "record" | "legacy" }
+type Entry =
+  | { source: "record"; holdId: string; sha256: string; record: LegalHoldV1 | LegacyRelease }
+  | { source: "legacy"; holdId: string; sha256: string; hold: LegalHoldV1 }
+  | { source: "legacy-unverified"; holdId: string; sha256: string };
+interface Descriptor { source: "record" | "legacy"; holdId: string; sha256: string }
+function recordDigest(rows: readonly Entry[]): string {
+  if (rows.length > MAX_RECORDS) fail("record_corrupt");
+  const descriptors: Descriptor[] = rows.map(row => ({ source: row.source === "record" ? "record" : "legacy", holdId: row.holdId, sha256: row.sha256 }));
+  descriptors.sort((a, b) => a.source + ":" + a.holdId < b.source + ":" + b.holdId ? -1 : a.source + ":" + a.holdId > b.source + ":" + b.holdId ? 1 : 0);
+  return sha256Hex(canonicalize(descriptors));
+}
+function identityPair(identity: Head["identity"]): Identity | null {
+  return identity === null ? null : { tenantId: identity.tenantId, workspaceId: identity.workspaceId };
+}
+function anchorOf(head: Pick<Head, "count" | "recordsDigest" | "identity">): Anchor {
+  return { count: head.count, recordsDigest: head.recordsDigest, identity: identityPair(head.identity) };
+}
+function readJournal(workspace: string): SignedControlJournalSnapshot<Anchor> {
+  try {
+    safeDirectory(workspace, journalPath(workspace));
+    return readSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace),
+      parsePayload: value => anchorSchema.parse(value), recoverPendingPublication: false });
+  } catch (error) { return fail(error instanceof SignedControlJournalError ? "record_corrupt" : "registry_unreadable"); }
+}
 export interface LegalHoldRegistrySnapshot {
   readonly holds: readonly LegalHoldV1[];
   readonly identity: Identity | null;
@@ -129,56 +169,93 @@ export interface LegalHoldRegistrySnapshot {
   readonly holdsChecked: number;
   readonly headMissing: boolean;
   readonly regulated: boolean;
+  readonly unverifiedLegacy: readonly { holdId: string; sha256: string }[];
+  readonly journalRevision: number;
 }
-function readUnlocked(workspace: string, allowInitialize = false, publishing = false): LegalHoldRegistrySnapshot {
+interface State extends LegalHoldRegistrySnapshot {
+  readonly rows: readonly Entry[];
+  readonly head: Head | null;
+  readonly journal: SignedControlJournalSnapshot<Anchor>;
+  readonly bindingMismatch: boolean;
+}
+function readUnlocked(workspace: string, options: { initialize?: boolean; rebind?: boolean } = {}): State {
   try {
-    const tenant = mapping(workspace), root = legalHoldRegistryRoot(workspace), oldRoot = legacyRoot(workspace, "legal-holds");
-    const entries: Entry[] = files(workspace, root, true).map(file => {
-      const row = signed(workspace, join(root, file), legalHoldSchema);
-      if (file !== `${row.value.holdId}.json`) fail("record_corrupt");
-      return { hold: row.value, sha256: row.sha256, source: "record" };
+    const tenant = mapping(workspace), root = legalHoldRegistryRoot(workspace), oldRoot = legacyRoot(workspace, "legal-holds"), now = Date.now();
+    const rows: Entry[] = files(workspace, root, true).map(file => {
+      const row = signed(workspace, join(root, file), modernSchema), record = row.value;
+      if (file !== record.holdId + ".json" || (record.schemaVersion === "amc.legal-hold/v1" && record.issuedTs > now)
+        || (record.releasedTs !== null && record.releasedTs > now)) fail("record_corrupt");
+      return { source: "record", holdId: record.holdId, record, sha256: row.sha256 };
     });
     for (const file of files(workspace, oldRoot, false)) {
-      const row = legacy(workspace, join(oldRoot, file), legacyHoldSchema), hold = row.value;
-      if (file !== `${hold.holdId}.json`) fail("record_corrupt");
-      entries.push({ source: "legacy", sha256: row.sha256, hold: {
-        schemaVersion: "amc.legal-hold/v1", holdId: hold.holdId, scope: { tenantId: hold.tenantId, workspaceIds: [], sessionIds: [], dataKinds: [] },
-        reason: hold.reason, issuedBy: hold.issuedBy, issuedTs: hold.issuedTs, expiresTs: hold.expiresTs, active: hold.active,
-        releasedTs: hold.active ? null : Math.max(hold.issuedTs, hold.storedTs), legacyRecordSha256: row.sha256 } });
+      const bytes = bounded(join(oldRoot, file)), sha256 = sha256Hex(bytes), holdId = file.slice(0, -5); term.parse(holdId);
+      try {
+        const hold = legacy(workspace, bytes, legacyHoldSchema);
+        if (hold.holdId !== holdId || hold.issuedTs > now || hold.storedTs > now) fail("record_corrupt");
+        rows.push({ source: "legacy", holdId, sha256, hold: { schemaVersion: "amc.legal-hold/v1", holdId,
+          scope: { tenantId: hold.tenantId, workspaceIds: [], sessionIds: [], dataKinds: [] }, reason: hold.reason, issuedBy: hold.issuedBy,
+          issuedTs: hold.issuedTs, expiresTs: hold.expiresTs, active: hold.active, releasedTs: hold.active ? null : Math.max(hold.issuedTs, hold.storedTs), legacyRecordSha256: sha256 } });
+      } catch (error) {
+        if (!(error instanceof LegalHoldRegistryError) || !["signature_invalid", "record_corrupt"].includes(error.verdict.reason)) throw error;
+        rows.push({ source: "legacy-unverified", holdId, sha256 });
+      }
     }
-    if (entries.length > MAX_RECORDS) fail("record_corrupt");
-    if (entries.some(row => row.hold.issuedTs > Date.now() || (row.hold.releasedTs !== null && row.hold.releasedTs > Date.now()))) fail("record_corrupt");
-    const recordDigest = sha256Hex(canonicalize(entries.map(row => ({ source: row.source, holdId: row.hold.holdId, sha256: row.sha256 }))
-      .sort((a, b) => `${a.source}:${a.holdId}` < `${b.source}:${b.holdId}` ? -1 : `${a.source}:${a.holdId}` > `${b.source}:${b.holdId}` ? 1 : 0)));
-    const path = headPath(workspace), headMissing = !present(path);
+    const registryDigest = recordDigest(rows), journal = readJournal(workspace), path = headPath(workspace), headMissing = !present(path);
     if (headMissing && present(artifactSigPath(path))) fail("record_corrupt");
-    if (!headMissing && !publishing) {
-      const head = signed(workspace, path, headSchema).value;
-      if (head.updatedTs > Date.now() || head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) || head.count !== entries.length || head.recordsDigest !== recordDigest
-        || canonicalize(head.identity) !== canonicalize(tenant.identity)) fail("record_corrupt");
-    } else if (headMissing && !publishing && ((tenant.regulated && !allowInitialize) || entries.some(row => row.source === "record"))) fail("head_missing");
-    const effective = new Map<string, Entry>();
-    for (const row of entries.filter(entry => entry.source === "legacy")) effective.set(row.hold.holdId, row);
-    for (const row of entries.filter(entry => entry.source === "record")) {
-      const old = effective.get(row.hold.holdId);
-      if (old) {
-        const previous = old.hold, next = row.hold;
-        if (next.legacyRecordSha256 !== old.sha256 || next.active || canonicalize(next.scope) !== canonicalize(previous.scope)
-          || next.reason !== previous.reason || next.issuedBy !== previous.issuedBy || next.issuedTs !== previous.issuedTs || next.expiresTs !== previous.expiresTs) fail("record_corrupt");
-      } else if (row.hold.legacyRecordSha256 !== null) fail("record_corrupt");
-      effective.set(row.hold.holdId, row);
+    let head: Head | null = null, bindingMismatch = false;
+    if (headMissing) {
+      if (journal.integrity !== "uninitialized" || rows.some(row => row.source === "record") || (tenant.regulated && !options.initialize)) fail("head_missing");
+    } else {
+      head = signed(workspace, path, headSchema).value;
+      if (head.updatedTs > now || head.count !== rows.length || head.recordsDigest !== registryDigest) fail("record_corrupt");
+      if (journal.integrity === "trusted") {
+        if (canonicalize(journal.payload) !== canonicalize(anchorOf(head))) fail("record_corrupt");
+      } else if (!options.initialize || (head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) && options.rebind !== true)) fail("record_corrupt");
+      bindingMismatch = head.workspacePathSha256 !== sha256Hex(workspacePath(workspace)) || canonicalize(identityPair(head.identity)) !== canonicalize(tenant.identity);
+      if (bindingMismatch) {
+        const previous = identityPair(head.identity);
+        const compatible = previous === null || canonicalize(previous) === canonicalize(tenant.identity);
+        if (!options.rebind || !compatible) fail("tenant_unmapped");
+      }
     }
-    // No HEAD is tolerable only after every legacy row has passed strict verification.
-    return freeze({ holds: [...effective.values()].map(row => row.hold), identity: tenant.identity, registryDigest: recordDigest,
-      holdsChecked: entries.length, headMissing, regulated: tenant.regulated });
+    const effective = new Map<string, LegalHoldV1>();
+    const legacyRows = new Map<string, Extract<Entry, { source: "legacy" | "legacy-unverified" }>>();
+    for (const row of rows) if (row.source !== "record") legacyRows.set(row.holdId, row);
+    const unresolved = new Map<string, { holdId: string; sha256: string }>();
+    for (const row of legacyRows.values()) {
+      if (row.source === "legacy") effective.set(row.holdId, row.hold);
+      else unresolved.set(row.holdId, { holdId: row.holdId, sha256: row.sha256 });
+    }
+    for (const row of rows) {
+      if (row.source !== "record") continue;
+      const old = legacyRows.get(row.holdId), next = row.record;
+      if (next.schemaVersion === "amc.legacy-hold-release/v1") {
+        if (!old || next.legacyRecordSha256 !== old.sha256) fail("record_corrupt");
+        unresolved.delete(row.holdId); effective.delete(row.holdId); continue;
+      }
+      if (old) {
+        if (next.active || next.legacyRecordSha256 !== old.sha256) fail("record_corrupt");
+        if (old.source === "legacy") {
+          const previous = old.hold;
+          if (canonicalize(next.scope) !== canonicalize(previous.scope) || next.reason !== previous.reason || next.issuedBy !== previous.issuedBy
+            || next.issuedTs !== previous.issuedTs || next.expiresTs !== previous.expiresTs) fail("record_corrupt");
+        } else unresolved.delete(row.holdId); // Only the independently verified modern override supplies trusted fields.
+      } else if (next.legacyRecordSha256 !== null) fail("record_corrupt");
+      effective.set(row.holdId, next);
+    }
+    return freeze({ holds: [...effective.values()], identity: tenant.identity, registryDigest, holdsChecked: rows.length, headMissing,
+      regulated: tenant.regulated, unverifiedLegacy: [...unresolved.values()], journalRevision: journal.revision, rows, head, journal, bindingMismatch });
   } catch (error) { if (error instanceof LegalHoldRegistryError) throw error; return fail("registry_unreadable"); }
 }
-export function readLegalHoldRegistry(workspace: string): LegalHoldRegistrySnapshot { return readUnlocked(workspacePath(workspace)); }
-export function listLegalHolds(workspace: string, options: { tenantId?: string; activeOnly?: boolean } = {}): readonly LegalHoldV1[] {
-  if (options.tenantId !== undefined && !term.safeParse(options.tenantId).success) fail("record_corrupt");
+function view(state: State): LegalHoldRegistrySnapshot {
+  const { rows: _rows, head: _head, journal: _journal, bindingMismatch: _binding, ...snapshot } = state; return freeze(snapshot);
+}
+export function readLegalHoldRegistry(workspace: string): LegalHoldRegistrySnapshot { return view(readUnlocked(workspacePath(workspace))); }
+/** Listing is a verified view, never deletion admission; untrusted legacy fields are not promoted into hold DTOs. */
+export function listLegalHolds(workspace: string, options: { tenantId?: string; activeOnly?: boolean; rejectUnverifiedLegacy?: boolean } = {}): readonly LegalHoldV1[] {
   const snapshot = readLegalHoldRegistry(workspace), now = Date.now();
-  if (snapshot.holds.some(hold => hold.active && (hold.expiresTs === null || hold.expiresTs > now)
-    && (!snapshot.identity || hold.scope.tenantId !== snapshot.identity.tenantId))) fail("tenant_unmapped");
+  if (options.rejectUnverifiedLegacy === true && snapshot.unverifiedLegacy.length) fail("signature_invalid");
+  if (options.tenantId !== undefined && !term.safeParse(options.tenantId).success) return [];
   return snapshot.holds.filter(hold => (!options.tenantId || hold.scope.tenantId === options.tenantId)
     && (!options.activeOnly || (hold.active && (hold.expiresTs === null || hold.expiresTs > now))));
 }
@@ -186,6 +263,7 @@ export function holdVerdict(input: { workspace: string; target?: DeletionRequest
   try {
     if (input.target !== undefined && !deletionTargetSchema.safeParse(input.target).success) fail("record_corrupt");
     const snapshot = readLegalHoldRegistry(input.workspace), now = Date.now();
+    if (snapshot.unverifiedLegacy.length) return freeze({ verdict: "unknown", reason: "signature_invalid" });
     const active = snapshot.holds.filter(hold => hold.active && (hold.expiresTs === null || hold.expiresTs > now));
     if (active.some(hold => !snapshot.identity || hold.scope.tenantId !== snapshot.identity.tenantId)) return freeze({ verdict: "unknown", reason: "tenant_unmapped" });
     const identity = snapshot.identity;
@@ -211,51 +289,75 @@ export function withLegalHoldLock<T>(workspace: string, operation: () => T): T {
 function assertWriter(workspace: string): void {
   if (getMode(workspace) !== "owner" || typeof process.getuid !== "function") fail("registry_unreadable");
   const mode = join(workspacePath(workspace), ".amc", "mode.json");
-  if (present(mode) && z.strictObject({ mode: z.literal("owner"), updatedTs: timestamp }).safeParse(json(bounded(mode))).success === false) fail("registry_unreadable");
+  if (present(mode) && !z.strictObject({ mode: z.literal("owner"), updatedTs: timestamp }).safeParse(json(bounded(mode))).success) fail("registry_unreadable");
   const root = legalHoldRegistryRoot(workspace); safeDirectory(workspace, root); mkdirSync(root, { recursive: true, mode: 0o700 });
   if (lstatSync(root).uid !== process.getuid()) fail("registry_unreadable"); chmodSync(root, 0o700);
 }
-function publishHead(workspace: string, snapshot: LegalHoldRegistrySnapshot): void {
-  const head = { schemaVersion: "amc.legal-hold-head/v1", workspacePathSha256: sha256Hex(workspacePath(workspace)), identity: snapshot.identity,
-    count: snapshot.holdsChecked, recordsDigest: snapshot.registryDigest, updatedTs: Date.now() };
-  writeFileAtomic(headPath(workspace), `${canonicalize(head)}\n`, 0o600);
-  signArtifactFile({ workspace, path: headPath(workspace), artifactKind: "legal-hold" }); chmodSync(artifactSigPath(headPath(workspace)), 0o600);
+function acknowledgedAudit(workspace: string, auditType: string, payload: Record<string, unknown>): void {
+  try {
+    const audit = appendOpsAuditEvent({ workspace, auditType, severity: "HIGH", payload });
+    if (!audit.eventId || !digest.safeParse(audit.eventHash).success) fail("registry_unreadable");
+  } catch { return fail("registry_unreadable"); }
 }
-/** Initializes the actual verified register; it never invents a hold or repairs an invalid publication. */
-export function initLegalHoldRegistry(workspace: string): LegalHoldRegistrySnapshot {
+function publishHead(workspace: string, previous: State, rows: readonly Entry[], identity = previous.identity): void {
+  const head = headSchema.parse({ schemaVersion: "amc.legal-hold-head/v1", workspacePathSha256: sha256Hex(workspacePath(workspace)), identity,
+    count: rows.length, recordsDigest: recordDigest(rows), updatedTs: Date.now() });
+  const bytes = Buffer.from(canonicalize(head) + "\n", "utf8");
+  writeFileAtomic(headPath(workspace), bytes, 0o600);
+  signArtifactFile({ workspace, path: headPath(workspace), artifactKind: "legal-hold", bytes }); chmodSync(artifactSigPath(headPath(workspace)), 0o600);
+  // The external signer pin and checkpoint make rollback or a replaced local auditor key an integrity failure.
+  appendSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace), previous: previous.journal, payload: anchorOf(head) });
+}
+/** Explicit initialization/rebinding never repairs row, signature, timestamp, digest or checkpoint mismatches. */
+export function initLegalHoldRegistry(workspace: string, options: { rebind?: boolean } = {}): LegalHoldRegistrySnapshot {
   const root = workspacePath(workspace); assertWriter(root);
   return withLegalHoldLock(root, () => {
-    const snapshot = readUnlocked(root, true);
-    if (!snapshot.headMissing) return snapshot;
-    publishHead(root, snapshot); return readLegalHoldRegistry(root);
+    assertWriter(root);
+    const snapshot = readUnlocked(root, { initialize: true, rebind: options.rebind === true });
+    if (!snapshot.headMissing && !snapshot.bindingMismatch && snapshot.journal.integrity === "trusted") return view(snapshot);
+    acknowledgedAudit(root, snapshot.bindingMismatch ? "LEGAL_HOLD_REGISTRY_REBOUND" : "LEGAL_HOLD_REGISTRY_INITIALIZED", {
+      count: snapshot.holdsChecked, recordsDigest: snapshot.registryDigest, unverifiedLegacyCount: snapshot.unverifiedLegacy.length,
+      journalRevision: snapshot.journalRevision, previousPathSha256: snapshot.head?.workspacePathSha256 ?? null, workspacePathSha256: sha256Hex(root) });
+    publishHead(root, snapshot, snapshot.rows); return readLegalHoldRegistry(root);
   });
 }
-function publish(workspace: string, hold: LegalHoldV1): LegalHoldV1 {
-  const value = legalHoldSchema.parse(hold), path = join(legalHoldRegistryRoot(workspace), `${value.holdId}.json`), bytes = `${canonicalize(value)}\n`;
-  if (Buffer.byteLength(bytes) > MAX_RECORD_BYTES) fail("record_corrupt");
-  writeFileAtomic(path, bytes, 0o600); signArtifactFile({ workspace, path, artifactKind: "legal-hold" }); chmodSync(artifactSigPath(path), 0o600);
-  // Record first, HEAD last: any partial publication remains unverifiable and denies deletion.
-  publishHead(workspace, readUnlocked(workspace, false, true));
-  readLegalHoldRegistry(workspace); return freeze(value);
+function publish(workspace: string, previous: State, record: LegalHoldV1 | LegacyRelease): void {
+  const value = modernSchema.parse(record), path = join(legalHoldRegistryRoot(workspace), value.holdId + ".json"), bytes = Buffer.from(canonicalize(value) + "\n", "utf8");
+  if (bytes.length > MAX_RECORD_BYTES) fail("record_corrupt");
+  const rows: Entry[] = previous.rows.filter(row => row.source !== "record" || row.holdId !== value.holdId);
+  rows.push({ source: "record", holdId: value.holdId, record: value, sha256: sha256Hex(bytes) }); recordDigest(rows);
+  writeFileAtomic(path, bytes, 0o600); signArtifactFile({ workspace, path, artifactKind: "legal-hold", bytes }); chmodSync(artifactSigPath(path), 0o600);
+  // Preserve the verified row descriptors. Never sign a directory reread narrowed during the signing window.
+  publishHead(workspace, previous, rows); readLegalHoldRegistry(workspace);
 }
 export function issueScopedLegalHold(input: { workspace: string; scope: LegalHoldScopeV1; reason: string; issuedBy: string; expiresTs?: number | null }): LegalHoldV1 {
   const workspace = workspacePath(input.workspace); assertWriter(workspace);
   return withLegalHoldLock(workspace, () => {
-    const snapshot = readUnlocked(workspace, true), scope = legalHoldScopeSchema.parse(input.scope);
+    assertWriter(workspace);
+    const snapshot = readUnlocked(workspace), scope = legalHoldScopeSchema.parse(input.scope);
     if (snapshot.identity && (scope.tenantId !== snapshot.identity.tenantId
       || (scope.workspaceIds.length && !scope.workspaceIds.includes(snapshot.identity.workspaceId)))) fail("tenant_unmapped");
     if (snapshot.holdsChecked >= MAX_RECORDS) fail("record_corrupt");
-    const holdId = `lh_${randomUUID()}`; if (snapshot.holds.some(hold => hold.holdId === holdId)) fail("record_corrupt");
-    return publish(workspace, { schemaVersion: "amc.legal-hold/v1", holdId, scope, reason: input.reason, issuedBy: input.issuedBy,
+    const holdId = "lh_" + randomUUID(); if (snapshot.rows.some(row => row.holdId === holdId)) fail("record_corrupt");
+    const hold = legalHoldSchema.parse({ schemaVersion: "amc.legal-hold/v1", holdId, scope, reason: input.reason, issuedBy: input.issuedBy,
       issuedTs: Date.now(), expiresTs: input.expiresTs ?? null, active: true, releasedTs: null, legacyRecordSha256: null });
+    publish(workspace, snapshot, hold); return freeze(hold);
   });
 }
-export function releaseScopedLegalHold(workspace: string, holdId: string): boolean {
+export function releaseScopedLegalHold(workspace: string, holdId: string, options: { acceptUnverifiedLegacy?: boolean } = {}): boolean {
   const root = workspacePath(workspace); assertWriter(root); term.parse(holdId);
   return withLegalHoldLock(root, () => {
-    const snapshot = readUnlocked(root, true), hold = snapshot.holds.find(row => row.holdId === holdId);
-    if (!hold || !hold.active) return false;
+    assertWriter(root);
+    const snapshot = readUnlocked(root), unknown = snapshot.unverifiedLegacy.find(row => row.holdId === holdId);
+    if (unknown) {
+      if (options.acceptUnverifiedLegacy !== true) fail("signature_invalid");
+      if (snapshot.holdsChecked >= MAX_RECORDS) fail("record_corrupt");
+      acknowledgedAudit(root, "LEGAL_HOLD_LEGACY_RELEASE_ACCEPTED", { holdId, legacyRecordSha256: unknown.sha256 });
+      publish(root, snapshot, { schemaVersion: "amc.legacy-hold-release/v1", holdId, active: false,
+        legacyRecordSha256: unknown.sha256, releasedTs: Date.now(), acceptedBy: "owner" }); return true;
+    }
+    const hold = snapshot.holds.find(row => row.holdId === holdId); if (!hold || !hold.active) return false;
     if (hold.legacyRecordSha256 !== null && snapshot.holdsChecked >= MAX_RECORDS) fail("record_corrupt");
-    publish(root, { ...hold, active: false, releasedTs: Date.now() }); return true;
+    publish(root, snapshot, { ...hold, active: false, releasedTs: Date.now() }); return true;
   });
 }

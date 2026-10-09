@@ -35,6 +35,7 @@ import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
+import { parseConnectAuthority } from "./connectResidency.js";
 export interface StartGatewayOptions {
   workspace: string;
   workspaceId?: string;
@@ -916,16 +917,11 @@ function createProxyServer(params: {
       clientSocket.destroy();
       return;
     }
-    const [hostRaw, portRaw] = (req.url ?? "").split(":");
-    const host = hostRaw ?? "";
-    const port = Number(portRaw ?? "443");
+    const authority = parseConnectAuthority(req.url);
+    const host = authority?.host ?? "";
+    const port = authority?.port ?? NaN;
     const proxyAgentId = firstString(req.headers["x-amc-agent-id"] ?? req.headers["amc-agent-id"]);
-    let connectUrl: URL | undefined;
-    try {
-      connectUrl = new URL(`http://${req.url ?? ""}`);
-    } catch {
-      connectUrl = undefined;
-    }
+    const connectUrl = authority?.url;
     const leaseCarrier = extractLeaseCarrier({
       headers: req.headers,
       url: connectUrl,
@@ -965,7 +961,7 @@ function createProxyServer(params: {
       requiredScope: "proxy:connect"
     });
 
-    if (!host || !Number.isInteger(port) || port < 1 || port > 65535) {
+    if (!authority || !host || !Number.isInteger(port) || port < 1 || port > 65535) {
       clientSocket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
       clientSocket.destroy();
       return;
@@ -998,7 +994,6 @@ function createProxyServer(params: {
       clientSocket.destroy();
       return;
     }
-
     clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
     const egress = await hostAllowed(params, host);
     if (!egress.decision.allowed) {
@@ -1008,10 +1003,15 @@ function createProxyServer(params: {
       return;
     }
     if (clientSocket.destroyed) return; // the client left during the lookup: open nothing
-
+    try { checkEgress({ workspace: params.workspace, channel: "network-tool", url: authority.url.href,
+      agentId: proxyAgentId, dataClasses: null, purpose: "proxy-connect" }); }
+    catch (error) {
+      if (!(error instanceof EgressBlocked)) throw error;
+      clientSocket.end("HTTP/1.1 403 Forbidden\r\nX-AMC-Error-Code: AMC_RESIDENCY_EGRESS_BLOCKED\r\nConnection: close\r\nContent-Length: 0\r\n\r\n", () => clientSocket.destroy()); return;
+    }
     // Only the checked addresses (a pinned lookup keeps every one as a fallback), never a fresh resolution.
     let connectedAddress: string | null = null;
-    const upstreamSocket = netConnect({ port, host: canonicalHost(host), lookup: pinnedLookup(egress.addresses) }, () => {
+    const upstreamSocket = netConnect({ port, host, lookup: pinnedLookup(egress.addresses) }, () => {
       connectedAddress = upstreamSocket.remoteAddress ?? null; // which checked address the tunnel reached
       clientSocket.write("HTTP/1.1 200 Connection Established\r\n\r\n");
       if (head.length > 0) {

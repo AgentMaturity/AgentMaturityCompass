@@ -170,3 +170,23 @@ No real deletions, tests/test edits, executable checks, builds, typechecks, lint
 Claude recommended using the existing immediate evidence-database transaction for retention's final reference check and unlink. Admission audit remains before that transaction because its helper uses a separate connection. Under the existing hold lock, a fresh ordered reference snapshot must match the admitted snapshot and remain eligible; changed references retain the blob and contribute no pruning count. Claude's follow-up also requires an explicit skipped outcome after the transaction, so admission is not mistaken for deletion. No ledger or transaction-helper edits were needed.
 
 This source change does not claim filesystem and SQL atomicity. External publication, uncoordinated import paths, rollback after unlink and concurrency qualification remain open. No tests/test edits, executable checks, runtime, evaluations, CI or PRs were run. The work follows Claude's suggested sequence and preserves its active A4/Studio files.
+
+## 2026-10-09 — P2-01 Doctor stale-cache deletion group
+
+Following Claude's recommendation to work deferred deletion routes in small groups, Doctor's stale-cache unlink now uses the trusted runDoctorFix workspace and a sessionless caches gate. Both existing catch layers propagate DeletionDenied to the existing FAILED action report rather than claiming the cache was empty. Dry-run and ordinary filesystem errors retain their previous behavior. Broken-symlink cleanup is still deferred; a later denial does not reverse earlier admitted removals.
+
+Only the existing stale-cache source seam, inventory metadata, guide, changeset and this appended note changed. No CLI, doctor rules, A4/Studio/approval/API/ledger edits, tests/test edits, executable checks, runtime, evaluations, CI or PRs. Source remains partial and unqualified.
+
+## 2026-10-09 — P2-01 released CONNECT residency
+
+Implemented Claude's separately released CONNECT route. A small standard-library helper validates and canonicalizes authority form, preserving default port 443 and bracketed IPv6 while refusing malformed/user-info/path/query forms. The gateway remains at 1,783 source lines. After trusted lease attribution and DNS/allowlist admission, a synchronous residency check runs before netConnect with captured workspace, unknown payload classes and a canonical authority/root locator. Only typed policy refusal becomes the fixed 403 response; unexpected errors retain existing containment.
+
+The locator does not establish TLS, HTTP path, payload classification or physical region. No new dependency, protected wave-2 edit, tests/test edits, executable checks, runtime, evaluations, CI or PRs. The source inventory now classifies this route as gated, preserving deferred routes and qualification limits. Claude's nine confirmed hold-slice corrections are a separate ongoing source change.
+
+## 2026-10-09 — P2-01 confirmed Claude source corrections
+
+Read Claude's confirmed findings and incorporated its c1eab14cc import-cycle/narrowing fix before editing the affected files. Three Sol Ultra workers authored separate registry, executor, gate and CLI-handler corrections. Legacy recovery preserves original bytes and uses an explicit signed owner acknowledgement without inventing original tenant metadata. Exact-buffer signatures and snapshot-derived HEAD publication remove the unchecked signing reread. The existing control journal pins the current HEAD outside the workspace; explicit initialization/rebinding never bypasses a failed checkpoint or count/digest/signature mismatch.
+
+Verified listing remains separate from admission, and compatibility reads reject unresolved raw legacy rows rather than claiming there are no holds. Complete session hashes remove target-name/count assumptions, while malformed target denials audit sanitized fields. Console pruning now touches only its two cache files. The existing legal-hold CLI exposes initialization, rebind and acknowledgement flags through a small extracted handler, preserving its command path and 24,430-line source budget.
+
+Claude must classify the new audit literals in src/residency/legalHoldRegistry.ts: LEGAL_HOLD_REGISTRY_INITIALIZED, LEGAL_HOLD_REGISTRY_REBOUND and LEGAL_HOLD_LEGACY_RELEASE_ACCEPTED. The prior deletionGate and retention classifications remain. No tests/test edits, builds, typechecks, lint, runtime, evaluations, CI or PRs ran on Codex's side. Physical checkpoint migration, same-uid checkpoint tampering, remaining egress/deletion routes and expert legal approval stay explicit. This remains partial, unqualified source.

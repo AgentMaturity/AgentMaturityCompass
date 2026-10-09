@@ -8,7 +8,8 @@
     "Gated identifies a source-visible fresh withDeletionGate callback around the effect, not an observed deletion result or a complete architecture proof.",
     "Deletion admission checks an acknowledged DELETION_ALLOWED ops audit row before the synchronous callback. Audit failure prevents the effect. A denied operation can still have auditPersisted false when its denial audit cannot be written.",
     "Guard-event pruning uses the resolved workspace, the selected DUAL_WRITE or CUTOVER store and a fresh gate. The gate audit is written through appendOpsAuditEvent, not inferred from the void best-effort emitGuardEvent contract.",
-    "Direct spill-store removal and purge use broad workspace spill scope because the locator owner does not prove all shared-session references. Lifecycle supplies complete authenticated sessionIds, but its nested direct-store gate can conservatively block unrelated spill holds.",
+    "Retention and spill lifecycle targets carry complete SHA-256 sessionHashes derived from workspace-local or authenticated session IDs, without a target hash count cap or truncation. Direct spill-store removal and purge use broad workspace spill scope because the locator owner does not prove all shared-session references; the nested direct-store gate can conservatively block unrelated spill holds.",
+    "Invalid deletion targets produce an unknown hold verdict and attempt DELETION_DENIED_HOLD_UNKNOWN audit only in a valid explicit or ALS workspace. The audit carries a validated executor slug or fallback and an optional recognized kind, omitting session IDs, session hashes, cutoff and raw parse errors. Unknown kinds are not replaced with an asserted category; absent trusted scope denies without a cwd guess. Denial auditPersisted requires an acknowledged event ID and event hash.",
     "Exempt is limited here to operation-owned unpublished atomic-write staging files and exclusive control-lock coordination cleanup. Other apparent temporary, rollback, quarantine, socket and verification-workspace deletions remain deferred until their ownership and publication boundaries are established.",
     "Deferred is not an exemption. Out-of-slice routes must be resolved before full deletion coverage can be claimed; protected ledger, A4, approval, API and Studio code was not changed.",
     "Rows include sync filesystem source occurrences, namespace and literal-require bindings, literal or template SQLite DELETE text, followed indirect erasure calls and the public payload-erasure definition. Several rows trace the same physical effect, so row totals are not counts of distinct deleted resources.",
@@ -446,9 +447,9 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:122:1",
+      "siteId": "src/doctor/doctorFix.ts:123:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 122,
+      "line": 123,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
@@ -456,9 +457,9 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:126:1",
+      "siteId": "src/doctor/doctorFix.ts:127:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 126,
+      "line": 127,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
@@ -466,14 +467,14 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/doctor/doctorFix.ts:158:1",
+      "siteId": "src/doctor/doctorFix.ts:160:1",
       "path": "src/doctor/doctorFix.ts",
-      "line": 158,
+      "line": 160,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
-      "source": "unlinkSync(full);",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "source": "() => unlinkSync(full));",
+      "status": "gated",
+      "reason": "The STALE_CACHE fix performs each unlink inside a fresh withDeletionGate callback using the trusted runDoctorFix workspace and a sessionless caches target. Both local catches rethrow DeletionDenied so executeFixRule reports a FAILED action. Dry-run returns before invoking the fix. The two broken-symlink unlink routes remain deferred."
     },
     {
       "siteId": "src/enforce/actionEvidenceLogic.ts:180:1",
@@ -1113,7 +1114,17 @@
       "category": "filesystem-sync",
       "source": "target: { kind: \"caches\", before: new Date(olderThanMs).toISOString() } }, () => unlinkSync(full));",
       "status": "gated",
-      "reason": "pruneFilesOlderThan performs each unlink inside a fresh withDeletionGate callback for caches. pruneOpsCaches supplies its explicit workspace; no session identity is inferred from cache names."
+      "reason": "pruneFilesOlderThan performs each unlink inside a fresh withDeletionGate callback for caches. pruneOpsCaches supplies its explicit workspace and uses this recursive helper only for agent transform snapshots and .amc/cache, not the Studio directory. No session identity is inferred from cache names."
+    },
+    {
+      "siteId": "src/ops/maintenance/cachePrune.ts:60:1",
+      "path": "src/ops/maintenance/cachePrune.ts",
+      "line": 60,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "target: { kind: \"caches\", before: new Date(consoleCutoff).toISOString() } }, () => unlinkSync(full));",
+      "status": "gated",
+      "reason": "pruneOpsCaches uses its resolved explicit workspace and a fresh sessionless caches gate for each console snapshot unlink. This loop selects only .amc/studio/console-snapshot.json and .amc/studio/console-snapshot.json.sig, requires a file older than consoleCutoff and never recurses through other Studio files. Held or unknown targets are retained."
     },
     {
       "siteId": "src/ops/maintenance/logRotation.ts:46:1",
@@ -1133,17 +1144,17 @@
       "category": "indirect-payload-erasure",
       "source": "() => ledger.pruneEventPayloadColumns(ids, nowMs()));",
       "status": "gated",
-      "reason": "runRetention calls the protected ledger method inside a fresh withDeletionGate callback. params.workspace is trusted; ids are grouped by their workspace-local evidence session_id before payload columns are erased. The ledger module itself was not modified."
+      "reason": "runRetention calls the protected ledger method inside a fresh withDeletionGate callback. params.workspace is trusted; event IDs are grouped by their workspace-local evidence session_id and the complete SHA-256 sessionHashes for each group are supplied without truncation before payload columns are erased. The ledger module itself was not modified."
     },
     {
-      "siteId": "src/ops/retention/retentionEngine.ts:285:1",
+      "siteId": "src/ops/retention/retentionEngine.ts:286:1",
       "path": "src/ops/retention/retentionEngine.ts",
-      "line": 285,
+      "line": 286,
       "call": "unlinkSync(",
       "category": "filesystem-sync",
       "source": "unlinkSync(full);",
       "status": "gated",
-      "reason": "runRetention performs the blob unlink inside a fresh withDeletionGate callback using params.workspace. The session set comes from all workspace-local evidence rows referring to the blob; held or unknown groups are retained. An immediate transaction compares the current reference snapshot with the admitted snapshot and rechecks retention eligibility before unlinking. Changed or ineligible references and a missing file return an explicit removed: false outcome and produce an acknowledged RETENTION_BLOB_DELETE_SKIPPED audit row."
+      "reason": "runRetention performs the blob unlink inside a fresh withDeletionGate callback using params.workspace. Complete SHA-256 sessionHashes come from all workspace-local evidence rows referring to the blob, without a target hash count cap or truncation; held or unknown groups are retained. An immediate transaction compares the current reference snapshot with the admitted snapshot and rechecks retention eligibility before unlinking. Changed or ineligible references and a missing file return an explicit removed: false outcome and produce an acknowledged RETENTION_BLOB_DELETE_SKIPPED audit row."
     },
     {
       "siteId": "src/packs/packRegistry.ts:92:1",
@@ -1396,14 +1407,14 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
-      "siteId": "src/session/spill/spillLifecycle.ts:158:indirect-object",
+      "siteId": "src/session/spill/spillLifecycle.ts:159:indirect-object",
       "path": "src/session/spill/spillLifecycle.ts",
-      "line": 158,
+      "line": 159,
       "call": "removeSpillObject(",
       "category": "indirect-spill-erasure",
-      "source": "() => removeSpillObject(input.workspace, entry.ref, input.options?.root)",
+      "source": "() => removeSpillObject(input.workspace, entry.ref, input.options?.root));",
       "status": "gated",
-      "reason": "eraseSessionSpills wraps the selected effect in a fresh withDeletionGate callback using input.workspace and the inventory entry's complete authenticated sessionIds. The direct store adds a conservative broad spill gate as described in the notes."
+      "reason": "eraseSessionSpills wraps the selected effect in a fresh withDeletionGate callback using input.workspace and complete SHA-256 sessionHashes derived from the inventory entry's authenticated session IDs, without a target hash count cap or truncation. The direct store adds a conservative broad spill gate as described in the notes."
     },
     {
       "siteId": "src/session/spill/spillStore.ts:182:1",
@@ -1423,7 +1434,7 @@
       "category": "filesystem-sync",
       "source": "unlinkSync(path);",
       "status": "gated",
-      "reason": "The private removeObjectAtPath helper is called by the source-visible purge and removeSpillObject paths only inside fresh synchronous withDeletionGate callbacks. Direct-store callers use broad workspace spill scope because a locator owner cannot prove complete shared-session references; lifecycle callers also supply authenticated entry.sessionIds."
+      "reason": "The private removeObjectAtPath helper is called by the source-visible purge and removeSpillObject paths only inside fresh synchronous withDeletionGate callbacks. Direct-store callers use broad workspace spill scope because a locator owner cannot prove complete shared-session references; lifecycle callers also supply complete SHA-256 sessionHashes derived from authenticated entry.sessionIds."
     },
     {
       "siteId": "src/session/spill/spillStore.ts:264:indirect-purge-object",
