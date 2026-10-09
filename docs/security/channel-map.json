@@ -81,7 +81,7 @@
         { "path": "src/gateway/requestFieldGuard.ts", "symbol": "checkUpstreamEgress" },
         { "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts", "symbol": "governedGet" }
       ],
-      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows (reason and resolved addresses; upstreamId when an upstream is refused) and proxy rows recording the resolved addresses and the address a tunnel reached; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
+      "evidence": "Gateway NETWORK_EGRESS_BLOCKED audit rows for proxy refusals (reason and resolved addresses), UNSAFE_PROVIDER_ROUTE audit rows for refused upstreams (reason, resolved addresses, upstreamId, agentId) and proxy rows recording the resolved addresses and the address a tunnel reached; NATIVE_SHELL_EGRESS rows for every shell proxy decision; NATIVE_WEB_EGRESS rows for every web_fetch and web_search egress decision; tool evidence rows for NETWORK_EXTERNAL tools",
       "status": "enforced",
       "bypasses": [
         "networkEgressGuard applies only to tools declared NETWORK_EXTERNAL; MCP servers and extensions open sockets directly",

@@ -121,7 +121,7 @@ All LLM traffic is routed through the AMC Gateway, which:
 - Mints receipts for each event
 - Redacts secrets before storage (configurable deny patterns)
 - Seals evidence with monitor signature
-- Resolves the upstream host again for every request and connects only to an address it checked; a loopback, private, link-local or otherwise non-public address is refused (HTTP 403 and a `NETWORK_EGRESS_BLOCKED` audit event naming it) unless `gateway.yaml` opts in (the IP literal written as the baseUrl host, `allowNonPublicAddresses`, or `allowLocalhost` for 127.0.0.1 and ::1)
+- Resolves the upstream host again for every request and connects only to an address it checked; a loopback, private, link-local or otherwise non-public address is refused (HTTP 403 and an `UNSAFE_PROVIDER_ROUTE` audit event naming it, attributed to the requesting agent) unless `gateway.yaml` opts in (the IP literal written as the baseUrl host, `allowNonPublicAddresses`, or `allowLocalhost` for 127.0.0.1 and ::1). A loopback literal such as `http://127.0.0.1:8000` passes this check, but the diagnostic still reports `UNSAFE_PROVIDER_ROUTE` for every request to a 127.0.0.1, localhost or [::1] upstream unless `allowLocalhost: true` is set. A host that does not resolve is a transport failure (HTTP 502 and a `request_error` gateway event, no audit)
 
 ### Proxy Mode (Egress Control)
 
@@ -176,7 +176,8 @@ AMC automatically detects and records:
 | UNSIGNED_FLEET_CONFIG | Fleet config signature invalid | IntegrityIndex penalty |
 | UNSIGNED_AGENT_CONFIG | Agent config signature invalid | IntegrityIndex penalty |
 | UNSIGNED_GATEWAY_CONFIG | Gateway config signature invalid | IntegrityIndex penalty |
-| NETWORK_EGRESS_BLOCKED | Agent attempted non-allowlisted connection | Evidence of bypass attempt |
+| NETWORK_EGRESS_BLOCKED | Gateway proxy refused an agent connection (host not allowlisted, a non-public or unresolved address, or a guarded upstream) | Evidence of bypass attempt |
+| UNSAFE_PROVIDER_ROUTE | Gateway refused an upstream that resolves to a non-public address without an opt-in, or a request went to a localhost upstream without `allowLocalhost` | IntegrityIndex penalty for the requesting agent |
 | DIRECT_PROVIDER_BYPASS_SUSPECTED | Proxy saw provider host but gateway didn't log content | Caps Q5, Q7 |
 | MODEL_ROUTE_MISMATCH | Agent configured for one provider but traffic goes elsewhere | Caps Q7 |
 | TRUTH_PROTOCOL_MISSING | High-risk response lacks truth protocol sections | Caps Q14/Q26 ≤ 2 if repeated |
