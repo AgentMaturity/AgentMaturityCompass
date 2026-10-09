@@ -24,22 +24,23 @@ export const a4EvidenceRefViewSchema = z.strictObject({
   reasonCodes: z.array(nonEmpty)
 });
 
-export const a4ReadinessItemSchema = z.strictObject({
+const itemFields = {
   id: nonEmpty,
   status: z.enum(A4_ITEM_STATUSES),
   kind: z.enum(A4_BLOCKER_KINDS).nullable(),
   reasonCodes: z.array(nonEmpty),
-  /** "integrity" is a fifth, non-claim section, never a lane. */
-  section: z.enum([...A4_LANES, "governance", "integrity"]),
-  evidence: z.array(a4EvidenceRefViewSchema),
-  /** null for integrity-section items: they carry no claim kind. */
-  claim: claimEnvelopeSchema.nullable(),
   report: verifierReportSchema.nullable(),
   acknowledged: z.strictObject({ by: nonEmpty, ts: z.number().int(), expiresTs: z.number().int(), reason: nonEmpty }).nullable(),
   nextAction: nextActionSchema.nullable(),
   mandatory: z.boolean(),
   bound: z.boolean()
-});
+};
+
+export const a4ReadinessItemSchema = z.union([
+  z.strictObject({ ...itemFields, section: z.enum([...A4_LANES, "governance"]), evidence: z.array(a4EvidenceRefViewSchema), claim: claimEnvelopeSchema.nullable() }),
+  /** "integrity" is a fifth, non-claim section, never a lane: it carries no claim and no evidence ref. */
+  z.strictObject({ ...itemFields, section: z.literal("integrity"), evidence: z.array(a4EvidenceRefViewSchema).max(0), claim: z.null() })
+]);
 
 /** `amc.a4-readiness/v1`: the one evaluator's output; one claim envelope per result. */
 export const a4ReadinessV1Schema = z.strictObject({

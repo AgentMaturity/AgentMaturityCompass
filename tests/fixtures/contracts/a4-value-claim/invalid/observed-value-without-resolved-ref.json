@@ -1,0 +1,95 @@
+{
+  "schema": "amc.a4-value-claim/v1",
+  "projectId": "a4p_example",
+  "revisionNo": 4,
+  "releaseId": "a4r_example",
+  "kpiId": "deflection",
+  "label": "Tickets deflected",
+  "unit": "percent",
+  "recommended": {
+    "target": "20",
+    "source": "aspire_brief",
+    "note": "owner estimate",
+    "claimKind": "self_reported"
+  },
+  "implemented": {
+    "instrumentation": "none",
+    "contractDigest": null,
+    "claimKind": "self_reported"
+  },
+  "observed": {
+    "value": 12.5,
+    "window": {
+      "from": "2026-10-09T00:00:00.000Z",
+      "to": "2026-10-09T00:00:00.000Z"
+    },
+    "evidenceRefs": [],
+    "resolvedRefs": 0,
+    "danglingRefs": 0,
+    "claim": {
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "provenance": {
+        "producer": "a4-store",
+        "method": "human_review",
+        "evidenceRefs": []
+      },
+      "eligibleLevel": null,
+      "reasons": [
+        "SELF_REPORTED_NO_POSITIVE_STATUS",
+        "REVIEW_NOT_INDEPENDENT"
+      ]
+    }
+  },
+  "verified": {
+    "status": "not_evaluated",
+    "reviewer": null,
+    "reason": "no admitted external record",
+    "claim": {
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "provenance": {
+        "producer": "a4-store",
+        "method": "human_review",
+        "evidenceRefs": []
+      },
+      "eligibleLevel": null,
+      "reasons": [
+        "SELF_REPORTED_NO_POSITIVE_STATUS",
+        "REVIEW_NOT_INDEPENDENT"
+      ]
+    }
+  },
+  "objective": {
+    "kind": "business",
+    "statement": "fewer billing tickets",
+    "basis": "aspire brief r1"
+  },
+  "createdAt": "2026-10-09T00:00:00.000Z",
+  "envelope": {
+    "digestSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "signature": "c2lnbmF0dXJl",
+    "signedTs": 1791504000000,
+    "signer": "auditor"
+  }
+}
