@@ -13,7 +13,7 @@ const APPROVER_ROLES: UserRole[] = ["APPROVER", "OWNER"];
 const VERIFIER_ROLES: UserRole[] = ["OPERATOR", "AUDITOR", "OWNER"];
 const ATTESTER_ROLES: UserRole[] = ["AUDITOR", "OWNER"];
 const OWNER_ROLES: UserRole[] = ["OWNER"];
-/** P1-57: an A4 reviewer may request changes on a gate without being handed approval authority. */
+/** P1-57: A4 gate approve, deny and request-changes; the gate's own rolesAllowed decides who may approve. */
 const REVIEWER_ROLES: UserRole[] = ["APPROVER", "AUDITOR", "OWNER"];
 
 const SUPPORTED_METHODS = new Set(["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]);
@@ -126,7 +126,7 @@ const A4_MEMBER = /^\/api\/v1\/a4\/projects\/[^/]+\/(comments|presence)$/;
 // `retire` is not here: the creator of a never-proposed draft may retire it (retireProject enforces owner-or-creator).
 const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete)$/;
 
-/** P1-57: an A4 gate decision takes the approve class (APPROVER_PATHS holds exact paths only). */
+/** P1-57: an A4 gate decision takes the approve class with APPROVER, AUDITOR or OWNER (APPROVER_PATHS holds exact paths only). */
 export function isA4ApprovalPath(pathname: string): boolean {
   return A4_APPROVAL.test(pathname);
 }
@@ -171,11 +171,12 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     return { access: "read", roles: [...HUMAN_READ_ROLES] };
   }
 
-  if (method === "POST" && (APPROVER_PATHS.has(pathname) || isA4ApprovalPath(pathname))) {
+  if (method === "POST" && APPROVER_PATHS.has(pathname)) {
     return { access: "approve", roles: [...APPROVER_ROLES] };
   }
 
-  if (method === "POST" && isA4ReviewPath(pathname)) {
+  // An A4 gate's own rolesAllowed (recordDecision) limits AUDITOR to the action classes that admit it, as Studio's engine route.
+  if (method === "POST" && (isA4ApprovalPath(pathname) || isA4ReviewPath(pathname))) {
     return { access: "approve", roles: [...REVIEWER_ROLES] };
   }
 

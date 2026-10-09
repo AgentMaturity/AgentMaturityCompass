@@ -404,7 +404,7 @@ function lineageItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
 const ROLE_CLASSES = {
   owner: [["owner"], ["OWNER"]],
   builder: [["builder", "owner"], ["OPERATOR", "OWNER"]],
-  approver: [["approver", "owner"], ["APPROVER", "OWNER"]],
+  approver: [["approver", "owner"], ["APPROVER", "AUDITOR", "OWNER"]],
   reviewer: [["reviewer", "approver", "owner"], ["APPROVER", "AUDITOR", "OWNER"]]
 } as const satisfies Record<string, readonly [readonly string[], readonly UserRole[]]>;
 const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
