@@ -1,5 +1,7 @@
 import { createHmac, createPrivateKey, createPublicKey, sign as signEd25519, timingSafeEqual, verify as verifyEd25519 } from "node:crypto";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import type { IndustryPack } from "./industryPacks.js";
@@ -465,18 +467,26 @@ export async function activateIndustryPackAccessOnline(params: {
   verifyUrl?: string;
   fetchImpl?: typeof fetch;
 }): Promise<IndustryPackEntitlement> {
+  const explicitWorkspace = params.workspace;
+  const rawWorkspace = explicitWorkspace === undefined ? getWorkspaceScope() : explicitWorkspace;
+  const gateWorkspace = typeof rawWorkspace === "string" && rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const workspace = typeof gateWorkspace === "string" && gateWorkspace.trim() ? gateWorkspace : resolve(process.cwd());
   const key = params.licenseKey.trim();
-  const local = verifyIndustryPackLicenseKey(key);
-  if (local.valid) {
-    return activateIndustryPackAccess(params);
-  }
+  const expiresAt = params.expiresAt ?? null;
   const verifyUrl = params.verifyUrl ?? process.env.AMC_INDUSTRY_PACKS_VERIFY_URL ?? INDUSTRY_PACKS_DEFAULT_VERIFY_URL;
   const fetcher = params.fetchImpl ?? fetch;
-  const response = await fetcher(verifyUrl, {
+  const local = verifyIndustryPackLicenseKey(key);
+  if (local.valid) {
+    return activateIndustryPackAccess({ workspace, licenseKey: key, expiresAt });
+  }
+  const request: RequestInit = {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ licenseKey: key })
-  });
+    body: JSON.stringify({ licenseKey: key }),
+    redirect: "manual"
+  };
+  checkScopedEgress(gateWorkspace, "network-tool", verifyUrl, { dataClasses: null, purpose: null });
+  const response = await fetcher(verifyUrl, request);
   const payload = await response.json() as {
     valid?: boolean;
     reason?: string;
@@ -485,14 +495,13 @@ export async function activateIndustryPackAccessOnline(params: {
   if (!response.ok || payload.valid !== true) {
     throw new Error(`Invalid Industry Packs license key: ${payload.reason ?? response.statusText}.`);
   }
-  const workspace = params.workspace ?? process.cwd();
   const file = entitlementPath(workspace);
   ensureDir(join(workspace, ".amc"));
   const [, storedPayloadPart, storedSignaturePart] = key.split(".");
   const stored: StoredEntitlement = {
     active: true,
     planId: INDUSTRY_PACKS_PLAN_ID,
-    expiresAt: payload.license?.expiresAt ?? params.expiresAt ?? null,
+    expiresAt: payload.license?.expiresAt ?? expiresAt,
     licenseKeySha256: sha256Hex(Buffer.from(key, "utf8")),
     ...(storedPayloadPart && storedSignaturePart
       ? { licensePayload: storedPayloadPart, licenseSignature: storedSignaturePart }

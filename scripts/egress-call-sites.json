@@ -179,12 +179,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/domains/industryPackEntitlement.ts:475:1",
+      "siteId": "src/domains/industryPackEntitlement.ts:489:1",
       "path": "src/domains/industryPackEntitlement.ts",
-      "line": 475,
+      "line": 489,
       "call": "fetcher(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Online activation POST uses captured explicit-or-ALS scope, kept separate from the persistence cwd fallback, and checks network-tool residency immediately before same-endpoint injected fetch with manual redirects. Key and expiry are captured; license classes/purpose remain unknown. Local-valid shortcut and verifier are unchanged. Source-only; trusted injected fetch, DNS, response parsing/caps, environment drift and post-dispatch persistence limits remain."
     },
     {
       "siteId": "src/drift/alerts.ts:205:1",
