@@ -414,9 +414,14 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
   release: "owner", recordDeployment: "builder", verifyDeployment: "builder", rollback: "owner", observeHypothesis: "builder"
 };
 
-/** Per-principal permission map: role classes on live roles and membership, then the global and action-specific blockers. */
+/**
+ * Per-principal permission map: role classes on live roles and membership, then the global and action-specific blockers.
+ * `decide` covers approve and deny alike, so it carries the regulated live-identity refusal (both are refused) but not
+ * the gate's SoD exclusions: an excluded requester, author or builder may still deny, and recordDecision refuses their
+ * approval at write (400 SOD_VIOLATION; `selfApprovalAllowed` says whether self-approval is open).
+ */
 function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: readonly A4ReadinessItem[],
-  gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }): A4ReadinessV1["allowed"] {
+  gates: { direction: A4GateStatus | null; completion: A4GateStatus | null }, regulated: boolean): A4ReadinessV1["allowed"] {
   const { principal, live } = query;
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal?.key)?.roles ?? []);
   if (principal?.roles.includes("OWNER")) held.add("owner");
@@ -433,7 +438,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
     decide: [
       ...(gateList.some((gate) => gate?.status === "PENDING") ? [] : ["GATE_NOT_OPEN"]),
       ...ids((candidate) => candidate.mandatory && candidate.bound && candidate.status === "NOT_EVALUATED"), ...blocked,
-      ...ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY")
+      ...ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
+      // recordDecision's rule: a regulated project takes decisions from live-checked (users.yaml) identities only, until P2-33.
+      ...(regulated && principal?.identityCheck !== "users_yaml" ? ["IDENTITY_CHECK_LIMITED"] : [])
     ],
     progress: [
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
@@ -520,5 +527,5 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
   };
   // The attached verifier report is timestamped per read; the digest covers the evaluation, not the report.
   const digested = { ...body, items: items.map((entry) => ({ ...entry, report: null })) };
-  return { ...body, allowed: allowedFor(state, query, items, gates), evaluatedAt: new Date(now).toISOString(), fullDigest: sha256Hex(canonicalize(digested)) };
+  return { ...body, allowed: allowedFor(state, query, items, gates, regulated), evaluatedAt: new Date(now).toISOString(), fullDigest: sha256Hex(canonicalize(digested)) };
 }

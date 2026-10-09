@@ -242,7 +242,7 @@ export function livePrincipal(store: A4Store, call: A4Call): A4Principal {
 export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore: readonly string[] = []): void {
   const codes = (readiness.allowed[action]?.reasonCodes ?? ["UNKNOWN_ACTION"]).filter((code) => !ignore.includes(code));
   if (codes.length === 0) return;
-  const role = ["ADMIN_TOKEN_REFUSED", "PRINCIPAL_ROLE_INSUFFICIENT", "PRINCIPAL_NOT_MEMBER", "READ_ONLY_MODE"].find((code) => codes.includes(code));
+  const role = ["ADMIN_TOKEN_REFUSED", "PRINCIPAL_ROLE_INSUFFICIENT", "PRINCIPAL_NOT_MEMBER", "READ_ONLY_MODE", "IDENTITY_CHECK_LIMITED"].find((code) => codes.includes(code));
   if (role !== undefined) {
     throw fail(403, role === "PRINCIPAL_NOT_MEMBER" ? "A4_NOT_A_MEMBER" : role === "READ_ONLY_MODE" ? "NATIVE_READ_ONLY" : role, `refused: ${codes.join(", ")}`, codes);
   }
