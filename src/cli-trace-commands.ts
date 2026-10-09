@@ -6,6 +6,7 @@
 
 import type { Command } from "commander";
 import chalk from "chalk";
+import { checkScopedEgress, EgressBlocked } from "./residency/checkEgress.js";
 
 export function registerTraceCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   const trace = program
@@ -256,9 +257,18 @@ export function registerAlertCommands(program: Command, activeAgent: (p: Command
     .option("--json", "JSON output")
     .action(async (opts: { url: string; message: string; severity: string; agent?: string; json?: boolean }) => {
       try {
+        const workspace = process.cwd();
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const endpoint = opts.url;
         const payload = { source: "amc", agentId, severity: opts.severity, message: opts.message, ts: new Date().toISOString(), type: "manual_alert" };
-        const resp = await fetch(opts.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const request: RequestInit = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          redirect: "manual"
+        };
+        checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+        const resp = await fetch(endpoint, request);
         if (opts.json) {
           console.log(JSON.stringify({ sent: resp.ok, status: resp.status, payload }, null, 2));
           return;
@@ -312,20 +322,34 @@ export function registerAlertCommands(program: Command, activeAgent: (p: Command
     .description("Send a test alert to all configured destinations")
     .action(async () => {
       try {
+        const workspace = process.cwd();
         const { join } = await import("node:path");
         const { existsSync, readFileSync } = await import("node:fs");
-        const configPath = join(process.cwd(), ".amc", "alerts.json");
+        const configPath = join(workspace, ".amc", "alerts.json");
         if (!existsSync(configPath)) { console.log(chalk.yellow("No destinations configured.")); return; }
         const config = JSON.parse(readFileSync(configPath, "utf-8"));
         const payload = { source: "amc", type: "test_alert", severity: "info", message: "AMC test alert — alerting is working!", ts: new Date().toISOString() };
+        let residencyBlocked = false;
         for (const [name, url] of Object.entries(config)) {
           if (typeof url === "string" && url.startsWith("http")) {
             try {
-              const resp = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+              const endpoint = url;
+              const request: RequestInit = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+                redirect: "manual"
+              };
+              checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+              const resp = await fetch(endpoint, request);
               console.log(`  ${resp.ok ? chalk.green("✅") : chalk.red("❌")} ${name}: ${resp.status}`);
-            } catch (e: any) { console.log(`  ${chalk.red("❌")} ${name}: ${e.message}`); }
+            } catch (e: any) {
+              if (e instanceof EgressBlocked) residencyBlocked = true;
+              console.log(`  ${chalk.red("❌")} ${name}: ${e.message}`);
+            }
           }
         }
+        if (residencyBlocked) process.exitCode = 1;
       } catch (e: any) {
         console.error(chalk.red(e.message));
         process.exit(1);
@@ -340,15 +364,17 @@ export function registerAlertCommands(program: Command, activeAgent: (p: Command
     .option("--interval <seconds>", "check interval", "60")
     .action(async (opts: { agent?: string; interval: string }) => {
       try {
+        const workspace = process.cwd();
+        const agentId = opts.agent ?? activeAgent(program) ?? "default";
+        const interval = opts.interval;
+        const intervalMs = parseInt(interval, 10) * 1000;
         const { join } = await import("node:path");
         const { existsSync, readFileSync } = await import("node:fs");
         const { buildAgentTimelineData } = await import("./observability/timeline.js");
-        const agentId = opts.agent ?? activeAgent(program) ?? "default";
-        const intervalMs = parseInt(opts.interval, 10) * 1000;
-        const configPath = join(process.cwd(), ".amc", "alerts.json");
-        console.log(chalk.bold(`\n👁️  Watching ${agentId} every ${opts.interval}s — Ctrl+C to stop\n`));
+        const configPath = join(workspace, ".amc", "alerts.json");
+        console.log(chalk.bold(`\n👁️  Watching ${agentId} every ${interval}s — Ctrl+C to stop\n`));
         const check = async () => {
-          const data = buildAgentTimelineData({ workspace: process.cwd(), agentId, maxRuns: 50 });
+          const data = buildAgentTimelineData({ workspace, agentId, maxRuns: 50 });
           const critical = data.anomalies.filter(a => a.severity === "CRITICAL" || a.severity === "HIGH");
           if (critical.length > 0) {
             console.log(chalk.red(`  ⚠️  ${new Date().toISOString().slice(11, 19)} — ${critical.length} anomalies!`));
@@ -357,7 +383,20 @@ export function registerAlertCommands(program: Command, activeAgent: (p: Command
               const payload = { source: "amc", agentId, type: "anomaly_detected", severity: critical[0]!.severity.toLowerCase(), anomalies: critical.map(a => ({ type: a.type, severity: a.severity, message: a.message })), ts: new Date().toISOString() };
               for (const [name, url] of Object.entries(config)) {
                 if (typeof url === "string" && url.startsWith("http")) {
-                  try { await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); console.log(chalk.dim(`    → sent to ${name}`)); } catch {}
+                  try {
+                    const endpoint = url;
+                    const request: RequestInit = {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(payload),
+                      redirect: "manual"
+                    };
+                    checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+                    const resp = await fetch(endpoint, request);
+                    console.log(resp.ok ? chalk.dim(`    → sent to ${name}`) : chalk.red(`    ❌ ${name}: ${resp.status}`));
+                  } catch (e) {
+                    if (e instanceof EgressBlocked) console.error(chalk.red(`    ❌ ${name}: ${e.message}`));
+                  }
                 }
               }
             }
