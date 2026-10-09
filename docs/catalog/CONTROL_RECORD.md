@@ -185,7 +185,7 @@ Dimensions:
 | Result | `fail` when an admitted item violates, whatever the evidence. A violating item that was not admitted blocks a pass, and so does a contract met only by self-reported items (truth rule 3). `pass` only when applicability is `applicable` and evidence `sufficient`; otherwise `not_evaluated`. A not-applicable control never passes. |
 | Enforcement | `advisory` when the plan runs the control's enforcement point in warn mode; `enforced at <point>` only on admitted allow or deny records from that point's producer under the plan's policy digest; `observed` when items were admitted otherwise; else `none`. |
 | Review | `pending` unless a review from the approval engine names this result's digest: `rejected` wins, then `approved`, which is `expired` after `expiresAt`. |
-| Claim kind | `synthetic_example` when an admitted item's producer is synthetic; `observed` only when every admitted item derives OBSERVED or OBSERVED_HARDENED; otherwise `self_reported`. Never `independently_reviewed` here. |
+| Claim kind | `synthetic_example` when an admitted item's producer is synthetic; `observed` only when the control's evidence is sufficient and every admitted item derives OBSERVED or OBSERVED_HARDENED; incomplete, stale or contradictory evidence, and anything else, reads `self_reported`. Never `independently_reviewed` here. |
 
 Compliance mappings (`.amc/compliance-maps.yaml`) run through the same evaluator, one control per requirement
 (`src/catalog/evidence/mappingAdapter.ts`): `requires_evidence_event` admits control-bound ledger records from
