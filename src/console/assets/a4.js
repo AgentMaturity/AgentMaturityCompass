@@ -141,7 +141,7 @@ async function renderListPage() {
 
 function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
-  const state = { project: null, readiness: null, gates: [], revision: null, comments: [], members: null, diff: null, options };
+  const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
   let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
@@ -168,9 +168,9 @@ function mountProject(projectId, options) {
   const detailsKey = (details) => `${details.closest("[data-card]")?.dataset.card ?? "page"}:${details.dataset.a4Open}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
-  // Answers are the head revision's only when that revision was recorded at the viewed stage, as Studio's own Ask reads
-  // them: a completed stage's revision stays the head after the next stage opens. A revision naming no stage shows none.
-  const shownAnswers = () => (state.revision?.stage === stage ? listOf(state.revision?.spec?.answers, "answers") : []);
+  // Answers come from the newest revision recorded at the viewed stage, the revision Studio's own Ask merges into: after
+  // the next stage opens, or after a reopen, that is not the head revision. A stage with no revision shows none.
+  const shownAnswers = () => listOf(state.stageRevision?.spec?.answers, "answers");
   const answerDrift = () => [...answerStarts].some(([id, start]) => view.answerText(shownAnswers(), id) !== start);
   const dropAnswerDrafts = (card) => {
     for (const id of answerStarts.keys()) drafts.delete(`${card}:${id}`);
@@ -244,7 +244,7 @@ function mountProject(projectId, options) {
     const project = one(await apiNativeRequest(projectPath("")), "project");
     const viewStage = view.STAGES.includes(params.get("stage")) ? params.get("stage")
       : view.STAGES.includes(project.stage) ? project.stage : "activate";
-    const [readiness, gates, revision, comments, members, diff] = await Promise.all([
+    const [readiness, gates, revision, comments, members, diff, revisions] = await Promise.all([
       apiNativeRequest(projectPath(`/readiness?stage=${viewStage}`)).then((data) => one(data, "readiness")),
       apiNativeRequest(projectPath("/gates")).then((data) => listOf(data, "gates")),
       project.revisionNo > 0 ? apiNativeRequest(projectPath(`/revisions/${project.revisionNo}`)).then((data) => one(data, "revision")) : null,
@@ -252,9 +252,16 @@ function mountProject(projectId, options) {
       apiNativeRequest(projectPath("/members")).catch((error) => ({ error: errorText(error) })),
       project.revisionNo > 1
         ? apiNativeRequest(projectPath(`/revisions/diff?from=${project.revisionNo - 1}&to=${project.revisionNo}`)).catch((error) => ({ error: errorText(error) }))
-        : null
+        : null,
+      apiNativeRequest(projectPath("/revisions")).then((data) => listOf(data, "revisions"))
     ]);
-    return { project, readiness, gates, revision, comments, members, diff, stage: viewStage };
+    // A revision past the head read above landed between the reads; the next load shows it.
+    const atStage = revisions.filter((row) => row.stage === viewStage && Number.isSafeInteger(row.revisionNo) && row.revisionNo <= project.revisionNo)
+      .map((row) => row.revisionNo);
+    const stageNo = atStage.length > 0 ? Math.max(...atStage) : null;
+    const stageRevision = stageNo === null ? null : stageNo === revision?.revisionNo ? revision
+      : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}`)), "revision");
+    return { project, readiness, gates, revision, stageRevision, comments, members, diff, stage: viewStage };
   }
 
   function render() {

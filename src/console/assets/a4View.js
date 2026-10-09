@@ -182,7 +182,9 @@ export function renderSpecEditor(ctx) {
       ${revision ? `This is r${esc(revision.revisionNo)}${revision.stage ? `, a ${esc(stageTitle(revision.stage))} specification` : ""}, shown read-only.` : "No specification yet."}
       Propose from the ${esc(stageTitle(project.stage))} view.</p>${revision ? studioJson(revision.spec ?? {}) : ""}`;
   }
-  const seeded = revision && revision.stage !== stage ? ` No ${esc(stageTitle(stage))} specification yet: the editor starts from
+  // After a reopen the stage has its own, older revision; the editor still starts from the head revision.
+  const seeded = revision && revision.stage !== stage ? ` ${ctx.stageRevision ? `The newest ${esc(stageTitle(stage))} specification is
+    r${esc(ctx.stageRevision.revisionNo)};` : `No ${esc(stageTitle(stage))} specification yet:`} the editor starts from the head revision
     r${esc(revision.revisionNo)}, ${revision.stage ? `the ${esc(stageTitle(revision.stage))} specification` : "whose stage Studio did not name"}.` : "";
   return `<p class="muted">Editing after Propose creates a new revision${revision ? ` (current r${esc(revision.revisionNo)},
     spec <code>${esc(revision.specDigest)}</code>)` : ""}.${seeded} ${RETAINED}</p>
