@@ -92,11 +92,15 @@ notice?.addEventListener("click", (event) => {
 /** The head a transition response names (its seq, or a head it returns); null when Studio named none. */
 const headSeqOf = (data) => [data?.seq, data?.headSeq, data?.head?.headSeq, data?.project?.headSeq].find(Number.isSafeInteger) ?? null;
 
+/**
+ * The preview gate: null only for the gate's own refusal, or for a 404 that carries no code (a Studio without the A4
+ * router, where the preview cannot be on). A4_ROUTE_NOT_FOUND and every other error is an error, not "not enabled".
+ */
 async function previewOptions() {
   try {
     return await apiNativeRequest(`${API}/options`);
   } catch (error) {
-    if (error?.status === 404 || error?.code === "A4_PREVIEW_DISABLED") return null;
+    if (error?.code === "A4_PREVIEW_DISABLED" || (error?.status === 404 && error?.code === "HTTP_ERROR")) return null;
     throw error;
   }
 }
