@@ -137,6 +137,12 @@ const fullIntegrity = (store: A4Store, projectId: string): A4LiveFacts["integrit
   const report = verifyA4Chain(store.ledger, projectId);
   return { valid: report.integrity.status === "pass", problems: report.integrity.errors, report };
 };
+/**
+ * A `fullIntegrity` call with its verifier report computed once, here, outside the project lock and the ledger
+ * transaction (design §7 rule 2), so neither plan run repeats it. The store commits only on the head it pins.
+ */
+export const withFullIntegrity = (store: A4Store, projectId: string, call: A4Call): A4Call =>
+  call.fullIntegrity === true && call.integrity === undefined ? { ...call, integrity: fullIntegrity(store, projectId) } : call;
 
 const vaultUnlocked = (workspace: string): boolean | null => {
   try {
@@ -490,9 +496,7 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
-  // The full verifier runs once, here, outside the project lock and the ledger transaction (design §7 rule 2); both plan
-  // runs read this report. The store commits only on expectedHeadSeq and its in-transaction check sees no new row.
-  const call: A4Call = input.fullIntegrity === true && input.integrity === undefined ? { ...input, integrity: fullIntegrity(store, projectId) } : input;
+  const call = withFullIntegrity(store, projectId, input);
   return governed(store, projectId, principal, input, (ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);

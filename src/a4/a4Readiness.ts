@@ -19,7 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ResolvedRef } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
+  A4_BOUND_ITEMS, A4_STAGES, deriveSelfApprovalAllowed, gatePolicyFloorViolations, gateSupersededBy, ratchetedFromChain, type A4_BLOCKER_KINDS,
   type A4ChainLink, type A4GatePolicyV1, type A4Member, type A4Principal, type A4ProjectRow, type A4ReadinessV1, type A4Stage,
   type a4DecisionRowSchema, type a4EffectRowSchema, type a4GateRowSchema, type a4ReadinessItemSchema, type a4RevisionRowSchema
 } from "./a4Schema.js";
@@ -297,15 +297,34 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
   return items;
 }
 
-/** A failed effect blocks the step until retried or re-opened; a running one keeps the project waiting (BUILD_RUNNING). */
+const EFFECT_KINDS = new Set(["EFFECT_STARTED", "EFFECT_FINISHED", "EFFECT_FAILED"]);
+/** The stages a REOPEN or TUNE (back to its target and later) or a REVISION (its own stage) sends back through their gates. */
+function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) | null {
+  if (link.kind === "REVISION") return (stage) => stage === link.body.stage;
+  if (link.kind !== "REOPEN" && link.kind !== "TUNE") return null;
+  const to = A4_STAGES.indexOf((link.body.headAfter as { stage?: unknown } | undefined)?.stage as A4Stage);
+  return (stage) => to >= 0 && A4_STAGES.indexOf(stage as A4Stage) >= to;
+}
+
+/**
+ * A failed effect blocks until it is retried or re-run, or its stage is redone; a running one keeps the project waiting
+ * (BUILD_RUNNING). A later REOPEN or TUNE back to the effect's stage or earlier, or a new revision of that stage, clears
+ * a settled outcome: that stage's gates, and so its effect, must complete again (design §6.5: a second failure requires
+ * a new revision). A revision of a later stage clears nothing, and a running attempt is never cleared.
+ */
 function effectsItem(state: A4ReadinessState): A4ReadinessItem {
-  const settled = new Map<string, string>();
+  const latest = new Map<string, A4ChainLink>();
   for (const link of state.chain) {
-    if (["EFFECT_STARTED", "EFFECT_FINISHED", "EFFECT_FAILED"].includes(link.kind) && typeof link.body.executionId === "string") {
-      if (settled.get(link.body.executionId) !== "EFFECT_FINISHED") settled.set(link.body.executionId, link.kind);
+    const executionId = link.body.executionId;
+    if (EFFECT_KINDS.has(link.kind) && typeof executionId === "string") {
+      if (latest.get(executionId)?.kind !== "EFFECT_FINISHED") latest.set(executionId, link);
+      continue;
     }
+    const redone = redoneStages(link);
+    if (redone === null) continue;
+    for (const [executionId, outcome] of latest) if (outcome.kind !== "EFFECT_STARTED" && redone(outcome.body.stage)) latest.delete(executionId);
   }
-  const states = [...settled.values()];
+  const states = [...latest.values()].map((link) => link.kind);
   if (states.includes("EFFECT_FAILED")) return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED"] });
   if (states.includes("EFFECT_STARTED")) return item("effects.failed", "WAITING", { kind: "outcome_unknown", reasonCodes: ["BUILD_RUNNING"] });
   return item("effects.failed", "READY");
