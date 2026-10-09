@@ -457,7 +457,8 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
 /**
  * Retry (owner; design §6.5): only for effects A4 consumes, and only when the chain has a failure and no finish for
  * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
- * consumed, was consumed by this execution id. A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
+ * consumed, was consumed by this execution id; one not consumed yet is verified as at `complete` (verifyAndConsumeEffect:
+ * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
  * failure whose stage was redone since its attempt started is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
  * id; executors that consume their own grant re-open the effect gate instead, and `complete` on the consumed gate runs
  * them again (`rerunExecutorEffect`).
@@ -492,8 +493,13 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     assertNotRedone(state, row.stage, failures.at(-1));
     const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
     if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The engine grant was consumed by another execution.");
-    const { readiness } = evaluateFor(store, state, principal, input, row.stage, now);
+    const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "retryEffect");
+    // Lost before step 0, the grant is still unconsumed and step 0 will consume it (markApprovalConsumed checks no status
+    // or expiry), so it is verified as `complete` verified it: status and expiry, intent, live approvers, membership, SoD.
+    if (consumed === null) {
+      verifyAndConsumeEffect(store, state, { def, gate: row, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, query.floor) });
+    }
     return { readiness, specs: { kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
       payload: { effectId: nextAttempt, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId, retryOf: input.attemptId,
         ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
