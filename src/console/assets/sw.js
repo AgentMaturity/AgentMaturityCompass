@@ -16,6 +16,8 @@ function staticAssets() {
     assetPath(""),
     assetPath("home"),
     assetPath("native-tasks"),
+    assetPath("a4"),
+    assetPath("a4Project"),
     assetPath("login"),
     assetPath("agent"),
     assetPath("evidence"),

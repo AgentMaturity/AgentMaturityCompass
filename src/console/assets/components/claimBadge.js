@@ -23,7 +23,7 @@ const LEGEND = [
   ]]
 ];
 
-export const LEGEND_PAGES = new Set(["home", "transparency", "compliance", "assurance", "passport", "industrypacks"]);
+export const LEGEND_PAGES = new Set(["home", "transparency", "compliance", "assurance", "passport", "industrypacks", "a4", "a4Project"]);
 export const CLAIM_PAGES = new Set([...LEGEND_PAGES, "agent", "compass", "diagnosticView", "evidenceDrilldown", "trust",
   "assuranceRun", "assuranceCert", "standard", "benchmarks", "benchCompare", "benchPortfolio", "benchRegistry", "compare",
   "forecast", "forecastAgent", "forecastNode", "portfolioForecast", "org", "outcomes", "value", "valueAgent", "valueKpis",
