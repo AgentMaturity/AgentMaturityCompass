@@ -389,9 +389,12 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   const ids = (predicate: (candidate: A4ReadinessItem) => boolean): string[] => items.filter(predicate).map((candidate) => candidate.id);
   const nonGate = (candidate: A4ReadinessItem): boolean => candidate.mandatory && !GATE_DERIVED.has(candidate.id);
   const blocked = ids((candidate) => nonGate(candidate) && candidate.status === "BLOCKED");
+  // Bound items that settle on their own, with no superseding transition (an effect finishing, the notary retry window):
+  // a gate bound while they wait would go stale on every decision while still reading PENDING, so it waits for them.
+  const transient = ids((candidate) => (candidate.id === "effects.failed" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY");
   const gateList = [gates.direction, gates.completion];
   const specific: Partial<Record<A4Action, string[]>> = {
-    requestGate: blocked,
+    requestGate: [...blocked, ...transient],
     decide: [
       ...(gateList.some((gate) => gate?.status === "PENDING") ? [] : ["GATE_NOT_OPEN"]),
       ...ids((candidate) => candidate.mandatory && candidate.bound && candidate.status === "NOT_EVALUATED"), ...blocked,
