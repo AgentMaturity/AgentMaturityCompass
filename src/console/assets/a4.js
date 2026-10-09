@@ -24,6 +24,10 @@ const one = (data, key) => (isObject(data?.[key]) ? data[key] : data);
 for (const register of [registerAspire, registerAssemble, registerAdapt, registerActivate]) register();
 
 let me = null;
+// The labelled claims the responses of the page load in flight carried, and the strip's "show these instead" hook: the
+// strip shows a load's claims only once that load has rendered, so it never mixes a superseded load's labels in.
+let claimSink = null;
+let showClaims = () => {};
 let pending = null; // the unconfirmed mutation; a retry repeats its clientRequestId so Studio returns the recorded result
 let busy = false; // one write in flight at a time, so a double click cannot mint a second, non-deduplicable request id
 
@@ -110,7 +114,10 @@ async function showHomeEntry() {
 }
 
 async function renderListPage() {
+  claimSink = [];
   const projects = listOf(await apiNativeRequest(`${API}/projects`), "projects");
+  showClaims(claimSink);
+  claimSink = null;
   root.innerHTML = `${view.renderCreateForm(params.has("new") || projects.length === 0)}${view.renderProjectList(projects)}`;
   root.querySelector("#a4CreateForm").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -125,10 +132,11 @@ async function renderListPage() {
   });
 }
 
-function mountProject(projectId, options, strip) {
+function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
   const state = { project: null, readiness: null, gates: [], revision: null, comments: [], members: null, diff: null, options };
-  let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null, generation = 0;
+  let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
+  let loading = null, loadAgain = false;
   let presence = [], presenceError = "", conflict = null, specBase = null;
   // The gate and readiness digest the approvals bar first showed. Polls re-render the bar, so a decision binds these,
   // never whatever the newest poll loaded; a change disables deciding until the user shows the new gate.
@@ -162,14 +170,35 @@ function mountProject(projectId, options, strip) {
     return reviewed;
   };
 
-  async function load() {
-    const mine = ++generation;
-    strip?.reset(); // the strip shows only the claims this load returns
+  /**
+   * One load at a time (polls, actions and conflicts all ask for one): a load asked for while one runs makes that load
+   * run once more, so every caller's await ends after a load that began after its call.
+   */
+  function load() {
+    if (loading) {
+      loadAgain = true;
+      return loading;
+    }
+    loading = (async () => {
+      try {
+        do {
+          loadAgain = false;
+          await loadOnce();
+        } while (loadAgain);
+      } finally {
+        loading = null;
+        claimSink = null;
+      }
+    })();
+    return loading;
+  }
+
+  async function loadOnce() {
     // The reads are separate requests: a write landing between them (a new revision and its gate) would show one
     // revision's gate under another revision's specification. Read again until they agree, three times at most.
     for (let attempt = 1; ; attempt += 1) {
+      claimSink = [];
       const read = await readProject();
-      if (mine !== generation) return;
       if (view.oneRevision(read.project, read.revision, read.gates, read.readiness)) {
         Object.assign(state, read);
         stage = read.stage;
@@ -180,6 +209,7 @@ function mountProject(projectId, options, strip) {
     const shown = shownReview();
     if (reviewed === null && view.boundReview(shown)) reviewed = shown;
     render();
+    showClaims(claimSink); // a failed load leaves the previous load's labels beside the previous load's content
   }
 
   async function readProject() {
@@ -483,17 +513,20 @@ async function main() {
   document.getElementById("a4NavLink")?.removeAttribute("hidden");
   // The strip prints claimLabel verbatim. A bare envelope (a readiness item's `claim`) carries no server label, so it
   // stays off the strip rather than being shown with a result word the page would have to supply.
-  const strip = installClaimStrip(page, (listener) => onClaims((claims) => {
-    const labelled = claims.filter((claim) => typeof claim?.claimLabel === "string");
-    if (labelled.length > 0) listener(labelled);
-  }));
+  let deliver = null;
+  const strip = installClaimStrip(page, (listener) => { deliver = listener; });
+  onClaims((claims) => claimSink?.push(...claims.filter((claim) => typeof claim?.claimLabel === "string")));
+  showClaims = (claims) => {
+    strip?.reset();
+    if (claims.length > 0) deliver?.(claims);
+  };
   if (page === "a4") return renderListPage();
   const projectId = params.get("project");
   if (!projectId) {
     root.innerHTML = `<section class="card"><p>Choose a project from <a href="./a4">agent projects</a>.</p></section>`;
     return;
   }
-  return mountProject(projectId, options, strip);
+  return mountProject(projectId, options);
 }
 
 main().catch(showError);
