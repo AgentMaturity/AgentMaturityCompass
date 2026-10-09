@@ -623,9 +623,10 @@ export function tuneProject(store: A4Store, projectId: string, input: A4Call & {
   }, "a4 tune");
 }
 
+const PRE_PROPOSAL_STEPS = new Set(["asked", "understood", "explained"]);
 /**
  * RETIRE (owner; or the creator of a project that never reached `proposed`, so an abandoned draft never holds the agent's
- * slot). Refused while an effect is running unless an owner acceptance note is recorded.
+ * slot, answers or not). Refused while an effect is running unless an owner acceptance note is recorded.
  */
 export function retireProject(store: A4Store, projectId: string, input: A4Call & { reason: string; acceptanceNote?: string; expectedHeadSeq: number }): A4TransitionResult {
   const principal = livePrincipal(store, input);
@@ -635,7 +636,10 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
     const state = load(now);
     if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
     const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
-    const draftCreator = state.project.created_by_key === principal.key && !state.chain.some((link) => link.kind === "REVISION");
+    // "Never reached proposed" from the signed head states (an answers REVISION keeps the step before proposed), and the
+    // creator from the signed CREATED body, never the unsigned head row.
+    const draftCreator = state.chain[0]?.kind === "CREATED" && state.chain[0].body.actorKey === principal.key
+      && state.chain.every((link) => PRE_PROPOSAL_STEPS.has(String((link.body.headAfter as { step?: unknown } | undefined)?.step)));
     assertAllowed(readiness, "retire", draftCreator ? ["PRINCIPAL_ROLE_INSUFFICIENT"] : []);
     if (state.effects.some((effect) => effect.state === "running") && !input.acceptanceNote?.trim()) {
       throw fail(409, "OUTCOME_UNKNOWN_OPEN", "An effect is still running; record an owner acceptance note to retire anyway.");
