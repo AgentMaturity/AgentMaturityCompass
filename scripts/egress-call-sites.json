@@ -555,12 +555,12 @@
       "reason": "The executor checks trusted workspace or ALS scope before socket construction; both AMC callers supply workspace. Preflight denials are definite failures, not unknown effects."
     },
     {
-      "siteId": "src/tools/builtin/nativeToolBreadth/governedFetch.ts:144:1",
+      "siteId": "src/tools/builtin/nativeToolBreadth/governedFetch.ts:152:1",
       "path": "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
-      "line": 144,
+      "line": 152,
       "call": "send(",
-      "status": "deferred",
-      "reason": "Native pipeline guard checks residency before body dispatch, but this DNS-awaiting transport needs a final-hop recheck and direct-call review."
+      "status": "gated",
+      "reason": "Native web_fetch and each web_search GET carry captured execution workspace/agent and authorization resource facts. checkScopedEgress rechecks after DNS/allowlist admission immediately before the pinned socket. Existing no-redirect, fixed-header and byte-cap constraints remain. Legacy direct-helper scope follows the conservative scoped fallback; a search refusal can follow earlier dispatched GETs, so composition uncertainty is retained. Source-only, not physical-region or legal approval evidence."
     },
     {
       "siteId": "src/trust/trustConfig.ts:193:1",

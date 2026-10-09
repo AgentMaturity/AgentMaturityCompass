@@ -3,7 +3,10 @@ import { lookup } from "node:dns/promises";
 import { request as httpRequest, type IncomingMessage } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { isIP, type LookupFunction } from "node:net";
+import { resolve as resolvePath } from "node:path";
 import { canonicalHost, decideEgress } from "../../../enforce/egressAllowlist.js";
+import { getWorkspaceScope } from "../../../enforce/evidenceEmitter.js";
+import { checkScopedEgress } from "../../../residency/checkEgress.js";
 import { redactSecrets } from "../../../shield/redaction/redactSecrets.js";
 import { NativeToolRefusal, type OriginPolicy } from "./originPolicy.js";
 
@@ -68,6 +71,11 @@ export interface GovernedGetInput {
   readonly resolve?: ResolveHost;
   readonly signal?: AbortSignal;
   readonly timeoutMs?: number;
+  /** Trusted execution context; omitted legacy callers retain scoped-helper fallback. */
+  readonly workspace?: string;
+  readonly agentId?: string;
+  readonly dataClasses?: readonly string[] | null;
+  readonly purpose?: string | null;
 }
 
 /** Parse and check a destination against the signed origins without touching the network. */
@@ -157,10 +165,16 @@ function pinnedGet(tool: string, url: URL, address: string, maxBytes: number, si
 }
 
 export async function governedGet(input: GovernedGetInput): Promise<GovernedResponse> {
+  const workspace = input.workspace ?? getWorkspaceScope();
+  input = { ...input, workspace: workspace === undefined || !workspace.trim() ? workspace : resolvePath(workspace),
+    dataClasses: Array.isArray(input.dataClasses) ? [...input.dataClasses] : null, purpose: input.purpose ?? null,
+    policy: { ...input.policy, origins: new Set(input.policy.origins), hosts: [...input.policy.hosts] } };
   const url = admitUrl(input.tool, input.url, input.policy);
   const address = await admitEgress(input, url);
   const timeout = AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   const signal = input.signal ? AbortSignal.any([input.signal, timeout]) : timeout;
+  checkScopedEgress(input.workspace, "network-tool", url.href,
+    { agentId: input.agentId, dataClasses: input.dataClasses, purpose: input.purpose });
   const response = await pinnedGet(input.tool, url, address, input.maxBytes, signal);
   return { url: url.href, origin: url.origin, address, ...response };
 }
