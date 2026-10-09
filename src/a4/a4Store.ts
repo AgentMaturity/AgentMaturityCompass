@@ -35,7 +35,7 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { principalPopulation } from "./a4Identity.js";
 import {
-  A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
+  A4_ENVELOPE_KINDS, A4_STAGE_STATES, DEFAULT_A4_GATE_POLICY, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema, a4RevisionRowSchema,
   a4TransitionRowSchema, deriveSelfApprovalAllowed, laneForClaimKind, ratchetedFromChain, type A4ChainLink, type A4GatePolicyV1,
   type A4Member, type A4Principal, type A4ProjectRow, type A4RefKind, type A4ResourceDigests, type A4Stage, type A4TransitionKind,
   type A4TransitionRow, a4ResourceDigestsSchema
@@ -171,9 +171,9 @@ export function collectLiveFacts(workspace: string, project: Pick<A4ProjectRow, 
   return { ...principalPopulation(workspace), hostedRouter: options.hostedRouter, ...refreshVolatileFacts(workspace, project) };
 }
 
-/** The in-force gate policy's digest: the latest GATE_POLICY_CHANGED payload, else CREATED's (design §4.4). */
+/** The in-force gate policy's digest: the latest GATE_POLICY_CHANGED payload, else the seq-0 CREATED's (design §4.4). */
 export function gatePolicyDigestOf(chain: readonly A4ChainLink[]): string | null {
-  const source = [...chain].sort((a, b) => b.seq - a.seq).find((link) => link.kind === "GATE_POLICY_CHANGED" || link.kind === "CREATED");
+  const source = [...chain].sort((a, b) => b.seq - a.seq).find((link) => link.kind === "GATE_POLICY_CHANGED" || (link.kind === "CREATED" && link.seq === 0));
   return source?.body.gatePolicy === undefined ? null : sha256Hex(canonicalize(source.body.gatePolicy));
 }
 
@@ -424,8 +424,14 @@ function createStore(workspace: string, ledger: Ledger) {
         const ts = Date.now();
         const seq = head0 === null ? 0 : head0.head_seq + 1;
         const spec = build({ head: head0, seq, ts });
+        if ((spec.kind === "CREATED") !== (create !== null)) throw new Error("CREATED is a project's first transition and only that");
         for (const key of Object.keys(spec.payload)) if (RESERVED_BODY_KEYS.has(key)) throw new Error(`A4 payload may not set ${key}`);
+        if ((spec.kind === "CREATED" || spec.kind === "GATE_POLICY_CHANGED") && !a4GatePolicyV1Schema.safeParse(spec.payload.gatePolicy).success) {
+          throw new A4StoreError(400, "INPUT_INVALID", "The gate policy is not an amc.a4-gate-policy/v1 document.");
+        }
         const sideRows = spec.sideRows ?? [];
+        // The store is the completeness root: a row filed under another project would break both projects' counts for good.
+        for (const row of sideRows) if (row.values.project_id !== projectId) throw new Error(`A4 side row in ${row.table} names another project`);
         const stage = spec.stage !== undefined ? spec.stage : head0?.stage ?? "aspire";
         const revisionNo = spec.revisionNo ?? head0?.revision_no ?? 0;
         const readinessSha256 = options.readiness ? options.readiness(db, projectId) : null;
