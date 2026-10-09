@@ -3,8 +3,9 @@
  * project's control-file lock, build the transition body on a pre-read head and sign any A4_RECORD envelope OUTSIDE
  * the ledger transaction; then, in one `BEGIN IMMEDIATE`, dedupe the request, check the head has not moved (else
  * rebuild and re-sign once, then 409 A4_STALE_HEAD), verify the chain (`verifyIncremental`), append the signed audit
- * row, insert the transition and the side rows its body names, and advance the head. Readers (`readChain`, `membersOf`,
- * `readRevision`, `ratcheted`) use only a chain that verifies whole up to its signed head.
+ * row, insert the transition and the side rows its body names, and advance the head. Readers (`readHead`,
+ * `listProjects`, `readChain`, `membersOf`, `readRevision`, `ratcheted`) use only a chain that verifies whole up to its
+ * signed head.
  *
  * Every row this store writes is `meta.source: "a4-store"`, `trustTier: "SELF_REPORTED"`, `claimKind: "self_reported"`;
  * there is no producer parameter and no path to OBSERVED. Observed facts enter only by reference (src/a4/a4Evidence.ts).
@@ -299,13 +300,13 @@ function createStore(workspace: string, ledger: Ledger) {
    * signed row together with the head fails on the next transition's ledger session, and transitions or a seq-0
    * session without a head row fail rather than read as an empty project.
    */
-  const readChain = (projectId: string): Link[] => db.transaction((): Link[] => {
+  const verified = (projectId: string): { head: A4ProjectRow | null; links: Link[] } => db.transaction(() => {
     const head = readHeadRow(projectId);
     if (head === null) {
       if (db.prepare("SELECT 1 FROM a4_transitions WHERE project_id = ? LIMIT 1").get(projectId) !== undefined || auditSessionExists(projectId, 0)) {
         throw integrityFailed(projectId, ["transitions exist without a head"]);
       }
-      return [];
+      return { head: null, links: [] };
     }
     const problems: string[] = [];
     if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
@@ -318,8 +319,9 @@ function createStore(workspace: string, ledger: Ledger) {
       problems.push(...auditProblems(last.row, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, last.body));
     }
     if (problems.length > 0) throw integrityFailed(projectId, problems);
-    return links;
+    return { head, links };
   })();
+  const readChain = (projectId: string): Link[] => verified(projectId).links;
 
   /** sha256 of the project's key.pub as its verified CREATED transition records it. */
   const createdKeySha256 = (projectId: string): string => {
@@ -547,7 +549,8 @@ function createStore(workspace: string, ledger: Ledger) {
   return {
     workspace,
     ledger,
-    readHead: readHeadRow,
+    /** The head row, only once the chain verifies up to it (its digest and signed headAfter); else A4_INTEGRITY_FAILED. */
+    readHead: (projectId: string): A4ProjectRow | null => verified(projectId).head,
     readChain,
     membersOf,
     verifyIncremental,
@@ -556,8 +559,9 @@ function createStore(workspace: string, ledger: Ledger) {
       const row = namedSideRows(projectId, "a4_revisions").find((candidate) => candidate.revision_no === revisionNo);
       return row === undefined ? null : a4RevisionRowSchema.parse(row);
     },
-    listProjects: (): A4ProjectRow[] => (db.prepare("SELECT * FROM a4_projects WHERE workspace_id = ? ORDER BY created_ts")
-      .all(workspaceId) as unknown[]).map((row) => a4ProjectRowSchema.parse(row)),
+    /** Every project's verified head, in one snapshot; one that does not verify fails the list with A4_INTEGRITY_FAILED. */
+    listProjects: (): A4ProjectRow[] => db.transaction(() => (db.prepare("SELECT project_id FROM a4_projects WHERE workspace_id = ? ORDER BY created_ts")
+      .all(workspaceId) as Array<{ project_id: string }>).map((row) => verified(row.project_id).head!))(),
 
     /**
      * Refused without a signed approval policy. CREATED carries the default gate policy, the derived single-user
