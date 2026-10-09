@@ -198,9 +198,14 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
       return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
         : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
     }
-    const projects = db.prepare("SELECT project_id FROM a4_projects ORDER BY created_ts").all() as Array<{ project_id: string }>;
+    // Every project any A4 row or audit session names, not only those with a head: a deleted head row (or project) must
+    // fail as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never read as a smaller passing set. Sessions are `a4-<projectId>-<seq>`.
+    const named = db.prepare(`SELECT project_id AS id FROM a4_projects UNION SELECT project_id FROM a4_transitions
+      UNION SELECT substr(session_id, 4, 36) FROM sessions WHERE session_id GLOB 'a4-a4p_*'
+      UNION SELECT substr(session_id, 4, 36) FROM evidence_events WHERE session_id GLOB 'a4-a4p_*'`).all() as Array<{ id: string }>;
+    const projects = named.map((row) => row.id).filter((id) => /^a4p_[0-9a-f]{32}$/.test(id)).sort();
     if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
-    return projects.map(({ project_id: projectId }) => {
+    return projects.map((projectId) => {
       const report = verifyA4Chain(ledger, projectId, trust);
       const failed = report.integrity.status === "fail";
       return { status: failed ? "FAIL" : "PASS", details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
