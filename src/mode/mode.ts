@@ -138,7 +138,24 @@ export function assertOwnerMode(workspace: string, commandPath: string): void {
     "identity init",
     "identity provider add",
     "identity mapping add",
-    "scim token create"
+    "scim token create",
+    // A4 Forge owner-gated leaves (P0-54). The CLI commands land with P1-65; A4 owner actions pass these paths themselves.
+    "a4 approve",
+    "a4 complete",
+    "a4 deny",
+    "a4 deploy record",
+    "a4 deploy verify",
+    "a4 export",
+    "a4 gate-policy",
+    "a4 hold",
+    "a4 members",
+    "a4 release",
+    "a4 reopen",
+    "a4 request-changes",
+    "a4 resume",
+    "a4 retire",
+    "a4 rollback",
+    "a4 tune"
   ]);
   if (blocked.has(commandPath)) {
     throw new Error(`Command '${commandPath}' is blocked in agent mode. Switch to owner mode with: amc mode owner`);
