@@ -137,8 +137,8 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     ?? createApprovalForIntent({ workspace: store.workspace, agentId: state0.project.agent_id, intentId: `a4-${projectId}-${def.id}-${gate0.gate_id}`,
       toolName: def.toolName, actionClass: def.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: engineRiskTier(state0),
       intentPayload, quorumFloor }).approval.approvalRequestId;
-  return governed(store, projectId, principal, input, () => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (_ts, load) => {
+    const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "openEffect");
@@ -359,8 +359,8 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
   // retry rule sees its failure; the head the client saw moves by exactly those rows (anything else is still stale).
   const executionId0 = String(startedLink(store.readChain(projectId), input.attemptId).body.executionId);
   const swept = sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: executionId0 }).length;
-  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts) => {
-    const state = loadA4State(store, projectId, now);
+  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts, load) => {
+    const state = load(now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));
     const executionId = String(started.body.executionId);

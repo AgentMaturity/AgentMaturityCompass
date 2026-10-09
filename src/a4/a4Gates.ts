@@ -226,26 +226,33 @@ export function refuseOnFreeze(store: A4Store, projectId: string): void {
   throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent; the project is held until it is lifted and an owner resumes.");
 }
 
-type Plan = (ts: number) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | readonly A4ChangeSpec[] };
+/** A governed write's plan; it reads the project only through `load`, which `governed` fills once per attempt. */
+type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | readonly A4ChangeSpec[] };
 
 /**
  * One governed write (design §4.3, C-26): the freeze refusal, the plan on rows read under the project lock, the store's
- * envelope signing outside the transaction, and the same plan again on the rows read inside it. The transition records
- * that evaluation's fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the
- * automatic hold; a notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
- * ponytail: the plan loads and resolves the whole project twice per write; cache the snapshot by head digest if slow.
+ * envelope signing outside the transaction, and the same plan again inside it. The transition records that evaluation's
+ * fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the automatic hold; a
+ * notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
+ * Inside the transaction the plan reuses the rows this attempt verified and resolved before it (design §7 rule 2: O(new
+ * rows) under the ledger write lock, never a chain walk): the store has just checked that the head is unmoved and still
+ * signed (`verifyIncremental`), so no transition is new, and only the live facts (`collectFacts`: freeze, read-only,
+ * population, vault, notary, resources, lost effects) and an effect's engine decisions are re-read.
  */
 export function governed(store: A4Store, projectId: string, actor: A4Actor, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
   plan: Plan): A4TransitionResult {
   refuseOnFreeze(store, projectId);
   let planned: string | null = null;
+  let loaded: A4ReadinessState | null = null;
+  const load = (now: number): A4ReadinessState => (loaded ??= loadA4State(store, projectId, now));
   try {
     return store.transition(projectId, actor, ({ ts }) => {
-      const result = plan(ts);
+      loaded = null; // each attempt (a moved head rebuilds once) loads the rows it verified afresh
+      const result = plan(ts, load);
       planned = result.readiness.fullDigest;
       return result.specs;
     }, { ...options, readiness: () => {
-      const digest = planned ?? plan(Date.now()).readiness.fullDigest;
+      const digest = planned ?? plan(Date.now(), load).readiness.fullDigest;
       planned = null;
       return digest;
     } });
@@ -342,8 +349,8 @@ export function requestGate(store: A4Store, projectId: string, input: A4Call & {
   const proposal = input.gate === "policy" ? a4GatePolicyV1Schema.safeParse(input.proposedGatePolicy) : null;
   if (proposal && !proposal.success) throw fail(400, "INPUT_INVALID", "proposedGatePolicy is not an amc.a4-gate-policy/v1 document.");
   if (input.gate !== "policy" && input.proposedGatePolicy !== undefined) throw fail(400, "INPUT_INVALID", "Only a policy gate carries a proposed policy.");
-  return governed(store, projectId, principal, input, (ts) => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (ts, load) => {
+    const state = load(now);
     const project = state.project;
     const stage = input.gate === "policy" ? project.stage : input.stage;
     if (stage === "retired") throw fail(409, "A4_RETIRED", "The project is retired.");
@@ -412,8 +419,8 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
   const now = Date.now();
   const decisionId = randomId("a4d");
   if (input.reason.trim().length === 0) throw fail(400, "INPUT_INVALID", "A decision needs a reason.");
-  return governed(store, projectId, principal, { request: input.request }, (ts) => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, { request: input.request }, (ts, load) => {
+    const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     const gate = gateStatus(state, row, query.policy, now);
@@ -486,8 +493,8 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
   // The full verifier runs once, here, outside the project lock and the ledger transaction (design §7 rule 2); both plan
   // runs read this report. The store commits only on expectedHeadSeq and its in-transaction check sees no new row.
   const call: A4Call = input.fullIntegrity === true && input.integrity === undefined ? { ...input, integrity: fullIntegrity(store, projectId) } : input;
-  return governed(store, projectId, principal, input, (ts) => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (ts, load) => {
+    const state = load(now);
     const row = gateRowOf(state, input.gateId);
     if (row.stage !== input.stage || row.gate === "policy") throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
     const { readiness, query } = evaluateFor(store, state, principal, call, row.stage, now);
@@ -515,8 +522,8 @@ export function changeGatePolicy(store: A4Store, projectId: string, input: A4Cal
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 gate-policy");
   const now = Date.now();
-  return governed(store, projectId, principal, input, () => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (_ts, load) => {
+    const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const proposal = proposalOf(state, row.gate_id);
     if (row.gate !== "policy" || proposal === null) throw fail(409, "A4_STEP_ORDER", "That is not a policy gate.");
@@ -538,8 +545,8 @@ function headTransition(store: A4Store, projectId: string, input: A4Call & { exp
   const principal = livePrincipal(store, input);
   if (commandPath) assertOwnerMode(store.workspace, commandPath);
   const now = Date.now();
-  return governed(store, projectId, principal, input, (ts) => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (ts, load) => {
+    const state = load(now);
     const stage = input.stage ?? (state.project.stage === "retired" ? "activate" : state.project.stage);
     const { readiness } = evaluateFor(store, state, principal, input, stage, now);
     assertAllowed(readiness, action);
@@ -594,10 +601,13 @@ const ASSEMBLE_SLOTS = /^(enforce|composition|graph)\./;
  */
 export function tuneProject(store: A4Store, projectId: string, input: A4Call & { capabilityChange: boolean; mechanicPlanId?: string; reason: string;
   expectedHeadSeq: number }): A4TransitionResult {
+  // Read once, outside the transaction (the plan runs again inside it); releases are append-only and expectedHeadSeq pins
+  // the head. A release missing from this read widens the reopen to Assemble, never narrows it.
+  const releases = store.snapshot(projectId).rows.a4_releases;
   return headTransition(store, projectId, input, "tune", (state) => {
     const releaseId = state.project.deployed_release_id;
     if (releaseId === null) throw fail(409, "A4_NOT_DEPLOYED", "Only a deployed project is tuned; retire it to start over.");
-    const release = store.snapshot(projectId).rows.a4_releases.find((row) => row.release_id === releaseId);
+    const release = releases.find((row) => row.release_id === releaseId);
     const slotsOf = (revisionNo: unknown) => flatSlots(JSON.parse(state.revisions.find((row) => row.revision_no === revisionNo)?.resource_digests_json ?? "{}"));
     const deployed = slotsOf(release?.revision_no), head = slotsOf(state.project.revision_no);
     const assemble = input.capabilityChange || release === undefined
@@ -615,8 +625,8 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 retire");
   const now = Date.now();
-  return governed(store, projectId, principal, input, () => {
-    const state = loadA4State(store, projectId, now);
+  return governed(store, projectId, principal, input, (_ts, load) => {
+    const state = load(now);
     if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
     const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
     const draftCreator = state.project.created_by_key === principal.key && !state.chain.some((link) => link.kind === "REVISION");

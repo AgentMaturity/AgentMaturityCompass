@@ -159,8 +159,8 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   refuseOnFreeze(route.store, projectId);
   check(loadA4State(route.store, projectId, now));
   const output = def.output !== null ? writeStageOutput(route, projectId, fields.content!) : null;
-  const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request }, (ts) => {
-    const state = loadA4State(route.store, projectId, now);
+  const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request }, (ts, load) => {
+    const state = load(now);
     const readiness = check(state);
     const project = state.project;
     const specs: A4ChangeSpec[] = [];
