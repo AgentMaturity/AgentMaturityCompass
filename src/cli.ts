@@ -4855,10 +4855,10 @@ plugin
   .requiredOption("--registry <base>", "registry path or URL")
   .option("--query <text>", "query text")
   .action(async (opts: { registry: string; query?: string }) => {
-    const out = await pluginSearchCli({
+    const out = await withWorkspaceScope(process.cwd(), () => pluginSearchCli({
       registry: opts.registry,
       query: opts.query
-    });
+    }));
     console.log(JSON.stringify(out, null, 2));
   });
 

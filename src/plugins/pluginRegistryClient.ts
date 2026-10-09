@@ -2,6 +2,8 @@ import { createPublicKey, verify } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, posix, resolve } from "node:path";
+import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -55,10 +57,12 @@ function compareVersions(a: string, b: string): number {
   return 0;
 }
 
-async function readTextFromRegistry(base: string, relPath: string): Promise<string> {
+async function readTextFromRegistry(base: string, relPath: string, workspace?: string): Promise<string> {
   if (isHttp(base)) {
     const url = joinUrl(base, relPath);
-    const response = await fetch(url, { method: "GET" });
+    const request: RequestInit = { method: "GET", redirect: "manual" };
+    checkScopedEgress(workspace, "network-tool", url, { dataClasses: null, purpose: null });
+    const response = await fetch(url, request);
     if (!response.ok) {
       throw new Error(`registry fetch failed (${response.status}): ${url}`);
     }
@@ -71,10 +75,12 @@ async function readTextFromRegistry(base: string, relPath: string): Promise<stri
   return readUtf8(file);
 }
 
-async function readBytesFromRegistry(base: string, relPath: string): Promise<Buffer> {
+async function readBytesFromRegistry(base: string, relPath: string, workspace?: string): Promise<Buffer> {
   if (isHttp(base)) {
     const url = joinUrl(base, relPath);
-    const response = await fetch(url, { method: "GET" });
+    const request: RequestInit = { method: "GET", redirect: "manual" };
+    checkScopedEgress(workspace, "network-tool", url, { dataClasses: null, purpose: null });
+    const response = await fetch(url, request);
     if (!response.ok) {
       throw new Error(`registry fetch failed (${response.status}): ${url}`);
     }
@@ -124,15 +130,15 @@ export interface ResolvedRegistryPackage {
  * context admits it for artifact-seal: a pinned fingerprint in the workspace's signed registries config, or the
  * operator's trust list (P0-09).
  */
-async function fetchRegistryIndex(baseRaw: string, trust: TrustContext): Promise<{
+async function fetchRegistryIndex(baseRaw: string, trust: TrustContext, workspace?: string): Promise<{
   base: string;
   index: PluginRegistryIndex;
   registryPub: string;
 }> {
   const base = isHttp(baseRaw) ? baseRaw.replace(/\/+$/, "") : resolve(baseRaw);
-  const indexRaw = await readTextFromRegistry(base, "index.json");
-  const sigRaw = await readTextFromRegistry(base, "index.sig");
-  const registryPub = await readTextFromRegistry(base, "registry.pub");
+  const indexRaw = await readTextFromRegistry(base, "index.json", workspace);
+  const sigRaw = await readTextFromRegistry(base, "index.sig", workspace);
+  const registryPub = await readTextFromRegistry(base, "registry.pub", workspace);
   const index = pluginRegistryIndexSchema.parse(JSON.parse(indexRaw) as unknown);
   const verifyResult = verifyRegistryIndexSignature({ index, sigRaw, pubPem: registryPub });
   if (!verifyResult.ok) {
@@ -184,31 +190,37 @@ export async function resolveRegistryPackage(params: {
   allowPluginPublishers?: string[];
   allowRiskCategories?: Array<"LOW" | "MEDIUM" | "HIGH" | "CRITICAL">;
 }): Promise<ResolvedRegistryPackage> {
-  const at = params.pluginRef.lastIndexOf("@");
-  const pluginId = at > 0 ? params.pluginRef.slice(0, at) : params.pluginRef;
-  const requestedVersion = at > 0 ? params.pluginRef.slice(at + 1) : null;
-  if (!params.pinnedRegistryPubkeyFingerprint) {
+  const rawWorkspace = getWorkspaceScope();
+  const workspace = rawWorkspace?.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const { registryBase, pluginRef, pinnedRegistryPubkeyFingerprint,
+    allowPluginPublishers: publishers, allowRiskCategories: riskCategories } = params;
+  const allowPluginPublishers = publishers?.slice();
+  const allowRiskCategories = riskCategories?.slice();
+  const at = pluginRef.lastIndexOf("@");
+  const pluginId = at > 0 ? pluginRef.slice(0, at) : pluginRef;
+  const requestedVersion = at > 0 ? pluginRef.slice(at + 1) : null;
+  if (!pinnedRegistryPubkeyFingerprint) {
     throw new Error("registry key not admitted: not-pinned: no pinned registry fingerprint");
   }
-  const trust = registryTrust(params.pinnedRegistryPubkeyFingerprint);
-  const { base, index, registryPub } = await fetchRegistryIndex(params.registryBase, trust);
+  const trust = registryTrust(pinnedRegistryPubkeyFingerprint);
+  const { base, index, registryPub } = await fetchRegistryIndex(registryBase, trust, workspace);
   const registryFingerprint = sha256Hex(Buffer.from(registryPub, "utf8"));
-  if (params.pinnedRegistryPubkeyFingerprint !== registryFingerprint) {
+  if (pinnedRegistryPubkeyFingerprint !== registryFingerprint) {
     throw new Error("registry fingerprint mismatch with pinned fingerprint");
   }
   const selected = selectVersion(index, pluginId, requestedVersion);
   const packageUrl = assertSafeRegistryRelativePath(selected.url);
-  if (params.allowPluginPublishers && params.allowPluginPublishers.length > 0) {
-    if (!params.allowPluginPublishers.includes(selected.publisherFingerprint)) {
+  if (allowPluginPublishers && allowPluginPublishers.length > 0) {
+    if (!allowPluginPublishers.includes(selected.publisherFingerprint)) {
       throw new Error(`plugin publisher not allowlisted: ${selected.publisherFingerprint}`);
     }
   }
-  if (params.allowRiskCategories && params.allowRiskCategories.length > 0) {
-    if (!params.allowRiskCategories.includes(selected.riskCategory)) {
+  if (allowRiskCategories && allowRiskCategories.length > 0) {
+    if (!allowRiskCategories.includes(selected.riskCategory)) {
       throw new Error(`plugin risk category not allowed: ${selected.riskCategory}`);
     }
   }
-  const bytes = await readBytesFromRegistry(base, packageUrl);
+  const bytes = await readBytesFromRegistry(base, packageUrl, workspace);
   const digest = sha256Hex(bytes);
   if (digest !== selected.sha256) {
     throw new Error("plugin package sha256 mismatch with registry index");
@@ -257,8 +269,11 @@ export async function browseRegistry(params: {
   registryFingerprint: string;
   plugins: PluginRegistryIndex["plugins"];
 }> {
-  const { index, registryPub } = await fetchRegistryIndex(params.registryBase, params.trust);
-  const query = (params.query ?? "").trim().toLowerCase();
+  const rawWorkspace = getWorkspaceScope();
+  const workspace = rawWorkspace?.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  const { registryBase, query: queryRaw, trust } = params;
+  const { index, registryPub } = await fetchRegistryIndex(registryBase, trust, workspace);
+  const query = (queryRaw ?? "").trim().toLowerCase();
   const filtered = query.length === 0
     ? index.plugins
     : index.plugins.filter((row) =>
