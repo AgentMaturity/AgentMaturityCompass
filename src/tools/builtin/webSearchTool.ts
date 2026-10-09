@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resolve as resolvePath } from "node:path";
 import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
@@ -80,6 +81,9 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
       if (execution.effectiveMode === "SIMULATE") {
         return { output: `[amc: SIMULATE web_search via ${provider.id}; no request made]` };
       }
+      const resource = execution.authorization?.record.resource;
+      const egress = { workspace: resolvePath(execution.workspace), agentId: execution.agentId,
+        dataClasses: resource ? [...resource.dataClasses] : null, purpose: resource?.purpose ?? null };
       const requests: { origin: string; address: string; status: number; bytes: number; contentSha256: string }[] = [];
       let spent = 0;
       const get: WebSearchProviderRequest["get"] = async (url) => {
@@ -91,7 +95,7 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
         }
         // One byte budget across all of a search's requests, not one each.
         const response = await governedGet({
-          tool: "web_search", url, policy, maxBytes: policy.maxBytes - spent,
+          tool: "web_search", url, policy, maxBytes: policy.maxBytes - spent, ...egress,
           recordEgress: (decision) => options.record(execution, { auditType: "NATIVE_WEB_EGRESS", ...decision }),
           ...(options.resolve ? { resolve: options.resolve } : {}),
           ...(execution.signal ? { signal: execution.signal } : {})

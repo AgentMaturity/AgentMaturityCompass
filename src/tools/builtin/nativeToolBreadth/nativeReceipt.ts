@@ -1,4 +1,5 @@
 import type { ToolBody, ToolBodyResult, ToolExecution } from "../../toolTypes.js";
+import { EgressBlocked } from "../../../residency/checkEgress.js";
 import { NativeToolRefusal } from "./originPolicy.js";
 
 /**
@@ -35,7 +36,7 @@ export function receiptedBody(auditType: string, record: NativeReceiptRecorder,
       return await body(execution, allow);
     } catch (error: unknown) {
       if (!recorded && execution.effectiveMode !== "SIMULATE") {
-        record(execution, { auditType, decision: error instanceof NativeToolRefusal ? "deny" : "fail",
+        record(execution, { auditType, decision: error instanceof NativeToolRefusal || error instanceof EgressBlocked ? "deny" : "fail",
           reason: error instanceof Error ? error.message : String(error) });
       }
       throw error;

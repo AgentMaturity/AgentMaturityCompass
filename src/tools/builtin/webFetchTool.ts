@@ -61,6 +61,8 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
       }
       const response = await governedGet({
         tool: "web_fetch", url: args.url, policy, maxBytes,
+        workspace: execution.workspace, agentId: execution.agentId,
+        dataClasses: execution.authorization?.record.resource.dataClasses ?? null, purpose: execution.authorization?.record.resource.purpose ?? null,
         recordEgress: (decision) => options.record(execution, { auditType: "NATIVE_WEB_EGRESS", ...decision }),
         ...(options.resolve ? { resolve: options.resolve } : {}),
         ...(execution.signal ? { signal: execution.signal } : {}),
