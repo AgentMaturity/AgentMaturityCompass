@@ -54,10 +54,12 @@ export const A4_ENVELOPE_KINDS: readonly A4TransitionKind[] = ["GATE_REQUESTED",
  * own ids. Gate-derived items (`gate.direction`, `gate.completion`, `approvals.fresh`, `sod`) are never bound: the first
  * APPROVE would otherwise change the digest and every second vote would be stale. Nor are the three environment facts
  * of item 7 — VAULT_LOCKED on envelope writes (`signing.available`), READ_ONLY_MODE and presence — so an approval does not
- * go stale because the vault was locked at render time. Do not add them back.
+ * go stale because the vault was locked at render time. Nor is `members.candidates`, a non-mandatory hint about who could
+ * be added that depends on the caller's plane and on session churn: bound, it made the intent differ per caller. Do not
+ * add them back.
  */
 const GOVERNANCE_BOUND_ITEMS = [
-  "members.present", "members.candidates", "signing.notary_route", "signing.notary_reachable",
+  "members.present", "signing.notary_route", "signing.notary_reachable",
   "store.integrity", "approvals.policy_signed", "gate.policy_floor", "hold.none", "identity.check", "effects.failed",
   // Member-derived, not vote-derived (P1-57): a regulated quorum of LOCAL_USER keys is foreseeable before the request, and
   // its owner acknowledgement must precede the request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
