@@ -72,11 +72,14 @@ const SLOT_OF_KIND: Record<string, string> = { MEMBER: "memberSet", EVIDENCE_REF
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
+/** A file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE, never "absent". */
 const fileSha = (path: string): string | null => {
   try {
     return sha256Hex(readFileSync(path));
-  } catch {
-    return null;
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return null;
+    throw fail(409, "RESOURCE_UNREADABLE", `a signed workspace config could not be read (${code ?? "unknown error"})`);
   }
 };
 const parseList = (json: string): string[] => JSON.parse(json) as string[];
@@ -84,7 +87,7 @@ const parseList = (json: string): string[] => JSON.parse(json) as string[];
 /**
  * Slot recomputers (design §8): A4 recomputes a producer's digest only to compare it. Stage lanes add theirs; a filled
  * slot without one counts as drifted (fail closed). A recomputer answers null exactly when the resource is absent, the
- * value a revision binds for it then. The gate-policy slot is bound through the intent instead.
+ * value a revision binds for it then, and throws when it cannot be read. The gate-policy slot is bound through the intent.
  */
 export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null> = {
   "signedConfigs.tools": (workspace) => fileSha(join(workspace, ".amc", "tools.yaml")),
@@ -105,13 +108,19 @@ export function flatSlots(digests: unknown, prefix = ""): Record<string, string 
 
 /**
  * Slots whose live recomputation differs from the bound value, including a recomputable slot bound null (a signed config
- * absent at propose) whose resource now exists; a filled slot nothing can recompute counts too. Only an unfilled slot
- * with no recomputer (not produced) is skipped. Decide, complete and the executor preamble all read this.
+ * absent at propose) whose resource now exists, and one that cannot be read now; a filled slot nothing can recompute
+ * counts too. Only an unfilled slot with no recomputer (not produced) is skipped. Decide, complete and the executor
+ * preamble all read this.
  */
 export function driftedSlots(workspace: string, slots: Record<string, string | null>): string[] {
   return Object.entries(slots).filter(([slot, value]) => {
     const recompute = RESOURCE_SLOTS[slot];
-    return recompute === undefined ? value !== null : recompute(workspace) !== value;
+    if (recompute === undefined) return value !== null;
+    try {
+      return recompute(workspace) !== value;
+    } catch {
+      return true; // unreadable data never reads as unchanged
+    }
   }).map(([slot]) => slot);
 }
 
