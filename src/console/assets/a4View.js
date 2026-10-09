@@ -185,7 +185,7 @@ export function renderComments(cardId, comments) {
     <span class="pill">SELF_REPORTED</span> <strong>${esc(comment.authorUsername ?? comment.authorKey)}</strong>
     <span class="muted">${time(comment.ts)}</span><div>${typeof comment.body === "string" ? esc(comment.body)
       : `<span class="muted">Text not returned by Studio</span> ${codes(comment.reasonCodes)}`}</div></li>`);
-  return `<details class="a4-comments"${rows.length ? " open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
+  return `<details class="a4-comments" data-a4-open="discussion"${rows.length ? " open" : ""}><summary>Discussion (${rows.length})</summary>${list(rows, "No comments yet.")}
     <textarea name="comment" rows="2" maxlength="${COMMENT_MAX_BYTES}"></textarea>
     <button type="button" data-a4-action="comment">Comment</button>
     <p class="muted">Discussion, never evidence; up to 8 KiB. ${RETAINED}</p></details>`;
@@ -235,7 +235,7 @@ function laneItem(item) {
 export function renderLanes(readiness) {
   const lanes = LANES.map(([lane, title]) => `<section class="card a4-lane"><h4>${title}</h4>${list(readiness.items
     .filter((item) => item.section === lane).map(laneItem), "Nothing recorded.")}</section>`).join("");
-  const checks = readiness.items.filter((item) => item.section === "integrity").map((item) => `<details><summary><code>${esc(item.id)}</code>
+  const checks = readiness.items.filter((item) => item.section === "integrity").map((item) => `<details data-a4-open="integrity:${esc(item.id)}"><summary><code>${esc(item.id)}</code>
     <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}</summary><pre class="scroll">${esc(JSON.stringify(item.report, null, 2))}</pre></details>`);
   return `<div class="a4-lanes"><div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
     <p class="muted">Integrity of bytes; not evidence about the agent. ${TRUTH.signatures}.</p>
@@ -337,7 +337,7 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Request completion approval", "request-completion", allowed.requestGate)}
       ${actionButton("Complete stage", "complete", stage === "activate" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
-    <details><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
+    <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;
 }
 

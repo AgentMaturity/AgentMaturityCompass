@@ -149,6 +149,8 @@ function mountProject(projectId, options) {
   const stagePath = (sub) => projectPath(`/stages/${stage}/${sub}`);
   const headBinding = () => ({ expectedHeadSeq: state.project.headSeq, clientRequestId: uuid() });
   const presenceCard = () => `${stage}:${activeCard}`;
+  // Every <details> the page renders carries data-a4-open; a re-render keeps the user's open/closed choice by this key.
+  const detailsKey = (details) => `${details.closest("[data-card]")?.dataset.card ?? "page"}:${details.dataset.a4Open}`;
   const draftKey = (field) => (field.name && !field.closest("[data-principal]")
     ? `${field.closest("[data-card]")?.dataset.card ?? "page"}:${field.name}` : null);
   // Answers are read from the head revision only when it belongs to the viewed stage or the viewed stage is current.
@@ -233,6 +235,7 @@ function mountProject(projectId, options) {
     const fields = () => new Map([...root.querySelectorAll("[name]")].map((field) => [draftKey(field), field]).filter(([key]) => key));
     const focused = document.activeElement && root.contains(document.activeElement) ? draftKey(document.activeElement) : null;
     const caret = focused ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
+    const opened = new Map([...root.querySelectorAll("details[data-a4-open]")].map((details) => [detailsKey(details), details.open]));
     const { project, readiness } = state;
     const shown = shownReview();
     const gateChange = view.boundReview(shown) && reviewed && !view.sameReview(reviewed, shown) ? { from: reviewed, to: shown } : null;
@@ -252,6 +255,9 @@ function mountProject(projectId, options) {
     renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
     renderPresenceChips();
+    for (const details of root.querySelectorAll("details[data-a4-open]")) {
+      if (opened.has(detailsKey(details))) details.open = opened.get(detailsKey(details));
+    }
     for (const [key, field] of fields()) {
       if (drafts.has(key)) field.value = drafts.get(key);
       if (key === focused) { field.focus(); if (caret && typeof field.setSelectionRange === "function") field.setSelectionRange(...caret); }
