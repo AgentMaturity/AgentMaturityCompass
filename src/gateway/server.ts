@@ -632,7 +632,7 @@ async function hostAllowed(params: { config: GatewayConfig; fieldGuard: FieldGua
   const allowHosts = [...params.config.proxy.allowlistHosts.flatMap((entry) => entry.startsWith(".") ? [] : [entry, `.${entry}`]), ...(anyHost ? [name] : [])];
   const egress = await resolveAndCheck(host, { allowHosts });
   const guarded = egress.decision.allowed ? await params.fieldGuard.targetRefused(host, egress.addresses) : null;
-  return guarded === null ? egress : { addresses: egress.addresses, decision: { allowed: false, reason: guarded } };
+  return guarded === null ? egress : { addresses: egress.addresses, unresolved: guarded.unresolved, decision: { allowed: false, reason: guarded.reason } };
 }
 
 function extractAgentId(route: GatewayConfig["routes"][number], headers: IncomingHttpHeaders): string {
@@ -647,12 +647,14 @@ function appendNetworkBlockedAudit(
     meta: Record<string, unknown>;
   }) => void,
   requestId: string,
+  agentId: string,
   destinationHost: string,
   destinationPort: number,
   egress: EgressCheck
 ): void {
   // The reason names the refused address; resolvedAddresses is what the name resolved to when the connection opened.
-  const row = { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", request_id: requestId, destinationHost, destinationPort,
+  // agentId is the lease-verified requester, so the row counts only against that agent.
+  const row = { auditType: "NETWORK_EGRESS_BLOCKED", severity: "HIGH", request_id: requestId, agentId, destinationHost, destinationPort,
     reason: egress.decision.reason, resolvedAddresses: egress.addresses };
   appendEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: { ...row, trustTier: "OBSERVED" } });
 }
@@ -672,6 +674,17 @@ function createProxyServer(params: {
   }) => void;
 }): Server {
   const resilience = gatewayResilienceConfig();
+  // A refusal by name, address or guarded target is a NETWORK_EGRESS_BLOCKED audit for the lease-verified agent. A DNS failure (the
+  // target's, or a guarded upstream's) is not an egress attempt: HTTP 502 and an egress_unresolved gateway row for that agent, no audit.
+  const recordRefusal = (requestId: string, agentId: string, host: string, port: number, egress: EgressCheck, meta: Record<string, unknown>): void => {
+    if (egress.unresolved !== true) {
+      appendNetworkBlockedAudit(({ payload, meta: row }) => params.appendEvidence({ eventType: "audit", payload, meta: { ...row, ...meta } }),
+        requestId, agentId, host, port, egress);
+      return;
+    }
+    const row = { request_id: requestId, agentId, destinationHost: host, destinationPort: port, stage: "egress_unresolved", status: 502, reason: egress.decision.reason };
+    params.appendEvidence({ eventType: "gateway", payload: JSON.stringify(row), meta: { ...row, ...meta, proxyMode: true, trustTier: "OBSERVED" } });
+  };
   const onRequest = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     const requestId = randomUUID();
     const method = (req.method ?? "GET").toUpperCase();
@@ -794,21 +807,9 @@ function createProxyServer(params: {
     // A host outside the allowlist is refused before any DNS query; a listed one is resolved now and checked by address.
     const egress = await hostAllowed(params, host);
     if (!egress.decision.allowed) {
-      appendNetworkBlockedAudit(
-        ({ payload, meta }) =>
-          params.appendEvidence({
-            eventType: "audit",
-            payload,
-            meta: {
-              ...meta,
-              sessionType: "proxy",
-              sessionId: params.gatewaySessionId
-            }
-          }),
-        requestId, host, port, egress
-      );
-      res.statusCode = 403;
-      res.end("blocked by AMC proxy allowlist");
+      recordRefusal(requestId, proxyAgentId, host, port, egress, { sessionType: "proxy", sessionId: params.gatewaySessionId });
+      res.statusCode = egress.unresolved === true ? 502 : 403;
+      res.end(egress.unresolved === true ? "proxy target not checked: a name did not resolve" : "blocked by AMC proxy allowlist");
       return;
     }
 
@@ -1005,19 +1006,8 @@ function createProxyServer(params: {
     clientSocket.on("error", () => clientSocket.destroy()); // the client may fail while the target resolves
     const egress = await hostAllowed(params, host);
     if (!egress.decision.allowed) {
-      appendNetworkBlockedAudit(
-        ({ payload, meta }) =>
-          params.appendEvidence({
-            eventType: "audit",
-            payload,
-            meta: {
-              ...meta,
-              proxyMode: true
-            }
-          }),
-        requestId, host, port, egress
-      );
-      clientSocket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+      recordRefusal(requestId, proxyAgentId, host, port, egress, { proxyMode: true });
+      clientSocket.write(egress.unresolved === true ? "HTTP/1.1 502 Bad Gateway\r\n\r\n" : "HTTP/1.1 403 Forbidden\r\n\r\n");
       clientSocket.destroy();
       return;
     }
@@ -1335,8 +1325,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       // The upstream is resolved and checked now (P1-66); refused fields (e.g. dsh_session_log) are decided on these addresses and the connection
       // below is pinned to them. An unreadable body is refused; the audit keeps names and size, never content.
       const upstreamEgress = await checkUpstreamEgress(upstreamConfigured, upstreamResolved);
-      // The upstream's name always passes by name, so no addresses means it did not resolve: a transport failure, as before P1-66 (502, request_error, no audit).
-      if (upstreamEgress.addresses.length === 0) {
+      // An upstream that did not resolve is a transport failure, as before P1-66 (502, request_error, no audit).
+      if (upstreamEgress.unresolved === true) {
         logger.error(`gateway error: ${upstreamEgress.decision.reason}`);
         const failure = { stage: "request_error", request_id: requestId, status: 502, upstreamId: route.upstream, agentId: attributedAgentId };
         appendEvidence({ eventType: "gateway", payload: JSON.stringify({ ...failure, error: upstreamEgress.decision.reason }), meta: failure });

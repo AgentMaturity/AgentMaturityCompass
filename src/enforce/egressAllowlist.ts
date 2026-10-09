@@ -59,6 +59,8 @@ export interface EgressCheck {
   /** What the host resolved to (an IP literal is its own only address). Connect only to one of these, and only when allowed. */
   readonly addresses: readonly string[];
   readonly decision: EgressDecision;
+  /** True when the refusal is a DNS failure (EGRESS_UNRESOLVED), not a policy decision; nothing was attempted. */
+  readonly unresolved?: boolean;
 }
 
 /** Lowercase and without IPv6 brackets; IPv6 literals in canonical form so `::1` and `0:0::1` compare equal. */
@@ -129,5 +131,6 @@ export async function resolveAndCheck(host: string, policy: { readonly allowHost
   if (!byName.allowed) return { addresses: [], decision: byName };
   let addresses: readonly string[] = [];
   try { addresses = await resolve(name); } catch { /* refused below */ }
-  return { addresses, decision: addresses.length === 0 ? { allowed: false, reason: `${name} did not resolve (EGRESS_UNRESOLVED)` } : decideEgress(name, addresses, policy) };
+  return addresses.length === 0 ? { addresses, unresolved: true, decision: { allowed: false, reason: `${name} did not resolve (EGRESS_UNRESOLVED)` } }
+    : { addresses, decision: decideEgress(name, addresses, policy) };
 }

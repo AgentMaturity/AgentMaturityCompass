@@ -24,8 +24,11 @@ export interface FieldGuard {
    * egress check resolved); all of them when an identity is unknown.
    */
   fieldsFor(upstream: string, addresses: readonly string[]): Promise<string[]>;
-  /** Forward proxy: why a target already resolved to `addresses` must be refused (it is, or is under, a guarded upstream), or null. */
-  targetRefused(host: string, addresses: readonly string[]): Promise<string | null>;
+  /**
+   * Forward proxy: why a target already resolved to `addresses` must be refused (it is, or is under, a guarded upstream), or
+   * null. `unresolved` marks a refusal because a guarded upstream did not resolve, which the target did not cause.
+   */
+  targetRefused(host: string, addresses: readonly string[]): Promise<{ reason: string; unresolved: boolean } | null>;
 }
 
 const BOMS = [Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from([0xfe, 0xff]), Buffer.from([0xff, 0xfe])];
@@ -81,13 +84,13 @@ export function prepareFieldGuard(config: GatewayConfig, resolve: HostResolver =
     async targetRefused(host, addresses) {
       const guarded = await guardedNow();
       const unresolved = guarded.find(({ identity }) => identity === null);
-      if (unresolved) return `guarded upstream ${unresolved.id} did not resolve, so every proxy target is refused`;
+      if (unresolved) return { reason: `guarded upstream ${unresolved.id} did not resolve, so every proxy target is refused`, unresolved: true };
       const target = identityOf(host, addresses);
-      if (addresses.length === 0) return `${target.name} has no resolved address to compare with the guarded upstreams`;
+      if (addresses.length === 0) return { reason: `${target.name} has no resolved address to compare with the guarded upstreams`, unresolved: false };
       // A tunnel cannot be field-checked: refuse a guarded upstream's name, its subdomains and every address it resolves to.
       for (const { id, identity } of guarded) {
         const shared = sharedWith(id, identity!, target);
-        if (shared !== null) return shared;
+        if (shared !== null) return { reason: shared, unresolved: false };
       }
       return null;
     }
