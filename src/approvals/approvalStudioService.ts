@@ -143,11 +143,20 @@ export async function decideApprovalInStudio(params: {
   requireExplicitDecision: boolean;
   reviewBasePath?: string;
   writeAudit: StudioApprovalAuditWriter;
+  /**
+   * The bound path (the A4 card): the decision binds this exact request digest, and the actor must carry its own
+   * verified userId and live roles; nothing defaults to OWNER here. Omitted: unchanged behaviour.
+   */
+  expectedRequestDigestSha256?: string;
 }): Promise<{
   approval: ReturnType<typeof decideApprovalForIntent>["approval"];
   approvalDelivery: ApprovalDeliverySummary;
   approvalEvent: "APPROVAL_DECISION_RECORDED" | "APPROVAL_QUORUM_MET" | "APPROVAL_DENIED";
 }> {
+  const bound = params.expectedRequestDigestSha256 !== undefined;
+  if (bound && (!params.actor.userId || params.actor.roles.length === 0)) {
+    throw new ApprovalStudioError(403, "a bound decision needs the reviewer's verified user id and live roles");
+  }
   if (params.requireExplicitDecision && !params.input.decision) {
     throw new ApprovalStudioError(400, "decision is required");
   }
@@ -165,7 +174,7 @@ export async function decideApprovalInStudio(params: {
   const policy = loadApprovalPolicy(params.workspace);
   const rule = policy.approvalPolicy.actionClasses[inbox.request.actionClass];
   const rolesAllowed = new Set((rule?.rolesAllowed ?? ["APPROVER", "OWNER"]) as UserRole[]);
-  if (!params.actor.isAdmin && !params.actor.roles.some((role) => rolesAllowed.has(role))) {
+  if ((bound || !params.actor.isAdmin) && !params.actor.roles.some((role) => rolesAllowed.has(role))) {
     throw new ApprovalStudioError(403, `roles not allowed for ${inbox.request.actionClass}`);
   }
   if (
@@ -234,11 +243,12 @@ export async function decideApprovalInStudio(params: {
       decisionReceiptId: audit.receiptId,
       username: params.actor.username,
       userId: params.actor.userId ?? params.actor.username,
-      userRoles: params.actor.roles.length > 0 ? params.actor.roles : ["OWNER"]
+      userRoles: bound || params.actor.roles.length > 0 ? params.actor.roles : ["OWNER"],
+      ...(bound ? { expectedRequestDigestSha256: params.expectedRequestDigestSha256 } : {})
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (/approval request (?:is not pending|context is untrusted):/i.test(message)) {
+    if (/approval request (?:is not pending|context is untrusted):|approval request changed after review/i.test(message)) {
       throw new ApprovalStudioError(409, message);
     }
     throw error;

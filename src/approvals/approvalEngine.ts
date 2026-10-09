@@ -8,6 +8,7 @@ import { loadWorkOrder, workOrderDigest } from "../workorders/workorderEngine.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  a4FloorFor,
   evaluateApprovalRequestPolicy,
   initApprovalPolicy,
   loadApprovalPolicy,
@@ -45,6 +46,11 @@ export interface ApprovalRequestInput {
   riskTier: "low" | "medium" | "high" | "critical";
   intentPayload: Record<string, unknown>;
   leaseConstraints?: Record<string, unknown>;
+  /**
+   * May only raise the signed class rule (A4 effect gates, design §6.1): approvals by max, distinct users by OR, roles
+   * by intersection, and the TTL by max up to the signed policy's `a4.maxTtlMinutes` (never past the rule without it).
+   */
+  quorumFloor?: { requiredApprovals?: number; requireDistinctUsers?: boolean; rolesAllowed?: UserRole[]; ttlMinutes?: number };
 }
 
 function fileDigestOrFallback(workspace: string, rel: string, fallback = ""): string {
@@ -209,7 +215,16 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
   if (!evaluation.allowed || !evaluation.rule) {
     throw new Error(evaluation.reasons[0] ?? `approval policy missing action class rule: ${input.actionClass}`);
   }
-  const rule = evaluation.rule;
+  const floor = input.quorumFloor;
+  const ttlCap = a4FloorFor(policy).maxTtlMinutes ?? evaluation.rule.ttlMinutes;
+  const rule = floor === undefined ? evaluation.rule : {
+    ...evaluation.rule,
+    requiredApprovals: Math.max(evaluation.rule.requiredApprovals, floor.requiredApprovals ?? 0),
+    requireDistinctUsers: evaluation.rule.requireDistinctUsers || floor.requireDistinctUsers === true,
+    rolesAllowed: floor.rolesAllowed ? evaluation.rule.rolesAllowed.filter((role) => floor.rolesAllowed!.includes(role)) : evaluation.rule.rolesAllowed,
+    ttlMinutes: Math.max(evaluation.rule.ttlMinutes, Math.min(floor.ttlMinutes ?? 0, ttlCap))
+  };
+  if (floor?.rolesAllowed && rule.requiredApprovals > 0 && rule.rolesAllowed.length === 0) throw new Error("quorumFloor.rolesAllowed leaves no role that may approve");
   const created = createApprovalRequestRecord({
     workspace: input.workspace,
     agentId: input.agentId,

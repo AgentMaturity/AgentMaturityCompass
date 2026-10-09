@@ -5,7 +5,7 @@ import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAn
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
-import { approvalPolicySchema, type ApprovalClassPolicy, type ApprovalPolicy } from "./approvalPolicySchema.js";
+import { approvalA4FloorSchema, approvalPolicySchema, type ApprovalA4Floor, type ApprovalClassPolicy, type ApprovalPolicy } from "./approvalPolicySchema.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 
 interface SignaturePayload {
@@ -314,4 +314,9 @@ export function evaluateApprovalRequestPolicy(input: {
 
 export function approvalRuleForAction(policy: ApprovalPolicy, actionClass: ActionClass): ApprovalClassPolicy {
   return policy.approvalPolicy.actionClasses[actionClass] ?? defaultApprovalPolicy().approvalPolicy.actionClasses[actionClass]!;
+}
+
+/** The signed policy's `a4` floor with its defaults filled in; a policy without the section reads as the defaults. */
+export function a4FloorFor(policy: ApprovalPolicy): ApprovalA4Floor {
+  return approvalA4FloorSchema.parse(policy.approvalPolicy.a4 ?? {});
 }
