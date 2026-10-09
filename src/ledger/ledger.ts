@@ -587,7 +587,7 @@ export class Ledger {
       this.db.prepare(EVIDENCE_EVENT_INSERT_SQL).run(candidate.row);
       return candidate;
     });
-    queueEvidenceEventSpan(prepared.row as unknown as EvidenceEvent);
+    queueEvidenceEventSpan(prepared.row as unknown as EvidenceEvent, this.workspace);
 
     this.autoLinkEvidenceToOpenIncidents({
       eventId: prepared.result.id,
@@ -648,7 +648,7 @@ export class Ledger {
       }
     });
     for (const row of spanRows) {
-      queueEvidenceEventSpan(row);
+      queueEvidenceEventSpan(row, this.workspace);
     }
 
     if (autoLink) {
@@ -795,7 +795,7 @@ export class Ledger {
       };
     });
 
-    queueEvidenceEventSpan(prepared.row as unknown as EvidenceEvent);
+    queueEvidenceEventSpan(prepared.row as unknown as EvidenceEvent, this.workspace);
 
     this.autoLinkEvidenceToOpenIncidents({
       eventId: id,

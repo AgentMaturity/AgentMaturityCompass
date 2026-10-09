@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
-import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { getWorkspaceScope, withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import type { Incident } from "../incidents/incidentTypes.js";
 import type { EvidenceEvent, TrustTier } from "../types.js";
 import { dispatchTelemetryRequest, type PreparedTelemetryRequest } from "./otelExportTransport.js";
@@ -845,20 +845,20 @@ export function resetSharedObservabilityExporterForTests(): void {
   sharedExporter = null;
 }
 
-export function queueEvidenceEventSpan(event: EvidenceEvent): void {
+export function queueEvidenceEventSpan(event: EvidenceEvent, workspace?: string): void {
   try {
     const exporter = getSharedObservabilityExporter();
-    exporter.recordEvidenceEvent(event);
+    workspace !== undefined ? withWorkspaceScope(workspace, () => exporter.recordEvidenceEvent(event)) : exporter.recordEvidenceEvent(event);
     maybeFlushSharedExporter(exporter);
   } catch {
     noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
   }
 }
 
-export function queueScoreComputationMetric(metric: ScoreComputationMetric): void {
+export function queueScoreComputationMetric(metric: ScoreComputationMetric, workspace?: string): void {
   try {
     const exporter = getSharedObservabilityExporter();
-    exporter.recordScoreComputation(metric);
+    workspace !== undefined ? withWorkspaceScope(workspace, () => exporter.recordScoreComputation(metric)) : exporter.recordScoreComputation(metric);
     maybeFlushSharedExporter(exporter);
   } catch {
     noteTelemetryDropped(1); // Observability must never block core workflows; the drop is counted.
