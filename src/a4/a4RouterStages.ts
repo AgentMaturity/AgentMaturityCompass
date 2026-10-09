@@ -19,7 +19,7 @@ import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
-  assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, refuseOnFreeze, requestChanges, requestGate,
+  assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze, requestChanges, requestGate,
   RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
@@ -207,16 +207,23 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   return true;
 }
 
-/** The executor runs after the response, outside the project lock, on its own store (design §6.5). */
+/**
+ * The executor runs after the response, outside the project lock, on its own store (design §6.5). The attempt is marked
+ * pending before the event loop turns, so nothing in this process reads it as lost while it runs. Once the promise
+ * settles, an attempt still running (a store that would not open, an outcome that could not be written) reads as lost
+ * in readiness (PROCESS_LOST), and retry settles it as process_lost.
+ */
 function runEffectAfterResponse(workspace: string, projectId: string, attemptId: string): void {
+  pendingExecutors.add(attemptId);
   setImmediate(() => {
-    let store: ReturnType<typeof openA4Store>;
-    try {
-      store = openA4Store(workspace);
-    } catch {
-      return; // The attempt stays running; the liveness sweeper settles it as process_lost once its heartbeat is stale.
-    }
-    void runA4Effect(store, projectId, attemptId).catch(() => undefined).finally(() => store.close());
+    void (async () => {
+      const store = openA4Store(workspace);
+      try {
+        await runA4Effect(store, projectId, attemptId);
+      } finally {
+        store.close();
+      }
+    })().catch(() => undefined).finally(() => pendingExecutors.delete(attemptId));
   });
 }
 

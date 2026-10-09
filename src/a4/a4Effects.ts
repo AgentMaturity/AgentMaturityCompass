@@ -10,7 +10,6 @@
  */
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
-import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed } from "../approvals/approvalChainStore.js";
 import { approvalStatusPayload, consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
@@ -319,14 +318,14 @@ function settleEffect(store: A4Store, projectId: string, attemptId: string, kind
  */
 export async function runA4Effect(store: A4Store, projectId: string, attemptId: string): Promise<A4TransitionResult> {
   const { workspace } = store;
-  const state = loadA4State(store, projectId, Date.now());
-  const started = startedLink(state.chain, attemptId);
-  const executionId = String(started.body.executionId);
-  const approvalRequestId = String(started.body.approvalRequestId);
   const failWith = (error: string): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FAILED", { error: error.slice(0, 500) });
-  const def = lookupEffect(String(started.body.effect));
-  if (def === undefined) return failWith("EFFECT_UNKNOWN");
   try {
+    const state = loadA4State(store, projectId, Date.now());
+    const started = startedLink(state.chain, attemptId);
+    const executionId = String(started.body.executionId);
+    const approvalRequestId = String(started.body.approvalRequestId);
+    const def = lookupEffect(String(started.body.effect));
+    if (def === undefined) return failWith("EFFECT_UNKNOWN");
     if (def.consumes === "A4") {
       const grant = consumeApprovedExecution({ workspace, approvalId: approvalRequestId, expectedAgentId: state.project.agent_id, executionId });
       if (grant.replay && loadApprovalConsumed({ workspace, agentId: state.project.agent_id, approvalRequestId })?.executionId !== executionId) {
@@ -349,7 +348,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
       try {
         store.heartbeatEffect(attemptId);
       } catch {
-        // The sweeper's liveness rule decides; a live local owner is never swept for a stale heartbeat.
+        // The sweeper's liveness rule decides; a pending executor of this process is never swept for a stale heartbeat.
       }
     };
     const timer = setInterval(beat, HEARTBEAT_MS);
@@ -369,10 +368,11 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
 }
 
 /**
- * The liveness sweeper (the action-journal rule, `recoverUnsettled`): a running effect whose owner process is gone on
- * this host, or whose owner's liveness cannot be read (another host) and whose heartbeat is older than `staleAfterMs`,
- * is written EFFECT_FAILED: process_lost. A live local owner is never swept, however long a synchronous step keeps its
- * heartbeat from firing. Returns the swept attempt ids.
+ * The liveness sweeper (the action-journal rule, `recoverUnsettled`; a4Gates.effectOwnerLost): a running effect of this
+ * process whose executor is no longer pending, one whose owner process is gone on this host, or one whose owner's
+ * liveness cannot be read (another host) and whose heartbeat is older than `staleAfterMs` is written EFFECT_FAILED:
+ * process_lost. A pending executor is never swept, however long a synchronous step keeps its heartbeat from firing.
+ * Returns the swept attempt ids.
  */
 export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS, only?: { projectId: string; executionId: string }): string[] {
   const staleBefore = Date.now() - staleAfterMs;
@@ -389,8 +389,8 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
 
 /**
  * Retry (owner; design §6.5): only for effects A4 consumes, and only when the chain has a failure and no finish for
- * this execution id, no attempt of it is still running under a live owner, and the engine grant, if consumed, was
- * consumed by this execution id. A new attempt with the same execution id; executors that consume their own grant
+ * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
+ * consumed, was consumed by this execution id. A new attempt with the same execution id; executors that consume their own grant
  * re-open the effect gate instead, and `complete` on the consumed gate runs them again (`rerunExecutorEffect`).
  */
 export function retryEffect(store: A4Store, projectId: string, input: A4Call & { attemptId: string; expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
@@ -413,7 +413,8 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     if (!runs.some((link) => link.kind === "EFFECT_FAILED") || runs.some((link) => link.kind === "EFFECT_FINISHED")) {
       throw fail(409, "EFFECT_NOT_RETRYABLE", "Only a failed, unfinished effect is retried.");
     }
-    if (state.effects.some((row) => row.execution_id === executionId && row.state === "running" && ownerAlive(row.owner_pid, row.owner_host) !== false)) {
+    // Lost attempts were just swept; one still running is live, or could not be settled, and either way is not retried over.
+    if (state.effects.some((row) => row.execution_id === executionId && row.state === "running")) {
       throw fail(409, "EFFECT_RUNNING", "A previous attempt may still be running; the sweeper settles it first.");
     }
     const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });

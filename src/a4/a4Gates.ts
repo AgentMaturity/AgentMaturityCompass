@@ -7,6 +7,7 @@
  */
 import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { hostname } from "node:os";
 import { join } from "node:path";
 import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
@@ -128,12 +129,18 @@ export function loadA4State(store: A4Store, projectId: string, now: number): A4R
   };
 }
 
+/** Attempt ids whose executor promise is pending in this process (a4RouterStages adds one before it runs); see effectOwnerLost. */
+export const pendingExecutors = new Set<string>();
+
 /**
- * The action journal's liveness rule (`recoverUnsettled`), shared by the sweeper and readiness: a running attempt is
- * lost when its owner is dead on this host, or its owner cannot be checked (another host) and its heartbeat is older
- * than `staleBefore`. A live local owner is never lost, however stale its heartbeat.
+ * The action journal's liveness rule (`recoverUnsettled`), shared by the sweeper and readiness. An attempt this process
+ * owns is lost once no executor here is pending for it (one that threw before writing its outcome): the process is
+ * alive but the attempt is not. Another owner's attempt is lost when that owner is dead on this host, or cannot be
+ * checked (another host) and its heartbeat is older than `staleBefore`. A pending executor is never lost, however stale
+ * its heartbeat.
  */
-export function effectOwnerLost(row: Pick<A4EffectRow, "owner_pid" | "owner_host" | "heartbeat_ts">, staleBefore: number): boolean {
+export function effectOwnerLost(row: Pick<A4EffectRow, "effect_id" | "owner_pid" | "owner_host" | "heartbeat_ts">, staleBefore: number): boolean {
+  if (row.owner_pid === process.pid && row.owner_host === hostname()) return !pendingExecutors.has(row.effect_id);
   const alive = ownerAlive(row.owner_pid, row.owner_host);
   return alive === false || (alive === null && row.heartbeat_ts < staleBefore);
 }
