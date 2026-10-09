@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import "./storage/nativeGuard.js";
+import { withWorkspaceScope } from "./enforce/evidenceEmitter.js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { basename, dirname, join, relative, resolve } from "node:path";
@@ -22327,7 +22328,7 @@ score
       // collectEvidence({[agentId]: {collected: true}}), fabricating a single
       // artifact from a literal and labelling it OBSERVED.
       const { collectEvidenceFromLedger } = await import("./score/evidenceCollector.js");
-      const result = collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14));
+      const result = withWorkspaceScope(process.cwd(), () => collectEvidenceFromLedger(agentId, Number(opts.windowDays ?? 14)));
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📊  Evidence Collection"), result, unverifiedClaim("score:evidenceCollector", result.artifacts.length), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Artifacts:"), result.artifacts.length);
@@ -22339,7 +22340,6 @@ score
       }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
-
 score
   .command("production-ready [agentId]")
   .description("Run production readiness gate for an agent")
@@ -22370,7 +22370,7 @@ score
   .action(async (agentId: string, opts: { window: string; domain?: string; json?: boolean }) => {
     try {
       const { scoreOperationalIndependence } = await import("./score/operationalIndependence.js");
-      const result = scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain });
+      const result = withWorkspaceScope(process.cwd(), () => scoreOperationalIndependence(agentId, Number(opts.window), { domain: opts.domain }));
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🕒  Operational Independence"), result, unverifiedClaim("score:operationalIndependence", result.telemetryConfidence > 0 ? 1 : 0), opts)) return;
       console.log(chalk.gray("Agent:"), agentId);
       console.log(chalk.gray("Context:"), result.context);
