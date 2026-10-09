@@ -48,8 +48,11 @@ function uuid() {
 }
 
 function errorText(error) {
-  const code = typeof error?.code === "string" && !["HTTP_ERROR", "INVALID_RESPONSE"].includes(error.code) ? `${error.code}: ` : "";
-  return `${code}${error?.message ?? String(error)}`;
+  const message = error?.message ?? String(error);
+  // P1-57's error text already starts with its code; it is printed once.
+  const code = typeof error?.code === "string" && !["HTTP_ERROR", "INVALID_RESPONSE"].includes(error.code)
+    && !message.startsWith(`${error.code}:`) ? `${error.code}: ` : "";
+  return `${code}${message}`;
 }
 
 function showError(error) {
