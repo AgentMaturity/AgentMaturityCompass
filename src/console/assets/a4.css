@@ -1,0 +1,19 @@
+/* A4 Studio (P1-58). The nav link and the home card stay absent until the preview answers; nav a sets display. */
+#a4NavLink[hidden], #a4HomeCard[hidden] { display: none !important; }
+.a4-cards { display: grid; gap: 14px; }
+.a4-form label, .a4-card label, .a4-approvals label { display: block; margin: 8px 0; }
+.a4-form :is(input, select, textarea), .a4-card textarea, .a4-approvals input { width: 100%; min-width: 0; }
+.a4-rows { padding-left: 18px; }
+.a4-rows li { margin: 6px 0; overflow-wrap: anywhere; }
+.chip { display: inline-block; border: 1px solid var(--border-strong); border-radius: 999px; padding: 1px 8px; font-size: .8rem; }
+.a4-hold { border-left: 4px solid var(--warn); }
+/* The four lanes share one column; the Integrity panel keeps its own beside them down to the phone breakpoint. */
+.a4-lanes { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 1.2fr); gap: 12px; align-items: start; }
+.a4-lane-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.a4-integrity { border-style: dashed; }
+.a4-conflict { border-color: var(--warn); }
+@media (max-width: 1100px) {
+  .a4-lanes { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .a4-lane-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) { .a4-lanes, .a4-lane-grid { grid-template-columns: minmax(0, 1fr); } }

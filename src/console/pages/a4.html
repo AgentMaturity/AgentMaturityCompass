@@ -3,18 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Compass Console - AMC Studio</title>
+    <title>Agent Projects - AMC Studio</title>
     <link rel="manifest" href="./assets/manifest.json" />
     <link rel="stylesheet" href="./assets/styles.css?v=20260908b" />
     <link rel="stylesheet" href="./assets/a4.css?v=20261009a" />
   </head>
-  <body data-page="home">
+  <body data-page="a4">
     <div class="shell">
       <nav>
         <h1>amc</h1>
         <a href="./home">Home</a>
         <a href="./native-tasks">Native Tasks</a>
-        <a href="./a4" id="a4NavLink" hidden>A4</a>
+        <a href="./a4" id="a4NavLink" aria-current="page" hidden>A4</a>
         <a href="./agent">Agent</a>
         <a href="./evidence">Evidence</a>
         <a href="./runtime">Runtime</a>
@@ -47,17 +47,12 @@
         </details>
       </nav>
       <main>
-        <div id="ucBanner" class="card banner muted">Unified Clarity loading…</div>
         <p id="status" class="muted">Authentication required.</p>
-        <section id="a4HomeCard" class="card" hidden>
-          <h3>Start an agent project</h3>
-          <p class="muted">Take an agent from idea to release with your team, one reviewed stage at a time (A4 preview).</p>
-          <a class="button" href="./a4?new=1">Start an agent project</a>
-        </section>
+        <p id="a4Notice" class="muted" role="status"></p>
         <div id="app"></div>
+        <noscript><p class="card">Agent projects require JavaScript. Loading this page changes nothing. Enable JavaScript and sign in before continuing.</p></noscript>
       </main>
     </div>
-    <script type="module" src="./assets/app.js?v=20260908b"></script>
     <script type="module" src="./assets/a4.js?v=20261009a"></script>
   </body>
 </html>
