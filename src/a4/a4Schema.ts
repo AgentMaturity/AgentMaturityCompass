@@ -4,12 +4,15 @@
  * self-approval derivation. Nothing here reads a clock, a file or the environment.
  */
 import { z } from "zod";
+import type { ApprovalA4Floor } from "../approvals/approvalPolicySchema.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { claimKindSchema } from "../claims/eligibility/schemas.js";
 import { nonEmpty, sha256HexSchema } from "../contracts/v1/common.js";
-import { a4GatePolicyV1Schema, type A4GatePolicyV1 } from "../contracts/v1/a4GatePolicy.js";
+import { A4_GATE_POLICY_KEYS, a4GatePolicyV1Schema, type A4GatePolicyV1 } from "../contracts/v1/a4GatePolicy.js";
 import { A4_ADMISSIONS, A4_GATES, A4_LANES, A4_STAGE_STATES, A4_STAGES, A4_STEPS, type A4Principal } from "../contracts/v1/a4Project.js";
 import { A4_TRANSITION_KINDS, type A4TransitionKind } from "../contracts/v1/a4Transition.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 
 export * from "../contracts/v1/a4ConformanceStatement.js";
 export * from "../contracts/v1/a4Decision.js";
@@ -55,13 +58,17 @@ export const A4_ENVELOPE_KINDS: readonly A4TransitionKind[] = ["GATE_REQUESTED",
  */
 const GOVERNANCE_BOUND_ITEMS = [
   "members.present", "members.candidates", "signing.notary_route", "signing.notary_reachable",
-  "store.integrity", "approvals.policy_signed", "gate.policy_floor", "hold.none", "identity.check", "effects.failed"
+  "store.integrity", "approvals.policy_signed", "gate.policy_floor", "hold.none", "identity.check", "effects.failed",
+  // Member-derived, not vote-derived (P1-57): a regulated quorum of LOCAL_USER keys is foreseeable before the request, and
+  // its owner acknowledgement must precede the request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
+  "sod.self_provisioned"
 ] as const;
 export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
   aspire: [...GOVERNANCE_BOUND_ITEMS],
   assemble: [...GOVERNANCE_BOUND_ITEMS],
   adapt: [...GOVERNANCE_BOUND_ITEMS],
-  activate: [...GOVERNANCE_BOUND_ITEMS]
+  // Consumed gates of the lineage, not this gate's votes: stable while this gate is open.
+  activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals"]
 };
 
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
@@ -165,6 +172,55 @@ export const DEFAULT_A4_GATE_POLICY: A4GatePolicyV1 = a4GatePolicyV1Schema.parse
     policy: { actionClass: "WRITE_HIGH", requireDistinctUsers: true }
   }
 });
+
+const policySource = (chain: readonly A4ChainLink[]): A4ChainLink | undefined =>
+  [...chain].sort((a, b) => b.seq - a.seq).find((link) => link.kind === "GATE_POLICY_CHANGED" || (link.kind === "CREATED" && link.seq === 0));
+/** The in-force gate policy's digest: the latest GATE_POLICY_CHANGED payload, else the seq-0 CREATED's (design §4.4). */
+export function gatePolicyDigestOf(chain: readonly A4ChainLink[]): string | null {
+  const source = policySource(chain);
+  return source?.body.gatePolicy === undefined ? null : sha256Hex(canonicalize(source.body.gatePolicy));
+}
+/** The in-force gate policy; the D-16 defaults (the floors) when the chain carries none that parses. */
+export function gatePolicyOf(chain: readonly A4ChainLink[]): A4GatePolicyV1 {
+  const parsed = a4GatePolicyV1Schema.safeParse(policySource(chain)?.body.gatePolicy);
+  return parsed.success ? parsed.data : DEFAULT_A4_GATE_POLICY;
+}
+
+/**
+ * Every way `next` is looser than `prev` (design §6.3: rules may only tighten). Any action-class change is unclassified
+ * and counts (fail closed); a removed `requiredReviews` entry counts; so does a longer TTL, a lower minimum, a wider role
+ * set or a dropped distinct-user rule.
+ */
+export function gatePolicyWeakenings(prev: A4GatePolicyV1, next: A4GatePolicyV1): string[] {
+  return A4_GATE_POLICY_KEYS.flatMap((key) => {
+    const a = prev.gates[key], b = next.gates[key];
+    const kept = new Set(b.requiredReviews.map((review) => canonicalize(review)));
+    return [
+      a.actionClass !== b.actionClass ? `${key}.actionClass ${a.actionClass} -> ${b.actionClass}` : null,
+      (b.minApprovals ?? 0) < (a.minApprovals ?? 0) ? `${key}.minApprovals` : null,
+      a.rolesAllowed && (!b.rolesAllowed || b.rolesAllowed.some((role) => !a.rolesAllowed!.includes(role))) ? `${key}.rolesAllowed` : null,
+      a.requireDistinctUsers === true && b.requireDistinctUsers !== true ? `${key}.requireDistinctUsers` : null,
+      b.ttlDays > a.ttlDays ? `${key}.ttlDays` : null,
+      a.requiredReviews.some((review) => !kept.has(canonicalize(review))) ? `${key}.requiredReviews` : null
+    ].filter((item): item is string => item !== null);
+  });
+}
+
+/**
+ * Why `next` sits below its floors: the D-16 defaults (TTL aside), the signed workspace `a4` TTL bounds and, against
+ * `prev`, any field the workspace does not let a project change (`allowedGateChanges`).
+ */
+export function gatePolicyFloorViolations(next: A4GatePolicyV1, floor: ApprovalA4Floor, prev?: A4GatePolicyV1): string[] {
+  const fields = ["minApprovals", "rolesAllowed", "requireDistinctUsers", "ttlDays", "requiredReviews"] as const;
+  return [
+    ...gatePolicyWeakenings(DEFAULT_A4_GATE_POLICY, next).filter((item) => !item.endsWith(".ttlDays")),
+    ...A4_GATE_POLICY_KEYS.filter((key) => next.gates[key].ttlDays > (floor.maxTtlDays ?? 90) || next.gates[key].ttlDays < (floor.minTtlDays ?? 1))
+      .map((key) => `${key}.ttlDays outside the workspace a4 floor`),
+    ...(prev === undefined ? [] : A4_GATE_POLICY_KEYS.flatMap((key) => fields
+      .filter((field) => !floor.allowedGateChanges.includes(field) && canonicalize(prev.gates[key][field] ?? null) !== canonicalize(next.gates[key][field] ?? null))
+      .map((field) => `${key}.${field} may not be changed in this workspace`)))
+  ];
+}
 
 /** What a stage module (src/a4/stages/*.ts) adds to the router's tables; P1-57 gives the entries their shape. */
 export interface A4StageRegistry {

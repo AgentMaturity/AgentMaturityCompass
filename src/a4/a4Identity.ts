@@ -131,7 +131,8 @@ export function liveRolesFor(workspace: string, principal: Pick<A4Principal, "au
  * Throws A4_NOT_A_MEMBER unless the principal holds one of `roles` on the project. Workspace OWNERs are implicit
  * project owners and AUDITORs implicit reviewers (design §5.2).
  */
-export function assertMember(members: readonly A4Member[], principal: A4Principal, roles: readonly A4Member["roles"][number][]): void {
+export function assertMember(members: readonly A4Member[], principal: Pick<A4Principal, "key" | "username" | "roles">,
+  roles: readonly A4Member["roles"][number][]): void {
   const held = new Set(members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
