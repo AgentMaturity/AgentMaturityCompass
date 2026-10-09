@@ -224,7 +224,7 @@ export function renderLanes(readiness) {
     .filter((item) => item.section === lane).map(laneItem), "Nothing recorded.")}</section>`).join("");
   const checks = readiness.items.filter((item) => item.section === "integrity").map((item) => `<details><summary><code>${esc(item.id)}</code>
     <code>${esc(item.status)}</code> ${codes(item.reasonCodes)}</summary><pre class="scroll">${esc(JSON.stringify(item.report, null, 2))}</pre></details>`);
-  return `<div class="a4-lanes">${lanes}<section class="card a4-integrity"><h4>Integrity</h4>
+  return `<div class="a4-lanes"><div class="a4-lane-grid">${lanes}</div><section class="card a4-integrity"><h4>Integrity</h4>
     <p class="muted">Integrity of bytes; not evidence about the agent. ${TRUTH.signatures}.</p>
     <p><code>valid: ${esc(readiness.integrity.valid)}</code> ${codes(readiness.integrity.reasonCodes)}</p>${checks.join("")}</section></div>`;
 }
@@ -355,15 +355,18 @@ export function applyChanges(base, changes) {
 
 // P1-52: validateNativeTaskPoll (nativeTasks.js) is exported, but it validates the native-task view (task, truncated,
 // event kinds), not A4's { events, nextCursor, firstCursor, droppedEvents, head, presence }. This copy keeps its refusals:
-// a malformed page, a cursor or event order that moves backwards, and a head that regresses or changes project.
+// a malformed or oversized page, a cursor or event order that moves backwards, and a head that regresses or does not
+// name this project (a missing projectId counts as a mismatch).
+const POLL_EVENT_BYTES = 2 * 1024 * 1024;
 export function validateA4Poll(value, current, cursor) {
   const int = (number) => Number.isSafeInteger(number) && number >= 0;
   if (!isObject(value) || !Array.isArray(value.events) || !Array.isArray(value.presence) || !int(value.nextCursor)
     || !int(value.firstCursor) || !int(value.droppedEvents) || !isObject(value.head) || !int(value.head.headSeq)
-    || value.events.length > 512 || value.presence.length > 256) {
+    || value.events.length > 512 || value.presence.length > 256
+    || new TextEncoder().encode(JSON.stringify(value.events)).byteLength > POLL_EVENT_BYTES) {
     throw new Error("Studio returned an unsupported A4 update. No updates were applied.");
   }
-  if ((value.head.projectId !== undefined && value.head.projectId !== current.projectId) || value.head.headSeq < current.headSeq) {
+  if (value.head.projectId !== current.projectId || value.head.headSeq < current.headSeq) {
     throw new Error("The project head moved backwards or changed identity. No updates were applied; reload the page.");
   }
   if (value.nextCursor < cursor || value.firstCursor > value.nextCursor + 1) {
