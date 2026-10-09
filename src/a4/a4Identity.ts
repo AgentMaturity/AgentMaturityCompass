@@ -152,21 +152,25 @@ export function assertMember(members: readonly A4Member[], principal: A4Principa
   if (!roles.some((role) => held.has(role))) throw Object.assign(new Error(`A4_NOT_A_MEMBER: ${principal.username} holds none of ${roles.join(", ")} on this project`), { code: "A4_NOT_A_MEMBER", status: 403 });
 }
 
-/** Who can be added: ACTIVE users.yaml users plus live tracked host sessions, keyed by principal key. `limited` in host mode or when the sessions are unreadable. */
+/**
+ * Who can be added: ACTIVE users.yaml users plus live tracked host sessions, keyed by principal key. `limited` in host
+ * mode, or when users.yaml or the session records cannot be read: an unreadable source is not an empty one.
+ */
 export function memberCandidates(workspace: string, hostMode: boolean, now = Date.now()): {
   candidates: Array<{ principalKey: string; authSource: A4Principal["authSource"]; userId: string; username: string }>; limited: boolean;
 } {
   let local: Array<{ principalKey: string; authSource: A4Principal["authSource"]; userId: string; username: string }> = [];
+  let localUnreadable = false;
   try {
     local = listUsers(workspace).filter((user) => user.status === "ACTIVE")
       .map((user) => ({ principalKey: `LOCAL_USER:${user.userId}`, authSource: "LOCAL_USER" as const, userId: user.userId, username: user.username }));
   } catch {
-    local = [];
+    localUnreadable = true;
   }
   const sessions = liveRouterSessions(workspace, now);
   const hosted = new Map((sessions ?? []).map((record) => [`WORKSPACE_ROUTER:${record.userId}`,
     { principalKey: `WORKSPACE_ROUTER:${record.userId}`, authSource: "WORKSPACE_ROUTER" as const, userId: record.userId, username: record.username }]));
-  return { candidates: [...local, ...hosted.values()], limited: hostMode || sessions === null };
+  return { candidates: [...local, ...hosted.values()], limited: hostMode || sessions === null || localUnreadable };
 }
 
 /** Distinct live host principals and the ACTIVE local user ids, the inputs `deriveSelfApprovalAllowed` reads; null when unreadable. */

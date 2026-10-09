@@ -6,7 +6,8 @@
  * secret, the vault secret `a4:<projectId>:wrap`. Sealing needs only `key.pub`, so the blob write itself needs no vault
  * (the transition recording it still signs with the vault's monitor key). `key.pub` is an unauthenticated file, so
  * `putPrivate` seals only to a key whose sha256 matches the one the caller read from the signed CREATED transition.
- * Reads unwrap through the vault and report VAULT_LOCKED when they cannot. The salted `bodySha256 = sha256(salt ||
+ * Reads unwrap through the vault: VAULT_LOCKED when no passphrase is available, VAULT_UNREADABLE when the vault does
+ * not open with the one given (a wrong passphrase or a damaged envelope). The salted `bodySha256 = sha256(salt ||
  * body)` keeps a short body from being confirmed by dictionary after erasure; the salt travels inside the ciphertext,
  * and `blobRef = sha256(ciphertext)` names the file.
  *
@@ -27,7 +28,7 @@ const SALT_BYTES = 32;
 const TOMBSTONE = "key.destroyed";
 const wrapSecret = (projectId: string): string => `a4:${projectId}:wrap`;
 
-export type A4BlobErrorCode = "VAULT_LOCKED" | "SECRET_SCAN_REFUSED" | "BLOB_MISSING" | "BLOB_INTEGRITY" | "PROJECT_KEY_DESTROYED"
+export type A4BlobErrorCode = "VAULT_LOCKED" | "VAULT_UNREADABLE" | "SECRET_SCAN_REFUSED" | "BLOB_MISSING" | "BLOB_INTEGRITY" | "PROJECT_KEY_DESTROYED"
   | "PROJECT_KEY_EXISTS" | "PROJECT_KEY_MISSING" | "PROJECT_KEY_UNVERIFIED";
 export class A4BlobError extends Error {
   constructor(readonly code: A4BlobErrorCode, message: string) {
@@ -70,13 +71,21 @@ function openWith(privateKeyPem: string, sealed: Buffer): Buffer {
   return aesOpen(privateDecrypt({ key: privateKeyPem, padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" }, Buffer.from(parsed.wrappedKey ?? "", "base64")), parsed);
 }
 
-/** Opens the vault for a write; only a vault that cannot be unlocked is VAULT_LOCKED, every other failure keeps its own error. */
+/** VAULT_LOCKED only when no passphrase is available; a wrong passphrase or a damaged vault is VAULT_UNREADABLE with the vault's message. */
+function vaultFailure(workspace: string, purpose: string, error: unknown): A4BlobError {
+  const message = error instanceof Error ? error.message : String(error);
+  return !vaultStatus(workspace).unlocked && !process.env.AMC_VAULT_PASSPHRASE
+    ? new A4BlobError("VAULT_LOCKED", `unlock the vault to ${purpose} (${message})`)
+    : new A4BlobError("VAULT_UNREADABLE", `the vault did not open to ${purpose} (${message})`);
+}
+
+/** Opens the vault for a write. */
 function unlockForWrite(workspace: string, purpose: string): void {
   if (vaultStatus(workspace).unlocked) return;
   try {
     unlockVault(workspace);
   } catch (error) {
-    throw new A4BlobError("VAULT_LOCKED", `unlock the vault to ${purpose} (${error instanceof Error ? error.message : String(error)})`);
+    throw vaultFailure(workspace, purpose, error);
   }
 }
 
@@ -131,8 +140,8 @@ export function getPrivate(workspace: string, projectId: string, blobRef: string
   let wrap: string | null;
   try {
     wrap = getVaultSecretReadOnly(workspace, wrapSecret(projectId));
-  } catch {
-    throw new A4BlobError("VAULT_LOCKED", "unlock the vault to read this");
+  } catch (error) {
+    throw vaultFailure(workspace, "read this", error);
   }
   if (wrap === null || !pathExists(join(dir, "key.enc"))) throw new A4BlobError("PROJECT_KEY_MISSING", `project ${projectId}'s key is missing without an erasure record`);
   let plaintext: Buffer;
