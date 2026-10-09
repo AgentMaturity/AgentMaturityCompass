@@ -17,13 +17,15 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
+import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
-import { openLedger, type Ledger } from "../ledger/ledger.js";
+import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { verifyReceipt } from "../receipts/receipt.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -101,6 +103,8 @@ const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisi
 const COLUMN = /^[a-z][a-z0-9_]*$/;
 const sideRowDigest = (values: Readonly<Record<string, Cell>>): string => sha256Hex(canonicalize(values));
 const keyOf = (row: A4SideRow): Record<string, Cell> => Object.fromEntries(SIDE_TABLE_KEYS[row.table].map((column) => [column, row.values[column] ?? null]));
+type SideRowName = { table: string; key: Record<string, unknown>; sha256: string };
+const namedIn = (bodyJson: string): SideRowName[] => (JSON.parse(bodyJson) as { sideRows?: SideRowName[] }).sideRows ?? [];
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 
 /** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private. */
@@ -181,16 +185,54 @@ function createStore(workspace: string, ledger: Ledger) {
   };
 
   /**
-   * Head continuity and the rows after `verified_seq` only (design §7 rule 2): prev-digest linkage, body digests, the
-   * audit row each names and every side row each body names. O(new rows) under the ledger write lock.
+   * Why one transition is not what its signed audit row recorded (mirrors actionJournal's checkEvidence): the body
+   * matches its digest and the unsigned columns readers use, and the audit row carries exactly these bytes, recomputes
+   * to its event hash, is signed by a monitor key of this workspace, names this project and seq, and holds a signed
+   * receipt over the same body and event. The meta binding also means one audit row can back only one transition.
+   */
+  const transitionProblems = (row: A4TransitionRow, keys: string[]): string[] => {
+    const problems: string[] = [];
+    if (sha256Hex(row.body_json) !== row.body_digest) problems.push(`transition ${row.seq} body digest mismatch`);
+    const body = JSON.parse(row.body_json) as Record<string, unknown>;
+    const columns = { projectId: row.project_id, seq: row.seq, kind: row.kind, stage: row.stage, revisionNo: row.revision_no, actorKey: row.actor_key,
+      actorUsername: row.actor_username, ts: row.ts, prevDigest: row.prev_digest, readinessSha256: row.readiness_sha256 };
+    for (const [field, value] of Object.entries(columns)) if (body[field] !== value) problems.push(`transition ${row.seq} column ${field} differs from its body`);
+    const event = ledger.getEventById(row.evidence_event_id);
+    if (!event || event.event_type !== "audit" || event.payload_sha256 !== row.body_digest
+      || [event.payload_inline, event.canonical_payload_inline].some((inline) => inline != null && inline !== row.body_json)) {
+      return [...problems, `transition ${row.seq} audit row missing or carries other bytes`];
+    }
+    const recomputed = sha256Hex(`${event.prev_event_hash}${canonicalMetadataForHash({ id: event.id, ts: event.ts, sessionId: event.session_id,
+      runtime: event.runtime, eventType: event.event_type, payloadPath: event.canonical_payload_path ?? event.payload_path,
+      payloadInline: event.canonical_payload_inline ?? event.payload_inline, metaJson: event.meta_json })}${event.payload_sha256}`);
+    if (recomputed !== event.event_hash || !verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) {
+      return [...problems, `transition ${row.seq} audit row signature does not verify`];
+    }
+    const meta = eventMeta(event);
+    if (meta.auditType !== A4_AUDIT_TYPE || meta.projectId !== row.project_id || meta.seq !== row.seq) problems.push(`transition ${row.seq} audit row is for another transition`);
+    const receipt = typeof meta.receipt === "string" ? verifyReceipt(meta.receipt, keys) : null;
+    if (!receipt?.ok || receipt.payload?.body_sha256 !== row.body_digest || receipt.payload.event_hash !== event.event_hash) {
+      problems.push(`transition ${row.seq} signed receipt does not bind it`);
+    }
+    return problems;
+  };
+
+  /**
+   * Head continuity and the rows after `verified_seq` (design §7 rule 2): prev-digest linkage, each row against its
+   * signed audit row, and every side row each body names; the verified anchor's audit row is re-checked so the
+   * unsigned `verified_seq` cannot be moved over a forged tail. Side tables may hold no row the chain does not name
+   * (one aggregate over the chain). Under the ledger write lock.
    */
   const verifyIncremental = (projectId: string, head: A4ProjectRow): void => {
     const problems: string[] = [];
+    const keys = getPublicKeyHistory(workspace, "monitor");
     let prev = "GENESIS";
     let expected = 0;
     if (head.verified_seq !== null) {
-      const anchor = db.prepare("SELECT body_digest FROM a4_transitions WHERE project_id = ? AND seq = ?").get(projectId, head.verified_seq) as { body_digest: string } | undefined;
-      if (anchor?.body_digest !== head.verified_digest) problems.push(`verified row ${head.verified_seq} changed`);
+      const raw = db.prepare("SELECT * FROM a4_transitions WHERE project_id = ? AND seq = ?").get(projectId, head.verified_seq);
+      const anchor = raw === undefined ? null : a4TransitionRowSchema.parse(raw);
+      if (anchor === null || anchor.body_digest !== head.verified_digest) problems.push(`verified row ${head.verified_seq} changed`);
+      else problems.push(...transitionProblems(anchor, keys));
       prev = head.verified_digest ?? "";
       expected = head.verified_seq + 1;
     }
@@ -198,18 +240,37 @@ function createStore(workspace: string, ledger: Ledger) {
       .map((raw) => a4TransitionRowSchema.parse(raw));
     for (const row of rows) {
       if (row.seq !== expected || row.prev_digest !== prev) problems.push(`transition ${row.seq} does not link to ${expected - 1}`);
-      if (sha256Hex(row.body_json) !== row.body_digest) problems.push(`transition ${row.seq} body digest mismatch`);
-      const event = ledger.getEventById(row.evidence_event_id);
-      if (!event || event.writer_sig === "unsigned" || (event.payload_pruned !== 1 && event.payload_sha256 !== row.body_digest)) {
-        problems.push(`transition ${row.seq} audit row missing, unsigned or different`);
-      }
-      const named = (JSON.parse(row.body_json) as { sideRows?: Array<{ table: string; key: Record<string, unknown>; sha256: string }> }).sideRows ?? [];
-      for (const ref of named) if (storedSideRowDigest(ref) !== ref.sha256) problems.push(`A4_SIDE_ROW_MISMATCH ${ref.table} ${JSON.stringify(ref.key)}`);
+      problems.push(...transitionProblems(row, keys));
+      for (const ref of namedIn(row.body_json)) if (storedSideRowDigest(ref) !== ref.sha256) problems.push(`A4_SIDE_ROW_MISMATCH ${ref.table} ${JSON.stringify(ref.key)}`);
       prev = row.body_digest;
       expected += 1;
     }
     if (head.head_seq !== expected - 1 || head.head_digest !== prev) problems.push("head does not equal the last transition");
+    const named = new Map((db.prepare(`SELECT json_extract(s.value, '$.table') AS side, COUNT(*) AS n FROM a4_transitions t,
+        json_each(t.body_json, '$.sideRows') s WHERE t.project_id = ? GROUP BY side`).all(projectId) as Array<{ side: string; n: number }>)
+      .map((row) => [row.side, row.n]));
+    for (const table of Object.keys(SIDE_TABLE_KEYS)) {
+      const { n } = db.prepare(`SELECT COUNT(*) AS n FROM ${table} WHERE project_id = ?`).get(projectId) as { n: number };
+      if (n !== (named.get(table) ?? 0)) problems.push(`A4_SIDE_ROW_UNNAMED ${table}: ${n} rows, ${named.get(table) ?? 0} named`);
+    }
     if (problems.length > 0) throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId} failed verification`, problems);
+  };
+
+  /**
+   * The project's rows of one side table that a verified transition names with their signed digest; a row inserted
+   * behind the store's back, or one changed since, is not returned (the chain is the completeness root for readers too).
+   */
+  const namedSideRows = (projectId: string, table: A4SideTable, rows: readonly Record<string, Cell>[]): Record<string, Cell>[] => {
+    const names = new Map<string, string>();
+    const links = db.prepare(`SELECT evidence_event_id, body_json FROM a4_transitions WHERE project_id = ?
+        AND seq <= COALESCE((SELECT verified_seq FROM a4_projects WHERE project_id = ?), -1)`).all(projectId, projectId) as Array<{ evidence_event_id: string; body_json: string }>;
+    for (const link of links) {
+      for (const ref of namedIn(link.body_json)) if (ref.table === table) names.set(`${link.evidence_event_id}\0${canonicalize(ref.key)}`, ref.sha256);
+    }
+    return rows.filter(({ evidence_event_id: evidenceEventId, ...values }) => {
+      const key = Object.fromEntries(SIDE_TABLE_KEYS[table].map((column) => [column, values[column] ?? null]));
+      return names.get(`${String(evidenceEventId)}\0${canonicalize(key)}`) === sideRowDigest(values);
+    });
   };
 
   /** Inside the transaction, before any side row: a replay answers the stored response; a different body is 409. */
@@ -327,7 +388,7 @@ function createStore(workspace: string, ledger: Ledger) {
 
   const membersOf = (projectId: string): A4Member[] => {
     const latest = new Map<string, A4Member | null>();
-    for (const raw of db.prepare("SELECT * FROM a4_members WHERE project_id = ? ORDER BY seq").all(projectId) as unknown[]) {
+    for (const raw of namedSideRows(projectId, "a4_members", db.prepare("SELECT * FROM a4_members WHERE project_id = ? ORDER BY seq").all(projectId) as Record<string, Cell>[])) {
       const row = a4MemberRowSchema.parse(raw);
       latest.set(row.principal_key, row.event === "removed" ? null : {
         principalKey: row.principal_key, authSource: row.auth_source as A4Member["authSource"], userId: row.user_id, username: row.username,
@@ -353,7 +414,8 @@ function createStore(workspace: string, ledger: Ledger) {
     verifyIncremental,
     transition: (projectId: string, build: Build, options: A4TransitionOptions = {}): A4TransitionResult => commit(projectId, build, options, null),
     readRevision: (projectId: string, revisionNo: number) => {
-      const row = db.prepare("SELECT * FROM a4_revisions WHERE project_id = ? AND revision_no = ?").get(projectId, revisionNo);
+      const [row] = namedSideRows(projectId, "a4_revisions", db.prepare("SELECT * FROM a4_revisions WHERE project_id = ? AND revision_no = ?")
+        .all(projectId, revisionNo) as Record<string, Cell>[]);
       return row === undefined ? null : a4RevisionRowSchema.parse(row);
     },
     listProjects: (): A4ProjectRow[] => (db.prepare("SELECT * FROM a4_projects WHERE workspace_id = ? ORDER BY created_ts")
