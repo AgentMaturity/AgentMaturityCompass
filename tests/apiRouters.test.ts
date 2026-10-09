@@ -209,7 +209,7 @@ const m = vi.hoisted(() => ({
   transparencyMerkleRebuildCli: vi.fn(() => ({ rebuilt: true })),
   transparencyMerkleRootCli: vi.fn(() => ({ root: "root-1" })),
   transparencyMerkleProofCli: vi.fn(() => ({ proofFile: "proof.json" })),
-  transparencyMerkleVerifyProofCli: vi.fn(() => ({ valid: true })),
+  verifyWorkspaceProofBundle: vi.fn(() => ({ valid: true })),
   verifyDelegationChain: vi.fn(() => ({ valid: true, chainLength: 1 })),
   getPublicKeyHistory: vi.fn(() => ["pk-1", "pk-2"]),
 
@@ -633,7 +633,7 @@ vi.mock("../src/transparency/transparencyMerkleCli.js", () => ({
   transparencyMerkleRebuildCli: m.transparencyMerkleRebuildCli,
   transparencyMerkleRootCli: m.transparencyMerkleRootCli,
   transparencyMerkleProofCli: m.transparencyMerkleProofCli,
-  transparencyMerkleVerifyProofCli: m.transparencyMerkleVerifyProofCli
+  verifyWorkspaceProofBundle: m.verifyWorkspaceProofBundle
 }));
 vi.mock("../src/receipts/receiptChain.js", () => ({ verifyDelegationChain: m.verifyDelegationChain }));
 vi.mock("../src/crypto/keys.js", () => ({ getPublicKeyHistory: m.getPublicKeyHistory }));

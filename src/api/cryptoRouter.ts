@@ -305,11 +305,11 @@ export async function handleCryptoRoute(
       const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
       const refused = requestTrustOverride(body);
       if (refused) { apiError(res, 400, refused); return true; }
-      const { transparencyMerkleVerifyProofCli } = await import('../transparency/transparencyMerkleCli.js');
-      const result = transparencyMerkleVerifyProofCli(resolve(workspace, body.file), loadTrustContext());
-      apiSuccess(res, result);
-    } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Merkle verify-proof failed');
+      // P0-51: only a bundle under .amc/transparency/proofs/ is read; anything else verifies as UNREADABLE.
+      const { verifyWorkspaceProofBundle } = await import('../transparency/transparencyMerkleCli.js');
+      apiSuccess(res, verifyWorkspaceProofBundle(workspace, body.file, loadTrustContext()));
+    } catch {
+      apiError(res, 500, 'Merkle verify-proof failed');
     }
     return true;
   }

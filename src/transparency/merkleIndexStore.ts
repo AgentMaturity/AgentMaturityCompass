@@ -44,7 +44,7 @@ import { fileSha256 } from "../trust/signatureCheck.js";
  * small archive can expand without bound. These bounds mirror the ones the
  * passport and plugin verifiers already use.
  */
-const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
+export const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
   maxEntries: 10_000,
   maxCompressedBytes: 128 * 1024 * 1024,
   maxEntryBytes: 128 * 1024 * 1024,
@@ -600,8 +600,9 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
   const signatures: IssuerAdmission[] = [];
   let proof: MerkleProofPayload | null = null;
   let publicAnchoring: PublicAnchoring | undefined;
+  let bundleSha256 = "0".repeat(64);
   const finish = () => {
-    const report = buildVerifierReport({ artifact: { kind: "transparency-proof", path: bundleFile, sha256: fileSha256(bundleFile) },
+    const report = buildVerifierReport({ artifact: { kind: "transparency-proof", path: bundleFile, sha256: bundleSha256 },
       context: trust, integrityErrors: errors, signatures,
       anchoring: { status: "not-applicable", detail: null, ...(publicAnchoring ? { public: publicAnchoring } : {}) } });
     return { ok: report.trusted, errors, proof, report };
@@ -609,6 +610,8 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
   const tmp = mkdtempSync(join(tmpdir(), "amc-proof-verify-"));
   try {
     tarExtract(bundleFile, tmp);
+    // P0-51: only a bundle that extracted is hashed, so a failed one never hashes (or reads on from) an arbitrary file.
+    bundleSha256 = fileSha256(bundleFile);
     const files = readdirSync(tmp, { withFileTypes: true });
     const root = files.find((entry) => entry.isDirectory()) ? join(tmp, files.find((entry) => entry.isDirectory())!.name) : tmp;
     const proofFile = join(root, "proof.json");
@@ -655,8 +658,9 @@ export function verifyTransparencyProofBundle(bundleFile: string, trust: TrustCo
       publicAnchoring = anchor.publicAnchoring;
     }
     return finish();
-  } catch (error) {
-    errors.push(String(error));
+  } catch {
+    // P0-51: never the error text, which names server paths and tells missing, unreadable and malformed files apart.
+    errors.push("UNREADABLE: cannot read proof bundle");
     return finish();
   } finally {
     rmSync(tmp, { recursive: true, force: true });
