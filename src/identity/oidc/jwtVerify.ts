@@ -1,4 +1,4 @@
-import { constants, createPublicKey, verify, type JsonWebKey, type KeyObject } from "node:crypto";
+import { constants, createPublicKey, verify, type JsonWebKeyInput, type KeyObject } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { request as httpRequest } from "node:http";
 import { request as httpsRequest } from "node:https";
@@ -138,7 +138,7 @@ function compatibleKey(jwk: ObjectJson, alg: Alg): KeyObject | null {
         || fromBase64Url(jwk.x).length !== 32 || fromBase64Url(jwk.y).length !== 32) return null;
     } else if (jwk.kty !== "RSA" || typeof jwk.n !== "string" || typeof jwk.e !== "string") return null;
     else { fromBase64Url(jwk.n); fromBase64Url(jwk.e); }
-    const key = createPublicKey({ key: jwk as JsonWebKey, format: "jwk" });
+    const key = createPublicKey({ key: jwk as JsonWebKeyInput["key"], format: "jwk" });
     if (alg !== "ES256" && (key.asymmetricKeyType !== "rsa" || (key.asymmetricKeyDetails?.modulusLength ?? 0) < 2048)) return null;
     if (alg === "ES256" && key.asymmetricKeyType !== "ec") return null;
     return key;
