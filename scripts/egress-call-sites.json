@@ -7,7 +7,8 @@
     "Source navigation inventory authored without executing requests or acceptance checks.",
     "Gated describes a source integration seam, not observed residency or legal approval. Scope/caller limitations remain in each reason.",
     "Deferred is deliberately distinct from exempt. Complete architecture acceptance must reject unresolved deferred sites before full coverage can be claimed.",
-    "Line locations are navigation hints and must be refreshed when source moves; patterns and aliases are not a complete static-analysis proof."
+    "Line locations are navigation hints and must be refreshed when source moves; patterns and aliases are not a complete static-analysis proof.",
+    "The gated demo transport covers the released scoped internal caller. Its frozen CLI caller at src/cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring; this caller limitation does not add a second native transport row."
   ],
   "sites": [
     {
@@ -163,12 +164,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/demo/demoRun.ts:364:1",
+      "siteId": "src/demo/demoRun.ts:375:1",
       "path": "src/demo/demoRun.ts",
-      "line": 364,
+      "line": 375,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Released no-vault internal runDemo caller installs prepared workspace scope; private helper captures it, prepares same-endpoint manual-redirect gateway POST, and gates bridge immediately before fetch with null facts/caller-declared demo actor. Typed denial propagates without a complete run result. Source-only: frozen CLI caller cli-late-stage-commands.ts:348 remains deferred for explicit workspace wiring, and external library callers own their scope. Earlier temp setup/lease/servers/requests can have effects; synthetic output, cleanup and transport/region limits remain unqualified."
     },
     {
       "siteId": "src/doctor/doctorLiveProbe.ts:34:1",

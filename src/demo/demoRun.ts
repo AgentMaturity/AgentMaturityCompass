@@ -14,6 +14,8 @@ import { initWorkspace } from "../workspace.js";
 import { openLedger } from "../ledger/ledger.js";
 import { ensureLeaseRevocationStore, issueLeaseForCli } from "../leases/leaseCli.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { getWorkspaceScope, withWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 
 export interface DemoResult {
   requestsSent: number;
@@ -330,6 +332,8 @@ async function sendRequest(
   leaseToken?: string,
   agentId = DEMO_AGENT_ID
 ): Promise<void> {
+  const workspace = getWorkspaceScope();
+  const endpoint = `${gatewayUrl}/local/v1/chat/completions`;
   const body: Record<string, unknown> = {
     model: "gpt-4o-demo",
     messages,
@@ -361,11 +365,14 @@ async function sendRequest(
     headers["x-amc-lease"] = leaseToken;
   }
 
-  const res = await fetch(`${gatewayUrl}/local/v1/chat/completions`, {
+  const request: RequestInit = {
     method: "POST",
     headers,
     body: JSON.stringify(body),
-  });
+    redirect: "manual",
+  };
+  checkScopedEgress(workspace, "bridge", endpoint, { dataClasses: null, purpose: null, agentId });
+  const res = await fetch(endpoint, request);
   if (!res.ok) {
     throw new Error(`Gateway returned ${res.status}: ${await res.text()}`);
   }
@@ -448,7 +455,7 @@ export async function runDemoWithoutUserVault(options: NoVaultDemoOptions = {}):
     );
 
     const result = await withTemporaryVaultPassphraseAsync(prepared.passphrase, () =>
-      runDemo(`http://${gateway!.host}:${gateway!.port}`, prepared!.leaseToken, prepared!.agentId)
+      withWorkspaceScope(prepared!.workspace, () => runDemo(`http://${gateway!.host}:${gateway!.port}`, prepared!.leaseToken, prepared!.agentId))
     );
     const evidenceItems = countLedgerEvidence(prepared.workspace);
     const score = demoMaturityScore(result.requestsSent, evidenceItems);
