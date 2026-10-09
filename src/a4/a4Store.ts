@@ -17,7 +17,7 @@ import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
@@ -81,6 +81,10 @@ export interface A4ChangeSpec {
 export interface A4RequestKey {
   readonly principalKey: string;
   readonly clientRequestId: string;
+  /**
+   * sha256 over the method, the route and the project id as well as the body: one (principal, clientRequestId)
+   * namespace spans every A4 route. The store also refuses a replay whose stored project differs (REQUEST_CONFLICT).
+   */
   readonly bodyHash: string;
   /** Credential-bearing routes store only this allowlist projection, never the response; a replay answers token: null. */
   readonly credential?: { readonly releaseId: string; readonly leaseIds: readonly string[] };
@@ -101,6 +105,11 @@ type NewHead = Pick<A4ProjectRow, "project_id" | "workspace_id" | "agent_id" | "
 
 const RESERVED_BODY_KEYS = new Set(["kind", "projectId", "seq", "stage", "revisionNo", "actorKey", "actorUsername", "ts", "prevDigest", "readinessSha256", "sideRows"]);
 const COLUMN = /^[a-z][a-z0-9_]*$/;
+/** The minted id shape (`randomId("a4p")`); it names a lock file and a blob directory, so nothing else is accepted. */
+const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
+const assertProjectId = (projectId: string): void => {
+  if (!PROJECT_ID.test(projectId)) throw new A4StoreError(400, "INPUT_INVALID", "Not an A4 project ID.");
+};
 const sideRowDigest = (values: Readonly<Record<string, Cell>>): string => sha256Hex(canonicalize(values));
 const keyOf = (row: A4SideRow): Record<string, Cell> => Object.fromEntries(SIDE_TABLE_KEYS[row.table].map((column) => [column, row.values[column] ?? null]));
 type SideRowName = { table: string; key: Record<string, unknown>; sha256: string };
@@ -285,12 +294,17 @@ function createStore(workspace: string, ledger: Ledger) {
     });
   };
 
-  /** Inside the transaction, before any side row: a replay answers the stored response; a different body is 409. */
-  const dedupeRequest = (request: A4RequestKey, projectId: string, response: Record<string, unknown> | null, ts: number): A4TransitionResult | null => {
-    const existing = db.prepare("SELECT body_hash, response_json, redacted FROM a4_requests WHERE principal_key = ? AND client_request_id = ?")
-      .get(request.principalKey, request.clientRequestId) as { body_hash: string; response_json: string; redacted: number } | undefined;
+  /**
+   * Inside the transaction, before any side row: a replay answers the stored response; a different body, or the same
+   * request ID against another project (a create mints its id, so only non-create commits compare it), is 409.
+   */
+  const dedupeRequest = (request: A4RequestKey, projectId: string, create: boolean, response: Record<string, unknown> | null, ts: number): A4TransitionResult | null => {
+    const existing = db.prepare("SELECT body_hash, project_id, response_json, redacted FROM a4_requests WHERE principal_key = ? AND client_request_id = ?")
+      .get(request.principalKey, request.clientRequestId) as { body_hash: string; project_id: string | null; response_json: string; redacted: number } | undefined;
     if (existing) {
-      if (existing.body_hash !== request.bodyHash) throw new A4StoreError(409, "REQUEST_CONFLICT", "That request ID already names a different A4 request.");
+      if (existing.body_hash !== request.bodyHash || (!create && existing.project_id !== projectId)) {
+        throw new A4StoreError(409, "REQUEST_CONFLICT", "That request ID already names a different A4 request.");
+      }
       const stored = JSON.parse(existing.response_json) as Record<string, unknown>;
       return { replay: true, response: existing.redacted === 1 ? { ...stored, token: null, reasonCode: "TOKEN_ALREADY_DELIVERED" } : stored };
     }
@@ -313,10 +327,22 @@ function createStore(workspace: string, ledger: Ledger) {
     }
   };
 
-  const commit = (projectId: string, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult =>
-    withControlFileLock({ root: a4ProjectsRoot(workspace), name: create ? "a4-requests" : `project-${projectId}`, operation: () => {
+  /** 423 before anything is written when no vault can sign the audit row (locked, and no AMC_VAULT_PASSPHRASE). */
+  const requireSigningKey = (): void => {
+    try {
+      getPrivateKeyPem(workspace, "monitor");
+    } catch (error) {
+      if (/vault locked/i.test(error instanceof Error ? error.message : String(error))) throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault to record this.");
+      throw error;
+    }
+  };
+
+  const commit = (projectId: string, build: Build, options: A4TransitionOptions, create: NewHead | null): A4TransitionResult => {
+    assertProjectId(projectId);
+    requireSigningKey();
+    return withControlFileLock({ root: a4ProjectsRoot(workspace), name: create ? "a4-requests" : `project-${projectId}`, operation: () => {
       for (let attempt = 0; ; attempt += 1) {
-        const replay = options.request ? dedupeRequest(options.request, projectId, null, 0) : null;
+        const replay = options.request ? dedupeRequest(options.request, projectId, create !== null, null, 0) : null;
         if (replay) return replay;
         const head0 = readHead(projectId);
         if (create === null && head0 === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
@@ -343,7 +369,7 @@ function createStore(workspace: string, ledger: Ledger) {
         try {
           return runImmediateTransaction(db, (): A4TransitionResult => {
             // (b) One transaction on rows read inside it.
-            const replayed = options.request ? dedupeRequest(options.request, projectId, { projectId, seq, kind: spec.kind, bodyDigest: digest }, ts) : null;
+            const replayed = options.request ? dedupeRequest(options.request, projectId, create !== null, { projectId, seq, kind: spec.kind, bodyDigest: digest }, ts) : null;
             if (replayed) return replayed;
             const head = readHead(projectId);
             if (head?.head_seq !== head0?.head_seq || head?.head_digest !== head0?.head_digest) throw new HeadMoved();
@@ -397,6 +423,7 @@ function createStore(workspace: string, ledger: Ledger) {
         }
       }
     } });
+  };
 
   const membersOf = (projectId: string): A4Member[] => {
     const latest = new Map<string, A4Member | null>();
@@ -508,8 +535,11 @@ function createStore(workspace: string, ledger: Ledger) {
      * ponytail: a blob whose transition then fails stays as an unreferenced file.
      */
     addComment(projectId: string, input: { actor: A4Actor; body: string; cardId: string; inReplyTo?: string | null; request?: A4RequestKey }): A4TransitionResult {
+      assertProjectId(projectId);
       if (input.body.trim().length === 0 || input.cardId.trim().length === 0) throw new A4StoreError(400, "INPUT_INVALID", "A comment needs text and a card.");
       if (readHead(projectId) === null) throw new A4StoreError(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
+      // Before the blob: a vault that cannot sign the transition must not leave an orphan file behind.
+      requireSigningKey();
       const blob = putPrivate(workspace, projectId, Buffer.from(input.body, "utf8"), createdKeySha256(projectId));
       const commentId = randomId("a4c");
       return commit(projectId, ({ head, ts }) => ({
