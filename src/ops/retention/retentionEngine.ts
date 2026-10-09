@@ -2,11 +2,13 @@ import { unlinkSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { openLedger, verifyLedgerIntegrity } from "../../ledger/ledger.js";
+import { runImmediateTransaction } from "../../ledger/ledgerSessionTransactions.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../policy.js";
 import { appendTransparencyEntry } from "../../transparency/logChain.js";
 import { rebuildTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
+import { canonicalize } from "../../utils/json.js";
 import { blobPathFromId } from "../../storage/blobs/blobStore.js";
 import { appendOpsAuditEvent } from "../audit.js";
 import {
@@ -250,10 +252,15 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       list.push(row);
       byBlob.set(row.blob_ref, list);
     }
+    const blobReferences = ledger.db.prepare(`SELECT id, session_id, ts, event_hash, writer_sig, blob_ref,
+      canonical_payload_path, payload_pruned, payload_pruned_ts FROM evidence_events WHERE blob_ref = ? ORDER BY id ASC`);
+    type BlobDeleteOutcome = { removed: true } | { removed: false;
+      reason: "references_changed" | "references_ineligible" | "file_missing" };
     for (const blobId of byBlob.keys()) {
       // Include every current reference, not just the expired rows selected earlier.
-      const rows = ledger.db.prepare("SELECT session_id, ts, payload_pruned FROM evidence_events WHERE blob_ref = ?")
-        .all(blobId) as Array<{ session_id: string; ts: number; payload_pruned: number }>;
+      const rows = blobReferences.all(blobId) as Array<Pick<EvidenceEvent, "id" | "session_id" | "ts" | "event_hash" | "writer_sig"
+        | "blob_ref" | "canonical_payload_path" | "payload_pruned" | "payload_pruned_ts">>;
+      const admittedReferences = canonicalize(rows);
       const eligibleForDelete = rows.length > 0 && rows.every((row) => row.payload_pruned === 1 && row.ts < pruneBeforeTs);
       if (!eligibleForDelete) {
         continue;
@@ -263,16 +270,35 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       if (!pathExists(full)) {
         continue;
       }
+      let outcome: BlobDeleteOutcome;
       try {
-        withDeletionGate({ workspace: params.workspace, executor: "retention.blob-unlink",
-          target: { kind: "blobs", sessionIds: [...new Set(rows.map(row => row.session_id))], before: new Date(pruneBeforeTs).toISOString() } }, () => {
+        outcome = withDeletionGate({ workspace: params.workspace, executor: "retention.blob-unlink",
+          target: { kind: "blobs", sessionIds: [...new Set(rows.map(row => row.session_id))], before: new Date(pruneBeforeTs).toISOString() } },
+        () => runImmediateTransaction<BlobDeleteOutcome>(ledger.db, () => {
+          // Admission/audit uses another connection; acquire the DB write lock only after it returns.
+          const current = blobReferences.all(blobId) as typeof rows;
+          if (canonicalize(current) !== admittedReferences) return { removed: false, reason: "references_changed" };
+          if (current.length === 0 || !current.every(row => row.payload_pruned === 1 && row.ts < pruneBeforeTs))
+            return { removed: false, reason: "references_ineligible" };
+          if (!pathExists(full)) return { removed: false, reason: "file_missing" };
           const bytes = readFileSync(full);
           unlinkSync(full);
           appendPrunedRow(params.workspace, blobId, sha256Hex(bytes));
-        });
-        prunedBlobCount += 1;
+          return { removed: true };
+        }));
       } catch (error) {
         if (!(error instanceof DeletionDenied)) throw error;
+        continue;
+      }
+      if (outcome.removed) {
+        prunedBlobCount += 1;
+      } else {
+        const skippedAudit = appendOpsAuditEvent({ workspace: params.workspace, auditType: "RETENTION_BLOB_DELETE_SKIPPED",
+          payload: { blobId, executor: "retention.blob-unlink", admittedReferenceSha256: sha256Hex(admittedReferences),
+            removed: false, reason: outcome.reason } });
+        if (!skippedAudit.eventId || !/^[a-f0-9]{64}$/.test(skippedAudit.eventHash))
+          throw new Error("retention_blob_delete_skipped_audit_unacknowledged");
+        auditEventIds.push(skippedAudit.eventId);
       }
     }
 
