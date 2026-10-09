@@ -479,7 +479,9 @@
             "PENDING",
             "QUORUM_MET",
             "DENIED",
-            "EXPIRED"
+            "EXPIRED",
+            "CONSUMED",
+            "CANCELLED"
           ],
           "type": "string"
         }
@@ -733,6 +735,18 @@
       ],
       "type": "string"
     },
+    "status": {
+      "enum": [
+        "PENDING",
+        "QUORUM_MET",
+        "DENIED",
+        "EXPIRED",
+        "CONSUMED",
+        "STALE",
+        "CHANGES_REQUESTED"
+      ],
+      "type": "string"
+    },
     "supersededBy": {
       "anyOf": [
         {
@@ -782,6 +796,7 @@
     "excludedKeys",
     "expiresTs",
     "decisions",
+    "status",
     "quorum",
     "integrity",
     "supersededBy",

@@ -26,8 +26,11 @@ export const a4GateV1Schema = z.strictObject({
   excludedKeys: z.array(nonEmpty),
   expiresTs: z.number().int(),
   decisions: z.array(a4DecisionV1Schema),
+  /** The gate's A4 status from the chain: a consumed, superseded or sent-back gate is never shown as open. */
+  status: z.enum(["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CONSUMED", "STALE", "CHANGES_REQUESTED"]),
+  /** The approval engine's fold over the counted decisions, as it reports it. */
   quorum: z.strictObject({
-    status: z.enum(["PENDING", "QUORUM_MET", "DENIED", "EXPIRED"]),
+    status: z.enum(["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CONSUMED", "CANCELLED"]),
     approvals: z.number().int().min(0),
     required: z.number().int().min(1)
   }),

@@ -62,10 +62,11 @@ type Status = A4ResolvedRef["status"];
  * A ledger_event ref against the row it names: dangling when the row is missing or neither of its digests is the ref's,
  * unsigned when its signature or chain does not verify. The tier is the reader contract's `effectiveTrustTier` (an
  * imported, manual or external row reads SELF_REPORTED whatever it declares; ATTESTED holds only under a pinned key),
- * never the declared `meta.trustTier`. `found` is false only for a missing row.
+ * never the declared `meta.trustTier`. `found` is false only for a missing row. `integrity` memoises the O(ledger prefix)
+ * chain verdict per (id, event_hash) for one caller's attempt; every other check reads the row afresh.
  */
 export function resolveLedgerEvent(ledger: Ledger, refId: string, sha256: string, reader: ReaderTrust | (() => ReaderTrust),
-  reasons: string[]): { status: Status; tier: string | null; found: boolean } {
+  reasons: string[], integrity?: Map<string, boolean>): { status: Status; tier: string | null; found: boolean } {
   const event = ledger.getEventById(refId);
   if (!event) return { status: "dangling", tier: null, found: false };
   const tier = effectiveTrustTier(event, reader);
@@ -73,7 +74,11 @@ export function resolveLedgerEvent(ledger: Ledger, refId: string, sha256: string
     reasons.push("REF_DIGEST_MISMATCH");
     return { status: "dangling", tier, found: true };
   }
-  if (event.writer_sig === "unsigned" || !verifyEvidenceEventIntegrity({ ledger, eventId: event.id }).ok) return { status: "unsigned", tier, found: true };
+  if (event.writer_sig === "unsigned") return { status: "unsigned", tier, found: true };
+  const key = `${event.id}:${event.event_hash}`;
+  const intact = integrity?.get(key) ?? verifyEvidenceEventIntegrity({ ledger, eventId: event.id }).ok;
+  integrity?.set(key, intact);
+  if (!intact) return { status: "unsigned", tier, found: true };
   return { status: event.payload_pruned === 1 ? "payload_pruned" : "resolved", tier, found: true };
 }
 
@@ -121,17 +126,17 @@ function verifiedDowngradeReason(workspace: string, ref: A4EvidenceRefRow, recor
 /**
  * Resolves each ref against the ledger, the signed artifact files and the trust list as of `now`. Kinds without a
  * resolver yet (receipt, session, approval, and an external link no admitted record backs) report `unsigned` with
- * RESOLVER_NOT_AVAILABLE: unverified, never resolved.
+ * RESOLVER_NOT_AVAILABLE: unverified, never resolved. `integrity` is resolveLedgerEvent's per-attempt memo.
  */
 export function resolveRefs(ledger: Ledger, refs: readonly A4EvidenceRefRow[], trust: TrustContext, now: number,
-  externalRecord: (ref: A4EvidenceRefRow) => A4ExternalRecord | null = () => null): A4ResolvedRef[] {
+  externalRecord: (ref: A4EvidenceRefRow) => A4ExternalRecord | null = () => null, integrity?: Map<string, boolean>): A4ResolvedRef[] {
   const reader: ReaderTrust = { trustList: trust, ownKeyIds: workspaceOwnKeyIds(ledger.workspace) };
   return refs.map((ref) => {
     const reasons: string[] = [];
     let status: Status;
     let tier: string | null = null;
     if (ref.ref_kind === "ledger_event") {
-      const resolved = resolveLedgerEvent(ledger, ref.ref_id, ref.sha256, reader, reasons);
+      const resolved = resolveLedgerEvent(ledger, ref.ref_id, ref.sha256, reader, reasons, integrity);
       ({ status, tier } = resolved);
       if (resolved.found && ref.trust_tier !== tier) {
         reasons.push(TIER_ORDER.indexOf(ref.trust_tier ?? "") > TIER_ORDER.indexOf(tier ?? "") ? "TRUST_TIER_INFLATED" : "TRUST_TIER_CHANGED");

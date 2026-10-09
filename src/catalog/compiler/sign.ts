@@ -5,7 +5,7 @@
  * local audit trail, not portable trust (P0-09). A signature shows who signed the plan, not that it is right.
  */
 import { resolve } from "node:path";
-import { createApprovalForIntent } from "../../approvals/approvalEngine.js";
+import { createApprovalForIntent, type ApprovalRequestInput } from "../../approvals/approvalEngine.js";
 import { signDigestWithPolicy, verifySignedDigest } from "../../crypto/signing/signer.js";
 import { fragmentWeakenings, keyed, weakenings, type Rules } from "../../domains/operatingProfiles/operatingProfileActivation.js";
 import type { OperatingProfile } from "../../domains/operatingProfiles/operatingProfileTypes.js";
@@ -111,6 +111,8 @@ export interface SignPlanInput {
   allowWeakening?: boolean;
   /** When set, also create an approval request bound to the plan digest under this agent id. */
   reviewAgentId?: string | null;
+  /** Passed to that request; it may only raise the signed rule (A4 regulated plan activation, design §5.3). */
+  quorumFloor?: ApprovalRequestInput["quorumFloor"];
 }
 
 export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings: string[] } {
@@ -134,7 +136,7 @@ export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings
     ? createApprovalForIntent({
       workspace, agentId: input.reviewAgentId, ...planReviewIntent(input.plan),
       requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
-      leaseConstraints: { scopes: [], routeAllowlist: [], modelAllowlist: [] }
+      leaseConstraints: { scopes: [], routeAllowlist: [], modelAllowlist: [] }, quorumFloor: input.quorumFloor
     }).approval.approvalRequestId
     : null;
   return {

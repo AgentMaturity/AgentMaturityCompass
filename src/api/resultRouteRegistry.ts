@@ -7,6 +7,7 @@
  */
 import { z } from "zod";
 import {
+  claimEnvelopeSchema,
   claimFields,
   claimKindSchema,
   envelopeForDiagnosticReport,
@@ -24,10 +25,11 @@ import { pathParam } from "./apiHelpers.js";
 
 /**
  * `diagnostic_report`: the body is a sealed run and carries the run's own claim. `compliance_report`: the body is the
- * compliance report the handler just generated, and carries its categories' claims (P1-11). A method: no adapter binds
- * the result to evidence yet.
+ * compliance report the handler just generated, and carries its categories' claims (P1-11). `a4_record`: the body is an
+ * A4 record whose own `claim` the readiness evaluator built from resolved refs (P1-57); the wrapper repeats it, never a
+ * second label. A method: no adapter binds the result to evidence yet.
  */
-export type ClaimSource = "diagnostic_report" | "compliance_report" | ClaimMethod;
+export type ClaimSource = "diagnostic_report" | "compliance_report" | "a4_record" | ClaimMethod;
 
 export interface ResultRoute {
   method: "GET" | "POST";
@@ -104,7 +106,10 @@ export const API_RESULT_ROUTES: readonly ResultRoute[] = [
     ["GET", "regulatory/readiness"],
     // P1-17: deadlines computed from operator-stated trigger and notice times; never a filing or compliance verdict.
     ["GET", "incidents/:id/clocks"]
-  ], true)
+  ], true),
+  // P1-57: A4 Forge records carry their own claim (one claim per result); readiness, conformance and value are regulated.
+  ...resultFamily("api", `${V1}a4/projects/`, "a4_record", [["GET", ":id"], ["GET", ":id/monitor"], ["GET", ":id/verify"]]),
+  ...resultFamily("api", `${V1}a4/projects/`, "a4_record", [["GET", ":id/readiness"], ["GET", ":id/conformance"], ["GET", ":id/value"]], true)
 ];
 
 /** An exact path wins over a parameterised one, so `assurance/history` never reads as `assurance/:runId`. */
@@ -136,7 +141,12 @@ export function resultEnvelope(route: ResultRoute, data: unknown, workspace: str
   }
   // In-process only: the route's handler passes the report generateComplianceReport returned, never a stored file.
   if (route.source === "compliance_report" && isComplianceReport(data)) return envelopeForComplianceReport(data, now);
-  const method = route.source === "diagnostic_report" || route.source === "compliance_report" ? "runtime_observation" : route.source;
+  if (route.source === "a4_record") {
+    const own = claimEnvelopeSchema.safeParse((data as { claim?: unknown } | null)?.claim);
+    if (own.success) return own.data;
+  }
+  const method = route.source === "diagnostic_report" || route.source === "compliance_report" ? "runtime_observation"
+    : route.source === "a4_record" ? "human_review" : route.source;
   return envelopeForUnboundResult({ producer: route.producer, method, regulated: route.regulated, now });
 }
 

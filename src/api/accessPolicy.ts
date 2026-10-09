@@ -13,6 +13,8 @@ const APPROVER_ROLES: UserRole[] = ["APPROVER", "OWNER"];
 const VERIFIER_ROLES: UserRole[] = ["OPERATOR", "AUDITOR", "OWNER"];
 const ATTESTER_ROLES: UserRole[] = ["AUDITOR", "OWNER"];
 const OWNER_ROLES: UserRole[] = ["OWNER"];
+/** P1-57: A4 gate approve, deny and request-changes; the gate's own rolesAllowed decides who may approve. */
+const REVIEWER_ROLES: UserRole[] = ["APPROVER", "AUDITOR", "OWNER"];
 
 const SUPPORTED_METHODS = new Set(["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]);
 
@@ -118,6 +120,32 @@ function isPassportRevocation(pathname: string): boolean {
   return /^\/api\/v1\/passport\/[^/]+\/revoke$/.test(pathname);
 }
 
+const A4_APPROVAL = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/(approve|deny)$/;
+const A4_REVIEW = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/request-changes$/;
+const A4_MEMBER = /^\/api\/v1\/a4\/projects\/[^/]+\/(comments|presence)$/;
+// `retire` is not here: the creator of a never-proposed draft may retire it (retireProject enforces owner-or-creator).
+const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete)$/;
+
+/** P1-57: an A4 gate decision takes the approve class with APPROVER, AUDITOR or OWNER (APPROVER_PATHS holds exact paths only). */
+export function isA4ApprovalPath(pathname: string): boolean {
+  return A4_APPROVAL.test(pathname);
+}
+
+/** P1-57: request-changes on an A4 gate: APPROVER, AUDITOR or OWNER. */
+export function isA4ReviewPath(pathname: string): boolean {
+  return A4_REVIEW.test(pathname);
+}
+
+/** P1-57: comments and presence take the read roles; the A4 router requires project membership. */
+export function isA4MemberPath(pathname: string): boolean {
+  return A4_MEMBER.test(pathname);
+}
+
+/** P1-57: A4 owner actions (hold, members, gate policy, effects, adapt/activate completion, releases). */
+export function isA4OwnerPath(pathname: string): boolean {
+  return A4_OWNER.test(pathname);
+}
+
 export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRolePolicy {
   const method = rawMethod.trim().toUpperCase();
 
@@ -139,8 +167,17 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     return { access: "analyze", roles: [...HUMAN_READ_ROLES] };
   }
 
+  if (method === "POST" && isA4MemberPath(pathname)) {
+    return { access: "read", roles: [...HUMAN_READ_ROLES] };
+  }
+
   if (method === "POST" && APPROVER_PATHS.has(pathname)) {
     return { access: "approve", roles: [...APPROVER_ROLES] };
+  }
+
+  // An A4 gate's own rolesAllowed (recordDecision) limits AUDITOR to the action classes that admit it, as Studio's engine route.
+  if (method === "POST" && (isA4ApprovalPath(pathname) || isA4ReviewPath(pathname))) {
+    return { access: "approve", roles: [...REVIEWER_ROLES] };
   }
 
   if (method === "POST" && (VERIFIER_PATHS.has(pathname) || isWorkOrderVerification(pathname))) {
@@ -154,6 +191,7 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
   if (
     OWNER_MUTATION_PATHS.has(pathname) ||
     isPassportRevocation(pathname) ||
+    isA4OwnerPath(pathname) ||
     OWNER_MUTATION_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
   ) {
     return { access: "owner", roles: [...OWNER_ROLES] };
