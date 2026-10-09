@@ -17,7 +17,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
-import { completeStage, openEffectGate, retryEffect, runA4Effect, sweepA4Effects } from "./a4Effects.js";
+import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
   assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, recordDecision, refuseOnFreeze, requestChanges, requestGate,
   RESOURCE_SLOTS
@@ -351,8 +351,6 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     return respond(route, projectId, request, () => {
       const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === body.attemptId);
       if (started?.body.effect !== effectId) throw a4Fail(404, "A4_EFFECT_NOT_FOUND", `no attempt ${body.attemptId} of effect ${effectId}`);
-      // A dead or silent earlier attempt is settled as process_lost first, so the retry rule can see its failure.
-      sweepA4Effects(store);
       const retried = retryEffect(store, projectId, { ...callOf(route, request), attemptId: body.attemptId, expectedHeadSeq: body.expectedHeadSeq });
       nextAttempt = retried.attemptId;
       if (!retried.result.replay) runEffectAfterResponse(route.workspace, projectId, nextAttempt);

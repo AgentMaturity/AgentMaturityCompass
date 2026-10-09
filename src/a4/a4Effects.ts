@@ -307,9 +307,10 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
  * heartbeat is older than `staleAfterMs`, is written EFFECT_FAILED: process_lost. A live executor heartbeats every 5 s
  * and is never swept, however long it runs. Returns the swept attempt ids.
  */
-export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS): string[] {
+export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS, only?: { projectId: string; executionId: string }): string[] {
   const staleBefore = Date.now() - staleAfterMs;
-  return store.runningEffects().filter((row) => ownerAlive(row.owner_pid, row.owner_host) === false || row.heartbeat_ts < staleBefore).flatMap((row) => {
+  return store.runningEffects().filter((row) => (only === undefined || (row.project_id === only.projectId && row.execution_id === only.executionId))
+    && (ownerAlive(row.owner_pid, row.owner_host) === false || row.heartbeat_ts < staleBefore)).flatMap((row) => {
     try {
       settleEffect(store, row.project_id, row.effect_id, "EFFECT_FAILED", { error: "process_lost" });
       return [row.effect_id];
@@ -330,7 +331,11 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
   const nextAttempt = randomId("a4e");
-  const result = governed(store, projectId, principal, input, (ts) => {
+  // A dead or silent earlier attempt of this execution is settled first, as amc-runtime under the liveness rule, so the
+  // retry rule sees its failure; the head the client saw moves by exactly those rows (anything else is still stale).
+  const executionId0 = String(startedLink(store.readChain(projectId), input.attemptId).body.executionId);
+  const swept = sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: executionId0 }).length;
+  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (ts) => {
     const state = loadA4State(store, projectId, now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));
