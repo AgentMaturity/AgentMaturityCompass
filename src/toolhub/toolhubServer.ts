@@ -26,7 +26,7 @@ import {
   type ToolBlastRadiusConsent,
   type ToolBlastRadiusReviewerDecision
 } from "./blastRadiusConsent.js";
-import { ToolhubJournal, isJournaledToolhubExecution, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, type JournaledToolhubOutcome } from "./toolhubJournal.js";
+import { ToolhubJournal, isJournaledToolhubExecution, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, classifyToolhubOutcome, type JournaledToolhubOutcome } from "./toolhubJournal.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { executeFsRead, executeFsWrite } from "./toolhubExecutors/fs.js";
 import { executeGit } from "./toolhubExecutors/git.js";
@@ -776,7 +776,9 @@ export class ToolHubService {
     const evidence = openToolhubExecutionEvidence(evidenceInput);
     try {
       const resultPayload = await this.runTool(tool.name, intent.request.args, simulate);
-      evidence.recordResult({ state: "completed", effect: null, reasonCode: "completed", result: resultPayload, bodySucceeded: true });
+      evidence.recordResult(simulate
+        ? { state: "completed", effect: null, reasonCode: "completed", result: resultPayload, bodySucceeded: true }
+        : classifyToolhubOutcome(intent.actionClass, resultPayload));
       this.executions.set(executionId, { executionId, ts: Date.now(), intentId: intent.intentId, agentId: intent.request.agentId,
         toolName: intent.request.toolName, requestedMode, effectiveMode, allowed: true, reasons, result: resultPayload, eventIds: evidence.eventIds });
       return { executionId, agentId: intent.request.agentId, allowed: true, effectiveMode, result: resultPayload,
@@ -1007,7 +1009,7 @@ export class ToolHubService {
       },
       eventIds
     };
-    this.executions.set(executionId, execution);
+    if (!this.executions.has(executionId)) this.executions.set(executionId, execution);
 
     return {
       executionId,

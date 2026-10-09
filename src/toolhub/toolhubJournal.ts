@@ -33,11 +33,10 @@ const executionFor = (call: Call): ToolExecution => ({
   arguments: call.args, requestedMode: call.requestedMode, effectiveMode: call.effectiveMode
 });
 
-/** The same protected facts are shown at intent creation and rechecked at dispatch. */
-export function toolhubApprovalIntent(call: Call): Record<string, unknown> {
+/** Protected facts for intent creation, or null when invalid; dispatch still binds and denies invalid authorization. */
+export function toolhubApprovalIntent(call: Call): Record<string, unknown> | null {
   const intent = authorizationIntentFor(executionFor(call));
-  if (!intent.ok) throw new Error(`authorization_denied:${intent.failures.join(",")}: ${intent.reason}`);
-  return intent.payload;
+  return intent.ok ? intent.payload : null;
 }
 
 export interface ToolhubOutcome {
@@ -64,14 +63,22 @@ interface Dispatch extends Call {
 
 const errorText = (error: unknown): string => error instanceof Error ? error.message : String(error);
 
-function classify(actionClass: ActionClass, result: Record<string, unknown>): ToolhubOutcome {
+export function classifyToolhubOutcome(actionClass: ActionClass, result: Record<string, unknown>): ToolhubOutcome {
+  if (typeof result.signal === "string" || (typeof result.errorCode === "string" && !["ENOENT", "EACCES"].includes(result.errorCode))) {
+    return { state: "outcome_unknown", effect: null, reasonCode: "process_terminated",
+      result: { ...result, outcomeUnknown: true, reasonCode: "process_terminated" }, bodySucceeded: false };
+  }
+  if (result.errorCode === "ENOENT" || result.errorCode === "EACCES") {
+    return { state: "completed", effect: "not_applied", reasonCode: "definite_failure", result, bodySucceeded: false };
+  }
   const effect = result.effect;
   const reasonCode = effect === "unknown" ? "effect_declared_unknown"
     : effect !== undefined && effect !== "applied" && effect !== "not_applied" ? "effect_declaration_invalid"
       : effect === undefined && ["FINANCIAL", "DATA_EXPORT", "IDENTITY"].includes(actionClass) ? "effect_not_declared" : "completed";
   const unknown = reasonCode !== "completed";
   return { state: unknown ? "outcome_unknown" : "completed", effect: effect === "applied" || effect === "not_applied" ? effect : null,
-    reasonCode, result: unknown ? { ...result, outcomeUnknown: true, reasonCode } : result, bodySucceeded: true };
+    reasonCode, result: unknown ? { ...result, outcomeUnknown: true, reasonCode } : result,
+    bodySucceeded: typeof result.code !== "number" || result.code === 0 };
 }
 
 /** One journal per service, including its startup recovery. Failure to open never enables an unjournaled fallback. */
@@ -152,7 +159,7 @@ export class ToolhubJournal {
       heartbeat.unref();
       let outcome: ToolhubOutcome;
       try {
-        outcome = classify(input.actionClass, await input.run(args, { idempotencyKey: key, header: carrier?.carrier === "http-header" ? carrier.name : null }));
+        outcome = classifyToolhubOutcome(input.actionClass, await input.run(args, { idempotencyKey: key, header: carrier?.carrier === "http-header" ? carrier.name : null }));
       } catch (error) {
         const beforeHttp = input.toolName === "http.fetch" && ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED"].includes(String((error as NodeJS.ErrnoException | null)?.code));
         const definite = error instanceof DefiniteFailureError || beforeHttp;

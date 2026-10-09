@@ -6,12 +6,14 @@ export function executeProcessSpawn(params: {
   cwd: string;
   env?: Record<string, string>;
   simulate: boolean;
-}): { code: number; stdout: string; stderr: string } {
+}): { code: number; stdout: string; stderr: string; signal: string | null; errorCode: string | null } {
   if (params.simulate) {
     return {
       code: 0,
       stdout: `SIMULATE ${params.binary} ${params.argv.join(" ")}`.trim(),
-      stderr: ""
+      stderr: "",
+      signal: null,
+      errorCode: null
     };
   }
 
@@ -26,6 +28,8 @@ export function executeProcessSpawn(params: {
   return {
     code: out.status ?? 1,
     stdout: out.stdout ?? "",
-    stderr: out.stderr ?? ""
+    stderr: out.stderr ?? "",
+    signal: out.signal ?? null,
+    errorCode: (out.error as NodeJS.ErrnoException | undefined)?.code ?? null
   };
 }

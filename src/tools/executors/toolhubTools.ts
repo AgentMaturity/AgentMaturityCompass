@@ -5,7 +5,7 @@ import { executeHttpFetch } from "../../toolhub/toolhubExecutors/http.js";
 import { executeProcessSpawn } from "../../toolhub/toolhubExecutors/process.js";
 import { resolveToolPath } from "../../toolhub/toolhubValidators.js";
 import { defineTool } from "../toolRegistry.js";
-import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
+import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 
 /**
  * Toolhub's executors, as pipeline tools (P4.1).
@@ -44,14 +44,20 @@ const spawnArgs = z.object({
 
 const simulated = (execution: ToolExecution): boolean => execution.effectiveMode === "SIMULATE";
 
-/** stdout and stderr as one stream, with the exit code kept as its own field. */
-function processOutcome(result: { code: number; stdout: string; stderr: string }): {
+/** Keep normal output and status; propagate abnormal termination through the pipeline's failure contract. */
+function processOutcome(result: ReturnType<typeof executeProcessSpawn>): {
+  ok: boolean;
   output: string;
   exitCode: number;
   bytes: number;
 } {
+  if (result.signal !== null) throw new Error(`process_terminated:${result.signal}`);
+  if (result.errorCode !== null) {
+    if (result.errorCode === "ENOENT" || result.errorCode === "EACCES") throw new DefiniteFailureError(`process_spawn_failed:${result.errorCode}`);
+    throw new Error(`process_terminated:${result.errorCode}`);
+  }
   const output = result.stderr.length > 0 ? `${result.stdout}${result.stderr}` : result.stdout;
-  return { output, exitCode: result.code, bytes: Buffer.byteLength(output, "utf8") };
+  return { ok: result.code === 0, output, exitCode: result.code, bytes: Buffer.byteLength(output, "utf8") };
 }
 
 export function toolhubPipelineTools(): readonly ToolDefinition[] {
