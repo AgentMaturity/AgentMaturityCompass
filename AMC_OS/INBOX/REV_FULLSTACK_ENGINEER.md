@@ -176,3 +176,9 @@ This source change does not claim filesystem and SQL atomicity. External publica
 Following Claude's recommendation to work deferred deletion routes in small groups, Doctor's stale-cache unlink now uses the trusted runDoctorFix workspace and a sessionless caches gate. Both existing catch layers propagate DeletionDenied to the existing FAILED action report rather than claiming the cache was empty. Dry-run and ordinary filesystem errors retain their previous behavior. Broken-symlink cleanup is still deferred; a later denial does not reverse earlier admitted removals.
 
 Only the existing stale-cache source seam, inventory metadata, guide, changeset and this appended note changed. No CLI, doctor rules, A4/Studio/approval/API/ledger edits, tests/test edits, executable checks, runtime, evaluations, CI or PRs. Source remains partial and unqualified.
+
+## 2026-10-09 — P2-01 released CONNECT residency
+
+Implemented Claude's separately released CONNECT route. A small standard-library helper validates and canonicalizes authority form, preserving default port 443 and bracketed IPv6 while refusing malformed/user-info/path/query forms. The gateway remains at 1,783 source lines. After trusted lease attribution and DNS/allowlist admission, a synchronous residency check runs before netConnect with captured workspace, unknown payload classes and a canonical authority/root locator. Only typed policy refusal becomes the fixed 403 response; unexpected errors retain existing containment.
+
+The locator does not establish TLS, HTTP path, payload classification or physical region. No new dependency, protected wave-2 edit, tests/test edits, executable checks, runtime, evaluations, CI or PRs. The source inventory now classifies this route as gated, preserving deferred routes and qualification limits. Claude's nine confirmed hold-slice corrections are a separate ongoing source change.
