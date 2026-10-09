@@ -8,7 +8,7 @@
  *   CLI:   amc openapi-generate --out openapi.yaml
  *   HTTP:  GET /openapi.yaml from Studio server
  */
-
+import { a4Endpoints, a4Schemas } from "./a4Openapi.js";
 import { generateBridgeOpenApiSpec, type OpenApiSpec } from "../setup/integrationScaffold.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -2128,15 +2128,15 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
     ...studioEndpoints(),
     ...gatewayEndpoints(),
     ...nativeTaskEndpoints(),
+    ...a4Endpoints(),
   };
-
   const allSchemas = {
     ...bridgeSpec.components.schemas,
     ...studioSchemas(),
     ...nativeTaskSchemas(),
+    ...a4Schemas(),
     ...claimOpenApiSchemas(),
   };
-
   return {
     openapi: "3.1.0",
     info: {
