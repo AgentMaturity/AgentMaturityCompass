@@ -20,6 +20,7 @@ import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { auditA4 } from "./a4Audit.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -214,14 +215,24 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
   throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
 }
 
-/** The automatic HOLD by amc-runtime naming the incidents (design §6.6); a project already held is left as it is. */
+/**
+ * The automatic HOLD by amc-runtime naming the incidents (design §6.6); a project already held is left as it is. Like a
+ * manual hold it is mirrored to the human action log and the A4_HOLD integration event, best effort.
+ */
 export function autoHold(store: A4Store, projectId: string, incidentIds: readonly string[]): void {
+  let held: { agentId: string; name: string; reason: string } | null = null;
   try {
-    store.transition(projectId, A4_RUNTIME, ({ head }) => {
+    const result = store.transition(projectId, A4_RUNTIME, ({ head }) => {
       if (head!.hold === 1) throw fail(409, "A4_ON_HOLD", "already held");
       const reason = `freeze ${incidentIds.join(", ") || "unreadable"}`;
+      held = { agentId: head!.agent_id, name: head!.name, reason };
       return { kind: "HOLD", payload: { reason, automatic: true, incidentIds: [...incidentIds] }, head: { hold: 1, hold_reason: reason } };
     });
+    if (held !== null && !result.replay) {
+      const { agentId, name, reason } = held;
+      auditA4(store.workspace, { type: "A4_HOLD", agentId, projectId, username: A4_RUNTIME.username, summary: `A4 project ${name} held automatically (${reason})`,
+        details: { reason, automatic: true, incidentIds: [...incidentIds], seq: result.seq } });
+    }
   } catch {
     // The refusal stands either way; the next attempt writes the hold if this one could not (e.g. a locked vault).
   }
