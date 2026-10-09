@@ -62,20 +62,19 @@ function tell(message) {
 
 /**
  * POSTs one action. Only a definite refusal of a first attempt clears the unconfirmed action: a refused retry says
- * nothing about the first attempt (auth, rate and ownership checks run before Studio's idempotent lookup), and an
- * unrelated action's outcome never clears or replaces it.
+ * nothing about the first attempt (auth, rate and ownership checks run before Studio's idempotent lookup). While one
+ * action is unconfirmed no other is sent, so a second lost acknowledgement can never go unreported.
  */
 async function send(action, retry = false) {
+  if (pending !== null && pending !== action) throw new Error("Nothing was sent.");
   try {
     const data = await apiNativeRequest(action.path, { method: "POST", body: action.body, nativeCsrfToken: me?.nativeCsrfToken ?? undefined });
-    if (pending === action) pending = null;
-    if (pending === null) tell("");
+    pending = null;
+    tell("");
     return data;
   } catch (error) {
-    if (pending === null || pending === action) {
-      const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
-      pending = refused ? null : action;
-    }
+    const refused = (error?.code === "NATIVE_CSRF_REQUIRED" && !retry) || definiteNativeSubmissionRefusal(error, retry);
+    pending = refused ? null : action;
     throw error;
   }
 }
