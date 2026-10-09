@@ -414,7 +414,7 @@ export class ContinuousMonitor extends EventEmitter {
     }
 
     // Log to ledger
-    const ledger = openLedger(this.config.workspace);
+    const ledger = openLedger(this.config.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {}); // P0-55
     const sessionId = `monitor-${randomUUID()}`;
     try {
       ledger.startSession({

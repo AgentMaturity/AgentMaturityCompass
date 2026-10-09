@@ -446,7 +446,7 @@ export async function startMonitor(opts: {
   stdin: boolean;
   agentId?: string;
 }): Promise<string> {
-  const ledger = openLedger(opts.workspace);
+  const ledger = openLedger(opts.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {}); // P0-55
   const sessionId = randomUUID();
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
 
