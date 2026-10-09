@@ -123,17 +123,17 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli.ts:841:1",
+      "siteId": "src/cli.ts:842:1",
       "path": "src/cli.ts",
-      "line": 841,
+      "line": 842,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli.ts:870:1",
+      "siteId": "src/cli.ts:871:1",
       "path": "src/cli.ts",
-      "line": 870,
+      "line": 871,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."

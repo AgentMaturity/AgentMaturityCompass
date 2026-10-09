@@ -54,7 +54,9 @@ A blocked request emits `RESIDENCY_ROUTE_BLOCKED`, carries a typed `EgressBlocke
 
 The unscoped compatibility path is available only outside a regulated profile and labels event metadata with `workspaceResolution: "cwd-fallback"`. It preserves the legacy database environment override there. An unscoped regulated or unverifiable profile cannot write or prune another workspace through this fallback. The emitter's existing best-effort, never-throw contract remains: a missing scope can therefore lose an event rather than misfile it. Hosts must provide explicit workspace values or install the asynchronous scope at their entrypoints.
 
-The DUAL_WRITE and CUTOVER stages keep their existing behavior; this change selects the workspace, not the rollout stage. Wiring all CLI, Studio and native-toolset entrypoints and assessment readers remains an integrator task because those files are owned by parallel work.
+The DUAL_WRITE and CUTOVER stages keep their existing behavior; this change selects the workspace, not the rollout stage. The complete asynchronous tool pipeline carries its trusted workspace through approvals, guards, bodies, recording and nested Code Mode calls. Native session composition and every later prompt install the session's captured workspace scope; its lifetime callbacks also use that scope. Native HTTP MCP discovery and mounting pass their trusted workspace directly to the transport.
+
+CLI `score collect-evidence` and `score operational-independence` scope their guard reads to the current workspace. Their command paths and output contracts are unchanged. Other CLI assessment paths, legacy Studio entrypoints, and external callers of the scoring APIs still need explicit workspace/scope integration before complete multi-workspace coverage can be claimed.
 
 ## Remaining P2-01 work
 

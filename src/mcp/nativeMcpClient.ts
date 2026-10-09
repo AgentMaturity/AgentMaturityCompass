@@ -121,7 +121,7 @@ function parameters(server: NativeMcpServer, workspace: string): { transport: Tr
   const timeout = server.timeoutMs ?? 30_000;
   if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000) throw new Error("MCP timeout must be between 1 and 300000 milliseconds");
   let transport: Transport;
-  if (server.transport === "streamable-http") transport = new NativeMcpHttpTransport(server, timeout);
+  if (server.transport === "streamable-http") transport = new NativeMcpHttpTransport({ ...server, workspace: resolve(workspace) }, timeout);
   else {
     if (!server.command || server.command.includes("\0")) throw new Error("MCP server requires an explicit executable");
     const stdio = new StdioClientTransport({ command: server.command, args: [...(server.args ?? [])],
