@@ -225,6 +225,15 @@ export function readinessBindingDigest(items: readonly A4ReadinessItem[], ids: r
   })));
 }
 
+/**
+ * An open gate whose bound items moved with no superseding transition (a trust-config switch between vault and notary
+ * moves `signing.notary_route`): decide and complete refuse it (a4Gates.assertIntentUnchanged), so readiness reads it
+ * STALE and requestGate may replace it.
+ */
+export const readinessMoved = (items: readonly A4ReadinessItem[], gate: A4GateStatus): boolean =>
+  (gate.status === "PENDING" || gate.status === "QUORUM_MET")
+  && readinessBindingDigest(items, (parseJson(gate.row.bound_items_json) as string[] | null) ?? []) !== gate.row.readiness_sha256;
+
 const METHODS = new Set<ClaimMethod>(["synthetic", "numeric_self_answer", "keyword_match", "unkeyed_checksum", "path_presence",
   "runtime_observation", "executed_test", "human_review"]);
 const TIERS = new Set<string>(["OBSERVED", "OBSERVED_HARDENED", "ATTESTED", "SELF_REPORTED", "UNVERIFIED"]);
@@ -498,18 +507,26 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
   const regulated = isRegulated(state, query.floor);
   const direction = latestGate(state, stage, "direction");
   const completion = latestGate(state, stage, "completion");
-  const gates = { direction: direction ? gateStatus(state, direction, query.policy, now) : null,
+  const opened = { direction: direction ? gateStatus(state, direction, query.policy, now) : null,
     completion: completion ? gateStatus(state, completion, query.policy, now) : null };
   const boundIds = A4_BOUND_ITEMS[stage];
   const acks = acknowledgements(state, now);
-  const built = [...governanceItems(state, query, gates, regulated), ...STAGE_ITEMS[stage].flatMap((builder) => builder(state, query))];
-  for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
-  const items = built.map((candidate) => {
-    const ack = acks.get(candidate.id);
-    const acknowledged = ack !== undefined && candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id);
-    return { ...candidate, bound: boundIds.includes(candidate.id),
-      ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
-  });
+  const itemsFor = (gates: typeof opened): A4ReadinessItem[] => {
+    const built = [...governanceItems(state, query, gates, regulated), ...STAGE_ITEMS[stage].flatMap((builder) => builder(state, query))];
+    for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
+    return built.map((candidate) => {
+      const ack = acks.get(candidate.id);
+      const acknowledged = ack !== undefined && candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id);
+      return { ...candidate, bound: boundIds.includes(candidate.id),
+        ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
+    });
+  };
+  const first = itemsFor(opened);
+  // A gate whose bound items moved reads STALE, as decide and complete answer it. Bound items never read a gate's
+  // status (gate-derived items are never bound), so one rebuild settles.
+  const staleIfMoved = (gate: A4GateStatus | null): A4GateStatus | null => gate !== null && readinessMoved(first, gate) ? { ...gate, status: "STALE" } : gate;
+  const gates = { direction: staleIfMoved(opened.direction), completion: staleIfMoved(opened.completion) };
+  const items = gates.direction === opened.direction && gates.completion === opened.completion ? first : itemsFor(gates);
   const mandatory = items.filter((candidate) => candidate.mandatory && candidate.section !== "integrity");
   // A mandatory BLOCKED item (a failed or lost effect, a freeze, an unsigned policy) outranks COMPLETE; once both gates are
   // consumed only a running effect or an unread freeze keeps the stage WAITING, so a past stage is not held by other waits.

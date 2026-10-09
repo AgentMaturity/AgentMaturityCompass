@@ -28,7 +28,7 @@ import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity
 import { verifyA4Chain } from "./a4Verify.js";
 import {
   A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, readinessBindingDigest,
-  riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
+  readinessMoved, riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
@@ -443,7 +443,8 @@ export function requestGate(store: A4Store, projectId: string, input: A4Call & {
     }
     const prior = state.gates.filter((row) => row.gate === input.gate && row.stage === stage && row.revision_no === project.revision_no)
       .map((row) => gateStatus(state, row, query.policy, now));
-    const open = prior.find((gate) => gate.status === "PENDING" || gate.status === "QUORUM_MET");
+    // One whose bound readiness moved is refused at decide and complete (assertIntentUnchanged) and readiness reads it STALE: replaceable.
+    const open = prior.find((gate) => (gate.status === "PENDING" || gate.status === "QUORUM_MET") && !readinessMoved(readiness.items, gate));
     if (open) throw fail(409, "A4_GATE_OPEN", `gate ${open.row.gate_id} is already open`, { gateId: open.row.gate_id });
     // DENY is terminal for the revision (design §6.4 step 7): a new gate needs a new revision.
     if (input.gate !== "policy" && prior.some((gate) => gate.status === "DENIED")) throw fail(409, "A4_GATE_DENIED", "This revision's gate was denied; propose a new revision.");
