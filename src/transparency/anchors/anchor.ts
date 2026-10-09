@@ -172,7 +172,8 @@ export function verifyBundledAnchor(input: {
         admission: check.admission };
     }
     return { publicAnchoring: receipt, admission: check.admission };
-  } catch (error) {
-    return { publicAnchoring: invalid(`the public anchor is malformed: ${error instanceof Error ? error.message : String(error)}`), admission: null };
+  } catch {
+    // P0-51: a fixed message; fs and parse errors would carry server paths or file contents to a Studio or API caller.
+    return { publicAnchoring: invalid("the public anchor is malformed"), admission: null };
   }
 }

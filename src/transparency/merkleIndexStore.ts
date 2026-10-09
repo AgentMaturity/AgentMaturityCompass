@@ -572,8 +572,9 @@ function bundledRootTree(dir: string, proof: MerkleProofPayload, check: (file: s
       if (digest !== sig.digestSha256 || !check("root.sig", digest, sig)) errors.push("signed root signature invalid");
       if (row.root !== proof.merkleRoot) errors.push(`proof root ${proof.merkleRoot} is not the signed root ${row.root}`);
       tree = { algorithm: row.algorithm ?? "amc-legacy-v1", treeSize: row.leafCount, root: row.root };
-    } catch (error) {
-      errors.push(`invalid signed root in the bundle: ${String(error)}`);
+    } catch {
+      // P0-51: a fixed message; the error text names temp paths and tells a missing file from a malformed one.
+      errors.push("invalid signed root in the bundle");
       return { algorithm: "rfc9162-sha256", treeSize: undefined, root: proof.merkleRoot };
     }
   }
