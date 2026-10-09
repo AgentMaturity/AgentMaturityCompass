@@ -7,6 +7,8 @@ import { providerDriftBasicScoreResponse, providerDriftScoreResponse } from './r
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, pathParam, queryParam, isRequestBodyError } from './apiHelpers.js';
+import { requestTrustOverride } from '../trust/requestTrust.js';
+import { sha256Hex } from '../utils/hash.js';
 import {
   countActiveScoreSessions,
   createScoreSession,
@@ -67,11 +69,9 @@ const industryAdjustBodySchema = z.object({
   lastVerifiedAt: z.number().optional(),
   observedEvidenceShare: z.number().min(0).max(1).optional(),
 });
-const verifyClaimBodySchema = z.object({
-  claim: objectRecordSchema,
-  policy: objectRecordSchema,
-  sharedSecret: optionalNonEmptyStringSchema,
-});
+const verifyClaimBodySchema = z.object({ claim: objectRecordSchema, policy: objectRecordSchema }).passthrough();
+const CLAIM_SECRET_REFUSED = 'request field "sharedSecret" is refused: a verdict never rests on a secret the caller supplies';
+const CLAIM_NOT_EVALUATED = "an identity claim is an HMAC under a shared secret and names no signer the server operator's trust list can admit; its statements are not evaluated";
 const createClaimBodySchema = z.object({
   agentId: nonEmptyStringSchema,
   publicKeyHash: nonEmptyStringSchema,
@@ -750,22 +750,16 @@ export async function handleScoreRoute(
 
   // ── Cross-Agent Trust Routes ───────────────────────────────────────────────
 
-  // POST /api/v1/score/trust/verify-claim — verify an agent identity claim against a policy
+  // POST /api/v1/score/trust/verify-claim — an agent identity claim's verdict, which is never evaluated (P0-55)
   if (pathname === '/api/v1/score/trust/verify-claim' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, verifyClaimBodySchema);
-      const { verifyAgentClaim } = await import('../score/crossAgentTrust.js');
-      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
-      // Dates may arrive as strings — coerce issuedAt / expiresAt
-      const claim = body.claim as Record<string, unknown>;
-      if (typeof claim['issuedAt'] === 'string') claim['issuedAt'] = new Date(claim['issuedAt'] as string);
-      if (typeof claim['expiresAt'] === 'string') claim['expiresAt'] = new Date(claim['expiresAt'] as string);
-      const result = verifyAgentClaim(
-        claim as unknown as import('../score/crossAgentTrust.js').AgentIdentityClaim,
-        body.policy as unknown as import('../score/crossAgentTrust.js').TrustPolicyRule,
-        secret,
-      );
-      apiSuccess(res, result);
+      // As trust-token/verify: secrets, like pins, never come from a request body, and an HMAC under a shared secret (the
+      // operator's too: create-claim mints one for any caller, with any score) names no signer a trust list can admit.
+      const refused = Object.hasOwn(body, 'sharedSecret') ? CLAIM_SECRET_REFUSED : requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
+      apiSuccess(res, { status: 'not_evaluated', trusted: false, trustLevel: 'untrusted', grantedScopes: [],
+        claimSha256: sha256Hex(JSON.stringify(body.claim)), reason: CLAIM_NOT_EVALUATED });
     } catch (err) {
       scoreRouteError(res, err, 'verify-claim failed');
     }
@@ -777,7 +771,8 @@ export async function handleScoreRoute(
     try {
       const body = await bodyJsonSchema(req, createClaimBodySchema);
       const { createAgentClaim } = await import('../score/crossAgentTrust.js');
-      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET'] ?? 'amc-trust-default';
+      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET']; // P0-55: no well-known default secret
+      if (!secret) { apiError(res, 400, 'sharedSecret is required when the server sets no AMC_TRUST_SECRET'); return true; }
       const result = createAgentClaim(
         body.agentId,
         body.publicKeyHash,
