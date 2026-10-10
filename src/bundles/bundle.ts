@@ -780,7 +780,7 @@ export function exportEvidenceBundle(params: {
         monitor: [...new Set([sha256Hex(monitorPub), ...(monitorHistory?.entries.map((entry) => entry.fingerprint) ?? [])])],
         auditor: [...new Set([sha256Hex(auditorPub), ...(auditorHistory?.entries.map((entry) => entry.fingerprint) ?? [])])]
       },
-      files: [], ...copied.a4Manifest
+      files: []
     };
 
     writeFileAtomic(join(root, "manifest.json"), JSON.stringify(manifest, null, 2), 0o644);

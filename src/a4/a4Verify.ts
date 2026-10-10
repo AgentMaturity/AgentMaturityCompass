@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
-import { materializeA4Record, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
+import { a4ProjectIds, materializeA4Record, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
@@ -278,12 +278,8 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
       return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
         : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
     }
-    // Every project any A4 row or audit session names, not only those with a head: a deleted head row (or project) must
-    // fail as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never read as a smaller passing set. Sessions are `a4-<projectId>-<seq>`.
-    const named = db.prepare(`SELECT project_id AS id FROM a4_projects UNION SELECT project_id FROM a4_transitions
-      UNION SELECT substr(session_id, 4, 36) FROM sessions WHERE session_id GLOB 'a4-a4p_*'
-      UNION SELECT substr(session_id, 4, 36) FROM evidence_events WHERE session_id GLOB 'a4-a4p_*'`).all() as Array<{ id: string }>;
-    const projects = named.map((row) => row.id).filter((id) => /^a4p_[0-9a-f]{32}$/.test(id)).sort();
+    // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
+    const projects = a4ProjectIds(db);
     if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
     return projects.map((projectId) => {
       const report = verifyA4Chain(ledger, projectId, trust);
@@ -503,11 +499,11 @@ const combine = (parts: ReadonlyArray<{ projectId: string; dimension: Dimension 
 });
 
 /**
- * Verifies an exported A4 project offline: an `amc.a4-record/v1` JSON file, or an `.amcbundle` whose signed manifest lists
- * an A4 slice (the bundle's manifest, files and ledger through verifyEvidenceBundle, then each listed project's record
- * file `a4/<projectId>.json`, whose head must be the one the manifest signed). The file is read once; every check reads
- * those bytes. Trust is the caller's: the operator's on an API route (never a request's), `--trust-list` on the CLI.
- * Every verdict is an integrity-section item.
+ * Verifies an exported A4 project offline: an `amc.a4-record/v1` JSON file, or an `.amcbundle` with an A4 slice (the
+ * bundle's manifest, files and ledger through verifyEvidenceBundle, then each project `a4/index.json` lists, whose record
+ * file `a4/<projectId>.json` must hold the listed head; the signed manifest pins both files). The file is read once;
+ * every check reads those bytes. Trust is the caller's: the operator's on an API route (never a request's),
+ * `--trust-list` on the CLI. Every verdict is an integrity-section item.
  */
 export async function verifyA4Bundle(file: string, trust: TrustContext = loadTrustContext(), now = Date.now()): Promise<VerifierReportV1> {
   const bytes = boundedFile(file, A4_INPUT_LIMIT);
@@ -531,26 +527,31 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     const root = join(dir, "root");
     mkdirSync(root);
     extractValidatedTarGzipArchive({ file: copy, destination: root, label: "archive", limits: A4_ARCHIVE_LIMITS });
-    const slice = (JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as { a4?: A4BundleSlice }).a4;
-    const listed = slice?.projects ?? [];
+    const index = join(root, "a4", "index.json");
+    const slice = existsSync(index) ? parsed(readFileSync(index, "utf8")) as A4BundleSlice | null : undefined;
     const sliceErrors: string[] = [];
+    if (slice === null || (slice !== undefined && (slice.schema !== "amc.a4-bundle-slice/v1" || !Array.isArray(slice.projects)))) {
+      sliceErrors.push("A4_SLICE_INDEX_INVALID: a4/index.json is not an amc.a4-bundle-slice/v1 listing");
+    }
+    const listed = Array.isArray(slice?.projects) ? slice.projects : [];
     const records = listed.flatMap((entry) => {
       const path = join(root, "a4", `${entry.projectId}.json`);
       const record = PROJECT_ID.test(entry.projectId) && existsSync(path) ? a4RecordV1Schema.safeParse(parsed(readFileSync(path, "utf8"))) : null;
       if (record?.success !== true || record.data.projectId !== entry.projectId) {
-        sliceErrors.push(`A4_SLICE_RECORD_INVALID: the manifest lists ${entry.projectId}, whose a4/<projectId>.json is not its amc.a4-record/v1 record`);
+        sliceErrors.push(`A4_SLICE_RECORD_INVALID: a4/index.json lists ${entry.projectId}, whose a4/<projectId>.json is not its amc.a4-record/v1 record`);
         return [];
       }
       const head = record.data.tables.a4_projects[0];
       if (head?.head_seq !== entry.headSeq || head.head_digest !== entry.headDigest) {
-        sliceErrors.push(`A4_SLICE_HEAD_MISMATCH: the exported head of ${entry.projectId} is not the head the signed manifest lists`);
+        sliceErrors.push(`A4_SLICE_HEAD_MISMATCH: the exported head of ${entry.projectId} is not the head a4/index.json lists`);
       }
       return [record.data];
     });
-    const unlisted = existsSync(join(root, "a4")) ? readdirSync(join(root, "a4")).filter((name) => !listed.some((entry) => `${entry.projectId}.json` === name)) : [];
-    sliceErrors.push(...unlisted.map((name) => `A4_SLICE_UNLISTED: a4/${name} is in the bundle but not in its signed manifest's A4 slice`));
-    if (slice !== undefined && slice.containsSyntheticExamples !== records.some((record) => syntheticIn(record.tables))) {
-      sliceErrors.push("A4_SYNTHETIC_LABEL_MISMATCH: the signed manifest's a4.containsSyntheticExamples does not match the exported evidence refs");
+    const unlisted = existsSync(join(root, "a4")) ? readdirSync(join(root, "a4"))
+      .filter((name) => name !== "index.json" && !listed.some((entry) => `${entry.projectId}.json` === name)) : [];
+    sliceErrors.push(...unlisted.map((name) => `A4_SLICE_UNLISTED: a4/${name} is in the bundle but a4/index.json does not list it`));
+    if (slice != null && slice.containsSyntheticExamples !== records.some((record) => syntheticIn(record.tables))) {
+      sliceErrors.push("A4_SYNTHETIC_LABEL_MISMATCH: a4/index.json's containsSyntheticExamples does not match the exported evidence refs");
     }
     // A later A4 audit session in the bundle's own ledger witnesses a transition the record does not show (rule 1).
     const db = new Database(join(root, "evidence", "evidence.sqlite"), { readonly: true });
@@ -558,7 +559,7 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
       for (const entry of listed) {
         const sessionId = `a4-${entry.projectId}-${entry.headSeq + 1}`;
         if (db.prepare("SELECT 1 FROM sessions WHERE session_id = ? UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? LIMIT 1").get(sessionId, sessionId) !== undefined) {
-          sliceErrors.push(`A4_SLICE_TRUNCATED: the bundle ledger holds session ${sessionId}, after the head the manifest lists`);
+          sliceErrors.push(`A4_SLICE_TRUNCATED: the bundle ledger holds session ${sessionId}, after the head a4/index.json lists`);
         }
       }
     } finally {
