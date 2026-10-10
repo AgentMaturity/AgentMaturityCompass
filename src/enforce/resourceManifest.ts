@@ -656,11 +656,14 @@ function selectEnforceResourceManifest(input: {
   return { manifest, path: candidate, kind, signature };
 }
 
-function digestPath(path: string): string | null {
+function digestPath(path: string, resource: Pick<CandidateResource, "schema">): string | null {
   if (!existsSync(path)) {
     return null;
   }
   if (lstatSync(path).isSymbolicLink()) integrityError("MANIFEST_PATH_INVALID");
+  if (resource.schema === "typed-multi-agent-graph.json") {
+    return typedMultiAgentGraphDigest(typedMultiAgentGraphSchema.parse(JSON.parse(readUtf8(path)) as unknown));
+  }
   const stat = statSync(path);
   if (stat.isFile()) {
     return sha256Hex(readFileSync(path));
@@ -730,9 +733,7 @@ export function buildEnforceResourceManifest(input: {
         return null;
       }
       const relativePath = workspaceRelative(workspace, absolutePath);
-      const digest = candidate.schema === "typed-multi-agent-graph.json"
-        ? typedMultiAgentGraphDigest(typedMultiAgentGraphSchema.parse(JSON.parse(readUtf8(absolutePath)) as unknown))
-        : digestPath(absolutePath);
+      const digest = digestPath(absolutePath, candidate);
       return {
         id: resourceId(candidate.kind, relativePath),
         type: candidate.kind,
@@ -799,7 +800,7 @@ function writeEnforceResourceManifestUnlocked(input: {
       if (!existsSync(source) || !resource.digest) integrityError("RESOURCE_STATE_CHANGED");
       const destination = join(stagedFilesPath, resource.path);
       copyPath(source, destination);
-      if (digestPath(destination) !== resource.digest) integrityError("RESOURCE_STATE_CHANGED");
+      if (digestPath(destination, resource) !== resource.digest) integrityError("RESOURCE_STATE_CHANGED");
     }
 
     const stagedManifestSignature = trySignArtifactFile({
@@ -1699,7 +1700,7 @@ function verifiedSnapshotVersionRef(input: {
       !existsSync(sourcePath)
       || lstatSync(sourcePath).isSymbolicLink()
       || !resource.digest
-      || digestPath(sourcePath) !== resource.digest
+      || digestPath(sourcePath, resource) !== resource.digest
     ) {
       integrityError("SNAPSHOT_RESOURCE_INVALID");
     }
@@ -1777,8 +1778,7 @@ function prepareRestore(input: {
     if (!existsSync(sourcePath) || lstatSync(sourcePath).isSymbolicLink()) {
       integrityError("SNAPSHOT_RESOURCE_INVALID");
     }
-    const sourceDigest = digestPath(sourcePath);
-    if (!resource.digest || sourceDigest !== resource.digest) {
+    if (!resource.digest || digestPath(sourcePath, resource) !== resource.digest) {
       integrityError("SNAPSHOT_RESOURCE_INVALID");
     }
     entries.push({
@@ -1806,7 +1806,7 @@ function prepareRestore(input: {
     }
     if (existsSync(targetPath)) {
       if (lstatSync(targetPath).isSymbolicLink()) integrityError("ROLLBACK_STATE_CHANGED");
-      if (!resource.digest || digestPath(targetPath) !== resource.digest) {
+      if (!resource.digest || digestPath(targetPath, resource) !== resource.digest) {
         integrityError("ROLLBACK_STATE_CHANGED");
       }
     }
@@ -1896,14 +1896,14 @@ function restoreEnforceResourceSnapshotUnlocked(input: {
       if (entry.operation === "restore") {
         if (!entry.sourcePath || !entry.expectedDigest) integrityError("SNAPSHOT_RESOURCE_INVALID");
         copyPath(entry.sourcePath, stagedPath);
-        if (digestPath(stagedPath) !== entry.expectedDigest) integrityError("SNAPSHOT_RESOURCE_INVALID");
+        if (digestPath(stagedPath, entry.resource) !== entry.expectedDigest) integrityError("SNAPSHOT_RESOURCE_INVALID");
       }
       const checkedTargetPath = resolveWorkspaceResource(workspace, entry.resource.path);
       if (resolve(checkedTargetPath) !== resolve(entry.targetPath)) integrityError("ROLLBACK_STATE_CHANGED");
       const existed = existsSync(entry.targetPath);
       if (existed) {
         if (lstatSync(entry.targetPath).isSymbolicLink()) integrityError("ROLLBACK_STATE_CHANGED");
-        if (entry.operation === "remove" && entry.expectedDigest && digestPath(entry.targetPath) !== entry.expectedDigest) {
+        if (entry.operation === "remove" && entry.expectedDigest && digestPath(entry.targetPath, entry.resource) !== entry.expectedDigest) {
           integrityError("ROLLBACK_STATE_CHANGED");
         }
         copyPath(entry.targetPath, backupPath);
@@ -1928,7 +1928,7 @@ function restoreEnforceResourceSnapshotUnlocked(input: {
       } else {
         if (!entry.expectedDigest) integrityError("SNAPSHOT_RESOURCE_INVALID");
         replacePathAtomic(entry.stagedPath, entry.targetPath);
-        if (digestPath(entry.targetPath) !== entry.expectedDigest) integrityError("ROLLBACK_STATE_CHANGED");
+        if (digestPath(entry.targetPath, entry.resource) !== entry.expectedDigest) integrityError("ROLLBACK_STATE_CHANGED");
       }
     }
 
