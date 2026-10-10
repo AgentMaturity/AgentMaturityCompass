@@ -1,6 +1,6 @@
 == install: helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 03:57:28 2026
+LAST DEPLOYED: Sun Oct 11 04:53:09 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
@@ -17,10 +17,10 @@ Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_H
 The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
 install exit=0
 == pin: pin
-monitor key sha256 6292ee7198d653e1966b4c84f497154803471aa5bf6da9c2e016b98ca68cdb29
+monitor key sha256 f28789d542868079f6342bf76aba34c12649239601f54fdc268717264fdb3fbd
 Release "amc" has been upgraded. Happy Helming!
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 03:57:46 2026
+LAST DEPLOYED: Sun Oct 11 04:53:28 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
@@ -40,18 +40,18 @@ pin exit=0
 pair-1 exit=0
 == test-1: helm test amc --logs --timeout 10m
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 03:57:46 2026
+LAST DEPLOYED: Sun Oct 11 04:53:28 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
 DESCRIPTION: Upgrade complete
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 03:58:02 2026
-Last Completed: Sun Oct 11 03:58:02 2026
+Last Started:   Sun Oct 11 04:53:48 2026
+Last Completed: Sun Oct 11 04:53:48 2026
 Phase:          Succeeded
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 03:58:02 2026
-Last Completed: Sun Oct 11 03:58:08 2026
+Last Started:   Sun Oct 11 04:53:48 2026
+Last Completed: Sun Oct 11 04:53:56 2026
 Phase:          Succeeded
 
 POD LOGS: amc-amc-governed-turn (governed-turn)
@@ -61,12 +61,12 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
   "failedStep": null,
   "baseUrl": "http://amc-amc:3212",
   "agentId": "default",
-  "taskId": "c30e85d74a4d60a4e8b649236e728be27defbb248142c349c1f67f14e174f31b",
+  "taskId": "836214beda6ea67835dca8456efe813d0d9e22d5553158b473aba45873b84e8e",
   "verification": "anchored-prefix",
   "verificationScope": {
     "scope": "verified-prefix",
     "unfinalizedSessions": [
-      "852a1d42-d779-41a5-b802-dfbfde066503"
+      "b9e9efc8-952f-43c6-9c53-815ac95100c9"
     ]
   },
   "steps": [
@@ -105,7 +105,7 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
       "id": "submit",
       "status": "passed",
       "httpStatus": 202,
-      "taskId": "c30e85d74a4d60a4e8b649236e728be27defbb248142c349c1f67f14e174f31b"
+      "taskId": "836214beda6ea67835dca8456efe813d0d9e22d5553158b473aba45873b84e8e"
     },
     {
       "id": "turn",
@@ -122,7 +122,7 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
       "verificationScope": {
         "scope": "verified-prefix",
         "unfinalizedSessions": [
-          "852a1d42-d779-41a5-b802-dfbfde066503"
+          "b9e9efc8-952f-43c6-9c53-815ac95100c9"
         ]
       }
     }
@@ -133,7 +133,7 @@ test-1 exit=0
 == upgrade: helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
 Release "amc" has been upgraded. Happy Helming!
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 03:58:09 2026
+LAST DEPLOYED: Sun Oct 11 04:53:57 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 3
@@ -156,18 +156,18 @@ rollback exit=0
 pair-2 exit=0
 == test-2: helm test amc --logs --timeout 10m
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 03:58:21 2026
+LAST DEPLOYED: Sun Oct 11 04:54:09 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 4
 DESCRIPTION: Rollback to 2
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 03:58:35 2026
-Last Completed: Sun Oct 11 03:58:35 2026
+Last Started:   Sun Oct 11 04:54:26 2026
+Last Completed: Sun Oct 11 04:54:26 2026
 Phase:          Succeeded
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 03:58:35 2026
-Last Completed: Sun Oct 11 03:58:40 2026
+Last Started:   Sun Oct 11 04:54:27 2026
+Last Completed: Sun Oct 11 04:54:33 2026
 Phase:          Succeeded
 
 POD LOGS: amc-amc-governed-turn (governed-turn)
@@ -177,12 +177,12 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
   "failedStep": null,
   "baseUrl": "http://amc-amc:3212",
   "agentId": "default",
-  "taskId": "09d0bb17dc27e4e1093d32d97fb66d8e5ad19635771aba207fa9695f7e68154f",
+  "taskId": "ad1af56b64455be3f89fc3da7acd08ae5adedff60d188262c00ed3853dce04a2",
   "verification": "anchored-prefix",
   "verificationScope": {
     "scope": "verified-prefix",
     "unfinalizedSessions": [
-      "03f661aa-b328-44ce-acdc-3f63825bb166"
+      "7344a194-d8bd-4bde-b912-89c9b102ef89"
     ]
   },
   "steps": [
@@ -221,7 +221,7 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
       "id": "submit",
       "status": "passed",
       "httpStatus": 202,
-      "taskId": "09d0bb17dc27e4e1093d32d97fb66d8e5ad19635771aba207fa9695f7e68154f"
+      "taskId": "ad1af56b64455be3f89fc3da7acd08ae5adedff60d188262c00ed3853dce04a2"
     },
     {
       "id": "turn",
@@ -238,7 +238,7 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
       "verificationScope": {
         "scope": "verified-prefix",
         "unfinalizedSessions": [
-          "03f661aa-b328-44ce-acdc-3f63825bb166"
+          "7344a194-d8bd-4bde-b912-89c9b102ef89"
         ]
       }
     }

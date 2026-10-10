@@ -34,29 +34,31 @@ docs/RELEASE_RUNBOOK.md differs only by main's own fefb9b85e (P0-09: pin keys in
 ## Net deletions against int (691a041dc) at the picks
 (none listed above means none)
 
-## At the receipt commit 8d665f173: S1 and S2 paths that P0-14 changed on purpose after the picks
-   deploy/helm/amc/files/governed-turn-probe.mjs      | 62 +++++++++++++++------
+## At the receipt commit 3a358adbd: S1 and S2 paths that P0-14 changed on purpose after the picks
+   deploy/helm/amc/files/governed-turn-probe.mjs      | 65 ++++++++++-----
    deploy/helm/amc/templates/configmap.yaml           |  1 +
-   deploy/helm/amc/templates/deployment.yaml          |  4 ++
-   deploy/helm/amc/templates/tests/governed-turn.yaml | 13 +++++
-   deploy/helm/amc/values.yaml                        |  4 ++
+   deploy/helm/amc/templates/deployment.yaml          |  4 +
+   deploy/helm/amc/templates/tests/governed-turn.yaml | 13 +++
+   deploy/helm/amc/values.yaml                        |  4 +
    deploy/k8s/deployment.yaml                         |  2 +
-   docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md            | 46 +++++++++-------
-   docs/KUBERNETES_HELM_DEPLOYMENT.md                 | 63 ++++++++++++++++++---
+   docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md            | 50 +++++++-----
+   docs/KUBERNETES_HELM_DEPLOYMENT.md                 | 65 +++++++++++++--
    scripts/credentials-presence-check.mjs             |  6 +-
    scripts/deploy-verify.mjs                          |  4 +-
    scripts/deploy/deploy-pack-check.mjs               |  4 +-
-   scripts/deploy/governed-turn-probe.mjs             | 62 +++++++++++++++------
+   scripts/deploy/governed-turn-probe.mjs             | 65 ++++++++++-----
    scripts/deploy/rollback-check.mjs                  |  4 +-
-   scripts/deploy/rollback-drill.mjs                  | 56 ++++++++++++++-----
+   scripts/deploy/rollback-drill.mjs                  | 74 ++++++++++++++---
    scripts/deploy/validate-assets.mjs                 |  4 +-
-   tests/deployPackCheck.test.ts                      | 24 +++++++-
-   tests/deployPackProbe.test.ts                      | 64 +++++++++++++++++++++-
-   tests/helmChartSecrets.test.ts                     | 20 +++++++
-   tests/k8sManifestsSecrets.test.ts                  |  8 +++
-   tests/rollbackDrill.test.ts                        | 58 +++++++++++++++++++-
-   20 files changed, 416 insertions(+), 93 deletions(-)
+   tests/deployPackCheck.test.ts                      | 24 +++++-
+   tests/deployPackProbe.test.ts                      | 69 +++++++++++++++-
+   tests/deploymentConfirmationRunbook.test.ts        | 14 ++++
+   tests/helmChartSecrets.test.ts                     | 20 +++++
+   tests/k8sManifestsSecrets.test.ts                  |  8 ++
+   tests/rollbackDrill.test.ts                        | 94 +++++++++++++++++++++-
+   21 files changed, 495 insertions(+), 99 deletions(-)
   Reasons: probe ready window (ff8566142); token automount (6fede779b); hermetic offline test (cc9284f5d);
   symlink-safe CLI guards, pairing claim, drill pairing mint (1ef317199); monitor-key pin and checksum/config (1972bbef0);
-  verified-prefix status in probe and drill (b6bded8d0); D-03, divergence and verify wording in the runbooks (9326666cd, aafd53d38, 30f88cac9).
-  The branch base is 691a041dc; int has since moved, so compare against 691a041dc, not int.
+  verified-prefix status in probe and drill (b6bded8d0); review fixes (2cb2f4f4c, e6e21dc28); drill readiness before pinning (3a358adbd);
+  D-03, divergence, verify and trust-on-first-use wording in the runbooks (9326666cd, aafd53d38, 30f88cac9, e6e21dc28).
+  The branch base is 691a041dc and int (cc063bdac) is merged as 1916ed65e; the S1 and S2 paths above changed only on this branch.

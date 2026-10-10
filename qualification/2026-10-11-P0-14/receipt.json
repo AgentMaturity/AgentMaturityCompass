@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P0-14",
   "date": "2026-10-11",
-  "commit": "8d665f17330869d0853296a1e1da4a7a9d94e03c",
+  "commit": "3a358adbd3be062d1cd1b13d8451cf757e769777",
   "branch": "rtd/p0-14-slice-c-deploy-hardening",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -16,6 +16,16 @@
     },
     {
       "cmd": "git diff --stat 7180bd0c4 5c2379934 -- <S1 paths>; git diff --stat 0d1bb10a3 5c2379934 -- <S2 paths> (equivalence.txt)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "git merge --no-edit int (cc063bdac), no conflicts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "pnpm install --frozen-lockfile && npm run build (after the merge)",
       "exit": 0,
       "durationMs": 0
     },
@@ -37,137 +47,142 @@
     {
       "cmd": "deploy-pack.yml static: node scripts/deploy/deploy-pack-check.mjs --json --require-tools",
       "exit": 0,
-      "durationMs": 1651
+      "durationMs": 1300
     },
     {
       "cmd": "deploy-pack.yml static: npx vitest run <15 S1 and S2 test files>",
       "exit": 0,
-      "durationMs": 5134
+      "durationMs": 5840
     },
     {
       "cmd": "deploy-pack.yml static: negative renders and no kind: Secret in the default render",
       "exit": 0,
-      "durationMs": 192
+      "durationMs": 188
     },
     {
       "cmd": "deploy-pack.yml static: negative renders with CHART=<chart 0.1.0 from 691a041dc> (must fail)",
       "exit": 1,
-      "durationMs": 251
+      "durationMs": 206
     },
     {
       "cmd": "deploy-pack.yml kind: kind create cluster --name amc-p014; docker build -t amc-studio:ci .; kind load docker-image amc-studio:ci",
       "exit": 0,
-      "durationMs": 201458
+      "durationMs": 399372
     },
     {
       "cmd": "deploy-pack.yml kind: create amc-bootstrap from openssl rand -hex 32 (never echoed)",
       "exit": 0,
-      "durationMs": 265
+      "durationMs": 535
     },
     {
-      "cmd": "deploy-pack.yml kind: helm install --wait; pin monitor key (helm upgrade); pair; helm test; helm upgrade --wait; helm rollback amc 2 --wait; pair; helm test",
+      "cmd": "deploy-pack.yml kind: helm install --wait; pin monitor key (helm upgrade, trust on first use); pair; helm test; helm upgrade --wait; helm rollback amc 2 --wait; pair; helm test",
       "exit": 0,
-      "durationMs": 73088
+      "durationMs": 84583
     },
     {
-      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (at 0c8fa7365, tree dirty with the receipt README only)",
+      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (at 1916ed65e)",
       "exit": 0,
-      "durationMs": 2887
+      "durationMs": 4677
     },
     {
-      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (clean tree)",
+      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (clean tree at the receipt commit)",
       "exit": 0,
-      "durationMs": 5243
+      "durationMs": 7871
     },
     {
-      "cmd": "deploy-pack.yml drill: git worktree add origin/main; docker build drill-a (origin/main) and drill-b (head)",
+      "cmd": "deploy-pack.yml drill: git worktree add origin/main; docker build drill-a (origin/main cc063bdac) and drill-b (head)",
       "exit": 0,
-      "durationMs": 123999
+      "durationMs": 204744
     },
     {
       "cmd": "deploy-pack.yml drill: node scripts/deploy/rollback-drill.mjs (image A from origin/main)",
       "exit": 1,
-      "durationMs": 9370
+      "durationMs": 18583
     },
     {
-      "cmd": "deploy-pack.yml drill: node scripts/deploy/rollback-drill.mjs (image A from 8c4bc10ec)",
+      "cmd": "deploy-pack.yml drill: node scripts/deploy/rollback-drill.mjs (image A from 2cb2f4f4c)",
       "exit": 0,
-      "durationMs": 22197
+      "durationMs": 55583
     },
     {
-      "cmd": "mutation runner: M1-M22 (each: mutate, npx vitest run <file>, restore, rerun)",
+      "cmd": "mutation runner: M1-M30 (each: mutate, npx vitest run <file>, restore, rerun)",
       "exit": 0,
       "durationMs": 0
     },
     {
-      "cmd": "npm run build",
+      "cmd": "npx vitest run <24 test files added or changed by P0-14>",
       "exit": 0,
-      "durationMs": 36049
+      "durationMs": 0
     },
     {
       "cmd": "npm run typecheck",
       "exit": 0,
-      "durationMs": 30374
+      "durationMs": 53557
     },
     {
       "cmd": "npm run typecheck:tests",
       "exit": 0,
-      "durationMs": 44742
+      "durationMs": 95757
     },
     {
       "cmd": "npm run lint",
       "exit": 0,
-      "durationMs": 2989
+      "durationMs": 5072
     },
     {
       "cmd": "npm run check:counts",
       "exit": 0,
-      "durationMs": 640
+      "durationMs": 965
     },
     {
       "cmd": "npm run check:docs-drift",
       "exit": 0,
-      "durationMs": 384
+      "durationMs": 495
     },
     {
       "cmd": "npm run check:freeze",
       "exit": 0,
-      "durationMs": 1892
+      "durationMs": 2656
     },
     {
       "cmd": "npm run check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1650
+      "durationMs": 2749
     },
     {
       "cmd": "npm run check:gates",
       "exit": 0,
-      "durationMs": 400
+      "durationMs": 668
     },
     {
       "cmd": "npm run check:schemas",
       "exit": 0,
-      "durationMs": 642
+      "durationMs": 1484
     },
     {
       "cmd": "npm run check:api-ref",
       "exit": 0,
-      "durationMs": 266
+      "durationMs": 428
     },
     {
       "cmd": "npm run check:threat-model",
       "exit": 0,
-      "durationMs": 284
+      "durationMs": 423
     },
     {
       "cmd": "npm run check:citations",
       "exit": 0,
-      "durationMs": 395
+      "durationMs": 567
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 405
     },
     {
       "cmd": "npm run check:clean-source",
       "exit": 0,
-      "durationMs": 63979
+      "durationMs": 85245
     },
     {
       "cmd": "node scripts/update-native-task-openapi.mjs --check",
@@ -175,14 +190,14 @@
       "durationMs": 0
     },
     {
-      "cmd": "npx vitest run (full suite)",
+      "cmd": "npx vitest run (full suite, merged head)",
       "exit": 1,
-      "durationMs": 679000
+      "durationMs": 883000
     }
   ],
   "tests": {
-    "total": 94,
-    "passed": 94,
+    "total": 98,
+    "passed": 98,
     "failed": 0,
     "skipped": 0
   },
@@ -201,32 +216,32 @@
     },
     {
       "path": "kind/helm-lifecycle.json",
-      "sha256": "0f6bdc827370eafcd74a431f1bc0b4c205c0d11046c131112fa25260bdada7e5"
+      "sha256": "80fcce5278d4f05cb395c366333df247b267eed5d624eb6237aab346bef6151a"
     },
     {
       "path": "kind/helm-lifecycle.log",
-      "sha256": "d08405d381d7c3156017ab1de749d2f7c16285ac243a0715943dca8fdd6392e1"
+      "sha256": "f7468fc835c3f5bedc543c504ed7de580e8f648520d8ff2394ef6f162495a714"
     },
     {
       "path": "kind/deploy-verify.json",
-      "sha256": "30fd7c94184f2f181d1b5ecd15cc57d09bb7f45ca222089f769f0e5f295a223d"
+      "sha256": "b2e034a5218596541a0fb5dfe0c108cb5642bb4cc467733e8ac9e9fc4365c460"
     },
     {
       "path": "drill/rollback-drill-a-origin-main.json",
-      "sha256": "16000ebb763f6c19e5c3ff8523af172bb9eac4c75532bf53c3c65716aced71f5"
+      "sha256": "66ca3b7ccff825b4b05d8ece435178d95e1ea87531047bc055c54bdd2fd6a540"
     },
     {
       "path": "drill/rollback-drill.json",
-      "sha256": "c87c29e3c0e38cca09e1c0407b7bd208ad2afc8dc59068e9ef20e64cf74dbec5"
+      "sha256": "0a80e8e2df6c516115c9f71957fc5750ff7be8d0304e11fe41862573575ff8f1"
     },
     {
       "path": "mutations.json",
-      "sha256": "628773035d68ad93805db52dc1edca9952a4a4cb33602f927789a2d9b047b978"
+      "sha256": "55681d7f6512fee77f5e2fe95c0e3b2a19b3d47b94393c053737fc1511acf10b"
     },
     {
       "path": "equivalence.txt",
-      "sha256": "d2293748497736106f84150e8486108d662f81e848c89e5f1742520556781c47"
+      "sha256": "8d00a41e2217e5a08fa7a99a326076f62c94d4c95d700fe67659228b38243281"
     }
   ],
-  "notes": "Local runs only (colima 0.10.3 VM, Docker 29.5.2 linux/arm64, kind v0.33.0, helm v4.3.0, kubeconform v0.8.0, kubectl v1.37.1). No GitHub Actions run: every deploy-pack.yml job is pending-ci (README.md). The receipt commit is the head the checks, the static steps and the clean verifier run used; the kind lifecycle and both drills ran at 0c8fa7365, and only this receipt's README changed after it. The branch base is 691a041dc; int has since moved.\nNon-zero exits, all expected or explained: (1) negative renders against chart 0.1.0 exit 1 by design. (2) deploy-verify.mjs --target http://127.0.0.1:1 and credentials-presence-check.mjs --json with an empty HOME exit 1: the spec's fail-closed negatives, no values printed. (3) The drill with image A from origin/main exit 1 at probe-a verify: main's Studio still runs the complete-ledger check, which its own live gateway session fails; the same drill with image A from 8c4bc10ec passes all six steps. (4) The full vitest suite exit 1: 107 failed of 23,196 (10 skipped by a hook timeout under load), every failing file also fails on 691a041dc with the same or a higher count (checked in a scratch worktree); studioNativeTaskService fails on this host on 691a041dc too.\nVerify fix: Studio's native verify returns the separate state anchored-prefix (probe status verified-prefix) when the task's session is closed and sealed, every row and sealed session verifies, the monitor key is pinned, and the only unfinalized sessions are named unended legacy sessions (the running gateway's); it never reports externally-anchored for that and never sets ok. Both kind helm tests and every post-fix drill probe reached verified-prefix.\ntests: the 15 S1 and S2 vitest files in the static job at the receipt commit. Mutations M1-M22 all killed (mutations.json).\nA durationMs of 0 means the command was not timed (the cherry-pick, the equivalence diff, the mutation runner, whose per-mutation timings are in mutations.json, and the OpenAPI --check).\nFollow-up recorded in README.md: amc lease issue leaves an unsigned revocation store when signing fails (src/leases/leaseStore.ts:44, :47; src/leases/leaseCli.ts:114; src/cli-lease-commands.ts:40)."
+  "notes": "Local runs only (colima 0.10.3 VM, Docker 29.5.2 linux/arm64, kind v0.33.0, helm v4.3.0, kubeconform v0.8.0, kubectl v1.37.1). No GitHub Actions run: every deploy-pack.yml job is pending-ci (README.md). Branch base 691a041dc; int (cc063bdac) merged as 1916ed65e without conflicts. The receipt commit is the head the static steps, the clean verifier run and both drills used; the kind lifecycle ran at 1916ed65e, and only the drill script and its test changed after it.\nNon-zero exits, all expected or explained: (1) negative renders against chart 0.1.0 exit 1 by design. (2) deploy-verify.mjs --target http://127.0.0.1:1 and credentials-presence-check.mjs --json with an empty HOME exit 1: the spec's fail-closed negatives, no values printed. (3) The drill with image A from origin/main (cc063bdac) exit 1 at probe-a verify: main's Studio still runs the complete-ledger check, which its own live gateway session fails; the drill with image A from 2cb2f4f4c and B from the merged head passes all six steps. (4) The full vitest suite on the merged head exit 1: 112 failed of 23,202 (10 skipped by a hook timeout under load). 108 are in files that fail the same way on 691a041dc; 4 (adaptersDoctorLeaseCarriers, leaseRevocationFailClosed, universalAgentIntegrationLayer, core/hotReload) failed only under load and pass alone (44 of 44).\nMonitor-key pins in the kind job and the drill are trust on first use (monitorPinSource in both receipts): they detect a later key swap, not a compromised first bootstrap.\nVerify fix: Studio's native verify returns the separate state anchored-prefix (probe status verified-prefix) only when the task's session is closed and sealed, every row and sealed session verifies, the monitor key is pinned, and every unfinalized session other than the target (an unsealed legacy session such as the running gateway's, or an open or interrupted native session) is named. It never reports externally-anchored for that and never sets ok.\ntests: the 15 S1 and S2 vitest files in the static job. Mutations M1-M30 all killed (mutations.json).\nA durationMs of 0 means the command was not timed.\nFollow-up recorded in README.md: amc lease issue leaves an unsigned revocation store when signing fails (src/leases/leaseStore.ts:44, :47; src/leases/leaseCli.ts:114; src/cli-lease-commands.ts:40)."
 }

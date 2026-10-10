@@ -1,6 +1,6 @@
 # P0-14 slice C: local qualification runs (2026-10-11)
 
-Slice C lands the S1 and S2 deployment-hardening commits (cherry-picked with `-x` from the candidate) and the P0-14 fixes on branch `rtd/p0-14-slice-c-deploy-hardening`. This folder records what ran locally on 2026-10-11 and what did not run.
+Slice C lands the S1 and S2 deployment-hardening commits (cherry-picked with `-x` from the candidate) and the P0-14 fixes on branch `rtd/p0-14-slice-c-deploy-hardening`, based on `691a041dc` and merged with `int` (`cc063bdac`) as `1916ed65e`. This folder records what ran locally on 2026-10-11 and what did not run.
 
 ## Environment (local, not CI)
 
@@ -16,17 +16,17 @@ How the workflow steps were run locally: a scratch runner executed each job's `r
 | Check | Commit | Result | Artifact |
 |---|---|---|---|
 | Tree equivalence of the 12 picks against `7180bd0c4` (S1) and `0d1bb10a3` (S2) | `5c2379934` | S1 empty; S2 differs only in `docs/RELEASE_RUNBOOK.md`, by main's own P0-09 change (`fefb9b85e`), kept | `equivalence.txt` |
-| `deploy-pack-check.mjs --json --require-tools` | receipt commit | passed (helm lint, renders, kubeconform; nothing skipped) | `static/deploy-pack-check.json` |
-| S1 and S2 vitest files (15 files) | receipt commit | 94 passed of 94 (the receipt's `tests`) | none |
-| Four negative renders and no `kind: Secret` in the default render | receipt commit | all five checks pass, each refusal naming its reason | `static/negative-renders.txt` |
-| The same step against chart 0.1.0 (`691a041dc`) | receipt commit | fails as required: 4 renders accepted, default render contains `kind: Secret` | `static/negative-renders-against-chart-0.1.0.txt` |
-| Kind: install, pin monitor key (revision 2), pair, test, upgrade, rollback to 2, pair, test | `0c8fa7365` | **passed**: every step exit 0; both `helm test` probes reached `verified-prefix` | `kind/helm-lifecycle.json`, `kind/helm-lifecycle.log` |
-| `deploy-verify.mjs` against the kind release | receipt commit (clean tree) | passed: 5 of 5 checks, `llm_response` receipt verified against the pinned monitor key | `kind/deploy-verify.json` |
-| Rollback drill, image A from `origin/main` (`691a041dc`), image B from the head | `0c8fa7365` | **failed** at `probe-a` `verify`: main's Studio runs the complete-ledger check, which the live gateway session fails | `drill/rollback-drill-a-origin-main.json` |
-| Rollback drill, image A from `8c4bc10ec`, image B from the head | `0c8fa7365` | **passed**: six steps, two `sha256` image ids, `verified-prefix` on all three probes | `drill/rollback-drill.json` |
-| Mutations M1 to M22 | `30f88cac9` | 22 of 22 killed, restored green | `mutations.json` |
+| `deploy-pack-check.mjs --json --require-tools` | `3a358adbd` | passed (helm lint, renders, kubeconform; nothing skipped) | `static/deploy-pack-check.json` |
+| S1 and S2 vitest files (15 files) | `3a358adbd` | 98 passed of 98 (the receipt's `tests`) | none |
+| Four negative renders and no `kind: Secret` in the default render | `3a358adbd` | all five checks pass, each refusal naming its reason | `static/negative-renders.txt` |
+| The same step against chart 0.1.0 (`691a041dc`) | `3a358adbd` | fails as required: 4 renders accepted, default render contains `kind: Secret` | `static/negative-renders-against-chart-0.1.0.txt` |
+| Kind: install, pin monitor key (revision 2), pair, test, upgrade, rollback to 2, pair, test | `1916ed65e` (merged head) | **passed**: every step exit 0; both `helm test` probes reached `verified-prefix` | `kind/helm-lifecycle.json`, `kind/helm-lifecycle.log` |
+| `deploy-verify.mjs` against the kind release | `3a358adbd` (clean tree) | passed: 5 of 5 checks, `llm_response` receipt verified against the pinned monitor key | `kind/deploy-verify.json` |
+| Rollback drill, image A from `origin/main` (`cc063bdac`), image B from the head | `3a358adbd` | **failed** at `probe-a` `verify`: main's Studio runs the complete-ledger check, which the live gateway session fails | `drill/rollback-drill-a-origin-main.json` |
+| Rollback drill, image A from `2cb2f4f4c` (all review fixes, before the merge), image B from the merged head | `3a358adbd` | **passed**: six steps, two `sha256` image ids, `verified-prefix` on all three probes | `drill/rollback-drill.json` |
+| Mutations M1 to M30 | `30f88cac9` (M1-M22), `2cb2f4f4c` (M23-M29), `3a358adbd` (M30) | 30 of 30 killed, restored green | `mutations.json` |
 
-Between `0c8fa7365` and the receipt commit only this receipt changed. Image A of the second drill comes from `8c4bc10ec`, whose Studio differs from the head only in `0c8fa7365` (a failed verdict keeps its recorded head), which no passing verdict touches.
+Between `1916ed65e` and `3a358adbd` only the drill script changed (`3a358adbd`: wait for A's first bootstrap before pinning); the kind job does not use it. On the merged head a first drill run with image A from `2cb2f4f4c` failed `probe-a` at `readyz` (`DIAGNOSTIC_BANK_UNTRUSTED: signature missing`): the drill had restarted A mid-bootstrap as soon as its key file appeared. `3a358adbd` fixes that; the recorded run is after the fix.
 
 ### Root cause of the earlier verify refusal, and the fix
 
@@ -36,7 +36,7 @@ The fix uses the verifier the product already had for this situation (`verifyNat
 
 - The target session must be closed and sealed; an unclosed or unsealed target fails.
 - Every row, every session chain and every sealed session is still checked. A truncated row or a cut row that later rows chain over fails.
-- Only unended, unsealed legacy sessions other than the target may be unfinalized, and each is named.
+- Only sessions other than the target may be unfinalized, and each is named: unended, unsealed legacy sessions, and native sessions that are open or interrupted (a native session whose `session/close` and seal were cut). A complete-ledger verdict fails on any of them (review MEDIUM 1).
 - The result is a separate state. `verifyAgentRun` reports `prefixVerified` with `ok: false`; the CLI renders `VERIFIED PREFIX (not finalized: ...)`; Studio reports `anchored-prefix` (never `externally-anchored`) with `verificationScope`; the console labels it "verified prefix only"; the probe's status is `verified-prefix`; the helm-lifecycle and drill receipts record `probeStatuses`. The SDK still requires `ok`.
 - Only Studio's own verify enables it (`src/studio/nativeTaskVerdict.ts`); the verify route's body schema is strict, and no query string or header reaches the service.
 - It applies only when the store marker is positively SQLite. A thrown verifier or any unexpected report shape is `failed`.
@@ -78,8 +78,16 @@ The kind verdicts name one unfinalized session, the gateway's (pods stop gracefu
 | M20 | the drill records every passing probe as `verified` | `tests/rollbackDrill.test.ts` |
 | M21 | the console labels a prefix like a full verification | `tests/studioNativeTaskValidation.test.ts` |
 | M22 | the shared entrypoint helper compares the unresolved `argv[1]` | `tests/scriptEntrypoint.test.ts` |
+| M23 | other open or interrupted native sessions left out of `unfinalizedSessions` | `tests/agentLoopReconstructable.test.ts` |
+| M24 | no complete-ledger error for another unfinalized session | `tests/agentLoopReconstructable.test.ts` |
+| M25 | the probe counts `workspace-key-consistency` as verified | `tests/deployPackProbe.test.ts` |
+| M26 | the drill passes a probe result without a status | `tests/rollbackDrill.test.ts` |
+| M27 | the console attributes every named session to a gateway | `tests/studioNativeTaskValidation.test.ts` |
+| M28 | the OpenAPI scope list advertises `maxItems` again | `tests/nativeTaskVerdict.test.ts` |
+| M29 | the drill receipt drops its trust-on-first-use label | `tests/rollbackDrill.test.ts` |
+| M30 | the drill reads A's key without waiting for readiness | `tests/rollbackDrill.test.ts` |
 
-Each mutation turned its test file red and the restored file green; failing test names are in `mutations.json`. M1 to M6 are the spec's six. M9, M10 and M19 edit only `scripts/deploy/governed-turn-probe.mjs`, so the byte-identity test with the chart copy also fails; the behaviour test fails in each. The Studio service's call into `nativeTaskVerdict.ts` was not mutated: `tests/studioNativeTaskService.test.ts` fails on `int` on this host, so the kind run is the evidence for that wiring.
+Each mutation turned its test file red and the restored file green; failing test names are in `mutations.json`. M1 to M6 are the spec's six; M23 to M29 cover the independent review's six findings. M9, M10, M19 and M25 edit only `scripts/deploy/governed-turn-probe.mjs`, so the byte-identity test with the chart copy also fails; the behaviour test fails in each. The Studio service's call into `nativeTaskVerdict.ts` was not mutated: `tests/studioNativeTaskService.test.ts` fails on `int` on this host, so the kind run is the evidence for that wiring.
 
 ## Pending CI (`pending-ci`, not passed)
 
@@ -89,7 +97,7 @@ Nothing below has run in GitHub Actions. After a push, the pull request runs `.g
 - `kind`: `kind create cluster --name amc-ci --wait 180s`; `docker build -t amc-studio:ci .`; `kind load docker-image amc-studio:ci --name amc-ci`; random `amc-bootstrap`; `helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m`; pin the monitor key (`helm upgrade --reuse-values --set env.AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256> --wait`); pair; `helm test amc --logs --timeout 10m`; `helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m`; `helm rollback amc 2 --wait --timeout 10m`; pair; `helm test amc --logs --timeout 10m`; `node scripts/deploy-verify.mjs --target http://127.0.0.1:13212 --gateway http://127.0.0.1:13210 --monitor-pubkey <pinned> --route /local --model gpt-test --lease-file <minted> --out tmp/deploy-pack/deploy-verify.json`.
 - `drill`: `git worktree add --detach "$RUNNER_TEMP/base" origin/main`; build `amc-studio:drill-a` there and `amc-studio:drill-b` from the head; `node scripts/deploy/rollback-drill.mjs --image-a amc-studio:drill-a --image-b amc-studio:drill-b --secrets-dir <tmp> --out tmp/deploy-pack/rollback-drill.json`.
 
-Expected from the local runs: `static` and `kind` green. `drill` stays red at `probe-a` until `origin/main` carries the verify fix, because image A is built from main. The workflow's actions are not pinned by commit SHA and its tool archives are checked against the publishers' checksum files, not pinned literals; both are marked `TODO(P0-14 follow-up)` in the file.
+Expected from the local runs: `static` and `kind` green. `drill` stays red at `probe-a` until `origin/main` carries the verify fix, because image A is built from main (`cc063bdac` still runs the complete-ledger check). The workflow's actions are not pinned by commit SHA and its tool archives are checked against the publishers' checksum files, not pinned literals; both are marked `TODO(P0-14 follow-up)` in the file.
 
 ## Not run here
 

@@ -578,5 +578,214 @@
       "durationMs": 1192
     },
     "killed": true
+  },
+  {
+    "id": "M23",
+    "mutation": "review MEDIUM 1: leave other open or interrupted native sessions out of unfinalizedSessions",
+    "file": "src/agent/runReport.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 20 passed (21)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: another native session whose close and seal were cut is named, and fails a complete verdict 453ms"
+      ],
+      "durationMs": 24161
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  21 passed (21)"
+      ],
+      "durationMs": 26758
+    },
+    "killed": true
+  },
+  {
+    "id": "M24",
+    "mutation": "review MEDIUM 1: no complete-ledger error for another unfinalized session",
+    "file": "src/agent/runReport.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 20 passed (21)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: another native session whose close and seal were cut is named, and fails a complete verdict 552ms"
+      ],
+      "durationMs": 22853
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  21 passed (21)"
+      ],
+      "durationMs": 18863
+    },
+    "killed": true
+  },
+  {
+    "id": "M25",
+    "mutation": "review LOW 1: the probe counts workspace-key-consistency as verified",
+    "file": "scripts/deploy/governed-turn-probe.mjs",
+    "test": "tests/deployPackProbe.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 5 passed (7)"
+      ],
+      "failingTests": [
+        "fails when Studio's verification verdict is not a verified scope 47ms",
+        "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 3ms"
+      ],
+      "durationMs": 2203
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 2529
+    },
+    "killed": true
+  },
+  {
+    "id": "M26",
+    "mutation": "review LOW 3: the drill passes a probe result without status",
+    "file": "scripts/deploy/rollback-drill.mjs",
+    "test": "tests/rollbackDrill.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 10 passed (11)"
+      ],
+      "failingTests": [
+        "fails a probe step whose result carries no recognised status (P0-14) 5ms"
+      ],
+      "durationMs": 1414
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  11 passed (11)"
+      ],
+      "durationMs": 1240
+    },
+    "killed": true
+  },
+  {
+    "id": "M27",
+    "mutation": "review LOW 2: the console attributes every named session to a gateway",
+    "file": "src/console/assets/nativeTasksView.js",
+    "test": "tests/studioNativeTaskValidation.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 5 passed (6)"
+      ],
+      "failingTests": [
+        "P0-14: an anchored verdict over a verified prefix is its own state, never shown as a full verification 16ms"
+      ],
+      "durationMs": 13858
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  6 passed (6)"
+      ],
+      "durationMs": 14595
+    },
+    "killed": true
+  },
+  {
+    "id": "M28",
+    "mutation": "review LOW 4: the OpenAPI scope list advertises maxItems again",
+    "file": "src/studio/nativeTaskOpenapi.ts",
+    "test": "tests/nativeTaskVerdict.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 3 passed (4)"
+      ],
+      "failingTests": [
+        "publishes no item cap the verdict does not enforce: every unfinalized session is listed 4ms"
+      ],
+      "durationMs": 7331
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  4 passed (4)"
+      ],
+      "durationMs": 4669
+    },
+    "killed": true
+  },
+  {
+    "id": "M29",
+    "mutation": "review MEDIUM 2: the drill receipt drops its trust-on-first-use label",
+    "file": "scripts/deploy/rollback-drill.mjs",
+    "test": "tests/rollbackDrill.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 10 passed (11)"
+      ],
+      "failingTests": [
+        "labels its monitor pin as trust on first use: read from the volume under test (P0-14) 5ms"
+      ],
+      "durationMs": 1278
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  11 passed (11)"
+      ],
+      "durationMs": 1028
+    },
+    "killed": true
+  },
+  {
+    "id": "M30",
+    "mutation": "merge rerun: the drill reads A's key without waiting for readiness",
+    "file": "scripts/deploy/rollback-drill.mjs",
+    "test": "tests/rollbackDrill.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 11 passed (12)"
+      ],
+      "failingTests": [
+        "waits for A's first bootstrap to finish (readyz) before it reads the key and restarts A pinned (P0-14) 4ms"
+      ],
+      "durationMs": 1034
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  12 passed (12)"
+      ],
+      "durationMs": 747
+    },
+    "killed": true
   }
 ]

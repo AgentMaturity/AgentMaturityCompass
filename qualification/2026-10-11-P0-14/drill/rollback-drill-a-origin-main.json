@@ -1,7 +1,7 @@
 {
   "kind": "amc.rollback-drill/1",
-  "sourceCommit": "0c8fa73658d6419fdbf5f5c39fd5ff1c4f0882db",
-  "startedAt": "2026-10-10T22:30:49.118Z",
+  "sourceCommit": "3a358adbd3be062d1cd1b13d8451cf757e769777",
+  "startedAt": "2026-10-10T23:38:24.598Z",
   "environment": {
     "node": "v25.5.0",
     "platform": "darwin",
@@ -11,20 +11,20 @@
   "images": {
     "a": {
       "ref": "amc-studio:drill-a",
-      "id": "sha256:d3cefb8fe9653f7772cdf84a05379016bb49758c95ba79b000b1d9b3f7b1db97"
+      "id": "sha256:24664f3506dbdfacbcbe51c05cffbf55c92a1624e6e7c0b2c6851bd6b134fd58"
     },
     "b": {
       "ref": "amc-studio:drill-b",
-      "id": "sha256:c79b217e8316fa2fd1fd3ffc158d3f14996b2d90e7a0fb73ab13b8a3364b0f06"
+      "id": "sha256:344afd54d695a33f1a1d764cd0a4291ce9aecc59707fd6ddc4ca47d70626ce13"
     }
   },
-  "container": "amc-rollback-drill-219a1015",
-  "volume": "amc-rollback-drill-219a1015",
+  "container": "amc-rollback-drill-5848f0eb",
+  "volume": "amc-rollback-drill-5848f0eb",
   "steps": [
     {
       "id": "deploy-a",
       "status": "passed",
-      "imageId": "sha256:d3cefb8fe9653f7772cdf84a05379016bb49758c95ba79b000b1d9b3f7b1db97"
+      "imageId": "sha256:24664f3506dbdfacbcbe51c05cffbf55c92a1624e6e7c0b2c6851bd6b134fd58"
     },
     {
       "id": "probe-a",
@@ -55,12 +55,13 @@
     }
   ],
   "status": "failed",
-  "monitorPin": "e1324650fd3d8ffaa4dcfab209add6dca15899616d42d3198c831aa0316a07d3",
+  "monitorPin": "e8e123930792a479c7b306eb9cd2dbaf10a82203a8dd660cbf39215c4da5853b",
   "probeStatuses": [
     "failed"
   ],
+  "monitorPinSource": "trust-on-first-use: read from the drill's own workspace volume after A's first bootstrap",
   "notExercised": [
     "Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"
   ],
-  "finishedAt": "2026-10-10T22:30:58.192Z"
+  "finishedAt": "2026-10-10T23:38:41.982Z"
 }

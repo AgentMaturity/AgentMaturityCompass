@@ -1,8 +1,9 @@
 {
   "kind": "amc.helm-lifecycle/1",
-  "commit": "0c8fa73658d6419fdbf5f5c39fd5ff1c4f0882db",
+  "commit": "1916ed65ec47a5c23b2a4e4a90e781439687c94e",
   "cluster": "kind",
-  "builtImageId": "sha256:f86b76d15c8d859c5e0633147dace41531c2a9c43e7fc6d349bcd3576a61b569",
+  "builtImageId": "sha256:eaeabd293ae99fd68aee66d941422e13692291b1d2decb7c49701eed24c95078",
+  "monitorPinSource": "trust-on-first-use: read from the pod workspace volume",
   "status": "passed",
   "steps": {
     "install": 0,
@@ -50,9 +51,9 @@
   ],
   "images": [
     {
-      "pod": "amc-amc-7dc5cccbd6-lcc6q",
+      "pod": "amc-amc-6bdbcdb797-2tz8l",
       "image": "docker.io/library/amc-studio:ci",
-      "imageID": "docker.io/library/import-2026-10-10@sha256:c3fc3d6d2a56421535cd98fc335282571ba96821d58903e704c0092aec853ecc"
+      "imageID": "docker.io/library/import-2026-10-10@sha256:f2fab92ce7108a3f9eb5c0ffe617b94b0bf2116bbdf54b4ceafaae18777f19b2"
     }
   ]
 }
