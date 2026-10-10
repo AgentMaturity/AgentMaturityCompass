@@ -39,7 +39,7 @@ import {
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
 import { authorOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
-import { A4StoreError, readA4Store } from "./a4Store.js";
+import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
 export const A4_MIGRATION = 13;
@@ -556,11 +556,8 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     // A later A4 audit session in the bundle's own ledger witnesses a transition the record does not show (rule 1).
     const db = new Database(join(root, "evidence", "evidence.sqlite"), { readonly: true });
     try {
-      for (const entry of listed) {
-        const sessionId = `a4-${entry.projectId}-${entry.headSeq + 1}`;
-        if (db.prepare("SELECT 1 FROM sessions WHERE session_id = ? UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? LIMIT 1").get(sessionId, sessionId) !== undefined) {
-          sliceErrors.push(`A4_SLICE_TRUNCATED: the bundle ledger holds session ${sessionId}, after the head a4/index.json lists`);
-        }
+      for (const entry of listed.filter((listing) => a4WitnessExists(db, listing.projectId, listing.headSeq + 1))) {
+        sliceErrors.push(`A4_SLICE_TRUNCATED: the bundle ledger holds session a4-${entry.projectId}-${entry.headSeq + 1}, after the head a4/index.json lists`);
       }
     } finally {
       db.close();

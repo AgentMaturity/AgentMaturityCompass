@@ -11,7 +11,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { a4PreviewEnabled, type A4ProjectRow } from "../a4/a4Schema.js";
-import { A4StoreError, readA4Store } from "../a4/a4Store.js";
+import { A4_WITNESS, A4StoreError, readA4Store } from "../a4/a4Store.js";
 import { A4_RECORD_TABLES, a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { verifyKeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
@@ -75,22 +75,25 @@ const workspaceKeys = (workspace: string): A4RecordKeys => {
 
 /**
  * Every project any A4 row or audit session names, not only those with a head: a deleted head row (or project) must
- * fail, never read as a smaller set. Audit sessions are `a4-<projectId>-<seq>`.
+ * fail, never read as a smaller set. Audit sessions are `a4-<projectId>-<seq>`, and only the store's rows there count
+ * (A4_WITNESS): a row another writer put in that namespace names no project.
  */
 export const a4ProjectIds = (db: Database.Database): string[] => (db.prepare(`SELECT project_id AS id FROM a4_projects
-  UNION SELECT project_id FROM a4_transitions UNION SELECT substr(session_id, 4, 36) FROM sessions WHERE session_id GLOB 'a4-a4p_*'
-  UNION SELECT substr(session_id, 4, 36) FROM evidence_events WHERE session_id GLOB 'a4-a4p_*'`).all() as Array<{ id: string }>)
+  UNION SELECT project_id FROM a4_transitions UNION SELECT substr(session_id, 4, 36) FROM sessions WHERE session_id GLOB 'a4-a4p_*' AND ${A4_WITNESS.sessions}
+  UNION SELECT substr(session_id, 4, 36) FROM evidence_events WHERE session_id GLOB 'a4-a4p_*' AND ${A4_WITNESS.events}`).all() as Array<{ id: string }>)
   .map((row) => row.id).filter((id) => /^a4p_[0-9a-f]{32}$/.test(id)).sort();
 
-/** The agent named by the receipt a monitor key signed for the project's seq-0 audit session; null when none verifies. */
+/** The agent a monitor key's receipt on this audit row names for the project's seq-0 session `a4-<projectId>-0`; null when none verifies. */
+export function seqZeroReceiptAgent(event: { meta_json: string }, projectId: string, monitorKeys: string[]): string | null {
+  const receipt = eventMeta(event).receipt;
+  const checked = typeof receipt === "string" ? verifyReceipt(receipt, monitorKeys) : null;
+  return checked?.ok === true && checked.payload?.session_id === `a4-${projectId}-0` ? checked.payload.agentId : null;
+}
+
+/** The agent the store's seq-0 audit row of the project is attributed to by its signed receipt; null when none verifies. */
 function receiptAgent(db: Database.Database, projectId: string, monitorKeys: string[]): string | null {
-  const sessionId = `a4-${projectId}-0`;
-  for (const event of db.prepare("SELECT meta_json FROM evidence_events WHERE session_id = ? ORDER BY rowid").all(sessionId) as Array<{ meta_json: string }>) {
-    const receipt = eventMeta(event).receipt;
-    const checked = typeof receipt === "string" ? verifyReceipt(receipt, monitorKeys) : null;
-    if (checked?.ok === true && checked.payload?.session_id === sessionId) return checked.payload.agentId;
-  }
-  return null;
+  const events = db.prepare(`SELECT meta_json FROM evidence_events WHERE session_id = ? AND ${A4_WITNESS.events} ORDER BY rowid`).all(`a4-${projectId}-0`);
+  return (events as Array<{ meta_json: string }>).map((event) => seqZeroReceiptAgent(event, projectId, monitorKeys)).find((agent) => agent !== null) ?? null;
 }
 
 const refused = (projectId: string, problems: string[]): A4StoreError => new A4StoreError(409, "A4_INTEGRITY_FAILED",

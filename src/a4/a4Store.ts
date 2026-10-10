@@ -27,7 +27,7 @@ import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
-import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
+import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { verifyReceipt } from "../receipts/receipt.js";
@@ -48,8 +48,17 @@ import {
 } from "./a4Schema.js";
 
 export const A4_AUDIT_TYPE = "A4_STATE" as const;
-/** Marks the store's ledger sessions, one per transition: `a4-<projectId>-<seq>`. */
-export const A4_STORE_BINARY = "a4-store";
+/** The rows only this store writes in its `a4-<projectId>-<seq>` sessions (the ledger refuses any other writer there). */
+export const A4_WITNESS = { sessions: `binary_path = '${A4_STORE_BINARY}'`,
+  events: `json_extract(meta_json, '$.source') = 'a4-store' AND json_extract(meta_json, '$.auditType') = '${A4_AUDIT_TYPE}'` };
+/**
+ * Whether the ledger holds this store's session or audit row of transition `seq` (`a4-<projectId>-<seq>`), written with
+ * the transition: sessions are append-only and audit rows hash-chained, so they witness a transition a4_transitions lost. */
+export function a4WitnessExists(db: Database.Database, projectId: string, seq: number): boolean {
+  const sessionId = `a4-${projectId}-${seq}`;
+  return db.prepare(`SELECT 1 FROM sessions WHERE session_id = ? AND ${A4_WITNESS.sessions}
+    UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? AND ${A4_WITNESS.events} LIMIT 1`).get(sessionId, sessionId) !== undefined;
+}
 /** ponytail: native tasks keep request ids for a descriptor's life and name no window; A4 keeps them 24 h. Raise it if clients retry later. */
 export const A4_REQUEST_WINDOW_MS = 24 * 60 * 60 * 1000;
 /** A lease token: base64url canonical JSON payload, a dot, a base64url Ed25519 signature (src/leases/leaseSigner.ts). */
@@ -213,16 +222,6 @@ function createStore(workspace: string, ledger: Ledger) {
     const row = db.prepare("SELECT * FROM a4_projects WHERE project_id = ?").get(projectId);
     return row === undefined ? null : a4ProjectRowSchema.parse(row);
   };
-  /**
-   * Whether the ledger holds the session or audit row of transition `seq` (`a4-<projectId>-<seq>`). Both are written in
-   * the transaction that inserts the transition; sessions are append-only by trigger and the audit row is in the
-   * ledger's hash chain, so they witness a transition that a4_transitions no longer shows.
-   */
-  const auditSessionExists = (projectId: string, seq: number): boolean => {
-    const sessionId = `a4-${projectId}-${seq}`;
-    return db.prepare("SELECT 1 FROM sessions WHERE session_id = ? UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? LIMIT 1")
-      .get(sessionId, sessionId) !== undefined;
-  };
   type Link = A4ChainLink & { readonly row: A4TransitionRow };
   /** The project's transition rows in seq order; a row that does not parse is an integrity failure. */
   const readRows = (projectId: string): A4TransitionRow[] =>
@@ -305,13 +304,13 @@ function createStore(workspace: string, ledger: Ledger) {
   const verified = (projectId: string): { head: A4ProjectRow | null; links: Link[] } => db.transaction(() => {
     const head = readHeadRow(projectId);
     if (head === null) {
-      if (db.prepare("SELECT 1 FROM a4_transitions WHERE project_id = ? LIMIT 1").get(projectId) !== undefined || auditSessionExists(projectId, 0)) {
+      if (db.prepare("SELECT 1 FROM a4_transitions WHERE project_id = ? LIMIT 1").get(projectId) !== undefined || a4WitnessExists(db, projectId, 0)) {
         throw integrityFailed(projectId, ["transitions exist without a head"]);
       }
       return { head: null, links: [] };
     }
     const problems: string[] = [];
-    if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
+    if (a4WitnessExists(db, projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     const links = walk(readRows(projectId), problems);
     const last = links.at(-1);
     if (last === undefined || last.seq !== head.head_seq || last.row.body_digest !== head.head_digest
@@ -392,7 +391,7 @@ function createStore(workspace: string, ledger: Ledger) {
       const body = parseBody(parsed.data.body_json);
       problems.push(...bodyProblems(parsed.data, body), ...auditProblems(parsed.data, getPublicKeyHistory(workspace, "monitor")), ...headProblems(head, body ?? {}));
     }
-    if (auditSessionExists(projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
+    if (a4WitnessExists(db, projectId, head.head_seq + 1)) problems.push("chain truncated: a later A4 audit session exists");
     if (problems.length > 0) throw integrityFailed(projectId, problems);
   };
 
