@@ -15,6 +15,8 @@ import { MERKLE_ALGORITHMS } from "./merkle.js";
  *
  * `merkle-migration` (P1-26) records the signed legacy-to-RFC 9162 migration
  * record in the hash chain, so the move cannot be undone by deleting a file.
+ *
+ * `a4-binder` (P1-63) records the signed manifest of an A4 binder slice (src/a4/a4Binder.ts).
  */
 export const TRANSPARENCY_ARTIFACT_KINDS = [
   "amccert",
@@ -29,7 +31,8 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "garak-scan-report",
   "vulnerability-scan-report",
   "session-root",
-  "merkle-migration"
+  "merkle-migration",
+  "a4-binder"
 ] as const;
 
 export type TransparencyArtifactKind = (typeof TRANSPARENCY_ARTIFACT_KINDS)[number];
