@@ -62,7 +62,7 @@ Statuses follow the rule above. Owners are plan keys that own the open gaps; a c
 | `extensions` | Extensions | `src/extensions/nativeExtensionRuntime.ts` `loadNativeExtensions`; `src/plugins/nativeExecutableRunner.ts` `NativeExecutableRunner` (Bubblewrap only) | Extension load receipts | enforced; executables refused outside Linux | Installed acceptance (P0-31) |
 | `managed-hooks` | Managed hooks | `src/adapters/managedHookLease.ts` `verifyManagedLease`; `src/bridge/hookControl.ts` `evaluateProviderHookControl` | Hook control results | enforced at the hook | Security mutation batch (P0-30) |
 | `notary` | Notary | `src/notary/notaryAuth.ts` `verifyNotaryRequestAuth` (HMAC over time, method, path and body hash); `src/notary/notaryServer.ts` `startNotaryServer`; `src/notary/notaryLog.ts` `appendNotaryLogEntry` | Notary log | enforced | P0-30; key providers (P2-08) |
-| `helm-compose` | Helm and Compose | `deploy/helm/amc/templates/secret.yaml` (`change-me` values); `deploy/compose/docker-compose.yml` (file secrets) | None at deploy on main | none | Helm passphrase (P0-14); base images (P0-35) |
+| `helm-compose` | Helm and Compose | `deploy/helm/amc/templates/secret.yaml` (`createSecret` guard, off by default); `deploy/helm/amc/templates/_helpers.tpl` `amc.bootstrapValue` (required, `change-me` refused); `deploy/compose/docker-compose.yml` (file secrets) | Render refusals; `helm test` and `deploy-verify` results the operator keeps | advisory: enforced at Helm render since P0-14; Compose secret files are unchecked | Chart 0.1.0 workspaces keep a published passphrase (P0-37); base images (P0-35) |
 
 ## STRIDE per channel
 
@@ -208,10 +208,10 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 
 - Spoofing: not applicable at deploy time; identity is set by the secrets below.
 - Tampering: an unpinned base image changes underneath a deployment. Control: none on main. Gap: digest pins (P0-35).
-- Repudiation: not applicable; deployment manifests produce no evidence on main.
-- Information disclosure: default secrets. Control: Compose reads operator-created secret files. Gap: the Helm secret template ships `change-me` values for the vault, owner and notary secrets (P0-14).
+- Repudiation: the manifests produce no evidence. `helm test` and `scripts/deploy-verify.mjs` write results the operator keeps; a workspace-key result is a local audit trail.
+- Information disclosure: default secrets. Control: chart 0.2.0 renders no Secret by default and refuses `change-me` values at render (template and `values.schema.json`); Compose reads operator-created secret files. Gap: a workspace bootstrapped by chart 0.1.0 used the published `change-me` values (P0-37); Compose secret files are unchecked.
 - Denial of service: not evaluated at deploy time in this review.
-- Elevation of privilege: a deployment that keeps the `change-me` vault passphrase gives anyone with the chart its signing authority. Control: none. Gap: P0-14.
+- Elevation of privilege: a deployment that keeps the `change-me` vault passphrase gives anyone with the chart its signing authority. Control: chart 0.2.0 refuses the placeholders. Gap: workspaces bootstrapped by chart 0.1.0 keep that passphrase, and no `amc vault` command changes it (P0-37).
 
 ## Verified bypasses
 
