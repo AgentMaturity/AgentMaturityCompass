@@ -193,9 +193,10 @@ function proposalItems(spec: Record<string, unknown>, answers: readonly A4Answer
 
 /**
  * Build's items: mandatory once the direction gate is consumed; before it they name the step that produces them. Review's
- * checks are read from its signed STEP on the built revision.
+ * checks are read from its signed STEP on the built revision. `manifest_active` is BLOCKED while the head revision's
+ * bound Enforce resources drifted (`enforce.resourcesSha256`, the live facts), as Enforce then reads DRIFTED.
  */
-function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revisionNo: number | null): A4ReadinessItem[] {
+function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revisionNo: number | null, drifted: readonly string[] | null): A4ReadinessItem[] {
   const due = reached(state, "direction_approved");
   const build = (spec.build ?? null) as { files?: Array<{ writer?: unknown }>; manifestId?: unknown; manifestError?: unknown } | null;
   const review = [...state.chain].reverse().find((link) => link.kind === "STEP" && link.body.to === "reviewed" && link.revisionNo === revisionNo)?.body as
@@ -216,7 +217,9 @@ function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revi
     signature !== undefined && signature.valid !== true
       ? item("agent_config_signed", "BLOCKED", { section: "implementation", kind: "evidence_untrusted", reasonCodes: ["AGENT_CONFIG_SIGNATURE_INVALID"] })
       : wrote("agent-config") ? item("agent_config_signed", "READY", { section: "implementation" }) : pending("agent_config_signed"),
-    typeof build?.manifestId === "string" ? item("manifest_active", "READY", { section: "implementation" })
+    typeof build?.manifestId === "string" && revisionNo === state.project.revision_no && drifted?.includes("enforce.resourcesSha256") === true
+      ? item("manifest_active", "BLOCKED", { section: "implementation", kind: "scope_changed", reasonCodes: ["MANIFEST_DRIFTED", "RESOURCE_DRIFTED"] })
+      : typeof build?.manifestId === "string" ? item("manifest_active", "READY", { section: "implementation" })
       : typeof build?.manifestError === "string" ? item("manifest_active", "BLOCKED", { section: "implementation", kind: "evidence_missing",
         reasonCodes: [...new Set(["ENFORCE_MANIFEST_REFUSED", build.manifestError])] }) : pending("manifest_active")
   ];
@@ -275,7 +278,7 @@ export function aspireItems(state: A4ReadinessState, query: A4ReadinessQuery): A
       : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
         ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)], { nextAction: { label: "Answer or confirm the listed questions" } }),
     ...proposalItems(spec, answers),
-    ...buildItems(state, spec, revisionNo),
+    ...buildItems(state, spec, revisionNo, query.live.driftedSlots),
     ...hypothesisItems(state, spec, query.now)
   ];
 }

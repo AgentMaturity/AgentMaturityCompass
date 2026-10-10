@@ -13,7 +13,7 @@ import { listArchetypes, previewArchetypeApply } from "../../archetypes/index.js
 import { validateContextGraph, type ContextGraph } from "../../context/contextGraph.js";
 import { a4QualitySpecSchema, type A4QualitySpec } from "../../contracts/v1/a4Package.js";
 import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
-import { writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { buildEnforceResourceManifest, latestEnforceResourceManifestPath, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
 import { parseStation } from "../../domains/stations.js";
 import { getAgentPaths } from "../../fleet/paths.js";
 import { agentConfigSchema, buildAgentConfig, saveAgentConfig, scaffoldAgent, verifyAgentConfigSignature, type AgentConfig } from "../../fleet/registry.js";
@@ -95,12 +95,29 @@ function typedGraphDigest(workspace: string, agentId: string): string | null {
   }
 }
 
-/** Readiness items and the brief and graph slots a gate binds and every decide, complete and executor preamble recomputes. */
+/**
+ * What Enforce binds for the agent: the sha256 of its live resource set (its config and the config's `.sig`, its context
+ * graph, the fleet's typed-graphs/latest.json, …) once it has a latest manifest, null before. A later write Enforce would
+ * read as DRIFTED (another agent's Build replacing latest.json, a removed or replaced `.sig`) is then RESOURCE_DRIFTED at
+ * decide, complete and the effect preamble. Assemble (P1-60) binds this same slot and reuses this recomputer.
+ * ponytail: hashes every Enforce candidate on each read; cache by mtime if large imported runs make readiness slow.
+ */
+function enforceResourcesSha256(workspace: string, agentId: string): string | null {
+  if (!pathExists(latestEnforceResourceManifestPath(workspace, agentId))) return null;
+  try {
+    return buildEnforceResourceManifest({ workspace, agentId }).resourcesSha256;
+  } catch (error) {
+    throw fail(409, "RESOURCE_UNREADABLE", `enforce.resourcesSha256 (the agent's Enforce resources) could not be read (${errorCodeOf(error, "UNREADABLE")})`);
+  }
+}
+
+/** Readiness items and the brief, graph and Enforce slots a gate binds and every decide, complete and executor preamble recomputes. */
 export function register(registry: A4StageRegistry): void {
   registry.items.push(aspireItems);
   RESOURCE_SLOTS["brief.contextGraphSha256"] = contextGraphSha256;
   RESOURCE_SLOTS["brief.agentConfigSha256"] = (workspace, agentId) => fileSha(getAgentPaths(workspace, agentId).agentConfig, "brief.agentConfigSha256 (the agent config)");
   RESOURCE_SLOTS["graph.typedGraphDigest"] = typedGraphDigest;
+  RESOURCE_SLOTS["enforce.resourcesSha256"] = enforceResourcesSha256;
   registry.registerEffect(CONTRACTS_EFFECT);
 }
 
