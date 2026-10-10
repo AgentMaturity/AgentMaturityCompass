@@ -204,7 +204,8 @@ describe("entire archived signed artifact workflows against real local signature
           .map(file => ({ file, proof: JSON.parse(readFileSync(join(dir, file), "utf8")) as { proofId: string; algorithm?: string } }));
         expect(proofs.length).toBeGreaterThan(0);
         expect(proofs.every(row => row.proof.algorithm === "rfc9162-sha256")).toBe(true);
-        const unedited = (name === "binder" ? uneditedBinder.verifyAuditBinderFile : uneditedPassport.verifyPassportArtifactFile)({ file: d.file, workspace });
+        const verifyUnedited = (name === "binder" ? uneditedBinder.verifyAuditBinderFile : uneditedPassport.verifyPassportArtifactFile) as Domain["original"];
+        const unedited = verifyUnedited({ file: d.file, workspace });
         expect(unedited.ok).toBe(false);
         expect(unedited.errors).toContainEqual({ code: "PROOF_INVALID",
           message: `inclusion proof ${proofs[0].proof.proofId} names rfc9162-sha256, but the signed merkle root is amc-legacy-v1` });
