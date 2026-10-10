@@ -14,7 +14,8 @@
  * Signing: this process never holds the vault. A comment is a signed transition, so amc_a4_comment sends it to the
  * workspace's running Studio as POST /api/v1/a4/projects/:id/comments with that session, and Studio's process signs.
  * The vault passphrase opens the auditor key that signs users.yaml, and anything in this server's environment is
- * readable by the agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE is set here (P1-64 review).
+ * readable by the agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE or AMC_VAULT_PASSPHRASE_FILE is set
+ * here (P1-64 review).
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
@@ -42,6 +43,9 @@ const TOOLS = [
   { name: "amc_a4_comment", description: `Add a self-reported comment to an A4 project card as the user of the ${A4_SESSION_TOKEN_ENV} session (writes a comment; never a decision)`,
     input: "{ projectId: string, cardId: string, body: string, clientRequestId: string, inReplyTo?: string, workspace?: string }" }
 ];
+
+/** Variables that open the vault; the agent host can read this server's environment (P1-64 review). */
+const VAULT_ENV = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE"] as const;
 
 /** The five A4 tools for MCP_TOOL_METADATA; none without AMC_A4_PREVIEW=1. */
 export function a4ToolMetadata(): Array<{ name: string; description: string; input: string }> {
@@ -133,8 +137,9 @@ async function a4Tool(host: Host, name: string, workspace: string | undefined, p
   host.enforceRateLimit();
   try {
     // Before anything reads the vault: readiness probes the signing key, which would unlock it from this variable.
-    if (process.env.AMC_VAULT_PASSPHRASE) {
-      throw new A4StoreError(403, "A4_SIGNING_KEY_IN_AGENT_HOST", "AMC_VAULT_PASSPHRASE is set in this MCP server's environment, where the agent host can read it, "
+    const vaultVariable = VAULT_ENV.find((variable) => process.env[variable]);
+    if (vaultVariable) {
+      throw new A4StoreError(403, "A4_SIGNING_KEY_IN_AGENT_HOST", `${vaultVariable} is set in this MCP server's environment, where the agent host can read it, `
         + "and it opens the workspace's signing keys. Remove it from the MCP config's env and from the shell that starts the agent host; Studio signs A4 records.");
     }
     const ws = host.validateWorkspace(workspace ?? host.defaultWorkspace);
