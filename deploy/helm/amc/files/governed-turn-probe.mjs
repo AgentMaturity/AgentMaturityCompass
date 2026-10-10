@@ -60,13 +60,18 @@ export async function governedTurnProbe(options) {
   const expect = (condition, message) => { if (!condition) throw new ProbeFailure(message); };
 
   try {
+    // One ready window for liveness and readiness: a container that is still starting refuses connections.
+    const until = Date.now() + readyTimeoutMs;
     await step("healthz", async () => {
-      const { status } = await call("/healthz");
-      expect(status === 200, `GET /healthz answered ${status}`);
-      return { httpStatus: status };
+      for (;;) {
+        let status;
+        try { ({ status } = await call("/healthz")); } catch (error) { if (Date.now() >= until) throw error; }
+        if (status === 200) return { httpStatus: status };
+        expect(status === undefined || Date.now() < until, `GET /healthz answered ${status}`);
+        await delay(pollMs);
+      }
     });
     await step("readyz", async () => {
-      const until = Date.now() + readyTimeoutMs;
       for (;;) {
         const { status, json } = await call("/readyz");
         if (status === 200) return { httpStatus: status };

@@ -88,6 +88,22 @@ describe("governed-turn probe", () => {
     expect(seen).toEqual([`task-workspace-v1|${csrf}|amc_session=s1|stub|none`]);
   });
 
+  it("waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503)", async () => {
+    let healthz = 0;
+    const starting: Record<string, Handler> = { ...governedServer("workspace-key-consistency"),
+      "/healthz": () => (++healthz < 3 ? { status: 503, body: { status: "starting" } } : ok()) };
+    const base = await stub(starting);
+    let refused = 2;
+    const fetchImpl = (url: string, init: RequestInit) => (refused-- > 0 ? Promise.reject(new TypeError("fetch failed")) : fetch(url, init));
+    const waited = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", fetchImpl, readyTimeoutMs: 5_000, timeoutMs: 5_000, pollMs: 10 });
+    expect(waited.status).toBe("verified");
+
+    // Without a ready window (readyTimeoutMs 0, the CLI default) the first refusal still fails at healthz.
+    refused = 1;
+    const once = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", fetchImpl, timeoutMs: 5_000, pollMs: 10 });
+    expect(once.failedStep).toBe("healthz");
+  });
+
   it("fails when Studio's verification verdict is not a verified scope", async () => {
     for (const verdict of ["failed", "not-verified"]) {
       const base = await stub(governedServer(verdict));
