@@ -11354,7 +11354,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
     post:
-      summary: Create a project (human session with OPERATOR or OWNER; an existing agent needs OWNER)
+      summary: Create a project (human session with OPERATOR or OWNER; an agent whose config, context graph or
+        target profile exists needs OWNER)
       tags:
         - Studio
         - A4 Forge
@@ -14465,8 +14466,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
-      summary: "Build (step built): the stage's producer, or a self_reported human-authored implementation ref while
-        it has none"
+      summary: "Build (step built): the stage's producer (aspire: owner, owner mode), or a self_reported
+        human-authored implementation ref while it has none"
       tags:
         - Studio
         - A4 Forge

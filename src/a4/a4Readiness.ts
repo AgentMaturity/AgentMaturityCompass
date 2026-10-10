@@ -443,14 +443,14 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 /**
  * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
- * Activate takes an owner.
+ * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile.
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const [projectRoles, workspaceRoles] = action === "progress" && (stage === "adapt" || stage === "activate")
-    ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && stage === "aspire");
+  const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
 }

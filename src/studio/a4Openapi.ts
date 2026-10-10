@@ -61,7 +61,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     "/api/v1/a4/inbox": { get: operation("This principal's non-READY mandatory readiness items across the projects it reads", "A4Response") },
     "/api/v1/a4/projects": {
       get: operation("Projects this principal reads (members; workspace OWNER and AUDITOR read all)", "A4Response"),
-      post: operation("Create a project (human session with OPERATOR or OWNER; an existing agent needs OWNER)", "A4MutationResponse",
+      post: operation("Create a project (human session with OPERATOR or OWNER; an agent whose config, context graph or target profile exists needs OWNER)", "A4MutationResponse",
         { write: true, body: "A4CreateProject", status: "201" })
     },
     [p]: { get: read("Project head, members, current revision summary, gates and readiness (amc.a4-project/v1)") },
@@ -109,7 +109,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     ["confirm-understanding", "A4ConfirmUnderstanding", "Confirm the understanding (step understood)"],
     ["explain", "A4Explain", "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"],
     ["propose", "A4Propose", "Freeze the proposed specification as a revision (step proposed)"],
-    ["build", "A4StageContent", "Build (step built): the stage's producer, or a self_reported human-authored implementation ref while it has none"],
+    ["build", "A4StageContent", "Build (step built): the stage's producer (aspire: owner, owner mode), or a self_reported human-authored implementation ref while it has none"],
     ["review", "A4StageContent", "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an observed ref"]
   ] as const) {
     paths[`${p}/stages/{stage}/${action}`] = { post: write(summary, body, [stagePath], "201") };

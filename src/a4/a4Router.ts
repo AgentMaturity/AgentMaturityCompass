@@ -10,6 +10,7 @@
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
+import { join } from "node:path";
 import { z, ZodError } from "zod";
 import { approvalDecisionSchema, approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -278,7 +279,7 @@ const createSchema = z.strictObject({
 
 /**
  * POST /projects (design §12.1): a human session with a live OPERATOR or OWNER role (the store checks it again); a
- * project for an agent that already exists needs OWNER (`AgentConfig` names no owner and `signAgentConfig` records no
+ * project for an agent that already exists (its config, context graph or target profile is on disk) needs OWNER (`AgentConfig` names no owner and `signAgentConfig` records no
  * signer, so nobody else can show a claim on it), so one OPERATOR cannot fill every agent's slot.
  */
 async function createProject(route: A4Route): Promise<void> {
@@ -291,7 +292,10 @@ async function createProject(route: A4Route): Promise<void> {
   const agentId = body.agentId ?? `${slug}-${randomBytes(3).toString("hex")}`;
   let existing = true;
   try {
-    existing = pathExists(getAgentPaths(route.workspace, agentId).agentConfig);
+    // Any of the agent's own files makes it existing: the root default agent of `amc init` has a context graph and a
+    // signed target profile but no agent config, and Aspire's Build re-signs what it finds (src/a4/stages/aspire.ts).
+    const paths = getAgentPaths(route.workspace, agentId);
+    existing = [paths.agentConfig, paths.contextGraph, join(paths.targetsDir, "default.target.json")].some((path) => pathExists(path));
   } catch {
     // An agent the fleet cannot resolve is treated as existing: OWNER only.
   }
