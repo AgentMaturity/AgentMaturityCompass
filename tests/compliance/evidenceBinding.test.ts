@@ -36,7 +36,8 @@ describe("evidenceProducer", () => {
     [{ source: "dogfood-maturity" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
-    ...["manual", "operator", "feedback.ingest"].map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
+    ...["manual", "operator", "feedback.ingest", "user", "inferred", "numeric_self_answer", "default"]
+      .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
     [{ source: "constructor" }, "amc-runtime"],
@@ -70,11 +71,11 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
   "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
   // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
-  // (P0-23, P1-11); the effective-policy receipt's nested strictEvidenceBinding.source (P1-12); catalog applicability
-  // exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger rows (P2-01); A4 answer provenance,
-  // carried in the payload of rows whose meta.source is "a4-store" (P1-57, P1-59).
-  "compliance_report", "diagnostic_report", "numeric_self_answer", "path_presence", "default", "predicate",
-  "reviewer_exception", "record", "legacy", "legacy-unverified", "user", "inferred"
+  // (P0-23, P1-11); catalog applicability exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger
+  // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
+  // in PRODUCER_BY_SOURCE instead, so they can never count as AMC runtime evidence.
+  "compliance_report", "diagnostic_report", "path_presence", "predicate", "reviewer_exception", "record", "legacy",
+  "legacy-unverified"
 ]);
 
 function sourceFiles(dir: string): string[] {
