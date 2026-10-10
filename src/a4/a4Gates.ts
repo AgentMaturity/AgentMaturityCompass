@@ -35,7 +35,7 @@ import {
   a4RevisionRowSchema, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
   type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
-import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
+import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import {
   A4StoreError, collectLiveFacts, refreshVolatileFacts, type A4Actor, type A4ChangeSpec, type A4RequestKey, type A4Store, type A4TransitionOptions,
@@ -349,8 +349,7 @@ export function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: 
   requesterKey: string; specDigest: string; boundItemIds: readonly string[] }, readiness: A4ReadinessV1): A4IntentV1 {
   const revision = state.revisions.find((row) => row.revision_no === gate.revisionNo) ?? null;
   // A policy gate approves the proposed policy, whose author is its requester, not the head revision (design §5.3).
-  const author = gate.gate === "policy" ? null : authorOf(state.chain, gate.revisionNo);
-  const excluded = [gate.requesterKey, ...(author === null ? [] : [author]), ...(gate.gate === "completion" ? buildersOf(state.chain, gate.revisionNo) : [])];
+  const excluded = [gate.requesterKey, ...authorsOf(state.chain, gate), ...(gate.gate === "completion" ? buildersOf(state.chain, gate.revisionNo) : [])];
   return a4IntentV1Schema.parse({
     schema: "amc.a4-intent/v1", projectId: state.project.project_id, stage: gate.stage, gate: gate.gate, revisionNo: gate.revisionNo,
     specDigest: gate.specDigest, resourceDigests: revision ? flatSlots(JSON.parse(revision.resource_digests_json)) : {},
