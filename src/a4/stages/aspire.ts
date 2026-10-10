@@ -332,12 +332,14 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
   for (const entry of found.inferred) values.set(entry.questionId, entry.value);
   const inferred: A4Answer[] = found.inferred.map((entry) => ({ questionId: entry.questionId, value: entry.value, source: "inferred", answeredAtRevision: revisionNo,
     dependencyDigest: dependencyDigest(QUESTIONS.find((question) => question.id === entry.questionId)?.dependsOn ?? [], values) }));
-  const understanding = { reflection: found.reflection, inferred: found.inferred.map(({ questionId, from }) => ({ questionId, from })),
-    facts: found.facts.map(({ id, lane, label, body }) => ({ id, lane, label, body })) };
+  const merged = [...answers, ...inferred].sort((a, b) => a.questionId.localeCompare(b.questionId));
+  // The answers it was made for: a confirmation, Explain and Propose refuse an understanding of other answers (UNDERSTANDING_STALE).
+  const understanding = { answersDigest: answersDigestOf(merged), reflection: found.reflection,
+    inferred: found.inferred.map(({ questionId, from }) => ({ questionId, from })), facts: found.facts.map(({ id, lane, label, body }) => ({ id, lane, label, body })) };
   return {
     outputs: [...found.facts.map((fact) => ({ output: "understanding", label: fact.label, lane: fact.lane, method: fact.method, body: fact.body })),
       { output: "understanding", label: "aspire understand: reflection (what AMC understood from your answers)", lane: "recommendation", method: null, body: found.reflection }],
-    spec: { ...spec, answers: [...answers, ...inferred].sort((a, b) => a.questionId.localeCompare(b.questionId)), understanding },
+    spec: { ...spec, answers: merged, understanding },
     response: { understanding: { reflection: found.reflection, inferred: understanding.inferred } }
   };
 }

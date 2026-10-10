@@ -33,7 +33,9 @@ import {
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
-import { hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
+import {
+  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, understandingCurrent
+} from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 
@@ -90,6 +92,7 @@ const STEP_ROUTES: Record<StepRoute, { action: A4Action; from: readonly A4Step[]
   build: { action: "build", from: ["direction_approved"], to: "built", output: "build" },
   review: { action: "review", from: ["built"], to: "reviewed", output: "review" }
 };
+const UNDERSTANDING_STEPS: ReadonlySet<StepRoute> = new Set(["confirm-understanding", "explain", "propose"]);
 const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
 const headSeqSchema = z.number().int().min(0);
 const reasonSchema = z.string().trim().min(1).max(2000);
@@ -193,6 +196,13 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     const { readiness } = evaluateFor(route.store, state, principal, call, stage, now);
     assertAllowed(readiness, def.action);
     if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
+    // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
+    if (stage === "aspire" && UNDERSTANDING_STEPS.has(kind)) {
+      const { spec, answers } = stageSpec(state, stage);
+      if (!understandingCurrent(spec, answers)) {
+        throw a4Fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
+      }
+    }
     if (fields.parentRevisionNo !== undefined && fields.parentRevisionNo !== project.revision_no) {
       throw a4Fail(409, "A4_STALE_HEAD", "The specification was edited from an older revision; reload and merge.", { revisionNo: project.revision_no });
     }

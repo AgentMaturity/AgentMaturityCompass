@@ -93,6 +93,10 @@ export function dependencyDigest(dependsOn: readonly string[], values: ReadonlyM
 export const answersDigestOf = (answers: readonly A4Answer[]): string =>
   sha256Hex(canonicalize([...answers].sort((a, b) => a.questionId.localeCompare(b.questionId)).map((answer) => [answer.questionId, answer.value ?? null])));
 
+/** Whether the recorded understanding was made for these answers (Understand records their digest); none, or older, is stale. */
+export const understandingCurrent = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
+  (spec.understanding as { answersDigest?: unknown } | null | undefined)?.answersDigest === answersDigestOf(answers);
+
 /** Required questions with no answer, and answered ones whose dependencies changed since (to be asked again). */
 export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; stale: string[]; invalid: string[] } {
   const values = answerValues(answers);
@@ -277,8 +281,11 @@ export function aspireItems(state: A4ReadinessState, query: A4ReadinessQuery): A
   const { spec, answers, revisionNo } = aspireSpecOf(state);
   const gaps = answerGaps(answers);
   return [
-    reached(state, "understood") ? item("understanding_confirmed", "READY")
-      : waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { nextAction: { label: "Run Understand, then confirm it" } }),
+    !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { nextAction: { label: "Run Understand, then confirm it" } })
+      // Answers do not change after Aspire; at Aspire a confirmation counts only for an understanding of the current answers.
+      : state.project.stage === "aspire" && !understandingCurrent(spec, answers)
+        ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
+        : item("understanding_confirmed", "READY"),
     gaps.missing.length + gaps.stale.length + gaps.invalid.length === 0 ? item("ask_complete", "READY")
       : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
         ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)], { nextAction: { label: "Answer or confirm the listed questions" } }),
