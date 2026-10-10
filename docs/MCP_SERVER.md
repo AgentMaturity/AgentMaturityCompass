@@ -117,6 +117,9 @@ The same fields are in `structuredContent`: `{ claimKind, statusDimensions, clai
 | `amc_score_sector_pack` | The regulated self-assessment envelope: self-reported, never a pass, at most level 1 |
 | `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
 | `amc_incident_clocks` | A regulated listing that is not evaluated: deadlines run from operator-recorded trigger and notice times, and applicability is unresolved |
+| `amc_a4_project`, `amc_a4_readiness` (A4 preview) | The server's own readiness envelope (`claim` of `amc.a4-readiness/v1`), never one composed by the tool |
+| `amc_a4_conformance` (A4 preview) | A regulated result that is not evaluated (`NO_PRODUCER_REGISTERED`) until Adapt registers its producer, as the API answers |
+| `amc_a4_list_projects`, `amc_a4_comment` (A4 preview) | The listing or the recorded comment itself is not evaluated (self-reported) |
 
 AMC output is evidence of conformity. No tool prints "certified".
 
@@ -246,6 +249,21 @@ Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTE
 
 ---
 
+### A4 Forge tools (preview)
+With `AMC_A4_PREVIEW=1` in the server's environment, `amc mcp serve` adds five tools for A4 agent projects (`amc mcp list-tools` lists them only then):
+
+```
+amc_a4_list_projects  { workspace?: string }
+amc_a4_project        { projectId: string, workspace?: string }
+amc_a4_readiness      { projectId: string, stage?: aspire|assemble|adapt|activate, workspace?: string }
+amc_a4_conformance    { projectId: string, stage?: aspire|assemble|adapt|activate, workspace?: string }
+amc_a4_comment        { projectId: string, cardId: string, body: string, clientRequestId: string, inReplyTo?: string, workspace?: string }
+```
+
+They read the same records and run the same readiness evaluator as `/api/v1/a4`. No tool approves, denies, builds, completes or releases: decisions stay with people in Studio. The server has no per-user session, so identity comes from the server's own configuration: set `AMC_A4_SESSION_TOKEN_FILE` in the MCP config's `env` to a private (0600) token file written by `amc approvals login`. Each call re-reads that user from the signed users.yaml; a missing, expired or revoked session, a revoked user or a user without a read role is refused, and the file's path is never printed. `amc_a4_comment` refuses without that file and records a self-reported comment as that user, through the same path as `POST /api/v1/a4/projects/:id/comments` (project membership, encrypted blob, request-id dedupe). Without the file the four reads answer as the admin token does: every project, reads only. With it they show the projects that user may read, and readiness's `allowed` is that user's. Every A4 tool refuses while the workspace is read-only (its users or trust signature does not verify).
+
+---
+
 ## Resources
 
 ### `amc://agent/{agentId}`
@@ -288,7 +306,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 
 - **Local only by default** — stdio transport, no network exposure
 - **Read-mostly** — the MCP server reads AMC data; it does not run diagnostics or modify agent configs
-- **All tools are read-only** — no tool modifies agent configs, runs diagnostics, or writes files
+- **Read-only tools** — no tool modifies agent configs or runs diagnostics; the only write is the A4 preview's `amc_a4_comment`, which records a self-reported comment as the configured signed-in user
 - **Workspace-scoped** — all data comes from the local `.amc/` directory in your project
 - **No credentials required** — AMC MCP needs no API keys or authentication
 

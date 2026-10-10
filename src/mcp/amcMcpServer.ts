@@ -39,6 +39,7 @@ import { createIncidentStore } from "../incidents/incidentStore.js";
 import { clockListing, loadIncidentClocks, parseIsoTimestamp, parseStation } from "../incidents/incidentClockEvents.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { agentRunClaim, unboundClaim, withClaim } from "./mcpClaimOutput.js";
+import { a4ToolMetadata, registerA4Tools } from "./a4Tools.js";
 
 // ---------------------------------------------------------------------------
 // Simple in-process rate limiter
@@ -115,9 +116,10 @@ export const MCP_TOOL_METADATA = [
   { name: "amc_query_diagnostic", description: "Query the latest diagnostic run report (read-only)", input: "{ agentId: string, workspace?: string }" },
   { name: "amc_get_recommendations", description: "Get actionable recommendations for improving agent maturity (read-only)", input: "{ agentId: string, workspace?: string }" },
   { name: "amc_incident_clocks", description: "List a stored incident's regulatory reporting clocks for a station (read-only)", input: "{ incidentId: string, station: string, now?: string, workspace?: string }" },
+  ...a4ToolMetadata(),
 ];
 
-/** Registers the 11 tools and the agent resource without a transport, so tests can connect in memory. */
+/** Registers the 11 tools (16 with AMC_A4_PREVIEW=1) and the agent resource without a transport, so tests can connect in memory. */
 export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer {
   const server = new McpServer({
     name: "amc",
@@ -751,6 +753,7 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
     }
   );
 
+  registerA4Tools(server, { defaultWorkspace, enforceRateLimit, validateWorkspace });
   return server;
 }
 
