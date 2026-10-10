@@ -76,28 +76,31 @@ Exit codes: `0` pass, `1` fail (result JSON still written), `2` usage error.
 
 ### Which deploy targets can pass
 
-| Target | Serves | Can a governed turn pass? |
-| --- | --- | --- |
-| Docker image (`Dockerfile`, `docker/docker-compose.yml`) | Studio (3212) + gateway (3210) | Yes: this is the path a governed turn needs |
-| `railway.json` (`npm run api:start` → `tsx api/index.ts`) | the lightweight scoring API only | **No.** It has no `/healthz`, `/readyz`, gateway or receipts, so the verifier fails closed against it |
-| `vercel.json` (`@vercel/node` on `api/index.ts`) | the same lightweight API | **No**, for the same reason |
+Decision D-03 (option C, 2026-10-11) keeps all four topologies documented: Helm, Compose, Railway and Vercel. Only the two that run the Studio image can pass this verifier. Railway and Vercel stay **documented but unqualified**: no AMC check has passed against them, and none can until they serve Studio and the gateway.
+
+| Target | Serves | Can a governed turn pass? | Status |
+| --- | --- | --- | --- |
+| Helm chart (`deploy/helm/amc`) | Studio (3212) + gateway (3210) | Yes: this is the path a governed turn needs | documented; qualified by `.github/workflows/deploy-pack.yml` once its run is green |
+| Docker image (`Dockerfile`, `docker/docker-compose.yml`) | Studio (3212) + gateway (3210) | Yes | documented |
+| `railway.json` (`npm run api:start` → `tsx api/index.ts`) | the lightweight scoring API only | **No.** It has no `/healthz`, `/readyz`, gateway or receipts, so the verifier fails closed against it | documented, unqualified |
+| `vercel.json` (`@vercel/node` on `api/index.ts`) | the same lightweight API | **No**, for the same reason | documented, unqualified |
+
+The Helm test and this verifier use different probes on purpose (an accepted S2 divergence). `helm test` drives one stub-provider native task through `/api/v1/native-tasks` and checks Studio's evidence verdict; this verifier sends one leased gateway completion and checks the monitor-signed `llm_response` receipt. Keep both results: the first shows Studio can run a governed turn, the second that the gateway signs what it returns with a key you pinned.
 
 `railway.json` health-checks `/api/health`, the route `api/index.ts` serves.
 Railway requires a 2xx from that path before it routes traffic (Railway
 healthcheck guide, retrieved 2026-10-03). That proves only that the process
 started.
 
-**Pending dependency (another session's uncommitted work, not exercised here).**
-A standalone API build (`scripts/build-standalone-api.mjs`,
-`scripts/standalone-api-smoke.mjs`, `src/api/routerResponseHelpers.ts`) and
-edits to `api/index.ts` were in progress in the root checkout when this was
-written. Once they land, re-check that `railway.json`'s `startCommand` and
-`vercel.json`'s `builds` still match `package.json` at that commit;
-`tests/deployVerifyConfig.test.ts` fails if they drift, and
-`tests/platformDeployConfig.test.ts` (over `src/deployVerify/platformDeployConfig.ts`)
-re-derives the findings below from the committed files. If the standalone API
-is meant to serve governed turns, it must expose `/healthz`, `/readyz` and a
-leased gateway route with receipts before this verifier can pass against it.
+The standalone API build (`scripts/build-standalone-api.mjs`, `npm run
+api:start:production`) has landed on `main`. `railway.json` still starts
+`npm run api:start` (`tsx api/index.ts`) and `vercel.json` still builds
+`api/index.ts`; `tests/deployVerifyConfig.test.ts` fails if they drift from
+`package.json`, and `tests/platformDeployConfig.test.ts` (over
+`src/deployVerify/platformDeployConfig.ts`) re-derives the findings below from
+the committed files. If the standalone API is meant to serve governed turns, it
+must expose `/healthz`, `/readyz` and a leased gateway route with receipts
+before this verifier can pass against it.
 
 Static findings and open questions (`checkRepoPlatformDeployConfig` reports the
 first two from the committed files; it reads them and changes nothing):
@@ -108,15 +111,16 @@ first two from the committed files; it reads them and changes nothing):
 - `tsx`, which `api:start` runs, is declared only in `devDependencies`
   (`package.json` `api:start` is `tsx api/index.ts`). Whether Railway's build
   keeps devDependencies at runtime is unknown.
-- `api/index.ts`'s `/api/health` returns hard-coded `version: "1.0.0"` and
-  fixed counts (package version is `1.2.0` at `8f57ce63`). That file belongs to
-  the other session.
+- At `8f57ce63`, `api/index.ts`'s `/api/health` returned a hard-coded
+  `version: "1.0.0"`; it now reports the package version (`amcVersion`).
 
 ## Local run record (2026-10-03)
 
 Verifier commit `a89508b2` (tree clean), darwin/arm64, Node v25.5.0. The full
-command log is in the S2 track report under
-`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S2/report.md`.
+command log is in the S2 track receipt, commit `0d1bb10a3` on the
+`amc/regulated-platform-20261003` candidate branch (`git show 0d1bb10a3`). The
+2026-10-11 slice C runs are in
+[`qualification/2026-10-11-P0-14/`](../qualification/2026-10-11-P0-14/README.md).
 
 1. **Governed target, PASS.** A scratch harness mirrored the `src/e2e/smoke.ts`
    steps from bootstrap to lease issue (temp workspace, fake OpenAI-compatible

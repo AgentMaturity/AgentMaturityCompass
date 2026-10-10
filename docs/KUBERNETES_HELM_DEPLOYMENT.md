@@ -157,7 +157,16 @@ helm test amc --namespace amc-system --logs
 
 The test pod logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. It exits 0 only when Studio reports the evidence as `workspace-key-consistency` or `externally-anchored`; a server that answers `/healthz` and `/readyz` but cannot run a governed turn fails. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs`. The docker compose example runs the same probe with `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`.
 
-Studio admits native requests (`/api/v1/native-tasks/*`) only when the request's `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). With `--bind 0.0.0.0` the bind host alone is `http://0.0.0.0:3212`, so the chart ConfigMap always sets `AMC_CORS_ALLOWED_ORIGINS` to the Service origin the test pod calls, `http://<release>-amc:<service.port>` (`http://amc-amc:3212` for release `amc`), and appends `env.AMC_CORS_ALLOWED_ORIGINS` from values. Add your Ingress host there, for example `--set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.example.internal`, or browser sessions through the Ingress are refused with `NATIVE_HOST_DENIED`. The compose file sets `AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212` for `amc-verify`.
+Studio admits native requests (`/api/v1/native-tasks/*`) only when the request's `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). With `--bind 0.0.0.0` the bind host alone is `http://0.0.0.0:3212`, so the chart ConfigMap always sets `AMC_CORS_ALLOWED_ORIGINS` to the Service origin the test pod calls, `http://<release>-amc:<service.port>` (`http://amc-amc:3212` for release `amc`), and appends `env.AMC_CORS_ALLOWED_ORIGINS` from values. Add your Ingress host there, for example `--set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.example.internal`, or browser sessions through the Ingress are refused with `NATIVE_HOST_DENIED`. `helm --set` splits values on commas, so escape them for more than one origin (`--set 'env.AMC_CORS_ALLOWED_ORIGINS=https://a.example\,https://b.example'`) or put the list in a values file. In `docker/docker-compose.yml` the `amc-studio` service sets `AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212`, so Studio admits the `amc-verify` probe that calls that origin.
+
+Two post-deploy checks exist, and they prove different things:
+
+| Check | Drives | Proves |
+|---|---|---|
+| `helm test` (`governed-turn-probe.mjs`) | one native task, provider `stub`, tools `none`, as the bootstrap owner | Studio runs a governed native turn and reports its evidence as `workspace-key-consistency` or `externally-anchored`; a workspace-key result is a local audit trail, not a portable verdict |
+| `scripts/deploy-verify.mjs` | one leased gateway chat completion | the gateway returns an `llm_response` receipt that verifies against a monitor key you pinned and commits to the response bytes ([`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md)) |
+
+Neither proves a real-model result: the Helm test uses the stub provider and the verifier spends one completion on whatever upstream the gateway route names. Keep both receipts.
 
 Then open `http://127.0.0.1:3212/console`.
 
@@ -219,7 +228,7 @@ node scripts/deploy/rollback-check.mjs --from <deployed-revision> --to WORKTREE
 
 Raw manifests are always rendered. The chart is rendered only when `helm` is on `PATH`; otherwise the script says so.
 
-Upgrade, verify, and roll back with Helm:
+Upgrade, verify, and roll back with Helm (Helm 4 accepts `--atomic` as a deprecated alias of `--rollback-on-failure`):
 
 ```bash
 helm upgrade amc deploy/helm/amc --namespace amc-system --atomic --wait --timeout 10m
@@ -232,7 +241,7 @@ helm test amc --namespace amc-system --logs
 
 ### Container rollback drill
 
-`rollback-drill.mjs` is the tested rollback until a cluster run is recorded. It needs a Docker daemon. It runs image A on a fresh workspace volume, runs the governed-turn probe, replaces the container with image B on the same volume, probes again, rolls back to A by its `sha256` image id and probes a third time. The JSON receipt holds both image ids and the six step results. Any failed step fails the drill and skips the rest. Each container runs with `AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:<port>` so Studio admits the probe's `127.0.0.1` host. `--secrets-dir` is required: it must hold `amc_vault_passphrase`, `amc_owner_username` and `amc_owner_password`, which bootstrap the drill workspace and log the probe in. Without it the drill exits 2 with `--secrets-dir is required`; with it and no daemon it exits 2 with `docker daemon unavailable`.
+`rollback-drill.mjs` is the container-level rollback; `.github/workflows/deploy-pack.yml` runs it next to the kind install, upgrade and rollback. It needs a Docker daemon. It runs image A on a fresh workspace volume, runs the governed-turn probe, replaces the container with image B on the same volume, probes again, rolls back to A by its `sha256` image id and probes a third time. The JSON receipt holds both image ids and the six step results. Any failed step fails the drill and skips the rest. Each container runs with `AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:<port>` so Studio admits the probe's `127.0.0.1` host. The probe waits up to `--ready-timeout-ms` (default 180000 in the drill) for `/healthz` and `/readyz`, because a container that has just started refuses connections. `--secrets-dir` is required: it must hold `amc_vault_passphrase`, `amc_owner_username` and `amc_owner_password`, which bootstrap the drill workspace and log the probe in. Without it the drill exits 2 with `--secrets-dir is required`; with it and no daemon it exits 2 with `docker daemon unavailable`.
 
 ```bash
 node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-studio:s1-b \
@@ -247,7 +256,14 @@ Chart 0.1.0 rendered its own `amc-bootstrap` Secret with fixed `change-me-*` val
 kubectl -n amc-system annotate secret amc-bootstrap helm.sh/resource-policy=keep
 ```
 
-A workspace bootstrapped by chart 0.1.0 used the published vault passphrase `change-me-vault-passphrase`; treat its vault as exposed. The `amc vault` commands at this revision (`init`, `unlock`, `lock`, `status`, `forget`) include no passphrase change, so moving that workspace to a new passphrase is an open operator decision, not a documented step.
+Facts for a workspace bootstrapped by chart 0.1.0 with its default Secret:
+
+- Chart 0.1.0 always rendered `amc-bootstrap` with published values: `change-me-vault-passphrase`, `change-me-owner-username`, `change-me-owner-password`, `change-me-notary-passphrase` and `change-me-notary-auth-secret`. Anyone who has read this repository knows them.
+- That workspace's vault was created with the published passphrase, so treat the vault and the signing keys it protects as exposed. Replacing the Secret's values does not change the passphrase the existing vault was encrypted with.
+- No `amc vault` subcommand at this revision changes a vault passphrase. `rotate-keys` rotates the monitor signing key; it does not re-encrypt the vault under a new passphrase.
+- Chart 0.2.0 does not repair such a workspace. It only stops new installs from receiving a published passphrase.
+
+Remediation: TODO(Sid, P0-14 with P0-37). Sid writes this text. Until he does, this guide documents no remediation and claims no fix for a workspace bootstrapped by chart 0.1.0.
 
 `--atomic` rolls back a failed upgrade automatically. A rollback restores manifests, not workspace data: the ledger on the claim keeps whatever the newer version wrote. Snapshot the volume before an upgrade if you need to restore data too.
 
