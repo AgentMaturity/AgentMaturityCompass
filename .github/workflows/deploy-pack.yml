@@ -237,7 +237,8 @@ jobs:
           # The monitor key is pinned through the cluster API, never fetched from the HTTP target.
           kubectl exec "$pod" -- cat /data/amc/.amc/keys/monitor_ed25519.pub > "$dir/monitor_ed25519.pub"
           # A loopback stub stands in for the /local route's upstream (127.0.0.1:8000): no real model is called.
-          kubectl exec "$pod" -- node -e 'require("node:http").createServer((q,s)=>{q.resume();q.on("end",()=>{s.writeHead(200,{"content-type":"application/json"});s.end(JSON.stringify({id:"chatcmpl-deploy-verify-stub",object:"chat.completion",created:Math.floor(Date.now()/1000),model:"gpt-test",choices:[{index:0,message:{role:"assistant",content:"ok"},finish_reason:"stop"}],usage:{prompt_tokens:1,completion_tokens:1,total_tokens:2}}))})}).listen(8000,"127.0.0.1",()=>console.log("stub upstream on 127.0.0.1:8000"))' > "$OUT/stub-upstream.log" 2>&1 &
+          # It exits by itself after 120 s; stopping the local kubectl exec does not stop the remote process.
+          kubectl exec "$pod" -- node -e 'setTimeout(()=>process.exit(0),120000);require("node:http").createServer((q,s)=>{q.resume();q.on("end",()=>{s.writeHead(200,{"content-type":"application/json"});s.end(JSON.stringify({id:"chatcmpl-deploy-verify-stub",object:"chat.completion",created:Math.floor(Date.now()/1000),model:"gpt-test",choices:[{index:0,message:{role:"assistant",content:"ok"},finish_reason:"stop"}],usage:{prompt_tokens:1,completion_tokens:1,total_tokens:2}}))})}).listen(8000,"127.0.0.1",()=>console.log("stub upstream on 127.0.0.1:8000"))' > "$OUT/stub-upstream.log" 2>&1 &
           kubectl port-forward svc/amc-amc 13212:3212 13210:3210 > "$OUT/port-forward.log" 2>&1 &
           for _ in $(seq 1 60); do
             grep -q "stub upstream on" "$OUT/stub-upstream.log" && curl -fsS -o /dev/null http://127.0.0.1:13212/healthz && break || sleep 1
