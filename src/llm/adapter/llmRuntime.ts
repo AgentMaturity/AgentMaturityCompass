@@ -65,6 +65,7 @@ import { ProviderToolBinding } from "./providerToolBinding.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 import { detectProtectedRequest } from "../../dataflow/detectors.js";
 import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
+import { loadProcessorRegistrySnapshot } from "../../dataflow/processorRegistry.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -227,6 +228,8 @@ export class LlmRuntime {
       tools: spec.tools,
       assertRequest: (request) => {
         assertRequestCapabilities(route.capabilities, request);
+        // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.
+        if (loadProcessorRegistrySnapshot(this.workspace).state === "missing") return;
         const detection = detectProtectedRequest(request);
         if (detection.classes.length === 0) return;
         const admission = admitProtectedModelRequest(this.workspace, route.providerId, route.baseUrl, detection);
