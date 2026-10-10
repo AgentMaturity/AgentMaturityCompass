@@ -39,23 +39,27 @@ function fixture(): string {
 /**
  * P1-26 (def0955fa): a proof's tree and tree size come from the merkle root the artifact carries, never from the proof,
  * and a bundle without a root is checked as amc-legacy-v1 only. Both archived verifiers predate carried roots and pass
- * none, so under the live proof checker they refuse every RFC 9162 proof a workspace now writes. This one forward edit
- * hands each archived verifier its artifact's proofs/merkle.root.json; it must apply exactly once, every other archived
- * byte runs unchanged, and the unedited archive's refusal is asserted below. Root signatures stay P0-09's checks.
+ * none, so under the live proof checker they refuse every RFC 9162 proof a workspace now writes. The archive's
+ * restoration-map.json records one forward edit per verifier that hands it its artifact's proofs/merkle.root.json; it
+ * must apply exactly once, every other archived byte runs unchanged, and the unedited archive's refusal is asserted
+ * below. Root signatures stay P0-09's checks.
  */
-const P1_26_BEFORE = "      transparencyRoot: null,\n      merkleRoot: null,\n      proofs: inclusion\n";
-const P1_26_AFTER = "      transparencyRoot: null,\n      merkleRoot: pathExists(join(root, \"proofs\", \"merkle.root.json\"))\n"
-  + "        ? { root: JSON.parse(readUtf8(join(root, \"proofs\", \"merkle.root.json\"))), signature: null, sha256: \"\" } : null,\n"
-  + "      proofs: inclusion\n";
+const forwardEdits = (JSON.parse(readFileSync(resolve(archive, "restoration-map.json"), "utf8")) as {
+  forwardEdits: Array<{ issue: string; path: string; before: string; after: string }>;
+}).forwardEdits;
 
 // Execute each entire archived module with its actual unchanged imported modules.
 // Only TS compilation/module loading and the P1-26 forward edit above are adapted; no verifier body is reconstructed.
 async function originalModule<T>(path: keyof typeof sourceHashes, applyForwardEdit = true): Promise<T> {
   const bytes = readFileSync(resolve(archive, "originals", path));
   expect(createHash("sha256").update(bytes).digest("hex")).toBe(sourceHashes[path]);
-  const archived = bytes.toString("utf8");
-  expect(archived.split(P1_26_BEFORE)).toHaveLength(2);
-  const source = applyForwardEdit ? archived.replace(P1_26_BEFORE, P1_26_AFTER) : archived;
+  let source = bytes.toString("utf8");
+  const edits = forwardEdits.filter(edit => edit.path === path);
+  expect(edits.map(edit => edit.issue)).toEqual(["P1-26"]);
+  for (const edit of edits) {
+    expect(source.split(edit.before)).toHaveLength(2);
+    if (applyForwardEdit) source = source.replace(edit.before, edit.after);
+  }
   const ast = ts.createSourceFile(path, source, ts.ScriptTarget.ES2022, true);
   const dependencies = new Map<string, unknown>();
   for (const node of ast.statements) {

@@ -25,25 +25,19 @@ const originals = JSON.parse(readFileSync(resolve(archive, "originals.json"), "u
 };
 const restoration = JSON.parse(readFileSync(resolve(archive, "restoration.json"), "utf8")) as {
   inverseEdits: Array<{ path: string; before: string; after: string }>;
+  forwardEdits: Array<{ issue: string; commit: string; path: string; before: string; after: string }>;
   statusSites: string[];
   projections: Array<{ name: string; keys: string[] }>;
 };
 
 /**
- * Intended behaviour changes since the archive, applied to the archived source as forward edits so the parity still runs
- * every other archived byte. Each `before` occurs once in the archive and each `after` once in the live source, so an edit
- * is exactly the landed change. P1-07 follow-up (8f6665727): repairHintFor names a not-evaluated next level and its
- * reason instead of advising toward it; rowHash, manifestHash and packHash follow from that hint.
+ * Intended behaviour changes since the archive are recorded in its restoration.json `forwardEdits` and applied to the
+ * archived source, so the parity still runs every other archived byte. Each `before` occurs once in the archive and each
+ * `after` once in the live source, so an edit is exactly the landed change. P1-07 follow-up (8f6665727): repairHintFor
+ * names a not-evaluated next level and its reason instead of advising toward it; rowHash, manifestHash and packHash
+ * follow from that hint.
  */
-const P1_07_HINT_HEAD = "function repairHintFor(question: DiagnosticQuestion, score: QuestionScore): string {\n  const nextLevel = Math.min(score.finalLevel + 1, 5);\n";
-const forwardEdits = [
-  { issue: "P1-07", path: "src/diagnostic/questionScoreExplainability.ts", before: 'import { sha256Hex } from "../utils/hash.js";\n',
-    after: 'import { notEvaluatedLevel } from "./levelSemantics.js";\nimport { sha256Hex } from "../utils/hash.js";\n' },
-  { issue: "P1-07", path: "src/diagnostic/questionScoreExplainability.ts", before: P1_07_HINT_HEAD,
-    after: P1_07_HINT_HEAD + "  // P1-07: a next level AMC cannot evaluate gets its reason, not advice that would promise it.\n"
-      + "  const notEvaluated = notEvaluatedLevel(question, score.finalLevel, nextLevel);\n"
-      + "  if (notEvaluated) {\n    return `Target L${nextLevel}: ${notEvaluated.notice}`;\n  }\n" },
-];
+const forwardEdits = restoration.forwardEdits;
 
 function originalModule<T>(file: string, applyForwardEdits = true): T {
   const row = originals.files.find(item => item.path === file)!;
