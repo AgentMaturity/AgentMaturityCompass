@@ -137,19 +137,22 @@ function deniedOnlyByNonMembers(store: A4Store, state: A4ReadinessState, approva
 }
 
 /**
- * Whether a principal live now who may `complete` the gate (progress on its stage: an owner at Adapt and Activate) cast
- * no APPROVE_EXECUTE on the engine request: a `complete` caller's own key joins the SoD exclusions, so a voter can never
- * consume it. An unreadable population counts as such a caller (re-open never stands on a guess).
+ * Whether a principal live now who may `complete` the gate cast no APPROVE_EXECUTE on the engine request: a `complete`
+ * caller's own key joins the SoD exclusions, so a voter can never consume it. Completing takes `progress` on the stage
+ * (an owner at Adapt and Activate) while the documentary gate is open, and `retryEffect` (an owner) once it is consumed,
+ * where `complete` re-runs an executor that consumes its own grant. An unreadable population counts as such a caller
+ * (re-open never stands on a guess).
  * ponytail: "live now" leaves out a host principal with no live session who could sign in later and complete; count
  * the host's membership once A4 can read it.
  */
 function nonVoterMayComplete(store: A4Store, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string): boolean {
+  const action = state.chain.some((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id) ? "retryEffect" : "progress";
   const { candidates, limited } = memberCandidates(store.workspace, false);
   if (limited) return true;
   const voters = new Set(listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId })
     .filter((decision) => decision.decision === "APPROVE_EXECUTE").map((decision) => resolveApprover(store.workspace, decision.userId)?.key));
   return candidates.some((candidate) => !voters.has(candidate.principalKey)
-    && roleRefusals(state, gate.stage, "progress", { key: candidate.principalKey, roles: liveRolesFor(store.workspace, candidate) }).length === 0);
+    && roleRefusals(state, gate.stage, action, { key: candidate.principalKey, roles: liveRolesFor(store.workspace, candidate) }).length === 0);
 }
 
 /**
@@ -158,9 +161,15 @@ function nonVoterMayComplete(store: A4Store, state: A4ReadinessState, gate: A4Ga
  * counts, or when it is QUORUM_MET on a grant `complete` would refuse (an uncounted or digest-less vote, too few bound
  * keys, a moved intent, a project regulated since the open) or that only its own voters could complete (a lone owner
  * who voted at Adapt or Activate): either would otherwise lock the effect until its TTL, or for good on a DENY. Never
- * over a live or consumed grant some caller could consume. `complete` always reads the latest opened request.
+ * over a live or consumed grant some caller could consume, and never while an attempt of the effect on this gate is
+ * still running (409 EFFECT_RUNNING): a re-open must not race its executor. `complete` always reads the latest opened request.
  */
 function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef, regulated: boolean): void {
+  const attempts = new Set(state.chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gate.gate_id && link.body.effect === def.id)
+    .map((link) => link.body.effectId));
+  if (state.effects.some((row) => row.state === "running" && attempts.has(row.effect_id))) {
+    throw fail(409, "EFFECT_RUNNING", "An attempt of this effect is still running; re-open it once that attempt has settled.");
+  }
   const opened = latestOpened(state, gate.gate_id, def.id);
   if (opened === undefined) return;
   const approvalId = String(opened.body.approvalRequestId);
