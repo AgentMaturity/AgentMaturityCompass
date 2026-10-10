@@ -66,6 +66,16 @@ describe("helm chart bootstrap secret", () => {
     expect(findSecretLiteralsInValues(refs, "values.yaml")).toEqual([]);
   });
 
+  it("pods that mount secrets at /run/secrets do not automount the service-account token", () => {
+    // The image's /var/run is a symlink to /run, so the token's mount point would sit inside the
+    // read-only /run/secrets mount and the container fails to start (kind run, 2026-10-11).
+    for (const template of ["templates/deployment.yaml", "templates/tests/governed-turn.yaml"]) {
+      const text = read(`${chartDir}/${template}`);
+      expect(text).toMatch(/mountPath: \/run\/secrets\n/);
+      expect(text, template).toMatch(/^ +serviceAccountName: .*\n +automountServiceAccountToken: false\n/m);
+    }
+  });
+
   it("every Helm example values file parses (no duplicate keys)", () => {
     for (const name of ["values-internal-only.yaml", "values-ingress-tls.yaml", "values-persistent-bootstrap.yaml"]) {
       expect(() => readYamlDocs(resolve(root, chartDir, "examples", name))).not.toThrow();

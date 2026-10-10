@@ -22,6 +22,8 @@ spec:
         app.kubernetes.io/name: amc
         app.kubernetes.io/component: control-plane
     spec:
+      # Studio never calls the Kubernetes API, and the token mount would nest inside /run/secrets (/var/run -> /run).
+      automountServiceAccountToken: false
       terminationGracePeriodSeconds: 40
       securityContext:
         fsGroup: 10001

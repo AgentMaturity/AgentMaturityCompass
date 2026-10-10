@@ -19,4 +19,12 @@ describe("raw k8s manifests: bootstrap secret contract", () => {
     expect(kustomization.resources).not.toContain("secret.yaml");
     expect(kustomization.resources).not.toContain("secret.example.yaml");
   });
+
+  it("the deployment that mounts /run/secrets does not automount the service-account token (/var/run -> /run)", () => {
+    const [deployment] = readYamlDocs(resolve(root, "deploy/k8s/deployment.yaml"));
+    const pod = deployment.spec.template.spec;
+    const mounts = pod.containers.flatMap((c: { volumeMounts?: { mountPath: string }[] }) => c.volumeMounts ?? []);
+    expect(mounts.map((m: { mountPath: string }) => m.mountPath)).toContain("/run/secrets");
+    expect(pod.automountServiceAccountToken).toBe(false);
+  });
 });

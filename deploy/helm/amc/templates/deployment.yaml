@@ -24,7 +24,9 @@ spec:
       labels:
         {{- include "amc.labels" . | nindent 8 }}
     spec:
+      # Studio never calls the Kubernetes API, and the token mount would nest inside /run/secrets (/var/run -> /run).
       serviceAccountName: {{ include "amc.serviceAccountName" . }}
+      automountServiceAccountToken: false
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
