@@ -1,8 +1,8 @@
 import { constants, openSync, closeSync, fstatSync, readSync } from "node:fs";
 import { verifyTrackedSessionToken } from "../auth/authApi.js";
 
-/** Read an existing authenticated session; never mint an identity or infer a role. */
-export function readNativeApprovalActor(workspace: string, tokenFile: string) {
+/** Read an existing authenticated session; never mint an identity or infer a role. The token is a live credential: keep it in memory only. */
+export function readNativeApprovalSession(workspace: string, tokenFile: string) {
   const fd = openSync(tokenFile, constants.O_RDONLY | constants.O_NONBLOCK);
   let token: string;
   try {
@@ -20,5 +20,10 @@ export function readNativeApprovalActor(workspace: string, tokenFile: string) {
   } finally { closeSync(fd); }
   const verified = verifyTrackedSessionToken({ workspace, token });
   if (!verified.ok || verified.payload === null) throw new Error("An active tracked workspace login is required; the approval session is missing, expired, revoked or untrusted");
-  return { userId: verified.payload.userId, username: verified.payload.username, roles: [...verified.payload.roles], expiresTs: verified.payload.expiresTs };
+  return { token, payload: verified.payload };
+}
+
+export function readNativeApprovalActor(workspace: string, tokenFile: string) {
+  const { payload } = readNativeApprovalSession(workspace, tokenFile);
+  return { userId: payload.userId, username: payload.username, roles: [...payload.roles], expiresTs: payload.expiresTs };
 }

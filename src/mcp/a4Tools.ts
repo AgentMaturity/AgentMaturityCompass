@@ -5,24 +5,30 @@
  * claim where no producer exists yet), never one composed here.
  *
  * Identity: the MCP server is a local process with no per-user session. An `amc approvals login` token file named by
- * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in memory only:
- * a comment records the user's key and name, as one typed in Studio), re-resolved against the signed users.yaml on
- * every call. That file is the user's whole Studio session and the agent host can read it, so only a VIEWER-only user's
- * session is accepted. The comment tool refuses without one; reads without one answer as the router's admin token does
- * (every project, reads only). Never a tool argument. Every tool refuses while the workspace is read-only.
+ * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in memory only),
+ * re-resolved against the signed users.yaml on every call. That file is the user's whole Studio session and the agent
+ * host can read it, so only a VIEWER-only user's session is accepted. The comment tool refuses without one; reads without
+ * one answer as the router's admin token does (every project, reads only). Never a tool argument. Every tool refuses
+ * while the workspace is read-only.
+ *
+ * Signing: this process never holds the vault. A comment is a signed transition, so amc_a4_comment sends it to the
+ * workspace's running Studio as POST /api/v1/a4/projects/:id/comments with that session, and Studio's process signs.
+ * The vault passphrase opens the auditor key that signs users.yaml, and anything in this server's environment is
+ * readable by the agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE is set here (P1-64 review).
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
-import { A4_API_PREFIX, a4PreviewEnabled, headStage, mutationResult, priorReplay, unboundClaim as a4UnboundClaim } from "../a4/a4Router.js";
+import { A4_API_PREFIX, a4PreviewEnabled, headStage, unboundClaim as a4UnboundClaim } from "../a4/a4Router.js";
 import { A4_STAGES, type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage } from "../a4/a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 import { listVerifiedUsers, verifyUsersConfigSignature } from "../auth/authApi.js";
-import { readNativeApprovalActor } from "../setup/nativeApprovalIdentity.js";
+import { createA4Client, type A4Session } from "../sdk/a4Client.js";
+import { readNativeApprovalSession } from "../setup/nativeApprovalIdentity.js";
+import { nativeCsrfTokenForSession } from "../studio/nativeAdmission.js";
+import { readStudioState } from "../studio/studioState.js";
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
 /** The MCP server config's env entry naming the `amc approvals login` token file; its path is never printed. */
@@ -42,8 +48,9 @@ export function a4ToolMetadata(): Array<{ name: string; description: string; inp
   return a4PreviewEnabled() ? TOOLS : [];
 }
 
-interface Ctx { readonly store: A4Store; readonly principal: A4Principal | null; readonly now: number }
-type ToolResult = ReturnType<typeof withClaim> | { content: Array<{ type: "text"; text: string }>; isError: true };
+interface Ctx { readonly store: A4Store; readonly principal: A4Principal | null; readonly session: A4Session | null; readonly now: number }
+type Refusal = { content: Array<{ type: "text"; text: string }>; structuredContent?: { status: number; code: string }; isError: true };
+type ToolResult = ReturnType<typeof withClaim> | Refusal;
 interface Host { readonly defaultWorkspace: string; readonly enforceRateLimit: () => void; readonly validateWorkspace: (workspace: string) => string }
 
 /** Studio's read-only rule (users or trust signature invalid; a4Store's readOnlyNow keeps it private); unreadable counts as read-only. */
@@ -56,18 +63,28 @@ function readOnly(workspace: string): boolean {
   }
 }
 
-/** The configured session's principal from one verified users.yaml read, with the route's role class re-run; null without one. */
-function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "POST"): A4Principal | null {
+/** The refusal an MCP client can key on: the status and code as text and as structuredContent. A4 messages start with their code. */
+function refusal(name: string, status: number, code: string, message: string): Refusal {
+  const text = message.startsWith(`${code}: `) ? message : `${code}: ${message}`;
+  return { content: [{ type: "text", text: `${name} refused (${status}): ${text}` }], structuredContent: { status, code }, isError: true };
+}
+
+/**
+ * The configured session's principal from one verified users.yaml read, with the route's role class re-run, and the
+ * Studio credentials of that same session (cookie and native CSRF proof); null without one.
+ */
+function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "POST"): { principal: A4Principal; session: A4Session } | null {
   const tokenFile = process.env[A4_SESSION_TOKEN_ENV];
   if (!tokenFile) return null;
-  let actor: ReturnType<typeof readNativeApprovalActor>;
+  let read: ReturnType<typeof readNativeApprovalSession>;
   try {
-    actor = readNativeApprovalActor(workspace, tokenFile);
+    read = readNativeApprovalSession(workspace, tokenFile);
   } catch (error) {
     // An open error names the file; only the token checks' own messages pass through.
     const reason = error instanceof Error && (error as NodeJS.ErrnoException).code === undefined ? error.message : "The session token file could not be opened";
     throw new A4StoreError(401, "A4_SESSION_REQUIRED", `${reason}. Run \`amc approvals login\` for a new token file.`);
   }
+  const actor = read.payload;
   let verified: ReturnType<typeof listVerifiedUsers>;
   try {
     verified = listVerifiedUsers(workspace);
@@ -83,9 +100,10 @@ function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "
   }
   const required = resolveApiRolePolicy(pathname, method).roles;
   if (!user.roles.some((role) => required.includes(role))) throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", `This tool needs one of ${required.join(", ")}.`);
-  return { key: `LOCAL_USER:${user.userId}`, authSource: "LOCAL_USER", userId: user.userId, username: user.username, roles: [...user.roles],
-    admission: "native_login_token", identityCheck: "users_yaml", provenance: { usersYamlSignerFingerprint: verified.signerFingerprint,
-      createdTs: user.createdTs, createdBy: user.createdBy ?? null, hostMembershipId: null } };
+  const principal: A4Principal = { key: `LOCAL_USER:${user.userId}`, authSource: "LOCAL_USER", userId: user.userId, username: user.username,
+    roles: [...user.roles], admission: "native_login_token", identityCheck: "users_yaml", provenance: {
+      usersYamlSignerFingerprint: verified.signerFingerprint, createdTs: user.createdTs, createdBy: user.createdBy ?? null, hostMembershipId: null } };
+  return { principal, session: { cookie: `amc_session=${encodeURIComponent(read.token)}`, nativeCsrfToken: nativeCsrfTokenForSession(actor) } };
 }
 
 /** The router's read rule (assertVisible): members, workspace OWNERs and AUDITORs, and the admin-token view. */
@@ -111,19 +129,25 @@ const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness:
 });
 
 async function a4Tool(host: Host, name: string, workspace: string | undefined, pathname: string, method: "GET" | "POST",
-  handle: (ctx: Ctx) => ToolResult): Promise<ToolResult> {
+  handle: (ctx: Ctx) => ToolResult | Promise<ToolResult>): Promise<ToolResult> {
   host.enforceRateLimit();
   try {
+    // Before anything reads the vault: readiness probes the signing key, which would unlock it from this variable.
+    if (process.env.AMC_VAULT_PASSPHRASE) {
+      throw new A4StoreError(403, "A4_SIGNING_KEY_IN_AGENT_HOST", "AMC_VAULT_PASSPHRASE is set in this MCP server's environment, where the agent host can read it, "
+        + "and it opens the workspace's signing keys. Remove it from the MCP config's env and from the shell that starts the agent host; Studio signs A4 records.");
+    }
     const ws = host.validateWorkspace(workspace ?? host.defaultWorkspace);
     if (readOnly(ws)) throw new A4StoreError(403, "NATIVE_READ_ONLY", "The workspace is read-only until its users and trust signatures verify.");
-    const principal = sessionPrincipal(ws, pathname, method);
+    const signedIn = sessionPrincipal(ws, pathname, method);
     const store = openA4Store(ws);
     try {
-      return handle({ store, principal, now: Date.now() });
+      return await handle({ store, principal: signedIn?.principal ?? null, session: signedIn?.session ?? null, now: Date.now() });
     } finally {
       store.close();
     }
   } catch (error) {
+    if (error instanceof A4StoreError) return refusal(name, error.status, error.code, error.message);
     return { content: [{ type: "text", text: `${name} refused: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
   }
 }
@@ -184,23 +208,22 @@ export function registerA4Tools(server: McpServer, host: Host): void {
     inReplyTo: z.string().regex(/^a4c_[0-9a-f]{32}$/).optional().describe("Comment ID this replies to"),
     clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/).describe("Your idempotency key; a retry with the same key and text answers the recorded result"),
     workspace
-  }, async (args) => {
-    const pathname = `${projectPath(args.projectId)}/comments`;
-    return a4Tool(host, "amc_a4_comment", args.workspace, pathname, "POST", (ctx) => {
-      const principal = ctx.principal;
-      if (principal === null) {
+  }, async (args) =>
+    a4Tool(host, "amc_a4_comment", args.workspace, `${projectPath(args.projectId)}/comments`, "POST", async (ctx) => {
+      if (ctx.session === null) {
         throw new A4StoreError(401, "A4_SESSION_REQUIRED", `Comments need a signed-in user: set ${A4_SESSION_TOKEN_ENV} in this MCP server's config to an \`amc approvals login\` token file.`);
       }
-      const fields = { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId };
-      const request = { principalKey: principal.key, clientRequestId: args.clientRequestId, bodyHash: sha256Hex(`POST ${pathname}\n${canonicalize(fields)}`) };
-      let result = priorReplay(ctx.store, request, args.projectId);
-      if (result === null) {
-        // Read roles plus membership, as the router's POST …/comments; the store writes the blob, the dedupe row and the transition.
-        if (!visible(principal, ctx.store.membersOf(args.projectId))) throw new A4StoreError(403, "A4_NOT_A_MEMBER", "You are not a member of this project.");
-        result = mutationResult(ctx.store.addComment(args.projectId, { actor: principal, body: fields.body, cardId: fields.cardId, inReplyTo: fields.inReplyTo, request }));
-      }
+      // Studio's route checks membership, dedupes the clientRequestId, writes the encrypted blob and signs the transition.
+      const studio = readStudioState(ctx.store.workspace);
+      if (studio === null) throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", "Studio records and signs comments; start it with `amc studio start` and AMC_A4_PREVIEW=1.");
+      const baseUrl = `http://${studio.host.includes(":") ? `[${studio.host}]` : studio.host}:${studio.apiPort}`;
+      const { status, body } = await createA4Client({ baseUrl, session: ctx.session }).comment(args.projectId,
+        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch(() => {
+        throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", `Studio at ${baseUrl} did not answer; start it with \`amc studio start\` and AMC_A4_PREVIEW=1.`);
+      });
+      if (!body.ok) return refusal("amc_a4_comment", status, body.code ?? `HTTP_${status}`, body.error);
+      const result = body.data;
       return withClaim(`Recorded a self-reported comment on ${args.projectId} at seq ${String(result.seq)}${result.replay ? " (an earlier request with this clientRequestId)" : ""}.`,
-        unboundClaim("mcp:amc_a4_comment", "human_review"), result);
-    });
-  });
+        unboundClaim("mcp:amc_a4_comment", "human_review"), { ...result });
+    }));
 }
