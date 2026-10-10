@@ -47,7 +47,7 @@ export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_ap
   "deployment.amc_check", "plan_unresolved"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
-export const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
+const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
 const EXPIRING_GUARD_MS = 60_000;
 
 /** The rows one evaluation reads; loaded by the caller (inside the write transaction for writes). */

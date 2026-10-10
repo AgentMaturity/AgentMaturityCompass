@@ -15,7 +15,8 @@ import Database from "better-sqlite3";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema } from "../approvals/approvalChainStore.js";
+import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
+import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { materializeA4Record, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
@@ -34,10 +35,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { resolveRefs } from "./a4Evidence.js";
 import {
-  A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
-  ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow
+  A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
+  ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
-import { GATE_DERIVED } from "./a4Readiness.js";
 import { authorOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { A4StoreError, readA4Store } from "./a4Store.js";
 
@@ -112,9 +112,6 @@ function checkTransitions(ledger: Ledger, rows: ReturnType<typeof chainOf>["rows
   }
 }
 
-/** Items a gate never binds: decided by its own votes, or environment facts of the moment (design §7 item 7). */
-const NEVER_BOUND = new Set([...GATE_DERIVED, "signing.available", "members.candidates"]);
-
 /**
  * The intent a gate stored against the rows it binds as they stood at its GATE_REQUESTED (design §6.2): the revision's
  * spec and resource digests (a policy gate's proposal instead), the member set, the revision's evidence refs, the policy
@@ -152,8 +149,11 @@ function intentProblems(db: Ledger["db"], projectId: string, links: readonly A4C
   const problems = Object.keys(expected).filter((key) => canonicalize(expected[key]) !== canonicalize(intent[key] ?? null)).map((key) => `A4_INTENT_MISMATCH: gate ${gateId} ${key}`);
   if (gate.intent_json !== canonicalize(intent) || request?.boundHashes?.intentHash !== sha256Hex(String(gate.intent_json))
     || requested.body.readinessBindingDigest !== gate.readiness_sha256) problems.push(`A4_INTENT_MISMATCH: gate ${gateId} intentHash`);
-  const never = (Array.isArray(expected.boundItemIds) ? expected.boundItemIds as unknown[] : []).filter((id) => NEVER_BOUND.has(String(id)));
-  if (!Array.isArray(expected.boundItemIds) || never.length > 0) problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds gate-derived or environment items (${never.join(", ")})`);
+  // Exactly the stage's set: never a gate-derived item or an environment fact, never fewer than the mandatory items.
+  // ponytail: one v1 table; key A4_BOUND_ITEMS by intent version the day it changes, or older gates would fail here.
+  if (canonicalize(expected.boundItemIds) !== canonicalize(A4_BOUND_ITEMS[gate.stage as A4Stage] ?? null)) {
+    problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds an item set other than A4_BOUND_ITEMS[${String(gate.stage)}]`);
+  }
   return problems;
 }
 
@@ -347,6 +347,9 @@ function recordChecks(ledger: Ledger, record: A4RecordV1): { errors: string[]; s
       errors.push(`A4_AUDIT_ROW_UNBOUND: transition ${String(transition.seq)} is not backed by its own A4_STATE, a4-store, SELF_REPORTED audit row`);
     }
   }
+  if (record.containsSyntheticExamples !== syntheticIn(record.tables)) {
+    errors.push(`A4_SYNTHETIC_LABEL_MISMATCH: containsSyntheticExamples is ${String(record.containsSyntheticExamples)} but the evidence refs say otherwise`);
+  }
   const agentId = object(record.tables.a4_transitions.find((row) => row.seq === 0)?.body_json)?.agentId;
   const agent = typeof agentId === "string" ? agentId : null;
   const scope = Object.entries(record.tables).flatMap(([table, rows]) => rows.some((row) => row.project_id !== record.projectId)
@@ -363,15 +366,44 @@ function recordChecks(ledger: Ledger, record: A4RecordV1): { errors: string[]; s
 }
 
 /**
+ * A consumed gate's quorum as the approval engine counts it at the consume (role-allowed decisions, distinct users, any
+ * DENY terminal), after checking nothing superseded the gate first: GATE_CONSUMED is itself the gate's first superseding
+ * transition, and anything earlier killed every vote. An open gate reads GATE_OPEN with its count; null when neither.
+ */
+function quorumFinding(gate: Record<string, unknown>, links: readonly A4ChainLink[], counted: ApprovalDecisionRecord[], supersededBy: A4ChainLink | null,
+  asOf: number): string | null {
+  const gateId = String(gate.gate_id);
+  const request = approvalRequestSchema.safeParse(object(gate.request_json));
+  if (!request.success) return null; // A4_GATE_BINDING_INVALID already failed integrity
+  const quorumAt = (ts: number) => evaluateApprovalQuorum({ request: { ...request.data, status: "PENDING" }, decisions: counted, now: ts });
+  const consumed = links.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gateId);
+  if (consumed === undefined) {
+    if (supersededBy !== null) return null;
+    const open = quorumAt(asOf);
+    return `GATE_OPEN: gate ${gateId} ${open.received} of ${open.required} approvals (${open.status})`;
+  }
+  if (supersededBy !== null && supersededBy.seq < consumed.seq) {
+    return `GATE_CONSUMED_AFTER_SUPERSEDED: gate ${gateId} was consumed at seq ${consumed.seq} after seq ${supersededBy.seq} (${supersededBy.kind}) superseded it`;
+  }
+  const quorum = quorumAt(Number(consumed.body.ts));
+  if (quorum.status === "DENIED") return `GATE_DENIED_CONSUMED: gate ${gateId} was consumed after a counted DENY`;
+  return quorum.status === "QUORUM_MET" ? null : `QUORUM_NOT_MET: gate ${gateId} was consumed with ${quorum.received} of ${quorum.required} approvals (${quorum.status})`;
+}
+
+/**
  * The gate rules over the verified snapshot: a decision counts only when it binds its gate's request digest and precedes
  * any superseding transition; every counted APPROVE passes SoD as of its own seq (builders, authors and requesters never
- * approve their own work); a consumed gate met its quorum. Self-approval, a single-user workspace, a synthetic bound ref
- * and a LOCAL_USER-only regulated quorum leave it not evaluated. SoD-distinct is never independent.
+ * approve their own work); a consumed gate was not superseded first and met its quorum as the engine counts it
+ * (`evaluateApprovalQuorum`: role-allowed decisions, distinct users, any DENY terminal). Self-approval, a single-user
+ * workspace, a synthetic bound ref and a LOCAL_USER-only regulated quorum leave it not evaluated; an open gate is listed
+ * with its count. SoD-distinct is never independent.
  */
 function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["snapshot"]>): Dimension {
   const { links, rows } = snapshot;
   const failed: string[] = [];
   const open: string[] = [];
+  const pending: string[] = [];
+  const asOf = Number(links.at(-1)?.body.ts);
   const facts = links.find((link) => link.kind === "CREATED")?.body.selfApprovalFacts as { activeUserCount?: unknown } | null | undefined;
   if (facts?.activeUserCount === 1 && !ratchetedFromChain(links)) open.push("SINGLE_USER_WORKSPACE: the project was created in a single-user workspace and never ratcheted");
   for (const gate of rows.a4_gates) {
@@ -384,34 +416,31 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
       const decided = links.find((link) => link.kind === "GATE_DECIDED" && link.body.decisionId === row.decision_id);
       const record = approvalDecisionSchema.safeParse(object(row.decision_json));
       const bound = record.success && row.request_digest === gate.binding_digest && record.data.requestDigestSha256 === gate.binding_digest;
-      return decided !== undefined && bound && (supersededBy === null || decided.seq < supersededBy.seq) ? [{ row, seq: decided.seq, decision: record.data.decision }] : [];
+      return decided !== undefined && bound && (supersededBy === null || decided.seq < supersededBy.seq) ? [{ row, seq: decided.seq, record: record.data }] : [];
     }).sort((a, b) => a.seq - b.seq);
     if (rows.a4_evidence_refs.some((ref) => ref.revision_no === revisionNo && ref.claim_kind === "synthetic_example" && Number(ref.seq) < requested.seq)) {
       open.push(`SYNTHETIC_VALUES: gate ${gateId} binds a synthetic_example ref`);
     }
     counted.forEach((entry, index) => {
       if (entry.row.self_approved === 1) open.push(`SINGLE_USER_WORKSPACE: gate ${gateId} decision ${String(entry.row.decision_id)} is self-approved`);
-      if (entry.row.self_approved === 1 || entry.decision !== "APPROVE_EXECUTE") return;
+      if (entry.row.self_approved === 1 || entry.record.decision !== "APPROVE_EXECUTE") return;
       const sod = evaluateSod({ gate: { gateId, gate: gate.gate as "direction" | "completion" | "policy", revisionNo, requesterKeys: [String(gate.requested_by_key)],
         excludedKeys: ([parsed(gate.excluded_keys_json)].flat() as unknown[]).map(String) },
       decisions: counted.slice(0, index).map((prior) => ({ approverKey: String(prior.row.approver_key), authSource: String(prior.row.auth_source),
-        decision: prior.decision as SodDecision["decision"] })),
+        decision: prior.record.decision as SodDecision["decision"] })),
       transitions: links.filter((link) => link.seq < entry.seq), regulated: object(entry.row.self_approval_facts_json)?.regulated !== false,
       selfApprovalAllowed: false, approver: { key: String(entry.row.approver_key), authSource: String(entry.row.auth_source) } });
       if (!sod.ok) failed.push(`SOD_VIOLATION: gate ${gateId} decision ${String(entry.row.decision_id)} (${sod.violations.join(", ")})`);
       if (sod.degraded.includes("SOD_DEGRADED_SELF_PROVISIONED")) open.push(`SOD_DEGRADED_SELF_PROVISIONED: gate ${gateId} has a regulated quorum of LOCAL_USER keys only`);
     });
-    const consumed = links.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gateId);
-    const request = approvalRequestSchema.safeParse(object(gate.request_json));
-    if (consumed !== undefined && request.success) {
-      const approvers = new Set(counted.filter((entry) => entry.decision === "APPROVE_EXECUTE" && entry.seq < consumed.seq).map((entry) => entry.row.approver_key));
-      if (approvers.size < request.data.requiredApprovals) failed.push(`QUORUM_NOT_MET: gate ${gateId} was consumed with ${approvers.size} of ${request.data.requiredApprovals} approvals`);
-    }
+    const quorum = quorumFinding(gate, links, counted.map((entry) => entry.record), supersededBy, asOf);
+    if (quorum !== null) (quorum.startsWith("GATE_OPEN") ? pending : failed).push(quorum);
   }
   if (failed.length > 0) return dimension("fail", [...failed, ...open]);
   if (open.length > 0) return dimension("not-evaluated", open);
   if (rows.a4_gates.length === 0) return dimension("not-evaluated", ["NO_GATES"]);
-  return dimension("pass", ["every counted decision binds its gate, is SoD-distinct and met its quorum; SoD-distinct is not independent: each decision is self_reported (review.independent = false)"]);
+  return dimension("pass", ["every counted decision binds its gate and is SoD-distinct, and every consumed gate met its quorum; SoD-distinct is not independent: each decision is self_reported (review.independent = false)",
+    ...pending]);
 }
 
 /** One exported project: verifyA4Chain on its rows, the export's own checks, then the four dimensions under admitted keys only. */
@@ -430,9 +459,8 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
     warnings: [...chain.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...(note === null ? [] : [note]),
       ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : [])] });
   if (!intact) return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
-  if (report.issuerAdmission.status !== "pass" || anchoring.status !== "anchored") {
-    return { ...report, ...allNotEvaluated("ISSUER_NOT_ADMITTED: integrity only; a pinned trust list must admit the monitor and auditor keys") };
-  }
+  // A project with no envelope yet has no auditor signature to admit (issuer admission not-evaluated): only a refused key blocks.
+  if (report.issuerAdmission.status === "fail" || anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };
   const completeness = [...sideRows, ...checks.completeness];
   return {
     ...report,
