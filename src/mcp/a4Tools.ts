@@ -121,7 +121,8 @@ function localStudioUrl(workspace: string): string {
   const host = studio.data.host.replace(/^\[|\]$/g, "").toLowerCase();
   const local = ["127.0.0.1", "::1", "localhost", "0.0.0.0", "::"].includes(host)
     || Object.values(networkInterfaces()).some((nics) => nics?.some((nic) => nic.address.toLowerCase() === host));
-  if (!local) throw new A4StoreError(403, "A4_STUDIO_NOT_LOCAL", `Studio's recorded address ${host} is not on this machine, so the session is not sent there.`);
+  // The unchecked address is not echoed: state.json is unsigned, and the agent reads this text.
+  if (!local) throw new A4StoreError(403, "A4_STUDIO_NOT_LOCAL", "Studio's recorded address is not on this machine, so the session is not sent there.");
   return `http://${host.includes(":") ? `[${host}]` : host}:${studio.data.apiPort}`;
 }
 
