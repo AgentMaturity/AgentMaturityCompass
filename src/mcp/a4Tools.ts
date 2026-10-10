@@ -5,10 +5,11 @@
  * claim where no producer exists yet), never one composed here.
  *
  * Identity: the MCP server is a local process with no per-user session. An `amc approvals login` token file named by
- * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token), re-resolved
- * against the signed users.yaml on every call. The comment tool refuses without one; reads without one answer as the
- * router's admin token does (every project, reads only). Never a tool argument. Every tool refuses while the
- * workspace is read-only.
+ * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in memory only:
+ * a comment records the user's key and name, as one typed in Studio), re-resolved against the signed users.yaml on
+ * every call. That file is the user's whole Studio session and the agent host can read it, so only a VIEWER-only user's
+ * session is accepted. The comment tool refuses without one; reads without one answer as the router's admin token does
+ * (every project, reads only). Never a tool argument. Every tool refuses while the workspace is read-only.
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
@@ -75,6 +76,11 @@ function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "
   }
   const user = verified.users.find((row) => row.userId === actor.userId && row.username === actor.username);
   if (!user || user.status !== "ACTIVE") throw new A4StoreError(403, "A4_USER_DISABLED", "The session's user is not an ACTIVE user in the signed users.yaml.");
+  // The agent host can read this file and call Studio with it, so it must not be able to decide or build: APPROVER, AUDITOR
+  // and OWNER decide A4 gates, OPERATOR builds. Live roles equal the token's (verifyTrackedSessionToken refuses a change).
+  if (user.roles.some((role) => role !== "VIEWER")) {
+    throw new A4StoreError(403, "A4_SESSION_TOO_PRIVILEGED", `The ${A4_SESSION_TOKEN_ENV} session can act in Studio beyond reading and commenting. Log in as a dedicated user whose only role is VIEWER.`);
+  }
   const required = resolveApiRolePolicy(pathname, method).roles;
   if (!user.roles.some((role) => required.includes(role))) throw new A4StoreError(403, "PRINCIPAL_ROLE_INSUFFICIENT", `This tool needs one of ${required.join(", ")}.`);
   return { key: `LOCAL_USER:${user.userId}`, authSource: "LOCAL_USER", userId: user.userId, username: user.username, roles: [...user.roles],
