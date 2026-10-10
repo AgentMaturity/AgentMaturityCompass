@@ -80,7 +80,7 @@ Decision D-03 (option C, 2026-10-11) keeps all four topologies documented: Helm,
 
 | Target | Serves | Can a governed turn pass? | Status |
 | --- | --- | --- | --- |
-| Helm chart (`deploy/helm/amc`) | Studio (3212) + gateway (3210) | Yes: this is the path a governed turn needs | documented; `.github/workflows/deploy-pack.yml` exercises it, and its `helm test` fails at the verify step at this revision ([`KUBERNETES_HELM_DEPLOYMENT.md`](./KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime)) |
+| Helm chart (`deploy/helm/amc`) | Studio (3212) + gateway (3210) | Yes: this is the path a governed turn needs | documented; `.github/workflows/deploy-pack.yml` exercises it; in a running deployment its `helm test` verdict is `verified-prefix` ([`KUBERNETES_HELM_DEPLOYMENT.md`](./KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime)) |
 | Docker image (`Dockerfile`, `docker/docker-compose.yml`) | Studio (3212) + gateway (3210) | Yes | documented |
 | `railway.json` (`npm run api:start` → `tsx api/index.ts`) | the lightweight scoring API only | **No.** It has no `/healthz`, `/readyz`, gateway or receipts, so the verifier fails closed against it | documented, unqualified |
 | `vercel.json` (`@vercel/node` on `api/index.ts`) | the same lightweight API | **No**, for the same reason | documented, unqualified |

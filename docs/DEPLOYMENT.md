@@ -56,7 +56,7 @@ helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wai
   --set image.repository=<registry>/amc-studio --set image.digest=sha256:<64 hex> --set image.requireDigest=true
 ```
 
-Then run `helm test` as [Verify Runtime](./KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime) describes: it needs a one-time pairing code, and at this revision it fails at its verify step in a running deployment.
+Then pin the monitor key and run `helm test` as [Verify Runtime](./KUBERNETES_HELM_DEPLOYMENT.md#verify-runtime) describes: the test needs a one-time pairing code, and in a running deployment its verdict is a verified prefix (`verified-prefix`), never a complete-ledger verification.
 
 Full operator guide, including the notary keys, the chart-created Secret option and upgrading from chart 0.1.0: [`docs/KUBERNETES_HELM_DEPLOYMENT.md`](./KUBERNETES_HELM_DEPLOYMENT.md).
 

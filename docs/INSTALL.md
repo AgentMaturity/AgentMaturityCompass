@@ -146,7 +146,7 @@ helm upgrade --install amc deploy/helm/amc --namespace amc-system --atomic --wai
   --set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.local
 ```
 
-`helm test` needs a one-time pairing code first; see Verify Runtime in `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
+Before `helm test`, pin the monitor key and mint a one-time pairing code; see Verify Runtime in `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 
 With the Ingress enabled, add its origin to `env.AMC_CORS_ALLOWED_ORIGINS` (the chart's `ingress.hosts` default is `amc.local`), or Studio refuses browser sessions through it. See `deploy/helm/amc/values.yaml` for all configurable values.
 

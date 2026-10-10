@@ -149,6 +149,16 @@ curl -fsS http://127.0.0.1:3212/healthz   # "version" must equal Chart.yaml appV
 curl -fsS http://127.0.0.1:3212/readyz    # "status":"READY"; otherwise read "reasons"
 ```
 
+First pin the monitor key. Studio anchors a native verdict only to a monitor key the operator pinned (`AMC_EXPECTED_MONITOR_FINGERPRINT`, or a trust list in Studio's AMC home), and the key exists only after the first bootstrap. Read it through the cluster API, not from Studio's HTTP endpoints, and pin its sha256; the chart's `checksum/config` annotation restarts the single pod with the pin:
+
+```bash
+kubectl -n amc-system exec deploy/amc-amc -- cat /data/amc/.amc/keys/monitor_ed25519.pub > ./monitor_ed25519.pub
+helm upgrade amc deploy/helm/amc --namespace amc-system --reuse-values --wait \
+  --set env.AMC_EXPECTED_MONITOR_FINGERPRINT="$(openssl dgst -sha256 -r ./monitor_ed25519.pub | cut -d' ' -f1)"
+```
+
+Keep that revision as your rollback target: rolling back to the install revision removes the pin.
+
 Then run the governed-turn check. The chart runs Studio in LAN mode (`env.AMC_LAN_MODE: "true"`), which refuses login until the client claims a one-time pairing code, so mint one inside the Studio pod and hand it to the test as the Secret `<release>-amc-test-pairing` (key `code`). The vault passphrase is read inside the pod and the code goes to a file, not your terminal:
 
 ```bash
@@ -162,9 +172,12 @@ helm test amc --namespace amc-system --logs
 
 A code is spent by one test run; mint a new one for each `helm test`. Without the Secret the probe fails at `login` (`pairing required before login`).
 
-The test pod claims the pairing code, logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. It exits 0 only when Studio reports the evidence as `workspace-key-consistency` or `externally-anchored`; a server that answers `/healthz` and `/readyz` but cannot run a governed turn fails. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs` and run from the ConfigMap mount.
+The test pod claims the pairing code, logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs` and run from the ConfigMap mount. It exits 0 on two verdicts, and its JSON log says which:
 
-Known failure at this revision: in a running deployment the test fails at `verify`. Studio's cold verification (`verifyAgentRun`) checks the whole workspace ledger, and the gateway that Studio runs keeps its own ledger session open, so the check reports a session with a missing seal and Studio answers `failed` ("Cold native verification refused this evidence"). Studio now reports only `failed`, `not-verified` or `externally-anchored`, and `externally-anchored` also needs the monitor key admitted by the operator's trust list or `AMC_EXPECTED_MONITOR_FINGERPRINT` in Studio's environment. The local kind run on 2026-10-11 recorded this failure ([`qualification/2026-10-11-P0-14/`](../qualification/2026-10-11-P0-14/README.md)). Until it is fixed, `helm test` proves that a pairing, a login and a stub-provider turn ran, not that the evidence verified.
+- `externally-anchored` gives probe status `verified`: the complete workspace ledger verified and the monitor key is the pinned one.
+- `anchored-prefix` gives probe status `verified-prefix`. The gateway that Studio runs keeps its own ledger session open while it serves, so a complete-ledger verdict is impossible in a running deployment. Studio then verifies a prefix: the task's own session must be closed and sealed, every recorded row and every sealed session must verify, and each unended, unsealed legacy session (the gateway's) is named in `verificationScope.unfinalizedSessions` instead of failing. Nothing is claimed about how those sessions end, and the state is never reported as `externally-anchored`.
+
+Anything else, including an unpinned key (`UNTRUSTED`), fails. A server that answers `/healthz` and `/readyz` but cannot run a governed turn fails.
 
 The docker compose example runs the same probe with `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`. Its `amc-verify` service passes no pairing code, so against the LAN-mode image it fails at `login`; that profile was not run on 2026-10-11.
 
@@ -174,7 +187,7 @@ Two post-deploy checks exist, and they prove different things:
 
 | Check | Drives | Proves |
 |---|---|---|
-| `helm test` (`governed-turn-probe.mjs`) | a pairing claim, then one native task, provider `stub`, tools `none`, as the bootstrap owner | Studio runs a governed native turn and reports its evidence as `workspace-key-consistency` or `externally-anchored`; a workspace-key result is a local audit trail, not a portable verdict. At this revision the verify step fails in a running deployment (see above) |
+| `helm test` (`governed-turn-probe.mjs`) | a pairing claim, then one native task, provider `stub`, tools `none`, as the bootstrap owner | Studio runs a governed native turn and anchors its evidence to the pinned monitor key: `verified` over the complete ledger, or `verified-prefix` while the gateway's session is open (see above) |
 | `scripts/deploy-verify.mjs` | one leased gateway chat completion | the gateway returns an `llm_response` receipt that verifies against a monitor key you pinned and commits to the response bytes ([`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md)) |
 
 Neither proves a real-model result: the Helm test uses the stub provider and the verifier spends one completion on whatever upstream the gateway route names. Keep both receipts.
@@ -295,11 +308,11 @@ On 2026-10-03, on macOS (Darwin 25.6.0, arm64) with Node v25.5.0, `node scripts/
 On 2026-10-11 the slice C checks ran locally on macOS 26.6.2 (Darwin 25.6.0, arm64) with Node v25.5.0, helm v4.3.0, kubeconform v0.8.0, kind v0.33.0 (node image `kindest/node:v1.37.0`), kubectl v1.37.1 and Docker 29.5.2 (linux/arm64) in a colima VM, using the steps of `.github/workflows/deploy-pack.yml`, which pins the same tool versions and has not yet run in CI. Results, with receipts in [`qualification/2026-10-11-P0-14/`](../qualification/2026-10-11-P0-14/README.md):
 
 - `deploy-pack-check.mjs --json --require-tools` passed (helm lint, renders, kubeconform). The four negative renders were refused, each naming its reason, and the default render held no `kind: Secret`; the same checks against chart 0.1.0 fail.
-- Kind: `helm install --wait`, `helm upgrade`, and `helm rollback amc 1 --wait` succeeded. Both `helm test` runs claimed a pairing code, logged in and ran the stub-provider turn, then failed at `verify` for the reason under [Verify Runtime](#verify-runtime).
+- Kind: `helm install --wait`, the monitor-key pin (`helm upgrade`, revision 2), `helm upgrade`, and `helm rollback amc 2 --wait` succeeded. Both `helm test` runs claimed a pairing code, logged in, ran the stub-provider turn and passed with status `verified-prefix` (Studio verdict `anchored-prefix`): the task's session sealed, the monitor key pinned, and the running gateway's session named as the only unfinalized session.
 - `deploy-verify.mjs` passed all five checks against the kind release: a lease minted inside the pod, the monitor key read through the cluster API, and a loopback stub upstream on the `/local` route, so no real model was called.
-- The container rollback drill deployed image A and failed `probe-a` at `verify` for the same reason, so the swap to image B and back was not exercised.
+- The container rollback drill with image A built from `origin/main` failed `probe-a` at `verify`: main's Studio still runs the complete-ledger check, which the live gateway session fails. With image A built from a commit that has the verify fix (same `src/` as image B), all six steps passed with two `sha256` image ids and `verified-prefix` on every probe. Each replaced container leaves its gateway session unsealed (`docker rm -f` stops it without a graceful shutdown), and every later verdict names those sessions.
 
-The first kind install failed until the pods stopped automounting the service-account token, and an earlier `helm test` pass was void: the probe, started through the ConfigMap's symlink, ran nothing. Both are fixed. These are local runs on one architecture, not a production deployment.
+The first kind install failed until the pods stopped automounting the service-account token. An earlier `helm test` pass was void: the probe, started through the ConfigMap's symlink, ran nothing. Before the verify fix both `helm test` runs failed at `verify`. All are fixed. These are local runs on one architecture, not a production deployment.
 
 Behaviour statements in this guide and where they were checked (retrieved 2026-10-03):
 
