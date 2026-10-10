@@ -192,12 +192,12 @@ jobs:
             echo "::add-mask::$(cat "$dir/code")" >&3
             kubectl create secret generic amc-amc-test-pairing --from-file=code="$dir/code" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
           }
-          # step <name> <cmd...>: runs in order; after the first failure the rest are recorded as skipped.
+          # step <name> <cmd...>: every step runs and the job fails if any failed; a failed install skips the rest.
           step() {
             local name="$1" rc=0; shift
-            if [ -n "$failed" ]; then echo "$name exit=skipped" >> "$log"; return 0; fi
+            if [ "$failed" = install ]; then echo "$name exit=skipped" >> "$log"; return 0; fi
             echo "== $name: $*" >> "$log"; "$@" >> "$log" 2>&1 || rc=$?
-            echo "$name exit=$rc" >> "$log"; [ "$rc" = 0 ] || failed="$name"
+            echo "$name exit=$rc" >> "$log"; [ "$rc" = 0 ] || failed="${failed:-$name}"
           }
           step install helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
           step pair-1 pair
@@ -224,6 +224,7 @@ jobs:
           test -z "$failed"
 
       - id: verify
+        if: always()
         name: Post-deploy verifier (deploy-verify.mjs) against the kind release
         shell: bash
         run: |
