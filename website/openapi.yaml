@@ -13430,7 +13430,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/hypotheses/{hypothesisId}/observe:
     post:
-      summary: Observe a PMF hypothesis with a runtime-written row inside its window
+      summary: Observe a PMF hypothesis, once the project has left Aspire, with a runtime-written row inside its window
       tags:
         - Studio
         - A4 Forge
