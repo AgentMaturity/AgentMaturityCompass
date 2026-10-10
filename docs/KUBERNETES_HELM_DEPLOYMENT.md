@@ -149,13 +149,24 @@ curl -fsS http://127.0.0.1:3212/healthz   # "version" must equal Chart.yaml appV
 curl -fsS http://127.0.0.1:3212/readyz    # "status":"READY"; otherwise read "reasons"
 ```
 
-Then run the governed-turn check:
+Then run the governed-turn check. The chart runs Studio in LAN mode (`env.AMC_LAN_MODE: "true"`), which refuses login until the client claims a one-time pairing code, so mint one inside the Studio pod and hand it to the test as the Secret `<release>-amc-test-pairing` (key `code`). The vault passphrase is read inside the pod and the code goes to a file, not your terminal:
 
 ```bash
+kubectl -n amc-system exec deploy/amc-amc -- sh -c \
+  'cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create --ttl 10m' \
+  | sed -n 's/.*Pairing code: \([0-9][0-9]*\).*/\1/p' > ./pairing-code.txt
+kubectl -n amc-system create secret generic amc-amc-test-pairing --from-file=code=./pairing-code.txt \
+  --dry-run=client -o yaml | kubectl apply -f -
 helm test amc --namespace amc-system --logs
 ```
 
-The test pod logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. It exits 0 only when Studio reports the evidence as `workspace-key-consistency` or `externally-anchored`; a server that answers `/healthz` and `/readyz` but cannot run a governed turn fails. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs`. The docker compose example runs the same probe with `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`.
+A code is spent by one test run; mint a new one for each `helm test`. Without the Secret the probe fails at `login` (`pairing required before login`).
+
+The test pod claims the pairing code, logs in as the bootstrap owner (credentials mounted read-only from the bootstrap Secret, never printed), submits one native task with provider `stub` and tools `none` through `/api/v1/native-tasks`, waits for the turn to finish and calls `/verify`. It exits 0 only when Studio reports the evidence as `workspace-key-consistency` or `externally-anchored`; a server that answers `/healthz` and `/readyz` but cannot run a governed turn fails. The probe is `scripts/deploy/governed-turn-probe.mjs`, shipped in the chart as `files/governed-turn-probe.mjs` and run from the ConfigMap mount.
+
+Known failure at this revision: in a running deployment the test fails at `verify`. Studio's cold verification (`verifyAgentRun`) checks the whole workspace ledger, and the gateway that Studio runs keeps its own ledger session open, so the check reports a session with a missing seal and Studio answers `failed` ("Cold native verification refused this evidence"). Studio now reports only `failed`, `not-verified` or `externally-anchored`, and `externally-anchored` also needs the monitor key admitted by the operator's trust list or `AMC_EXPECTED_MONITOR_FINGERPRINT` in Studio's environment. The local kind run on 2026-10-11 recorded this failure ([`qualification/2026-10-11-P0-14/`](../qualification/2026-10-11-P0-14/README.md)). Until it is fixed, `helm test` proves that a pairing, a login and a stub-provider turn ran, not that the evidence verified.
+
+The docker compose example runs the same probe with `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`. Its `amc-verify` service passes no pairing code, so against the LAN-mode image it fails at `login`; that profile was not run on 2026-10-11.
 
 Studio admits native requests (`/api/v1/native-tasks/*`) only when the request's `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). With `--bind 0.0.0.0` the bind host alone is `http://0.0.0.0:3212`, so the chart ConfigMap always sets `AMC_CORS_ALLOWED_ORIGINS` to the Service origin the test pod calls, `http://<release>-amc:<service.port>` (`http://amc-amc:3212` for release `amc`), and appends `env.AMC_CORS_ALLOWED_ORIGINS` from values. Add your Ingress host there, for example `--set env.AMC_CORS_ALLOWED_ORIGINS=https://amc.example.internal`, or browser sessions through the Ingress are refused with `NATIVE_HOST_DENIED`. `helm --set` splits values on commas, so escape them for more than one origin (`--set 'env.AMC_CORS_ALLOWED_ORIGINS=https://a.example\,https://b.example'`) or put the list in a values file. In `docker/docker-compose.yml` the `amc-studio` service sets `AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212`, so Studio admits the `amc-verify` probe that calls that origin.
 
@@ -163,7 +174,7 @@ Two post-deploy checks exist, and they prove different things:
 
 | Check | Drives | Proves |
 |---|---|---|
-| `helm test` (`governed-turn-probe.mjs`) | one native task, provider `stub`, tools `none`, as the bootstrap owner | Studio runs a governed native turn and reports its evidence as `workspace-key-consistency` or `externally-anchored`; a workspace-key result is a local audit trail, not a portable verdict |
+| `helm test` (`governed-turn-probe.mjs`) | a pairing claim, then one native task, provider `stub`, tools `none`, as the bootstrap owner | Studio runs a governed native turn and reports its evidence as `workspace-key-consistency` or `externally-anchored`; a workspace-key result is a local audit trail, not a portable verdict. At this revision the verify step fails in a running deployment (see above) |
 | `scripts/deploy-verify.mjs` | one leased gateway chat completion | the gateway returns an `llm_response` receipt that verifies against a monitor key you pinned and commits to the response bytes ([`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md)) |
 
 Neither proves a real-model result: the Helm test uses the stub provider and the verifier spends one completion on whatever upstream the gateway route names. Keep both receipts.
@@ -279,7 +290,16 @@ kubectl -n amc-system rollout status deploy/amc-studio
 
 ### What was exercised
 
-On 2026-10-03, on macOS (Darwin 25.6.0, arm64) with Node v25.5.0, `node scripts/deploy/deploy-pack-check.mjs --json` (status `passed`, `helm` and `kubeconform` skipped as `binary absent`) and `node scripts/deploy/rollback-check.mjs --from 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da --to WORKTREE` were run against the change that added them. `helm`, `kubectl`, `kustomize` and `kubeconform` were not installed and the Docker daemon was not running. Not exercised: Helm rendering, `helm lint`, `values.schema.json` validation by Helm (the schema was checked with Ajv), `helm test`, kubeconform, the container rollback drill (it exited 2, `docker daemon unavailable`), the compose `verify` profile, and any cluster install, upgrade or rollback. The governed-turn probe was exercised only against stub HTTP servers. On 2026-10-04 the rendered `AMC_CORS_ALLOWED_ORIGINS` value (`http://amc-amc:3212`, computed from the template expression because `helm` was absent) was passed to Studio's own `nativeAllowedBrowserOrigins` and `assertNativeBrowserAdmission` in a unit test (`tests/helmChartOrigins.test.ts`): the test pod's `GET` and `POST` were admitted, and without the value the `GET` was refused with `NATIVE_HOST_DENIED`. That admitted path was proven with a unit test against `src/studio/nativeAdmission.ts`, not in a cluster, a compose run or a drill run. The commands in this section are the documented procedure, not a recorded cluster run.
+On 2026-10-03, on macOS (Darwin 25.6.0, arm64) with Node v25.5.0, `node scripts/deploy/deploy-pack-check.mjs --json` (status `passed`, `helm` and `kubeconform` skipped as `binary absent`) and `node scripts/deploy/rollback-check.mjs --from 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da --to WORKTREE` were run against the change that added them. `helm`, `kubectl`, `kustomize` and `kubeconform` were not installed and the Docker daemon was not running. Not exercised: Helm rendering, `helm lint`, `values.schema.json` validation by Helm (the schema was checked with Ajv), `helm test`, kubeconform, the container rollback drill (it exited 2, `docker daemon unavailable`), the compose `verify` profile, and any cluster install, upgrade or rollback. The governed-turn probe was exercised only against stub HTTP servers. On 2026-10-04 the rendered `AMC_CORS_ALLOWED_ORIGINS` value (`http://amc-amc:3212`, computed from the template expression because `helm` was absent) was passed to Studio's own `nativeAllowedBrowserOrigins` and `assertNativeBrowserAdmission` in a unit test (`tests/helmChartOrigins.test.ts`): the test pod's `GET` and `POST` were admitted, and without the value the `GET` was refused with `NATIVE_HOST_DENIED`. That admitted path was proven with a unit test against `src/studio/nativeAdmission.ts`, not in a cluster, a compose run or a drill run. On that date the commands in this section were the documented procedure, not a recorded cluster run.
+
+On 2026-10-11 the slice C checks ran locally on macOS 26.6.2 (Darwin 25.6.0, arm64) with Node v25.5.0, helm v4.3.0, kubeconform v0.8.0, kind v0.33.0 (node image `kindest/node:v1.37.0`), kubectl v1.37.1 and Docker 29.5.2 (linux/arm64) in a colima VM, using the steps of `.github/workflows/deploy-pack.yml`, which pins the same tool versions and has not yet run in CI. Results, with receipts in [`qualification/2026-10-11-P0-14/`](../qualification/2026-10-11-P0-14/README.md):
+
+- `deploy-pack-check.mjs --json --require-tools` passed (helm lint, renders, kubeconform). The four negative renders were refused, each naming its reason, and the default render held no `kind: Secret`; the same checks against chart 0.1.0 fail.
+- Kind: `helm install --wait`, `helm upgrade`, and `helm rollback amc 1 --wait` succeeded. Both `helm test` runs claimed a pairing code, logged in and ran the stub-provider turn, then failed at `verify` for the reason under [Verify Runtime](#verify-runtime).
+- `deploy-verify.mjs` passed all five checks against the kind release: a lease minted inside the pod, the monitor key read through the cluster API, and a loopback stub upstream on the `/local` route, so no real model was called.
+- The container rollback drill deployed image A and failed `probe-a` at `verify` for the same reason, so the swap to image B and back was not exercised.
+
+The first kind install failed until the pods stopped automounting the service-account token, and an earlier `helm test` pass was void: the probe, started through the ConfigMap's symlink, ran nothing. Both are fixed. These are local runs on one architecture, not a production deployment.
 
 Behaviour statements in this guide and where they were checked (retrieved 2026-10-03):
 
