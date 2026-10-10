@@ -199,15 +199,22 @@ export function riskTierOf(state: A4ReadinessState): string | null {
   return typeof tier === "string" && declared.every((other) => other === tier) ? tier : null;
 }
 
+/** Risk tiers by rank, in every spelling A4 meets (C-25); a tier not listed ranks as high (unknown risk is not low risk). */
+export const TIER_RANK: Readonly<Record<string, number>> = { low: 0, med: 1, medium: 1, high: 2, critical: 3 };
+
 /**
  * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier other than low or
  * medium (an unstated, unknown or differently spelled tier counts: unknown risk is not low risk, as engineRiskTier maps
- * it to high), or a head Adapt revision carrying an activated plan.
+ * it to high), a brief tier below the agent's own tier before it (`brief.priorRiskTier`, recorded by Aspire's Propose:
+ * a lowering is decided under the rules of the tier it lowers), or a head Adapt revision carrying an activated plan.
  */
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
   if (tier !== "low" && tier !== "med" && tier !== "medium") return true;
+  const brief = latestRevision(state, "aspire");
+  const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
+  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
   const adapt = latestRevision(state, "adapt");
   const digests = adapt ? parseJson(adapt.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null : null;
   return typeof digests?.plan?.journalEntrySha256 === "string";
