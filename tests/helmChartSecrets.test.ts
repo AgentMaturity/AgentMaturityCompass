@@ -76,6 +76,16 @@ describe("helm chart bootstrap secret", () => {
     }
   });
 
+  it("passes the operator's monitor-key pin to Studio, and a config change rolls the single pod (P0-14)", () => {
+    // Studio anchors a native verdict only to a key the operator pinned; the pin is known after the first bootstrap.
+    expect(read(`${chartDir}/templates/configmap.yaml`))
+      .toContain("  AMC_EXPECTED_MONITOR_FINGERPRINT: {{ .Values.env.AMC_EXPECTED_MONITOR_FINGERPRINT | quote }}\n");
+    expect(readYaml(`${chartDir}/values.yaml`).env.AMC_EXPECTED_MONITOR_FINGERPRINT).toBe("");
+    // A ConfigMap change alone does not restart a pod; without this the pin would never reach Studio.
+    expect(read(`${chartDir}/templates/deployment.yaml`))
+      .toMatch(/  template:\n    metadata:\n      annotations:\n        checksum\/config: \{\{ include \(print \$\.Template\.BasePath "\/configmap\.yaml"\) \. \| sha256sum \}\}\n/);
+  });
+
   it("every Helm example values file parses (no duplicate keys)", () => {
     for (const name of ["values-internal-only.yaml", "values-ingress-tls.yaml", "values-persistent-bootstrap.yaml"]) {
       expect(() => readYamlDocs(resolve(root, chartDir, "examples", name))).not.toThrow();

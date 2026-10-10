@@ -54,7 +54,8 @@ function governedServer(verification: string, seen: string[] = []): Record<strin
       return { status: 202, body: { ok: true, data: { taskId: "task-00000001" } } };
     },
     "/api/v1/native-tasks/task-00000001": () => ({ status: 200, body: { ok: true, data: { task: { state: "idle", revision: 1 } } } }),
-    "/api/v1/native-tasks/task-00000001/verify": (_req, body) => ({ status: 200, body: { ok: true, data: { state: "closed", revision: body.expectedRevision, verification } } })
+    "/api/v1/native-tasks/task-00000001/verify": (_req, body) => ({ status: 200, body: { ok: true, data: { state: "closed", revision: body.expectedRevision, verification,
+      verificationScope: verification === "externally-anchored" ? { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } : null } } })
   };
 }
 
@@ -86,6 +87,14 @@ describe("governed-turn probe", () => {
     expect(result.steps.map((s: { id: string; status: string }) => `${s.id}=${s.status}`)).toEqual(
       ["healthz", "readyz", "login", "csrf", "options", "submit", "turn", "verify"].map((id) => `${id}=passed`));
     expect(seen).toEqual([`task-workspace-v1|${csrf}|amc_session=s1|stub|none`]);
+  });
+
+  it("records what an anchored verdict covers, so a verified prefix is never reported as a complete ledger", async () => {
+    const base = await stub(governedServer("externally-anchored"));
+    const result = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
+    expect(result.status).toBe("verified");
+    expect(result.verificationScope).toEqual({ scope: "verified-prefix", unfinalizedSessions: ["gw-1"] });
+    expect(result.steps.at(-1)).toMatchObject({ id: "verify", verification: "externally-anchored", verificationScope: { scope: "verified-prefix" } });
   });
 
   it("waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503)", async () => {

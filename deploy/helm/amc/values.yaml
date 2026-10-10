@@ -86,6 +86,10 @@ env:
   AMC_ENABLE_NOTARY: "false"
   AMC_NOTARY_BASE_URL: "http://127.0.0.1:4343"
   AMC_NOTARY_REQUIRED_ATTESTATION: "SOFTWARE"
+  # The monitor key's sha256 fingerprint, pinned by the operator after the first
+  # bootstrap (docs/KUBERNETES_HELM_DEPLOYMENT.md "Pin the monitor key"). Empty:
+  # Studio anchors no verdict, so native verification answers "failed" (untrusted).
+  AMC_EXPECTED_MONITOR_FINGERPRINT: ""
 
 resources:
   requests:

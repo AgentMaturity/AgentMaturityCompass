@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { DrillUnavailable, mintPairingCode, runRollbackDrill, STEP_IDS } from "../scripts/deploy/rollback-drill.mjs";
 
@@ -14,11 +15,13 @@ function fakeDocker(ids: Record<string, string>, { daemon = true } = {}) {
     if (args[0] === "image") return ids[args.at(-1)!] ? { status: 0, stdout: `${ids[args.at(-1)!]}\n`, stderr: "" } : { status: 1, stdout: "", stderr: "No such image" };
     if (args[0] === "run") { running = args.at(-1)!; return { status: 0, stdout: "cid\n", stderr: "" }; }
     if (args[0] === "inspect") return { status: 0, stdout: `${running}\n`, stderr: "" };
+    if (args[0] === "exec" && args.at(-1) === "/data/amc/.amc/keys/monitor_ed25519.pub") return { status: 0, stdout: MONITOR_PEM, stderr: "" };
     return { status: 0, stdout: "", stderr: "" };
   };
   return { docker, calls, runs: () => calls.filter((c) => c[0] === "run").map((c) => c.at(-1)) };
 }
 const verified = async () => ({ status: "verified" });
+const MONITOR_PEM = "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAfixture\n-----END PUBLIC KEY-----\n";
 const base = { imageA: "amc-studio:s1-a", imageB: "amc-studio:s1-b", secretsDir: "/nonexistent-secrets" };
 
 describe("rollback drill", () => {
@@ -28,7 +31,8 @@ describe("rollback drill", () => {
     expect(receipt.status).toBe("passed");
     expect(receipt.steps.map((s: { id: string; status: string }) => `${s.id}=${s.status}`)).toEqual(STEP_IDS.map((id) => `${id}=passed`));
     expect(receipt.images).toEqual({ a: { ref: "amc-studio:s1-a", id: idA }, b: { ref: "amc-studio:s1-b", id: idB } });
-    expect(fake.runs()).toEqual([idA, idB, idA]);
+    // A runs twice for deploy-a: once to bootstrap the workspace key, once pinned to it.
+    expect(fake.runs()).toEqual([idA, idA, idB, idA]);
     expect(fake.calls.at(-1)).toEqual(["volume", "rm", "-f", receipt.volume]);
   });
 
@@ -46,15 +50,40 @@ describe("rollback drill", () => {
 
   it("mints a one-time LAN pairing code inside the container it probes; the passphrase stays in the container", async () => {
     const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
-    const docker = (args: string[]) => (args[0] === "exec" ? (fake.calls.push(args), { status: 0, stdout: "Pairing code: 1234567890\npairingId=pair_1\n", stderr: "" }) : fake.docker(args));
+    const docker = (args: string[]) => (args[0] === "exec" && String(args.at(-1)).includes("amc pair create")
+      ? (fake.calls.push(args), { status: 0, stdout: "Pairing code: 1234567890\npairingId=pair_1\n", stderr: "" }) : fake.docker(args));
     const codes: string[] = [];
     const receipt = await runRollbackDrill({ ...base, docker, probe: async (container: string) => (codes.push(mintPairingCode(docker, container)), { status: "verified" }) });
     expect(receipt.status).toBe("passed");
     expect(codes).toEqual(["1234567890", "1234567890", "1234567890"]);
-    const execs = fake.calls.filter((c) => c[0] === "exec");
+    const execs = fake.calls.filter((c) => c[0] === "exec" && String(c.at(-1)).includes("amc pair create"));
     expect(execs.map((c) => c[1])).toEqual([receipt.container, receipt.container, receipt.container]);
     expect(execs[0]!.at(-1)).toContain('"$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create');
     expect(() => mintPairingCode(() => ({ status: 1, stdout: "", stderr: "Vault locked" }), "c")).toThrow(/amc pair create in c failed: Vault locked/);
+  });
+
+  it("pins the workspace's monitor key after A's first bootstrap and runs every probed container with that pin (P0-14)", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const receipt = await runRollbackDrill({ ...base, docker: fake.docker, probe: verified, pollMs: 1 });
+    const pin = createHash("sha256").update(MONITOR_PEM, "utf8").digest("hex");
+    expect(receipt.status).toBe("passed");
+    expect(receipt.monitorPin).toBe(pin);
+    const runs = fake.calls.filter((c) => c[0] === "run");
+    const pins = runs.map((run) => run.flatMap((arg, i) => (run[i - 1] === "-e" && arg.startsWith("AMC_EXPECTED_MONITOR_FINGERPRINT=") ? [arg] : [])));
+    // A boots once unpinned to create the key, then every container that is probed runs pinned.
+    expect(runs.map((run) => run.at(-1))).toEqual([idA, idA, idB, idA]);
+    expect(pins).toEqual([[], [`AMC_EXPECTED_MONITOR_FINGERPRINT=${pin}`], [`AMC_EXPECTED_MONITOR_FINGERPRINT=${pin}`], [`AMC_EXPECTED_MONITOR_FINGERPRINT=${pin}`]]);
+  });
+
+  it("fails deploy-a, and probes nothing, when the monitor key never appears to pin", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const docker = (args: string[]) => (args[0] === "exec" ? { status: 1, stdout: "", stderr: "No such file" } : fake.docker(args));
+    let probes = 0;
+    const receipt = await runRollbackDrill({ ...base, docker, probe: async () => (probes++, { status: "verified" }), pollMs: 1, pinTimeoutMs: 5 });
+    expect(receipt.status).toBe("failed");
+    expect(receipt.steps[0]).toMatchObject({ id: "deploy-a", status: "failed", detail: expect.stringMatching(/monitor key not readable/) });
+    expect(probes).toBe(0);
+    expect(receipt.monitorPin).toBeNull();
   });
 
   it("refuses non-digest ids", async () => {

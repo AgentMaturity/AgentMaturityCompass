@@ -11,7 +11,7 @@
 // Exit 0: drill passed. Exit 1: a step failed (the drill fails closed; later
 // steps are skipped). Exit 2: usage error or "docker daemon unavailable".
 import { execFileSync, spawnSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { arch, platform, release } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -52,7 +52,8 @@ export function mintPairingCode(docker, container) {
  * Run the drill with an injected docker runner and probe so it can be tested
  * without a daemon. probe(container): Promise<{status: "verified"|"failed", ...}>.
  */
-export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212, docker = dockerCli, probe, sourceCommit = null }) {
+export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212, docker = dockerCli, probe, sourceCommit = null,
+  pollMs = 1000, pinTimeoutMs = 180_000 }) {
   if (docker(["info", "--format", "{{.ServerVersion}}"]).status !== 0) throw new DrillUnavailable("docker daemon unavailable");
   const images = { a: { ref: imageA, id: inspectId(docker, imageA) }, b: { ref: imageB, id: inspectId(docker, imageB) } };
   const suffix = randomBytes(4).toString("hex");
@@ -62,8 +63,20 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
   const receipt = {
     kind: "amc.rollback-drill/1", sourceCommit, startedAt: new Date().toISOString(),
     environment: { node: process.version, platform: platform(), release: release(), arch: arch() },
-    images, container, volume, steps, status: "failed",
+    images, container, volume, steps, status: "failed", monitorPin: null,
     notExercised: ["Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"]
+  };
+  // Studio anchors a verdict only to a monitor key the operator pinned (AMC_EXPECTED_MONITOR_FINGERPRINT). The key
+  // exists after A's first bootstrap, so the drill reads it through docker (not the HTTP target) and pins it.
+  let pin = null;
+  const pinMonitor = async () => {
+    const deadline = Date.now() + pinTimeoutMs;
+    for (;;) {
+      const run = docker(["exec", container, "cat", "/data/amc/.amc/keys/monitor_ed25519.pub"]);
+      if (run.status === 0 && run.stdout.includes("BEGIN PUBLIC KEY")) return createHash("sha256").update(run.stdout, "utf8").digest("hex");
+      if (Date.now() >= deadline) throw new Error(`monitor key not readable in ${container}: ${run.stderr.trim() || "no key yet"}`);
+      await new Promise((done) => setTimeout(done, pollMs));
+    }
   };
   const start = (id) => {
     docker(["rm", "-f", container]);
@@ -76,6 +89,7 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
       "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase",
       "-e", "AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username",
       "-e", "AMC_BOOTSTRAP_OWNER_PASSWORD_FILE=/run/secrets/amc_owner_password",
+      ...(pin ? ["-e", `AMC_EXPECTED_MONITOR_FINGERPRINT=${pin}`] : []),
       "--read-only", "--tmpfs", "/tmp", "--tmpfs", "/home/amc:uid=10001,gid=10001,mode=0700", id]);
     if (run.status !== 0) throw new Error(`docker run ${id} failed: ${run.stderr.trim()}`);
     const running = docker(["inspect", "--format", "{{.Image}}", container]).stdout.trim();
@@ -84,7 +98,7 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
   };
   const probeContainer = () => probe(container);
   const plan = [
-    () => start(images.a.id), probeContainer,
+    async () => { start(images.a.id); pin = await pinMonitor(); receipt.monitorPin = pin; return start(images.a.id); }, probeContainer,
     () => start(images.b.id), probeContainer,
     () => start(images.a.id), probeContainer
   ];
@@ -96,7 +110,7 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
         steps[index] = { id: STEP_IDS[index], status: failed ? "failed" : "passed",
           ...(detail?.imageId ? { imageId: detail.imageId } : {}),
           ...(detail?.status ? { probe: { status: detail.status, failedStep: detail.failedStep ?? null, verification: detail.verification ?? null,
-            failedDetail: detail.steps?.find((s) => s.status === "failed")?.detail ?? null } } : {}) };
+            verificationScope: detail.verificationScope ?? null, failedDetail: detail.steps?.find((s) => s.status === "failed")?.detail ?? null } } : {}) };
       } catch (error) {
         steps[index] = { id: STEP_IDS[index], status: "failed", detail: error.message };
       }

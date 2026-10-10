@@ -192,6 +192,14 @@ jobs:
             echo "::add-mask::$(cat "$dir/code")" >&3
             kubectl create secret generic amc-amc-test-pairing --from-file=code="$dir/code" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
           }
+          # Studio anchors a native verdict only to a monitor key the operator pinned. The key exists after the first
+          # bootstrap: read it through the cluster API (not the HTTP target) and pin its sha256 (revision 2).
+          pin() {
+            kubectl exec deploy/amc-amc -- cat /data/amc/.amc/keys/monitor_ed25519.pub > "$dir/monitor.pub" || return 1
+            fp=$(node -e 'process.stdout.write(require("node:crypto").createHash("sha256").update(require("node:fs").readFileSync(process.argv[1])).digest("hex"))' "$dir/monitor.pub")
+            echo "monitor key sha256 $fp"
+            helm upgrade amc deploy/helm/amc --reuse-values --set env.AMC_EXPECTED_MONITOR_FINGERPRINT="$fp" --wait --timeout 10m
+          }
           # step <name> <cmd...>: every step runs and the job fails if any failed; a failed install skips the rest.
           step() {
             local name="$1" rc=0; shift
@@ -200,10 +208,11 @@ jobs:
             echo "$name exit=$rc" >> "$log"; [ "$rc" = 0 ] || failed="${failed:-$name}"
           }
           step install helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
+          step pin pin
           step pair-1 pair
           step test-1 helm test amc --logs --timeout 10m
           step upgrade helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
-          step rollback helm rollback amc 1 --wait --timeout 10m
+          step rollback helm rollback amc 2 --wait --timeout 10m
           step pair-2 pair
           step test-2 helm test amc --logs --timeout 10m
           helm history amc -o json > "$OUT/helm-history.json" || echo "[]" > "$OUT/helm-history.json"

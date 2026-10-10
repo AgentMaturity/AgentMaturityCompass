@@ -34,7 +34,7 @@ export async function governedTurnProbe(options) {
     timeoutMs = 120_000, readyTimeoutMs = 0, pollMs = 500 } = options;
   const origin = new URL(baseUrl).origin;
   const steps = [];
-  const result = { kind: "amc.governed-turn-probe/1", status: "failed", failedStep: null, baseUrl: origin, agentId, taskId: null, verification: null, steps };
+  const result = { kind: "amc.governed-turn-probe/1", status: "failed", failedStep: null, baseUrl: origin, agentId, taskId: null, verification: null, verificationScope: null, steps };
   const deadline = Date.now() + timeoutMs;
   let cookie = "";
   let csrf = "";
@@ -150,8 +150,10 @@ export async function governedTurnProbe(options) {
         view = json?.data?.task ?? view;
       }
       result.verification = view.verification;
+      // What the verdict covers: "verified-prefix" names the live sessions (a running gateway's) it did not finalize.
+      result.verificationScope = view.verificationScope ?? null;
       expect(VERIFIED.has(view.verification), `verification is ${view.verification}${view.error ? `: ${view.error}` : ""}`);
-      return { httpStatus: status, state: view.state, verification: view.verification };
+      return { httpStatus: status, state: view.state, verification: view.verification, verificationScope: result.verificationScope };
     });
     result.status = "verified";
   } catch (error) {
