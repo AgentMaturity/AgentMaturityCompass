@@ -130,6 +130,18 @@ const response = await openai.chat.completions.create({
 - `createAMCClient({ ... })` for explicit config
 - `createAMCClientFromEnv({ ...overrides })` for env-first setup with explicit overrides when needed
 
+### A4 Forge client (preview)
+
+`createA4Client({ baseUrl, session })` calls the `/api/v1/a4` routes of a running Studio, which answer only when the server runs with `AMC_A4_PREVIEW=1`. `session` is a signed-in Studio session (`cookie` plus its `nativeCsrfToken` from `GET /auth/me`, needed for writes) or `adminToken`, which reads only. Writes send the native intent header, the session's CSRF proof and an `Origin` of `baseUrl`; each body carries `expectedHeadSeq` (decisions `expectedGateSeq`) and a `clientRequestId`, generated when omitted, so pass your own to retry safely. No body names a user. Each method resolves to `{ status, body }` with the server's JSON unchanged, errors included (for example `400 SOD_VIOLATION`); on result routes the `claimKind`, `statusDimensions` and `claimLabel` are the server's and the client adds no label. Only a failed request or a non-JSON answer throws `AMCSDKError` (`NETWORK_ERROR`, `INVALID_JSON`). Redirects are refused. The release, deployment and rollback routes arrive with Activate.
+
+```ts
+import { createA4Client } from "agent-maturity-compass";
+
+const a4 = createA4Client({ baseUrl: "http://127.0.0.1:3212", session: { cookie, nativeCsrfToken } });
+const { body } = await a4.readiness(projectId, { stage: "aspire" });
+if (body.ok) console.log(body.data.status, body.claimLabel);
+```
+
 ### Node error handling
 
 SDK runtime failures throw `AMCSDKError` with stable codes:

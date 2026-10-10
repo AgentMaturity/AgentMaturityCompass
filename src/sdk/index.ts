@@ -20,6 +20,7 @@ export {
   type LocalChatPayload
 } from "./amcClient.js";
 export { AMCAgent, createAMCAgent } from "./amcAgent.js";
+export { createA4Client, type A4Client, type A4Session, type A4ApiResponse, type A4MutationResult } from "./a4Client.js";
 export {
   AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError,
   type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt
