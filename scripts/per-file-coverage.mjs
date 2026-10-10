@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const metrics = ["lines", "functions", "branches", "statements"];
 export function coverageSourceFiles(root) {
@@ -79,7 +79,7 @@ export function checkPerFileCoverage(files, baseline, expectedFiles = Object.key
   return failures;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const root = process.cwd();
   const summaryPath = resolve(root, process.argv[2] ?? "coverage/coverage-summary.json");
   const baselinePath = resolve(root, "scripts/quality/coverage-baseline.json");

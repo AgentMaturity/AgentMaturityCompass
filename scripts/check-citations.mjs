@@ -17,6 +17,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_BASELINE_PATH = join(root, "scripts/citations-baseline.json");
@@ -271,6 +272,6 @@ export async function main(argv = process.argv.slice(2), deps = {}) {
   return result.ok && problems.length === 0 ? 0 : 1;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   process.exitCode = await main();
 }
