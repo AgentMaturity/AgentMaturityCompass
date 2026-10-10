@@ -55,4 +55,4 @@ docs/RELEASE_RUNBOOK.md differs only by main's own fefb9b85e (P0-09: pin keys in
    tests/rollbackDrill.test.ts                        | 15 ++++++-
    18 files changed, 280 insertions(+), 71 deletions(-)
   Reasons: probe ready window (ff8566142); token automount (6fede779b); hermetic offline test (cc9284f5d);
-  symlink-safe CLI guards, pairing claim, drill pairing mint (1ef317199); D-03 and divergence wording in the runbooks (9326666cd, 75ba37d5b).
+  symlink-safe CLI guards, pairing claim, drill pairing mint (1ef317199); D-03 and divergence wording in the runbooks (9326666cd, aafd53d38).
