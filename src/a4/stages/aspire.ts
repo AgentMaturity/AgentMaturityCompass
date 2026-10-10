@@ -581,7 +581,8 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const hypotheses = pick("hypotheses", () => metrics.slice(0, 5).map((metric) => {
     const content = { statement: `Deploying ${agentName} for ${audience.join(", ")} improves: ${metric}`, predictedOutcome: metric, window: { from, to },
       evidenceSource: { eventType: "audit", metric: slug(metric) } };
-    return { id: `h-${sha256Hex(canonicalize(content)).slice(0, 12)}`, ...content, verdict: null, status: "proposed" as const };
+    // AMC states no confidence; a member's edit may. The observed value stays on the observation's ref (design §10.1).
+    return { id: `h-${sha256Hex(canonicalize(content)).slice(0, 12)}`, ...content, observedOutcome: null, confidence: null, verdict: null, status: "proposed" as const };
   }));
   const learningPlan = pick("learningPlan", () => [
     ...hypotheses.map((hypothesis, index) => ({ milestoneId: `learn-${index + 1}`, title: `Learn whether: ${hypothesis.statement}`,
@@ -695,13 +696,13 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   };
 }
 
-/**
 /** verifySignedFile's reasons as closed codes: its payload error quotes the exception, which may name absolute paths. */
 const SIGNATURE_REASON_CODES: Readonly<Record<string, string>> = { "file missing": "AGENT_CONFIG_MISSING", "signature missing": "SIGNATURE_MISSING",
   "digest mismatch": "DIGEST_MISMATCH", "signature verify failed": "SIGNATURE_VERIFY_FAILED" };
 const signatureReasonCode = (reason: string | null): string | null => reason === null ? null
   : SIGNATURE_REASON_CODES[reason] ?? (reason.startsWith("invalid signature payload") ? "SIGNATURE_PAYLOAD_INVALID" : "SIGNATURE_INVALID");
 
+/**
  * Review: the written context graph validates and matches the build, and equals the contextGraphHash of the agent's own
  * target profile, whose signature verifies; the agent config's signature under this workspace's keys (an integrity
  * check, recorded on the STEP, never a ref); the doctor's failing and warning checks with their first-run fixes; brief

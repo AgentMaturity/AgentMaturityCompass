@@ -268,6 +268,10 @@ export const a4HypothesisSchema = z.strictObject({
   predictedOutcome: nonEmpty,
   window: z.strictObject({ from: z.iso.datetime(), to: z.iso.datetime() }),
   evidenceSource: z.strictObject({ eventType: nonEmpty, metric: nonEmpty }),
+  /** Always null on the row: a revision is immutable, so the observed value lives on the observation's EVIDENCE_REF (P1-59). */
+  observedOutcome: z.null().default(null),
+  /** The member's own confidence in the prediction (self-reported); null when none was stated. */
+  confidence: z.enum(["low", "medium", "high"]).nullable().default(null),
   verdict: z.strictObject({ outcome: z.enum(["supported", "refuted", "inconclusive"]), by: nonEmpty, ts: z.number().int(), claimKind: z.literal("self_reported") }).nullable(),
   status: z.enum(["proposed", "observed", "refuted", "expired"])
 });
