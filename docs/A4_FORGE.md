@@ -143,15 +143,17 @@ destruction is effective only after every backup, WORM segment or mirror older t
   `a4/index.json` names each project's head and `containsSyntheticExamples`, and the signed manifest lists every file.
   A project is the agent's by the receipt signed for its first audit row, never by the head row's editable `agent_id`.
   Each project's chain is verified whole before it is exported. A project that does not verify, has lost its head row,
-  or names two agents refuses the export with `A4_INTEGRITY_FAILED`. A project no signed receipt attributes is verified
+  or names two agents refuses the export with `A4_INTEGRITY_FAILED`. Only the store writes in the `a4-` session
+  namespace (any other writer is refused with `A4_SESSION_RESERVED`), and only its rows there name a project. A project no signed receipt attributes is verified
   as well, so it too refuses the export unless it verifies. The bundle's own ledger is unchanged by the slice.
   `amc certify` builds its internal bundle the same way, so with the flag set such a project also refuses
   certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
   trust list admits them. It is a library function for now: the CLI entry point is `amc a4 verify --trust-list`
-  (P1-65). With no trust list the report states integrity only. Seven normative fixtures, with their expected
-  verdicts, are in `tests/fixtures/contracts/a4-record/`.
+  (P1-65). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
+  seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
+  with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,
   evidence refs and verifier summary under `.amc/audit/binders/exports/` only: digests, statuses and hashed principals,
   never specification text, comment bodies or decision reasons. Only ledger row ids are kept as they are; every other

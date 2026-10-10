@@ -66,4 +66,6 @@ every decision is `self_reported`, and SoD-distinct users in one workspace are n
 
 AMC reports these through `verifyA4Bundle` (`src/a4/a4Verify.ts`), which takes either one of these files or an
 `.amcbundle` whose signed manifest lists an A4 slice. Turning each row of the table into a test is recorded as P2-35
-debt.
+debt, together with one bundle case no file here covers: a bundle for agent X whose `a4/index.json` and manifest list a
+verified record of agent Y, re-signed by an admitted auditor key, must report scope `fail` with
+`A4_SCOPE_AGENT: record <projectId> is not about the bundle's agent`.

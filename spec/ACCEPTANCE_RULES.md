@@ -236,7 +236,10 @@ exactly as stored), or inside an `.amcbundle` as one such record per project (`a
 `AMC_A4_PREVIEW=1`, and only after each project's chain verifies whole in the same read transaction that reads its
 rows. A project belongs to the bundle's agent by the receipt a monitor key signed for its seq-0 audit row (session
 `a4-<projectId>-0`), never by the head row's unsigned `agent_id`; every project any A4 row or audit session names is a
-candidate, and one no receipt attributes is verified as well. A candidate that does not verify, has no head row, or
+candidate, and one no receipt attributes is verified as well. Only the A4 store writes in the `a4-` session namespace:
+the ledger refuses any other session start or append there (`A4_SESSION_RESERVED`), and an audit session counts only
+through the store's own rows, a session whose `binary_path` is `a4-store` or an `A4_STATE` row whose meta has
+`source: "a4-store"`. A candidate that does not verify, has no head row, or
 whose head row, `CREATED` body and receipt name different agents refuses the bundle export (`A4_INTEGRITY_FAILED`).
 `a4_requests` (idempotency)
 and `a4_effects` (liveness) are bookkeeping no transition names and are never exported. Inside a workspace,
@@ -266,8 +269,8 @@ Integrity (`integrity: fail` with the code named):
    `readinessSha256`), `kind` is in the closed v1 set, and the head row equals the last transition (`head_seq`,
    `head_digest`, `verified_seq`, `verified_digest`, and the head columns equal the last body's `headAfter`). The head
    row itself is unsigned: a record proves a prefix. A tail cut back together with its head shows only against a later
-   signed statement, such as the bundle manifest (`A4_SLICE_HEAD_MISMATCH`), or the ledger: a session
-   `a4-<projectId>-<head_seq + 1>` witnesses a later transition (in the workspace, `A4_CHAIN_INVALID`; in a bundle's own
+   signed statement, such as the bundle manifest (`A4_SLICE_HEAD_MISMATCH`), or the ledger: the store's session or
+   audit row in `a4-<projectId>-<head_seq + 1>` witnesses a later transition (in the workspace, `A4_CHAIN_INVALID`; in a bundle's own
    ledger, `A4_SLICE_TRUNCATED`).
 2. Audit rows. Each `evidence_event_id` resolves to an `audit` row whose meta has `auditType: "A4_STATE"`,
    `source: "a4-store"`, `trustTier: "SELF_REPORTED"` and this transition's `projectId` and `seq`
@@ -340,7 +343,7 @@ Integrity (`integrity: fail` with the code named):
 12. Bundles. `a4/index.json` is an `amc.a4-bundle-slice/v1` listing (`A4_SLICE_INDEX_INVALID`); every
     `a4/<projectId>.json` in a bundle is listed in its `projects` (`A4_SLICE_UNLISTED`) and every listing has that
     record (`A4_SLICE_RECORD_INVALID`); the head each listing names is the record's head row (`A4_SLICE_HEAD_MISMATCH`);
-    the bundle's ledger holds no session `a4-<projectId>-<headSeq + 1>` (`A4_SLICE_TRUNCATED`); and
+    the bundle's ledger holds no store row in session `a4-<projectId>-<headSeq + 1>` (`A4_SLICE_TRUNCATED`); and
     `containsSyntheticExamples` is true exactly when a listed record holds a `synthetic_example` ref
     (`A4_SYNTHETIC_LABEL_MISMATCH`). `manifest.sig` pins both files, so no dimension is evaluated unless every
     signature of the bundle is admitted and every record's monitor key is admitted for `ledger-row` (`ISSUER_NOT_ADMITTED`).
@@ -349,7 +352,10 @@ Integrity (`integrity: fail` with the code named):
 
 Scope (`scope: fail`): every exported row names the project (`A4_SCOPE_FOREIGN_ROW`), the head row and the `CREATED`
 body name one agent (`A4_SCOPE_AGENT`), and every row a `ledger_event` ref names is a row of that agent
-(`A4_SCOPE_FOREIGN_AGENT`).
+(`A4_SCOPE_FOREIGN_AGENT`). In a bundle, each listed record is about the bundle's subject: the `CREATED` body's
+`agentId` and the `agentId` of the receipt a monitor key signed on the record's seq-0 audit row (receipt
+`session_id` `a4-<projectId>-0`) both equal the signed manifest's `agentId`; a record whose seq-0 row has no such
+receipt, or that names another agent, fails (`A4_SCOPE_AGENT`).
 
 Freshness (`freshness: fail`): a decision whose `request_digest`, or whose record's `requestDigestSha256`, is not its
 gate's `binding_digest`, or that carries none, is stale and counts for nothing (`DECISION_NOT_BOUND`; fixture
