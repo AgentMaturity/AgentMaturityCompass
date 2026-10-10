@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-14",
+  "date": "2026-10-11",
+  "commit": "5a2b847561070fc93bb04652b218f676efcc8adc",
+  "branch": "rtd/p0-14-slice-c-deploy-hardening",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2); runs in a colima 0.10.3 VM (Docker 29.5.2 linux/arm64) and kind v0.33.0 (kindest/node v1.37.0)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "git cherry-pick -x e05bcb7d2 a0ed68d05 3ca024d03 903c19fe4 cdab568c5 fa7b6f381 a89508b24 d6a0beece 327c712de e94ec4ea1 895d7fb5a ddfda721a",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "git diff --stat 7180bd0c4 5c2379934 -- <S1 paths>; git diff --stat 0d1bb10a3 5c2379934 -- <S2 paths> (equivalence.txt)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/deploy/deploy-pack-check.mjs --json",
+      "exit": 0,
+      "durationMs": 2807
+    },
+    {
+      "cmd": "node scripts/deploy-verify.mjs --target http://127.0.0.1:1 (expect 1)",
+      "exit": 1,
+      "durationMs": 654
+    },
+    {
+      "cmd": "HOME=$(mktemp -d) node scripts/credentials-presence-check.mjs --json (expect 1, no values)",
+      "exit": 1,
+      "durationMs": 404
+    },
+    {
+      "cmd": "deploy-pack.yml static: node scripts/deploy/deploy-pack-check.mjs --json --require-tools",
+      "exit": 0,
+      "durationMs": 1536
+    },
+    {
+      "cmd": "deploy-pack.yml static: npx vitest run <15 S1 and S2 test files>",
+      "exit": 0,
+      "durationMs": 3877
+    },
+    {
+      "cmd": "deploy-pack.yml static: negative renders and no kind: Secret in the default render",
+      "exit": 0,
+      "durationMs": 187
+    },
+    {
+      "cmd": "deploy-pack.yml static: negative renders with CHART=<chart 0.1.0 from int> (must fail)",
+      "exit": 1,
+      "durationMs": 159
+    },
+    {
+      "cmd": "deploy-pack.yml kind: kind create cluster --name amc-p014; docker build -t amc-studio:ci .; kind load docker-image amc-studio:ci",
+      "exit": 0,
+      "durationMs": 105039
+    },
+    {
+      "cmd": "deploy-pack.yml kind: create amc-bootstrap from openssl rand -hex 32 (never echoed)",
+      "exit": 0,
+      "durationMs": 238
+    },
+    {
+      "cmd": "deploy-pack.yml kind: helm install --wait; pair; helm test; helm upgrade --wait; helm rollback amc 1 --wait; pair; helm test",
+      "exit": 1,
+      "durationMs": 54705
+    },
+    {
+      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (at 7f98c42fe, tree dirty with docs only)",
+      "exit": 0,
+      "durationMs": 3034
+    },
+    {
+      "cmd": "deploy-pack.yml kind: deploy-verify.mjs against the kind release (clean tree)",
+      "exit": 0,
+      "durationMs": 3852
+    },
+    {
+      "cmd": "deploy-pack.yml kind: deploy-verify.mjs again after the stub's 120 s self-exit (clean tree)",
+      "exit": 0,
+      "durationMs": 13394
+    },
+    {
+      "cmd": "deploy-pack.yml drill: git worktree add origin/main; docker build drill-a (origin/main) and drill-b (head)",
+      "exit": 0,
+      "durationMs": 5815
+    },
+    {
+      "cmd": "deploy-pack.yml drill: node scripts/deploy/rollback-drill.mjs --image-a amc-studio:drill-a --image-b amc-studio:drill-b --secrets-dir <tmp> --out rollback-drill.json",
+      "exit": 1,
+      "durationMs": 7180
+    },
+    {
+      "cmd": "mutation runner: M1-M10 (each: mutate, npx vitest run <file>, restore, rerun)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 33986
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 40388
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 57013
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 11598
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 2019
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 1287
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 6022
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 7660
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 1176
+    },
+    {
+      "cmd": "npm run check:schemas",
+      "exit": 0,
+      "durationMs": 2933
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 910
+    },
+    {
+      "cmd": "npm run check:threat-model",
+      "exit": 0,
+      "durationMs": 724
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 55785
+    },
+    {
+      "cmd": "npm run check:packed-install",
+      "exit": 0,
+      "durationMs": 66392
+    },
+    {
+      "cmd": "npm run release:gate",
+      "exit": 1,
+      "durationMs": 1138441
+    },
+    {
+      "cmd": "npx vitest run <69 existing test files citing the touched paths>",
+      "exit": 0,
+      "durationMs": 21138
+    },
+    {
+      "cmd": "npx vitest run (full suite)",
+      "exit": 1,
+      "durationMs": 837000
+    }
+  ],
+  "tests": {
+    "total": 89,
+    "passed": 89,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "static/deploy-pack-check.json",
+      "sha256": "60d217c58b3508ccac6c7053763b81bf6a97c3cddb23f3ffe6a28ebf290dd2b7"
+    },
+    {
+      "path": "static/negative-renders.txt",
+      "sha256": "cbfdd7c06fb4bf1973b36b63443444e546cb9523331d292204c924dc2a79270a"
+    },
+    {
+      "path": "static/negative-renders-against-chart-0.1.0.txt",
+      "sha256": "79fe7e25551cbcfe6d7dfd3d5741e6ed26677015c179b3c276ade11243b70aae"
+    },
+    {
+      "path": "kind/helm-lifecycle.json",
+      "sha256": "5a1278da54eb42ca0878e83842dea6eaaaaa96d30a8bbeaf0a8a34e2ce6363e1"
+    },
+    {
+      "path": "kind/helm-lifecycle.log",
+      "sha256": "2dae99169224f5f434d5da27b1309e8192aecca8daff75f66b473ae9e036c66c"
+    },
+    {
+      "path": "kind/deploy-verify.json",
+      "sha256": "68ff7f75b3df617e06fd51d7592ecd93b468d5a4ab4c13e048ebec05e6ee55eb"
+    },
+    {
+      "path": "drill/rollback-drill.json",
+      "sha256": "658d445af264e5bfdce194d8ddee1668d5c12ae7e8d260e0df6c3ed35ac8b88c"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "989874513b8e0887899f405fc10f6f43f08e14f31e415723dfaa744c86e1b6a2"
+    },
+    {
+      "path": "equivalence.txt",
+      "sha256": "c89950d67a04ee1e63c585134ba52bc1380dd721db72637ccc00c10e4fed8bbc"
+    }
+  ],
+  "notes": "Local runs only (colima 0.10.3 VM, Docker 29.5.2 linux/arm64, kind v0.33.0, helm v4.3.0, kubeconform v0.8.0, kubectl v1.37.1). No GitHub Actions run: every deploy-pack.yml job is pending-ci (see README.md). The receipt commit is the head the checks and mutations ran on; the kind lifecycle and the drill ran at 7f98c42fe, whose scripts, deploy/, docker/, Dockerfile, src/ and package.json equal this commit's; the first verifier run at 7f98c42fe (exit 0, tree dirty with docs only) was repeated twice at this commit with a clean tree (both pass).\nNon-zero exits, all expected or explained: (1) negative renders against chart 0.1.0 exit 1 by design (the check must fail on main's chart). (2) deploy-verify.mjs --target http://127.0.0.1:1 exit 1 and credentials-presence-check.mjs --json with an empty HOME exit 1 are the spec's negative commands (fail closed, no values printed). (3) The kind helm-lifecycle step exit 1: install, upgrade, rollback and both pairings exit 0; both helm test runs exit 1 at the probe's verify step, because Studio's cold verification refuses while the gateway's ledger session is open (Session ... missing seal) and the monitor key is not pinned; product behaviour outside P0-14 (README.md). (4) The rollback drill exit 1: deploy-a passed, probe-a failed at verify for the same reason; the B swap and rollback did not run. (5) The full vitest suite exit 1 with 117 failed of 23,172: 62 in the four restoration-parity files and 53 in 18 other files fail identically on int 691a041dc (same files and counts, checked in a scratch worktree); claudeHookFailClosed (a 9 s timing bound, 9.3 s under load) and releaseEngineeringPack failed only under load and pass alone at this commit (claudeHookFailClosed 3 of 3 runs, releaseEngineeringPack 1 of 1). (6) npm run release:gate exit 1: 16 of 19 executed checks passed; failed full-test-suite (the baseline failures in (5)), source-duplicates (1,252 findings, the same count as int) and source-dead-code (2,790 findings; int has 2,784; the 6 new are knip findings in the cherry-picked S1/S2 files: helm and kubeconform binaries in deploy-pack-check.mjs and validate-assets.mjs, the diffSummary export in rollback-check.mjs, startScriptName and FindingKind in src/deployVerify/platformDeployConfig.ts); skipped per-file-coverage and live-deploy-health.\ntests: the 15 S1 and S2 vitest files in the static job. Other runs: existing tests that cite the touched files (69 files, 722 tests) pass; restoration-parity set 7,113 tests with the same 62 failures as int.\nAn earlier local helm test \"pass\" (before 1ef317199) ran no probe because the probe's main guard failed through the ConfigMap symlink; it is void and not recorded as a pass.\nA durationMs of 0 means the command was not timed (the cherry-pick, the equivalence diff and the mutation runner, whose per-mutation timings are in mutations.json)."
+}

@@ -1,0 +1,266 @@
+[
+  {
+    "id": "M1",
+    "mutation": "delete the secret.yaml if-wrapper",
+    "file": "deploy/helm/amc/templates/secret.yaml",
+    "test": "tests/helmChartSecrets.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 5 passed (7)"
+      ],
+      "failingTests": [
+        "default render must contain no Secret: secret.yaml is wholly guarded by bootstrap.createSecret (default false) 4ms",
+        "finds no literal secret in Helm values, templates, k8s manifests or docker assets 11ms"
+      ],
+      "durationMs": 906
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 716
+    },
+    "killed": true
+  },
+  {
+    "id": "M2",
+    "mutation": "replace `required` in amc.bootstrapValue with the bare value",
+    "file": "deploy/helm/amc/templates/_helpers.tpl",
+    "test": "tests/helmChartSecrets.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 6 passed (7)"
+      ],
+      "failingTests": [
+        "createSecret without values must refuse: every key is required and refuses change-me 2ms"
+      ],
+      "durationMs": 659
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 659
+    },
+    "killed": true
+  },
+  {
+    "id": "M3",
+    "mutation": "remove the configmap AMC_CORS_ALLOWED_ORIGINS line",
+    "file": "deploy/helm/amc/templates/configmap.yaml",
+    "test": "tests/helmChartOrigins.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 2 passed (3)"
+      ],
+      "failingTests": [
+        "the ConfigMap sets AMC_CORS_ALLOWED_ORIGINS from the Service origin the test pod calls 6ms"
+      ],
+      "durationMs": 638
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)"
+      ],
+      "durationMs": 635
+    },
+    "killed": true
+  },
+  {
+    "id": "M4",
+    "mutation": "drop the drill's AMC_CORS_ALLOWED_ORIGINS env",
+    "file": "scripts/deploy/rollback-drill.mjs",
+    "test": "tests/rollbackDrill.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 5 passed (6)"
+      ],
+      "failingTests": [
+        "admits the probe's 127.0.0.1 host: docker run sets AMC_CORS_ALLOWED_ORIGINS for the published port 3ms"
+      ],
+      "durationMs": 714
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  6 passed (6)"
+      ],
+      "durationMs": 650
+    },
+    "killed": true
+  },
+  {
+    "id": "M5",
+    "mutation": "make buildReport print value: env[name]",
+    "file": "scripts/credentials-presence-check.mjs",
+    "test": "tests/credentialPresence.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 5 passed (7)"
+      ],
+      "failingTests": [
+        "--json names each contract credential as {present, requiredFor, configureAt} and exits 1 when absent 67ms",
+        "never prints a value in text or JSON mode, even when every credential is set 121ms"
+      ],
+      "durationMs": 1297
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 1395
+    },
+    "killed": true
+  },
+  {
+    "id": "M6",
+    "mutation": "delete \"wait for an explicit yes\" under B4",
+    "file": "docs/RELEASE_RUNBOOK.md",
+    "test": "tests/deploymentConfirmationRunbook.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 2 passed (3)"
+      ],
+      "failingTests": [
+        "states the B4 live-deployment gate and 'wait for an explicit yes' inside the B4 section 4ms"
+      ],
+      "durationMs": 642
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)"
+      ],
+      "durationMs": 651
+    },
+    "killed": true
+  },
+  {
+    "id": "M7",
+    "mutation": "P0-14 guard: drop automountServiceAccountToken: false from the Helm Deployment",
+    "file": "deploy/helm/amc/templates/deployment.yaml",
+    "test": "tests/helmChartSecrets.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 6 passed (7)"
+      ],
+      "failingTests": [
+        "pods that mount secrets at /run/secrets do not automount the service-account token 3ms"
+      ],
+      "durationMs": 761
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 720
+    },
+    "killed": true
+  },
+  {
+    "id": "M8",
+    "mutation": "P0-14 guard: compare the unresolved argv[1] again in deploy-verify.mjs",
+    "file": "scripts/deploy-verify.mjs",
+    "test": "tests/deployPackCheck.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 7 passed (8)"
+      ],
+      "failingTests": [
+        "every deploy-pack CLI still runs when started through a symlink (Kubernetes mounts ConfigMap files as symlinks) 430ms"
+      ],
+      "durationMs": 2466
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  8 passed (8)"
+      ],
+      "durationMs": 2273
+    },
+    "killed": true
+  },
+  {
+    "id": "M9",
+    "mutation": "P0-14 guard: skip the pairing claim in the probe",
+    "file": "scripts/deploy/governed-turn-probe.mjs",
+    "test": "tests/deployPackProbe.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 4 passed (6)"
+      ],
+      "failingTests": [
+        "claims a one-time pairing code before login when Studio's LAN mode requires pairing 6ms",
+        "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 2ms"
+      ],
+      "durationMs": 868
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  6 passed (6)"
+      ],
+      "durationMs": 1015
+    },
+    "killed": true
+  },
+  {
+    "id": "M10",
+    "mutation": "P0-14 guard: the probe tries /healthz once (no ready window)",
+    "file": "scripts/deploy/governed-turn-probe.mjs",
+    "test": "tests/deployPackProbe.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 4 passed (6)"
+      ],
+      "failingTests": [
+        "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 2ms",
+        "waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503) 3ms"
+      ],
+      "durationMs": 940
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  6 passed (6)"
+      ],
+      "durationMs": 1012
+    },
+    "killed": true
+  }
+]

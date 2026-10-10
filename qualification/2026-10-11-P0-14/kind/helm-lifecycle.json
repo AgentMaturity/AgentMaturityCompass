@@ -1,0 +1,51 @@
+{
+  "kind": "amc.helm-lifecycle/1",
+  "commit": "7f98c42fe24973a478042a19943ed9f527d05d9f",
+  "cluster": "kind",
+  "builtImageId": "sha256:da8e001aa51e5a7232858974a5ca9c976b52951c00eafe9462845b7d055d27d3",
+  "status": "failed",
+  "steps": {
+    "install": 0,
+    "pair-1": 0,
+    "test-1": 1,
+    "upgrade": 0,
+    "rollback": 0,
+    "pair-2": 0,
+    "test-2": 1
+  },
+  "revisions": [
+    {
+      "revision": 1,
+      "status": "superseded",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Install complete"
+    },
+    {
+      "revision": 2,
+      "status": "superseded",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 3,
+      "status": "deployed",
+      "chart": "amc-0.2.0",
+      "appVersion": "1.2.0",
+      "description": "Rollback to 1"
+    }
+  ],
+  "images": [
+    {
+      "pod": "amc-amc-c4f7fc584-nhr74",
+      "image": "docker.io/library/amc-studio:ci",
+      "imageID": "docker.io/library/import-2026-10-10@sha256:65b255e82a57abb01e20dca9034dc5107339b3849ae07622041a8a26e85c194e"
+    },
+    {
+      "pod": "amc-amc-governed-turn",
+      "image": "docker.io/library/amc-studio:ci",
+      "imageID": "docker.io/library/import-2026-10-10@sha256:65b255e82a57abb01e20dca9034dc5107339b3849ae07622041a8a26e85c194e"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+== install: helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 02:00:03 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+install exit=0
+== pair-1: pair
+pair-1 exit=0
+== test-1: helm test amc --logs --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 02:00:03 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 02:00:20 2026
+Last Completed: Sun Oct 11 02:00:20 2026
+Phase:          Succeeded
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 02:00:20 2026
+Last Completed: Sun Oct 11 02:00:25 2026
+Phase:          Failed
+
+POD LOGS: amc-amc-governed-turn (governed-turn)
+{
+  "kind": "amc.governed-turn-probe/1",
+  "status": "failed",
+  "failedStep": "verify",
+  "baseUrl": "http://amc-amc:3212",
+  "agentId": "default",
+  "taskId": "2f3891e39a481a9cdd39ad16dc7110e10e1481d50ae267171addac0d5a24318f",
+  "verification": "failed",
+  "steps": [
+    {
+      "id": "healthz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "readyz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "pair",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "login",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "csrf",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "options",
+      "status": "passed",
+      "httpStatus": 200,
+      "agentId": "default"
+    },
+    {
+      "id": "submit",
+      "status": "passed",
+      "httpStatus": 202,
+      "taskId": "2f3891e39a481a9cdd39ad16dc7110e10e1481d50ae267171addac0d5a24318f"
+    },
+    {
+      "id": "turn",
+      "status": "passed",
+      "state": "idle",
+      "revision": 1
+    },
+    {
+      "id": "verify",
+      "status": "failed",
+      "detail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
+    }
+  ]
+}
+
+Error: resource Pod/default/amc-amc-governed-turn not ready. status: Failed, message: pod amc-amc-governed-turn failed
+test-1 exit=1
+== upgrade: helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
+Release "amc" has been upgraded. Happy Helming!
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 02:00:25 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+upgrade exit=0
+== rollback: helm rollback amc 1 --wait --timeout 10m
+Rollback was a success! Happy Helming!
+rollback exit=0
+== pair-2: pair
+pair-2 exit=0
+== test-2: helm test amc --logs --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 02:00:37 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Rollback to 1
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 02:00:52 2026
+Last Completed: Sun Oct 11 02:00:52 2026
+Phase:          Succeeded
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 02:00:52 2026
+Last Completed: Sun Oct 11 02:00:57 2026
+Phase:          Failed
+
+POD LOGS: amc-amc-governed-turn (governed-turn)
+{
+  "kind": "amc.governed-turn-probe/1",
+  "status": "failed",
+  "failedStep": "verify",
+  "baseUrl": "http://amc-amc:3212",
+  "agentId": "default",
+  "taskId": "17622a160472b4b2f20af10b25f246f64508d1c145b9ce0a61b27b1a44a57a61",
+  "verification": "failed",
+  "steps": [
+    {
+      "id": "healthz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "readyz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "pair",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "login",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "csrf",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "options",
+      "status": "passed",
+      "httpStatus": 200,
+      "agentId": "default"
+    },
+    {
+      "id": "submit",
+      "status": "passed",
+      "httpStatus": 202,
+      "taskId": "17622a160472b4b2f20af10b25f246f64508d1c145b9ce0a61b27b1a44a57a61"
+    },
+    {
+      "id": "turn",
+      "status": "passed",
+      "state": "idle",
+      "revision": 1
+    },
+    {
+      "id": "verify",
+      "status": "failed",
+      "detail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
+    }
+  ]
+}
+
+Error: resource Pod/default/amc-amc-governed-turn not ready. status: Failed, message: pod amc-amc-governed-turn failed
+test-2 exit=1

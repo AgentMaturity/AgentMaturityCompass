@@ -1,0 +1,5 @@
+ok refused (vaultPassphrase): --set bootstrap.createSecret=true
+ok refused (vaultPassphrase): --set bootstrap.createSecret=true --set bootstrap.values.vaultPassphrase=change-me-x --set bootstrap.values.ownerUsername=u --set bootstrap.values.ownerPassword=p --set bootstrap.values.notaryPassphrase=n --set bootstrap.values.notaryAuthSecret=a
+ok refused (digest): --set image.requireDigest=true
+ok refused (replicaCount): --set replicaCount=2
+ok default render has no kind: Secret
