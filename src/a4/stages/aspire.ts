@@ -29,13 +29,13 @@ import { valueContractTemplate } from "../../value/valueContracts.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
-import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
+import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4Hypothesis, type A4StageRegistry } from "../a4Schema.js";
 import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
 import { understandAspire } from "../aspireUnderstand.js";
 import {
-  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
-  learningPlanSchema, listValue, misuseSchema, textValue, unmeasuredTargets
+  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
+  hypothesisDigestOf, learningPlanSchema, listValue, misuseSchema, previousHypotheses, textValue, unmeasuredTargets
 } from "../spec/aspire.js";
 
 const DAY_MS = 86_400_000;
@@ -321,19 +321,31 @@ function alternativesOf(ctx: A4ProducerContext, spec: Record<string, unknown>, v
   ];
 }
 
-/** A member's edit of one editable part, validated; null when the proposal does not change it. */
-function editOf(key: Editable, input: Record<string, unknown> | undefined, previous: Record<string, unknown>): unknown {
+/**
+ * A member's edit of one editable part, validated; null when the proposal does not change it. A hypothesis new in this
+ * edit (its content digest is in no earlier one) predicts from now: its window starts at or after the server's `now`
+ * and ends after it starts, so no row written before the prediction can observe it. Its id is one the observe route takes.
+ */
+function editOf(key: Editable, input: Record<string, unknown> | undefined, previous: Record<string, unknown>, now: number): unknown {
   if (input === undefined || !Object.hasOwn(input, key) || canonicalize(input[key] ?? null) === canonicalize(previous[key] ?? null)) return null;
   const value = input[key];
   const parsed = key === "hypotheses" ? a4HypothesisSchema.array().min(1).safeParse(value) : key === "learningPlan" ? learningPlanSchema.safeParse(value)
     : key === "quality" ? a4QualitySpecSchema.safeParse(value) : misuseSchema.safeParse(value);
   if (!parsed.success) throw fail(400, "INPUT_INVALID", `${key}: ${parsed.error.issues[0]?.message ?? "invalid"}`);
   if (key === "hypotheses") {
-    const rows = parsed.data as Array<{ id: string; status: string; verdict: unknown }>;
+    const rows = parsed.data as A4Hypothesis[];
     if (rows.some((entry) => entry.status !== "proposed" || entry.verdict !== null)) {
       throw fail(400, "INPUT_INVALID", "A hypothesis is proposed with no verdict; only …/hypotheses/:id/observe moves it.");
     }
     if (new Set(rows.map((entry) => entry.id)).size !== rows.length) throw fail(400, "INPUT_INVALID", "hypotheses: each id names one hypothesis.");
+    const bad = rows.find((entry) => !HYPOTHESIS_ID.test(entry.id));
+    if (bad !== undefined) throw fail(400, "INPUT_INVALID", `hypotheses: an id is 1 to 128 letters, digits, ".", "_" or "-" (${bad.id.slice(0, 40)})`);
+    const known = new Set(previousHypotheses(previous).map(hypothesisDigestOf));
+    const early = rows.find((entry) => !known.has(hypothesisDigestOf(entry))
+      && !(Date.parse(entry.window.from) >= now && Date.parse(entry.window.to) > Date.parse(entry.window.from)));
+    if (early !== undefined) {
+      throw fail(400, "INPUT_INVALID", `hypotheses: ${early.id} is new or changed, so its window starts now or later (server time ${new Date(now).toISOString()}) and ends after it starts.`);
+    }
   }
   return parsed.data;
 }
@@ -401,7 +413,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const audience = listValue(values.get("audience"));
   const edited = new Set(Array.isArray(spec.edited) ? spec.edited.filter((key): key is string => typeof key === "string") : []);
   const pick = <T>(key: Editable, generated: () => T): T => {
-    const edit = editOf(key, ctx.spec, spec);
+    const edit = editOf(key, ctx.spec, spec, ctx.now);
     if (edit !== null) {
       edited.add(key);
       return edit as T;

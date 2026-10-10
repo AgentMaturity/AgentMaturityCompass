@@ -133,6 +133,15 @@ export const hypothesisDigestOf = (hypothesis: Pick<A4Hypothesis, "id" | "statem
   sha256Hex(canonicalize({ id: hypothesis.id, statement: hypothesis.statement, predictedOutcome: hypothesis.predictedOutcome, window: hypothesis.window,
     evidenceSource: hypothesis.evidenceSource }));
 
+/** The hypotheses a spec carries, each as the schema reads it (a row that does not parse is left out). */
+export const previousHypotheses = (spec: Record<string, unknown>): A4Hypothesis[] =>
+  (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).flatMap((entry) => {
+    const parsed = a4HypothesisSchema.safeParse(entry);
+    return parsed.success ? [parsed.data] : [];
+  });
+/** A hypothesis id the observe route takes (src/a4/a4RouterStages.ts, POST …/hypotheses/:id/observe). */
+export const HYPOTHESIS_ID = /^[A-Za-z0-9_.-]{1,128}$/;
+
 export const misuseSchema = z.array(z.strictObject({ failureMode: z.string().trim().min(1), mitigation: z.string().trim().min(1), source: z.string().min(1) })).min(1);
 export const learningPlanSchema = z.array(z.strictObject({
   milestoneId: z.string().min(1), title: z.string().min(1), acceptanceCriteria: z.array(z.string().min(1)).min(1), evidenceSource: z.string().nullable(),

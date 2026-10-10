@@ -29,11 +29,11 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import {
-  a4AnswerSchema, a4HypothesisSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
+  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
-import { hypothesisDigestOf, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
+import { hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 
@@ -328,8 +328,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
   return respond(route, projectId, request, () => {
     const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
     const { spec } = stageSpec(state, "aspire");
-    const hypothesis = (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).map((entry) => a4HypothesisSchema.safeParse(entry))
-      .find((parsed) => parsed.success && parsed.data.id === hypothesisId)?.data;
+    const hypothesis = previousHypotheses(spec).find((entry) => entry.id === hypothesisId);
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);
     // The ref binds this hypothesis's content: an older observation of another statement under the same id does not count.
     const hypothesisDigest = hypothesisDigestOf(hypothesis);
@@ -350,6 +349,10 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
     if (event.ts < Date.parse(hypothesis.window.from) || event.ts > Date.parse(hypothesis.window.to)) {
       throw a4Fail(409, "HYPOTHESIS_OUTSIDE_WINDOW", "The row lies outside the hypothesis window.");
     }
+    // Nor before the first revision that carried this exact hypothesis: a prediction written after its evidence observes nothing.
+    const proposedTs = state.revisions.find((row) => row.stage === "aspire"
+      && previousHypotheses(JSON.parse(row.spec_json) as Record<string, unknown>).some((entry) => hypothesisDigestOf(entry) === hypothesisDigest))?.ts;
+    if (proposedTs === undefined || event.ts < proposedTs) throw a4Fail(409, "HYPOTHESIS_OUTSIDE_WINDOW", "The row was written before the hypothesis was proposed.");
     return route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: body.evidenceRef.refId, sha256: body.evidenceRef.sha256,
       claimKind: "observed", method: "runtime_observation", label: `hypothesis ${hypothesisId}: observed outcome`, column: "implementation",
       expectedHeadSeq: body.expectedHeadSeq, request,
