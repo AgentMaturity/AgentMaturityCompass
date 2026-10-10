@@ -136,7 +136,7 @@ export function stepOffer(offer, ctx, route) {
 const CONTENT_MAX = 65_536;
 
 const NO_REFLECTION = "No statement recorded from this page yet";
-const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
+export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
 /** What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. */
 const recorded = (what, entry) => `<p class="muted">Studio recorded ${what} as self-reported${Number.isSafeInteger(entry.headSeq)
