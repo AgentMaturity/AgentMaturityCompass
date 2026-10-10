@@ -27,6 +27,11 @@ amc bundle diff <bundleA> <bundleB>
 - `evidence/blobs/*` (referenced blobs)
 - `metadata/exportInfo.json`
 
+When the run's agent has A4 Forge projects (preview, `AMC_A4_PREVIEW=1`), `evidence/evidence.sqlite` also holds their
+rows as stored and the ledger rows those rows name, and the ledger slice is extended so it stays one unbroken prefix.
+`manifest.json` then lists the slice under `a4`: each project's exported head and `containsSyntheticExamples`. A4 rules
+and the offline A4 verifier are described in `docs/A4_FORGE.md`; `amc bundle verify` does not check the A4 rules.
+
 ## Verification Checks
 
 `amc bundle verify` checks:
