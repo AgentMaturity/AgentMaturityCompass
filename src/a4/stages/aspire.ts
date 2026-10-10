@@ -28,8 +28,8 @@ import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { valueContractApplyForApi } from "../../value/valueApi.js";
-import { valueContractTemplate } from "../../value/valueContracts.js";
-import { valueAgentContractPath } from "../../value/valueStore.js";
+import { valueContractSchema, valueContractTemplate } from "../../value/valueContracts.js";
+import { valueAgentContractPath, verifyValueContractSignature } from "../../value/valueStore.js";
 import { a4ProjectsRoot } from "../a4Blobs.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "../a4Effects.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
@@ -159,18 +159,39 @@ export function outcomeMetricsOf(quality: unknown): OutcomeMetric[] {
   return [...new Map(metrics.map((metric) => [metric.metricId, metric])).values()];
 }
 
+const untrustedOutcome = (): A4StoreError => fail(409, "OUTCOME_CONTRACT_UNTRUSTED", "The outcome contract is missing or does not verify under this workspace's keys.",
+  { reasonCodes: ["OUTCOME_CONTRACT_UNTRUSTED"] });
+/** The agent's outcome contract, read once and verified over those bytes; null when absent, 409 OUTCOME_CONTRACT_UNTRUSTED when it does not verify. */
+function trustedOutcomeContract(workspace: string, agentId: string) {
+  const path = outcomeContractPath(workspace, agentId);
+  const bytes = readOrAbsent(path, "The outcome contract");
+  if (bytes === null) return null;
+  if (signatureProblem(workspace, bytes, readOrAbsent(`${path}.sig`, "The outcome contract's signature")) !== null) throw untrustedOutcome();
+  return outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8"))).outcomeContract;
+}
+
+/** Whether the agent has a value contract; one that does not verify is 409 VALUE_CONTRACT_UNTRUSTED, never recorded as kept. */
+function trustedValueContract(workspace: string, agentId: string): boolean {
+  if (readOrAbsent(valueAgentContractPath(workspace, agentId), "The value contract") === null) return false;
+  let valid = false;
+  try {
+    valid = verifyValueContractSignature({ workspace, agentId }).valid;
+  } catch {
+    valid = false;
+  }
+  if (!valid) throw fail(409, "VALUE_CONTRACT_UNTRUSTED", "The agent's value contract does not verify under this workspace's keys; restore it or have an owner re-sign it.",
+    { reasonCodes: ["VALUE_CONTRACT_UNTRUSTED"] });
+  return true;
+}
+
 /**
- * Merges `metrics` by metricId into the agent's outcome contract, read once and verified over those bytes, and re-signs
- * it; a contract that already holds them is left as it is (re-signing the same bytes repeats its ledger row's key).
+ * Merges `metrics` by metricId into the agent's verified outcome contract and re-signs it; a contract that already holds
+ * them is left as it is (re-signing the same bytes repeats its ledger row's key).
  */
 function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): void {
   if (metrics.length === 0) return;
-  const path = outcomeContractPath(workspace, agentId);
-  const bytes = readOrAbsent(path, "The outcome contract");
-  if (bytes === null || signatureProblem(workspace, bytes, readOrAbsent(`${path}.sig`, "The outcome contract's signature")) !== null) {
-    throw fail(409, "OUTCOME_CONTRACT_UNTRUSTED", "The outcome contract is missing or does not verify under this workspace's keys.");
-  }
-  const current = outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8"))).outcomeContract;
+  const current = trustedOutcomeContract(workspace, agentId);
+  if (current === null) throw untrustedOutcome();
   const ids = new Set(metrics.map((metric) => metric.metricId));
   const next = { ...current, metrics: [...current.metrics.filter((metric) => !ids.has(metric.metricId)), ...metrics] };
   if (canonicalize(outcomeContractSchema.parse({ outcomeContract: next })) === canonicalize({ outcomeContract: current })) return;
@@ -178,32 +199,55 @@ function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readon
 }
 
 /**
+ * The completion effect's refusals, each run before anything is written (by Build too, so a contract that would fail the
+ * effect after the gate is consumed refuses first): the signing key (423 while the vault is locked), an existing value
+ * contract that does not verify, and, when the quality spec states metrics, an outcome contract that does not verify.
+ * Returns whether the agent has a (verified) value contract.
+ */
+function assertContractsWritable(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): boolean {
+  getPrivateKeyPem(workspace, "auditor");
+  if (metrics.length > 0) trustedOutcomeContract(workspace, agentId);
+  return trustedValueContract(workspace, agentId);
+}
+/** Whether the value contract on disk is the approved draft (a contract that does not parse is not). */
+function isApprovedDraft(path: string, draft: unknown): boolean {
+  try {
+    return canonicalize(valueContractSchema.parse(YAML.parse(readFileSync(path, "utf8")))) === canonicalize(valueContractSchema.parse(draft));
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Aspire's completion effect (design §10.1, Completion approval): after GATE_CONSUMED, once the runner re-read the freeze
- * and recomputed the bound slots, the approved revision's value contract draft is applied when the agent has none (an
- * existing one is kept) and its quality-spec metrics are merged into the verified outcome contract, each signed by its
- * own writer. A signed receipt names both by path and sha256. A failure is recorded by its code; retry re-runs it.
+ * and recomputed the bound slots, every refusal runs, then the approved revision's value contract draft is applied when
+ * the agent has none and its quality-spec metrics are merged into the verified outcome contract, each signed by its own
+ * writer. A signed receipt names both by path and sha256; a value contract found present says whether it is the approved
+ * draft (an earlier attempt of this effect may have applied it). A failure is recorded by its code; retry re-runs it.
  */
 async function applyContracts({ workspace, state, gate }: A4EffectContext): Promise<A4EffectOutcome> {
   try {
     const revision = state.revisions.find((row) => row.revision_no === gate.revision_no);
     const spec = revision === undefined ? {} : JSON.parse(revision.spec_json) as Record<string, unknown>;
     const agentId = state.project.agent_id;
-    // The outcome merge first: it is the step that refuses (an untrusted contract), so a retry still finds the value contract absent.
     const metrics = outcomeMetricsOf(spec.quality);
+    const valuePresent = assertContractsWritable(workspace, agentId, metrics);
     mergeOutcomeMetrics(workspace, agentId, metrics);
     const valuePath = valueAgentContractPath(workspace, agentId);
-    const valuePresent = pathExists(valuePath);
     if (!valuePresent) valueContractApplyForApi({ workspace, contract: spec.valueContractDraft, scopeType: "AGENT", scopeId: agentId });
+    const matchesDraft = valuePresent ? isApprovedDraft(valuePath, spec.valueContractDraft) : true;
     const outcomePath = outcomeContractPath(workspace, agentId);
     const receipt = canonicalize({ schema: "amc.a4-aspire-contracts/v1", projectId: state.project.project_id, gateId: gate.gate_id, revisionNo: gate.revision_no,
-      valueContract: { path: relPath(workspace, valuePath), action: valuePresent ? "present" : "applied", sha256: fileSha(valuePath, "The value contract") },
+      valueContract: { path: relPath(workspace, valuePath), action: valuePresent ? "present" : "applied", matchesApprovedDraft: matchesDraft,
+        sha256: fileSha(valuePath, "The value contract") },
       outcomeContract: { path: relPath(workspace, outcomePath), metricsMerged: metrics.map((metric) => metric.metricId), sha256: fileSha(outcomePath, "The outcome contract") } });
     const receiptPath = join(a4ProjectsRoot(workspace), state.project.project_id, "effects", `${gate.gate_id}.contracts.json`);
     ensureDir(dirname(receiptPath));
     writeFileAtomic(receiptPath, receipt, 0o644);
     signArtifactFile({ workspace, path: receiptPath, artifactKind: "a4-stage-output" });
+    const value = !valuePresent ? "applied" : matchesDraft ? "present, identical to the approved draft" : "kept (differs from the approved draft)";
     return { receipt: { refKind: "stage_output", refId: relPath(workspace, receiptPath), sha256: sha256Hex(receipt),
-      label: `aspire completion: value contract ${valuePresent ? "kept" : "applied"}, ${metrics.length} outcome metric(s) merged (signed)` } };
+      label: `aspire completion: value contract ${value}, ${metrics.length} outcome metric(s) merged (signed)` } };
   } catch (error) {
     // EFFECT_FAILED stores the message: a code only (messages name absolute paths).
     throw new Error(errorCodeOf(error, "ASPIRE_CONTRACTS_FAILED"));
@@ -598,8 +642,9 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const fields = { agentName: brief.agentName, role, domain: brief.stations[0] ?? "general", primaryTasks: brief.goals, stakeholders: brief.audience, riskTier: graph.riskTier };
   const typedGraph = typedMultiAgentGraphSchema.safeParse(spec.graph);
   if (!typedGraph.success) throw fail(409, "A4_NOT_READY", "The proposed solution sketch is not a typed multi-agent graph; propose again.", { reasonCodes: ["TYPED_GRAPH_INVALID"] });
-  // Refusals first: the signing key (423 while the vault is locked), the agent's own signed files, the config to sign.
-  getPrivateKeyPem(workspace, "auditor");
+  // Refusals first: the signing key (423 while the vault is locked) and the contracts the completion effect builds on (it
+  // would otherwise fail only after the completion gate is consumed), the agent's own signed files, the config to sign.
+  assertContractsWritable(workspace, agentId, outcomeMetricsOf(spec.quality));
   const prior = priorAgent(workspace, agentId);
   let config: AgentConfig;
   try {
