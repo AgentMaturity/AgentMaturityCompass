@@ -54,9 +54,10 @@ function renderConversation(ctx) {
 
 function renderBuild(ctx) {
   const files = list(specOf(ctx).build?.files);
-  return `<p class="muted">${esc(view.TRUTH.admission)}. Build writes the approved brief: context-graph.json, the signed agent config, the target
-    profile, the outcome contract when there is none and the Enforce manifest. Each write is a self-reported implementation
-    ref with its file's sha256. Your note is recorded beside it as your own statement; pasted text is retained until the project's blob key is destroyed.</p>
+  return `<p class="muted">${esc(view.TRUTH.admission)}. Build, a workspace owner's action, writes the approved brief: context-graph.json, the signed
+    agent config, the target profile, the outcome contract when there is none and the Enforce manifest. It writes nothing when the agent's existing
+    config or target profile does not verify. Each write is a self-reported implementation ref with its file's sha256. A note, when you write one,
+    is recorded beside it as your own statement; pasted text is retained until the project's blob key is destroyed.</p>
     ${table(["Written", "Path", "sha256"], files.map((file) => [esc(file.writer), `<code>${esc(file.path)}</code>`, `<code>${esc(String(file.sha256 ?? "absent").slice(0, 16))}</code>`]),
       "Nothing written yet.")}
     ${["context_graph_written", "agent_config_signed", "manifest_active"].map((id) => status(ctx, id)).join("")}
