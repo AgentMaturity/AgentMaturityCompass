@@ -11,7 +11,7 @@
 // schema directory for a fully offline run (kubeconform otherwise fetches schemas).
 // Exit 0: status "passed". Exit 1: status "failed". Exit 2: usage error.
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
@@ -57,7 +57,7 @@ export function deployPackCheck(root, { requireTools = false, present = binaryPr
   return { status: errors.length === 0 ? "passed" : "failed", skipped, errors, ran, versions: assets.versions, endpoints: assets.endpoints };
 }
 
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   const argv = process.argv.slice(2);
   const unknown = argv.filter((arg) => !["--json", "--require-tools"].includes(arg));

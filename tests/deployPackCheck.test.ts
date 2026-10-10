@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { dirname } from "node:path";
+import { mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { deployPackCheck, TOOLS } from "../scripts/deploy/deploy-pack-check.mjs";
 import { checkProbes, checkSingleWriter } from "../scripts/deploy/validate-assets.mjs";
@@ -35,6 +37,22 @@ describe("deploy-pack-check", () => {
 
   it("rejects unknown options with exit 2", () => {
     expect(run(["--bogus"]).status).toBe(2);
+  });
+
+  it("every deploy-pack CLI still runs when started through a symlink (Kubernetes mounts ConfigMap files as symlinks)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-deploy-cli-"));
+    try {
+      for (const script of ["scripts/deploy/deploy-pack-check.mjs", "scripts/deploy/rollback-drill.mjs", "scripts/deploy/rollback-check.mjs",
+        "scripts/deploy/validate-assets.mjs", "scripts/deploy/governed-turn-probe.mjs", "scripts/deploy-verify.mjs", "scripts/credentials-presence-check.mjs"]) {
+        const link = join(dir, basename(script));
+        symlinkSync(resolve(root, script), link);
+        const result = spawnSync(process.execPath, [link, "--bogus"], { cwd: dir, encoding: "utf8", env: offlineEnv });
+        // A main guard that compares the unresolved argv[1] skips main(): no output and exit 0, a silent pass.
+        expect(`${result.stdout}${result.stderr}`.trim(), script).not.toBe("");
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 

@@ -7,14 +7,17 @@
 //
 //   node governed-turn-probe.mjs --base-url http://amc-amc:3212 \
 //     --username-file /run/secrets/amc_owner_username --password-file /run/secrets/amc_owner_password \
-//     [--agent-id default] [--ready-timeout-ms 0] [--timeout-ms 120000] [--out receipt.json]
+//     [--pairing-code-file <path>] [--agent-id default] [--ready-timeout-ms 0] [--timeout-ms 120000] [--out receipt.json]
+//
+// A workspace in LAN mode (the image and chart default) refuses login until the
+// client claims a one-time pairing code (`amc pair create` inside the workspace).
+// With --pairing-code-file the probe claims it first; an absent file means no code.
 //
 // Plain Node (>=20), no npm dependencies, so it runs inside the runtime image.
 // Credentials are read from files and never printed. Exit 0 only on "verified".
 // Contract: docs/NATIVE_STUDIO_TASKS.md "API clients and hosted workspaces".
 import { randomUUID } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const API = "/api/v1/native-tasks";
@@ -27,7 +30,7 @@ class ProbeFailure extends Error {}
 
 /** Run the probe; never throws. Returns {status: "verified"|"failed", steps, ...}. */
 export async function governedTurnProbe(options) {
-  const { baseUrl, username, password, agentId = "default", fetchImpl = fetch,
+  const { baseUrl, username, password, pairingCode, agentId = "default", fetchImpl = fetch,
     timeoutMs = 120_000, readyTimeoutMs = 0, pollMs = 500 } = options;
   const origin = new URL(baseUrl).origin;
   const steps = [];
@@ -78,6 +81,16 @@ export async function governedTurnProbe(options) {
         if (Date.now() >= until) throw new ProbeFailure(`GET /readyz answered ${status}${json?.reasons ? `: ${JSON.stringify(json.reasons)}` : ""}`);
         await delay(pollMs);
       }
+    });
+    // pairingCode: a string, or a function that mints one once Studio is ready (the rollback drill).
+    if (pairingCode) await step("pair", async () => {
+      const code = typeof pairingCode === "function" ? await pairingCode() : pairingCode;
+      const { status, headers } = await call("/pair/claim", { method: "POST", body: { code } });
+      expect(status === 200, `POST /pair/claim answered ${status}`);
+      const paired = (headers.getSetCookie?.() ?? []).find((value) => value.startsWith("amc_pairing="));
+      expect(paired, "pair claim set no amc_pairing cookie");
+      cookie = paired.split(";")[0];
+      return { httpStatus: status };
     });
     await step("login", async () => {
       const { status, headers } = await call("/auth/login", { method: "POST", body: { username, password } });
@@ -149,7 +162,7 @@ export async function governedTurnProbe(options) {
 }
 
 function parseArgs(argv) {
-  const known = ["base-url", "username-file", "password-file", "agent-id", "ready-timeout-ms", "timeout-ms", "out"];
+  const known = ["base-url", "username-file", "password-file", "pairing-code-file", "agent-id", "ready-timeout-ms", "timeout-ms", "out"];
   const args = {};
   for (let i = 0; i < argv.length; i += 2) {
     const key = argv[i]?.replace(/^--/, "");
@@ -160,7 +173,8 @@ function parseArgs(argv) {
   return args;
 }
 
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+// realpath: Kubernetes mounts ConfigMap files as symlinks, and import.meta.url names the resolved file.
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   let args;
   try {
@@ -172,6 +186,7 @@ if (invokedDirectly) {
   const secret = (path) => readFileSync(path, "utf8").replace(/\r?\n$/, "");
   const result = await governedTurnProbe({
     baseUrl: args["base-url"], username: secret(args["username-file"]), password: secret(args["password-file"]),
+    pairingCode: args["pairing-code-file"] && existsSync(args["pairing-code-file"]) ? secret(args["pairing-code-file"]) : undefined,
     agentId: args["agent-id"] ?? "default", readyTimeoutMs: Number(args["ready-timeout-ms"] ?? 0), timeoutMs: Number(args["timeout-ms"] ?? 120_000)
   });
   const text = JSON.stringify(result, null, 2);

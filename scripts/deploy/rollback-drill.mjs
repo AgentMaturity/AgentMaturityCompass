@@ -12,7 +12,7 @@
 // steps are skipped). Exit 2: usage error or "docker daemon unavailable".
 import { execFileSync, spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { arch, platform, release } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,8 +38,19 @@ function inspectId(docker, ref) {
 }
 
 /**
+ * One-time LAN pairing code for the probe's login. The image bootstraps in LAN mode, which refuses
+ * login without one. The vault passphrase is read inside the container and never leaves it.
+ */
+export function mintPairingCode(docker, container) {
+  const run = docker(["exec", container, "sh", "-c", 'cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create --ttl 10m']);
+  const code = /Pairing code: (\d+)/.exec(run.stdout)?.[1];
+  if (run.status !== 0 || !code) throw new Error(`amc pair create in ${container} failed: ${run.stderr.trim() || "no code printed"}`);
+  return code;
+}
+
+/**
  * Run the drill with an injected docker runner and probe so it can be tested
- * without a daemon. probe(): Promise<{status: "verified"|"failed", ...}>.
+ * without a daemon. probe(container): Promise<{status: "verified"|"failed", ...}>.
  */
 export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212, docker = dockerCli, probe, sourceCommit = null }) {
   if (docker(["info", "--format", "{{.ServerVersion}}"]).status !== 0) throw new DrillUnavailable("docker daemon unavailable");
@@ -71,10 +82,11 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
     if (running !== id) throw new Error(`container runs ${running || "nothing"}, expected ${id}`);
     return { imageId: id };
   };
+  const probeContainer = () => probe(container);
   const plan = [
-    () => start(images.a.id), probe,
-    () => start(images.b.id), probe,
-    () => start(images.a.id), probe
+    () => start(images.a.id), probeContainer,
+    () => start(images.b.id), probeContainer,
+    () => start(images.a.id), probeContainer
   ];
   try {
     for (const [index, action] of plan.entries()) {
@@ -83,7 +95,8 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
         const failed = detail?.status !== undefined && detail.status !== "verified";
         steps[index] = { id: STEP_IDS[index], status: failed ? "failed" : "passed",
           ...(detail?.imageId ? { imageId: detail.imageId } : {}),
-          ...(detail?.status ? { probe: { status: detail.status, failedStep: detail.failedStep ?? null, verification: detail.verification ?? null } } : {}) };
+          ...(detail?.status ? { probe: { status: detail.status, failedStep: detail.failedStep ?? null, verification: detail.verification ?? null,
+            failedDetail: detail.steps?.find((s) => s.status === "failed")?.detail ?? null } } : {}) };
       } catch (error) {
         steps[index] = { id: STEP_IDS[index], status: "failed", detail: error.message };
       }
@@ -110,7 +123,7 @@ function parseArgs(argv) {
   return args;
 }
 
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   let args;
   try {
@@ -122,8 +135,9 @@ if (invokedDirectly) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const port = Number(args.port ?? 3212);
   const secret = (name) => readFileSync(resolve(args["secrets-dir"], name), "utf8").replace(/\r?\n$/, "");
-  const probe = () => governedTurnProbe({ baseUrl: `http://127.0.0.1:${port}`, username: secret("amc_owner_username"),
-    password: secret("amc_owner_password"), readyTimeoutMs: Number(args["ready-timeout-ms"] ?? 180_000) });
+  const probe = (container) => governedTurnProbe({ baseUrl: `http://127.0.0.1:${port}`, username: secret("amc_owner_username"),
+    password: secret("amc_owner_password"), pairingCode: () => mintPairingCode(dockerCli, container),
+    readyTimeoutMs: Number(args["ready-timeout-ms"] ?? 180_000) });
   let sourceCommit = null;
   try { sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(); } catch { /* not a checkout */ }
   try {

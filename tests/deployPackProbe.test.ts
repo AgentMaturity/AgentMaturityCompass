@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -104,6 +104,32 @@ describe("governed-turn probe", () => {
     expect(once.failedStep).toBe("healthz");
   });
 
+  it("claims a one-time pairing code before login when Studio's LAN mode requires pairing", async () => {
+    const paired: Record<string, Handler> = { ...governedServer("workspace-key-consistency"),
+      "/pair/claim": (_req, body) => (body?.code === "1234567890"
+        ? { status: 200, body: { ok: true }, headers: { "set-cookie": "amc_pairing=p1; HttpOnly" } } : { status: 400, body: { error: "pairing failed" } }),
+      "/auth/login": (req) => (String(req.headers.cookie).includes("amc_pairing=p1")
+        ? { status: 200, body: { ok: true }, headers: { "set-cookie": "amc_session=s1; HttpOnly" } } : { status: 403, body: { error: "pairing required before login" } }) };
+    const base = await stub(paired);
+    const probe = (pairingCode?: string | (() => Promise<string>)) =>
+      governedTurnProbe({ baseUrl: base, username: "u", password: "p", pairingCode, timeoutMs: 5_000, pollMs: 10 });
+    expect((await probe()).failedStep).toBe("login");
+    expect((await probe("0000000000")).failedStep).toBe("pair");
+    const minted = await probe(async () => "1234567890");
+    expect(minted.status).toBe("verified");
+    expect(minted.steps.slice(0, 4).map((s: { id: string }) => s.id)).toEqual(["healthz", "readyz", "pair", "login"]);
+
+    // The Helm test runs the chart's copy from a ConfigMap volume: a symlink into a ..data directory.
+    const dir = mkdtempSync(join(tmpdir(), "amc-probe-cm-")); dirs.push(dir);
+    mkdirSync(join(dir, "..data"));
+    writeFileSync(join(dir, "..data", "governed-turn-probe.mjs"), read("deploy/helm/amc/files/governed-turn-probe.mjs"));
+    symlinkSync("..data/governed-turn-probe.mjs", join(dir, "governed-turn-probe.mjs"));
+    for (const [name, value] of [["user", "u\n"], ["pass", "p\n"], ["code", "1234567890\n"]]) writeFileSync(join(dir, name), value);
+    const cli = await promisify(execFile)(process.execPath, [join(dir, "governed-turn-probe.mjs"), "--base-url", base, "--username-file", join(dir, "user"),
+      "--password-file", join(dir, "pass"), "--pairing-code-file", join(dir, "code"), "--timeout-ms", "5000"], { cwd: dir });
+    expect(JSON.parse(cli.stdout).status).toBe("verified");
+  });
+
   it("fails when Studio's verification verdict is not a verified scope", async () => {
     for (const verdict of ["failed", "not-verified"]) {
       const base = await stub(governedServer(verdict));
@@ -119,6 +145,9 @@ describe("governed-turn probe", () => {
     expect(hook.match(/helm\.sh\/hook: test/g)).toHaveLength(2);
     expect(hook).toContain('.Files.Get "files/governed-turn-probe.mjs"');
     expect(hook).toContain('command: ["node", "/probe/governed-turn-probe.mjs"]');
+    // LAN mode (the chart default) needs a one-time pairing code: an optional Secret the operator creates before `helm test`.
+    expect(hook).toMatch(/- --pairing-code-file\n\s+- \/run\/secrets\/amc_pairing_code\n/);
+    expect(hook).toMatch(/name: \{\{ include "amc\.fullname" \. \}\}-test-pairing\n\s+optional: true\n\s+items:\n\s+- key: code\n\s+path: amc_pairing_code\n/);
     expect(read("deploy/helm/amc/templates/networkpolicy.yaml")).toContain("app.kubernetes.io/component: governed-turn-test");
     const compose = read("docker/docker-compose.yml");
     expect(compose).toMatch(/amc-verify:\n\s+profiles: \["verify"\]/);

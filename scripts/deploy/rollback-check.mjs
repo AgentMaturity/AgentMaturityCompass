@@ -8,7 +8,7 @@
 // kustomization resource list) are always rendered. The Helm chart is rendered
 // only when a helm binary is already on PATH; otherwise the output says so.
 // Exit 0: no hazard. Exit 1: hazard found. Exit 2: usage or render error.
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -87,7 +87,7 @@ function parseArgs(argv) {
   return args;
 }
 
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const scratch = mkdtempSync(join(tmpdir(), "amc-rollback-check-"));

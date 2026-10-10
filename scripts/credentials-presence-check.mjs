@@ -19,8 +19,8 @@
  * 2 on a usage error. Without --for, every listed credential is required.
  * Node built-ins only.
  */
-import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { readFileSync, realpathSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const GH_SECRET = "GitHub repo secret (Settings > Secrets and variables > Actions, or `gh secret set NAME`)";
@@ -147,6 +147,6 @@ function main() {
   process.exitCode = missing.length === 0 ? 0 : 1;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main();
 }

@@ -4,6 +4,10 @@ The probe source is files/governed-turn-probe.mjs, a byte-identical copy of
 scripts/deploy/governed-turn-probe.mjs (tests/deployPackProbe.test.ts enforces it).
 The pod deliberately omits app.kubernetes.io/name so the Studio NetworkPolicy
 does not select it; networkpolicy.yaml admits it by the component label.
+LAN mode (env.AMC_LAN_MODE, default "true") refuses login without a one-time
+pairing code: create Secret <fullname>-test-pairing (key `code`, from
+`amc pair create` in the Studio pod) before `helm test`. Without it the probe
+fails at login.
 */}}
 {{- $component := "governed-turn-test" }}
 apiVersion: v1
@@ -47,6 +51,8 @@ spec:
         - /run/secrets/amc_owner_username
         - --password-file
         - /run/secrets/amc_owner_password
+        - --pairing-code-file
+        - /run/secrets/amc_pairing_code
         - --ready-timeout-ms
         - "60000"
       securityContext:
@@ -75,3 +81,9 @@ spec:
               items:
                 - key: {{ .Values.bootstrap.ownerPasswordSecret.key }}
                   path: amc_owner_password
+          - secret:
+              name: {{ include "amc.fullname" . }}-test-pairing
+              optional: true
+              items:
+                - key: code
+                  path: amc_pairing_code

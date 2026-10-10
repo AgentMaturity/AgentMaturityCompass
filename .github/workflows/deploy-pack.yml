@@ -181,6 +181,17 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$OUT"; log="$OUT/helm-lifecycle.log"; : > "$log"; failed=""
+          dir=$(mktemp -d); chmod 700 "$dir"; trap 'rm -rf "$dir"' EXIT; exec 3>&1
+          # LAN mode (the chart default) refuses login without a one-time pairing code; mint one in the
+          # Studio pod for each helm test and hand it over as the optional <fullname>-test-pairing Secret.
+          # The code is masked on the job's stdout (fd 3) and never written to the log artifact.
+          pair() {
+            kubectl exec deploy/amc-amc -- sh -c 'cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create --ttl 10m' \
+              | sed -n 's/.*Pairing code: \([0-9][0-9]*\).*/\1/p' > "$dir/code" || return 1
+            test -s "$dir/code" || { echo "amc pair create printed no code"; return 1; }
+            echo "::add-mask::$(cat "$dir/code")" >&3
+            kubectl create secret generic amc-amc-test-pairing --from-file=code="$dir/code" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+          }
           # step <name> <cmd...>: runs in order; after the first failure the rest are recorded as skipped.
           step() {
             local name="$1" rc=0; shift
@@ -189,10 +200,12 @@ jobs:
             echo "$name exit=$rc" >> "$log"; [ "$rc" = 0 ] || failed="$name"
           }
           step install helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
-          step test-1 helm test amc --timeout 10m
+          step pair-1 pair
+          step test-1 helm test amc --logs --timeout 10m
           step upgrade helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
           step rollback helm rollback amc 1 --wait --timeout 10m
-          step test-2 helm test amc --timeout 10m
+          step pair-2 pair
+          step test-2 helm test amc --logs --timeout 10m
           helm history amc -o json > "$OUT/helm-history.json" || echo "[]" > "$OUT/helm-history.json"
           kubectl get pods -l app.kubernetes.io/instance=amc -o json > "$OUT/pods.json" || echo '{"items":[]}' > "$OUT/pods.json"
           IMAGE_ID=$(docker image inspect --format '{{.Id}}' amc-studio:ci) node -e '

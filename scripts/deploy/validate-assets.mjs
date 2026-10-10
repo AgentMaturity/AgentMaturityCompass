@@ -3,7 +3,7 @@
 // quickstart, Terraform/Pulumi examples). Needs no cluster. Uses `helm template`
 // only when a helm binary is already on PATH; otherwise it says so and runs the
 // static checks alone. Exits non-zero on any drift.
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync, readdirSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -251,7 +251,7 @@ export function validateAssets(root) {
   return { ok: errors.length === 0, errors, versions, endpoints: probes.endpoints, notes: [render.note] };
 }
 
-const invokedDirectly = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const invokedDirectly = process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   let result;

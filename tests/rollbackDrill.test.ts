@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DrillUnavailable, runRollbackDrill, STEP_IDS } from "../scripts/deploy/rollback-drill.mjs";
+import { DrillUnavailable, mintPairingCode, runRollbackDrill, STEP_IDS } from "../scripts/deploy/rollback-drill.mjs";
 
 const idA = `sha256:${"a".repeat(64)}`;
 const idB = `sha256:${"b".repeat(64)}`;
@@ -42,6 +42,19 @@ describe("rollback drill", () => {
       expect(env).toContain(`AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:${port}`);
       expect(env).toContain("AMC_BIND=0.0.0.0");
     }
+  });
+
+  it("mints a one-time LAN pairing code inside the container it probes; the passphrase stays in the container", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const docker = (args: string[]) => (args[0] === "exec" ? (fake.calls.push(args), { status: 0, stdout: "Pairing code: 1234567890\npairingId=pair_1\n", stderr: "" }) : fake.docker(args));
+    const codes: string[] = [];
+    const receipt = await runRollbackDrill({ ...base, docker, probe: async (container: string) => (codes.push(mintPairingCode(docker, container)), { status: "verified" }) });
+    expect(receipt.status).toBe("passed");
+    expect(codes).toEqual(["1234567890", "1234567890", "1234567890"]);
+    const execs = fake.calls.filter((c) => c[0] === "exec");
+    expect(execs.map((c) => c[1])).toEqual([receipt.container, receipt.container, receipt.container]);
+    expect(execs[0]!.at(-1)).toContain('"$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc pair create');
+    expect(() => mintPairingCode(() => ({ status: 1, stdout: "", stderr: "Vault locked" }), "c")).toThrow(/amc pair create in c failed: Vault locked/);
   });
 
   it("refuses non-digest ids", async () => {
