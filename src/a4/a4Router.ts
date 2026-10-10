@@ -640,6 +640,11 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
 function verifyRead(route: A4Route, projectId: string): true {
   const { store, principal } = route;
   assertQuery(route.params, []);
+  // Nor a body: one naming a trust list (or anything else) is refused rather than silently ignored (P1-63).
+  const headers = route.req.headers ?? {};
+  if (headers["transfer-encoding"] !== undefined || Number(headers["content-length"] ?? 0) > 0) {
+    throw a4Fail(400, "INPUT_INVALID", "This route takes no body; verification trust comes only from the server operator's trust list.");
+  }
   let head: A4ProjectRow | null | undefined;
   try {
     head = store.readHead(projectId);

@@ -32,7 +32,7 @@ import {
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
   type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
@@ -97,14 +97,6 @@ export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null
   "signedConfigs.opsPolicy": (workspace) => fileSha(join(workspace, ".amc", "ops-policy.yaml")),
   "signedConfigs.firewall": (workspace) => fileSha(runtimeFirewallPolicyPath(workspace))
 };
-
-/** A4ResourceDigests as `group.slot` → value. */
-export function flatSlots(digests: unknown, prefix = ""): Record<string, string | null> {
-  if (digests === null || typeof digests !== "object") return {};
-  return Object.fromEntries(Object.entries(digests as Record<string, unknown>).filter(([key]) => key !== "schema" && key !== "gatePolicyDigest")
-    .flatMap(([key, value]) => value !== null && typeof value === "object" ? Object.entries(flatSlots(value, `${prefix}${key}.`))
-      : [[`${prefix}${key}`, typeof value === "string" ? value : null]]));
-}
 
 /**
  * Slots whose live recomputation differs from the bound value, including a recomputable slot bound null (a signed config
