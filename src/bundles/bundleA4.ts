@@ -93,8 +93,8 @@ export function copyA4Slice<T extends object>(input: { workspace: string; root: 
       try {
         head = store.verifyChain(projectId);
       } catch (error) {
-        throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `A4 project ${projectId} does not verify; the bundle is not exported.`,
-          error instanceof A4StoreError ? error.detail : [error instanceof Error ? error.message : String(error)]);
+        const problems = error instanceof A4StoreError && Array.isArray(error.detail) ? error.detail.map(String) : [error instanceof Error ? error.message : String(error)];
+        throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `A4 project ${projectId} does not verify (${problems.slice(0, 3).join("; ")}); the bundle is not exported.`, problems);
       }
       if (head === null) throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `A4 project ${projectId} has no head; the bundle is not exported.`);
       return { head, record: a4RecordV1Schema.parse(readA4Record(ledger.db, projectId, keys)) };
