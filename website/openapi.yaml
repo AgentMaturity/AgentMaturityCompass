@@ -13324,8 +13324,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/complete:
     post:
-      summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it runs
-        its effect and the response names the attempt"
+      summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or
+        an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts), runs its
+        effect and the response names the attempt"
       tags:
         - Studio
         - A4 Forge
