@@ -259,7 +259,10 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
           method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
     }
     if (def.to !== null && def.to !== project.step) {
-      const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed");
+      // A hypothesis observation is the PMF evidence of a later stage, never this review's observation.
+      const hypothesisRefs = new Set(state.chain.filter((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId !== undefined)
+        .map((link) => `${String(link.body.refId)}:${String(link.body.sha256)}`));
+      const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed" && !hypothesisRefs.has(`${ref.refId}:${ref.sha256}`));
       const notEvaluated = producer === undefined ? [NO_PRODUCER] : [...(produced?.notEvaluated ?? [])];
       // A producer that ran and named no reason still observed nothing: never labelled as if none were registered.
       if (notEvaluated.length === 0) notEvaluated.push("NO_OBSERVED_REF");
@@ -318,15 +321,17 @@ async function respond(route: A4Route, projectId: string, request: A4RequestKey 
 }
 
 /**
- * POST …/hypotheses/:id/observe (design §10.1): the only path out of `proposed`. The ref must be a runtime-written
- * (OBSERVED) ledger row of the declared evidence source, inside the hypothesis window; the human verdict is signed
- * beside it as a separate, self_reported statement and never merged with the observed value.
+ * POST …/hypotheses/:id/observe (design §10.1): the only path out of `proposed`, once the project has left Aspire
+ * (nothing in Aspire is observed). The ref must be a runtime-written (OBSERVED) ledger row of the declared evidence
+ * source, inside the hypothesis window; the human verdict is signed beside it as a separate, self_reported statement
+ * and never merged with the observed value.
  */
 async function observeHypothesis(route: A4Route, projectId: string, hypothesisId: string): Promise<true> {
   const principal = requirePrincipal(route);
   const { body, request } = await readJson(route, observeSchema);
   return respond(route, projectId, request, () => {
     const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
+    if (state.project.stage === "aspire") throw a4Fail(409, "A4_STEP_ORDER", "Hypotheses are observed after Aspire; the project is still at Aspire.");
     const { spec } = stageSpec(state, "aspire");
     const hypothesis = previousHypotheses(spec).find((entry) => entry.id === hypothesisId);
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);

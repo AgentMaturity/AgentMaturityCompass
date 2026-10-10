@@ -251,8 +251,11 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
     if (link === undefined) {
       const expired = now > Date.parse(hypothesis.window.to);
       return [item(id, "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false, reasonCodes: [expired ? "HYPOTHESIS_EXPIRED" : "HYPOTHESIS_PROPOSED"],
-        nextAction: expired ? null : { label: `Observe with a runtime-written ${hypothesis.evidenceSource.eventType} row for ${hypothesis.evidenceSource.metric} inside the window`,
-          route: `POST /api/v1/a4/projects/${state.project.project_id}/hypotheses/${hypothesis.id}/observe` } })];
+        // Nothing at Aspire is observed: the observe route refuses until the project has left it.
+        nextAction: expired ? null : state.project.stage === "aspire"
+          ? { label: `Observed after Aspire, with a runtime-written ${hypothesis.evidenceSource.eventType} row for ${hypothesis.evidenceSource.metric} inside the window` }
+          : { label: `Observe with a runtime-written ${hypothesis.evidenceSource.eventType} row for ${hypothesis.evidenceSource.metric} inside the window`,
+            route: `POST /api/v1/a4/projects/${state.project.project_id}/hypotheses/${hypothesis.id}/observe` } })];
     }
     const verdict = (link.body.verdict ?? {}) as { outcome?: unknown; by?: unknown; username?: unknown };
     const ref = state.refs.find((candidate) => candidate.refId === link.body.refId && candidate.sha256 === link.body.sha256);
