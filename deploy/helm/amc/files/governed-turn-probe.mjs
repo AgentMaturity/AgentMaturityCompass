@@ -3,7 +3,9 @@
 // sufficient: this logs in as the bootstrap owner, runs one stub-provider native
 // task with tools "none" through /api/v1/native-tasks, waits for the turn to
 // finish and asks Studio to verify the recorded evidence. Only a closed task
-// whose verification is workspace-key-consistency or externally-anchored counts.
+// whose verification is workspace-key-consistency or externally-anchored counts as "verified". Studio's
+// "anchored-prefix" (the task's session sealed, a running gateway's session named as unfinalized) is reported
+// as the separate status "verified-prefix", never as "verified".
 //
 //   node governed-turn-probe.mjs --base-url http://amc-amc:3212 \
 //     --username-file /run/secrets/amc_owner_username --password-file /run/secrets/amc_owner_password \
@@ -14,7 +16,7 @@
 // With --pairing-code-file the probe claims it first; an absent file means no code.
 //
 // Plain Node (>=20), no npm dependencies, so it runs inside the runtime image.
-// Credentials are read from files and never printed. Exit 0 only on "verified".
+// Credentials are read from files and never printed. Exit 0 only on "verified" or "verified-prefix".
 // Contract: docs/NATIVE_STUDIO_TASKS.md "API clients and hosted workspaces".
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
@@ -23,12 +25,13 @@ import { fileURLToPath } from "node:url";
 const API = "/api/v1/native-tasks";
 const INTENT = "task-workspace-v1";
 const VERIFIED = new Set(["workspace-key-consistency", "externally-anchored"]);
+const PREFIX = "anchored-prefix";
 const SETTLED = new Set(["idle", "failed", "closed", "released"]);
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 
 class ProbeFailure extends Error {}
 
-/** Run the probe; never throws. Returns {status: "verified"|"failed", steps, ...}. */
+/** Run the probe; never throws. Returns {status: "verified"|"verified-prefix"|"failed", steps, ...}. */
 export async function governedTurnProbe(options) {
   const { baseUrl, username, password, pairingCode, agentId = "default", fetchImpl = fetch,
     timeoutMs = 120_000, readyTimeoutMs = 0, pollMs = 500 } = options;
@@ -152,10 +155,10 @@ export async function governedTurnProbe(options) {
       result.verification = view.verification;
       // What the verdict covers: "verified-prefix" names the live sessions (a running gateway's) it did not finalize.
       result.verificationScope = view.verificationScope ?? null;
-      expect(VERIFIED.has(view.verification), `verification is ${view.verification}${view.error ? `: ${view.error}` : ""}`);
+      expect(VERIFIED.has(view.verification) || view.verification === PREFIX, `verification is ${view.verification}${view.error ? `: ${view.error}` : ""}`);
       return { httpStatus: status, state: view.state, verification: view.verification, verificationScope: result.verificationScope };
     });
-    result.status = "verified";
+    result.status = result.verification === PREFIX ? "verified-prefix" : "verified";
   } catch (error) {
     result.status = "failed";
     result.failedStep = error instanceof ProbeFailure ? error.message : "probe";
@@ -194,5 +197,6 @@ if (invokedDirectly) {
   const text = JSON.stringify(result, null, 2);
   if (args.out) writeFileSync(args.out, `${text}\n`);
   console.log(text);
-  process.exit(result.status === "verified" ? 0 : 1);
+  // Exit 0 for both; the printed status says which (a helm test log shows "verified-prefix" explicitly).
+  process.exit(result.status === "verified" || result.status === "verified-prefix" ? 0 : 1);
 }

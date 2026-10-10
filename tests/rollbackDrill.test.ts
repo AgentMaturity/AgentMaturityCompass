@@ -86,6 +86,18 @@ describe("rollback drill", () => {
     expect(receipt.monitorPin).toBeNull();
   });
 
+  it("passes a probe that verified a prefix and records that status, distinct from verified (P0-14)", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const prefix = async () => ({ status: "verified-prefix", verification: "anchored-prefix", verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw"] } });
+    const receipt = await runRollbackDrill({ ...base, docker: fake.docker, probe: prefix, pollMs: 1 });
+    expect(receipt.status).toBe("passed");
+    for (const index of [1, 3, 5]) {
+      expect(receipt.steps[index]).toMatchObject({ status: "passed", probe: { status: "verified-prefix", verification: "anchored-prefix",
+        verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw"] } } });
+    }
+    expect(receipt.probeStatuses).toEqual(["verified-prefix", "verified-prefix", "verified-prefix"]);
+  });
+
   it("refuses non-digest ids", async () => {
     for (const bad of ["abc", "sha256:xyz", `sha256:${"A".repeat(64)}`, "amc-studio:s1-a"]) {
       const fake = fakeDocker({ "amc-studio:s1-a": bad, "amc-studio:s1-b": idB });

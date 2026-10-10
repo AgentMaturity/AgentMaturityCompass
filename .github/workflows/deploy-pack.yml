@@ -226,6 +226,8 @@ jobs:
             const receipt = { kind: "amc.helm-lifecycle/1", commit: process.env.GITHUB_SHA ?? process.env.AMC_SOURCE_COMMIT ?? null,
               cluster: "kind", builtImageId: process.env.IMAGE_ID,
               status: Object.values(exits).every((e) => e === 0) ? "passed" : "failed", steps: exits,
+              // Each helm test prints the probe JSON; "verified" and "verified-prefix" are distinct states (P0-14).
+              probeStatuses: [...log.matchAll(/"kind": "amc\.governed-turn-probe\/1",\s*"status": "([a-z-]+)"/g)].map((m) => m[1]),
               revisions: history.map((r) => ({ revision: r.revision, status: r.status, chart: r.chart, appVersion: r.app_version, description: r.description })),
               images: pods.flatMap((p) => (p.status.containerStatuses ?? []).map((c) => ({ pod: p.metadata.name, image: c.image, imageID: c.imageID }))) };
             fs.writeFileSync(`${out}/helm-lifecycle.json`, JSON.stringify(receipt, null, 2) + "\n");'

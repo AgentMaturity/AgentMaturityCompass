@@ -63,7 +63,7 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
   const receipt = {
     kind: "amc.rollback-drill/1", sourceCommit, startedAt: new Date().toISOString(),
     environment: { node: process.version, platform: platform(), release: release(), arch: arch() },
-    images, container, volume, steps, status: "failed", monitorPin: null,
+    images, container, volume, steps, status: "failed", monitorPin: null, probeStatuses: [],
     notExercised: ["Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"]
   };
   // Studio anchors a verdict only to a monitor key the operator pinned (AMC_EXPECTED_MONITOR_FINGERPRINT). The key
@@ -106,7 +106,8 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
     for (const [index, action] of plan.entries()) {
       try {
         const detail = await action();
-        const failed = detail?.status !== undefined && detail.status !== "verified";
+        // A probe passes on "verified" or "verified-prefix"; the step records which (P0-14).
+        const failed = detail?.status !== undefined && detail.status !== "verified" && detail.status !== "verified-prefix";
         steps[index] = { id: STEP_IDS[index], status: failed ? "failed" : "passed",
           ...(detail?.imageId ? { imageId: detail.imageId } : {}),
           ...(detail?.status ? { probe: { status: detail.status, failedStep: detail.failedStep ?? null, verification: detail.verification ?? null,
@@ -122,6 +123,7 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
     receipt.finishedAt = new Date().toISOString();
   }
   receipt.status = steps.every((s) => s.status === "passed") ? "passed" : "failed";
+  receipt.probeStatuses = steps.filter((s) => s.probe).map((s) => s.probe.status);
   return receipt;
 }
 

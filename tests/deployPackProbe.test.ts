@@ -55,7 +55,8 @@ function governedServer(verification: string, seen: string[] = []): Record<strin
     },
     "/api/v1/native-tasks/task-00000001": () => ({ status: 200, body: { ok: true, data: { task: { state: "idle", revision: 1 } } } }),
     "/api/v1/native-tasks/task-00000001/verify": (_req, body) => ({ status: 200, body: { ok: true, data: { state: "closed", revision: body.expectedRevision, verification,
-      verificationScope: verification === "externally-anchored" ? { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } : null } } })
+      verificationScope: verification === "anchored-prefix" ? { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] }
+        : verification === "externally-anchored" ? { scope: "complete-ledger", unfinalizedSessions: [] } : null } } })
   };
 }
 
@@ -89,12 +90,17 @@ describe("governed-turn probe", () => {
     expect(seen).toEqual([`task-workspace-v1|${csrf}|amc_session=s1|stub|none`]);
   });
 
-  it("records what an anchored verdict covers, so a verified prefix is never reported as a complete ledger", async () => {
-    const base = await stub(governedServer("externally-anchored"));
-    const result = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
-    expect(result.status).toBe("verified");
-    expect(result.verificationScope).toEqual({ scope: "verified-prefix", unfinalizedSessions: ["gw-1"] });
-    expect(result.steps.at(-1)).toMatchObject({ id: "verify", verification: "externally-anchored", verificationScope: { scope: "verified-prefix" } });
+  it("reports an anchored verified prefix as its own status, never as verified, and records what it covers", async () => {
+    const complete = await governedTurnProbe({ baseUrl: await stub(governedServer("externally-anchored")), username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
+    expect(complete).toMatchObject({ status: "verified", verification: "externally-anchored", verificationScope: { scope: "complete-ledger" } });
+    const prefix = await governedTurnProbe({ baseUrl: await stub(governedServer("anchored-prefix")), username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
+    expect(prefix).toMatchObject({ status: "verified-prefix", failedStep: null, verification: "anchored-prefix",
+      verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } });
+    expect(prefix.steps.at(-1)).toMatchObject({ id: "verify", status: "passed", verification: "anchored-prefix" });
+    // A prefix scope attached to any other verdict does not pass.
+    for (const verdict of ["not-verified", "failed"]) {
+      expect((await governedTurnProbe({ baseUrl: await stub(governedServer(verdict)), username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 })).status).toBe("failed");
+    }
   });
 
   it("waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503)", async () => {
