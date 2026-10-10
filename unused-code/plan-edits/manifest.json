@@ -31,6 +31,13 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "scripts/source-quality.mjs",
+      "issue": "P1-52",
+      "baseCommit": "e1e1a1bb52043ef28ee58eed24613604430e7d24",
+      "archivePath": "unused-code/plan-edits/P1-52/scripts/source-quality.mjs.landed",
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
       "path": "src/agent/nativeToolCapabilities.ts",
       "issue": "P1-43",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
