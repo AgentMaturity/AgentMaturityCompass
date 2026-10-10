@@ -16,6 +16,7 @@
  * The session goes only to a Studio whose recorded process is alive and whose recorded address is this machine. The vault
  * passphrase opens the auditor key that signs users.yaml, and anything in this server's environment is readable by the
  * agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE or AMC_VAULT_PASSPHRASE_FILE is set here (P1-64 review).
+ * The same is why readiness's `signing.available` reads WAITING here: Studio's readiness decides signing.
  */
 import { networkInterfaces } from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -40,8 +41,9 @@ export const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
 
 const TOOLS = [
   { name: "amc_a4_list_projects", description: "List the A4 Forge projects this identity may read (read-only)", input: "{ workspace?: string }" },
-  { name: "amc_a4_project", description: "Show one A4 project: head, members, current revision and readiness status (read-only)", input: "{ projectId: string, workspace?: string }" },
-  { name: "amc_a4_readiness", description: "The server's A4 readiness for a project stage, with its own claim (read-only)", input: "{ projectId: string, stage?: string, workspace?: string }" },
+  { name: "amc_a4_project", description: "Show one A4 project: head, members, current revision and readiness status; signing is Studio's to evaluate (read-only)", input: "{ projectId: string, workspace?: string }" },
+  { name: "amc_a4_readiness", description: "The A4 readiness evaluator's result and claim for a project stage, run in this server, which never holds the vault: "
+    + "signing.available reads WAITING here and Studio's readiness decides signing (read-only)", input: "{ projectId: string, stage?: string, workspace?: string }" },
   { name: "amc_a4_conformance", description: "The A4 conformance view for a project stage (read-only)", input: "{ projectId: string, stage?: string, workspace?: string }" },
   { name: "amc_a4_comment", description: `Add a self-reported comment to an A4 project card as the user of the ${A4_SESSION_TOKEN_ENV} session (writes a comment; never a decision)`,
     input: "{ projectId: string, cardId: string, body: string, clientRequestId: string, inReplyTo?: string, workspace?: string }" }
@@ -50,6 +52,8 @@ const TOOLS = [
 /** Variables that open the vault; the agent host can read this server's environment (P1-64 review). */
 const VAULT_ENV = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE"] as const;
 const STUDIO_TIMEOUT_MS = 10_000;
+const SIGNING_NOTE = "signing.available reads WAITING here by design: this MCP server never holds the vault, so do not give it the passphrase. "
+  + "Studio signs, and Studio's readiness decides signing.";
 /** state.json is unsigned and outlives a crashed Studio; pid > 0 because processRunning(0) signals the process group. */
 const studioStateSchema = z.object({ pid: z.number().int().positive(), apiPort: z.number().int().min(1).max(65_535), host: z.string().min(1) });
 /** Studio's answer to POST …/comments: a recorded transition, or a refusal with its code. */
@@ -184,6 +188,9 @@ function readable(ctx: Ctx, projectId: string) {
 /** GET /projects/:id/readiness's evaluation: the one evaluator, full integrity, for this principal. */
 const readinessAt = (ctx: Ctx, state: ReturnType<typeof loadA4State>, stage: A4Stage) =>
   evaluateFor(ctx.store, state, ctx.principal, { fullIntegrity: true }, stage, ctx.now).readiness;
+/** This process's signing probe is not READY: always, since it never holds the vault. */
+const signingHere = (readiness: ReturnType<typeof readinessAt>): boolean =>
+  readiness.items.some((item) => item.id === "signing.available" && item.status !== "READY");
 
 /** `amc.a4-project/v1`, as the router's projectView builds it. */
 const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
@@ -244,16 +251,17 @@ export function registerA4Tools(server: McpServer, host: Host): void {
           specDigest: revision.spec_digest, resourceDigestsSha256: revision.resource_digests_sha256, createdByKey: revision.created_by_key, ts: revision.ts },
         gates: readiness.gates, claim: readiness.claim };
       return withClaim(`A4 project ${body.name} (${body.projectId}): ${body.stage}, ${body.step}; readiness ${readiness.status}; `
-        + `${body.members.length} member(s); head seq ${body.headSeq}.`, readiness.claim, body);
+        + `${body.members.length} member(s); head seq ${body.headSeq}.${signingHere(readiness) ? `\nNote: ${SIGNING_NOTE}` : ""}`, readiness.claim, body);
     }));
 
   server.tool("amc_a4_readiness", TOOLS[2]!.description, { projectId, stage, workspace }, async (args) =>
     a4Tool(host, "amc_a4_readiness", args.workspace, `${projectPath(args.projectId)}/readiness`, "GET", (ctx) => {
       const state = readable(ctx, args.projectId);
       const readiness = readinessAt(ctx, state, args.stage ?? headStage(state.project));
-      const open = readiness.items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE")
+      const open = readiness.items.filter((item) => item.mandatory && item.status !== "READY" && item.status !== "COMPLETE" && item.id !== "signing.available")
         .map((item) => `- ${item.id}: ${item.status}${item.reasonCodes.length > 0 ? ` (${item.reasonCodes.join(", ")})` : ""}`);
       return withClaim([`A4 readiness for ${args.projectId} at ${args.stage ?? headStage(state.project)}: ${readiness.status}`, ...open,
+        ...(signingHere(readiness) ? [`Note: ${SIGNING_NOTE}`] : []),
         ...(readiness.nextAction ? [`Next: ${readiness.nextAction.label}`] : [])].join("\n"), readiness.claim, readiness);
     }));
 
