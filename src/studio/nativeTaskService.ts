@@ -51,7 +51,7 @@ interface Entry {
   validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
   verificationStoreHead?: string;
-  verification: NativeTaskView["verification"]; finishing?: Promise<void>;
+  verification: NativeTaskView["verification"]; verificationScope?: NativeTaskView["verificationScope"]; finishing?: Promise<void>;
   /** Process closure is distinct from a successful signed session handover. */
   processCleanupConfirmed?: boolean;
 }
@@ -253,7 +253,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.projectionError ?? entry.error,
       validationSelection: d.validation ?? null,
       validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
-      verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
+      verification: entry.verification, verificationScope: entry.verification === "externally-anchored" ? entry.verificationScope ?? null : null, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
       canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
@@ -566,7 +566,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         // P0-51: the operator's trust (the AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT in Studio's environment)
         // decides, as `amc agent-loop verify` does; with it, report.ok also needs the monitor key admitted.
         const trust = loadTrustContext({ env: environment, ...(options.credentialsHome ? { amcHome: options.credentialsHome } : {}) });
-        const report = await verifyAgentRun(workspace, entry.descriptor.sessionId, trust);
+        // P0-14: a running Studio's gateway session is never sealed while it serves; the verdict names it instead of failing.
+        const report = await verifyAgentRun(workspace, entry.descriptor.sessionId, trust, { allowLiveLegacySessions: true });
+        entry.verificationScope = { scope: report.scope ?? "complete-ledger", unfinalizedSessions: [...(report.unfinalizedSessions ?? [])] };
         entry.projectionAt = 0; refresh(entry);
         const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
         entry.verification = !report.ok ? "failed" : !sameHead ? "not-verified" : "externally-anchored";

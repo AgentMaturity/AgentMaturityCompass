@@ -2620,6 +2620,7 @@ components:
         - turnEndReason
         - error
         - verification
+        - verificationScope
         - approvals
         - approvalError
         - nextCursor
@@ -2728,6 +2729,13 @@ components:
             - failed
           description: Evidence integrity result, separate from task success. Other open ledger writers can prevent a
             complete verification.
+        verificationScope:
+          oneOf:
+            - $ref: "#/components/schemas/NativeTaskVerificationScope"
+            - type: object
+              nullable: true
+              enum:
+                - null
         approvals:
           type: array
           items:
@@ -2758,6 +2766,26 @@ components:
               nullable: true
               enum:
                 - null
+    NativeTaskVerificationScope:
+      type: object
+      additionalProperties: false
+      required:
+        - scope
+        - unfinalizedSessions
+      properties:
+        scope:
+          type: string
+          enum:
+            - complete-ledger
+            - verified-prefix
+        unfinalizedSessions:
+          type: array
+          maxItems: 64
+          items:
+            type: string
+      description: "What an externally-anchored verdict covers. verified-prefix: every recorded row and every sealed
+        session verified, while the listed unended, unsealed legacy sessions (a running gateway's) were named
+        instead of failed; nothing is claimed about how they end."
     NativeTaskRecovery:
       type: object
       additionalProperties: false

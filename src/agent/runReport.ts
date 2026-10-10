@@ -22,7 +22,7 @@
  * happened, `verify` says whether the log can prove it.
  */
 import { openLedger } from "../ledger/ledger.js";
-import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { IssuerAdmission } from "../trust/admission.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
@@ -183,6 +183,14 @@ export interface AgentRunVerification {
   readonly unsignedRowIds: readonly string[];
   readonly requests: readonly RequestDerivationRow[];
   /**
+   * "complete-ledger": every session in the workspace verified, finalized ones sealed. "verified-prefix": the same
+   * row checks, but the unended, unsealed legacy sessions in `unfinalizedSessions` (a running gateway's) were named
+   * instead of failed, so nothing is claimed about how they end (verifyNativeSessionContinuation). Absent from
+   * reports written before P0-14.
+   */
+  readonly scope?: "complete-ledger" | "verified-prefix";
+  readonly unfinalizedSessions?: readonly string[];
+  /**
    * What the verdict above rests on.
    *
    * `anchored` is false when no expected monitor fingerprint was supplied,
@@ -209,8 +217,16 @@ export interface AgentRunVerification {
  * what it sent. An operator asking "can this run be reconstructed" deserves
  * "no, lawfully" rather than a green tick.
  */
-export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext): Promise<AgentRunVerification> {
-  const result = await verifyLedgerIntegrity(workspace, trust ? { trust } : {});
+export interface AgentRunVerifyOptions {
+  /** A running Studio's own gateway session is never sealed while it serves: name such sessions instead of failing (SQLite only). */
+  readonly allowLiveLegacySessions?: boolean;
+}
+
+export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext, options: AgentRunVerifyOptions = {}): Promise<AgentRunVerification> {
+  const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) !== "jsonl"
+    ? verifyNativeSessionContinuation(workspace, sessionId, trust ? { trust } : {}) : null;
+  const result = live ?? verifyLedgerIntegrity(workspace, trust ? { trust } : {});
+  const unfinalizedSessions = live?.incompleteLegacySessions ?? [];
   const sessionChainErrors: string[] = [];
   let unsignedRowIds: string[];
   if (readSessionStoreMarker(workspace) === "jsonl") {
@@ -261,6 +277,8 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
     sessionChainErrors,
     unsignedRowIds,
     requests,
+    scope: unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger",
+    unfinalizedSessions,
     trustRoot: result.trustRoot
   };
 }
@@ -309,6 +327,7 @@ export function renderVerifyReport(report: AgentRunVerification): string {
     `  session chain       ${report.sessionChainErrors.length === 0 ? "ok" : `${report.sessionChainErrors.length} error(s)`}`,
     `  unsigned rows       ${report.unsignedRowIds.length}`,
     `  requests derived    ${report.requests.filter((request) => request.status === "reconstructed").length}/${report.requests.length}`,
+    ...(report.scope ? [`  scope               ${report.scope}${report.unfinalizedSessions?.length ? ` (not finalized: ${report.unfinalizedSessions.join(", ")})` : ""}`] : []),
     // Say what the verdict rests on. VERIFIED over an unanchored run means the
     // rows are internally consistent, not that this workspace wrote them: the
     // key they were checked against lives inside the workspace being checked.
