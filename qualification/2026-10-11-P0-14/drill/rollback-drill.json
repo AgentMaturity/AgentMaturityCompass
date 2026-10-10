@@ -1,7 +1,7 @@
 {
   "kind": "amc.rollback-drill/1",
-  "sourceCommit": "7f98c42fe24973a478042a19943ed9f527d05d9f",
-  "startedAt": "2026-10-10T20:31:33.064Z",
+  "sourceCommit": "0c8fa73658d6419fdbf5f5c39fd5ff1c4f0882db",
+  "startedAt": "2026-10-10T22:30:58.650Z",
   "environment": {
     "node": "v25.5.0",
     "platform": "darwin",
@@ -11,51 +11,92 @@
   "images": {
     "a": {
       "ref": "amc-studio:drill-a",
-      "id": "sha256:95fda8999718ad0eb04dc1f55054a4fc1be99aacfa3a7b583f33ec7adabaecc3"
+      "id": "sha256:9d300f505179f8fcedff5e51557903e1cb2385bdc8eddb169acb55a5b0d57eec"
     },
     "b": {
       "ref": "amc-studio:drill-b",
-      "id": "sha256:6d2591a934c9d7e285789fc7156c7aeb8a24e736ebba2430c335efb0e46c041e"
+      "id": "sha256:c79b217e8316fa2fd1fd3ffc158d3f14996b2d90e7a0fb73ab13b8a3364b0f06"
     }
   },
-  "container": "amc-rollback-drill-db07ffd2",
-  "volume": "amc-rollback-drill-db07ffd2",
+  "container": "amc-rollback-drill-78506324",
+  "volume": "amc-rollback-drill-78506324",
   "steps": [
     {
       "id": "deploy-a",
       "status": "passed",
-      "imageId": "sha256:95fda8999718ad0eb04dc1f55054a4fc1be99aacfa3a7b583f33ec7adabaecc3"
+      "imageId": "sha256:9d300f505179f8fcedff5e51557903e1cb2385bdc8eddb169acb55a5b0d57eec"
     },
     {
       "id": "probe-a",
-      "status": "failed",
+      "status": "passed",
       "probe": {
-        "status": "failed",
-        "failedStep": "verify",
-        "verification": "failed",
-        "failedDetail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "3beba6c3-92b8-4c11-8169-2aaa2e230d22"
+          ]
+        },
+        "failedDetail": null
       }
     },
     {
       "id": "upgrade-b",
-      "status": "skipped"
+      "status": "passed",
+      "imageId": "sha256:c79b217e8316fa2fd1fd3ffc158d3f14996b2d90e7a0fb73ab13b8a3364b0f06"
     },
     {
       "id": "probe-b",
-      "status": "skipped"
+      "status": "passed",
+      "probe": {
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "3beba6c3-92b8-4c11-8169-2aaa2e230d22",
+            "5d48e4f7-cbec-44a9-85af-c85dfdda4496"
+          ]
+        },
+        "failedDetail": null
+      }
     },
     {
       "id": "rollback-a",
-      "status": "skipped"
+      "status": "passed",
+      "imageId": "sha256:9d300f505179f8fcedff5e51557903e1cb2385bdc8eddb169acb55a5b0d57eec"
     },
     {
       "id": "probe-after-rollback",
-      "status": "skipped"
+      "status": "passed",
+      "probe": {
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "3beba6c3-92b8-4c11-8169-2aaa2e230d22",
+            "5d48e4f7-cbec-44a9-85af-c85dfdda4496",
+            "36451ae4-9787-49f0-bc56-262225f86ade"
+          ]
+        },
+        "failedDetail": null
+      }
     }
   ],
-  "status": "failed",
+  "status": "passed",
+  "monitorPin": "b736a023cd913fba7b40ac28c81219fd876c56a39d20944b334661d28db56397",
+  "probeStatuses": [
+    "verified-prefix",
+    "verified-prefix",
+    "verified-prefix"
+  ],
   "notExercised": [
     "Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"
   ],
-  "finishedAt": "2026-10-10T20:31:39.992Z"
+  "finishedAt": "2026-10-10T22:31:20.552Z"
 }

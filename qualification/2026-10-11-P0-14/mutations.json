@@ -8,21 +8,21 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  2 failed | 5 passed (7)"
+        "Tests  2 failed | 6 passed (8)"
       ],
       "failingTests": [
         "default render must contain no Secret: secret.yaml is wholly guarded by bootstrap.createSecret (default false) 4ms",
-        "finds no literal secret in Helm values, templates, k8s manifests or docker assets 11ms"
+        "finds no literal secret in Helm values, templates, k8s manifests or docker assets 14ms"
       ],
-      "durationMs": 906
+      "durationMs": 1265
     },
     "restored": {
       "exit": 0,
       "summary": [
         "Test Files  1 passed (1)",
-        "Tests  7 passed (7)"
+        "Tests  8 passed (8)"
       ],
-      "durationMs": 716
+      "durationMs": 723
     },
     "killed": true
   },
@@ -35,20 +35,20 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  1 failed | 6 passed (7)"
+        "Tests  1 failed | 7 passed (8)"
       ],
       "failingTests": [
-        "createSecret without values must refuse: every key is required and refuses change-me 2ms"
+        "createSecret without values must refuse: every key is required and refuses change-me 5ms"
       ],
-      "durationMs": 659
+      "durationMs": 924
     },
     "restored": {
       "exit": 0,
       "summary": [
         "Test Files  1 passed (1)",
-        "Tests  7 passed (7)"
+        "Tests  8 passed (8)"
       ],
-      "durationMs": 659
+      "durationMs": 1053
     },
     "killed": true
   },
@@ -64,9 +64,9 @@
         "Tests  1 failed | 2 passed (3)"
       ],
       "failingTests": [
-        "the ConfigMap sets AMC_CORS_ALLOWED_ORIGINS from the Service origin the test pod calls 6ms"
+        "the ConfigMap sets AMC_CORS_ALLOWED_ORIGINS from the Service origin the test pod calls 9ms"
       ],
-      "durationMs": 638
+      "durationMs": 785
     },
     "restored": {
       "exit": 0,
@@ -74,7 +74,7 @@
         "Test Files  1 passed (1)",
         "Tests  3 passed (3)"
       ],
-      "durationMs": 635
+      "durationMs": 708
     },
     "killed": true
   },
@@ -87,20 +87,20 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  1 failed | 5 passed (6)"
+        "Tests  1 failed | 8 passed (9)"
       ],
       "failingTests": [
         "admits the probe's 127.0.0.1 host: docker run sets AMC_CORS_ALLOWED_ORIGINS for the published port 3ms"
       ],
-      "durationMs": 714
+      "durationMs": 712
     },
     "restored": {
       "exit": 0,
       "summary": [
         "Test Files  1 passed (1)",
-        "Tests  6 passed (6)"
+        "Tests  9 passed (9)"
       ],
-      "durationMs": 650
+      "durationMs": 822
     },
     "killed": true
   },
@@ -116,10 +116,10 @@
         "Tests  2 failed | 5 passed (7)"
       ],
       "failingTests": [
-        "--json names each contract credential as {present, requiredFor, configureAt} and exits 1 when absent 67ms",
-        "never prints a value in text or JSON mode, even when every credential is set 121ms"
+        "--json names each contract credential as {present, requiredFor, configureAt} and exits 1 when absent 75ms",
+        "never prints a value in text or JSON mode, even when every credential is set 156ms"
       ],
-      "durationMs": 1297
+      "durationMs": 1511
     },
     "restored": {
       "exit": 0,
@@ -127,7 +127,7 @@
         "Test Files  1 passed (1)",
         "Tests  7 passed (7)"
       ],
-      "durationMs": 1395
+      "durationMs": 2305
     },
     "killed": true
   },
@@ -145,7 +145,7 @@
       "failingTests": [
         "states the B4 live-deployment gate and 'wait for an explicit yes' inside the B4 section 4ms"
       ],
-      "durationMs": 642
+      "durationMs": 813
     },
     "restored": {
       "exit": 0,
@@ -153,7 +153,7 @@
         "Test Files  1 passed (1)",
         "Tests  3 passed (3)"
       ],
-      "durationMs": 651
+      "durationMs": 723
     },
     "killed": true
   },
@@ -166,20 +166,20 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  1 failed | 6 passed (7)"
+        "Tests  1 failed | 7 passed (8)"
       ],
       "failingTests": [
         "pods that mount secrets at /run/secrets do not automount the service-account token 3ms"
       ],
-      "durationMs": 761
+      "durationMs": 1026
     },
     "restored": {
       "exit": 0,
       "summary": [
         "Test Files  1 passed (1)",
-        "Tests  7 passed (7)"
+        "Tests  8 passed (8)"
       ],
-      "durationMs": 720
+      "durationMs": 1108
     },
     "killed": true
   },
@@ -195,9 +195,9 @@
         "Tests  1 failed | 7 passed (8)"
       ],
       "failingTests": [
-        "every deploy-pack CLI still runs when started through a symlink (Kubernetes mounts ConfigMap files as symlinks) 430ms"
+        "every deploy-pack CLI still runs when started through a symlink (Kubernetes mounts ConfigMap files as symlinks) 528ms"
       ],
-      "durationMs": 2466
+      "durationMs": 3314
     },
     "restored": {
       "exit": 0,
@@ -205,7 +205,7 @@
         "Test Files  1 passed (1)",
         "Tests  8 passed (8)"
       ],
-      "durationMs": 2273
+      "durationMs": 4804
     },
     "killed": true
   },
@@ -218,21 +218,21 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  2 failed | 4 passed (6)"
+        "Tests  2 failed | 5 passed (7)"
       ],
       "failingTests": [
-        "claims a one-time pairing code before login when Studio's LAN mode requires pairing 6ms",
+        "claims a one-time pairing code before login when Studio's LAN mode requires pairing 18ms",
         "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 2ms"
       ],
-      "durationMs": 868
+      "durationMs": 1302
     },
     "restored": {
       "exit": 0,
       "summary": [
         "Test Files  1 passed (1)",
-        "Tests  6 passed (6)"
+        "Tests  7 passed (7)"
       ],
-      "durationMs": 1015
+      "durationMs": 1292
     },
     "killed": true
   },
@@ -245,13 +245,303 @@
       "exit": 1,
       "summary": [
         "Test Files  1 failed (1)",
-        "Tests  2 failed | 4 passed (6)"
+        "Tests  2 failed | 5 passed (7)"
       ],
       "failingTests": [
         "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 2ms",
         "waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503) 3ms"
       ],
-      "durationMs": 940
+      "durationMs": 1169
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 1412
+    },
+    "killed": true
+  },
+  {
+    "id": "M11",
+    "mutation": "review guard 1: drop the closed-and-sealed target check in the live scope",
+    "file": "src/agent/runReport.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 19 passed (20)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: in the live scope the target itself must be closed and sealed 386ms"
+      ],
+      "durationMs": 14244
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  20 passed (20)"
+      ],
+      "durationMs": 10193
+    },
+    "killed": true
+  },
+  {
+    "id": "M12",
+    "mutation": "review guard 2: let a verified prefix set ok",
+    "file": "src/agent/runReport.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 18 passed (20)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: every row of an unfinalized session is still checked, and a stripped seal is named 1061ms",
+        "P0-14: beside a live gateway the complete verdict fails; the live scope gives a verified prefix, never ok 406ms"
+      ],
+      "durationMs": 10774
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  20 passed (20)"
+      ],
+      "durationMs": 10342
+    },
+    "killed": true
+  },
+  {
+    "id": "M13",
+    "mutation": "fail-open review: live scope on any marker except jsonl",
+    "file": "src/agent/runReport.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 19 passed (20)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: the live scope needs a positive SQLite store marker; unknown or missing evidence fails closed 316ms"
+      ],
+      "durationMs": 14203
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  20 passed (20)"
+      ],
+      "durationMs": 11237
+    },
+    "killed": true
+  },
+  {
+    "id": "M14",
+    "mutation": "review guard 4: skip row checks in the live scope",
+    "file": "src/ledger/ledgerVerification.ts",
+    "test": "tests/agentLoopReconstructable.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 19 passed (20)"
+      ],
+      "failingTests": [
+        "NEGATIVE P0-14: every row of an unfinalized session is still checked, and a stripped seal is named 294ms"
+      ],
+      "durationMs": 10762
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  20 passed (20)"
+      ],
+      "durationMs": 10663
+    },
+    "killed": true
+  },
+  {
+    "id": "M15",
+    "mutation": "review guard 2: Studio reports a prefix as externally-anchored",
+    "file": "src/studio/nativeTaskVerdict.ts",
+    "test": "tests/nativeTaskVerdict.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 1 passed (3)"
+      ],
+      "failingTests": [
+        "is the only place the live scope is enabled, and a thrown verifier is failed, not verified 1ms",
+        "maps a complete anchored verification and a verified prefix to different states 6ms"
+      ],
+      "durationMs": 2940
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)"
+      ],
+      "durationMs": 2203
+    },
+    "killed": true
+  },
+  {
+    "id": "M16",
+    "mutation": "fail-open review: accept a report without prefixVerified",
+    "file": "src/studio/nativeTaskVerdict.ts",
+    "test": "tests/nativeTaskVerdict.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 2 passed (3)"
+      ],
+      "failingTests": [
+        "fails closed on an unanchored prefix, a failed prefix and every inconsistent or unexpected shape 4ms"
+      ],
+      "durationMs": 2068
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)"
+      ],
+      "durationMs": 2109
+    },
+    "killed": true
+  },
+  {
+    "id": "M17",
+    "mutation": "fail-open review: let a thrown verifier escape the verdict",
+    "file": "src/studio/nativeTaskVerdict.ts",
+    "test": "tests/nativeTaskVerdict.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 2 passed (3)"
+      ],
+      "failingTests": [
+        "is the only place the live scope is enabled, and a thrown verifier is failed, not verified 3ms"
+      ],
+      "durationMs": 2202
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)"
+      ],
+      "durationMs": 2073
+    },
+    "killed": true
+  },
+  {
+    "id": "M18",
+    "mutation": "review guard 3: verify body schema accepts unknown fields",
+    "file": "src/api/nativeTasksRouter.ts",
+    "test": "tests/cosProduct10NativeTasksRouter.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 7 passed (8)"
+      ],
+      "failingTests": [
+        "P0-14: no request body, query string or header can enable the live verification scope 5ms"
+      ],
+      "durationMs": 4728
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  8 passed (8)"
+      ],
+      "durationMs": 4492
+    },
+    "killed": true
+  },
+  {
+    "id": "M19",
+    "mutation": "review guard 2: probe reports a prefix as verified",
+    "file": "scripts/deploy/governed-turn-probe.mjs",
+    "test": "tests/deployPackProbe.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 5 passed (7)"
+      ],
+      "failingTests": [
+        "reports an anchored verified prefix as its own status, never as verified, and records what it covers 13ms",
+        "the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted 2ms"
+      ],
+      "durationMs": 1029
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  7 passed (7)"
+      ],
+      "durationMs": 1051
+    },
+    "killed": true
+  },
+  {
+    "id": "M20",
+    "mutation": "review guard 2: drill records every passing probe as verified",
+    "file": "scripts/deploy/rollback-drill.mjs",
+    "test": "tests/rollbackDrill.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  2 failed | 7 passed (9)"
+      ],
+      "failingTests": [
+        "fails closed on probe failure 1ms",
+        "passes a probe that verified a prefix and records that status, distinct from verified (P0-14) 4ms"
+      ],
+      "durationMs": 688
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  9 passed (9)"
+      ],
+      "durationMs": 833
+    },
+    "killed": true
+  },
+  {
+    "id": "M21",
+    "mutation": "review guard 2: console labels a prefix like a full verification",
+    "file": "src/console/assets/nativeTasksView.js",
+    "test": "tests/studioNativeTaskValidation.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 5 passed (6)"
+      ],
+      "failingTests": [
+        "P0-14: an anchored verdict over a verified prefix is its own state, never shown as a full verification 6ms"
+      ],
+      "durationMs": 4374
     },
     "restored": {
       "exit": 0,
@@ -259,7 +549,33 @@
         "Test Files  1 passed (1)",
         "Tests  6 passed (6)"
       ],
-      "durationMs": 1012
+      "durationMs": 5606
+    },
+    "killed": true
+  },
+  {
+    "id": "M22",
+    "mutation": "follow-up guard: the shared entrypoint helper compares the unresolved argv[1]",
+    "file": "scripts/lib/entrypoint.mjs",
+    "test": "tests/scriptEntrypoint.test.ts",
+    "mutated": {
+      "exit": 1,
+      "summary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 9 passed (10)"
+      ],
+      "failingTests": [
+        "isEntrypoint is true when a script is started directly or through a symlink, and false when imported 81ms"
+      ],
+      "durationMs": 1508
+    },
+    "restored": {
+      "exit": 0,
+      "summary": [
+        "Test Files  1 passed (1)",
+        "Tests  10 passed (10)"
+      ],
+      "durationMs": 1192
     },
     "killed": true
   }

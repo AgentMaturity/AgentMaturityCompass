@@ -1,6 +1,6 @@
 == install: helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 02:00:03 2026
+LAST DEPLOYED: Sun Oct 11 03:57:28 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
@@ -16,91 +16,11 @@ Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_H
 
 The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
 install exit=0
-== pair-1: pair
-pair-1 exit=0
-== test-1: helm test amc --logs --timeout 10m
-NAME: amc
-LAST DEPLOYED: Sun Oct 11 02:00:03 2026
-NAMESPACE: default
-STATUS: deployed
-REVISION: 1
-DESCRIPTION: Install complete
-TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 02:00:20 2026
-Last Completed: Sun Oct 11 02:00:20 2026
-Phase:          Succeeded
-TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 02:00:20 2026
-Last Completed: Sun Oct 11 02:00:25 2026
-Phase:          Failed
-
-POD LOGS: amc-amc-governed-turn (governed-turn)
-{
-  "kind": "amc.governed-turn-probe/1",
-  "status": "failed",
-  "failedStep": "verify",
-  "baseUrl": "http://amc-amc:3212",
-  "agentId": "default",
-  "taskId": "2f3891e39a481a9cdd39ad16dc7110e10e1481d50ae267171addac0d5a24318f",
-  "verification": "failed",
-  "steps": [
-    {
-      "id": "healthz",
-      "status": "passed",
-      "httpStatus": 200
-    },
-    {
-      "id": "readyz",
-      "status": "passed",
-      "httpStatus": 200
-    },
-    {
-      "id": "pair",
-      "status": "passed",
-      "httpStatus": 200
-    },
-    {
-      "id": "login",
-      "status": "passed",
-      "httpStatus": 200
-    },
-    {
-      "id": "csrf",
-      "status": "passed",
-      "httpStatus": 200
-    },
-    {
-      "id": "options",
-      "status": "passed",
-      "httpStatus": 200,
-      "agentId": "default"
-    },
-    {
-      "id": "submit",
-      "status": "passed",
-      "httpStatus": 202,
-      "taskId": "2f3891e39a481a9cdd39ad16dc7110e10e1481d50ae267171addac0d5a24318f"
-    },
-    {
-      "id": "turn",
-      "status": "passed",
-      "state": "idle",
-      "revision": 1
-    },
-    {
-      "id": "verify",
-      "status": "failed",
-      "detail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
-    }
-  ]
-}
-
-Error: resource Pod/default/amc-amc-governed-turn not ready. status: Failed, message: pod amc-amc-governed-turn failed
-test-1 exit=1
-== upgrade: helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
+== pin: pin
+monitor key sha256 6292ee7198d653e1966b4c84f497154803471aa5bf6da9c2e016b98ca68cdb29
 Release "amc" has been upgraded. Happy Helming!
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 02:00:25 2026
+LAST DEPLOYED: Sun Oct 11 03:57:46 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 2
@@ -115,37 +35,40 @@ Run the governed-turn check (logs in, runs a stub-provider native task, verifies
 Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
 
 The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
-upgrade exit=0
-== rollback: helm rollback amc 1 --wait --timeout 10m
-Rollback was a success! Happy Helming!
-rollback exit=0
-== pair-2: pair
-pair-2 exit=0
-== test-2: helm test amc --logs --timeout 10m
+pin exit=0
+== pair-1: pair
+pair-1 exit=0
+== test-1: helm test amc --logs --timeout 10m
 NAME: amc
-LAST DEPLOYED: Sun Oct 11 02:00:37 2026
+LAST DEPLOYED: Sun Oct 11 03:57:46 2026
 NAMESPACE: default
 STATUS: deployed
-REVISION: 3
-DESCRIPTION: Rollback to 1
+REVISION: 2
+DESCRIPTION: Upgrade complete
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 02:00:52 2026
-Last Completed: Sun Oct 11 02:00:52 2026
+Last Started:   Sun Oct 11 03:58:02 2026
+Last Completed: Sun Oct 11 03:58:02 2026
 Phase:          Succeeded
 TEST SUITE:     amc-amc-governed-turn
-Last Started:   Sun Oct 11 02:00:52 2026
-Last Completed: Sun Oct 11 02:00:57 2026
-Phase:          Failed
+Last Started:   Sun Oct 11 03:58:02 2026
+Last Completed: Sun Oct 11 03:58:08 2026
+Phase:          Succeeded
 
 POD LOGS: amc-amc-governed-turn (governed-turn)
 {
   "kind": "amc.governed-turn-probe/1",
-  "status": "failed",
-  "failedStep": "verify",
+  "status": "verified-prefix",
+  "failedStep": null,
   "baseUrl": "http://amc-amc:3212",
   "agentId": "default",
-  "taskId": "17622a160472b4b2f20af10b25f246f64508d1c145b9ce0a61b27b1a44a57a61",
-  "verification": "failed",
+  "taskId": "c30e85d74a4d60a4e8b649236e728be27defbb248142c349c1f67f14e174f31b",
+  "verification": "anchored-prefix",
+  "verificationScope": {
+    "scope": "verified-prefix",
+    "unfinalizedSessions": [
+      "852a1d42-d779-41a5-b802-dfbfde066503"
+    ]
+  },
   "steps": [
     {
       "id": "healthz",
@@ -182,7 +105,7 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
       "id": "submit",
       "status": "passed",
       "httpStatus": 202,
-      "taskId": "17622a160472b4b2f20af10b25f246f64508d1c145b9ce0a61b27b1a44a57a61"
+      "taskId": "c30e85d74a4d60a4e8b649236e728be27defbb248142c349c1f67f14e174f31b"
     },
     {
       "id": "turn",
@@ -192,11 +115,134 @@ POD LOGS: amc-amc-governed-turn (governed-turn)
     },
     {
       "id": "verify",
-      "status": "failed",
-      "detail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
+      "status": "passed",
+      "httpStatus": 200,
+      "state": "closed",
+      "verification": "anchored-prefix",
+      "verificationScope": {
+        "scope": "verified-prefix",
+        "unfinalizedSessions": [
+          "852a1d42-d779-41a5-b802-dfbfde066503"
+        ]
+      }
     }
   ]
 }
 
-Error: resource Pod/default/amc-amc-governed-turn not ready. status: Failed, message: pod amc-amc-governed-turn failed
-test-2 exit=1
+test-1 exit=0
+== upgrade: helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
+Release "amc" has been upgraded. Happy Helming!
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 03:58:09 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+upgrade exit=0
+== rollback: helm rollback amc 2 --wait --timeout 10m
+Rollback was a success! Happy Helming!
+rollback exit=0
+== pair-2: pair
+pair-2 exit=0
+== test-2: helm test amc --logs --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 03:58:21 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+DESCRIPTION: Rollback to 2
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 03:58:35 2026
+Last Completed: Sun Oct 11 03:58:35 2026
+Phase:          Succeeded
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 03:58:35 2026
+Last Completed: Sun Oct 11 03:58:40 2026
+Phase:          Succeeded
+
+POD LOGS: amc-amc-governed-turn (governed-turn)
+{
+  "kind": "amc.governed-turn-probe/1",
+  "status": "verified-prefix",
+  "failedStep": null,
+  "baseUrl": "http://amc-amc:3212",
+  "agentId": "default",
+  "taskId": "09d0bb17dc27e4e1093d32d97fb66d8e5ad19635771aba207fa9695f7e68154f",
+  "verification": "anchored-prefix",
+  "verificationScope": {
+    "scope": "verified-prefix",
+    "unfinalizedSessions": [
+      "03f661aa-b328-44ce-acdc-3f63825bb166"
+    ]
+  },
+  "steps": [
+    {
+      "id": "healthz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "readyz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "pair",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "login",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "csrf",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "options",
+      "status": "passed",
+      "httpStatus": 200,
+      "agentId": "default"
+    },
+    {
+      "id": "submit",
+      "status": "passed",
+      "httpStatus": 202,
+      "taskId": "09d0bb17dc27e4e1093d32d97fb66d8e5ad19635771aba207fa9695f7e68154f"
+    },
+    {
+      "id": "turn",
+      "status": "passed",
+      "state": "idle",
+      "revision": 1
+    },
+    {
+      "id": "verify",
+      "status": "passed",
+      "httpStatus": 200,
+      "state": "closed",
+      "verification": "anchored-prefix",
+      "verificationScope": {
+        "scope": "verified-prefix",
+        "unfinalizedSessions": [
+          "03f661aa-b328-44ce-acdc-3f63825bb166"
+        ]
+      }
+    }
+  ]
+}
+
+test-2 exit=0

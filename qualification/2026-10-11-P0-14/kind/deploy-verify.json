@@ -6,24 +6,24 @@
   "route": "/local",
   "model": "gpt-test",
   "agentId": "default",
-  "verifierCommit": "7f98c42fe24973a478042a19943ed9f527d05d9f",
-  "verifierTreeDirty": true,
+  "verifierCommit": "8d665f17330869d0853296a1e1da4a7a9d94e03c",
+  "verifierTreeDirty": false,
   "targetReportedVersion": "1.2.0",
   "environment": {
     "node": "v25.5.0",
     "platform": "darwin",
     "arch": "arm64"
   },
-  "startedAt": "2026-10-10T20:31:00.121Z",
-  "finishedAt": "2026-10-10T20:31:00.296Z",
-  "durationMs": 175,
+  "startedAt": "2026-10-10T22:31:51.915Z",
+  "finishedAt": "2026-10-10T22:31:52.138Z",
+  "durationMs": 223,
   "receipt": {
-    "receiptId": "60be42ef-6b71-4f32-8f51-e809617a5c7f",
+    "receiptId": "d142f2a5-b447-40b3-b182-9683cec588df",
     "kind": "llm_response",
-    "ts": 1791664260373,
-    "sessionId": "d2cab7c9-ac26-4439-8928-391dd21e4b7a",
-    "eventHash": "c0dbc9c85b12983ef1a9f1ed7bf2d083c7f708e976c5c101b9bf690d261b60eb",
-    "receiptSha256": "8f4877029cce57a9657d4a6ab1dc9debc0c61c4e2927560419da72539e729d9b"
+    "ts": 1791671512150,
+    "sessionId": "03f661aa-b328-44ce-acdc-3f63825bb166",
+    "eventHash": "cb9b4c461721b2c7c7aa6440163f10728eec52478ed4caf277dbe2b9f5fd703d",
+    "receiptSha256": "d59fa7f132ce31b2a6cbcd24261da60641f1dff2f31b8171d8f3969af79b5bb8"
   },
   "requiredChecks": [
     "health",
@@ -37,26 +37,26 @@
     {
       "name": "health",
       "status": "PASS",
-      "durationMs": 71,
+      "durationMs": 33,
       "detail": "/healthz 200 status=ok version=1.2.0"
     },
     {
       "name": "readiness",
       "status": "PASS",
-      "durationMs": 32,
+      "durationMs": 86,
       "detail": "/readyz 200 READY"
     },
     {
       "name": "governed-turn",
       "status": "PASS",
-      "durationMs": 65,
+      "durationMs": 101,
       "detail": "gateway 200 with x-amc-receipt"
     },
     {
       "name": "receipt-signature",
       "status": "PASS",
-      "durationMs": 4,
-      "detail": "Ed25519 signature verifies against pinned key; receipt_id=60be42ef-6b71-4f32-8f51-e809617a5c7f"
+      "durationMs": 1,
+      "detail": "Ed25519 signature verifies against pinned key; receipt_id=d142f2a5-b447-40b3-b182-9683cec588df"
     },
     {
       "name": "receipt-binding",
