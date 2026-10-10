@@ -193,10 +193,22 @@ function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateR
 }
 
 /**
+ * Settles the lost attempts of `effect` on `gateId` (the sweeper's liveness rule, as retryEffect settles them first), so
+ * a re-open's EFFECT_RUNNING refusal names only an attempt that may still be running; returns how many rows that wrote.
+ */
+function sweepGateAttempts(store: A4Store, projectId: string, gateId: string, effect: string): number {
+  const executions = new Set(store.readChain(projectId).filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gateId && link.body.effect === effect)
+    .map((link) => String(link.body.executionId)));
+  return [...executions].reduce((count, executionId) => count + sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId }).length, 0);
+}
+
+/**
  * Opens (or re-opens) an effect gate (owner): a second engine request, created with `quorumFloor { requiredApprovals: 2,
  * requireDistinctUsers: true }` when the project is regulated, and an EFFECT_GATE_OPENED transition naming it. Only on
  * the gate the effect `completes`, named under its own stage: `complete` runs whatever effect is opened on the gate, so
- * any other effect would stand in for the stage's own (409 A4_STEP_ORDER).
+ * any other effect would stand in for the stage's own (409 A4_STEP_ORDER). Lost attempts of the effect on the gate are
+ * settled first (process_lost), so a crashed executor never holds the re-open path shut; the head the client saw moves
+ * by exactly those rows.
  * ponytail: the engine request is written before the project lock (files and a signature); one whose transition then
  * fails stays PENDING until it expires and is never consumed.
  */
@@ -205,6 +217,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   const def = effectDef(input.effectId);
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
+  const swept = sweepGateAttempts(store, projectId, input.gateId, def.id);
   const now = Date.now();
   const state0 = loadA4State(store, projectId, now);
   const gate0 = gateRowOf(state0, input.gateId);
@@ -223,7 +236,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   // The digest an approver binds a decision to from the A4 card (decideApprovalInStudio's bound path), read back verified.
   const requestDigestSha256 = approvalRequestBindingDigest(loadApprovalRequestRecord({ workspace: store.workspace, agentId: state0.project.agent_id,
     approvalRequestId, requireValidSignature: true }));
-  return governed(store, projectId, principal, input, (_ts, load) => {
+  return governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (_ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
