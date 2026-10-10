@@ -51,6 +51,11 @@
       "sha256": "f4ce96bbd89cdd690d4ec3aaa7b6f35e2463418284e5e5b8d0e56ec110092616"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
+      "name": "a4-record.schema.json",
+      "sha256": "abdcc82c10fe5a19b170ba1f0886e3a16cc4de902bc86608d8bbd823527c3ca0"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-release.schema.json",
       "name": "a4-release.schema.json",
       "sha256": "1e2ef794a7d80ac73c78d0026ff97fe4e73964e2a8aec6846ce18262d21bffcd"

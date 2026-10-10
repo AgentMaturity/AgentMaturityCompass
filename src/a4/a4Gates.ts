@@ -32,10 +32,10 @@ import {
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
   type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
-import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
+import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import {
   A4StoreError, collectLiveFacts, refreshVolatileFacts, type A4Actor, type A4ChangeSpec, type A4RequestKey, type A4Store, type A4TransitionOptions,
@@ -87,9 +87,10 @@ const parseList = (json: string): string[] => JSON.parse(json) as string[];
 /**
  * Slot recomputers (design §8): A4 recomputes a producer's digest only to compare it. Stage lanes add theirs; a filled
  * slot without one counts as drifted (fail closed). A recomputer answers null exactly when the resource is absent, the
- * value a revision binds for it then, and throws when it cannot be read. The gate-policy slot is bound through the intent.
+ * value a revision binds for it then, and throws when it cannot be read; per-agent resources read the project's agent.
+ * The gate-policy slot is bound through the intent.
  */
-export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null> = {
+export const RESOURCE_SLOTS: Record<string, (workspace: string, agentId: string) => string | null> = {
   "signedConfigs.tools": (workspace) => fileSha(join(workspace, ".amc", "tools.yaml")),
   "signedConfigs.approvalPolicy": (workspace) => fileSha(join(workspace, ".amc", "approval-policy.yaml")),
   "signedConfigs.budgets": (workspace) => fileSha(join(workspace, ".amc", "budgets.yaml")),
@@ -98,26 +99,18 @@ export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null
   "signedConfigs.firewall": (workspace) => fileSha(runtimeFirewallPolicyPath(workspace))
 };
 
-/** A4ResourceDigests as `group.slot` → value. */
-export function flatSlots(digests: unknown, prefix = ""): Record<string, string | null> {
-  if (digests === null || typeof digests !== "object") return {};
-  return Object.fromEntries(Object.entries(digests as Record<string, unknown>).filter(([key]) => key !== "schema" && key !== "gatePolicyDigest")
-    .flatMap(([key, value]) => value !== null && typeof value === "object" ? Object.entries(flatSlots(value, `${prefix}${key}.`))
-      : [[`${prefix}${key}`, typeof value === "string" ? value : null]]));
-}
-
 /**
  * Slots whose live recomputation differs from the bound value, including a recomputable slot bound null (a signed config
  * absent at propose) whose resource now exists, and one that cannot be read now; a filled slot nothing can recompute
  * counts too. Only an unfilled slot with no recomputer (not produced) is skipped. Decide, complete and the executor
  * preamble all read this.
  */
-export function driftedSlots(workspace: string, slots: Record<string, string | null>): string[] {
+export function driftedSlots(workspace: string, slots: Record<string, string | null>, agentId: string): string[] {
   return Object.entries(slots).filter(([slot, value]) => {
     const recompute = RESOURCE_SLOTS[slot];
     if (recompute === undefined) return value !== null;
     try {
-      return recompute(workspace) !== value;
+      return recompute(workspace, agentId) !== value;
     } catch {
       return true; // unreadable data never reads as unchanged
     }
@@ -199,7 +192,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
     integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
-    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : [],
+    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json)), state.project.agent_id) : [],
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
@@ -348,8 +341,7 @@ export function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: 
   requesterKey: string; specDigest: string; boundItemIds: readonly string[] }, readiness: A4ReadinessV1): A4IntentV1 {
   const revision = state.revisions.find((row) => row.revision_no === gate.revisionNo) ?? null;
   // A policy gate approves the proposed policy, whose author is its requester, not the head revision (design §5.3).
-  const author = gate.gate === "policy" ? null : authorOf(state.chain, gate.revisionNo);
-  const excluded = [gate.requesterKey, ...(author === null ? [] : [author]), ...(gate.gate === "completion" ? buildersOf(state.chain, gate.revisionNo) : [])];
+  const excluded = [gate.requesterKey, ...authorsOf(state.chain, gate), ...(gate.gate === "completion" ? buildersOf(state.chain, gate.revisionNo) : [])];
   return a4IntentV1Schema.parse({
     schema: "amc.a4-intent/v1", projectId: state.project.project_id, stage: gate.stage, gate: gate.gate, revisionNo: gate.revisionNo,
     specDigest: gate.specDigest, resourceDigests: revision ? flatSlots(JSON.parse(revision.resource_digests_json)) : {},
@@ -595,7 +587,8 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     // store.integrity is bound from the incremental check at request and decide but from the full verifier here, so a
     // failure only the full verifier finds would otherwise read as a moved readiness digest; answer what GET shows.
     if (!readiness.integrity.valid) assertAllowed(readiness, "progress");
-    assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
+    // Expiry at the commit ts GATE_CONSUMED records too, the instant a verifier counts the quorum at.
+    assertGateLive(state, row, gate, readiness, query.live.driftedSlots, Math.max(now, ts));
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
     assertReviewsMet(state, gate);
     assertAllowed(readiness, "progress");
@@ -619,14 +612,14 @@ export function changeGatePolicy(store: A4Store, projectId: string, input: A4Cal
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 gate-policy");
   const now = Date.now();
-  return governed(store, projectId, principal, input, (_ts, load) => {
+  return governed(store, projectId, principal, input, (ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const proposal = proposalOf(state, row.gate_id);
     if (row.gate !== "policy" || proposal === null) throw fail(409, "A4_STEP_ORDER", "That is not a policy gate.");
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     const gate = gateStatus(state, row, query.policy, now);
-    assertGateLive(state, row, gate, readiness, [], now);
+    assertGateLive(state, row, gate, readiness, [], Math.max(now, ts));
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
     assertReviewsMet(state, gate);
     assertAllowed(readiness, "changeGatePolicy");

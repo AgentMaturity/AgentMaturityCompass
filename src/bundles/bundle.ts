@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { BundleManifest, DiagnosticReport, EvidenceEvent } from "../types.js";
 import { exportSessionSpills } from "../session/spill/spillLifecycle.js";
 import { restoreBundleSpills, trustTierByEventIdFromBundle } from "./bundleEvidence.js";
+import { copyA4Slice } from "./bundleA4.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -35,7 +36,6 @@ const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
   maxTotalBytes: 512 * 1024 * 1024,
   maxPathBytes: 1024,
 };
-
 
 interface BundleManifestSignature {
   manifestSha256: string;
@@ -725,7 +725,7 @@ export function exportEvidenceBundle(params: {
 
     const sourceDbPath = join(params.workspace, ".amc", "evidence.sqlite");
     const outputDbPath = join(root, "evidence", "evidence.sqlite");
-    const copied = copyEvidenceSlice({ sourceDbPath, outputDbPath, report });
+    const copied = copyA4Slice({ workspace: params.workspace, root, agentId, slice: copyEvidenceSlice({ sourceDbPath, outputDbPath, report }) });
 
     // Transport authenticated encrypted objects, never vault keys or legacy
     // plaintext. The signed bundle manifest includes this index and its gaps.

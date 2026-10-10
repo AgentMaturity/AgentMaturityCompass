@@ -1,0 +1,45 @@
+{
+  "list": {
+    "type": "amc.trust-list",
+    "version": 1,
+    "listId": "a4-record-fixtures",
+    "sequence": 1,
+    "issuedAt": "2026-10-10T00:00:00.000Z",
+    "expiresAt": "2036-01-01T00:00:00.000Z",
+    "entries": [
+      {
+        "keyId": "212ba4e337d359a3dd1f80479cc709048f71c6371a8f4b8cfdf74317a84afc3f",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARPGnzT0wcpihEtfjjRzgQKxLKt8cl4bGyYVvWzB0cXU=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "ledger-row",
+          "receipt"
+        ],
+        "subject": "A4 fixture workspace monitor",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": null,
+        "source": "operator"
+      },
+      {
+        "keyId": "5633b43c1ea764f40723f5e9137318195988f377a635346fa7437fceda6b00dc",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+vciagkQI3YwfYbHPv4RHmI6SJyUq6ubug3XMnKTi50=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "artifact-seal"
+        ],
+        "subject": "A4 fixture workspace auditor",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": null,
+        "source": "operator"
+      }
+    ],
+    "distrust": []
+  },
+  "signatures": [
+    {
+      "keyId": "5988650df5b5d141b97ad0b143cf29de62c5b35124db62194fa77a72f898dfde",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA9kjnw78R+55qmYXTU7+U0dmzZ8Dr4CO7KjV+j2ZHqEA=\n-----END PUBLIC KEY-----\n",
+      "signature": "4ggqT+F1vKAWisLhp55n0n+2GRsjoRq3FII0QK3o5jTC6DVzQyL4ydiXf99zGLAGXyHqLbEWQ+bTTM4r4efaDg=="
+    }
+  ]
+}

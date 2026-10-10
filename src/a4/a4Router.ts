@@ -10,6 +10,7 @@
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
+import { join } from "node:path";
 import { z, ZodError } from "zod";
 import { approvalDecisionSchema, approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -38,7 +39,8 @@ import { gateStatus, type A4Action, type A4ReadinessState } from "./a4Readiness.
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, type A4Member, type A4Principal, type A4ProjectRow, type A4Stage
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, type A4Member, type A4Principal,
+  type A4ProjectRow, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -50,10 +52,6 @@ const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
 /** Never read from a body: identity comes from the session, trust from the operator (design §12.1, §16 rule 1). */
 const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "approvalId", "token"];
 
-/** The A4 preview gate (D-20): every A4 route and page stays absent unless the operator set AMC_A4_PREVIEW=1. */
-export function a4PreviewEnabled(): boolean {
-  return process.env.AMC_A4_PREVIEW === "1";
-}
 
 /** One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. */
 export interface A4Route {
@@ -278,7 +276,7 @@ const createSchema = z.strictObject({
 
 /**
  * POST /projects (design §12.1): a human session with a live OPERATOR or OWNER role (the store checks it again); a
- * project for an agent that already exists needs OWNER (`AgentConfig` names no owner and `signAgentConfig` records no
+ * project for an agent that already exists (its config, context graph or target profile is on disk) needs OWNER (`AgentConfig` names no owner and `signAgentConfig` records no
  * signer, so nobody else can show a claim on it), so one OPERATOR cannot fill every agent's slot.
  */
 async function createProject(route: A4Route): Promise<void> {
@@ -291,7 +289,10 @@ async function createProject(route: A4Route): Promise<void> {
   const agentId = body.agentId ?? `${slug}-${randomBytes(3).toString("hex")}`;
   let existing = true;
   try {
-    existing = pathExists(getAgentPaths(route.workspace, agentId).agentConfig);
+    // Any of the agent's own files makes it existing: the root default agent of `amc init` has a context graph and a
+    // signed target profile but no agent config, and Aspire's Build re-signs what it finds (src/a4/stages/aspire.ts).
+    const paths = getAgentPaths(route.workspace, agentId);
+    existing = [paths.agentConfig, paths.contextGraph, join(paths.targetsDir, "default.target.json")].some((path) => pathExists(path));
   } catch {
     // An agent the fleet cannot resolve is treated as existing: OWNER only.
   }
@@ -640,6 +641,11 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
 function verifyRead(route: A4Route, projectId: string): true {
   const { store, principal } = route;
   assertQuery(route.params, []);
+  // Nor a body: one naming a trust list (or anything else) is refused rather than silently ignored (P1-63).
+  const headers = route.req.headers ?? {};
+  if (headers["transfer-encoding"] !== undefined || Number(headers["content-length"] ?? 0) > 0) {
+    throw a4Fail(400, "INPUT_INVALID", "This route takes no body; verification trust comes only from the server operator's trust list.");
+  }
   let head: A4ProjectRow | null | undefined;
   try {
     head = store.readHead(projectId);
