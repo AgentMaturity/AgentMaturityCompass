@@ -192,12 +192,10 @@ function reply(id: WireId, error: { code: WireErrorCode; message: string }): Buf
 /**
  * The revoked lease ids, or null when the list cannot be trusted.
  *
- * `revokedLeaseIdSet` (../leases/leaseStore.ts) returns an EMPTY SET when the
- * signature does not verify, which reads as "nothing is revoked" -- so tampering
- * with that one file un-revokes every lease ever revoked. That is a fail-OPEN
- * answer to a security question, and this surface will not inherit it. Here an
- * unverifiable list is a refusal: null means no lease is accepted at all, which
- * is loud, safe, and fixable by re-signing.
+ * An unverifiable list (missing, tampered, unsigned or unparseable) is a
+ * refusal here: null means no lease is accepted at all, which is loud, safe and
+ * fixable with `amc lease resign-revocations`. `revokedLeaseIdSet`
+ * (../leases/leaseStore.ts) fails closed the same way: it throws.
  */
 function revokedLeaseIds(workspace: string): Set<string> | null {
   const signature = verifyLeaseRevocationsSignature(workspace);

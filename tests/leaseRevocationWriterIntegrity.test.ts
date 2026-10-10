@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { leaseRevocationPaths, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "../src/leases/leaseStore.js";
-import { revokeLeaseForCli, resignLeaseRevocationsForCli } from "../src/leases/leaseCli.js";
+import { ensureLeaseRevocationStore, revokeLeaseForCli, resignLeaseRevocationsForCli } from "../src/leases/leaseCli.js";
 
 // Temporary signed-store fixtures, authored only. No production revocation or
 // repair is performed; future source tests do not constitute installed proof.
@@ -70,6 +70,30 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     expect(() => revokeLease(root, "next-id", "signer unavailable")).toThrow();
     expect(snapshot(root)).toEqual(before);
+  });
+  it("lease issue bootstrap with the signer unavailable leaves no unsigned store behind (P0-30)", () => {
+    const root = workspace();
+    const paths = leaseRevocationPaths(root);
+    rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
+    expect(() => ensureLeaseRevocationStore(root)).toThrow(/locked/i);
+    expect(snapshot(root)).toEqual({ list: null, signature: null });
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-revocation-writer-fixture");
+    expect(ensureLeaseRevocationStore(root).signatureValid).toBe(true);
+  });
+  it.each(["revoke", "resign", "bootstrap"] as const)("%s refuses to publish a pair that would not verify (P0-30)", variant => {
+    const root = workspace();
+    if (variant === "bootstrap") {
+      const paths = leaseRevocationPaths(root);
+      rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    } else revokeLease(root, "older-revoked", "must remain revoked");
+    const before = snapshot(root);
+    lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); vi.stubEnv("AMC_NO_SIGN", "1"); // ephemeral signer
+    const publish = variant === "revoke" ? () => revokeLease(root, "next-id", "unverifiable signer")
+      : variant === "resign" ? () => resignLeaseRevocationsForCli(root) : () => ensureLeaseRevocationStore(root);
+    expect(publish).toThrow(/would not verify/);
+    expect(snapshot(root)).toEqual(before);
+    if (variant !== "bootstrap") expect(revokedLeaseIdSet(root)).toEqual(new Set(["older-revoked"]));
   });
   it("leaves the deliberate reviewed repair path separate from ordinary revocation", () => {
     const root = workspace(); revokeLease(root, "older-revoked", "preserve");

@@ -1,7 +1,8 @@
-import { mkdirSync, readFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
-import { pathExists, writeFileAtomic } from "../utils/fs.js";
+import { pathExists } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { sha256Hex } from "../utils/hash.js";
 import { leaseRevocationsSchema, type LeaseRevocations } from "./leaseSchema.js";
@@ -37,29 +38,49 @@ export function loadLeaseRevocations(workspace: string): LeaseRevocations {
   return leaseRevocationsSchema.parse(JSON.parse(readFileSync(paths.file, "utf8")) as unknown);
 }
 
+/**
+ * Sign and publish exact list bytes. Nothing on disk changes unless the prepared signature verifies against the
+ * auditor key history (a locked vault or an AMC_NO_SIGN ephemeral key refuses here). Both files are written to
+ * temporary names first, then renamed list-first; a crash between the two renames leaves a pair that every
+ * consumer refuses until `amc lease resign-revocations` (docs/LEASES.md). Callers hold the revocations lock.
+ */
+function publishSignedRevocations(workspace: string, bytes: Buffer): void {
+  const paths = leaseRevocationPaths(workspace);
+  const digest = sha256Hex(bytes);
+  const signed: SignedDigest = {
+    digestSha256: digest,
+    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signedTs: Date.now(),
+    signer: "auditor"
+  };
+  if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) {
+    throw new Error("lease revocation signature would not verify against the auditor key history; nothing was published");
+  }
+  mkdirSync(dirname(paths.file), { recursive: true });
+  const suffix = `.${randomBytes(6).toString("hex")}.tmp`;
+  const temporary = { file: `${paths.file}${suffix}`, sig: `${paths.sig}${suffix}` };
+  try {
+    writeFileSync(temporary.file, bytes, { mode: 0o644 });
+    writeFileSync(temporary.sig, JSON.stringify(signed, null, 2), { mode: 0o644 });
+    renameSync(temporary.file, paths.file);
+    renameSync(temporary.sig, paths.sig);
+  } finally {
+    rmSync(temporary.file, { force: true });
+    rmSync(temporary.sig, { force: true });
+  }
+  const published = verifyLeaseRevocationsSignature(workspace);
+  if (!published.valid) throw new Error(`lease revocation store does not verify after publishing (${published.reason ?? "unknown"})`);
+}
+
 export function signLeaseRevocations(workspace: string): string {
   const paths = leaseRevocationPaths(workspace);
-  if (!pathExists(paths.file)) {
-    mkdirSync(dirname(paths.file), { recursive: true });
-    writeFileAtomic(paths.file, JSON.stringify(defaultLeaseRevocations(), null, 2), 0o644);
-  }
-  const digest = sha256Hex(readFileSync(paths.file));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-  writeFileAtomic(
-    paths.sig,
-    JSON.stringify(
-      {
-        digestSha256: digest,
-        signature,
-        signedTs: Date.now(),
-        signer: "auditor"
-      } satisfies SignedDigest,
-      null,
-      2
-    ),
-    0o644
-  );
-  return paths.sig;
+  return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
+    const bytes = pathExists(paths.file)
+      ? readFileSync(paths.file)
+      : Buffer.from(JSON.stringify(defaultLeaseRevocations(), null, 2), "utf8");
+    publishSignedRevocations(workspace, bytes);
+    return paths.sig;
+  } });
 }
 
 export function verifyLeaseRevocationsSignature(workspace: string): {
@@ -143,15 +164,7 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
         }
       ]
     });
-    const bytes = JSON.stringify(next, null, 2);
-    const digest = sha256Hex(Buffer.from(bytes, "utf8"));
-    // Prepare the intended signature before publishing either file. Signer failure
-    // must not replace the old list while leaving its previous signature behind.
-    const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-    const signed: SignedDigest = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
-    mkdirSync(dirname(paths.file), { recursive: true });
-    writeFileAtomic(paths.file, bytes, 0o644);
-    writeFileAtomic(paths.sig, JSON.stringify(signed, null, 2), 0o644);
+    publishSignedRevocations(workspace, Buffer.from(JSON.stringify(next, null, 2), "utf8"));
     return next;
   } });
 }
