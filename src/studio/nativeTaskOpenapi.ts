@@ -120,7 +120,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] }
     }),
     NativeTaskVerificationScope: { ...object({ scope: { type: "string", enum: ["complete-ledger", "verified-prefix"] },
-      unfinalizedSessions: { type: "array", maxItems: 64, items: string } }),
+      unfinalizedSessions: { type: "array", items: string } }),
       description: "What an anchored verdict covers. verified-prefix (verification anchored-prefix): the task's session closed and sealed, every recorded row and every sealed session verified, while the listed unended, unsealed legacy sessions (a running gateway's) were named instead of failed; nothing is claimed about how they end." },
     NativeTaskRecovery: { ...object({ eligible: bool, state: { type: "string", enum: ["ready", "interrupted", "blocked"] }, message: string }),
       description: "Read-only native JSONL recovery eligibility, not a writer grant. Resume rechecks original history, identity, settings, accounting and actual abandoned ownership under the writer mutex. An interrupted turn is acknowledged without replaying its effects; submit a new explicit turn. Closed or archived sessions remain non-resumable." },

@@ -2782,7 +2782,6 @@ components:
             - verified-prefix
         unfinalizedSessions:
           type: array
-          maxItems: 64
           items:
             type: string
       description: "What an anchored verdict covers. verified-prefix (verification anchored-prefix): the task's

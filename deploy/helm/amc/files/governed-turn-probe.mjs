@@ -3,7 +3,7 @@
 // sufficient: this logs in as the bootstrap owner, runs one stub-provider native
 // task with tools "none" through /api/v1/native-tasks, waits for the turn to
 // finish and asks Studio to verify the recorded evidence. Only a closed task
-// whose verification is workspace-key-consistency or externally-anchored counts as "verified". Studio's
+// whose verification is externally-anchored (the pinned monitor key admitted it) counts as "verified". Studio's
 // "anchored-prefix" (the task's session sealed, a running gateway's session named as unfinalized) is reported
 // as the separate status "verified-prefix", never as "verified".
 //
@@ -24,7 +24,8 @@ import { fileURLToPath } from "node:url";
 
 const API = "/api/v1/native-tasks";
 const INTENT = "task-workspace-v1";
-const VERIFIED = new Set(["workspace-key-consistency", "externally-anchored"]);
+// An unanchored "workspace-key-consistency" verdict never counts: an unpinned key does not verify (P0-51).
+const VERIFIED = new Set(["externally-anchored"]);
 const PREFIX = "anchored-prefix";
 const SETTLED = new Set(["idle", "failed", "closed", "released"]);
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));

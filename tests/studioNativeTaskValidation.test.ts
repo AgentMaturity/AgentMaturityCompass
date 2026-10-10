@@ -112,7 +112,9 @@ test("P0-14: an anchored verdict over a verified prefix is its own state, never 
   const prefix = renderTaskVerification({ ...task, verification: "anchored-prefix", verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } });
   expect(prefix).toContain("Anchored to the configured monitor fingerprint; verified prefix only");
   expect(prefix).not.toContain("Verified against the configured monitor fingerprint");
-  expect(prefix).toContain("Scope: verified prefix. Not finalized: gw-1");
+  expect(prefix).toContain("Scope: verified prefix. Sessions not finalized: gw-1.");
+  // The view cannot know which session is whose: it never attributes them to a gateway.
+  expect(prefix).not.toContain("gateway");
   const complete = renderTaskVerification({ ...task, verificationScope: { scope: "complete-ledger", unfinalizedSessions: [] } });
   expect(complete).toContain("Verified against the configured monitor fingerprint");
   expect(complete).not.toContain("verified prefix");

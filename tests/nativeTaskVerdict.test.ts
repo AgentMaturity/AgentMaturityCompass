@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AgentRunVerification } from "../src/agent/runReport.js";
 import { nativeEvidenceVerdict, verifyNativeTaskEvidence } from "../src/studio/nativeTaskVerdict.js";
+import { nativeTaskSchemas } from "../src/studio/nativeTaskOpenapi.js";
 
 // Studio's native-task verify (P0-14): the only caller that enables the live scope, and fail-closed on every branch.
 const base: AgentRunVerification = {
@@ -37,5 +38,12 @@ describe("Studio native-task evidence verdict", () => {
     expect(verify).toHaveBeenCalledWith("/w", "s1", trust, { allowLiveLegacySessions: true });
     const thrown = await verifyNativeTaskEvidence("/w", "s1", trust, async () => { throw new Error("unable to open database file"); });
     expect(thrown).toEqual({ verification: "failed", scope: null, error: "Cold native verification did not complete. No verified result is claimed." });
+  });
+
+  it("publishes no item cap the verdict does not enforce: every unfinalized session is listed", () => {
+    const many = Array.from({ length: 100 }, (_, i) => `gw-${i}`);
+    expect(nativeEvidenceVerdict({ ...prefix, unfinalizedSessions: many }).scope?.unfinalizedSessions).toHaveLength(100);
+    const schema = (nativeTaskSchemas() as Record<string, { properties: Record<string, Record<string, unknown>> }>).NativeTaskVerificationScope;
+    expect(schema.properties.unfinalizedSessions).not.toHaveProperty("maxItems");
   });
 });

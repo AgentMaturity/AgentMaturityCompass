@@ -98,6 +98,21 @@ describe("rollback drill", () => {
     expect(receipt.probeStatuses).toEqual(["verified-prefix", "verified-prefix", "verified-prefix"]);
   });
 
+  it("fails a probe step whose result carries no recognised status (P0-14)", async () => {
+    for (const result of [{}, { status: "VERIFIED" }, { verification: "externally-anchored" }, null]) {
+      const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+      const receipt = await runRollbackDrill({ ...base, docker: fake.docker, probe: async () => result, pollMs: 1 });
+      expect(receipt.status, JSON.stringify(result)).toBe("failed");
+      expect(receipt.steps[1], JSON.stringify(result)).toMatchObject({ id: "probe-a", status: "failed" });
+    }
+  });
+
+  it("labels its monitor pin as trust on first use: read from the volume under test (P0-14)", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const receipt = await runRollbackDrill({ ...base, docker: fake.docker, probe: verified, pollMs: 1 });
+    expect(receipt.monitorPinSource).toBe("trust-on-first-use: read from the drill's own workspace volume after A's first bootstrap");
+  });
+
   it("refuses non-digest ids", async () => {
     for (const bad of ["abc", "sha256:xyz", `sha256:${"A".repeat(64)}`, "amc-studio:s1-a"]) {
       const fake = fakeDocker({ "amc-studio:s1-a": bad, "amc-studio:s1-b": idB });

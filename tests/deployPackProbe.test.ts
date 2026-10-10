@@ -82,7 +82,7 @@ describe("governed-turn probe", () => {
 
   it("verifies only a completed stub turn whose evidence Studio verified", async () => {
     const seen: string[] = [];
-    const base = await stub(governedServer("workspace-key-consistency", seen));
+    const base = await stub(governedServer("externally-anchored", seen));
     const result = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
     expect(result.status).toBe("verified");
     expect(result.steps.map((s: { id: string; status: string }) => `${s.id}=${s.status}`)).toEqual(
@@ -105,7 +105,7 @@ describe("governed-turn probe", () => {
 
   it("waits up to readyTimeoutMs for a container that is still starting (connection refused, then 503)", async () => {
     let healthz = 0;
-    const starting: Record<string, Handler> = { ...governedServer("workspace-key-consistency"),
+    const starting: Record<string, Handler> = { ...governedServer("externally-anchored"),
       "/healthz": () => (++healthz < 3 ? { status: 503, body: { status: "starting" } } : ok()) };
     const base = await stub(starting);
     let refused = 2;
@@ -120,7 +120,7 @@ describe("governed-turn probe", () => {
   });
 
   it("claims a one-time pairing code before login when Studio's LAN mode requires pairing", async () => {
-    const paired: Record<string, Handler> = { ...governedServer("workspace-key-consistency"),
+    const paired: Record<string, Handler> = { ...governedServer("externally-anchored"),
       "/pair/claim": (_req, body) => (body?.code === "1234567890"
         ? { status: 200, body: { ok: true }, headers: { "set-cookie": "amc_pairing=p1; HttpOnly" } } : { status: 400, body: { error: "pairing failed" } }),
       "/auth/login": (req) => (String(req.headers.cookie).includes("amc_pairing=p1")
@@ -146,7 +146,8 @@ describe("governed-turn probe", () => {
   });
 
   it("fails when Studio's verification verdict is not a verified scope", async () => {
-    for (const verdict of ["failed", "not-verified"]) {
+    // "workspace-key-consistency" is unanchored: since P0-51 an unpinned key never verifies.
+    for (const verdict of ["failed", "not-verified", "workspace-key-consistency"]) {
       const base = await stub(governedServer(verdict));
       const result = await governedTurnProbe({ baseUrl: base, username: "u", password: "p", timeoutMs: 5_000, pollMs: 10 });
       expect(result.status).toBe("failed");
