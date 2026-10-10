@@ -17,6 +17,24 @@
       "bytes": 9969
     }
   ],
+  "forwardEdits": [
+    {
+      "issue": "P1-26",
+      "commit": "def0955fac234ea0ce96c849c849cffd49a99ea4",
+      "path": "src/audit/binderVerifier.ts",
+      "reason": "a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only",
+      "before": "      transparencyRoot: null,\n      merkleRoot: null,\n      proofs: inclusion\n",
+      "after": "      transparencyRoot: null,\n      merkleRoot: pathExists(join(root, \"proofs\", \"merkle.root.json\"))\n        ? { root: JSON.parse(readUtf8(join(root, \"proofs\", \"merkle.root.json\"))), signature: null, sha256: \"\" } : null,\n      proofs: inclusion\n"
+    },
+    {
+      "issue": "P1-26",
+      "commit": "def0955fac234ea0ce96c849c849cffd49a99ea4",
+      "path": "src/passport/passportVerifier.ts",
+      "reason": "a proof's tree and tree size come from the merkle root the artifact carries; a bundle without one is checked as amc-legacy-v1 only",
+      "before": "      transparencyRoot: null,\n      merkleRoot: null,\n      proofs: inclusion\n",
+      "after": "      transparencyRoot: null,\n      merkleRoot: pathExists(join(root, \"proofs\", \"merkle.root.json\"))\n        ? { root: JSON.parse(readUtf8(join(root, \"proofs\", \"merkle.root.json\"))), signature: null, sha256: \"\" } : null,\n      proofs: inclusion\n"
+    }
+  ],
   "newFilesToRemoveOnRestore": [
     "src/utils/signedArtifactVerification.ts",
     "tests/signedArtifactVerificationParity.test.ts"

@@ -36,7 +36,9 @@ describe("evidence paths", () => {
       "src/sandbox/sandbox.ts",
       "src/runtime/traceLogger.ts",
       "src/runtime/truthProtocol.ts",
-      "src/agents/monitor.ts"
+      "src/agents/monitor.ts",
+      // The signed ToolHub allowlist is AMC's tool-call whitelist; src/policy (P1-12's effective-policy receipt) is not.
+      "src/toolhub/toolhubValidators.ts"
     ];
     for (const path of repointed) {
       expect(existsSync(join(process.cwd(), path)), path).toBe(true);

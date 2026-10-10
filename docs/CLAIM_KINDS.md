@@ -13,7 +13,7 @@ AMC output is evidence of conformity. It is not a certificate.
 | `observed` | Observed | AMC observed the behaviour at runtime or in an executed test, backed by `OBSERVED` or `OBSERVED_HARDENED` evidence. |
 | `independently_reviewed` | Independently reviewed | Approved by a reviewer who is independent of the producer and whose key is pinned. |
 
-Results stored by AMC 1.x are labelled "Legacy (1.x), self-reported" or "Legacy (1.x), synthetic example", followed by the legacy notice they are read under, for example "(notice AMC-LEGACY-2026-001 v1)". See [migration/LEGACY_RESULTS.md](migration/LEGACY_RESULTS.md).
+Results stored by AMC 1.x are labelled "Legacy (1.x), self-reported" or "Legacy (1.x), synthetic example", followed by the legacy notice they are read under, for example "(notice AMC-LEGACY-2026-001 v1)". See [migration/LEGACY_RESULTS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/migration/LEGACY_RESULTS.md).
 
 JSON consumers read `claimKind`. The label text is public output too, so changing its wording is a breaking change for text parsers.
 

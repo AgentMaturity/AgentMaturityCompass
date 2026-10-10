@@ -94,6 +94,13 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/binderArtifact.ts",
+      "issue": "P1-16",
+      "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+      "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
       "path": "src/auth/authApi.ts",
       "issue": "P1-56",
       "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",

@@ -115,7 +115,7 @@ test.runIf(process.platform === "darwin").each(["sqlite", "jsonl"] as const)("re
   expect(second.validationSelection).toEqual(first.validationSelection);
   const newDecisions = f.observations.filter(row => String(row.path).includes("/approve") && !firstApprovals.has(row.path));
   expect(newDecisions.length).toBeGreaterThanOrEqual(2); expect(new Set(newDecisions.map(row => row.identity))).toEqual(new Set(["ada", "grace"]));
-  expect(f.operator.effect()).toBe("validation-outcome");
+  expect(f.operator.effect()).toBe("validation-outcome"); expect(f.operator.escaped()).toBe(false);
   await f.control(first.taskId, "verify", 2);
   writeFileSync(join(f.root, "native-controller-recovery.json"), JSON.stringify({ backend, sessionId: id, sameStudio: true,
     originalApprovalRemovalRefused: true, changedValidationPinRefused: true, newApproverIdentities: [...new Set(newDecisions.map(row => row.identity))],
