@@ -47,6 +47,9 @@ import {
 const DAY_MS = 86_400_000;
 const HYPOTHESIS_WINDOW_DAYS = 90;
 const NOT_OBSERVED = "NO_RUNTIME_OBSERVATION_AT_ASPIRE";
+/** The largest brief Propose records: Build's section must still fit under the router's 256 KiB specification limit. */
+const SPEC_ROOM_FOR_BUILD = 248 * 1024; // ponytail: Build's section is ~1.3 KiB (6 file entries + digests; ~2.5 KiB at a 128-character agent id); 8 KiB headroom
+const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicalize(spec).length > SPEC_ROOM_FOR_BUILD;
 /** The parts of a proposal a member may write; every other part is built from the answers. */
 const EDITABLE = ["hypotheses", "learningPlan", "quality", "misuse"] as const;
 type Editable = (typeof EDITABLE)[number];
@@ -611,6 +614,8 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     graph: typedGraphOf(agentId, agentName, values, ctx.now), hypotheses, alternatives: alternativesOf(ctx, spec, values), learningPlan, quality,
     valueContractDraft: valueContractTemplate({ scopeType: "AGENT", scopeId: agentId, type: "other" }), outcomeContractDraft: { metrics: outcomeMetricsOf(quality) }, edited: [...edited].sort(),
     claim: { claimKind: "self_reported", result: "not_evaluated", claimBoundary: ASPIRE_CLAIM_BOUNDARY } };
+  // Build would refuse it only after writing the agent's files (the router checks the produced spec after the producer runs).
+  if (tooLargeForBuild(next)) throw fail(413, "INPUT_TOO_LARGE", "The brief leaves Build no room under the 256 KiB specification limit; shorten the edited parts.");
   return { outputs: [{ output: "brief", label: "aspire propose: the brief (AMC's draft from your answers)", lane: "recommendation", method: null,
     body: { brief, misuse, hypotheses, quality } }], spec: next };
 }
@@ -637,6 +642,8 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   if (spec.schema !== ASPIRE_SPEC_SCHEMA || spec.answersDigest !== answersDigestOf(answers)) {
     throw fail(409, "A4_NOT_READY", "Build writes the proposed brief; propose it again first.", { reasonCodes: ["BRIEF_STALE"] });
   }
+  // A brief proposed before Propose left this room would pass every refusal below and then fail the router's size check after the writes.
+  if (tooLargeForBuild(spec)) throw fail(413, "INPUT_TOO_LARGE", "The brief leaves Build no room under the 256 KiB specification limit; propose a shorter brief.");
   const brief = spec.brief as { agentName: string; agent: string; goals: string[]; audience: string[]; stations: string[]; contextGraph: unknown };
   const agentId = ctx.state.project.agent_id;
   const paths = getAgentPaths(workspace, agentId);
