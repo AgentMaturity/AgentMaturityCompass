@@ -93,8 +93,16 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       [path("gateId", { type: "string", pattern: "^a4gate_[0-9a-f]{32}$" })]) },
     [`${p}/stages/{stage}/complete`]: { post: write("Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts), runs its effect and the response names the attempt", "A4Complete", [stagePath]) },
     [`${p}/hypotheses/{hypothesisId}/observe`]: { post: write("Observe a PMF hypothesis, once the project has left Aspire, with a runtime-written row inside its window", "A4Observe",
-      [path("hypothesisId")], "201") }
+      [path("hypothesisId")], "201") },
+    [`${p}/outcome-unknown/{executionId}/request`]: { post: write("Request a resolution of an outcome_unknown execution blocking the project's agent: the operator's statement as an amc.action.resolve engine request (self_reported)",
+      "A4OutcomeRequest", [path("executionId")], "201") },
+    [`${p}/outcome-unknown/{executionId}/resolve`]: { post: write("Record the approved resolution (resolveManually); its receipt is an implementation ref, self_reported, never observed",
+      "A4Control", [path("executionId")], "201") }
   };
+  for (const verdict of ["approve", "deny"]) {
+    paths[`${p}/approvals/{approvalRequestId}/${verdict}`] = { post: operation(`${verdict === "approve" ? "Approve" : "Deny"} an engine request this project named (an effect gate it opened, an outcome_unknown resolution it requested), as a live project approver or owner, bound to the request digest`,
+      "A4Response", { write: true, body: "A4EngineDecision", status: "201", parameters: [project, path("approvalRequestId", { type: "string", pattern: "^apprreq_[a-f0-9]{32}$" })] }) };
+  }
   for (const verdict of ["approve", "deny"]) {
     paths[`${p}/gates/{gateId}/${verdict}`] = { post: write(`${verdict === "approve" ? "Approve" : "Deny"} a gate (bound to its request digest and seq; separation of duties refused at write)`,
       "A4Decide", [path("gateId", { type: "string", pattern: "^a4gate_[0-9a-f]{32}$" })], "201") };
@@ -109,7 +117,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     ["confirm-understanding", "A4ConfirmUnderstanding", "Confirm the understanding (step understood)"],
     ["explain", "A4Explain", "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"],
     ["propose", "A4Propose", "Freeze the proposed specification as a revision (step proposed)"],
-    ["build", "A4StageContent", "Build (step built): the stage's producer (aspire: owner, owner mode), or a self_reported human-authored implementation ref while it has none"],
+    ["build", "A4StageContent", "Build (step built): the stage's producer (aspire and assemble: owner, owner mode; assemble's native build session starts after the step is recorded and the response names it), or a self_reported human-authored implementation ref while it has none"],
     ["review", "A4StageContent", "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an observed ref"]
   ] as const) {
     paths[`${p}/stages/{stage}/${action}`] = { post: write(summary, body, [stagePath], "201") };
@@ -158,6 +166,9 @@ export function a4Schemas(): Record<string, unknown> {
     A4Complete: control({ gateId: string }),
     A4EffectOpen: control({ gateId: string }),
     A4EffectRetry: control({ attemptId: string }),
-    A4Observe: control({ verdict: { type: "string", enum: ["observed", "refuted"] }, evidenceRef: object({ refId: string, sha256: digest }) })
+    A4Observe: control({ verdict: { type: "string", enum: ["observed", "refuted"] }, evidenceRef: object({ refId: string, sha256: digest }) }),
+    A4OutcomeRequest: control({ effect: { type: "string", enum: ["applied", "not_applied"] }, externalRef: { type: ["string", "null"], maxLength: 512 },
+      note: { type: "string", minLength: 1, maxLength: 4000, description: "Sealed in the project's encrypted blob store; the ledger keeps its sha256." } }),
+    A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest })
   };
 }

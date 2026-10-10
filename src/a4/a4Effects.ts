@@ -13,7 +13,7 @@
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
-import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
+import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed, loadApprovalRequestRecord, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
 import { approvalStatusPayload, consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ActionClass } from "../types.js";
@@ -220,6 +220,9 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     ?? createApprovalForIntent({ workspace: store.workspace, agentId: state0.project.agent_id, intentId: `a4-${projectId}-${def.id}-${gate0.gate_id}`,
       toolName: def.toolName, actionClass: def.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: engineRiskTier(state0),
       intentPayload, quorumFloor }).approval.approvalRequestId;
+  // The digest an approver binds a decision to from the A4 card (decideApprovalInStudio's bound path), read back verified.
+  const requestDigestSha256 = approvalRequestBindingDigest(loadApprovalRequestRecord({ workspace: store.workspace, agentId: state0.project.agent_id,
+    approvalRequestId, requireValidSignature: true }));
   return governed(store, projectId, principal, input, (_ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
@@ -231,7 +234,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
     assertReopenable(store, state, row, def, isRegulated(state, query.floor));
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
-      payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
+      payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, requestDigestSha256, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
   });
 }
 

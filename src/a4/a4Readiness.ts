@@ -44,7 +44,9 @@ export type A4Action = (typeof A4_ACTIONS)[number];
 
 /** Items an owner may acknowledge (D-21 pattern, design §7 item 6): they stay WAITING, labelled, for 90 days. */
 export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status",
-  "deployment.amc_check", "plan_unresolved"];
+  "deployment.amc_check", "plan_unresolved",
+  // Assemble (P1-60): an unsupported path or plan item stays listed; the owner records it out of scope with a reason (design §13).
+  "path_supported", "unsupported_acknowledged"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
@@ -84,6 +86,8 @@ export interface A4LiveFacts {
   readonly hostSessionsSinceCreated: number | null;
   /** Running effect attempts whose owner is lost under the sweeper's liveness rule (a4Gates.effectOwnerLost). */
   readonly lostEffects: readonly string[];
+  /** The agent's outcome_unknown executions blocking its journaled calls (read at Assemble only); null when unread or unreadable. */
+  readonly blockingExecutions: readonly string[] | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -462,13 +466,14 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 /**
  * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
- * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile.
+ * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, and at
+ * Assemble, which signs the workspace presets file and starts native build sessions.
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && stage === "aspire");
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble"));
   const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];

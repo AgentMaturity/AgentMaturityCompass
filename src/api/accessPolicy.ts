@@ -120,13 +120,15 @@ function isPassportRevocation(pathname: string): boolean {
   return /^\/api\/v1\/passport\/[^/]+\/revoke$/.test(pathname);
 }
 
-const A4_APPROVAL = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/(approve|deny)$/;
+// P1-60: an engine request named on the project (an effect gate, an outcome_unknown resolution) is decided from the A4 card too.
+const A4_APPROVAL = /^\/api\/v1\/a4\/projects\/[^/]+\/(gates|approvals)\/[^/]+\/(approve|deny)$/;
 const A4_REVIEW = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/request-changes$/;
 const A4_MEMBER = /^\/api\/v1\/a4\/projects\/[^/]+\/(comments|presence)$/;
 // `retire` is not here: the creator of a never-proposed draft may retire it (retireProject enforces owner-or-creator).
 // Aspire's build signs an agent config, a target profile and an Enforce manifest (what `agent add`, `target set` and the
-// OWNER-only fleet and enforce mutations write), so it takes OWNER like they do (P1-59).
-const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete|stages\/aspire\/build)$/;
+// OWNER-only fleet and enforce mutations write), so it takes OWNER like they do (P1-59). Assemble's build signs the
+// workspace presets file and starts native build sessions (P1-60).
+const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete|stages\/(aspire|assemble)\/build)$/;
 
 /** P1-57: an A4 gate decision takes the approve class with APPROVER, AUDITOR or OWNER (APPROVER_PATHS holds exact paths only). */
 export function isA4ApprovalPath(pathname: string): boolean {

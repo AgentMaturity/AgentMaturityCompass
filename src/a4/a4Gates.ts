@@ -23,6 +23,7 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
+import { blockingExecutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -172,8 +173,20 @@ const vaultUnlocked = (workspace: string): boolean | null => {
   }
 };
 
-/** Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the read evaluateFor used. */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"]): A4LiveFacts {
+/** The agent's outcome_unknown executions on the store's own connection (read-only, inside a transaction too); null when unreadable. */
+function blockingExecutionsOf(store: A4Store, agentId: string): string[] | null {
+  try {
+    return blockingExecutionsIn(store.ledger.db, store.workspace, agentId);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
+ * read evaluateFor used; the action journal is read only for an evaluation at `stage` Assemble.
+ */
+export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
   let route: "vault" | "notary" | null;
@@ -196,7 +209,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
-    lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id)
+    lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
+    blockingExecutions: stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null
   };
 }
 
@@ -220,7 +234,7 @@ export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: 
   ensureA4Stages();
   const signed = loadVerifiedApprovalPolicy(store.workspace);
   const query: A4ReadinessQuery = { stage, principal, policy: signed.policy ?? defaultApprovalPolicy(), gatePolicy: gatePolicyOf(state.chain),
-    floor: signed.policy ? a4FloorFor(signed.policy) : UNVERIFIED_FLOOR, now, live: collectFacts(store, state, call, signed.verdict) };
+    floor: signed.policy ? a4FloorFor(signed.policy) : UNVERIFIED_FLOOR, now, live: collectFacts(store, state, call, signed.verdict, stage) };
   return { readiness: evaluateA4Readiness(state, query), query };
 }
 
