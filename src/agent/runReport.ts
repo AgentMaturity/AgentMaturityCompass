@@ -232,8 +232,13 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) === "sqlite"
     ? verifyNativeSessionContinuation(workspace, sessionId, trust ? { trust } : {}) : null;
   const result = live ?? verifyLedgerIntegrity(workspace, trust ? { trust } : {});
-  const unfinalizedSessions = live?.incompleteLegacySessions ?? [];
+  // Another native session that is open or interrupted is unfinalized too: a cut session/close leaves that shape.
+  const otherLive = [...result.sessions.open, ...result.sessions.interrupted].filter((id) => id !== sessionId);
+  const unfinalizedSessions = [...new Set([...(live?.incompleteLegacySessions ?? []), ...otherLive])];
   const sessionChainErrors: string[] = [];
+  if (!live) {
+    for (const id of otherLive) sessionChainErrors.push(`Session ${id} is not finalized; a complete-ledger verdict needs every other session closed and sealed`);
+  }
   // A prefix verdict covers a finalized target only: its own session must be closed with a valid seal.
   if (live && !live.sessions.closed.includes(sessionId)) {
     sessionChainErrors.push(`Session ${sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
@@ -279,11 +284,11 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   const integrityOk = result.chain.ok && sessionChainErrors.length === 0 && unsignedRowIds.length === 0
     && requests.every((request) => request.status === "reconstructed");
   const anchoredOk = trust === undefined || result.trustRoot.anchored;
-  const scope = unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger";
+  const scope = live && unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger";
   return {
     sessionId,
     ok: integrityOk && anchoredOk && scope === "complete-ledger",
-    prefixVerified: integrityOk && anchoredOk && scope === "verified-prefix",
+    prefixVerified: live !== null && integrityOk && anchoredOk && scope === "verified-prefix",
     integrityOk,
     ledgerOk: result.chain.ok,
     ledgerErrors: result.chain.errors,

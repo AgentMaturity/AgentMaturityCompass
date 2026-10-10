@@ -6,6 +6,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { verifySessionChains } from "../src/ledger/sessionVerification.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { SessionService } from "../src/session/sessionService.js";
 import { deriveRecordedRequest } from "../src/llm/request/deriveRequest.js";
 import { readAgentRunSummary, renderVerifyReport, verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
@@ -342,6 +343,38 @@ describe("P3.2 — the run reconstructs and is signed", () => {
     const report = await live(named.dir, named.sessionId);
     expect(report).toMatchObject({ ok: false, scope: "verified-prefix" });
     expect([...(report.unfinalizedSessions ?? [])].sort()).toEqual(["gateway-live", "legacy-sealed"]);
+  });
+
+  test("NEGATIVE P0-14: another native session whose close and seal were cut is named, and fails a complete verdict", async () => {
+    for (const withGateway of [false, true]) {
+      const harness = loopHarness({ scripts: [textStep("done")] });
+      open.push(harness);
+      harness.driver.followup("say hello");
+      await harness.driver.whenIdle();
+      harness.finish();
+      const second = new SessionService(harness.dir);
+      second.open({ agentId: "default", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p" });
+      second.recordSystemPrompt("second");
+      second.close({ reason: "completed" });
+      const other = second.sessionId;
+      if (withGateway) {
+        const ledger = openLedger(harness.dir);
+        try { ledger.startSession({ sessionId: "gateway-live", runtime: "gateway", binaryPath: "gateway", binarySha256: "fixture" }); } finally { ledger.close(); }
+      }
+      // Intact: the other session is closed and sealed, so it is not named.
+      expect((await live(harness.dir, harness.sessionId)).unfinalizedSessions).toEqual(withGateway ? ["gateway-live"] : []);
+      // Cut its tail (its session/close is the ledger's last row) and clear its seal columns.
+      withoutTriggers(harness.dir, (db) => {
+        db.prepare("DELETE FROM evidence_events WHERE session_id=? AND event_type='session/close'").run(other);
+        db.prepare("UPDATE sessions SET ended_ts=NULL, session_final_event_hash=NULL, session_seal_sig=NULL WHERE session_id=?").run(other);
+      });
+      const prefix = await live(harness.dir, harness.sessionId);
+      expect(prefix).toMatchObject({ ok: false, scope: "verified-prefix" });
+      expect([...(prefix.unfinalizedSessions ?? [])].sort()).toEqual([other, ...(withGateway ? ["gateway-live"] : [])].sort());
+      const strict = await verifyAgentRun(harness.dir, harness.sessionId);
+      expect(strict).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false, scope: "complete-ledger" });
+      expect(strict.sessionChainErrors).toContain(`Session ${other} is not finalized; a complete-ledger verdict needs every other session closed and sealed`);
+    }
   });
 
   test("NEGATIVE P0-14: the live scope needs a positive SQLite store marker; unknown or missing evidence fails closed", async () => {
