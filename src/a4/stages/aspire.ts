@@ -142,7 +142,10 @@ export function outcomeMetricsOf(quality: unknown): OutcomeMetric[] {
   return [...new Map(metrics.map((metric) => [metric.metricId, metric])).values()];
 }
 
-/** Merges `metrics` by metricId into the agent's outcome contract, read once and verified over those bytes, and re-signs it. */
+/**
+ * Merges `metrics` by metricId into the agent's outcome contract, read once and verified over those bytes, and re-signs
+ * it; a contract that already holds them is left as it is (re-signing the same bytes repeats its ledger row's key).
+ */
 function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): void {
   if (metrics.length === 0) return;
   const path = outcomeContractPath(workspace, agentId);
@@ -152,7 +155,9 @@ function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readon
   }
   const current = outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8"))).outcomeContract;
   const ids = new Set(metrics.map((metric) => metric.metricId));
-  upsertOutcomeContract(workspace, { outcomeContract: { ...current, metrics: [...current.metrics.filter((metric) => !ids.has(metric.metricId)), ...metrics] } }, agentId);
+  const next = { ...current, metrics: [...current.metrics.filter((metric) => !ids.has(metric.metricId)), ...metrics] };
+  if (canonicalize(outcomeContractSchema.parse({ outcomeContract: next })) === canonicalize({ outcomeContract: current })) return;
+  upsertOutcomeContract(workspace, { outcomeContract: next }, agentId);
 }
 
 /**
@@ -166,11 +171,12 @@ async function applyContracts({ workspace, state, gate }: A4EffectContext): Prom
     const revision = state.revisions.find((row) => row.revision_no === gate.revision_no);
     const spec = revision === undefined ? {} : JSON.parse(revision.spec_json) as Record<string, unknown>;
     const agentId = state.project.agent_id;
+    // The outcome merge first: it is the step that refuses (an untrusted contract), so a retry still finds the value contract absent.
+    const metrics = outcomeMetricsOf(spec.quality);
+    mergeOutcomeMetrics(workspace, agentId, metrics);
     const valuePath = valueAgentContractPath(workspace, agentId);
     const valuePresent = pathExists(valuePath);
     if (!valuePresent) valueContractApplyForApi({ workspace, contract: spec.valueContractDraft, scopeType: "AGENT", scopeId: agentId });
-    const metrics = outcomeMetricsOf(spec.quality);
-    mergeOutcomeMetrics(workspace, agentId, metrics);
     const outcomePath = outcomeContractPath(workspace, agentId);
     const receipt = canonicalize({ schema: "amc.a4-aspire-contracts/v1", projectId: state.project.project_id, gateId: gate.gate_id, revisionNo: gate.revision_no,
       valueContract: { path: relPath(workspace, valuePath), action: valuePresent ? "present" : "applied", sha256: fileSha(valuePath, "The value contract") },
