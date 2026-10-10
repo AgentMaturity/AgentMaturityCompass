@@ -573,7 +573,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
         const passed = verdict.verification !== "failed";
         entry.verification = !passed ? "failed" : !sameHead ? "not-verified" : verdict.verification;
-        entry.verificationStoreHead = passed && sameHead ? verificationHead : undefined;
+        entry.verificationStoreHead = sameHead ? verificationHead : undefined;
         entry.verificationScope = verdict.scope;
         entry.error = passed && !sameHead ? "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current." : verdict.error;
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
