@@ -7,6 +7,8 @@
  * project lock: step 0 consumes the engine grant (for `consumes: "A4"`), then the shared preamble re-reads the freeze
  * and read-only facts and recomputes every bound resource slot before anything is touched. Orphans are swept by
  * owner liveness and heartbeat, never by a wall-clock bound alone. Stage lanes register the executors; none lives here.
+ * An effect registered with `consumes: "gate"` has no effect gate: `complete` journals it on the documentary gate's
+ * own quorum (GATE_CONSUMED + EFFECT_STARTED in one transaction), and the same preamble, settlement and retry apply.
  */
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
@@ -50,8 +52,12 @@ export interface A4EffectDef {
   readonly id: string;
   readonly toolName: string;
   readonly actionClass: ActionClass;
-  /** "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried. */
-  readonly consumes: "A4" | "executor";
+  /**
+   * "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried.
+   * "gate": no effect gate and no engine request; the documentary gate's own quorum, consumed by GATE_CONSUMED in the same
+   * transaction, authorizes it (a workspace write its approvers saw in the bound spec, design §10.1 Aspire completion).
+   */
+  readonly consumes: "A4" | "executor" | "gate";
   /**
    * The documentary gate whose consumption runs this effect: the only gate it may be opened on, and `complete` refuses to
    * consume that gate without it. An effect without one cannot be opened.
@@ -196,6 +202,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   if (gate0.stage !== input.stage || def.completes !== `${gate0.stage}.${gate0.gate}`) {
     throw fail(409, "A4_STEP_ORDER", `effect ${def.id} is not opened on the ${gate0.stage} ${gate0.gate} gate`);
   }
+  if (def.consumes === "gate") throw fail(409, "A4_STEP_ORDER", `effect ${def.id} runs on the documentary gate's quorum; complete runs it`);
   const regulated0 = isRegulated(state0, signedA4Floor(store.workspace));
   assertReopenable(store, state0, gate0, def, regulated0);
   const intentPayload = effectIntent(def, state0, gate0);
@@ -303,11 +310,17 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
   const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
+    const executionId = def.executionId(state, row);
+    // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
+    if (def.consumes === "gate") {
+      return { payload: { effect: def.id }, specs: [{ kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
+        payload: { effectId: attemptId, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId: null, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
+        startEffect: { effectId: attemptId, gateId: row.gate_id, executionId, approvalRequestId: null } }] };
+    }
     const opened = latestOpened(state, row.gate_id, def.id);
     if (opened === undefined) throw fail(409, "EFFECT_GATE_NOT_OPEN", "An owner opens the effect gate before completing this stage.");
     const approvalRequestId = String(opened.body.approvalRequestId);
     const keys = verifyAndConsumeEffect(store, state, { def, gate: row, approvalRequestId, callerKey: principal.key, regulated });
-    const executionId = def.executionId(state, row);
     return { payload: { effect: def.id, effectApproverKeys: keys }, specs: [{ kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
       payload: { effectId: attemptId, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
       startEffect: { effectId: attemptId, gateId: row.gate_id, executionId, approvalRequestId } }] };
@@ -361,8 +374,8 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
 
 /**
  * `complete` (design §6.5; the body names no effect): the effect is the one an owner opened on this gate
- * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened); a gate
- * with neither is consumed plainly. consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a
+ * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened, except
+ * a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly. consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a
  * consumed gate whose re-opened effect consumes its own grant, it re-runs that effect (`rerunExecutorEffect`).
  */
 export function completeStage(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number }): {
@@ -489,7 +502,7 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
 }
 
 /**
- * Retry (owner; design §6.5): only for effects A4 consumes, and only when the chain has a failure and no finish for
+ * Retry (owner; design §6.5): only for effects A4 or the gate's quorum consumes, and only when the chain has a failure and no finish for
  * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
  * consumed, was consumed by this execution id; one not consumed yet is verified as at `complete` (verifyAndConsumeEffect:
  * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
@@ -512,7 +525,7 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     const def = effectDef(String(started.body.effect));
     const executionId = String(started.body.executionId);
     const approvalRequestId = String(started.body.approvalRequestId);
-    if (def.consumes !== "A4") throw fail(409, "EFFECT_NOT_RETRYABLE", "This executor consumes its own grant; re-open the effect gate, then complete runs it again.");
+    if (def.consumes === "executor") throw fail(409, "EFFECT_NOT_RETRYABLE", "This executor consumes its own grant; re-open the effect gate, then complete runs it again.");
     const runs = state.chain.filter((link) => link.body.executionId === executionId);
     if (!runs.some((link) => link.kind === "EFFECT_FAILED") || runs.some((link) => link.kind === "EFFECT_FINISHED")) {
       throw fail(409, "EFFECT_NOT_RETRYABLE", "Only a failed, unfinished effect is retried.");
@@ -525,19 +538,19 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     const failures = failuresOf(state.chain, row.gate_id, def.id);
     if (failures.length >= 2) throw fail(409, "EFFECT_NOT_RETRYABLE", "A second failure requires a new revision of the stage (design §6.5); reopen it.");
     assertNotRedone(state, row.stage, failures.at(-1));
-    const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
+    const consumed = def.consumes === "gate" ? null : loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
     if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The engine grant was consumed by another execution.");
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "retryEffect");
     // Lost before step 0, the grant is still unconsumed and step 0 will consume it (markApprovalConsumed checks no status
     // or expiry), so it is verified as `complete` verified it: status and expiry, intent, live approvers, membership, SoD.
-    if (consumed === null) {
+    if (consumed === null && def.consumes === "A4") {
       verifyAndConsumeEffect(store, state, { def, gate: row, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, query.floor) });
     }
     return { readiness, specs: { kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
-      payload: { effectId: nextAttempt, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId, retryOf: input.attemptId,
-        ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
-      startEffect: { effectId: nextAttempt, gateId: row.gate_id, executionId, approvalRequestId } } };
+      payload: { effectId: nextAttempt, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId: started.body.approvalRequestId ?? null,
+        retryOf: input.attemptId, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
+      startEffect: { effectId: nextAttempt, gateId: row.gate_id, executionId, approvalRequestId: def.consumes === "gate" ? null : approvalRequestId } } };
   });
   return { result, attemptId: nextAttempt };
 }
