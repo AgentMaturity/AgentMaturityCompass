@@ -3850,7 +3850,6 @@ components:
       type: object
       additionalProperties: false
       required:
-        - content
         - expectedHeadSeq
         - clientRequestId
       properties:
@@ -3858,7 +3857,8 @@ components:
           type: string
           minLength: 1
           maxLength: 65536
-          description: Human-authored text; stored encrypted in the project's blob store, never inline.
+          description: Human-authored text; stored encrypted in the project's blob store, never inline. Required while
+            the stage has no producer; beside a producer it is the member's own statement.
         expectedHeadSeq:
           type: integer
           minimum: 0
@@ -3889,7 +3889,6 @@ components:
       type: object
       additionalProperties: false
       required:
-        - content
         - level
         - expectedHeadSeq
         - clientRequestId
@@ -3898,7 +3897,8 @@ components:
           type: string
           minLength: 1
           maxLength: 65536
-          description: Human-authored text; stored encrypted in the project's blob store, never inline.
+          description: Human-authored text; stored encrypted in the project's blob store, never inline. Required while
+            the stage has no producer; beside a producer it is the member's own statement.
         level:
           type: string
           enum:
@@ -14049,7 +14049,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/understand:
     post:
-      summary: "Record what was understood (no producer registered: human-authored stage output)"
+      summary: "Run Understand: the stage's producer, or the human-authored statement while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14257,7 +14257,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/explain:
     post:
-      summary: Record the explanation at a level (step explained)
+      summary: "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14465,7 +14465,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
-      summary: "Record the build (no producer registered: a self_reported implementation ref; step built)"
+      summary: "Build (step built): the stage's producer, or a self_reported human-authored implementation ref while
+        it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14569,7 +14570,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/review:
     post:
-      summary: Record the review (observed checks not evaluated without a producer; step reviewed)
+      summary: "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an
+        observed ref"
       tags:
         - Studio
         - A4 Forge

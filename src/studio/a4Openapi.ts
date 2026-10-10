@@ -12,7 +12,8 @@ const digest = { type: "string", pattern: "^[a-f0-9]{64}$" };
 const stage = { type: "string", enum: ["aspire", "assemble", "adapt", "activate"] };
 const requestId = { type: "string", pattern: "^[A-Za-z0-9_-]{8,128}$", description: "Owner-scoped idempotency key; a retry with the same key and body answers the recorded result." };
 const reason = { type: "string", minLength: 1, maxLength: 2000 };
-const content = { type: "string", minLength: 1, maxLength: 65536, description: "Human-authored text; stored encrypted in the project's blob store, never inline." };
+const content = { type: "string", minLength: 1, maxLength: 65536,
+  description: "Human-authored text; stored encrypted in the project's blob store, never inline. Required while the stage has no producer; beside a producer it is the member's own statement." };
 const object = (properties: Record<string, unknown>, required = Object.keys(properties)) =>
   ({ type: "object", additionalProperties: false, required, properties });
 const control = (properties: Record<string, unknown> = {}, required = Object.keys(properties)) =>
@@ -104,12 +105,12 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
   }
   for (const [action, body, summary] of [
     ["answers", "A4Answers", "Record answers (a new revision; the step returns to asked)"],
-    ["understand", "A4StageContent", "Record what was understood (no producer registered: human-authored stage output)"],
+    ["understand", "A4StageContent", "Run Understand: the stage's producer, or the human-authored statement while it has none"],
     ["confirm-understanding", "A4ConfirmUnderstanding", "Confirm the understanding (step understood)"],
-    ["explain", "A4Explain", "Record the explanation at a level (step explained)"],
+    ["explain", "A4Explain", "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"],
     ["propose", "A4Propose", "Freeze the proposed specification as a revision (step proposed)"],
-    ["build", "A4StageContent", "Record the build (no producer registered: a self_reported implementation ref; step built)"],
-    ["review", "A4StageContent", "Record the review (observed checks not evaluated without a producer; step reviewed)"]
+    ["build", "A4StageContent", "Build (step built): the stage's producer, or a self_reported human-authored implementation ref while it has none"],
+    ["review", "A4StageContent", "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an observed ref"]
   ] as const) {
     paths[`${p}/stages/{stage}/${action}`] = { post: write(summary, body, [stagePath], "201") };
   }
@@ -146,9 +147,9 @@ export function a4Schemas(): Record<string, unknown> {
     A4Evidence: control({ refKind: string, refId: string, sha256: digest, label: string }),
     A4GatePolicyChange: { oneOf: [control({ proposedGatePolicy: { type: "object", description: "amc.a4-gate-policy/v1" } }), control({ gateId: string })] },
     A4Answers: control({ answers: { type: "array", minItems: 1, maxItems: 200, items: object({ questionId: string, value: {} }) } }),
-    A4StageContent: control({ content }),
+    A4StageContent: control({ content }, []),
     A4ConfirmUnderstanding: control({ confirmed: { type: "boolean", enum: [true] } }),
-    A4Explain: control({ content, level: { type: "string", enum: ["novice", "practitioner", "expert"] } }),
+    A4Explain: control({ content, level: { type: "string", enum: ["novice", "practitioner", "expert"] } }, ["level"]),
     A4Propose: control({ spec: { type: "object", description: "The specification; answers are carried by the server." }, parentRevisionNo: integer }, ["spec"]),
     A4Decide: object({ reason, expectedRequestDigestSha256: digest, expectedReadinessBindingDigest: digest, expectedGateSeq: integer, clientRequestId: requestId },
       ["reason", "expectedRequestDigestSha256", "expectedGateSeq", "clientRequestId"]),

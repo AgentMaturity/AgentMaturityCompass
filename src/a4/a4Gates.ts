@@ -87,9 +87,10 @@ const parseList = (json: string): string[] => JSON.parse(json) as string[];
 /**
  * Slot recomputers (design §8): A4 recomputes a producer's digest only to compare it. Stage lanes add theirs; a filled
  * slot without one counts as drifted (fail closed). A recomputer answers null exactly when the resource is absent, the
- * value a revision binds for it then, and throws when it cannot be read. The gate-policy slot is bound through the intent.
+ * value a revision binds for it then, and throws when it cannot be read; per-agent resources read the project's agent.
+ * The gate-policy slot is bound through the intent.
  */
-export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null> = {
+export const RESOURCE_SLOTS: Record<string, (workspace: string, agentId: string) => string | null> = {
   "signedConfigs.tools": (workspace) => fileSha(join(workspace, ".amc", "tools.yaml")),
   "signedConfigs.approvalPolicy": (workspace) => fileSha(join(workspace, ".amc", "approval-policy.yaml")),
   "signedConfigs.budgets": (workspace) => fileSha(join(workspace, ".amc", "budgets.yaml")),
@@ -112,12 +113,12 @@ export function flatSlots(digests: unknown, prefix = ""): Record<string, string 
  * counts too. Only an unfilled slot with no recomputer (not produced) is skipped. Decide, complete and the executor
  * preamble all read this.
  */
-export function driftedSlots(workspace: string, slots: Record<string, string | null>): string[] {
+export function driftedSlots(workspace: string, slots: Record<string, string | null>, agentId: string): string[] {
   return Object.entries(slots).filter(([slot, value]) => {
     const recompute = RESOURCE_SLOTS[slot];
     if (recompute === undefined) return value !== null;
     try {
-      return recompute(workspace) !== value;
+      return recompute(workspace, agentId) !== value;
     } catch {
       return true; // unreadable data never reads as unchanged
     }
@@ -199,7 +200,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
     integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
-    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json))) : [],
+    driftedSlots: revision ? driftedSlots(workspace, flatSlots(JSON.parse(revision.resource_digests_json)), state.project.agent_id) : [],
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),

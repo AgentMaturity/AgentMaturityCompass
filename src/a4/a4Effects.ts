@@ -346,7 +346,7 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
     if (row.revision_no !== state.project.revision_no) throw fail(409, "A4_GATE_STALE", "the gate is bound to an earlier revision", { moved: ["revision"] });
     assertNotRedone(state, row.stage, outcomes.filter((link) => link.kind === "EFFECT_FAILED").at(-1));
     // Drift is refused before anything is written, as consumeGate refuses it (design §6.5), not left to the preamble.
-    const drifted = driftedSlots(store.workspace, boundSlots(row));
+    const drifted = driftedSlots(store.workspace, boundSlots(row), state.project.agent_id);
     if (drifted.length > 0) throw fail(409, "RESOURCE_DRIFTED", `resources moved since the gate opened: ${drifted.join(", ")}`, { slots: drifted });
     const approvalRequestId = String(opened.body.approvalRequestId);
     const keys = verifyAndConsumeEffect(store, state, { def, gate: row, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, query.floor) });
@@ -437,7 +437,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     if (volatile.readOnly !== false) return failWith("READ_ONLY_MODE");
     const gate = gateRowOf(state, String(started.body.gateId));
     bound = boundSlots(gate);
-    const drifted = driftedSlots(workspace, bound);
+    const drifted = driftedSlots(workspace, bound, state.project.agent_id);
     if (drifted.length > 0) return failWith(`RESOURCE_DRIFTED ${drifted.join(" ")}`);
     // A beat that throws (SQLITE_BUSY, a closed ledger) is a missed beat, never an uncaught timer exception that exits Studio.
     const beat = (): void => {
