@@ -32,7 +32,7 @@ import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4Hypothesis, type A4StageRegistry } from "../a4Schema.js";
 import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
-import { understandAspire } from "../aspireUnderstand.js";
+import { errorCodeOf, understandAspire } from "../aspireUnderstand.js";
 import {
   ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
   hypothesisDigestOf, learningPlanSchema, listValue, misuseSchema, previousHypotheses, textValue, unmeasuredTargets
@@ -532,11 +532,12 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   let manifest: { manifestId: string; path: string } | { error: string };
   try {
     const written = writeEnforceResourceManifest({ workspace, agentId });
-    manifest = { manifestId: written.manifest.manifestId, path: written.manifestPath };
+    // The writer publishes a manifest it could not sign (its signing errors are swallowed); Enforce's loader refuses it.
+    manifest = written.manifestSigPath === null || written.snapshotSigPath === null ? { error: "MANIFEST_UNSIGNED" }
+      : { manifestId: written.manifest.manifestId, path: written.manifestPath };
   } catch (error) {
     // Only a code is recorded (members and viewers read it); an error's message may carry absolute workspace paths.
-    const code = (error as { code?: unknown }).code;
-    manifest = { error: typeof code === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : "ENFORCE_MANIFEST_REFUSED" };
+    manifest = { error: errorCodeOf(error, "ENFORCE_MANIFEST_REFUSED") };
   }
   const files = ([["context-graph", paths.contextGraph, "written"], ["agent-config", paths.agentConfig, "written"], ["target-profile", targetPath, "written"],
     ["outcome-contract", outcomePath, outcomeKept ? "kept" : "written"], ["typed-graph", graphWritten.graphPath, "written"], ...("path" in manifest ? [["enforce-manifest", manifest.path, "written"] as const] : [])] as const)
@@ -568,7 +569,8 @@ async function review(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   try {
     hash = sha256Hex(canonicalize(validateContextGraph(JSON.parse(readFileSync(paths.contextGraph, "utf8")) as unknown)));
   } catch (caught) {
-    error = caught instanceof Error ? caught.message.slice(0, 300) : "unreadable";
+    // A code only: the message names the absolute path (members and viewers read this output).
+    error = caught instanceof SyntaxError ? "NOT_JSON" : errorCodeOf(caught, "INVALID");
   }
   // The agent's own profile only (never loadTargetProfile's root fallback), and only once its signature verifies.
   let targetProfile: "verified" | "TARGET_PROFILE_ABSENT" | "TARGET_PROFILE_INVALID" | "TARGET_PROFILE_UNTRUSTED";

@@ -49,7 +49,14 @@ export interface AspireUnderstanding {
   readonly archetypeIds: string[];
 }
 
-const errorText = (error: unknown): string => (error instanceof Error ? error.message : String(error)).slice(0, 300);
+/**
+ * An error as a code only (an errno such as EACCES, a YAML or validation code, else `fallback`): messages carry absolute
+ * workspace paths and quoted source lines, and what Aspire records is read by every project member.
+ */
+export function errorCodeOf(error: unknown, fallback: string): string {
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : fallback;
+}
 const WORD = /[a-z]{4,}/g;
 const words = (text: string): Set<string> => new Set(text.toLowerCase().match(WORD) ?? []);
 
@@ -62,12 +69,12 @@ function agentFiles(workspace: string, agentId: string): { config: AgentConfig |
   try {
     if (pathExists(paths.agentConfig)) config = loadAgentConfig(workspace, agentId);
   } catch (error) {
-    notes.agentConfig = errorText(error);
+    notes.agentConfig = errorCodeOf(error, "INVALID");
   }
   try {
     if (pathExists(paths.contextGraph)) graph = loadContextGraph(workspace, agentId);
   } catch (error) {
-    notes.contextGraph = errorText(error);
+    notes.contextGraph = errorCodeOf(error, error instanceof SyntaxError ? "NOT_JSON" : "INVALID");
   }
   return { config, graph, notes };
 }
