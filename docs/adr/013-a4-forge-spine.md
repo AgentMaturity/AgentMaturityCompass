@@ -42,9 +42,10 @@ envelopes and a verifier report. The question was how much of A4 could be built 
   `review.independent = false`: SoD-distinct users in one workspace are not independent, and two local users are not
   evidence of two people. `independently_reviewed` needs an admitted external record (P2-24, P3-21).
 - **No new formats.** A4 adds no bundle format, threat-model channel, failure row, `ApprovalAnswer` member or
-  `EvidenceEventType`. It adds contracts under `spec/schemas/v1/a4-*.schema.json`, an A4 slice inside the existing
-  `.amcbundle` (one net-zero hook in `src/bundles/bundle.ts`), and the `amc.a4-record/v1` export, which carries the
-  rows exactly as stored so a second verifier recomputes every digest without SQLite. Its rules and seven normative
+  `EvidenceEventType`. It adds contracts under `spec/schemas/v1/a4-*.schema.json` and the `amc.a4-record/v1` export,
+  which carries the rows exactly as stored so a second verifier recomputes every digest without SQLite. The A4 slice of
+  an existing `.amcbundle` is one such record per verified project, listed in the signed manifest (one net-zero hook in
+  `src/bundles/bundle.ts`); the bundle's ledger is never extended for it. Its rules and seven normative
   fixtures are published (`spec/ACCEPTANCE_RULES.md`, "A4 project record"; `tests/fixtures/contracts/a4-record/`).
 
 ## Consequences
@@ -65,5 +66,7 @@ envelopes and a verifier report. The question was how much of A4 could be built 
   signed control journal needs a checkpoint directory that read-only container filesystems cannot write.
 - **Engine decisions for documentary gates.** Would replay votes across two stores and let an engine decision stand in
   for an A4 vote; kept for effects only.
-- **A new export format for A4.** Rejected: one more format to verify. The `.amcbundle` carries the slice and the
-  `a4-record` JSON is the same rows for verifiers without SQLite.
+- **A new export format for A4.** Rejected: one more format to verify. The `.amcbundle` carries the slice as
+  `a4-record` files, the same rows a verifier without SQLite reads.
+- **Extending the bundle's ledger prefix to the A4 rows.** Rejected: it pulls in every session open in that range,
+  such as a running gateway's unsealed legacy session, and the bundle then fails ledger verification.

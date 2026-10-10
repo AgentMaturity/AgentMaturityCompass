@@ -11375,7 +11375,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12135,7 +12135,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12302,7 +12302,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12396,7 +12396,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12565,7 +12565,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12950,7 +12950,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13044,7 +13044,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13156,7 +13156,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13256,7 +13256,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13361,7 +13361,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13460,7 +13460,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13560,7 +13560,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13660,7 +13660,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13769,7 +13769,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13878,7 +13878,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13982,7 +13982,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14086,7 +14086,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14190,7 +14190,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14294,7 +14294,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14398,7 +14398,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14502,7 +14502,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14606,7 +14606,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14700,7 +14700,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14794,7 +14794,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14888,7 +14888,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14982,7 +14982,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -15076,7 +15076,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false

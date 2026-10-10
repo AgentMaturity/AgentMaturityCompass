@@ -3,8 +3,8 @@
 A4 Forge takes one agent from a brief to a recorded, customer-controlled deployment in four stages: **Aspire**
 (conceptualization), **Assemble** (creation), **Adapt** (contextualization) and **Activate** (commercialization). Every
 stage records what people asked, understood, proposed, built and reviewed, and every gate binds the exact bytes the
-approvers decided on. A4 produces evidence of conformity about how the agent was built; no A4 output is a statement
-that the agent is safe, correct or lawful.
+approvers decided on. A4 produces signed, `self_reported` records of how the agent was built; no A4 output is a
+statement that the agent is safe, correct or lawful.
 
 Status: preview. Every A4 route and Studio page is absent unless the operator sets `AMC_A4_PREVIEW=1` in the Studio
 process environment (D-20). The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
@@ -69,9 +69,10 @@ A signature proves who wrote a record and that it is unchanged since, never that
 | binder slice | an `a4-binder` artifact signature over its manifest, plus a transparency entry | the slice's files are the ones exported |
 
 **Notary mode.** In `NOTARY` mode with the default `trust.enforcement.denyLocalVaultSigningIfNotaryEnabled: true`, every
-`A4_RECORD` envelope is a notary call, so each gate decision adds one. `A4_PACKAGE` (Activate, P1-62) is in the schema
-default `requireNotaryFor`, but a `trust.yaml` that lists `requireNotaryFor` explicitly keeps its own list: add
-`A4_PACKAGE` to it and re-sign `trust.yaml`. The readiness item `signing.notary_route` shows the route for both kinds.
+`A4_RECORD` envelope is a notary call, so each gate decision adds one. Today the readiness item `signing.notary_route`
+reports the `A4_RECORD` route only. `A4_PACKAGE` is not a sign kind yet: once Activate (P1-62) adds it, an operator whose
+`trust.yaml` lists `requireNotaryFor` explicitly keeps that list and must add `A4_PACKAGE` to it and re-sign
+`trust.yaml`.
 
 ## Approvals and separation of duties
 
@@ -137,22 +138,27 @@ destruction is effective only after every backup, WORM segment or mirror older t
   trust list. It takes no query parameter and no body: `?trustList=` is 400 `QUERY_INVALID`, and any trust a request
   names is refused. The report is the same for every reader allowed to see it. `amc verify all` runs the same check
   (`a4-projects`) for every project.
-- **Export.** `amc bundle export` adds the A4 slice of the run's agent to the `.amcbundle`: the project rows as stored and
-  the ledger rows they name. The signed manifest lists each project with its exported head and
-  `containsSyntheticExamples`.
+- **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
+  as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name. Each
+  project's chain is verified whole before it is exported, and a project that does not verify refuses the export. The
+  signed manifest lists every file, each project's head and `containsSyntheticExamples`. The bundle's own ledger and
+  `amc certify` are unchanged by the slice.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
-  trust list admits them (on the CLI, `amc a4 verify --trust-list`, P1-65). With no trust list the report states
-  integrity only. Seven normative fixtures, with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
+  trust list admits them. It is a library function for now: the CLI entry point is `amc a4 verify --trust-list`
+  (P1-65). With no trust list the report states integrity only. Seven normative fixtures, with their expected
+  verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,
   evidence refs and verifier summary under `.amc/audit/binders/exports/` only: digests, statuses and hashed principals,
-  never specification text, comment bodies or decision reasons, scanned for personal data and key material before its
-  manifest is signed.
+  never specification text, comment bodies or decision reasons. Only ledger row ids are kept as they are; every other
+  ref id (a file name, a receipt or external id) is hashed with its kind. The slice is scanned for personal data and
+  key material, then staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
+  function for now: no route or command serves it yet.
 
 ## Using the API before the Studio pages
 
 With `AMC_A4_PREVIEW=1` and a Studio session (`amc approvals login` or the Studio login), read the native CSRF token
-from `GET /api/v1/studio/whoami` (`nativeCsrfToken`), then send on every call:
+from `GET /auth/me` (field `nativeCsrfToken`), then send on every call:
 
 ```text
 Cookie: <the Studio session cookie>
