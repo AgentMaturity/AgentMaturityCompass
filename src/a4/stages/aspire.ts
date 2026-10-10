@@ -17,7 +17,7 @@ import { writeEnforceResourceManifest } from "../../enforce/resourceManifest.js"
 import { parseStation } from "../../domains/stations.js";
 import { getAgentPaths } from "../../fleet/paths.js";
 import { agentConfigSchema, buildAgentConfig, saveAgentConfig, scaffoldAgent, verifyAgentConfigSignature, type AgentConfig } from "../../fleet/registry.js";
-import { typedMultiAgentGraphSchema } from "../../fleet/typedGraph.js";
+import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema, writeTypedMultiAgentGraph } from "../../fleet/typedGraph.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { initOutcomeContract, outcomeContractPath } from "../../outcomes/outcomeContractEngine.js";
 import { createSignedTargetProfile, defaultTargetMapping, loadTargetProfileFromFile, saveTargetProfile, verifyTargetProfileSignature } from "../../targets/targetProfile.js";
@@ -75,11 +75,26 @@ function contextGraphSha256(workspace: string, agentId: string): string | null {
   return sha256Hex(canonicalize(graph));
 }
 
-/** Readiness items and the two brief slots a gate binds and every decide, complete and executor preamble recomputes. */
+/** The typed graph Build writes for the agent (writeTypedMultiAgentGraph's per-graph file, graphId `a4-<agentId>`). */
+const typedGraphPath = (workspace: string, agentId: string): string => join(workspace, ".amc", "fleet", "typed-graphs", `a4-${agentId}.json`);
+/** typedMultiAgentGraphDigest of that file, the digest Enforce's manifest records for a typed graph. */
+function typedGraphDigest(workspace: string, agentId: string): string | null {
+  const what = "graph.typedGraphDigest (the agent's typed multi-agent graph)";
+  const bytes = readOrAbsent(typedGraphPath(workspace, agentId), what);
+  if (bytes === null) return null;
+  try {
+    return typedMultiAgentGraphDigest(typedMultiAgentGraphSchema.parse(JSON.parse(bytes.toString("utf8"))));
+  } catch {
+    throw fail(409, "RESOURCE_UNREADABLE", `${what} is not a typed multi-agent graph`);
+  }
+}
+
+/** Readiness items and the brief and graph slots a gate binds and every decide, complete and executor preamble recomputes. */
 export function register(registry: A4StageRegistry): void {
   registry.items.push(aspireItems);
   RESOURCE_SLOTS["brief.contextGraphSha256"] = contextGraphSha256;
   RESOURCE_SLOTS["brief.agentConfigSha256"] = (workspace, agentId) => fileSha(getAgentPaths(workspace, agentId).agentConfig, "brief.agentConfigSha256 (the agent config)");
+  RESOURCE_SLOTS["graph.typedGraphDigest"] = typedGraphDigest;
 }
 
 /** Why a detached `.sig` (registry.ts's format) does not sign `bytes` under this workspace's auditor keys; null when it does. */
@@ -461,14 +476,12 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
  * Build (after the direction gate is consumed): the context graph through validateContextGraph and initWorkspace's writer,
  * scaffoldAgent for an agent with none of its files, else the signed config re-saved (a placeholder one when it has none)
  * and its own target profile re-signed with the new contextGraphHash and its verified mapping; the outcome contract when
- * there is none, then the Enforce manifest so the agent is ACTIVE. It signs what `agent add`, `target set` and `snapshot`
+ * there is none; the typed multi-agent graph (writeTypedMultiAgentGraph, which also replaces the fleet's latest.json);
+ * then the Enforce manifest so the agent is ACTIVE. It signs what `agent add`, `target set` and `snapshot`
  * sign, so it takes their owner-mode gates, and the router admits only owners (src/api/accessPolicy.ts A4_OWNER). Every
  * check that can refuse runs before the first write. Each write is an implementation ref with its file's sha256; the
  * revision names what was written. A manifest Enforce refuses is recorded by its code (manifest_active BLOCKED), never
  * thrown after the other writes.
- * The typed graph stays a draft in the spec: Enforce's manifest digests `typed-graphs/latest.json` canonically and checks
- * its staged copy by raw bytes, so once that file exists no manifest can be written in the workspace; Assemble writes the
- * graph (P1-60) once that is fixed.
  * The router refuses Build (409 RESOURCE_DRIFTED) before it runs when a resource the approved revision bound has moved.
  * ponytail: the router refuses a stale head before Build runs, but the files are still written before the transaction
  * that records them; a head that moves in between leaves them written, and Build run again is then refused as drifted,
@@ -487,6 +500,8 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const graph = validateContextGraph(brief.contextGraph);
   const role = brief.agent.includes(":") ? brief.agent.slice(brief.agent.indexOf(":") + 1).trim() || "assistant" : "assistant";
   const fields = { agentName: brief.agentName, role, domain: brief.stations[0] ?? "general", primaryTasks: brief.goals, stakeholders: brief.audience, riskTier: graph.riskTier };
+  const typedGraph = typedMultiAgentGraphSchema.safeParse(spec.graph);
+  if (!typedGraph.success) throw fail(409, "A4_NOT_READY", "The proposed solution sketch is not a typed multi-agent graph; propose again.", { reasonCodes: ["TYPED_GRAPH_INVALID"] });
   // Refusals first: the signing key (423 while the vault is locked), the agent's own signed files, the config to sign.
   getPrivateKeyPem(workspace, "auditor");
   const prior = priorAgent(workspace, agentId);
@@ -513,6 +528,7 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const outcomePath = outcomeContractPath(workspace, agentId);
   const outcomeKept = pathExists(outcomePath);
   if (!outcomeKept) initOutcomeContract(workspace, agentId);
+  const graphWritten = writeTypedMultiAgentGraph({ workspace, graph: typedGraph.data });
   let manifest: { manifestId: string; path: string } | { error: string };
   try {
     const written = writeEnforceResourceManifest({ workspace, agentId });
@@ -523,13 +539,13 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
     manifest = { error: typeof code === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : "ENFORCE_MANIFEST_REFUSED" };
   }
   const files = ([["context-graph", paths.contextGraph, "written"], ["agent-config", paths.agentConfig, "written"], ["target-profile", targetPath, "written"],
-    ["outcome-contract", outcomePath, outcomeKept ? "kept" : "written"], ...("path" in manifest ? [["enforce-manifest", manifest.path, "written"] as const] : [])] as const)
+    ["outcome-contract", outcomePath, outcomeKept ? "kept" : "written"], ["typed-graph", graphWritten.graphPath, "written"], ...("path" in manifest ? [["enforce-manifest", manifest.path, "written"] as const] : [])] as const)
     .map(([writer, path, action]) => ({ writer, path: relPath(workspace, path), action, sha256: fileSha(path, `the ${writer} Build ${action}`) }));
   return {
     outputs: files.map((file) => ({ output: "build", lane: "implementation" as const, method: null, body: file,
       label: `aspire build: ${file.writer} ${file.action === "kept" ? "kept (not written by Build)" : "written"} (${file.path})` })),
     spec: { ...spec, build: { files, agentCreated: !prior.exists, verifiedBefore: prior.checked, contextGraphHash, outcomeContract: outcomeKept ? "kept" : "initialised",
-      typedGraph: "draft in this spec; not written (Enforce manifest digest mismatch)", ...("manifestId" in manifest ? { manifestId: manifest.manifestId } : { manifestError: manifest.error }),
+      typedGraphDigest: graphWritten.ref.digestSha256, ...("manifestId" in manifest ? { manifestId: manifest.manifestId } : { manifestError: manifest.error }),
       provider: prior.config === null ? "local_openai placeholder, no key (Assemble chooses the provider)" : "kept" } }
   };
 }
