@@ -20,8 +20,8 @@ import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
-  assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze, requestChanges, requestGate,
-  RESOURCE_SLOTS
+  assertAllowed, driftedSlots, evaluateFor, flatSlots, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
+  requestChanges, requestGate, RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
@@ -205,6 +205,13 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   // A stale request is refused before a producer writes workspace files or any blob is sealed (governed() checks again inside).
   if (checked.project.head_seq !== fields.expectedHeadSeq) {
     throw a4Fail(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: checked.project.head_seq });
+  }
+  // A Build producer writes the approved resources and its revision binds them as they then are, so drift since the
+  // direction was approved is refused here, before it writes (inside, readiness would refuse Build's own writes).
+  if (kind === "build" && producer !== undefined) {
+    const approved = checked.revisions.find((row) => row.revision_no === checked.project.revision_no);
+    const drifted = approved === undefined ? [] : driftedSlots(route.workspace, flatSlots(JSON.parse(approved.resource_digests_json)), checked.project.agent_id);
+    if (drifted.length > 0) throw a4Fail(409, "RESOURCE_DRIFTED", `resources moved since the direction was approved: ${drifted.join(", ")}`, { slots: drifted });
   }
   const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now,
     ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
