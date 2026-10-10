@@ -33,7 +33,7 @@ import {
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
-import { PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
+import { hypothesisDigestOf, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 
@@ -202,8 +202,14 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   refuseOnFreeze(route.store, projectId);
   const checked = loadA4State(route.store, projectId, now);
   check(checked);
+  // A stale request is refused before a producer writes workspace files or any blob is sealed (governed() checks again inside).
+  if (checked.project.head_seq !== fields.expectedHeadSeq) {
+    throw a4Fail(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: checked.project.head_seq });
+  }
   const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now,
     ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
+  // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
+  if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
   const outputs = [
     ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
     ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
@@ -248,11 +254,13 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     if (def.to !== null && def.to !== project.step) {
       const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed");
       const notEvaluated = producer === undefined ? [NO_PRODUCER] : [...(produced?.notEvaluated ?? [])];
+      // A producer that ran and named no reason still observed nothing: never labelled as if none were registered.
+      if (notEvaluated.length === 0) notEvaluated.push("NO_OBSERVED_REF");
       specs.push({ kind: "STEP", stage, payload: { ...(produced?.record ?? {}), from: project.step, to: def.to, claimKind: "self_reported", producer: producer?.id ?? null,
         ...(def.output !== null && producer === undefined ? { reasonCodes: [NO_PRODUCER] } : {}),
         ...(fields.level !== undefined ? { level: fields.level } : {}),
         // `reviewed` needs an observed ref or an explicit not_evaluated output with its reason (design §9.1).
-        ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: notEvaluated.length > 0 ? notEvaluated : [NO_PRODUCER] } } : {}) },
+        ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: notEvaluated } } : {}) },
         head: { step: def.to } });
     }
     if (specs.length === 0) throw a4Fail(409, "A4_STEP_ORDER", "Nothing to record.");
@@ -316,7 +324,9 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
     const hypothesis = (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).map((entry) => a4HypothesisSchema.safeParse(entry))
       .find((parsed) => parsed.success && parsed.data.id === hypothesisId)?.data;
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);
-    if (state.chain.some((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId === hypothesisId)) {
+    // The ref binds this hypothesis's content: an older observation of another statement under the same id does not count.
+    const hypothesisDigest = hypothesisDigestOf(hypothesis);
+    if (state.chain.some((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId === hypothesisId && link.body.hypothesisDigest === hypothesisDigest)) {
       throw a4Fail(409, "A4_HYPOTHESIS_OBSERVED", "This hypothesis already left proposed.");
     }
     const event = route.store.ledger.getEventById(body.evidenceRef.refId);
@@ -336,7 +346,9 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
     return route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: body.evidenceRef.refId, sha256: body.evidenceRef.sha256,
       claimKind: "observed", method: "runtime_observation", label: `hypothesis ${hypothesisId}: observed outcome`, column: "implementation",
       expectedHeadSeq: body.expectedHeadSeq, request,
-      note: { hypothesisId, verdict: { outcome: body.verdict, by: principal.key, claimKind: "self_reported" } } });
+      // The observed value is the row's own, copied as recorded (null when it carries none); the verdict stays apart.
+      note: { hypothesisId, hypothesisDigest, observedOutcome: ["number", "string", "boolean"].includes(typeof meta.value) ? meta.value : null,
+        verdict: { outcome: body.verdict, by: principal.key, username: principal.username, claimKind: "self_reported" } } });
   }, 201);
 }
 
