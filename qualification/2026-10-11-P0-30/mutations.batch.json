@@ -354,11 +354,10 @@
     "replace": "if (false && !Number.isSafeInteger",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M02-bwrap-exit-before-child",
@@ -368,11 +367,10 @@
     "replace": "if (exit !== null ||",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M03-bwrap-exit-dup",
@@ -382,11 +380,10 @@
     "replace": "if (child === null ||",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M04-bwrap-exit-range",
@@ -396,11 +393,10 @@
     "replace": ") return null;",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M05-bwrap-nonobject-row",
@@ -410,11 +406,10 @@
     "replace": "if (!row) return null;",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M06-bwrap-child-positive",
@@ -424,11 +419,10 @@
     "replace": ") return null;",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M07-bpf-arch-check",
@@ -438,11 +432,10 @@
     "replace": "[0x15, 1, 1, arch === \"x64\"",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M08-bpf-x32-rule",
@@ -452,11 +445,10 @@
     "replace": "if (false) instructions.push([0x35",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M09-bpf-io-uring",
@@ -466,11 +458,10 @@
     "replace": "]) {",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M10-bpf-connect",
@@ -480,11 +471,10 @@
     "replace": "[41, 53]",
     "tests": [
       "tests/sandboxConfinement.test.ts",
-      "tests/nativeSandboxPolicyBinding.test.ts",
       "tests/bwrapBackendPure.test.ts"
     ],
     "expect": "killed",
-    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests)."
+    "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure."
   },
   {
     "id": "S7-M11-profile-import-gate-221",
