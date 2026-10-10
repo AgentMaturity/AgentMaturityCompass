@@ -1,0 +1,67 @@
+{
+  "kind": "amc.rollback-drill/1",
+  "sourceCommit": "3a358adbd3be062d1cd1b13d8451cf757e769777",
+  "startedAt": "2026-10-10T23:38:24.598Z",
+  "environment": {
+    "node": "v25.5.0",
+    "platform": "darwin",
+    "release": "25.6.0",
+    "arch": "arm64"
+  },
+  "images": {
+    "a": {
+      "ref": "amc-studio:drill-a",
+      "id": "sha256:24664f3506dbdfacbcbe51c05cffbf55c92a1624e6e7c0b2c6851bd6b134fd58"
+    },
+    "b": {
+      "ref": "amc-studio:drill-b",
+      "id": "sha256:344afd54d695a33f1a1d764cd0a4291ce9aecc59707fd6ddc4ca47d70626ce13"
+    }
+  },
+  "container": "amc-rollback-drill-5848f0eb",
+  "volume": "amc-rollback-drill-5848f0eb",
+  "steps": [
+    {
+      "id": "deploy-a",
+      "status": "passed",
+      "imageId": "sha256:24664f3506dbdfacbcbe51c05cffbf55c92a1624e6e7c0b2c6851bd6b134fd58"
+    },
+    {
+      "id": "probe-a",
+      "status": "failed",
+      "probe": {
+        "status": "failed",
+        "failedStep": "verify",
+        "verification": "failed",
+        "verificationScope": null,
+        "failedDetail": "verification is failed: Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims."
+      }
+    },
+    {
+      "id": "upgrade-b",
+      "status": "skipped"
+    },
+    {
+      "id": "probe-b",
+      "status": "skipped"
+    },
+    {
+      "id": "rollback-a",
+      "status": "skipped"
+    },
+    {
+      "id": "probe-after-rollback",
+      "status": "skipped"
+    }
+  ],
+  "status": "failed",
+  "monitorPin": "e8e123930792a479c7b306eb9cd2dbaf10a82203a8dd660cbf39215c4da5853b",
+  "probeStatuses": [
+    "failed"
+  ],
+  "monitorPinSource": "trust-on-first-use: read from the drill's own workspace volume after A's first bootstrap",
+  "notExercised": [
+    "Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"
+  ],
+  "finishedAt": "2026-10-10T23:38:41.982Z"
+}

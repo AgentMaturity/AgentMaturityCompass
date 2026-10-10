@@ -111,7 +111,10 @@ export interface NativeTaskView {
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
   readonly archived: boolean;
   readonly turnEndReason: string | null; readonly error: string | null;
-  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "failed";
+  /** "anchored-prefix" (P0-14): anchored, but over a verified prefix; never the same state as "externally-anchored". */
+  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "anchored-prefix" | "failed";
+  /** What an anchored verdict covers; null unless verification is "externally-anchored" or "anchored-prefix" (P0-14). */
+  readonly verificationScope: { readonly scope: "complete-ledger" | "verified-prefix"; readonly unfinalizedSessions: readonly string[] } | null;
   readonly approvals: readonly NativeTaskApproval[]; readonly approvalError: string | null;
   readonly nextCursor: number; readonly firstCursor: number; readonly droppedEvents: number;
   readonly canResume: boolean;

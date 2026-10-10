@@ -1,0 +1,248 @@
+== install: helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 04:53:09 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+install exit=0
+== pin: pin
+monitor key sha256 f28789d542868079f6342bf76aba34c12649239601f54fdc268717264fdb3fbd
+Release "amc" has been upgraded. Happy Helming!
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 04:53:28 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+pin exit=0
+== pair-1: pair
+pair-1 exit=0
+== test-1: helm test amc --logs --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 04:53:28 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 04:53:48 2026
+Last Completed: Sun Oct 11 04:53:48 2026
+Phase:          Succeeded
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 04:53:48 2026
+Last Completed: Sun Oct 11 04:53:56 2026
+Phase:          Succeeded
+
+POD LOGS: amc-amc-governed-turn (governed-turn)
+{
+  "kind": "amc.governed-turn-probe/1",
+  "status": "verified-prefix",
+  "failedStep": null,
+  "baseUrl": "http://amc-amc:3212",
+  "agentId": "default",
+  "taskId": "836214beda6ea67835dca8456efe813d0d9e22d5553158b473aba45873b84e8e",
+  "verification": "anchored-prefix",
+  "verificationScope": {
+    "scope": "verified-prefix",
+    "unfinalizedSessions": [
+      "b9e9efc8-952f-43c6-9c53-815ac95100c9"
+    ]
+  },
+  "steps": [
+    {
+      "id": "healthz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "readyz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "pair",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "login",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "csrf",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "options",
+      "status": "passed",
+      "httpStatus": 200,
+      "agentId": "default"
+    },
+    {
+      "id": "submit",
+      "status": "passed",
+      "httpStatus": 202,
+      "taskId": "836214beda6ea67835dca8456efe813d0d9e22d5553158b473aba45873b84e8e"
+    },
+    {
+      "id": "turn",
+      "status": "passed",
+      "state": "idle",
+      "revision": 1
+    },
+    {
+      "id": "verify",
+      "status": "passed",
+      "httpStatus": 200,
+      "state": "closed",
+      "verification": "anchored-prefix",
+      "verificationScope": {
+        "scope": "verified-prefix",
+        "unfinalizedSessions": [
+          "b9e9efc8-952f-43c6-9c53-815ac95100c9"
+        ]
+      }
+    }
+  ]
+}
+
+test-1 exit=0
+== upgrade: helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
+Release "amc" has been upgraded. Happy Helming!
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 04:53:57 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+DESCRIPTION: Upgrade complete
+NOTES:
+AMC Studio 1.2.0 is deployed as amc-amc in namespace default.
+
+Run the governed-turn check (logs in, runs a stub-provider native task, verifies its evidence):
+
+  helm test amc --namespace default --logs
+
+Liveness and readiness alone do not prove a governed turn; see docs/KUBERNETES_HELM_DEPLOYMENT.md.
+
+The image is referenced by tag (amc-studio:ci). Set image.digest to pin it.
+upgrade exit=0
+== rollback: helm rollback amc 2 --wait --timeout 10m
+Rollback was a success! Happy Helming!
+rollback exit=0
+== pair-2: pair
+pair-2 exit=0
+== test-2: helm test amc --logs --timeout 10m
+NAME: amc
+LAST DEPLOYED: Sun Oct 11 04:54:09 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+DESCRIPTION: Rollback to 2
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 04:54:26 2026
+Last Completed: Sun Oct 11 04:54:26 2026
+Phase:          Succeeded
+TEST SUITE:     amc-amc-governed-turn
+Last Started:   Sun Oct 11 04:54:27 2026
+Last Completed: Sun Oct 11 04:54:33 2026
+Phase:          Succeeded
+
+POD LOGS: amc-amc-governed-turn (governed-turn)
+{
+  "kind": "amc.governed-turn-probe/1",
+  "status": "verified-prefix",
+  "failedStep": null,
+  "baseUrl": "http://amc-amc:3212",
+  "agentId": "default",
+  "taskId": "ad1af56b64455be3f89fc3da7acd08ae5adedff60d188262c00ed3853dce04a2",
+  "verification": "anchored-prefix",
+  "verificationScope": {
+    "scope": "verified-prefix",
+    "unfinalizedSessions": [
+      "7344a194-d8bd-4bde-b912-89c9b102ef89"
+    ]
+  },
+  "steps": [
+    {
+      "id": "healthz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "readyz",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "pair",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "login",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "csrf",
+      "status": "passed",
+      "httpStatus": 200
+    },
+    {
+      "id": "options",
+      "status": "passed",
+      "httpStatus": 200,
+      "agentId": "default"
+    },
+    {
+      "id": "submit",
+      "status": "passed",
+      "httpStatus": 202,
+      "taskId": "ad1af56b64455be3f89fc3da7acd08ae5adedff60d188262c00ed3853dce04a2"
+    },
+    {
+      "id": "turn",
+      "status": "passed",
+      "state": "idle",
+      "revision": 1
+    },
+    {
+      "id": "verify",
+      "status": "passed",
+      "httpStatus": 200,
+      "state": "closed",
+      "verification": "anchored-prefix",
+      "verificationScope": {
+        "scope": "verified-prefix",
+        "unfinalizedSessions": [
+          "7344a194-d8bd-4bde-b912-89c9b102ef89"
+        ]
+      }
+    }
+  ]
+}
+
+test-2 exit=0

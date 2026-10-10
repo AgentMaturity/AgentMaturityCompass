@@ -22,6 +22,11 @@ const namespace = config.get("namespace") ?? "amc-system";
 const chartPath = config.get("chartPath") ?? "../../helm/amc";
 const imageRepository = config.get("imageRepository") ?? "ghcr.io/your-org/amc-studio";
 const imageTag = config.get("imageTag") ?? "latest";
+// sha256:<64 hex>; when set the chart deploys repository@digest and ignores the tag.
+const imageDigest = config.get("imageDigest") ?? "";
+if (!/^(sha256:[a-f0-9]{64})?$/.test(imageDigest)) {
+  throw new Error("imageDigest must be empty or sha256:<64 lowercase hex>");
+}
 const imagePullPolicy = config.get("imagePullPolicy") ?? "IfNotPresent";
 const replicaCount = config.getNumber("replicaCount") ?? 1;
 const bootstrapSecretName = config.get("bootstrapSecretName") ?? "amc-bootstrap";
@@ -39,6 +44,7 @@ const inlineValues: Record<string, unknown> = {
   image: {
     repository: imageRepository,
     tag: imageTag,
+    digest: imageDigest,
     pullPolicy: imagePullPolicy
   },
   ingress: {
@@ -102,4 +108,5 @@ const release = new k8s.helm.v3.Release(
 export const amcReleaseName = release.name;
 export const amcNamespace = release.namespace;
 export const amcChart = chartPath;
-export const amcLocalPortForward = pulumi.interpolate`kubectl -n ${release.namespace} port-forward svc/${release.name} 3212:3212`;
+// The chart names resources "<release>-amc" (templates/_helpers.tpl amc.fullname).
+export const amcLocalPortForward = pulumi.interpolate`kubectl -n ${release.namespace} port-forward svc/${release.name}-amc 3212:3212`;
