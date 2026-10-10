@@ -124,7 +124,9 @@ const A4_APPROVAL = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/(approve|den
 const A4_REVIEW = /^\/api\/v1\/a4\/projects\/[^/]+\/gates\/[^/]+\/request-changes$/;
 const A4_MEMBER = /^\/api\/v1\/a4\/projects\/[^/]+\/(comments|presence)$/;
 // `retire` is not here: the creator of a never-proposed draft may retire it (retireProject enforces owner-or-creator).
-const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete)$/;
+// Aspire's build signs an agent config, a target profile and an Enforce manifest (what `agent add`, `target set` and the
+// OWNER-only fleet and enforce mutations write), so it takes OWNER like they do (P1-59).
+const A4_OWNER = /^\/api\/v1\/a4\/projects\/[^/]+\/(hold|resume|reopen|tune|members|gate-policy|acknowledge|releases(\/.*)?|stages\/[^/]+\/effects\/[^/]+\/(open|retry)|stages\/(adapt|activate)\/complete|stages\/aspire\/build)$/;
 
 /** P1-57: an A4 gate decision takes the approve class with APPROVER, AUDITOR or OWNER (APPROVER_PATHS holds exact paths only). */
 export function isA4ApprovalPath(pathname: string): boolean {
@@ -141,7 +143,7 @@ export function isA4MemberPath(pathname: string): boolean {
   return A4_MEMBER.test(pathname);
 }
 
-/** P1-57: A4 owner actions (hold, members, gate policy, effects, adapt/activate completion, releases). */
+/** P1-57: A4 owner actions (hold, members, gate policy, effects, adapt/activate completion, releases); P1-59: Aspire build. */
 export function isA4OwnerPath(pathname: string): boolean {
   return A4_OWNER.test(pathname);
 }

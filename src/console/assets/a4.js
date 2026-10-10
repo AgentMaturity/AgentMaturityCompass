@@ -383,11 +383,9 @@ function mountProject(projectId, options) {
     const scope = button.closest("[data-card]") ?? button.closest("section") ?? root;
     const card = scope.dataset?.card ?? "page";
     const value = (field) => scope.querySelector(`[name="${field}"]`)?.value.trim() ?? "";
-    const written = (field, what) => {
-      const text = value(field);
-      if (!text) throw new Error(`Write ${what} first. Nothing was sent.`);
-      return text;
-    };
+    // Understand, Explain, Build and Review send the text only when written: a stage with producers (Aspire) runs AMC's
+    // step and records it as a note beside it; Studio refuses an empty one where no producer is registered (400 INPUT_INVALID).
+    const note = (field) => (value(field) ? { content: value(field) } : {});
     // Studio refuses an empty reason on decisions, Hold, Resume and Acknowledge.
     const reason = () => {
       const text = root.querySelector('.a4-approvals [name="reason"]')?.value.trim() ?? "";
@@ -417,22 +415,22 @@ function mountProject(projectId, options) {
         if (!answer) throw new Error("That answer is no longer shown. Nothing was sent.");
         return post("Confirm answer", stagePath("answers"), { ...headBinding(), answers: [{ questionId: answer.questionId, value: answer.value }] });
       }
-      // Until a stage producer lands, Understand and Explain record the member's own text (P1-57's no-producer path).
+      // Where a stage has no producer, Understand and Explain record the member's own text (P1-57's no-producer path).
       case "understand": {
-        const content = written("understanding", "what this stage should achieve");
-        return post("Run Understand", stagePath("understand"), { content, ...headBinding() }, [`${card}:understanding`],
-          (data) => { reflection = { data, text: content, headSeq: headSeqOf(data) }; });
+        const sent = note("understanding");
+        return post("Run Understand", stagePath("understand"), { ...sent, ...headBinding() }, [`${card}:understanding`],
+          (data) => { reflection = { data, text: sent.content ?? "", headSeq: headSeqOf(data) }; });
       }
       case "confirm": return post("Confirm understanding", stagePath("confirm-understanding"), { confirmed: true, ...reflectionBinding() });
       case "explain": {
         const level = value("level");
-        const content = written("explanation", "your explanation");
-        return post("Explain", stagePath("explain"), { content, level, ...headBinding() }, [`${card}:explanation`],
-          (data) => { explanation = { level, text: content, data, headSeq: headSeqOf(data) }; });
+        const sent = note("explanation");
+        return post("Explain", stagePath("explain"), { ...sent, level, ...headBinding() }, [`${card}:explanation`],
+          (data) => { explanation = { level, text: sent.content ?? "", data, headSeq: headSeqOf(data) }; });
       }
       case "propose": return proposeAction(scope);
-      case "build": return post("Build", stagePath("build"), { content: written("content", "the build output"), ...headBinding() }, [`${card}:content`]);
-      case "review": return post("Review", stagePath("review"), { content: written("content", "your findings"), ...headBinding() }, [`${card}:content`]);
+      case "build": return post("Build", stagePath("build"), { ...note("content"), ...headBinding() }, [`${card}:content`]);
+      case "review": return post("Review", stagePath("review"), { ...note("content"), ...headBinding() }, [`${card}:content`]);
       case "request-direction": return post("Request direction approval", stagePath("gates/direction/request"), headBinding(), [], repin);
       case "request-completion": return post("Request completion approval", stagePath("gates/completion/request"), headBinding(), [], repin);
       case "approve": return decide("approve", "Approve", (binding) => binding);
@@ -453,6 +451,9 @@ function mountProject(projectId, options) {
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
       // The item was listed by the viewed stage's readiness, so it is acknowledged at that stage, not the head's.
       case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, stage, reason: reason(), ...headBinding() }, REASON);
+      // The attempt readiness named (owner only); the effect's own stage, which may not be the one viewed.
+      case "retry-effect": return post("Retry effect", projectPath(`/stages/${encodeURIComponent(button.dataset.effectStage)}/effects/${
+        encodeURIComponent(button.dataset.effect)}/retry`), { attemptId: button.dataset.attempt, ...headBinding() });
       case "add-member": {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.

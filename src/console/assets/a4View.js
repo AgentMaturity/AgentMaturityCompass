@@ -136,11 +136,14 @@ export function stepOffer(offer, ctx, route) {
 const CONTENT_MAX = 65_536;
 
 const NO_REFLECTION = "No statement recorded from this page yet";
-const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
+export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
-/** What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. */
-const recorded = (what, entry) => `<p class="muted">Studio recorded ${what} as self-reported${Number.isSafeInteger(entry.headSeq)
-  ? ` at seq ${esc(entry.headSeq)}` : ""}. What you sent:</p><p>${esc(entry.text)}</p>${studioJson(entry.data)}`;
+/**
+ * What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. With
+ * nothing sent (a stage whose producer ran), the receipt is the step's output, never labelled as the member's statement.
+ */
+const recorded = (what, entry) => `<p class="muted">Studio recorded ${entry.text ? what : "this step's output"} as self-reported${Number.isSafeInteger(entry.headSeq)
+  ? ` at seq ${esc(entry.headSeq)}` : ""}. ${entry.text ? `What you sent:</p><p>${esc(entry.text)}</p>` : "You sent no statement.</p>"}${studioJson(entry.data)}`;
 
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
 function reflectionHtml(reflection, understand) {
@@ -291,11 +294,19 @@ function nextActionHtml(next) {
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
   "plan_unresolved"]);
 
+/** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
+function retryButton(item, allowed) {
+  const attempt = item.id === "effects.failed" ? item.reasonCodes.find((code) => /^ATTEMPT:a4e_[0-9a-f]{32}$/.test(code)) : undefined;
+  const route = /\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/retry$/.exec(item.nextAction?.route ?? "");
+  return attempt && route ? ` ${actionButton("Retry", "retry-effect", allowed.retryEffect,
+    `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
+}
+
 function itemRow(item, allowed) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
-      still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${
+      still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
     !ack && item.status === "WAITING" && ACKNOWLEDGEABLE.has(item.id) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }

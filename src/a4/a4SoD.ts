@@ -34,10 +34,18 @@ export function buildersOf(transitions: readonly A4ChainLink[], revisionNo: numb
     .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string" && key !== "amc-runtime"))];
 }
 
-/** The author of a revision: the actor of its REVISION transition. */
-export function authorOf(transitions: readonly A4ChainLink[], revisionNo: number): string | null {
-  const key = transitions.find((link) => link.kind === "REVISION" && link.revisionNo === revisionNo)?.body.actorKey;
-  return typeof key === "string" ? key : null;
+/**
+ * The authors a gate's approver must not be: the actor of the gate revision's REVISION transition and, for a completion
+ * gate, of every revision since the one the stage's consumed direction gate approved (a producer's Build appends a
+ * revision, which must not drop the approved brief's author). A policy gate approves its proposal, authored by its requester.
+ */
+export function authorsOf(transitions: readonly A4ChainLink[], gate: { readonly gate: "direction" | "completion" | "policy"; readonly revisionNo: number }): string[] {
+  if (gate.gate === "policy") return [];
+  // The newest direction gate consumed at or before this revision is this stage's: a stage advances only when its completion gate is consumed.
+  const from = gate.gate === "completion" ? transitions.filter((link) => link.kind === "GATE_CONSUMED" && link.body.gate === "direction"
+    && link.revisionNo <= gate.revisionNo).at(-1)?.revisionNo ?? gate.revisionNo : gate.revisionNo;
+  return [...new Set(transitions.filter((link) => link.kind === "REVISION" && link.revisionNo >= from && link.revisionNo <= gate.revisionNo)
+    .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string"))];
 }
 
 /**
@@ -62,8 +70,8 @@ export function evaluateSod(input: {
   if (!/^(LOCAL_USER|WORKSPACE_ROUTER):./.test(approver.key)) violations.add(/demo/i.test(approver.key) ? "no_demo" : "no_admin_token");
   const selfRules = new Set<SodRule>();
   if (gate.requesterKeys.includes(approver.key)) selfRules.add("requester_not_approver");
-  // The revision under approval: a policy gate approves its proposal (authored by the requester), not the head revision.
-  if (gate.gate !== "policy" && authorOf(input.transitions, gate.revisionNo) === approver.key) selfRules.add("author_not_approver");
+  // The revisions under approval: a policy gate approves its proposal (authored by the requester), not the head revision.
+  if (authorsOf(input.transitions, gate).includes(approver.key)) selfRules.add("author_not_approver");
   if ((gate.gate === "completion" || input.effect === true) && buildersOf(input.transitions, gate.revisionNo).includes(approver.key)) {
     selfRules.add("builder_not_completion_approver");
   }

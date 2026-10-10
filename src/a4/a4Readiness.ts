@@ -199,15 +199,22 @@ export function riskTierOf(state: A4ReadinessState): string | null {
   return typeof tier === "string" && declared.every((other) => other === tier) ? tier : null;
 }
 
+/** Risk tiers by rank, in every spelling A4 meets (C-25); a tier not listed ranks as high (unknown risk is not low risk). */
+export const TIER_RANK: Readonly<Record<string, number>> = { low: 0, med: 1, medium: 1, high: 2, critical: 3 };
+
 /**
  * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier other than low or
  * medium (an unstated, unknown or differently spelled tier counts: unknown risk is not low risk, as engineRiskTier maps
- * it to high), or a head Adapt revision carrying an activated plan.
+ * it to high), a brief tier below the agent's own tier before it (`brief.priorRiskTier`, recorded by Aspire's Propose:
+ * a lowering is decided under the rules of the tier it lowers), or a head Adapt revision carrying an activated plan.
  */
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
   if (tier !== "low" && tier !== "med" && tier !== "medium") return true;
+  const brief = latestRevision(state, "aspire");
+  const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
+  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
   const adapt = latestRevision(state, "adapt");
   const digests = adapt ? parseJson(adapt.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null : null;
   return typeof digests?.plan?.journalEntrySha256 === "string";
@@ -369,7 +376,8 @@ export function redoneStages(link: A4ChainLink): ((stage: unknown) => boolean) |
  * a new revision). One that lands while the attempt runs clears its outcome once it settles, as retry refuses it
  * (a4Effects.assertNotRedone). A revision of a later stage clears nothing, and a running attempt is never cleared. A
  * running attempt whose owner is lost is BLOCKED (PROCESS_LOST) with retry as the next action: retry settles it first,
- * since nothing else runs the sweeper.
+ * since nothing else runs the sweeper. Both name the attempt (`ATTEMPT:<id>`, which Studio's Retry sends) and the retry
+ * route; a failure also names its recorded error's code (`EFFECT_ERROR:<code>`).
  */
 function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4ReadinessItem {
   const latest = new Map<string, A4ChainLink>();
@@ -390,10 +398,21 @@ function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4Readin
     }
   }
   const states = [...latest.values()].map((link) => link.kind);
-  if (states.includes("EFFECT_FAILED")) return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED"] });
-  if ([...latest.values()].some((link) => link.kind === "EFFECT_STARTED" && lost.includes(String(link.body.effectId)))) {
-    return item("effects.failed", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["PROCESS_LOST"], nextAction: {
-      label: "Retry the effect: the retry first settles the lost attempt as process_lost (an effect that consumes its own grant is then re-opened and completed)" } });
+  const retry = (link: A4ChainLink) => `POST /api/v1/a4/projects/${state.project.project_id}/stages/${String(link.body.stage)}/effects/${String(link.body.effect)}/retry`;
+  const failed = [...latest.values()].find((link) => link.kind === "EFFECT_FAILED");
+  if (failed !== undefined) {
+    const code = /^[A-Za-z][A-Za-z0-9_]{0,63}/.exec(String(failed.body.error ?? ""))?.[0] ?? "UNKNOWN";
+    const second = state.chain.filter((link) => link.kind === "EFFECT_FAILED" && link.body.executionId === failed.body.executionId).length >= 2;
+    return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED", `EFFECT_ERROR:${code}`, `ATTEMPT:${String(failed.body.effectId)}`],
+      nextAction: second ? { label: "A second failure needs a new revision of the stage: reopen it (design §6.5)" }
+        : { label: `An owner retries attempt ${String(failed.body.effectId)} (recorded error ${code}; an effect that consumes its own grant is re-opened and completed instead)`,
+          route: retry(failed) } });
+  }
+  const lostRun = [...latest.values()].find((link) => link.kind === "EFFECT_STARTED" && lost.includes(String(link.body.effectId)));
+  if (lostRun !== undefined) {
+    return item("effects.failed", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["PROCESS_LOST", `ATTEMPT:${String(lostRun.body.effectId)}`], nextAction: {
+      label: "Retry the effect: the retry first settles the lost attempt as process_lost (an effect that consumes its own grant is then re-opened and completed)",
+      route: retry(lostRun) } });
   }
   if (states.includes("EFFECT_STARTED")) return item("effects.failed", "WAITING", { kind: "outcome_unknown", reasonCodes: ["BUILD_RUNNING"] });
   return item("effects.failed", "READY");
@@ -443,14 +462,14 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 /**
  * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
- * Activate takes an owner.
+ * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile.
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const [projectRoles, workspaceRoles] = action === "progress" && (stage === "adapt" || stage === "activate")
-    ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && stage === "aspire");
+  const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
 }
@@ -488,6 +507,8 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
         ? ["A4_DUPLICATE_DECISION"] : []),
       ...(everyPending((gate) => query.now >= gate.row.expires_ts - EXPIRING_GUARD_MS) ? ["GATE_EXPIRING"] : [])
     ],
+    // A retry that cannot sign fails at once and spends the attempt the stage has left before a new revision.
+    retryEffect: ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
     progress: [
       ...(gateList.some((gate) => gate?.status === "QUORUM_MET") ? [] : ["GATE_PENDING"]),
       ...ids((candidate) => (nonGate(candidate) || candidate.id === "sod" || candidate.id === "gate.required_reviews") && candidate.status !== "READY"

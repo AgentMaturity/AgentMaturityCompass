@@ -4,7 +4,8 @@
  * producer (its spec module's PRODUCERS is empty, until P1-59…P1-62) they take the "no producer registered" path: the
  * human-authored content goes to the project's encrypted blob store, is signed as an `a4-stage-output` artifact outside
  * any transaction and is recorded as a `stage_output` ref (self_reported, lane implementation), so `built` and `reviewed`
- * are reachable now. Every write is governed (src/a4/a4Gates.ts): freeze refusal, readiness on rows read inside the
+ * are reachable now. A stage's producer (P1-59 on) runs on rows checked under the step order before the transaction; each
+ * of its outputs takes the same blob, signature and ref path, and the member's own text, when sent, is recorded beside it. Every write is governed (src/a4/a4Gates.ts): freeze refusal, readiness on rows read inside the
  * transaction, signing outside it. Decisions, consumption and effects reuse the slice A functions unchanged. Stage
  * modules register through src/a4/a4Stages.ts, which evaluation and effect lookups run first.
  */
@@ -19,8 +20,8 @@ import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
-  assertAllowed, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze, requestChanges, requestGate,
-  RESOURCE_SLOTS
+  assertAllowed, driftedSlots, evaluateFor, flatSlots, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
+  requestChanges, requestGate, RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
@@ -28,11 +29,13 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import {
-  a4AnswerSchema, a4HypothesisSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Question, type A4Stage, type A4Step
+  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
-import { PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS } from "./spec/aspire.js";
+import {
+  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, understandingCurrent
+} from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 
@@ -44,6 +47,37 @@ export const STAGE_QUESTIONS: Readonly<Record<A4Stage, readonly A4Question[]>> =
 const STAGE_PRODUCERS: Readonly<Record<A4Stage, ReadonlyArray<{ readonly id: string }>>> = {
   aspire: ASPIRE_PRODUCERS, assemble: ASSEMBLE_PRODUCERS, adapt: ADAPT_PRODUCERS, activate: ACTIVATE_PRODUCERS
 };
+
+/** What a stage producer reads: rows checked under the step order, the live principal, the step's own input. */
+export interface A4ProducerContext {
+  readonly workspace: string;
+  readonly state: A4ReadinessState;
+  readonly principal: A4Principal;
+  readonly level?: "novice" | "practitioner" | "expert";
+  readonly spec?: Record<string, unknown>;
+  readonly now: number;
+}
+/** What one step records: AMC's outputs (each a signed stage_output ref, self_reported, lane derived), and optionally a revision. */
+export interface A4ProducerResult {
+  readonly outputs: ReadonlyArray<{ readonly output: string; readonly label: string; readonly lane: "implementation" | "recommendation";
+    readonly method: string | null; readonly body: unknown }>;
+  /** A new revision at the stage with this spec (the producer carries the answers). */
+  readonly spec?: Record<string, unknown>;
+  /** Review only: the reason codes of the explicit not_evaluated output `reviewed` records without an observed ref. */
+  readonly notEvaluated?: readonly string[];
+  /** Signed onto the STEP body (checks whose result is no evidence ref, such as integrity self-checks). */
+  readonly record?: Record<string, unknown>;
+  /** Answered beside the transition (a replay answers it too). */
+  readonly response?: Record<string, unknown>;
+}
+/** A stage producer (src/a4/spec/<stage>.ts PRODUCERS) for one step route. */
+export interface A4Producer {
+  readonly id: string;
+  readonly step: "understand" | "explain" | "propose" | "build" | "review";
+  readonly run: (ctx: A4ProducerContext) => Promise<A4ProducerResult>;
+}
+const producerFor = (stage: A4Stage, step: string): A4Producer | undefined => STAGE_PRODUCERS[stage]
+  .find((producer): producer is A4Producer => (producer as Partial<A4Producer>).step === step && typeof (producer as Partial<A4Producer>).run === "function");
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 const NO_PRODUCER = "NO_PRODUCER_REGISTERED";
 
@@ -58,11 +92,13 @@ const STEP_ROUTES: Record<StepRoute, { action: A4Action; from: readonly A4Step[]
   build: { action: "build", from: ["direction_approved"], to: "built", output: "build" },
   review: { action: "review", from: ["built"], to: "reviewed", output: "review" }
 };
+const UNDERSTANDING_STEPS: ReadonlySet<StepRoute> = new Set(["confirm-understanding", "explain", "propose"]);
 const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
 const headSeqSchema = z.number().int().min(0);
 const reasonSchema = z.string().trim().min(1).max(2000);
 const base = { expectedHeadSeq: headSeqSchema, clientRequestId: clientRequestIdSchema };
-const content = z.string().trim().min(1).max(65_536);
+// Required on the no-producer path (stageStep); beside a producer it is the member's own statement, recorded next to AMC's.
+const content = z.string().trim().min(1).max(65_536).optional();
 const STEP_SCHEMAS = {
   answers: z.strictObject({ ...base, answers: z.array(z.strictObject({ questionId: z.string().regex(/^[A-Za-z0-9_.-]{1,128}$/), value: z.unknown() })).min(1).max(200) }),
   understand: z.strictObject({ ...base, content }),
@@ -85,18 +121,21 @@ function stageSpec(state: A4ReadinessState, stage: A4Stage): { spec: Record<stri
   return { spec, answers };
 }
 
-/** The slots a generic revision binds: the signed configs as they are now and the gate policy in force; the rest is not produced. */
+/**
+ * The slots a revision binds: every slot a lane registered a recomputer for (the signed configs, Aspire's brief), as it
+ * is now, and the gate policy in force; a slot nothing recomputes is not produced (null).
+ */
 function genericResourceDigests(workspace: string, state: A4ReadinessState) {
-  const slot = (name: string): string | null => RESOURCE_SLOTS[`signedConfigs.${name}`]!(workspace);
+  const slot = (name: string): string | null => RESOURCE_SLOTS[name]?.(workspace, state.project.agent_id) ?? null;
+  const group = (name: string, slots: readonly string[]) => Object.fromEntries(slots.map((key) => [key, slot(`${name}.${key}`)]));
   return a4ResourceDigestsSchema.parse({
-    schema: "amc.a4-resource-digests/v1", brief: { contextGraphSha256: null, agentConfigSha256: null },
-    enforce: { manifestId: null, resourcesSha256: null, snapshotBundleSha256: null }, composition: { compositionDigest: null, policyDigest: null, presetSha256: null },
-    graph: { typedGraphDigest: null },
-    signedConfigs: { tools: slot("tools"), approvalPolicy: slot("approvalPolicy"), budgets: slot("budgets"), firewall: slot("firewall"),
-      actionPolicy: slot("actionPolicy"), opsPolicy: slot("opsPolicy") },
-    plan: { planDigest: null, lockDigest: null, journalEntrySha256: null }, operatingProfile: { sha256: null, activationSha256: null },
-    context: { contextPluginSha256: null, promptPackSha256: null, memoryPolicySha256: null },
-    release: { packageDigest: null, imageDigest: null, chartOrComposeDigest: null, valuesDigest: null }, gatePolicyDigest: gatePolicyDigestOf(state.chain)
+    schema: "amc.a4-resource-digests/v1", brief: group("brief", ["contextGraphSha256", "agentConfigSha256"]),
+    enforce: group("enforce", ["manifestId", "resourcesSha256", "snapshotBundleSha256"]), composition: group("composition", ["compositionDigest", "policyDigest", "presetSha256"]),
+    graph: group("graph", ["typedGraphDigest"]),
+    signedConfigs: group("signedConfigs", ["tools", "approvalPolicy", "budgets", "firewall", "actionPolicy", "opsPolicy"]),
+    plan: group("plan", ["planDigest", "lockDigest", "journalEntrySha256"]), operatingProfile: group("operatingProfile", ["sha256", "activationSha256"]),
+    context: group("context", ["contextPluginSha256", "promptPackSha256", "memoryPolicySha256"]),
+    release: group("release", ["packageDigest", "imageDigest", "chartOrComposeDigest", "valuesDigest"]), gatePolicyDigest: gatePolicyDigestOf(state.chain)
   });
 }
 
@@ -126,18 +165,25 @@ function writeStageOutput(route: A4Route, projectId: string, text: string): { re
   return { refId: relative(route.workspace, path).split(sep).join("/"), sha256: blobRef };
 }
 
-/** One generic stage step: answers, understand, confirm-understanding, explain, propose, build or review. */
+/**
+ * One stage step: answers, understand, confirm-understanding, explain, propose, build or review. With a producer for the
+ * step, AMC's outputs are recorded (and the member's text beside them, when sent); without one, the member's text is.
+ */
 async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind: StepRoute): Promise<true> {
   const def = STEP_ROUTES[kind];
   const { body, request } = await readJson(route, STEP_SCHEMAS[kind]);
   const replay = priorReplay(route.store, request, projectId);
   if (replay) return (apiSuccess(route.res, replay), true);
+  const producer = producerFor(stage, kind);
   // The output is labelled NO_PRODUCER_REGISTERED, so the generic path serves only a stage whose lane registered none.
-  if (def.output !== null && STAGE_PRODUCERS[stage].length > 0) {
+  if (def.output !== null && producer === undefined && STAGE_PRODUCERS[stage].length > 0) {
     throw a4Fail(409, "A4_PRODUCER_REGISTERED", `${stage} has registered producers; its lane records ${kind}, not the no-producer path.`);
   }
-  const fields = body as { content?: string; level?: string; spec?: Record<string, unknown>; parentRevisionNo?: number;
+  const fields = body as { content?: string; level?: "novice" | "practitioner" | "expert"; spec?: Record<string, unknown>; parentRevisionNo?: number;
     answers?: Array<{ questionId: string; value?: unknown }>; expectedHeadSeq: number };
+  if (def.output !== null && producer === undefined && fields.content === undefined) {
+    throw a4Fail(400, "INPUT_INVALID", `content: ${stage} has no producer, so ${kind} records what you write.`);
+  }
   if (fields.spec !== undefined && Object.hasOwn(fields.spec, "answers")) throw a4Fail(400, "INPUT_INVALID", "Answers are carried by the server; record them through …/answers.");
   if (fields.spec !== undefined) assertNoSecrets(fields.spec, "The specification");
   if (fields.answers !== undefined) assertNoSecrets(fields.answers, "The answers");
@@ -150,6 +196,13 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     const { readiness } = evaluateFor(route.store, state, principal, call, stage, now);
     assertAllowed(readiness, def.action);
     if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
+    // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
+    if (stage === "aspire" && UNDERSTANDING_STEPS.has(kind)) {
+      const { spec, answers } = stageSpec(state, stage);
+      if (!understandingCurrent(spec, answers)) {
+        throw a4Fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
+      }
+    }
     if (fields.parentRevisionNo !== undefined && fields.parentRevisionNo !== project.revision_no) {
       throw a4Fail(409, "A4_STALE_HEAD", "The specification was edited from an older revision; reload and merge.", { revisionNo: project.revision_no });
     }
@@ -157,21 +210,35 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   };
   // The pre-flight refusal writes the automatic hold under a freeze, as governed() does, before any blob is written.
   refuseOnFreeze(route.store, projectId);
-  check(loadA4State(route.store, projectId, now));
-  const output = def.output !== null ? writeStageOutput(route, projectId, fields.content!) : null;
-  const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request }, (ts, load) => {
+  const checked = loadA4State(route.store, projectId, now);
+  check(checked);
+  // A stale request is refused before a producer writes workspace files or any blob is sealed (governed() checks again inside).
+  if (checked.project.head_seq !== fields.expectedHeadSeq) {
+    throw a4Fail(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: checked.project.head_seq });
+  }
+  // A Build producer writes the approved resources and its revision binds them as they then are, so drift since the
+  // direction was approved is refused here, before it writes (inside, readiness would refuse Build's own writes).
+  if (kind === "build" && producer !== undefined) {
+    const approved = checked.revisions.find((row) => row.revision_no === checked.project.revision_no);
+    const drifted = approved === undefined ? [] : driftedSlots(route.workspace, flatSlots(JSON.parse(approved.resource_digests_json)), checked.project.agent_id);
+    if (drifted.length > 0) throw a4Fail(409, "RESOURCE_DRIFTED", `resources moved since the direction was approved: ${drifted.join(", ")}`, { slots: drifted });
+  }
+  const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now,
+    ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
+  // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
+  if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
+  const outputs = [
+    ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
+    ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
+      label: producer === undefined ? `${stage} ${def.output} (no producer registered; human-authored)` : `${stage} ${def.output}: the member's own statement (human-authored)`,
+      ...writeStageOutput(route, projectId, fields.content) }] : [])
+  ];
+  const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request,
+    ...(produced?.response === undefined ? {} : { response: produced.response }) }, (ts, load) => {
     const state = load(now);
     const readiness = check(state);
     const project = state.project;
     const specs: A4ChangeSpec[] = [];
-    if (output !== null) {
-      const label = `${stage} ${def.output} (no producer registered; human-authored)`;
-      specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: output.refId, sha256: output.sha256, lane: "implementation",
-        claimKind: "self_reported", output: def.output, producer: null },
-        sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1, revision_no: project.revision_no, stage,
-          lane: "implementation", ref_kind: "stage_output", ref_id: output.refId, sha256: output.sha256, claim_kind: "self_reported", trust_tier: null,
-          method: null, label, actor_key: principal.key, ts } }] });
-    }
     const { spec, answers } = stageSpec(state, stage);
     if (kind === "answers") {
       const revisionNo = project.revision_no + 1;
@@ -190,20 +257,36 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       specs.push(revisionSpec(route.workspace, state, stage, { ...spec, answers: [...merged.values()].sort((a, b) => a.questionId.localeCompare(b.questionId)) },
         principal.key, ts));
     }
-    if (kind === "propose") specs.push(revisionSpec(route.workspace, state, stage, { ...fields.spec, answers }, principal.key, ts));
+    if (kind === "propose" && producer === undefined) specs.push(revisionSpec(route.workspace, state, stage, { ...fields.spec, answers }, principal.key, ts));
+    if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
+    // A revision recorded here comes first, so the outputs and the step land on it.
+    const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
+    for (const entry of outputs) {
+      specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
+        claimKind: "self_reported", output: entry.output, producer: entry.producer },
+        sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
+          lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: "self_reported", trust_tier: null,
+          method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
+    }
     if (def.to !== null && def.to !== project.step) {
-      const observed = state.refs.some((ref) => ref.revisionNo === project.revision_no && ref.lane === "observed");
-      specs.push({ kind: "STEP", stage, payload: { from: project.step, to: def.to, claimKind: "self_reported", producer: null,
-        ...(def.output !== null ? { reasonCodes: [NO_PRODUCER] } : {}),
+      // A hypothesis observation is the PMF evidence of a later stage, never this review's observation.
+      const hypothesisRefs = new Set(state.chain.filter((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId !== undefined)
+        .map((link) => `${String(link.body.refId)}:${String(link.body.sha256)}`));
+      const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed" && !hypothesisRefs.has(`${ref.refId}:${ref.sha256}`));
+      const notEvaluated = producer === undefined ? [NO_PRODUCER] : [...(produced?.notEvaluated ?? [])];
+      // A producer that ran and named no reason still observed nothing: never labelled as if none were registered.
+      if (notEvaluated.length === 0) notEvaluated.push("NO_OBSERVED_REF");
+      specs.push({ kind: "STEP", stage, payload: { ...(produced?.record ?? {}), from: project.step, to: def.to, claimKind: "self_reported", producer: producer?.id ?? null,
+        ...(def.output !== null && producer === undefined ? { reasonCodes: [NO_PRODUCER] } : {}),
         ...(fields.level !== undefined ? { level: fields.level } : {}),
         // `reviewed` needs an observed ref or an explicit not_evaluated output with its reason (design §9.1).
-        ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: [NO_PRODUCER] } } : {}) },
+        ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: notEvaluated } } : {}) },
         head: { step: def.to } });
     }
     if (specs.length === 0) throw a4Fail(409, "A4_STEP_ORDER", "Nothing to record.");
     return { readiness, specs };
   });
-  apiSuccess(route.res, mutationResult(result), 201);
+  apiSuccess(route.res, mutationResult(result, produced?.response ?? {}), 201);
   return true;
 }
 
@@ -248,20 +331,23 @@ async function respond(route: A4Route, projectId: string, request: A4RequestKey 
 }
 
 /**
- * POST …/hypotheses/:id/observe (design §10.1): the only path out of `proposed`. The ref must be a runtime-written
- * (OBSERVED) ledger row of the declared evidence source, inside the hypothesis window; the human verdict is signed
- * beside it as a separate, self_reported statement and never merged with the observed value.
+ * POST …/hypotheses/:id/observe (design §10.1): the only path out of `proposed`, once the project has left Aspire
+ * (nothing in Aspire is observed). The ref must be a runtime-written (OBSERVED) ledger row of the declared evidence
+ * source, inside the hypothesis window; the human verdict is signed beside it as a separate, self_reported statement
+ * and never merged with the observed value.
  */
 async function observeHypothesis(route: A4Route, projectId: string, hypothesisId: string): Promise<true> {
   const principal = requirePrincipal(route);
   const { body, request } = await readJson(route, observeSchema);
   return respond(route, projectId, request, () => {
     const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
+    if (state.project.stage === "aspire") throw a4Fail(409, "A4_STEP_ORDER", "Hypotheses are observed after Aspire; the project is still at Aspire.");
     const { spec } = stageSpec(state, "aspire");
-    const hypothesis = (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).map((entry) => a4HypothesisSchema.safeParse(entry))
-      .find((parsed) => parsed.success && parsed.data.id === hypothesisId)?.data;
+    const hypothesis = previousHypotheses(spec).find((entry) => entry.id === hypothesisId);
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);
-    if (state.chain.some((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId === hypothesisId)) {
+    // The ref binds this hypothesis's content: an older observation of another statement under the same id does not count.
+    const hypothesisDigest = hypothesisDigestOf(hypothesis);
+    if (state.chain.some((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId === hypothesisId && link.body.hypothesisDigest === hypothesisDigest)) {
       throw a4Fail(409, "A4_HYPOTHESIS_OBSERVED", "This hypothesis already left proposed.");
     }
     const event = route.store.ledger.getEventById(body.evidenceRef.refId);
@@ -278,10 +364,16 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
     if (event.ts < Date.parse(hypothesis.window.from) || event.ts > Date.parse(hypothesis.window.to)) {
       throw a4Fail(409, "HYPOTHESIS_OUTSIDE_WINDOW", "The row lies outside the hypothesis window.");
     }
+    // Nor before the first revision that carried this exact hypothesis: a prediction written after its evidence observes nothing.
+    const proposedTs = state.revisions.find((row) => row.stage === "aspire"
+      && previousHypotheses(JSON.parse(row.spec_json) as Record<string, unknown>).some((entry) => hypothesisDigestOf(entry) === hypothesisDigest))?.ts;
+    if (proposedTs === undefined || event.ts < proposedTs) throw a4Fail(409, "HYPOTHESIS_OUTSIDE_WINDOW", "The row was written before the hypothesis was proposed.");
     return route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: body.evidenceRef.refId, sha256: body.evidenceRef.sha256,
       claimKind: "observed", method: "runtime_observation", label: `hypothesis ${hypothesisId}: observed outcome`, column: "implementation",
       expectedHeadSeq: body.expectedHeadSeq, request,
-      note: { hypothesisId, verdict: { outcome: body.verdict, by: principal.key, claimKind: "self_reported" } } });
+      // The observed value is the row's own, copied as recorded (null when it carries none); the verdict stays apart.
+      note: { hypothesisId, hypothesisDigest, observedOutcome: ["number", "string", "boolean"].includes(typeof meta.value) ? meta.value : null,
+        verdict: { outcome: body.verdict, by: principal.key, username: principal.username, claimKind: "self_reported" } } });
   }, 201);
 }
 
