@@ -20,7 +20,7 @@ import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
 import { completeStage, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
-  assertAllowed, driftedSlots, evaluateFor, flatSlots, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
+  assertAllowed, driftedSlots, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
   requestChanges, requestGate, RESOURCE_SLOTS
 } from "./a4Gates.js";
 import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
@@ -28,7 +28,7 @@ import type { A4Action, A4ReadinessState } from "./a4Readiness.js";
 import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
-import {
+import { flatSlots,
   a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";

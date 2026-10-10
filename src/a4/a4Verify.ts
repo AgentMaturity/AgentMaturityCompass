@@ -38,7 +38,7 @@ import {
   A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
-import { authorOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
+import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
@@ -134,7 +134,7 @@ function intentProblems(db: Ledger["db"], projectId: string, links: readonly A4C
   }
   const refs = db.prepare("SELECT ref_kind, ref_id, sha256 FROM a4_evidence_refs WHERE project_id = ? AND revision_no = ? AND seq < ? ORDER BY seq")
     .all(projectId, revisionNo, requested.seq) as Row[];
-  const author = gate.gate === "policy" ? null : authorOf(before, revisionNo);
+  const authors = authorsOf(before, { gate: gate.gate as "direction" | "completion" | "policy", revisionNo });
   const expected: Row = {
     schema: "amc.a4-intent/v1", projectId, stage: gate.stage, gate: gate.gate, revisionNo,
     specDigest: gate.gate === "policy" ? sha256Hex(canonicalize(requested.body.proposedGatePolicy ?? null)) : revision?.spec_digest ?? sha256Hex(""),
@@ -144,7 +144,7 @@ function intentProblems(db: Ledger["db"], projectId: string, links: readonly A4C
     evidenceRefDigests: refs.map((ref) => sha256Hex(canonicalize([ref.ref_kind, ref.ref_id, ref.sha256]))),
     readinessBindingDigest: gate.readiness_sha256, boundItemIds: parsed(gate.bound_items_json),
     gatePolicyDigest: gate.gate_policy_digest,
-    excludedKeys: [...new Set([String(gate.requested_by_key), ...(author === null ? [] : [author]), ...(gate.gate === "completion" ? buildersOf(before, revisionNo) : [])])].sort()
+    excludedKeys: [...new Set([String(gate.requested_by_key), ...authors, ...(gate.gate === "completion" ? buildersOf(before, revisionNo) : [])])].sort()
   };
   const problems = Object.keys(expected).filter((key) => canonicalize(expected[key]) !== canonicalize(intent[key] ?? null)).map((key) => `A4_INTENT_MISMATCH: gate ${gateId} ${key}`);
   if (gate.intent_json !== canonicalize(intent) || request?.boundHashes?.intentHash !== sha256Hex(String(gate.intent_json))
