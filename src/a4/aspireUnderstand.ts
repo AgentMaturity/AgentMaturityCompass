@@ -18,7 +18,7 @@ import { listAgents, loadAgentConfig, type AgentConfig } from "../fleet/registry
 import { detectFramework } from "../guide/guideGenerator.js";
 import { detectAgentInstructionSources, detectFrameworksForOnboarding } from "../setup/setupWizard.js";
 import { pathExists } from "../utils/fs.js";
-import { answerGaps, CHOICES, listValue, PREFILL_SOURCES, textValue } from "./spec/aspire.js";
+import { ANSWER_RULES, answerGaps, listValue, PREFILL_SOURCES, textValue } from "./spec/aspire.js";
 import type { A4Answer } from "./a4Schema.js";
 
 export interface AspireFact {
@@ -149,7 +149,7 @@ export function understandAspire(workspace: string, agentId: string, answers: re
     ],
     unknowns: [
       ...gaps.missing.map((id) => `Not answered yet: ${id}`), ...gaps.stale.map((id) => `Needs confirming because an answer it depends on changed: ${id}`),
-      ...gaps.invalid.map((id) => `Not one of ${CHOICES[id]?.join(", ")}: ${id}`),
+      ...gaps.invalid.map((id) => `Not a valid answer for ${id} (${ANSWER_RULES[id] ?? "see the question"})`),
       ...(listValue(values.get("markets")).length === 0 ? ["Markets unknown: which rules apply is decided at Adapt"] : []),
       ...stations.unknown.map((value) => `Not a station: ${value}`),
       "Maturity levels are not evaluated at Aspire"

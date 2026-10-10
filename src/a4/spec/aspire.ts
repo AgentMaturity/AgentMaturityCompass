@@ -7,13 +7,14 @@
  */
 import { z } from "zod";
 import { validateContextGraph } from "../../context/contextGraph.js";
-import { a4QualitySpecSchema } from "../../contracts/v1/a4Package.js";
+import { a4QualitySpecSchema, type A4QualitySpec } from "../../contracts/v1/a4Package.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
+import { parseStation, STATIONS } from "../../domains/stations.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
+import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Step } from "../a4Schema.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "aspire", prompt, dependsOn, required, kind });
@@ -32,13 +33,29 @@ export const QUESTIONS: A4Question[] = [
   question("riskTier", "Risk appetite: low, med, high or critical?", "choice", true),
   question("markets", "Which markets (jurisdictions) first? One per line; leave empty when unknown.", "list", false),
   question("stations", "Which stations does it touch: education, environment, health, wealth, technology, mobility or governance?", "list", true, ["markets"]),
-  question("governance", "Governance: regulated (two distinct approvers on every gate) or standard?", "choice", true, ["riskTier", "markets"]),
+  question("governance", "Governance: regulated (no self-approval: someone other than a gate's requester, author and builder approves it; takes a high or critical risk tier) or standard?",
+    "choice", true, ["riskTier", "markets"]),
   question("archetypeInterest", "Start from an archetype? Name its id, or leave empty.", "choice", false)
 ];
 
 /** The values a choice question takes (archetypeInterest takes a listed archetype id). `riskTier` keeps the context-graph spelling. */
 export const CHOICES: Readonly<Record<string, readonly string[]>> = {
   expertise: ["novice", "practitioner", "expert"], riskTier: ["low", "med", "high", "critical"], governance: ["regulated", "standard"]
+};
+
+/** What a valid answer is, for each question answerGaps checks beyond being answered (the reflection quotes it). */
+export const ANSWER_RULES: Readonly<Record<string, string>> = {
+  expertise: "one of novice, practitioner, expert", riskTier: "one of low, med, high, critical",
+  governance: "regulated or standard; regulated takes a high or critical risk tier, the tiers that make every gate regulated",
+  stations: `each one of ${STATIONS.join(", ")}`
+};
+const isStation = (value: string): boolean => {
+  try {
+    parseStation(value);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 /** Where Understand pre-fills an unanswered question from (recorded `source: "inferred"`; the member confirms or changes it). */
@@ -85,6 +102,11 @@ export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; s
     && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
   const invalid = Object.entries(CHOICES).filter(([id, allowed]) => textValue(values.get(id)) !== null && !allowed.includes(textValue(values.get(id))!))
     .map(([id]) => id);
+  // "regulated" promises regulated gates (no self-approval); isRegulated (src/a4/a4Readiness.ts) gives that only for a high or critical tier.
+  const tier = textValue(values.get("riskTier"));
+  if (!invalid.includes("governance") && textValue(values.get("governance")) === "regulated" && (tier === "low" || tier === "med")) invalid.push("governance");
+  // Build writes the first station into the agent config's domain.
+  if (listValue(values.get("stations")).some((value) => !isStation(value))) invalid.push("stations");
   return { missing, stale, invalid };
 }
 
@@ -98,6 +120,18 @@ export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec
   }) : [];
   return { spec, answers, revisionNo: revision?.revision_no ?? null };
 }
+
+/** Quality targets with neither an evidence source (blank counts as none) nor `measure: "not instrumented"`. */
+export const unmeasuredTargets = (quality: A4QualitySpec): A4QualitySpec["targets"] =>
+  quality.targets.filter((target) => (target.evidenceSource ?? "").trim() === "" && target.measure !== "not instrumented");
+
+/**
+ * What an observation binds (the observe route records it on the ref): the hypothesis's content, so an id that names
+ * another statement, window or evidence source after a new proposal is not observed by an older ref.
+ */
+export const hypothesisDigestOf = (hypothesis: Pick<A4Hypothesis, "id" | "statement" | "predictedOutcome" | "window" | "evidenceSource">): string =>
+  sha256Hex(canonicalize({ id: hypothesis.id, statement: hypothesis.statement, predictedOutcome: hypothesis.predictedOutcome, window: hypothesis.window,
+    evidenceSource: hypothesis.evidenceSource }));
 
 export const misuseSchema = z.array(z.strictObject({ failureMode: z.string().trim().min(1), mitigation: z.string().trim().min(1), source: z.string().min(1) })).min(1);
 export const learningPlanSchema = z.array(z.strictObject({
@@ -126,7 +160,7 @@ function proposalItems(spec: Record<string, unknown>, answers: readonly A4Answer
   if (spec.answersDigest !== answersDigestOf(answers)) return ids.map((id) => waiting(id, ["BRIEF_STALE"], { nextAction: { label: "Answers changed: propose again" } }));
   const brief = (spec.brief ?? {}) as Record<string, unknown>;
   const quality = a4QualitySpecSchema.safeParse(spec.quality);
-  const unmeasured = quality.success ? quality.data.targets.filter((target) => target.evidenceSource === null && target.measure !== "not instrumented") : [];
+  const unmeasured = quality.success ? unmeasuredTargets(quality.data) : [];
   const hypotheses = Array.isArray(spec.hypotheses) ? spec.hypotheses : [];
   const check = (id: string, ok: boolean, code: string, section: "recommendation" | "implementation" = "recommendation"): A4ReadinessItem =>
     ok ? item(id, "READY", { section }) : waiting(id, [code], { section });
@@ -156,20 +190,26 @@ function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revi
   const due = reached(state, "direction_approved");
   const build = (spec.build ?? null) as { files?: Array<{ writer?: unknown }>; manifestId?: unknown; manifestError?: unknown } | null;
   const review = [...state.chain].reverse().find((link) => link.kind === "STEP" && link.body.to === "reviewed" && link.revisionNo === revisionNo)?.body as
-    { checks?: { contextGraph?: { valid?: unknown } }; integrity?: { agentConfigSignature?: { valid?: unknown; reason?: unknown } } } | undefined;
+    { checks?: { contextGraph?: { valid?: unknown; matchesBuild?: unknown; targetMatches?: unknown; targetProfile?: unknown } };
+      integrity?: { agentConfigSignature?: { valid?: unknown; reason?: unknown } } } | undefined;
   const wrote = (writer: string): boolean => build?.files?.some((file) => file.writer === writer) === true;
   const pending = (id: string): A4ReadinessItem => waiting(id, ["PRODUCED_AT_BUILD"], { section: "implementation", mandatory: due });
   const signature = review?.integrity?.agentConfigSignature;
+  // Review's graph checks: it validates, it is what Build wrote, and it is what the agent's verified target profile signs.
+  const graph = review?.checks?.contextGraph;
+  const graphProblems = graph === undefined ? [] : graph.valid !== true ? ["CONTEXT_GRAPH_INVALID"] : [
+    ...(graph.matchesBuild === true ? [] : ["CONTEXT_GRAPH_MISMATCH"]),
+    ...(graph.targetMatches === true ? [] : ["TARGET_PROFILE_MISMATCH", ...(typeof graph.targetProfile === "string" && graph.targetProfile !== "verified" ? [graph.targetProfile] : [])])];
   const items = [
-    review?.checks?.contextGraph?.valid === false
-      ? item("context_graph_written", "BLOCKED", { section: "implementation", kind: "evidence_contradictory", reasonCodes: ["CONTEXT_GRAPH_INVALID"] })
+    graphProblems.length > 0
+      ? item("context_graph_written", "BLOCKED", { section: "implementation", kind: "evidence_contradictory", reasonCodes: graphProblems })
       : wrote("context-graph") ? item("context_graph_written", "READY", { section: "implementation" }) : pending("context_graph_written"),
     signature !== undefined && signature.valid !== true
       ? item("agent_config_signed", "BLOCKED", { section: "implementation", kind: "evidence_untrusted", reasonCodes: ["AGENT_CONFIG_SIGNATURE_INVALID"] })
       : wrote("agent-config") ? item("agent_config_signed", "READY", { section: "implementation" }) : pending("agent_config_signed"),
     typeof build?.manifestId === "string" ? item("manifest_active", "READY", { section: "implementation" })
       : typeof build?.manifestError === "string" ? item("manifest_active", "BLOCKED", { section: "implementation", kind: "evidence_missing",
-        reasonCodes: ["ENFORCE_MANIFEST_REFUSED", build.manifestError] }) : pending("manifest_active")
+        reasonCodes: [...new Set(["ENFORCE_MANIFEST_REFUSED", build.manifestError])] }) : pending("manifest_active")
   ];
   // AMC's own signature check: integrity of bytes under the workspace's keys, never a lane, never a claim (design §7).
   if (signature !== undefined) {
@@ -181,15 +221,18 @@ function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revi
 
 /**
  * One item per hypothesis, never mandatory and never a level: `proposed` until …/observe binds a runtime-written row (the
- * only way out), `expired` past its window with none. The observed value is the row's (Observed); the verdict is a
- * person's statement (self-reported) and is printed as such.
+ * only way out) to this exact hypothesis (its id and content digest), `expired` past its window with none. It reads as
+ * observed only while that ref still resolves in the observed lane; a dangling or downgraded ref is NOT_EVALUATED. The
+ * observed value is the row's (Observed); the verdict is a person's statement (self-reported) and is printed as such.
  */
 function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>, now: number): A4ReadinessItem[] {
   return (Array.isArray(spec.hypotheses) ? spec.hypotheses : []).flatMap((entry) => {
     const parsed = a4HypothesisSchema.safeParse(entry);
     if (!parsed.success) return [];
     const hypothesis = parsed.data;
-    const link = state.chain.find((candidate) => candidate.kind === "EVIDENCE_REF" && candidate.body.hypothesisId === hypothesis.id);
+    const digest = hypothesisDigestOf(hypothesis);
+    const link = state.chain.find((candidate) => candidate.kind === "EVIDENCE_REF" && candidate.body.hypothesisId === hypothesis.id
+      && candidate.body.hypothesisDigest === digest);
     const id = `hypothesis.${hypothesis.id}`;
     if (link === undefined) {
       const expired = now > Date.parse(hypothesis.window.to);
@@ -197,12 +240,16 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
         nextAction: expired ? null : { label: `Observe with a runtime-written ${hypothesis.evidenceSource.eventType} row for ${hypothesis.evidenceSource.metric} inside the window`,
           route: `POST /api/v1/a4/projects/${state.project.project_id}/hypotheses/${hypothesis.id}/observe` } })];
     }
-    const verdict = (link.body.verdict ?? {}) as { outcome?: unknown; by?: unknown };
+    const verdict = (link.body.verdict ?? {}) as { outcome?: unknown; by?: unknown; username?: unknown };
     const ref = state.refs.find((candidate) => candidate.refId === link.body.refId && candidate.sha256 === link.body.sha256);
     const view = ref === undefined ? [] : [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: ref.trustTier,
       reasonCodes: ref.reasonCodes, lane: ref.lane, claimKind: ref.claimKind }];
-    return [item(id, "COMPLETE", { section: ref?.lane === "observed" ? "observed" : "implementation", mandatory: false, evidence: view as A4ReadinessItem["evidence"],
-      reasonCodes: [verdict.outcome === "refuted" ? "HYPOTHESIS_REFUTED" : "HYPOTHESIS_OBSERVED", "VERDICT_SELF_REPORTED", `VERDICT_BY:${String(verdict.by ?? "unknown")}`] })];
+    if (ref === undefined || ref.lane !== "observed") {
+      return [item(id, "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false, evidence: view as A4ReadinessItem["evidence"],
+        reasonCodes: [ref === undefined ? "HYPOTHESIS_REF_UNRESOLVED" : "HYPOTHESIS_OBSERVATION_DOWNGRADED", ...(ref?.reasonCodes ?? [])] })];
+    }
+    return [item(id, "COMPLETE", { section: "observed", mandatory: false, evidence: view as A4ReadinessItem["evidence"],
+      reasonCodes: [verdict.outcome === "refuted" ? "HYPOTHESIS_REFUTED" : "HYPOTHESIS_OBSERVED", "VERDICT_SELF_REPORTED", `VERDICT_BY:${String(verdict.username ?? verdict.by ?? "unknown")}`] })];
   });
 }
 
