@@ -115,6 +115,42 @@ An activated compiled plan whose identity binding requires a lease used to deny 
 tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
 cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
 
+## Assemble: building the agent
+
+Assemble turns the approved brief into a built agent. This build covers the native path; scaffolding and connecting an
+external framework, the `workflow` executor and execution phases follow in slice B of P1-60.
+
+- **Ask and Understand.** Assemble asks for capabilities, autonomy (`advise`: no tools; `act_with_approval`: the signed
+  workspace tools), tools, MCP connectors, the build provider (`stub`, or `provider:model`), existing systems, budget,
+  the engineering path and validation checks. Understand carries `riskTier` and `stations` from Aspire (change them
+  there) and reads the tool pipeline's readiness, the doctor's checks, the native task limits, providers (credentials by
+  reference and `configured` only, never a value), tool scope and validation config from Studio's own native task
+  service, the frameworks, mechanic profiles, the compiled plan, the open `outcome_unknown` executions and the path table.
+- **Paths.** Each path has an IntegrationClaim: which boundary enforces it, what its evidence can reach and what it does
+  not cover. Native is `tool_pipeline`; `claude-code` is preview (P1-23, held on D-02); `pi` is unsupported (P1-22, held
+  on D-02); the framework paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
+  key, and the stage completes only after an owner acknowledges it out of scope with a reason.
+- **Propose** records the plan: the typed graph with the agent's permissions, tasks by executor (`deterministic`,
+  `native_turn`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
+  validation plan and the baseline Enforce manifest, which must be ACTIVE: pending Enforce drift is reviewed in Enforce
+  first, never applied unseen by Assemble.
+- **Build** (an owner) signs the agent's preset into `.amc/agents.yaml`, writes the typed graph and journals one native
+  build session in its revision; Studio starts it after the step is recorded, on its one native task service (the
+  four-session limit and its sweeper are shared with every Studio task). Further turns, cancel and resume use the native
+  tasks page as the session's owner.
+- **Review** is run by the session's owner and refuses while a session runs or has failed. AMC's `verifyAgentRun` is an
+  integrity self-check (`workspace-key-consistency`, `SELF_CHECK`) with its verifier report attached. On the stub
+  provider every ref about the agent is `synthetic_example` and the review reads "tool pipeline observed on a stub model;
+  agent behaviour not evaluated"; the agent stays at lifecycle stage `development` (`unit_tests_passing` not evaluated).
+- **Completion** runs the effect `a4.assemble.apply`: an owner opens the effect gate once the completion gate has its
+  quorum, project approvers decide that second engine request from the A4 card (bound to its request digest), and
+  `complete` applies the reviewed Enforce resources as the agent's active manifest with a signed receipt. A failed apply
+  leaves the gate consumed and offers one owner retry.
+- **outcome_unknown.** A cancelled or failed journaled call blocks the agent's journaled calls and this stage
+  (`no_open_outcome_unknown`). The Outcome unknown card requests a resolution (the operator's statement, an
+  `amc.action.resolve` engine request under the class's dual control), another member decides it from the card, and
+  the resolution is recorded. It is the operator's statement, `self_reported`, never observed.
+
 ## Deployment boundary
 
 AMC prepares deployment plans and records what the operator says happened; it never deploys, never holds deployment
