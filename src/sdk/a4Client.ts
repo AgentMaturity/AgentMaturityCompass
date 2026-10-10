@@ -42,7 +42,8 @@ export interface A4MutationResult { projectId: string; seq: number; kind: string
 interface Control { readonly expectedHeadSeq: number; readonly clientRequestId?: string }
 interface Decision { readonly reason: string; readonly expectedGateSeq: number; readonly clientRequestId?: string }
 
-export function createA4Client(options: { baseUrl: string; session: A4Session }) {
+/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. */
+export function createA4Client(options: { baseUrl: string; session: A4Session; timeoutMs?: number }) {
   const origin = new URL(options.baseUrl).origin;
   const root = `${options.baseUrl.replace(/\/+$/, "")}/api/v1/a4`;
   const session = options.session;
@@ -56,18 +57,21 @@ export function createA4Client(options: { baseUrl: string; session: A4Session })
       if (session.nativeCsrfToken) headers[NATIVE_CSRF_HEADER] = session.nativeCsrfToken;
     }
     const sent = body === undefined ? undefined : JSON.stringify({ ...body, clientRequestId: (body as { clientRequestId?: string }).clientRequestId ?? randomUUID() });
-    let response: Response;
+    let status: number;
+    let text: string;
     try {
       // No redirects: a session cookie never follows one.
-      response = await fetch(`${root}${path}`, { method, headers, body: sent, redirect: "error" });
+      const response = await fetch(`${root}${path}`, { method, headers, body: sent, redirect: "error",
+        signal: options.timeoutMs === undefined ? undefined : AbortSignal.timeout(options.timeoutMs) });
+      status = response.status;
+      text = await response.text();
     } catch (cause) {
       throw new AMCSDKError({ code: "NETWORK_ERROR", message: `A4 request failed: ${method} ${path}`, path, cause });
     }
-    const text = await response.text();
     try {
-      return { status: response.status, body: JSON.parse(text) as A4ApiResponse<T>["body"] };
+      return { status, body: JSON.parse(text) as A4ApiResponse<T>["body"] };
     } catch (cause) {
-      throw new AMCSDKError({ code: "INVALID_JSON", message: `A4 answered HTTP ${response.status} without JSON`, status: response.status, path, cause });
+      throw new AMCSDKError({ code: "INVALID_JSON", message: `A4 answered HTTP ${status} without JSON`, status, path, cause });
     }
   }
 
