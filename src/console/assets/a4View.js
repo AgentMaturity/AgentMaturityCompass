@@ -138,9 +138,12 @@ const CONTENT_MAX = 65_536;
 const NO_REFLECTION = "No statement recorded from this page yet";
 export const NO_PRODUCER = "No producer is registered for this stage yet, so Studio records what you write here as your own self-reported statement, not as AMC's.";
 const studioJson = (value) => `<pre class="scroll">${esc(JSON.stringify(value ?? null, null, 2))}</pre>`;
-/** What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. */
-const recorded = (what, entry) => `<p class="muted">Studio recorded ${what} as self-reported${Number.isSafeInteger(entry.headSeq)
-  ? ` at seq ${esc(entry.headSeq)}` : ""}. What you sent:</p><p>${esc(entry.text)}</p>${studioJson(entry.data)}`;
+/**
+ * What the member sent and Studio's receipt for it, verbatim: with no producer registered, nothing here is AMC's. With
+ * nothing sent (a stage whose producer ran), the receipt is the step's output, never labelled as the member's statement.
+ */
+const recorded = (what, entry) => `<p class="muted">Studio recorded ${entry.text ? what : "this step's output"} as self-reported${Number.isSafeInteger(entry.headSeq)
+  ? ` at seq ${esc(entry.headSeq)}` : ""}. ${entry.text ? `What you sent:</p><p>${esc(entry.text)}</p>` : "You sent no statement.</p>"}${studioJson(entry.data)}`;
 
 /** Understand's recorded statement; Confirm and Correct stay disabled until one is shown here. */
 function reflectionHtml(reflection, understand) {

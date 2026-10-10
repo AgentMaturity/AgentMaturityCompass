@@ -55,8 +55,10 @@ function renderConversation(ctx) {
 function renderBuild(ctx) {
   const files = list(specOf(ctx).build?.files);
   return `<p class="muted">${esc(view.TRUTH.admission)}. Build, a workspace owner's action, writes the approved brief: context-graph.json, the signed
-    agent config, the target profile, the outcome contract when there is none and the Enforce manifest. It writes nothing when the agent's existing
-    config or target profile does not verify. Each write is a self-reported implementation ref with its file's sha256. A note, when you write one,
+    agent config, the target profile, the outcome contract when there is none (with the quality targets that have an evidence source), the typed
+    multi-agent graph and the Enforce manifest. It writes nothing when the agent's existing config or target profile does not verify, or when a
+    resource the approved revision bound has changed since (RESOURCE_DRIFTED: propose again). Completing Aspire applies the value contract draft
+    when the agent has none and merges those quality targets into the outcome contract. Each write is a self-reported implementation ref with its file's sha256. A note, when you write one,
     is recorded beside it as your own statement; pasted text is retained until the project's blob key is destroyed.</p>
     ${table(["Written", "Path", "sha256"], files.map((file) => [esc(file.writer), `<code>${esc(file.path)}</code>`, `<code>${esc(String(file.sha256 ?? "absent").slice(0, 16))}</code>`]),
       "Nothing written yet.")}
@@ -115,7 +117,8 @@ function renderGraph(ctx) {
   return `<svg viewBox="0 0 620 ${height}" role="img" aria-label="Solution sketch: audiences, agent and approver" width="100%">
     <defs><marker id="a4Arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path></marker></defs>
     ${list(graph.edges).map(edge).join("")}${nodes.map(box).join("")}</svg>
-    <p class="muted">The typed multi-agent graph draft (<code>${esc(graph.graphId)}</code>), kept in the specification; Build does not write it. Invariants:</p>
+    <p class="muted">The typed multi-agent graph draft (<code>${esc(graph.graphId)}</code>); Build writes it to <code>.amc/fleet/typed-graphs/${esc(graph.graphId)}.json</code>
+      and the fleet's <code>latest.json</code>. Invariants:</p>
     ${bullets(list(graph.invariants).map((entry) => `${entry.description} (${entry.severity})`))}`;
 }
 
@@ -128,7 +131,9 @@ function renderHypotheses(ctx) {
     const by = reasons.find((code) => String(code).startsWith("VERDICT_BY:"));
     if (by) {
       const lane = list(item.evidence)[0]?.lane;
-      return `observed value (${esc(lane === "observed" ? "Observed" : lane ?? "unresolved")}) · verdict ${esc(reasons.includes("HYPOTHESIS_REFUTED") ? "refuted" : "observed")}
+      const value = reasons.find((code) => String(code).startsWith("OBSERVED_VALUE:"));
+      return `observed value <code>${esc(value ? String(value).slice("OBSERVED_VALUE:".length) : "not shown")}</code>
+        (${esc(lane === "observed" ? "Observed" : lane ?? "unresolved")}) · verdict ${esc(reasons.includes("HYPOTHESIS_REFUTED") ? "refuted" : "observed")}
         by ${esc(String(by).slice("VERDICT_BY:".length))} (self-reported)`;
     }
     return `Not observed ${codes(reasons)}${item?.nextAction?.route ? `<br><span class="muted">${esc(item.nextAction.label)}: <code>${esc(item.nextAction.route)}</code></span>` : ""}`;
@@ -155,7 +160,10 @@ function renderQuality(ctx) {
     specification to change them.</p>
     ${table(["Dimension", "Statement", "Measure", "Target", "Evidence source", "Method", "Source"], list(spec.quality?.targets).map((target) => [esc(target.dimension),
       esc(target.statement), esc(target.measure), esc(target.target), esc(target.evidenceSource ?? "none"), `<code>${esc(target.evidenceMethod)}</code>`, esc(target.source)]),
-      "No quality targets.")}${status(ctx, "quality_spec_complete")}`;
+      "No quality targets.")}
+    <p class="muted">Outcome contract metrics drafted from the targets that have an evidence source (Build seeds a new contract with them;
+      completing Aspire merges them): ${list(spec.outcomeContractDraft?.metrics).map((metric) => `<code>${esc(metric.metricId)}</code>`).join(" ") || "none"}</p>
+    ${status(ctx, "quality_spec_complete")}`;
 }
 
 function renderAlternatives(ctx) {

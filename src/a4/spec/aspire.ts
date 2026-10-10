@@ -258,7 +258,9 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
         reasonCodes: [ref === undefined ? "HYPOTHESIS_REF_UNRESOLVED" : "HYPOTHESIS_OBSERVATION_DOWNGRADED", ...(ref?.reasonCodes ?? [])] })];
     }
     return [item(id, "COMPLETE", { section: "observed", mandatory: false, evidence: view as A4ReadinessItem["evidence"],
-      reasonCodes: [verdict.outcome === "refuted" ? "HYPOTHESIS_REFUTED" : "HYPOTHESIS_OBSERVED", "VERDICT_SELF_REPORTED", `VERDICT_BY:${String(verdict.username ?? verdict.by ?? "unknown")}`] })];
+      reasonCodes: [verdict.outcome === "refuted" ? "HYPOTHESIS_REFUTED" : "HYPOTHESIS_OBSERVED", "VERDICT_SELF_REPORTED", `VERDICT_BY:${String(verdict.username ?? verdict.by ?? "unknown")}`,
+        // The row's own value as the observe route copied it (null: the row carried none).
+        `OBSERVED_VALUE:${canonicalize(link.body.observedOutcome ?? null)}`] })];
   });
 }
 
