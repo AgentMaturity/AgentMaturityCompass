@@ -230,8 +230,11 @@ One A4 Forge project (docs/A4_FORGE.md) as the ledger stores it: the head row `a
 `a4_transitions`, the side tables the chain names (`a4_revisions`, `a4_gates`, `a4_decisions`, `a4_members`,
 `a4_comments`, `a4_evidence_refs`, `a4_releases`, `a4_deployments`), each transition's audit row and every ledger row
 a `ledger_event` ref names. It travels as an `a4-record` JSON export (`amc.a4-record/v1`: the rows column by column,
-exactly as stored) or as the A4 slice of an `.amcbundle`, whose signed `manifest.json` lists each project with the head
-it exported (`a4.projects[].headSeq`, `headDigest`) and `a4.containsSyntheticExamples`. `a4_requests` (idempotency)
+exactly as stored), or inside an `.amcbundle` as one such record per project (`a4/<projectId>.json`), listed with every
+other file in the signed `manifest.json`, whose `a4` member names each project's head (`a4.projects[].headSeq`,
+`headDigest`) and `a4.containsSyntheticExamples`. AMC adds that slice only with `AMC_A4_PREVIEW=1`, and only after
+each project's chain verifies whole in the same read transaction that reads its rows; a project that does not verify
+refuses the bundle export (`A4_INTEGRITY_FAILED`). `a4_requests` (idempotency)
 and `a4_effects` (liveness) are bookkeeping no transition names and are never exported. Inside a workspace,
 `verifyA4Chain` and `amc verify all` (check `a4-projects`) apply the integrity rules; `verifyA4Bundle`
 (`src/a4/a4Verify.ts`) applies all of them to an export. Normative fixtures, each with its expected verdict:
@@ -245,9 +248,10 @@ stored; never parse and re-serialize it first.
 Trust. Keys carried in an export only locate a signer. The monitor key is admitted for `ledger-row` and the auditor key
 for `artifact-seal` from a trust list the verifier pinned (on the CLI, `amc a4 verify --trust-list`, P1-65). An API or
 MCP route uses the server operator's trust context only: `GET /api/v1/a4/projects/:id/verify` takes no query parameter
-and no body, so `?trustList=` is 400 `QUERY_INVALID` and a body is 400. With no admitted key a report states integrity
-only: issuer admission fails, the ledger is unanchored and scope, freshness, completeness and satisfaction are
-`not-evaluated` (`ISSUER_NOT_ADMITTED`).
+and no body, so `?trustList=` is 400 `QUERY_INVALID` and a body is 400. With a key the trust list does not admit, a
+report states integrity only: issuer admission fails or the ledger is unanchored, and scope, freshness, completeness and
+satisfaction are `not-evaluated` (`ISSUER_NOT_ADMITTED`). A record with no envelope yet carries no auditor signature
+(issuer admission `not-evaluated`); it is evaluated once its monitor key is admitted.
 
 Integrity (`integrity: fail` with the code named):
 
@@ -257,16 +261,24 @@ Integrity (`integrity: fail` with the code named):
    `readinessSha256`), `kind` is in the closed v1 set, and the head row equals the last transition (`head_seq`,
    `head_digest`, `verified_seq`, `verified_digest`, and the head columns equal the last body's `headAfter`). The head
    row itself is unsigned: a record proves a prefix. A tail cut back together with its head shows only against a later
-   signed statement, such as the bundle manifest (`A4_SLICE_HEAD_MISMATCH`) or the workspace ledger.
+   signed statement, such as the bundle manifest (`A4_SLICE_HEAD_MISMATCH`), or the ledger: a session
+   `a4-<projectId>-<head_seq + 1>` witnesses a later transition (in the workspace, `A4_CHAIN_INVALID`; in a bundle's own
+   ledger, `A4_SLICE_TRUNCATED`).
 2. Audit rows. Each `evidence_event_id` resolves to an `audit` row whose meta has `auditType: "A4_STATE"`,
    `source: "a4-store"`, `trustTier: "SELF_REPORTED"` and this transition's `projectId` and `seq`
    (`A4_AUDIT_ROW_UNBOUND`). Its `payload_sha256` equals `body_digest` and its inline payload, when present, is
-   `body_json`. Its `event_hash` recomputes as in evidence-event rule 3 and its `writer_sig` verifies under a monitor
-   key (`A4_EVIDENCE_ROW_INVALID`); its receipt binds `body_sha256 = body_digest` and that `event_hash`. An `A4_STATE`
-   row claiming `OBSERVED` or `OBSERVED_HARDENED` is `TRUST_TIER_INFLATED`: the store never emits OBSERVED. A pruned
-   inline payload (`payload_pruned = 1`) is `payload_pruned`, bound by digest: a warning, never a failure. In an
-   `a4-record` each ledger row is checked on its own and its place in the workspace chain is not evaluated; a bundle's
-   ledger prefix is verified whole.
+   `body_json`. Its `event_hash` is `sha256(prev_event_hash + canonicalMetadata + payload_sha256)` over the stored row
+   (evidence-event rule 3), where `canonicalMetadata` is the canonical form of
+   `{ id, ts, session_id, runtime, event_type, payload_path, payload_inline, meta_json }` with
+   `payload_path = canonical_payload_path ?? payload_path`, `payload_inline = canonical_payload_inline ?? payload_inline`
+   and `meta_json` the stored meta string with `receipt` and `receipt_sha256` removed (as in evidence-event rule 3).
+   Its `writer_sig` verifies under a monitor key (`A4_EVIDENCE_ROW_INVALID`); its receipt binds
+   `body_sha256 = body_digest` and that `event_hash`. An `A4_STATE` row claiming `OBSERVED` or `OBSERVED_HARDENED` is
+   `TRUST_TIER_INFLATED`: the store never emits OBSERVED. Pruning (`payload_pruned = 1`) sets `payload_inline` to null
+   and keeps `canonical_payload_inline`, so a pruned row still recomputes; it is `payload_pruned`, bound by digest: a
+   warning, never a failure. Each exported ledger row is checked on its own, in an `a4-record` and in a bundle alike,
+   and its place in the workspace chain is not evaluated from an export; a bundle's own ledger (the run's prefix) is
+   verified whole by the bundle rules, apart from its A4 records.
 3. Envelopes. `GATE_REQUESTED`, `GATE_DECIDED`, `RELEASE`, `DEPLOYMENT` and `ROLLBACK` carry an `A4_RECORD` envelope
    (`A4_ENVELOPE_MISSING`) whose `digestSha256` is `body_digest` and whose signature verifies under an auditor key
    (`A4_ENVELOPE_INVALID`). An envelope counts only within its key's validity window and while the key is absent from
@@ -293,8 +305,12 @@ Integrity (`integrity: fail` with the code named):
    readiness binding digest is the workspace's statement at request time, from live facts no export carries: it must
    be one value in the gate row, the intent and the `GATE_REQUESTED` body. The intent is recomputed only when every
    side row matched (rule 4).
-8. Bound items (`A4_BOUND_ITEMS`). A gate's `bound_items_json` is exactly the set its readiness digest covers
-   (`A4_BOUND_ITEMS[stage]` when it opened). It never holds a gate-derived item (`gate.direction`, `gate.completion`,
+8. Bound items (`A4_BOUND_ITEMS`). A gate's `bound_items_json` is exactly `A4_BOUND_ITEMS[stage]`, compared as the
+   canonical array (`src/a4/a4Schema.ts`); an empty, partial, reordered or extra set fails. In v1 every stage binds
+   `members.present`, `signing.notary_route`, `signing.notary_reachable`, `store.integrity`,
+   `approvals.policy_signed`, `gate.policy_floor`, `hold.none`, `identity.check`, `effects.failed` and
+   `sod.self_provisioned`, in that order, and `activate` adds `lineage.independent_approvals`. The set never holds a
+   gate-derived item (`gate.direction`, `gate.completion`,
    `gate.required_reviews`, `approvals.fresh`, `sod`) or an environment fact (`signing.available`,
    `members.candidates`), so a first APPROVE never moves the digest a second approver binds: the second vote lands on
    the same `binding_digest` and `readiness_sha256` (fixture `second-vote-lands`). A bound item that is NOT_EVALUATED is
@@ -316,8 +332,14 @@ Integrity (`integrity: fail` with the code named):
 11. Effects and requests. Every `EFFECT_FINISHED` records a passing check for exactly the resource slots its gate's
     intent bound (`A4_EFFECT_SLOT_MISMATCH`); a workspace verify also refuses a stored request response that holds a
     credential (`A4_REQUEST_SECRET`).
-12. Bundles. Every project with rows in a bundle's ledger is listed in its signed manifest (`A4_SLICE_UNLISTED`), and
-    the head each listing names is the exported one (`A4_SLICE_HEAD_MISMATCH`).
+12. Bundles. Every `a4/<projectId>.json` in a bundle is listed in its signed manifest's `a4.projects`
+    (`A4_SLICE_UNLISTED`) and every listing has that record (`A4_SLICE_RECORD_INVALID`); the head each listing names is
+    the record's head row (`A4_SLICE_HEAD_MISMATCH`); the bundle's ledger holds no session
+    `a4-<projectId>-<headSeq + 1>` (`A4_SLICE_TRUNCATED`); and `a4.containsSyntheticExamples` is true exactly when a
+    listed record holds a `synthetic_example` ref (`A4_SYNTHETIC_LABEL_MISMATCH`). `manifest.sig` pins the heads, so
+    no dimension is evaluated unless every signature of the bundle is admitted (`ISSUER_NOT_ADMITTED`).
+13. Labels (`A4_SYNTHETIC_LABEL_MISMATCH`). A record's `containsSyntheticExamples` is true exactly when one of its
+    `a4_evidence_refs` rows has `claim_kind = "synthetic_example"`.
 
 Scope (`scope: fail`): every exported row names the project (`A4_SCOPE_FOREIGN_ROW`), the head row and the `CREATED`
 body name one agent (`A4_SCOPE_AGENT`), and every row a `ledger_event` ref names is a row of that agent
@@ -341,7 +363,12 @@ the body never leaves the encrypted blob store.
 Satisfaction (`satisfaction`), evaluated only when integrity and completeness pass under admitted keys:
 
 - A gate counts only decisions bound to it (freshness) and recorded before any superseding transition. A consumed gate
-  met its request's `requiredApprovals` with distinct approvers (`QUORUM_NOT_MET`).
+  was not superseded before its `GATE_CONSUMED`, which is itself the gate's first superseding transition
+  (`GATE_CONSUMED_AFTER_SUPERSEDED`). Its counted decisions meet the request's quorum as the approval engine counts it
+  at the consume's `ts` (`evaluateApprovalQuorum`, `src/approvals/approvalQuorum.ts`, with the request `PENDING`): only
+  decisions whose `roles` hold one of the request's `rolesAllowed` count, `requiredApprovals` distinct users when
+  `requireDistinctUsers`, and any counted DENY is terminal (`GATE_DENIED_CONSUMED`; otherwise `QUORUM_NOT_MET`). An open
+  gate is listed with its count (`GATE_OPEN: … 1 of 2 approvals`), never reported as a met quorum.
 - Every counted APPROVE passes separation of duties as of its own seq (`SOD_VIOLATION`, `src/a4/a4SoD.ts`): never the
   gate's requester or an excluded key, never the revision's author (except on a `policy` gate, whose proposal the
   requester authored), and on a completion gate never a principal with a build transition on the revision (a `STEP` to
@@ -354,8 +381,9 @@ Satisfaction (`satisfaction`), evaluated only when integrity and completeness pa
 - **Two local users are not evidence of two people.** Every LOCAL_USER key is minted under one workspace signing
   authority. A regulated quorum of LOCAL_USER keys only is `SOD_DEGRADED_SELF_PROVISIONED` (`not-evaluated`), and a
   user record whose `createdBy` is `null` is self-provisioned, never independently reviewed.
-- Every gate decision is evaluated with `review.independent = false`: a pass means the counted decisions are bound,
-  SoD-distinct and quorate, never that an independent reviewer approved. Each is `self_reported`.
+- Every gate decision is evaluated with `review.independent = false`: a pass means the counted decisions are bound and
+  SoD-distinct and every consumed gate was quorate, never that an independent reviewer approved. Each is
+  `self_reported`.
 
 The derived values a verifier recomputes rather than reads: the in-force gate-policy digest (rule 5), the ratchet and
 `selfApprovalAllowed` (rule 9), the lanes and tiers (rule 10), and the readiness `bindingDigest` scope, which excludes

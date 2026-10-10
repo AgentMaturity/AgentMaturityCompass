@@ -56,9 +56,12 @@ monitor key for `ledger-row` and `receipt` and its auditor key for `artifact-sea
 | `deleted-evidence-ref.json` | `valid.json` without the `a4_evidence_refs` row of seq 4 (no transition touched) | fail: `A4_SIDE_ROW_MISMATCH` | pass | pass | fail: `A4_SIDE_ROW_MISMATCH` | not-evaluated |
 | `tampered-transition.json` | `valid.json` with one hex digit of the seq 3 `specDigest` changed in `body_json` | fail: `A4_CHAIN_INVALID` (body digest mismatch) | not-evaluated | not-evaluated | not-evaluated | not-evaluated |
 
-With no trust list, every file that loads reports integrity only: `issuerAdmission: fail` (the keys are not pinned),
-the ledger unanchored, and scope, freshness, completeness and satisfaction `not-evaluated` with
-`ISSUER_NOT_ADMITTED`. A pass here is evidence about the record's bytes and its gate rules, never about the agent:
+`tampered-transition.json` reports `INTEGRITY_FAILED` for scope, freshness, completeness and satisfaction under any
+trust list, because integrity is checked first. With no trust list, the other six files report integrity only:
+`issuerAdmission: fail` (the keys are not pinned), the ledger unanchored, and scope, freshness, completeness and
+satisfaction `not-evaluated` with `ISSUER_NOT_ADMITTED`. A passing satisfaction lists each gate still open with its
+count (`GATE_OPEN`, for example `1 of 2 approvals` in `valid.json`): a pass never states that an open gate met its
+quorum. A pass here is evidence about the record's bytes and its gate rules, never about the agent:
 every decision is `self_reported`, and SoD-distinct users in one workspace are not independent reviewers.
 
 AMC reports these through `verifyA4Bundle` (`src/a4/a4Verify.ts`), which takes either one of these files or an
