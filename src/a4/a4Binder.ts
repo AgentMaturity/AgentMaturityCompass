@@ -20,7 +20,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { containedPath } from "../utils/pathSafety.js";
 import { resolveRefs } from "./a4Evidence.js";
-import { a4EvidenceRefRowSchema, type A4Stage } from "./a4Schema.js";
+import { a4EvidenceRefRowSchema, a4PreviewEnabled, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, readA4Store } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
 
@@ -55,11 +55,12 @@ function exportProblems(files: Record<string, string>): string[] {
  * verified head. The report and the slice are read in one read transaction, so the slice is exactly the chain the
  * report verified. Refuses a project whose chain does not verify (409 A4_INTEGRITY_FAILED) and any slice the scans flag
  * (409 A4_BINDER_REFUSED). The slice is staged in a sibling directory, signed there and renamed into place, so a refusal
- * or a signing failure leaves nothing behind.
+ * or a signing failure leaves nothing behind. Absent without `AMC_A4_PREVIEW=1` (404 A4_PREVIEW_DISABLED), for every caller.
  */
 export function buildA4BinderSlice(workspace: string, input: { projectId: string; stage?: A4Stage; gateId?: string; trust?: TrustContext }): {
   dir: string; manifestSha256: string; files: string[];
 } {
+  if (!a4PreviewEnabled()) throw new A4StoreError(404, "A4_PREVIEW_DISABLED", "A4 Forge is not enabled in this workspace.");
   const now = Date.now();
   const policy = verifyAuditPolicySignature(workspace).valid ? loadAuditPolicy(workspace).auditPolicy.privacy.hashTruncBytes : 8;
   const hashed = (value: Cell): string => `hash:${hashAuditId(text(value), policy)}`;
