@@ -87,6 +87,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/ingest/ingest.ts", why: "ingest bookkeeping; imported rows are self-reported" },
   { module: "src/integrations/integrationDispatcher.ts", why: "outbound integration dispatch bookkeeping" },
   { module: "src/integrations/noCodeWebhookAdapters.ts", why: "webhook ingestion; external reports are self-reported" },
+  { module: "src/llm/adapter/llmRuntime.ts", why: "protected-data admission records (P2-02): aggregate classes and counts only, AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/ops/backup/backupEngine.ts", why: "AMC backup operations" },
   { module: "src/ops/maintenance/maintenanceCli.ts", why: "AMC maintenance operations" },
   { module: "src/ops/metrics/metricsServer.ts", why: "AMC metrics endpoint lifecycle" },

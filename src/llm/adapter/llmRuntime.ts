@@ -63,6 +63,8 @@ import { BudgetEvidenceIntegrityError } from "../../budgets/nativeBudgetUsage.js
 import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
 import { ProviderToolBinding } from "./providerToolBinding.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
+import { detectProtectedRequest } from "../../dataflow/detectors.js";
+import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -223,7 +225,28 @@ export class LlmRuntime {
       params: spec.params,
       systemPromptEventId: spec.systemPromptEventId,
       tools: spec.tools,
-      assertRequest: (request) => assertRequestCapabilities(route.capabilities, request),
+      assertRequest: (request) => {
+        assertRequestCapabilities(route.capabilities, request);
+        const detection = detectProtectedRequest(request);
+        if (detection.classes.length === 0) return;
+        const admission = admitProtectedModelRequest(this.workspace, route.providerId, route.baseUrl, detection);
+        const evidence = {
+          classes: [...detection.classes],
+          counts: { ...detection.counts },
+          detectorSetDigest: detection.detectorSetDigest,
+          processorId: admission.processorId
+        };
+        try {
+          this.init.session.recordProjectedEvidence({
+            eventType: "audit",
+            payload: JSON.stringify(evidence),
+            meta: { auditType: "PROTECTED_DATA_DETECTED", ...evidence }
+          });
+        } catch {
+          throw new DataFlowRefused("audit_failed");
+        }
+        if (!admission.allowed) throw new DataFlowRefused(admission.reason);
+      },
       ...(this.init.encoders !== undefined ? { encoders: this.init.encoders } : {})
     });
     return new PreparedCall(this, route, prepared, spec, toolNames);

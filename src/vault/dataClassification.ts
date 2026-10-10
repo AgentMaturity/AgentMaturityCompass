@@ -3,6 +3,7 @@
  */
 
 export type DataClass = 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL' | 'RESTRICTED';
+export type ProtectedDataClass = 'phi' | 'pii' | 'card_number' | 'bank_account' | 'credential';
 
 export interface ClassificationResult {
   classification: DataClass;

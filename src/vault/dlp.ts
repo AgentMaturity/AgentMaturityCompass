@@ -8,6 +8,7 @@ interface PiiPattern {
   re: RegExp;
   replacement: string;
   validate?: (match: string) => boolean;
+  validatorRevision?: string;
 }
 
 function normalizeIban(value: string): string {
@@ -61,8 +62,8 @@ const PII_PATTERNS: PiiPattern[] = [
   { type: "email", re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}\b/gi, replacement: "[EMAIL_REDACTED]" },
   { type: "phone", re: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, replacement: "[PHONE_REDACTED]" },
   { type: "ssn", re: /\b\d{3}-\d{2}-\d{4}\b/g, replacement: "[SSN_REDACTED]" },
-  { type: "credit_card", re: /\b(?:\d[ -]*?){13,19}\b/g, replacement: "[CC_REDACTED]", validate: isValidCreditCard },
-  { type: "iban", re: /\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){2,7}(?:\s?[A-Z0-9]{1,3})?\b/gi, replacement: "[IBAN_REDACTED]", validate: isValidIban },
+  { type: "credit_card", re: /\b(?:\d[ -]*?){13,19}\b/g, replacement: "[CC_REDACTED]", validate: isValidCreditCard, validatorRevision: "luhn-v1" },
+  { type: "iban", re: /\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){2,7}(?:\s?[A-Z0-9]{1,3})?\b/gi, replacement: "[IBAN_REDACTED]", validate: isValidIban, validatorRevision: "iban-mod97-v1" },
   { type: "ip_address", re: new RegExp(`${IPV4_SOURCE}|${IPV6_SOURCE}`, "gi"), replacement: "[IP_ADDRESS_REDACTED]" },
   { type: "eu_vat", re: /\b(?:VAT(?:\s+ID)?|VATIN|USt-?IdNr\.?|TVA|IVA|BTW|NIP|NIF)\s*[:#-]?\s*[A-Z]{2}[A-Z0-9]{2,12}\b/gi, replacement: "[EU_VAT_REDACTED]" },
   { type: "eu_national_id", re: /\b(?:national\s+(?:id|identity|identification)(?:\s+(?:number|card))?|identity\s+card|id\s+card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s+nationale|carta\s+d['’]?identit[aà]|documento\s+nacional\s+de\s+identidad)\s*[:#-]?\s*[A-Z0-9][A-Z0-9 ./-]{5,20}\b/gi, replacement: "[EU_NATIONAL_ID_REDACTED]" },
@@ -98,4 +99,37 @@ export function scanForPII(text: string): ScanResult {
     types: [...new Set(types)],
     redacted,
   };
+}
+
+export interface PiiSpan { readonly type: string; readonly start: number; readonly end: number }
+
+/** UTF-16 offsets only; uses the same patterns and validators as scanForPII. */
+export function findPIISpans(text: string): readonly PiiSpan[] {
+  const spans: PiiSpan[] = [];
+  for (const pattern of PII_PATTERNS) {
+    for (const match of text.matchAll(cloneGlobal(pattern.re))) {
+      if (!pattern.validate || pattern.validate(match[0])) {
+        const start = match.index!;
+        spans.push(Object.freeze({ type: pattern.type, start, end: start + match[0].length }));
+      }
+    }
+  }
+  return Object.freeze(spans.sort((a, b) => a.start - b.start || a.end - b.end || (a.type < b.type ? -1 : a.type > b.type ? 1 : 0)));
+}
+
+export interface PiiDetectorMetadata {
+  readonly type: string;
+  readonly source: string;
+  readonly flags: string;
+  readonly replacement: string;
+  readonly validatorRevision: string | null;
+}
+
+/** Metadata and declared validator revisions; this is not an executable/source digest. */
+export function getPIIDetectorMetadata(): readonly PiiDetectorMetadata[] {
+  return Object.freeze(PII_PATTERNS.map(pattern => {
+    if (pattern.validate && !pattern.validatorRevision) throw new Error("PII validator revision missing");
+    return Object.freeze({ type: pattern.type, source: pattern.re.source, flags: pattern.re.flags,
+      replacement: pattern.replacement, validatorRevision: pattern.validatorRevision ?? null });
+  }));
 }
