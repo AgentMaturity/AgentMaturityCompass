@@ -4,7 +4,8 @@
  * scope from the live Studio NativeTaskService, frameworks, mechanic profiles, the compiled plan, the outcome_unknown
  * count, the path table); Explain renders them at three levels; Propose builds the plan from the answers (revised typed
  * graph with node permissions, implementation plan by executor, preset, build session, validation plan, the
- * IntegrationClaim, unsupported items with their keys, and the baseline Enforce manifest). Build and Review are in
+ * IntegrationClaim, unsupported items with their keys (a declared workflow among them while it cannot run), and the
+ * baseline Enforce manifest). Build and Review are in
  * src/a4/assembleBuild.ts. Completion runs the effect a4.assemble.apply: the reviewed Enforce resources are applied
  * through applyEnforceResourceLifecycle after the effect gate's engine grant is consumed. Everything A4 writes here is
  * self_reported; a stub-provider session's agent-facing refs are synthetic_example.
@@ -12,7 +13,7 @@
 import { readFileSync } from "node:fs";
 import { relative, sep } from "node:path";
 import { checkToolsetReadiness } from "../../agent/agentToolset.js";
-import { loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
+import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { applyEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus } from "../../enforce/resourceManifest.js";
 import { typedMultiAgentGraphSchema } from "../../fleet/typedGraph.js";
 import { isActionClass } from "../../governor/actionCatalog.js";
@@ -20,8 +21,10 @@ import { openLedger } from "../../ledger/ledger.js";
 import { listMechanicProfiles } from "../../mechanic/profiles.js";
 import { readPresets } from "../../presets/agentPresets.js";
 import { listAvailableFrameworks } from "../../setup/integrationScaffold.js";
+import { compiledPolicyShows } from "../../tools/guards/compiledPolicyGuard.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
+import type { WorkflowNode } from "../../workflow/workflowPlan.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "../a4Effects.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
@@ -34,7 +37,8 @@ import { buildAssemble, nativeActor, reviewAssemble } from "../assembleBuild.js"
 import { blockingExecutionsIn } from "../assembleLockout.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
-  APPLY_EFFECT_ID, ASSEMBLE_CLAIM_BOUNDARY, ASSEMBLE_SPEC_SCHEMA, CARRIED, answerGaps, assembleItems, assembleSpecOf, carriedValues, parseProvider, presetIdOf
+  APPLY_EFFECT_ID, ASSEMBLE_CLAIM_BOUNDARY, ASSEMBLE_SPEC_SCHEMA, CARRIED, answerGaps, assembleItems, assembleSpecOf, carriedValues, parseProvider, presetIdOf,
+  workflowPlanOf
 } from "../spec/assemble.js";
 import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue } from "../spec/aspire.js";
 
@@ -106,6 +110,17 @@ function attempt<T>(read: () => T): T | { error: string } {
   }
 }
 
+/**
+ * C6: whether the active compiled plan shows the `workflow` tool (P1-12's default visibleTools omits it), with the
+ * runtime's own denial (compiledPolicyDenial) and the plan's controls compiled at the tool pipeline.
+ */
+function workflowVisibility(policy: ActiveCompiledPolicy) {
+  if (compiledPolicyShows(policy, "workflow")) return { visible: true, revision: policy.revision };
+  return { visible: false, revision: policy.revision, policyDigest: policy.runtimePolicy.policyDigest,
+    denial: "compiled policy denied this call (toolPipeline.visibleTools): \"workflow\" is not a visible tool",
+    controlIds: policy.controls.filter((control) => control.compiledPoints.includes("tool_pipeline")).map((control) => control.controlId).slice(0, 32) };
+}
+
 /** Understand's facts: compact values for the spec (read by readiness and Propose) and one self_reported output each. */
 async function understandFacts(ctx: A4ProducerContext) {
   const { workspace } = ctx;
@@ -142,10 +157,12 @@ async function understandFacts(ctx: A4ProducerContext) {
     }
   });
   const baseline = attempt(() => projectEnforceResourceLifecycleStatus({ workspace, agentId }).state);
+  const compiled = attempt(() => loadActiveCompiledPolicy(workspace));
   const facts = {
     toolset, doctor: { ok: report.ok, attention: attention.map((check) => check.id) }, native, platform: process.platform,
     frameworks: listAvailableFrameworks().map((framework) => framework.id), mechanicProfiles: attempt(() => listMechanicProfiles(workspace).map((profile) => profile.id)),
-    compiledPolicy: attempt(() => (loadActiveCompiledPolicy(workspace) === null ? "none" : "active")),
+    compiledPolicy: compiled === null ? "none" : "error" in compiled ? compiled : "active",
+    workflowTool: compiled === null ? { visible: true, revision: null } : "error" in compiled ? compiled : workflowVisibility(compiled),
     outcomeUnknown: Array.isArray(outcomeUnknown) ? outcomeUnknown.length : outcomeUnknown, baseline,
     paths: Object.values(INTEGRATION_CLAIMS).map(({ path, enforcementBoundary, evidenceTier, supported, reason }) => ({ path, enforcementBoundary, evidenceTier, supported, reason }))
   };
@@ -156,8 +173,8 @@ async function understandFacts(ctx: A4ProducerContext) {
     output("doctor checks needing attention, with first-run fixes", { ok: report.ok, attention: attention.map(({ id, status, message }) => ({ id, status, message })),
       fixes: firstRunFixCommands(report) }),
     output("native task providers, tool scope, limits and validation config (the live Studio service)", native ?? { error: nativeError }),
-    output("integration frameworks, mechanic profiles and the compiled plan", { frameworks: facts.frameworks, mechanicProfiles: facts.mechanicProfiles,
-      compiledPolicy: facts.compiledPolicy }),
+    output("integration frameworks, mechanic profiles, the compiled plan and whether it shows the workflow tool", { frameworks: facts.frameworks,
+      mechanicProfiles: facts.mechanicProfiles, compiledPolicy: facts.compiledPolicy, workflowTool: facts.workflowTool }),
     output("outcome_unknown executions blocking this agent", { executions: outcomeUnknown }),
     output("Enforce resource state", { state: baseline }),
     output("integration paths and what each can claim (IntegrationClaim)", Object.values(INTEGRATION_CLAIMS), "recommendation")
@@ -190,6 +207,8 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
   const claim = integrationClaimFor(textValue(values.get("path")));
   const limits = facts.native?.limits;
   const open = typeof facts.outcomeUnknown === "number" ? facts.outcomeUnknown : null;
+  const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
+  const hidden = facts.workflowTool !== undefined && "denial" in facts.workflowTool ? facts.workflowTool : null;
   return [
     { id: "enforced-vs-advisory", sources: ["compiledPolicyGuard", "bindAuthorization", "recheckAuthorization", "openActionJournal", "writeEffectivePolicyReceipt"], dataStatus: null,
       novice: "On AMC's own runtime every action the agent tries goes through AMC first: AMC can stop it, asks for approval when the rules say so, and keeps a record. Anything outside that runtime AMC can only advise on.",
@@ -214,8 +233,31 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
     { id: "stub", sources: ["design §10.1 keyless first run"], dataStatus: null,
       novice: "Without an AI key the build session uses a stand-in model. That shows how AMC records actions, not how good your agent is.",
       practitioner: "On the stub provider every ref about the agent is synthetic_example; only runtime-written rows stay observed by reference, and the review says \"tool pipeline observed on a stub model; agent behaviour not evaluated\".",
-      expert: "Stub sessions: claimKind synthetic_example (method synthetic, reason SYNTHETIC_VALUES, lane implementation); verifyAgentRun is an integrity-section item." }
+      expert: "Stub sessions: claimKind synthetic_example (method synthetic, reason SYNTHETIC_VALUES, lane implementation); verifyAgentRun is an integrity-section item." },
+    ...(workflow === null ? [] : [{ id: "workflow", sources: ["parseWorkflowPlan", "runWorkflowPlan", "spawnSubagent", "compiledPolicyShows"], dataStatus: null,
+      novice: "A workflow splits the work across helper agents. AMC checks the plan you declared, but cannot run it from Studio yet: Studio's build sessions cannot start helper agents.",
+      practitioner: `A declared workflow runs only through the agent's workflow tool, where each helper starts through spawnSubagent (depth limit, signed handoff packet, declared scope, a started/completed pair). Studio's native build sessions compose no delegation, so the workflow stays listed as unsupported until they do${hidden ? `; the active compiled plan (revision ${hidden.revision}) also hides the workflow tool` : ""}.`,
+      expert: `workflowTool → parseWorkflowPlan → runWorkflowPlan → spawnSubagent per agent node; Studio native tasks (acpNativeSession → openAgentSession) compose no subagents capability (NATIVE_TASKS_NO_DELEGATION); once a plan is active, P1-12's default visibleTools omits workflow (C6)${hidden ? `: ${hidden.denial}` : ""}.` }])
   ];
+}
+
+/**
+ * The `workflow` executor's task (design §10.2, C6). A declared workflow runs only through the agent's workflow tool,
+ * each agent node through spawnSubagent (depth refusal, signed handoff packet, declared scope, a started/completed
+ * pair), never as sessions A4 starts on its own. It is listed with every reason it cannot run, never silently skipped:
+ * the active compiled plan hiding the tool (C6, with the runtime's denial and the plan's tool-pipeline controls; an
+ * unread or unreadable plan counts as hiding it), and Studio's native tasks composing no delegation, so nothing in
+ * Studio can run it (NATIVE_TASKS_NO_DELEGATION, a seam of the native task lane).
+ * ponytail: unsupported until a native task can be granted `subagents`; Build then runs it before plan activation.
+ */
+function workflowTask(workflow: { plan: WorkflowNode; agents: number }, tool: Partial<Facts>["workflowTool"], native: boolean) {
+  const denial = tool !== undefined && "denial" in tool ? tool : null;
+  const policy = tool === undefined ? ["COMPILED_POLICY_NOT_READ"] : "error" in tool ? ["COMPILED_POLICY_UNREADABLE"] : denial !== null ? ["C6_COMPILED_POLICY_DENIES"] : [];
+  const blockers = [...(native ? [] : ["NATIVE_PATH_ONLY"]), ...policy, "NATIVE_TASKS_NO_DELEGATION"];
+  return { id: "workflow", title: `Run the declared workflow ${workflow.plan.id}: ${workflow.agents} delegated task(s), each through spawnSubagent`,
+    executor: "workflow", supported: false, key: blockers[0]!, blockers, plan: workflow.plan, agents: workflow.agents, compiledPolicy: denial,
+    acceptance: "every agent node reports through spawnSubagent (depth refusal, signed handoff packet, declared scope, a started/completed pair)",
+    expectedEvidence: "the parent session's delegation-started/completed rows and each child's own session" };
 }
 
 /** Explain: the facts once, rendered at the member's level; all three renderings are kept. */
@@ -275,12 +317,15 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const agentName = typeof brief.agentName === "string" ? brief.agentName : agentId;
   const prompt = [`You are ${agentName}, an agent being assembled in AMC.`, "Show, step by step, how you would do each of these, using only the tools you are given:",
     ...capabilities.map((capability) => `- ${capability}`)].join("\n").slice(0, 4000);
+  const declared = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
+  const workflow = declared === null || "error" in declared ? null : workflowTask(declared, facts.workflowTool, native);
   const unsupported = [
     ...(native ? [] : [{ id: "external-path", what: `${claim.path}: scaffold, connect instructions, policy pack and trace import`, key: "P1-60 slice B" }]),
     ...listValue(values.get("connectors")).map((name) => ({ id: `connector:${name.slice(0, 64)}`, what: `MCP connector ${name}`, key: "NOT_MOUNTED_IN_NATIVE_TASKS" })),
     ...listValue(values.get("tools")).filter((name) => !scopeTools.some((tool) => tool.name === name))
       .map((name) => ({ id: `tool:${name.slice(0, 64)}`, what: `tool ${name}`, key: "NOT_IN_SIGNED_SCOPE" })),
-    ...checkIds.filter((id) => !(config?.validation.checks ?? []).includes(id)).map((id) => ({ id: `check:${id.slice(0, 64)}`, what: `validation check ${id}`, key: "NOT_IN_VALIDATION_CONFIG" }))
+    ...checkIds.filter((id) => !(config?.validation.checks ?? []).includes(id)).map((id) => ({ id: `check:${id.slice(0, 64)}`, what: `validation check ${id}`, key: "NOT_IN_VALIDATION_CONFIG" })),
+    ...(workflow === null ? [] : [{ id: "workflow", what: `workflow ${workflow.plan.id} (${workflow.agents} delegated task(s))`, key: workflow.key }])
   ];
   const plan = [
     { id: "graph", title: "Write the revised typed multi-agent graph (node permissions)", executor: "deterministic", supported: true, key: null,
@@ -292,6 +337,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
         acceptance: "the session settles; Review verifies it", expectedEvidence: "session ref with its head event hash (synthetic_example on the stub provider)" }
     ] : [{ id: "scaffold", title: `Scaffold or connect the ${claim.path} agent`, executor: "scaffold", supported: false, key: "P1-60 slice B",
       acceptance: "not available in this build", expectedEvidence: "none" }]),
+    ...(workflow === null ? [] : [workflow]),
     { id: "review-resources", title: "Review the agent's pending Enforce changes", executor: "human", supported: true, key: null,
       command: `amc resource evaluate --agent ${agentId}`, acceptance: "Review records Enforce's decision", expectedEvidence: "Review's Enforce record" }
   ];

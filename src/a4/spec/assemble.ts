@@ -6,6 +6,7 @@
  * src/a4/stages/assemble.ts (Understand, Explain, Propose, the apply effect) and src/a4/assembleBuild.ts (Build, Review).
  */
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
+import { parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
 import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
@@ -35,7 +36,9 @@ export const QUESTIONS: A4Question[] = [
   question("budget", "Budget for build sessions, in your words (AMC enforces its own per-turn limits regardless).", "text", false),
   question("path", `Engineering path: ${INTEGRATION_PATHS.join(", ")}.`, "choice", true),
   question("validation", "Validation checks to run in the build session: check ids from the operator's validation config, one per line; leave empty for none.",
-    "list", false, ["autonomy"])
+    "list", false, ["autonomy"]),
+  question("workflow", "Optional: a declared workflow of delegated tasks, as JSON: {kind: \"agent\", id, runAs, goal, scope?}, {kind: \"parallel\", id, children} or {kind: \"pipeline\", id, stages}, at most 64 nodes. Leave empty for none.",
+    "text", false, ["autonomy"])
 ];
 
 export const ASSEMBLE_SPEC_SCHEMA = "amc.a4-assemble-spec/v1";
@@ -84,11 +87,33 @@ export function parseProvider(value: unknown): { provider: (typeof NATIVE_PROVID
 }
 
 /**
+ * The declared workflow (design §10.2, the `workflow` executor), refused as data before anything could spawn: JSON runs
+ * nothing, and parseWorkflowPlan checks node kinds, unique ids, scopes and the 64-node bound. A workflow delegates
+ * through the signed workspace tools, so it needs autonomy act_with_approval. null when none is declared.
+ */
+export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: WorkflowNode; agents: number } | { error: string } | null {
+  if (value === null || value === undefined || (typeof value === "string" && value.trim() === "")) return null;
+  let raw = value;
+  if (typeof value === "string") {
+    try {
+      raw = JSON.parse(value);
+    } catch {
+      return { error: "the workflow is not JSON" };
+    }
+  }
+  const parsed = parseWorkflowPlan(raw);
+  if (!parsed.ok) return { error: parsed.reason };
+  if (textValue(autonomy) !== "act_with_approval") return { error: "a workflow delegates with the signed workspace tools: choose autonomy act_with_approval" };
+  return { plan: parsed.plan, agents: planAgentCount(parsed.plan) };
+}
+
+/**
  * Required questions with no answer, answered ones whose dependencies changed since, answers that are not one of their
  * question's values, and carried answers that are missing or no longer Aspire's (fail closed: re-carry at Understand).
  */
 export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
   const values = answerValues(answers);
+  const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
   const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
   const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
@@ -99,7 +124,8 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     ...(choice("path", INTEGRATION_PATHS) ? ["path"] : []),
     ...(textValue(values.get("providers")) !== null && parseProvider(values.get("providers")) === null ? ["providers"] : []),
     // Validation runs as public checks in the session, which needs the signed workspace tools.
-    ...(listValue(values.get("validation")).length > 0 && textValue(values.get("autonomy")) !== "act_with_approval" ? ["validation"] : [])
+    ...(listValue(values.get("validation")).length > 0 && textValue(values.get("autonomy")) !== "act_with_approval" ? ["validation"] : []),
+    ...(workflow !== null && "error" in workflow ? ["workflow"] : [])
   ];
   const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
     : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
@@ -239,11 +265,13 @@ export function assembleItems(state: A4ReadinessState, query: A4ReadinessQuery):
     toolset?: { ready?: unknown; blockers?: unknown }; native?: { scope?: { ready?: unknown; message?: unknown } } | null } | null;
   const unsupported = proposed && Array.isArray(spec.unsupported) ? spec.unsupported as Array<{ id?: unknown; key?: unknown }> : [];
   const blockers = listValue(facts?.toolset?.blockers);
+  const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   return [
     gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
       : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
         ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { section: "recommendation",
-        nextAction: { label: gaps.carried.length > 0 ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
+        nextAction: { label: gaps.carried.length > 0 ? "Run Understand to carry the Aspire answers again"
+          : workflow !== null && "error" in workflow ? `The workflow was refused: ${workflow.error.slice(0, 300)}` : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { section: "recommendation" })
       : state.project.stage === "assemble" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { section: "recommendation", nextAction: { label: "Answers changed: run Understand again, then confirm it" } })

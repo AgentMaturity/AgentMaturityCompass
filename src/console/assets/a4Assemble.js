@@ -1,4 +1,4 @@
-// Assemble's Studio cards (P1-60 slice A, design §10.2, §13): the path table with each path's IntegrationClaim, the plan,
+// Assemble's Studio cards (P1-60, design §10.2, §13): the path table with each path's IntegrationClaim, the plan (with the workflow executor),
 // the build log, the outcome_unknown card, the completion effect and the review tables, read from the newest Assemble
 // revision and the readiness Studio returns. Pure renderers: every server string goes through esc(), statuses and
 // reason codes are printed as Studio returned them, and no card names a maturity level. The build session's own turns,
@@ -57,15 +57,27 @@ function renderPaths(ctx) {
     ${status(ctx, "path_supported")}${status(ctx, "unsupported_acknowledged")}`;
 }
 
+/** The declared workflow (design §10.2, C6): every reason it does not run, the compiled plan's denial with its controls, and its nodes. */
+function renderWorkflow(task) {
+  const denial = isObject(task.compiledPolicy) ? task.compiledPolicy : null;
+  return `<h4>Workflow executor</h4><p class="muted">A declared workflow runs only through the agent's workflow tool, each helper through
+    spawnSubagent (depth limit, signed handoff packet, declared scope, a started/completed pair). AMC never starts helper agents on its own,
+    so this workflow is listed, not run: ${codes(task.blockers)}</p>
+    ${denial ? `<p class="muted">Denied by the active compiled plan (revision <code>${esc(denial.revision)}</code>): ${esc(denial.denial)}.
+      Controls compiled at the tool pipeline: ${codes(denial.controlIds) || "none"}</p>` : ""}
+    <details><summary>${esc(task.agents)} delegated task(s) in <code>${esc(task.plan?.id)}</code></summary><pre>${esc(JSON.stringify(task.plan ?? null, null, 2))}</pre></details>`;
+}
+
 function renderPlan(ctx) {
   const spec = specOf(ctx);
   if (!proposed(spec)) return `<p class="muted">${NOT_PROPOSED}</p>`;
   const tasks = list(spec.plan).map((task) => [`<code>${esc(task.id)}</code>`, esc(task.title), `<code>${esc(task.executor)}</code>`,
     task.supported ? "yes" : `no (<code>${esc(task.key)}</code>)`, task.command ? `<code>${esc(task.command)}</code>` : esc(task.acceptance)]);
   const node = list(spec.graph?.nodes).find((entry) => entry.nodeId === "agent");
+  const workflow = list(spec.plan).find((task) => task?.executor === "workflow");
   return `<p class="muted">${esc(spec.claimBoundary ?? "")}</p>
     ${table(["Task", "What", "Executor", "Supported", "Acceptance or command"], tasks, "No tasks.")}
-    <p class="muted">A human task is a command for you to run; AMC never runs it.</p>
+    <p class="muted">A human task is a command for you to run; AMC never runs it.</p>${workflow ? renderWorkflow(workflow) : ""}
     <h4>Unsupported items (listed with their key, never hidden)</h4>
     ${table(["Item", "What", "Key"], list(spec.unsupported).map((entry) => [`<code>${esc(entry.id)}</code>`, esc(entry.what), `<code>${esc(entry.key)}</code>`]), "None.")}
     <p><strong>Agent permissions in the typed graph:</strong> ${codes(node?.permissions)}</p>
