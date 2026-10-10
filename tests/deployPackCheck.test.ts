@@ -1,11 +1,15 @@
 import { spawnSync } from "node:child_process";
+import { dirname } from "node:path";
 import { describe, expect, it } from "vitest";
 import { deployPackCheck, TOOLS } from "../scripts/deploy/deploy-pack-check.mjs";
 import { checkProbes, checkSingleWriter } from "../scripts/deploy/validate-assets.mjs";
 import { rollbackHazards } from "../scripts/deploy/rollback-check.mjs";
 import { root } from "./helpers/deployPackFixtures.js";
 
-const run = (args: string[]) => spawnSync(process.execPath, ["scripts/deploy/deploy-pack-check.mjs", ...args], { cwd: root, encoding: "utf8" });
+// PATH holds only node's directory, so helm and kubeconform are absent and the run stays offline
+// (kubeconform fetches schemas over the network); the deploy-pack workflow runs them with --require-tools.
+const offlineEnv = { ...process.env, PATH: dirname(process.execPath) };
+const run = (args: string[]) => spawnSync(process.execPath, ["scripts/deploy/deploy-pack-check.mjs", ...args], { cwd: root, encoding: "utf8", env: offlineEnv });
 
 describe("deploy-pack-check", () => {
   it("passes offline and names every tool it could not run", () => {
