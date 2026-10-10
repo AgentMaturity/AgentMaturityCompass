@@ -260,7 +260,21 @@ amc_a4_conformance    { projectId: string, stage?: aspire|assemble|adapt|activat
 amc_a4_comment        { projectId: string, cardId: string, body: string, clientRequestId: string, inReplyTo?: string, workspace?: string }
 ```
 
-They read the same records and run the same readiness evaluator as `/api/v1/a4`. No tool approves, denies, builds, completes or releases: decisions stay with people in Studio. The server has no per-user session, so identity comes from the server's own configuration: set `AMC_A4_SESSION_TOKEN_FILE` in the MCP config's `env` to a private (0600) token file written by `amc approvals login`. Each call re-reads that user from the signed users.yaml; a missing, expired or revoked session, a revoked user or a user without a read role is refused, and the file's path is never printed. `amc_a4_comment` refuses without that file and records a self-reported comment as that user, through the same path as `POST /api/v1/a4/projects/:id/comments` (project membership, encrypted blob, request-id dedupe). Without the file the four reads answer as the admin token does: every project, reads only. With it they show the projects that user may read, and readiness's `allowed` is that user's. Every A4 tool refuses while the workspace is read-only (its users or trust signature does not verify).
+They read the same records and run the same readiness evaluator as `/api/v1/a4`. No tool approves, denies, builds, completes or releases: decisions stay with people in Studio. Every A4 tool refuses while the workspace is read-only (its users or trust signature does not verify).
+
+The server has no per-user session, so identity comes from the server's own configuration: set `AMC_A4_SESSION_TOKEN_FILE` in the MCP config's `env` to a private (0600) token file written by `amc approvals login`. Each call re-reads that user from the signed users.yaml; a missing, expired or revoked session or a revoked user is refused, and the file's path is never printed. Without the file the four reads answer as the admin token does: every project, reads only. With it they show the projects that user may read, and readiness's `allowed` is that user's.
+
+**The token file is a live user credential.** It is that user's full Studio session, not a comment-only identity. The agent host runs as the same OS user, so its own tools can read the path from the MCP config, read the file, and call Studio, or `amc approvals … --session-token-file`, as that user until the session expires. The server therefore accepts the session only of a user whose sole role is `VIEWER`; any other role is refused (403 `A4_SESSION_TOO_PRIVILEGED`). A `VIEWER` cannot approve, deny or request changes on an A4 gate, which needs `APPROVER`, `AUDITOR` or `OWNER`, and cannot build, which needs `OPERATOR`. It can still read what a `VIEWER` reads in Studio, and it can decide an approval request only if a rule in the signed approval policy lists `VIEWER` in its `rolesAllowed`. Set it up like this:
+
+```bash
+amc user add --username a4-agent --role VIEWER       # a dedicated user for the agent host
+# as a project owner, add LOCAL_USER:<its userId from `amc user list`> to each project it should read
+amc approvals login --username a4-agent --token-file ~/.amc-a4-agent.token --ttl-minutes 5
+```
+
+Use the shortest lifetime that works (5 to 60 minutes). Revoke the user (`amc user revoke`) to cut access before the session expires.
+
+`amc_a4_comment` refuses without that file. It records a self-reported comment through the same path as `POST /api/v1/a4/projects/:id/comments` (project membership, encrypted blob, request-id dedupe). The record is that user's own comment, the same as one typed in Studio: it stores the user's key and name and carries no MCP marker. The dedicated user is therefore how the project history tells MCP comments from a person's.
 
 ---
 
@@ -308,7 +322,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 - **Read-mostly** — the MCP server reads AMC data; it does not run diagnostics or modify agent configs
 - **Read-only tools** — no tool modifies agent configs or runs diagnostics; the only write is the A4 preview's `amc_a4_comment`, which records a self-reported comment as the configured signed-in user
 - **Workspace-scoped** — all data comes from the local `.amc/` directory in your project
-- **No credentials required** — AMC MCP needs no API keys or authentication
+- **Credentials** — the eleven core tools need none. The A4 preview's `amc_a4_comment` needs the `amc approvals login` session file named by `AMC_A4_SESSION_TOKEN_FILE`, and when it is set the A4 reads verify it too. That file is a live Studio session that the agent host can read, so the server accepts only a `VIEWER`-only user's session (see A4 Forge tools)
 
 ---
 
