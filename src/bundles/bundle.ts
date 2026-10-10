@@ -725,7 +725,7 @@ export function exportEvidenceBundle(params: {
 
     const sourceDbPath = join(params.workspace, ".amc", "evidence.sqlite");
     const outputDbPath = join(root, "evidence", "evidence.sqlite");
-    const copied = copyA4Slice({ sourceDbPath, outputDbPath, agentId, slice: copyEvidenceSlice({ sourceDbPath, outputDbPath, report }) });
+    const copied = copyA4Slice({ workspace: params.workspace, root, agentId, slice: copyEvidenceSlice({ sourceDbPath, outputDbPath, report }) });
 
     // Transport authenticated encrypted objects, never vault keys or legacy
     // plaintext. The signed bundle manifest includes this index and its gaps.

@@ -1,7 +1,8 @@
 /**
- * The `.amcbundle` A4 slice and the `amc.a4-record/v1` export (P1-63; design §14.5). Both carry an A4 project exactly as
- * the ledger stored it: every side-table row, each transition's audit row and every row a `ledger_event` ref names, so a
- * verifier recomputes every `body_digest`, `binding_digest` and `request_digest` from the exported bytes without a key.
+ * The `amc.a4-record/v1` export and the `.amcbundle` A4 slice, which carries one such record per project (P1-63; design
+ * §14.5). A record holds an A4 project exactly as the ledger stored it: every side-table row, each transition's audit row
+ * and every row a `ledger_event` ref names, so a verifier recomputes every `body_digest`, `binding_digest` and
+ * `request_digest` from the exported bytes without a key.
  * Public keys travel only to locate a signer; a verifier admits them from its own pinned trust list. `synthetic_example`
  * refs are exported, retained and labelled (`containsSyntheticExamples`); `assertNotExample` never runs on an export.
  */
@@ -9,17 +10,19 @@ import Database from "better-sqlite3";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { A4_RECORD_TABLES, type A4RecordV1 } from "../contracts/v1/a4Record.js";
+import { a4PreviewEnabled, type A4ProjectRow } from "../a4/a4Schema.js";
+import { A4StoreError, readA4Store } from "../a4/a4Store.js";
+import { A4_RECORD_TABLES, a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
 import { verifyKeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
+import { getAuthenticatedKeyHistory, getPublicKeyPem } from "../crypto/keys.js";
+import { openLedger } from "../ledger/ledger.js";
 import { hasTable, runMigrations } from "../ledger/ledgerSchema.js";
-import { A4_MIGRATION_SQL } from "../ledger/ledgerSchemaA4.js";
-import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 
 type Row = Record<string, string | number | null>;
 type Tables = A4RecordV1["tables"];
 export type A4RecordKeys = A4RecordV1["publicKeys"];
-/** What `exportEvidenceBundle` lists in its signed manifest for the slice: each project's head as exported. */
+/** What `exportEvidenceBundle` lists in its signed manifest for the slice: each project's verified head as exported. */
 export interface A4BundleSlice {
   schema: "amc.a4-bundle-slice/v1";
   projects: Array<{ projectId: string; headSeq: number; headDigest: string }>;
@@ -30,30 +33,27 @@ const COLUMN = /^[a-z][a-z0-9_]*$/;
 const marks = (count: number): string => Array.from({ length: count }, () => "?").join(",");
 
 /** Inserts rows as given; a column name outside [a-z0-9_] is refused, never interpolated. */
-function insertRows(db: Database.Database, table: string, rows: readonly Row[], verb = "INSERT"): number {
-  let inserted = 0;
+function insertRows(db: Database.Database, table: string, rows: readonly Row[]): void {
   for (const row of rows) {
     const columns = Object.keys(row);
     if (!columns.every((column) => COLUMN.test(column))) throw new Error(`invalid column in ${table}`);
-    inserted += db.prepare(`${verb} INTO ${table} (${columns.join(", ")}) VALUES (${marks(columns.length)})`).run(...columns.map((column) => row[column])).changes;
+    db.prepare(`INSERT INTO ${table} (${columns.join(", ")}) VALUES (${marks(columns.length)})`).run(...columns.map((column) => row[column]));
   }
-  return inserted;
 }
 
-// ponytail: one IN (...) list per query; SQLite allows 32766 parameters, far beyond a project's rows. Chunk if exports grow past it.
-function projectRows(db: Database.Database, projectIds: readonly string[]): Tables {
+function projectRows(db: Database.Database, projectId: string): Tables {
   return Object.fromEntries(A4_RECORD_TABLES.map((table) => [table,
-    db.prepare(`SELECT * FROM ${table} WHERE project_id IN (${marks(projectIds.length)}) ORDER BY rowid`).all(...projectIds) as Row[]])) as Tables;
+    db.prepare(`SELECT * FROM ${table} WHERE project_id = ? ORDER BY rowid`).all(projectId) as Row[]])) as Tables;
 }
 
 /** Each transition's audit row and each row a `ledger_event` ref names. */
 const namedEventIds = (tables: Tables): string[] => [...new Set([...tables.a4_transitions.map((row) => String(row.evidence_event_id)),
   ...tables.a4_evidence_refs.filter((row) => row.ref_kind === "ledger_event").map((row) => String(row.ref_id))])];
-const syntheticIn = (tables: Tables): boolean => tables.a4_evidence_refs.some((row) => row.claim_kind === "synthetic_example");
+export const syntheticIn = (tables: Tables): boolean => tables.a4_evidence_refs.some((row) => row.claim_kind === "synthetic_example");
 
 /** One project as stored, for a verifier without SQLite. Reads only; signs nothing. */
 export function readA4Record(db: Database.Database, projectId: string, keys: A4RecordKeys): A4RecordV1 {
-  const tables = projectRows(db, [projectId]);
+  const tables = projectRows(db, projectId);
   const ids = namedEventIds(tables);
   const events = ids.length === 0 ? [] : db.prepare(`SELECT * FROM evidence_events WHERE id IN (${marks(ids.length)}) ORDER BY rowid`).all(...ids) as Row[];
   const sessionIds = [...new Set(events.map((row) => String(row.session_id)))];
@@ -62,71 +62,51 @@ export function readA4Record(db: Database.Database, projectId: string, keys: A4R
   return { schema: "amc.a4-record/v1", projectId, containsSyntheticExamples: syntheticIn(tables), tables, evidence: { events, sessions }, publicKeys: keys };
 }
 
-/**
- * The ledger rows after the bundle's prefix up to the last row the slice names, plus the rest of their sessions, appended
- * to `out`: the bundle's ledger stays one unbroken prefix that verifyLedgerIntegrity checks whole.
- */
-function extendPrefix(source: Database.Database, out: Database.Database, copied: readonly EvidenceEvent[], ids: readonly string[]): {
-  events: EvidenceEvent[]; blobPaths: string[]; sessions: number;
-} {
-  const last = copied.at(-1);
-  const from = last ? (source.prepare("SELECT rowid FROM evidence_events WHERE id = ?").get(last.id) as { rowid: number } | undefined)?.rowid ?? 0 : 0;
-  const needed = ids.length === 0 ? 0
-    : (source.prepare(`SELECT MAX(rowid) AS m FROM evidence_events WHERE id IN (${marks(ids.length)})`).get(...ids) as { m: number | null }).m ?? 0;
-  if (needed <= from) return { events: [], blobPaths: [], sessions: 0 };
-  // Whole sessions, as copyEvidenceSlice keeps them: a session cut mid-way would fail its seal.
-  const to = Math.max(needed, (source.prepare(`SELECT MAX(rowid) AS m FROM evidence_events WHERE session_id IN
-    (SELECT session_id FROM evidence_events WHERE rowid > ? AND rowid <= ?)`).get(from, needed) as { m: number | null }).m ?? 0);
-  const rows = source.prepare("SELECT * FROM evidence_events WHERE rowid > ? AND rowid <= ? ORDER BY rowid").all(from, to) as Row[];
-  const columnsOf = (table: string): Set<string> => new Set((out.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>).map((column) => column.name));
-  const keep = (columns: Set<string>, row: Row): Row => Object.fromEntries(Object.entries(row).filter(([column]) => columns.has(column)));
-  const eventColumns = columnsOf("evidence_events");
-  const sessionColumns = columnsOf("sessions");
-  const sessionIds = [...new Set(rows.map((row) => String(row.session_id)))];
-  const sessions = source.prepare(`SELECT * FROM sessions WHERE session_id IN (${marks(sessionIds.length)})`).all(...sessionIds) as Row[];
-  const inserted = out.transaction(() => {
-    insertRows(out, "evidence_events", rows.map((row) => keep(eventColumns, row)));
-    return insertRows(out, "sessions", sessions.map((row) => keep(sessionColumns, row)), "INSERT OR IGNORE");
-  })();
-  return { events: rows as unknown as EvidenceEvent[], blobPaths: rows.map((row) => String(row.payload_path ?? "")).filter((path) => path.length > 0),
-    sessions: inserted };
-}
+/** The workspace's role keys, carried to locate signers only (a verifier admits them from its own pinned trust list). */
+const workspaceKeys = (workspace: string): A4RecordKeys => {
+  const key = (role: "monitor" | "auditor"): A4RecordKeys["monitor"] => {
+    const history = getAuthenticatedKeyHistory(workspace, role);
+    return { publicKeyPem: getPublicKeyPem(workspace, role), history: history === null ? null : { ...history } };
+  };
+  return { monitor: key("monitor"), auditor: key("auditor") };
+};
 
 /**
- * The A4 slice of a run bundle (the one hook in `exportEvidenceBundle`): every A4 project of the bundle's agent, its rows
- * as stored and the ledger rows they name. Returns the evidence slice extended by those rows, and the manifest member
- * that lists the slice (empty when the agent has no A4 project, so such bundles are byte-for-byte unchanged).
+ * The A4 slice of a run bundle (the one hook in `exportEvidenceBundle`; preview only, `AMC_A4_PREVIEW=1`): each A4
+ * project of the bundle's agent as an `amc.a4-record/v1` file `a4/<projectId>.json`, which the signed manifest lists with
+ * every other file, and the manifest member naming each project's head. Each project is verified whole (`verifyChain`)
+ * and read in one read transaction, so the head the manifest signs is the verified head of exactly the rows exported;
+ * a project that does not verify refuses the export (A4_INTEGRITY_FAILED). The bundle's ledger is never touched, so an
+ * agent with no A4 project, or a process without the preview flag, exports byte-for-byte what it did before.
  */
-export function copyA4Slice<T extends { events: EvidenceEvent[]; blobPaths: string[]; eventCount: number; sessionCount: number }>(input: {
-  sourceDbPath: string; outputDbPath: string; agentId: string; slice: T;
-}): T & { a4Manifest: { a4?: A4BundleSlice } } {
-  const source = new Database(input.sourceDbPath, { readonly: true });
+export function copyA4Slice<T extends object>(input: { workspace: string; root: string; agentId: string; slice: T }): T & { a4Manifest: { a4?: A4BundleSlice } } {
+  if (!a4PreviewEnabled()) return { ...input.slice, a4Manifest: {} };
+  const ledger = openLedger(input.workspace, { readonly: true });
+  let exported: Array<{ head: A4ProjectRow; record: A4RecordV1 }>;
   try {
-    const projects = hasTable(source, "a4_projects")
-      ? source.prepare("SELECT project_id, head_seq, head_digest FROM a4_projects WHERE agent_id = ? ORDER BY created_ts, project_id")
-        .all(input.agentId) as Array<{ project_id: string; head_seq: number; head_digest: string }> : [];
-    if (projects.length === 0) return { ...input.slice, a4Manifest: {} };
-    const tables = projectRows(source, projects.map((project) => project.project_id));
-    const out = new Database(input.outputDbPath);
-    try {
-      const extra = extendPrefix(source, out, input.slice.events, namedEventIds(tables));
-      out.exec(A4_MIGRATION_SQL);
-      out.transaction(() => A4_RECORD_TABLES.forEach((table) => insertRows(out, table, tables[table])))();
-      return {
-        ...input.slice,
-        events: [...input.slice.events, ...extra.events],
-        blobPaths: [...new Set([...input.slice.blobPaths, ...extra.blobPaths])],
-        eventCount: input.slice.eventCount + extra.events.length,
-        sessionCount: input.slice.sessionCount + extra.sessions,
-        a4Manifest: { a4: { schema: "amc.a4-bundle-slice/v1", containsSyntheticExamples: syntheticIn(tables),
-          projects: projects.map((project) => ({ projectId: project.project_id, headSeq: project.head_seq, headDigest: project.head_digest })) } }
-      };
-    } finally {
-      out.close();
-    }
+    if (!hasTable(ledger.db, "a4_projects")) return { ...input.slice, a4Manifest: {} };
+    const store = readA4Store(ledger);
+    const keys = workspaceKeys(input.workspace);
+    exported = ledger.db.transaction(() => (ledger.db.prepare("SELECT project_id FROM a4_projects WHERE agent_id = ? ORDER BY created_ts, project_id")
+      .all(input.agentId) as Array<{ project_id: string }>).map(({ project_id: projectId }) => {
+      let head: A4ProjectRow | null;
+      try {
+        head = store.verifyChain(projectId);
+      } catch (error) {
+        throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `A4 project ${projectId} does not verify; the bundle is not exported.`,
+          error instanceof A4StoreError ? error.detail : [error instanceof Error ? error.message : String(error)]);
+      }
+      if (head === null) throw new A4StoreError(409, "A4_INTEGRITY_FAILED", `A4 project ${projectId} has no head; the bundle is not exported.`);
+      return { head, record: a4RecordV1Schema.parse(readA4Record(ledger.db, projectId, keys)) };
+    }))();
   } finally {
-    source.close();
+    ledger.close();
   }
+  if (exported.length === 0) return { ...input.slice, a4Manifest: {} };
+  ensureDir(join(input.root, "a4"));
+  for (const { record } of exported) writeFileAtomic(join(input.root, "a4", `${record.projectId}.json`), JSON.stringify(record), 0o644);
+  return { ...input.slice, a4Manifest: { a4: { schema: "amc.a4-bundle-slice/v1", containsSyntheticExamples: exported.some(({ record }) => record.containsSyntheticExamples),
+    projects: exported.map(({ head }) => ({ projectId: head.project_id, headSeq: head.head_seq, headDigest: head.head_digest })) } } };
 }
 
 /** The carried role keys where the ledger verifiers look. A history that does not authenticate under its role key is refused. */
@@ -145,8 +125,8 @@ function writeKeys(workspace: string, keys: A4RecordKeys): void {
 
 /**
  * A temporary workspace whose fresh ledger holds exactly the record's rows, with its carried keys, for verifyA4Chain.
- * The schema comes from the migrations alone: no vault, no signing key and no foreign-key enforcement, so a record
- * missing its head or a gate still loads and fails verification instead.
+ * The schema comes from the migrations alone: no vault and no signing key. Foreign keys are switched off (better-sqlite3
+ * enforces them by default), so a record missing its head or a gate still loads and fails verification instead.
  */
 export function materializeA4Record(record: A4RecordV1): { workspace: string; cleanup: () => void } {
   const workspace = mkdtempSync(join(tmpdir(), "amc-a4-record-"));
@@ -156,6 +136,7 @@ export function materializeA4Record(record: A4RecordV1): { workspace: string; cl
     const db = new Database(join(workspace, ".amc", "evidence.sqlite"));
     try {
       runMigrations(db);
+      db.pragma("foreign_keys = OFF");
       db.transaction(() => {
         insertRows(db, "evidence_events", record.evidence.events);
         insertRows(db, "sessions", record.evidence.sessions);

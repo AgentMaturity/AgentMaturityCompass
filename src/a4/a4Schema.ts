@@ -93,6 +93,11 @@ export function laneForClaimKind(claimKind: ClaimKind, trustTier: string | null,
   return { lane: fallback, claimKind: claimKind === "synthetic_example" ? "synthetic_example" : "self_reported" };
 }
 
+/** The A4 preview gate (D-20): every A4 route, page and export stays absent unless the operator set AMC_A4_PREVIEW=1. */
+export function a4PreviewEnabled(): boolean {
+  return process.env.AMC_A4_PREVIEW === "1";
+}
+
 /** A4ResourceDigests as `group.slot` → value: what a gate's intent binds, and what decide, complete and verify recompute. */
 export function flatSlots(digests: unknown, prefix = ""): Record<string, string | null> {
   if (digests === null || typeof digests !== "object") return {};

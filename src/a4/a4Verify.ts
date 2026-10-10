@@ -12,11 +12,11 @@
  * the caller's pinned trust only, and adds scope, freshness, completeness and satisfaction (spec/ACCEPTANCE_RULES.md).
  */
 import Database from "better-sqlite3";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema } from "../approvals/approvalChainStore.js";
-import { materializeA4Record, readA4Record, type A4BundleSlice, type A4RecordKeys } from "../bundles/bundleA4.js";
+import { materializeA4Record, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
@@ -303,6 +303,8 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
 const A4_INPUT_LIMIT = 128 * 1024 * 1024;
 const A4_ARCHIVE_LIMITS = { maxEntries: 10_000, maxCompressedBytes: A4_INPUT_LIMIT, maxEntryBytes: A4_INPUT_LIMIT, maxTotalBytes: 512 * 1024 * 1024, maxPathBytes: 1024 };
 const RECORD_NOTE = "a4-record: each exported ledger row is checked on its own; its place in the workspace ledger chain is not evaluated from a record";
+const NOT_ADMITTED = "ISSUER_NOT_ADMITTED: integrity only; a pinned trust list must admit the monitor and auditor keys";
+const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
 type Dimension = VerifierReportV1["scope"];
 type Dimensions = Pick<VerifierReportV1, "scope" | "freshness" | "completeness" | "satisfaction">;
 const dimension = (status: Dimension["status"], reasons: string[]): Dimension => ({ status, reasons });
@@ -474,9 +476,10 @@ const combine = (parts: ReadonlyArray<{ projectId: string; dimension: Dimension 
 
 /**
  * Verifies an exported A4 project offline: an `amc.a4-record/v1` JSON file, or an `.amcbundle` whose signed manifest lists
- * an A4 slice (the bundle's manifest, files and ledger through verifyEvidenceBundle, then each listed project, whose head
- * must be the one the manifest signed). The file is read once; every check reads those bytes. Trust is the caller's: the
- * operator's on an API route (never a request's), `--trust-list` on the CLI. Every verdict is an integrity-section item.
+ * an A4 slice (the bundle's manifest, files and ledger through verifyEvidenceBundle, then each listed project's record
+ * file `a4/<projectId>.json`, whose head must be the one the manifest signed). The file is read once; every check reads
+ * those bytes. Trust is the caller's: the operator's on an API route (never a request's), `--trust-list` on the CLI.
+ * Every verdict is an integrity-section item.
  */
 export async function verifyA4Bundle(file: string, trust: TrustContext = loadTrustContext(), now = Date.now()): Promise<VerifierReportV1> {
   const bytes = boundedFile(file, A4_INPUT_LIMIT);
@@ -490,6 +493,7 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     }
     return parsed?.success ? verifyA4Record(parsed.data, trust, now, artifact) : unloadable(artifact, trust, now, "A4_RECORD_INVALID: not an amc.a4-record/v1 document");
   }
+  const bundleArtifact = { ...artifact, kind: "a4-bundle" };
   const dir = mkdtempSync(join(tmpdir(), "amc-a4-bundle-"));
   try {
     const copy = join(dir, "bundle.amcbundle");
@@ -499,40 +503,52 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     const root = join(dir, "root");
     mkdirSync(root);
     extractValidatedTarGzipArchive({ file: copy, destination: root, label: "archive", limits: A4_ARCHIVE_LIMITS });
-    const slice = (JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as { a4?: A4BundleSlice }).a4?.projects ?? [];
-    const history = JSON.parse(readFileSync(join(root, "public-keys", "key-history.json"), "utf8")) as Record<string, Record<string, unknown> | null>;
-    const keys: A4RecordKeys = {
-      monitor: { publicKeyPem: readFileSync(join(root, "public-keys", "monitor.pub"), "utf8"), history: history.monitor ?? null },
-      auditor: { publicKeyPem: readFileSync(join(root, "public-keys", "auditor.pub"), "utf8"), history: history.auditor ?? null }
-    };
+    const slice = (JSON.parse(readFileSync(join(root, "manifest.json"), "utf8")) as { a4?: A4BundleSlice }).a4;
+    const listed = slice?.projects ?? [];
+    const sliceErrors: string[] = [];
+    const records = listed.flatMap((entry) => {
+      const path = join(root, "a4", `${entry.projectId}.json`);
+      const record = PROJECT_ID.test(entry.projectId) && existsSync(path) ? a4RecordV1Schema.safeParse(parsed(readFileSync(path, "utf8"))) : null;
+      if (record?.success !== true || record.data.projectId !== entry.projectId) {
+        sliceErrors.push(`A4_SLICE_RECORD_INVALID: the manifest lists ${entry.projectId}, whose a4/<projectId>.json is not its amc.a4-record/v1 record`);
+        return [];
+      }
+      const head = record.data.tables.a4_projects[0];
+      if (head?.head_seq !== entry.headSeq || head.head_digest !== entry.headDigest) {
+        sliceErrors.push(`A4_SLICE_HEAD_MISMATCH: the exported head of ${entry.projectId} is not the head the signed manifest lists`);
+      }
+      return [record.data];
+    });
+    const unlisted = existsSync(join(root, "a4")) ? readdirSync(join(root, "a4")).filter((name) => !listed.some((entry) => `${entry.projectId}.json` === name)) : [];
+    sliceErrors.push(...unlisted.map((name) => `A4_SLICE_UNLISTED: a4/${name} is in the bundle but not in its signed manifest's A4 slice`));
+    if (slice !== undefined && slice.containsSyntheticExamples !== records.some((record) => syntheticIn(record.tables))) {
+      sliceErrors.push("A4_SYNTHETIC_LABEL_MISMATCH: the signed manifest's a4.containsSyntheticExamples does not match the exported evidence refs");
+    }
+    // A later A4 audit session in the bundle's own ledger witnesses a transition the record does not show (rule 1).
     const db = new Database(join(root, "evidence", "evidence.sqlite"), { readonly: true });
-    let records: A4RecordV1[];
-    let unlisted: string[];
     try {
-      records = slice.map((entry) => a4RecordV1Schema.parse(readA4Record(db, entry.projectId, keys)));
-      unlisted = hasTable(db, "a4_transitions") ? (db.prepare("SELECT DISTINCT project_id FROM a4_transitions").all() as Array<{ project_id: string }>)
-        .map((row) => row.project_id).filter((id) => !slice.some((entry) => entry.projectId === id)) : [];
+      for (const entry of listed) {
+        const sessionId = `a4-${entry.projectId}-${entry.headSeq + 1}`;
+        if (db.prepare("SELECT 1 FROM sessions WHERE session_id = ? UNION ALL SELECT 1 FROM evidence_events WHERE session_id = ? LIMIT 1").get(sessionId, sessionId) !== undefined) {
+          sliceErrors.push(`A4_SLICE_TRUNCATED: the bundle ledger holds session ${sessionId}, after the head the manifest lists`);
+        }
+      }
     } finally {
       db.close();
     }
-    const projects = records.map((record, index) => {
-      const head = record.tables.a4_projects[0];
-      const listed = slice[index]!;
-      const report = verifyA4Record(record, trust, now, { ...artifact, kind: "a4-bundle" }, null);
-      const headErrors = head?.head_seq === listed.headSeq && head.head_digest === listed.headDigest ? []
-        : [`A4_SLICE_HEAD_MISMATCH: the bundle ledger's head of ${record.projectId} is not the head its signed manifest lists`];
-      return { projectId: record.projectId, report, headErrors };
-    });
-    const integrityErrors = [...bundle.integrity.errors, ...unlisted.map((id) => `A4_SLICE_UNLISTED: ${id} has rows in the bundle ledger but is not in its signed manifest`),
-      ...projects.flatMap((project) => [...project.report.integrity.errors, ...project.headErrors].map((error) => `${error} [${project.projectId}]`))];
-    const report = buildVerifierReport({ artifact: { ...artifact, kind: "a4-bundle" }, context: trust, integrityErrors, anchoring: bundle.anchoring, verifiedAt: new Date(now),
+    const projects = records.map((record) => ({ projectId: record.projectId, report: verifyA4Record(record, trust, now, bundleArtifact) }));
+    const integrityErrors = [...bundle.integrity.errors, ...sliceErrors,
+      ...projects.flatMap((project) => project.report.integrity.errors.map((error) => `${error} [${project.projectId}]`))];
+    const report = buildVerifierReport({ artifact: bundleArtifact, context: trust, integrityErrors, anchoring: bundle.anchoring, verifiedAt: new Date(now),
       signatures: [...bundle.issuerAdmission.signatures, ...projects.flatMap((project) => project.report.issuerAdmission.signatures)],
-      warnings: [...bundle.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...projects.flatMap((project) => project.report.warnings)] });
-    if (bundle.integrity.status === "fail" || unlisted.length > 0 || projects.some((project) => project.headErrors.length > 0)) return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
+      warnings: [...bundle.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...new Set(projects.flatMap((project) => project.report.warnings))] });
+    if (report.integrity.status === "fail") return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
+    // manifest.sig pins the heads: no dimension is evaluated unless every signature, that one included, is admitted.
+    if (report.issuerAdmission.status !== "pass" || bundle.anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };
     const of = (key: keyof Dimensions): Dimension => combine(projects.map((project) => ({ projectId: project.projectId, dimension: project.report[key] })));
     return { ...report, scope: of("scope"), freshness: of("freshness"), completeness: of("completeness"), satisfaction: of("satisfaction") };
   } catch (error) {
-    return unloadable({ ...artifact, kind: "a4-bundle" }, trust, now, `A4_BUNDLE_UNREADABLE: ${messageOf(error)}`);
+    return unloadable(bundleArtifact, trust, now, `A4_BUNDLE_UNREADABLE: ${messageOf(error)}`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

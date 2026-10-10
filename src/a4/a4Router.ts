@@ -38,7 +38,8 @@ import { gateStatus, type A4Action, type A4ReadinessState } from "./a4Readiness.
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, type A4Member, type A4Principal, type A4ProjectRow, type A4Stage
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, type A4Member, type A4Principal,
+  type A4ProjectRow, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -50,10 +51,6 @@ const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
 /** Never read from a body: identity comes from the session, trust from the operator (design §12.1, §16 rule 1). */
 const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "approvalId", "token"];
 
-/** The A4 preview gate (D-20): every A4 route and page stays absent unless the operator set AMC_A4_PREVIEW=1. */
-export function a4PreviewEnabled(): boolean {
-  return process.env.AMC_A4_PREVIEW === "1";
-}
 
 /** One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. */
 export interface A4Route {
