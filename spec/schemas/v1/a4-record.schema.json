@@ -1,0 +1,398 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "containsSyntheticExamples": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "sessions": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "events",
+        "sessions"
+      ],
+      "type": "object"
+    },
+    "projectId": {
+      "pattern": "^a4p_[0-9a-f]{32}$",
+      "type": "string"
+    },
+    "publicKeys": {
+      "additionalProperties": false,
+      "properties": {
+        "auditor": {
+          "additionalProperties": false,
+          "properties": {
+            "history": {
+              "anyOf": [
+                {
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "publicKeyPem": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "publicKeyPem",
+            "history"
+          ],
+          "type": "object"
+        },
+        "monitor": {
+          "additionalProperties": false,
+          "properties": {
+            "history": {
+              "anyOf": [
+                {
+                  "additionalProperties": {},
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "publicKeyPem": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "publicKeyPem",
+            "history"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "monitor",
+        "auditor"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "amc.a4-record/v1",
+      "type": "string"
+    },
+    "tables": {
+      "additionalProperties": false,
+      "properties": {
+        "a4_comments": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_decisions": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_deployments": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_evidence_refs": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_gates": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_members": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_projects": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_releases": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_revisions": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "a4_transitions": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "a4_projects",
+        "a4_transitions",
+        "a4_revisions",
+        "a4_gates",
+        "a4_decisions",
+        "a4_members",
+        "a4_comments",
+        "a4_evidence_refs",
+        "a4_releases",
+        "a4_deployments"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "containsSyntheticExamples",
+    "tables",
+    "evidence",
+    "publicKeys"
+  ],
+  "title": "AMC A4 Project Record Export",
+  "type": "object"
+}
