@@ -13,10 +13,11 @@
  *
  * Signing: this process never holds the vault. A comment is a signed transition, so amc_a4_comment sends it to the
  * workspace's running Studio as POST /api/v1/a4/projects/:id/comments with that session, and Studio's process signs.
- * The vault passphrase opens the auditor key that signs users.yaml, and anything in this server's environment is
- * readable by the agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE or AMC_VAULT_PASSPHRASE_FILE is set
- * here (P1-64 review).
+ * The session goes only to a Studio whose recorded process is alive and whose recorded address is this machine. The vault
+ * passphrase opens the auditor key that signs users.yaml, and anything in this server's environment is readable by the
+ * agent host, so every A4 tool refuses while AMC_VAULT_PASSPHRASE or AMC_VAULT_PASSPHRASE_FILE is set here (P1-64 review).
  */
+import { networkInterfaces } from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodError } from "zod";
 import { A4BlobError } from "../a4/a4Blobs.js";
@@ -27,9 +28,10 @@ import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 import { listVerifiedUsers, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { createA4Client, type A4Session } from "../sdk/a4Client.js";
+import { AMCSDKError } from "../sdk/errors.js";
 import { readNativeApprovalSession } from "../setup/nativeApprovalIdentity.js";
 import { nativeCsrfTokenForSession } from "../studio/nativeAdmission.js";
-import { readStudioState } from "../studio/studioState.js";
+import { processRunning, readStudioState } from "../studio/studioState.js";
 import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
@@ -47,6 +49,15 @@ const TOOLS = [
 
 /** Variables that open the vault; the agent host can read this server's environment (P1-64 review). */
 const VAULT_ENV = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE"] as const;
+const STUDIO_TIMEOUT_MS = 10_000;
+/** state.json is unsigned and outlives a crashed Studio; pid > 0 because processRunning(0) signals the process group. */
+const studioStateSchema = z.object({ pid: z.number().int().positive(), apiPort: z.number().int().min(1).max(65_535), host: z.string().min(1) });
+/** Studio's answer to POST …/comments: a recorded transition, or a refusal with its code. */
+const studioAnswerSchema = z.union([
+  z.object({ ok: z.literal(true), data: z.object({ projectId: z.string(), seq: z.number().int().nonnegative(), kind: z.string(), bodyDigest: z.string(),
+    replay: z.boolean() }) }),
+  z.object({ ok: z.literal(false).optional(), error: z.string(), code: z.string().regex(/^[A-Z][A-Z0-9_]{0,63}$/).optional() })
+]);
 
 /** The five A4 tools for MCP_TOOL_METADATA; none without AMC_A4_PREVIEW=1. */
 export function a4ToolMetadata(): Array<{ name: string; description: string; input: string }> {
@@ -84,6 +95,43 @@ function refusalFor(name: string, error: unknown): Refusal {
   const tagged = error as { status?: unknown; code?: unknown } | null;
   if (error instanceof Error && typeof tagged?.status === "number" && typeof tagged.code === "string") return refusal(name, tagged.status, tagged.code, error.message);
   return refusal(name, 500, "A4_INTERNAL", "The A4 request could not be completed; retry, and check the workspace if it persists.");
+}
+
+/**
+ * The workspace's Studio, only while its recorded process is alive and its recorded address is this machine (loopback, a
+ * wildcard bind, or one of this machine's interface addresses), so the session never reaches another host or a listener
+ * left on a dead Studio's port. The recorded bind is used unchanged so Studio's native host and origin checks match.
+ */
+function localStudioUrl(workspace: string): string {
+  let recorded: unknown = null;
+  try {
+    recorded = readStudioState(workspace);
+  } catch {
+    // An unreadable state file names no running Studio.
+  }
+  const studio = studioStateSchema.safeParse(recorded);
+  // ponytail: pid liveness, not identity; a reused pid of this same OS user still passes.
+  if (!studio.success || !processRunning(studio.data.pid)) {
+    throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", "Studio records and signs comments; start it with `amc studio start` and AMC_A4_PREVIEW=1.");
+  }
+  const host = studio.data.host.replace(/^\[|\]$/g, "").toLowerCase();
+  const local = ["127.0.0.1", "::1", "localhost", "0.0.0.0", "::"].includes(host)
+    || Object.values(networkInterfaces()).some((nics) => nics?.some((nic) => nic.address.toLowerCase() === host));
+  if (!local) throw new A4StoreError(403, "A4_STUDIO_NOT_LOCAL", `Studio's recorded address ${host} is not on this machine, so the session is not sent there.`);
+  return `http://${host.includes(":") ? `[${host}]` : host}:${studio.data.apiPort}`;
+}
+
+/** A failed call to Studio: only a failed connection means Studio is not running. */
+function studioFailure(error: unknown, baseUrl: string): unknown {
+  if (!(error instanceof AMCSDKError)) return error;
+  if (error.code === "INVALID_JSON") {
+    return new A4StoreError(502, "A4_STUDIO_BAD_ANSWER", `${baseUrl} answered HTTP ${error.status ?? "?"} without JSON; it may not be this workspace's Studio.`);
+  }
+  if (error.cause instanceof Error && error.cause.name === "TimeoutError") {
+    return new A4StoreError(504, "A4_STUDIO_TIMEOUT", `Studio at ${baseUrl} did not answer within ${STUDIO_TIMEOUT_MS / 1000} s. The comment may be recorded: `
+      + "retry with the same clientRequestId for the recorded result.");
+  }
+  return new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", `Studio at ${baseUrl} did not answer; start it with \`amc studio start\` and AMC_A4_PREVIEW=1.`);
 }
 
 /**
@@ -231,16 +279,20 @@ export function registerA4Tools(server: McpServer, host: Host): void {
         throw new A4StoreError(401, "A4_SESSION_REQUIRED", `Comments need a signed-in user: set ${A4_SESSION_TOKEN_ENV} in this MCP server's config to an \`amc approvals login\` token file.`);
       }
       // Studio's route checks membership, dedupes the clientRequestId, writes the encrypted blob and signs the transition.
-      const studio = readStudioState(ctx.store.workspace);
-      if (studio === null) throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", "Studio records and signs comments; start it with `amc studio start` and AMC_A4_PREVIEW=1.");
-      const baseUrl = `http://${studio.host.includes(":") ? `[${studio.host}]` : studio.host}:${studio.apiPort}`;
-      const { status, body } = await createA4Client({ baseUrl, session: ctx.session }).comment(args.projectId,
-        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch(() => {
-        throw new A4StoreError(503, "A4_STUDIO_NOT_RUNNING", `Studio at ${baseUrl} did not answer; start it with \`amc studio start\` and AMC_A4_PREVIEW=1.`);
+      const baseUrl = localStudioUrl(ctx.store.workspace);
+      const { status, body } = await createA4Client({ baseUrl, session: ctx.session, timeoutMs: STUDIO_TIMEOUT_MS }).comment(args.projectId,
+        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch((error: unknown) => {
+        throw studioFailure(error, baseUrl);
       });
-      if (!body.ok) return refusal("amc_a4_comment", status, body.code ?? `HTTP_${status}`, body.error);
-      const result = body.data;
-      return withClaim(`Recorded a self-reported comment on ${args.projectId} at seq ${String(result.seq)}${result.replay ? " (an earlier request with this clientRequestId)" : ""}.`,
+      // Missing data never reads as recorded: a success names this project and a seq, and a refusal carries its error.
+      const answer = studioAnswerSchema.safeParse(body);
+      const success = status >= 200 && status < 300;
+      if (!answer.success || (answer.data.ok === true) !== success || (answer.data.ok === true && answer.data.data.projectId !== args.projectId)) {
+        throw new A4StoreError(502, "A4_STUDIO_BAD_ANSWER", `${baseUrl} answered HTTP ${status} without a recorded comment or a refusal; nothing was reported as recorded.`);
+      }
+      if (answer.data.ok !== true) return refusal("amc_a4_comment", status, answer.data.code ?? `HTTP_${status}`, answer.data.error);
+      const result = answer.data.data;
+      return withClaim(`Recorded a self-reported comment on ${args.projectId} at seq ${result.seq}${result.replay ? " (an earlier request with this clientRequestId)" : ""}.`,
         unboundClaim("mcp:amc_a4_comment", "human_review"), { ...result });
     }));
 }
