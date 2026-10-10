@@ -696,6 +696,12 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
 }
 
 /**
+/** verifySignedFile's reasons as closed codes: its payload error quotes the exception, which may name absolute paths. */
+const SIGNATURE_REASON_CODES: Readonly<Record<string, string>> = { "file missing": "AGENT_CONFIG_MISSING", "signature missing": "SIGNATURE_MISSING",
+  "digest mismatch": "DIGEST_MISMATCH", "signature verify failed": "SIGNATURE_VERIFY_FAILED" };
+const signatureReasonCode = (reason: string | null): string | null => reason === null ? null
+  : SIGNATURE_REASON_CODES[reason] ?? (reason.startsWith("invalid signature payload") ? "SIGNATURE_PAYLOAD_INVALID" : "SIGNATURE_INVALID");
+
  * Review: the written context graph validates and matches the build, and equals the contextGraphHash of the agent's own
  * target profile, whose signature verifies; the agent config's signature under this workspace's keys (an integrity
  * check, recorded on the STEP, never a ref); the doctor's failing and warning checks with their first-run fixes; brief
@@ -754,6 +760,7 @@ async function review(ctx: A4ProducerContext): Promise<A4ProducerResult> {
     notEvaluated: [NOT_OBSERVED],
     record: { checks: { contextGraph: { valid: contextGraph.valid, matchesBuild: contextGraph.matchesBuild, targetMatches: contextGraph.targetMatches,
       targetProfile }, doctorOk: doctor.ok },
-      integrity: { agentConfigSignature: { valid: signature.valid, signatureExists: signature.signatureExists, reason: signature.reason, mode: "workspace-key-consistency" } } }
+      integrity: { agentConfigSignature: { valid: signature.valid, signatureExists: signature.signatureExists, reasonCode: signatureReasonCode(signature.reason),
+        mode: "workspace-key-consistency" } } }
   };
 }

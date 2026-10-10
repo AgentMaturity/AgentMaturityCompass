@@ -201,7 +201,7 @@ function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revi
   const build = (spec.build ?? null) as { files?: Array<{ writer?: unknown }>; manifestId?: unknown; manifestError?: unknown } | null;
   const review = [...state.chain].reverse().find((link) => link.kind === "STEP" && link.body.to === "reviewed" && link.revisionNo === revisionNo)?.body as
     { checks?: { contextGraph?: { valid?: unknown; matchesBuild?: unknown; targetMatches?: unknown; targetProfile?: unknown } };
-      integrity?: { agentConfigSignature?: { valid?: unknown; reason?: unknown } } } | undefined;
+      integrity?: { agentConfigSignature?: { valid?: unknown; reasonCode?: unknown } } } | undefined;
   const wrote = (writer: string): boolean => build?.files?.some((file) => file.writer === writer) === true;
   const pending = (id: string): A4ReadinessItem => waiting(id, ["PRODUCED_AT_BUILD"], { section: "implementation", mandatory: due });
   const signature = review?.integrity?.agentConfigSignature;
@@ -226,7 +226,9 @@ function buildItems(state: A4ReadinessState, spec: Record<string, unknown>, revi
   // AMC's own signature check: integrity of bytes under the workspace's keys, never a lane, never a claim (design §7).
   if (signature !== undefined) {
     items.push(item("aspire.agent_config_signature", signature.valid === true ? "READY" : "BLOCKED", { section: "integrity",
-      reasonCodes: signature.valid === true ? ["SELF_CHECK", "UNANCHORED"] : ["AGENT_CONFIG_SIGNATURE_INVALID", String(signature.reason ?? "unknown")] }));
+      reasonCodes: signature.valid === true ? ["SELF_CHECK", "UNANCHORED"]
+        // A closed code only (Review records one); anything else in a STEP body is never printed.
+        : ["AGENT_CONFIG_SIGNATURE_INVALID", typeof signature.reasonCode === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(signature.reasonCode) ? signature.reasonCode : "SIGNATURE_INVALID"] }));
   }
   return items;
 }
