@@ -117,23 +117,32 @@ cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NAT
 
 ## Assemble: building the agent
 
-Assemble turns the approved brief into a built agent. This build covers the native path; scaffolding and connecting an
-external framework, the `workflow` executor and execution phases follow in slice B of P1-60.
+Assemble turns the approved brief into a built agent. This build covers the native path and the `workflow` executor's
+plan; scaffolding and connecting an external framework and execution phases are not built yet.
 
 - **Ask and Understand.** Assemble asks for capabilities, autonomy (`advise`: no tools; `act_with_approval`: the signed
   workspace tools), tools, MCP connectors, the build provider (`stub`, or `provider:model`), existing systems, budget,
-  the engineering path and validation checks. Understand carries `riskTier` and `stations` from Aspire (change them
-  there) and reads the tool pipeline's readiness, the doctor's checks, the native task limits, providers (credentials by
-  reference and `configured` only, never a value), tool scope and validation config from Studio's own native task
-  service, the frameworks, mechanic profiles, the compiled plan, the open `outcome_unknown` executions and the path table.
+  the engineering path, validation checks and, optionally, a declared workflow. Understand carries `riskTier` and
+  `stations` from Aspire (change them there) and reads the tool pipeline's readiness, the doctor's checks, the native
+  task limits, providers (credentials by reference and `configured` only, never a value), tool scope and validation
+  config from Studio's own native task service, the frameworks, mechanic profiles, the compiled plan (and whether it
+  shows the `workflow` tool), the open `outcome_unknown` executions and the path table.
 - **Paths.** Each path has an IntegrationClaim: which boundary enforces it, what its evidence can reach and what it does
   not cover. Native is `tool_pipeline`; `claude-code` is preview (P1-23, held on D-02); `pi` is unsupported (P1-22, held
   on D-02); the framework paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
   key, and the stage completes only after an owner acknowledges it out of scope with a reason.
 - **Propose** records the plan: the typed graph with the agent's permissions, tasks by executor (`deterministic`,
-  `native_turn`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
+  `native_turn`, `workflow`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
   validation plan and the baseline Enforce manifest, which must be ACTIVE: pending Enforce drift is reviewed in Enforce
   first, never applied unseen by Assemble.
+- **Workflow.** A declared workflow (JSON: `agent`, `parallel` and `pipeline` nodes, at most 64) is checked as data
+  when you answer and needs autonomy `act_with_approval`. It runs only through the agent's `workflow` tool, each helper
+  through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
+  starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow
+  as unsupported (`NATIVE_TASKS_NO_DELEGATION`) and it stays listed until an owner acknowledges it out of scope. Once a
+  compiled plan is active its default `visibleTools` hides the tool, and the plan names that denial
+  (`C6_COMPILED_POLICY_DENIES`, with the plan revision and its tool-pipeline controls); an unreadable plan counts as
+  hiding it.
 - **Build** (an owner) signs the agent's preset into `.amc/agents.yaml`, writes the typed graph and journals one native
   build session in its revision; Studio starts it after the step is recorded, on its one native task service (the
   four-session limit and its sweeper are shared with every Studio task). Further turns, cancel and resume use the native
