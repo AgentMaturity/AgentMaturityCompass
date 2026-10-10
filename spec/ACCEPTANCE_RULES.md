@@ -230,11 +230,15 @@ One A4 Forge project (docs/A4_FORGE.md) as the ledger stores it: the head row `a
 `a4_transitions`, the side tables the chain names (`a4_revisions`, `a4_gates`, `a4_decisions`, `a4_members`,
 `a4_comments`, `a4_evidence_refs`, `a4_releases`, `a4_deployments`), each transition's audit row and every ledger row
 a `ledger_event` ref names. It travels as an `a4-record` JSON export (`amc.a4-record/v1`: the rows column by column,
-exactly as stored), or inside an `.amcbundle` as one such record per project (`a4/<projectId>.json`), listed with every
-other file in the signed `manifest.json`, whose `a4` member names each project's head (`a4.projects[].headSeq`,
-`headDigest`) and `a4.containsSyntheticExamples`. AMC adds that slice only with `AMC_A4_PREVIEW=1`, and only after
-each project's chain verifies whole in the same read transaction that reads its rows; a project that does not verify
-refuses the bundle export (`A4_INTEGRITY_FAILED`). `a4_requests` (idempotency)
+exactly as stored), or inside an `.amcbundle` as one such record per project (`a4/<projectId>.json`) beside
+`a4/index.json` (`amc.a4-bundle-slice/v1`), which names each project's head (`projects[].headSeq`, `headDigest`) and
+`containsSyntheticExamples`; the signed `manifest.json` lists both with every other file. AMC adds that slice only with
+`AMC_A4_PREVIEW=1`, and only after each project's chain verifies whole in the same read transaction that reads its
+rows. A project belongs to the bundle's agent by the receipt a monitor key signed for its seq-0 audit row (session
+`a4-<projectId>-0`), never by the head row's unsigned `agent_id`; every project any A4 row or audit session names is a
+candidate, and one no receipt attributes is verified as well. A candidate that does not verify, has no head row, or
+whose head row, `CREATED` body and receipt name different agents refuses the bundle export (`A4_INTEGRITY_FAILED`).
+`a4_requests` (idempotency)
 and `a4_effects` (liveness) are bookkeeping no transition names and are never exported. Inside a workspace,
 `verifyA4Chain` and `amc verify all` (check `a4-projects`) apply the integrity rules; `verifyA4Bundle`
 (`src/a4/a4Verify.ts`) applies all of them to an export. Normative fixtures, each with its expected verdict:
@@ -250,7 +254,8 @@ for `artifact-seal` from a trust list the verifier pinned (on the CLI, `amc a4 v
 MCP route uses the server operator's trust context only: `GET /api/v1/a4/projects/:id/verify` takes no query parameter
 and no body, so `?trustList=` is 400 `QUERY_INVALID` and a body is 400. With a key the trust list does not admit, a
 report states integrity only: issuer admission fails or the ledger is unanchored, and scope, freshness, completeness and
-satisfaction are `not-evaluated` (`ISSUER_NOT_ADMITTED`). A record with no envelope yet carries no auditor signature
+satisfaction are `not-evaluated` (`ISSUER_NOT_ADMITTED`). In a bundle each record's carried monitor key is admitted on
+its own, and the bundle is anchored only when the bundle's ledger and every record are. A record with no envelope yet carries no auditor signature
 (issuer admission `not-evaluated`); it is evaluated once its monitor key is admitted.
 
 Integrity (`integrity: fail` with the code named):
@@ -332,12 +337,13 @@ Integrity (`integrity: fail` with the code named):
 11. Effects and requests. Every `EFFECT_FINISHED` records a passing check for exactly the resource slots its gate's
     intent bound (`A4_EFFECT_SLOT_MISMATCH`); a workspace verify also refuses a stored request response that holds a
     credential (`A4_REQUEST_SECRET`).
-12. Bundles. Every `a4/<projectId>.json` in a bundle is listed in its signed manifest's `a4.projects`
-    (`A4_SLICE_UNLISTED`) and every listing has that record (`A4_SLICE_RECORD_INVALID`); the head each listing names is
-    the record's head row (`A4_SLICE_HEAD_MISMATCH`); the bundle's ledger holds no session
-    `a4-<projectId>-<headSeq + 1>` (`A4_SLICE_TRUNCATED`); and `a4.containsSyntheticExamples` is true exactly when a
-    listed record holds a `synthetic_example` ref (`A4_SYNTHETIC_LABEL_MISMATCH`). `manifest.sig` pins the heads, so
-    no dimension is evaluated unless every signature of the bundle is admitted (`ISSUER_NOT_ADMITTED`).
+12. Bundles. `a4/index.json` is an `amc.a4-bundle-slice/v1` listing (`A4_SLICE_INDEX_INVALID`); every
+    `a4/<projectId>.json` in a bundle is listed in its `projects` (`A4_SLICE_UNLISTED`) and every listing has that
+    record (`A4_SLICE_RECORD_INVALID`); the head each listing names is the record's head row (`A4_SLICE_HEAD_MISMATCH`);
+    the bundle's ledger holds no session `a4-<projectId>-<headSeq + 1>` (`A4_SLICE_TRUNCATED`); and
+    `containsSyntheticExamples` is true exactly when a listed record holds a `synthetic_example` ref
+    (`A4_SYNTHETIC_LABEL_MISMATCH`). `manifest.sig` pins both files, so no dimension is evaluated unless every
+    signature of the bundle is admitted and every record's monitor key is admitted for `ledger-row` (`ISSUER_NOT_ADMITTED`).
 13. Labels (`A4_SYNTHETIC_LABEL_MISMATCH`). A record's `containsSyntheticExamples` is true exactly when one of its
     `a4_evidence_refs` rows has `claim_kind = "synthetic_example"`.
 
@@ -367,7 +373,8 @@ Satisfaction (`satisfaction`), evaluated only when integrity and completeness pa
   (`GATE_CONSUMED_AFTER_SUPERSEDED`). Its counted decisions meet the request's quorum as the approval engine counts it
   at the consume's `ts` (`evaluateApprovalQuorum`, `src/approvals/approvalQuorum.ts`, with the request `PENDING`): only
   decisions whose `roles` hold one of the request's `rolesAllowed` count, `requiredApprovals` distinct users when
-  `requireDistinctUsers`, and any counted DENY is terminal (`GATE_DENIED_CONSUMED`; otherwise `QUORUM_NOT_MET`). An open
+  `requireDistinctUsers`, and any counted DENY is terminal (`GATE_DENIED_CONSUMED`; otherwise `QUORUM_NOT_MET`). The
+  engine checks the gate's expiry at that same `ts` and refuses a consume whose commit `ts` is at or past it. An open
   gate is listed with its count (`GATE_OPEN: … 1 of 2 approvals`), never reported as a met quorum.
 - Every counted APPROVE passes separation of duties as of its own seq (`SOD_VIOLATION`, `src/a4/a4SoD.ts`): never the
   gate's requester or an excluded key, never the revision's author (except on a `policy` gate, whose proposal the

@@ -30,8 +30,10 @@ amc bundle diff <bundleA> <bundleB>
 When the exporting process runs with `AMC_A4_PREVIEW=1` and the run's agent has A4 Forge projects, the bundle also
 holds `a4/<projectId>.json` for each one: an `amc.a4-record/v1` record of the project rows as stored and the ledger
 rows they name. Each project's chain is verified before it is exported, and one that does not verify refuses the export.
-`manifest.json` lists the records with every other file and names the slice under `a4`: each project's exported head
-and `containsSyntheticExamples`. `evidence/evidence.sqlite` is unchanged by the slice. A4 rules and the offline A4
+`a4/index.json` names each project's exported head and `containsSyntheticExamples`, and `manifest.json` lists it and
+the records with every other file. A project is the agent's by the receipt signed for its first audit row, never by an
+editable column. `evidence/evidence.sqlite` is unchanged by the slice; with the flag set, `amc certify`'s internal
+bundle carries it too, so a project that does not verify also refuses certification. A4 rules and the offline A4
 verifier are described in `docs/A4_FORGE.md`; `amc bundle verify` does not check the A4 rules.
 
 ## Verification Checks

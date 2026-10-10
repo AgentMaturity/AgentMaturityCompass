@@ -139,10 +139,14 @@ destruction is effective only after every backup, WORM segment or mirror older t
   names is refused. The report is the same for every reader allowed to see it. `amc verify all` runs the same check
   (`a4-projects`) for every project.
 - **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
-  as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name. Each
-  project's chain is verified whole before it is exported, and a project that does not verify refuses the export. The
-  signed manifest lists every file, each project's head and `containsSyntheticExamples`. The bundle's own ledger and
-  `amc certify` are unchanged by the slice.
+  as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name.
+  `a4/index.json` names each project's head and `containsSyntheticExamples`, and the signed manifest lists every file.
+  A project is the agent's by the receipt signed for its first audit row, never by the head row's editable `agent_id`.
+  Each project's chain is verified whole before it is exported. A project that does not verify, has lost its head row,
+  or names two agents refuses the export with `A4_INTEGRITY_FAILED`. A project no signed receipt attributes is verified
+  as well, so it too refuses the export unless it verifies. The bundle's own ledger is unchanged by the slice.
+  `amc certify` builds its internal bundle the same way, so with the flag set such a project also refuses
+  certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
   trust list admits them. It is a library function for now: the CLI entry point is `amc a4 verify --trust-list`
@@ -153,7 +157,7 @@ destruction is effective only after every backup, WORM segment or mirror older t
   never specification text, comment bodies or decision reasons. Only ledger row ids are kept as they are; every other
   ref id (a file name, a receipt or external id) is hashed with its kind. The slice is scanned for personal data and
   key material, then staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
-  function for now: no route or command serves it yet.
+  function for now, absent without `AMC_A4_PREVIEW=1` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
 
 ## Using the API before the Studio pages
 
