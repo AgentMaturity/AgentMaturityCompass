@@ -16,61 +16,93 @@ How the workflow steps were run locally: a scratch runner executed each job's `r
 | Check | Commit | Result | Artifact |
 |---|---|---|---|
 | Tree equivalence of the 12 picks against `7180bd0c4` (S1) and `0d1bb10a3` (S2) | `5c2379934` | S1 empty; S2 differs only in `docs/RELEASE_RUNBOOK.md`, by main's own P0-09 change (`fefb9b85e`), kept | `equivalence.txt` |
-| `deploy-pack-check.mjs --json --require-tools` | `7f98c42fe` | passed (helm lint, renders, kubeconform; nothing skipped) | `static/deploy-pack-check.json` |
-| S1 and S2 vitest files (15 files) | `7f98c42fe` | 89 passed of 89 (the receipt's `tests`) | none |
-| Four negative renders and no `kind: Secret` in the default render | `7f98c42fe` | all five checks pass: each render refused with its reason, default render has no Secret | `static/negative-renders.txt` |
-| The same step against chart 0.1.0 (`int`) | `7f98c42fe` | fails as required: 4 renders accepted, default render contains `kind: Secret` | `static/negative-renders-against-chart-0.1.0.txt` |
-| Kind: install, pair, test, upgrade, rollback to 1, pair, test | `7f98c42fe` | **failed**: install, upgrade, rollback and both pairings exit 0; both `helm test` runs exit 1 at the probe's `verify` step | `kind/helm-lifecycle.json`, `kind/helm-lifecycle.log` |
-| `deploy-verify.mjs` against the kind release | `5a2b84756` (clean tree) | passed: 5 of 5 checks, `llm_response` receipt verified against the pinned monitor key | `kind/deploy-verify.json` |
-| Rollback drill, image A from `origin/main` (`691a041dc`), image B from the head | `7f98c42fe` | **failed**: `deploy-a` passed; `probe-a` failed at `verify`; the B swap and rollback did not run | `drill/rollback-drill.json` |
-| Mutations M1 to M10 | `5a2b84756` | 10 of 10 killed, restored green | `mutations.json` |
+| `deploy-pack-check.mjs --json --require-tools` | receipt commit | passed (helm lint, renders, kubeconform; nothing skipped) | `static/deploy-pack-check.json` |
+| S1 and S2 vitest files (15 files) | receipt commit | 94 passed of 94 (the receipt's `tests`) | none |
+| Four negative renders and no `kind: Secret` in the default render | receipt commit | all five checks pass, each refusal naming its reason | `static/negative-renders.txt` |
+| The same step against chart 0.1.0 (`691a041dc`) | receipt commit | fails as required: 4 renders accepted, default render contains `kind: Secret` | `static/negative-renders-against-chart-0.1.0.txt` |
+| Kind: install, pin monitor key (revision 2), pair, test, upgrade, rollback to 2, pair, test | `0c8fa7365` | **passed**: every step exit 0; both `helm test` probes reached `verified-prefix` | `kind/helm-lifecycle.json`, `kind/helm-lifecycle.log` |
+| `deploy-verify.mjs` against the kind release | receipt commit (clean tree) | passed: 5 of 5 checks, `llm_response` receipt verified against the pinned monitor key | `kind/deploy-verify.json` |
+| Rollback drill, image A from `origin/main` (`691a041dc`), image B from the head | `0c8fa7365` | **failed** at `probe-a` `verify`: main's Studio runs the complete-ledger check, which the live gateway session fails | `drill/rollback-drill-a-origin-main.json` |
+| Rollback drill, image A from `8c4bc10ec`, image B from the head | `0c8fa7365` | **passed**: six steps, two `sha256` image ids, `verified-prefix` on all three probes | `drill/rollback-drill.json` |
+| Mutations M1 to M22 | `30f88cac9` | 22 of 22 killed, restored green | `mutations.json` |
 
-Between `7f98c42fe` and `5a2b84756` only docs, the changeset and the verifier step's stub line changed (`git diff --stat 7f98c42fe 5a2b84756 -- scripts deploy docker Dockerfile src package.json` is empty).
+Between `0c8fa7365` and the receipt commit only this receipt changed. Image A of the second drill comes from `8c4bc10ec`, whose Studio differs from the head only in `0c8fa7365` (a failed verdict keeps its recorded head), which no passing verdict touches.
 
-### Why `helm test` and the drill fail at `verify`
+### Root cause of the earlier verify refusal, and the fix
 
-Both probes reach Studio, claim a pairing code, log in, run one stub-provider native task to `idle` and call `/verify`, which answers `failed`: "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification". In the kind pod, `amc agent-loop verify <native session> --json --allow-unanchored` (vault unlocked inside the pod) reports one ledger error for both native sessions, `Session d2cab7c9-… missing seal`. That session is the gateway's (`runtime: gateway`), which Studio keeps open while it runs. The monitor key was also `not-pinned`, so even an intact ledger would give `failed` (untrusted) unless the operator's trust list or `AMC_EXPECTED_MONITOR_FINGERPRINT` admits it. Studio now reports only `failed`, `not-verified` or `externally-anchored`; the probe's other accepted value, `workspace-key-consistency`, is not produced at this revision. This is a product behaviour of `src/studio/nativeTaskService.ts` and `verifyAgentRun`, outside P0-14's touch scope. No assertion was weakened to make these runs pass.
+Both probes reached Studio, claimed a pairing code, logged in, ran one stub-provider turn and called `/verify`, which answered `failed`. Studio's native verify ran `verifyAgentRun` over the complete ledger (`verifyLedgerIntegrity`), which requires every legacy session to carry a seal (`src/ledger/ledgerVerification.ts`, the `missing seal` rule in `verifySessions`). The gateway that Studio runs opens one legacy session at start and seals it only at stop (`src/gateway/server.ts`, `startSession` and `sealSession`), so a running Studio could never verify its own turn. The monitor key was also unpinned, so even an intact ledger would have been `failed` (untrusted).
 
-### Defects the real runs found, fixed in this slice
+The fix uses the verifier the product already had for this situation (`verifyNativeSessionContinuation`, the verified-prefix scope that session resume uses), without weakening any rule:
 
-1. The kind install failed (`RunContainerError`): the image's `/var/run` is a symlink to `/run`, so the service-account token mount point lay inside the read-only `/run/secrets` mount. Pods no longer automount the token (`6fede779b`). main's chart has the same mount.
+- The target session must be closed and sealed; an unclosed or unsealed target fails.
+- Every row, every session chain and every sealed session is still checked. A truncated row or a cut row that later rows chain over fails.
+- Only unended, unsealed legacy sessions other than the target may be unfinalized, and each is named.
+- The result is a separate state. `verifyAgentRun` reports `prefixVerified` with `ok: false`; the CLI renders `VERIFIED PREFIX (not finalized: ...)`; Studio reports `anchored-prefix` (never `externally-anchored`) with `verificationScope`; the console labels it "verified prefix only"; the probe's status is `verified-prefix`; the helm-lifecycle and drill receipts record `probeStatuses`. The SDK still requires `ok`.
+- Only Studio's own verify enables it (`src/studio/nativeTaskVerdict.ts`); the verify route's body schema is strict, and no query string or header reaches the service.
+- It applies only when the store marker is positively SQLite. A thrown verifier or any unexpected report shape is `failed`.
+- The monitor key is pinned by the operator: the chart passes `env.AMC_EXPECTED_MONITOR_FINGERPRINT` and rolls the pod on a config change; the kind job and the drill read the key through the cluster or docker, not from Studio's HTTP endpoints.
+
+The kind verdicts name one unfinalized session, the gateway's (pods stop gracefully, so earlier gateway sessions were sealed). The drill's verdicts name one more session per replaced container, because `docker rm -f` stops the gateway without sealing.
+
+### Other defects the real runs found, fixed in this slice
+
+1. The kind install failed (`RunContainerError`): the image's `/var/run` is a symlink to `/run`, so the service-account token mount point lay inside the read-only `/run/secrets` mount. Pods no longer automount the token (`6fede779b`).
 2. The drill's probe tried `/healthz` once, before Studio listened. The ready window now covers `/healthz` (`ff8566142`).
-3. Every deploy CLI compared the unresolved `argv[1]` with `import.meta.url`. Started through a symlink, as a ConfigMap mount starts the Helm test probe, it ran nothing and exited 0. A first kind run recorded a `helm test` "pass" that ran no probe; that result is void and is not used here. Guards now compare realpaths (`1ef317199`).
+3. Every deploy CLI compared the unresolved `argv[1]` with `import.meta.url`. Started through a symlink, as a ConfigMap mount starts the Helm test probe, it ran nothing and exited 0. A first kind run recorded a `helm test` "pass" that ran no probe; that result is void. Guards now compare realpaths (`1ef317199`). The same bug in nine maintenance scripts is fixed with a shared helper, `scripts/lib/entrypoint.mjs` (`d28dba39a`).
 4. LAN mode (the image and chart default) refuses login without a one-time pairing code. The probe claims one (`--pairing-code-file`), the Helm test mounts the optional Secret `<fullname>-test-pairing`, the drill mints one inside each container, and the workflow mints one before each `helm test` (`1ef317199`).
-5. Secret temp dirs were left behind when a step failed; the workflow now cleans up in `EXIT` traps (`3596d3f00`). The verifier's stub upstream now exits by itself (`5a2b84756`).
+5. Secret temp dirs were left behind when a step failed; the workflow now cleans up in `EXIT` traps (`3596d3f00`). The verifier's stub upstream exits by itself (`5a2b84756`).
 
 ## Mutations (`mutations.json`)
 
-| Id | Mutation | Test file | Result |
-|---|---|---|---|
-| M1 | delete the `secret.yaml` if-wrapper | `tests/helmChartSecrets.test.ts` | 2 failed, restored green |
-| M2 | `amc.bootstrapValue` uses the bare value, not `required` | `tests/helmChartSecrets.test.ts` | 1 failed, restored green |
-| M3 | remove the ConfigMap `AMC_CORS_ALLOWED_ORIGINS` line | `tests/helmChartOrigins.test.ts` | 1 failed, restored green |
-| M4 | drop the drill's `AMC_CORS_ALLOWED_ORIGINS` env | `tests/rollbackDrill.test.ts` | 1 failed, restored green |
-| M5 | `buildReport` prints `value: env[name]` | `tests/credentialPresence.test.ts` | 2 failed, restored green |
-| M6 | delete "wait for an explicit yes" under B4 | `tests/deploymentConfirmationRunbook.test.ts` | 1 failed, restored green |
-| M7 | drop `automountServiceAccountToken: false` (P0-14 guard) | `tests/helmChartSecrets.test.ts` | 1 failed, restored green |
-| M8 | `deploy-verify.mjs` compares the unresolved `argv[1]` (P0-14 guard) | `tests/deployPackCheck.test.ts` | 1 failed, restored green |
-| M9 | the probe skips the pairing claim (P0-14 guard) | `tests/deployPackProbe.test.ts` | 2 failed, restored green |
-| M10 | the probe tries `/healthz` once (P0-14 guard) | `tests/deployPackProbe.test.ts` | 2 failed, restored green |
+| Id | Mutation | Test file |
+|---|---|---|
+| M1 | delete the `secret.yaml` if-wrapper | `tests/helmChartSecrets.test.ts` |
+| M2 | `amc.bootstrapValue` uses the bare value, not `required` | `tests/helmChartSecrets.test.ts` |
+| M3 | remove the ConfigMap `AMC_CORS_ALLOWED_ORIGINS` line | `tests/helmChartOrigins.test.ts` |
+| M4 | drop the drill's `AMC_CORS_ALLOWED_ORIGINS` env | `tests/rollbackDrill.test.ts` |
+| M5 | `buildReport` prints `value: env[name]` | `tests/credentialPresence.test.ts` |
+| M6 | delete "wait for an explicit yes" under B4 | `tests/deploymentConfirmationRunbook.test.ts` |
+| M7 | drop `automountServiceAccountToken: false` | `tests/helmChartSecrets.test.ts` |
+| M8 | `deploy-verify.mjs` compares the unresolved `argv[1]` | `tests/deployPackCheck.test.ts` |
+| M9 | the probe skips the pairing claim | `tests/deployPackProbe.test.ts` |
+| M10 | the probe tries `/healthz` once | `tests/deployPackProbe.test.ts` |
+| M11 | no closed-and-sealed target check in the live scope | `tests/agentLoopReconstructable.test.ts` |
+| M12 | a verified prefix sets `ok` | `tests/agentLoopReconstructable.test.ts` |
+| M13 | live scope on any marker except `jsonl` | `tests/agentLoopReconstructable.test.ts` |
+| M14 | skip row checks in the live scope | `tests/agentLoopReconstructable.test.ts` |
+| M15 | Studio reports a prefix as `externally-anchored` | `tests/nativeTaskVerdict.test.ts` |
+| M16 | Studio accepts a report without `prefixVerified` | `tests/nativeTaskVerdict.test.ts` |
+| M17 | a thrown verifier escapes the verdict | `tests/nativeTaskVerdict.test.ts` |
+| M18 | the verify body schema passes unknown fields through | `tests/cosProduct10NativeTasksRouter.test.ts` |
+| M19 | the probe reports a prefix as `verified` | `tests/deployPackProbe.test.ts` |
+| M20 | the drill records every passing probe as `verified` | `tests/rollbackDrill.test.ts` |
+| M21 | the console labels a prefix like a full verification | `tests/studioNativeTaskValidation.test.ts` |
+| M22 | the shared entrypoint helper compares the unresolved `argv[1]` | `tests/scriptEntrypoint.test.ts` |
 
-M1 to M6 are the spec's six; they were also run once right after the picks (all killed). M9 and M10 edit only `scripts/deploy/governed-turn-probe.mjs`, so the byte-identity test with the chart copy fails too; the behaviour test fails in each.
+Each mutation turned its test file red and the restored file green; failing test names are in `mutations.json`. M1 to M6 are the spec's six. M9, M10 and M19 edit only `scripts/deploy/governed-turn-probe.mjs`, so the byte-identity test with the chart copy also fails; the behaviour test fails in each. The Studio service's call into `nativeTaskVerdict.ts` was not mutated: `tests/studioNativeTaskService.test.ts` fails on `int` on this host, so the kind run is the evidence for that wiring.
 
 ## Pending CI (`pending-ci`, not passed)
 
 Nothing below has run in GitHub Actions. After a push, the pull request runs `.github/workflows/deploy-pack.yml`:
 
 - `static`: `pnpm install --frozen-lockfile`; tool install with checksum checks; `node scripts/deploy/deploy-pack-check.mjs --json --require-tools`; the 15 S1 and S2 test files; the negative-render step.
-- `kind`: `kind create cluster --name amc-ci --wait 180s`; `docker build -t amc-studio:ci .`; `kind load docker-image amc-studio:ci --name amc-ci`; random `amc-bootstrap`; `helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m`; pair; `helm test amc --logs --timeout 10m`; `helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m`; `helm rollback amc 1 --wait --timeout 10m`; pair; `helm test amc --logs --timeout 10m`; `node scripts/deploy-verify.mjs --target http://127.0.0.1:13212 --gateway http://127.0.0.1:13210 --monitor-pubkey <pinned> --route /local --model gpt-test --lease-file <minted> --out tmp/deploy-pack/deploy-verify.json`.
+- `kind`: `kind create cluster --name amc-ci --wait 180s`; `docker build -t amc-studio:ci .`; `kind load docker-image amc-studio:ci --name amc-ci`; random `amc-bootstrap`; `helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m`; pin the monitor key (`helm upgrade --reuse-values --set env.AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256> --wait`); pair; `helm test amc --logs --timeout 10m`; `helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m`; `helm rollback amc 2 --wait --timeout 10m`; pair; `helm test amc --logs --timeout 10m`; `node scripts/deploy-verify.mjs --target http://127.0.0.1:13212 --gateway http://127.0.0.1:13210 --monitor-pubkey <pinned> --route /local --model gpt-test --lease-file <minted> --out tmp/deploy-pack/deploy-verify.json`.
 - `drill`: `git worktree add --detach "$RUNNER_TEMP/base" origin/main`; build `amc-studio:drill-a` there and `amc-studio:drill-b` from the head; `node scripts/deploy/rollback-drill.mjs --image-a amc-studio:drill-a --image-b amc-studio:drill-b --secrets-dir <tmp> --out tmp/deploy-pack/rollback-drill.json`.
 
-Expected from the local runs: `static` green; `kind` red at both `helm test` runs; `drill` red at `probe-a`. The workflow's actions are not pinned by commit SHA and its tool archives are checked against the publishers' checksum files, not pinned literals; both are marked `TODO(P0-14 follow-up)` in the file.
+Expected from the local runs: `static` and `kind` green. `drill` stays red at `probe-a` until `origin/main` carries the verify fix, because image A is built from main. The workflow's actions are not pinned by commit SHA and its tool archives are checked against the publishers' checksum files, not pinned literals; both are marked `TODO(P0-14 follow-up)` in the file.
 
 ## Not run here
 
 - The `docker-smoke` and `security-scan-lite` steps of `ci.yml` on `origin/main` and on the slice (landing runbook section 8). The `helm-lint-template` checks are covered by `deploy-pack-check.mjs`, which ran `helm lint` and the renders.
-- The compose `verify` profile. Its `amc-verify` service passes no pairing code, so it would fail at login.
-- Any non-local cluster, any registry push and any real-model call.
+- The compose `verify` profile. Its `amc-verify` service passes no pairing code and no monitor pin, so it would fail at login.
+- Any non-local cluster, any registry push and any real-model call. The verifier's turn used a loopback stub upstream.
+
+## Follow-ups (not fixed here)
+
+- `amc lease issue` can leave an unsigned revocation store that blocks every later lease. `signLeaseRevocations` writes the default store (`src/leases/leaseStore.ts:44`) before it asks for the auditor key (`src/leases/leaseStore.ts:47`); with the vault locked the signing throws and the unsigned file stays. `ensureLeaseRevocationStore` then refuses it (`src/leases/leaseCli.ts:114`), and `amc lease issue` fails with "Lease revocation signature invalid" (`src/cli-lease-commands.ts:40`) until an owner runs `amc lease resign-revocations`. Seen on 2026-10-11 when a first `amc lease issue` ran without `AMC_VAULT_PASSPHRASE`.
+- Pin the workflow's actions by commit SHA and its tool archives by sha256 literal.
+- A gateway stopped without a graceful shutdown (`docker rm -f`) leaves its session unsealed for good; every later prefix verdict names it.
+- The compose `verify` profile needs a pairing code and a monitor pin.
 
 ## Needs a human (skipped)
 
