@@ -7,30 +7,35 @@
  * Hypotheses live only in the revision spec, never in the decision-receipt files a full score run marks observed.
  */
 import { readFileSync } from "node:fs";
-import { relative, sep } from "node:path";
+import { join, relative, sep } from "node:path";
+import YAML from "yaml";
 import { listArchetypes, previewArchetypeApply } from "../../archetypes/index.js";
 import { validateContextGraph, type ContextGraph } from "../../context/contextGraph.js";
 import { a4QualitySpecSchema, type A4QualitySpec } from "../../contracts/v1/a4Package.js";
+import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import { writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { parseStation } from "../../domains/stations.js";
 import { getAgentPaths } from "../../fleet/paths.js";
-import { agentConfigSchema, buildAgentConfig, loadAgentConfig, saveAgentConfig, scaffoldAgent, verifyAgentConfigSignature } from "../../fleet/registry.js";
+import { agentConfigSchema, buildAgentConfig, saveAgentConfig, scaffoldAgent, verifyAgentConfigSignature, type AgentConfig } from "../../fleet/registry.js";
 import { typedMultiAgentGraphSchema } from "../../fleet/typedGraph.js";
+import { assertOwnerMode } from "../../mode/mode.js";
 import { initOutcomeContract, outcomeContractPath } from "../../outcomes/outcomeContractEngine.js";
-import { createSignedTargetProfile, defaultTargetMapping, loadTargetProfile, saveTargetProfile } from "../../targets/targetProfile.js";
+import { createSignedTargetProfile, defaultTargetMapping, loadTargetProfileFromFile, saveTargetProfile, verifyTargetProfileSignature } from "../../targets/targetProfile.js";
+import type { TargetProfile } from "../../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { valueContractTemplate } from "../../value/valueContracts.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
-import type { A4ReadinessState } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
+import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
 import { understandAspire } from "../aspireUnderstand.js";
 import {
   ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
-  learningPlanSchema, listValue, misuseSchema, textValue
+  learningPlanSchema, listValue, misuseSchema, textValue, unmeasuredTargets
 } from "../spec/aspire.js";
 
 const DAY_MS = 86_400_000;
@@ -42,33 +47,113 @@ type Editable = (typeof EDITABLE)[number];
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
-/** A file's sha256; null only when it is absent (the RESOURCE_SLOTS contract: any other read error throws). */
-function fileSha(path: string): string | null {
+/** A file's bytes; null only when it is absent. Any other read error is 409 RESOURCE_UNREADABLE naming `what` (the RESOURCE_SLOTS contract). */
+function readOrAbsent(path: string, what: string): Buffer | null {
   try {
-    return sha256Hex(readFileSync(path));
+    return readFileSync(path);
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw error;
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return null;
+    throw fail(409, "RESOURCE_UNREADABLE", `${what} could not be read (${code ?? "unknown error"})`);
   }
+}
+function fileSha(path: string, what: string): string | null {
+  const bytes = readOrAbsent(path, what);
+  return bytes === null ? null : sha256Hex(bytes);
 }
 /** sha256Hex(canonicalize(graph)): the contextGraphHash scaffoldAgent and initWorkspace sign into the target profile. */
 function contextGraphSha256(workspace: string, agentId: string): string | null {
-  const path = getAgentPaths(workspace, agentId).contextGraph;
-  let raw: string;
+  const what = "brief.contextGraphSha256 (the agent's context-graph.json)";
+  const bytes = readOrAbsent(getAgentPaths(workspace, agentId).contextGraph, what);
+  if (bytes === null) return null;
+  let graph: unknown;
   try {
-    raw = readFileSync(path, "utf8");
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw error;
+    graph = JSON.parse(bytes.toString("utf8"));
+  } catch {
+    throw fail(409, "RESOURCE_UNREADABLE", `${what} is not JSON`);
   }
-  return sha256Hex(canonicalize(JSON.parse(raw) as unknown));
+  return sha256Hex(canonicalize(graph));
 }
 
 /** Readiness items and the two brief slots a gate binds and every decide, complete and executor preamble recomputes. */
 export function register(registry: A4StageRegistry): void {
   registry.items.push(aspireItems);
   RESOURCE_SLOTS["brief.contextGraphSha256"] = contextGraphSha256;
-  RESOURCE_SLOTS["brief.agentConfigSha256"] = (workspace, agentId) => fileSha(getAgentPaths(workspace, agentId).agentConfig);
+  RESOURCE_SLOTS["brief.agentConfigSha256"] = (workspace, agentId) => fileSha(getAgentPaths(workspace, agentId).agentConfig, "brief.agentConfigSha256 (the agent config)");
+}
+
+/** Why a detached `.sig` (registry.ts's format) does not sign `bytes` under this workspace's auditor keys; null when it does. */
+function signatureProblem(workspace: string, bytes: Buffer, sigBytes: Buffer | null): string | null {
+  if (sigBytes === null) return "signature missing";
+  let sig: { digestSha256?: unknown; signature?: unknown; signer?: unknown } | null;
+  try {
+    sig = JSON.parse(sigBytes.toString("utf8")) as typeof sig;
+  } catch {
+    return "signature unreadable";
+  }
+  if (sig === null || typeof sig !== "object" || sig.signer !== "auditor" || typeof sig.signature !== "string") return "signature unreadable";
+  const digest = sha256Hex(bytes);
+  if (sig.digestSha256 !== digest) return "digest mismatch";
+  try {
+    return verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor")) ? null : "signature verify failed";
+  } catch (error) {
+    return `signature not checkable (${error instanceof Error ? error.message.slice(0, 120) : "no auditor key"})`;
+  }
+}
+
+interface PriorAgent {
+  /** Any of the agent's config, context graph or target profile is on disk (the root default agent of `amc init` has no config). */
+  readonly exists: boolean;
+  readonly config: AgentConfig | null;
+  readonly mapping: Record<string, number> | null;
+  readonly checked: { readonly agentConfig: "verified" | "absent"; readonly targetProfile: "verified" | "absent" };
+}
+
+/**
+ * The agent's own signed files as Build may build on them, checked before anything is written: each is absent (ENOENT)
+ * or verifies, the config over the very bytes that are then parsed. Anything else refuses (409) and nothing is written.
+ * Only the agent's own target profile is read, never loadTargetProfile's fallback to the workspace root's.
+ */
+function priorAgent(workspace: string, agentId: string): PriorAgent {
+  const paths = getAgentPaths(workspace, agentId);
+  const untrusted = (code: string, message: string): A4StoreError => fail(409, code, `${message} Build wrote nothing; restore the file or have an owner re-sign it.`,
+    { reasonCodes: [code] });
+  const configBytes = readOrAbsent(paths.agentConfig, "The agent config");
+  let config: AgentConfig | null = null;
+  if (configBytes !== null) {
+    const problem = signatureProblem(workspace, configBytes, readOrAbsent(`${paths.agentConfig}.sig`, "The agent config's signature"));
+    if (problem !== null) throw untrusted("AGENT_CONFIG_UNTRUSTED", `The agent config does not verify under this workspace's keys (${problem}).`);
+    let parsed: ReturnType<typeof agentConfigSchema.safeParse> | null = null;
+    try {
+      parsed = agentConfigSchema.safeParse(YAML.parse(configBytes.toString("utf8")));
+    } catch {
+      parsed = null;
+    }
+    if (parsed?.success !== true) throw untrusted("AGENT_CONFIG_INVALID", "The agent config is signed but does not parse as an agent config.");
+    config = parsed.data;
+  }
+  const targetFile = join(paths.targetsDir, "default.target.json");
+  let profile: TargetProfile | null = null;
+  try {
+    profile = loadTargetProfileFromFile(targetFile);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") {
+      if (typeof code === "string") throw fail(409, "RESOURCE_UNREADABLE", `The agent's target profile could not be read (${code})`);
+      throw untrusted("TARGET_PROFILE_INVALID", "The agent's target profile does not parse.");
+    }
+  }
+  if (profile !== null) {
+    let valid = false;
+    try {
+      valid = verifyTargetProfileSignature(workspace, profile);
+    } catch {
+      valid = false;
+    }
+    if (!valid) throw untrusted("TARGET_PROFILE_UNTRUSTED", "The agent's target profile does not verify under this workspace's keys.");
+  }
+  return { exists: config !== null || profile !== null || pathExists(paths.contextGraph), config,
+    mapping: profile?.mapping ?? null, checked: { agentConfig: config === null ? "absent" : "verified", targetProfile: profile === null ? "absent" : "verified" } };
 }
 
 /** The router's entry (src/a4/spec/aspire.ts PRODUCERS). */
@@ -118,9 +203,10 @@ export function aspireFacts(spec: Record<string, unknown>, answers: readonly A4A
   return [
     { id: "risk-tier", sources: ["answers.riskTier", "a4Readiness.isRegulated"], dataStatus: null,
       novice: tier === null ? "You have not chosen a risk level yet, so AMC treats the project as high risk and asks two different people to approve each step."
-        : regulated ? `You chose ${tier} risk, so AMC asks two different people to approve each step.` : `You chose ${tier} risk. One approver is enough; if you are the only user, you may approve your own steps and AMC labels them self-approved.`,
-      practitioner: `riskTier "${tier ?? "unstated"}" is written to context-graph.json and sent as the gate request's riskTier (${tier === null ? "high" : mapRiskTier(tier as "low")}); high or critical makes the project regulated.`,
-      expert: `isRegulated(state, floor): riskTierOf(brief) ∉ {low, med, medium} → requireDistinctUsers on every gate and deriveSelfApprovalAllowed() → false.` },
+        : regulated ? `You chose ${tier} risk, so AMC asks two different people to approve each step.`
+          : `You chose ${tier} risk. AMC still asks two different people for each step (one asks, another approves) when your workspace requires that for every project, or when ${tier} is lower than the agent's current risk level; otherwise, if you are the only user, you may approve your own steps, which AMC labels self-approved.`,
+      practitioner: `riskTier "${tier ?? "unstated"}" is written to context-graph.json and sent as the gate request's riskTier (${tier === null ? "high" : mapRiskTier(tier as "low")}); high or critical makes the project regulated, and so do the workspace's a4.regulated floor and a tier below the agent's current one.`,
+      expert: `isRegulated(state, floor): floor.regulated, riskTierOf(brief) ∉ {low, med, medium}, brief.priorRiskTier ranked above it, or an activated Adapt plan → requireDistinctUsers on every gate and deriveSelfApprovalAllowed() → false.` },
     { id: "archetype", sources: ["listArchetypes", "answers.archetypeInterest"], dataStatus: null,
       novice: matches.length > 0 ? `Archetypes that share words with your answers: ${matches.slice(0, 3).map((entry) => entry.id).join(", ")}. Propose shows what each would change.` : "No archetype shares words with your answers; Propose still offers alternatives.",
       practitioner: `Matched by shared words with the agent, problem and goals (a keyword match, self-reported): ${matches.slice(0, 3).map((entry) => `${entry.id} (${entry.sharedWords.length})`).join(", ") || "none"}.`,
@@ -222,7 +308,7 @@ function alternativesOf(ctx: A4ProducerContext, spec: Record<string, unknown>, v
       try {
         preview = { contextDiff: previewArchetypeApply({ workspace: ctx.workspace, agentId: ctx.state.project.agent_id, archetypeId: id }).contextDiff };
       } catch {
-        previewReason = "AGENT_HAS_NO_CONTEXT_GRAPH";
+        previewReason = pathExists(getAgentPaths(ctx.workspace, ctx.state.project.agent_id).contextGraph) ? "PREVIEW_FAILED" : "AGENT_HAS_NO_CONTEXT_GRAPH";
       }
       const shared = matched.find((entry) => entry.id === id)?.sharedWords ?? [];
       return { id: `archetype:${id}`, title: known.get(id)!.name, archetypeId: id,
@@ -242,10 +328,36 @@ function editOf(key: Editable, input: Record<string, unknown> | undefined, previ
   const parsed = key === "hypotheses" ? a4HypothesisSchema.array().min(1).safeParse(value) : key === "learningPlan" ? learningPlanSchema.safeParse(value)
     : key === "quality" ? a4QualitySpecSchema.safeParse(value) : misuseSchema.safeParse(value);
   if (!parsed.success) throw fail(400, "INPUT_INVALID", `${key}: ${parsed.error.issues[0]?.message ?? "invalid"}`);
-  if (key === "hypotheses" && (parsed.data as Array<{ status: string; verdict: unknown }>).some((entry) => entry.status !== "proposed" || entry.verdict !== null)) {
-    throw fail(400, "INPUT_INVALID", "A hypothesis is proposed with no verdict; only …/hypotheses/:id/observe moves it.");
+  if (key === "hypotheses") {
+    const rows = parsed.data as Array<{ id: string; status: string; verdict: unknown }>;
+    if (rows.some((entry) => entry.status !== "proposed" || entry.verdict !== null)) {
+      throw fail(400, "INPUT_INVALID", "A hypothesis is proposed with no verdict; only …/hypotheses/:id/observe moves it.");
+    }
+    if (new Set(rows.map((entry) => entry.id)).size !== rows.length) throw fail(400, "INPUT_INVALID", "hypotheses: each id names one hypothesis.");
   }
   return parsed.data;
+}
+
+/**
+ * The agent's risk tier before this brief: the higher of its config's and its context graph's. A file that does not
+ * parse counts as "unreadable", which ranks as high (unknown risk is not low risk); isRegulated decides a lowering as
+ * regulated (src/a4/a4Readiness.ts). Raising the bar from an unsigned file is safe; nothing here lowers it.
+ */
+function priorRiskTierOf(workspace: string, agentId: string): string | null {
+  const paths = getAgentPaths(workspace, agentId);
+  const tierIn = (bytes: Buffer | null, parse: (text: string) => unknown): string | null => {
+    if (bytes === null) return null;
+    try {
+      const tier = (parse(bytes.toString("utf8")) as { riskTier?: unknown } | null)?.riskTier;
+      return typeof tier === "string" ? tier : "unstated";
+    } catch {
+      return "unreadable";
+    }
+  };
+  const rank = (tier: string): number => TIER_RANK[tier] ?? 2;
+  const tiers = [tierIn(readOrAbsent(paths.agentConfig, "The agent config"), (text) => YAML.parse(text)),
+    tierIn(readOrAbsent(paths.contextGraph, "The agent's context graph"), (text) => JSON.parse(text))].filter((tier): tier is string => tier !== null);
+  return tiers.sort((a, b) => rank(b) - rank(a))[0] ?? null;
 }
 
 /** Propose: the brief and everything around it, from the answers; members may edit hypotheses, learning plan, quality and misuse. */
@@ -263,7 +375,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const agentId = ctx.state.project.agent_id;
   const agentLine = textValue(values.get("agent")) ?? agentId;
   const agentName = agentLine.split(":")[0]!.trim().slice(0, 80) || agentId;
-  const metrics = listValue(values.get("successMetrics"));
+  const metrics = [...new Set(listValue(values.get("successMetrics")))];
   const audience = listValue(values.get("audience"));
   const edited = new Set(Array.isArray(spec.edited) ? spec.edited.filter((key): key is string => typeof key === "string") : []);
   const pick = <T>(key: Editable, generated: () => T): T => {
@@ -276,9 +388,12 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   };
   const from = new Date(ctx.now).toISOString();
   const to = new Date(ctx.now + HYPOTHESIS_WINDOW_DAYS * DAY_MS).toISOString();
-  const hypotheses = pick("hypotheses", () => metrics.slice(0, 5).map((metric, index) => ({ id: `h${index + 1}`,
-    statement: `Deploying ${agentName} for ${audience.join(", ")} improves: ${metric}`, predictedOutcome: metric, window: { from, to },
-    evidenceSource: { eventType: "audit", metric: slug(metric) }, verdict: null, status: "proposed" as const })));
+  // An id names its content (statement, outcome, window, source), never a list position; observations bind the content too.
+  const hypotheses = pick("hypotheses", () => metrics.slice(0, 5).map((metric) => {
+    const content = { statement: `Deploying ${agentName} for ${audience.join(", ")} improves: ${metric}`, predictedOutcome: metric, window: { from, to },
+      evidenceSource: { eventType: "audit", metric: slug(metric) } };
+    return { id: `h-${sha256Hex(canonicalize(content)).slice(0, 12)}`, ...content, verdict: null, status: "proposed" as const };
+  }));
   const learningPlan = pick("learningPlan", () => [
     ...hypotheses.map((hypothesis, index) => ({ milestoneId: `learn-${index + 1}`, title: `Learn whether: ${hypothesis.statement}`,
       acceptanceCriteria: [`A runtime-written ${hypothesis.evidenceSource.eventType} row for ${hypothesis.evidenceSource.metric} inside the window`,
@@ -296,7 +411,8 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const contextGraph = contextGraphOf(values, agentName);
   const brief = { agent: agentLine, agentName, problem: textValue(values.get("problem")), audience, currentWorkflow: textValue(values.get("currentWorkflow")),
     goals: listValue(values.get("goals")), expertise: textValue(values.get("expertise")), markets: listValue(values.get("markets")).length > 0 ? listValue(values.get("markets")) : null,
-    stations: listValue(values.get("stations")), governance: textValue(values.get("governance")), riskTier: contextGraph.riskTier, contextGraph };
+    stations: [...new Set(listValue(values.get("stations")).map((value) => parseStation(value)))], governance: textValue(values.get("governance")),
+    riskTier: contextGraph.riskTier, priorRiskTier: priorRiskTierOf(ctx.workspace, agentId), contextGraph };
   const { build: _build, ...carried } = spec;
   const next = { ...carried, answers, schema: ASPIRE_SPEC_SCHEMA, answersDigest: answersDigestOf(answers), brief, misuse,
     graph: typedGraphOf(agentId, agentName, values, ctx.now), hypotheses, alternatives: alternativesOf(ctx, spec, values), learningPlan, quality,
@@ -308,18 +424,22 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
 
 /**
  * Build (after the direction gate is consumed): the context graph through validateContextGraph and initWorkspace's writer,
- * scaffoldAgent for a new agent or the signed config re-saved for an existing one (the default target profile re-signed
- * with the new contextGraphHash), the outcome contract when there is none, then the Enforce manifest so the agent is
- * ACTIVE. Each write is an implementation ref with its file's sha256; the revision names what was written. A manifest
- * Enforce refuses is recorded with its code (manifest_active BLOCKED), never thrown after the other writes.
+ * scaffoldAgent for an agent with none of its files, else the signed config re-saved (a placeholder one when it has none)
+ * and its own target profile re-signed with the new contextGraphHash and its verified mapping; the outcome contract when
+ * there is none, then the Enforce manifest so the agent is ACTIVE. It signs what `agent add`, `target set` and `snapshot`
+ * sign, so it takes their owner-mode gates, and the router admits only owners (src/api/accessPolicy.ts A4_OWNER). Every
+ * check that can refuse runs before the first write. Each write is an implementation ref with its file's sha256; the
+ * revision names what was written. A manifest Enforce refuses is recorded by its code (manifest_active BLOCKED), never
+ * thrown after the other writes.
  * The typed graph stays a draft in the spec: Enforce's manifest digests `typed-graphs/latest.json` canonically and checks
  * its staged copy by raw bytes, so once that file exists no manifest can be written in the workspace; Assemble writes the
  * graph (P1-60) once that is fixed.
- * ponytail: the files are written before the transaction that records them; a request refused there (a moved head)
- * leaves them written, and Build run again rewrites the same brief.
+ * ponytail: the router refuses a stale head before Build runs, but the files are still written before the transaction
+ * that records them; a head that moves in between leaves them written, and Build run again rewrites the same brief.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { workspace } = ctx;
+  for (const command of ["agent add", "target set", "snapshot"]) assertOwnerMode(workspace, command);
   const { spec, answers } = aspireSpecOf(ctx.state);
   if (spec.schema !== ASPIRE_SPEC_SCHEMA || spec.answersDigest !== answersDigestOf(answers)) {
     throw fail(409, "A4_NOT_READY", "Build writes the proposed brief; propose it again first.", { reasonCodes: ["BRIEF_STALE"] });
@@ -330,24 +450,28 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const graph = validateContextGraph(brief.contextGraph);
   const role = brief.agent.includes(":") ? brief.agent.slice(brief.agent.indexOf(":") + 1).trim() || "assistant" : "assistant";
   const fields = { agentName: brief.agentName, role, domain: brief.stations[0] ?? "general", primaryTasks: brief.goals, stakeholders: brief.audience, riskTier: graph.riskTier };
+  // Refusals first: the signing key (423 while the vault is locked), the agent's own signed files, the config to sign.
+  getPrivateKeyPem(workspace, "auditor");
+  const prior = priorAgent(workspace, agentId);
+  let config: AgentConfig;
+  try {
+    // No provider key: a local placeholder upstream; Assemble chooses the provider.
+    config = prior.config === null
+      ? buildAgentConfig({ agentId, ...fields, templateId: "local_openai", baseUrl: "http://127.0.0.1:8000", routePrefix: "/local", auth: { type: "none" } })
+      : agentConfigSchema.parse({ ...prior.config, ...fields, updatedTs: ctx.now });
+  } catch (error) {
+    throw fail(409, "A4_NOT_READY", `The brief does not make a valid agent config: ${error instanceof Error ? error.message.slice(0, 300) : "invalid"}`,
+      { reasonCodes: ["AGENT_CONFIG_INVALID"] });
+  }
   ensureDir(paths.rootDir);
   writeFileAtomic(paths.contextGraph, JSON.stringify(graph, null, 2), 0o644);
   const contextGraphHash = sha256Hex(canonicalize(graph));
-  const created = !pathExists(paths.agentConfig);
   let targetPath: string;
-  if (created) {
-    // No provider key: a local placeholder upstream; Assemble chooses the provider.
-    targetPath = scaffoldAgent(workspace, buildAgentConfig({ agentId, ...fields, templateId: "local_openai", baseUrl: "http://127.0.0.1:8000", routePrefix: "/local",
-      auth: { type: "none" } })).targetPath;
+  if (!prior.exists) {
+    targetPath = scaffoldAgent(workspace, config).targetPath;
   } else {
-    saveAgentConfig(workspace, agentConfigSchema.parse({ ...loadAgentConfig(workspace, agentId), ...fields, updatedTs: Date.now() }));
-    let mapping: Record<string, number>;
-    try {
-      mapping = loadTargetProfile(workspace, "default", agentId).mapping;
-    } catch {
-      mapping = defaultTargetMapping(3);
-    }
-    targetPath = saveTargetProfile(workspace, createSignedTargetProfile({ workspace, name: "default", contextGraphHash, mapping }), agentId);
+    saveAgentConfig(workspace, config);
+    targetPath = saveTargetProfile(workspace, createSignedTargetProfile({ workspace, name: "default", contextGraphHash, mapping: prior.mapping ?? defaultTargetMapping(3) }), agentId);
   }
   const outcomePath = outcomeContractPath(workspace, agentId);
   const outcomeKept = pathExists(outcomePath);
@@ -357,24 +481,27 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
     const written = writeEnforceResourceManifest({ workspace, agentId });
     manifest = { manifestId: written.manifest.manifestId, path: written.manifestPath };
   } catch (error) {
-    manifest = { error: (error as { code?: unknown }).code === undefined ? String(error).slice(0, 200) : String((error as { code: unknown }).code) };
+    // Only a code is recorded (members and viewers read it); an error's message may carry absolute workspace paths.
+    const code = (error as { code?: unknown }).code;
+    manifest = { error: typeof code === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : "ENFORCE_MANIFEST_REFUSED" };
   }
-  const files = ([["context-graph", paths.contextGraph], ["agent-config", paths.agentConfig], ["target-profile", targetPath], ["outcome-contract", outcomePath],
-    ...("path" in manifest ? [["enforce-manifest", manifest.path] as const] : [])] as const)
-    .map(([writer, path]) => ({ writer, path: relPath(workspace, path), sha256: fileSha(path) }));
+  const files = ([["context-graph", paths.contextGraph, "written"], ["agent-config", paths.agentConfig, "written"], ["target-profile", targetPath, "written"],
+    ["outcome-contract", outcomePath, outcomeKept ? "kept" : "written"], ...("path" in manifest ? [["enforce-manifest", manifest.path, "written"] as const] : [])] as const)
+    .map(([writer, path, action]) => ({ writer, path: relPath(workspace, path), action, sha256: fileSha(path, `the ${writer} Build ${action}`) }));
   return {
-    outputs: files.map((file) => ({ output: "build", label: `aspire build: ${file.writer} written (${file.path})`, lane: "implementation" as const, method: null, body: file })),
-    spec: { ...spec, build: { files, agentCreated: created, contextGraphHash, outcomeContract: outcomeKept ? "kept" : "initialised",
+    outputs: files.map((file) => ({ output: "build", lane: "implementation" as const, method: null, body: file,
+      label: `aspire build: ${file.writer} ${file.action === "kept" ? "kept (not written by Build)" : "written"} (${file.path})` })),
+    spec: { ...spec, build: { files, agentCreated: !prior.exists, verifiedBefore: prior.checked, contextGraphHash, outcomeContract: outcomeKept ? "kept" : "initialised",
       typedGraph: "draft in this spec; not written (Enforce manifest digest mismatch)", ...("manifestId" in manifest ? { manifestId: manifest.manifestId } : { manifestError: manifest.error }),
-      provider: created ? "local_openai placeholder, no key (Assemble chooses the provider)" : "kept" } }
+      provider: prior.config === null ? "local_openai placeholder, no key (Assemble chooses the provider)" : "kept" } }
   };
 }
 
 /**
- * Review: the written context graph validates and matches the build and the signed target profile; the agent config's
- * signature under this workspace's keys (an integrity check, recorded on the STEP, never a ref); the doctor's failing and
- * warning checks with their first-run fixes; brief completeness. Nothing at Aspire is observed: `reviewed` carries the
- * explicit not_evaluated output with its reason.
+ * Review: the written context graph validates and matches the build, and equals the contextGraphHash of the agent's own
+ * target profile, whose signature verifies; the agent config's signature under this workspace's keys (an integrity
+ * check, recorded on the STEP, never a ref); the doctor's failing and warning checks with their first-run fixes; brief
+ * completeness. Nothing at Aspire is observed: `reviewed` carries the explicit not_evaluated output with its reason.
  */
 async function review(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   const { workspace } = ctx;
@@ -382,19 +509,32 @@ async function review(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   const built = spec.build as { contextGraphHash?: unknown } | undefined;
   if (built === undefined) throw fail(409, "A4_NOT_READY", "Nothing was built at this revision.", { reasonCodes: ["PRODUCED_AT_BUILD"] });
   const agentId = ctx.state.project.agent_id;
-  let contextGraph: { valid: boolean; matchesBuild: boolean; targetMatches: boolean; error: string | null };
+  const paths = getAgentPaths(workspace, agentId);
+  let hash: string | null = null;
+  let error: string | null = null;
   try {
-    const hash = sha256Hex(canonicalize(validateContextGraph(JSON.parse(readFileSync(getAgentPaths(workspace, agentId).contextGraph, "utf8")) as unknown)));
-    let target: string | null = null;
-    try {
-      target = loadTargetProfile(workspace, "default", agentId).contextGraphHash;
-    } catch {
-      target = null;
-    }
-    contextGraph = { valid: true, matchesBuild: hash === built.contextGraphHash, targetMatches: hash === target, error: null };
-  } catch (error) {
-    contextGraph = { valid: false, matchesBuild: false, targetMatches: false, error: error instanceof Error ? error.message.slice(0, 300) : String(error) };
+    hash = sha256Hex(canonicalize(validateContextGraph(JSON.parse(readFileSync(paths.contextGraph, "utf8")) as unknown)));
+  } catch (caught) {
+    error = caught instanceof Error ? caught.message.slice(0, 300) : "unreadable";
   }
+  // The agent's own profile only (never loadTargetProfile's root fallback), and only once its signature verifies.
+  let targetProfile: "verified" | "TARGET_PROFILE_ABSENT" | "TARGET_PROFILE_INVALID" | "TARGET_PROFILE_UNTRUSTED";
+  let targetHash: string | null = null;
+  try {
+    const profile = loadTargetProfileFromFile(join(paths.targetsDir, "default.target.json"));
+    let valid = false;
+    try {
+      valid = verifyTargetProfileSignature(workspace, profile);
+    } catch {
+      valid = false;
+    }
+    targetProfile = valid ? "verified" : "TARGET_PROFILE_UNTRUSTED";
+    targetHash = valid ? profile.contextGraphHash : null;
+  } catch (caught) {
+    targetProfile = (caught as NodeJS.ErrnoException).code === "ENOENT" ? "TARGET_PROFILE_ABSENT" : "TARGET_PROFILE_INVALID";
+  }
+  const contextGraph = { valid: hash !== null, matchesBuild: hash !== null && hash === built.contextGraphHash, targetMatches: hash !== null && hash === targetHash,
+    targetProfile, error };
   const signature = verifyAgentConfigSignature(workspace, agentId);
   const { runDoctorRules } = await import("../../doctor/doctorRules.js");
   const { firstRunFixCommands } = await import("../../doctor/firstRunPlan.js");
@@ -403,17 +543,18 @@ async function review(ctx: A4ProducerContext): Promise<A4ProducerResult> {
     .map(({ id, status, message }) => ({ id, status, message })), fixes: firstRunFixCommands(report) };
   const quality = a4QualitySpecSchema.safeParse(spec.quality);
   const completeness = { qualityTargets: quality.success ? quality.data.targets.length : 0,
-    unmeasured: quality.success ? quality.data.targets.filter((target) => target.evidenceSource === null && target.measure !== "not instrumented").map((target) => target.statement) : [],
+    unmeasured: quality.success ? unmeasuredTargets(quality.data).map((target) => target.statement) : [],
     misuseRows: misuseSchema.safeParse(spec.misuse).success ? (spec.misuse as unknown[]).length : 0,
     hypothesesNotObserved: Array.isArray(spec.hypotheses) ? spec.hypotheses.length : 0 };
   return {
     outputs: [
-      { output: "review", label: "aspire review: context graph validates and matches the build and the target profile", lane: "implementation", method: null, body: contextGraph },
+      { output: "review", label: "aspire review: context graph validates and matches the build and the signed target profile", lane: "implementation", method: null, body: contextGraph },
       { output: "review", label: "aspire review: doctor checks needing attention, with first-run fixes", lane: "implementation", method: null, body: doctor },
       { output: "review", label: "aspire review: brief completeness", lane: "recommendation", method: null, body: completeness }
     ],
     notEvaluated: [NOT_OBSERVED],
-    record: { checks: { contextGraph: { valid: contextGraph.valid, matchesBuild: contextGraph.matchesBuild, targetMatches: contextGraph.targetMatches }, doctorOk: doctor.ok },
+    record: { checks: { contextGraph: { valid: contextGraph.valid, matchesBuild: contextGraph.matchesBuild, targetMatches: contextGraph.targetMatches,
+      targetProfile }, doctorOk: doctor.ok },
       integrity: { agentConfigSignature: { valid: signature.valid, signatureExists: signature.signatureExists, reason: signature.reason, mode: "workspace-key-consistency" } } }
   };
 }
