@@ -375,8 +375,9 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
 /**
  * `complete` (design §6.5; the body names no effect): the effect is the one an owner opened on this gate
  * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened, except
- * a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly. consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a
- * consumed gate whose re-opened effect consumes its own grant, it re-runs that effect (`rerunExecutorEffect`).
+ * a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly.
+ * consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a consumed gate whose re-opened
+ * effect consumes its own grant, it re-runs that effect (`rerunExecutorEffect`).
  */
 export function completeStage(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number }): {
   result: A4TransitionResult; attemptId: string | null;
@@ -502,8 +503,8 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
 }
 
 /**
- * Retry (owner; design §6.5): only for effects A4 or the gate's quorum consumes, and only when the chain has a failure and no finish for
- * this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
+ * Retry (owner; design §6.5): only for effects A4 or the gate's quorum consumes, and only when the chain has a failure
+ * and no finish for this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
  * consumed, was consumed by this execution id; one not consumed yet is verified as at `complete` (verifyAndConsumeEffect:
  * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
  * failure whose stage was redone since its attempt started is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
