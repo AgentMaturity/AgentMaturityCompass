@@ -1,0 +1,288 @@
+name: Deploy pack
+
+# Proves the Helm chart, the container rollback and the post-deploy verifier with real tools (P0-14).
+# Bootstrap values are random per run, written to files with umask 077 and never echoed.
+#
+# TODO(P0-14 follow-up): pin every `uses:` below to a full commit SHA. No workflow in this repository
+# pins a SHA yet, and none was invented; each line keeps the action@version it would pin.
+# TODO(P0-14 follow-up): pin the sha256 of each tool archive below as a literal. Until then the
+# install step checks each download against the checksum file published next to it, which
+# catches corruption, not a compromised release host.
+
+on:
+  pull_request:
+    paths:
+      - "deploy/**"
+      - "docker/**"
+      - "scripts/deploy/**"
+      - "scripts/deploy-verify.mjs"
+      - "Dockerfile"
+      - ".github/workflows/deploy-pack.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HELM_VERSION: v4.3.0
+  KUBECONFORM_VERSION: v0.8.0
+  KIND_VERSION: v0.33.0
+  KUBECTL_VERSION: v1.37.1
+  OUT: tmp/deploy-pack
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-14 follow-up): pin actions/checkout@v6 by full commit SHA
+
+      - uses: pnpm/action-setup@v4 # TODO(P0-14 follow-up): pin pnpm/action-setup@v4 by full commit SHA
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v6 # TODO(P0-14 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - id: install
+        run: pnpm install --frozen-lockfile
+
+      - id: install-tools
+        name: Install helm, kubeconform, kind and kubectl (checksum-verified)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin="$RUNNER_TEMP/bin"; dl="$RUNNER_TEMP/dl"; mkdir -p "$bin" "$dl"; cd "$dl"
+          # check <file> <checksum file>: the checksum file holds a bare hash or "<hash>  <file>" lines.
+          check() { want=$(awk -v f="$1" 'NF==1 || $2==f || $2=="*"f {print $1; exit}' "$2"); test -n "$want"; echo "$want  $1" | sha256sum -c -; }
+          get() { curl -fsSLo "$(basename "$1")" "$1"; curl -fsSLo "$(basename "$1").sum" "$2"; check "$(basename "$1")" "$(basename "$1").sum"; }
+          get "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+          tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz" -C "$bin" --strip-components=1 linux-amd64/helm
+          get "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/CHECKSUMS"
+          tar -xzf kubeconform-linux-amd64.tar.gz -C "$bin" kubeconform
+          get "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64" "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64.sha256sum"
+          install -m 0755 kind-linux-amd64 "$bin/kind"
+          get "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          install -m 0755 kubectl "$bin/kubectl"
+          echo "$bin" >> "$GITHUB_PATH"
+
+      - id: deploy-pack-check
+        name: deploy-pack-check --require-tools
+        run: |
+          mkdir -p "$OUT"
+          helm version --short && kubeconform -v
+          node scripts/deploy/deploy-pack-check.mjs --json --require-tools | tee "$OUT/deploy-pack-check.json"
+
+      - id: tests
+        name: S1 and S2 tests
+        run: >-
+          npx vitest run tests/helmChartOrigins.test.ts tests/helmChartVersion.test.ts tests/helmChartSecrets.test.ts
+          tests/k8sManifestsSecrets.test.ts tests/deployPackCheck.test.ts tests/deployPackProbe.test.ts tests/rollbackDrill.test.ts
+          tests/deploymentPack.test.ts tests/pulumiHelmRelease.test.ts tests/containerSourceBuild.test.ts
+          tests/deployVerify.test.ts tests/credentialPresence.test.ts tests/deployVerifyConfig.test.ts
+          tests/deploymentConfirmationRunbook.test.ts tests/platformDeployConfig.test.ts
+
+      - id: negative-renders
+        name: Negative renders must fail; the default render has no Secret
+        shell: bash
+        env:
+          CHART: deploy/helm/amc
+        run: |
+          set -uo pipefail
+          mkdir -p "$OUT"; log="$OUT/negative-renders.txt"; : > "$log"; bad=0
+          # refuse <reason pattern> <helm args...>: helm template must exit non-zero and name the reason.
+          refuse() {
+            local want="$1"; shift
+            if err=$(helm template amc "$CHART" "$@" 2>&1 >/dev/null); then
+              echo "FAIL rendered, must refuse: $*" | tee -a "$log"; bad=1
+            elif ! grep -q -- "$want" <<<"$err"; then
+              echo "FAIL refused without naming $want: $* :: $err" | tee -a "$log"; bad=1
+            else
+              echo "ok refused ($want): $*" | tee -a "$log"
+            fi
+          }
+          others=(--set bootstrap.values.ownerUsername=u --set bootstrap.values.ownerPassword=p --set bootstrap.values.notaryPassphrase=n --set bootstrap.values.notaryAuthSecret=a)
+          refuse vaultPassphrase --set bootstrap.createSecret=true
+          refuse vaultPassphrase --set bootstrap.createSecret=true --set bootstrap.values.vaultPassphrase=change-me-x "${others[@]}"
+          refuse digest --set image.requireDigest=true
+          refuse replicaCount --set replicaCount=2
+          if ! helm template amc "$CHART" > "$OUT/default-render.yaml"; then
+            echo "FAIL default render did not render" | tee -a "$log"; bad=1
+          elif grep -Eq '^kind:[[:space:]]*Secret[[:space:]]*$' "$OUT/default-render.yaml"; then
+            echo "FAIL default render contains kind: Secret" | tee -a "$log"; bad=1
+          else
+            echo "ok default render has no kind: Secret" | tee -a "$log"
+          fi
+          exit "$bad"
+
+      - if: always()
+        uses: actions/upload-artifact@v7 # TODO(P0-14 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: deploy-pack-static
+          path: tmp/deploy-pack/
+
+  kind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-14 follow-up): pin actions/checkout@v6 by full commit SHA
+
+      - uses: actions/setup-node@v6 # TODO(P0-14 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      - id: install-tools
+        name: Install helm, kubeconform, kind and kubectl (checksum-verified)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin="$RUNNER_TEMP/bin"; dl="$RUNNER_TEMP/dl"; mkdir -p "$bin" "$dl"; cd "$dl"
+          # check <file> <checksum file>: the checksum file holds a bare hash or "<hash>  <file>" lines.
+          check() { want=$(awk -v f="$1" 'NF==1 || $2==f || $2=="*"f {print $1; exit}' "$2"); test -n "$want"; echo "$want  $1" | sha256sum -c -; }
+          get() { curl -fsSLo "$(basename "$1")" "$1"; curl -fsSLo "$(basename "$1").sum" "$2"; check "$(basename "$1")" "$(basename "$1").sum"; }
+          get "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+          tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz" -C "$bin" --strip-components=1 linux-amd64/helm
+          get "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/CHECKSUMS"
+          tar -xzf kubeconform-linux-amd64.tar.gz -C "$bin" kubeconform
+          get "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64" "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64.sha256sum"
+          install -m 0755 kind-linux-amd64 "$bin/kind"
+          get "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          install -m 0755 kubectl "$bin/kubectl"
+          echo "$bin" >> "$GITHUB_PATH"
+
+      - id: cluster
+        name: Kind cluster and image
+        env:
+          KIND_CLUSTER: amc-ci
+        run: |
+          kind create cluster --name "$KIND_CLUSTER" --wait 180s
+          docker build -t amc-studio:ci .
+          kind load docker-image amc-studio:ci --name "$KIND_CLUSTER"
+
+      - id: bootstrap-secret
+        name: Create amc-bootstrap from random values (never echoed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077; dir=$(mktemp -d)
+          for key in vaultPassphrase ownerUsername ownerPassword notaryPassphrase notaryAuthSecret; do
+            openssl rand -hex 32 > "$dir/$key"; echo "::add-mask::$(cat "$dir/$key")"
+          done
+          kubectl create secret generic amc-bootstrap \
+            --from-file="$dir/vaultPassphrase" --from-file="$dir/ownerUsername" --from-file="$dir/ownerPassword" \
+            --from-file="$dir/notaryPassphrase" --from-file="$dir/notaryAuthSecret" >/dev/null
+          rm -rf "$dir"
+          echo "amc-bootstrap created (5 keys, values not printed)"
+
+      - id: helm-lifecycle
+        name: helm install, test, upgrade, rollback, test
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT"; log="$OUT/helm-lifecycle.log"; : > "$log"; failed=""
+          # step <name> <cmd...>: runs in order; after the first failure the rest are recorded as skipped.
+          step() {
+            local name="$1" rc=0; shift
+            if [ -n "$failed" ]; then echo "$name exit=skipped" >> "$log"; return 0; fi
+            echo "== $name: $*" >> "$log"; "$@" >> "$log" 2>&1 || rc=$?
+            echo "$name exit=$rc" >> "$log"; [ "$rc" = 0 ] || failed="$name"
+          }
+          step install helm install amc deploy/helm/amc --set image.repository=amc-studio --set image.tag=ci --wait --timeout 10m
+          step test-1 helm test amc --timeout 10m
+          step upgrade helm upgrade amc deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m
+          step rollback helm rollback amc 1 --wait --timeout 10m
+          step test-2 helm test amc --timeout 10m
+          helm history amc -o json > "$OUT/helm-history.json" || echo "[]" > "$OUT/helm-history.json"
+          kubectl get pods -l app.kubernetes.io/instance=amc -o json > "$OUT/pods.json" || echo '{"items":[]}' > "$OUT/pods.json"
+          IMAGE_ID=$(docker image inspect --format '{{.Id}}' amc-studio:ci) node -e '
+            const fs = require("node:fs"); const out = process.env.OUT;
+            const history = JSON.parse(fs.readFileSync(`${out}/helm-history.json`, "utf8"));
+            const pods = JSON.parse(fs.readFileSync(`${out}/pods.json`, "utf8")).items;
+            const log = fs.readFileSync(`${out}/helm-lifecycle.log`, "utf8");
+            const exits = Object.fromEntries([...log.matchAll(/^(\S+) exit=(\d+|skipped)$/gm)].map((m) => [m[1], m[2] === "skipped" ? "skipped" : Number(m[2])]));
+            const receipt = { kind: "amc.helm-lifecycle/1", commit: process.env.GITHUB_SHA ?? process.env.AMC_SOURCE_COMMIT ?? null,
+              cluster: "kind", builtImageId: process.env.IMAGE_ID,
+              status: Object.values(exits).every((e) => e === 0) ? "passed" : "failed", steps: exits,
+              revisions: history.map((r) => ({ revision: r.revision, status: r.status, chart: r.chart, appVersion: r.app_version, description: r.description })),
+              images: pods.flatMap((p) => (p.status.containerStatuses ?? []).map((c) => ({ pod: p.metadata.name, image: c.image, imageID: c.imageID }))) };
+            fs.writeFileSync(`${out}/helm-lifecycle.json`, JSON.stringify(receipt, null, 2) + "\n");'
+          cat "$log" "$OUT/helm-lifecycle.json"
+          test -z "$failed"
+
+      - id: verify
+        name: Post-deploy verifier (deploy-verify.mjs) against the kind release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT"; dir=$(mktemp -d); chmod 700 "$dir"; pod=deploy/amc-amc
+          trap 'kill $(jobs -p) 2>/dev/null || true; rm -rf "$dir"' EXIT
+          # The lease is minted inside the pod: the vault passphrase is read there and never leaves it.
+          kubectl exec "$pod" -- sh -c 'cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc lease issue --agent default --ttl 15m --scopes gateway:llm --routes /local --models gpt-test' > "$dir/lease"
+          echo "::add-mask::$(cat "$dir/lease")"
+          # The monitor key is pinned through the cluster API, never fetched from the HTTP target.
+          kubectl exec "$pod" -- cat /data/amc/.amc/keys/monitor_ed25519.pub > "$dir/monitor_ed25519.pub"
+          # A loopback stub stands in for the /local route's upstream (127.0.0.1:8000): no real model is called.
+          kubectl exec "$pod" -- node -e 'require("node:http").createServer((q,s)=>{q.resume();q.on("end",()=>{s.writeHead(200,{"content-type":"application/json"});s.end(JSON.stringify({id:"chatcmpl-deploy-verify-stub",object:"chat.completion",created:Math.floor(Date.now()/1000),model:"gpt-test",choices:[{index:0,message:{role:"assistant",content:"ok"},finish_reason:"stop"}],usage:{prompt_tokens:1,completion_tokens:1,total_tokens:2}}))})}).listen(8000,"127.0.0.1",()=>console.log("stub upstream on 127.0.0.1:8000"))' > "$OUT/stub-upstream.log" 2>&1 &
+          kubectl port-forward svc/amc-amc 13212:3212 13210:3210 > "$OUT/port-forward.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            grep -q "stub upstream on" "$OUT/stub-upstream.log" && curl -fsS -o /dev/null http://127.0.0.1:13212/healthz && break || sleep 1
+          done
+          grep -q "stub upstream on" "$OUT/stub-upstream.log" || { cat "$OUT/stub-upstream.log"; echo "stub upstream did not start"; exit 1; }
+          node scripts/deploy-verify.mjs --target http://127.0.0.1:13212 --gateway http://127.0.0.1:13210 \
+            --monitor-pubkey "$dir/monitor_ed25519.pub" --route /local --model gpt-test --lease-file "$dir/lease" \
+            --out "$OUT/deploy-verify.json"
+
+      - if: always()
+        name: Collect cluster state
+        run: |
+          mkdir -p "$OUT"
+          kubectl get all,pvc,secrets -o wide > "$OUT/cluster-state.txt" 2>&1 || true
+          kubectl logs -l app.kubernetes.io/instance=amc --all-containers --tail=200 > "$OUT/studio-logs.txt" 2>&1 || true
+
+      - if: always()
+        uses: actions/upload-artifact@v7 # TODO(P0-14 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: deploy-pack-kind
+          path: tmp/deploy-pack/
+
+  drill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6 # TODO(P0-14 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6 # TODO(P0-14 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      - id: images
+        name: Image A from origin/main, image B from the PR head
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/base" origin/main
+          docker build -t amc-studio:drill-a "$RUNNER_TEMP/base"
+          docker build -t amc-studio:drill-b .
+
+      - id: rollback-drill
+        name: Rollback drill (A -> B -> A on one workspace volume)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT"; dir=$(mktemp -d)
+          for key in amc_vault_passphrase amc_owner_username amc_owner_password; do
+            (umask 077; openssl rand -hex 32 > "$dir/$key"); echo "::add-mask::$(cat "$dir/$key")"
+          done
+          # The container runs as uid 10001 and reads the files through a read-only bind mount.
+          chmod 0755 "$dir"; chmod 0644 "$dir"/*
+          node scripts/deploy/rollback-drill.mjs --image-a amc-studio:drill-a --image-b amc-studio:drill-b \
+            --secrets-dir "$dir" --out "$OUT/rollback-drill.json"
+          rm -rf "$dir"
+
+      - if: always()
+        uses: actions/upload-artifact@v7 # TODO(P0-14 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: deploy-pack-drill
+          path: tmp/deploy-pack/
