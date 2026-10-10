@@ -7,7 +7,7 @@
  * Hypotheses live only in the revision spec, never in the decision-receipt files a full score run marks observed.
  */
 import { readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import YAML from "yaml";
 import { listArchetypes, previewArchetypeApply } from "../../archetypes/index.js";
 import { validateContextGraph, type ContextGraph } from "../../context/contextGraph.js";
@@ -19,13 +19,19 @@ import { getAgentPaths } from "../../fleet/paths.js";
 import { agentConfigSchema, buildAgentConfig, saveAgentConfig, scaffoldAgent, verifyAgentConfigSignature, type AgentConfig } from "../../fleet/registry.js";
 import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema, writeTypedMultiAgentGraph } from "../../fleet/typedGraph.js";
 import { assertOwnerMode } from "../../mode/mode.js";
-import { initOutcomeContract, outcomeContractPath } from "../../outcomes/outcomeContractEngine.js";
+import { signArtifactFile } from "../../lifecycle/artifactSignature.js";
+import { initOutcomeContract, outcomeContractPath, upsertOutcomeContract } from "../../outcomes/outcomeContractEngine.js";
+import { outcomeContractSchema, type OutcomeCategory, type OutcomeMetric } from "../../outcomes/outcomeContractSchema.js";
 import { createSignedTargetProfile, defaultTargetMapping, loadTargetProfileFromFile, saveTargetProfile, verifyTargetProfileSignature } from "../../targets/targetProfile.js";
 import type { TargetProfile } from "../../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
+import { valueContractApplyForApi } from "../../value/valueApi.js";
 import { valueContractTemplate } from "../../value/valueContracts.js";
+import { valueAgentContractPath } from "../../value/valueStore.js";
+import { a4ProjectsRoot } from "../a4Blobs.js";
+import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "../a4Effects.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
@@ -95,6 +101,7 @@ export function register(registry: A4StageRegistry): void {
   RESOURCE_SLOTS["brief.contextGraphSha256"] = contextGraphSha256;
   RESOURCE_SLOTS["brief.agentConfigSha256"] = (workspace, agentId) => fileSha(getAgentPaths(workspace, agentId).agentConfig, "brief.agentConfigSha256 (the agent config)");
   RESOURCE_SLOTS["graph.typedGraphDigest"] = typedGraphDigest;
+  registry.registerEffect(CONTRACTS_EFFECT);
 }
 
 /** Why a detached `.sig` (registry.ts's format) does not sign `bytes` under this workspace's auditor keys; null when it does. */
@@ -115,6 +122,72 @@ function signatureProblem(workspace: string, bytes: Buffer, sigBytes: Buffer | n
     return `signature not checkable (${error instanceof Error ? error.message.slice(0, 120) : "no auditor key"})`;
   }
 }
+
+/** Quality dimensions as outcome-contract categories (a coarse default; the contract's owner edits it). */
+const OUTCOME_CATEGORY: Readonly<Record<A4QualitySpec["targets"][number]["dimension"], OutcomeCategory>> = {
+  capability: "Functional", reliability: "Functional", latency: "Functional", maintainability: "Functional", cost: "Economic", impact: "Economic",
+  security: "Brand", privacy: "Brand"
+};
+
+/**
+ * The outcome-contract metrics a quality spec states: one per target with an evidence source (an uninstrumented target
+ * gives none), its signal that source, its target the member's own at every level (Aspire derives no level ladder).
+ */
+export function outcomeMetricsOf(quality: unknown): OutcomeMetric[] {
+  const parsed = a4QualitySpecSchema.safeParse(quality);
+  const metrics = (parsed.success ? parsed.data.targets : []).filter((target) => (target.evidenceSource ?? "").trim() !== "" && target.measure !== "not instrumented")
+    .map((target): OutcomeMetric => ({ metricId: `a4.${target.dimension}.${slug(target.statement)}`, category: OUTCOME_CATEGORY[target.dimension],
+      description: target.statement, type: "avg", signal: target.evidenceSource!.trim(), target: { level3: target.target, level4: target.target, level5: target.target },
+      evidenceRules: { trustTierAtLeast: target.evidenceMethod === "human_review" ? "ATTESTED" : "OBSERVED" } }));
+  return [...new Map(metrics.map((metric) => [metric.metricId, metric])).values()];
+}
+
+/** Merges `metrics` by metricId into the agent's outcome contract, read once and verified over those bytes, and re-signs it. */
+function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): void {
+  if (metrics.length === 0) return;
+  const path = outcomeContractPath(workspace, agentId);
+  const bytes = readOrAbsent(path, "The outcome contract");
+  if (bytes === null || signatureProblem(workspace, bytes, readOrAbsent(`${path}.sig`, "The outcome contract's signature")) !== null) {
+    throw fail(409, "OUTCOME_CONTRACT_UNTRUSTED", "The outcome contract is missing or does not verify under this workspace's keys.");
+  }
+  const current = outcomeContractSchema.parse(YAML.parse(bytes.toString("utf8"))).outcomeContract;
+  const ids = new Set(metrics.map((metric) => metric.metricId));
+  upsertOutcomeContract(workspace, { outcomeContract: { ...current, metrics: [...current.metrics.filter((metric) => !ids.has(metric.metricId)), ...metrics] } }, agentId);
+}
+
+/**
+ * Aspire's completion effect (design §10.1, Completion approval): after GATE_CONSUMED, once the runner re-read the freeze
+ * and recomputed the bound slots, the approved revision's value contract draft is applied when the agent has none (an
+ * existing one is kept) and its quality-spec metrics are merged into the verified outcome contract, each signed by its
+ * own writer. A signed receipt names both by path and sha256. A failure is recorded by its code; retry re-runs it.
+ */
+async function applyContracts({ workspace, state, gate }: A4EffectContext): Promise<A4EffectOutcome> {
+  try {
+    const revision = state.revisions.find((row) => row.revision_no === gate.revision_no);
+    const spec = revision === undefined ? {} : JSON.parse(revision.spec_json) as Record<string, unknown>;
+    const agentId = state.project.agent_id;
+    const valuePath = valueAgentContractPath(workspace, agentId);
+    const valuePresent = pathExists(valuePath);
+    if (!valuePresent) valueContractApplyForApi({ workspace, contract: spec.valueContractDraft, scopeType: "AGENT", scopeId: agentId });
+    const metrics = outcomeMetricsOf(spec.quality);
+    mergeOutcomeMetrics(workspace, agentId, metrics);
+    const outcomePath = outcomeContractPath(workspace, agentId);
+    const receipt = canonicalize({ schema: "amc.a4-aspire-contracts/v1", projectId: state.project.project_id, gateId: gate.gate_id, revisionNo: gate.revision_no,
+      valueContract: { path: relPath(workspace, valuePath), action: valuePresent ? "present" : "applied", sha256: fileSha(valuePath, "The value contract") },
+      outcomeContract: { path: relPath(workspace, outcomePath), metricsMerged: metrics.map((metric) => metric.metricId), sha256: fileSha(outcomePath, "The outcome contract") } });
+    const receiptPath = join(a4ProjectsRoot(workspace), state.project.project_id, "effects", `${gate.gate_id}.contracts.json`);
+    ensureDir(dirname(receiptPath));
+    writeFileAtomic(receiptPath, receipt, 0o644);
+    signArtifactFile({ workspace, path: receiptPath, artifactKind: "a4-stage-output" });
+    return { receipt: { refKind: "stage_output", refId: relPath(workspace, receiptPath), sha256: sha256Hex(receipt),
+      label: `aspire completion: value contract ${valuePresent ? "kept" : "applied"}, ${metrics.length} outcome metric(s) merged (signed)` } };
+  } catch (error) {
+    // EFFECT_FAILED stores the message: a code only (messages name absolute paths).
+    throw new Error(errorCodeOf(error, "ASPIRE_CONTRACTS_FAILED"));
+  }
+}
+const CONTRACTS_EFFECT: A4EffectDef = { id: "a4.aspire.apply_contracts", toolName: "a4.aspire.apply_contracts", actionClass: "WRITE_LOW", consumes: "gate",
+  completes: "aspire.completion", executionId: (_state, gate) => `a4-aspire-contracts-${gate.gate_id}`, run: applyContracts };
 
 interface PriorAgent {
   /** Any of the agent's config, context graph or target profile is on disk (the root default agent of `amc init` has no config). */
@@ -466,7 +539,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { build: _build, ...carried } = spec;
   const next = { ...carried, answers, schema: ASPIRE_SPEC_SCHEMA, answersDigest: answersDigestOf(answers), brief, misuse,
     graph: typedGraphOf(agentId, agentName, values, ctx.now), hypotheses, alternatives: alternativesOf(ctx, spec, values), learningPlan, quality,
-    valueContractDraft: valueContractTemplate({ scopeType: "AGENT", scopeId: agentId, type: "other" }), edited: [...edited].sort(),
+    valueContractDraft: valueContractTemplate({ scopeType: "AGENT", scopeId: agentId, type: "other" }), outcomeContractDraft: { metrics: outcomeMetricsOf(quality) }, edited: [...edited].sort(),
     claim: { claimKind: "self_reported", result: "not_evaluated", claimBoundary: ASPIRE_CLAIM_BOUNDARY } };
   return { outputs: [{ output: "brief", label: "aspire propose: the brief (AMC's draft from your answers)", lane: "recommendation", method: null,
     body: { brief, misuse, hypotheses, quality } }], spec: next };
@@ -527,7 +600,10 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   }
   const outcomePath = outcomeContractPath(workspace, agentId);
   const outcomeKept = pathExists(outcomePath);
-  if (!outcomeKept) initOutcomeContract(workspace, agentId);
+  if (!outcomeKept) {
+    initOutcomeContract(workspace, agentId);
+    mergeOutcomeMetrics(workspace, agentId, outcomeMetricsOf(spec.quality));
+  }
   const graphWritten = writeTypedMultiAgentGraph({ workspace, graph: typedGraph.data });
   let manifest: { manifestId: string; path: string } | { error: string };
   try {
