@@ -193,7 +193,9 @@ jobs:
             kubectl create secret generic amc-amc-test-pairing --from-file=code="$dir/code" --dry-run=client -o yaml | kubectl apply -f - > /dev/null
           }
           # Studio anchors a native verdict only to a monitor key the operator pinned. The key exists after the first
-          # bootstrap: read it through the cluster API (not the HTTP target) and pin its sha256 (revision 2).
+          # bootstrap: read it through the cluster API (not the HTTP target) and pin its sha256 (revision 2). This is
+          # trust on first use: the pin detects a later key swap, not a compromised first bootstrap. A fresh kind
+          # workspace cannot have an out-of-band pin; a real deployment sets env.AMC_EXPECTED_MONITOR_FINGERPRINT at install.
           pin() {
             kubectl exec deploy/amc-amc -- cat /data/amc/.amc/keys/monitor_ed25519.pub > "$dir/monitor.pub" || return 1
             fp=$(node -e 'process.stdout.write(require("node:crypto").createHash("sha256").update(require("node:fs").readFileSync(process.argv[1])).digest("hex"))' "$dir/monitor.pub")
@@ -225,6 +227,7 @@ jobs:
             const exits = Object.fromEntries([...log.matchAll(/^(\S+) exit=(\d+|skipped)$/gm)].map((m) => [m[1], m[2] === "skipped" ? "skipped" : Number(m[2])]));
             const receipt = { kind: "amc.helm-lifecycle/1", commit: process.env.GITHUB_SHA ?? process.env.AMC_SOURCE_COMMIT ?? null,
               cluster: "kind", builtImageId: process.env.IMAGE_ID,
+              monitorPinSource: "trust-on-first-use: read from the pod workspace volume",
               status: Object.values(exits).every((e) => e === 0) ? "passed" : "failed", steps: exits,
               // Each helm test prints the probe JSON; "verified" and "verified-prefix" are distinct states (P0-14).
               probeStatuses: [...log.matchAll(/"kind": "amc\.governed-turn-probe\/1",\s*"status": "([a-z-]+)"/g)].map((m) => m[1]),
@@ -245,7 +248,7 @@ jobs:
           # The lease is minted inside the pod: the vault passphrase is read there and never leaves it.
           kubectl exec "$pod" -- sh -c 'cd /data/amc && AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")" amc lease issue --agent default --ttl 15m --scopes gateway:llm --routes /local --models gpt-test' > "$dir/lease"
           echo "::add-mask::$(cat "$dir/lease")"
-          # The monitor key is pinned through the cluster API, never fetched from the HTTP target.
+          # The monitor key is read through the cluster API, never fetched from the HTTP target. Same caveat: trust on first use.
           kubectl exec "$pod" -- cat /data/amc/.amc/keys/monitor_ed25519.pub > "$dir/monitor_ed25519.pub"
           # A loopback stub stands in for the /local route's upstream (127.0.0.1:8000): no real model is called.
           # It exits by itself after 120 s; stopping the local kubectl exec does not stop the remote process.

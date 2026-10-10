@@ -159,6 +159,8 @@ helm upgrade amc deploy/helm/amc --namespace amc-system --reuse-values --wait \
 
 Keep that revision as your rollback target: rolling back to the install revision removes the pin.
 
+This pin is trust on first use: you read the key from the same deployment you are about to verify. It detects a later key swap (any later verdict signed with another key fails), but it does not detect a deployment whose first bootstrap was already compromised, because a compromised deployment can hand you its own key. For an independent pin, take the fingerprint from your own record made through a channel that does not depend on this deployment (for example the key you provisioned, or a fingerprint recorded at first bootstrap by someone else), set it at install time with `--set env.AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 from your own record>`, and give the matching public key to `scripts/deploy-verify.mjs` with `--monitor-pubkey`. The kind job in `.github/workflows/deploy-pack.yml` and the rollback drill create a fresh workspace each run, so they can only pin on first use, and their receipts say so (`monitorPinSource`).
+
 Then run the governed-turn check. The chart runs Studio in LAN mode (`env.AMC_LAN_MODE: "true"`), which refuses login until the client claims a one-time pairing code, so mint one inside the Studio pod and hand it to the test as the Secret `<release>-amc-test-pairing` (key `code`). The vault passphrase is read inside the pod and the code goes to a file, not your terminal:
 
 ```bash

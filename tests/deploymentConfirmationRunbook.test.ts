@@ -34,4 +34,18 @@ describe("deployment confirmation runbook (B3/B4 owner gates)", () => {
     expect(runbook).toContain("(./DEPLOYMENT_CONFIRMATION_RUNBOOK.md)");
     expect(existsSync(join(root, "docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md"))).toBe(true);
   });
+
+  test("P0-14: every monitor-key pin read from the deployment itself is labelled trust on first use, and an out-of-band pin is documented", () => {
+    const read = (path: string) => readFileSync(join(root, path), "utf8");
+    const guide = read("docs/KUBERNETES_HELM_DEPLOYMENT.md");
+    for (const phrase of ["trust on first use", "detects a later key swap", "does not detect a deployment whose first bootstrap was already compromised",
+      "--set env.AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 from your own record>", "--monitor-pubkey"]) {
+      expect(guide, phrase).toContain(phrase);
+    }
+    expect(read("docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md")).toContain("Copying it from the deployment you are verifying is trust on first use");
+    const workflow = read(".github/workflows/deploy-pack.yml");
+    expect(workflow.match(/trust on first use/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(workflow).toContain('monitorPinSource: "trust-on-first-use: read from the pod workspace volume"');
+    expect(read("qualification/2026-10-11-P0-14/README.md")).toContain("trust on first use");
+  });
 });

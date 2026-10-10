@@ -51,7 +51,9 @@ Design decisions:
   target.** A target that names its own key can sign its own pass. Copy
   `.amc/keys/monitor_ed25519.pub` from the deployed workspace through a channel
   you trust, and pass it with `--monitor-pubkey` (repeatable for key rotation).
-  With no key pinned, `receipt-signature` fails.
+  With no key pinned, `receipt-signature` fails. Copying it from the deployment you are verifying is trust on first use:
+  it detects a later key swap, not a deployment whose first bootstrap was already compromised. Prefer a fingerprint
+  from your own record made through another channel.
 - **The lease is a credential.** It is read from `AMC_DEPLOY_VERIFY_LEASE` or
   `--lease-file` and is never printed or written to the result. Issue a short,
   narrow one on the target workspace, for example
