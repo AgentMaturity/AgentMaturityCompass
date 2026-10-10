@@ -1,0 +1,7 @@
+{
+  "type": "amc.trust-roots",
+  "version": 1,
+  "roots": [
+    "5988650df5b5d141b97ad0b143cf29de62c5b35124db62194fa77a72f898dfde"
+  ]
+}

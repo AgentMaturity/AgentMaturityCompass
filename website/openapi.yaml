@@ -3880,7 +3880,6 @@ components:
       type: object
       additionalProperties: false
       required:
-        - content
         - expectedHeadSeq
         - clientRequestId
       properties:
@@ -3888,7 +3887,8 @@ components:
           type: string
           minLength: 1
           maxLength: 65536
-          description: Human-authored text; stored encrypted in the project's blob store, never inline.
+          description: Human-authored text; stored encrypted in the project's blob store, never inline. Required while
+            the stage has no producer; beside a producer it is the member's own statement.
         expectedHeadSeq:
           type: integer
           minimum: 0
@@ -3919,7 +3919,6 @@ components:
       type: object
       additionalProperties: false
       required:
-        - content
         - level
         - expectedHeadSeq
         - clientRequestId
@@ -3928,7 +3927,8 @@ components:
           type: string
           minLength: 1
           maxLength: 65536
-          description: Human-authored text; stored encrypted in the project's blob store, never inline.
+          description: Human-authored text; stored encrypted in the project's blob store, never inline. Required while
+            the stage has no producer; beside a producer it is the member's own statement.
         level:
           type: string
           enum:
@@ -11384,7 +11384,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
     post:
-      summary: Create a project (human session with OPERATOR or OWNER; an existing agent needs OWNER)
+      summary: Create a project (human session with OPERATOR or OWNER; an agent whose config, context graph or
+        target profile exists needs OWNER)
       tags:
         - Studio
         - A4 Forge
@@ -11405,7 +11406,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12165,7 +12166,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12332,7 +12333,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12426,7 +12427,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12595,7 +12596,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -12980,7 +12981,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13074,7 +13075,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13186,7 +13187,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13286,7 +13287,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13353,8 +13354,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/complete:
     post:
-      summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it runs
-        its effect and the response names the attempt"
+      summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or
+        an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts), runs its
+        effect and the response names the attempt"
       tags:
         - Studio
         - A4 Forge
@@ -13391,7 +13393,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13458,7 +13460,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/hypotheses/{hypothesisId}/observe:
     post:
-      summary: Observe a PMF hypothesis with a runtime-written row inside its window
+      summary: Observe a PMF hypothesis, once the project has left Aspire, with a runtime-written row inside its window
       tags:
         - Studio
         - A4 Forge
@@ -13490,7 +13492,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13590,7 +13592,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13690,7 +13692,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13799,7 +13801,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -13908,7 +13910,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14012,7 +14014,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14079,7 +14081,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/understand:
     post:
-      summary: "Record what was understood (no producer registered: human-authored stage output)"
+      summary: "Run Understand: the stage's producer, or the human-authored statement while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14116,7 +14118,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14220,7 +14222,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14287,7 +14289,7 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/explain:
     post:
-      summary: Record the explanation at a level (step explained)
+      summary: "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14324,7 +14326,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14428,7 +14430,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14495,7 +14497,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
-      summary: "Record the build (no producer registered: a self_reported implementation ref; step built)"
+      summary: "Build (step built): the stage's producer (aspire: owner, owner mode), or a self_reported
+        human-authored implementation ref while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -14532,7 +14535,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14599,7 +14602,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/review:
     post:
-      summary: Record the review (observed checks not evaluated without a producer; step reviewed)
+      summary: "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an
+        observed ref"
       tags:
         - Studio
         - A4 Forge
@@ -14636,7 +14640,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14730,7 +14734,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14824,7 +14828,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -14918,7 +14922,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -15012,7 +15016,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
@@ -15106,7 +15110,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL.
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
         - name: Origin
           in: header
           required: false
