@@ -22,7 +22,7 @@ function fakeDocker(ids: Record<string, string>, { daemon = true } = {}) {
 }
 const verified = async () => ({ status: "verified" });
 const MONITOR_PEM = "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAfixture\n-----END PUBLIC KEY-----\n";
-const base = { imageA: "amc-studio:s1-a", imageB: "amc-studio:s1-b", secretsDir: "/nonexistent-secrets" };
+const base = { imageA: "amc-studio:s1-a", imageB: "amc-studio:s1-b", secretsDir: "/nonexistent-secrets", ready: async () => true };
 
 describe("rollback drill", () => {
   it("orders A -> B -> A by sha256 id and passes with six passed steps", async () => {
@@ -96,6 +96,25 @@ describe("rollback drill", () => {
         verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw"] } } });
     }
     expect(receipt.probeStatuses).toEqual(["verified-prefix", "verified-prefix", "verified-prefix"]);
+  });
+
+  it("waits for A's first bootstrap to finish (readyz) before it reads the key and restarts A pinned (P0-14)", async () => {
+    const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+    const events: string[] = [];
+    const docker = (args: string[]) => {
+      if (args[0] === "run") events.push("run");
+      if (args[0] === "exec" && args.at(-1) === "/data/amc/.amc/keys/monitor_ed25519.pub") events.push("read-key");
+      return fake.docker(args);
+    };
+    let checks = 0;
+    const ready = async () => { events.push("ready?"); return ++checks >= 3; };
+    const receipt = await runRollbackDrill({ ...base, docker, probe: verified, pollMs: 1, ready });
+    expect(receipt.status).toBe("passed");
+    // Killing A mid-bootstrap left an unsigned diagnostic bank (readyz 503 on the pinned restart, 2026-10-11).
+    expect(events.slice(0, 6)).toEqual(["run", "ready?", "ready?", "ready?", "read-key", "run"]);
+
+    const never = await runRollbackDrill({ ...base, docker: fake.docker, probe: verified, pollMs: 1, pinTimeoutMs: 5, ready: async () => false });
+    expect(never.steps[0]).toMatchObject({ id: "deploy-a", status: "failed", detail: expect.stringMatching(/not ready/) });
   });
 
   it("fails a probe step whose result carries no recognised status (P0-14)", async () => {

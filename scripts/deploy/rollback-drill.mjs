@@ -38,6 +38,16 @@ function inspectId(docker, ref) {
   return id;
 }
 
+/** Studio's own readiness, through the published port (bootstrap finished, signed configs verify). */
+async function studioReady(port) {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/readyz`, { signal: AbortSignal.timeout(5_000) });
+    return response.status === 200;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * One-time LAN pairing code for the probe's login. The image bootstraps in LAN mode, which refuses
  * login without one. The vault passphrase is read inside the container and never leaves it.
@@ -54,7 +64,7 @@ export function mintPairingCode(docker, container) {
  * without a daemon. probe(container): Promise<{status: "verified"|"failed", ...}>.
  */
 export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212, docker = dockerCli, probe, sourceCommit = null,
-  pollMs = 1000, pinTimeoutMs = 180_000 }) {
+  pollMs = 1000, pinTimeoutMs = 180_000, ready = () => studioReady(port) }) {
   if (docker(["info", "--format", "{{.ServerVersion}}"]).status !== 0) throw new DrillUnavailable("docker daemon unavailable");
   const images = { a: { ref: imageA, id: inspectId(docker, imageA) }, b: { ref: imageB, id: inspectId(docker, imageB) } };
   const suffix = randomBytes(4).toString("hex");
@@ -73,6 +83,11 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
   let pin = null;
   const pinMonitor = async () => {
     const deadline = Date.now() + pinTimeoutMs;
+    // Let A's first bootstrap finish: restarting it mid-bootstrap leaves an unsigned diagnostic bank (readyz 503).
+    while (!(await ready())) {
+      if (Date.now() >= deadline) throw new Error(`${container} not ready before its monitor key could be pinned`);
+      await new Promise((done) => setTimeout(done, pollMs));
+    }
     for (;;) {
       const run = docker(["exec", container, "cat", "/data/amc/.amc/keys/monitor_ed25519.pub"]);
       if (run.status === 0 && run.stdout.includes("BEGIN PUBLIC KEY")) return createHash("sha256").update(run.stdout, "utf8").digest("hex");
