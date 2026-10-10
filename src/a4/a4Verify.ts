@@ -568,12 +568,16 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     const projects = records.map((record) => ({ projectId: record.projectId, report: verifyA4Record(record, trust, now, bundleArtifact) }));
     const integrityErrors = [...bundle.integrity.errors, ...sliceErrors,
       ...projects.flatMap((project) => project.report.integrity.errors.map((error) => `${error} [${project.projectId}]`))];
-    const report = buildVerifierReport({ artifact: bundleArtifact, context: trust, integrityErrors, anchoring: bundle.anchoring, verifiedAt: new Date(now),
+    // Each record's rows are signed by the monitor key it carries, admitted on its own: the bundle is anchored only when every record is.
+    const unanchored = projects.find((project) => project.report.anchoring.status !== "anchored");
+    const anchoring = unanchored === undefined ? bundle.anchoring
+      : { status: "unanchored" as const, detail: `A4 record ${unanchored.projectId}: ${unanchored.report.anchoring.detail ?? "monitor key not admitted for ledger-row"}` };
+    const report = buildVerifierReport({ artifact: bundleArtifact, context: trust, integrityErrors, anchoring, verifiedAt: new Date(now),
       signatures: [...bundle.issuerAdmission.signatures, ...projects.flatMap((project) => project.report.issuerAdmission.signatures)],
       warnings: [...bundle.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...new Set(projects.flatMap((project) => project.report.warnings))] });
     if (report.integrity.status === "fail") return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
     // manifest.sig pins the heads: no dimension is evaluated unless every signature, that one included, is admitted.
-    if (report.issuerAdmission.status !== "pass" || bundle.anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };
+    if (report.issuerAdmission.status !== "pass" || anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };
     const of = (key: keyof Dimensions): Dimension => combine(projects.map((project) => ({ projectId: project.projectId, dimension: project.report[key] })));
     return { ...report, scope: of("scope"), freshness: of("freshness"), completeness: of("completeness"), satisfaction: of("satisfaction") };
   } catch (error) {
