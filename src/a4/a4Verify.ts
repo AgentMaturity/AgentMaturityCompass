@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
-import { a4ProjectIds, materializeA4Record, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
+import { a4ProjectIds, materializeA4Record, seqZeroReceiptAgent, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
@@ -325,10 +325,12 @@ function rowProblem(event: EvidenceEvent, keys: string[]): string | null {
 
 /**
  * What an export adds to verifyA4Chain: each exported ledger row recomputes and is signed on its own, and each transition's
- * audit row is the A4_STATE, a4-store, SELF_REPORTED row of that transition (integrity); every row names the project, and
- * every ledger_event ref names a row of the project's agent (scope); every such ref resolves in the export (completeness).
+ * audit row is the A4_STATE, a4-store, SELF_REPORTED row of that transition (integrity); every row names the project,
+ * every ledger_event ref names a row of the project's agent and, in a bundle, the CREATED body and the signed receipt on
+ * the seq-0 audit row both name the bundle's agent (scope); every such ref resolves in the export (completeness).
  */
-function recordChecks(ledger: Ledger, record: A4RecordV1): { errors: string[]; scope: string[]; completeness: string[]; agentId: string | null } {
+function recordChecks(ledger: Ledger, record: A4RecordV1, bundleAgentId: string | null | undefined):
+  { errors: string[]; scope: string[]; completeness: string[]; agentId: string | null } {
   const keys = getPublicKeyHistory(ledger.workspace, "monitor");
   const events = new Map(record.evidence.events.map((row) => [String(row.id), row as unknown as EvidenceEvent]));
   const errors = [...events.values()].flatMap((event) => {
@@ -351,6 +353,9 @@ function recordChecks(ledger: Ledger, record: A4RecordV1): { errors: string[]; s
   const scope = Object.entries(record.tables).flatMap(([table, rows]) => rows.some((row) => row.project_id !== record.projectId)
     ? [`A4_SCOPE_FOREIGN_ROW: ${table} holds rows of another project`] : []);
   if (agent === null || record.tables.a4_projects.some((row) => row.agent_id !== agent)) scope.push("A4_SCOPE_AGENT: the head row and the CREATED transition name different agents, or none");
+  const seqZero = events.get(String(record.tables.a4_transitions.find((row) => row.seq === 0)?.evidence_event_id));
+  const signed = seqZero === undefined ? null : seqZeroReceiptAgent(seqZero, record.projectId, keys);
+  if (bundleAgentId !== undefined && (agent !== bundleAgentId || signed !== bundleAgentId)) scope.push(`A4_SCOPE_AGENT: record ${record.projectId} is not about the bundle's agent`);
   const completeness: string[] = [];
   for (const ref of record.tables.a4_evidence_refs.filter((row) => row.ref_kind === "ledger_event")) {
     const event = events.get(String(ref.ref_id));
@@ -440,9 +445,10 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
 }
 
 /** One exported project: verifyA4Chain on its rows, the export's own checks, then the four dimensions under admitted keys only. */
-function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, now: number, artifact: VerifierReportV1["artifact"], note: string | null): VerifierReportV1 {
+function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, now: number, artifact: VerifierReportV1["artifact"], note: string | null,
+  bundleAgentId: string | null | undefined): VerifierReportV1 {
   const chain = verifyA4Chain(ledger, record.projectId, trust, now);
-  const checks = recordChecks(ledger, record);
+  const checks = recordChecks(ledger, record, bundleAgentId);
   const integrityErrors = [...chain.integrity.errors, ...checks.errors];
   const sideRows = integrityErrors.filter((error) => error.startsWith("A4_SIDE_ROW_"));
   const intact = integrityErrors.length === sideRows.length;
@@ -468,9 +474,13 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
   };
 }
 
-/** An `amc.a4-record/v1` export, loaded into a temporary ledger of exactly its rows. Trust is the caller's. */
+/**
+ * An `amc.a4-record/v1` export, loaded into a temporary ledger of exactly its rows. Trust is the caller's. `bundleAgentId`
+ * is the signed manifest's agent when the record came from a bundle (undefined for a record file on its own).
+ */
 export function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
-  artifact: VerifierReportV1["artifact"] = { kind: "a4-record", path: record.projectId, sha256: sha256Hex(canonicalize(record)) }, note: string | null = RECORD_NOTE): VerifierReportV1 {
+  artifact: VerifierReportV1["artifact"] = { kind: "a4-record", path: record.projectId, sha256: sha256Hex(canonicalize(record)) }, note: string | null = RECORD_NOTE,
+  bundleAgentId?: string | null): VerifierReportV1 {
   let materialized: ReturnType<typeof materializeA4Record>;
   try {
     materialized = materializeA4Record(record);
@@ -480,7 +490,7 @@ export function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Da
   try {
     const ledger = openLedger(materialized.workspace, { readonly: true });
     try {
-      return recordReport(ledger, record, trust, now, artifact, note);
+      return recordReport(ledger, record, trust, now, artifact, note, bundleAgentId);
     } catch (error) {
       // Rows that load but cannot be read back as A4 records are an integrity failure, never another verdict.
       return unloadable(artifact, trust, now, `A4_RECORD_UNVERIFIABLE: ${messageOf(error)}`);
@@ -523,7 +533,7 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     const copy = join(dir, "bundle.amcbundle");
     writeFileSync(copy, bytes, { mode: 0o600 });
     const { verifyEvidenceBundle } = await import("../bundles/bundle.js");
-    const bundle = (await verifyEvidenceBundle(copy, trust)).report;
+    const { report: bundle, agentId: bundleAgentId } = await verifyEvidenceBundle(copy, trust);
     const root = join(dir, "root");
     mkdirSync(root);
     extractValidatedTarGzipArchive({ file: copy, destination: root, label: "archive", limits: A4_ARCHIVE_LIMITS });
@@ -562,7 +572,7 @@ export async function verifyA4Bundle(file: string, trust: TrustContext = loadTru
     } finally {
       db.close();
     }
-    const projects = records.map((record) => ({ projectId: record.projectId, report: verifyA4Record(record, trust, now, bundleArtifact) }));
+    const projects = records.map((record) => ({ projectId: record.projectId, report: verifyA4Record(record, trust, now, bundleArtifact, RECORD_NOTE, bundleAgentId) }));
     const integrityErrors = [...bundle.integrity.errors, ...sliceErrors,
       ...projects.flatMap((project) => project.report.integrity.errors.map((error) => `${error} [${project.projectId}]`))];
     // Each record's rows are signed by the monitor key it carries, admitted on its own: the bundle is anchored only when every record is.
