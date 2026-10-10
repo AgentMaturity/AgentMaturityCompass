@@ -170,8 +170,13 @@ export interface RequestDerivationRow {
 
 export interface AgentRunVerification {
   readonly sessionId: string;
-  /** Every check below, conjoined; with a trust context (P0-09) it also needs the monitor key admitted (anchored). */
+  /**
+   * Every check below, conjoined, over the complete ledger; with a trust context (P0-09) it also needs the monitor
+   * key admitted (anchored). Always false for a verified prefix, which is `prefixVerified`, never `ok`.
+   */
   readonly ok: boolean;
+  /** The same conjunction over a verified prefix (P0-14): a distinct, weaker state that never sets `ok`. */
+  readonly prefixVerified?: boolean;
   /** The integrity checks alone: chains, signatures, unsigned rows and request derivation. */
   readonly integrityOk: boolean;
   /** The workspace-wide chain verdict, which a session cannot be sound without. */
@@ -223,11 +228,16 @@ export interface AgentRunVerifyOptions {
 }
 
 export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext, options: AgentRunVerifyOptions = {}): Promise<AgentRunVerification> {
-  const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) !== "jsonl"
+  // Only a positively SQLite workspace gets the live scope; an unknown or missing marker keeps the strict verifier.
+  const live = options.allowLiveLegacySessions === true && readSessionStoreMarker(workspace) === "sqlite"
     ? verifyNativeSessionContinuation(workspace, sessionId, trust ? { trust } : {}) : null;
   const result = live ?? verifyLedgerIntegrity(workspace, trust ? { trust } : {});
   const unfinalizedSessions = live?.incompleteLegacySessions ?? [];
   const sessionChainErrors: string[] = [];
+  // A prefix verdict covers a finalized target only: its own session must be closed with a valid seal.
+  if (live && !live.sessions.closed.includes(sessionId)) {
+    sessionChainErrors.push(`Session ${sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
+  }
   let unsignedRowIds: string[];
   if (readSessionStoreMarker(workspace) === "jsonl") {
     // The operations SQLite ledger is not the JSONL session lifecycle.
@@ -268,16 +278,19 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   }));
   const integrityOk = result.chain.ok && sessionChainErrors.length === 0 && unsignedRowIds.length === 0
     && requests.every((request) => request.status === "reconstructed");
+  const anchoredOk = trust === undefined || result.trustRoot.anchored;
+  const scope = unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger";
   return {
     sessionId,
-    ok: integrityOk && (trust === undefined || result.trustRoot.anchored),
+    ok: integrityOk && anchoredOk && scope === "complete-ledger",
+    prefixVerified: integrityOk && anchoredOk && scope === "verified-prefix",
     integrityOk,
     ledgerOk: result.chain.ok,
     ledgerErrors: result.chain.errors,
     sessionChainErrors,
     unsignedRowIds,
     requests,
-    scope: unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger",
+    scope,
     unfinalizedSessions,
     trustRoot: result.trustRoot
   };
@@ -322,7 +335,10 @@ export function renderRunSummary(summary: AgentRunSummary): string {
 /** Render a verification report for a terminal. */
 export function renderVerifyReport(report: AgentRunVerification): string {
   const lines = [
-    `session ${report.sessionId}: ${report.ok ? "VERIFIED" : report.integrityOk ? "NOT VERIFIED: UNANCHORED (integrity verified, authorship not)" : "NOT VERIFIED"}`,
+    `session ${report.sessionId}: ${report.scope === "verified-prefix"
+      ? report.prefixVerified ? `VERIFIED PREFIX (not finalized: ${(report.unfinalizedSessions ?? []).join(", ")})`
+        : report.integrityOk ? "NOT VERIFIED: UNANCHORED PREFIX (prefix integrity verified, authorship not)" : "NOT VERIFIED"
+      : report.ok ? "VERIFIED" : report.integrityOk ? "NOT VERIFIED: UNANCHORED (integrity verified, authorship not)" : "NOT VERIFIED"}`,
     `  ledger chain        ${report.ledgerOk ? "ok" : `${report.ledgerErrors.length} error(s)`}`,
     `  session chain       ${report.sessionChainErrors.length === 0 ? "ok" : `${report.sessionChainErrors.length} error(s)`}`,
     `  unsigned rows       ${report.unsignedRowIds.length}`,

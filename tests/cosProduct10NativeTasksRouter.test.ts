@@ -113,6 +113,25 @@ describe("P10 native media HTTP admission", () => {
     expect(f.service.start).not.toHaveBeenCalled();
   });
 
+  test("P0-14: no request body, query string or header can enable the live verification scope", async () => {
+    const f = await fixture(), path = `/api/v1/native-tasks/${taskId}/verify?agentId=default`;
+    for (const body of [{ expectedRevision: 1, allowLiveLegacySessions: true }, { expectedRevision: 1, scope: "verified-prefix" },
+      { expectedRevision: 1, options: { allowLiveLegacySessions: true } }]) {
+      expect((await f.post(path, body)).status).toBe(400);
+    }
+    expect(f.service.verify).not.toHaveBeenCalled();
+    const flagged = await f.post(`${path}&allowLiveLegacySessions=true`, { expectedRevision: 1 }, { "x-amc-allow-live-legacy-sessions": "true" });
+    if (flagged.status === 200) {
+      // Accepted only with the flag ignored: the service receives exactly the actor, the task and the revision.
+      expect(f.service.verify).toHaveBeenCalledTimes(1);
+      expect(f.service.verify.mock.calls[0]).toHaveLength(3);
+      expect(f.service.verify.mock.calls[0]!.slice(1)).toEqual([taskId, 1]);
+    } else {
+      expect(flagged.status).toBe(400);
+      expect(f.service.verify).not.toHaveBeenCalled();
+    }
+  });
+
   test("follow-ups cannot mutate validation, model or authority, and require an exact revision", async () => {
     const f = await fixture(), path = `/api/v1/native-tasks/${taskId}/turn?agentId=default`;
     const turn = { clientRequestId: requestId, expectedRevision: 1, input: start().input };

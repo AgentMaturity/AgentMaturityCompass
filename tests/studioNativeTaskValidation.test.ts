@@ -107,12 +107,14 @@ test("Studio projects authenticated core results separately from model text and 
   } finally { session.disposeWithoutClosing(); }
 });
 
-test("P0-14: an anchored verdict over a verified prefix says so and names the sessions that are not finalized", () => {
+test("P0-14: an anchored verdict over a verified prefix is its own state, never shown as a full verification", () => {
   const task = { agentId: "default", sessionId: "s1", history: { status: "authenticated" }, verification: "externally-anchored" };
-  const prefix = renderTaskVerification({ ...task, verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } });
-  expect(prefix).toContain("Verified against the configured monitor fingerprint");
+  const prefix = renderTaskVerification({ ...task, verification: "anchored-prefix", verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } });
+  expect(prefix).toContain("Anchored to the configured monitor fingerprint; verified prefix only");
+  expect(prefix).not.toContain("Verified against the configured monitor fingerprint");
   expect(prefix).toContain("Scope: verified prefix. Not finalized: gw-1");
   const complete = renderTaskVerification({ ...task, verificationScope: { scope: "complete-ledger", unfinalizedSessions: [] } });
+  expect(complete).toContain("Verified against the configured monitor fingerprint");
   expect(complete).not.toContain("verified prefix");
   // A scope never decorates a verdict that is not anchored.
   expect(renderTaskVerification({ ...task, verification: "failed", verificationScope: { scope: "verified-prefix", unfinalizedSessions: ["gw-1"] } }))

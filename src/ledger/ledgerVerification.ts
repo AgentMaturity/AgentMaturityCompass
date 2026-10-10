@@ -645,11 +645,11 @@ export function verifyLedgerIntegrity(
  */
 export function verifyNativeSessionContinuation(workspacePath: string, targetSessionId: string, options: LedgerVerifyOptions = {}): {
   scope: "verified-prefix"; targetSessionId: string; chain: VerifyResult["chain"];
-  trustRoot: VerifyResult["trustRoot"]; incompleteLegacySessions: readonly string[];
+  trustRoot: VerifyResult["trustRoot"]; sessions: VerifyResult["sessions"]; incompleteLegacySessions: readonly string[];
 } {
   const continuation: NativeContinuationScope = { targetSessionId, incompleteLegacySessions: [] };
   const result = verifyLedger(workspacePath, options, continuation);
-  return { scope: "verified-prefix", targetSessionId, chain: result.chain, trustRoot: result.trustRoot,
+  return { scope: "verified-prefix", targetSessionId, chain: result.chain, trustRoot: result.trustRoot, sessions: result.sessions,
     incompleteLegacySessions: continuation.incompleteLegacySessions };
 }
 

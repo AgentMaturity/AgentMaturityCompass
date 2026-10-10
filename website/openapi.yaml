@@ -2726,9 +2726,11 @@ components:
             - not-verified
             - workspace-key-consistency
             - externally-anchored
+            - anchored-prefix
             - failed
-          description: Evidence integrity result, separate from task success. Other open ledger writers can prevent a
-            complete verification.
+          description: "Evidence integrity result, separate from task success. anchored-prefix: anchored to the
+            operator's monitor pin over a verified prefix (verificationScope names the unfinalized sessions); it
+            is not a complete verification."
         verificationScope:
           oneOf:
             - $ref: "#/components/schemas/NativeTaskVerificationScope"
@@ -2783,9 +2785,10 @@ components:
           maxItems: 64
           items:
             type: string
-      description: "What an externally-anchored verdict covers. verified-prefix: every recorded row and every sealed
-        session verified, while the listed unended, unsealed legacy sessions (a running gateway's) were named
-        instead of failed; nothing is claimed about how they end."
+      description: "What an anchored verdict covers. verified-prefix (verification anchored-prefix): the task's
+        session closed and sealed, every recorded row and every sealed session verified, while the listed unended,
+        unsealed legacy sessions (a running gateway's) were named instead of failed; nothing is claimed about how
+        they end."
     NativeTaskRecovery:
       type: object
       additionalProperties: false
