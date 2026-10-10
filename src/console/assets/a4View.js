@@ -294,11 +294,19 @@ function nextActionHtml(next) {
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
   "plan_unresolved"]);
 
+/** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
+function retryButton(item, allowed) {
+  const attempt = item.id === "effects.failed" ? item.reasonCodes.find((code) => /^ATTEMPT:a4e_[0-9a-f]{32}$/.test(code)) : undefined;
+  const route = /\/stages\/([a-z]+)\/effects\/([a-z0-9_.-]{1,128})\/retry$/.exec(item.nextAction?.route ?? "");
+  return attempt && route ? ` ${actionButton("Retry", "retry-effect", allowed.retryEffect,
+    `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
+}
+
 function itemRow(item, allowed) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
-      still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${
+      still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
     !ack && item.status === "WAITING" && ACKNOWLEDGEABLE.has(item.id) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }

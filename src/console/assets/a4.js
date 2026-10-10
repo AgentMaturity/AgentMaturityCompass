@@ -451,6 +451,9 @@ function mountProject(projectId, options) {
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
       // The item was listed by the viewed stage's readiness, so it is acknowledged at that stage, not the head's.
       case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, stage, reason: reason(), ...headBinding() }, REASON);
+      // The attempt readiness named (owner only); the effect's own stage, which may not be the one viewed.
+      case "retry-effect": return post("Retry effect", projectPath(`/stages/${encodeURIComponent(button.dataset.effectStage)}/effects/${
+        encodeURIComponent(button.dataset.effect)}/retry`), { attemptId: button.dataset.attempt, ...headBinding() });
       case "add-member": {
         const row = button.closest("[data-principal]");
         // `projectRoles`: Studio refuses any body naming `roles` as an identity claim.
