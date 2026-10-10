@@ -12,12 +12,14 @@ import {
   listEnforceResourceHistory,
   listEnforceResources,
   loadEnforceResourceManifest,
+  projectEnforceResourceLifecycleStatus,
   proposeEnforceResourceLifecycle,
   restoreEnforceResourceSnapshot,
   validateEnforceResourceLifecycle,
   verifyEnforceResourceManifest,
   writeEnforceResourceManifest
 } from "../../src/enforce/resourceManifest.js";
+import { writeTypedMultiAgentGraph } from "../../src/fleet/typedGraph.js";
 import { verifyArtifactFileSignature } from "../../src/lifecycle/artifactSignature.js";
 
 function withWorkspace(fn: (workspace: string) => void): void {
@@ -209,5 +211,40 @@ describe("enforce resource manifest", () => {
     expect(contract.resourceKinds).toContain("tool");
     expect(contract.resourceKinds).toContain("policy");
     expect(contract.gates).toContain("immutable-resources-protected");
+  });
+
+  test("snapshots, verifies and restores a typed graph by the digest its manifest recorded", () => {
+    withWorkspace((workspace) => {
+      const resource = "graph:.amc/fleet/typed-graphs/latest.json";
+      const graphPath = join(workspace, ".amc", "fleet", "typed-graphs", "latest.json");
+      const graph = (role: string) => ({
+        schemaVersion: "2026-05-22",
+        graphId: "g",
+        createdAt: "2026-01-01T00:00:00Z",
+        nodes: [{ nodeId: "a", nodeType: "agent", role, inputs: [{ name: "i", schema: "text" }] }]
+      });
+      mkdirSync(join(workspace, ".amc"), { recursive: true });
+      writeFileSync(join(workspace, ".amc", "guardrails.yaml"), "rules:\n  - allow\n", { encoding: "utf8", flag: "w" });
+      const before = writeEnforceResourceManifest({ workspace, agentId: "default" });
+      writeTypedMultiAgentGraph({ workspace, graph: graph("x") });
+
+      writeEnforceResourceManifest({ workspace, agentId: "default" });
+      expect(projectEnforceResourceLifecycleStatus({ workspace, agentId: "default" }).state).toBe("ACTIVE");
+
+      writeTypedMultiAgentGraph({ workspace, graph: graph("y") });
+      const restored = restoreEnforceResourceSnapshot({ workspace, agentId: "default", resource, apply: true });
+      expect(restored.entries).toEqual([expect.objectContaining({ id: resource, status: "restored" })]);
+      expect(JSON.parse(readFileSync(graphPath, "utf8")).nodes[0].role).toBe("x");
+
+      const removed = restoreEnforceResourceSnapshot({
+        workspace,
+        agentId: "default",
+        manifestPath: before.snapshotPath,
+        resource,
+        apply: true
+      });
+      expect(removed.entries).toEqual([expect.objectContaining({ id: resource, status: "removed" })]);
+      expect(existsSync(graphPath)).toBe(false);
+    });
   });
 });
