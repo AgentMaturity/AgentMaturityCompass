@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { linkSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { EmptyCredentialValueError, ShadowedWriteError } from "../src/credentials/credentialsErrors.js";
 import { CredentialsFileParseError } from "../src/credentials/credentialsStoreErrors.js";
@@ -17,6 +17,20 @@ import { ControlFileLockError } from "../src/lifecycle/controlFileLock.js";
  * precedence, restart-free rotation, and a write path that does not lose,
  * corrupt, or half-apply the file it edits.
  */
+
+// The real fs.watch, kept per call so a test can deliver the change event the OS
+// owes it. macOS FSEvents drops or delays some (none within 1 s on a probe here),
+// which made the recovery wait below a host-dependent flake.
+const fsWatchers = vi.hoisted(() => [] as import("node:fs").FSWatcher[]);
+vi.mock("node:fs", async (importOriginal) => {
+  const fs = await importOriginal<typeof import("node:fs")>();
+  const watch = ((...args: Parameters<typeof fs.watch>) => {
+    const watcher = fs.watch(...args);
+    fsWatchers.push(watcher);
+    return watcher;
+  }) as typeof fs.watch;
+  return { ...fs, watch };
+});
 
 const KEY = credentialRef("AMC_TEST_API_KEY");
 const NAME = "AMC_TEST_API_KEY";
@@ -40,6 +54,7 @@ describe("credentials store — precedence, rotation and the write path", () => 
   let opened: LocalCredentialsService[];
 
   beforeEach(() => {
+    fsWatchers.length = 0;
     home = mkdtempSync(join(tmpdir(), "amc-credentials-"));
     file = join(home, ".credentials.yaml");
     projectDir = join(home, "project");
@@ -226,8 +241,12 @@ describe("credentials store — precedence, rotation and the write path", () => 
       expect(service.lastReloadError).toBeInstanceOf(CredentialsFileParseError);
       expect(service.resolve(KEY)).toBe("good-key");
 
-      // And it recovers on its own once the file is valid again.
+      // And it recovers on its own once the file is valid again. The first
+      // edit above was seen by the arming reconcile; this one needs a change
+      // event, so deliver the one the OS reports for it (inotify always does).
       writeFileSync(file, `${NAME}: "fixed-key"\n`, { mode: 0o600 });
+      expect(fsWatchers).toHaveLength(1);
+      fsWatchers[0]!.emit("change", "change", ".credentials.yaml");
       await waitFor(() => service.resolve(KEY) === "fixed-key");
       expect(service.lastReloadError).toBeNull();
     });
