@@ -166,14 +166,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          umask 077; dir=$(mktemp -d)
+          umask 077; dir=$(mktemp -d); trap 'rm -rf "$dir"' EXIT
           for key in vaultPassphrase ownerUsername ownerPassword notaryPassphrase notaryAuthSecret; do
             openssl rand -hex 32 > "$dir/$key"; echo "::add-mask::$(cat "$dir/$key")"
           done
           kubectl create secret generic amc-bootstrap \
             --from-file="$dir/vaultPassphrase" --from-file="$dir/ownerUsername" --from-file="$dir/ownerPassword" \
             --from-file="$dir/notaryPassphrase" --from-file="$dir/notaryAuthSecret" >/dev/null
-          rm -rf "$dir"
           echo "amc-bootstrap created (5 keys, values not printed)"
 
       - id: helm-lifecycle
@@ -271,7 +270,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$OUT"; dir=$(mktemp -d)
+          mkdir -p "$OUT"; dir=$(mktemp -d); trap 'rm -rf "$dir"' EXIT
           for key in amc_vault_passphrase amc_owner_username amc_owner_password; do
             (umask 077; openssl rand -hex 32 > "$dir/$key"); echo "::add-mask::$(cat "$dir/$key")"
           done
@@ -279,7 +278,6 @@ jobs:
           chmod 0755 "$dir"; chmod 0644 "$dir"/*
           node scripts/deploy/rollback-drill.mjs --image-a amc-studio:drill-a --image-b amc-studio:drill-b \
             --secrets-dir "$dir" --out "$OUT/rollback-drill.json"
-          rm -rf "$dir"
 
       - if: always()
         uses: actions/upload-artifact@v7 # TODO(P0-14 follow-up): pin actions/upload-artifact@v7 by full commit SHA
