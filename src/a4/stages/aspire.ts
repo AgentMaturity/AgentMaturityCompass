@@ -338,26 +338,48 @@ function editOf(key: Editable, input: Record<string, unknown> | undefined, previ
   return parsed.data;
 }
 
+const tierRank = (tier: string): number => TIER_RANK[tier] ?? 2;
+const highestTier = (tiers: ReadonlyArray<string | null>): string | null =>
+  tiers.filter((tier): tier is string => tier !== null).sort((a, b) => tierRank(b) - tierRank(a))[0] ?? null;
+/** The bar an earlier proposal of this stage recorded (null before the first). */
+const priorTierOf = (spec: Record<string, unknown>): string | null => {
+  const prior = (spec.brief as { priorRiskTier?: unknown } | undefined)?.priorRiskTier;
+  return prior === undefined || prior === null ? null : typeof prior === "string" ? prior : "unreadable";
+};
+
 /**
- * The agent's risk tier before this brief: the higher of its config's and its context graph's. A file that does not
- * parse counts as "unreadable", which ranks as high (unknown risk is not low risk); isRegulated decides a lowering as
- * regulated (src/a4/a4Readiness.ts). Raising the bar from an unsigned file is safe; nothing here lowers it.
+ * The agent's risk tier before this brief: the higher of its config's and its context graph's, each read only from
+ * verified bytes: the config when its detached signature verifies over the bytes read, the graph when it is what the
+ * agent's own verified target profile signs (contextGraphHash). Any other file counts as "unreadable", which ranks as
+ * high (unknown risk is not low risk), so a tier never comes from an editable file; isRegulated decides a lowering as
+ * regulated (src/a4/a4Readiness.ts).
  */
 function priorRiskTierOf(workspace: string, agentId: string): string | null {
   const paths = getAgentPaths(workspace, agentId);
-  const tierIn = (bytes: Buffer | null, parse: (text: string) => unknown): string | null => {
+  const tierOf = (value: unknown): string => {
+    const tier = (value as { riskTier?: unknown } | null)?.riskTier;
+    return typeof tier === "string" ? tier : "unstated";
+  };
+  const configTier = (bytes: Buffer | null): string | null => {
     if (bytes === null) return null;
+    if (signatureProblem(workspace, bytes, readOrAbsent(`${paths.agentConfig}.sig`, "The agent config's signature")) !== null) return "unreadable";
     try {
-      const tier = (parse(bytes.toString("utf8")) as { riskTier?: unknown } | null)?.riskTier;
-      return typeof tier === "string" ? tier : "unstated";
+      return tierOf(YAML.parse(bytes.toString("utf8")));
     } catch {
       return "unreadable";
     }
   };
-  const rank = (tier: string): number => TIER_RANK[tier] ?? 2;
-  const tiers = [tierIn(readOrAbsent(paths.agentConfig, "The agent config"), (text) => YAML.parse(text)),
-    tierIn(readOrAbsent(paths.contextGraph, "The agent's context graph"), (text) => JSON.parse(text))].filter((tier): tier is string => tier !== null);
-  return tiers.sort((a, b) => rank(b) - rank(a))[0] ?? null;
+  const graphTier = (bytes: Buffer | null): string | null => {
+    if (bytes === null) return null;
+    try {
+      const graph = JSON.parse(bytes.toString("utf8")) as unknown;
+      const profile = loadTargetProfileFromFile(join(paths.targetsDir, "default.target.json"));
+      return verifyTargetProfileSignature(workspace, profile) && profile.contextGraphHash === sha256Hex(canonicalize(graph)) ? tierOf(graph) : "unreadable";
+    } catch {
+      return "unreadable";
+    }
+  };
+  return highestTier([configTier(readOrAbsent(paths.agentConfig, "The agent config")), graphTier(readOrAbsent(paths.contextGraph, "The agent's context graph"))]);
 }
 
 /** Propose: the brief and everything around it, from the answers; members may edit hypotheses, learning plan, quality and misuse. */
@@ -412,7 +434,8 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const brief = { agent: agentLine, agentName, problem: textValue(values.get("problem")), audience, currentWorkflow: textValue(values.get("currentWorkflow")),
     goals: listValue(values.get("goals")), expertise: textValue(values.get("expertise")), markets: listValue(values.get("markets")).length > 0 ? listValue(values.get("markets")) : null,
     stations: [...new Set(listValue(values.get("stations")).map((value) => parseStation(value)))], governance: textValue(values.get("governance")),
-    riskTier: contextGraph.riskTier, priorRiskTier: priorRiskTierOf(ctx.workspace, agentId), contextGraph };
+    // The bar is carried: after this stage's own Build the files hold its lowered tier, which must not unregulate a re-proposal.
+    riskTier: contextGraph.riskTier, priorRiskTier: highestTier([priorRiskTierOf(ctx.workspace, agentId), priorTierOf(spec)]), contextGraph };
   const { build: _build, ...carried } = spec;
   const next = { ...carried, answers, schema: ASPIRE_SPEC_SCHEMA, answersDigest: answersDigestOf(answers), brief, misuse,
     graph: typedGraphOf(agentId, agentName, values, ctx.now), hypotheses, alternatives: alternativesOf(ctx, spec, values), learningPlan, quality,
@@ -434,8 +457,10 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
  * The typed graph stays a draft in the spec: Enforce's manifest digests `typed-graphs/latest.json` canonically and checks
  * its staged copy by raw bytes, so once that file exists no manifest can be written in the workspace; Assemble writes the
  * graph (P1-60) once that is fixed.
+ * The router refuses Build (409 RESOURCE_DRIFTED) before it runs when a resource the approved revision bound has moved.
  * ponytail: the router refuses a stale head before Build runs, but the files are still written before the transaction
- * that records them; a head that moves in between leaves them written, and Build run again rewrites the same brief.
+ * that records them; a head that moves in between leaves them written, and Build run again is then refused as drifted,
+ * so the brief is proposed and approved again.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { workspace } = ctx;
