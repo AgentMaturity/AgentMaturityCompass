@@ -18,7 +18,8 @@
  * here (P1-64 review).
  */
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { z, ZodError } from "zod";
+import { A4BlobError } from "../a4/a4Blobs.js";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
 import { A4_API_PREFIX, a4PreviewEnabled, headStage, unboundClaim as a4UnboundClaim } from "../a4/a4Router.js";
 import { A4_STAGES, type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage } from "../a4/a4Schema.js";
@@ -71,6 +72,18 @@ function readOnly(workspace: string): boolean {
 function refusal(name: string, status: number, code: string, message: string): Refusal {
   const text = message.startsWith(`${code}: `) ? message : `${code}: ${message}`;
   return { content: [{ type: "text", text: `${name} refused (${status}): ${text}` }], structuredContent: { status, code }, isError: true };
+}
+
+/** The router's sendError classification, so a stored row that no longer parses is an integrity failure and nothing else leaks raw. */
+function refusalFor(name: string, error: unknown): Refusal {
+  if (error instanceof ZodError) {
+    const issue = error.issues[0];
+    return refusal(name, 409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
+  }
+  if (error instanceof A4BlobError) return refusal(name, error.code === "VAULT_LOCKED" ? 423 : error.code === "SECRET_SCAN_REFUSED" ? 400 : 409, error.code, error.message);
+  const tagged = error as { status?: unknown; code?: unknown } | null;
+  if (error instanceof Error && typeof tagged?.status === "number" && typeof tagged.code === "string") return refusal(name, tagged.status, tagged.code, error.message);
+  return refusal(name, 500, "A4_INTERNAL", "The A4 request could not be completed; retry, and check the workspace if it persists.");
 }
 
 /**
@@ -152,8 +165,7 @@ async function a4Tool(host: Host, name: string, workspace: string | undefined, p
       store.close();
     }
   } catch (error) {
-    if (error instanceof A4StoreError) return refusal(name, error.status, error.code, error.message);
-    return { content: [{ type: "text", text: `${name} refused: ${error instanceof Error ? error.message : String(error)}` }], isError: true };
+    return refusalFor(name, error);
   }
 }
 
