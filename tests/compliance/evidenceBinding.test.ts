@@ -68,7 +68,13 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators"
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
+  // (P0-23, P1-11); the effective-policy receipt's nested strictEvidenceBinding.source (P1-12); catalog applicability
+  // exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger rows (P2-01); A4 answer provenance,
+  // carried in the payload of rows whose meta.source is "a4-store" (P1-57, P1-59).
+  "compliance_report", "diagnostic_report", "numeric_self_answer", "path_presence", "default", "predicate",
+  "reviewer_exception", "record", "legacy", "legacy-unverified", "user", "inferred"
 ]);
 
 function sourceFiles(dir: string): string[] {
