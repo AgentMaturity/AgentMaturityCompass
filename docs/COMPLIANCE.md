@@ -8,7 +8,7 @@ AMC compliance reports are **evidence-linked signals**, not legal certifications
   - required evidence event types with minimum OBSERVED ratio
   - required assurance pack score thresholds
   - required absence of denylisted audit events
-- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions).
+- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions).
 - Keeps a derived `status` for one more minor release: `SATISFIED` (result `pass`), `MISSING` (`fail`) or `NOT_EVALUATED` (`not_evaluated`). It never emits `PARTIAL` or `UNKNOWN`; those appear only in reports written by earlier versions.
 - Includes exact evidence references (event IDs/hashes, run context) and a "what to collect next" checklist.
 
