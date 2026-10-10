@@ -24,7 +24,7 @@ const mutationHeaders = [
   { name: "x-amc-native-intent", in: "header", required: true, schema: { type: "string", enum: ["task-workspace-v1"] },
     description: "Explicit native mutation intent." },
   { name: "x-amc-native-csrf", in: "header", required: false, schema: string,
-    description: "Required with a human session cookie; obtain from /api/v1/studio/whoami. Never use in a URL." },
+    description: "Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL." },
   { name: "Origin", in: "header", required: false, schema: string, description: "Required for cookie mutations; must match a configured browser origin and the request Host." }
 ];
 const project = path("projectId", { type: "string", pattern: "^a4p_[0-9a-f]{32}$" });

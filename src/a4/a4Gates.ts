@@ -32,7 +32,7 @@ import {
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
   type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
 import { authorOf, buildersOf, evaluateSod } from "./a4SoD.js";
@@ -97,14 +97,6 @@ export const RESOURCE_SLOTS: Record<string, (workspace: string) => string | null
   "signedConfigs.opsPolicy": (workspace) => fileSha(join(workspace, ".amc", "ops-policy.yaml")),
   "signedConfigs.firewall": (workspace) => fileSha(runtimeFirewallPolicyPath(workspace))
 };
-
-/** A4ResourceDigests as `group.slot` → value. */
-export function flatSlots(digests: unknown, prefix = ""): Record<string, string | null> {
-  if (digests === null || typeof digests !== "object") return {};
-  return Object.fromEntries(Object.entries(digests as Record<string, unknown>).filter(([key]) => key !== "schema" && key !== "gatePolicyDigest")
-    .flatMap(([key, value]) => value !== null && typeof value === "object" ? Object.entries(flatSlots(value, `${prefix}${key}.`))
-      : [[`${prefix}${key}`, typeof value === "string" ? value : null]]));
-}
 
 /**
  * Slots whose live recomputation differs from the bound value, including a recomputable slot bound null (a signed config
@@ -595,7 +587,8 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     // store.integrity is bound from the incremental check at request and decide but from the full verifier here, so a
     // failure only the full verifier finds would otherwise read as a moved readiness digest; answer what GET shows.
     if (!readiness.integrity.valid) assertAllowed(readiness, "progress");
-    assertGateLive(state, row, gate, readiness, query.live.driftedSlots, now);
+    // Expiry at the commit ts GATE_CONSUMED records too, the instant a verifier counts the quorum at.
+    assertGateLive(state, row, gate, readiness, query.live.driftedSlots, Math.max(now, ts));
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: [gate.status === "DENIED" ? "GATE_DENIED" : "GATE_PENDING"] });
     assertReviewsMet(state, gate);
     assertAllowed(readiness, "progress");
@@ -619,14 +612,14 @@ export function changeGatePolicy(store: A4Store, projectId: string, input: A4Cal
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 gate-policy");
   const now = Date.now();
-  return governed(store, projectId, principal, input, (_ts, load) => {
+  return governed(store, projectId, principal, input, (ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const proposal = proposalOf(state, row.gate_id);
     if (row.gate !== "policy" || proposal === null) throw fail(409, "A4_STEP_ORDER", "That is not a policy gate.");
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     const gate = gateStatus(state, row, query.policy, now);
-    assertGateLive(state, row, gate, readiness, [], now);
+    assertGateLive(state, row, gate, readiness, [], Math.max(now, ts));
     if (gate.status !== "QUORUM_MET") throw fail(409, "A4_NOT_READY", `the gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
     assertReviewsMet(state, gate);
     assertAllowed(readiness, "changeGatePolicy");

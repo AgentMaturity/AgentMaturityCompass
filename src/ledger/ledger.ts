@@ -34,7 +34,7 @@ import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
 import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
 import type { SessionWriteFence } from "../session/sessionOwnership.js";
-import { assertLedgerSessionAppend, assertLedgerSessionBatch, runImmediateTransaction } from "./ledgerSessionTransactions.js";
+import { assertLedgerSessionAppend, assertLedgerSessionBatch, assertSessionNamespace, runImmediateTransaction } from "./ledgerSessionTransactions.js";
 
 export interface AppendEvidenceInput {
   sessionId: string;
@@ -670,6 +670,7 @@ export class Ledger {
     receiptSha256: string;
   } {
     this.assertTrustedWriter();
+    assertSessionNamespace(this.db, input.sessionId);
     const id = input.id ?? randomUUID();
     const ts = input.ts ?? Date.now();
     const policy = this.getOpsPolicy();
@@ -775,9 +776,7 @@ export class Ledger {
         payload_pruned: 0,
         payload_pruned_ts: null
       };
-      this.db
-        .prepare(EVIDENCE_EVENT_INSERT_SQL)
-        .run(row);
+      this.db.prepare(EVIDENCE_EVENT_INSERT_SQL).run(row);
 
       return {
         row,
@@ -924,6 +923,7 @@ export class Ledger {
     binarySha256: string;
   }): void {
     this.assertTrustedWriter();
+    assertSessionNamespace(this.db, params.sessionId, params.binaryPath);
     this.db
       .prepare(
         `INSERT INTO sessions

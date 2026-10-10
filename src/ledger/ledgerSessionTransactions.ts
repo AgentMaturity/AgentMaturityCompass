@@ -20,8 +20,24 @@ function lastSessionEvent(db: Database.Database, sessionId: string): EvidenceEve
   return db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1").get(sessionId) as EvidenceEvent | undefined ?? null;
 }
 
+/** The binary the A4 store (src/a4/a4Store.ts) starts each of its `a4-<projectId>-<seq>` sessions with. */
+export const A4_STORE_BINARY = "a4-store";
+
+/**
+ * `a4-` sessions witness A4 transitions, so only the A4 store writes them: it starts each one as binary `a4-store`,
+ * appends its audit row and seals it in one transaction. Any other session start (`binaryPath` given) or append in that
+ * namespace is refused, whichever route named the session id.
+ */
+export function assertSessionNamespace(db: Database.Database, sessionId: string, binaryPath?: string): void {
+  if (!sessionId.startsWith("a4-")) return;
+  const owner = binaryPath ?? (db.prepare("SELECT binary_path FROM sessions WHERE session_id = ? AND ended_ts IS NULL")
+    .get(sessionId) as { binary_path: string | null } | undefined)?.binary_path;
+  if (owner !== A4_STORE_BINARY) throw new Error(`A4_SESSION_RESERVED: only the A4 store writes session ${sessionId}`);
+}
+
 /** Called inside the existing write transaction, before payload materialization. */
 export function assertLedgerSessionAppend(db: Database.Database, input: AppendEvidenceInput): void {
+  assertSessionNamespace(db, input.sessionId);
   const record = db.prepare("SELECT * FROM sessions WHERE session_id = ? LIMIT 1").get(input.sessionId) as SessionRecord | undefined;
   assertSessionWriteAllowed(input, lastSessionEvent(db, input.sessionId), record ?? null);
 }

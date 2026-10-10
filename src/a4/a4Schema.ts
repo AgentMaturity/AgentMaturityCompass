@@ -93,6 +93,19 @@ export function laneForClaimKind(claimKind: ClaimKind, trustTier: string | null,
   return { lane: fallback, claimKind: claimKind === "synthetic_example" ? "synthetic_example" : "self_reported" };
 }
 
+/** The A4 preview gate (D-20): every A4 route, page and export stays absent unless the operator set AMC_A4_PREVIEW=1. */
+export function a4PreviewEnabled(): boolean {
+  return process.env.AMC_A4_PREVIEW === "1";
+}
+
+/** A4ResourceDigests as `group.slot` → value: what a gate's intent binds, and what decide, complete and verify recompute. */
+export function flatSlots(digests: unknown, prefix = ""): Record<string, string | null> {
+  if (digests === null || typeof digests !== "object") return {};
+  return Object.fromEntries(Object.entries(digests as Record<string, unknown>).filter(([key]) => key !== "schema" && key !== "gatePolicyDigest")
+    .flatMap(([key, value]) => value !== null && typeof value === "object" ? Object.entries(flatSlots(value, `${prefix}${key}.`))
+      : [[`${prefix}${key}`, typeof value === "string" ? value : null]]));
+}
+
 /** What `gateSupersededBy` reads from a chain row. */
 export interface A4ChainLink {
   readonly seq: number;

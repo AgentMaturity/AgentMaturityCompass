@@ -25,7 +25,8 @@ function hasAllowedRole(roles: readonly UserRole[], allowed: readonly UserRole[]
 export function evaluateApprovalQuorum(params: {
   request: ApprovalRequestRecord;
   decisions: ApprovalDecisionRecord[];
-  policy: ApprovalPolicy;
+  /** Not read: the request carries its own quorum rules. Optional so an offline verifier without the policy can count. */
+  policy?: ApprovalPolicy;
   /** The caller's clock, so a display and a progression check agree across the expiry boundary (A4, design §6.4). */
   now?: number;
 }): QuorumState {

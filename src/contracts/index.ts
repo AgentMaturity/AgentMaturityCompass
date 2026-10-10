@@ -23,6 +23,7 @@ import { a4IntentV1Schema } from "./v1/a4Intent.js";
 import { a4PackageV1Schema } from "./v1/a4Package.js";
 import { a4ProjectV1Schema } from "./v1/a4Project.js";
 import { a4ReadinessV1Schema } from "./v1/a4Readiness.js";
+import { a4RecordV1Schema } from "./v1/a4Record.js";
 import { a4ReleaseV1Schema } from "./v1/a4Release.js";
 import { a4RevisionV1Schema } from "./v1/a4Revision.js";
 import { a4RollbackReceiptV1Schema } from "./v1/a4RollbackReceipt.js";
@@ -44,6 +45,7 @@ export * from "./v1/a4Intent.js";
 export * from "./v1/a4Package.js";
 export * from "./v1/a4Project.js";
 export * from "./v1/a4Readiness.js";
+export * from "./v1/a4Record.js";
 export * from "./v1/a4Release.js";
 export * from "./v1/a4Revision.js";
 export * from "./v1/a4RollbackReceipt.js";
@@ -75,7 +77,7 @@ export const CONTRACTS = {
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },
   "catalog-lock": { title: "AMC Catalog Lockfile", schema: catalogLockSchema },
-  // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md once P1-63 lands.
+  // A4 Forge (P1-56); refinements are in spec/ACCEPTANCE_RULES.md "A4 project record" (P1-63).
   "a4-project": { title: "AMC A4 Project", schema: a4ProjectV1Schema },
   "a4-revision": { title: "AMC A4 Revision", schema: a4RevisionV1Schema },
   "a4-gate": { title: "AMC A4 Gate", schema: a4GateV1Schema },
@@ -90,7 +92,8 @@ export const CONTRACTS = {
   "a4-deployment-receipt": { title: "AMC A4 Deployment Receipt", schema: a4DeploymentReceiptV1Schema },
   "a4-rollback-receipt": { title: "AMC A4 Rollback Receipt", schema: a4RollbackReceiptV1Schema },
   "a4-value-claim": { title: "AMC A4 Value Claim", schema: a4ValueClaimV1Schema },
-  "a4-conformance-statement": { title: "AMC A4 Conformance Statement", schema: a4ConformanceStatementV1Schema }
+  "a4-conformance-statement": { title: "AMC A4 Conformance Statement", schema: a4ConformanceStatementV1Schema },
+  "a4-record": { title: "AMC A4 Project Record Export", schema: a4RecordV1Schema }
 } as const;
 export type ContractName = keyof typeof CONTRACTS;
 
