@@ -1,0 +1,19 @@
+
+ RUN  v4.1.11 <scratch>/fresh
+
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'managedHookLease' 496ms
+stdout | tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'gateway'
+AMC gateway listening on http://127.0.0.1:59362
+
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'bridgeAuth' 221ms
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'gateway' 536ms
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'workspaceRouter' 272ms
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'wireDispatcher' 234ms
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'agentCredentialAuth' 228ms
+ ✓ tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list > 'studioServer verifyLeaseForScope' 293ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  04:56:45
+   Duration  12.72s (transform 7.57s, setup 49ms, import 10.11s, tests 2.29s, environment 0ms)
+

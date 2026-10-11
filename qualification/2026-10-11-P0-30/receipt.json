@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "date": "2026-10-11",
+  "commit": "91678253fb17b62c8ee3e8701b8c927d1cf42b8b",
+  "branch": "rtd/p0-30-security-mutations",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "node scripts/mutation-batch.mjs --batch qualification/2026-10-11-P0-30/mutations.batch.json --out mutations.json",
+      "exit": 0,
+      "durationMs": 1291000
+    },
+    {
+      "cmd": "npx vitest run tests/mutationBatch.test.ts tests/crypto/keyHistoryMutationGuards.test.ts tests/leaseRevocationConsumers.test.ts tests/studioCredentialBindingHttp.test.ts tests/portalAttribution.test.ts tests/nativeBudgets.test.ts tests/leaseRevocationWriterIntegrity.test.ts",
+      "exit": 0,
+      "durationMs": 19865
+    },
+    {
+      "cmd": "npm test -- --maxWorkers=4",
+      "exit": 1,
+      "durationMs": 1054000
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 49418
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 42614
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 66691
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4419
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 765
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 366
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 2607
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2112
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 438
+    },
+    {
+      "cmd": "npm run check:schemas",
+      "exit": 0,
+      "durationMs": 846
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 274
+    },
+    {
+      "cmd": "npm run check:threat-model",
+      "exit": 0,
+      "durationMs": 247
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 79384
+    },
+    {
+      "cmd": "(fresh clone at 910a63ba) pnpm install --frozen-lockfile --offline",
+      "exit": 0,
+      "durationMs": 3329
+    },
+    {
+      "cmd": "(fresh clone at 910a63ba) pnpm run build",
+      "exit": 0,
+      "durationMs": 57165
+    },
+    {
+      "cmd": "(fresh clone at 910a63ba) npx vitest run tests/leaseRevocationConsumers.test.ts --reporter=verbose",
+      "exit": 0,
+      "durationMs": 12720
+    },
+    {
+      "cmd": "(fresh clone at 910a63ba) npx vitest run tests/notaryComposeIntegration.test.ts tests/notaryAuthReplay.test.ts",
+      "exit": 0,
+      "durationMs": 9040
+    },
+    {
+      "cmd": "(clone at 885bd72c) docker buildx build --target studio -t amc-studio:p030 --load .",
+      "exit": 0,
+      "durationMs": 303370
+    },
+    {
+      "cmd": "npm install --prefix <temp> --no-audit --no-fund --prefer-offline agent-maturity-compass-1.2.0.tgz",
+      "exit": 0,
+      "durationMs": 8313
+    },
+    {
+      "cmd": "node <scratch>/subset/run.mjs <temp-prefix>",
+      "exit": 0,
+      "durationMs": 11980
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 291
+    }
+  ],
+  "tests": {
+    "total": 23136,
+    "passed": 23022,
+    "failed": 114,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "mutations.batch.json",
+      "sha256": "8c48eb88f80e834c54f751037137a65c93f00091fcb44b6437f1ac8fa5ca138d"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "ab96f23b2bb2d7741225e8f98b7287f0980f02c1aaa1dd7527407c17be3f6649"
+    },
+    {
+      "path": "outcomes.json",
+      "sha256": "9dfa8cc39ba124c6c9f3248dac0039b514226cc522f0c3a60bf019aa9c7e9b0d"
+    },
+    {
+      "path": "notary-rerun.txt",
+      "sha256": "4fc10854cf8297883cf3f7ae3995e621badc9cec6ea266430ff6c26c7da21c63"
+    },
+    {
+      "path": "installed-subset.json",
+      "sha256": "0d7321a52b3bc9513333e55bbf5877d7c2837c4bd9a6595e6e3f0f80d6156227"
+    },
+    {
+      "path": "lease-consumers-fresh-clone.log",
+      "sha256": "ba08a9c720da6a6f7e877a48a7066bbc99dcde4cd58a9a2fe772e8d642c2be97"
+    }
+  ],
+  "notes": "Batch commit 91678253 = main cc063bdac plus the P0-30 commits; product source differs from main only in src/leases/leaseStore.ts and a comment in src/wire/wireDispatcher.ts. Mutation batch: 71 entries, 70 killed, 0 survived, 1 equivalent (S7-M23, callbackTelemetryCapture.ts:113), 0 errors. npm test exited 1: 114 of 23,136 tests failed, in 21 files. 113 are the int baseline failures (the same 20 files with the same counts, none touched by P0-30); the 114th, tests/publicDocsArtifact.test.ts, fails only in this git-worktree checkout and passed at 91678253 in a fresh clone and at cc063bdac. Fresh-clone runs were at 910a63ba, whose src and tests equal 91678253 (the later commits change only published counts and the batch file). The Docker image was built at 885bd72c (same product source) on local colima (linux/arm64), not CI; the compose plugin is not installed, so the notary and Studio services ran under docker run (notary-rerun.txt). The installed subset run used npm pack of 910a63ba (tarball sha256 ecaad05b68ab1310c00e77c0698778e5e77ad19b347a8965d44a685a785390cf). All secrets were synthetic and stayed in temporary directories or volumes, which were removed afterwards."
+}
