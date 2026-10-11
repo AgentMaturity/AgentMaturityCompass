@@ -1,0 +1,253 @@
+{
+  "view": {
+    "baseRefName": "main",
+    "headRefName": "codex/amc-install-persona-readiness",
+    "mergeCommit": {
+      "oid": "2b4e35ffc32ea63afceadcc93a12ffa84dbd45af"
+    },
+    "mergedAt": "2026-06-12T19:46:46Z",
+    "number": 22,
+    "state": "MERGED",
+    "title": "Complete AMC lifecycle readiness",
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/22"
+  },
+  "headAndCommits": {
+    "baseRefOid": "65678b77bbabe0b0a70f4297782e1bfddb503797",
+    "commits": [
+      {
+        "authoredDate": "2026-06-10T07:16:44Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-10T07:16:44Z",
+        "messageBody": "",
+        "messageHeadline": "Complete AMC lifecycle readiness",
+        "oid": "5174ffba0bc408d01cf54c4412bd04d8c351e950"
+      },
+      {
+        "authoredDate": "2026-06-10T07:20:49Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-10T07:20:49Z",
+        "messageBody": "",
+        "messageHeadline": "Fix PR readiness gates",
+        "oid": "777ae0cfa750f51a01b11bc6131b1e3325e42608"
+      },
+      {
+        "authoredDate": "2026-06-10T07:21:14Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-10T07:21:14Z",
+        "messageBody": "",
+        "messageHeadline": "Clean generated PR agent artifacts",
+        "oid": "1d1de0d615eafd41983b0753981ccc6824455603"
+      },
+      {
+        "authoredDate": "2026-06-10T07:26:33Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-10T07:26:33Z",
+        "messageBody": "",
+        "messageHeadline": "Fix AMC action JSON extraction",
+        "oid": "cb2352757efd2bfc4133b6629b6bb0cf773f008c"
+      },
+      {
+        "authoredDate": "2026-06-12T16:45:03Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T16:45:03Z",
+        "messageBody": "",
+        "messageHeadline": "Fix flagged API validation and QA dependency alert",
+        "oid": "2a42d6b31064236db59b2391b543626839d925d7"
+      },
+      {
+        "authoredDate": "2026-06-12T17:11:03Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T17:11:03Z",
+        "messageBody": "",
+        "messageHeadline": "Fix flagged architecture boundary audit",
+        "oid": "a0f3644d66c97294a6a602cbda53d8e729afd6f9"
+      },
+      {
+        "authoredDate": "2026-06-12T17:21:11Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T17:21:11Z",
+        "messageBody": "",
+        "messageHeadline": "Fix Studio test port race",
+        "oid": "07660bddf8fcfff52165b6f8750acf787986c390"
+      },
+      {
+        "authoredDate": "2026-06-12T17:58:32Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T17:58:32Z",
+        "messageBody": "",
+        "messageHeadline": "Fix dogfood evidence verification bugs",
+        "oid": "72e2bc9577233366834cc14cab8942f82f40b3cb"
+      },
+      {
+        "authoredDate": "2026-06-12T18:41:57Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T18:41:57Z",
+        "messageBody": "",
+        "messageHeadline": "Add strict dogfood maturity harness",
+        "oid": "332a7d235cff850454db98dfda272cecd1ba3239"
+      },
+      {
+        "authoredDate": "2026-06-12T19:10:53Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T19:10:53Z",
+        "messageBody": "",
+        "messageHeadline": "Add AMC landscape research pipeline",
+        "oid": "0bbb5b38dd4e29cde9e47c0c483f32fb67c252b1"
+      },
+      {
+        "authoredDate": "2026-06-12T19:38:31Z",
+        "authors": [
+          {
+            "email": "274010792+AgentMaturity@users.noreply.github.com",
+            "id": "U_kgDOEFUSqA",
+            "login": "AgentMaturity",
+            "name": "AgentMaturity"
+          }
+        ],
+        "committedDate": "2026-06-12T19:38:31Z",
+        "messageBody": "",
+        "messageHeadline": "Harden AMC dogfood and research evidence",
+        "oid": "220887d285978f34042a25cf04a52b88857c1656"
+      }
+    ],
+    "headRefOid": "220887d285978f34042a25cf04a52b88857c1656"
+  },
+  "checks": [
+    "amc-score\tpass\t49s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671362/job/81106998838\t",
+    "build-test (20)\tpass\t6m5s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106999076\t",
+    "build-test (22)\tpass\t5m8s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106999027\t",
+    "changeset\tpass\t6s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106998988\t",
+    "docker-build\tpass\t1m9s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671369/job/81106998891\t",
+    "docker-smoke\tpass\t57s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106999469\t",
+    "e2e-smoke-local\tpass\t53s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106999167\t",
+    "helm-lint-template\tpass\t8s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106998971\t",
+    "security-scan-lite\tpass\t46s\thttps://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/27438671367/job/81106999005"
+  ],
+  "titleSearch": [
+    {
+      "mergedAt": "2026-06-12T19:46:46Z",
+      "number": 22,
+      "state": "MERGED",
+      "title": "Complete AMC lifecycle readiness"
+    }
+  ],
+  "ancestry": [
+    {
+      "cmd": "git merge-base --is-ancestor 2a42d6b3 origin/main",
+      "exit": 0,
+      "durationMs": 64
+    },
+    {
+      "cmd": "git merge-base --is-ancestor a0f3644d origin/main",
+      "exit": 0,
+      "durationMs": 56
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 07660bdd origin/main",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 2a42d6b3 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 41
+    },
+    {
+      "cmd": "git merge-base --is-ancestor a0f3644d 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 07660bdd 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 45
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 2b4e35ffc origin/main (PR #22 squash merge)",
+      "exit": 0,
+      "durationMs": 45
+    }
+  ],
+  "localRefs": {
+    "origin/main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "fetchedNote": "local remote-tracking ref, not refetched for this run"
+  },
+  "squashTree": {
+    "2b4e35ffc (squash merge) tree": "0cb6d5a8f0bf06b994c7fe0379794b34836d6dd1",
+    "220887d28 (PR head) tree": "0cb6d5a8f0bf06b994c7fe0379794b34836d6dd1"
+  },
+  "otherPr22": {
+    "commit": "ef6bc1a1146bfe346c4e3bc7ebe1a88556469f52",
+    "subject": "Merge pull request #22 from thewisecrab/dependabot/npm_and_yarn/typescript-6.0.2"
+  }
+}

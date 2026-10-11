@@ -1,0 +1,56 @@
+{
+  "note": "Summary of the 2026-09-14 reconciliation record. The original is not in main's git history; it is a file in candidate commit 37c1466b (branch amc/regulated-platform-20261003), read with git show. Facts only; no claim below is used as Done evidence unless the README re-measures it.",
+  "original": {
+    "candidateCommit": "37c1466b32ed878ed89877fdcae2e3145d82d546",
+    "gitBlob": "427995c645f37d67958f1f78012b4f56f0c24fa8",
+    "sha256": "fa3e4cb5fda8538534a1355ba8892ecf448e353c3eca6c550a7c8b4376242272",
+    "bytes": 18782
+  },
+  "measuredAt": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+  "verdict": "PARTIAL",
+  "claimsHeld": 14,
+  "claimsNotHeld": [
+    "'147 tests across 11 affected suites and source typecheck pass' (issue description, at 1b89a573)",
+    "Receipt <untracked>/RESEARCH/2026-09-08-dsh-pi/pi-session-import-review.md and full-suite-qualified-d1f2ee84.{md,json} exist as evidence",
+    "Reconciliation record <untracked>/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1507) exists",
+    "Full suite at d1f2ee84: 11,092 passed / 0 failed / 0 pending across 1,321 files (and plans/amc-dsh-pi-execution-2026-09-08.md:148 'included in fdabeba9 whole suite: 11,107 passed')",
+    "Obsidian evidence note + Now/Roadmap updated"
+  ],
+  "testsRun": [
+    {
+      "command": "npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceIngestionTiming.test.ts tests/traceFailureUnknownTime.test.ts tests/neutralImportMapping.test.ts tests/importProvenance.test.ts tests/neutralImportReview.test.ts",
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "[mutation 1: sanitizePiSession safeId returns raw value] npx vitest run tests/piSessionImportBoundaries.test.ts (expected RED; source restored afterwards, diff -q identical)",
+      "passed": 12,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "command": "[mutation 2: piSessionTraces durationMs: null -> 0] npx vitest run tests/piSessionImport.test.ts (expected RED; source restored afterwards, diff -q identical)",
+      "passed": 10,
+      "failed": 1,
+      "skipped": 0
+    }
+  ],
+  "missingForDone": [
+    "DoD 5: a receipt for this issue tracked under <untracked>/RESEARCH/ at the merged commit. The cited <untracked>/RESEARCH/2026-09-08-dsh-pi/{pi-session-import-review.md, full-suite-qualified-d1f2ee84.md, .json} and 2026-09-09-phase-a-reconciliation/reconciliation.json are absent from 6e7875f2 (<untracked>/ is gitignored; they need git add -f). The receipt must name source commit, environment, exercised and not-exercised, and should include the fresh-candidate reproduction the closure map asks for (nested failure, duplicate/cycle/orphan, redaction, unknown-time consumer evidence) -- this run's 47/47 + two RED mutations at 6e7875f2 on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0 / vitest 4.1.11 can seed it.",
+    "DoD 2/3: a single-commit full suite at 6e7875f2 (or the final merged candidate) recorded with pass/fail/pending counts in a tracked receipt attributable to this issue; commit 3439cda6's 14,101/14,101 claim and the tracked attempt-3 full-suite.json (12,262) were not tied to this issue or reproduced here.",
+    "DoD 4: pnpm release:gate disposition recorded for the candidate (not run in this task).",
+    "Source typecheck at HEAD for the importer path (claimed at 1b89a573, not run here).",
+    "DoD 6: Linear transition to Done with commit SHA and tracked receipt path.",
+    "DoD 7: Obsidian note update (cannot be verified from the repository).",
+    "Optional: qualify the 268-line neutralImporter.ts evolution after 1b89a573 (bda990ac/822123d7/d3cae563) beyond the scoped suites."
+  ],
+  "defectsFound": [
+    {
+      "file": "src/importers/piSessionImport.ts",
+      "line": 259,
+      "description": "entryTimestamp accepts any finite numeric timestamp, including negative (pre-1970) values, while the generic mapper traceMapping.traceTimestamp (src/importers/traceMapping.ts:18) rejects value < 0 and > 8.64e15. Pi writes ISO strings so numeric input is unlikely, but a Pi entry with timestamp -1 would be recorded as a valid 1969 event time by one mapper and as unknown by the other. Boundary inconsistency, no test covers negative numeric Pi timestamps.",
+      "severity": "low"
+    }
+  ]
+}
