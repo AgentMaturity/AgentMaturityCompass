@@ -511,7 +511,8 @@ export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): st
 /** P1-08: the private key for one local signing purpose (src/keys/purposeKeys.ts getSigningKey). */
 export function getVaultPurposeKeyPem(workspace: string, purpose: LocalPurpose): string {
   const resolved = signingPayload(workspace);
-  if (resolved === null) return generateEphemeralKey(`purpose:${purpose}`);
+  // No-sign mode: one ephemeral key per role, as before purposes, so purposes that share a role still share a key.
+  if (resolved === null) return generateEphemeralKey(roleOfPurpose(purpose));
   const pem = usableKey(workspace, resolved, purpose);
   if (!pem) throw new Error(`The vault holds no ${purpose} key.`);
   return pem;

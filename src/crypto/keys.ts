@@ -7,6 +7,9 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
+
+/** P1-08: signing call sites take their key per purpose; re-exported here so callers keep one import. */
+export { getSigningKey, getSigningPublicKeyPem } from "../keys/purposeKeys.js";
 import {
   buildKeyHistoryEntry
 } from "./keyHistoryChain.js";

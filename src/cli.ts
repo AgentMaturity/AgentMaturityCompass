@@ -11658,8 +11658,7 @@ vault
     }
   });
 
-registerVaultRotationCommand(vault);
-registerKeysCommands(program); // P1-08 freeze exception: amc keys list|rotate|revoke|export-public
+registerVaultRotationCommand(vault); registerKeysCommands(program); // P1-08 freeze exception: amc keys list|rotate|revoke|export-public
 
 notary
   .command("init")
