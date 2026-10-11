@@ -119,6 +119,12 @@ schema cannot express (docs/RECEIPTS.md):
 - From `authorized` on, `authorizationRecordDigest` must equal the digest of the execution's authorization record.
 - `enforcement.level: "enforced"` names the boundary that held; it is AMC's statement and is checked against the
   deployment's declared boundaries, never taken on trust.
+- Issuer admission: the signer is admitted for purpose `receipt`. The receipt names no key, so a verifier searches the
+  keys of its pinned trust lists. It is anchored only by the exported ledger row (`evidence-event`) whose `eventHash` is
+  `event_hash` and whose `payloadSha256` is `body_sha256`, with a `writerSignature` by a key admitted for `ledger-row`;
+  otherwise `UNANCHORED`. Completeness needs the body `body_sha256` names, naming the same execution, state and agent.
+  A receipt proves that a row was written, not the work's outcome: satisfaction is `NOT_RECOMPUTABLE`
+  (docs/STANDALONE_VERIFIER.md).
 
 ## authorization-record
 
@@ -150,16 +156,29 @@ one of `synthetic_example`, `self_reported`, `observed` or `independently_review
 
 ## scoped-attestation
 
-A signed statement about one deployment snapshot, one profile and one window. Contract only: no AMC command emits it
-yet; the registry (P3-04) issues it and the standalone verifier (P1-06) checks it. The schema's `signature` is the
-reused signature envelope below. Proposed signed bytes, to be fixed by P1-06 before any attestation is issued: the
-sha256 digest of the canonical form of the attestation without `signature`. Rules the schema cannot express:
+A signed statement about one tenant, workspace, subject, deployment snapshot, profile and window. No AMC command emits
+it yet; the registry (P3-04) issues it and the standalone verifier (`amc-verify`, docs/STANDALONE_VERIFIER.md) checks
+it. P1-06 finalized this contract-only record before any attestation was issued: it added `tenantId`, `workspaceId`,
+`subjectId` and `sequence`, made the signature envelope refuse unknown members, and fixed the signed bytes. The
+envelope's `sigB64` is Ed25519 over the 32 bytes of sha256(`"AMC_SCOPED_ATTESTATION_V1"` (ASCII), one `0x00` byte, the
+canonical form of the attestation without `signature`). Rules the schema cannot express:
 
-- `window.start` < `window.end` ≤ `issuedAt` < `expiresAt`.
-- `issuerKeyId` equals `signature.fingerprint` and is admitted for purpose `independent-attestation`. The workspace's
-  own keys are never admitted for it.
-- Scope: `deployment` and `snapshotDigest` match what the verifier is checking. Freshness: `asOf` < `expiresAt`.
-- `controlResultsDigest` equals the digest of the control results the verifier holds; otherwise completeness fails.
+- `window.start` < `window.end` ≤ `issuedAt` < `expiresAt`, and `signature.signedTs` is `issuedAt` in epoch
+  milliseconds.
+- `signature.pubkeyB64` is base64 of a canonical Ed25519 SPKI PEM whose sha256 is `signature.fingerprint`, which equals
+  `issuerKeyId` (and `notaryFingerprint` when present). The carried key only locates the signer: `issuerKeyId` is
+  admitted for purpose `independent-attestation` by a pinned trust list. The workspace's own keys are never admitted for
+  it.
+- Scope: `tenantId`, `deployment.deploymentId`, `subjectId` and `profile.id` match what the verifier is checking, and
+  every cited receipt names `workspaceId` and `subjectId` (else `FOREIGN_EVIDENCE`). Freshness: `issuedAt` ≤ `asOf` <
+  `expiresAt`; `sequence` is not below the highest one known for `subjectId`; `issuedAt` is not before the key's
+  `validFrom`.
+- Completeness: `controlResultsDigest` is the sha256 of a JSON array of control results the verifier holds; every
+  control result not listed in `exclusions` cites at least one item, every cited item is present, and the cited
+  `amc.action-receipt/v1` records of one execution agree, end in a terminal state and are marked complete.
+- Satisfaction: the attestation's result is the conjunction of its control results. A declared `fail`, or a `pass` that
+  is `synthetic_example`, fails it; a declared `not_evaluated`, a `self_reported` pass or evidence of an unknown kind
+  is not evaluated (`NOT_RECOMPUTABLE`).
 
 ## trust-list
 
@@ -181,9 +200,11 @@ express, all enforced by AMC (`src/trust/trustList.ts`):
 
 ## verifier-report
 
-What AMC's verify commands return with `--json` (docs/TRUST_LIST.md). `integrity`, `issuerAdmission`, `scope`,
-`freshness`, `completeness` and `satisfaction` are separate results; the last four stay `not-evaluated` until P1-06,
-except where a record's own section fills them (A4 project record).
+What AMC's verify commands and the standalone verifier return with `--json` (docs/TRUST_LIST.md,
+docs/STANDALONE_VERIFIER.md). `integrity`, `issuerAdmission`, `scope`, `freshness`, `completeness` and `satisfaction`
+are separate results. AMC's verify commands leave the last four `not-evaluated`, except where a record's own section
+fills them (A4 project record); `amc-verify` evaluates all six and lists the normative codes behind each status in
+`reasonCodes` (P1-06). `verifier.name` names the implementation (`agent-maturity-compass`, `amc-verify` or another).
 `trusted` is AMC's summary (integrity and issuer admission pass and the ledger is not unanchored); a consumer must
 read the separate results and not `trusted` alone. Status values are spelled `pass`, `fail` and `not-evaluated`
 (hyphen). `overrides` lists any allow flag used; an override never makes a report trusted. The optional `time`
@@ -245,7 +266,8 @@ whose head row, `CREATED` body and receipt name different agents refuses the bun
 and `a4_effects` (liveness) are bookkeeping no transition names and are never exported. Inside a workspace,
 `verifyA4Chain` and `amc verify all` (check `a4-projects`) apply the integrity rules; `verifyA4Bundle`
 (`src/a4/a4Verify.ts`) applies all of them to an export. Normative fixtures, each with its expected verdict:
-`tests/fixtures/contracts/a4-record/` (moving to `spec/fixtures/v1/a4-record/` with P1-06).
+`tests/fixtures/contracts/a4-record/` (to move to `spec/fixtures/v1/a4-record/` in one coordinated commit; P1-06 left
+them in place).
 
 Canonical form. Every digest below is sha256 over the UTF-8 bytes of the canonical form above: sorted keys with
 integer-like keys first, ECMAScript number text, **not RFC 8785**. Every JSON column (`body_json`, `spec_json`,
