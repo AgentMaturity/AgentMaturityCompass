@@ -68,6 +68,7 @@
     "postinstall": "node scripts/postinstall.js || true",
     "gen-counts": "node scripts/gen-counts.mjs --write",
     "check:counts": "node scripts/gen-counts.mjs --check",
+    "mutation:batch": "node scripts/mutation-batch.mjs",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
     "check:threat-model": "node scripts/check-threat-model.mjs",
