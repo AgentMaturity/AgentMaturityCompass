@@ -13,6 +13,8 @@ import {
   exportPublicKey, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, listKeys, resumeKeyRotation, revokeKey, rotatePurposeKeys, verifyProofOfPossession
 } from "../../src/keys/purposeKeys.js";
 import { verifyRotationStatement } from "../../src/keys/rotationStatement.js";
+import { openLedger } from "../../src/ledger/ledger.js";
+import { verifyReceipt } from "../../src/receipts/receipt.js";
 import { admitKey, ed25519KeyId, workspaceSelfTrust } from "../../src/trust/index.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { lockVault, purposeKeyPaths, unlockVault, vaultPaths } from "../../src/vault/vault.js";
@@ -75,6 +77,25 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     expect(verifyRotationStatement(statement, { expected: { workspaceId: "default", purpose: "receipt" },
       trustedCurrentPublicKeyPem: getPublicKeyPem(root, "monitor"), previous: null })).toMatchObject({ valid: true });
     expect(listKeys(root).purposes.find(row => row.purpose === "receipt")).toMatchObject({ sharedWith: [], rotations: 1 });
+  });
+
+  it("the ledger signs receipts with the receipt key and rows with the ledger-row key after a receipt rotation", () => {
+    const root = workspace();
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    const ledger = openLedger(root);
+    try {
+      ledger.startSession({ sessionId: "s1", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+      const appended = ledger.appendEvidenceWithReceipt({ sessionId: "s1", runtime: "unknown", eventType: "stdout", payload: "x", meta: { trustTier: "OBSERVED" },
+        receipt: { kind: "tool_action", agentId: "default", providerId: "toolhub", model: null, bodySha256: "a".repeat(64) } });
+      const row = ledger.getEventById(appended.id)!;
+      const receipt = (JSON.parse(row.meta_json) as { receipt: string }).receipt;
+      expect(verifyReceipt(receipt, [getSigningPublicKeyPem(root, "receipt")]).ok).toBe(true);
+      expect(verifyReceipt(receipt, [getSigningPublicKeyPem(root, "ledger-row")]).ok).toBe(false);
+      expect(verifyHexDigestAny(row.event_hash, row.writer_sig, [getSigningPublicKeyPem(root, "ledger-row")])).toBe(true);
+      expect(verifyHexDigestAny(row.event_hash, row.writer_sig, [getSigningPublicKeyPem(root, "receipt")])).toBe(false);
+    } finally {
+      ledger.close();
+    }
   });
 
   it("an artifact-seal key signing a revocation is refused by P0-09 admission (wrong-purpose)", () => {
