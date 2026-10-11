@@ -52,7 +52,7 @@ COPY --from=install /opt/amc/ /opt/amc/
 RUN ln -s /opt/amc/node_modules/.bin/amc /usr/local/bin/amc \
     && groupadd --gid 10001 amc \
     && useradd --uid 10001 --gid 10001 --create-home --shell /bin/bash amc \
-    && mkdir -p /workspace /data/amc /data/notary \
+    && mkdir -p /workspace /data/amc /data/notary /home/amc/.config/amc/state \
     && chown -R 10001:10001 /workspace /data/amc /data/notary /home/amc
 ENV NODE_ENV=production HOME=/home/amc
 USER 10001:10001

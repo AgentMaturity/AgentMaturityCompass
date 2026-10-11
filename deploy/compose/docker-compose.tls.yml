@@ -70,6 +70,8 @@ services:
       - "3212"
     volumes:
       - amc_data:/data/amc
+      # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
+      - amc_state:/home/amc/.config/amc/state
     secrets:
       - amc_vault_passphrase
       - amc_owner_username
@@ -110,6 +112,8 @@ volumes:
     name: amc_data
   amc_notary_data:
     name: amc_notary_data
+  amc_state:
+    name: amc_state
   caddy_data:
   caddy_config:
 

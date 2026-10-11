@@ -38,6 +38,7 @@ The chart renders:
 - `Service` for Studio, Gateway, and proxy ports.
 - `Ingress` when enabled.
 - `PersistentVolumeClaim` for the AMC workspace.
+- `PersistentVolumeClaim` `<release>-state` for `<AMC home>/state` (`amcHomeState`, mounted at `/home/amc/.config/amc/state`). It keeps this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations across restarts; on an `emptyDir` every restart forgets them ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md#anti-rollback)). It is never mounted into the workspace.
 - `NetworkPolicy`, `PodDisruptionBudget`, `ServiceAccount` and `ConfigMap`.
 - No `Secret` by default. The chart references the bootstrap secret you create. `bootstrap.createSecret=true` renders it from `bootstrap.values`, and then every value is required and any value starting with `change-me` is refused, by the template and by `values.schema.json`. No default passphrase can reach the cluster.
 - A `helm test` pod (`templates/tests/governed-turn.yaml`), created only by `helm test`.
@@ -273,6 +274,10 @@ helm test amc --namespace amc-system --logs
 node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-studio:s1-b \
   --secrets-dir ./drill-secrets --out ./rollback-receipt.json
 ```
+
+### Upgrading to chart 0.3.0
+
+Chart 0.3.0 adds the `<release>-state` claim for `<AMC home>/state` (P1-08). A plain upgrade creates it empty, so this machine's anti-rollback marks start again from the workspace transparency log; nothing else changes. Set `amcHomeState.persistence.enabled=false` only for a disposable install.
 
 ### Upgrading from chart 0.1.0
 

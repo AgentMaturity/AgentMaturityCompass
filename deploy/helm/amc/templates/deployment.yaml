@@ -94,6 +94,8 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: {{ .Values.workspace.mountPath }}
+            - name: amc-home-state
+              mountPath: {{ .Values.amcHomeState.mountPath }}
             - name: secrets
               mountPath: /run/secrets
               readOnly: true
@@ -146,6 +148,14 @@ spec:
           {{- if .Values.workspace.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ include "amc.fullname" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        # P1-08 anti-rollback marks and key-set recovery copies; see amcHomeState in values.yaml.
+        - name: amc-home-state
+          {{- if .Values.amcHomeState.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "amc.fullname" . }}-state
           {{- else }}
           emptyDir: {}
           {{- end }}
