@@ -118,7 +118,7 @@ The same fields are in `structuredContent`: `{ claimKind, statusDimensions, clai
 | `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
 | `amc_incident_clocks` | A regulated listing that is not evaluated: deadlines run from operator-recorded trigger and notice times, and applicability is unresolved |
 | `amc_a4_project`, `amc_a4_readiness` (A4 preview) | The readiness evaluator's own envelope (`claim` of `amc.a4-readiness/v1`), never one composed by the tool; it is evaluated in the MCP process, where `signing.available` reads `WAITING` (see A4 Forge tools) |
-| `amc_a4_conformance` (A4 preview) | A regulated result that is not evaluated (`NO_PRODUCER_REGISTERED`) until Adapt registers its producer, as the API answers |
+| `amc_a4_conformance` (A4 preview) | The stage's conformance statement as the API answers it: the statement's own claim envelope, built from Adapt's verified control results (counts, never a percentage); a stage without a reviewed plan is not evaluated |
 | `amc_a4_list_projects`, `amc_a4_comment` (A4 preview) | The listing or the recorded comment itself is not evaluated (self-reported) |
 
 AMC output is evidence of conformity. No tool prints "certified".
@@ -214,7 +214,7 @@ Input:  { packId: string, responses: Record<questionId, integer 1-5> }
 Output: self-reported score and level, "Self-assessment: complete (self-reported; not a certification)", complianceGaps
 ```
 
-Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
+Responses are self-declared Likert answers; a value that is not an integer 1-5 fails the call. A complete self-assessment is not a certification and caps at L1 (see [CLAIM_KINDS.md](CLAIM_KINDS.md)). Its claim line reads `Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · …`. Only a pack's own id is accepted: inherited names such as `__proto__` or `constructor` return "Unknown sector pack".
 
 Available pack IDs (40 total across 7 stations):
 
@@ -340,7 +340,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 Run `amc init` in your project to register an agent first.
 
 **"Could not load agent"**
-Run `amc quickscore` or `amc score run` to generate the first assessment before using MCP tools.
+Run `amc quickscore` or `amc run` to generate the first assessment before using MCP tools.
 
 **IDE not showing AMC tools**
 1. Verify `amc` is in your PATH: `which amc`

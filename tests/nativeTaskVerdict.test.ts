@@ -6,7 +6,7 @@ import { nativeTaskSchemas } from "../src/studio/nativeTaskOpenapi.js";
 // Studio's native-task verify (P0-14): the only caller that enables the live scope, and fail-closed on every branch.
 const base: AgentRunVerification = {
   sessionId: "s1", ok: true, prefixVerified: false, integrityOk: true, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [],
-  unsignedRowIds: [], requests: [], scope: "complete-ledger", unfinalizedSessions: [],
+  unsignedRowIds: [], requests: [], scope: "complete-ledger", unfinalizedSessions: [], targetFinalized: true, intactUnlessUnfinalized: true,
   trustRoot: { anchored: true, monitorFingerprint: "f".repeat(64), expectedFingerprint: "f".repeat(64) }
 };
 const prefix: AgentRunVerification = { ...base, ok: false, prefixVerified: true, scope: "verified-prefix", unfinalizedSessions: ["gw-1"] };
@@ -29,6 +29,14 @@ describe("Studio native-task evidence verdict", () => {
     ]) {
       expect(nativeEvidenceVerdict(odd), JSON.stringify(odd)).toMatchObject({ verification: "failed", scope: null });
     }
+  });
+
+  it("names an intact but unfinalized target as not finalized, from the verifier's own read, and never verifies it (P0-57)", () => {
+    const released = { ...base, ok: false, integrityOk: false, targetFinalized: false, intactUnlessUnfinalized: true,
+      sessionChainErrors: ["Session s1 is not closed and sealed; a verified prefix needs a finalized target"] };
+    expect(nativeEvidenceVerdict(released)).toMatchObject({ verification: "failed", scope: null, error: expect.stringContaining("not closed and sealed, so it is not finalized") });
+    // Any other failure beside it stays an integrity refusal.
+    expect(nativeEvidenceVerdict({ ...released, intactUnlessUnfinalized: false })).toMatchObject({ verification: "failed", error: expect.stringContaining("refused this evidence") });
   });
 
   it("is the only place the live scope is enabled, and a thrown verifier is failed, not verified", async () => {

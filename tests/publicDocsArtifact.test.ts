@@ -43,13 +43,14 @@ function filesUnder(directory: string): string[] {
   return files.sort();
 }
 
-function buildArtifact(): string {
+function buildArtifact(env: Record<string, string> = {}): string {
   const output = mkdtempSync(join(tmpdir(), "amc-pages-artifact-"));
   temporaryRoots.push(output);
+  const { AMC_PAGES_API_REFERENCE: _unset, ...inherited } = process.env;
   const result = spawnSync(process.execPath, [buildScript, "--out", output], {
     cwd: root,
     encoding: "utf8",
-    env: { ...process.env, GITHUB_SHA: revision },
+    env: { ...inherited, GITHUB_SHA: revision, ...env },
   });
   expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
   return output;
@@ -131,8 +132,12 @@ describe("public Docs Pages artifact", () => {
     const builtScript = readFileSync(resolve(first, "docs/docs.js"), "utf8");
     expect(builtHtml).not.toContain("cdn.jsdelivr.net");
     expect(builtScript).not.toContain("raw.githubusercontent.com");
-    expect(builtHtml).toContain('href="../api/"');
-    const apiHtml = readFileSync(resolve(first, "api/index.html"), "utf8");
+    // D-12: the unreviewed TypeDoc reference is left out and unlinked unless AMC_PAGES_API_REFERENCE=1.
+    expect(builtHtml).not.toContain('href="../api/"');
+    expect(existsSync(resolve(first, "api"))).toBe(false);
+    expect(readFileSync(resolve(first, "docs/content/PACKAGE_API_REFERENCE.md"), "utf8")).not.toContain("](../api/)");
+    const withApi = buildArtifact({ AMC_PAGES_API_REFERENCE: "1" });
+    const apiHtml = readFileSync(resolve(withApi, "api/index.html"), "utf8");
     expect(apiHtml).toContain("Agent Maturity Compass API");
     expect(apiHtml).toContain("Find exported functions, classes and types");
     expect(apiHtml).not.toContain('href="media/api"');
@@ -140,11 +145,11 @@ describe("public Docs Pages artifact", () => {
     // Keep useful inline inheritance and avoid links to missing summary anchors.
     for (const provider of ["AnthropicMessages", "GeminiGenerateContent", "LocalChat", "OpenAIAudioSpeech",
       "OpenAIChat", "OpenAIEmbeddings", "OpenAIImages", "OpenAIResponses", "OpenRouterChat", "XAIChat"]) {
-      const page = readFileSync(resolve(first, `api/interfaces/index.${provider}Payload.html`), "utf8");
+      const page = readFileSync(resolve(withApi, `api/interfaces/index.${provider}Payload.html`), "utf8");
       expect(page).toContain('class="tsd-hierarchy"');
       expect(page).not.toContain("hierarchy.html#");
     }
-    const reflection = JSON.parse(readFileSync(resolve(first, "api/reflection.json"), "utf8"));
+    const reflection = JSON.parse(readFileSync(resolve(withApi, "api/reflection.json"), "utf8"));
     expect(reflection.children.length).toBeGreaterThan(0);
     const entryPoints = JSON.parse(readFileSync(resolve(root, "typedoc.json"), "utf8")).entryPoints as string[];
     const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
@@ -155,11 +160,9 @@ describe("public Docs Pages artifact", () => {
     for (const symbol of ["initWorkspace", "InitWorkspaceOptions", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
     expect(serialized).toContain(`/blob/${revision}/`);
     expect(pnpmIntegrityFor("typedoc", String(pkg.devDependencies.typedoc), root)).not.toBeNull();
-    const initPage = readFileSync(resolve(first, "api/functions/index.initWorkspace.html"), "utf8");
+    const initPage = readFileSync(resolve(withApi, "api/functions/index.initWorkspace.html"), "utf8");
     expect(initPage).toContain("interfaces/index.InitWorkspaceOptions.html");
     expect(initPage).not.toContain("This barrel is the contract");
-    expect(readFileSync(resolve(first, "docs/content/PACKAGE_API_REFERENCE.md"), "utf8"))
-      .toContain("[open the generated package reference](../api/)");
 
     // The same pair of complete builds owns both Docs and font artifact checks.
     const firstBrandRaw = readFileSync(resolve(first, "brand-assets.json"));

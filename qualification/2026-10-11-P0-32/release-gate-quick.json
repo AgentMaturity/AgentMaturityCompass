@@ -1,0 +1,166 @@
+{
+  "command": "node scripts/release-gate.mjs --quick --out <scratch>/release-gate-quick.json",
+  "commit": "60d0255c43f7a54bae88e665e38d326b3232fcd5",
+  "createdAt": "2026-10-11T17:45:18.704Z",
+  "quick": true,
+  "status": "passed",
+  "qualification": "partial",
+  "counts": {
+    "executed": 16,
+    "passed": 16,
+    "failed": 0,
+    "skipped": 5,
+    "total": 21
+  },
+  "summary": "16/16 executed checks passed; 0 failed; 5 skipped. Acceptance is incomplete: packed-install, full-test-suite, per-file-coverage, install-persona-qa, live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "status": "passed",
+      "command": "node --check src/console/assets/app.js",
+      "startedAt": "2026-10-11T17:42:53.147Z",
+      "endedAt": "2026-10-11T17:42:53.220Z"
+    },
+    {
+      "id": "openapi-parse",
+      "status": "passed",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "startedAt": "2026-10-11T17:42:53.220Z",
+      "endedAt": "2026-10-11T17:42:53.496Z"
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "command": "npm run typecheck",
+      "startedAt": "2026-10-11T17:42:53.496Z",
+      "endedAt": "2026-10-11T17:43:32.103Z"
+    },
+    {
+      "id": "typecheck-tests",
+      "status": "passed",
+      "command": "npm run typecheck:tests",
+      "startedAt": "2026-10-11T17:43:32.106Z",
+      "endedAt": "2026-10-11T17:44:16.554Z"
+    },
+    {
+      "id": "build",
+      "status": "passed",
+      "command": "npm run build",
+      "startedAt": "2026-10-11T17:44:16.554Z",
+      "endedAt": "2026-10-11T17:44:53.101Z"
+    },
+    {
+      "id": "lint",
+      "status": "passed",
+      "command": "npm run lint",
+      "startedAt": "2026-10-11T17:44:53.101Z",
+      "endedAt": "2026-10-11T17:44:57.025Z"
+    },
+    {
+      "id": "source-duplicates",
+      "status": "passed",
+      "command": "npm run check:duplicates",
+      "startedAt": "2026-10-11T17:44:57.025Z",
+      "endedAt": "2026-10-11T17:44:58.888Z"
+    },
+    {
+      "id": "source-dead-code",
+      "status": "passed",
+      "command": "npm run check:dead-code",
+      "startedAt": "2026-10-11T17:44:58.888Z",
+      "endedAt": "2026-10-11T17:45:02.948Z"
+    },
+    {
+      "id": "package-lint",
+      "status": "passed",
+      "command": "npm run check:package",
+      "startedAt": "2026-10-11T17:45:02.948Z",
+      "endedAt": "2026-10-11T17:45:07.441Z"
+    },
+    {
+      "id": "citations",
+      "status": "passed",
+      "command": "npm run check:citations",
+      "startedAt": "2026-10-11T17:45:07.441Z",
+      "endedAt": "2026-10-11T17:45:07.776Z"
+    },
+    {
+      "id": "packed-install",
+      "status": "skipped",
+      "command": "",
+      "startedAt": "2026-10-11T17:45:07.776Z",
+      "endedAt": "2026-10-11T17:45:07.776Z"
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "status": "passed",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "startedAt": "2026-10-11T17:45:07.776Z",
+      "endedAt": "2026-10-11T17:45:12.856Z"
+    },
+    {
+      "id": "full-test-suite",
+      "status": "skipped",
+      "command": "",
+      "startedAt": "2026-10-11T17:45:12.856Z",
+      "endedAt": "2026-10-11T17:45:12.856Z"
+    },
+    {
+      "id": "per-file-coverage",
+      "status": "skipped",
+      "command": "",
+      "startedAt": "2026-10-11T17:45:12.856Z",
+      "endedAt": "2026-10-11T17:45:12.856Z"
+    },
+    {
+      "id": "command-inventory",
+      "status": "passed",
+      "command": "node dist/cli.js commands --markdown --out <tmp>",
+      "startedAt": "2026-10-11T17:45:12.856Z",
+      "endedAt": "2026-10-11T17:45:14.120Z"
+    },
+    {
+      "id": "architecture-boundaries",
+      "status": "passed",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "startedAt": "2026-10-11T17:45:14.120Z",
+      "endedAt": "2026-10-11T17:45:15.797Z"
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "status": "passed",
+      "command": "npm run check:docs-drift",
+      "startedAt": "2026-10-11T17:45:15.797Z",
+      "endedAt": "2026-10-11T17:45:16.219Z"
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "status": "passed",
+      "command": "npm run audit:runtime",
+      "startedAt": "2026-10-11T17:45:16.219Z",
+      "endedAt": "2026-10-11T17:45:16.953Z"
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "status": "passed",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "startedAt": "2026-10-11T17:45:16.954Z",
+      "endedAt": "2026-10-11T17:45:18.703Z"
+    },
+    {
+      "id": "install-persona-qa",
+      "status": "skipped",
+      "command": "",
+      "startedAt": "2026-10-11T17:45:18.704Z",
+      "endedAt": "2026-10-11T17:45:18.704Z"
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "command": "",
+      "startedAt": "2026-10-11T17:45:18.704Z",
+      "endedAt": "2026-10-11T17:45:18.704Z"
+    }
+  ]
+}

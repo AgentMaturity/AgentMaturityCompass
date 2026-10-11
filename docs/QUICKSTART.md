@@ -202,7 +202,7 @@ amc run --question-set lifecycle    # 244 default questions + 20 lifecycle quest
 
 ```bash
 amc quickscore --rapid    # lightweight pulse check, not the full score
-amc badge                 # README badge after a scored run
+amc badge                 # passport badge line from what AMC recorded
 ```
 
 For CI or other non-interactive runs, pass answer levels as JSON instead of relying on a TTY prompt:
@@ -369,7 +369,7 @@ amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 
 | Goal | Command |
 |------|---------|
-| Deep diagnostic (244 default questions) | `amc diagnostic run` |
+| Deep diagnostic (244 default questions) | `amc run --score-only` |
 | Lifecycle-expanded diagnostic (264 questions) | `amc run --question-set lifecycle` |
 | EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |

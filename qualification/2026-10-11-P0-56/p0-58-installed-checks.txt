@@ -1,0 +1,10 @@
+# P0-58 installed-style checks on this branch build (macOS arm64, node v25.5.0, this worktree's dist/; not the RC tarball)
+$ AMC_SESSION_STORE=jsonl amc agent-loop run --tools workspace --delegate --delegate-stop max-turns:1 --json "delegate once"   (tools.yaml allows delegate, signed; firewall block)
+exit 1, stdout 0 bytes, last stderr line:
+In-process delegation needs a second session writer, but this workspace's session store is JSONL, which admits one session writer per workspace. Nothing was opened. Use a workspace on the default SQLite session store for this.
+.amc/session-store.json absent afterwards (no session opened or pinned)
+$ (same workspace, default store) amc agent-loop run ... --delegate ...
+exit 0 (marker pinned sqlite)
+
+$ node p058-sdk.mjs  (fresh workspace; AMCNativeClient.start({provider:"stub", env:{AMC_SESSION_STORE:"jsonl"}}); newSession(); newSession())
+{"first":"string","second":{"name":"AMCNativeRefusedError","code":-32602,"data":{"reason":"SESSION_STORE_SINGLE_WRITER"},"message":"A second ACP session needs a second session writer, but this workspace's session store is JSONL, which admits one session writer per workspace. Nothing was opened. Use a workspace on the default SQLite session store for this."}}

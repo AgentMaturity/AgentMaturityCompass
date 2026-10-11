@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-02",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "lease",
+    "actionClass": "WRITE_HIGH",
+    "lease": {
+      "state": "valid",
+      "agentId": "agent-other",
+      "scopes": [
+        "toolhub:execute"
+      ]
+    }
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "authorization_denied:scope_widened"
+  }
+}

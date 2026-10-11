@@ -94,7 +94,7 @@ function segmentsOf(input: string, what: string): string[] {
  * ponytail: lstat-then-use, not openat; a workspace writer racing directory swaps between the check and the use is not
  * excluded (Node has no no-follow directory open). The resolved-path re-check in writeScaffold narrows it.
  */
-function plainPath(workspace: string, segments: readonly string[], create: boolean): string {
+export function plainPath(workspace: string, segments: readonly string[], create: boolean): string {
   let path = workspace;
   for (const [index, segment] of segments.entries()) {
     path = join(path, segment);

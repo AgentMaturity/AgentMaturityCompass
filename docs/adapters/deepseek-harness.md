@@ -28,6 +28,8 @@ amc adapters run --agent default --adapter deepseek-harness -- "Summarize the RE
 
 Configuration validates file hashes and stores the launcher inside signed `adapters.yaml`. Each run checks the signature and hashes again, probes only that approved command's package version, and uses structured arguments with no shell. The task must be one quoted, nonempty argument beginning with ordinary text; extra DSH options are refused. The launcher receives its optional entrypoint followed by `--profile headless --patch <private file> <task>` and runs in the AMC workspace. Without interruption, its actual exit code is returned. SIGINT/SIGTERM are forwarded to that child, with a five-second forced-termination fallback. A requested interruption returns wrapper code 130/143 even if DSH handles the signal by exiting zero. Signed exit records preserve `requestedSignal`, `childExitCode`, and `childSignal` separately. This does not certify reaping every descendant created by external DSH plugins.
 
+The last hash runs immediately before `spawn`: a changed approved file stops the run before any child starts, and the refusal is recorded as `agent_process_exited` with `refused: "dsh_launch_changed"` in a sealed session. The child is then started by path, so a write to those paths after that last hash and before the operating system executes them is not detected (the exec-by-path window). Keep the approved files where only the operator can write.
+
 This slice supports `SUPERVISE` only. It does not represent DSH's internal tools as AMC-governed tools, change its sandbox/approval settings, or claim an outer process sandbox.
 
 ## Routing and settings

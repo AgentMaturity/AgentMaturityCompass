@@ -286,6 +286,7 @@ import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js"
 import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
@@ -1201,36 +1202,6 @@ function findImmediatePackDirectories(parentDir: string): string[] {
   return out.sort((a, b) => a.localeCompare(b));
 }
 
-function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
-      runId?: string;
-      integrityIndex?: number;
-      trustLabel?: string;
-    };
-    if (!parsed.runId) {
-      return null;
-    }
-    return {
-      runId: parsed.runId,
-      integrityIndex: Number(parsed.integrityIndex ?? 0),
-      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
-    };
-  } catch {
-    return null;
-  }
-}
-
 function readCurrentAgentScore(workspace: string, agentId: string): { score0to1: number; source: string } | null {
   const latest = latestRunSummary(workspace, agentId);
   if (!latest) {
@@ -1354,19 +1325,13 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
 }
 
 function loadTemporalDecayRuns(workspace: string, agentId: string, lookbackDays: number, nowTs: number): TemporalDecaySourceRun[] {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return [];
-  }
   const minTs = nowTs - Math.max(1, lookbackDays) * 24 * 60 * 60 * 1000;
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
+  const files = agentRunFiles(workspace, agentId);
 
   const rows: TemporalDecaySourceRun[] = [];
   for (const file of files) {
     try {
-      const parsed = JSON.parse(readUtf8(join(runsDir, file))) as {
+      const parsed = JSON.parse(readUtf8(file)) as {
         runId?: string;
         ts?: number;
         integrityIndex?: number;
@@ -9083,7 +9048,7 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 126-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed default diagnostic question bank operations");
 
 diagnosticBank
   .command("init")
@@ -9114,7 +9079,7 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 126-question diagnostic for an agent")
+  .description("Render the contextualized default diagnostic question bank for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
@@ -18520,13 +18485,17 @@ release
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
   .option("--skip-install-build", "use current built artifacts without frozen source install/build", false)
-  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
+  .option("--npm-tarball <file>", "embed this gated npm tarball as is; nothing is installed, built or packed")
+  .option("--sbom <file>", "embed this gated CycloneDX SBOM instead of regenerating it")
+  .option("--licenses <file>", "embed this gated licence inventory instead of regenerating it")
+  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean; npmTarball?: string; sbom?: string; licenses?: string }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
       workspace: process.cwd(),
       outFile: resolve(process.cwd(), opts.out),
       privateKeyPath: opts.privateKey,
-      skipInstallBuild: opts.skipInstallBuild
+      skipInstallBuild: opts.skipInstallBuild,
+      npmTarball: opts.npmTarball, sbomFile: opts.sbom, licensesFile: opts.licenses
     });
     console.log(chalk.green("Release bundle created"));
     console.log(`File: ${out.outFile}`);
@@ -24270,7 +24239,7 @@ program
     for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(`  ${line}`)); }
 
     console.log(chalk.bold.hex('#4AEF79')("\n📋  Next Steps:"));
-    console.log("  amc score tier --tier standard   Full 126-question assessment");
+    console.log("  amc score tier --tier standard   Full default diagnostic question bank assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
     console.log("  amc playground run               Run scenario tests");

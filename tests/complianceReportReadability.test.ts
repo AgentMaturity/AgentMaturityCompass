@@ -106,7 +106,7 @@ describe("compliance report readability", () => {
   });
 
   test("keeps the UX audit aligned with current compliance report readability", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R10 — compliance reports shorten evidence refs and show config fixes");
     expect(audit).toContain("Full hashes remain available in JSON reports");

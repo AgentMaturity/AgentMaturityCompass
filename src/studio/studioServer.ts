@@ -15,6 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
+import { agentRunFiles } from "../diagnostic/runReportResolution.js";
 import { evaluateDiagnosticEvidenceReadiness, summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
@@ -1298,17 +1299,11 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
 }
 
 function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const runDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runDir)) {
+  const latest = agentRunFiles(workspace, agentId).at(-1);
+  if (!latest) {
     return { agentId, latestRun: null };
   }
-  const files = readdirSync(runDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return { agentId, latestRun: null };
-  }
-  const last = JSON.parse(readUtf8(join(runDir, files[files.length - 1]!))) as Record<string, unknown>;
+  const last = JSON.parse(readUtf8(latest)) as Record<string, unknown>;
   return {
     agentId,
     latestRun: {

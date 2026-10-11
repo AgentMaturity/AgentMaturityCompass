@@ -63,6 +63,11 @@ export interface A4EffectDef {
    * consume that gate without it. An effect without one cannot be opened.
    */
   readonly completes?: `${A4Stage}.${"direction" | "completion"}`;
+  /**
+   * Run only when an owner opened it on that gate before `complete`; `complete` consumes the gate plainly otherwise (a
+   * stage's readiness may still require it), and it can no longer be opened on that consumed gate.
+   */
+  readonly optional?: boolean;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -98,10 +103,10 @@ const latestOpened = (state: A4ReadinessState, gateId: string, effect: string): 
   [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === gateId && link.body.effect === effect);
 /** The resource slots the gate's intent bound, `group.slot` → value. */
 const boundSlots = (gate: A4GateRow): Record<string, string | null> => (JSON.parse(gate.intent_json) as { resourceDigests: Record<string, string | null> }).resourceDigests;
-/** The EFFECT_FAILED rows of `effect`'s attempts on `gateId`, in chain order. */
-const failuresOf = (chain: readonly A4ChainLink[], gateId: string, effect: string): A4ChainLink[] => {
+/** The EFFECT_FAILED (or `kind`) rows of `effect`'s attempts on `gateId`, in chain order. */
+const failuresOf = (chain: readonly A4ChainLink[], gateId: string, effect: string, kind: "EFFECT_FAILED" | "EFFECT_FINISHED" = "EFFECT_FAILED"): A4ChainLink[] => {
   const attempts = new Set(chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gateId && link.body.effect === effect).map((link) => link.body.effectId));
-  return chain.filter((link) => link.kind === "EFFECT_FAILED" && attempts.has(link.body.effectId));
+  return chain.filter((link) => link.kind === kind && attempts.has(link.body.effectId));
 };
 const startedLink = (chain: readonly A4ChainLink[], attemptId: string): A4ChainLink => {
   const link = chain.find((candidate) => candidate.kind === "EFFECT_STARTED" && candidate.body.effectId === attemptId);
@@ -208,7 +213,8 @@ function sweepGateAttempts(store: A4Store, projectId: string, gateId: string, ef
  * the gate the effect `completes`, named under its own stage: `complete` runs whatever effect is opened on the gate, so
  * any other effect would stand in for the stage's own (409 A4_STEP_ORDER). Lost attempts of the effect on the gate are
  * settled first (process_lost), so a crashed executor never holds the re-open path shut; the head the client saw moves
- * by exactly those rows.
+ * by exactly those rows. Who may open and the documentary gate's quorum are checked on the rows read before the engine
+ * request is written (openRequest signs and files it), and again inside the transaction.
  * ponytail: the engine request is written before the project lock (files and a signature); one whose transition then
  * fails stays PENDING until it expires and is never consumed.
  */
@@ -225,6 +231,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     throw fail(409, "A4_STEP_ORDER", `effect ${def.id} is not opened on the ${gate0.stage} ${gate0.gate} gate`);
   }
   if (def.consumes === "gate") throw fail(409, "A4_STEP_ORDER", `effect ${def.id} runs on the documentary gate's quorum; complete runs it`);
+  assertEffectOpenable(store, state0, principal, input, gate0, def, now);
   const regulated0 = isRegulated(state0, signedA4Floor(store.workspace));
   assertReopenable(store, state0, gate0, def, regulated0);
   const intentPayload = effectIntent(def, state0, gate0);
@@ -239,16 +246,35 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   return governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (_ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
-    const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
-    assertAllowed(readiness, "openEffect");
-    const gate = gateStatus(state, row, query.policy, now);
-    const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
-    if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
-    if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
+    const { readiness, query } = assertEffectOpenable(store, state, principal, input, row, def, now);
     assertReopenable(store, state, row, def, isRegulated(state, query.floor));
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, requestDigestSha256, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
   });
+}
+
+/**
+ * openEffect's own refusals on `state`: the role class and the global blockers (readiness `allowed.openEffect`), then the
+ * documentary gate's quorum, or a consumed gate on which an attempt of this executor (it consumes its own grant) failed,
+ * none finished, and the stage was not redone. A consumed gate with no failed attempt (an optional effect the gate was
+ * consumed without) or a finished one is 409 A4_GATE_STALE (consumed): `complete` could never run it (rerunExecutorEffect),
+ * so nothing is filed for it.
+ */
+function assertEffectOpenable(store: A4Store, state: A4ReadinessState, principal: A4Principal, input: A4Call, row: A4GateRow, def: A4EffectDef,
+  now: number): ReturnType<typeof evaluateFor> {
+  const evaluated = evaluateFor(store, state, principal, input, row.stage, now);
+  assertAllowed(evaluated.readiness, "openEffect");
+  const gate = gateStatus(state, row, evaluated.query.policy, now);
+  const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
+  if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
+  if (consumedForExecutor) {
+    const failures = failuresOf(state.chain, row.gate_id, def.id);
+    if (failures.length === 0 || failuresOf(state.chain, row.gate_id, def.id, "EFFECT_FINISHED").length > 0) {
+      throw fail(409, "A4_GATE_STALE", "consumed", { supersededBy: "GATE_CONSUMED", moved: ["consumed"] });
+    }
+    assertNotRedone(state, row.stage, failures.at(-1));
+  }
+  return evaluated;
 }
 
 /** An engine decision's userId as a principal with its plane: users.yaml or a live host session, exactly one, live roles. */
@@ -448,8 +474,8 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
 
 /**
  * `complete` (design §6.5; the body names no effect): the effect is the one an owner opened on this gate
- * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened, except
- * a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly.
+ * (EFFECT_GATE_OPENED), else a registered, non-optional effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until
+ * opened, except a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly.
  * consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a consumed gate whose re-opened
  * effect consumes its own grant, it re-runs that effect (`rerunExecutorEffect`).
  */
@@ -465,7 +491,7 @@ export function completeStage(store: A4Store, projectId: string, input: A4Call &
     return rerunExecutorEffect(store, projectId, openedDef, input);
   }
   const effectId = opened !== undefined ? String(opened.body.effect)
-    : [...EFFECTS.values()].find((def) => requested !== undefined && def.completes === `${String(requested.body.stage)}.${String(requested.body.gate)}`)?.id;
+    : [...EFFECTS.values()].find((def) => def.optional !== true && requested !== undefined && def.completes === `${String(requested.body.stage)}.${String(requested.body.gate)}`)?.id;
   if (effectId === undefined) return { result: consumeGate(store, projectId, input), attemptId: null };
   return completeWithEffect(store, projectId, { ...input, effectId });
 }

@@ -1,15 +1,15 @@
 name: npm Publish
 
-# Automated release pipeline: test → build → publish
-# Uses Changesets to manage versions, changelogs, and npm publishing.
+# Version PRs only (P0-34). This workflow never publishes, tags or creates a release:
+# release.yml, run from a v*.*.* tag in the protected `release` environment, is the only publisher.
+# P1-41 redesigns the release train.
 #
 # Flow:
 #   1. Changesets land on main via PRs (ci.yml enforces their presence)
-#   2. This workflow detects pending changesets and opens a "Version Packages" PR
-#      - That PR bumps package.json, updates CHANGELOG.md
-#   3. When the "Version Packages" PR merges, this workflow publishes to npm
-#      and creates a GitHub Release with auto-generated release notes
-#   4. The existing release.yml triggers on the new tag for Docker/Homebrew/assets
+#   2. When CHANGESETS_GITHUB_TOKEN is configured, this workflow opens or updates a "Version Packages" PR
+#      through scripts/release-prepare.mjs --version-only: release notes, version bump from the published
+#      version, one CHANGELOG heading and the version-coupled files
+#   3. A maintainer merges it, then tags the commit; the tag runs release.yml
 
 on:
   push:
@@ -19,8 +19,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  packages: write
-  id-token: write
 
 concurrency:
   group: npm-publish-${{ github.ref }}
@@ -108,127 +106,24 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Release automation preflight
+      - name: Version PR preflight
         id: release_preflight
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CHANGESETS_GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
         run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::notice::Skipping npm release automation because NPM_TOKEN is not configured."
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           if [ -z "$CHANGESETS_GITHUB_TOKEN" ]; then
-            echo "::notice::Skipping npm release automation because CHANGESETS_GITHUB_TOKEN is not configured. This token must be allowed to create release PRs."
+            echo "::notice::No version PR: CHANGESETS_GITHUB_TOKEN is not configured. Nothing is published from this workflow."
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "enabled=true" >> "$GITHUB_OUTPUT"
 
-      - name: Create Release PR or Publish
+      - name: Create or update the version PR
         if: steps.release_preflight.outputs.enabled == 'true'
-        id: changesets
         uses: changesets/action@v1
         with:
-          # When pending changesets exist: opens/updates a "Version Packages" PR
-          # When no pending changesets (i.e. version PR just merged): publishes
-          version: npm run version-packages
-          publish: npm run release
+          version: node scripts/release-prepare.mjs --version-only
           title: "chore: version packages for release"
           commit: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-
-      - name: Release automation skipped
-        if: steps.release_preflight.outputs.enabled != 'true'
-        run: |
-          echo "## npm release automation skipped" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Configure both NPM_TOKEN and CHANGESETS_GITHUB_TOKEN to enable automated release PR creation and npm publishing." >> "$GITHUB_STEP_SUMMARY"
-
-      # After publish: tag + GitHub Release with auto-generated notes
-      - name: Create git tag and GitHub Release
-        if: steps.changesets.outputs.published == 'true'
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            const tag = `v${pkg.version}`;
-            const { owner, repo } = context.repo;
-
-            // Check if tag already exists (release.yml may create it)
-            try {
-              await github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` });
-              core.info(`Tag ${tag} already exists, skipping tag creation.`);
-            } catch (e) {
-              if (e.status === 404) {
-                await github.rest.git.createRef({
-                  owner, repo,
-                  ref: `refs/tags/${tag}`,
-                  sha: context.sha,
-                });
-                core.info(`Created tag ${tag}`);
-              } else {
-                throw e;
-              }
-            }
-
-            // Generate release notes from recent commits
-            let releaseNotes;
-            try {
-              const { data } = await github.rest.repos.generateReleaseNotes({
-                owner, repo,
-                tag_name: tag,
-              });
-              releaseNotes = data.body;
-            } catch {
-              releaseNotes = `Release ${tag}`;
-            }
-
-            // Append CHANGELOG.md section if available
-            try {
-              const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
-              const versionHeader = new RegExp(`## \\[?${pkg.version.replace(/\./g, '\\.')}\\]?`, 'm');
-              const match = changelog.match(versionHeader);
-              if (match) {
-                const start = match.index;
-                const nextHeader = changelog.indexOf('\n## ', start + 1);
-                const section = nextHeader > -1
-                  ? changelog.slice(start, nextHeader).trim()
-                  : changelog.slice(start).trim();
-                releaseNotes = `${section}\n\n---\n\n${releaseNotes}`;
-              }
-            } catch {}
-
-            // Create GitHub Release (will trigger release.yml for Docker/Homebrew)
-            try {
-              await github.rest.repos.createRelease({
-                owner, repo,
-                tag_name: tag,
-                name: `AMC ${tag}`,
-                body: releaseNotes,
-                draft: false,
-                prerelease: false,
-              });
-              core.info(`Created GitHub Release ${tag}`);
-            } catch (e) {
-              if (e.status === 422) {
-                core.info(`Release ${tag} already exists, skipping.`);
-              } else {
-                throw e;
-              }
-            }
-
-      - name: Post-publish summary
-        if: steps.changesets.outputs.published == 'true'
-        run: |
-          VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
-          echo "## 📦 Published agent-maturity-compass@${VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- npm: https://www.npmjs.com/package/agent-maturity-compass/v/${VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "- Tag: v${VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "- Docker + Homebrew release triggered via release.yml" >> $GITHUB_STEP_SUMMARY

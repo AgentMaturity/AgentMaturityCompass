@@ -11,7 +11,7 @@ The planned commercial surface is **Industry Packs** — 41 sector-specific doma
 Everything except Industry Packs:
 
 - **Score** — full evidence-weighted trust scoring, gap analysis, maturity diagnostics
-- **Shield** — all 142 adversarial assurance packs
+- **Shield** — all <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection
@@ -19,7 +19,7 @@ Everything except Industry Packs:
 - **Fleet** — multi-agent oversight, comparison, delegation graphs
 - **Passport** — portable identity, credentials, trust portability artifacts
 - **All 16 framework adapters** — AutoGen, Claude Code, CrewAI, DeepSeek Harness, Gemini CLI, Generic CLI, Hermes Agent, LangChain for Node and Python, LangGraph, LlamaIndex, OpenAI Agents SDK, OpenClaw, OpenHands, Python AMC SDK, and Semantic Kernel. OpenAI-compatible endpoints use Generic CLI. The optional DeepSeek Harness adapter requires a reviewed, signed launcher; process capture does not prove internal tool or provider coverage.
-- **1,241 CLI command paths**
+- **1,231 CLI command paths**
 - **244 default diagnostic questions** plus the free, opt-in 20-question lifecycle expansion
 - **Browser playground**
 - **CI trust gates**

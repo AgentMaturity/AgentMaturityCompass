@@ -27,7 +27,7 @@ describe("deployment pack assets", () => {
   it("does not advertise unverified GHCR quickstart images as published", () => {
     const readme = read("README.md");
     const publishing = read("docs/PUBLISHING.md");
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(readme).not.toContain("ghcr.io/agentmaturity/amc-quickstart");
     expect(readme).toContain("docker build -t amc-quickstart");
@@ -124,7 +124,7 @@ describe("deployment pack assets", () => {
     expect(terraformVars).not.toContain("password");
     expect(terraformReadme).toContain("Do not put vault passphrases or owner passwords in `terraform.tfvars`");
 
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("Kubernetes/Helm deployment guide** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("Terraform Helm-release example exists at `deploy/terraform/helm-release/`");
     expect(audit).not.toContain("No Kubernetes Helm chart or k8s manifests.");

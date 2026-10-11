@@ -69,7 +69,7 @@ describe("pack init target directory", () => {
   });
 
   test("keeps the UX audit aligned with current pack init directory behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R7 — pack init creates a named subdirectory by default");
     expect(audit).toContain("`amc pack init --name mypack` creates `./mypack/`");

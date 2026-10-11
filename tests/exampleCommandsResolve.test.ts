@@ -68,7 +68,7 @@ describe("documented commands resolve", () => {
     "docs/GDPR_ARTICLE_COMPLIANCE.md",
     "docs/NO_CODE_GOVERNANCE.md",
     "docs/score-history.md",
-    "docs/AMC_MASTER_REFERENCE.md"
+    "docs/archive/AMC_MASTER_REFERENCE.md"
   ];
 
   /** Shell words that follow "amc" as an argument, not a subcommand. */

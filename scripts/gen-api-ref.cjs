@@ -37,7 +37,10 @@ function extractCliCommandsFromInventory() {
     const aliasCell = cells[3] || '-';
     const aliases = aliasCell === '-'
       ? []
-      : aliasCell.split(', ').map((alias) => alias.replaceAll('`', ''));
+      : aliasCell.split(', ').map((alias) => alias.replaceAll('`', ''))
+        // A one-word alias renames the last segment (`domain pack access` → `domain pack subscribe`);
+        // a multi-word alias is already a full path under an aliased parent.
+        .map((alias) => (alias.includes(' ') ? alias : [...command.split(' ').slice(0, -1), alias].join(' ')));
     commands.push({ name: command, description, options, aliases, line: commands.length + 1 });
   }
 
@@ -199,7 +202,7 @@ ${configSource}
 
 ## Assurance Packs
 
-AMC includes ${packs.length} assurance packs for comprehensive agent evaluation.
+This table lists <!-- amc:count:assurancePackFiles -->${packs.length}<!-- /amc:count --> assurance pack source files in \`src/assurance/packs/\`. Registered packs (returned by \`listAssurancePacks()\`) can differ in number; the README states the registered count.
 
 | # | Pack ID | Name | Category | Assertions |
 |---|---------|------|----------|------------|

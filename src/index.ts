@@ -2195,32 +2195,6 @@ export type {
   StabilizedScore,
 } from "./score/antiGaming.js";
 
-// ── Global Regulatory Translation (MF-10) ─
-export {
-  FEDRAMP_MODERATE_FAMILIES,
-  GLOBAL_FRAMEWORKS,
-  generateEvidencePackage,
-  classifyEuAiActRisk,
-  EU_AI_ACT_RISK_MATRIX,
-  CONSTRUCT_VALIDITY_DATA,
-} from "./compliance/globalRegulatory.js";
-export type {
-  FedRampProfile,
-  FedRampControlFamily,
-  ContinuousMonitoringConfig,
-  SspSection,
-  RegulatoryFramework,
-  RegulatoryRequirement,
-  AuditEvidencePackage,
-  AuditSection,
-  EuAiActRiskAssessment,
-  ConstructValidityReport,
-  DpiaAssessment,
-  DataFlow,
-  DpiaRisk,
-  DpiaMitigation,
-} from "./compliance/globalRegulatory.js";
-
 // ── Enterprise IAM (MF-12: Authentication & Access Control) ─
 export {
   ssoProviderSchema,

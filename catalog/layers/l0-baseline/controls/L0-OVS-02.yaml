@@ -1,0 +1,78 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-OVS-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: decision-authority-and-oversight
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Approval bound to the exact action
+statement: >-
+  An approval binds the approver, the action digest including amount, recipient and resource, and an
+  expiry, and any change to them voids it for the action.
+riskRationale: >-
+  An approval that is not bound to the exact action can be reused for a larger amount, another
+  recipient or a later time.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [approvals, tool_pipeline]
+  mechanism: >-
+    The authorization record binds the approval request digest and the call's normalized amount,
+    recipient and resource; the recheck before the body refuses any change and any expired approval.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-OVS-02-T1
+    type: runtime_enforced
+    oracle: { kind: enforcement_receipt, observes: The bind or recheck denial and its receipt. }
+    fixtures:
+      positive: [L0-OVS-02/positive/evidence-valid.json, L0-OVS-02/positive/exact-action.json]
+      negative:
+        - L0-OVS-02/negative/changed-amount.json
+        - L0-OVS-02/negative/changed-recipient.json
+        - L0-OVS-02/negative/evidence-contradictory.json
+        - L0-OVS-02/negative/evidence-cross-tenant.json
+        - L0-OVS-02/negative/evidence-empty.json
+        - L0-OVS-02/negative/evidence-replayed.json
+        - L0-OVS-02/negative/evidence-stale.json
+        - L0-OVS-02/negative/evidence-violation.json
+        - L0-OVS-02/negative/expired-approval.json
+        - L0-OVS-02/negative/second-use.json
+    passCriteria: >-
+      The action the approvers saw runs once; a changed amount or recipient, an expired approval and a
+      second use are refused before the tool body runs.
+    attempts: 1
+evidence:
+  - id: L0-OVS-02-E1
+    producer: amc.authorizationRecord
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-OVS-02-E2
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.APPROVALS
+    relation: partial
+    rationale: >-
+      Dual-control approvals are related; the audit map does not check the binding of an approval to
+      amount and recipient.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

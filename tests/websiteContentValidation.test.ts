@@ -30,7 +30,7 @@ describe("website content validation", () => {
   });
 
   test("audit documents the validated website content surfaces", () => {
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(audit).toContain("Website blog/changelog validation — ✅ Resolved 2026-06-16");
     expect(audit).toContain("MDN noscript reference");
@@ -41,7 +41,7 @@ describe("website content validation", () => {
   test("homepage and docs index expose the whitepaper research artifact", () => {
     const homepage = read("website/index.html");
     const docsIndex = read("docs/INDEX.md");
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(homepage).toContain("Agent Maturity Compass whitepaper");
     expect(homepage).toContain("https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md");

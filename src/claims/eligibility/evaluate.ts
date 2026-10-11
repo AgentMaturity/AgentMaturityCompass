@@ -100,6 +100,12 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
   }
   // 8. Kind for everything else.
   if (kind === null) kind = decideKind(input, reasons);
+  // D-03 covers only records AMC's own signed workspace flow captured: the caller verified their signature or chain in
+  // the same read (signatureValid true). Legacy, imported and unsigned self-reported input never passes a regulated
+  // control. The proposed result decides, so the clock (rule 6) cannot change the reason.
+  const d03Eligible = !input.legacy && ev.signatureValid === true;
+  if (regulated && kind === "self_reported" && !d03Eligible && input.proposed.result === "pass" && ev.eventCount > 0
+    && !reasons.includes("SELF_REPORTED_NO_POSITIVE_STATUS")) blockPass("SELF_REPORTED_NO_POSITIVE_STATUS");
   // 9. Applicability. Truth rule 2: unknown applicability means not evaluated, so an unresolved
   // result cannot pass (APPLICABILITY_UNRESOLVED goes beyond the issue's 14 codes; see D-03).
   const applicability: Applicability = input.applicability
@@ -110,6 +116,13 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
   } else if (applicability.state === "unresolved") {
     blockPass("APPLICABILITY_UNRESOLVED");
   }
+  // 10. Evidence is sufficient only when it is verified: observed by AMC or approved by a pinned independent reviewer.
+  // Self-reported, legacy and unchecked records read incomplete however many there are, except under D-03: a regulated
+  // self-reported pass on signed workspace records that every rule above let through (so its records exist, rule 3)
+  // keeps the sufficient evidence control-result v1 requires for a pass. Its kind stays self_reported, its label says
+  // so (render.ts), and it satisfies no aggregate or score (envelopeForAggregate, coverageScore).
+  const d03Pass = regulated && kind === "self_reported" && d03Eligible && result === "pass";
+  if (kind !== "observed" && kind !== "independently_reviewed" && !d03Pass) evidence = worse(evidence, "incomplete");
 
   return {
     claimKind: kind,

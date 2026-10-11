@@ -2,7 +2,7 @@
 
 Use this reference to find exported functions, classes, types and their source locations. It is generated from AMC's TypeScript source. An exported toolkit is available to an embedding application; its presence does not establish that AMC enables it in a running deployment.
 
-In the staged documentation site, [open the generated package reference](../api/). For a local source checkout, build it with the commands below.
+The generated reference is not part of the published documentation site: it has not been reviewed (D-12). Build it from a local source checkout with the commands below.
 
 | Package import | Source entry | Purpose |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ pnpm docs:api
 
 Open `tmp/api-reference/index.html`. Search and the module list lead to the public entry points. `reflection.json` contains the generated declarations for tools that inspect the reference. TypeDoc checks TypeScript before emitting documentation; compiler errors are not hidden by this configuration. Warnings should be reviewed alongside the generated output.
 
-`pnpm build:pages` includes the reference at `tmp/pages-site/api/index.html`, alongside the existing guides. An explicit staging directory passed with `--out` receives the reference in its own `api/` directory. The Pages workflow builds this artifact from its checked-out commit. Source/configuration/dependency changes trigger the same workflow when integrated into its configured branch; building locally does not publish anything.
+`pnpm build:pages` leaves the reference out. With `AMC_PAGES_API_REFERENCE=1` it adds it at `tmp/pages-site/api/index.html`, beside the guides, and an explicit staging directory passed with `--out` receives it in its own `api/` directory; no page links to it. The Pages workflow builds this artifact from its checked-out commit. Source/configuration/dependency changes trigger the same workflow when integrated into its configured branch; building locally does not publish anything.
 
 Generated HTML stays outside source directories. During shared-checkout work, generate in an isolated candidate clone and retain the exact commit and environment with the output receipt. Do not generate from someone else's uncommitted edits or treat a generated file count as executed-test evidence.
 

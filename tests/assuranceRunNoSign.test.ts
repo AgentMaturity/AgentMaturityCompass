@@ -113,7 +113,7 @@ describe("assurance run --all --no-sign", () => {
   });
 
   test("keeps the UX audit aligned with the current no-sign assurance behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R2 — assurance run --all --no-sign runs unsigned");
     expect(audit).toContain("Signed assurance artifacts still require vault setup");
@@ -127,14 +127,15 @@ describe("assurance run --all --no-sign", () => {
 
   test("documents signed certificate walkthrough and threshold tuning", () => {
     const docs = readFileSync(resolve(process.cwd(), "docs/ASSURANCE_LAB.md"), "utf8");
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(docs).toContain("## Signed Certificate Walkthrough");
     expect(docs).toContain("amc setup");
     expect(docs).toContain("amc assurance run --demo --no-sign");
     expect(docs).toContain("amc assurance run --demo");
-    expect(docs).toContain("amc assurance cert issue --run <runId>");
-    expect(docs).toContain("amc assurance cert verify .amc/assurance/certificates/latest.amccert");
+    // P0-28: the registered commands are cert-issue and cert-verify; "cert issue" was never registered.
+    expect(docs).toContain("amc assurance cert-issue --run <runId>");
+    expect(docs).toContain("amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>");
     expect(docs).toContain("## Policy Threshold Tuning");
     expect(docs).toContain("minRiskAssuranceScore");
     expect(docs).toContain("maxCriticalFindings");

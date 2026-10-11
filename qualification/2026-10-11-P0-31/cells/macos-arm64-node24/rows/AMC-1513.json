@@ -1,0 +1,65 @@
+{
+  "schema": "p031-installed-rows/v1",
+  "startedAt": "2026-10-11T10:44:51.846Z",
+  "node": "v24.21.0",
+  "npm": "11.19.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "osRelease": "25.6.0",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "harnessSha256": {
+    "run-rows.mjs": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768",
+    "fixtures.mjs": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd",
+    "mcp-stdio-fixture.mjs": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc",
+    "chat-pty.py": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+  },
+  "row": "AMC-1513",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "write-outside-workspace-denied",
+      "ok": true,
+      "exit": 0,
+      "outsideExists": false,
+      "toolResult": "{\"isError\":true,\"output\":\"[amc] guard denied: tool allowlist: path '../../../outside-0433f1d6-2a5c-4ab0-8698-2a6f81df49af.txt' not in allowlist\",\"type\":\"amc.tool-result\",\"version\":1}"
+    },
+    {
+      "name": "control-write-inside-scope-succeeds",
+      "ok": true,
+      "exit": 0,
+      "toolResult": "{\"isError\":false,\"output\":\"wrote workspace/output/inside.txt\",\"type\":\"amc.tool-result\",\"version\":1}"
+    },
+    {
+      "name": "cancel-mid-command-kills-process-tree",
+      "ok": true,
+      "exit": 0,
+      "ending": {
+        "turn": 1,
+        "reason": "cancelled",
+        "cancelCause": "user",
+        "interrupted": false
+      },
+      "processesSeenDuringRun": 2,
+      "processesLeft": 0,
+      "confinement": {
+        "platform": "darwin",
+        "backend": "seatbelt",
+        "confined": true,
+        "enforcementLevel": "enforced",
+        "cancelled": true,
+        "treeExitProven": true,
+        "failure": null
+      }
+    }
+  ],
+  "offered": [
+    "amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs",
+    "amc_fs_write_srNmByKKV4TSi_UN1awn9eVmuohbuYh6JCUhhD57jRk",
+    "amc_fs_edit_6yaxdbXeGDhm1vhpXZEr8udb3OrSk6uZM9HpEmNXoGg",
+    "glob",
+    "grep",
+    "bash"
+  ],
+  "durationMs": 13027
+}

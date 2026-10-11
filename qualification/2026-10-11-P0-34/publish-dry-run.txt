@@ -1,0 +1,9 @@
+npm notice name: agent-maturity-compass
+npm notice version: 2.0.0
+npm notice filename: agent-maturity-compass-2.0.0.tgz
+npm notice package size: 8.0 MB
+npm notice unpacked size: 34.3 MB
+npm notice shasum: cbdaed80d1be796e0a475e92dda03cb211a4bcca
+npm notice integrity: sha512-IEaIo98ybx/51[...]Q629qdOrui9mA==
+npm notice total files: 4548
+npm notice Publishing to https://registry.npmjs.org/ with tag latest and default access (dry-run)

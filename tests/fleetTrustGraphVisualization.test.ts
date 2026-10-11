@@ -162,7 +162,7 @@ describe("fleet trust graph visualization", () => {
   });
 
   test("keeps the UX audit aligned with trust graph visualization", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R19 — trust graph visualization is available");
     expect(audit).toContain("`amc fleet trust-graph` renders Mermaid by default");

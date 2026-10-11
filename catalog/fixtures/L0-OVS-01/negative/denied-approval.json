@@ -1,0 +1,35 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-OVS-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "bound_approval",
+    "tool": "fixture.pay",
+    "actionClass": "FINANCIAL",
+    "approved": {
+      "amount": "100.00",
+      "currency": "USD",
+      "recipient": "acct-123"
+    },
+    "call": {
+      "amount": "100.00",
+      "currency": "USD",
+      "recipient": "acct-123"
+    },
+    "approvers": [
+      {
+        "userId": "approver-1",
+        "roles": [
+          "OWNER"
+        ],
+        "decision": "DENIED"
+      }
+    ],
+    "scenario": "approved"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "authorization_denied:approval_not_granted"
+  }
+}

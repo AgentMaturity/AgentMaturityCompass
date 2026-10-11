@@ -101,7 +101,7 @@ describe("pack publish destination UX", () => {
   });
 
   test("keeps the UX audit aligned with pack publish destination behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R17 — pack publish destination and registry upload are explicit");
     expect(audit).toContain("R35 — community registry governance and moderation gates are explicit");

@@ -339,6 +339,17 @@ function planActivation(workspace: string, profile: OperatingProfile, agentId: s
 }
 
 /**
+ * Read-only: the widenings activation would refuse and the sha256 of each config it would write, for a profile that
+ * need not be signed (A4's Adapt dry-runs an in-memory one). No write closure leaves this module, so nothing reached
+ * through it writes or signs a config; activation keeps every gate of activateOperatingProfile.
+ */
+export function planActivationWidenings(workspace: string, profile: OperatingProfile, agentId: string): {
+  widenings: string[]; configs: Array<{ config: SignedConfigName; sha256: string | null }> } {
+  const { planned, widenings } = planActivation(workspace, profile, agentId);
+  return { widenings, configs: planned.map((entry) => ({ config: entry.config, sha256: entry.bytes === null ? null : sha256Hex(Buffer.from(entry.bytes, "utf8")) })) };
+}
+
+/**
  * Activates a signed, reviewed operating profile into the six signed configs under `.amc/`.
  * Blocked in agent mode. Refuses an unsigned, edited, foreign-signed or inconsistent profile,
  * a profile for another agent, and (unless `allowWidening`) any change that weakens the current

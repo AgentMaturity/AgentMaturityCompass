@@ -199,7 +199,7 @@ describe("score industry-adjust current score fallback", () => {
   });
 
   test("keeps the UX audit aligned with current score auto-read behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R9 — industry-adjust auto-reads the latest agent score");
     expect(audit).toContain("`amc score industry-adjust --industry healthcare` reuses the latest scored run");

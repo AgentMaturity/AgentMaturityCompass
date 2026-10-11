@@ -81,6 +81,7 @@ import { approvalServices, APPROVAL_SEAM } from "./services/approvalServices.js"
 import type { ApprovalSeamService } from "./services/approvalServices.js";
 import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices.js";
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
+import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -412,6 +413,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approvalClass: options.approvalGate.actionClass });
   }
   if (options.delegation !== undefined) {
+    // An in-process child opens a second session writer; a foreign runner's process opens none here.
+    if (options.delegation.runner === undefined) assertSecondSessionWriter(options.workspace, "In-process delegation");
     const parsed = parseSubagentStopConditions(options.delegation.stopConditions);
     if (!parsed.ok) throw new Error(`Delegation stop conditions: ${parsed.reason}`);
     // Pin the operator's declaration before asynchronous composition or provider

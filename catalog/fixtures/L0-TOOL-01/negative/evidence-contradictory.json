@@ -1,0 +1,103 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-01",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-TOOL-01-toolPipeline-guard-1"
+        },
+        "producerId": "amc.toolPipeline.guard",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.toolPipeline.guard",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-TOOL-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-TOOL-01-toolPipeline-guard-1-receipt",
+          "observationKey": "L0-TOOL-01-observation-1",
+          "observation": "allow"
+        }
+      },
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-TOOL-01-toolPipeline-guard-2"
+        },
+        "producerId": "amc.toolPipeline.guard",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.toolPipeline.guard",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-TOOL-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-TOOL-01-toolPipeline-guard-2-receipt",
+          "observationKey": "L0-TOOL-01-observation-1",
+          "observation": "deny"
+        }
+      },
+      {
+        "ref": {
+          "kind": "signed_config",
+          "id": "L0-TOOL-01-signedConfig-tools-3"
+        },
+        "producerId": "amc.signedConfig.tools",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.signedConfig.tools",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "controlId": "L0-TOOL-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-TOOL-01-signedConfig-tools-3-receipt",
+          "observationKey": "L0-TOOL-01-observation-3",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "contradictory"
+  }
+}

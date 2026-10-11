@@ -177,7 +177,7 @@ describe("observe API routes", () => {
     const apiIndex = readFileSync(resolve(process.cwd(), "src/api/index.ts"), "utf8");
     const surfaces = readFileSync(resolve(process.cwd(), "docs/API_SURFACES.md"), "utf8");
     const openapi = readFileSync(resolve(process.cwd(), "website/openapi.yaml"), "utf8");
-    const audit = readFileSync(resolve(process.cwd(), "docs/AUDIT_50_AGENTS_BATCH5.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/AUDIT_50_AGENTS_BATCH5.md"), "utf8");
 
     expect(apiIndex).toContain("handleObserveRoute");
     expect(apiIndex).toContain("id: 'observe'");

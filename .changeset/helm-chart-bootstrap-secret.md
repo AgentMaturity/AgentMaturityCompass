@@ -2,7 +2,7 @@
 "agent-maturity-compass": major
 ---
 
-Deployment pack hardening (P0-14, slices S1 and S2). Breaking for Helm chart users: chart `deploy/helm/amc` is now 0.2.0 (appVersion 1.2.0).
+Deployment pack hardening (P0-14, slices S1 and S2). Breaking for Helm chart users: chart `deploy/helm/amc` is now 0.2.0 (its appVersion follows the package version).
 
 - The chart renders no Secret by default. Create the `amc-bootstrap` Secret before `helm install`, or the Studio pod cannot start. Chart 0.1.0 always rendered that Secret with published `change-me-*` values. With `bootstrap.createSecret=true` the chart renders it from `bootstrap.values`: all five values are required, a value that starts with `change-me` (any case) is refused by the template and by `values.schema.json`, and the Secret carries `helm.sh/resource-policy: keep`.
 - `replicaCount` other than 1 is refused (the workspace has a single writer), and the rollout strategy is `Recreate`. `image.digest` renders `repository@digest`; `image.requireDigest=true` refuses to render without a digest.

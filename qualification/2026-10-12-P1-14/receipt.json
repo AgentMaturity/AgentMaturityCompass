@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-14",
+  "date": "2026-10-12",
+  "commit": "1d04929017c12a2b09b786b6a6c649bde268f254",
+  "branch": "rtd/p1-14-layer0-baseline",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 30799
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 24988
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 34074
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 2945
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 556
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 465
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 1796
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1717
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 323
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 645
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 205
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 234
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 371
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 180325
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 843
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3931
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 305
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/l0/",
+      "exit": 0,
+      "durationMs": 12078
+    },
+    {
+      "cmd": "npx vitest run tests/genCountsSemantics.test.ts tests/publicStatsDrift.test.ts tests/docsTruthReset.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/sourceQualityRatchet.test.ts tests/claims/d03Gates.test.ts tests/checkPackContents.test.ts",
+      "exit": 0,
+      "durationMs": 4450
+    },
+    {
+      "cmd": "npx vitest run --reporter=json (full suite, at d7f18660f)",
+      "exit": 1,
+      "durationMs": 832000
+    },
+    {
+      "cmd": "npm run -s check:packed-install",
+      "exit": 0,
+      "durationMs": 58000
+    }
+  ],
+  "tests": {
+    "total": 23878,
+    "passed": 23846,
+    "failed": 32,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "counts.json",
+      "sha256": "195310a80c5406afd43f67cf79ea9a85a3fd70f5273508b0c3e8bdb4458d7ae5"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "f962857b6f58011b1d8e81a03b41581bd9d94f37225af24155e2482656b90401"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "f435e2d0098006440393a4432a46a1cec8ffa82b79cdd1510cc58fe1c502aec0"
+    }
+  ],
+  "notes": "Layer 0 Agent Control Baseline v0.1. counts.json: 47 controls, 17 with an executed test against a real enforcement point (most partial; docs/catalog/LAYER0.md), 30 waiting for a producer, 338 negative fixtures run with 0 passes. mutations.txt: the mutation checks. checks.json: each check's exit and tail. Full suite at d7f18660f (the last commit after it changes one rationale sentence and two review packets only): 32 failures in 12 files, none from P1-14. Five files are in the int baseline (credentialsLocalStore, jsonlWriterResume, llmResponsesCapabilities, privateModuleHelperVisibility, compliance/dataResidencyPersistence). Five pass when run alone (gatewayAndSupervise, leaseRevocationConsumers, releaseEngineeringPack, studioVaultModeLoop, performance/sessionSpine). publicDocsArtifact needs .git as a directory (git worktree; followups.md). publicTaskTransport fails the same 2 tests on a pristine git archive of int. Local run on macOS arm64, not CI. No network: no citation was fetched."
+}

@@ -121,7 +121,7 @@ describe("public leaderboard export", () => {
     const source = readFileSync(join(process.cwd(), "src/cli-business-commands.ts"), "utf8");
     const inventory = readFileSync(join(process.cwd(), "docs/CLI_COMMAND_INVENTORY.md"), "utf8");
     const apiReference = readFileSync(join(process.cwd(), "docs/API_REFERENCE.md"), "utf8");
-    const audit = readFileSync(join(process.cwd(), "docs/AUDIT_50_AGENTS_BATCH5.md"), "utf8");
+    const audit = readFileSync(join(process.cwd(), "docs/archive/AUDIT_50_AGENTS_BATCH5.md"), "utf8");
 
     expect(source).toContain('.command("public-export")');
     expect(source).toContain("Build an anonymized public leaderboard dataset bundle");

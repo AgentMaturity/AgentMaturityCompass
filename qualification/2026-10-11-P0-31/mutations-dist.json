@@ -1,0 +1,104 @@
+{
+  "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b",
+  "note": "dist mutated in place, restored byte-for-byte after each run",
+  "results": [
+    {
+      "id": "1541-turn-archived-code",
+      "oldIssue": "AMC-1541",
+      "file": "dist/studio/nativeTaskService.js",
+      "find": "d.archivedAt !== undefined ? \"TASK_ARCHIVED\" : \"TURN_BUSY\"",
+      "replace": "\"TURN_BUSY\"",
+      "test": "tests/studioNativeTaskArchiveNegatives.test.ts",
+      "exit": 1,
+      "outcome": "killed",
+      "failingTests": [
+        "a turn sent to an archived task is refused with 409 TASK_ARCHIVED and records nothing"
+      ],
+      "totals": {
+        "numTotalTests": 3,
+        "numPassedTests": 2,
+        "numFailedTests": 1
+      },
+      "seconds": 24
+    },
+    {
+      "id": "1541-archive-not-closed",
+      "oldIssue": "AMC-1541",
+      "file": "dist/studio/nativeTaskService.js",
+      "find": "if (!projection.closed)",
+      "replace": "if (false)",
+      "test": "tests/studioNativeTaskArchiveNegatives.test.ts",
+      "exit": 1,
+      "outcome": "killed",
+      "failingTests": [
+        "archiving an open task is refused with 409 while its runtime is live and after release"
+      ],
+      "totals": {
+        "numTotalTests": 3,
+        "numPassedTests": 2,
+        "numFailedTests": 1
+      },
+      "seconds": 17
+    },
+    {
+      "id": "1541-archive-busy",
+      "oldIssue": "AMC-1541",
+      "file": "dist/studio/nativeTaskService.js",
+      "find": "if (entry.client || entry.session || entry.preparation || entry.turn || entry.work || entry.finishing\n                    || [\"starting\", \"running\", \"cancel-requested\", \"releasing\", \"verifying\"].includes(entry.state))\n                    throw new NativeTaskServiceError(\"ARCHIVE_BUSY\"",
+      "replace": "if (false)\n                    throw new NativeTaskServiceError(\"ARCHIVE_BUSY\"",
+      "test": "tests/studioNativeTaskArchiveNegatives.test.ts",
+      "exit": 1,
+      "outcome": "killed",
+      "failingTests": [
+        "archiving an open task is refused with 409 while its runtime is live and after release"
+      ],
+      "totals": {
+        "numTotalTests": 3,
+        "numPassedTests": 2,
+        "numFailedTests": 1
+      },
+      "seconds": 16
+    },
+    {
+      "id": "1541-owner-check",
+      "oldIssue": "AMC-1541",
+      "file": "dist/studio/nativeTaskService.js",
+      "find": "assertOwner(actor, d);",
+      "replace": "void actor;",
+      "test": "tests/studioNativeTaskArchiveNegatives.test.ts",
+      "exit": 1,
+      "outcome": "killed",
+      "failingTests": [
+        "archiving a task owned by another agent or principal is refused as not found and changes nothing"
+      ],
+      "totals": {
+        "numTotalTests": 3,
+        "numPassedTests": 2,
+        "numFailedTests": 1
+      },
+      "seconds": 13
+    },
+    {
+      "id": "1511-reconcile-closed-client",
+      "oldIssue": "AMC-1511",
+      "file": "dist/studio/nativeTaskService.js",
+      "find": "if (entry.client?.processClosed !== true",
+      "replace": "if (true || entry.client?.processClosed !== true",
+      "test": "tests/nativeManagedRecovery.test.ts",
+      "exit": 1,
+      "outcome": "killed",
+      "failingTests": [
+        "same Studio explicitly reattaches a dead sqlite writer without restarting or replaying",
+        "same Studio explicitly reattaches a dead jsonl writer without restarting or replaying",
+        "reattached sqlite native controller retains approval quorum, accounting and validation pins",
+        "reattached jsonl native controller retains approval quorum, accounting and validation pins"
+      ],
+      "totals": {
+        "numTotalTests": 5,
+        "numPassedTests": 1,
+        "numFailedTests": 4
+      },
+      "seconds": 74
+    }
+  ]
+}

@@ -2717,7 +2717,7 @@ const seeds: QuestionSeed[] = [
   },
 
   // ── 2026 Research-Derived Questions ──────────────────────────────────
-  // Source: RESEARCH_PAPERS_2026.md gap analysis
+  // Source: docs/archive/RESEARCH_PAPERS_2026.md gap analysis (an archived working paper; no current doc replaces it)
 
   {
     id: "AMC-TAS-1",

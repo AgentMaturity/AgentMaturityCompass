@@ -7,6 +7,8 @@
 **Depends on:** AMC Standard RFC v1.0  
 **Repository:** https://github.com/AgentMaturity/AgentMaturityCompass  
 
+> **Implementation status (2026-10-11):** this is a design proposal, and only parts of it exist. `issueTrustToken` and `verifyTrustToken` (`src/passport/trustInterchange.ts`, exported from the `agent-maturity-compass` package root) sign and check an HMAC-SHA256 under a shared secret. A shared-secret HMAC proves only that a holder of the secret wrote the token and names no signer, so `amc passport verify-token` never reports a token as trusted. The trust-graph math (`src/score/crossAgentTrust.ts`) is served at `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`, and `amc fleet trust-graph` renders a fleet's delegation graph. Passages marked *design, not implemented* describe code that does not exist.
+
 ---
 
 ## Abstract
@@ -568,6 +570,8 @@ INDUSTRY_DECAY_PRESETS.general = {
 
 **Node.js (TypeScript)**
 
+*Design, not implemented as shown:* `verifyTrustToken` is exported from the package root (`import { verifyTrustToken } from 'agent-maturity-compass'`), but `amc/score/crossAgentTrust` and `amc/passport/trustInterchange` are not package paths, and a shared secret cannot establish trust between separate organizations.
+
 ```typescript
 import { createAgentClaim, verifyAgentClaim } from 'amc/score/crossAgentTrust';
 import { issueTrustToken, verifyTrustToken } from 'amc/passport/trustInterchange';
@@ -595,6 +599,8 @@ async function delegateToSubAgent(subAgentId: string, task: string) {
 ```
 
 **Python (via AMC Python SDK)**
+
+*Design, not implemented:* the Python SDK (`sdk/python`, package `amc_sdk`) has no `TrustClient` or `TrustPolicy`. The same holds for the CrewAI and AutoGen examples below.
 
 ```python
 from amc import TrustClient, TrustPolicy
@@ -674,6 +680,8 @@ worker = create_trust_checked_agent("worker", "...", min_level="L2")
 
 ### 7.4 Direct AMC SDK Usage
 
+These functions exist in `src/score/crossAgentTrust.ts`. They are not exported from the package, so the import below works only inside the AMC repository; outside it, call `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`.
+
 ```typescript
 import {
   createAgentClaim,
@@ -727,27 +735,20 @@ const decayedScore = applyTemporalDecay(
 ### 7.5 CLI Reference
 
 ```bash
-# Issue a trust token for an agent
-amc passport create --agent my-agent --ttl 24h
+# Issue a trust token for an agent. The CLI prints token metadata only, and it signs with a
+# fixed demo secret over zero-score claims, so its tokens are examples, never evidence.
+amc passport issue-token --agent my-agent --ttl 24
 
-# Verify another agent's trust token
-amc passport verify --token ./agent-b-token.json
+# Check a token's HMAC, expiry and claim bounds; the report never marks a token trusted
+amc passport verify-token '<token JSON>'
 
-# Check agent identity claim
-amc identity verify --agent agent-b --workspace prod-workspace
-
-# Refresh an expiring identity claim
-amc identity refresh --agent my-agent
-
-# View trust graph
-amc trust graph --show
-
-# Compute transitive trust
-amc trust transitive --from agent-a --to agent-c --max-hops 3
-
-# Apply industry preset
-amc trust decay --preset healthcare --score 80 --age 6h
+# Render the fleet's delegation trust graph
+amc fleet trust-graph --format mermaid
 ```
+
+Transitive trust and temporal decay are API routes, not CLI commands: `POST /api/v1/score/trust/transitive` and `POST /api/v1/score/trust/decay`.
+
+*Design, not implemented:* agent identity claims (verifying or refreshing another agent's identity claim from the CLI). `amc identity verify` checks only the signature of the host's `identity.yaml`, and there is no `amc identity refresh`.
 
 ---
 

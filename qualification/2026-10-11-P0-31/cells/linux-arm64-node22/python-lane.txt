@@ -1,0 +1,40 @@
+== python Python 3.11.2
+== build venv
+packaging==26.3
+== runner venv
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+pytest==9.1.1
+== consumer venv
+amc-sdk @ file:///work/python/wheel/amc_sdk-0.2.0-py3-none-any.whl
+== wheel
+f1768eb1ae15e43fc3f3970fe7ca81e7567e903562f9ad204c5f9d4b09d5634d  wheel/amc_sdk-0.2.0-py3-none-any.whl
+.....................s                                                   [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[not-requested]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[pending]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[passed]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[failed]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[unavailable]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result0]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result1]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result2]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result3]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[None]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[True]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid2]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid3]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid4]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid5]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid6]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid7]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid8]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid9]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid10]
+PASSED ../src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid11]
+SKIPPED [1] ../src/sdk/python/tests/test_validation_installed.py:224: native signed fixtures not supplied; wire checks do not replace installed native acceptance
+21 passed, 1 skipped in 1.22s
+exit 0 duration 23s

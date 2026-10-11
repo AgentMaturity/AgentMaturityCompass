@@ -54,23 +54,25 @@ New Watch indexes use `schemaVersion: "2026-09-08"`. Their entry `timestamp` and
 
 `IngestionStats.avgLatencyMs` is now `number | null`: it averages finite, nonnegative measured durations over the pipeline lifetime. Unknown/invalid values are excluded; a real zero is included. Scoring skips and buffer eviction do not alter the sample history. `clear()` resets it to unknown. Consumers should display null event times and latency as “unknown”. Generic import mapping and its existing fallbacks are unchanged by this Pi correction.
 
-## Path 2 — Wrap your agent command (5 minutes, configured capture)
+## Path 2 — Run your agent command through an adapter (5 minutes, configured capture)
 
-Let AMC watch a real run through configured process, proxy, and tool capture paths. Activity those paths actually capture can carry observed provenance; activity outside their coverage remains unknown:
+Let AMC watch a real run through configured process, proxy, and tool capture paths. `amc adapters run` mints a lease and routes model traffic through the gateway. Activity those paths actually capture can carry observed provenance; activity outside their coverage remains unknown:
 
 ```bash
-amc wrap <runtime> -- <your-agent-command>
+amc adapters run --agent my-agent --adapter <adapter-id> -- <your-agent-command>
 # examples
-amc wrap claude -- claude -p "triage the open issues"
-amc wrap any -- python my_agent.py
+amc adapters run --agent my-agent --adapter claude-cli -- claude -p "triage the open issues"
+amc adapters run --agent my-agent --adapter generic-cli -- python my_agent.py
 ```
 
-Or run through a framework adapter with a leased gateway route (15 built-ins — LangChain, CrewAI, AutoGen, Claude Code, Gemini, OpenClaw, Hermes, and more):
+The built-in adapters cover LangChain, CrewAI, AutoGen, Claude Code, Gemini, OpenClaw, Hermes and more; `amc adapters list` names them:
 
 ```bash
 amc adapters detect
 amc adapters run --agent my-agent --adapter hermes-cli -- hermes -z "summarize this repo"
 ```
+
+`amc wrap` still runs but is deprecated; use `amc adapters run`.
 
 ## Path 3 — Stream from your observability stack (continuous, source-qualified telemetry)
 

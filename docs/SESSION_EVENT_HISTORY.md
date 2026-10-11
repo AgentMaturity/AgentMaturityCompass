@@ -37,6 +37,14 @@ present. The reader creates no workspace, marker, keys, writer lock or evidence.
 Filesystem aliases of the selected workspace resolve to the same directory;
 links within the evidence and trust paths are refused.
 
+A JSONL workspace admits one session writer at a time, even within one process.
+Anything that would open a second writer refuses up front, before opening
+anything, with `SESSION_STORE_SINGLE_WRITER`: `amc agent-loop run --delegate`
+with in-process delegates, and a second ACP `session/new`, `session/load` or
+`session/fork` while another session is open on the connection (ACP error
+`-32602`, `data.reason`; the native SDK raises it as `AMCNativeRefusedError`).
+Use the default SQLite store for delegation or several sessions per process.
+
 ## What is verified
 
 Every load authenticates **all available events in the selected store before

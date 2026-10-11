@@ -62,6 +62,23 @@ function cliCommandPaths() {
   return paths.length;
 }
 
+/**
+ * Layer 0 catalog counts (P1-14): its controls, the controls with at least one fixture an executed harness runs against
+ * a real enforcement point (any `setup.harness` other than "evidence"), and the rest, which wait for a producer.
+ * tests/catalog/l0/fixtureCoverage.test.ts proves every such harness has a test file that runs it. Reads dist/.
+ */
+async function layer0Counts() {
+  const built = join(root, "dist", "catalog", "loader.js");
+  if (!existsSync(built) || !existsSync(join(root, "catalog"))) return null;
+  const { loadCatalog } = await import(built);
+  const cat = loadCatalog({ root: join(root, "catalog") });
+  const controls = [...cat.controls.values()].filter((c) => c.layer === 0);
+  const harnessOf = (ref) => cat.fixtures.get(ref)?.envelope?.setup?.harness;
+  const executed = controls.filter((c) => c.tests.some((t) => [...t.fixtures.positive, ...t.fixtures.negative]
+    .some((ref) => typeof harnessOf(ref) === "string" && harnessOf(ref) !== "evidence")));
+  return { controls: controls.length, executed: executed.length, awaiting: controls.length - executed.length };
+}
+
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
   // Retained for inventory consumers: lexical matches, not discovered cases
@@ -73,6 +90,7 @@ export async function collectCounts() {
     }, 0);
 
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  const layer0 = await layer0Counts();
 
   return {
     adapters: countFiles("src/adapters/builtins", isTs),
@@ -89,6 +107,9 @@ export async function collectCounts() {
     })(),
     testFiles,
     testBlocks,
+    layer0Controls: layer0?.controls ?? null,
+    layer0ExecutedControls: layer0?.executed ?? null,
+    layer0AwaitingProducer: layer0?.awaiting ?? null,
     testBlocksMethodology: "Regex matches for direct it()/test() calls in tests/**/*.test.ts; may include comments and omit parameterized or generated cases. Not executed tests or passing results.",
     version: pkg.version,
     license: pkg.license
@@ -132,6 +153,17 @@ const PUBLIC_SURFACES = new Set([
   "docs/internal/competitive-landscape.md",
   "docs/internal/mirofish-simulation-council.md",
   "whitepaper/AMC_WHITEPAPER_v1.md",
+  // P0-28: every surface that states an assurance-pack count carries a marker.
+  "docs/EXECUTIVE_OVERVIEW.md",
+  "docs/RELEASE_HIGHLIGHTS.md",
+  "website/executive.html",
+  "website/methodology.html",
+  "website/playground.html",
+  "website/vs-promptfoo.html",
+  "website/docs/compliance.html",
+  "website/blog/langchain-scoring-tutorial.html",
+  // P1-14: the Layer 0 baseline's control totals.
+  "docs/catalog/LAYER0.md",
   ...CLI_COUNT_SURFACES
 ]);
 const failures = [];

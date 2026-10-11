@@ -1,0 +1,19 @@
+packed-install check of agent-maturity-compass@1.2.0 in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-packed-install-E5KLKA
+note: checking the given tarball /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/rc.tgz; nothing is built or packed
+ok   npm install <tarball> (fresh dir, empty HOME) (7.5s)
+ok   @amc/core is not resolvable from the consumer directory
+ok   installed standalone production API (no dev dependencies) (1.5s)
+ok   installed control catalog loads with loadCatalog() and validates (0.2s)
+ok   amc doctor (2.8s)
+ok   amc init (isolated workspace) (1.2s)
+ok   amc composition (installed kernel, no private packages) (0.8s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW unset) (1.0s)
+ok   amc mcp list-tools --json (AMC_A4_PREVIEW 1) (1.1s)
+ok   installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview (0.6s)
+ok   A4 preview gate: 0 amc_a4_* tools without it, 5 with it
+ok   amc agent-loop run (stub provider, keyless) (1.3s)
+ok   amc session verify --json (1.0s)
+ok   amc agent-loop verify --json (0.9s)
+ok   installed evidence and request reconstruction
+skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)
+exit 0 duration 21s

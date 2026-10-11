@@ -1,0 +1,13 @@
+# P0-62 diagnosis of the Studio scenario failure 'Evidence unavailable' (branch tarball + one line in dist/studio/nativeTaskService.js refresh() catch appending the error to /tmp/p062diag.log; tarball de62045b…, local scratch only)
+# Run under VM CPU stress (4 busy loops in a separate container); lane result: exit 1; the only projection error in the run:
+2026-10-11T15:41:05.964Z P062DIAG projection af91f4b5-75b4-4124-8f62-5167fb63f793 SessionHistoryRefused: CHANGED: History or trust changed during loading; quiesce writers and explicitly load a new snapshot.
+    at historyRefuse (dist/session/sessionHistoryReader.js:13:11)
+    at Object.assertUnchanged (dist/session/sessionHistoryReader.js:123:21)
+    at loadSessionEventHistory (dist/session/sessionEventHistory.js:122:16)
+    at readNativeTaskProjection (dist/studio/nativeTaskProjection.js:74:21)
+    at refresh (dist/studio/nativeTaskService.js:214:32)
+    at view (dist/studio/nativeTaskService.js:249:9)
+    at Object.poll (dist/studio/nativeTaskService.js:593:56)
+    at Object.handleNativeTasksRoute [as handler] (dist/api/nativeTasksRouter.js:128:50)
+    at handleApiRoute (dist/api/index.js:477:41)
+    at handleStudioApiDelegation (dist/studio/apiDelegation.js:81:12)

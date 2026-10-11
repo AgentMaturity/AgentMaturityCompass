@@ -1,0 +1,696 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-26",
+  "source": {
+    "f5": {
+      "what": "F5 editorial review of the station-pack questions: per-station JSON outputs, the 30 questions whose verdict is drop",
+      "generatedAt": "2026-10-03T16:49Z",
+      "sourceCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "location": "untracked program research folder on the maintainer's workstation; not in any commit, so the facts needed are copied here",
+      "copiedAt": "2026-10-11"
+    },
+    "metaReview": {
+      "what": "independent AI meta-review of a stratified sample of F5 verdicts (sample.items where F5verdict is drop)",
+      "reviewer": "Fable 5.1 meta-review",
+      "generatedAt": "2026-10-04",
+      "sampleSize": 60,
+      "sampledDrops": 8,
+      "agreedDrops": 8,
+      "method": "stratified by station (proportional) and verdict (keep 35%/rewrite 35%/merge 18%/drop 12%), seed 20261004, README-named citation questions prioritised within strata"
+    },
+    "candidate": {
+      "branch": "amc/regulated-platform-20261003",
+      "head": "37c1466b",
+      "note": "candidateRemovedBy is the apply commit that removed the id (present in its parent, absent after it); every id is absent at 37c1466b"
+    }
+  },
+  "agentRecommendation": {
+    "by": "Claude Opus 5.5, P0-26 implementing agent",
+    "date": "2026-10-11",
+    "status": "AI draft recommendation for Sid's review; not a decision and not reviewed by a qualified expert"
+  },
+  "items": [
+    {
+      "id": "EDU-HE-3",
+      "station": "education",
+      "packId": "higher-education",
+      "dimension": "Compliance",
+      "weight": 10,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Regional Accreditation Standards; Bologna Process QF-EHEA",
+        "packQuestionCount": 15,
+        "issues": [
+          "\"Regional Accreditation Standards\" is not a citable instrument; accreditation compliance is institutional, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4f54445a1fe637a58c436b0acbe5ad9390e4d011",
+      "agentRecommendation": {
+        "recommendation": "defer",
+        "rationale": "The concern (AI curriculum changes and accreditation) is real outside AACSB schools, which EDU-HE-13 alone covers; the defect is the uncitable reference, so send it to the citation pass (P0-24/expert) before deciding."
+      }
+    },
+    {
+      "id": "EDU-SE-11",
+      "station": "education",
+      "packId": "specialized-education",
+      "dimension": "Governance",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "UNESCO Seoul Agenda (2010) - Goal 2",
+        "packQuestionCount": 15,
+        "issues": [
+          "capacity-building for arts education is a programme activity, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4f54445a1fe637a58c436b0acbe5ad9390e4d011",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Arts-education capacity building is a programme activity under a non-binding agenda, not agent behaviour; EDU-SE-1 keeps the Seoul Agenda anchor (Goal 3)."
+      }
+    },
+    {
+      "id": "EDU-SE-13",
+      "station": "education",
+      "packId": "specialized-education",
+      "dimension": "Transparency",
+      "weight": 10,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "ISTE Standards (2023) - 1b",
+        "packQuestionCount": 15,
+        "issues": [
+          "educator professional-learning networks are not an agent control; ISTE 1b non-binding"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4f54445a1fe637a58c436b0acbe5ad9390e4d011",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Educator professional-learning networks are not agent behaviour and ISTE is non-binding; EDU-SE-6 already covers ISTE pedagogical transparency."
+      }
+    },
+    {
+      "id": "EDU-SE-15",
+      "station": "education",
+      "packId": "specialized-education",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Accessibility scope gating",
+        "packQuestionCount": 15,
+        "issues": [
+          "program-level accessibility scope matrix; not an agent control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "4f54445a1fe637a58c436b0acbe5ad9390e4d011",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "A jurisdiction-matrix overlay on duties EDU-SE-8 (WCAG/508/WAD) and EDU-SE-10 (Revised 508) assess directly; the reference names no instrument; the meta-review agreed."
+      }
+    },
+    {
+      "id": "ENV-SS-5",
+      "station": "environment",
+      "packId": "source-to-sustenance",
+      "dimension": "Ethics",
+      "weight": 10,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "IPBES NCP Framework — Habitat Connectivity Assessment",
+        "packQuestionCount": 15,
+        "issues": [
+          "IPBES NCP framework is a conceptual framework, not an instrument; connectivity modelling is not an agent-governance control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "69be7333f7824f11ec71fdb06f950aa77ad43377",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Connectivity modelling is a capability, not a governance control, and IPBES NCP is a conceptual framework; the meta-review agreed."
+      }
+    },
+    {
+      "id": "ENV-SS-14",
+      "station": "environment",
+      "packId": "source-to-sustenance",
+      "dimension": "Transparency",
+      "weight": 10,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
+        "packQuestionCount": 15,
+        "issues": [
+          "EU Biodiversity Strategy 2030 has no numbered \"Target 4\"; strategy is non-binding; control duplicated by SS-2"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "69be7333f7824f11ec71fdb06f950aa77ad43377",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "A non-binding strategy, duplicated by ENV-SS-2, which cites the binding Nature Restoration Law Art. 4; F5's \"no numbered Target 4\" claim is not verified here."
+      }
+    },
+    {
+      "id": "GOV-DCR-14",
+      "station": "governance",
+      "packId": "digital-citizens-rights",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "eIDAS 2.0 (control mapping governance)",
+        "packQuestionCount": 14,
+        "issues": [
+          "citation-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4e53ceb505900b26a6ac99beaf1dc9a9f25acffd",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Asks whether the program keeps the pack's own eIDAS citations consistent \"across questions and outputs\": pack maintenance; GOV-DCR-1, -4 and -10 assess eIDAS directly."
+      }
+    },
+    {
+      "id": "GOV-DD-15",
+      "station": "governance",
+      "packId": "dance-of-democracy",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Citation mapping governance",
+        "packQuestionCount": 15,
+        "issues": [
+          "citation-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4e53ceb505900b26a6ac99beaf1dc9a9f25acffd",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance (a mapping \"for the Dance of Democracy pack\"); the reference names no instrument; the anchors it lists are assessed by GOV-DD-1, -3, -10, -11, -12 and -14."
+      }
+    },
+    {
+      "id": "GOV-PL-14",
+      "station": "governance",
+      "packId": "petition-to-law",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Citation mapping governance",
+        "packQuestionCount": 14,
+        "issues": [
+          "citation-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "4e53ceb505900b26a6ac99beaf1dc9a9f25acffd",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance; the reference names no instrument; Open Data Directive duties are assessed by GOV-PL-3, -7 and -10; the meta-review agreed."
+      }
+    },
+    {
+      "id": "GOV-PPC-15",
+      "station": "governance",
+      "packId": "public-private-collaboration",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Citation mapping governance",
+        "packQuestionCount": 15,
+        "issues": [
+          "citation-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "4e53ceb505900b26a6ac99beaf1dc9a9f25acffd",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance; the reference names no instrument; the anchors it lists are assessed by GOV-PPC-1, -2, -10, -11, -12, -13 and -14."
+      }
+    },
+    {
+      "id": "HLT-WM-17",
+      "station": "health",
+      "packId": "wellness-management",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "ADA Title III §12182 (scope clarity) + ADA Title I context",
+        "packQuestionCount": 17,
+        "issues": [
+          "program-level scope-mapping exercise; does not govern agent behaviour; same control as WM-4/WM-14"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "ca7aec6a633fdf936de5b94ec6a462c4ae3772ad",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "A scope overlay on HLT-WM-4 (ADA Title I) and HLT-WM-14 (Title III §12182); the pack stays at 16, above the floor; the meta-review agreed."
+      }
+    },
+    {
+      "id": "HLT-PL-17",
+      "station": "health",
+      "packId": "patient-lifecycle",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Joint Commission NPSG crosswalk expectations",
+        "packQuestionCount": 17,
+        "issues": [
+          "accreditor crosswalk is a program artefact, not an agent control; no official instrument"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "ca7aec6a633fdf936de5b94ec6a462c4ae3772ad",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "An accreditor-crosswalk artefact with no instrument; HLT-PL-14 assesses NPSG.06.01.01 directly; the pack stays at 16; the meta-review agreed."
+      }
+    },
+    {
+      "id": "MOB-SC-14",
+      "station": "mobility",
+      "packId": "sustainable-communities",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU Urban Agenda §3",
+        "packQuestionCount": 14,
+        "issues": [
+          "Urban Agenda partnership cycle is a programme process, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "febdc748328880563ce763593e73a618f4c9ffab",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "The Urban Agenda partnership cycle is a non-binding programme process, not agent behaviour; MOB-SC-3 and -4 keep the Urban Agenda context."
+      }
+    },
+    {
+      "id": "MOB-RE-15",
+      "station": "mobility",
+      "packId": "sustainable-real-estate",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU EPBD 2024 (control mapping governance)",
+        "packQuestionCount": 15,
+        "issues": [
+          "control-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "febdc748328880563ce763593e73a618f4c9ffab",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance (EPBD citation mapping); MOB-RE-1 and -10 assess the EPBD directly."
+      }
+    },
+    {
+      "id": "MOB-VI-14",
+      "station": "mobility",
+      "packId": "virtual-infrastructure",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Regulatory mapping governance",
+        "packQuestionCount": 14,
+        "issues": [
+          "regulatory-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "febdc748328880563ce763593e73a618f4c9ffab",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance (\"a versioned regulatory mapping for the pack\"); the reference names no instrument; FedRAMP, NIS2, ISO 27001 and the Data Act are assessed by MOB-VI-1, -3, -5, -10, -11, -12 and -13."
+      }
+    },
+    {
+      "id": "MOB-F3W-8",
+      "station": "mobility",
+      "packId": "freight-3pl-warehouse",
+      "dimension": "Operational KPI Mapping",
+      "weight": 8,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "ISO 9001:2015 §9.1; ISO 28000:2022 performance evaluation",
+        "packQuestionCount": 8,
+        "issues": [
+          "self-referential (maps KPIs to AMC maturity evidence); not a regulatory control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "febdc748328880563ce763593e73a618f4c9ffab",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Self-referential (maps logistics KPIs to AMC's own maturity evidence); MOB-F3W-1 already binds OTIF scorecards to routing; the meta-review agreed; a drop must also edit tests/logisticsIndustryPack.test.ts."
+      }
+    },
+    {
+      "id": "TECH-OS-4",
+      "station": "technology",
+      "packId": "os-sustainable-outcomes",
+      "dimension": "Transparency",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "GRI Standards 201-207; UN SDG Impact Standards",
+        "packQuestionCount": 15,
+        "issues": [
+          "GRI 201-207 economic reporting is organisational disclosure, not an agent control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "GRI 201-207 is organisational economic disclosure, not agent behaviour; the meta-review agreed."
+      }
+    },
+    {
+      "id": "TECH-OS-15",
+      "station": "technology",
+      "packId": "os-sustainable-outcomes",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Citation mapping governance",
+        "packQuestionCount": 15,
+        "issues": [
+          "citation-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance (\"Council-required\" anchors); the reference names no instrument; DORA, ISO, ITIL and GDPR are assessed by TECH-OS-1, -2, -5 and -8 to -14."
+      }
+    },
+    {
+      "id": "TECH-INF-15",
+      "station": "technology",
+      "packId": "infotainment",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU DSA 2022/2065 Art. 14, 17",
+        "packQuestionCount": 15,
+        "issues": [
+          "DSA control-map governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "The text asks whether \"the pack\" maintains a DSA control map: pack maintenance; DSA Art. 14 and Art. 17 are assessed by TECH-INF-8 and TECH-INF-10."
+      }
+    },
+    {
+      "id": "TECH-PP-7",
+      "station": "technology",
+      "packId": "partnerships-prosperity",
+      "dimension": "Governance",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI 203",
+        "packQuestionCount": 14,
+        "issues": [
+          "SDG 17.16.1 / GRI 203 impact measurement is organisational reporting, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "SDG indicator 17.16.1 is reported by countries and GRI 203 is organisational disclosure; TECH-PP-3 already cites 17.16.1."
+      }
+    },
+    {
+      "id": "TECH-PP-13",
+      "station": "technology",
+      "packId": "partnerships-prosperity",
+      "dimension": "Governance",
+      "weight": 10,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "WTO SPS Agreement Art. 5.7",
+        "packQuestionCount": 14,
+        "issues": [
+          "WTO SPS Agreement is out of scope for a technology-partnerships pack"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "SPS Agreement Art. 5.7 governs measures taken by WTO Members (states), so a technology-partnerships agent cannot meet it; out of scope for the pack."
+      }
+    },
+    {
+      "id": "TECH-PP-14",
+      "station": "technology",
+      "packId": "partnerships-prosperity",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "WIPO WCT/WPPT (mapping governance)",
+        "packQuestionCount": 14,
+        "issues": [
+          "WIPO treaty-mapping governance is pack maintenance, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "A mapping overlay; the WCT and WPPT duties are assessed directly by TECH-PP-9 (WCT Art. 11) and TECH-PP-11 (WPPT Art. 7)."
+      }
+    },
+    {
+      "id": "WLT-FW-6",
+      "station": "wealth",
+      "packId": "future-of-work",
+      "dimension": "Ethics",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "WEF Future of Jobs Framework; ILO Centenary Declaration (2019)",
+        "packQuestionCount": 14,
+        "issues": [
+          "WEF framework is not an official instrument; workforce reskilling is an organisational programme, not an agent control"
+        ]
+      },
+      "metaReview": {
+        "verdict": "drop",
+        "agree": true,
+        "note": "Reasoning and citation hold."
+      },
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Reskilling is an organisational programme and the WEF framework is not an instrument; worker-facing AI duties are assessed by WLT-FW-13 and WLT-FW-15 (AI Act Art. 26(7)); the meta-review agreed."
+      }
+    },
+    {
+      "id": "WLT-FW-14",
+      "station": "wealth",
+      "packId": "future-of-work",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Jurisdictional scope gating for employment AI laws",
+        "packQuestionCount": 14,
+        "issues": [
+          "program-level jurisdiction matrix; not an agent control; no instrument"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "An applicability-matrix overlay; the location-specific duties it names are assessed directly by WLT-FW-10 (NYC LL144) and WLT-FW-11 (820 ILCS 42)."
+      }
+    },
+    {
+      "id": "WLT-NP-6",
+      "station": "wealth",
+      "packId": "no-poverty",
+      "dimension": "Governance",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "UN SDG 1 Indicators 1.1.1, 1.2.1; World Bank Poverty Measurement",
+        "packQuestionCount": 14,
+        "issues": [
+          "impact measurement against SDG 1 indicators is an organisational M&E activity, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Poverty-impact measurement is organisational monitoring and evaluation; WLT-NP-8 (CERISE-SPTF social performance) covers the agent-relevant outcome tracking."
+      }
+    },
+    {
+      "id": "WLT-NP-11",
+      "station": "wealth",
+      "packId": "no-poverty",
+      "dimension": "Governance",
+      "weight": 12,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Community Reinvestment Act (CRA) — community reinvestment and LMI outcomes",
+        "packQuestionCount": 14,
+        "issues": [
+          "CRA is an institution-level examination framework; the 2023 CRA rule was rescinded in 2025; not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "keep",
+        "rationale": "The CRA statute is binding US law for insured depository institutions and the question is conditional on it; F5's 2025 rescission claim concerns a rule version, not the statute, and is unverified: correct the citation (P0-24/expert), do not drop."
+      }
+    },
+    {
+      "id": "WLT-NP-14",
+      "station": "wealth",
+      "packId": "no-poverty",
+      "dimension": "Compliance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU Microfinance Reg §3",
+        "packQuestionCount": 14,
+        "issues": [
+          "\"EU Microfinance Reg §3\" does not exist; the European Code of Good Conduct for Microcredit Provision is voluntary"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "It asks for compliance with an instrument this repo's own catalogue could not identify (eu-microfinance: \"No EU regulation by this name was identified\"); a real anchor would be new content (P1-09/P1-42)."
+      }
+    },
+    {
+      "id": "WLT-CE-14",
+      "station": "wealth",
+      "packId": "circular-economy",
+      "dimension": "Governance",
+      "weight": 8,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "Ellen MacArthur Foundation CE100",
+        "packQuestionCount": 15,
+        "issues": [
+          "Ellen MacArthur CE100 is a membership network, not a standard; no assessable obligation"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "CE100 is a membership network with no assessable obligation; WLT-CE-8 keeps the Ellen MacArthur circularity indicators."
+      }
+    },
+    {
+      "id": "WLT-CE-15",
+      "station": "wealth",
+      "packId": "circular-economy",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "EU CSRD 2022/2464; ESRS scope governance",
+        "packQuestionCount": 15,
+        "issues": [
+          "program-level ESRS scope map; not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "An ESRS scope-map overlay; the CSRD/ESRS duties are assessed directly by WLT-CE-9 and WLT-CE-11."
+      }
+    },
+    {
+      "id": "WLT-BC-15",
+      "station": "wealth",
+      "packId": "blockchain",
+      "dimension": "Governance",
+      "weight": 6,
+      "f5": {
+        "verdict": "drop",
+        "regulatoryRef": "MiCA 2023/1114 (internal control mapping governance)",
+        "packQuestionCount": 15,
+        "issues": [
+          "citation-drift governance is a pack-maintenance task, not an agent control"
+        ]
+      },
+      "metaReview": null,
+      "candidateRemovedBy": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "agentRecommendation": {
+        "recommendation": "drop",
+        "rationale": "Pack maintenance (MiCA citation drift); MiCA is assessed by WLT-BC-1, -4, -5, -7, -8 and -10."
+      }
+    }
+  ]
+}

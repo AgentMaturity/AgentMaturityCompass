@@ -1,0 +1,6 @@
+M1-readme-142: KILLED (command failed) ::      × public surfaces advertise the compiled pack registry consistently 9ms      × the README invites no self-made badge and hand-types no pack count 4ms ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯ 
+M2-promoted-certified: KILLED (command failed) :: Docs drift check failed: - docs/QUICKSTART.md:1: prohibited truth claim "certified" (D-03 vocabulary): Every agent scored here is fully certified. # Quickstart — choose your first task Run a bounded native task, as 
+M3-negation-always: KILLED (command failed) ::      × docs-drift fails a banned claim word used as a status and passes a negation, a quote or code (P0-28) 5ms ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯       Tests  1 failed | 1 passed | 13 skipped (15) 
+M4-subcommand-check: KILLED (command failed) ::      × docs-drift fails an amc command the CLI inventory does not register (P0-28) 11ms ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯       Tests  1 failed | 1 passed | 13 skipped (15) 
+M5-quote-skip-all: KILLED (command failed) ::      × docs-drift fails a banned claim word used as a status and passes a negation, a quote or code (P0-28) 6ms ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯       Tests  1 failed | 1 passed | 13 skipped (15) 
+M6-promoted-unknown-command: KILLED (command failed) :: Docs drift check failed: - docs/QUICKSTART.md:1: `amc trust decay` is not in docs/CLI_COMMAND_INVENTORY.md 

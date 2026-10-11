@@ -292,7 +292,13 @@ function nextActionHtml(next) {
 
 /** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
-  "plan_unresolved", "path_supported", "unsupported_acknowledged"]);
+  "plan_unresolved", "path_supported", "unsupported_acknowledged", "context_probe_unavailable", "plan_activated"]);
+/**
+ * acknowledgeable (src/a4/a4Readiness.ts) as the item shows it: plan_activated only when deferred and mandatory (from Review on),
+ * plan_unresolved never when regulated.
+ */
+const acknowledgeable = (item) => ACKNOWLEDGEABLE.has(item.id) && !item.reasonCodes.includes("REGULATED_READY_PLAN_ONLY")
+  && (item.id !== "plan_activated" || (item.mandatory === true && item.reasonCodes.includes("PLAN_ACTIVATION_DEFERRED")));
 
 /** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
 function retryButton(item, allowed) {
@@ -307,7 +313,7 @@ function itemRow(item, allowed) {
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
       still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
-    !ack && item.status === "WAITING" && ACKNOWLEDGEABLE.has(item.id) && allowed.acknowledge?.allowed === true
+    !ack && item.status === "WAITING" && acknowledgeable(item) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 
@@ -442,7 +448,7 @@ function requestOffer(ctx, kind) {
   if (gate?.status === "PENDING" || gate?.status === "QUORUM_MET") offer = refuse(offer, "A4_GATE_OPEN");
   else if (gate?.status === "DENIED" && gate.revisionNo === ctx.project.revisionNo) offer = refuse(offer, "A4_GATE_DENIED");
   const unacknowledged = ctx.readiness.items.filter((item) => item.mandatory && item.status === "WAITING" && item.acknowledged === null
-    && ACKNOWLEDGEABLE.has(item.id)).map((item) => item.id);
+    && acknowledgeable(item)).map((item) => item.id);
   return unacknowledged.length ? refuse(offer, ...unacknowledged) : offer;
 }
 

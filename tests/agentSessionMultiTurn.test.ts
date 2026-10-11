@@ -1,4 +1,6 @@
-import { mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import YAML from "yaml";
+import { budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -212,6 +214,19 @@ describe("what a session refuses", () => {
     session.close();
     const closes = typesOf(eventsFor(dir, session.sessionId)).filter((t) => t === "session/close");
     expect(closes).toHaveLength(1);
+  });
+});
+
+describe("a prompt AMC's own budget refused (P0-59)", () => {
+  it("names the budget refusal on the failed result instead of only the turn ending", async () => {
+    const dir = workspace();
+    const config = loadBudgetsConfig(dir); config.budgets.perAgent.default!.daily.maxLlmRequests = 1;
+    writeFileSync(budgetsPath(dir), YAML.stringify(config)); signBudgetsConfig(dir);
+    const session = sessionWith(dir, ["first", "second"]);
+    expect(await session.prompt("one")).toMatchObject({ ok: true });
+    const refused = await session.prompt("two");
+    expect(refused).toMatchObject({ ok: false, failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] });
+    expect(refused.ok ? "" : refused.reason).toMatch(/ended error/);
   });
 });
 

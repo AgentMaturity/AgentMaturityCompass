@@ -100,11 +100,12 @@ amc doctor</code></pre>
       <pre><code><span class="comment"># Build the quickstart image</span>
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
 
-<span class="comment"># Run the full score</span>
-docker run -it --rm amc-quickstart amc
+<span class="comment"># Check the CLI in the image</span>
+docker run --rm amc-quickstart --version
 
-<span class="comment"># Non-interactive</span>
-docker run -it --rm -e AMC_VAULT_PASSPHRASE=demo amc-quickstart amc</code></pre>
+<span class="comment"># Run the image's default command (amc quickscore, interactive)</span>
+docker run -it --rm amc-quickstart</code></pre>
+      <p>The image's entry point is already <code>amc</code>, so pass only its arguments (a second <code>amc</code> fails with "too many arguments"). Signing needs a vault passphrase: set a strong <code>AMC_VAULT_PASSPHRASE</code> of your own and pass it through with <code>docker run -e AMC_VAULT_PASSPHRASE …</code>, or let <code>amc init</code> prompt for one. Never use an example or guessable value. The image installs the published 1.1.1 release.</p>
 
       <h3>From source</h3>
       <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git

@@ -148,11 +148,11 @@ describe("business GRC treatment-plan export", () => {
     expect(read("README.md")).toContain("amc business grc-export --portfolio risk-portfolio.json --out grc-treatment-plan.csv");
     expect(read("docs/GETTING_STARTED.md")).toContain("Export a GRC treatment-plan register");
     expect(read("docs/QUICKSTART.md")).toContain("Export a GRC treatment plan");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("GRC treatment-plan export — ✅ Resolved 2026-06-16");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("GRC exports are resolved; native GRC sync and certified Open FAIR remain");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("ISO 31000:2018");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("FAIR Institute");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No output format compatible with GRC tools");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("GRC exports and full FAIR/ISO 31000 workflows remain");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("GRC treatment-plan export — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("GRC exports are resolved; native GRC sync and certified Open FAIR remain");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("ISO 31000:2018");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("FAIR Institute");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No output format compatible with GRC tools");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("GRC exports and full FAIR/ISO 31000 workflows remain");
   });
 });
