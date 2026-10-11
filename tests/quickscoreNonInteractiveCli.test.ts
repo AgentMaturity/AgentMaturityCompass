@@ -157,11 +157,11 @@ describe("quickscore non-interactive CLI output", () => {
   });
 
   test("audit and getting-started docs record the first-run hint fix", () => {
-    const audit = readFileSync("docs/AUDIT_50_AGENTS_BATCH5.md", "utf8");
+    const audit = readFileSync("docs/archive/AUDIT_50_AGENTS_BATCH5.md", "utf8");
     const gettingStarted = readFileSync("docs/GETTING_STARTED.md", "utf8");
     const quickstart = readFileSync("docs/QUICKSTART.md", "utf8");
     const readme = readFileSync("README.md", "utf8");
-    const uxAudit = readFileSync("docs/UX_AUDIT_REPORT.md", "utf8");
+    const uxAudit = readFileSync("docs/archive/UX_AUDIT_REPORT.md", "utf8");
 
     expect(audit).toContain("First-run interactive hint — ✅ Resolved 2026-06-16");
     expect(audit).toContain("Auto no-evidence status — ✅ Resolved 2026-06-16");

@@ -91,7 +91,7 @@ describe("amc up local demo mode", () => {
   });
 
   test("keeps the UX audit aligned with the current demo startup behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R4 — amc up --demo starts no-vault exploratory Studio");
     expect(audit).toContain("`amc up --demo --dry-run` previews the ports and no-vault boundary");

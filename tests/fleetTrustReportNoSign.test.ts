@@ -68,7 +68,7 @@ describe("fleet trust-report --no-sign", () => {
   });
 
   test("keeps the UX audit aligned with the unsigned trust report behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("`trust-report --no-sign` generates an unsigned local trust composition report");
     expect(audit).toContain("Signed report boundary remains");

@@ -41,7 +41,7 @@ describe("executive and board-facing path", () => {
     const overview = readProjectFile("docs/EXECUTIVE_OVERVIEW.md");
     const page = readProjectFile("website/executive.html");
     const readme = readProjectFile("README.md");
-    const audit = readProjectFile("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = readProjectFile("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(memo).toContain("# What L3 Means For Business Risk");
     expect(memo).toContain("L3 is not a blanket approval");

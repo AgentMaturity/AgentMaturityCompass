@@ -98,7 +98,7 @@ describe("executive brief artifact", () => {
     expect(read("docs/GETTING_STARTED.md")).toContain("Generate a board-ready one-page HTML brief");
     expect(read("docs/QUICKSTART.md")).toContain("Create a board one-pager");
     expect(read("docs/EXECUTIVE_OVERVIEW.md")).toContain("Board one-pager: amc executive brief");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("PDF/exportable board one-pager — ✅ Resolved");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("PDF/exportable board one-pager — ✅ Resolved");
   });
 
   test("blocks board-ready claims when a signed report has no evidence", () => {

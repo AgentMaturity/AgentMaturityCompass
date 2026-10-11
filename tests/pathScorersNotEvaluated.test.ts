@@ -34,7 +34,7 @@ function fullCheckout(): string {
   const root = tempDir("amc-p015-checkout-");
   markAsAmcCheckout(root);
   const files = [
-    "README.md", "docs/AMC_MASTER_REFERENCE.md", "docs/RISK_MANAGEMENT.md", "docs/DATA_GOVERNANCE.md", "docs/QA.md",
+    "README.md", "docs/archive/AMC_MASTER_REFERENCE.md", "docs/RISK_MANAGEMENT.md", "docs/DATA_GOVERNANCE.md", "docs/QA.md",
     "docs/INCIDENT_RESPONSE_READINESS.md", "docs/FRIA.md", "docs/AI_GOVERNANCE.md", "docs/POLICY.md", "docs/OPERATIONS.md",
     "docs/MONITORING.md", "docs/MANAGEMENT_REVIEW.md", ".amc/audit_log.jsonl", ".amc/evidence.sqlite",
     "src/assurance/packs/injectionPack.ts", "src/score/outputIntegrityMaturity.ts", "src/assurance/packs/ragPoisoningPack.ts",

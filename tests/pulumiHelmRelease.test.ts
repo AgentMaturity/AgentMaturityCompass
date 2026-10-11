@@ -58,7 +58,7 @@ describe("Pulumi Helm release example", () => {
     expect(guide).toContain("deploy/pulumi/helm-release/");
     expect(guide).toContain("Pulumi state/config is not the right place for bootstrap secret literals");
 
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("Pulumi Helm-release module** — ✅ Resolved 2026-06-16");
     expect(audit).toContain("deploy/pulumi/helm-release/");
     expect(audit).toContain("AMC-operated hosted SaaS endpoint remains future work");
