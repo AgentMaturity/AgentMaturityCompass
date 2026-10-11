@@ -2,7 +2,7 @@ import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, describe, expect, test, vi } from "vitest";
 import {
   appendSignedControlJournal,
   readSignedControlJournal,
@@ -321,7 +321,7 @@ describe("signed control journal", () => {
     const auditor = signingPair();
     const lease = signingPair();
     const session = signingPair();
-    createVault({
+    const replacement = {
       workspace: ws,
       passphrase: "amc-test-passphrase",
       monitorPrivateKeyPem: monitor.privateKeyPem,
@@ -332,7 +332,12 @@ describe("signed control journal", () => {
       auditorPublicKeyPem: auditor.publicKeyPem,
       leasePublicKeyPem: lease.publicKeyPem,
       sessionPublicKeyPem: session.publicKeyPem
-    });
+    };
+    // P1-08: this machine committed the workspace's key set, so a vault re-created after the keys were removed is refused.
+    expect(() => createVault(replacement)).toThrow(/keyset\.json is missing, but this machine committed/);
+    // A machine without that key-set mark can create it; the journal's own pinned genesis signer still refuses it.
+    vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-control-journal-other-home-")));
+    createVault(replacement);
     expect(() => appendSignedControlJournal({
       workspace: ws,
       controlKind: "guardrail-control",
@@ -340,5 +345,6 @@ describe("signed control journal", () => {
       previous: first,
       payload: { value: "unauthorized signer rotation" }
     })).toThrow(/pinned genesis signer/i);
+    vi.unstubAllEnvs();
   });
 });

@@ -122,8 +122,17 @@ const policy: TrustPolicyRule = {
   requireFreshness: true,   // claim must be < 24h old
   allowedWorkspaces: ['prod-workspace'],
 };
-const result = verifyAgentClaim(agentBClaim, policy, sharedSecret);
+const result = verifyAgentClaim(agentBClaim, policy, sharedSecret, {
+  audience: 'agent-a',              // this verifier: the claim must name it
+  issuer: 'agent-b',                // the peer expected; read from the verified claim, never from the caller
+  requestedScope: 'read',           // what agent B asks to do
+  grants: { 'agent-b': ['read'] },  // the verifier's own policy: unknown issuer or scope refuses
+  issuerKeyIds: { 'agent-b': [claimHmacKeyId(sharedSecret)] }, // keys bound to each issuer; any other key refuses
+  replay: claimReplayCache,         // a ClaimReplayCache shared by this verifier
+});
 ```
+
+Since P1-08 a claim proved by a shared secret carries `integrity: "shared-secret"` and `trustTier: "SELF_REPORTED"`: every holder of the secret, every verifier included, can mint one. A `SELF_REPORTED` claim (a shared secret, or an Ed25519 key issuer admission does not vouch for) is reported but never trusted: `trusted: false`, `trustLevel` at most `limited`, no granted scope. An Ed25519 claim (`createSignedAgentClaim`, `verifySignedAgentClaim`) by a session key that issuer admission admits for `session` is `ATTESTED`, and only such a claim can be trusted. The claim's key must be one `issuerKeyIds` binds to the issuer it names, so a key admitted for agent A never speaks for agent B. A claim that fails any binding, expiry, replay or grant check is refused with score 0.
 
 **Step 5 — Trust Assignment**  
 Based on the composite trust score, Agent A assigns a trust level:
@@ -154,7 +163,7 @@ The `verifyAgentClaim` function computes a composite trust score from six checks
 
 | Check | Weight | Condition |
 |-------|--------|-----------|
-| Signature validity | 0.30 | HMAC-SHA256 of `agentId:publicKeyHash:workspace:issuedAt` |
+| Signature validity | 0.30 | HMAC-SHA256 (purpose-derived key) or Ed25519 over every bound field (see 3.3) |
 | Freshness | 0.15 | `ageHours < 24` and not explicitly expired |
 | AMC Score | 0.20 | `claim.amcScore >= policy.minAmcScore` |
 | AMC Level | 0.15 | `levelToNum(claim.amcLevel) >= levelToNum(policy.minAmcLevel)` |
@@ -209,19 +218,25 @@ The lighter-weight identity claim used in direct agent-to-agent verification:
 
 ```typescript
 interface AgentIdentityClaim {
-  agentId: string;
+  agentId: string;            // the issuing agent
   publicKeyHash: string;      // SHA-256 of agent's public signing key
   amcPassportId?: string;     // AMC Passport ID
   amcScore?: number;          // Display-scale AMC score
   amcLevel?: string;          // e.g. "L3"
   issuingWorkspace: string;   // AMC workspace ID
   issuedAt: Date;
-  expiresAt?: Date;
-  signature: string;          // HMAC-SHA256 of canonical payload
+  expiresAt?: Date;           // required for verification; at most 24 hours after issuedAt
+  audience?: string;          // the agent or workspace the claim is for (required)
+  nonce?: string;             // 128-bit hex, single use
+  keyId?: string;             // the HMAC key id or the session key id
+  keyPurpose?: 'agent-claim-hmac' | 'session';
+  signature: string;          // HMAC-SHA256 hex, or Ed25519 base64
 }
 ```
 
-**Signature payload:** `"${agentId}:${publicKeyHash}:${issuingWorkspace}:${issuedAt.toISOString()}"`
+**Signed payload (P1-08):** the tag `AMC_AGENT_CLAIM_HMAC_V2` (HMAC) or `AMC_AGENT_CLAIM_V2` (Ed25519), a NUL byte, then the canonical JSON of every field above except `signature`. The HMAC key is derived from the shared secret under a purpose label (the secret keys nothing else) and must be at least 16 bytes; a PEM private key is refused as a secret. Claims from before P1-08, which covered only `agentId:publicKeyHash:workspace:issuedAt`, are refused.
+
+**Verification (P1-08):** the verifier supplies its expectation. The issuer read from the verified claim must equal the expected peer, the audience must name the verifier, the verifier's grants must allow the issuer the requested scope, the key must be the expected one and not revoked, the claim must be inside its lifetime (60 seconds of clock skew), and the nonce must be new to the replay cache, which also caps uses per key. Granted scopes are the trust level's scopes that the grants allow.
 
 ### 3.4 Issuance
 
@@ -242,7 +257,7 @@ const claim = createAgentClaim(
   publicKeyHash,
   issuingWorkspace,
   sharedSecret,
-  { amcScore: 72, amcLevel: 'L3', ttlHours: 24 }
+  { audience: 'agent-a', amcScore: 72, amcLevel: 'L3', ttlHours: 24 }
 );
 ```
 

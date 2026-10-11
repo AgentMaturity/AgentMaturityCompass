@@ -15,7 +15,7 @@ import type {
   RuntimeName,
   SessionRecord
 } from "../types.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -207,11 +207,11 @@ export class Ledger {
   }
 
   private monitorPrivateKey(): string {
-    return getPrivateKeyPem(this.workspace, "monitor");
+    return getSigningKey(this.workspace, "ledger-row");
   }
 
   private auditorPrivateKey(): string {
-    return getPrivateKeyPem(this.workspace, "auditor");
+    return getSigningKey(this.workspace, "artifact-seal");
   }
 
   // The ops policy, loaded (and validated) at most once per connection. See the
@@ -732,7 +732,7 @@ export class Ledger {
         ts,
         eventHash,
         sessionId: input.sessionId,
-        privateKeyPem: this.monitorPrivateKey(),
+        privateKeyPem: getSigningKey(this.workspace, "receipt"),
         receiptId
       });
 
@@ -857,7 +857,7 @@ export class Ledger {
         eventHash,
         bodySha256: payloadSha256,
         sessionId,
-        privateKeyPem: this.monitorPrivateKey()
+        privateKeyPem: getSigningKey(this.workspace, "receipt")
       });
 
       this.db

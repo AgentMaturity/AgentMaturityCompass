@@ -611,6 +611,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc inventory list` | List AI assets (alias for 'inventory scan') | `--deep`<br>`--json` | - |
 | `amc inventory scan` | Scan workspace for AI assets (agents, models, configs, API keys) | `--deep`<br>`--json` | - |
 | `amc key-custody-modes` | List available key custody modes and their configurations | - | - |
+| `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys | - | - |
+| `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list | `--purpose <purpose>` | - |
+| `amc keys list` | List each signing purpose's key id, shared keys, history size and rotations (public files only) | `--json` | - |
+| `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list | `--purpose <purpose>`<br>`--key-id <id>`<br>`--reason <reason>` | - |
+| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
 | `amc lab-compare` | Compare two lab experiments | `--baseline <id>`<br>`--candidate <id>` | - |
 | `amc lab-create` | Create a new lab experiment | `--kind <kind>`<br>`--name <name>`<br>`--model <modelId>`<br>`--description <desc>` | - |
 | `amc lab-list` | List all lab experiments | `--kind <kind>` | - |
@@ -625,7 +630,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
 | `amc lease issue` | - | `--agent <agentId>`<br>`--ttl <ttl>`<br>`--scopes <scopes>`<br>`--routes <routes>`<br>`--models <models>`<br>`--rpm <rpm>`<br>`--tpm <tpm>`<br>`--max-cost-usd-per-day <usd>`<br>`--workorder <workOrderId>` | - |
 | `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest | `--expect-digest <sha256>` | - |
-| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>` | - |
+| `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>`<br>`--token <lease>` | - |
 | `amc lease verify` | - | - | - |
 | `amc legal-hold` | Issue or manage legal holds | `--issue`<br>`--release <holdId>`<br>`--list`<br>`--init`<br>`--rebind`<br>`--accept-unverified-legacy`<br>`--tenant <id>`<br>`--reason <text>`<br>`--issued-by <name>` | - |
 | `amc lessons-list` | List lessons learned from corrections | `--scope <scope>`<br>`--agent <agentId>` | - |
@@ -1193,7 +1198,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
 | `amc vault privacy-budget` | Check privacy budget for an agent | `--json` | - |
 | `amc vault rag-guard` | Guard RAG chunks against injection | `--json` | - |
-| `amc vault rotate-keys` | Rotate monitor signing key and append to public key history | - | - |
+| `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate | - | - |
 | `amc vault scrub` | Scrub metadata from a file | `--json` | - |
 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing | `--secret <value>`<br>`--shares <n>`<br>`--threshold <k>` | - |
 | `amc vault status` | Show vault status | - | - |

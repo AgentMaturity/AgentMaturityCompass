@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { getCorrectionById } from "./correctionStore.js";
 import { readdirSync } from "node:fs";
@@ -177,7 +177,7 @@ export function promoteCorrection(
     const lessonHash = computeLessonHash(updated);
     let signature = "unsigned";
     try {
-      signature = signHexDigest(lessonHash, getPrivateKeyPem(workspace, "monitor"));
+      signature = signHexDigest(lessonHash, getSigningKey(workspace, "ledger-row"));
     } catch { /* no key */ }
 
     const lesson: Lesson = { ...updated, lesson_hash: lessonHash, signature };
@@ -207,7 +207,7 @@ export function promoteCorrection(
   const lessonHash = computeLessonHash(base);
   let signature = "unsigned";
   try {
-    signature = signHexDigest(lessonHash, getPrivateKeyPem(workspace, "monitor"));
+    signature = signHexDigest(lessonHash, getSigningKey(workspace, "ledger-row"));
   } catch { /* no key */ }
 
   const lesson: Lesson = { ...base, lesson_hash: lessonHash, signature };

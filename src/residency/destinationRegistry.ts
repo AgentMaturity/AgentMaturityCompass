@@ -5,7 +5,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { parseDeploymentProfile } from "../catalog/compiler/compile.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -100,7 +100,7 @@ export function signDestinationRegistry(workspace: string): string {
   assertOwnerMode(workspace, "residency sign");
   const bytes = readBounded(destinationRegistryPath(workspace), MAX_REGISTRY_BYTES); parse(bytes);
   const digestSha256 = sha256Hex(bytes), path = destinationRegistrySigPath(workspace);
-  writeFileAtomic(path, JSON.stringify({ digestSha256, signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, "auditor")),
+  writeFileAtomic(path, JSON.stringify({ digestSha256, signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(), signer: "auditor" }), 0o600);
   return path;
 }

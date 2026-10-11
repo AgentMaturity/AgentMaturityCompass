@@ -11,7 +11,7 @@ import type { Claim, ClaimLifecycleState, ClaimProvenanceTag, ClaimTransition } 
 import { getClaimsByAgent, insertClaim, insertClaimTransition, getLastClaimHash } from "./claimStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 
 // ---------------------------------------------------------------------------
 // TTL Configuration
@@ -190,7 +190,7 @@ export function sweepStaleClaims(
       const digest = sha256Hex(canonicalize(transitionBody));
       let transitionSignature = "unsigned";
       try {
-        transitionSignature = signHexDigest(digest, getPrivateKeyPem(workspace, "monitor"));
+        transitionSignature = signHexDigest(digest, getSigningKey(workspace, "ledger-row"));
       } catch { /* no key available */ }
 
       const transition: ClaimTransition = { ...transitionBody, signature: transitionSignature };
@@ -241,7 +241,7 @@ export function sweepStaleClaims(
 
       let expiredClaimSignature = "unsigned";
       try {
-        expiredClaimSignature = signHexDigest(expiredClaimHash, getPrivateKeyPem(workspace, "monitor"));
+        expiredClaimSignature = signHexDigest(expiredClaimHash, getSigningKey(workspace, "ledger-row"));
       } catch { /* no key available */ }
 
       insertClaim(db, {

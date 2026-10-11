@@ -4,7 +4,7 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import { z } from "zod";
 import type { DiagnosticReport, TargetProfile } from "../types.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -30,7 +30,7 @@ function targetPath(workspace: string, name: string, agentId?: string): string {
 
 function signTargetPayload(workspace: string, payload: Omit<TargetProfile, "signature">): string {
   const digest = sha256Hex(canonicalize(payload));
-  const privateKey = getPrivateKeyPem(workspace, "auditor");
+  const privateKey = getSigningKey(workspace, "config-signature");
   return signHexDigest(digest, privateKey);
 }
 

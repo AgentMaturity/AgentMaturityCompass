@@ -4,7 +4,7 @@ import { join } from "node:path";
 import YAML from "yaml";
 import type { ExperimentReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -365,7 +365,7 @@ export function runExperiment(params: {
   } satisfies Omit<ExperimentReport, "reportJsonSha256" | "reportSealSig">;
 
   const reportJsonSha256 = sha256Hex(canonicalize(base));
-  const reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(params.workspace, "auditor"));
+  const reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(params.workspace, "artifact-seal"));
   const report: ExperimentReport = {
     ...base,
     reportJsonSha256,

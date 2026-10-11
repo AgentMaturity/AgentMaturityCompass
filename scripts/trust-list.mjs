@@ -22,7 +22,16 @@ Commands:
            [--from <utc>] [--reference <id or URL>] [--source operator]
                                                  add a distrust entry (removes existing signatures)
   sign     --list <file> --key <private pem>     sign with a trust-list root key
-  verify   --list <file> --root <sha256>...      verify under pinned roots; exit 1 when refused`;
+  verify   --list <file> --root <sha256>...      verify under pinned roots and the threshold <AMC home>/trust/trust-roots.json
+                                                 sets; exit 1 when refused
+  root-rotate --roots <trust-roots.json> --new-pub <pem>... --new-threshold <n> --out <file>
+           [--previous <last applied rotation>] [--allow-decrease] [--current-key <key>...] [--new-key <key>...]
+                                                 write an amc.root-rotation statement for the pinned root set (P1-08)
+  root-sign   --statement <file> --key <private pem> --as current|new
+                                                 add one root holder's signature: m of the current set authorize,
+                                                 m of the new set prove possession
+  root-apply  --statement <file> --root-pub <pem>...
+                                                 verify against the pinned current set and apply to <AMC home>/trust`;
 
 const OPTIONS = {
   out: { type: "string" }, name: { type: "string" }, "list-id": { type: "string" }, days: { type: "string" },
@@ -30,7 +39,10 @@ const OPTIONS = {
   subject: { type: "string" }, "valid-from": { type: "string" }, "valid-to": { type: "string" },
   "allow-key-history": { type: "boolean" }, source: { type: "string" }, "key-id": { type: "string" }, reason: { type: "string" },
   note: { type: "string" }, from: { type: "string" }, reference: { type: "string" }, key: { type: "string" },
-  root: { type: "string", multiple: true }, help: { type: "boolean" }
+  root: { type: "string", multiple: true }, help: { type: "boolean" },
+  roots: { type: "string" }, "new-pub": { type: "string", multiple: true }, "new-threshold": { type: "string" }, previous: { type: "string" },
+  "allow-decrease": { type: "boolean" }, "current-key": { type: "string", multiple: true }, "new-key": { type: "string", multiple: true },
+  statement: { type: "string" }, as: { type: "string" }, "root-pub": { type: "string", multiple: true }
 };
 
 async function trust() {
@@ -53,7 +65,10 @@ const writeJson = (path, value, flag = "w") => writeFileSync(path, JSON.stringif
 async function editList(values, edit) {
   const { trustListSchema, TrustListError } = await trust();
   const path = required(values, "list");
-  const list = edit(readJson(path).list);
+  const current = readJson(path);
+  // A verifier refuses other content at a sequence it already accepted (P1-08), so the first edit after signing bumps it.
+  const signed = (current.signatures ?? []).length > 0;
+  const list = edit({ ...current.list, sequence: current.list.sequence + (signed ? 1 : 0) });
   const parsed = trustListSchema.safeParse(list);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
@@ -113,10 +128,44 @@ const COMMANDS = {
     writeJson(path, { list: current.list, signatures: [...others, signature] });
     console.log(`Signed ${path} with root ${signature.keyId}`);
   },
+  async "root-rotate"(values) {
+    const { ed25519KeyId, signRootRotation } = await trust();
+    const { createHash } = await import("node:crypto");
+    const pinned = readJson(required(values, "roots"));
+    const previous = values.previous ? readFileSync(values.previous) : null;
+    const newRootPublicKeyPems = required(values, "new-pub").map(path => readFileSync(path, "utf8"));
+    const statement = {
+      type: "amc.root-rotation", version: 1, rootSetId: pinned.rootSetId, sequence: previous ? JSON.parse(previous).statement.sequence + 1 : 1,
+      previousSha256: previous ? createHash("sha256").update(previous).digest("hex") : null,
+      previousRoots: pinned.roots, previousThreshold: pinned.threshold ?? 1,
+      newRoots: newRootPublicKeyPems.map(pem => ed25519KeyId(pem)), newThreshold: Number(required(values, "new-threshold")), newRootPublicKeyPems,
+      allowDecrease: values["allow-decrease"] === true, issuedAt: new Date().toISOString()
+    };
+    const keys = name => (values[name] ?? []).map(path => readFileSync(path, "utf8"));
+    writeFileSync(required(values, "out"), signRootRotation(statement, { current: keys("current-key"), next: keys("new-key") }), { mode: 0o600, flag: "wx" });
+    console.log(`Wrote root rotation ${statement.sequence} of ${statement.rootSetId}: ${statement.newRoots.length} roots, threshold ${statement.newThreshold}`);
+  },
+  async "root-sign"(values) {
+    const { addRootRotationSignature } = await trust();
+    const path = required(values, "statement");
+    const as = required(values, "as");
+    if (as !== "current" && as !== "new") throw new Error(`--as must be current or new\n\n${USAGE}`);
+    writeFileSync(path, addRootRotationSignature(readFileSync(path), as, readFileSync(required(values, "key"), "utf8")), { mode: 0o600 });
+    console.log(`Signed ${path} as a ${as} root`);
+  },
+  async "root-apply"(values) {
+    const { applyTrustRootRotation } = await trust();
+    const result = applyTrustRootRotation({ statement: readFileSync(required(values, "statement")), currentRootPublicKeyPems: required(values, "root-pub").map(path => readFileSync(path, "utf8")) });
+    console.log(`Applied root rotation ${result.sequence} of ${result.rootSetId}: ${result.roots.length} roots, threshold ${result.threshold}`);
+  },
   async verify(values) {
     const { readSignedTrustListFile, verifySignedTrustList } = await trust();
+    const { readPinnedTrustRoots } = await import("../dist/trust/rootRotation.js");
+    const { resolveAmcHome } = await import("../dist/credentials/credentialsPaths.js");
+    // The operator's m-of-n policy applies here as in every verifier: --root names the roots, never a lower threshold.
+    const policy = readPinnedTrustRoots(resolveAmcHome({ env: process.env }));
     const list = verifySignedTrustList(readSignedTrustListFile(required(values, "list")),
-      { pinnedRootKeyIds: required(values, "root"), now: new Date() });
+      { pinnedRootKeyIds: required(values, "root"), now: new Date(), threshold: policy?.threshold ?? 1 });
     console.log(`OK ${list.listId} sequence ${list.sequence}: ${list.entries.length} entries, ${list.distrust.length} distrusted, expires ${list.expiresAt}`);
   }
 };

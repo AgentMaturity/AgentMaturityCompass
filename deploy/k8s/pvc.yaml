@@ -11,3 +11,19 @@ spec:
   resources:
     requests:
       storage: 20Gi
+---
+# <AMC home>/state: this machine's anti-rollback marks, key-set recovery copies and applied trust-root rotations
+# (P1-08). Matches the Helm chart's amcHomeState claim (chart 0.3.0). Never mounted into the workspace.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: amc-home-state
+  labels:
+    app.kubernetes.io/name: amc
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

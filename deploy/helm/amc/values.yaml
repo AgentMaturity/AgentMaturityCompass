@@ -28,6 +28,18 @@ workspace:
       - ReadWriteOnce
     size: 10Gi
 
+# <AMC home>/state keeps this machine's anti-rollback marks (high-water.json), key-set recovery copies and applied
+# trust-root rotations (P1-08). On an emptyDir every restart forgets them, and an older revocation list, key history or
+# key set is then accepted again. Keep it persistent; it is never mounted into the workspace.
+amcHomeState:
+  mountPath: /home/amc/.config/amc/state
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+
 notary:
   enabled: false
   port: 4343

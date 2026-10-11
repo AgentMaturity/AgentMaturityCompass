@@ -76,6 +76,7 @@ const createClaimBodySchema = z.object({
   agentId: nonEmptyStringSchema,
   publicKeyHash: nonEmptyStringSchema,
   issuingWorkspace: nonEmptyStringSchema,
+  audience: nonEmptyStringSchema, // P1-08: a claim is bound to the agent or workspace it is for
   sharedSecret: optionalNonEmptyStringSchema,
   amcScore: z.number().optional(),
   amcLevel: optionalNonEmptyStringSchema,
@@ -779,6 +780,7 @@ export async function handleScoreRoute(
         body.issuingWorkspace,
         secret,
         {
+          audience: body.audience,
           amcScore: body.amcScore,
           amcLevel: body.amcLevel,
           amcPassportId: body.amcPassportId,

@@ -17,7 +17,7 @@ import { join } from "node:path";
 import { getOrCreateSqlitePool } from "../storage/sqlitePool.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import type { ModelVersion } from "./modelDrift.js";
 
 /* ── Types ────────────────────────────────────────────────────────── */
@@ -154,7 +154,7 @@ export class ScoreHistoryStore {
   }
 
   private monitorPrivateKey(): string {
-    return getPrivateKeyPem(this.workspace, "monitor");
+    return getSigningKey(this.workspace, "ledger-row");
   }
 
   /**

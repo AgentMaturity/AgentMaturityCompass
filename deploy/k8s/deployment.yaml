@@ -97,6 +97,8 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /data/amc
+            - name: amc-home-state
+              mountPath: /home/amc/.config/amc/state
             - name: secrets
               mountPath: /run/secrets
               readOnly: true
@@ -106,6 +108,10 @@ spec:
         - name: workspace
           persistentVolumeClaim:
             claimName: amc-workspace
+        # P1-08 anti-rollback marks and key-set recovery copies (<AMC home>/state).
+        - name: amc-home-state
+          persistentVolumeClaim:
+            claimName: amc-home-state
         - name: secrets
           secret:
             # Same secret name and keys as the Helm chart; create it out of band

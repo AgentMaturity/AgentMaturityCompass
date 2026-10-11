@@ -1,5 +1,6 @@
 import { join } from "node:path";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../../crypto/keys.js";
+import { ROLE_PRIMARY_PURPOSE } from "../../../vault/vaultPayload.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../../utils/fs.js";
 import { sha256Hex } from "../../../utils/hash.js";
 import { canonicalize } from "../../../utils/json.js";
@@ -66,7 +67,7 @@ export function recordDigest(record: unknown): string {
 
 export function signRecord<T>(workspace: string, record: T, signer: RecordSigner): SignedRecordFile<T> {
   const digestSha256 = recordDigest(record);
-  return { record, digestSha256, signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, signer)), signer };
+  return { record, digestSha256, signature: signHexDigest(digestSha256, getSigningKey(workspace, ROLE_PRIMARY_PURPOSE[signer])), signer };
 }
 
 /** True only when the signature verifies over the record as it is now. */

@@ -1,11 +1,14 @@
 import { generateKeyPairSync } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { admitKey, loadTrustContext, signTrustList, withPins, workspaceSelfTrust, type KeyPurpose } from "../../src/trust/index.js";
 import { initWorkspace } from "../../src/workspace.js";
 import { distrustEntry, listEntry, testKey, trustList } from "./trustFixtures.js";
+import { recordHighWater } from "../../src/keys/highWater.js";
+import { sha256Hex } from "../../src/utils/hash.js";
+import { trustRootSetIdOf } from "../../src/trust/rootRotation.js";
 
 const NOW = new Date("2026-10-06T00:00:00.000Z");
 const root = testKey();
@@ -77,6 +80,20 @@ describe("loadTrustContext", () => {
     expect(admitKey({ publicKeyPem: auditor.publicKeyPem, purpose: "artifact-seal", signature: "s", context }).status).toBe("admitted");
   });
 
+  it("needs threshold signatures from the roots trust-roots.json pins (P1-08 m-of-n)", () => {
+    const amcHome = home();
+    const second = testKey();
+    const list = trustList([listEntry(auditor)]);
+    put(join(amcHome, "trust", "trust-roots.json"), { ...roots(root.keyId, second.keyId), threshold: 2 });
+    const one = signTrustList(list, root.privateKeyPem);
+    put(join(amcHome, "trust", "amc-trust-list.json"), one);
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+    put(join(amcHome, "trust", "amc-trust-list.json"), { list, signatures: [...one.signatures, ...signTrustList(list, second.privateKeyPem).signatures] });
+    expect(loadTrustContext({ amcHome, now: NOW }).lists).toEqual([list]);
+    put(join(amcHome, "trust", "trust-roots.json"), { ...roots(root.keyId), threshold: 2 });
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_INVALID");
+  });
+
   it("uses --trust-list and --trust-root instead of the defaults", () => {
     const amcHome = home();
     put(join(amcHome, "trust", "amc-trust-list.json"), signTrustList(trustList([]), testKey().privateKeyPem));
@@ -98,6 +115,67 @@ describe("loadTrustContext", () => {
     expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_INVALID");
     expect(codeOf(() => loadTrustContext({ amcHome: home(), now: NOW, trustLists: [join(home(), "missing.json")], trustRoots: [root.keyId] })))
       .toBe("TRUST_LIST_INVALID");
+  });
+});
+
+describe("m-of-n never falls back to a weaker policy (P1-08, security review)", () => {
+  it("a dangling default trust list is refused, never read as no list (self-audit)", () => {
+    const amcHome = home();
+    mkdirSync(join(amcHome, "trust"), { recursive: true });
+    symlinkSync(join(amcHome, "nowhere.json"), join(amcHome, "trust", "amc-trust-list.json"));
+    expect(() => loadTrustContext({ amcHome, now: NOW, trustRoots: [root.keyId] })).toThrow();
+  });
+
+  it("a root pinned twice is the same root set as the root pinned once (self-audit)", () => {
+    expect(trustRootSetIdOf([root.keyId, root.keyId])).toBe(trustRootSetIdOf([root.keyId]));
+  });
+
+  const second = testKey();
+  const policy = (amcHome: string, value: unknown) => put(join(amcHome, "trust", "trust-roots.json"), value);
+  const listFile = (amcHome: string, signers: typeof root[], patch: Record<string, unknown> = {}, sequence = 1) => {
+    const list = { ...trustList([listEntry(auditor)], { sequence }), ...patch } as never;
+    return put(join(amcHome, "trust", "amc-trust-list.json"), { list, signatures: signers.flatMap(key => signTrustList(list, key.privateKeyPem).signatures) });
+  };
+
+  it("--trust-root flags never lower the threshold trust-roots.json declares", () => {
+    const amcHome = home();
+    policy(amcHome, { ...roots(root.keyId, second.keyId), threshold: 2 });
+    listFile(amcHome, [root]);
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW, trustRoots: [root.keyId] }))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+  });
+
+  it("a malformed or unreadable trust-roots.json is refused even when --trust-root flags are given", () => {
+    const amcHome = home();
+    policy(amcHome, "{not json");
+    listFile(amcHome, [root]);
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW, trustRoots: [root.keyId] }))).toBe("TRUST_LIST_INVALID");
+  });
+
+  it("once m-of-n was accepted for a list, a later single-signature policy is refused", () => {
+    const amcHome = home();
+    policy(amcHome, { ...roots(root.keyId, second.keyId), threshold: 2 });
+    listFile(amcHome, [root, second]);
+    expect(loadTrustContext({ amcHome, now: NOW }).lists).toHaveLength(1);
+    policy(amcHome, { ...roots(root.keyId, second.keyId), threshold: 1 });
+    listFile(amcHome, [root], {}, 2);
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+  });
+
+  it("a list that declares rootThreshold needs that many distinct roots, whatever the local policy says", () => {
+    const amcHome = home();
+    policy(amcHome, roots(root.keyId, second.keyId));
+    listFile(amcHome, [root], { rootThreshold: 2 });
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+    listFile(amcHome, [root, second], { rootThreshold: 2 }, 2);
+    expect(loadTrustContext({ amcHome, now: NOW }).lists[0]).toMatchObject({ rootThreshold: 2 });
+  });
+
+  it("refuses a list version older than the one this machine accepted", () => {
+    const amcHome = home();
+    policy(amcHome, roots(root.keyId));
+    listFile(amcHome, [root]);
+    recordHighWater(`trust-list-version:tenant-a@${sha256Hex(root.keyId).slice(0, 16)}`, 2, sha256Hex("version 2"), { amcHome });
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("ROLLBACK_DETECTED");
   });
 });
 

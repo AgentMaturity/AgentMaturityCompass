@@ -1,12 +1,20 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import { AntiRollbackError, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
+import { readKeyRevocations } from "../keys/keyRevocations.js";
+import { keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { readPinnedTrustRoots, trustRootSetIdOf } from "./rootRotation.js";
+import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 import {
-  distrustEntrySchema, ed25519KeyId, parseTrustValue, readSignedTrustListFile, TrustListError, verifySignedTrustList,
+  distrustEntrySchema, ed25519KeyId, parseTrustValue, readSignedTrustListFile, signedTrustListSchema, TrustListError, verifySignedTrustList,
   type DistrustEntry, type TrustList
 } from "./trustList.js";
 
@@ -39,11 +47,6 @@ export interface LoadTrustContextOptions {
   now?: Date;
 }
 
-const trustRootsSchema = z.strictObject({
-  type: z.literal("amc.trust-roots"),
-  version: z.literal(1),
-  roots: z.array(z.string().regex(/^[0-9a-f]{64}$/)).min(1)
-});
 const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySchema) });
 
 /** Shipped with the package; no flag or environment variable disables it, and it beats any pin. */
@@ -74,20 +77,58 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   if (monitor) explicitPins.push({ keyId: fingerprint(monitor.value, monitor.origin), purposes: ["ledger-row"], origin: monitor.origin });
 
   const defaultList = join(trustDir, "amc-trust-list.json");
-  const listPaths = opts.trustLists?.length ? opts.trustLists : existsSync(defaultList) ? [defaultList] : [];
+  // lstat, not exists: a dangling or unreadable default list is refused when read, never taken as no list.
+  const listPaths = opts.trustLists?.length ? opts.trustLists : lstatSync(defaultList, { throwIfNoEntry: false }) !== undefined ? [defaultList] : [];
   const rootsFile = join(trustDir, "trust-roots.json");
-  const roots = opts.trustRoots?.length
-    ? opts.trustRoots.map(root => fingerprint(root, "--trust-root"))
-    : listPaths.length && existsSync(rootsFile) ? parseTrustValue(trustRootsSchema, readSignedTrustListFile(rootsFile), rootsFile).roots : [];
+  // The operator's m-of-n policy is read whenever lists are checked and the file exists, --trust-root flags included:
+  // a flag replaces the root set, never the threshold, and an unreadable policy is refused, never skipped (P1-08).
+  // The file is also checked against this machine's verified root-set rotations (src/trust/rootRotation.ts).
+  const policy = listPaths.length ? readPinnedTrustRoots(join(trustDir, "..")) : null;
+  const roots = opts.trustRoots?.length ? opts.trustRoots.map(root => fingerprint(root, "--trust-root")) : policy?.roots ?? [];
   const now = opts.now ?? new Date();
   const lists = listPaths.map(path => {
     if (!roots.length) throw new TrustListError("TRUST_LIST_SIGNATURE_INVALID", `${path}: no trust-list root is pinned (--trust-root or ${rootsFile})`);
-    return verifySignedTrustList(readSignedTrustListFile(path), { pinnedRootKeyIds: roots, now });
+    const signed = readSignedTrustListFile(path);
+    const listId = parseTrustValue(signedTrustListSchema, signed, path).list.listId;
+    const marks = trustListMarks(listId, roots, { amcHome: opts.amcHome, env });
+    const list = verifySignedTrustList(signed, { pinnedRootKeyIds: roots, now, threshold: Math.max(policy?.threshold ?? 1, marks.threshold) });
+    marks.accept(list, Math.max(policy?.threshold ?? 1, list.rootThreshold ?? 1));
+    return list;
   });
   return {
     mode: "pinned", asOf: now, lists, explicitPins,
     distrust: [...builtInDistrust(), ...lists.flatMap(list => list.distrust)],
     allowUnpinned: opts.allowUnpinned === true, allowUnanchored: opts.allowUnanchored === true
+  };
+}
+
+/**
+ * Anti-rollback (P1-08), per listId under the pinned root set (pinning other roots is a deliberate trust change, so it
+ * starts other marks): a lower sequence is ROLLBACK_DETECTED and other content at an accepted sequence FORK_DETECTED; a
+ * lower list version is refused; and the highest m-of-n threshold ever required for the list stays required, so a later
+ * single-signature policy or list cannot downgrade it.
+ */
+function trustListMarks(listId: string, roots: readonly string[], opts: { amcHome: string | undefined; env: NodeJS.ProcessEnv }) {
+  const rootSet = trustRootSetIdOf(roots);
+  const key = (kind: "trust-list" | "trust-list-version" | "trust-list-threshold") => highWaterKey(kind, `${listId}@${rootSet}`);
+  const rethrow = (error: unknown): never => {
+    if (error instanceof AntiRollbackError) throw new TrustListError(error.code, `list "${listId}": ${error.message}`);
+    throw error;
+  };
+  let threshold = 1;
+  try { threshold = readHighWater(key("trust-list-threshold"), opts)?.sequence ?? 1; } catch (error) { rethrow(error); }
+  return {
+    threshold,
+    accept(list: TrustList, required: number): void {
+      try {
+        recordHighWater(key("trust-list-version"), list.version, sha256Hex(`version ${list.version}`), opts);
+        recordHighWater(key("trust-list"), list.sequence, sha256Hex(canonicalize(list)), opts);
+        const floor = Math.max(threshold, required);
+        if (floor > threshold) recordHighWater(key("trust-list-threshold"), floor, sha256Hex(`threshold ${floor}`), opts);
+      } catch (error) {
+        rethrow(error);
+      }
+    }
   };
 }
 
@@ -106,18 +147,31 @@ function operatorDistrust(now: Date): DistrustEntry[] {
 /**
  * For internal round trips only (an export re-checking what this workspace just signed). The keys come from the
  * workspace under test, so this is a self-check: never wire it into a CLI or API verdict, and never treat it as an
- * independent issuer. Only the role purposes are pinned, so independent-attestation and evidence-authority never pass.
- * The operator's distrust still applies (operatorDistrust).
+ * independent issuer. Only the local purposes are pinned, so independent-attestation and evidence-authority never pass.
+ * Since P1-08 each purpose pins its own key history (`<purpose>.pub`), so a key split off for one purpose is refused for
+ * another (wrong-purpose); a workspace not yet migrated pins its role histories as before. The operator's distrust and
+ * the workspace's own signed key revocations (`amc keys revoke`) still apply.
  */
 export function workspaceSelfTrust(workspace: string, now: Date = new Date()): TrustContext {
-  const explicitPins = (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
-    if (!existsSync(join(workspace, ".amc", "keys", `${role}_ed25519.pub`))) return [];
-    return getPublicKeyHistory(workspace, role).flatMap(pem => {
+  // A workspace with a key set pins purposes only; a missing purpose file then fails closed, never widens to roles.
+  const migrated = keysetDeclared(workspace);
+  const explicitPins = migrated
+    ? LOCAL_PURPOSES.flatMap(purpose => getPurposeKeyHistory(workspace, purpose).flatMap(pem => {
       const keyId = ed25519KeyId(pem);
-      return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
+      return keyId ? [{ keyId, purposes: [purpose], origin: `workspace-self:${purpose}` }] : [];
+    }))
+    : (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
+      if (!existsSync(join(workspace, ".amc", "keys", `${role}_ed25519.pub`))) return [];
+      return getPublicKeyHistory(workspace, role).flatMap(pem => {
+        const keyId = ed25519KeyId(pem);
+        return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
+      });
     });
-  });
-  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: operatorDistrust(now), allowUnpinned: false, allowUnanchored: false };
+  const revoked = readKeyRevocations(workspace, migrated).map((row): DistrustEntry => ({
+    keyId: row.keyId, distrustedFrom: row.reason === "key-compromise" ? null : row.revokedAt, reason: row.reason,
+    note: `revoked by amc keys revoke at ${row.revokedAt}`, source: "workspace-key-revocations"
+  }));
+  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: [...operatorDistrust(now), ...revoked], allowUnpinned: false, allowUnanchored: false };
 }
 
 /**

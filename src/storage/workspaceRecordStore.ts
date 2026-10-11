@@ -25,7 +25,7 @@ import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 
 /**
@@ -91,7 +91,7 @@ export function saveWorkspaceRecord<T extends Record<string, unknown>>(
   const hash = sha256Hex(canonicalize({ ...body, prev_record_hash: prev }));
   let signature = "unsigned";
   try {
-    signature = signHexDigest(hash, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(hash, getSigningKey(workspace, "artifact-seal"));
   } catch {
     // No auditor key in this workspace; the chain still detects tampering.
   }

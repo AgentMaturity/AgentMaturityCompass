@@ -1,0 +1,18 @@
+     × m-of-n of the current set authorizes, m-of-n of the new set proves possession, and the new set then signs lists 4ms
+     × signatures from the new set alone, or one current signature under a threshold of 2, never authorize 3ms
+     × refuses a threshold decrease signed only by the new set, a silent decrease, and a rotation to m=1 1ms
+     × refuses replaying an applied rotation and a fork from the version before last 1ms
+     × refuses a rotation for another root set, and duplicate signatures from one key 1ms
+     × once rotated, an edited trust-roots.json or a missing anchored statement fails closed 1ms
+     × an apply interrupted after its anchor is finished by applying the same statement again 1ms
+     × an older list signed by roots that survive the rotation stays refused after it 7ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+TypeError: signRootRotation is not a function
+AssertionError: expected [Function] to throw error matching /needs 2 distinct signatures from the …/ but got '(0 , __vite_ssr_import_4__.signRootRo…'
+AssertionError: expected [Function] to throw error matching /current root set/ but got '(0 , __vite_ssr_import_4__.signRootRo…'
+TypeError: signRootRotation is not a function
+AssertionError: expected [Function] to throw error matching /for root set other-roots/ but got '(0 , __vite_ssr_import_4__.signRootRo…'
+TypeError: signRootRotation is not a function
+TypeError: signRootRotation is not a function
+TrustListError: TRUST_LIST_INVALID: <tmp>/amc-root-rotation-XXXX/trust/trust-roots.json: (root) Unrecognized key: "rootSetId"
+      Tests  8 failed (8)

@@ -12,7 +12,7 @@ import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadRunReport, generateReport } from "../diagnostic/runner.js";
-import { getAuthenticatedKeyHistory, getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getAuthenticatedKeyHistory, getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -512,7 +512,7 @@ function gatherManifest(root: string): BundleManifest["files"] {
 
 function createManifestSignature(workspace: string, manifestBytes: Buffer): BundleManifestSignature {
   const manifestSha256 = sha256Hex(manifestBytes);
-  const signature = signHexDigest(manifestSha256, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(manifestSha256, getSigningKey(workspace, "artifact-seal"));
   return {
     manifestSha256,
     signature,

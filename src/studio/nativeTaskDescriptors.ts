@@ -1,7 +1,7 @@
 import { lstatSync, readFileSync, opendirSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
@@ -93,7 +93,7 @@ export class NativeTaskDescriptors {
   /** Call under lock. No caller text or credential value enters this file. */
   write(descriptor: NativeTaskDescriptor): void {
     const checked = taskDescriptorSchema.parse(descriptor);
-    const signature = signHexDigest(taskBodyHash(checked), getPrivateKeyPem(this.workspace, "auditor"));
+    const signature = signHexDigest(taskBodyHash(checked), getSigningKey(this.workspace, "artifact-seal"));
     writeFileAtomic(this.path(checked.taskId), JSON.stringify({ descriptor: checked, signature }), 0o600);
   }
 }

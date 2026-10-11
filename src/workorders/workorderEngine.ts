@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { getPublicKeyHistory, getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory, getSigningKey, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -47,7 +47,7 @@ function workOrderRevokePath(workspace: string, agentId: string, workOrderId: st
 
 function signFile(workspace: string, filePath: string): string {
   const digest = sha256Hex(readFileSync(filePath));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: SignatureFile = {
     digestSha256: digest,
     signature,
