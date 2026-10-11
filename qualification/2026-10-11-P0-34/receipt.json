@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-34",
+  "date": "2026-10-11",
+  "commit": "0fa75227caca5df1a6e6977e65b4d261217f577f",
+  "branch": "rtd/p0-34-release-surface",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local, not CI; load average 10 to 24 from other agents during the gate runs",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 35000
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 30000
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 39000
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates (new 0)",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:dead-code (new 0)",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <35 changed and related test files>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <14 test files importing src/index.ts>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/publicDocsArtifact.test.ts tests/publicDocsGraph.test.ts tests/pagesWorkflowRuntime.test.ts (fresh clone at 5b73fb0d7)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:packed-install (branch, includes the A4 preview-gate probe)",
+      "exit": 0,
+      "durationMs": 65000
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 70000
+    },
+    {
+      "cmd": "npm run release:gate -- --json (fresh clone of the branch at ea131c134)",
+      "exit": 1,
+      "durationMs": 1242000
+    },
+    {
+      "cmd": "npm run release:prepare -- 2.0.0 (throwaway clone at ea131c134)",
+      "exit": 1,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run release:prepare -- 2.0.0 (throwaway clone at a16d17706)",
+      "exit": 1,
+      "durationMs": 1261000
+    },
+    {
+      "cmd": "npm run release:prepare -- 2.0.0 (throwaway clone at 0fa75227c)",
+      "exit": 1,
+      "durationMs": 1259000
+    },
+    {
+      "cmd": "node scripts/check-pack-contents.mjs --tarball tmp/npm-release/agent-maturity-compass-2.0.0.tgz (same clone)",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "node scripts/packed-install-check.mjs --tarball tmp/npm-release/agent-maturity-compass-2.0.0.tgz (same clone)",
+      "exit": 0,
+      "durationMs": 22000
+    },
+    {
+      "cmd": "npm publish tmp/npm-release/agent-maturity-compass-2.0.0.tgz --dry-run (same clone)",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "node scripts/release-prepare.mjs --version-only 2.0.0 (rerun in the same clone; tracked diff unchanged)",
+      "exit": 0,
+      "durationMs": 38000
+    },
+    {
+      "cmd": "node dist/cli.js release sbom --out sbom.cdx.json (same clone, version 2.0.0)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 673,
+    "passed": 673,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "mutations.txt",
+      "sha256": "f80b0e34f0c90dd30477a3e53383b3c394337358c57660e0e9d18ab3f66ca0b4"
+    },
+    {
+      "path": "pack-contents.json",
+      "sha256": "ea93589692ee7fb2cc6bbdb309745ca5c9b2c0b26f1d54b6ee7d57855efd2c8a"
+    },
+    {
+      "path": "packed-install-branch.txt",
+      "sha256": "86dc448a1fce7fc9878ab97b2dc3d7f3bcf5205a6b6811c1d55e8b50843b181f"
+    },
+    {
+      "path": "packed-install-tarball.txt",
+      "sha256": "dc2c3614f35baaa92a61b575dcbe49a8647d62ea35aa840b131b211929d657e0"
+    },
+    {
+      "path": "publish-dry-run.txt",
+      "sha256": "ab31a2f78e3cb0819cd7e60fc494a7fca1cbb8e2e4a824177f3e3cbd7dc27234"
+    },
+    {
+      "path": "release-gate-branch.json",
+      "sha256": "e7ef9e64cea0373dad2e57b98a9887aabf385f81fae1190644cd394e7b3bdfce"
+    },
+    {
+      "path": "release-gate-prepare.json",
+      "sha256": "6ad98d2253c53cd76abce75f3ef533617e33a43fe2b15eaaa288ac5f1da91087"
+    },
+    {
+      "path": "sbom.cdx.json",
+      "sha256": "b0eceb9fd6fd06f205b4dcbd5d89070fedea2b2528a7842bcb4a58a1655356e4"
+    }
+  ],
+  "notes": "Focused tests: 423 in 35 files plus 250 in 14 files that import the package root, all passed. The full suite was not completed: inside the release gate it was stopped at the gate's own 900 s cap twice. release:gate on the branch exited 1: 18 of 19 executed checks passed; full-test-suite stopped at 900 s under load (per-file-coverage skipped as its dependent); live-deploy-health skipped (no AMC_RELEASE_GATE_LIVE_URL). See release-gate-branch.json. release:prepare run 1 exited 1 at the version step: the changesets CLI refuses this repository ('Found changeset ... for package agent-maturity-compass which is not in the workspace', since the 2026-08-22 vendoring, because pnpm-workspace.yaml lists only vendor/* and packages/*). Fixed in a16d17706: release:prepare applies the version itself. release:prepare run 2 exited 1 at the release gate: docs-drift failed on the generated 2.0.0 changelog page (three changeset first lines and a /multica/i false positive on 'multicast'), and full-test-suite hit 900 s. Fixed in 0fa75227c, which also makes release:notes refuse such lines before anything is consumed. release:prepare run 3 exited 1 at the release gate only because full-test-suite hit 900 s (18 of 19 executed passed, docs-drift included; release-gate-prepare.json). Its remaining steps were then run by hand on the same tarball and passed: check-pack-contents (4,548 files, 7,983,838 bytes, sha256 3c9b49883c00..., no forbidden paths, secret scan PASS), packed-install --tarball (A4 preview gate: 0 amc_a4_* tools without AMC_A4_PREVIEW, 5 with it; /api/v1/a4 404 A4_PREVIEW_DISABLED) and npm publish <tarball> --dry-run (2.0.0, 4,548 files). The tarball sha256 was unchanged afterwards. The throwaway clones were never committed; their consumed changesets exist only there. sbom.cdx.json is the CycloneDX SBOM of that 2.0.0 candidate (526 components, sha256 b0eceb9fd6fd...). No publish, tag, push, credential or network write. The workflows were checked by the contract test and their mutations, not run in GitHub Actions."
+}
