@@ -12886,7 +12886,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/conformance:
     get:
-      summary: "Conformance statement: not evaluated until Adapt's producer (P1-61)"
+      summary: "The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's
+        signed control results, with the owner's out-of-scope settlements read now; every other stage carries no
+        plan and says not_evaluated"
       tags:
         - Studio
         - A4 Forge
@@ -12910,7 +12912,7 @@ paths:
               - assemble
               - adapt
               - activate
-          description: Stage.
+          description: Defaults to the head stage.
       responses:
         "200":
           description: Current A4 state; no-store.
@@ -14077,6 +14079,103 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/A4AssembleImport"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/stages/adapt/probe:
+    post:
+      summary: "Adapt context probe, after Build (builder or owner, owner mode): one in-process turn on the stub
+        provider with the A4 context plugin; the session's EFFECTIVE_POLICY row becomes a ledger_event ref
+        (observed when the row earns it) beside whether the plugin's exact text is in the session's signed
+        snapshot; delivery to a model and to native tasks is not evaluated"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Control"
       responses:
         "201":
           description: Recorded transition (or the recorded result of a retried request ID).

@@ -117,7 +117,12 @@ cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NAT
 Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock). A revision
 recorded before these slots existed binds them as null, so its open gates read `RESOURCE_DRIFTED` once: record a new
-revision.
+revision. The same holds for the context slots (`context.contextPluginSha256`, `context.memoryPolicySha256`,
+`context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, A4's own profile proposals for the
+agent; `operatingProfile.activationSha256`, every activation record of the agent). A prompt pack rebuilt by the prompt
+scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
+Under an active plan, Studio mints a native task's lease with the workspace lease key, which the vault holds: while the
+vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`).
 
 ## Assemble: building the agent
 
@@ -205,10 +210,11 @@ framework through a scaffold, connect instructions and a trace import.
   BLOCKED (`RESOLUTION_UNRECORDED`) and the card keeps "Record the resolution" for it. Decisions cast from the card on
   engine requests are mirrored to the human action log (`HUMAN_APPROVAL_DECISION`), as Studio's approvals page does.
 
-## Adapt: the compiled plan
+## Adapt: the compiled plan and the agent's context
 
-Adapt makes the agent specific to its audiences, markets, sector and data. This first slice is the plan: applicability,
-signing, activation and the conformance statement. Prompts, permissions, memory policy and the context probe follow.
+Adapt makes the agent specific to its audiences, markets, sector and data: applicability, signing, activation and the
+conformance statement, then the context plugin and its probe, the memory policy, the operating-profile widenings and
+the agent's prompt pack.
 
 - **Ask and Understand.** Adapt asks for audiences, workflows, preferences, languages, accessibility, the compiler's
   nine facts (jurisdictions, primary station, domains, roles, entity types, risk class, use cases, data classes; the
@@ -231,9 +237,44 @@ signing, activation and the conformance statement. Prompts, permissions, memory 
   (`POLICY_WIDENING_REFUSED`). **Review** evaluates every requirement with `evaluateControl` (no loader binds runtime
   rows to catalog evidence contracts yet, so each reads `not_evaluated`), writes the set signed (`CONTROL_RESULT`) under
   `a4-projects/<projectId>/control-results/` and reads it back verified. A set that does not verify locally, such as a
-  notary-route signature, is `not_evaluated`. Review records no observed ref (`CONTEXT_PROBE_NOT_RUN`).
+  notary-route signature, is `not_evaluated`. Review's own revision carries no observed ref; the probe's ref sits on the
+  revision it was recorded on.
+- **Context plugin.** Build writes the members' audience, market, sector, language, accessibility, data-handling and
+  regulatory-note answers as one attributed context plugin (`# A4 context: <section>`, source
+  `a4:<projectId>@r<revision>`, order 160, the catalog's notice quoted) to `<agent>/a4/context-plugin.json`. The only
+  path that delivers it is `extraContextPlugins` of an in-process `runComposedTurn` (the CLI's agent-loop run). A Studio
+  native task loads only the instructions file and the time plugin, and nothing loads the plugin into a deployed agent:
+  `context.native_delivery` stays `not_evaluated` (P2-37), and a native task started after Adapt shows no A4 context
+  plugin in its frame.
+- **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; builder or owner; owner mode) runs
+  one in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. The
+  session writer records the session's effective-policy receipt before the turn, and the probe checks that the run's
+  signed `user/message` snapshot carries the plugin's exact text. The receipt row becomes a `ledger_event` ref, observed
+  when the row earns it, with the session, the snapshot row and the receipt's `downgrades` beside it.
+  `context_reaches_runtime_frame` is READY only from that ref ("observed in-process, not in a Studio native session");
+  a failed turn (`PROBE_DENIED`) or a snapshot without the text (`CONTEXT_NOT_IN_FRAME`) never satisfies it. Delivery
+  to a model (`model_delivery`) is `not_evaluated` on the stub provider. The item is mandatory once Adapt is built, so a
+  regulated project's plan is activated only after the probe. A workspace whose session store is JSONL has no ledger row
+  for the ref, and the probe is refused (`PROBE_NOT_RECORDED`).
+- **Memory policy.** Four optional questions (privacy class, retention days, review days, consumers) build
+  `amc.a4-memory-policy/v1` with `ReasoningMemoryItem`'s field names. An empty answer takes the stated default
+  (restricted, 90 days, 30 days, every consumer), labelled `default`. Build writes it to `<agent>/memory/policy.json`,
+  inside the agent's `memory` Enforce resource, and re-writes the signed Enforce manifest after it; Review re-reads the
+  bytes Build wrote. Enforcement is `advisory`: the reasoning-memory writer does not read the file yet.
+- **Permissions.** Understand emits the primary station's operating profile to A4's own proposal file,
+  `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` (deterministic bytes; the operator's own
+  default-path profile is never touched), signs it as `domain apply --sign-profile` does, and dry-runs
+  `activateOperatingProfile` against the current verified configs. `profile_no_widening` lists each widening as
+  `scope_changed` (`POLICY_WIDENING_REFUSED`) until a project owner's revision answers `acceptWidenings` with exactly
+  their digest. A4 never passes `allowWidening` and never activates a profile: activation stays the owner's
+  `amc domain apply --activate-profile` after review. Per-agent `gatePolicy.json` and lease caps are not proposed yet.
+- **Prompt pack.** Understand and Review record the agent's latest signed prompt pack and whether it verifies under this
+  workspace's own keys (`adapt.prompt_pack_signature`, an integrity item: no lane, no claim). A prompt pack is a signed
+  Score resource; the runtime does not load it into a model's prompt, and Adapt does not build one.
 - **Conformance statement** (`amc.a4-conformance-statement/v1`): five dimensions per control and counts, never a
-  percentage. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
+  percentage. `GET /api/v1/a4/projects/:id/conformance?stage=` and the `amc_a4_conformance` MCP tool return it: Adapt's
+  from the results its newest Review recorded, with owner settlements read now; every other stage, and Adapt before its
+  Review, carries no plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
   `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays
   unresolved in the counts with `OWNER_OUT_OF_SCOPE` and `OWNER_ACKNOWLEDGED` (a true exception is P2-24).
 - **Completion.** A regulated project activates its plan at completion through the effect `a4.adapt.activate_plan`.
