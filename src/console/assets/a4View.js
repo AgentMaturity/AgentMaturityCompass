@@ -51,7 +51,7 @@ export function actionButton(label, action, allowed, attributes = "") {
 
 export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
-export const ACTIVATE_COMPLETE = "Activate completion is handled by the release card";
+export const ACTIVATE_COMPLETE = "Activate's release and deployment approval are completed on the Release card, which shows each lease token once";
 
 export const cardLabel = (card) => {
   const [stage, id] = String(card ?? "").split(":");
@@ -482,7 +482,7 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
       ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
-      ${actionButton("Complete stage", "complete", stage === "activate" && met?.gate === "completion" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
+      ${actionButton("Complete stage", "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;

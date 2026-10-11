@@ -442,9 +442,9 @@ function mountProject(projectId, options) {
       case "complete": {
         const { met } = view.currentGates(state.gates, stage, state.readiness);
         if (!met) throw new Error("No approved gate is shown for this stage. Refresh before completing it.");
-        // Activate's completion delivers the production lease token once (design §10.4); this generic action would drop
-        // it. Its direction gate carries no token and is consumed here like any other.
-        if (stage === "activate" && met.gate === "completion") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
+        // Both Activate gates run an inline effect whose lease token is answered once (the release's staging lease, the
+        // deployment approval's production lease; design §10.4); this generic action would drop it.
+        if (stage === "activate") throw new Error(`${view.ACTIVATE_COMPLETE}. Nothing was sent.`);
         return post("Complete stage", stagePath("complete"), { gateId: reviewedFor(met).gateId, ...headBinding() });
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
