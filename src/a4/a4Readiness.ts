@@ -584,14 +584,20 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   }));
 }
 
-/** The latest unexpired owner acknowledgement per item on the head revision. */
-function acknowledgements(state: A4ReadinessState, now: number): Map<string, NonNullable<A4ReadinessItem["acknowledged"]>> {
-  const out = new Map<string, NonNullable<A4ReadinessItem["acknowledged"]>>();
+/**
+ * The reason codes of an item that name a record (a deployment receipt, an AMC check): an acknowledgement is recorded
+ * with them and counts only while the item names the same records, never for a receipt or check it never saw.
+ */
+export const acknowledgedRecords = (reasonCodes: readonly string[]): string[] => reasonCodes.filter((code) => /^(RECEIPT|CHECK):/.test(code)).sort();
+
+/** The latest unexpired owner acknowledgement per item on the head revision, with the records it was recorded against. */
+function acknowledgements(state: A4ReadinessState, now: number): Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }> {
+  const out = new Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }>();
   for (const link of state.chain) {
-    const { itemId, reason, expiresTs, actorKey, ts } = link.body;
+    const { itemId, reason, expiresTs, actorKey, ts, recordCodes } = link.body;
     if (link.kind !== "ACKNOWLEDGED" || link.revisionNo !== state.project.revision_no || typeof itemId !== "string" || typeof reason !== "string"
       || typeof expiresTs !== "number" || typeof actorKey !== "string" || typeof ts !== "number" || expiresTs <= now) continue;
-    out.set(itemId, { by: actorKey, ts, expiresTs, reason });
+    out.set(itemId, { ack: { by: actorKey, ts, expiresTs, reason }, records: JSON.stringify(Array.isArray(recordCodes) ? recordCodes : []) });
   }
   return out;
 }
@@ -611,9 +617,9 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
     return built.map((candidate) => {
       const ack = acks.get(candidate.id);
-      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated);
+      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated) && ack.records === JSON.stringify(acknowledgedRecords(candidate.reasonCodes));
       return { ...candidate, bound: boundIds.includes(candidate.id),
-        ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
+        ...(acknowledged ? { acknowledged: ack.ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
     });
   };
   const first = itemsFor(opened);

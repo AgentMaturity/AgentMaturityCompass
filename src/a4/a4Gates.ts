@@ -31,7 +31,7 @@ import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
-  A4_BOUND_ITEMS, acknowledgeable, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
+  A4_BOUND_ITEMS, acknowledgeable, ACKNOWLEDGEABLE_ITEMS, acknowledgedRecords, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
   readinessBindingDigest, readinessMoved, riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
@@ -780,7 +780,10 @@ export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call
           ? `${input.itemId} is acknowledged after Review: every step before it records a new revision, and an acknowledgement counts only on its own.`
           : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
     }
-    return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS } };
+    // The receipt and check ids it names: the acknowledgement counts only while the item names the same ones.
+    const records = acknowledgedRecords(target.reasonCodes);
+    return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS,
+      ...(records.length > 0 ? { recordCodes: records } : {}) } };
   }, "a4 acknowledge");
 }
 

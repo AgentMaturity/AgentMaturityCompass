@@ -495,8 +495,10 @@ Readiness adds these items:
 - `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
   a later receipt stales an open deployment approval.
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
-  approval. It is BLOCKED on `failed`, and WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED`
-  otherwise; an owner may acknowledge either WAITING form.
+  approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
+  later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,
+  and an owner may acknowledge either WAITING form. The acknowledgement records the receipt and check ids it saw and
+  counts only while the item names the same ones, so it never carries over to a new receipt or check.
 - `backup.include_paths` (not mandatory): WAITING until the signed ops policy backs up `a4-releases/` and
   `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
 - `lifecycle.production_controls` (not mandatory): names the controls that keep the agent at staging.

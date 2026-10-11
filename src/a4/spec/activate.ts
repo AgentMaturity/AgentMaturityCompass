@@ -289,19 +289,22 @@ function receiptItem(state: A4ReadinessState, releaseId: string | null): A4Readi
 }
 
 /**
- * The newest AMC check of the bound receipt (VERIFICATION, src/a4/a4DeployVerify.ts): BLOCKED on failed (never
- * acknowledgeable), READY only on passed (unreachable before P2-40), WAITING otherwise. The receipt and check ids are
- * reason codes, so a later check moves the bound readiness.
+ * AMC's check of the bound receipt (VERIFICATION, src/a4/a4DeployVerify.ts): BLOCKED while the newest check of this
+ * release failed (never acknowledgeable; a newer receipt alone never clears it, only a later check that does not fail),
+ * READY only on passed (unreachable before P2-40), WAITING otherwise. The receipt and check ids are reason codes, so a
+ * later receipt or check moves the bound readiness, and an owner's acknowledgement counts only for the ids it named.
  */
 function amcCheckItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
   const mandatory = reached(state, "reviewed");
   const receipt = boundReceipt(state.chain, releaseId);
-  const check = receipt === undefined ? undefined
-    : cycleLinks(state.chain, "VERIFICATION").filter((link) => link.body.receiptId === receipt.body.deploymentId).at(-1);
+  const checks = releaseId === null ? [] : cycleLinks(state.chain, "VERIFICATION").filter((link) => link.body.releaseId === releaseId);
+  const check = receipt === undefined ? undefined : checks.filter((link) => link.body.receiptId === receipt.body.deploymentId).at(-1);
   const status = check?.body.amcCheckStatus;
   const bound = [...(receipt === undefined ? [] : [`RECEIPT:${String(receipt.body.deploymentId)}`]), `CHECK:${check === undefined ? "none" : String(check.body.checkId)}`];
-  if (status === "failed") return item("deployment.amc_check", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: ["AMC_CHECK_FAILED", ...codes(check?.body.reasonCodes), ...bound],
-    nextAction: { label: "AMC's check of the deployment failed while the operator's receipt may say succeeded; fix the deployment and check again" } });
+  const failed = checks.at(-1)?.body.amcCheckStatus === "failed" ? checks.at(-1) : undefined;
+  if (failed !== undefined) return item("deployment.amc_check", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: ["AMC_CHECK_FAILED", ...codes(failed.body.reasonCodes),
+    ...(failed === check ? [] : [`FAILED_CHECK:${String(failed.body.checkId)}`]), ...bound],
+  nextAction: { label: "AMC's check of the deployment failed while the operator's receipt may say succeeded; fix the deployment, record the receipt and check again" } });
   if (status === "passed") return item("deployment.amc_check", "READY", { reasonCodes: ["AMC_CHECK_PASSED", ...bound] });
   if (status === "reachable") return waiting("deployment.amc_check", ["DEPLOYMENT_IDENTITY_NOT_EVALUATED", "KEY:P2-40", ...bound], { kind: "review_pending", mandatory,
     nextAction: { label: `The destination answered; the release's identity there is not evaluated: ${IDENTITY_NOT_EVALUATED}` } });
