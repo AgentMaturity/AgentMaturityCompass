@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import { createVault, ensureVaultAndPublicKeys, lockVault, rotateMonitorKeyInVault, unlockVault, vaultExists, vaultPaths, vaultStatus } from "./vault.js";
 import { generateKeyPairSync } from "node:crypto";
 
-async function promptPassphrase(message: string): Promise<string> {
+export async function promptPassphrase(message: string): Promise<string> {
   const answers = await inquirer.prompt<{ passphrase: string }>([
     {
       type: "password",

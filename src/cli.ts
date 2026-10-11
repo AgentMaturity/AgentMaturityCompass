@@ -211,7 +211,7 @@ import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
-import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
+import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
@@ -11659,6 +11659,7 @@ vault
   });
 
 registerVaultRotationCommand(vault);
+registerKeysCommands(program); // P1-08 freeze exception: amc keys list|rotate|revoke|export-public
 
 notary
   .command("init")

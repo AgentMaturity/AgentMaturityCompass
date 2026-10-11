@@ -4,6 +4,8 @@ import chalk from "chalk";
 import type { KeyHistoryRole } from "./crypto/keyHistoryEnvelope.js";
 import { rotateVaultKeysInteractive } from "./vault/vaultCli.js";
 
+export { registerKeysCommands } from "./keys/keysCli.js";
+
 interface HistoryMigrationOptions {
   role: string;
   expectedSha256: string;
@@ -33,12 +35,12 @@ export function registerVaultHistoryCommands(vault: Command): void {
 export function registerVaultRotationCommand(vault: Command): void {
   vault
     .command("rotate-keys")
-    .description("Rotate monitor signing key and append to public key history")
+    .description("Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate")
     .action(async () => {
       const rotated = await rotateVaultKeysInteractive(process.cwd());
       console.log(chalk.green(`Monitor key rotated: ${rotated.fingerprint}`));
       console.log(`Public key path: ${rotated.publicKeyPath}`);
-      console.log(`Rotation receipt: ${rotated.rotationReceiptPath}`);
+      console.log(`Rotation statement: ${rotated.rotationReceiptPath}`);
       console.log(`Recovery files: ${rotated.recoveryDirectory}`);
     });
 }
