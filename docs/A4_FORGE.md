@@ -413,8 +413,9 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    `GET …/releases/:rid` reads the entry from the log, or shows the reason it is missing. When the append fails the
    release still finishes, but readiness item `package.transparency` is BLOCKED (`TRANSPARENCY_NOT_APPENDED`, or
    `TRANSPARENCY_LOG_UNREADABLE`) until an entry in the log names the release's exact package digest, so the deployment
-   approval cannot be requested on an unanchored package. `POST …/releases/:rid/transparency { expectedHeadSeq }`
-   (owner, owner mode) appends it: idempotent, refused `EFFECT_RUNNING` while the release effect still runs.
+   approval cannot be requested on an unanchored package. `POST …/releases/:rid/transparency { expectedHeadSeq,
+   clientRequestId }` (owner, owner mode; the Activate card's "Append the transparency entry") appends it: idempotent,
+   refused `EFFECT_RUNNING` while the release effect still runs.
 
 The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the attempt id,
 and a replay answers from the chain: `token: null` with `TOKEN_ALREADY_DELIVERED` once that attempt finished, the

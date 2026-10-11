@@ -38,7 +38,8 @@ import { completeAndRun } from "./a4RouterStages.js";
 const releaseSchema = z.strictObject({ gateId: z.string().regex(/^a4gate_[0-9a-f]{32}$/), expectedHeadSeq: z.number().int().min(0),
   clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -") });
 const RELEASE_ACTION = /^\/releases\/(a4r_[0-9a-f]{32})\/(deployments|verify|rollback\/preview|rollback|transparency)$/;
-const transparencySchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0) });
+// clientRequestId as on every A4 write; the append itself is idempotent (it reuses an entry), so a retry answers the same entry.
+const transparencySchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
 
 /**
  * POST …/releases/:rid/transparency (owner, owner mode): the package's transparency entry, appended when the release

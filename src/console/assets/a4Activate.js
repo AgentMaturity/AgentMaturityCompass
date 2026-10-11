@@ -103,7 +103,7 @@ function releaseRecord(release) {
     `<code>${esc(row.claimKind ?? "none")}</code>`, `<code>${esc(row.satisfiedBy ?? "none")}</code>`, esc(row.reason ?? "")]);
   return `<h4>Release record <code>${esc(release.releaseId)}</code></h4>
     <p class="muted">Version ${esc(release.version)} · package <code>${esc(release.packageDigest)}</code> · record envelope
-      <code>${release.envelopeValid ? "valid under this workspace's keys" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId ?? release.transparency?.reason ?? "none")}</code>
+      <code>${release.envelopeValid ? "valid under this workspace's keys or its pinned notary" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId ?? release.transparency?.reason ?? "none")}</code>
       · previous <code>${esc(release.previousReleaseId ?? "none")}</code> · base <code>${esc(release.baseReleaseId ?? "none")}</code></p>
     <p class="muted">Expert review at the deployment approval (D-21): <code>${esc(release.expertReview?.status ?? "not_recorded")}</code>${release.expertReview?.acknowledgement
       ? ` · acknowledged by <code>${esc(release.expertReview.acknowledgement.by)}</code> until ${esc(new Date(release.expertReview.acknowledgement.expiresTs).toISOString())}: ${esc(release.expertReview.acknowledgement.reason)}`
@@ -150,11 +150,13 @@ function renderRelease(ctx) {
     <p class="muted">Completing the deployment approval (completion gate) mints the production lease, whose token this page shows once, then moves the
       lifecycle to production only with every production control evidenced; in v1 it stays at staging (P2-40). A DENY of it revokes the staging lease.
       On a regulated project an owner acknowledges the pending expert review (D-21) before requesting it.</p>
-    ${["deployment.receipt", "deployment.amc_check", "monitoring.source", "regulatory_sources_status", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
+    ${["package.transparency", "deployment.receipt", "deployment.amc_check", "monitoring.source", "regulatory_sources_status", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton("Complete the deployment approval", "complete-activate", quorumMet(completion) ? ctx.allowed.progress
       : view.held("The deployment approval has no quorum yet"), `data-gate="${esc(completion?.gateId ?? "")}" ${project}`)}</div>
     ${tokenBox(tokens.get(ctx.project.projectId))}
-    ${loadButton(ctx)}${release ? releaseRecord(release) : ""}`;
+    ${loadButton(ctx)}${release ? releaseRecord(release) : ""}
+    ${release && release.transparencyEntryId === null ? `<div class="row wrap">${view.actionButton("Append the transparency entry", "append-transparency", ctx.allowed.release,
+      `data-release="${esc(release.releaseId)}" ${project}`)}</div>` : ""}`;
 }
 
 /** The prepared plan (signed a4-deployment-plan), each command with a copy button; the lease secret is a placeholder. */
@@ -352,6 +354,8 @@ export function register() {
   registerStageAction("activate", "verify", ({ button, value, headBinding, projectPath }) => ({ label: "Run AMC's check",
     path: projectPath(`/releases/${encodeURIComponent(button.dataset.release)}/verify`), body: { environment: value("verify-environment"), ...headBinding() },
     got: (data) => keep(checks, button.dataset.project, { checkId: data?.checkId, amcCheckStatus: data?.amcCheckStatus, statusText: data?.statusText }) }));
+  registerStageAction("activate", "append-transparency", ({ button, headBinding, projectPath }) => ({ label: "Append the transparency entry",
+    path: projectPath(`/releases/${encodeURIComponent(button.dataset.release)}/transparency`), body: headBinding(), got: () => loaded.delete(button.dataset.project) }));
   registerStageAction("activate", "rollback-preview", ({ button, value, headBinding, projectPath }) => ({ label: "Preview the rollback",
     path: projectPath(`/releases/${encodeURIComponent(button.dataset.release)}/rollback/preview`), body: { environment: value("rollback-environment"), ...headBinding() },
     got: (data) => previews.set(button.dataset.project, { releaseId: button.dataset.release, preview: data?.preview ?? null }) }));

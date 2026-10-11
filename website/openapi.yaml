@@ -4320,10 +4320,15 @@ components:
       additionalProperties: false
       required:
         - expectedHeadSeq
+        - clientRequestId
       properties:
         expectedHeadSeq:
           type: integer
           minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
     A4Rollback:
       type: object
       additionalProperties: false

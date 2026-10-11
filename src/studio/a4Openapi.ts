@@ -207,7 +207,7 @@ export function a4Schemas(): Record<string, unknown> {
       operatorStated: object({ status: { type: "string", enum: ["succeeded", "failed", "partial"] } }) }),
     A4Verify: control({ environment: { type: "string", enum: ["staging", "production"] } }),
     A4RollbackPreview: control({ environment: { type: "string", enum: ["staging", "production"] } }),
-    A4Transparency: object({ expectedHeadSeq: integer }),
+    A4Transparency: control(),
     A4Rollback: control({ environment: { type: "string", enum: ["staging", "production"] }, reason,
       toReleaseId: { type: ["string", "null"], pattern: "^a4r_[0-9a-f]{32}$" }, confirmManifestId: { type: ["string", "null"], pattern: "^enforce-resources-[0-9a-f]{16}$" } })
   };
