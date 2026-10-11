@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
-import { CONSTRUCT_VALIDITY_DATA } from "../src/index.js";
+import { CONSTRUCT_VALIDITY_DATA } from "../src/compliance/globalRegulatory.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS, latestObservedEvidenceShare } from "../src/score/industryTrustModels.js";
 import { sha256Hex } from "../src/utils/hash.js";
