@@ -182,7 +182,7 @@ amc guide --go</code></pre>
 <h3>4. Generate the audit binder</h3>
 
 <pre><code><span style="color:#6a9955"># Export compliance evidence for regulatory review</span>
-amc audit binder create --framework eu-ai-act
+amc audit binder create --scope workspace --out binder.amcaudit
 
 <span style="color:#6a9955"># Generate a compliance report</span>
 amc compliance report --framework eu-ai-act
