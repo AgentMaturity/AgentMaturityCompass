@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { piSessionSha256 } from "../adapters/pi/piIdentity.js";
-import { measurePiInstall, type PiInstall } from "../adapters/pi/piInstall.js";
+import { cachedFileSha256, measurePiInstall, type PiInstall } from "../adapters/pi/piInstall.js";
 import { isQualifiedPiVersion } from "../adapters/pi/piVersions.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
@@ -77,7 +77,7 @@ type LedgerHandle = ReturnType<typeof openLedger>;
 const eventIdFor = (agentId: string, sessionId: string, manifestSha256: string) =>
   `pi_registration_${sha256Hex(canonicalize({ agentId, session: piSessionSha256(sessionId), manifest: manifestSha256 })).slice(0, 44)}`;
 const manifestPath = (workspace: string) => join(workspace, ".amc", "hooks", "pi.json");
-const fileSha256 = (path: string) => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
+const fileSha256 = cachedFileSha256;
 const ledgerSessionFor = (eventId: string) => `pi-registration-session-${sha256Hex(eventId).slice(0, 36)}`;
 const bodySha256 = (record: PiRegistrationRecord) => sha256Hex(Buffer.from(canonicalize(record), "utf8"));
 const invalid = (message: string) => new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, message);
@@ -145,12 +145,30 @@ function verifiedRegistration(ledger: LedgerHandle, eventId: string, agentId: st
   }
 }
 
-/** The verified registration of Pi session `sessionId` for `agentId` under the current installation, read through an open ledger. */
+/** Whether the extension file, AMC's module and the Pi install on disk are still what `record`'s installation bound. */
+function stillOnDisk(workspace: string, manifestBytes: Buffer, record: PiRegistrationRecord): boolean {
+  const manifest = signedManifestSchema.safeParse(JSON.parse(manifestBytes.toString("utf8")));
+  return manifest.success && manifest.data.piInstall !== null
+    && fileSha256(join(workspace, ".pi", "extensions", "amc.js")) === manifest.data.extensionSha256
+    && fileSha256(manifest.data.modulePath) === record.extensionSha256
+    && measurePiInstall(manifest.data.piInstall.packageDir)?.sha256 === record.piInstallSha256;
+}
+
+/**
+ * The verified registration of Pi session `sessionId` for `agentId` under the current installation, read through an
+ * open ledger. Every call rechecks the disk (cheaply, see cachedFileSha256): once the extension file, AMC's module or
+ * the Pi install differs from what the session registered, the session is not governed.
+ */
 export function piSessionRegistration(ledger: LedgerHandle, agentId: string, sessionId: string): PiSessionRegistration {
-  const manifestSha256 = fileSha256(manifestPath(ledger.workspace));
-  if (manifestSha256 === null) return { status: "missing" };
+  const path = manifestPath(ledger.workspace);
+  if (!existsSync(path)) return { status: "missing" };
+  const manifestBytes = readFileSync(path);
+  const manifestSha256 = sha256Hex(manifestBytes);
   const found = verifiedRegistration(ledger, eventIdFor(agentId, sessionId, manifestSha256), agentId);
-  return found.status === "registered" && found.record.manifestSha256 !== manifestSha256 ? { status: "missing" } : found;
+  if (found.status !== "registered") return found;
+  if (found.record.manifestSha256 !== manifestSha256) return { status: "missing" };
+  return stillOnDisk(ledger.workspace, manifestBytes, found.record) ? found
+    : { status: "invalid", reason: "the AMC extension or Pi on disk changed after this session registered" };
 }
 
 /** Record (or replay) the registration of one Pi session. A different registration for a recorded session is a conflict. */

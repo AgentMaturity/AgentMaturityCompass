@@ -128,6 +128,29 @@ describe("Pi session registration (a lease-holder attestation checked against di
     expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted", governance: { claim: "not_governed" } });
   });
 
+  test("every call rechecks the extension and Pi on disk: after a swap the call is denied as not governed, never receipted enforced", () => {
+    const workspace = installed();
+    route(workspace, registration());
+    const call = (id: string) => route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: id })) as unknown as
+      { decision: string; reason: string; receipt: string };
+    const enforcement = (id: string) => {
+      const decision = call(id);
+      return { decision: decision.decision, reason: decision.reason,
+        level: (verifyReceipt(decision.receipt, getPurposeKeyHistory(workspace, "receipt")).payload as { enforcement: { level: string } }).enforcement.level };
+    };
+    expect(enforcement("before")).toMatchObject({ decision: "allow", level: "enforced" });
+
+    const extensionFile = join(workspace, ".pi", "extensions", "amc.js");
+    const original = readFileSync(extensionFile);
+    writeFileSync(extensionFile, "export default function () {}\n");
+    expect(enforcement("swapped-extension")).toEqual({ decision: "deny", reason: expect.stringContaining("not governed"), level: "advisory" });
+    writeFileSync(extensionFile, original);
+    expect(enforcement("restored")).toMatchObject({ decision: "allow", level: "enforced" });
+
+    appendFileSync(join(piPackage, "dist", "bundle", "chunks", "runtime.js"), "export const patched = true;\n");
+    expect(enforcement("patched-pi")).toEqual({ decision: "deny", reason: expect.stringContaining("not governed"), level: "advisory" });
+  });
+
   test("tampered registrations are refused: a foreign extension digest, a conflicting re-registration, an altered ledger row", () => {
     const workspace = installed();
     const refused = (rawInput: string, code: string) => expect(() => route(workspace, rawInput))
