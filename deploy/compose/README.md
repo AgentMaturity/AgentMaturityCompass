@@ -96,4 +96,25 @@ The API image target is additive; the default Docker target remains Studio. Use 
 
 ## A4 Forge releases (preview)
 
-With `AMC_A4_PREVIEW=1`, an A4 project's Activate stage signs an agent package and records the release; AMC never runs these commands. In v1 a deployment is a same-host restart with a pinned image: the Compose overlay restarts this hosted Studio, the one that built the agent, whose data volume holds the agent's resources. A deployment receipt is recordable only for an agent built in this hosted Studio; an agent built elsewhere has no v1 deployment path (`DEPLOYMENT_NOT_SAME_HOST`), and installing a package into another workspace is P2-40. The package under `a4-releases/<projectId>/<releaseId>/` is the signed provenance record of what the workspace held at the release, not an installable. The image stays pinned by tag until D-03 and P0-14 provide a digest (`IMAGE_TAG_ONLY`, a WAITING item). The staging lease token is shown once by the release response: mount it as an operator-supplied secret file and never commit it. AMC's check of a deployment establishes reachability only; release identity at the destination is not evaluated until P2-40. Back up `a4-releases/` and `a4-projects/` with the data volume.
+With `AMC_A4_PREVIEW=1`, an A4 project's Activate stage signs an agent package and records the release; AMC never runs these commands. In v1 a deployment is a same-host restart with a pinned image: the Compose overlay restarts this hosted Studio, the one that built the agent, whose data volume holds the agent's resources. A deployment receipt is recordable only for an agent built in this hosted Studio; an agent built elsewhere has no v1 deployment path (`DEPLOYMENT_NOT_SAME_HOST`), and installing a package into another workspace is P2-40. The package under `a4-releases/<projectId>/<releaseId>/` is the signed provenance record of what the workspace held at the release, not an installable. Back up `a4-releases/` and `a4-projects/` with the data volume: list both in the ops policy's `backups.includePaths` before proposing a release.
+
+The package's `deploy/` directory holds the prepared overlay `docker-compose.a4-<releaseId>.yml` and `deploy/plan.json`, which lists the steps, the receipt form and the known gaps and is signed `a4-deployment-plan`. Run the steps from this directory on the host that runs the Studio:
+
+```bash
+docker compose -f docker-compose.yml cp studio:/data/amc/a4-releases/<projectId>/<releaseId>/deploy/docker-compose.a4-<releaseId>.yml ./
+# Write the lease token (shown once by AMC) to ./secrets/amc_a4_lease_<releaseId>.txt with mode 0600; never commit it.
+docker compose -f docker-compose.yml exec studio amc doctor --strict --json
+docker compose -f docker-compose.yml -f docker-compose.a4-<releaseId>.yml up -d
+sha256sum docker-compose.a4-<releaseId>.yml
+```
+
+The overlay has these known limits:
+
+- The image is pinned by tag only until D-03 and P0-14 provide a digest (`IMAGE_TAG_ONLY`, a WAITING item, never a blocker).
+- The overlay sets `AMC_A4_PREVIEW=1`.
+- It moves the signed-journal checkpoint root to its own named volume at `/workspace`, outside the `/data/amc` workspace.
+- It mounts the lease token file as a Compose secret. Nothing in the Studio reads it; it is for the agent's gateway client.
+
+Record what happened with `POST /api/v1/a4/projects/<projectId>/releases/<releaseId>/deployments` (owner): the release's `packageDigest`, the `overlayDigest` above, the `restartedAt` time, the lease id, the `destinationRef` and `operatorStated.status`. That receipt is the operator's statement. AMC's own check is `POST …/releases/<releaseId>/verify`. It runs token-less against the receipt's destination over TLS and establishes reachability only: release identity at the destination is not evaluated until P2-40. A destination that resolves to a private address is refused, and nothing is recorded. The two results stay in separate columns.
+
+To roll back, an owner previews the rollback and project approvers other than the confirming owner decide its DEPLOY engine request. Confirming it restores the previous Enforce snapshot, revokes the release's leases and returns the commands. The commands copy the previous release's overlay out and run `docker compose -f docker-compose.yml -f docker-compose.a4-<previousReleaseId>.yml up -d`, or the base file alone when there is no earlier release. Never use `down -v`. Record the rollback row afterwards.

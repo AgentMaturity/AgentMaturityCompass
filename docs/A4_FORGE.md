@@ -422,8 +422,74 @@ NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both
 operator whose `trust.yaml` lists `requireNotaryFor` explicitly and sets that flag to `false` adds `A4_PACKAGE` to the
 list and re-signs the file. Expect one notary call for every gate decision.
 
-Not yet: prepared Compose and Helm files, deployment receipts, AMC's verify, rollback, the lifecycle bridge, monitoring
-and value (P1-62 slices B and C). Back up `a4-releases/` with the workspace.
+## Activate: deployment, AMC's check, rollback and the lifecycle bridge
+
+The package also carries the prepared deployment under `deploy/`: the Compose overlay
+`docker-compose.a4-<releaseId>.yml` or the Helm values overlay `values.a4-<releaseId>.yaml`, and `deploy/plan.json` with
+the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollback), the receipt form and the gaps. The plan
+is signed `a4-deployment-plan`. AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
+tag (`IMAGE_TAG_ONLY`, until D-03 and P0-14), and a Helm topology is undecided (`TOPOLOGY_UNDECIDED`, until D-03). Both are
+WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
+workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The lease token is mounted
+as an operator-supplied secret file. The update policy is `update-policy.yaml`, signed beside it (`A4_PACKAGE`); nothing
+enforces it yet (P2-34).
+
+`POST …/releases/:rid/deployments` (owner, owner mode) records the operator's receipt
+(`amc.a4-deployment-receipt/v1`, signed `a4-deployment-receipt`, `self_reported`): `kind` (`deploy`, or `rollback` after
+a rollback), `environment`, `target`, `packageDigest`, `imageDigest`, `overlayDigest`, `restartedAt` (operator-stated),
+`helmRevision` (a Helm target only), `leaseIds`, `destinationRef` and `operatorStated.status`. It lists what changed and
+nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unless this Studio runs under the target, and
+with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
+production lease) or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
+moves the project's `deployedReleaseId`; a succeeded rollback row moves it to the release rolled back to.
+
+`POST …/releases/:rid/verify { environment }` (owner, owner mode) is AMC's own check of the newest receipt's
+`destinationRef`. It sends no credential, and a body naming a URL is 400. A receipt whose destination is not the declared
+`destinationRef` fails at once (`DESTINATION_MISMATCH`). The host goes through `resolveAndCheck`: a destination that
+resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRESS_REFUSED`, naming the address), and
+nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
+checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.
+`/readyz` READY gives `reachable`; a 503, a redirect, a refused certificate or a mismatch gives `failed`. The image,
+package and plan-head checks are `not_evaluated` ("no unauthenticated digest source at the destination (P2-40)"), so
+`passed` is unreachable in v1. No probe turn runs. The row keeps the operator's `recorded_status` untouched and adds
+`amc_check_status`, the resolved address, the response digest and a VerifierReportV1. The status text composes both
+columns, for example "recorded: succeeded; AMC check: reachable, release identity not evaluated at the destination
+(P2-40)".
+
+Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
+`a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
+separation of duties. The preview names the previous release, its Enforce manifest, the leases, the prepared commands
+and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+then confirms the exact ids the preview bound and runs these steps:
+
+1. An incident freeze, first, for a high or critical risk tier.
+2. `restoreEnforceResourceSnapshot({ apply: true, confirmManifestId })`.
+3. Every lease of the release revoked.
+4. The prepared operator commands answered.
+5. A signed `a4-rollback-receipt` written and a `ROLLBACK` transition recorded. The project holds when a freeze was raised.
+
+A rollback may run on a held or frozen project. The lifecycle is never moved backwards. The project's
+`deployedReleaseId` moves only when the operator records the rollback row.
+
+The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves
+an agent still at development to testing (the Aspire charter gate, an executed non-stub validation and the brief's misuse
+section), then testing → staging. After the production lease it moves staging → production. Each step advances only when
+every control of the bridge table has a ref, and records each control's ref, claim kind and reason. In v1 `rollback_plan_validated` and `operator_handoff_acknowledged` need a `passed` AMC check,
+so the agent stays at staging (P2-40). `assurance_pack_passing` needs an assurance run artifact.
+`monitoring_slo_enabled` needs a monitor ref that carries a first SLO measurement.
+
+Readiness adds these items:
+
+- `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
+  a later receipt stales an open deployment approval.
+- `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
+  approval. It is BLOCKED on `failed`, and WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED`
+  otherwise; an owner may acknowledge either WAITING form.
+- `backup.include_paths` (not mandatory): WAITING until the signed ops policy backs up `a4-releases/` and
+  `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
+- `lifecycle.production_controls` (not mandatory): names the controls that keep the agent at staging.
+
+Monitoring and value are P1-62 slice C.
 
 ## Deployment boundary
 
@@ -431,8 +497,8 @@ AMC prepares deployment plans and records what the operator says happened; it ne
 credentials and never merges the operator's statement with its own check. A deployment row has two columns:
 `recorded_status` (the operator's statement, `self_reported`) and `amc_check_status` (`not_evaluated`, `reachable`,
 `passed` or `failed`; AMC's own probe). In v1 the deployment is a same-host restart of the hosted Studio that built the
-agent, from a pinned image (D-18); the first real deployment target is P2-40. "Verified" is reserved for the
-independently reviewed lane.
+agent, from a pinned image (D-18); the first real deployment target is P2-40. The only outbound connection A4 makes is
+the owner's token-less check of a receipt's destination. "Verified" is reserved for the independently reviewed lane.
 
 ## Private text and erasure
 
