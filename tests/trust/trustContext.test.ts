@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
@@ -8,6 +8,7 @@ import { initWorkspace } from "../../src/workspace.js";
 import { distrustEntry, listEntry, testKey, trustList } from "./trustFixtures.js";
 import { recordHighWater } from "../../src/keys/highWater.js";
 import { sha256Hex } from "../../src/utils/hash.js";
+import { trustRootSetIdOf } from "../../src/trust/rootRotation.js";
 
 const NOW = new Date("2026-10-06T00:00:00.000Z");
 const root = testKey();
@@ -118,6 +119,17 @@ describe("loadTrustContext", () => {
 });
 
 describe("m-of-n never falls back to a weaker policy (P1-08, security review)", () => {
+  it("a dangling default trust list is refused, never read as no list (self-audit)", () => {
+    const amcHome = home();
+    mkdirSync(join(amcHome, "trust"), { recursive: true });
+    symlinkSync(join(amcHome, "nowhere.json"), join(amcHome, "trust", "amc-trust-list.json"));
+    expect(() => loadTrustContext({ amcHome, now: NOW, trustRoots: [root.keyId] })).toThrow();
+  });
+
+  it("a root pinned twice is the same root set as the root pinned once (self-audit)", () => {
+    expect(trustRootSetIdOf([root.keyId, root.keyId])).toBe(trustRootSetIdOf([root.keyId]));
+  });
+
   const second = testKey();
   const policy = (amcHome: string, value: unknown) => put(join(amcHome, "trust", "trust-roots.json"), value);
   const listFile = (amcHome: string, signers: typeof root[], patch: Record<string, unknown> = {}, sequence = 1) => {

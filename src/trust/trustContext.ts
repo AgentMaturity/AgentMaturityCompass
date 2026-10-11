@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
@@ -77,7 +77,8 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   if (monitor) explicitPins.push({ keyId: fingerprint(monitor.value, monitor.origin), purposes: ["ledger-row"], origin: monitor.origin });
 
   const defaultList = join(trustDir, "amc-trust-list.json");
-  const listPaths = opts.trustLists?.length ? opts.trustLists : existsSync(defaultList) ? [defaultList] : [];
+  // lstat, not exists: a dangling or unreadable default list is refused when read, never taken as no list.
+  const listPaths = opts.trustLists?.length ? opts.trustLists : lstatSync(defaultList, { throwIfNoEntry: false }) !== undefined ? [defaultList] : [];
   const rootsFile = join(trustDir, "trust-roots.json");
   // The operator's m-of-n policy is read whenever lists are checked and the file exists, --trust-root flags included:
   // a flag replaces the root set, never the threshold, and an unreadable policy is refused, never skipped (P1-08).

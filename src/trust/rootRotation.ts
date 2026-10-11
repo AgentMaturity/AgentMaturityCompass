@@ -281,5 +281,5 @@ function finishInterruptedApply(home: string, statementBytes: Buffer, currentRoo
 
 /** The id that scopes trust-list marks to one pinned root set. */
 export function trustRootSetIdOf(roots: readonly string[]): string {
-  return sha256Hex([...roots].sort().join(",")).slice(0, 16);
+  return sha256Hex([...new Set(roots)].sort().join(",")).slice(0, 16);
 }
