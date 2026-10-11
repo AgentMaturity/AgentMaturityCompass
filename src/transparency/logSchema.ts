@@ -17,6 +17,8 @@ import { MERKLE_ALGORITHMS } from "./merkle.js";
  * record in the hash chain, so the move cannot be undone by deleting a file.
  *
  * `a4-binder` (P1-63) records the signed manifest of an A4 binder slice (src/a4/a4Binder.ts).
+ *
+ * `a4-package` (P1-62) records the signed manifest of an A4 agent package (src/a4/a4Package.ts).
  */
 export const TRANSPARENCY_ARTIFACT_KINDS = [
   "amccert",
@@ -32,7 +34,8 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "vulnerability-scan-report",
   "session-root",
   "merkle-migration",
-  "a4-binder"
+  "a4-binder",
+  "a4-package"
 ] as const;
 
 export type TransparencyArtifactKind = (typeof TRANSPARENCY_ARTIFACT_KINDS)[number];

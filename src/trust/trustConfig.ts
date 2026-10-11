@@ -55,7 +55,8 @@ export const signKindValues = [
   "MIGRATION_RECEIPT",
   "CONTROL_PLAN",
   "CONTROL_RESULT",
-  "A4_RECORD"
+  "A4_RECORD",
+  "A4_PACKAGE"
 ] as const;
 
 export type SignKind = (typeof signKindValues)[number];
@@ -83,7 +84,8 @@ export const trustConfigSchema = z.object({
         "CERT",
         "INSTALLED_LOCK",
         "RELEASE_MANIFEST",
-        "BACKUP_MANIFEST"
+        "BACKUP_MANIFEST",
+        "A4_PACKAGE"
       ]),
       denyLocalVaultSigningIfNotaryEnabled: z.boolean().default(true),
       notaryMaxClockSkewSeconds: z.number().int().positive().default(120)
@@ -129,7 +131,8 @@ function defaultTrustConfig(): TrustConfig {
           "CERT",
           "INSTALLED_LOCK",
           "RELEASE_MANIFEST",
-          "BACKUP_MANIFEST"
+          "BACKUP_MANIFEST",
+          "A4_PACKAGE"
         ],
         denyLocalVaultSigningIfNotaryEnabled: true,
         notaryMaxClockSkewSeconds: 120
