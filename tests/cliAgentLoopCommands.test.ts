@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -334,6 +334,23 @@ describe("amc agent-loop — the operator surface", () => {
       expect(resumed.summary.driverStatus).toBe("idle");
       expect(resumed.summary.endings.map(ending => ending.reason)).toEqual(["error", "complete"]);
       expect(resumed.summary.assistantText.join(" ")).toContain("stub provider");
+    });
+
+    it.runIf(process.platform !== "win32")("names the credentials-home permission refusal instead of a generic composition error (P0-56)", async () => {
+      process.chdir(dir);
+      const secret = "p0-56-secret-value-never-printed";
+      writeFileSync(join(home, ".credentials.yaml"), `AMC_P056_KEY: ${secret}\n`, { mode: 0o600 });
+      chmodSync(home, 0o755);
+      const { program, captured } = programWith();
+      const failure = await run(program, ["agent-loop", "run", "hello", "--credentials-home", home, "--json"]).then(
+        () => null, (error: unknown) => error as Error & { kind?: string; mode?: number; fixCommand?: string });
+      expect(failure, "the run must still be refused (fail closed)").not.toBeNull();
+      expect(failure).toMatchObject({ name: "CredentialsFilePermissionsError", kind: "directory", mode: 0o755, fixCommand: `chmod 700 ${home}` });
+      expect(failure!.message).toContain(home);
+      expect(failure!.message).toContain(`chmod 700 ${home}`);
+      expect(failure!.message).not.toContain("composition did not provide");
+      expect([failure!.message, ...captured.out, ...captured.errors].join("\n")).not.toContain(secret);
+      expect(captured.out).toEqual([]);
     });
 
     it("refuses a run it cannot compose, and names the flag that was wrong", async () => {
