@@ -241,7 +241,9 @@ function sourceRevision() {
   return revision;
 }
 
-export async function buildPagesSite({ output = defaultOutput, explicit = false } = {}) {
+// D-12 (AMC-1543): the TypeDoc reference was never reviewed, so Pages leaves it out unless explicitly asked for.
+export async function buildPagesSite({ output = defaultOutput, explicit = false,
+  apiReference = process.env.AMC_PAGES_API_REFERENCE === "1" } = {}) {
   // A source version bump must not deploy installer URLs for unpublished assets.
   verifyPublishedInstallerVersion(repositoryRoot);
   const resolvedOutput = resolve(output);
@@ -278,6 +280,9 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   const brandManifestPath = resolve(resolvedOutput, "brand-assets.json");
   writeFileSync(brandManifestPath, `${JSON.stringify(brandManifest, null, 2)}\n`, "utf8");
 
+  if (!apiReference) {
+    return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput: null };
+  }
   // The reference is built from the public source entries into this same staged
   // artifact, never copied from a possibly stale website/api directory.
   const apiOutput = resolve(resolvedOutput, "api");
