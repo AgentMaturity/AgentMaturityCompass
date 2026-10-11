@@ -39,7 +39,7 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "./a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "./a4Readiness.js";
 import { a4Fail, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
@@ -49,8 +49,8 @@ import {
 import { answerValues, listValue, textValue } from "./spec/aspire.js";
 import { A4_PROBE_SESSION_PREFIX, type A4Answer } from "./a4Schema.js";
 
-export const A4_CONTEXT_ORDER = 160;
-export const CONTEXT_PLUGIN_SCHEMA = "amc.a4-context-plugin/v1";
+const A4_CONTEXT_ORDER = 160;
+const CONTEXT_PLUGIN_SCHEMA = "amc.a4-context-plugin/v1";
 export const PROBE_PURPOSE = "adapt_context_probe";
 export const PROBE_LIMITATION = "observed in-process, not in a Studio native session";
 const PROBE_PROMPT = "AMC A4 Adapt context probe: reply in one line.";
@@ -74,7 +74,7 @@ const line = (label: string, value: readonly string[] | string | null): string =
  * The frame text (pure): every section from the answers, attributed, with the catalog's notice and the claim boundary
  * quoted verbatim (Adapt composes no regulatory sentence of its own). Unknown is said as "not stated", never guessed.
  */
-export function contextPluginText(input: { projectId: string; revisionNo: number; answers: readonly A4Answer[]; clocks: ReadonlyArray<{ clockId: string }> }): string {
+function contextPluginText(input: { projectId: string; revisionNo: number; answers: readonly A4Answer[]; clocks: ReadonlyArray<{ clockId: string }> }): string {
   const values = answerValues(input.answers);
   const list = (id: string): string[] => listValue(values.get(id));
   const fact = (name: Parameters<typeof factAnswer>[1]): string[] | null => factList(factAnswer(input.answers, name)?.value);
@@ -202,7 +202,7 @@ export function promptPackSha256(workspace: string, agentId: string): string | n
   }
 }
 
-export interface ContextProbeOutcome {
+interface ContextProbeOutcome {
   readonly sessionId: string;
   readonly systemPromptEventId: string;
   /** The reason on the session's signed turn/end row (`complete`, `blocked`, `error`, ...), `unknown` when none verifies. */
@@ -264,7 +264,7 @@ export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unkn
  * the turn and writes nothing into its session: no tools, no receipt of its own. A compiled plan that does not verify
  * refuses it, as agentToolset refuses a session; so does a JSONL session store (sticky per workspace), before any turn.
  */
-export async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
+async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
   if (resolveSessionStoreBackend(input.workspace) === "jsonl") {
     throw fail(409, "PROBE_NOT_RECORDED", "This workspace's session store is JSONL, which has no ledger row an A4 ref can name; nothing was run.", { reasonCodes: ["SESSION_STORE_JSONL"] });
   }
@@ -339,11 +339,7 @@ export async function handleAdaptRoute(route: A4Route, projectId: string, tail: 
   return probe(route, projectId);
 }
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "implementation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
+const { item } = readinessItemBuilders("implementation");
 
 /** The newest probe of exactly this build's plugin (its text's and its file's sha256), and its ref as resolved at this read. */
 function probeOf(state: A4ReadinessState, context: NonNullable<AdaptBuild["context"]>) {

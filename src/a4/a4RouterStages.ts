@@ -30,12 +30,12 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import { flatSlots,
-  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4ChainLink, type A4Principal, type A4Question, type A4Stage, type A4Step
+  a4ResourceDigestsSchema, clientRequestIdSchema, gatePolicyDigestOf, headSeqSchema, reasonSchema, type A4ChainLink, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
 import {
-  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, understandingCurrent
+  hypothesisDigestOf, previousHypotheses, PRODUCERS as ASPIRE_PRODUCERS, QUESTIONS as ASPIRE_QUESTIONS, stageSpecOf, understandingCurrent
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
@@ -119,9 +119,6 @@ const STEP_ROUTES: Record<StepRoute, { action: A4Action; from: readonly A4Step[]
   review: { action: "review", from: ["built"], to: "reviewed", output: "review" }
 };
 const UNDERSTANDING_STEPS: ReadonlySet<StepRoute> = new Set(["confirm-understanding", "explain", "propose"]);
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
 const base = { expectedHeadSeq: headSeqSchema, clientRequestId: clientRequestIdSchema };
 // Required on the no-producer path (stageStep); beside a producer it is the member's own statement, recorded next to AMC's.
 const content = z.string().trim().min(1).max(65_536).optional();
@@ -135,17 +132,6 @@ const STEP_SCHEMAS = {
   build: z.strictObject({ ...base, content }),
   review: z.strictObject({ ...base, content })
 } as const;
-
-/** The newest revision recorded at `stage`, and its answers. */
-function stageSpec(state: A4ReadinessState, stage: A4Stage): { spec: Record<string, unknown>; answers: A4Answer[] } {
-  const revision = state.revisions.filter((row) => row.stage === stage).at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers };
-}
 
 /**
  * The slots a revision binds: every slot a lane registered a recomputer for (the signed configs, Aspire's brief), as it
@@ -224,7 +210,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
     // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
     if ((stage === "aspire" || stage === "assemble") && UNDERSTANDING_STEPS.has(kind)) {
-      const { spec, answers } = stageSpec(state, stage);
+      const { spec, answers } = stageSpecOf(state, stage);
       if (!understandingCurrent(spec, answers)) {
         throw a4Fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
       }
@@ -269,7 +255,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       const readiness = check(state);
       const project = state.project;
       const specs: A4ChangeSpec[] = [];
-      const { spec, answers } = stageSpec(state, stage);
+      const { spec, answers } = stageSpecOf(state, stage);
       if (kind === "answers") {
         const revisionNo = project.revision_no + 1;
         const bank = STAGE_QUESTIONS[stage];
@@ -448,7 +434,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
   return respond(route, projectId, request, () => {
     const state = precheck(route, projectId, "observeHypothesis", body.expectedHeadSeq);
     if (state.project.stage === "aspire") throw a4Fail(409, "A4_STEP_ORDER", "Hypotheses are observed after Aspire; the project is still at Aspire.");
-    const { spec } = stageSpec(state, "aspire");
+    const { spec } = stageSpecOf(state, "aspire");
     const hypothesis = previousHypotheses(spec).find((entry) => entry.id === hypothesisId);
     if (hypothesis === undefined) throw a4Fail(404, "A4_HYPOTHESIS_NOT_FOUND", `no hypothesis ${hypothesisId} in the Aspire brief`);
     // The ref binds this hypothesis's content: an older observation of another statement under the same id does not count.

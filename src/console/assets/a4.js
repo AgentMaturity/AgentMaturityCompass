@@ -449,7 +449,8 @@ function mountProject(projectId, options) {
       }
       case "hold": return post("Hold", projectPath("/hold"), { reason: reason(), ...headBinding() }, REASON);
       case "resume": return post("Resume", projectPath("/resume"), { reason: reason(), ...headBinding() }, REASON);
-      // The item was listed by the viewed stage's readiness, so it is acknowledged at that stage, not the head's.
+      // The item was listed by the viewed stage's readiness, which offers Acknowledge only at the project's current stage;
+      // sending that stage binds it, so a project that moved on since is refused (409 A4_STEP_ORDER), never acknowledged elsewhere.
       case "acknowledge": return post("Acknowledge", projectPath("/acknowledge"), { itemId: button.dataset.item, stage, reason: reason(), ...headBinding() }, REASON);
       // The attempt readiness named (owner only); the effect's own stage, which may not be the one viewed.
       case "retry-effect": return post("Retry effect", projectPath(`/stages/${encodeURIComponent(button.dataset.effectStage)}/effects/${

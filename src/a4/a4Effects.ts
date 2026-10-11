@@ -441,7 +441,7 @@ export function assertCallerNotCounted(keys: unknown, principal: Pick<A4Principa
  * one transaction. A gate-quorum effect above WRITE_LOW is refused to a caller the gate counted (409 SOD_VIOLATION). The
  * caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
  */
-export function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
+function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");

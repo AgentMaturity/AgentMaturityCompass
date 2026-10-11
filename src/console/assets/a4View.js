@@ -4,7 +4,7 @@ import { renderEvidenceRefList } from "./components/evidenceRefList.js";
 import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
 
 export const STAGES = ["aspire", "assemble", "adapt", "activate"];
-export const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
+const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
 const STEP_TITLES = { asked: "Ask", understood: "Understand", explained: "Explain", proposed: "Propose",
   direction_approved: "Direction approved", built: "Build", reviewed: "Review", completion_approved: "Completion approved" };
 const LANES = [["recommendation", "Recommendation"], ["implementation", "Implementation"], ["observed", "Observed"],
@@ -53,7 +53,7 @@ export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
 export const ACTIVATE_COMPLETE = "Activate's release and deployment approval are completed on the Release card, which shows each lease token once";
 
-export const cardLabel = (card) => {
+const cardLabel = (card) => {
   const [stage, id] = String(card ?? "").split(":");
   return id ? `${stageTitle(stage)} › ${id}` : String(card ?? "");
 };
@@ -259,7 +259,7 @@ export function renderReviewCard(ctx) {
  * One thread per stage-qualified card id (`aspire:specification`), the key a4.js posts and presence uses. Studio names a
  * comment's author by principal key only; a current member's key is shown as their username.
  */
-export function renderComments(cardId, comments, members = []) {
+function renderComments(cardId, comments, members = []) {
   const names = new Map(members.map((member) => [member.principalKey, member.username]));
   const rows = comments.filter((comment) => comment.cardId === cardId).map((comment) => `<li>
     <span class="pill">SELF_REPORTED</span> <strong>${esc(names.get(comment.authorKey) ?? comment.authorKey)}</strong>
@@ -412,7 +412,7 @@ function decisionRow(decision, reasonCodes = []) {
   return `<li>${strikeIfStale(`${esc(decision.username)} <code>${esc(decision.decision)}</code>`, reasonCodes)} ${codes(reasonCodes)}
     <span class="muted">${time(decision.ts)}</span>${decision.selfApproved ? ` <span class="muted">${TRUTH.selfApproved}</span>` : ""}</li>`;
 }
-export const POLICY_ELSEWHERE = "A gate-policy change is open. This page does not show the proposed policy, so it cannot be decided here";
+const POLICY_ELSEWHERE = "A gate-policy change is open. This page does not show the proposed policy, so it cannot be decided here";
 
 function gateChangeBanner({ from, to }) {
   const what = from.gateId === to.gateId && from.bindingDigest === to.bindingDigest
@@ -428,7 +428,7 @@ function gateChangeBanner({ from, to }) {
  * self-approval is open. Approve is held with that code from the gate's own excludedKeys, under the key Studio derives:
  * a WORKSPACE_ROUTER principal is checked from session records, a LOCAL_USER one from users.yaml.
  */
-export function approveOffer(decide, gate, readiness, me) {
+function approveOffer(decide, gate, readiness, me) {
   const key = typeof me?.userId === "string" ? `${readiness.identityCheck === "session_record" ? "WORKSPACE_ROUTER" : "LOCAL_USER"}:${me.userId}` : null;
   if (key === null || readiness.selfApprovalAllowed === true || !Array.isArray(gate?.excludedKeys) || !gate.excludedKeys.includes(key)) return decide;
   return refuse(decide, "SOD_VIOLATION");
@@ -551,7 +551,7 @@ const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
  * Applies jsonDiff rows onto another spec ("apply my changes on top"); a missing `after` deletes the key. A row reaching
  * through a value that is not an object there is refused, never replaced by {} (mergeOnTop avoids it).
  */
-export function applyChanges(base, changes) {
+function applyChanges(base, changes) {
   let out = structuredClone(isObject(base) ? base : {});
   for (const { path, after } of changes) {
     if (path.some((key) => UNSAFE_KEYS.has(key))) throw new Error("The specification uses a reserved key name.");

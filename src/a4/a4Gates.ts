@@ -199,7 +199,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
  * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route and the releases' transparency entries only at Activate.
  */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
+function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
   const route = collectRoute(workspace);
@@ -269,6 +269,7 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
     throw fail(403, code, `refused: ${codes.join(", ")}`, codes);
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
+  if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
 }
 
@@ -309,7 +310,7 @@ export function refuseOnFreeze(store: A4Store, projectId: string): void {
 type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | readonly A4ChangeSpec[] };
 
 /**
- * One governed write (design §4.3, C-26): the freeze refusal (not for a `remedy`), the plan on rows read under the project lock, the store's
+ * One governed write (design §4.3, C-26): the freeze refusal (not for a `remedy`, a rollback whose plan applies every other refusal), the plan on rows read under the project lock, the store's
  * envelope signing outside the transaction, and the same plan again inside it. The transition records that evaluation's
  * fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the automatic hold; a
  * notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
@@ -324,7 +325,6 @@ type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness
  */
 export function governed(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
   plan: Plan, remedy = false): A4TransitionResult {
-  // A remedy (recording a rollback) runs under a freeze; its plan still applies every other refusal.
   if (!remedy) refuseOnFreeze(store, projectId);
   let planned: string | null = null;
   let snapshot: ReturnType<A4Store["snapshot"]> | null = null;
@@ -366,7 +366,7 @@ const collectRoute = (workspace: string, kind: SignKind = "A4_RECORD"): "vault" 
 };
 
 /** What a gate binds, rebuilt from rows (design §6.2, §6.4); `requesterKey` and `specDigest` come from the gate. */
-export function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: "direction" | "completion" | "policy"; revisionNo: number;
+function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: "direction" | "completion" | "policy"; revisionNo: number;
   requesterKey: string; specDigest: string; boundItemIds: readonly string[] }, readiness: A4ReadinessV1): A4IntentV1 {
   const revision = state.revisions.find((row) => row.revision_no === gate.revisionNo) ?? null;
   // A policy gate approves the proposed policy, whose author is its requester, not the head revision (design §5.3).
@@ -765,9 +765,9 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
 /**
  * ACKNOWLEDGED (owner; D-21, design §7 item 6): an acknowledgeable WAITING item stays WAITING with OWNER_ACKNOWLEDGED for
  * 90 days and is bound into the next gate's intent; a BLOCKED item is never acknowledged. Record it before the request.
- * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, `plan_activated`
- * only from Review on while its activation is deferred, Activate's D-21 item and AMC's check from Review on (the check
- * once it names a receipt), so no acknowledgement is recorded that would not count.
+ * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, `plan_activated` only from Review on while
+ * deferred (PLAN_ACTIVATION_DEFERRED), Activate's D-21 item and AMC's check from Review on (the check once it names a receipt), and only at the
+ * project's current stage (409 A4_STEP_ORDER otherwise; allowedFor refuses it), so no acknowledgement is recorded that would not count.
  */
 export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; itemId: string; reason: string; expectedHeadSeq: number }): A4TransitionResult {
   if (!ACKNOWLEDGEABLE_ITEMS.includes(input.itemId)) throw fail(400, "INPUT_INVALID", `${input.itemId} cannot be acknowledged`);

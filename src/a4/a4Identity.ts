@@ -20,7 +20,7 @@ import { listUsers, listVerifiedUsers } from "../auth/authApi.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
 import type { A4Member, A4Principal } from "./a4Schema.js";
 
-export type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
+type A4Refusal = { ok: false; status: 401 | 403; code: string; message: string };
 export type A4Resolution =
   /** The route's role class passed on live roles; project membership is still checked per action (assertMember). */
   | { ok: true; principal: A4Principal; allowed: { read: true; mutate: true } }

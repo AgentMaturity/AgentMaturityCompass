@@ -12,13 +12,14 @@ import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { STATIONS } from "../../domains/stations.js";
 import {
-  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState
+  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery,
+  type A4ReadinessState
 } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
+import { flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { LIFECYCLE_SEAM_KEY } from "./assemble.js";
 import { memoryPolicyFields } from "../adaptMemoryPolicy.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "adapt", prompt, dependsOn, required, kind });
@@ -82,20 +83,13 @@ export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "prop
   .map((step) => ({ id: `adapt.${step}`, step, run: async (ctx) => (await load()).produceAdapt(step, ctx) }));
 
 /** The newest Adapt revision's spec and answers. */
-export function adaptSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "adapt").at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers, revisionNo: revision?.revision_no ?? null };
+export function adaptSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "adapt");
 }
 
 /** The Aspire answers Adapt carries, as the newest Aspire revision records them (absent ones are left out). */
 export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<string, unknown> {
-  const values = answerValues(aspireSpecOf(state).answers);
-  return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+  return carriedValuesOf(state, CARRIED);
 }
 
 const TERM = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/;
@@ -124,12 +118,9 @@ export function factAnswer(answers: readonly A4Answer[], fact: AdaptFact): A4Ans
  * question's values (a fact is catalog terms; the primary station one of the carried stations), and carried answers that
  * are missing or no longer Aspire's (fail closed: re-carry at Understand).
  */
-export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
+export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): CarryingAnswerGaps {
   const values = answerValues(answers);
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const invalid: string[] = (Object.keys(FACTS) as AdaptFact[]).filter((fact) => {
     const value = factAnswer(answers, fact)?.value;
     const terms = FACTS[fact] === "list" ? factList(value) ?? [] : [factTerm(value)].filter((term): term is string => term !== null);
@@ -140,9 +131,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
   invalid.push(...memoryPolicyFields(values).invalid);
   const accept = textValue(values.get("acceptWidenings"));
   if (accept !== null && !/^[0-9a-f]{64}$/.test(accept)) invalid.push("acceptWidenings");
-  const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
-    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
-  return { missing, stale, invalid, carried: carriedGaps };
+  return { missing, stale, invalid, carried: carriedGaps(CARRIED, answers, carried) };
 }
 
 /**
@@ -190,11 +179,7 @@ export const buildOf = (spec: Record<string, unknown>): AdaptBuild | null => {
 };
 
 type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "recommendation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("recommendation");
 
 /** Whether the project has reached `step` at Adapt (any later stage counts; an earlier one has not). */
 export function reached(state: A4ReadinessState, step: A4Step): boolean {
@@ -238,7 +223,7 @@ export function ownerOutOfScope(plan: CompiledPlan | null, ack: { by: string; ts
 }
 
 /** One lifecycle-bridge row (design §7 item 9): the control, whether A4 evidence satisfies it, the ref and why. */
-export interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
+interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
   readonly evidenceRef: string | null; readonly claimKind: string | null; readonly reason: string; readonly satisfiedBy: string }
 
 /**

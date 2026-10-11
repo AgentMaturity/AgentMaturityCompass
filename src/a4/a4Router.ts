@@ -43,8 +43,8 @@ import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, type A4Member, type A4Principal,
-  type A4ProjectRow, type A4Stage
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, reasonSchema,
+  type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -75,10 +75,6 @@ export function a4Fail(status: number, code: string, message: string, detail?: u
   return new A4StoreError(status, code, message, detail);
 }
 
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
-
 /** Every supported query parameter, once; anything else is 400 (proxies and the server must read one URL alike). */
 export function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
   if ([...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1)) {
@@ -90,7 +86,7 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
  * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
  */
-export function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
+function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issue = parsed.error.issues[0];
@@ -264,7 +260,8 @@ export function unboundClaim(projectId: string, what: string, regulated: boolean
   return envelopeForUnboundResult({ producer: `a4:${projectId}:${what}`, method: "human_review", regulated, now: Date.now() });
 }
 
-const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: { status: string; bindingDigest: string } | null) => ({
+/** `amc.a4-project/v1`: the head, the current members and the readiness summary (this router's and the MCP tools' project view). */
+export const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
   schema: "amc.a4-project/v1", projectId: row.project_id, workspaceId: row.workspace_id, agentId: row.agent_id, name: row.name, stage: row.stage,
   step: row.step, hold: row.hold === 1, holdReason: row.hold_reason, revisionNo: row.revision_no, headSeq: row.head_seq, headDigest: row.head_digest,
   deployedReleaseId: row.deployed_release_id, baseReleaseId: row.base_release_id, createdByKey: row.created_by_key, createdTs: row.created_ts,
