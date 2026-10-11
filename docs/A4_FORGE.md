@@ -328,7 +328,8 @@ the agent's prompt pack.
   deferred-activation acknowledgement (`activationAcknowledgement`) on that Adapt revision as readiness counts them (one
   readiness ignores, such as `plan_unresolved`'s on a regulated project or `plan_activated`'s while activation is due,
   is not listed); once its completion gate is consumed, the acknowledgement in force then stays on the statement after
-  it expires and after Activate records new revisions. Review's own record of the statement carries none of them: no
+  it expires and after Activate records new revisions, and an Adapt revision the head moved past without consuming that
+  gate (a reopen) lists none. Review's own record of the statement carries none of them: no
   acknowledgement that counts on the revision Review records exists yet. Every other stage, and Adapt before its Review, carries no
   plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
   `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays

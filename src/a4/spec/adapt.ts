@@ -213,7 +213,7 @@ export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: num
  * revision is consumed, the one in force at the consumption (recorded before it, unexpired then) stays the record, after
  * it expires and after the head moves on (the conformance statement P1-62 binds). Before that, the newest one unexpired at
  * `now`, whether or not the evaluator counts it (acknowledgeable): conformanceView reads the evaluated item's
- * `acknowledged` there instead. Null when none.
+ * `acknowledged` there instead, and lists none on a revision the head moved past without a consumption. Null when none.
  */
 export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no):
   { by: string; ts: number; reason: string; expiresTs: number } | null {

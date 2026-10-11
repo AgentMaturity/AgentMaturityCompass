@@ -336,9 +336,11 @@ export function controlResultsNow(workspace: string, state: Pick<A4ReadinessStat
  * reads not_evaluated with its reason), and with the owner's out-of-scope settlements, the sources acknowledgement and
  * the deferred-activation acknowledgement on that revision: while it is the head and its completion gate is not
  * consumed, only those the readiness evaluator counts (`counted`, Adapt's evaluated items: acknowledgeable decides);
- * once that gate is consumed, or the head moved past it, the ones in force at the consumption, even once they expire
- * (acknowledgementOf). Review stores none of them. A record that does not parse counts as none. Every other stage, and
- * Adapt before its Review, carries no plan and says not_evaluated (Activate's own statement is P1-62's).
+ * once that gate is consumed, the ones in force at the consumption, even once they expire and the head moves on
+ * (acknowledgementOf); on a revision the head moved past without consuming that gate (a reopen), none, since readiness
+ * counts acknowledgements on the head only. Review stores none of them. A record that does not parse counts as none.
+ * Every other stage, and Adapt before its Review, carries no plan and says not_evaluated (Activate's own statement is
+ * P1-62's).
  */
 export function conformanceView(workspace: string, state: A4ReadinessState, stage: A4Stage, now: number,
   counted: () => readonly Pick<A4ReadinessItem, "id" | "acknowledged">[]): A4ConformanceStatementV1 {
@@ -350,9 +352,11 @@ export function conformanceView(workspace: string, state: A4ReadinessState, stag
   const plan = stage === "adapt" ? proposedPlan(spec) : null;
   const revisionNo = revision?.revision_no ?? state.project.revision_no;
   const required = gatePolicyOf(state.chain).gates["adapt.completion"].requiredReviews.some((entry) => entry.kind === "review_record");
-  const items = stage === "adapt" && revisionNo === state.project.revision_no && adaptCompletionConsumed(state, revisionNo) === undefined ? counted() : null;
+  const consumed = stage === "adapt" ? adaptCompletionConsumed(state, revisionNo) : undefined;
+  const items = stage === "adapt" && revisionNo === state.project.revision_no && consumed === undefined ? counted() : null;
   const ackOf = (itemId: string) => stage !== "adapt" ? null
-    : items === null ? acknowledgementOf(state, itemId, now, revisionNo) : items.find((entry) => entry.id === itemId)?.acknowledged ?? null;
+    : items !== null ? items.find((entry) => entry.id === itemId)?.acknowledged ?? null
+    : consumed !== undefined ? acknowledgementOf(state, itemId, now, revisionNo) : null;
   return conformanceStatement({ stage, revisionDigest, stored, evaluatedAt: new Date(now).toISOString(),
     ownerOutOfScope: stored === null ? [] : ownerOutOfScope(plan, ackOf("plan_unresolved")),
     unsupported: stored === null || plan === null ? [] : plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`),
