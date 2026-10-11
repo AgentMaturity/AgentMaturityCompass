@@ -320,8 +320,9 @@ function options(route: A4Route): void {
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
     workspace: { signingRoute: route_, readOnly: !route.native.executionAllowed() },
-    // Supported integration paths arrive with Assemble (P1-60); the running image digest with the bootstrap report.
-    integrationClaims: [], imageDigest: null
+    // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
+    // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
+    integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)"
   });
 }
 
