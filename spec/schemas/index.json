@@ -13,7 +13,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-deployment-receipt.schema.json",
       "name": "a4-deployment-receipt.schema.json",
-      "sha256": "c0b830ffdc0148e07d3b867bb06d9a52835e437ff94bb3c65d70eeb56189a225"
+      "sha256": "c7765de85338735567dc0244e1d9b325790462bb5a224732d1cc1b7b886f5cbb"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate-policy.schema.json",
