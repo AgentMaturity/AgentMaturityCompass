@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-06",
+  "date": "2026-10-12",
+  "commit": "bbd3f2b9a6571e929f95e96c0e34571ecb625f69",
+  "branch": "rtd/p1-06-pinned-issuer-verifier",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0, local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 47372
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 31797
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 42971
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3860
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 931
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 524
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 2543
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2091
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 378
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 823
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 238
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 301
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 866
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 1,
+      "durationMs": 3803
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 89089
+    },
+    {
+      "cmd": "npm run -s check:packed-install",
+      "exit": 0,
+      "durationMs": 71737
+    },
+    {
+      "cmd": "npx vitest run tests/verifier",
+      "exit": 0,
+      "durationMs": 9215
+    },
+    {
+      "cmd": "node packages/verifier/conformance/run.mjs --cmd \"node packages/verifier/bin/amc-verify.mjs\"",
+      "exit": 0,
+      "durationMs": 4654
+    },
+    {
+      "cmd": "node $SP/needs-snapshot.mjs int",
+      "exit": 0,
+      "durationMs": 421
+    },
+    {
+      "cmd": "npm run -s check:dead-code (after the accept and shrink, at 770cd7977)",
+      "exit": 0,
+      "durationMs": 4000
+    },
+    {
+      "cmd": "docker run --network none node:22-bookworm-slim: npm install --offline <tarball>; run.mjs --cmd amc-verify",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "docker run --network none node:24-bookworm: npm install --offline <tarball>; run.mjs --cmd amc-verify",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run (full suite, at 0fcd97035)",
+      "exit": 1,
+      "durationMs": 2400000
+    }
+  ],
+  "tests": {
+    "total": 128,
+    "passed": 128,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.txt",
+      "sha256": "3b9e41a938c2c215f1cd01e9bbb09e4f4bbd5e61fa58a34a795df0d0f4b001de"
+    },
+    {
+      "path": "conformance-results.json",
+      "sha256": "1853e0a09005301cfc01652f9b5491b6057b8c921232380b61cae6976ef28179"
+    },
+    {
+      "path": "containers.txt",
+      "sha256": "525e3ad65e65e85f8d36c09fc33673053da98c0bdea1545023691baf9a87b093"
+    },
+    {
+      "path": "full-suite.txt",
+      "sha256": "47f50c1502b859ed7f641e4280aa8534d22f6cd3edc832a02f7acccf926ebfca"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "175f4df536a03a7502c477719d777700925b7b944d28048927d3f976a4fa82b0"
+    },
+    {
+      "path": "red/review.txt",
+      "sha256": "e27822b18c78d19fcb62386e4ee0e3b9ba113cfcfa7de0dbdb705632f0f18e7f"
+    },
+    {
+      "path": "red/self-audit.txt",
+      "sha256": "22ff2f7122a32cc681922597d4aa1e12cc26c27347272ff434c3b745fd8f0644"
+    }
+  ],
+  "notes": "tests counts the 7 tests/verifier files at bbd3f2b9a. check:dead-code first exited 1 on a new finding (the CLI test runs the POSIX mkfifo utility); it was accepted with a reason and 6 stale entries shrunk in 770cd7977, then exit 0. The full suite exited 1: 58 failures at 0fcd97035, triaged in full-suite.txt (pre-existing on this lineage, worktree-only, load timeouts, or verifier tests edited while the run was in progress; none caused by P1-06). Container runs are local colima (aarch64), not CI; durations of 0 were not measured. Node 20 was not evaluated locally."
+}

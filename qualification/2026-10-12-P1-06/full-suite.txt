@@ -1,0 +1,44 @@
+Full suite: npx vitest run --reporter=json, started 2026-10-11T21:14:48Z, ended 2026-10-11T21:54:48Z, at commit 0fcd97035ff93eca56cb454dc0aacbe09794e167.
+Totals: 5044 files, 24154 tests, 24096 passed, 58 failed, 0 skipped.
+
+Failed files (failed tests):
+- tests/assuranceLabV2.test.ts (1)
+- tests/assuranceRunNoSign.test.ts (1)
+- tests/jsonlWriterResume.test.ts (19)
+- tests/ledgerTrustRootAnchorCli.test.ts (0; Hook timed out in 10000ms.)
+- tests/llmResponsesCapabilities.test.ts (1)
+- tests/privateModuleHelperVisibility.test.ts (1)
+- tests/publicDocsArtifact.test.ts (1)
+- tests/publicDocsGraph.test.ts (1)
+- tests/publicTaskTransport.test.ts (2)
+- tests/releaseEngineeringPack.test.ts (1)
+- tests/releaseSecretScanCoverage.test.ts (2)
+- tests/sessionSpillCommitment.test.ts (1)
+- tests/sessionStoreConformance.test.ts (8; Hook timed out in 10000ms.)
+- tests/spillLifecycle.test.ts (1)
+- tests/assurance/industryPackFailClosed.test.ts (1)
+- tests/compliance/dataResidencyPersistence.test.ts (1)
+- tests/keys/atomicRotation.test.ts (2; Hook timed out in 10000ms.)
+- tests/performance/sessionSpine.performance.test.ts (2)
+- tests/storage/blobIndexChainSig.test.ts (1)
+- tests/verifier/cli.test.ts (4)
+- tests/verifier/failClosed.test.ts (5)
+- tests/verifier/parityWithAmc.test.ts (2)
+
+Triage. The run started at 0fcd97035; the tree then gained the uncommitted RED tests and fixtures of the self-audit round
+while it ran, so the three tests/verifier files fail on in-flight edits, not on a commit. At HEAD (bbd3f2b9a) all 7
+verifier files, 128 tests, pass (checks.txt). The machine's load average was 16 to 44 (other sessions), so timeouts
+are expected.
+
+Rerun alone at bbd3f2b9a: assuranceLabV2, assuranceRunNoSign, ledgerTrustRootAnchorCli, sessionSpillCommitment,
+spillLifecycle, industryPackFailClosed and blobIndexChainSig pass. Still failing, none touched by P1-06:
+- jsonlWriterResume (19), llmResponsesCapabilities (1), privateModuleHelperVisibility (1), dataResidencyPersistence (1):
+  pre-existing, listed in the session's baseline-triage (P2-01 storage admission, P2-01 spillStore snapshot).
+- publicDocsGraph (1): pre-existing (baseline-triage). P1-06 first added one more edge (EXTERNAL_EVIDENCE_PROFILE to
+  STANDALONE_VERIFIER); bbd3f2b9a cites the guide by path instead, so the failing edge set is the baseline's.
+- publicDocsArtifact (1): typedoc needs .git to be a directory, so it fails in any git worktree (session follow-ups).
+- publicTaskTransport (2): the same 2 tests fail with int's versions of every src file P1-06 changed swapped in and
+  rebuilt, so they are pre-existing.
+- releaseEngineeringPack (1), releaseSecretScanCoverage (1), sessionStoreConformance (3), atomicRotation (1): also failed
+  in P1-08's full suite on this lineage; here they are timeouts under load (atomicRotation took 797 s).
+- sessionSpine.performance (2): throughput floors under load; not rerun.

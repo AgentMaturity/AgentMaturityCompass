@@ -1,0 +1,36 @@
+# Mutations: each line is one deliberate break, then the tests that failed on it (all restored afterwards).
+
+## Spec mutation checks (P1-06 'Tests to add'), on the tree committed as 8937e5339..ab54424c4
+- admit-embedded-key (packages/verifier/src/kinds/attestation.ts): KILLED by x forged-embedded-key 4ms; x unpinned-issuer 1ms
+- skip-tenant-comparison (packages/verifier/src/evaluation.ts): KILLED by x cross-tenant 5ms
+- ignore-known-sequences (packages/verifier/src/kinds/attestation.ts): KILLED by x replayed 5ms
+- empty-evidence-passes (packages/verifier/src/kinds/attestation.ts): KILLED by x empty 5ms
+
+## Extra guard mutations, same tree
+- skip-distrust (packages/verifier/src/trust.ts): KILLED by x distrusted-key 5ms
+- ignore-trust-list-expiry (packages/verifier/src/trust.ts): KILLED by x a trust-list artifact is refused when expired, rolled back or signed by no pinned root 4ms; x stale-trust-list 4ms
+- drop-unanchored (packages/verifier/src/kinds/receipt.ts): KILLED by x unanchored 6ms
+- previous-signs-compromise (packages/verifier/src/kinds/rotation.ts): KILLED by x key-compromise-rotation-without-root 5ms
+- skip-signature-check (packages/verifier/src/kinds/attestation.ts): KILLED by x tampered 4ms
+
+## Coordinator self-audit (as-of admission, pinned threshold), on the tree committed as 9ccb71250
+- revocation-judged-before-as-of (packages/verifier/src/trust.ts): KILLED by x revoked-superseded-earlier-claim 5ms; x admission never rests on the record's claimed time: only the verifier's as-of time decides it 7ms
+- validity-end-ignored (packages/verifier/src/trust.ts): KILLED by x key-expired 6ms; x rotated-out-key-earlier-claim 2ms
+- dated-distrust-ignored (packages/verifier/src/trust.ts): KILLED by x distrusted-after-claim 7ms
+- pinned-threshold-dropped (packages/verifier/src/trust.ts): KILLED by x --root-threshold reaches the trust lists 20ms; x root-threshold-downgrade 5ms
+
+## Independent review findings, on the tree committed as 1f5de52ff
+- H1-root-distrust-builtin-only (packages/verifier/src/trust.ts): KILLED by x distrusted-root-in-another-list 8ms
+- H2-sibling-checks-dropped (packages/verifier/src/trust.ts): KILLED by x forked-trust-list 11ms; x stale-list-beside-newer 4ms
+- M3-unreviewed-independent-allowed (packages/verifier/src/kinds/attestation.ts): KILLED by x unreviewed-independent-claim 8ms
+- M3-rejected-review-passes (packages/verifier/src/kinds/attestation.ts): KILLED by x review-rejected-pass 14ms
+- M3-late-evaluation-allowed (packages/verifier/src/kinds/attestation.ts): KILLED by x evaluated-after-issuance 11ms
+- M3-exclusions-silent (packages/verifier/src/kinds/attestation.ts): KILLED by x controls left out by exclusions are named in a warning 6ms
+- M4-anchor-warning-dropped (packages/verifier/src/kinds/receipt.ts): KILLED by x an anchored receipt says that only the ledger row's eventHash is signed 9ms
+- L5-noncanonical-b64-accepted (packages/verifier/src/kinds/externalEvidence.ts): KILLED by x an external evidence signature in a non-canonical base64 spelling fails integrity 9ms; x an external evidence signature verifies for the package exactly when it does for AMC 17ms
+- L6-chain-head-unchecked (packages/verifier/src/kinds/common.ts): KILLED by x rotation-chain-head-not-first 18ms
+- L7-decrease-vs-statement-only (packages/verifier/src/kinds/rotation.ts): KILLED by x a rotation that keeps its own stated threshold but lowers the pinned one needs allowDecrease 636ms
+- L8-as-of-rollover (packages/verifier/src/cli.ts): KILLED by x refuses an --as-of that is not a calendar date with exit 64 6ms
+- multi-root-warning-dropped (packages/verifier/src/verify.ts): KILLED by x several pinned roots without a threshold say that one root's signature counts a list 5ms
+
+Total: 25 mutations, 25 killed.
