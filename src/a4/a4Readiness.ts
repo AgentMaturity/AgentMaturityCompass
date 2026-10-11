@@ -88,6 +88,8 @@ export interface A4LiveFacts {
   readonly lostEffects: readonly string[];
   /** The agent's outcome_unknown executions blocking its journaled calls (read at Assemble only); null when unread or unreadable. */
   readonly blockingExecutions: readonly string[] | null;
+  /** The engine status of each engine request the chain names, by request id (read at Assemble only); null when unread. */
+  readonly engineRequests: Readonly<Record<string, string>> | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;

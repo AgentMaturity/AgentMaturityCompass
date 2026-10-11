@@ -23,7 +23,7 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
-import { blockingExecutionsIn } from "./assembleLockout.js";
+import { blockingExecutionsIn, engineRequestStatusesIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -184,7 +184,7 @@ function blockingExecutionsOf(store: A4Store, agentId: string): string[] | null 
 
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
- * read evaluateFor used; the action journal is read only for an evaluation at `stage` Assemble.
+ * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble.
  */
 export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -210,7 +210,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
-    blockingExecutions: stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null
+    blockingExecutions: stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null,
+    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain) : null
   };
 }
 

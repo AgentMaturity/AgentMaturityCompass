@@ -269,14 +269,16 @@ const isProjectApprover = (state: A4ReadinessState, approver: Pick<A4Principal, 
   }
 };
 
+/** Who an engine decision names: its userId, display name and recorded roles (a decision record, or a live voter before it votes). */
+type DecisionIdentity = Pick<ApprovalDecisionRecord, "userId" | "username" | "roles">;
+
 /**
- * Design §6.1 steps 2–3 for one engine APPROVE_EXECUTE: it resolves to one live principal and plane (LOCAL_USER only
- * when regulated, else 403 IDENTITY_CHECK_LIMITED), holds no recorded role it no longer has, is a project approver or
- * owner, and passes A4's SoD with the gate's exclusions plus `requesterKeys` and every builder of the revision, given the
- * decisions `checked` before it (else 400 SOD_VIOLATION). Returns the refusal, or the decision as SoD counts it.
+ * Design §6.1 steps 2–3 without SoD, for one engine APPROVE_EXECUTE: it resolves to one live principal and plane
+ * (LOCAL_USER only when regulated, else 403 IDENTITY_CHECK_LIMITED), holds no recorded role it no longer has, and is a
+ * project approver or owner (else 400 SOD_VIOLATION). Returns the refusal, or the approver.
  */
-function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4GateRow, decision: ApprovalDecisionRecord, checked: readonly SodDecision[],
-  requesterKeys: readonly string[], regulated: boolean): SodDecision | A4StoreError {
+function memberApprovalOf(workspace: string, state: A4ReadinessState, decision: DecisionIdentity, regulated: boolean):
+  Pick<A4Principal, "key" | "username" | "roles" | "authSource"> | A4StoreError {
   const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
   const approver = resolveApprover(workspace, decision.userId);
   if (approver === null) return refuse("the approver does not resolve to exactly one live principal");
@@ -286,6 +288,53 @@ function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4Ga
   }
   if (!decision.roles.every((role) => approver.roles.includes(role))) return refuse("recorded roles exceed the approver's live roles");
   if (!isProjectApprover(state, approver)) return refuse("not an approver or owner of this project");
+  return approver;
+}
+
+/**
+ * The distinct live project approvers or owners whose APPROVE_EXECUTE on an engine request is bound to `bindingDigest`
+ * (memberApprovalOf), leaving out `excludedKeys`. A decision that is unbound, digest-less, by a non-member or another
+ * plane when regulated counts for nothing (design §6.1 rule 2) and refuses nothing. An outcome_unknown resolution
+ * counts its dual control here: the engine's own fold counts any APPROVER's vote, bound or not.
+ */
+export function boundMemberApprovalKeys(workspace: string, state: A4ReadinessState, input: { approvalRequestId: string; bindingDigest: string;
+  excludedKeys: readonly string[]; regulated: boolean }): string[] {
+  const keys = new Set<string>();
+  for (const decision of listApprovalDecisions({ workspace, agentId: state.project.agent_id, approvalRequestId: input.approvalRequestId })) {
+    if (decision.decision !== "APPROVE_EXECUTE" || decision.requestDigestSha256 !== input.bindingDigest) continue;
+    const approver = memberApprovalOf(workspace, state, decision, input.regulated);
+    if (!(approver instanceof A4StoreError) && !input.excludedKeys.includes(approver.key)) keys.add(approver.key);
+  }
+  return [...keys];
+}
+
+/**
+ * An APPROVE on the engine request of an effect `gate`, refused at write the way consumption would refuse it
+ * (verifyAndConsumeEffect throws for the whole grant on one such vote): 400 SOD_VIOLATION or 403 IDENTITY_CHECK_LIMITED
+ * for the voter, given the votes already cast that consumption would count (the `complete` caller is not known yet).
+ */
+export function assertEffectVoteAllowed(workspace: string, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string, voter: DecisionIdentity,
+  regulated: boolean): void {
+  const checked: SodDecision[] = [];
+  for (const decision of listApprovalDecisions({ workspace, agentId: state.project.agent_id, approvalRequestId })) {
+    if (decision.decision !== "APPROVE_EXECUTE") continue;
+    const entry = effectApprovalOf(workspace, state, gate, decision, checked, [gate.requested_by_key], regulated);
+    if (!(entry instanceof A4StoreError)) checked.push(entry);
+  }
+  const entry = effectApprovalOf(workspace, state, gate, voter, checked, [gate.requested_by_key], regulated);
+  if (entry instanceof A4StoreError) throw entry;
+}
+
+/**
+ * Design §6.1 steps 2–3 for one engine APPROVE_EXECUTE: memberApprovalOf, then A4's SoD with the gate's exclusions plus
+ * `requesterKeys` and every builder of the revision, given the decisions `checked` before it (else 400 SOD_VIOLATION).
+ * Returns the refusal, or the decision as SoD counts it.
+ */
+function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4GateRow, decision: DecisionIdentity, checked: readonly SodDecision[],
+  requesterKeys: readonly string[], regulated: boolean): SodDecision | A4StoreError {
+  const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
+  const approver = memberApprovalOf(workspace, state, decision, regulated);
+  if (approver instanceof A4StoreError) return approver;
   const excludedKeys = [...(JSON.parse(gate.excluded_keys_json) as string[]), ...buildersOf(state.chain, gate.revision_no)];
   const sod = evaluateSod({ gate: { gateId: gate.gate_id, gate: gate.gate, revisionNo: gate.revision_no, requesterKeys, excludedKeys },
     decisions: checked, transitions: state.chain, regulated, selfApprovalAllowed: false, approver, effect: true });

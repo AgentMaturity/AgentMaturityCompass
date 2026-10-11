@@ -10,7 +10,9 @@
 import type Database from "better-sqlite3";
 import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
+import { approvalStatusPayload } from "../approvals/approvalEngine.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import type { A4ChainLink } from "./a4Schema.js";
 
 export function blockingExecutionsIn(db: Database.Database, workspace: string, agentId: string): string[] {
   const staleBefore = Date.now() - DEFAULT_ACTION_STALE_AFTER_MS;
@@ -25,4 +27,23 @@ export function blockingExecutionsIn(db: Database.Database, workspace: string, a
       headComplete: number; pid: number | null; host: string | null; heartbeat: number | null }>;
   return [...new Set(rows.filter((row) => row.indexState === "outcome_unknown" || row.headState === "outcome_unknown" || row.indexComplete === 0
     || row.headComplete === 0 || row.heartbeat === null || row.heartbeat < staleBefore || ownerAlive(row.pid, row.host) === false).map((row) => row.id))];
+}
+
+/**
+ * The engine status (PENDING, QUORUM_MET, DENIED, EXPIRED, CONSUMED, CANCELLED; UNREADABLE when its record does not
+ * verify) of the newest engine requests this project's chain names: an effect gate it opened, an `approval` ref it
+ * recorded (an outcome_unknown resolution request). Readiness names it so a card never offers a vote on a closed request.
+ */
+export function engineRequestStatusesIn(workspace: string, agentId: string, chain: readonly A4ChainLink[]): Record<string, string> {
+  const ids = [...new Set([...chain].reverse().flatMap((link) => {
+    const id = link.kind === "EFFECT_GATE_OPENED" ? link.body.approvalRequestId : link.kind === "EVIDENCE_REF" && link.body.refKind === "approval" ? link.body.refId : null;
+    return typeof id === "string" && /^apprreq_[a-f0-9]{32}$/.test(id) ? [id] : [];
+  }))].slice(0, 32);
+  return Object.fromEntries(ids.map((approvalId) => {
+    try {
+      return [approvalId, approvalStatusPayload({ workspace, agentId, approvalId }).status];
+    } catch {
+      return [approvalId, "UNREADABLE"];
+    }
+  }));
 }
