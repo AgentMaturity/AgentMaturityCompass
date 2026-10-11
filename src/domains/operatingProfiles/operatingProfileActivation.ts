@@ -75,7 +75,7 @@ export interface ActivationResult {
   recordPath: string | null;
 }
 
-export interface PlannedConfig {
+interface PlannedConfig {
   config: SignedConfigName;
   path: string;
   bytes: string | null;
@@ -281,10 +281,9 @@ const firewallFragmentSchema = z.object({ mode: z.enum(["observe", "warn", "bloc
 /**
  * Parses every fragment with the schema its signing command uses, compares it with the current
  * verified config (or the runtime default when none is written) and returns the writes.
- * Nothing is written here (each `write` runs only when a caller invokes it), and no signature is
- * read from the profile: A4's Adapt lists the widenings of an unsigned, in-memory profile with it.
+ * Nothing is written here.
  */
-export function planActivation(workspace: string, profile: OperatingProfile, agentId: string): { planned: PlannedConfig[]; widenings: string[] } {
+function planActivation(workspace: string, profile: OperatingProfile, agentId: string): { planned: PlannedConfig[]; widenings: string[] } {
   const fragments = profile.proposedSignedConfigs;
   const approval = approvalPolicySchema.parse(fragments.approvalPolicy);
   const tools = toolsConfigSchema.parse(fragments.tools);
@@ -337,6 +336,17 @@ export function planActivation(workspace: string, profile: OperatingProfile, age
     }
   ];
   return { planned, widenings };
+}
+
+/**
+ * Read-only: the widenings activation would refuse and the sha256 of each config it would write, for a profile that
+ * need not be signed (A4's Adapt dry-runs an in-memory one). No write closure leaves this module, so nothing reached
+ * through it writes or signs a config; activation keeps every gate of activateOperatingProfile.
+ */
+export function planActivationWidenings(workspace: string, profile: OperatingProfile, agentId: string): {
+  widenings: string[]; configs: Array<{ config: SignedConfigName; sha256: string | null }> } {
+  const { planned, widenings } = planActivation(workspace, profile, agentId);
+  return { widenings, configs: planned.map((entry) => ({ config: entry.config, sha256: entry.bytes === null ? null : sha256Hex(Buffer.from(entry.bytes, "utf8")) })) };
 }
 
 /**

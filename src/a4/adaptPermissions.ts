@@ -1,7 +1,8 @@
 /**
  * Adapt's permissions (P1-61 slice B; design §10.3 Understand, Explain and Review): the station operating profile
  * (buildOperatingProfile) for the primary station, built in memory and compared with the current verified configs by
- * planActivation, the comparison activateOperatingProfile runs. Nothing is written and nothing is signed: the auditor
+ * planActivationWidenings, the read-only view of the comparison activateOperatingProfile runs (no write closure leaves
+ * that module). Nothing is written and nothing is signed: the auditor
  * signature activateOperatingProfile treats as proof of review stays the owner's `amc domain apply --sign-profile` on a
  * profile they emitted and reviewed. The bytes compared are a pure function of the station, the agent and the project's
  * creation time. A widening is refused (`scope_changed`, POLICY_WIDENING_REFUSED) unless a project owner's answer accepts
@@ -11,7 +12,7 @@
  */
 import { closeSync, constants, lstatSync, openSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { planActivation } from "../domains/operatingProfiles/operatingProfileActivation.js";
+import { planActivationWidenings } from "../domains/operatingProfiles/operatingProfileActivation.js";
 import { buildOperatingProfile } from "../domains/operatingProfiles/operatingProfileBuilder.js";
 import { OPERATING_PROFILE_DIR } from "../domains/operatingProfiles/operatingProfileEmit.js";
 import { isStation, type Station } from "../domains/stations.js";
@@ -69,11 +70,10 @@ export function permissionsDryRun(input: { workspace: string; agentId: string; s
   try {
     const profile = buildOperatingProfile({ station: input.station, agentId: input.agentId, generatedAt: input.generatedAt });
     if (!profile.consistency.ok) return { station: input.station, ...none, error: "PROFILE_INCONSISTENT" };
-    const { planned, widenings: found } = planActivation(input.workspace, profile, input.agentId);
+    const { configs, widenings: found } = planActivationWidenings(input.workspace, profile, input.agentId);
     const widenings = found.slice(0, MAX_WIDENINGS).map((entry) => entry.slice(0, 300));
     return { station: input.station, profileSha256: sha256Hex(`${JSON.stringify(profile, null, 2)}\n`), riskTier: profile.riskTier, widenings,
-      wideningsSha256: sha256Hex(canonicalize(found)),
-      configs: planned.map((entry) => ({ config: entry.config, sha256: entry.bytes === null ? null : sha256Hex(Buffer.from(entry.bytes, "utf8")) })), error: null };
+      wideningsSha256: sha256Hex(canonicalize(found)), configs, error: null };
   } catch (error) {
     return { station: input.station, ...none, error: profileCode(error) };
   }
