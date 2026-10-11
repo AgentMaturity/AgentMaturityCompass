@@ -53,6 +53,21 @@ describe("scripts/trust-list.mjs (maintainer tooling)", () => {
     expect(run("verify", "--list", list, "--root", rootId).stderr).toContain("TRUST_LIST_SIGNATURE_INVALID");
   });
 
+  it("verify honours the threshold <AMC home>/trust/trust-roots.json sets (review low)", () => {
+    for (const name of ["policy-root-1", "policy-root-2"]) expect(run("keygen", "--out", dir, "--name", name).status).toBe(0);
+    const ids = ["policy-root-1", "policy-root-2"].map(name => createHash("sha256").update(readFileSync(join(dir, `${name}.pub`), "utf8")).digest("hex"));
+    const list = join(dir, "threshold-list.json");
+    expect(run("init", "--list-id", "acme-threshold", "--out", list, "--days", "90").status).toBe(0);
+    expect(run("sign", "--list", list, "--key", join(dir, "policy-root-1.key")).status).toBe(0);
+    const home = join(dir, "threshold-home");
+    mkdirSync(join(home, "trust"), { recursive: true });
+    writeFileSync(join(home, "trust", "trust-roots.json"), JSON.stringify({ type: "amc.trust-roots", version: 1, roots: ids, threshold: 2 }));
+    const verify = () => spawnSync(process.execPath, [SCRIPT, "verify", "--list", list, "--root", ids[0]!, "--root", ids[1]!], { cwd: dir, encoding: "utf8", env: { ...process.env, AMC_HOME: home } });
+    expect(verify().status).toBe(1);
+    expect(run("sign", "--list", list, "--key", join(dir, "policy-root-2.key")).status).toBe(0);
+    expect(verify().status, verify().stderr).toBe(0);
+  });
+
   it("creates missing directories with mode 0700 on a fresh machine", () => {
     const roots = join(dir, "fresh", "amc-roots");
     expect(run("keygen", "--out", roots, "--name", "root").status).toBe(0);

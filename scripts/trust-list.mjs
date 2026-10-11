@@ -22,7 +22,8 @@ Commands:
            [--from <utc>] [--reference <id or URL>] [--source operator]
                                                  add a distrust entry (removes existing signatures)
   sign     --list <file> --key <private pem>     sign with a trust-list root key
-  verify   --list <file> --root <sha256>...      verify under pinned roots; exit 1 when refused
+  verify   --list <file> --root <sha256>...      verify under pinned roots and the threshold <AMC home>/trust/trust-roots.json
+                                                 sets; exit 1 when refused
   root-rotate --roots <trust-roots.json> --new-pub <pem>... --new-threshold <n> --out <file>
            [--previous <last applied rotation>] [--allow-decrease] [--current-key <key>...] [--new-key <key>...]
                                                  write an amc.root-rotation statement for the pinned root set (P1-08)
@@ -159,8 +160,12 @@ const COMMANDS = {
   },
   async verify(values) {
     const { readSignedTrustListFile, verifySignedTrustList } = await trust();
+    const { readPinnedTrustRoots } = await import("../dist/trust/rootRotation.js");
+    const { resolveAmcHome } = await import("../dist/credentials/credentialsPaths.js");
+    // The operator's m-of-n policy applies here as in every verifier: --root names the roots, never a lower threshold.
+    const policy = readPinnedTrustRoots(resolveAmcHome({ env: process.env }));
     const list = verifySignedTrustList(readSignedTrustListFile(required(values, "list")),
-      { pinnedRootKeyIds: required(values, "root"), now: new Date() });
+      { pinnedRootKeyIds: required(values, "root"), now: new Date(), threshold: policy?.threshold ?? 1 });
     console.log(`OK ${list.listId} sequence ${list.sequence}: ${list.entries.length} entries, ${list.distrust.length} distrusted, expires ${list.expiresAt}`);
   }
 };
