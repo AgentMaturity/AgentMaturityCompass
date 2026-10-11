@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "sourceCommit": "35c193fdc550f9786424d18fd447902db19572de",
+  "sourceCommit": "279eb4cb60291a3f128c4432028a9540d06768a4",
   "tools": {"jscpd":"5.4.0","knip":"6.39.0"},
   "config": {"jscpdSha256":"b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209","knipSha256":"43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"},
   "duplicates": [
@@ -4048,5 +4048,9 @@
     {"id":"20f67376c7db251cf905784371629af4dfd67539748e431d9b2e145bba9baad8","file":"tests/helpers/llmStubUpstream.ts","kind":"types"},
     {"id":"cd29b70bdc8a4dad3d6ee8239b709fd07de3be19f8d00baaeddb814d06bde21e","file":"tests/helpers/sessionProjectionFixtures.ts","kind":"exports"}
   ],
-  "accepted": []
+  "accepted": [],
+  "rebaselines": [
+    {"scan":"duplicates","toolFrom":"","toolTo":"5.4.0","configFrom":"","configTo":"b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209","added":1254,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"},
+    {"scan":"dead-code","toolFrom":"","toolTo":"6.39.0","configFrom":"","configTo":"43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1","added":2787,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"}
+  ]
 }
