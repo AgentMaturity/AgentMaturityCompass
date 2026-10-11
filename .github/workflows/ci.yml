@@ -318,7 +318,7 @@ jobs:
           docker build --target runner -t amc-runner:ci .
       - name: Qualify installed container runtime
         run: node scripts/container-smoke.mjs --studio-image amc-studio:ci --runner-image amc-runner:ci --out tmp/container-smoke.json
-      - name: Build the quickstart and check its version and user
+      - name: Build the quickstart and check its version, user and native SQLite
         run: |
           docker build -f docker/Dockerfile.quickstart -t amc-quickstart:ci .
           expected=$(sed -n 's/^ARG AMC_VERSION=//p' docker/Dockerfile.quickstart)
@@ -326,6 +326,7 @@ jobs:
           echo "quickstart --version: $actual (pinned $expected)"
           [ "$actual" = "$expected" ]
           [ "$(docker run --rm --entrypoint id amc-quickstart:ci -u)" = "10001" ]
+          docker run --rm --entrypoint node amc-quickstart:ci -e 'const r = require("node:module").createRequire("/usr/local/lib/node_modules/agent-maturity-compass/package.json"); new (r("better-sqlite3"))(":memory:").close()'
       - name: Quickstart refuses a wrong tarball hash
         run: |
           mkdir -p tmp
