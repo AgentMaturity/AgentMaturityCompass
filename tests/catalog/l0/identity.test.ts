@@ -10,7 +10,11 @@ import { activateControlPlan, loadActiveCompiledPolicy } from "../../../src/cata
 import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compiler/compile.js";
 import { signPlan } from "../../../src/catalog/compiler/sign.js";
 import { writeRuntimeFirewallPolicy } from "../../../src/runtime/firewall.js";
-import { issueLeaseForCli } from "../../../src/leases/leaseCli.js";
+import { addUser, initUsersConfig } from "../../../src/auth/authApi.js";
+import { parseLeaseTtlToMs } from "../../../src/leases/leaseCli.js";
+import type { LeasePayload, LeaseScope } from "../../../src/leases/leaseSchema.js";
+import { issueLeaseToken } from "../../../src/leases/leaseSigner.js";
+import { taskLeasePrincipal } from "../../../src/studio/nativeTaskService.js";
 import { leaseRevocationPaths, revokeLease } from "../../../src/leases/leaseStore.js";
 import { toolEvidenceFor } from "../../../src/tools/toolEvidence.js";
 import { ToolPipeline, type ToolApprovalAsker } from "../../../src/tools/toolPipeline.js";
@@ -31,9 +35,10 @@ type DrillSetup = { actionClass: ActionClass; mode: string; boundMs: number };
 const leaseIdOf = (token: string): string =>
   (JSON.parse(Buffer.from(token.split(".")[0]!, "base64url").toString("utf8")) as { leaseId: string }).leaseId;
 
-function issue(ws: string, agentId: string, scopes: string[], ttl = "1h", workspaceId?: string): string {
-  return issueLeaseForCli({ workspace: ws, agentId, ttl, scopes: scopes.join(","), routes: "/", models: "*", rpm: 1000, tpm: 1_000_000,
-    ...(workspaceId ? { workspaceId } : {}) }).token;
+function issue(ws: string, agentId: string, scopes: string[], ttl = "1h", workspaceId?: string, principal?: LeasePayload["principal"]): string {
+  return issueLeaseToken({ workspace: ws, agentId, ttlMs: parseLeaseTtlToMs(ttl), scopes: scopes as LeaseScope[], routeAllowlist: ["/"],
+    modelAllowlist: ["*"], maxRequestsPerMinute: 1000, maxTokensPerMinute: 1_000_000, maxCostUsdPerDay: null,
+    ...(workspaceId ? { workspaceId } : {}), ...(principal ? { principal } : {}) }).token;
 }
 
 function compose(ws: string, actionClass: ActionClass, leaseToken: () => string, approve?: ToolApprovalAsker) {
@@ -139,11 +144,21 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
 /**
  * L0-IDN-01 under a real active compiled plan (P1-10, P1-12, P1-67): the fixture profile compiles against the shipped
  * catalog to a ready plan, which is signed, approved by two distinct owners and activated; the native toolset pins it
- * and its compiled-policy guard enforces identity-binding. The lease is the agent identity. A lease also counts as the
- * principal (a service principal), so a lease-bound call with no human principal is allowed: that part of the
- * statement is not enforced yet (proposed follow-up P1-78), and no fixture claims it is.
+ * and its compiled-policy guard enforces identity-binding. The lease is the agent identity; the principal is the one the
+ * signed lease names (P1-78): a human, or a service registered as an active user in the signed users.yaml. The lease
+ * token's own identity is never a principal, so a lease naming none, or naming an unregistered service, is refused.
  */
-type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>; lease: "valid" | "none" | "expired" | "signed_by_other_workspace" };
+type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>;
+  lease: "valid" | "none" | "expired" | "signed_by_other_workspace" | "valid_without_principal" | "registered_service" | "unregistered_service" };
+
+/** The principal the fixture's lease names. "valid" leases name a Studio user, as a native task's lease does. */
+function leasePrincipal(ws: string, state: IdentitySetup["lease"]): LeasePayload["principal"] {
+  if (state === "none" || state === "valid_without_principal") return undefined;
+  if (state !== "registered_service" && state !== "unregistered_service") return taskLeasePrincipal("session:LOCAL_USER:layer0-owner");
+  initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+  const service = addUser({ workspace: ws, username: "layer0-scheduler", roles: ["AGENT"], password: "layer0-fixture-password" });
+  return { principalId: state === "registered_service" ? service.userId : "svc-not-in-users-yaml", kind: "service" };
+}
 
 /** The authorization records among the rows a call recorded. */
 const authorizationRecords = (rows: ReadonlyArray<{ payload: string; meta: Record<string, unknown> }>) =>
@@ -164,6 +179,13 @@ function activate(ws: string, profile: unknown): void {
 }
 
 describe("L0-IDN-01 unique agent identity under an active compiled plan (compiled-policy identity-binding)", () => {
+  it("a native task's lease names the Studio user it belongs to; the admin token names nobody (P1-78)", () => {
+    expect(taskLeasePrincipal("session:LOCAL_USER:u-1")).toEqual({ principalId: "LOCAL_USER:u-1", kind: "human" });
+    expect(taskLeasePrincipal("session:WORKSPACE_ROUTER:u-2")).toEqual({ principalId: "WORKSPACE_ROUTER:u-2", kind: "human" });
+    expect(taskLeasePrincipal("bootstrap-admin")).toBeUndefined();
+    expect(taskLeasePrincipal("session:OTHER:u-3")).toBeUndefined();
+  });
+
   const fixtures = fixturesFor("compiled_identity", "L0-IDN-01");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
   for (const f of fixtures) {
@@ -178,7 +200,8 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       activate(ws, s.profile);
       expect(loadActiveCompiledPolicy(ws)?.controls.some((c) => c.controlId === "L0-IDN-01")).toBe(true);
       const signer = s.lease === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
-      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h");
+      const principal = leasePrincipal(ws, s.lease);
+      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h", undefined, principal);
       if (s.lease === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });
         vi.setSystemTime(Date.now() + 2 * 3_600_000);
@@ -203,7 +226,10 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
         // The record binds the deployment the active plan's profile names (P1-78), not a placeholder.
         const records = authorizationRecords(rows);
         expect(records.length, "the call was bound to an authorization record").toBeGreaterThan(0);
-        for (const record of records) expect(record.scope).toMatchObject({ tenantId: "tenant-a", deploymentId: "dep-a" });
+        for (const record of records) {
+          expect(record.scope).toMatchObject({ tenantId: "tenant-a", deploymentId: "dep-a" });
+          expect(record.principal, "the principal the lease names, never the lease itself").toEqual({ ...principal, authenticatedVia: "lease" });
+        }
         return;
       }
       expect(text).not.toContain('"outcome":"OK"');

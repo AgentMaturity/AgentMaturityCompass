@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { intersectDelegationScopes } from "../agent/delegationScope.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { listVerifiedUsers } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
@@ -190,6 +191,26 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
   }
 }
 
+/**
+ * The principal a verified lease names (P1-78), or null when it names none or names a service that is not an active user
+ * of the signed users.yaml (read and verified here). A human is the one the issuer authenticated, e.g. the Studio session
+ * a native task's lease was minted for. The lease token's own identity is never a principal.
+ */
+function leasePrincipal(workspace: string, payload: LeasePayload): AuthorizationRecordV1["principal"] | null | Failed {
+  const named = payload.principal;
+  if (!named) return null;
+  if (named.kind === "service") {
+    let users: ReturnType<typeof listVerifiedUsers>["users"];
+    try {
+      users = listVerifiedUsers(workspace).users;
+    } catch (error) {
+      return failed("authority_store_unavailable", `the lease names service ${named.principalId}, and users.yaml could not be verified: ${message(error)}`);
+    }
+    if (!users.some((user) => user.userId === named.principalId && user.status === "ACTIVE")) return null;
+  }
+  return { principalId: named.principalId, kind: named.kind, authenticatedVia: "lease" };
+}
+
 function osUser(): string {
   try {
     return userInfo().username || "unknown";
@@ -210,6 +231,8 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
   }
   const lease = ctx.leaseToken === undefined ? null : checkLease(execution, ctx.leaseToken);
   if (lease !== null && "ok" in lease) return lease;
+  const named = lease === null ? null : leasePrincipal(execution.workspace, lease.payload);
+  if (named !== null && "ok" in named) return named;
   const issuedTs = Date.now();
   // Earliest of every authority's own expiry. ponytail: no parent record is in reach in-process; P2-25 clamps to it.
   const expiresTs = Math.min(issuedTs + DEFAULT_RECORD_TTL_MS, lease?.payload.expiresTs ?? Infinity,
@@ -226,10 +249,10 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       expiresAt: new Date(expiresTs).toISOString(),
       scope: facts.facts.scope,
       subject: { governedAs: execution.agentId, runAs: ctx.runAs ?? execution.agentId, agentConfigDigest: null },
-      // An approval names who authorized the effect; a lease names a service; otherwise the CLI user, self-reported.
+      // An approval names who authorized the effect; a lease, the principal its issuer named (never the lease itself,
+      // P1-78); otherwise the CLI user, self-reported, which identity-binding refuses.
       principal: approverIds.length > 0 ? { principalId: approverIds.join(","), kind: "human", authenticatedVia: "approval-engine" }
-        : lease ? { principalId: `lease:${lease.payload.leaseId}`, kind: "service", authenticatedVia: "lease" }
-          : { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
+        : named ?? { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
         leaseId: lease?.payload.leaseId ?? null },

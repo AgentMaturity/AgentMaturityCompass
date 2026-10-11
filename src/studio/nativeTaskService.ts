@@ -23,6 +23,7 @@ import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { isActionClass } from "../governor/actionCatalog.js";
+import type { LeasePayload } from "../leases/leaseSchema.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -73,6 +74,16 @@ export interface NativeTaskServiceOptions {
   readonly validationConfig?: string;
   readonly credentialsHome?: string; readonly credentialsFile?: string;
   readonly environment?: NodeJS.ProcessEnv;
+}
+
+/**
+ * The principal a native task's lease names (P1-78): the Studio user the task belongs to, keyed as A4 keys it
+ * (`<plane>:<userId>`). The bootstrap admin token names nobody, so under a plan whose identity-binding requires a
+ * principal its tool calls are refused (PRINCIPAL_UNRESOLVED).
+ */
+export function taskLeasePrincipal(principalId: string): LeasePayload["principal"] {
+  const human = /^session:(LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(principalId);
+  return human ? { principalId: `${human[1]}:${human[2]}`, kind: "human" } : undefined;
 }
 
 /** One native ACP client per task. This is a fixed AMC protocol binding, not a command bridge. */
@@ -204,9 +215,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!planRequiresAgentLease(plan)) return null;
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
+    const principal = taskLeasePrincipal(d.principalId);
     let lease: ReturnType<typeof issueLeaseToken>;
     try {
       lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+        ...(principal ? { principal } : {}),
         ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
         routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
     } catch (error) {
