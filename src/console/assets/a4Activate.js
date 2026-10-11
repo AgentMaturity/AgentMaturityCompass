@@ -98,6 +98,7 @@ function proposalSummary(proposal) {
 /** The release record as GET …/releases/:rid returned it: header, surfaces, leases, lifecycle provenance and the package files. */
 function releaseRecord(release) {
   const files = release.packageFiles?.files;
+  const productionRun = list(release.lifecycleBridge).filter((row) => row.effect === "a4.activate.production_lease").at(-1);
   const controls = (rows) => list(rows).map((row) => [`<code>${esc(row.controlId)}</code>`, `<code>${esc(row.status)}</code>`, esc(row.evidenceRef ?? "none"),
     `<code>${esc(row.claimKind ?? "none")}</code>`, `<code>${esc(row.satisfiedBy ?? "none")}</code>`, esc(row.reason ?? "")]);
   return `<h4>Release record <code>${esc(release.releaseId)}</code></h4>
@@ -114,6 +115,8 @@ function releaseRecord(release) {
       `<code>${esc(lease.recordedStatus)}</code>`, esc(lease.expiresAt)]), "No lease.")}
     <h4>Lifecycle provenance (${esc(release.lifecycle?.from)} → ${esc(release.lifecycle?.to)}, as recorded at release)</h4>
     ${table(["Control", "Status", "Evidence ref", "Claim kind", "Satisfied by", "Reason"], controls(release.lifecycle?.controls), "No control.")}
+    <h4>Production bridge as the deployment approval's effect recorded it</h4>
+    ${table(["Control", "Status", "Evidence ref", "Claim kind", "Satisfied by", "Reason"], controls(productionRun?.controls), "The deployment approval's effect has not run.")}
     <h4>Production bridge as it stands now</h4>
     ${table(["Control", "Status", "Evidence ref", "Claim kind", "Satisfied by", "Reason"], controls(release.lifecycleProduction), "Not evaluated.")}
     ${table(["Bridge run", "From", "To", "Advanced", "Transition", "Missing"], list(release.lifecycleBridge).map((row) => [`<code>${esc(row.effect)}</code>`,

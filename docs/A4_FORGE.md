@@ -501,7 +501,9 @@ rollback may run on a held or frozen project, and the operator's rollback row af
 The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves
 an agent still at development to testing (the Aspire charter gate, an executed non-stub validation and the brief's misuse
 section), then testing → staging. After the production lease it moves staging → production. Each step advances only when
-every control of the bridge table has a ref, and records each control's ref, claim kind and reason. In v1 `rollback_plan_validated` and `operator_handoff_acknowledged` need a `passed` AMC check,
+every control of the bridge table has a ref, and records each control's ref, claim kind, `satisfiedBy` and reason: the
+release record keeps the release bridge's rows, and the deployment approval's effect record keeps the production
+bridge's, which `GET …/releases/:rid` shows beside the production rows as they stand now. In v1 `rollback_plan_validated` and `operator_handoff_acknowledged` need a `passed` AMC check,
 so the agent stays at staging (P2-40). `assurance_pack_passing` needs an assurance run artifact.
 `monitoring_slo_enabled` needs a monitor ref that carries a first SLO measurement.
 

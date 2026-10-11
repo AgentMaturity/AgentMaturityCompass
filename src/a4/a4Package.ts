@@ -402,9 +402,13 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
   return { files, deploy };
 }
 
-/** What the effect records about the lifecycle bridge it ran (EFFECT_FINISHED record): ids and reasons, never a credential. */
+/**
+ * What the effect records about the lifecycle bridge it ran (EFFECT_FINISHED record): ids, reasons and each control's
+ * { controlId, status, evidenceRef, claimKind, satisfiedBy, reason } as the bridge read it (lifecycle/state.json keeps no
+ * provenance, and the release record's rows predate the production bridge); never a credential.
+ */
 const lifecycleRecord = (releaseId: string, outcome: BridgeOutcome) => ({ releaseId, target: outcome.target, from: outcome.from, to: outcome.to, advanced: outcome.advanced,
-  transitionId: outcome.transitionId, missing: [...outcome.missing], reason: outcome.reason });
+  transitionId: outcome.transitionId, missing: [...outcome.missing], reason: outcome.reason, controls: recordControls(outcome) });
 
 /** The EFFECT_FINISHED receipt: the signed tarball, an implementation ref (self_reported). */
 const receiptOf = (release: Record<string, unknown>): NonNullable<A4EffectOutcome["receipt"]> => ({ refKind: "package", refId: String(release.tarballPath),
