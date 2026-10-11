@@ -178,6 +178,13 @@
       "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
     },
     {
+      "path": "src/corrections/lessonStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/corrections/lessonStore.ts.landed",
+      "sha256": "86b7e1fdc0fead2c917dcfa83f22e8804550f1c901ae5080d7f1ff2c52478469"
+    },
+    {
       "path": "src/demo/prospectDemo.ts",
       "issue": "P0-15",
       "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
