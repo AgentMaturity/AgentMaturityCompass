@@ -1,0 +1,163 @@
+{
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "artifactPath": "/stage/rc.tgz",
+  "root": "/work/out/studio",
+  "startedAt": "2026-10-11T08:26:49.598134+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "--version"
+      ],
+      "cwd": "/work/out/studio",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-01.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--prefix",
+        "/work/out/studio/installation",
+        "--no-audit",
+        "--no-fund",
+        "/stage/rc.tgz"
+      ],
+      "cwd": "/work/out/studio/installation",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-02.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "bootstrap"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-03.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-04.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "cwd": "/work/out/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-05.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "up",
+        "--demo",
+        "--no-open",
+        "--no-baseline"
+      ],
+      "cwd": "/work/out/studio/demo",
+      "exitCode": 1,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-06.log"
+    },
+    {
+      "argv": [
+        "/usr/local/bin/node",
+        "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "down"
+      ],
+      "cwd": "/work/out/studio/demo",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/work/out/studio/command-07.log"
+    }
+  ],
+  "cleanup": [
+    {
+      "resource": "owned demo daemon",
+      "ok": false,
+      "error": "'NoneType' object cannot be interpreted as an integer"
+    },
+    {
+      "resource": "owned foreground Studio",
+      "exitCode": 0,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "private fixture credentials/workspaces/raw log",
+      "ok": false,
+      "error": "Retain private fixtures for owner cleanup after incomplete process shutdown"
+    }
+  ],
+  "ok": false,
+  "harnessHashes": {
+    "scripts/studio-native-browser-check.mjs": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "tests/e2e/native-tasks-page.mjs": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "scripts/lib/nativeStudioBrowserReceipt.mjs": "2624565f6d09c28f66ce750ac53e6b12f2e92a1f3997db47035aa10ab54bce5e",
+    "scripts/installed-studio-browser-check.py": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4"
+  },
+  "nodeSha256": "0f8949d1028f6d61506b2d5bc57e7e6fe893d7b1997509b7847294fc9c616584",
+  "nodeVersion": "v24.21.0",
+  "browserExecutableSha256": "e8b500712730fd4cbd0261f675a27c5a79b2375276876f1e3f69db10ee080a72",
+  "helperSha256": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4",
+  "trustBoundary": "Local pre-execution workspace key consistency; not independent external anchoring",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "preExecutionMonitorSha256": "819b891e785e6391b8acd69921f474d399464b575a4d829e1a84fa0484d666bc",
+  "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+  "browserReceiptComplete": false,
+  "verificationError": "",
+  "finishedAt": "2026-10-11T08:27:57.207227+00:00"
+}
