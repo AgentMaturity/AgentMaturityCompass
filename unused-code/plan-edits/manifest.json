@@ -24,6 +24,13 @@
       "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
     },
     {
+      "path": "knip.json",
+      "issue": "P1-58",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/P1-58/knip.json.landed",
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+    },
+    {
       "path": "package.json",
       "issue": "P0-09",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",

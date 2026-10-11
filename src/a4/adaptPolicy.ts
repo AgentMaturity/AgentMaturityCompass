@@ -34,8 +34,8 @@ import {
   ADAPT_SPEC_SCHEMA, ACTIVATE_PLAN_EFFECT_ID, CATALOG_EXPERIMENTAL_NOTICE, FACTS, buildOf, factAnswer, factList, factTerm, lockDigestOf, profileIdOf, proposedPlan,
   type AdaptBuild, type AdaptFact
 } from "./spec/adapt.js";
+import { attempt, fail } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const hexOf = (digest: string): string => digest.replace(/^sha256:/, "");
 
 let shippedLock: string | undefined;
@@ -55,7 +55,7 @@ export function shippedLockDigest(): string {
 }
 
 /** The raw DeploymentProfile of these answers (parseDeploymentProfile checks it strictly). One profile id per project. */
-export function profileFromAnswers(input: { projectId: string; workspaceId: string; agentId: string; answers: readonly A4Answer[] }): unknown {
+function profileFromAnswers(input: { projectId: string; workspaceId: string; agentId: string; answers: readonly A4Answer[] }): unknown {
   const fact = (name: AdaptFact) => {
     const answer = factAnswer(input.answers, name);
     const value = FACTS[name] === "list" ? factList(answer?.value) : factTerm(answer?.value);
@@ -67,15 +67,6 @@ export function profileFromAnswers(input: { projectId: string; workspaceId: stri
     ...Object.fromEntries((Object.keys(FACTS) as AdaptFact[]).map((name) => [name, fact(name)])),
     euRoleRecord: null, art63Record: null, operatingProfile: null, exceptions: []
   };
-}
-
-/** One reader's answer, or the error's code: a fact that cannot be read is recorded as such, never as "fine". */
-function attempt<T>(read: () => T): T | { error: string } {
-  try {
-    return read();
-  } catch (error) {
-    return { error: errorCodeOf(error, "UNREADABLE") };
-  }
 }
 
 /** A signed config's state: valid, missing (no file) or invalid (present and not verifying). A code only, never a path. */
@@ -173,7 +164,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
 }
 
 /** The previous plan this project proposed (newest first, another digest), for the plan diff Propose shows; null when none. */
-export function previousProposal(state: A4ReadinessState, planDigest: string): CompiledPlan | null {
+function previousProposal(state: A4ReadinessState, planDigest: string): CompiledPlan | null {
   for (const row of [...state.revisions].reverse()) {
     const plan = row.stage === "adapt" ? proposedPlan(JSON.parse(row.spec_json) as Record<string, unknown>) : null;
     if (plan !== null && plan.digest !== planDigest) return plan;
@@ -192,7 +183,7 @@ export const proposalDiff = (state: A4ReadinessState, plan: CompiledPlan): PlanD
  * than `planDigest`: the baseline signPlan lists weakenings against. A plan another project or the CLI activated is
  * checked by activateControlPlan itself, against the journal head, at activation.
  */
-export function inForcePlan(state: A4ReadinessState, planDigest: string): SignedPlan | null {
+function inForcePlan(state: A4ReadinessState, planDigest: string): SignedPlan | null {
   // The attempt's own execution id (EFFECT_STARTED's, copied onto EFFECT_FINISHED), never the consumed record's, which
   // is absent when that record could not be read after a successful activation (fail closed: the baseline stays).
   const activated = new Set(state.chain.filter((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID)

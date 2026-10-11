@@ -18,6 +18,8 @@ import { MERKLE_ALGORITHMS } from "./merkle.js";
  *
  * `a4-binder` (P1-63) records the signed manifest of an A4 binder slice (src/a4/a4Binder.ts).
  *
+ * `a4-package` (P1-62) records the signed manifest of an A4 agent package (src/a4/a4Package.ts).
+ *
  * `revocation-list`, `key-rotation` and `key-history` (P1-08) anchor each signed revocation list, rotation statement
  * and key-history revision, with `id` = `<list or chain id>#<sequence>`, so an older file can be refused even after the
  * per-machine high-water mark is lost (src/keys/anchors.ts).
@@ -37,6 +39,7 @@ export const TRANSPARENCY_ARTIFACT_KINDS = [
   "session-root",
   "merkle-migration",
   "a4-binder",
+  "a4-package",
   "revocation-list",
   "key-rotation",
   "key-history"

@@ -30,12 +30,12 @@ export { A4_BOUND_ITEMS };
 export type BlockerKind = (typeof A4_BLOCKER_KINDS)[number];
 export type A4ReadinessItem = z.infer<typeof a4ReadinessItemSchema>;
 export type A4GateRow = z.infer<typeof a4GateRowSchema>;
-export type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
-export type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
+type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
+type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
 export type A4EffectRow = z.infer<typeof a4EffectRowSchema>;
 export type A4RequiredReview = A4GatePolicyV1["gates"]["policy"]["requiredReviews"][number];
 
-export const A4_ACTIONS = [
+const A4_ACTIONS = [
   "ask", "understand", "explain", "propose", "requestGate", "decide", "requestChanges", "build", "review", "progress", "hold", "resume",
   "reopen", "tune", "retire", "addMember", "changeGatePolicy", "acknowledge", "openEffect", "retryEffect", "release", "recordDeployment",
   "verifyDeployment", "rollback", "observeHypothesis"
@@ -62,11 +62,16 @@ export const PLAN_ACTIVATION_DEFERRED = "PLAN_ACTIVATION_DEFERRED";
  * Whether an owner acknowledgement counts for `candidate` as evaluated now (and may be recorded): a WAITING item of
  * ACKNOWLEDGEABLE_ITEMS, except `plan_unresolved` while the project is regulated (it activates only a ready plan) and
  * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED while mandatory (from Review on: every earlier step records
- * a new revision, and an acknowledgement counts only on its own). The evaluator and acknowledgeItem both decide by it.
+ * a new revision, and an acknowledgement counts only on its own). Activate's two that the deployment approval reads count
+ * from Review on too: `regulatory_sources_status` at Activate (D-21; Adapt carries its own), and `deployment.amc_check`
+ * only once it names a receipt (one recorded with none would never match the receipt the approval binds). The evaluator
+ * and acknowledgeItem both decide by it, at the stage evaluated.
  */
-export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean): boolean {
+export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean, stage?: A4Stage): boolean {
   return candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id) && !(regulated && candidate.id === "plan_unresolved")
-    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)));
+    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)))
+    && (candidate.id !== "regulatory_sources_status" || stage !== "activate" || candidate.mandatory)
+    && (candidate.id !== "deployment.amc_check" || (candidate.mandatory && candidate.reasonCodes.some((code) => code.startsWith("RECEIPT:"))));
 }
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
@@ -119,6 +124,10 @@ export interface A4LiveFacts {
   readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
   /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
   readonly sessionStore?: "sqlite" | "jsonl";
+  /** Activate only: who signs A4_PACKAGE (null: the trust config does not verify); absent when not read. */
+  readonly packageSigningRoute?: "vault" | "notary" | null;
+  /** Activate only: each release's transparency entry in the log now (release id → entry hash, null for none); null when the log does not read. */
+  readonly packageTransparency?: Readonly<Record<string, string | null>> | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -150,7 +159,7 @@ export const LIFECYCLE_BRIDGE: ReadonlyArray<{ readonly target: "testing" | "sta
   { target: "staging", controlId: "deployment_plan_approved", satisfiedBy: "Activate direction gate (release approval) consumed" },
   { target: "production", controlId: "assurance_pack_passing", satisfiedBy: "assurance run artifact with a non-inconclusive VALID result" },
   { target: "production", controlId: "rollback_plan_validated", satisfiedBy: "rollback drill receipt plus a staging rollback row with amc_check_status passed" },
-  { target: "production", controlId: "monitoring_slo_enabled", satisfiedBy: "monitor ref carrying a first SLO measurement (self_reported)" },
+  { target: "production", controlId: "monitoring_slo_enabled", satisfiedBy: "monitor ref carrying an SLO measurement of this agent since its deploy receipt (the SLO report labels no agent yet)" },
   { target: "production", controlId: "operator_handoff_acknowledged", satisfiedBy: "OWNER deployment approval with a deploy row whose amc_check_status is passed" }
 ];
 
@@ -161,7 +170,7 @@ const parseJson = (text: string): unknown => {
     return null;
   }
 };
-export const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
+const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
 const decisionRecordOf = (row: A4DecisionRow): ApprovalDecisionRecord | null => {
   const parsed = approvalDecisionSchema.safeParse(parseJson(row.decision_json));
   return parsed.success ? parsed.data : null;
@@ -329,10 +338,19 @@ function decisionEnvelope(decision: A4DecisionRow, regulated: boolean, now: numb
 }
 
 type ItemFields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: ItemFields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "governance", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
+/**
+ * The item builders of one readiness section: `item` (every field not given is its empty default, the item mandatory)
+ * and `waiting`, a WAITING item with evidence missing under `codes`. Each stage's spec module takes the pair for its section.
+ */
+export function readinessItemBuilders(section: A4ReadinessItem["section"]) {
+  const item = (id: string, status: A4ReadinessItem["status"], fields: ItemFields = {}): A4ReadinessItem => ({
+    id, status, kind: null, reasonCodes: [], section, evidence: [], claim: null, report: null, acknowledged: null,
+    nextAction: null, mandatory: true, bound: false, ...fields
+  } as A4ReadinessItem);
+  const waiting = (id: string, codes: string[], fields: ItemFields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+  return { item, waiting };
+}
+const { item } = readinessItemBuilders("governance");
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });
 
@@ -354,8 +372,10 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
       : item("members.candidates", "READY", { reasonCodes: live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [], mandatory: false }),
     live.vaultUnlocked === null ? unread("signing.available", "VAULT_LOCKED")
       : item("signing.available", live.vaultUnlocked ? "READY" : "WAITING", live.vaultUnlocked ? {} : { kind: "source_unavailable", reasonCodes: ["VAULT_LOCKED"] }),
-    live.signingRoute === null ? item("signing.notary_route", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["CONFIG_UNTRUSTED"] })
-      : item("signing.notary_route", "READY", { reasonCodes: live.signingRoute === "vault" ? ["NOTARY_ROUTE_VAULT"] : [] }),
+    // At Activate the route of each kind A4 signs is named: A4_RECORD (every record) and A4_PACKAGE (the package manifest).
+    live.signingRoute === null || live.packageSigningRoute === null ? item("signing.notary_route", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["CONFIG_UNTRUSTED"] })
+      : item("signing.notary_route", "READY", { reasonCodes: [...(live.signingRoute === "vault" ? ["NOTARY_ROUTE_VAULT"] : []),
+        ...(live.packageSigningRoute === undefined ? [] : [`A4_RECORD:${live.signingRoute}`, `A4_PACKAGE:${live.packageSigningRoute}`])] }),
     live.signingRoute === "notary" && live.notaryReachable === false
       ? item("signing.notary_reachable", "WAITING", { kind: "source_unavailable", reasonCodes: ["NOTARY_UNREACHABLE"] }) : item("signing.notary_reachable", "READY"),
     // Integrity of bytes, checked against this workspace's own keys: a self-check, never anchored, never a claim.
@@ -440,11 +460,15 @@ function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4Readin
     }
   }
   const states = [...latest.values()].map((link) => link.kind);
-  const retry = (link: A4ChainLink) => `POST /api/v1/a4/projects/${state.project.project_id}/stages/${String(link.body.stage)}/effects/${String(link.body.effect)}/retry`;
+  // A rollback (src/a4/a4Rollback.ts, execution a4-rollback-<releaseId>) is run again by its own route, any number of times.
+  const rollback = (link: A4ChainLink): boolean => link.body.effect === "a4.activate.rollback";
+  const retry = (link: A4ChainLink) => rollback(link)
+    ? `POST /api/v1/a4/projects/${state.project.project_id}/releases/${String(link.body.executionId).replace(/^a4-rollback-/, "")}/rollback`
+    : `POST /api/v1/a4/projects/${state.project.project_id}/stages/${String(link.body.stage)}/effects/${String(link.body.effect)}/retry`;
   const failed = [...latest.values()].find((link) => link.kind === "EFFECT_FAILED");
   if (failed !== undefined) {
     const code = /^[A-Za-z][A-Za-z0-9_]{0,63}/.exec(String(failed.body.error ?? ""))?.[0] ?? "UNKNOWN";
-    const second = state.chain.filter((link) => link.kind === "EFFECT_FAILED" && link.body.executionId === failed.body.executionId).length >= 2;
+    const second = !rollback(failed) && state.chain.filter((link) => link.kind === "EFFECT_FAILED" && link.body.executionId === failed.body.executionId).length >= 2;
     return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED", `EFFECT_ERROR:${code}`, `ATTEMPT:${String(failed.body.effectId)}`],
       nextAction: second ? { label: "A second failure needs a new revision of the stage: reopen it (design §6.5)" }
         : { label: `An owner retries attempt ${String(failed.body.effectId)} (recorded error ${code}; an effect that consumes its own grant is re-opened and completed instead)`,
@@ -498,7 +522,7 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
   ask: "builder", understand: "builder", explain: "builder", propose: "builder", requestGate: "builder", decide: "approver",
   requestChanges: "reviewer", build: "builder", review: "builder", progress: "builder", hold: "owner", resume: "owner", reopen: "owner",
   tune: "owner", retire: "owner", addMember: "owner", changeGatePolicy: "owner", acknowledge: "owner", openEffect: "owner", retryEffect: "owner",
-  release: "owner", recordDeployment: "builder", verifyDeployment: "builder", rollback: "owner", observeHypothesis: "builder"
+  release: "owner", recordDeployment: "owner", verifyDeployment: "owner", rollback: "owner", observeHypothesis: "builder"
 };
 
 /**
@@ -553,6 +577,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
         ? ["A4_DUPLICATE_DECISION"] : []),
       ...(everyPending((gate) => query.now >= gate.row.expires_ts - EXPIRING_GUARD_MS) ? ["GATE_EXPIRING"] : [])
     ],
+    // An acknowledgement is recorded on the head revision and supersedes its gates, and readiness counts it at the
+    // project's own stage: one at any other stage would not count there and would stale the current stage's gates.
+    acknowledge: state.project.stage !== "retired" && query.stage !== state.project.stage ? ["A4_STEP_ORDER"] : [],
     // A retry that cannot sign fails at once and spends the attempt the stage has left before a new revision.
     retryEffect: ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
     progress: [
@@ -576,14 +603,20 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
   }));
 }
 
-/** The latest unexpired owner acknowledgement per item on the head revision. */
-function acknowledgements(state: A4ReadinessState, now: number): Map<string, NonNullable<A4ReadinessItem["acknowledged"]>> {
-  const out = new Map<string, NonNullable<A4ReadinessItem["acknowledged"]>>();
+/**
+ * The reason codes of an item that name a record (a deployment receipt, an AMC check): an acknowledgement is recorded
+ * with them and counts only while the item names the same records, never for a receipt or check it never saw.
+ */
+export const acknowledgedRecords = (reasonCodes: readonly string[]): string[] => reasonCodes.filter((code) => /^(RECEIPT|CHECK):/.test(code)).sort();
+
+/** The latest unexpired owner acknowledgement per item on the head revision, with the records it was recorded against. */
+function acknowledgements(state: A4ReadinessState, now: number): Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }> {
+  const out = new Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }>();
   for (const link of state.chain) {
-    const { itemId, reason, expiresTs, actorKey, ts } = link.body;
+    const { itemId, reason, expiresTs, actorKey, ts, recordCodes } = link.body;
     if (link.kind !== "ACKNOWLEDGED" || link.revisionNo !== state.project.revision_no || typeof itemId !== "string" || typeof reason !== "string"
       || typeof expiresTs !== "number" || typeof actorKey !== "string" || typeof ts !== "number" || expiresTs <= now) continue;
-    out.set(itemId, { by: actorKey, ts, expiresTs, reason });
+    out.set(itemId, { ack: { by: actorKey, ts, expiresTs, reason }, records: JSON.stringify(Array.isArray(recordCodes) ? recordCodes : []) });
   }
   return out;
 }
@@ -603,9 +636,9 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
     return built.map((candidate) => {
       const ack = acks.get(candidate.id);
-      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated);
+      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated, stage) && ack.records === JSON.stringify(acknowledgedRecords(candidate.reasonCodes));
       return { ...candidate, bound: boundIds.includes(candidate.id),
-        ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
+        ...(acknowledged ? { acknowledged: ack.ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
     });
   };
   const first = itemsFor(opened);

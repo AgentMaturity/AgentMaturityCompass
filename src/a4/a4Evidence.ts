@@ -10,14 +10,44 @@ import { readFileSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import { effectiveTrustTier, workspaceOwnKeyIds, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
+import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
+import { signingRoute, verifySignedDigest } from "../crypto/signing/signer.js";
+import type { SignatureEnvelope, SignKind } from "../crypto/signing/signerTypes.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
-import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
+import { readAndVerifyArtifactFileSignature, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { admitKey } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { EvidenceEvent } from "../types.js";
 import { A4_PROBE_SESSION_PREFIX, laneForClaimKind, type A4EvidenceRefRow, type A4Lane } from "./a4Schema.js";
+
+/**
+ * Whether `envelope` is the pinned notary's signature over `sha256`: `kind` routes to the notary under the signed trust
+ * config (signingRoute verifies its signature), the envelope is self-consistent and its key is the one that config pins.
+ */
+export function pinnedNotarySignature(workspace: string, sha256: string, envelope: unknown, kind: SignKind): boolean {
+  if ((envelope as { signer?: { type?: unknown } } | null | undefined)?.signer?.type !== "NOTARY") return false;
+  try {
+    if (signingRoute(workspace, kind) !== "notary") return false;
+    const trust = loadTrustConfig(workspace).trust;
+    return trust.mode === "NOTARY" && (envelope as { fingerprint?: unknown }).fingerprint === trust.notary.pinnedPubkeyFingerprint
+      && verifySignatureEnvelope(sha256, envelope as SignatureEnvelope);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A digest A4 signed (an A4_RECORD envelope, the A4_PACKAGE-signed update policy) checked now: under this workspace's
+ * auditor key history, or as the pinned notary's envelope when `kind` routes there (NOTARY mode signs both by the notary).
+ * Either way a local audit trail, never a portable verdict.
+ */
+export function verifiedA4Digest(workspace: string, digestHex: string, signed: { signature: string; envelope?: unknown }, kind: "A4_RECORD" | "A4_PACKAGE"): boolean {
+  if (verifySignedDigest({ workspace, digestHex, signed })) return true;
+  return (signed.envelope as { sigB64?: unknown } | null | undefined)?.sigB64 === signed.signature && pinnedNotarySignature(workspace, digestHex, signed.envelope, kind);
+}
 
 /**
  * An admitted external record (P2-24 review record, P3-21 registry record) behind a verified-lane ref. The loader
@@ -54,8 +84,13 @@ const LANE_RANK: Record<A4Lane, number> = { recommendation: 0, implementation: 0
 const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
 const FILE_REF_KINDS = new Set(["stage_output", "artifact", "package", "deployment_receipt", "rollback_receipt", "value_claim",
   "outcome_report", "monitor", "manifest", "plan", "control_result", "verification"]);
-/** The artifact kind a file ref's signature must carry. Kinds without one yet accept any workspace artifact kind (P1-62 adds theirs). */
-const ARTIFACT_KIND_BY_REF: Readonly<Record<string, "a4-stage-output" | undefined>> = { stage_output: "a4-stage-output" };
+/**
+ * The artifact kind a file ref's signature must carry: each kind A4 writes itself (Activate's records under a4-releases/,
+ * src/a4/a4Package.ts writeReleaseRecord). Kinds without one accept any workspace artifact kind.
+ */
+const ARTIFACT_KIND_BY_REF: Readonly<Record<string, ArtifactSignature["artifactKind"] | undefined>> = { stage_output: "a4-stage-output", package: "a4-package",
+  deployment_receipt: "a4-deployment-receipt", verification: "a4-amc-check", rollback_receipt: "a4-rollback-receipt", monitor: "a4-stage-output",
+  value_claim: "a4-stage-output" };
 
 type Status = A4ResolvedRef["status"];
 
