@@ -33,6 +33,8 @@ import {
   type CanonicalToolRequest, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
   type HookProvider, type PiControlContext, type ProviderControlResponse,
 } from "./hookProviders.js";
+// Still exported here for importers of hookControl.js, the archived HTTP parity module among them.
+export { HookControlError } from "./hookProviders.js";
 import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
 import { isQualifiedPiVersion, piVersionRefusal } from "../adapters/pi/piVersions.js";
@@ -346,9 +348,7 @@ function normalizeProviderRequest(input: {
 }): NormalizedProviderToolRequest {
   const parsed = parseProviderInput(input.rawInput);
   const expectedEvent = CONTROL_HOOK_EVENTS[input.provider];
-  if (parsed.hook_event_name !== expectedEvent) {
-    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
-  }
+  if (parsed.hook_event_name !== expectedEvent) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
   const pi = piControlContext(input.provider, parsed);
   const identity = resolveProviderHookRequestIdentity({
