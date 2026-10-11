@@ -189,6 +189,8 @@ describe("source-quality ratchet", () => {
     expect(rebased.exitCode).toBe(0);
     expect(rebased.baseline.config.jscpdSha256).toBe(after);
     expect(() => ratchet("duplicates", current("duplicates", findings), baseline, { rebaseline: true })).toThrow(/--reason/);
+    expect(() => ratchet("duplicates", current("duplicates", findings, { user: "" }), baseline, { rebaseline: true, reason: REASON }))
+      .toThrow(/git config user.name/);
   });
 
   it("keeps still-current accepted findings and their reasons across a rebaseline", () => {
@@ -279,8 +281,25 @@ describe("source-quality ratchet", () => {
     expect(baseCheck(root, "dead-code", { ...base, deadCode: base.deadCode.slice(1) }, { base: "main" }).exitCode).toBe(0);
     const accepted = { ...base, accepted: [{ id: addedId, scan: "dead-code", reason: "kept for the P0-14 compose verify profile", acceptedBy: "Test", date: "2026-10-11" }] };
     expect(baseCheck(root, "dead-code", accepted, { base: "main" }).exitCode).toBe(0);
-    // A reviewed rebaseline after tool or config drift may add entries.
-    expect(baseCheck(root, "dead-code", { ...handAdded, tools: { ...handAdded.tools, knip: "6.40.0" } }, { base: "main" }).exitCode).toBe(0);
+    // A rebaseline after a real tool or config change may add entries, but only with a matching record.
+    const upgraded = ratchet("dead-code", current("dead-code", findings, { version: "6.40.0" }), base,
+      { rebaseline: true, reason: "knip 6.40.0 upgrade: new findings reviewed" }).baseline;
+    expect(upgraded.rebaselines.at(-1)).toEqual({ scan: "dead-code", toolFrom: "6.39.0", toolTo: "6.40.0", configFrom: "a".repeat(64),
+      configTo: "a".repeat(64), added: 1, reason: "knip 6.40.0 upgrade: new findings reviewed", rebaselinedBy: "Test User", date: "2026-10-11" });
+    const rebased = (baseline: unknown, scanned = findings) => baseCheck(root, "dead-code", baseline, { base: "main", findings: scanned });
+    expect(rebased(upgraded)).toMatchObject({ exitCode: 0, messages: [expect.stringMatching(/recorded rebaseline/)] });
+    // (a) no record, a record from other values, or a wrong count
+    expect(rebased({ ...handAdded, tools: { ...handAdded.tools, knip: "6.40.0" } })).toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/no rebaselines record/)] });
+    const record = upgraded.rebaselines.at(-1);
+    expect(rebased({ ...upgraded, rebaselines: [{ ...record, toolFrom: "6.38.0" }] }).exitCode).toBe(1);
+    expect(rebased({ ...upgraded, rebaselines: [{ ...record, added: 0 }] })).toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/says 0 added/)] });
+    expect(() => parseBaseline(serializeBaseline({ ...upgraded, rebaselines: [{ ...record, reason: "upgrade" }] }))).toThrow(/recorded reason/);
+    expect(() => parseBaseline(serializeBaseline({ ...upgraded, rebaselines: [{ ...record, rebaselinedBy: "" }] }))).toThrow(/recorded reason/);
+    // (b) a record does not help when the tool version and config hash equal the base's
+    expect(rebased({ ...upgraded, tools: base.tools, rebaselines: [{ ...record, toolTo: "6.39.0" }] }))
+      .toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/only through --accept/)] });
+    // (c) every added entry must come from this scan
+    expect(rebased(upgraded, findings.slice(1))).toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/not produced by this scan/)] });
 
     // The merge-base decides: main shrinking after the fork does not fail the branch's older entries.
     git("checkout", "-q", "main");

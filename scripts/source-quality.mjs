@@ -93,7 +93,7 @@ const SCANS = {
   "dead-code": { tool: "knip", config: "knip.json", configKey: "knipSha256", list: "deadCode" }
 };
 const EMPTY_BASELINE = { v: 1, sourceCommit: "", tools: { jscpd: "", knip: "" }, config: { jscpdSha256: "", knipSha256: "" },
-  duplicates: [], deadCode: [], accepted: [] };
+  duplicates: [], deadCode: [], accepted: [], rebaselines: [] };
 const sha256 = text => createHash("sha256").update(text).digest("hex");
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const sortKey = entry => [...(entry.paths ?? [entry.file]), entry.format ?? entry.kind, entry.id].join("\0");
@@ -155,14 +155,20 @@ export function ratchet(scan, current, baseline, options = {}) {
   const messages = [];
   let next = baseline;
   if (options.rebaseline) {
+    if (!current.user) throw new Error("--rebaseline records rebaselinedBy from git config user.name, which is empty");
     const prior = baseline ?? EMPTY_BASELINE;
     const entries = baselineEntries(scan, current.findings);
     const live = new Set(entries.map(entry => entry.id));
     const accepted = prior.accepted.filter(entry => entry.scan !== scan || live.has(entry.id));
     const acceptedIds = new Set(accepted.map(entry => entry.id));
+    const priorIds = new Set(prior[spec.list].map(entry => entry.id));
+    const list = entries.filter(entry => !acceptedIds.has(entry.id));
+    const record = { scan, toolFrom: prior.tools[spec.tool], toolTo: current.version, configFrom: prior.config[spec.configKey],
+      configTo: current.configSha256, added: list.filter(entry => !priorIds.has(entry.id)).length, reason: options.reason.trim(),
+      rebaselinedBy: current.user, date: current.date };
     next = { ...prior, sourceCommit: current.commit, tools: { ...prior.tools, [spec.tool]: current.version },
-      config: { ...prior.config, [spec.configKey]: current.configSha256 },
-      [spec.list]: entries.filter(entry => !acceptedIds.has(entry.id)), accepted };
+      config: { ...prior.config, [spec.configKey]: current.configSha256 }, [spec.list]: list, accepted,
+      rebaselines: [...prior.rebaselines, record] };
     messages.push(`Rebaselined ${scan}: ${entries.length} findings. Put this reason in the PR description: ${options.reason.trim()}`);
   } else {
     if (!baseline) throw new Error(`No source-quality baseline at ${BASELINE}; create it with --rebaseline --reason "<why>"`);
@@ -196,7 +202,7 @@ export function parseBaseline(text) {
   const baseline = JSON.parse(text);
   const ids = [...(baseline?.duplicates ?? []), ...(baseline?.deadCode ?? []), ...(baseline?.accepted ?? [])].map(entry => entry?.id);
   if (baseline?.v !== 1 || typeof baseline.sourceCommit !== "string"
-    || ![baseline.duplicates, baseline.deadCode, baseline.accepted].every(Array.isArray)
+    || ![baseline.duplicates, baseline.deadCode, baseline.accepted, baseline.rebaselines].every(Array.isArray)
     || !Object.values(SCANS).every(spec => typeof baseline.tools?.[spec.tool] === "string" && typeof baseline.config?.[spec.configKey] === "string")
     || !ids.every(id => /^[0-9a-f]{64}$/.test(id)) || new Set(ids).size !== ids.length) {
     throw new Error(`Source-quality baseline ${BASELINE} is malformed`);
@@ -207,6 +213,13 @@ export function parseBaseline(text) {
       throw new Error(`Accepted source-quality finding ${entry.id} has no valid recorded reason`);
     }
   }
+  for (const [index, entry] of baseline.rebaselines.entries()) {
+    if (!Object.hasOwn(SCANS, entry?.scan) || !["toolFrom", "toolTo", "configFrom", "configTo"].every(key => typeof entry[key] === "string")
+      || !Number.isInteger(entry.added) || entry.added < 0 || typeof entry.reason !== "string" || entry.reason.trim().length < MIN_REASON
+      || typeof entry.rebaselinedBy !== "string" || !entry.rebaselinedBy || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+      throw new Error(`Source-quality rebaseline record ${index} has no valid recorded reason, author, date or values`);
+    }
+  }
   return baseline;
 }
 /** Sorted arrays, one entry per line, LF endings: a shrink removes one line per fixed finding. */
@@ -214,7 +227,8 @@ export function serializeBaseline(baseline) {
   const rows = list => (list.length ? `[\n${list.map(entry => `    ${JSON.stringify(entry)}`).join(",\n")}\n  ]` : "[]");
   return `{\n  "v": 1,\n  "sourceCommit": ${JSON.stringify(baseline.sourceCommit)},\n  "tools": ${JSON.stringify(baseline.tools)},\n`
     + `  "config": ${JSON.stringify(baseline.config)},\n  "duplicates": ${rows(baseline.duplicates)},\n`
-    + `  "deadCode": ${rows(baseline.deadCode)},\n  "accepted": ${rows(baseline.accepted)}\n}\n`;
+    + `  "deadCode": ${rows(baseline.deadCode)},\n  "accepted": ${rows(baseline.accepted)},\n`
+    + `  "rebaselines": ${rows(baseline.rebaselines)}\n}\n`;
 }
 /** Config bytes with LF endings, so a CRLF checkout is not drift. */
 export function configSha256(root, scan) {
@@ -235,13 +249,14 @@ function git(root, args) {
 /**
  * Every unaccepted entry of `scan` must already be in the baseline at the merge-base of HEAD and `base`
  * (default origin/main, else int): a new finding enters only through --accept with a reason, and removals always
- * pass. Additions are allowed only when the scan's tool version or config hash changed since the base (a reviewed
- * --rebaseline). A base without any baseline file is the one-time bootstrap; any other unreadable base fails closed
- * unless `allowMissingBase`.
- * @param {{ base?: string, allowMissingBase?: boolean }} [options]
+ * pass. Entries may be added otherwise only when (a) the baseline's last matching `rebaselines` record goes from the
+ * base's tool version and config hash to the current ones and counts exactly the added entries, (b) that version or
+ * hash really differs from the base's, and (c) every added entry is a current finding (`findings`). A base without
+ * any baseline file is the one-time bootstrap; any other unreadable base fails closed unless `allowMissingBase`.
+ * @param {{ base?: string, allowMissingBase?: boolean, findings?: string[] }} [options]
  */
 export function baseCheck(root, scan, baseline, options = {}) {
-  const { base, allowMissingBase = false } = options;
+  const { base, allowMissingBase = false, findings = [] } = options;
   const spec = scanSpec(scan);
   const ref = base ?? (spawnSync("git", ["rev-parse", "--verify", "-q", "origin/main^{commit}"], { cwd: root }).status === 0 ? "origin/main" : "int");
   let at;
@@ -257,14 +272,29 @@ export function baseCheck(root, scan, baseline, options = {}) {
       : { exitCode: 1, messages: [`${message}. Pass --base <ref>, or --allow-missing-base to skip this check.`] };
   }
   if (!prior) return { exitCode: 0, messages: [`No source-quality baseline at ${at}: one-time bootstrap, base check skipped`] };
-  if (prior.tools[spec.tool] !== baseline.tools[spec.tool] || prior.config[spec.configKey] !== baseline.config[spec.configKey]) {
-    return { exitCode: 0, messages: [`${spec.tool} version or ${spec.config} changed since ${at}: a reviewed --rebaseline may add ${scan} entries`] };
-  }
   const known = new Set(prior[spec.list].map(entry => entry.id));
   const added = baseline[spec.list].filter(entry => !known.has(entry.id));
-  return { exitCode: added.length ? 1 : 0, messages: added.map(entry => `baseline entry ${entry.id} `
-    + `(${entry.paths ? entry.paths.join(" <-> ") : `${entry.file} ${entry.kind}`}) is not in the baseline at ${at}; `
-    + "a new finding enters only through --accept <id> --reason") };
+  if (!added.length) return { exitCode: 0, messages: [] };
+  const from = [prior.tools[spec.tool], prior.config[spec.configKey]];
+  const to = [baseline.tools[spec.tool], baseline.config[spec.configKey]];
+  if (from[0] === to[0] && from[1] === to[1]) {
+    return { exitCode: 1, messages: added.map(entry => `baseline entry ${entry.id} `
+      + `(${entry.paths ? entry.paths.join(" <-> ") : `${entry.file} ${entry.kind}`}) is not in the baseline at ${at}; `
+      + "a new finding enters only through --accept <id> --reason") };
+  }
+  const record = baseline.rebaselines.filter(entry => entry.scan === scan && entry.toolFrom === from[0] && entry.toolTo === to[0]
+    && entry.configFrom === from[1] && entry.configTo === to[1]).at(-1);
+  const current = new Set(identify(scan, findings).map(item => item.entry.id));
+  const foreign = added.filter(entry => !current.has(entry.id));
+  const problems = [
+    ...(record ? [] : [`${added.length} ${scan} entries are not in the baseline at ${at} and there is no rebaselines record from `
+      + `${spec.tool} ${from[0]} / ${spec.config} ${from[1].slice(0, 12)} to ${to[0]} / ${to[1].slice(0, 12)}: restore the base's `
+      + `${BASELINE} and run --rebaseline --reason once`]),
+    ...(record && record.added !== added.length ? [`the ${scan} rebaselines record says ${record.added} added entries, but ${added.length} are not in the baseline at ${at}`] : []),
+    ...(foreign.length ? [`${foreign.length} added ${scan} entries were not produced by this scan: ${foreign.map(entry => entry.id).join(", ")}`] : [])
+  ];
+  return problems.length ? { exitCode: 1, messages: problems }
+    : { exitCode: 0, messages: [`${added.length} ${scan} entries added by a recorded rebaseline (${record.rebaselinedBy}, ${record.date}): ${record.reason}`] };
 }
 function main(argv, root = process.cwd()) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, strict: true, options: {
@@ -291,14 +321,14 @@ function main(argv, root = process.cwd()) {
     if (dirty.length) throw new Error(`Refusing to rebaseline with ${dirty.length} uncommitted path(s): commit first, so sourceCommit names the scanned tree`);
   }
   const result = scanSourceQuality(scan, root);
-  const user = values.accept === undefined ? "" : (spawnSync("git", ["config", "user.name"], { cwd: root, encoding: "utf8" }).stdout ?? "").trim();
+  const user = values.accept === undefined && !values.rebaseline ? "" : (spawnSync("git", ["config", "user.name"], { cwd: root, encoding: "utf8" }).stdout ?? "").trim();
   const out = ratchet(scan, { version: result.version, configSha256: configSha256(root, scan), findings: result.findings,
     commit: git(root, ["rev-parse", "HEAD"]), user, date: today() }, baseline, values);
   if (out.changed) writeFileSync(baselinePath, serializeBaseline(out.baseline));
   mkdirSync(join(root, SUMMARY_DIR), { recursive: true });
   writeFileSync(join(root, SUMMARY_DIR, `${scan}.json`), `${JSON.stringify(out.summary, null, 2)}\n`);
   const based = write ? { exitCode: 0, messages: [] }
-    : baseCheck(root, scan, out.baseline, { base: values.base, allowMissingBase: values["allow-missing-base"] });
+    : baseCheck(root, scan, out.baseline, { base: values.base, allowMissingBase: values["allow-missing-base"], findings: result.findings });
   console.log(JSON.stringify(out.summary));
   for (const line of [...out.messages, ...based.messages]) console.error(line);
   return Math.max(out.exitCode, based.exitCode);
