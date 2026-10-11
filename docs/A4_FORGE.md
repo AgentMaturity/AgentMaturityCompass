@@ -115,6 +115,92 @@ An activated compiled plan whose identity binding requires a lease used to deny 
 tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
 cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
 
+## Assemble: building the agent
+
+Assemble turns the approved brief into a built agent: the native path through Studio's native tasks, or an external
+framework through a scaffold, connect instructions and a trace import.
+
+- **Ask and Understand.** Assemble asks for capabilities, autonomy (`advise`: no tools; `act_with_approval`: the signed
+  workspace tools), tools, MCP connectors, the build provider (`stub`, or `provider:model`), existing systems, budget,
+  the engineering path, validation checks and, optionally, a declared workflow. Understand carries `riskTier` and
+  `stations` from Aspire (change them there) and reads the tool pipeline's readiness, the doctor's checks, the native
+  task limits, providers (credentials by reference and `configured` only, never a value), tool scope and validation
+  config from Studio's own native task service, the frameworks, mechanic profiles, the compiled plan (and whether it
+  shows the `workflow` tool), the open `outcome_unknown` executions and the path table.
+- **Paths.** Each path has an IntegrationClaim: which boundary enforces it, what its evidence can reach and what it does
+  not cover. Native is `tool_pipeline`; `claude-code` is preview (P1-23, held on D-02); `pi` is unsupported (P1-22, held
+  on D-02); the framework paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
+  key, and the stage completes only after an owner acknowledges it out of scope with a reason. A `tools` answer narrower
+  than the signed scope is listed too (`NATIVE_TASKS_WHOLE_SCOPE`): a native session is granted the whole scope.
+- **Propose** records the plan: the typed graph with the agent's permissions, tasks by executor (`deterministic`,
+  `native_turn`, `workflow`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
+  validation plan and the baseline Enforce manifest, which must be ACTIVE: pending Enforce drift is reviewed in Enforce
+  first, never applied unseen by Assemble.
+- **Workflow.** A declared workflow (JSON: `agent`, `parallel` and `pipeline` nodes, at most 64) is checked as data
+  when you answer and needs autonomy `act_with_approval`. It runs only through the agent's `workflow` tool, each helper
+  through `spawnSubagent` (depth limit, signed handoff packet, declared scope, a started/completed pair); AMC never
+  starts helper agents on its own. Studio's native build sessions compose no delegation, so the plan lists the workflow
+  as unsupported (`NATIVE_TASKS_NO_DELEGATION`) and it stays listed until an owner acknowledges it out of scope. Once a
+  compiled plan is active its default `visibleTools` hides the tool, and the plan names that denial
+  (`C6_COMPILED_POLICY_DENIES`, with the plan revision and its tool-pipeline controls); an unreadable plan counts as
+  hiding it.
+- **Build** (an owner) signs the agent's preset into `.amc/agents.yaml` (the presets file is verified and parsed from
+  one read, and the bytes written are the bytes signed), writes the typed graph and journals one native
+  build session in its revision; Studio starts it after the step is recorded, on its one native task service (the
+  four-session limit and its sweeper are shared with every Studio task). Further turns, cancel and resume use the native
+  tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract. Build
+  refuses, before any write, a session start Studio's native tasks would refuse (`ANSWER_INVALID:validation` or
+  `ANSWER_INVALID:capabilities`): a check missing from the operator's config, checks without the signed workspace
+  `bash`, or more than 8 or duplicate check ids. Propose already leaves such checks out of the plan and lists them as
+  unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
+  control characters removed, cut by code point.
+- **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
+  and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
+  file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
+  never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
+  retained; imported traces are self-reported). A source already imported is refused (`IMPORT_EXISTS`): an existing
+  import, which an earlier record may name, is never rewritten or rolled back. Whoever scaffolds, connects or imports
+  counts as a builder of the stage: they cannot approve its completion gate or the `a4.assemble.apply` request. The scaffold directory and the import source are workspace paths of
+  plain names with no symbolic link on the way (each component is checked; `PATH_NOT_PLAIN` otherwise), so a link
+  such as `docs -> .amc` cannot lead either into `.amc/`. A bounded first task through `createForeignRunner` is not run: a foreign
+  child runs only under `spawnSubagent`, which Studio's native tasks cannot do (`NATIVE_TASKS_NO_DELEGATION`); the plan
+  gives a supervised command for you to run.
+- **Review** is run by the session's owner and refuses a session that is not the start Build journaled
+  (`BUILD_SESSION_MISMATCH`; the prompt itself is not comparable yet and is recorded as not evaluated), one that runs
+  or has failed, and one that is still open (`BUILD_SESSION_OPEN`): verify the session on the native tasks page, which
+  closes it, so it takes no turn after what approvers approve. AMC's `verifyAgentRun` is an integrity self-check (`workspace-key-consistency`, `SELF_CHECK`) with its
+  verifier report attached; a session with no head event is not evaluated. Review also records each session's
+  effective-policy receipts and their downgrades, listed from the session's signed `EFFECTIVE_POLICY` ledger rows (a
+  receipt file that is missing or does not hash to its row reads unverified, `RECEIPT_MISSING`), and four execution phases (admission, model completion, side-effect
+  completion, evidence verification). On the stub provider every ref about the agent is `synthetic_example` and the
+  review reads "tool pipeline observed on a stub model; agent behaviour not evaluated". Review records the agent's
+  lifecycle stage as `lifecycle/state.json` holds it (`not_evaluated` with the reason when the file is absent or
+  unreadable) and advances nothing: the development → testing bridge (design §7 item 9) waits for the A4 lifecycle
+  wrapper, so `lifecycle_bridge` reads NOT_EVALUATED with `KEY:A4_LIFECYCLE_WRAPPER`. `unit_tests_passing` needs every
+  pinned check executed and passed on a non-stub provider. Review itself records no observed ref yet: it does not
+  reference the session's runtime-written rows as ledger refs. Every answered capability is `not_evaluated`: nothing
+  maps a check or a session output to it.
+  `composition.compositionDigest` and `composition.policyDigest` are not recomputed per session yet (`composition_bound`
+  is not evaluated); the reviewed receipts are bound through the review.
+- **Completion** runs the effect `a4.assemble.apply`: an owner opens the effect gate once the completion gate has its
+  quorum, project approvers decide that second engine request from the A4 card (bound to its request digest), and
+  `complete` applies the reviewed Enforce resources as the agent's active manifest with a signed receipt. A failed apply
+  leaves the gate consumed and offers one owner retry. A vote that consumption would refuse (separation of duties, the
+  revision's builders, a host session on a regulated project) is refused when it is cast.
+- **outcome_unknown.** A cancelled or failed journaled call blocks the agent's journaled calls and this stage
+  (`no_open_outcome_unknown`). The Outcome unknown card requests a resolution (the operator's statement, an
+  `amc.action.resolve` engine request), another project approver or owner decides it from the card, and the resolution
+  is recorded once A4's dual control holds: approvals bound to the request from members other than the operator, the
+  principals who built at Assemble and the owners of its build sessions, two distinct live-checked identities when the
+  project is regulated. The engine request is filed at that floor (at least 1 approval, 2 distinct users when regulated)
+  even when the action class's rule asks for fewer, so it stays open until A4's quorum can be met. The note is sealed in
+  the project's blob store; the
+  engine request and the action journal carry only a reference naming the sealed blob and the note's sha256. The
+  resolution is the operator's statement, `self_reported`, never observed. A denied or expired request is requested
+  again from the same card. If the journal settled a resolution but its project record was refused, the item stays
+  BLOCKED (`RESOLUTION_UNRECORDED`) and the card keeps "Record the resolution" for it. Decisions cast from the card on
+  engine requests are mirrored to the human action log (`HUMAN_APPROVAL_DECISION`), as Studio's approvals page does.
+
 ## Deployment boundary
 
 AMC prepares deployment plans and records what the operator says happened; it never deploys, never holds deployment

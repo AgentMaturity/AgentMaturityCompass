@@ -25,12 +25,26 @@ export interface SodDecision { readonly approverKey: string; readonly authSource
 export interface SodApprover { readonly key: string; readonly authSource: string }
 
 /**
- * Principals who built this revision: STEP actors whose body moves `to: "built"` (the STEP body records from/to, design
- * §9.1) and EFFECT_STARTED actors (the build manifest's author is amc-runtime).
+ * The first revision of a completion gate's stage cycle: the one the newest direction gate consumed at or before
+ * `revisionNo` approved (a stage advances only when its completion gate is consumed), else `revisionNo` itself.
+ */
+const cycleStart = (transitions: readonly A4ChainLink[], revisionNo: number): number => transitions.filter((link) => link.kind === "GATE_CONSUMED"
+  && link.body.gate === "direction" && link.revisionNo <= revisionNo).at(-1)?.revisionNo ?? revisionNo;
+
+/** EVIDENCE_REF purposes that record build work (src/a4/assembleConnect.ts): their actors built what Review counts. */
+const BUILD_REF_PURPOSES: ReadonlySet<unknown> = new Set(["assemble_scaffold", "assemble_connect", "assemble_import"]);
+
+/**
+ * Principals who built up to this revision since the stage's direction gate (cycleStart, the range authorsOf uses for a
+ * completion gate): STEP actors whose body moves `to: "built"` (the STEP body records from/to, design §9.1), the actors
+ * of build-work evidence refs (BUILD_REF_PURPOSES: scaffold, connect, import), and EFFECT_STARTED actors of this
+ * revision (the build manifest's author is amc-runtime).
  */
 export function buildersOf(transitions: readonly A4ChainLink[], revisionNo: number): string[] {
-  return [...new Set(transitions.filter((link) => link.revisionNo === revisionNo
-    && ((link.kind === "STEP" && link.body.to === "built") || link.kind === "EFFECT_STARTED"))
+  const from = cycleStart(transitions, revisionNo);
+  const inCycle = (link: A4ChainLink): boolean => link.revisionNo >= from && link.revisionNo <= revisionNo;
+  return [...new Set(transitions.filter((link) => (link.kind === "EFFECT_STARTED" && link.revisionNo === revisionNo)
+    || (inCycle(link) && ((link.kind === "STEP" && link.body.to === "built") || (link.kind === "EVIDENCE_REF" && BUILD_REF_PURPOSES.has(link.body.purpose)))))
     .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string" && key !== "amc-runtime"))];
 }
 
@@ -41,9 +55,7 @@ export function buildersOf(transitions: readonly A4ChainLink[], revisionNo: numb
  */
 export function authorsOf(transitions: readonly A4ChainLink[], gate: { readonly gate: "direction" | "completion" | "policy"; readonly revisionNo: number }): string[] {
   if (gate.gate === "policy") return [];
-  // The newest direction gate consumed at or before this revision is this stage's: a stage advances only when its completion gate is consumed.
-  const from = gate.gate === "completion" ? transitions.filter((link) => link.kind === "GATE_CONSUMED" && link.body.gate === "direction"
-    && link.revisionNo <= gate.revisionNo).at(-1)?.revisionNo ?? gate.revisionNo : gate.revisionNo;
+  const from = gate.gate === "completion" ? cycleStart(transitions, gate.revisionNo) : gate.revisionNo;
   return [...new Set(transitions.filter((link) => link.kind === "REVISION" && link.revisionNo >= from && link.revisionNo <= gate.revisionNo)
     .map((link) => link.body.actorKey).filter((key): key is string => typeof key === "string"))];
 }

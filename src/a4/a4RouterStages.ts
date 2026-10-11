@@ -12,6 +12,7 @@
 import { join, relative, sep } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
+import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { effectiveTrustTier, eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import { signArtifactFile } from "../lifecycle/artifactSignature.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -38,6 +39,7 @@ import {
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
+import { handleAssembleRoute } from "./assembleResolve.js";
 
 /** Each stage's question bank as its lane publishes it (empty until P1-59…P1-62). */
 export const STAGE_QUESTIONS: Readonly<Record<A4Stage, readonly A4Question[]>> = {
@@ -53,14 +55,19 @@ export interface A4ProducerContext {
   readonly workspace: string;
   readonly state: A4ReadinessState;
   readonly principal: A4Principal;
+  /** The live Studio native task service and this session's admission (Assemble's build sessions; never a second service). */
+  readonly native?: NativeTaskApiContext;
   readonly level?: "novice" | "practitioner" | "expert";
   readonly spec?: Record<string, unknown>;
   readonly now: number;
 }
-/** What one step records: AMC's outputs (each a signed stage_output ref, self_reported, lane derived), and optionally a revision. */
+/**
+ * What one step records: AMC's outputs (each a signed stage_output ref, self_reported unless it derives from a stub-provider
+ * session, which is synthetic_example; lane derived), and optionally a revision.
+ */
 export interface A4ProducerResult {
   readonly outputs: ReadonlyArray<{ readonly output: string; readonly label: string; readonly lane: "implementation" | "recommendation";
-    readonly method: string | null; readonly body: unknown }>;
+    readonly method: string | null; readonly body: unknown; readonly claimKind?: "self_reported" | "synthetic_example" }>;
   /** A new revision at the stage with this spec (the producer carries the answers). */
   readonly spec?: Record<string, unknown>;
   /** Review only: the reason codes of the explicit not_evaluated output `reviewed` records without an observed ref. */
@@ -69,6 +76,11 @@ export interface A4ProducerResult {
   readonly record?: Record<string, unknown>;
   /** Answered beside the transition (a replay answers it too). */
   readonly response?: Record<string, unknown>;
+  /**
+   * A post-commit effect the transition journaled (Assemble's build session start): run once the step is recorded, never
+   * on a replay or a refused transition; its answer joins the response and is not stored for replays.
+   */
+  readonly afterCommit?: () => Promise<Record<string, unknown>>;
 }
 /** A stage producer (src/a4/spec/<stage>.ts PRODUCERS) for one step route. */
 export interface A4Producer {
@@ -197,7 +209,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     assertAllowed(readiness, def.action);
     if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
     // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
-    if (stage === "aspire" && UNDERSTANDING_STEPS.has(kind)) {
+    if ((stage === "aspire" || stage === "assemble") && UNDERSTANDING_STEPS.has(kind)) {
       const { spec, answers } = stageSpec(state, stage);
       if (!understandingCurrent(spec, answers)) {
         throw a4Fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
@@ -223,7 +235,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     const drifted = approved === undefined ? [] : driftedSlots(route.workspace, flatSlots(JSON.parse(approved.resource_digests_json)), checked.project.agent_id);
     if (drifted.length > 0) throw a4Fail(409, "RESOURCE_DRIFTED", `resources moved since the direction was approved: ${drifted.join(", ")}`, { slots: drifted });
   }
-  const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now,
+  const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now, native: route.native,
     ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
   // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
   if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
@@ -262,10 +274,11 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     // A revision recorded here comes first, so the outputs and the step land on it.
     const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
     for (const entry of outputs) {
+      const claimKind = "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" : "self_reported";
       specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
-        claimKind: "self_reported", output: entry.output, producer: entry.producer },
+        claimKind, output: entry.output, producer: entry.producer },
         sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
-          lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: "self_reported", trust_tier: null,
+          lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: claimKind, trust_tier: null,
           method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
     }
     if (def.to !== null && def.to !== project.step) {
@@ -286,7 +299,8 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     if (specs.length === 0) throw a4Fail(409, "A4_STEP_ORDER", "Nothing to record.");
     return { readiness, specs };
   });
-  apiSuccess(route.res, mutationResult(result, produced?.response ?? {}), 201);
+  const after = result.replay || produced?.afterCommit === undefined ? {} : await produced.afterCommit();
+  apiSuccess(route.res, mutationResult(result, { ...(produced?.response ?? {}), ...after }), 201);
   return true;
 }
 
@@ -380,6 +394,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
 /** Stage, gate, effect and hypothesis POSTs. Returns false when none matches. */
 export async function handleA4StageRoute(route: A4Route, projectId: string, tail: string): Promise<boolean> {
   if (route.method !== "POST") return false;
+  if (await handleAssembleRoute(route, projectId, tail)) return true;
   const { store } = route;
   const step = /^\/stages\/([a-z]+)\/(answers|understand|confirm-understanding|explain|propose|build|review)$/.exec(tail);
   if (step !== null) return stageStep(route, projectId, stageInput(step[1]), step[2] as StepRoute);

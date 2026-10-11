@@ -83,8 +83,13 @@ function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
     }
     let scope: readonly ActionClass[] | undefined;
     if (node["scope"] !== undefined) {
-      if (!Array.isArray(node["scope"])) return { ok: false, reason: `node ${id}: scope must be an array` };
-      const parsed = parseDelegationScope((node["scope"] as unknown[]).map(String));
+      // A flat type check, never String(): String() on a nested array recurses through join with no depth cap, so one
+      // deeply nested scope would throw RangeError on every read of the plan (A4 readiness, workflowTool).
+      const rawScope = node["scope"];
+      if (!Array.isArray(rawScope) || !rawScope.every((entry) => typeof entry === "string")) {
+        return { ok: false, reason: `node ${id}: scope must be an array of strings` };
+      }
+      const parsed = parseDelegationScope(rawScope);
       if (!parsed.ok) return { ok: false, reason: `node ${id}: ${parsed.reason}` };
       scope = parsed.classes;
     }

@@ -67,6 +67,14 @@ describe("a plan is validated before anything runs", () => {
     expect(parseWorkflowPlan({ kind: "agent", id: "a" }).ok, "an agent needs a goal").toBe(false);
   });
 
+  it("refuses a deeply nested scope instead of overflowing the stack", () => {
+    let scope: unknown = [];
+    for (let depth = 0; depth < 5000; depth += 1) scope = [scope];
+    const parsed = parseWorkflowPlan({ ...agent("a"), scope });
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.reason).toBe("node a: scope must be an array of strings");
+  });
+
   it("counts the agents a plan would spawn, before it spawns them", () => {
     const parsed = parseWorkflowPlan({
       kind: "pipeline",

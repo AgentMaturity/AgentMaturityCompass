@@ -5,7 +5,7 @@
  * which is self-reported, never observed. AMC never promises exactly-once delivery. See docs/RECEIPTS.md.
  */
 import { z } from "zod";
-import { consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { listApprovalDecisions } from "../approvals/approvalChainStore.js";
 import { approvalRuleForAction, loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { authorizationRecordV1Schema } from "../contracts/v1/authorizationRecord.js";
@@ -238,9 +238,10 @@ function resolutionIntent(executionId: string, head: ActionReceiptV1, intent: Ac
 
 /**
  * File the approval request an operator's resolution needs (dual control). A second person approves it with
- * `amc approvals approve`; then `resolveManually` records it. Refused in agent mode.
+ * `amc approvals approve`; then `resolveManually` records it. Refused in agent mode. `quorumFloor` may only raise the
+ * class rule (A4 passes its own floor so the engine request can reach the quorum A4 checks).
  */
-export function requestManualResolution(executionId: string, input: ManualResolutionInput): {
+export function requestManualResolution(executionId: string, input: ManualResolutionInput, quorumFloor?: ApprovalRequestInput["quorumFloor"]): {
   readonly approvalRequestId: string; readonly agentId: string; readonly actionClass: string; readonly requiredApprovals: number;
 } {
   assertOwnerMode(input.workspace, "action resolve");
@@ -250,7 +251,7 @@ export function requestManualResolution(executionId: string, input: ManualResolu
     const { payload } = resolutionIntent(executionId, head, intent, input);
     const created = createApprovalForIntent({ workspace: input.workspace, agentId: head.agentId, intentId: `resolve:${executionId}`,
       toolName: RESOLVE_TOOL, actionClass: payload.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
-      intentPayload: payload });
+      intentPayload: payload, quorumFloor });
     return { approvalRequestId: created.approval.approvalRequestId, agentId: head.agentId, actionClass: payload.actionClass,
       requiredApprovals: created.approval.requiredApprovals };
   } finally {

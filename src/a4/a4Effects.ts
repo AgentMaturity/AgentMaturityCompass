@@ -13,7 +13,7 @@
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
-import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
+import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalConsumed, loadApprovalRequestRecord, type ApprovalDecisionRecord } from "../approvals/approvalChainStore.js";
 import { approvalStatusPayload, consumeApprovedExecution, createApprovalForIntent, verifyApprovalForExecution, type ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ActionClass } from "../types.js";
@@ -137,19 +137,22 @@ function deniedOnlyByNonMembers(store: A4Store, state: A4ReadinessState, approva
 }
 
 /**
- * Whether a principal live now who may `complete` the gate (progress on its stage: an owner at Adapt and Activate) cast
- * no APPROVE_EXECUTE on the engine request: a `complete` caller's own key joins the SoD exclusions, so a voter can never
- * consume it. An unreadable population counts as such a caller (re-open never stands on a guess).
+ * Whether a principal live now who may `complete` the gate cast no APPROVE_EXECUTE on the engine request: a `complete`
+ * caller's own key joins the SoD exclusions, so a voter can never consume it. Completing takes `progress` on the stage
+ * (an owner at Adapt and Activate) while the documentary gate is open, and `retryEffect` (an owner) once it is consumed,
+ * where `complete` re-runs an executor that consumes its own grant. An unreadable population counts as such a caller
+ * (re-open never stands on a guess).
  * ponytail: "live now" leaves out a host principal with no live session who could sign in later and complete; count
  * the host's membership once A4 can read it.
  */
 function nonVoterMayComplete(store: A4Store, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string): boolean {
+  const action = state.chain.some((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id) ? "retryEffect" : "progress";
   const { candidates, limited } = memberCandidates(store.workspace, false);
   if (limited) return true;
   const voters = new Set(listApprovalDecisions({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId })
     .filter((decision) => decision.decision === "APPROVE_EXECUTE").map((decision) => resolveApprover(store.workspace, decision.userId)?.key));
   return candidates.some((candidate) => !voters.has(candidate.principalKey)
-    && roleRefusals(state, gate.stage, "progress", { key: candidate.principalKey, roles: liveRolesFor(store.workspace, candidate) }).length === 0);
+    && roleRefusals(state, gate.stage, action, { key: candidate.principalKey, roles: liveRolesFor(store.workspace, candidate) }).length === 0);
 }
 
 /**
@@ -158,9 +161,15 @@ function nonVoterMayComplete(store: A4Store, state: A4ReadinessState, gate: A4Ga
  * counts, or when it is QUORUM_MET on a grant `complete` would refuse (an uncounted or digest-less vote, too few bound
  * keys, a moved intent, a project regulated since the open) or that only its own voters could complete (a lone owner
  * who voted at Adapt or Activate): either would otherwise lock the effect until its TTL, or for good on a DENY. Never
- * over a live or consumed grant some caller could consume. `complete` always reads the latest opened request.
+ * over a live or consumed grant some caller could consume, and never while an attempt of the effect on this gate is
+ * still running (409 EFFECT_RUNNING): a re-open must not race its executor. `complete` always reads the latest opened request.
  */
 function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateRow, def: A4EffectDef, regulated: boolean): void {
+  const attempts = new Set(state.chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gate.gate_id && link.body.effect === def.id)
+    .map((link) => link.body.effectId));
+  if (state.effects.some((row) => row.state === "running" && attempts.has(row.effect_id))) {
+    throw fail(409, "EFFECT_RUNNING", "An attempt of this effect is still running; re-open it once that attempt has settled.");
+  }
   const opened = latestOpened(state, gate.gate_id, def.id);
   if (opened === undefined) return;
   const approvalId = String(opened.body.approvalRequestId);
@@ -184,10 +193,22 @@ function assertReopenable(store: A4Store, state: A4ReadinessState, gate: A4GateR
 }
 
 /**
+ * Settles the lost attempts of `effect` on `gateId` (the sweeper's liveness rule, as retryEffect settles them first), so
+ * a re-open's EFFECT_RUNNING refusal names only an attempt that may still be running; returns how many rows that wrote.
+ */
+function sweepGateAttempts(store: A4Store, projectId: string, gateId: string, effect: string): number {
+  const executions = new Set(store.readChain(projectId).filter((link) => link.kind === "EFFECT_STARTED" && link.body.gateId === gateId && link.body.effect === effect)
+    .map((link) => String(link.body.executionId)));
+  return [...executions].reduce((count, executionId) => count + sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId }).length, 0);
+}
+
+/**
  * Opens (or re-opens) an effect gate (owner): a second engine request, created with `quorumFloor { requiredApprovals: 2,
  * requireDistinctUsers: true }` when the project is regulated, and an EFFECT_GATE_OPENED transition naming it. Only on
  * the gate the effect `completes`, named under its own stage: `complete` runs whatever effect is opened on the gate, so
- * any other effect would stand in for the stage's own (409 A4_STEP_ORDER).
+ * any other effect would stand in for the stage's own (409 A4_STEP_ORDER). Lost attempts of the effect on the gate are
+ * settled first (process_lost), so a crashed executor never holds the re-open path shut; the head the client saw moves
+ * by exactly those rows.
  * ponytail: the engine request is written before the project lock (files and a signature); one whose transition then
  * fails stays PENDING until it expires and is never consumed.
  */
@@ -196,6 +217,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   const def = effectDef(input.effectId);
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
+  const swept = sweepGateAttempts(store, projectId, input.gateId, def.id);
   const now = Date.now();
   const state0 = loadA4State(store, projectId, now);
   const gate0 = gateRowOf(state0, input.gateId);
@@ -211,7 +233,10 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     ?? createApprovalForIntent({ workspace: store.workspace, agentId: state0.project.agent_id, intentId: `a4-${projectId}-${def.id}-${gate0.gate_id}`,
       toolName: def.toolName, actionClass: def.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: engineRiskTier(state0),
       intentPayload, quorumFloor }).approval.approvalRequestId;
-  return governed(store, projectId, principal, input, (_ts, load) => {
+  // The digest an approver binds a decision to from the A4 card (decideApprovalInStudio's bound path), read back verified.
+  const requestDigestSha256 = approvalRequestBindingDigest(loadApprovalRequestRecord({ workspace: store.workspace, agentId: state0.project.agent_id,
+    approvalRequestId, requireValidSignature: true }));
+  return governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (_ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
@@ -222,7 +247,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
     assertReopenable(store, state, row, def, isRegulated(state, query.floor));
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
-      payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
+      payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, requestDigestSha256, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
   });
 }
 
@@ -244,14 +269,16 @@ const isProjectApprover = (state: A4ReadinessState, approver: Pick<A4Principal, 
   }
 };
 
+/** Who an engine decision names: its userId, display name and recorded roles (a decision record, or a live voter before it votes). */
+type DecisionIdentity = Pick<ApprovalDecisionRecord, "userId" | "username" | "roles">;
+
 /**
- * Design §6.1 steps 2–3 for one engine APPROVE_EXECUTE: it resolves to one live principal and plane (LOCAL_USER only
- * when regulated, else 403 IDENTITY_CHECK_LIMITED), holds no recorded role it no longer has, is a project approver or
- * owner, and passes A4's SoD with the gate's exclusions plus `requesterKeys` and every builder of the revision, given the
- * decisions `checked` before it (else 400 SOD_VIOLATION). Returns the refusal, or the decision as SoD counts it.
+ * Design §6.1 steps 2–3 without SoD, for one engine APPROVE_EXECUTE: it resolves to one live principal and plane
+ * (LOCAL_USER only when regulated, else 403 IDENTITY_CHECK_LIMITED), holds no recorded role it no longer has, and is a
+ * project approver or owner (else 400 SOD_VIOLATION). Returns the refusal, or the approver.
  */
-function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4GateRow, decision: ApprovalDecisionRecord, checked: readonly SodDecision[],
-  requesterKeys: readonly string[], regulated: boolean): SodDecision | A4StoreError {
+function memberApprovalOf(workspace: string, state: A4ReadinessState, decision: DecisionIdentity, regulated: boolean):
+  Pick<A4Principal, "key" | "username" | "roles" | "authSource"> | A4StoreError {
   const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
   const approver = resolveApprover(workspace, decision.userId);
   if (approver === null) return refuse("the approver does not resolve to exactly one live principal");
@@ -261,6 +288,53 @@ function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4Ga
   }
   if (!decision.roles.every((role) => approver.roles.includes(role))) return refuse("recorded roles exceed the approver's live roles");
   if (!isProjectApprover(state, approver)) return refuse("not an approver or owner of this project");
+  return approver;
+}
+
+/**
+ * The distinct live project approvers or owners whose APPROVE_EXECUTE on an engine request is bound to `bindingDigest`
+ * (memberApprovalOf), leaving out `excludedKeys`. A decision that is unbound, digest-less, by a non-member or another
+ * plane when regulated counts for nothing (design §6.1 rule 2) and refuses nothing. An outcome_unknown resolution
+ * counts its dual control here: the engine's own fold counts any APPROVER's vote, bound or not.
+ */
+export function boundMemberApprovalKeys(workspace: string, state: A4ReadinessState, input: { approvalRequestId: string; bindingDigest: string;
+  excludedKeys: readonly string[]; regulated: boolean }): string[] {
+  const keys = new Set<string>();
+  for (const decision of listApprovalDecisions({ workspace, agentId: state.project.agent_id, approvalRequestId: input.approvalRequestId })) {
+    if (decision.decision !== "APPROVE_EXECUTE" || decision.requestDigestSha256 !== input.bindingDigest) continue;
+    const approver = memberApprovalOf(workspace, state, decision, input.regulated);
+    if (!(approver instanceof A4StoreError) && !input.excludedKeys.includes(approver.key)) keys.add(approver.key);
+  }
+  return [...keys];
+}
+
+/**
+ * An APPROVE on the engine request of an effect `gate`, refused at write the way consumption would refuse it
+ * (verifyAndConsumeEffect throws for the whole grant on one such vote): 400 SOD_VIOLATION or 403 IDENTITY_CHECK_LIMITED
+ * for the voter, given the votes already cast that consumption would count (the `complete` caller is not known yet).
+ */
+export function assertEffectVoteAllowed(workspace: string, state: A4ReadinessState, gate: A4GateRow, approvalRequestId: string, voter: DecisionIdentity,
+  regulated: boolean): void {
+  const checked: SodDecision[] = [];
+  for (const decision of listApprovalDecisions({ workspace, agentId: state.project.agent_id, approvalRequestId })) {
+    if (decision.decision !== "APPROVE_EXECUTE") continue;
+    const entry = effectApprovalOf(workspace, state, gate, decision, checked, [gate.requested_by_key], regulated);
+    if (!(entry instanceof A4StoreError)) checked.push(entry);
+  }
+  const entry = effectApprovalOf(workspace, state, gate, voter, checked, [gate.requested_by_key], regulated);
+  if (entry instanceof A4StoreError) throw entry;
+}
+
+/**
+ * Design §6.1 steps 2–3 for one engine APPROVE_EXECUTE: memberApprovalOf, then A4's SoD with the gate's exclusions plus
+ * `requesterKeys` and every builder of the revision, given the decisions `checked` before it (else 400 SOD_VIOLATION).
+ * Returns the refusal, or the decision as SoD counts it.
+ */
+function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4GateRow, decision: DecisionIdentity, checked: readonly SodDecision[],
+  requesterKeys: readonly string[], regulated: boolean): SodDecision | A4StoreError {
+  const refuse = (why: string): A4StoreError => fail(400, "SOD_VIOLATION", `${decision.username}: ${why}`);
+  const approver = memberApprovalOf(workspace, state, decision, regulated);
+  if (approver instanceof A4StoreError) return approver;
   const excludedKeys = [...(JSON.parse(gate.excluded_keys_json) as string[]), ...buildersOf(state.chain, gate.revision_no)];
   const sod = evaluateSod({ gate: { gateId: gate.gate_id, gate: gate.gate, revisionNo: gate.revision_no, requesterKeys, excludedKeys },
     decisions: checked, transitions: state.chain, regulated, selfApprovalAllowed: false, approver, effect: true });
