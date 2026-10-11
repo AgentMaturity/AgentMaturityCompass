@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { closeSync, constants, fstatSync, mkdirSync, openSync, readSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { pathExists } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -22,6 +22,27 @@ export function leaseRevocationPaths(workspace: string): { file: string; sig: st
   };
 }
 
+// ponytail: the list is never pruned, so a workspace with ~500k revocations hits this cap and refuses every lease.
+const MAX_LIST_BYTES = 64 * 1024 * 1024;
+const MAX_SIG_BYTES = 64 * 1024;
+
+/**
+ * Read one store file without following a symlink or blocking on a FIFO or device: anything but a regular file within
+ * `maxBytes` throws, and every caller treats that as an unverifiable store (every lease refused).
+ */
+function readStoreFile(path: string, maxBytes: number): Buffer {
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile()) throw new Error(`${basename(path)} is not a regular file`);
+    if (stat.size > maxBytes) throw new Error(`${basename(path)} exceeds ${maxBytes} bytes`);
+    const bytes = Buffer.alloc(stat.size);
+    return bytes.subarray(0, readSync(fd, bytes, 0, bytes.length, 0));
+  } finally {
+    closeSync(fd);
+  }
+}
+
 function defaultLeaseRevocations(): LeaseRevocations {
   return {
     v: 1,
@@ -35,7 +56,7 @@ export function loadLeaseRevocations(workspace: string): LeaseRevocations {
   if (!pathExists(paths.file)) {
     return defaultLeaseRevocations();
   }
-  return leaseRevocationsSchema.parse(JSON.parse(readFileSync(paths.file, "utf8")) as unknown);
+  return leaseRevocationsSchema.parse(JSON.parse(readStoreFile(paths.file, MAX_LIST_BYTES).toString("utf8")) as unknown);
 }
 
 /**
@@ -93,7 +114,7 @@ export function signLeaseRevocations(workspace: string, reviewedDigestSha256: st
   const paths = leaseRevocationPaths(workspace);
   return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
     if (!pathExists(paths.file)) throw new Error("revocation list missing; restore the reviewed list before re-signing. Nothing was signed.");
-    const bytes = readFileSync(paths.file);
+    const bytes = readStoreFile(paths.file, MAX_LIST_BYTES);
     const digest = sha256Hex(bytes);
     if (digest !== reviewedDigestSha256.trim().toLowerCase()) {
       throw new Error(`revocation list sha256 is ${digest}, not the reviewed ${reviewedDigestSha256}; nothing was signed. Review the current list again.`);
@@ -120,8 +141,8 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
     return { valid: false, signatureExists: false, reason: "revocation signature missing" };
   }
   try {
-    const payload = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
-    const digest = sha256Hex(readFileSync(paths.file));
+    const payload = JSON.parse(readStoreFile(paths.sig, MAX_SIG_BYTES).toString("utf8")) as SignedDigest;
+    const digest = sha256Hex(readStoreFile(paths.file, MAX_LIST_BYTES));
     if (digest !== payload.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch" };
     }
@@ -149,8 +170,8 @@ function readVerifiedRevocations(workspace: string): LeaseRevocations {
   if (!pathExists(paths.file) && !pathExists(paths.sig)) return defaultLeaseRevocations();
   if (!pathExists(paths.file)) throw new Error("revocation list missing but signature present");
   if (!pathExists(paths.sig)) throw new Error("revocation signature missing");
-  const bytes = readFileSync(paths.file);
-  const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
+  const bytes = readStoreFile(paths.file, MAX_LIST_BYTES);
+  const signed = JSON.parse(readStoreFile(paths.sig, MAX_SIG_BYTES).toString("utf8")) as SignedDigest;
   const digest = sha256Hex(bytes);
   if (signed.digestSha256 !== digest) throw new Error("digest mismatch");
   if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) throw new Error("signature verification failed");

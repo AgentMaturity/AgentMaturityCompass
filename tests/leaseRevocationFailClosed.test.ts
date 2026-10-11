@@ -1,4 +1,5 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, truncateSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -20,6 +21,7 @@ import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import {
   bootstrapLeaseRevocations,
   leaseRevocationPaths,
+  readRevokedLeaseIds,
   revokeLease,
   revokedLeaseIdSet,
   signLeaseRevocations,
@@ -156,6 +158,26 @@ describe("revokedLeaseIdSet fails closed", () => {
     });
     expect(revokedLeaseIdSet(workspace)).toEqual(new Set());
     expect(existsSync(leaseRevocationPaths(workspace).file)).toBe(false);
+  });
+});
+
+describe("a special file in place of the store refuses instead of blocking (P0-30 follow-up)", () => {
+  type Paths = ReturnType<typeof leaseRevocationPaths>;
+  const replace = (path: string, make: (path: string) => void) => { rmSync(path); make(path); };
+  const fifo = (path: string) => { execFileSync("mkfifo", [path]); };
+  test.each([
+    { name: "FIFO list", reason: /not a regular file/, apply: (p: Paths) => replace(p.file, fifo) },
+    { name: "FIFO signature", reason: /not a regular file/, apply: (p: Paths) => replace(p.sig, fifo) },
+    { name: "list symlinked to /dev/zero", reason: /ELOOP/, apply: (p: Paths) => replace(p.file, (path) => symlinkSync("/dev/zero", path)) },
+    { name: "list over the size cap", reason: /exceeds/, apply: (p: Paths) => truncateSync(p.file, 64 * 1024 * 1024 + 1) }
+  ])("$name: every lease is refused", ({ reason, apply }) => {
+    const workspace = newWorkspace();
+    const token = issueGatewayLease(workspace);
+    revokeLease(workspace, "lease-other", "special file fixture");
+    apply(leaseRevocationPaths(workspace));
+    expect(readRevokedLeaseIds(workspace)).toEqual({ ok: false, reason: expect.stringMatching(reason) });
+    expect(verifyLeaseRevocationsSignature(workspace)).toMatchObject({ valid: false, reason: expect.stringMatching(reason) });
+    expect(verifyLeaseForCli({ workspace, token }).ok).toBe(false);
   });
 });
 

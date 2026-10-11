@@ -42,6 +42,11 @@ is refused without rewriting its evidence; revoking another lease is not a
 repair operation and must not certify altered older revocations. Only a genuinely
 absent list **and** signature use first-store bootstrap behavior.
 
+Both files are read without following a symbolic link and must be regular files
+(at most 64 MiB for the list, 64 KiB for the signature). A symlink, FIFO, device or
+oversized file in their place is an unverifiable store: every lease is refused, and
+no reader blocks on it.
+
 Review and restore the approved history before using a deliberate repair command.
 `amc lease resign-revocations` signs only the reviewed bytes: copy the list, review
 the copy, and pass its digest (`shasum -a 256 <copy>`) as `--expect-digest`. Under
