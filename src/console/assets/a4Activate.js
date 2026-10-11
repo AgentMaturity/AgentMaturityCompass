@@ -104,6 +104,9 @@ function releaseRecord(release) {
     <p class="muted">Version ${esc(release.version)} · package <code>${esc(release.packageDigest)}</code> · record envelope
       <code>${release.envelopeValid ? "valid under this workspace's keys" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId ?? release.transparency?.reason ?? "none")}</code>
       · previous <code>${esc(release.previousReleaseId ?? "none")}</code> · base <code>${esc(release.baseReleaseId ?? "none")}</code></p>
+    <p class="muted">Expert review at the deployment approval (D-21): <code>${esc(release.expertReview?.status ?? "not_recorded")}</code>${release.expertReview?.acknowledgement
+      ? ` · acknowledged by <code>${esc(release.expertReview.acknowledgement.by)}</code> until ${esc(new Date(release.expertReview.acknowledgement.expiresTs).toISOString())}: ${esc(release.expertReview.acknowledgement.reason)}`
+      : ""}</p>
     <h4>Eight surfaces</h4>${table(["Surface", "Status", "Reason", "Values"], list(release.surfaceTable).map((row) => [`<code>${esc(row.surface)}</code>`,
       `<code>${esc(row.status)}</code>`, esc(row.reason ?? ""), json(row.values)]), "No surface table.")}
     <h4>Leases</h4>${table(["Lease", "Scope", "Status now", "Recorded", "Expires"], list(release.leases).map((lease) => [`<code>${esc(lease.leaseId)}</code>`,
@@ -142,8 +145,9 @@ function renderRelease(ctx) {
     ${decideForm(ctx, request, "release-reason")}
     <h4>Deployment approval</h4>
     <p class="muted">Completing the deployment approval (completion gate) mints the production lease, whose token this page shows once, then moves the
-      lifecycle to production only with every production control evidenced; in v1 it stays at staging (P2-40). A DENY of it revokes the staging lease.</p>
-    ${["deployment.receipt", "deployment.amc_check", "monitoring.source", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
+      lifecycle to production only with every production control evidenced; in v1 it stays at staging (P2-40). A DENY of it revokes the staging lease.
+      On a regulated project an owner acknowledges the pending expert review (D-21) before requesting it.</p>
+    ${["deployment.receipt", "deployment.amc_check", "monitoring.source", "regulatory_sources_status", "lifecycle.production_controls"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton("Complete the deployment approval", "complete-activate", quorumMet(completion) ? ctx.allowed.progress
       : view.held("The deployment approval has no quorum yet"), `data-gate="${esc(completion?.gateId ?? "")}" ${project}`)}</div>
     ${tokenBox(tokens.get(ctx.project.projectId))}
