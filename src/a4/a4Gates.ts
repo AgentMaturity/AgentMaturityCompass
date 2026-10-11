@@ -764,9 +764,9 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
 /**
  * ACKNOWLEDGED (owner; D-21, design §7 item 6): an acknowledgeable WAITING item stays WAITING with OWNER_ACKNOWLEDGED for
  * 90 days and is bound into the next gate's intent; a BLOCKED item is never acknowledged. Record it before the request.
- * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, and `plan_activated`
- * only from Review on while its activation is deferred (PLAN_ACTIVATION_DEFERRED), so no acknowledgement is recorded
- * that would not count.
+ * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, `plan_activated`
+ * only from Review on while its activation is deferred, Activate's D-21 item and AMC's check from Review on (the check
+ * once it names a receipt), so no acknowledgement is recorded that would not count.
  */
 export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; itemId: string; reason: string; expectedHeadSeq: number }): A4TransitionResult {
   if (!ACKNOWLEDGEABLE_ITEMS.includes(input.itemId)) throw fail(400, "INPUT_INVALID", `${input.itemId} cannot be acknowledged`);
@@ -774,12 +774,12 @@ export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call
   return headTransition(store, projectId, input, "acknowledge", (state, readiness, ts, query) => {
     const target = readiness.items.find((entry) => entry.id === input.itemId);
     if (target?.status !== "WAITING") throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", `${input.itemId} is ${target?.status ?? "absent"}; only a WAITING item is acknowledged`);
-    if (!acknowledgeable(target, isRegulated(state, query.floor))) {
+    if (!acknowledgeable(target, isRegulated(state, query.floor), input.stage)) {
       throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", input.itemId === "plan_unresolved"
         ? "A regulated project activates only a ready plan: answer the missing facts; an owner's out-of-scope does not settle them."
-        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)
+        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED) || !target.mandatory
           ? `${input.itemId} is acknowledged after Review: every step before it records a new revision, and an acknowledgement counts only on its own.`
-          : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
+          : `${input.itemId} is acknowledged only ${input.itemId === "plan_activated" ? `while its activation is deferred (${PLAN_ACTIVATION_DEFERRED})` : "once it names the deployment receipt the approval binds"}.`, { reasonCodes: target.reasonCodes });
     }
     // The receipt and check ids it names: the acknowledgement counts only while the item names the same ones.
     const records = acknowledgedRecords(target.reasonCodes);

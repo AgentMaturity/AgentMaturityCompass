@@ -62,11 +62,16 @@ export const PLAN_ACTIVATION_DEFERRED = "PLAN_ACTIVATION_DEFERRED";
  * Whether an owner acknowledgement counts for `candidate` as evaluated now (and may be recorded): a WAITING item of
  * ACKNOWLEDGEABLE_ITEMS, except `plan_unresolved` while the project is regulated (it activates only a ready plan) and
  * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED while mandatory (from Review on: every earlier step records
- * a new revision, and an acknowledgement counts only on its own). The evaluator and acknowledgeItem both decide by it.
+ * a new revision, and an acknowledgement counts only on its own). Activate's two that the deployment approval reads count
+ * from Review on too: `regulatory_sources_status` at Activate (D-21; Adapt carries its own), and `deployment.amc_check`
+ * only once it names a receipt (one recorded with none would never match the receipt the approval binds). The evaluator
+ * and acknowledgeItem both decide by it, at the stage evaluated.
  */
-export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean): boolean {
+export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean, stage?: A4Stage): boolean {
   return candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id) && !(regulated && candidate.id === "plan_unresolved")
-    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)));
+    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)))
+    && (candidate.id !== "regulatory_sources_status" || stage !== "activate" || candidate.mandatory)
+    && (candidate.id !== "deployment.amc_check" || (candidate.mandatory && candidate.reasonCodes.some((code) => code.startsWith("RECEIPT:"))));
 }
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
@@ -617,7 +622,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
     return built.map((candidate) => {
       const ack = acks.get(candidate.id);
-      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated) && ack.records === JSON.stringify(acknowledgedRecords(candidate.reasonCodes));
+      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated, stage) && ack.records === JSON.stringify(acknowledgedRecords(candidate.reasonCodes));
       return { ...candidate, bound: boundIds.includes(candidate.id),
         ...(acknowledged ? { acknowledged: ack.ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
     });
