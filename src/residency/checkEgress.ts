@@ -1,6 +1,8 @@
-import { resolve } from "node:path";
+import { lstatSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { controlCheckpointDir, SignedControlJournalError } from "../lifecycle/signedControlJournal.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadDestinationRegistrySnapshot, loadPinnedResidencyProfile } from "./destinationRegistry.js";
 import { EGRESS_CHANNELS, type CheckEgressInput, type DestinationRecordV1, type DestinationRegistryV1, type EgressChannel,
@@ -11,15 +13,16 @@ type Accepted = Exclude<EgressDecision, Blocked>;
 export class EgressBlocked extends Error {
   readonly decision: Blocked;
   readonly controlResult: ResidencyControlResult;
-  constructor(decision: Blocked, controlResult: ResidencyControlResult) {
+  constructor(decision: Blocked, controlResult: ResidencyControlResult, cause?: string) {
     super(`Residency egress blocked: ${decision.reason}${decision.detail ? ` (${decision.detail})` : ""}; `
-      + `destination=${decision.destinationId ?? "unregistered"}; rules=${decision.ruleIds.slice(0, 8).join(",") || "none"}`);
+      + `destination=${decision.destinationId ?? "unregistered"}; rules=${decision.ruleIds.slice(0, 8).join(",") || "none"}${cause ? `. ${cause}` : ""}`);
     this.name = "EgressBlocked";
     this.decision = Object.freeze({ ...decision, ruleIds: Object.freeze([...decision.ruleIds]) });
     this.controlResult = Object.freeze({ ...controlResult, controlIds: Object.freeze([...controlResult.controlIds]) });
   }
 }
-function block(input: CheckEgressInput, reason: Blocked["reason"], detail: string, rules: readonly ResidencyRuleV1[] = [], destinationId?: string): never {
+/** `cause` reaches the operator through the error message only; the audit row keeps the fixed `detail` code. */
+function block(input: CheckEgressInput, reason: Blocked["reason"], detail: string, rules: readonly ResidencyRuleV1[] = [], destinationId?: string, cause?: string): never {
   const decision: Blocked = { verdict: "blocked", reason, detail, ruleIds: rules.map(rule => rule.ruleId), ...(destinationId ? { destinationId } : {}) };
   const controlResult: ResidencyControlResult = { status: "not_evaluated", controlIds: [...new Set(rules.map(rule => rule.controlId))], reason };
   let routeHash: string | null = null;
@@ -30,17 +33,41 @@ function block(input: CheckEgressInput, reason: Blocked["reason"], detail: strin
         channel: input.channel, destinationId: destinationId ?? null, routeHash, ruleIds: decision.ruleIds, controlResult,
         purposeDeclared: typeof input.purpose === "string" && input.purpose.length > 0 } });
   } catch { /* Audit storage failure never permits the egress or replaces its typed denial. */ }
-  throw new EgressBlocked(decision, controlResult);
+  throw new EgressBlocked(decision, controlResult, cause);
 }
 interface Context {
   readonly active: ActiveCompiledPolicy | null;
   readonly registry: DestinationRegistryV1 | null;
   readonly facts: { readonly dataClasses: readonly string[] | null; readonly jurisdictions: readonly string[] | null; readonly storageUrl: string } | null;
 }
+/** The control checkpoint root's configuration error for this workspace, or null when the root is outside it. */
+function checkpointRootError(workspace: string): string | null {
+  try { controlCheckpointDir(workspace, "compiled-control-plan"); return null; }
+  catch (error) { return error instanceof SignedControlJournalError ? error.message : null; }
+}
+/** Any trace of `.amc/control-plan/` (activate.ts's journal root), or one that cannot be inspected, counts as opted in. */
+function planJournalPresent(workspace: string): boolean {
+  try { return lstatSync(join(workspace, ".amc", "control-plan"), { throwIfNoEntry: false }) !== undefined; } catch { return true; }
+}
+/**
+ * The verified active plan, or null when none is active. A control checkpoint root inside the workspace (HOME as the
+ * workspace, P0-57) is a configuration error, refused under its own name, never as active_policy_unverifiable. No plan
+ * can be activated under that root, so a workspace with no plan journal and no destination registry has not opted in
+ * (the P2-02 posture) and keeps the unregulated no_rule path.
+ * ponytail: a plan activated under another AMC_CONTROL_CHECKPOINT_DIR whose journal was then deleted reads as not opted
+ * in here, as it already does with that variable unset; the checkpoint store is host configuration this gate trusts.
+ */
+function activePolicy(input: CheckEgressInput, registryPresent: boolean): ActiveCompiledPolicy | null {
+  const rootError = checkpointRootError(input.workspace);
+  if (rootError) {
+    if (!registryPresent && !planJournalPresent(input.workspace)) return null;
+    return block(input, "registry_unverifiable", "control_checkpoint_root_in_workspace", [], undefined, rootError);
+  }
+  try { return loadActiveCompiledPolicy(input.workspace); } catch { return block(input, "registry_unverifiable", "active_policy_unverifiable"); }
+}
 function context(input: CheckEgressInput, cwdFallback: boolean): Context {
-  let active: ActiveCompiledPolicy | null;
-  try { active = loadActiveCompiledPolicy(input.workspace); } catch { return block(input, "registry_unverifiable", "active_policy_unverifiable"); }
   const snapshot = loadDestinationRegistrySnapshot(input.workspace);
+  const active = activePolicy(input, snapshot.state !== "missing");
   if (cwdFallback && (active || snapshot.state !== "missing")) return block(input, "registry_unverifiable", "workspace_scope_required");
   if (snapshot.state === "invalid") return block(input, "registry_unverifiable", snapshot.reason);
   if (snapshot.state === "missing") {
@@ -119,7 +146,10 @@ export async function residencyFetch(workspace: string | undefined, channel: Egr
   checkScopedEgress(workspace, channel, url);
   return fetch(url, { ...init, redirect: init.redirect === "error" ? "error" : "manual", signal: init.signal ?? AbortSignal.timeout(30_000) });
 }
-/** Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable rule. */
+/**
+ * Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable
+ * rule. Opt-in: a workspace with no active plan and no destination registry returns no_rule, whatever its checkpoint root.
+ */
 export function assertStorageAdmission(workspace: string): Accepted {
   if (typeof workspace !== "string" || !workspace.trim()) return block({ workspace, channel: "storage", url: "" }, "registry_unverifiable", "workspace_scope_required");
   const input: CheckEgressInput = { workspace: resolve(workspace), channel: "storage", url: "" };
