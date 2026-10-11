@@ -50,7 +50,7 @@ import {
   ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, adaptItems, adaptSpecOf,
   answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
-import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
+import { answersDigestOf, answerValues, carryAnswers, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
@@ -120,12 +120,7 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = adaptSpecOf(ctx.state);
   const carried = carriedValues(ctx.state);
   const project = ctx.state.project;
-  const revisionNo = project.revision_no + 1;
-  const kept = answers.filter((answer) => !(CARRIED as readonly string[]).includes(answer.questionId));
-  const values = answerValues(kept);
-  for (const [id, value] of carried) values.set(id, value);
-  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
-    dependencyDigest: dependencyDigest([], values) }));
+  const { kept, values, carriedAnswers } = carryAnswers(answers, CARRIED, carried, project.revision_no + 1);
   // An answer given before a carried question had any value here (the answers route digested it as null) and current
   // then is stamped against the values carried now; one given against another, earlier carried value stays stale.
   const previous = answerValues(answers);

@@ -11,7 +11,7 @@ import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, typ
 import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { INTEGRATION_PATHS, integrationClaimFor } from "../assemblePaths.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "assemble", prompt, dependsOn, required, kind });
@@ -74,8 +74,7 @@ export function assembleSpecOf(state: Pick<A4ReadinessState, "revisions">): Retu
 
 /** The Aspire answers Assemble carries, as the newest Aspire revision records them (absent ones are left out). */
 export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<string, unknown> {
-  const values = answerValues(aspireSpecOf(state).answers);
-  return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+  return carriedValuesOf(state, CARRIED);
 }
 
 /** `stub`, or `provider:model` for a model-requiring provider; null when it names no native provider. */
@@ -138,14 +137,11 @@ export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: Workf
  * Required questions with no answer, answered ones whose dependencies changed since, answers that are not one of their
  * question's values, and carried answers that are missing or no longer Aspire's (fail closed: re-carry at Understand).
  */
-export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
+export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): CarryingAnswerGaps {
   const values = answerValues(answers);
   const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const checks = listValue(values.get("validation"));
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const choice = (id: string, allowed: readonly string[]): boolean => textValue(values.get(id)) !== null && !allowed.includes(textValue(values.get(id))!);
   const invalid = [
     ...(choice("autonomy", AUTONOMY) ? ["autonomy"] : []),
@@ -156,9 +152,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
       || !checks.every((id) => CHECK_ID.test(id))) ? ["validation"] : []),
     ...(workflow !== null && "error" in workflow ? ["workflow"] : [])
   ];
-  const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
-    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
-  return { missing, stale, invalid, carried: carriedGaps };
+  return { missing, stale, invalid, carried: carriedGaps(CARRIED, answers, carried) };
 }
 
 /** Whether `spec` is the plan Propose built for exactly these answers. */

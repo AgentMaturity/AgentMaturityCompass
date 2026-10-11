@@ -3,7 +3,9 @@
  * re-asked when it is missing or when its `dependencyDigest` (sha256 over the canonical answers of `dependsOn`, as the
  * answers route records it) no longer matches, so changing `markets` re-asks only `stations` and `governance`. The
  * producers live in src/a4/stages/aspire.ts and are loaded on first use. The item builders are pure: they read the
- * newest Aspire revision and the chain, never a file, and nothing here computes a maturity level.
+ * newest Aspire revision and the chain, never a file, and nothing here computes a maturity level. The answer helpers the
+ * later stages share live here too: a stage's newest revision (stageSpecOf), a question bank's unanswered and stale
+ * questions (askGaps) and the Aspire answers a stage carries (carriedValuesOf, carriedGaps, carryAnswers).
  */
 import { z } from "zod";
 import { validateContextGraph } from "../../context/contextGraph.js";
@@ -97,13 +99,20 @@ export const answersDigestOf = (answers: readonly A4Answer[]): string =>
 export const understandingCurrent = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
   (spec.understanding as { answersDigest?: unknown } | null | undefined)?.answersDigest === answersDigestOf(answers);
 
+/** Of `questions`, the required ones with no answer and the answered ones whose dependencies changed since (to be asked again). */
+export function askGaps(questions: readonly A4Question[], answers: readonly A4Answer[]): { missing: string[]; stale: string[] } {
+  const values = answerValues(answers);
+  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
+  const missing = questions.filter((entry) => entry.required && !answered(values.get(entry.id))).map((entry) => entry.id);
+  const stale = questions.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
+    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  return { missing, stale };
+}
+
 /** Required questions with no answer, and answered ones whose dependencies changed since (to be asked again). */
 export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; stale: string[]; invalid: string[] } {
   const values = answerValues(answers);
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && !answered(values.get(entry.id))).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const invalid = Object.entries(CHOICES).filter(([id, allowed]) => textValue(values.get(id)) !== null && !allowed.includes(textValue(values.get(id))!))
     .map(([id]) => id);
   // "regulated" promises regulated gates (no self-approval); isRegulated (src/a4/a4Readiness.ts) gives that only for a high or critical tier.
@@ -127,6 +136,34 @@ export function stageSpecOf(state: Pick<A4ReadinessState, "revisions">, stage: A
 /** The newest Aspire revision's spec and answers (the stage's record). */
 export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
   return stageSpecOf(state, "aspire");
+}
+
+/** A carrying stage's answer gaps: unanswered, to ask again, not one of their question's values, and carried (carriedGaps). */
+export interface CarryingAnswerGaps { missing: string[]; stale: string[]; invalid: string[]; carried: string[] }
+/** The Aspire answers a later stage carries (`ids`), as the newest Aspire revision records them (absent ones are left out). */
+export function carriedValuesOf(state: Pick<A4ReadinessState, "revisions">, ids: readonly string[]): Map<string, unknown> {
+  const values = answerValues(aspireSpecOf(state).answers);
+  return new Map(ids.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+}
+/** The carried answers (`ids`) that are missing or no longer Aspire's (`carried`, as carriedValuesOf reads them); fail closed: re-carry at Understand. */
+export function carriedGaps(ids: readonly string[], answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): string[] {
+  const values = answerValues(answers);
+  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
+  return ids.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
+    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
+}
+/**
+ * Understand's carry at a later stage: the stage's own answers without the carried ids (`kept`), the values they give with
+ * the carried ones over them, and the carried answers recorded at `revisionNo` (`source: "carried"`).
+ */
+export function carryAnswers(answers: readonly A4Answer[], ids: readonly string[], carried: ReadonlyMap<string, unknown>, revisionNo: number):
+  { kept: A4Answer[]; values: Map<string, unknown>; carriedAnswers: A4Answer[] } {
+  const kept = answers.filter((answer) => !ids.includes(answer.questionId));
+  const values = answerValues(kept);
+  for (const [id, value] of carried) values.set(id, value);
+  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
+    dependencyDigest: dependencyDigest([], values) }));
+  return { kept, values, carriedAnswers };
 }
 
 /** Quality targets with neither an evidence source (blank counts as none) nor `measure: "not instrumented"`. */

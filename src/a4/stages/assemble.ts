@@ -41,7 +41,7 @@ import {
   APPLY_EFFECT_ID, ASSEMBLE_CLAIM_BOUNDARY, ASSEMBLE_SPEC_SCHEMA, CARRIED, answerGaps, assembleItems, assembleSpecOf, carriedValues, parseProvider, presetIdOf,
   workflowPlanOf
 } from "../spec/assemble.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue } from "../spec/aspire.js";
+import { answersDigestOf, answerValues, aspireSpecOf, carryAnswers, listValue, textValue } from "../spec/aspire.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
@@ -194,12 +194,7 @@ async function understandFacts(ctx: A4ProducerContext) {
 async function understand(ctx: A4ProducerContext): Promise<A4ProducerResult> {
   const { spec, answers } = assembleSpecOf(ctx.state);
   const carried = carriedValues(ctx.state);
-  const revisionNo = ctx.state.project.revision_no + 1;
-  const kept = answers.filter((answer) => !(CARRIED as readonly string[]).includes(answer.questionId));
-  const values = answerValues(kept);
-  for (const [id, value] of carried) values.set(id, value);
-  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
-    dependencyDigest: dependencyDigest([], values) }));
+  const { kept, carriedAnswers } = carryAnswers(answers, CARRIED, carried, ctx.state.project.revision_no + 1);
   const merged = [...kept, ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
   const { facts, outputs } = await understandFacts(ctx);
   const understanding = { answersDigest: answersDigestOf(merged), carried: [...carried.keys()], facts };
