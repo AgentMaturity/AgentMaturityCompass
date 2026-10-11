@@ -17,7 +17,7 @@ import {
   recordIncidentClockEvent
 } from '../incidents/incidentClockEvents.js';
 import { recordWorkspaceOversight } from '../incidents/oversightRecord.js';
-import { signHexDigest, getPrivateKeyPem, getPublicKeyHistory } from '../crypto/keys.js';
+import { signHexDigest, getSigningKey, getPublicKeyHistory } from '../crypto/keys.js';
 import { sha256Hex } from '../utils/hash.js';
 import { canonicalize } from '../utils/json.js';
 
@@ -81,7 +81,7 @@ async function handleIncidentClockRoute(
         triggerOrClockId: trigger ?? notified ?? '',
         ts: parseIsoTimestamp(text(body.at), 'at'),
         recordedBy: principal ? `api:${principal}` : 'api',
-        privateKeyPem: getPrivateKeyPem(workspace, 'monitor'),
+        privateKeyPem: getSigningKey(workspace, 'ledger-row'),
         publicKeys: getPublicKeyHistory(workspace, 'monitor'),
       });
       apiSuccess(res, event, 201);
@@ -110,7 +110,7 @@ async function handleIncidentClockRoute(
       rationale: text(body.rationale),
       clockIds: clockIds as string[],
       reviewedTs: Date.now(),
-      privateKeyPem: getPrivateKeyPem(workspace, 'auditor'),
+      privateKeyPem: getSigningKey(workspace, 'artifact-seal'),
       publicKeys: getPublicKeyHistory(workspace, 'auditor'),
     });
     apiSuccess(res, record, 201);
@@ -222,7 +222,7 @@ export async function handleIncidentRoute(
       };
 
       const incident_hash = computeIncidentHash(partial);
-      const privateKey = getPrivateKeyPem(workspace, 'monitor');
+      const privateKey = getSigningKey(workspace, 'ledger-row');
       const signature = signHexDigest(incident_hash, privateKey);
 
       const incident: Incident = {
@@ -321,7 +321,7 @@ export async function handleIncidentRoute(
         evidenceId?: string;
       }>(req);
 
-      const privateKey = getPrivateKeyPem(workspace, 'monitor');
+      const privateKey = getSigningKey(workspace, 'ledger-row');
       const now = Date.now();
 
       // Handle resolution → close incident

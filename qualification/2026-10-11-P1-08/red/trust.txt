@@ -1,0 +1,8 @@
+     × needs threshold distinct pinned roots; an unpinned signer never counts 5ms
+     × refuses the same root counted twice 2ms
+     × refuses a bit-flipped extra row even beside enough valid signatures 1ms
+     × refuses a re-spelled base64 signature that decodes to the same bytes 2ms
+     × refuses a duplicated JSON key, which JSON.parse would collapse to its last value (P1-08) 1ms
+     × needs threshold signatures from the roots trust-roots.json pins (P1-08 m-of-n) 11ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  6 failed | 36 passed (42)

@@ -1,4 +1,4 @@
-import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -31,13 +31,16 @@ const ADMIN = "lease-consumers-fixture-admin";
 // A one-shot hook that runs right after the revocation list's signature verifies, to swap the file on disk
 // between that check and any later use of the list.
 const afterVerify = vi.hoisted(() => ({ next: null as null | { digest: string; run: () => void } }));
-vi.mock("../src/crypto/keys.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../src/crypto/keys.js")>();
-  return { ...actual, verifyHexDigestAny: (digest: string, signature: string, keys: string[]) => {
-    const valid = actual.verifyHexDigestAny(digest, signature, keys);
+// P1-08: the store is one signed file, read once and verified by readAnchoredRevocationList.
+vi.mock("../src/keys/revocationList.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/keys/revocationList.js")>();
+  return { ...actual, readAnchoredRevocationList: (location: Parameters<typeof actual.readAnchoredRevocationList>[0]) => {
+    const path = join(location.workspace, location.rel);
+    const bytes = existsSync(path) ? readFileSync(path) : null;
+    const signed = actual.readAnchoredRevocationList(location);
     const hook = afterVerify.next;
-    if (valid && hook?.digest === digest) { afterVerify.next = null; hook.run(); }
-    return valid;
+    if (bytes !== null && hook?.digest === sha256Hex(bytes)) { afterVerify.next = null; hook.run(); }
+    return signed;
   } };
 });
 const roots: string[] = [];
@@ -183,7 +186,7 @@ describe("AMC-1542 every revocation consumer refuses an unverifiable list", () =
     const paths = leaseRevocationPaths(workspace);
     const signedList = readFileSync(paths.file);
     const body = JSON.parse(signedList.toString("utf8"));
-    writeFileSync(paths.file, JSON.stringify({ ...body, revocations: [] }, null, 2));
+    writeFileSync(paths.file, JSON.stringify({ ...body, list: { ...body.list, revoked: [] } }));
     expect(await admits(revoked), "revoked id removed beside the old signature: revoked lease").toBe(false);
     expect(await admits(live), "revoked id removed beside the old signature: unrevoked lease").toBe(false);
 
@@ -206,7 +209,7 @@ describe("AMC-1542 a list swapped after its signature check is never used", () =
     const body = JSON.parse(signedList.toString("utf8"));
     let swaps = 0;
     afterVerify.next = { digest: sha256Hex(signedList), run: () => {
-      writeFileSync(paths.file, JSON.stringify({ ...body, revocations: [] }, null, 2));
+      writeFileSync(paths.file, JSON.stringify({ ...body, list: { ...body.list, revoked: [] } }));
       swaps += 1;
     } };
     expect(await admits(revoked), "revoked lease after the list was emptied between check and use").toBe(false);
@@ -224,7 +227,8 @@ describe("Studio /leases/status reports from one verified read (P0-30 follow-up)
     const signedList = readFileSync(paths.file);
     const status = async () => (await fetch(new URL("/leases/status", server.url), { headers: { "x-amc-admin-token": ADMIN } })).json();
     afterVerify.next = { digest: sha256Hex(signedList), run: () => {
-      writeFileSync(paths.file, JSON.stringify({ ...JSON.parse(signedList.toString("utf8")), revocations: [] }, null, 2));
+      const body = JSON.parse(signedList.toString("utf8"));
+      writeFileSync(paths.file, JSON.stringify({ ...body, list: { ...body.list, revoked: [] } }));
     } };
     expect(await status()).toMatchObject({ revocationSignatureValid: true, revokedLeaseCount: 1 });
     expect(await status()).toMatchObject({ revocationSignatureValid: false, revokedLeaseCount: null, updatedTs: null });

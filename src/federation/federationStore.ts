@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { safeIdSchema } from "../utils/pathSafety.js";
@@ -48,7 +48,7 @@ function signFileWithAuditor(workspace: string, filePath: string): string {
   const digest = sha256Hex(readFileSync(filePath));
   const payload: SignedDigest = {
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };

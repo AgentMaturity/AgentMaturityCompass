@@ -106,6 +106,38 @@ describe("signed trust lists", () => {
   }, 30_000);
 });
 
+describe("m-of-n roots and one encoding per signature set (P1-08, security review)", () => {
+  const second = testKey();
+  const third = testKey();
+  const list = trustList([listEntry(auditor)]);
+  const pins = [root.keyId, second.keyId, third.keyId];
+  const verifyN = (signatures: unknown[], threshold: number) => verifySignedTrustList({ list, signatures }, { pinnedRootKeyIds: pins, now: NOW, threshold });
+
+  it("needs threshold distinct pinned roots; an unpinned signer never counts", () => {
+    expect(codeOf(() => verifyN([rawSignature(list, root)], 2))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+    expect(verifyN([rawSignature(list, root), rawSignature(list, second)], 2)).toEqual(list);
+    expect(codeOf(() => verifyN([rawSignature(list, root), rawSignature(list, testKey())], 2))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+  });
+
+  it("refuses the same root counted twice", () => {
+    expect(codeOf(() => verifyN([rawSignature(list, root), rawSignature(list, root)], 2))).toBe("TRUST_LIST_INVALID");
+  });
+
+  it("refuses a bit-flipped extra row even beside enough valid signatures", () => {
+    const flipped = rawSignature(list, third);
+    const raw = Buffer.from(flipped.signature, "base64");
+    raw[3] = raw[3]! ^ 0x01;
+    expect(codeOf(() => verifyN([rawSignature(list, root), { ...flipped, signature: raw.toString("base64") }], 1))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+  });
+
+  it("refuses a re-spelled base64 signature that decodes to the same bytes", () => {
+    const row = rawSignature(list, root);
+    const respelled = `${row.signature.slice(0, 85)}${String.fromCharCode(row.signature.charCodeAt(85) + 1)}==`;
+    expect(Buffer.from(respelled, "base64").equals(Buffer.from(row.signature, "base64"))).toBe(true);
+    expect(codeOf(() => verifyN([{ ...row, signature: respelled }], 1))).toBe("TRUST_LIST_INVALID");
+  });
+});
+
 describe("trust-list files", () => {
   function dir(): string {
     const made = mkdtempSync(join(tmpdir(), "amc-trust-list-"));
@@ -130,6 +162,18 @@ describe("trust-list files", () => {
       const file = join(base, `${name}.json`);
       writeFileSync(file, text!);
       expect(codeOf(() => verify(readSignedTrustListFile(file)))).toBe("TRUST_LIST_INVALID");
+    }
+  });
+
+  it("refuses a duplicated JSON key, which JSON.parse would collapse to its last value (P1-08)", () => {
+    const signed = JSON.stringify(signTrustList(trustList([listEntry(auditor)]), root.privateKeyPem));
+    const base = dir();
+    for (const [name, text] of [["list", signed.replace('"listId":"tenant-a"', '"listId":"other-tenant","listId":"tenant-a"')],
+      ["escaped", signed.replace('"listId":"tenant-a"', '"list\\u0049d":"other-tenant","listId":"tenant-a"')]]) {
+      const file = join(base, `${name}.json`);
+      writeFileSync(file, text!);
+      expect(JSON.parse(text!).list.listId).toBe("tenant-a");
+      expect(codeOf(() => readSignedTrustListFile(file))).toBe("TRUST_LIST_INVALID");
     }
   });
 

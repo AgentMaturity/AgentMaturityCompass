@@ -12,7 +12,7 @@ import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { fleetRoot } from "./paths.js";
 
 // ---------------------------------------------------------------------------
@@ -95,7 +95,7 @@ export function createDag(workspace: string, fleetId?: string): OrchestrationDag
   };
   dag.dagHash = sha256Hex(Buffer.from(canonicalize({ dagId: dag.dagId, fleetId: dag.fleetId, createdTs: dag.createdTs }), "utf8"));
   try {
-    dag.dagSignature = signHexDigest(dag.dagHash, getPrivateKeyPem(workspace, "auditor"));
+    dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal"));
   } catch {
     dag.dagSignature = "unsigned";
   }
@@ -140,7 +140,7 @@ export function appendDagNode(
   const nodeHash = sha256Hex(Buffer.from(canonicalize(nodeBody), "utf8"));
   let signature = "unsigned";
   try {
-    signature = signHexDigest(nodeHash, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(nodeHash, getSigningKey(workspace, "artifact-seal"));
   } catch { /* unsigned */ }
 
   const node: DagNode = dagNodeSchema.parse({
@@ -152,7 +152,7 @@ export function appendDagNode(
   dag.nodes.push(node);
   dag.dagHash = nodeHash;
   try {
-    dag.dagSignature = signHexDigest(dag.dagHash, getPrivateKeyPem(workspace, "auditor"));
+    dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal"));
   } catch {
     dag.dagSignature = "unsigned";
   }

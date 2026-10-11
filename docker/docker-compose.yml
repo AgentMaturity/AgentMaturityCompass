@@ -17,6 +17,8 @@ services:
       - "4173:4173"   # Dashboard UI
     volumes:
       - amc-data:/data/amc
+      # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
+      - amc-state:/home/amc/.config/amc/state
     environment:
       - NODE_ENV=production
       - AMC_BIND=0.0.0.0
@@ -73,6 +75,8 @@ services:
 
 volumes:
   amc-data:
+    driver: local
+  amc-state:
     driver: local
 
 secrets:

@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport, CorrectionTriggerType, CorrectionStatus } from "./correctionTypes.js";
 import {
@@ -129,7 +129,7 @@ export function autoVerifyPendingCorrections(
     });
 
     const correctionHash = sha256Hex(hashPayload);
-    const privateKey = getPrivateKeyPem(workspace, "monitor");
+    const privateKey = getSigningKey(workspace, "ledger-row");
     const signature = signHexDigest(correctionHash, privateKey);
 
     updateCorrectionVerification(

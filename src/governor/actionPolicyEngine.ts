@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
 import {
   type ActionClass,
@@ -133,7 +133,7 @@ export function actionPolicySigPath(workspace: string): string {
 }
 
 function signActionPolicyDigest(workspace: string, digest: string): string {
-  return signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  return signHexDigest(digest, getSigningKey(workspace, "config-signature"));
 }
 
 export function defaultActionPolicy(): ActionPolicy {

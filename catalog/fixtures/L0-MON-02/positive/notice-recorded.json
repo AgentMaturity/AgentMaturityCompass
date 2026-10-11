@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [
+      {
+        "kind": "NOTIFIED",
+        "clock": "gdpr-33-1-supervisory-authority",
+        "atHours": 1
+      }
+    ]
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

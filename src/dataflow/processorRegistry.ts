@@ -2,7 +2,7 @@ import { closeSync, constants, fstatSync, lstatSync, openSync, readSync } from "
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getMode } from "../mode/mode.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -193,7 +193,7 @@ export function signProcessorRegistry(workspace: string): string {
     parse(bytes);
     const digestSha256 = sha256Hex(bytes);
     const sigPath = processorRegistrySigPath(root);
-    writeFileAtomic(sigPath, canonicalize({ digestSha256, signature: signHexDigest(digestSha256, getPrivateKeyPem(root, "auditor")),
+    writeFileAtomic(sigPath, canonicalize({ digestSha256, signature: signHexDigest(digestSha256, getSigningKey(root, "config-signature")),
       signedTs: Date.now(), signer: "auditor" }), 0o600);
     return sigPath;
   } catch { throw new ProcessorRegistryError("signing_failed"); }

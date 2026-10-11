@@ -1,5 +1,5 @@
 import { sign, verify, randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import { execTicketPayloadSchema, type ExecTicketPayload } from "./execTicketSchema.js";
 import { loadWorkOrder, workOrderDigest } from "../workorders/workorderEngine.js";
@@ -47,7 +47,7 @@ export function issueExecTicket(params: {
   });
 
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
-  const signature = sign(null, payloadBytes, getPrivateKeyPem(params.workspace, "auditor"));
+  const signature = sign(null, payloadBytes, getSigningKey(params.workspace, "config-signature"));
   const ticket = `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`;
   return {
     ticket,

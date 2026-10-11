@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-04",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "lease_revocation_drill",
+    "actionClass": "WRITE_HIGH",
+    "mode": "revoke_between_calls",
+    "boundMs": 5000
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

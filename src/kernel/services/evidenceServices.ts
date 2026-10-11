@@ -24,7 +24,8 @@ import type { Context } from "../amcRuntime.js";
 import { openLedger, type AppendEvidenceInput, type AppendEvidenceResult } from "../../ledger/ledger.js";
 import type { RuntimeName } from "../../types.js";
 import { verifyLedgerIntegrity, type VerifyResult } from "../../ledger/ledgerVerification.js";
-import { getPublicKeyHistory, signHexDigest, verifyHexDigestAny, getPrivateKeyPem } from "../../crypto/keys.js";
+import { getPublicKeyHistory, signHexDigest, verifyHexDigestAny, getSigningKey } from "../../crypto/keys.js";
+import { ROLE_PRIMARY_PURPOSE } from "../../vault/vaultPayload.js";
 import { mintReceipt, verifyReceipt } from "../../receipts/receipt.js";
 import {
   verifyDelegationChain,
@@ -120,7 +121,7 @@ export class CryptoService extends AmcSeam {
   }
 
   sign(digestHex: string, kind: "monitor" | "auditor" = "auditor"): string {
-    return signHexDigest(digestHex, getPrivateKeyPem(this.workspace, kind));
+    return signHexDigest(digestHex, getSigningKey(this.workspace, ROLE_PRIMARY_PURPOSE[kind]));
   }
 
   verify(digestHex: string, signature: string, kind: "monitor" | "auditor" = "auditor"): boolean {

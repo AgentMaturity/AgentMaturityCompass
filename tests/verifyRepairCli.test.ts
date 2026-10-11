@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { forgeKeysetKey } from "./helpers/forgeKeyset.js";
 import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -145,6 +146,8 @@ describe("amc verify messages", () => {
     // A substituted monitor key: every event and seal signature fails, which is what tampering looks like.
     const { publicKey } = generateKeyPairSync("ed25519");
     writeFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), publicKey.export({ format: "pem", type: "spki" }).toString());
+    // The CLI runs with a fresh AMC home, so re-pointing the unsigned key set too leaves only the signatures failing (P1-08).
+    forgeKeysetKey(workspace, "ledger-row", publicKey.export({ format: "pem", type: "spki" }).toString());
     const result = amc(workspace, ["verify"]);
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("signature");

@@ -1,5 +1,5 @@
 import { randomUUID, sign } from "node:crypto";
-import { getPrivateKeyPem } from "../crypto/keys.js";
+import { getSigningKey } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
@@ -45,7 +45,7 @@ export function issueLeaseToken(input: IssueLeaseInput): { token: string; payloa
   });
 
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
-  const signature = sign(null, payloadBytes, getPrivateKeyPem(input.workspace, "lease"));
+  const signature = sign(null, payloadBytes, getSigningKey(input.workspace, "lease"));
   return {
     token: `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`,
     payload

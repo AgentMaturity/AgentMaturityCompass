@@ -1,0 +1,84 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-TRN-03
+version: "0.1.0"
+support: experimental
+layer: 0
+family: transparency-and-disclosure
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Content marking
+statement: >-
+  Synthetic media and documents the agent publishes carry provenance marking, with C2PA manifests
+  where required, and unmarked output is blocked from publishing channels.
+riskRationale: >-
+  Unmarked synthetic content can be passed off as authentic, and the operator cannot show which
+  outputs it produced.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [publishes_synthetic_content] }
+  reasons: [Applies only where the profile's use cases include publishing synthetic media or documents.]
+  exclusions: []
+citations:
+  - key: eu-ai-act-art-50-2
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 50(2)
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2026-08-02"
+    complianceDueDate: null
+    dateNote: >-
+      Systems placed on the market before 2 August 2026 comply by 2 December 2026 (Art. 111(4); register
+      keyDate newProhibitionsAndArt50_2Transition).
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: providers mark synthetic audio, image, video or text output in a machine-readable form.
+binding:
+  kind: enforcement_point
+  points: [egress]
+  mechanism: >-
+    Publishing channels accept only output whose provenance manifest verifies; unmarked output is
+    refused at egress.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-TRN-03-T1
+    type: runtime_enforced
+    oracle: { kind: enforcement_receipt, observes: The publishing channel's refusal and the manifest it verified. }
+    fixtures:
+      positive: [L0-TRN-03/positive/evidence-valid.json]
+      negative:
+        - L0-TRN-03/negative/evidence-contradictory.json
+        - L0-TRN-03/negative/evidence-cross-tenant.json
+        - L0-TRN-03/negative/evidence-empty.json
+        - L0-TRN-03/negative/evidence-replayed.json
+        - L0-TRN-03/negative/evidence-stale.json
+        - L0-TRN-03/negative/evidence-violation.json
+    passCriteria: >-
+      Marked output is published; unmarked output and output with a failing manifest are refused. Today
+      AMC emits an AMC-C2PA-INSPIRED/1 manifest, not a C2PA manifest, and no channel checks it.
+    attempts: 1
+evidence:
+  - id: L0-TRN-03-E1
+    producer: amc.provenance.c2pa
+    bindingFields: [deploymentId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

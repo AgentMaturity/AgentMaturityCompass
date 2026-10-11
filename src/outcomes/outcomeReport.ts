@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { OutcomeCategory, OutcomeReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { openLedger } from "../ledger/ledger.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -262,7 +262,7 @@ export function runOutcomeReport(input: RunOutcomeReportInput): { report: Outcom
   } satisfies Omit<OutcomeReport, "reportJsonSha256" | "reportSealSig">;
 
   const reportJsonSha256 = sha256Hex(canonicalize(base));
-  const reportSealSig = signHexDigest(reportJsonSha256, getPrivateKeyPem(input.workspace, "auditor"));
+  const reportSealSig = signHexDigest(reportJsonSha256, getSigningKey(input.workspace, "artifact-seal"));
   const report: OutcomeReport = {
     ...base,
     reportJsonSha256,

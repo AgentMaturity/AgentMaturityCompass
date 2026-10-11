@@ -12,7 +12,7 @@ import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { fleetRoot } from "./paths.js";
 
 // ---------------------------------------------------------------------------
@@ -162,7 +162,7 @@ function handoffUnresolvedDependencyPath(workspace: string, packetId: string): s
 function signCanonicalBody(workspace: string, body: unknown): string {
   const digest = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
   try {
-    return signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+    return signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
   } catch {
     return "unsigned";
   }
@@ -300,7 +300,7 @@ export function createHandoffPacket(
   const digest = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
   let signature = "unsigned";
   try {
-    signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
   } catch { /* unsigned */ }
 
   const packet = handoffPacketSchema.parse({ ...body, signature });

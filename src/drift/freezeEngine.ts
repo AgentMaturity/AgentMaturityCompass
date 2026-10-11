@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { ActionClass } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -72,7 +72,7 @@ function incidentLiftPath(workspace: string, agentId: string, incidentId: string
 
 function signIncidentPayload(workspace: string, payload: Omit<FreezeIncident, "signature">): string {
   const digest = sha256Hex(canonicalize(payload));
-  return signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  return signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
 }
 
 export function verifyIncidentSignature(workspace: string, incident: FreezeIncident): boolean {
@@ -246,7 +246,7 @@ export function liftFreeze(params: {
     reason: params.reason
   };
   const digest = sha256Hex(canonicalize(payload));
-  const signature = signHexDigest(digest, getPrivateKeyPem(params.workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(params.workspace, "artifact-seal"));
   const out = {
     ...payload,
     signature

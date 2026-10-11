@@ -14,6 +14,8 @@ services:
       - "3220"
     volumes:
       - amc_data:/data/amc:ro
+      # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
+      - amc_api_state:/home/amc/.config/amc/state
     read_only: true
     tmpfs:
       - /tmp
@@ -29,3 +31,6 @@ services:
       - amc-api
     volumes:
       - ./Caddyfile.studio-api:/etc/caddy/Caddyfile:ro
+
+volumes:
+  amc_api_state:

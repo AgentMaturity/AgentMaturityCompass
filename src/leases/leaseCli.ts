@@ -1,7 +1,7 @@
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
 import { bootstrapLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
-import { leaseRevocationsSchema, type LeaseScope } from "./leaseSchema.js";
+import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
   const text = ttl.trim().toLowerCase();
@@ -91,8 +91,18 @@ export function revokeLeaseForCli(params: {
   workspace: string;
   leaseId: string;
   reason: string;
+  /** The lease itself: its signed expiry lets a later write prune the revocation once the lease has lapsed. */
+  token?: string;
 }): { leaseId: string } {
-  revokeLease(params.workspace, params.leaseId, params.reason);
+  let expiresTs: number | undefined;
+  if (params.token !== undefined) {
+    // Only a payload whose signature verified carries a usable expiry; an expired or already revoked lease still does.
+    const verified = verifyLeaseToken({ workspace: params.workspace, token: params.token });
+    if (!verified.ok && verified.error !== "lease expired" && verified.error !== "lease revoked") throw new Error(`--token does not verify: ${verified.error}`);
+    if (verified.payload?.leaseId !== params.leaseId) throw new Error("--token is not the lease named by --lease-id");
+    expiresTs = verified.payload.expiresTs;
+  }
+  revokeLease(params.workspace, params.leaseId, params.reason, { expiresTs });
   return {
     leaseId: params.leaseId
   };
@@ -138,6 +148,6 @@ export function resignLeaseRevocationsForCli(workspace: string, reviewedDigestSh
   return {
     wasValid: before.valid,
     previousReason: before.reason,
-    revocationCount: leaseRevocationsSchema.parse(JSON.parse(signed.toString("utf8"))).revocations.length
+    revocationCount: signed.revocations.length
   };
 }

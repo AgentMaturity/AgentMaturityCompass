@@ -1,6 +1,6 @@
 # AMC Compose Deployment
 
-Both HTTP and TLS builds use the root Dockerfile `studio` target. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
+Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC service mounts a named volume at `/home/amc/.config/amc/state` (`<AMC home>/state`), next to the workspace volume, so this machine's anti-rollback marks and key-set recovery copies survive a restart (P1-08, `docs/KEY_LIFECYCLE.md`). Keep it with the workspace volume when you back up or roll back, and never mount it into the workspace. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
 
 ## Prerequisites
 

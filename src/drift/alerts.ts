@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
@@ -114,7 +114,7 @@ export function loadAlertsConfig(workspace: string): AlertsConfig {
 export function signAlertsConfig(workspace: string): string {
   const path = alertsPath(workspace);
   const digest = sha256Hex(readFileSync(path));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: SignedDigest = {
     digestSha256: digest,
     signature,

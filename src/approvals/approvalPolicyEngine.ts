@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
@@ -133,7 +133,7 @@ export function signApprovalPolicy(workspace: string, explicitPath?: string): st
   const digest = sha256Hex(readFileSync(path));
   const payload: SignaturePayload = {
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };

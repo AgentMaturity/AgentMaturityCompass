@@ -1,0 +1,70 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-OVS-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: decision-authority-and-oversight
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Override and rubber-stamp telemetry
+statement: >-
+  Override rate, approve rate and approval dwell time are measured per reviewer, and a value beyond
+  the profile threshold raises an oversight alert.
+riskRationale: >-
+  Reviewers who approve everything in seconds give the appearance of oversight without its substance.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [approvals]
+  mechanism: >-
+    Each approval decision feeds per-reviewer rates and dwell times; a breach of the profile threshold
+    raises a recorded oversight alert.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-OVS-04-T1
+    type: runtime_enforced
+    oracle:
+      kind: ledger_state
+      observes: >-
+        The per-reviewer metrics computed from signed approval records and any alert raised.
+    fixtures:
+      positive: [L0-OVS-04/positive/evidence-valid.json]
+      negative:
+        - L0-OVS-04/negative/evidence-contradictory.json
+        - L0-OVS-04/negative/evidence-cross-tenant.json
+        - L0-OVS-04/negative/evidence-empty.json
+        - L0-OVS-04/negative/evidence-replayed.json
+        - L0-OVS-04/negative/evidence-stale.json
+        - L0-OVS-04/negative/evidence-violation.json
+    passCriteria: >-
+      Metrics are computed from the signed records and a threshold breach raises an alert.
+    attempts: 1
+  - id: L0-OVS-04-T2
+    type: document_review
+    oracle: { kind: human_assessor, observes: The oversight alert log and the responses to it. }
+    fixtures:
+      positive: [L0-OVS-04/positive/evidence-valid-t2.json]
+      negative: [L0-OVS-04/negative/evidence-violation-t2.json]
+    passCriteria: Every alert has a recorded response from a named owner.
+    attempts: 1
+evidence:
+  - id: L0-OVS-04-E1
+    producer: amc.oversight.telemetry
+    bindingFields: [workspaceId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

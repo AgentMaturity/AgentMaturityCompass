@@ -1,0 +1,109 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-TRN-01
+version: "0.1.0"
+support: experimental
+layer: 0
+family: transparency-and-disclosure
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: AI disclosure at first interaction
+statement: >-
+  In user-facing deployments the agent's first message in every session discloses that it is an AI
+  system, and a transcript check covers every session.
+riskRationale: >-
+  People who do not know they are talking to an AI system cannot weigh its statements or ask for a
+  human.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [interacts_with_natural_persons] }
+  reasons: [Applies only where the profile's use cases include direct interaction with people.]
+  exclusions: []
+citations:
+  - key: eu-ai-act-art-50-1
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 50(1)
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2026-08-02"
+    complianceDueDate: "2026-08-02"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: providers disclose direct interaction with an AI system; Art. 50 applies from 2026-08-02
+      (keyDate generalApplication).
+  - key: us-co-sb26-189-deployers
+    registerId: us-co-sb26-189
+    instrument: Colorado SB26-189 (Part 17 of Article 1 of Title 6, C.R.S.)
+    clause: Deployer duties (register ref Deployers); section numbers to be pinned by the legal reviewer
+    edition: SB26-189 as signed 2026-05-14
+    jurisdiction: US-CO
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2027-01-01"
+    complianceDueDate: "2027-01-01"
+    dateNote: null
+    url: https://leg.colorado.gov/bills/sb26-189
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-co-sb26-189 records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [US-CO] }
+    legalReview: null
+    note: >-
+      Register: notice at points of interaction; a plain-language description within 30 days after an
+      adverse consequential decision; meaningful human review on request.
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    An output check requires the disclosure in the first message of each session and a transcript check
+    confirms it across sessions.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Configure the first-message disclosure and review the transcript check results.
+    ownerRole: senior_manager
+    cadence: monthly
+    evidenceOfPerformance: The transcript check report covering every session.
+tests:
+  - id: L0-TRN-01-T1
+    type: runtime_enforced
+    oracle: { kind: system_of_record, observes: Session transcripts held outside the agent. }
+    fixtures:
+      positive: [L0-TRN-01/positive/evidence-valid.json]
+      negative:
+        - L0-TRN-01/negative/evidence-contradictory.json
+        - L0-TRN-01/negative/evidence-cross-tenant.json
+        - L0-TRN-01/negative/evidence-empty.json
+        - L0-TRN-01/negative/evidence-replayed.json
+        - L0-TRN-01/negative/evidence-stale.json
+        - L0-TRN-01/negative/evidence-violation.json
+    passCriteria: >-
+      Every session's first agent message carries the disclosure; a session without it fails.
+    attempts: 1
+evidence:
+  - id: L0-TRN-01-E1
+    producer: amc.transparency.outputCheck
+    bindingFields: [deploymentId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, prompt_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

@@ -75,7 +75,10 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
   // in PRODUCER_BY_SOURCE instead, so they can never count as AMC runtime evidence.
   "compliance_report", "diagnostic_report", "path_presence", "predicate", "reviewer_exception", "record", "legacy",
-  "legacy-unverified"
+  "legacy-unverified",
+  // A trust-context distrust entry's source (P1-08, src/trust/trustContext.ts): the workspace's own key revocation list,
+  // never an evidence event's meta.source.
+  "workspace-key-revocations"
 ]);
 
 function sourceFiles(dir: string): string[] {

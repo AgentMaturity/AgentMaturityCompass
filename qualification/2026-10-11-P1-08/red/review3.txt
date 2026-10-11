@@ -1,0 +1,9 @@
+     × adopted-ratchet: refuses a newer key set it did not commit until the owner accepts the digest the committing machine shows 859ms
+     × a stray purpose key in a 1.x workspace is refused by name, and the owner quarantines it to migrate 32ms
+     × a purpose key in a 1.x workspace that is the vault's own is adopted by the migration 34ms
+     × on a machine that never committed the key set, a deleted keyset.json names its recovery: copy it from the committing machine 615ms
+     × restore-loop: an older vault swapped in is replaced by the committed copy, and unlock works 1020ms
+     × when no committed copy holds the named keys, restore says so and gives another next step 1143ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  6 failed | 18 skipped (24)

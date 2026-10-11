@@ -1,3 +1,4 @@
+import { legacyV1Payload } from "./helpers/legacyVault.js";
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -75,7 +76,7 @@ test.each(["current", "legacy"] as const)("cold-process %s vault verification re
   const { workspace, phrase } = encryptedWorkspace();
   if (format === "legacy") {
     const path = vaultPaths(workspace).vaultFile;
-    const payload = JSON.parse(decryptVaultPayload(JSON.parse(readFileSync(path, "utf8")), phrase).toString("utf8"));
+    const payload = legacyV1Payload(path, phrase);
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     writeFileSync(path, JSON.stringify(encryptVaultPayload(Buffer.from(JSON.stringify(payload)), phrase)));
@@ -119,7 +120,9 @@ test("public-only ledger verification preserves the supplied trust anchors witho
     ledger.close();
   }
   const keysDir = join(snapshot, ".amc", "keys");
-  const keyBytes = () => Object.fromEntries(readdirSync(keysDir).sort().map((file) => [file, sha256Hex(readFileSync(join(keysDir, file)))]));
+  // Every file under keys/, recursively (P1-08 keeps key-set recovery manifests in keys/rotations/).
+  const keyBytes = () => Object.fromEntries(readdirSync(keysDir, { recursive: true }).map(String).filter((file) => statSync(join(keysDir, file)).isFile()).sort()
+    .map((file) => [file, sha256Hex(readFileSync(join(keysDir, file)))]));
   const before = keyBytes();
   const result = verifyLedgerIntegrity(snapshot);
   expect(result.errors).toEqual([]);

@@ -546,7 +546,7 @@ export {
 export { inspectSignatures, fixSignatures } from "./studio/signatures.js";
 export { startStudioApiServer } from "./studio/studioServer.js";
 export { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
-export { createVault, unlockVault, lockVault, vaultStatus, ensureVaultAndPublicKeys, rotateMonitorKeyInVault } from "./vault/vault.js";
+export { createVault, unlockVault, lockVault, vaultStatus, ensureVaultAndPublicKeys } from "./vault/vault.js"; export { rotateMonitorKeyInVault } from "./keys/purposeKeys.js"; // P1-08: index.ts line budget
 export { scanForPII } from "./vault/dlp.js";
 export type { ScanResult } from "./vault/dlp.js";
 export { generateHoneytoken, isHoneytoken } from "./vault/honeytokens.js";

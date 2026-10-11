@@ -1,0 +1,66 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-TOOL-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: least-privilege-and-tools
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Mandate limits outside the model
+statement: >-
+  Consequential calls carry declared limits on amount, recipient, resource and rate that the
+  enforcement point checks, and an over-limit call is refused.
+riskRationale: >-
+  Limits that live only in a prompt can be talked away; only a check outside the model holds against
+  injection or error.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    The authorization stage compares the call's bound amount, recipient, resource and rate with the
+    signed mandate and refuses any value beyond it.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-TOOL-02-T1
+    type: runtime_enforced
+    oracle: { kind: enforcement_receipt, observes: The authorization denial and its receipt for an over-limit call. }
+    fixtures:
+      positive: [L0-TOOL-02/positive/evidence-valid.json]
+      negative:
+        - L0-TOOL-02/negative/evidence-contradictory.json
+        - L0-TOOL-02/negative/evidence-cross-tenant.json
+        - L0-TOOL-02/negative/evidence-empty.json
+        - L0-TOOL-02/negative/evidence-replayed.json
+        - L0-TOOL-02/negative/evidence-stale.json
+        - L0-TOOL-02/negative/evidence-violation.json
+    passCriteria: >-
+      Calls within the mandate are allowed; over-limit amount, unlisted recipient, unlisted resource and
+      over-rate calls are refused. Today only a daily per-class count is enforced (budgets guard).
+    attempts: 1
+evidence:
+  - id: L0-TOOL-02-E1
+    producer: amc.mandate.limits
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: SECURE_CONFIGURATION.BUDGETS_POLICY
+    relation: partial
+    rationale: >-
+      The audit map checks that budgets are signed; budgets count calls, not amounts or recipients.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

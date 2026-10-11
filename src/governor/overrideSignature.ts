@@ -15,7 +15,7 @@
  * bytes, signed directly as trust lists are, never through signHexDigest.
  */
 import { sign, verify } from "node:crypto";
-import { assertSha256HexDigest, getPrivateKeyPem, getPublicKeyHistory, isSha256HexDigest } from "../crypto/keys.js";
+import { assertSha256HexDigest, getSigningKey, getPublicKeyHistory, isSha256HexDigest } from "../crypto/keys.js";
 
 const DOMAIN_TAG = "AMC_BREAK_GLASS_OVERRIDE_V1";
 
@@ -54,7 +54,7 @@ export function signOverrideDigest(workspace: string, digestHex: string): string
   let signature: string;
   try {
     assertSha256HexDigest(digestHex);
-    signature = sign(null, signedBytes(digestHex), getPrivateKeyPem(workspace, "auditor")).toString("base64");
+    signature = sign(null, signedBytes(digestHex), getSigningKey(workspace, "config-signature")).toString("base64");
   } catch {
     throw new BreakGlassSigningError();
   }

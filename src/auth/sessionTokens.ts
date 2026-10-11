@@ -1,6 +1,6 @@
 import { randomUUID, sign, verify } from "node:crypto";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import { userRoleSchema } from "./userSchema.js";
 
@@ -44,7 +44,7 @@ export function issueSessionToken(params: {
     nonce: randomUUID().replace(/-/g, "")
   });
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
-  const signature = sign(null, payloadBytes, getPrivateKeyPem(params.workspace, "session"));
+  const signature = sign(null, payloadBytes, getSigningKey(params.workspace, "session"));
   return {
     token: `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`,
     payload

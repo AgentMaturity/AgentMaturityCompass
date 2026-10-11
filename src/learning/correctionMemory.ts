@@ -19,7 +19,7 @@ import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport } from "../corrections/correctionTypes.js";
 import {
@@ -378,7 +378,7 @@ export function extractLessonsFromCorrections(
     const lessonHash = sha256Hex(hashPayload);
     let signature = "unsigned";
     try {
-      signature = signHexDigest(lessonHash, getPrivateKeyPem(workspace, "monitor"));
+      signature = signHexDigest(lessonHash, getSigningKey(workspace, "ledger-row"));
     } catch {
       // No key available
     }

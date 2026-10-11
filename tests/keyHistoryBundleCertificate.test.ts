@@ -12,7 +12,7 @@ import { writeSignedGatePolicy } from "../src/ci/gate.js";
 import { addPublicKeyToHistory, getAuthenticatedKeyHistory, getPrivateKeyPem, getPublicKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { buildKeyHistoryEntry } from "../src/crypto/keyHistoryChain.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../src/crypto/keyHistoryEnvelope.js";
-import { rotateMonitorKeyInVault } from "../src/vault/vault.js";
+import { rotateMonitorKeyInVault } from "../src/keys/purposeKeys.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { BundleManifest } from "../src/types.js";
 import { keyHistoryTrust, workspaceKeyPem, workspaceKeyTrust } from "./helpers/trustContext.js";

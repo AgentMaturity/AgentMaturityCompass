@@ -168,7 +168,7 @@ export const withFullIntegrity = (store: A4Store, projectId: string, call: A4Cal
 
 const vaultUnlocked = (workspace: string): boolean | null => {
   try {
-    getPrivateKeyPem(workspace, "auditor");
+    for (const purpose of ["ledger-row", "receipt", "artifact-seal"] as const) getPrivateKeyPem(workspace, purpose); // P1-08: the keys a gate decision's commit signs with
     return true;
   } catch (error) {
     return /vault locked/i.test(error instanceof Error ? error.message : String(error)) ? false : null;

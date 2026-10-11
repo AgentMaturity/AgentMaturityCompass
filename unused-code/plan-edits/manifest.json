@@ -122,6 +122,13 @@
       "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df"
     },
     {
+      "path": "src/auth/humanLog.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/auth/humanLog.ts.landed",
+      "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
+    },
+    {
       "path": "src/bench/benchRegistryClient.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -150,6 +157,13 @@
       "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f"
     },
     {
+      "path": "src/casebooks/casebookStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/casebooks/casebookStore.ts.landed",
+      "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
+    },
+    {
       "path": "src/bridge/hookActionIdentity.ts",
       "issue": "P1-22",
       "baseCommit": "e7123c69a2d9de7cacec9e552f4b431f9f825766",
@@ -169,6 +183,13 @@
       "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
       "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
       "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8"
+    },
+    {
+      "path": "src/corrections/lessonStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/corrections/lessonStore.ts.landed",
+      "sha256": "86b7e1fdc0fead2c917dcfa83f22e8804550f1c901ae5080d7f1ff2c52478469"
     },
     {
       "path": "src/demo/prospectDemo.ts",
@@ -262,6 +283,13 @@
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
     },
     {
+      "path": "src/governor/policyDebt.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/governor/policyDebt.ts.landed",
+      "sha256": "65cca06ec04b9f961ebfecb66f4e8c807817188c0235bcc0b4f4472ed1841cf8"
+    },
+    {
       "path": "src/identity/hostVault.ts",
       "issue": "P0-37",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
@@ -332,11 +360,32 @@
       "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da"
     },
     {
+      "path": "src/ops/retention/retentionArchive.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/ops/retention/retentionArchive.ts.landed",
+      "sha256": "5b0f86069ea1a4efe7f0810274ee9701c91f1a4d664da490caf82d308a423445"
+    },
+    {
       "path": "src/org/orgRun.ts",
       "issue": "P0-37",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
       "archivePath": "unused-code/plan-edits/P0-37/src/org/orgRun.ts.landed",
       "sha256": "de6f8d70b8b3410b4476f1daa6169818bffbcf8e4fe131149df8a6c86cd2fcee"
+    },
+    {
+      "path": "src/outcomes/outcomeContractEngine.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/outcomes/outcomeContractEngine.ts.landed",
+      "sha256": "51ba7ab24c1d190629f771ebab1e74780fea4b0a3012d26ff49fe1a34f72f24f"
+    },
+    {
+      "path": "src/pairing/lanMode.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/pairing/lanMode.ts.landed",
+      "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
     },
     {
       "path": "src/passport/passportCli.ts",
@@ -381,6 +430,13 @@
       "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
     },
     {
+      "path": "src/storage/blobs/blobStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/storage/blobs/blobStore.ts.landed",
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+    },
+    {
       "path": "src/studio/studioServer.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
@@ -414,6 +470,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+    },
+    {
+      "path": "src/workorders/workorderEngine.ts",
+      "issue": "P1-08",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
+      "archivePath": "unused-code/plan-edits/P1-08/src/workorders/workorderEngine.ts.landed",
+      "sha256": "ced036fc4c9be0c9e2ca531200eb74b4b824610659eeb0547475ef7d6b3ac38f"
     },
     {
       "path": "src/workspace.ts",
