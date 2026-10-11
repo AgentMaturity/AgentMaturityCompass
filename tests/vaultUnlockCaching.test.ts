@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
+import { getVaultPrivateKeyPem, lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
 import * as vaultCrypto from "../src/vault/vaultCrypto.js";
 import { readBlobKeyMaterial } from "../src/storage/blobs/blobKeys.js";
 
@@ -216,4 +216,23 @@ describe("unlocking an already-unlocked vault", () => {
       else expect(vaultStatus(dir).exists).toBe(false);
     }
   );
+
+  it.each(["locked", "unlocked"] as const)("a legacy key upgrade that throws leaves a previously %s vault locked with no payload (P0-30)", (prior) => {
+    const dir = workspace(PASS);
+    if (prior === "locked") lockVault(dir);
+    else unlockVault(dir, PASS);
+    // A legacy payload without lease and session keys, beside an existing lease.pub: unlock's upgrade refuses
+    // to replace that public key without an authenticated rotation, and throws after decryption succeeded.
+    const path = vaultPaths(dir).vaultFile;
+    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(path, "utf8")), PASS).toString("utf8"));
+    delete payload.leasePrivateKeyPem;
+    delete payload.sessionPrivateKeyPem;
+    writeFileSync(path, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
+    const before = diskState(dir);
+    expect(() => unlockVault(dir, PASS)).toThrow();
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "monitor")).toThrow(/Vault locked/);
+    expect(diskState(dir)).toEqual(before);
+  });
 });
