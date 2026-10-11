@@ -601,7 +601,7 @@ const headAfterConsume = (row: A4GateRow): { stage?: A4Stage; step: "direction_a
  */
 export function consumeGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number;
   response?: A4TransitionOptions["response"] },
-  extra?: (ctx: { state: A4ReadinessState; row: A4GateRow; principal: A4Principal; regulated: boolean; ts: number }) => { payload: Record<string, unknown>; specs: A4ChangeSpec[] }): A4TransitionResult {
+  extra?: (ctx: { state: A4ReadinessState; row: A4GateRow; principal: A4Principal; regulated: boolean; ts: number; approverKeys: string[] }) => { payload: Record<string, unknown>; specs: A4ChangeSpec[] }): A4TransitionResult {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
@@ -624,7 +624,7 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     if (extra === undefined && state.chain.some((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === row.gate_id)) {
       throw fail(409, "EFFECT_REQUIRED", "An effect gate is open on this gate; complete runs its effect.");
     }
-    const effect = extra?.({ state, row, principal, regulated: isRegulated(state, query.floor), ts });
+    const effect = extra?.({ state, row, principal, regulated: isRegulated(state, query.floor), ts, approverKeys: approverKeys(gate) });
     return { readiness, specs: [{ kind: "GATE_CONSUMED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, gate: row.gate, approverKeys: approverKeys(gate), readinessBindingDigest: readiness.bindingDigest, ...effect?.payload },
       head: headAfterConsume(row) }, ...(effect?.specs ?? [])] };

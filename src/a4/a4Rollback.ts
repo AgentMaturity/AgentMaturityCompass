@@ -27,7 +27,7 @@ import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { mintedLeases } from "./a4Deploy.js";
-import { settleEffect, sweepA4Effects, verifyAndConsumeEffect, type A4EffectDef } from "./a4Effects.js";
+import { assertCallerNotCounted, settleEffect, sweepA4Effects, verifyAndConsumeEffect, type A4EffectDef } from "./a4Effects.js";
 import { A4_RUNTIME, assertAllowed, autoHold, engineRiskTier, evaluateFor, gateRowOf, livePrincipal, loadA4State, pendingExecutors, signedA4Floor, type A4Call } from "./a4Gates.js";
 import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
@@ -120,8 +120,9 @@ export function previewRollback(store: A4Store, projectId: string, releaseId: st
 /**
  * POST …/releases/:rid/rollback (owner): the exact-id confirmation of the opened preview, then the effect, journaled as
  * every A4 effect is (plan §7 rule 9). The checks run on rows read now (a lost earlier attempt, and a lost production-lease
- * effect, settled first as process_lost); the grant's quorum is verified only while it is unconsumed (one this rollback's
- * own execution consumed already proved it, as retryEffect treats it; one another execution consumed is GRANT_ALREADY_USED);
+ * effect, settled first as process_lost); the grant's quorum is verified only while it is unconsumed and its counted keys
+ * recorded on EFFECT_STARTED (one this rollback's own execution consumed already proved it, as retryEffect treats it, and
+ * a confirmer it counted is 409 SOD_VIOLATION; one another execution consumed is GRANT_ALREADY_USED);
  * EFFECT_STARTED (owner pid and host, heartbeat) and its liveness row commit pinned to `expectedHeadSeq`, refused while
  * another attempt runs or the deployment approval's production-lease effect does (409 EFFECT_RUNNING: a lease it minted
  * after this read would outlive the rollback). Only then: the engine grant consumed as step 0, the freeze,
@@ -157,12 +158,14 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   const { gate } = releaseAndGate(state, releaseId);
   const approvalRequestId = String(opened.body.approvalRequestId);
   // An earlier attempt that ran step 0 consumed the grant for this execution, which proved its quorum (retryEffect's rule):
-  // it is re-run on that grant. A grant another execution consumed is refused; only an unconsumed one is verified now.
+  // it is re-run on that grant, never by an approver that quorum counted (the keys each attempt recorded on EFFECT_STARTED;
+  // plan rule 9). A grant another execution consumed is refused; only an unconsumed one is verified now.
   const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
   if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The rollback's engine grant was consumed by another execution.");
-  if (consumed === null) {
-    verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
-  }
+  const counted = state.chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.executionId === executionId).map((link) => link.body.effectApproverKeys);
+  if (consumed !== null) assertCallerNotCounted(counted.some(Array.isArray) ? counted.flatMap((keys) => Array.isArray(keys) ? keys : []) : null, principal);
+  const effectApproverKeys = consumed !== null ? null
+    : verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
   // Signing keys first: every later step signs, and none may run when the record of it could not be written.
   try {
     getPrivateKeyPem(store.workspace, "auditor");
@@ -191,7 +194,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
       throw fail(409, "EFFECT_RUNNING", "The deployment approval's production-lease effect is still running; roll back once it has settled.");
     }
     return { kind: "EFFECT_STARTED", stage: gate.stage, revisionNo: gate.revision_no, payload: { effectId: attemptId, effect: ROLLBACK_EFFECT_ID, gateId: gate.gate_id, executionId,
-      approvalRequestId, releaseId, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
+      approvalRequestId, releaseId, ...(effectApproverKeys === null ? {} : { effectApproverKeys }), ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
     startEffect: { effectId: attemptId, gateId: gate.gate_id, executionId, approvalRequestId } };
   }, { expectedHeadSeq, request: input.request, response: { attemptId } });
   if (started.replay) return { result: started, attemptId: String(started.response?.attemptId ?? ""), rollbackId: null, receiptPath: null, leaseIdsRevoked: [], preparedCommands: [], frozen: null };

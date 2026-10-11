@@ -61,7 +61,8 @@ export interface A4EffectDef {
   /**
    * "A4": the runner consumes the engine grant as step 0. "executor": the executor consumes it itself and is never retried.
    * "gate": no effect gate and no engine request; the documentary gate's own quorum, consumed by GATE_CONSUMED in the same
-   * transaction, authorizes it (a workspace write its approvers saw in the bound spec, design §10.1 Aspire completion).
+   * transaction, authorizes it (a workspace write its approvers saw in the bound spec, design §10.1 Aspire completion);
+   * above WRITE_LOW, never for a `complete` or retry caller that quorum counted (plan rule 9).
    */
   readonly consumes: "A4" | "executor" | "gate";
   /**
@@ -416,18 +417,39 @@ export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, 
 }
 
 /**
+ * Whether plan rule 9 (an effect's quorum excludes the `complete` caller) applies to `def` beyond the effect gate's own
+ * count: every engine-consumed effect, and a gate-quorum effect above WRITE_LOW (the production lease, a deploy). A
+ * WRITE_LOW gate-quorum write (Aspire's contracts) keeps the documentary gate's own rule.
+ */
+const callerExcluded = (def: A4EffectDef): boolean => def.consumes !== "gate" || (def.actionClass !== "READ_ONLY" && def.actionClass !== "WRITE_LOW");
+/**
+ * Plan rule 9 where the quorum was counted before this caller came (a gate-quorum effect at `complete`, a retry or re-run
+ * on a grant already consumed): a caller among the keys the quorum counted (`keys`, as GATE_CONSUMED or EFFECT_STARTED
+ * recorded them) never runs it, since an inline attempt delivers to its caller; keys not recorded refuse too (fail
+ * closed). 409 SOD_VIOLATION.
+ */
+export function assertCallerNotCounted(keys: unknown, principal: Pick<A4Principal, "key" | "username">): void {
+  if (!Array.isArray(keys) || keys.includes(principal.key)) {
+    throw fail(409, "SOD_VIOLATION", `${principal.username}: ${Array.isArray(keys) ? "an approver this effect's quorum counted"
+      : "the approvers this effect's quorum counted are not recorded, so the caller"} may not run it (the caller is excluded from an effect's quorum)`);
+  }
+}
+
+/**
  * `complete` for a stage whose completion triggers an effect (design §6.5): GATE_CONSUMED (with the resolved effect
  * approver keys) + EFFECT_STARTED (owner pid/host, heartbeat, engine request id, execution id) + the a4_effects row, in
- * one transaction. The caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
+ * one transaction. A gate-quorum effect above WRITE_LOW is refused to a caller the gate counted (409 SOD_VIOLATION). The
+ * caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
  */
 export function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
-  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
+  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts, approverKeys }) => {
     const executionId = def.executionId(state, row);
     // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
     if (def.consumes === "gate") {
+      if (callerExcluded(def)) assertCallerNotCounted(approverKeys, principal);
       return { payload: { effect: def.id }, specs: [{ kind: "EFFECT_STARTED", stage: row.stage, revisionNo: row.revision_no,
         payload: { effectId: attemptId, effect: def.id, gateId: row.gate_id, executionId, approvalRequestId: null, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
         startEffect: { effectId: attemptId, gateId: row.gate_id, executionId, approvalRequestId: null } }] };
@@ -624,7 +646,9 @@ export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STA
  * Retry (owner; design §6.5): only for effects A4 or the gate's quorum consumes, and only when the chain has a failure
  * and no finish for this execution id, no attempt of it is still running (the retry first settles lost ones), and the engine grant, if
  * consumed, was consumed by this execution id; one not consumed yet is verified as at `complete` (verifyAndConsumeEffect:
- * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
+ * an expired, denied or cancelled grant, or an approver since revoked or removed, is refused). On a grant already consumed,
+ * or the gate's own quorum, a caller that quorum counted is refused (409 SOD_VIOLATION; plan rule 9, assertCallerNotCounted),
+ * since an inline attempt delivers to its caller. A second failure needs a new revision (409 EFFECT_NOT_RETRYABLE), and a
  * failure whose stage was redone since its attempt started is cleared, not retried (409 A4_GATE_STALE). A new attempt with the same execution
  * id; executors that consume their own grant re-open the effect gate instead, and `complete` on the consumed gate runs
  * them again (`rerunExecutorEffect`).
@@ -659,6 +683,11 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     assertNotRedone(state, row.stage, failures.at(-1));
     const consumed = def.consumes === "gate" ? null : loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
     if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The engine grant was consumed by another execution.");
+    // Counted before this caller came (the gate's quorum, or a grant already consumed): rule 9 against the keys GATE_CONSUMED recorded.
+    if ((consumed !== null || def.consumes === "gate") && callerExcluded(def)) {
+      const body = state.chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === row.gate_id)?.body;
+      assertCallerNotCounted(def.consumes === "gate" ? body?.approverKeys : body?.effectApproverKeys, principal);
+    }
     const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
     assertAllowed(readiness, "retryEffect");
     // Lost before step 0, the grant is still unconsumed and step 0 will consume it (markApprovalConsumed checks no status
