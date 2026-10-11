@@ -12888,9 +12888,9 @@ paths:
     get:
       summary: "The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's
         signed control results, checked again now (a results file edited, deleted or no longer verifying reads
-        not_evaluated with its reason), with the owner's out-of-scope settlements and the sources
-        acknowledgement recorded on that Adapt revision; every other stage carries no plan and says
-        not_evaluated"
+        not_evaluated with its reason), with the owner's out-of-scope settlements, the sources acknowledgement
+        and the deferred-activation acknowledgement recorded on that Adapt revision; every other stage carries
+        no plan and says not_evaluated"
       tags:
         - Studio
         - A4 Forge
