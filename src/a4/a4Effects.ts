@@ -63,6 +63,8 @@ export interface A4EffectDef {
    * consume that gate without it. An effect without one cannot be opened.
    */
   readonly completes?: `${A4Stage}.${"direction" | "completion"}`;
+  /** Run only when an owner opened it on that gate; `complete` consumes the gate plainly otherwise (a stage's readiness may still require it). */
+  readonly optional?: boolean;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -448,8 +450,8 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
 
 /**
  * `complete` (design §6.5; the body names no effect): the effect is the one an owner opened on this gate
- * (EFFECT_GATE_OPENED), else a registered effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until opened, except
- * a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly.
+ * (EFFECT_GATE_OPENED), else a registered, non-optional effect that `completes` it (refused EFFECT_GATE_NOT_OPEN until
+ * opened, except a `consumes: "gate"` effect, which runs on the gate's own quorum); a gate with neither is consumed plainly.
  * consumeGate re-checks the opened row inside its transaction (EFFECT_REQUIRED). On a consumed gate whose re-opened
  * effect consumes its own grant, it re-runs that effect (`rerunExecutorEffect`).
  */
@@ -465,7 +467,7 @@ export function completeStage(store: A4Store, projectId: string, input: A4Call &
     return rerunExecutorEffect(store, projectId, openedDef, input);
   }
   const effectId = opened !== undefined ? String(opened.body.effect)
-    : [...EFFECTS.values()].find((def) => requested !== undefined && def.completes === `${String(requested.body.stage)}.${String(requested.body.gate)}`)?.id;
+    : [...EFFECTS.values()].find((def) => def.optional !== true && requested !== undefined && def.completes === `${String(requested.body.stage)}.${String(requested.body.gate)}`)?.id;
   if (effectId === undefined) return { result: consumeGate(store, projectId, input), attemptId: null };
   return completeWithEffect(store, projectId, { ...input, effectId });
 }
