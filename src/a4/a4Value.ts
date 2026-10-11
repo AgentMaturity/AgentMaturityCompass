@@ -187,7 +187,7 @@ export async function recordReviewResults(input: ReviewInput & { readonly ledger
         if (row === null || (resolved.status !== "resolved" && resolved.status !== "payload_pruned") || agentOf(row) !== head.agent_id) continue;
         const claim = ledgerRefClaim(row, "observed", "runtime_observation", resolved.tier);
         specs.push(refSpec(input, head, seq + specs.length, ts, review.seq, { refKind: "ledger_event", refId: ref.refId, sha256: ref.sha256, claimKind: claim.claimKind,
-          trustTier: claim.trustTier, method: claim.method, label: `monitor source ${ref.source}: the agent's newest row there (its own tier)`,
+          trustTier: claim.trustTier, method: claim.method, label: `monitor source ${ref.source}: the agent's newest row since the deploy receipt (its own tier)`,
           note: { purpose: "monitor_source", source: ref.source } }));
       }
       for (const file of files) {

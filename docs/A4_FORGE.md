@@ -532,7 +532,9 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   source has its own claim envelope from the eligibility service:
   - `slo`: the SLO state held by this process (`generateSloReport`). It is `self_reported` with evidence `incomplete`
     (in-memory measurements, unsigned).
-  - `actionJournal`: the agent's executions and its open `outcome_unknown` ones, at its newest row's own tier.
+  - `actionJournal`: the agent's open `outcome_unknown` executions, and its executions started since the release's
+    succeeded deploy receipt was recorded (that window is on the field), outside A4's own probe sessions, at the newest
+    such row's own tier.
   - `approvals`: the counted approvals of the release and deployment approvals (human statements).
   - `freeze`: the freeze and its incidents.
   - `amcCheck`: AMC's newest check of the release's destination.
@@ -540,16 +542,20 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
 
   `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record lists the alerts
   already emitted. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
-  agent counts toward `monitoring.source`: an execution in the action journal at its row's own tier, an SLO measurement,
-  or AMC's check. A4's own approvals and the freeze reading are context and never count, so a record with none of the
-  three leaves the item WAITING `MONITOR_NO_SOURCE`. Each source envelope carries the project's regulated flag.
+  agent counts toward `monitoring.source`, and nothing does before the release's bound deploy receipt is recorded
+  `succeeded`. After it, a source counts when it is an execution in the action journal started since that receipt (at
+  its row's own tier; a row of A4's own probe session has none), an SLO measurement, or AMC's check of that receipt that
+  connected and found the destination reachable. A failed or unconnected check, A4's own approvals and the freeze reading
+  are context and never count, so a record with none of the three leaves the item WAITING `MONITOR_NO_SOURCE`. Each
+  source envelope carries the project's regulated flag.
 
 Once the review step has committed (never on a replay or a refusal), Review runs `createValueReport` once for the agent.
 Then one transition by `amc-runtime` records:
 
 - One `amc.a4-value-claim/v1` per KPI of the agent's value contract (signed `a4-stage-output`, with an `A4_RECORD`
   envelope; a `value_claim` ref, `self_reported`).
-- The action journal's newest row of this agent as its own `ledger_event` ref, whose lane derives from that row.
+- The action journal's newest row of this agent since the deploy receipt, when that source counted, as its own
+  `ledger_event` ref, whose lane derives from that row.
 
 `GET …/value` never runs the report and never appends a value event. A missing value contract records no claim
 (`VALUE_CONTRACT_MISSING`), and the review still stands.

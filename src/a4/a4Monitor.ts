@@ -5,8 +5,10 @@
  * the eligibility service from that source's own tier (the action journal's rows; approvals per effect, human statements;
  * the freeze incidents; AMC's own check; the SLO state, self_reported with evidence incomplete: in-memory measurements,
  * unsigned), folded with envelopeForAggregate for display. Every field is `{ value, source, trustTier, window }`; a source
- * that is missing is `source_unavailable` with `value: null`, never a default. The action journal's newest row of this
- * agent is named for Review's post-commit step (src/a4/a4Value.ts) to record as its own ledger_event ref, whose lane
+ * that is missing is `source_unavailable` with `value: null`, never a default. Nothing counts as having observed the
+ * deployed agent before the release's succeeded deploy receipt is recorded (the bound one): the journal counts only
+ * executions started since that receipt's server-recorded time, outside A4's own probe sessions. The newest such row of
+ * this agent is named for Review's post-commit step (src/a4/a4Value.ts) to record as its own ledger_event ref, whose lane
  * derives from that row; nothing here labels a lane. The kill switch is not available in this release (P2-26).
  */
 import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js";
@@ -19,10 +21,12 @@ import { generateSloReport } from "../ops/governanceSlo.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { ledgerRefClaim } from "./a4Evidence.js";
 import { readReleaseRecord } from "./a4Package.js";
 import { latestGate, type A4ReadinessState } from "./a4Readiness.js";
+import { A4_PROBE_SESSION_PREFIX, type A4ChainLink } from "./a4Schema.js";
 import { blockingExecutionsIn } from "./assembleLockout.js";
-import { cycleLinks, monitorResolves, PRODUCTION_LEASE_EFFECT_ID, RELEASE_EFFECT_ID } from "./spec/activate.js";
+import { boundReceipt, cycleLinks, monitorResolves, PRODUCTION_LEASE_EFFECT_ID, RELEASE_EFFECT_ID } from "./spec/activate.js";
 
 const MONITOR_SCHEMA = "amc.a4-monitor/v1";
 const KILL_SWITCH = "not available in this release (P2-26)";
@@ -33,8 +37,9 @@ const ALERT_RULES = ["pod not ready", "ledger verify failure", "open outcome_unk
 type Window = { readonly from: string; readonly to: string };
 interface Field { readonly value: unknown; readonly source: string; readonly trustTier: string | null; readonly window: Window | null; readonly reason?: string }
 /**
- * `monitors`: the source observed the deployed agent (a journal execution at its row's own tier, an SLO measurement, AMC's
- * check of the destination). Only those count toward `nonNullSources`; A4's own approvals and the freeze reading are context.
+ * `monitors`: the source observed the deployed agent once its succeeded deploy receipt was recorded (a journal execution
+ * started since then at its row's own tier, an SLO measurement, AMC's check of that receipt that connected and found the
+ * destination answering). Only those count toward `nonNullSources`; A4's own approvals and the freeze reading are context.
  */
 interface Source { readonly fields: Record<string, Field>; readonly envelope: ClaimEnvelope; readonly available: boolean; readonly monitors: boolean }
 /** A ledger row a monitor source rests on, for Review's post-commit step to record as its own ref. */
@@ -52,8 +57,11 @@ function envelopeOf(producer: string, method: ClaimMethod, tiers: readonly Claim
     ...(review === undefined ? {} : { review }), now });
 }
 
-/** The SLO state this process holds (generateSloReport; evaluateSloAlerts is not called, since it advances the shared alert state). */
-function sloSource(producer: string, now: number, regulated: boolean): Source & { measurements: number; report: unknown; sha256: string } {
+/**
+ * The SLO state this process holds (generateSloReport; evaluateSloAlerts is not called, since it advances the shared alert
+ * state). It counts as a signal of the deployed agent only once a succeeded deploy receipt is recorded (`deployed`).
+ */
+function sloSource(producer: string, now: number, regulated: boolean, deployed: boolean): Source & { measurements: number; report: unknown; sha256: string } {
   const report = generateSloReport();
   const measurements = report.metrics.reduce((sum, metric) => sum + metric.count, 0);
   const window = { from: iso(report.ts - report.windowMs), to: iso(report.ts) };
@@ -63,32 +71,45 @@ function sloSource(producer: string, now: number, regulated: boolean): Source & 
   const envelope = { ...base, statusDimensions: { ...base.statusDimensions, evidence: "incomplete" as const },
     reasons: [...new Set([...base.reasons, "EVIDENCE_NOT_CLAIM_READY" as const])] };
   const none = unavailable(`no SLO measurement in this process's window (${SLO_NOTE})`);
-  return { measurements, report, sha256, envelope, available: measurements > 0, monitors: measurements > 0, fields: measurements > 0
+  return { measurements, report, sha256, envelope, available: measurements > 0, monitors: deployed && measurements > 0, fields: measurements > 0
     ? { sloReportSha256: { ...field(sha256, "slo", "SELF_REPORTED", window), reason: SLO_NOTE },
       alerts: field(report.recentAlerts.map((alert) => ({ alertId: alert.alertId, severity: alert.severity, sloId: alert.sloId, status: alert.status, ts: alert.ts })),
         "slo", "SELF_REPORTED", window) }
     : { sloReportSha256: none, alerts: none } };
 }
 
-/** The action journal of this agent, read-only: its executions, the open outcome_unknown ones and its newest row's own tier. */
-function journalSource(workspace: string, agentId: string, producer: string, now: number, regulated: boolean): Source & { ledgerRef: MonitorLedgerRef | null } {
+/**
+ * The action journal of this agent, read-only: the open outcome_unknown executions (agent-wide context) and, from `since`
+ * (the bound deploy receipt's server-recorded time; null when none succeeded, which counts nothing), the executions
+ * started in that window outside A4's own probe sessions and the newest such row's own tier. A row of a turn A4 ran
+ * itself has no tier (ledgerRefClaim), so it never counts.
+ */
+function journalSource(workspace: string, agentId: string, producer: string, now: number, regulated: boolean, since: number | null): Source & { ledgerRef: MonitorLedgerRef | null } {
   let ledger: ReturnType<typeof openLedger> | null = null;
   try {
     ledger = openLedger(workspace, { readonly: true });
     const workspaceId = workspaceIdFromDirectory(workspace);
-    const blocking = blockingExecutionsIn(ledger.db, workspace, agentId);
-    const stats = ledger.db.prepare("SELECT COUNT(*) AS n, MAX(updated_ts) AS newest FROM action_executions WHERE workspace_id = ? AND agent_id = ?")
-      .get(workspaceId, agentId) as { n: number; newest: number | null };
+    const open = blockingExecutionsIn(ledger.db, workspace, agentId).length;
+    if (since === null) {
+      return { available: true, monitors: false, ledgerRef: null, envelope: envelopeOf(`${producer}:actionJournal`, "runtime_observation", [], 0, null, now, regulated),
+        fields: { openOutcomeUnknown: field(open, "actionJournal", null, null),
+          actionExecutions: unavailable("no succeeded deploy receipt of this release is recorded, so no execution is attributed to the deployed agent") } };
+    }
+    const window = { from: iso(since), to: iso(now) };
+    const scope = "e.workspace_id = ? AND e.agent_id = ? AND e.created_ts >= ? AND (e.session_id IS NULL OR substr(e.session_id, 1, ?) <> ?)";
+    const params = [workspaceId, agentId, since, A4_PROBE_SESSION_PREFIX.length, A4_PROBE_SESSION_PREFIX];
+    const stats = ledger.db.prepare(`SELECT COUNT(*) AS n, MAX(e.updated_ts) AS newest FROM action_executions e WHERE ${scope}`).get(...params) as { n: number; newest: number | null };
     const newest = ledger.db.prepare(`SELECT t.evidence_event_id AS id FROM action_transitions t JOIN action_executions e ON e.execution_id = t.execution_id
-      WHERE e.workspace_id = ? AND e.agent_id = ? ORDER BY e.updated_ts DESC, t.seq DESC LIMIT 1`).get(workspaceId, agentId) as { id: string } | undefined;
+      WHERE ${scope} ORDER BY e.updated_ts DESC, t.seq DESC LIMIT 1`).get(...params) as { id: string } | undefined;
     const row = newest === undefined ? null : ledger.getEventById(newest.id);
     // A row whose signed meta names another agent never speaks for this one.
     const own = row !== null && (eventMeta(row).agentId ?? eventMeta(row).agent_id) === agentId ? row : null;
-    const tier = own === null ? null : effectiveTrustTier(own, readerTrustFor(workspace));
-    // An execution of this agent at its own row's tier observed it; a count of 0, or rows of A4's own turns (no tier), did not.
-    return { available: true, monitors: stats.n > 0 && tier !== null, ledgerRef: own === null ? null : { refId: own.id, sha256: own.event_hash, source: "actionJournal" },
+    const tier = own === null ? null : ledgerRefClaim(own, "self_reported", null, effectiveTrustTier(own, readerTrustFor(workspace))).trustTier as ClaimEvidenceTier | null;
+    // An execution of this agent since the receipt, at its own row's tier, observed it; a count of 0, or a row with no tier, did not.
+    const monitors = stats.n > 0 && tier !== null;
+    return { available: true, monitors, ledgerRef: monitors ? { refId: own!.id, sha256: own!.event_hash, source: "actionJournal" } : null,
       envelope: envelopeOf(`${producer}:actionJournal`, "runtime_observation", tier === null ? [] : [tier], stats.n, stats.newest, now, regulated),
-      fields: { openOutcomeUnknown: field(blocking.length, "actionJournal", tier, null), actionExecutions: field(stats.n, "actionJournal", tier, null) } };
+      fields: { openOutcomeUnknown: field(open, "actionJournal", tier, null), actionExecutions: field(stats.n, "actionJournal", tier, window) } };
   } catch {
     const none = unavailable("the action journal could not be read");
     return { available: false, monitors: false, ledgerRef: null, envelope: envelopeOf(`${producer}:actionJournal`, "runtime_observation", [], 0, null, now, regulated),
@@ -126,36 +147,46 @@ function freezeSource(workspace: string, agentId: string, producer: string, now:
   }
 }
 
-/** AMC's own newest check of this release's destination (reachability at best before P2-40); A4 recorded it, so self_reported. */
-function checkSource(state: A4ReadinessState, releaseId: string, producer: string, now: number, regulated: boolean): Source {
+/**
+ * AMC's own newest check of this release's destination (reachability at best before P2-40); A4 recorded it, so
+ * self_reported. It observed the deployment only when it checked the bound receipt, connected (a response digest) and
+ * found the destination answering; a failed or unconnected check (DESTINATION_MISMATCH, DESTINATION_UNRESOLVED) is context.
+ */
+function checkSource(state: A4ReadinessState, releaseId: string, receipt: A4ChainLink | null, producer: string, now: number, regulated: boolean): Source {
   const check = cycleLinks(state.chain, "VERIFICATION").filter((link) => link.body.releaseId === releaseId).at(-1);
   if (check === undefined) {
     return { available: false, monitors: false, envelope: envelopeOf(`${producer}:amcCheck`, "executed_test", [], 0, null, now, regulated),
       fields: { readyzSnapshot: unavailable("AMC has not checked this release's destination") } };
   }
-  return { available: true, monitors: true, envelope: envelopeOf(`${producer}:amcCheck`, "executed_test", ["SELF_REPORTED"], 1, Number(check.body.ts) || null, now, regulated),
+  const observed = receipt !== null && check.body.receiptId === receipt.body.deploymentId && typeof check.body.responseSha256 === "string"
+    && (check.body.amcCheckStatus === "reachable" || check.body.amcCheckStatus === "passed");
+  return { available: true, monitors: observed, envelope: envelopeOf(`${producer}:amcCheck`, "executed_test", ["SELF_REPORTED"], 1, Number(check.body.ts) || null, now, regulated),
     fields: { readyzSnapshot: field({ checkId: check.body.checkId, receiptId: check.body.receiptId, amcCheckStatus: check.body.amcCheckStatus,
       reasonCodes: check.body.reasonCodes, resolvedAddress: check.body.resolvedAddress, responseSha256: check.body.responseSha256 }, "amcCheck", "SELF_REPORTED", null) } };
 }
 
 /**
  * The monitor record of one review (design §14.4), built from reads only. `note` is what the ref's signed body carries
- * for readiness and the lifecycle bridge: the release, how many sources observed the deployed agent (A4's own approvals
- * and the freeze reading never count), and the SLO measurement count. `regulated` is the project's flag as Review read it
- * (fail closed), so no source envelope is decided as unregulated.
+ * for readiness and the lifecycle bridge: the release, how many sources observed the deployed agent since its succeeded
+ * deploy receipt (A4's own approvals and the freeze reading never count; none before that receipt), and the SLO
+ * measurement count. `regulated` is the project's flag as Review read it (fail closed), so no source envelope is decided
+ * as unregulated.
  */
 export function monitorRecord(workspace: string, state: A4ReadinessState, releaseId: string, now: number, regulated: boolean): { doc: Record<string, unknown>;
   note: Record<string, unknown>; ledgerRefs: MonitorLedgerRef[] } {
   const { project_id: projectId, agent_id: agentId } = state.project;
   const producer = `a4:${projectId}:monitor:${releaseId}`;
-  const slo = sloSource(producer, now, regulated);
-  const journal = journalSource(workspace, agentId, producer, now, regulated);
+  // The bound deploy receipt, recorded succeeded: before it nothing observed a deployed agent (MONITOR_NO_SOURCE).
+  const bound = boundReceipt(state.chain, releaseId);
+  const receipt = bound?.body.recordedStatus === "succeeded" && typeof bound.body.ts === "number" ? bound : null;
+  const slo = sloSource(producer, now, regulated, receipt !== null);
+  const journal = journalSource(workspace, agentId, producer, now, regulated, receipt === null ? null : Number(receipt.body.ts));
   const runtime: Source = { available: false, monitors: false, envelope: envelopeOf(`${producer}:runtime`, "runtime_observation", [], 0, null, now, regulated),
     fields: { runtimeRunId: unavailable("no lease-bound session has run the deployed runtime; runtimeRunIds stay empty (a receipt never creates a run)") } };
   const backup: Source = { available: false, monitors: false, envelope: envelopeOf(`${producer}:backup`, "executed_test", [], 0, null, now, regulated),
     fields: { lastBackupAge: unavailable("verifyBackup needs the backup file; the age of the last backup is not read here") } };
   const sources: Record<string, Source> = { slo, actionJournal: journal, approvals: approvalsSource(state, producer, now, regulated),
-    freeze: freezeSource(workspace, agentId, producer, now, regulated), amcCheck: checkSource(state, releaseId, producer, now, regulated), runtime, backup };
+    freeze: freezeSource(workspace, agentId, producer, now, regulated), amcCheck: checkSource(state, releaseId, receipt, producer, now, regulated), runtime, backup };
   const fields = Object.assign({}, ...Object.values(sources).map((source) => source.fields)) as Record<string, Field>;
   const monitoring = Object.entries(sources).filter(([, source]) => source.monitors).map(([name]) => name);
   const nonNullSources = monitoring.length;
@@ -163,6 +194,7 @@ export function monitorRecord(workspace: string, state: A4ReadinessState, releas
   const doc = { schema: MONITOR_SCHEMA, projectId, releaseId, revisionNo: state.project.revision_no, recordedAt: iso(now), fields,
     sources: Object.fromEntries(Object.entries(sources).map(([name, source]) => [name, source.available ? "ok" : "unavailable"])), envelopes,
     claim: envelopeForAggregate(producer, Object.values(envelopes), now), nonNullSources, monitoringSources: monitoring, contextSources: ["approvals", "freeze"],
+    observedSince: receipt === null ? null : { deploymentId: receipt.body.deploymentId, recordedAt: iso(Number(receipt.body.ts)) },
     sloMeasurements: slo.measurements, sloReport: slo.available ? slo.report : null,
     alertRules: ALERT_RULES.map((rule) => ({ rule, status: "proposal" })), killSwitch: KILL_SWITCH,
     claimKind: "self_reported", lane: "implementation",

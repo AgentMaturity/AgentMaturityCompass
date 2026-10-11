@@ -388,7 +388,7 @@ function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4Re
   return sources > 0 ? item("monitoring.source", "READY", { reasonCodes: [`SOURCES:${sources}`, "SELF_REPORTED", `MONITOR:${String(monitor!.body.refId)}`] })
     : waiting("monitoring.source", ["MONITOR_NO_SOURCE"], { kind: "source_unavailable", mandatory,
       nextAction: { label: monitor === undefined ? "Review records the monitor ref (one per review)"
-        : "No source of the monitor ref observed the deployed agent (an execution in its journal, an SLO measurement or AMC's check); review again once one has" } });
+        : "No source of the monitor ref observed the deployed agent since its succeeded deploy receipt (an execution in its journal, an SLO measurement or AMC's check that reached the destination); review again once one has" } });
 }
 
 /**
