@@ -1,0 +1,25 @@
+P1-14 mutation checks (local, macOS arm64, not CI). Each mutated file was copied aside, mutated, tested and copied back;
+`git diff --quiet` confirmed the restore.
+
+1. tools.yaml signature check removed from the allowlist guard (src/tools/guards/policyGuards.ts, toolhubAllowlistGuard:
+   `!snapshot.signatureValid || !snapshot.config` -> `!snapshot.config`).
+   npx vitest run tests/catalog/l0/tools.test.ts -> 12 passed. SURVIVED: loadVerifiedToolsConfigSnapshot returns
+   config null whenever the signature fails, so the guard's own signatureValid test is redundant.
+
+1b. tools.yaml signature verification removed at its source (src/toolhub/toolhubValidators.ts, verifyToolsConfigBytes
+    returns the bytes as valid whenever the file exists).
+    npx vitest run tests/catalog/l0/tools.test.ts -> 3 failed, 9 passed:
+      L0-TOOL-01/negative/edited-config.json, foreign-signature.json, signature-removed.json.
+
+2. Lease expiry disabled in the verifier only (src/leases/leaseVerifier.ts, the `Date.now() > payload.expiresTs` check).
+   npx vitest run tests/catalog/l0/identity.test.ts -> 16 passed. SURVIVED: bindAuthorization clamps the record's
+   expiry to the lease's and refuses capability_expired, and the recheck refuses an expired record.
+
+2b. Lease expiry disabled in the verifier and the bind clamp (src/actions/authorize.ts: the lease expiry removed from
+    the record's Math.min).
+    npx vitest run tests/catalog/l0/identity.test.ts -> 2 failed, 14 passed:
+      L0-IDN-02/negative/expired-lease.json, L0-IDN-01/negative/expired-lease.json.
+
+3. Evidence freshness disabled in P1-11 admission (src/catalog/evidence/admission.ts, the maxAgeDays rejection).
+   npx vitest run tests/catalog/l0/evidenceFixtures.test.ts -> 16 failed, 328 passed: every evidence-stale.json of a
+   control whose first producer is available.
