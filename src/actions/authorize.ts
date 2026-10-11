@@ -34,6 +34,11 @@ import {
 import { mintIdempotencyKey } from "./idempotency.js";
 import { normalizeArguments } from "./normalizeArguments.js";
 
+/**
+ * The deploymentId of a record no active compiled plan binds to a deployment: no plan, or one compiled before P1-78.
+ * Such a record names its workspace and deploymentDigest only and claims no deployment (docs/adr/009-authorization-record.md).
+ */
+export const DEPLOYMENT_NOT_BOUND = "not_bound";
 /** A record with no shorter-lived authority expires this soon after it is bound. */
 const DEFAULT_RECORD_TTL_MS = 5 * 60_000;
 const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
@@ -42,6 +47,8 @@ const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
 export interface CompiledPolicyFacts {
   readonly digest: string;
   readonly revision: number;
+  /** The tenant and deployment its profile names (P1-78); null when the plan names none. */
+  readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
   controlFor(actionClass: ActionClass): { readonly controlId: string; readonly controlVersion: string | null } | null;
 }
 
@@ -113,8 +120,9 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
       actionPolicyDigest: policy.actionPolicyDigest, approvalPolicyDigest: policy.approvalPolicyDigest,
       budgetsDigest: policy.budgetsDigest, compiledPolicyDigest: policy.compiledPolicyDigest, agentConfigDigest: null }));
     return { ok: true, facts: {
-      // ponytail: tenant and deployment id stay unregistered; the compiled plan does not carry them (P1-10 schema).
-      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: null, deploymentId: "unregistered", deploymentDigest },
+      // From the verified plan the session pinned (P1-78); without one the record claims no tenant and no deployment.
+      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: compiled?.deployment?.tenantId ?? null,
+        deploymentId: compiled?.deployment?.deploymentId ?? DEPLOYMENT_NOT_BOUND, deploymentDigest },
       policy,
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
         actionClass: call.actionClass, mode: call.effectiveMode, argumentsDigest: args.argumentsDigest, normalizer: args.normalizer },

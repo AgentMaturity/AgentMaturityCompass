@@ -2,6 +2,7 @@ import { writeFileSync } from "node:fs";
 import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
+import { DEPLOYMENT_NOT_BOUND } from "../../../src/actions/authorize.js";
 import { createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution } from "../../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../../src/approvals/approvalPolicyEngine.js";
 import type { UserRole } from "../../../src/auth/roles.js";
@@ -87,8 +88,10 @@ describe("L0-OVS-01 and L0-OVS-02: a signed human approval bound to the exact ac
         expect(bodyRuns - before).toBe(1);
         expect(state).toBe("completed");
         const row = records.find((r) => r.meta?.auditType === "AUTHORIZATION_RECORD");
-        const principal = (JSON.parse(row?.payload ?? "{}") as { record?: { principal?: { principalId: string; authenticatedVia: string } } }).record?.principal;
-        expect(principal, "the record names the approvers as the principal").toEqual({ principalId: "approver-1,approver-2", kind: "human", authenticatedVia: "approval-engine" });
+        const record = (JSON.parse(row?.payload ?? "{}") as { record?: { principal?: unknown; scope?: { deploymentId: string; tenantId: string | null } } }).record;
+        expect(record?.principal, "the record names the approvers as the principal").toEqual({ principalId: "approver-1,approver-2", kind: "human", authenticatedVia: "approval-engine" });
+        // No active plan names a deployment here: the record says so instead of a placeholder (P1-78).
+        expect(record?.scope).toMatchObject({ tenantId: null, deploymentId: DEPLOYMENT_NOT_BOUND });
         return;
       }
       expect(outcome.ok).toBe(false);

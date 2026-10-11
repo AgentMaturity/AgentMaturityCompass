@@ -145,6 +145,11 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
  */
 type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>; lease: "valid" | "none" | "expired" | "signed_by_other_workspace" };
 
+/** The authorization records among the rows a call recorded. */
+const authorizationRecords = (rows: ReadonlyArray<{ payload: string; meta: Record<string, unknown> }>) =>
+  rows.filter((row) => row.meta.auditType === "AUTHORIZATION_RECORD")
+    .map((row) => (JSON.parse(row.payload) as { record: { scope: { tenantId: string | null; deploymentId: string }; principal: Record<string, string> } }).record);
+
 function activate(ws: string, profile: unknown): void {
   const plan = compilePlan({ profile: parseDeploymentProfile(profile), catalog, asOf: new Date().toISOString() });
   expect(plan.status, `the fixture profile compiles to a ready plan (${plan.requirements.filter((r) => r.applicability === "unresolved").map((r) => r.controlId).join(", ")})`).toBe("ready");
@@ -178,10 +183,12 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
         vi.useFakeTimers({ toFake: ["Date"] });
         vi.setSystemTime(Date.now() + 2 * 3_600_000);
       }
-      // No session writer: under an active plan SessionService.open also requires a pinned residency profile (P2-01),
-      // which is L0-DAT-04's concern, not this control's. The toolset records through its own ledger handle.
+      // A capturing writer: under an active plan SessionService.open also requires a pinned residency profile (P2-01),
+      // which is L0-DAT-04's concern, not this control's. The rows are the ones a session writer would be handed.
       const sessionId = `layer0-identity-${f.envelope.evidenceClass}`;
-      const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId, ...(token ? { leaseToken: token } : {}) });
+      const rows: Array<{ payload: string; meta: Record<string, unknown> }> = [];
+      const toolset = agentToolset({ workspace: ws, agentId: "default", sessionId, ...(token ? { leaseToken: token } : {}),
+        recorder: { recordProjectedEvidence: (row) => { rows.push(row); return null; } } });
       let result: Awaited<ReturnType<typeof toolset.seam.execute>>;
       try {
         result = await toolset.seam.execute({ callId: "layer0-identity-call", toolName: s.tool, rawArguments: JSON.stringify(s.args), sessionId,
@@ -193,6 +200,10 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       if (f.envelope.expected.result === "allow") {
         expect(text).toContain('"outcome":"OK"');
         expect(text).not.toMatch(/IDENTITY_UNRESOLVED|PRINCIPAL_UNRESOLVED/);
+        // The record binds the deployment the active plan's profile names (P1-78), not a placeholder.
+        const records = authorizationRecords(rows);
+        expect(records.length, "the call was bound to an authorization record").toBeGreaterThan(0);
+        for (const record of records) expect(record.scope).toMatchObject({ tenantId: "tenant-a", deploymentId: "dep-a" });
         return;
       }
       expect(text).not.toContain('"outcome":"OK"');

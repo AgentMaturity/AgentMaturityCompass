@@ -111,6 +111,7 @@ export function compiledPolicyFacts(policy: ActiveCompiledPolicy): CompiledPolic
   return {
     digest: policy.runtimePolicy.policyDigest.replace(/^sha256:/, ""),
     revision: policy.revision,
+    deployment: policy.deployment,
     // The rule that admitted the call: its class's approval rule first, then the compiled guards every call passes.
     controlFor: (actionClass) => {
       const id = [...(policy.runtimePolicy.approvals[actionClass]?.controlIds ?? []), ...policy.runtimePolicy.toolPipeline.guards.flatMap((g) => g.controlIds)][0];
