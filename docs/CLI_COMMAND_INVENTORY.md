@@ -624,7 +624,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc learn` | Education flow for a specific maturity question | `--question <qid>`<br>`--agent <agentId>` | - |
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
 | `amc lease issue` | - | `--agent <agentId>`<br>`--ttl <ttl>`<br>`--scopes <scopes>`<br>`--routes <routes>`<br>`--models <models>`<br>`--rpm <rpm>`<br>`--tpm <tpm>`<br>`--max-cost-usd-per-day <usd>`<br>`--workorder <workOrderId>` | - |
-| `amc lease resign-revocations` | Re-sign the lease revocation store, vouching for its CURRENT content as owner | - | - |
+| `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest | `--expect-digest <sha256>` | - |
 | `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>` | - |
 | `amc lease verify` | - | - | - |
 | `amc legal-hold` | Issue or manage legal holds | `--issue`<br>`--release <holdId>`<br>`--list`<br>`--init`<br>`--rebind`<br>`--accept-unverified-legacy`<br>`--tenant <id>`<br>`--reason <text>`<br>`--issued-by <name>` | - |

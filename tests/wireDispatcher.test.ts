@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
-import { leaseRevocationPaths, revokeLease, signLeaseRevocations } from "../src/leases/leaseStore.js";
+import { leaseRevocationPaths, revokeLease } from "../src/leases/leaseStore.js";
 import { initWorkspace } from "../src/workspace.js";
 import { createWireDispatcher } from "../src/wire/wireDispatcher.js";
 import { MAX_WIRE_LINE_BYTES } from "../src/wire/ndjsonFraming.js";
@@ -165,8 +165,7 @@ describe("what a lease must say", () => {
     const payload = JSON.parse(
       Buffer.from(token.split(".")[0]!.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf8")
     ) as { leaseId: string };
-    revokeLease(ws.dir, payload.leaseId, "test");
-    signLeaseRevocations(ws.dir);
+    revokeLease(ws.dir, payload.leaseId, "test"); // publishes a signed pair
 
     const { reply } = send(dispatcherFor(ws), {
       jsonrpc: "2.0", id: 1, method: "work/accept", lease: token,
@@ -179,8 +178,7 @@ describe("what a lease must say", () => {
   it("refuses EVERY lease when the revocation list will not verify", () => {
     const ws = makeWorkspace();
     const token = lease(ws.dir);
-    revokeLease(ws.dir, "some-other-lease", "test");
-    signLeaseRevocations(ws.dir);
+    revokeLease(ws.dir, "some-other-lease", "test"); // publishes a signed pair
 
     // Tampering with this one file makes `revokedLeaseIdSet` return an empty
     // set, i.e. "nothing is revoked" -- which would un-revoke every lease ever
