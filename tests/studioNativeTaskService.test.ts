@@ -34,12 +34,14 @@ const pass = "synthetic-studio-service-vault";
 beforeEach(() => {
   prior = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = pass;
   root = mkdtempSync(join(tmpdir(), "amc-studio-service-"));
-  credentialHome = join(root, "operator-home"); mkdirSync(credentialHome, { mode: 0o700 });
+  // The operator home (also HOME, so ~/.amc/control-checkpoints) stays OUTSIDE the
+  // governed workspace, as an installed operator's does (P0-57).
+  credentialHome = mkdtempSync(join(tmpdir(), "amc-studio-operator-home-"));
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
 });
 afterEach(async () => {
   const outcomes = await Promise.allSettled(services.splice(0).map(service => service.close()));
-  lockVault(root); rmSync(root, { recursive: true, force: true });
+  lockVault(root); rmSync(root, { recursive: true, force: true }); rmSync(credentialHome, { recursive: true, force: true });
   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;
   expect(outcomes.filter(outcome => outcome.status === "rejected")).toEqual([]);
 });
