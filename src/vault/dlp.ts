@@ -58,17 +58,19 @@ function cloneGlobal(re: RegExp): RegExp {
 const IPV4_SOURCE = String.raw`\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b`;
 const IPV6_SOURCE = String.raw`\b(?:[A-F0-9]{1,4}:){2,7}[A-F0-9]{1,4}\b`;
 
+// Quantifiers are bounded (RFC 5321 email lengths; at most 16 whitespace around keywords) so a hostile leaf cannot
+// make these patterns quadratic on the per-request detection path or on scanForPII.
 const PII_PATTERNS: PiiPattern[] = [
-  { type: "email", re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}\b/gi, replacement: "[EMAIL_REDACTED]" },
+  { type: "email", re: /\b[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Z]{2,63}\b/gi, replacement: "[EMAIL_REDACTED]" },
   { type: "phone", re: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, replacement: "[PHONE_REDACTED]" },
   { type: "ssn", re: /\b\d{3}-\d{2}-\d{4}\b/g, replacement: "[SSN_REDACTED]" },
   { type: "credit_card", re: /\b(?:\d[ -]*?){13,19}\b/g, replacement: "[CC_REDACTED]", validate: isValidCreditCard, validatorRevision: "luhn-v1" },
   { type: "iban", re: /\b[A-Z]{2}\d{2}(?:\s?[A-Z0-9]{4}){2,7}(?:\s?[A-Z0-9]{1,3})?\b/gi, replacement: "[IBAN_REDACTED]", validate: isValidIban, validatorRevision: "iban-mod97-v1" },
   { type: "ip_address", re: new RegExp(`${IPV4_SOURCE}|${IPV6_SOURCE}`, "gi"), replacement: "[IP_ADDRESS_REDACTED]" },
-  { type: "eu_vat", re: /\b(?:VAT(?:\s+ID)?|VATIN|USt-?IdNr\.?|TVA|IVA|BTW|NIP|NIF)\s*[:#-]?\s*[A-Z]{2}[A-Z0-9]{2,12}\b/gi, replacement: "[EU_VAT_REDACTED]" },
-  { type: "eu_national_id", re: /\b(?:national\s+(?:id|identity|identification)(?:\s+(?:number|card))?|identity\s+card|id\s+card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s+nationale|carta\s+d['’]?identit[aà]|documento\s+nacional\s+de\s+identidad)\s*[:#-]?\s*[A-Z0-9][A-Z0-9 ./-]{5,20}\b/gi, replacement: "[EU_NATIONAL_ID_REDACTED]" },
-  { type: "passport_number", re: /\b(?:passport(?:\s+(?:number|no\.?|id))?|passaporte|passeport|pasaporte|reisepass)\s*[:#-]?\s*[A-Z0-9][A-Z0-9< -]{5,14}\b/gi, replacement: "[PASSPORT_REDACTED]" },
-  { type: "health_record_id", re: /\b(?:MRN|medical\s+record(?:\s+(?:number|id))?|health\s+record(?:\s+(?:number|id))?|NHS\s+number|EHIC)\s*[:#-]?\s*[A-Z0-9][A-Z0-9 -]{5,24}\b/gi, replacement: "[HEALTH_RECORD_REDACTED]" },
+  { type: "eu_vat", re: /\b(?:VAT(?:\s{1,16}ID)?|VATIN|USt-?IdNr\.?|TVA|IVA|BTW|NIP|NIF)\s{0,16}[:#-]?\s{0,16}[A-Z]{2}[A-Z0-9]{2,12}\b/gi, replacement: "[EU_VAT_REDACTED]" },
+  { type: "eu_national_id", re: /\b(?:national\s{1,16}(?:id|identity|identification)(?:\s{1,16}(?:number|card))?|identity\s{1,16}card|id\s{1,16}card|DNI|NIE|NIF|CNP|PESEL|BSN|personalausweis|carte\s{1,16}nationale|carta\s{1,16}d['’]?identit[aà]|documento\s{1,16}nacional\s{1,16}de\s{1,16}identidad)\s{0,16}[:#-]?\s{0,16}[A-Z0-9][A-Z0-9 ./-]{5,20}\b/gi, replacement: "[EU_NATIONAL_ID_REDACTED]" },
+  { type: "passport_number", re: /\b(?:passport(?:\s{1,16}(?:number|no\.?|id))?|passaporte|passeport|pasaporte|reisepass)\s{0,16}[:#-]?\s{0,16}[A-Z0-9][A-Z0-9< -]{5,14}\b/gi, replacement: "[PASSPORT_REDACTED]" },
+  { type: "health_record_id", re: /\b(?:MRN|medical\s{1,16}record(?:\s{1,16}(?:number|id))?|health\s{1,16}record(?:\s{1,16}(?:number|id))?|NHS\s{1,16}number|EHIC)\s{0,16}[:#-]?\s{0,16}[A-Z0-9][A-Z0-9 -]{5,24}\b/gi, replacement: "[HEALTH_RECORD_REDACTED]" },
   { type: "api_key_openai", re: /sk-[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_github", re: /gho_[A-Za-z0-9]{20,}/g, replacement: "[API_KEY_REDACTED]" },
   { type: "api_key_aws", re: /AKIA[A-Z0-9]{16}/g, replacement: "[AWS_KEY_REDACTED]" },
