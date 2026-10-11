@@ -7,9 +7,9 @@ import YAML from "yaml";
  * P0-34: release.yml is the only publisher. It publishes exactly the tarball that passed the gate, from a job that
  * installs and builds nothing and is the only one holding id-token: write; npm-publish.yml only opens version PRs.
  */
-type Step = { name?: string; id?: string; run?: string; uses?: string; with?: Record<string, unknown>; env?: Record<string, string> };
+type Step = { name?: string; id?: string; if?: string; run?: string; uses?: string; with?: Record<string, unknown>; env?: Record<string, string> };
 type Job = { environment?: string | { name: string }; "timeout-minutes"?: number; needs?: string | string[]; env?: Record<string, string>;
-  permissions?: Record<string, string>; outputs?: Record<string, string>; steps: Step[] };
+  if?: string; permissions?: Record<string, string>; outputs?: Record<string, string>; steps: Step[] };
 type Workflow = { on: Record<string, unknown>; env?: Record<string, string>; permissions?: Record<string, string>; jobs: Record<string, Job> };
 
 const read = (name: string) => readFileSync(join(process.cwd(), ".github", "workflows", name), "utf8");
@@ -31,6 +31,67 @@ export function credentialSkips(script: string): string[] {
 }
 
 const runsOf = (job: Job) => job.steps.map(step => step.run ?? "");
+/** Where each secret may be read: only from the env of these jobs' steps. */
+const SECRET_JOBS: Record<string, string[]> = {
+  NPM_TOKEN: ["release"], AMC_RELEASE_SIGNING_KEY: ["sign"], HOMEBREW_TAP_TOKEN: ["homebrew"],
+  GITHUB_TOKEN: ["approve", "image", "image-tags", "github-release"]
+};
+const SIGNED_OR_PUBLISHED = ["approve", "sign", "release", "homebrew"];
+const AFTER_APPROVAL = ["gate", "image", "image-tags", "sign", "release", "github-release", "homebrew"];
+const needsOf = (job: Job) => (job.needs === undefined ? [] : Array.isArray(job.needs) ? job.needs : [job.needs]);
+function upstream(workflow: Workflow, id: string, seen = new Set<string>()): Set<string> {
+  for (const need of needsOf(workflow.jobs[id] ?? { steps: [] })) if (!seen.has(need)) { seen.add(need); upstream(workflow, need, seen); }
+  return seen;
+}
+
+/** Steps that print a secret-bound variable (single-quoted text is literal; stdin to --password-stdin is allowed). */
+function secretPrints(id: string, step: Step, names: string[]): string[] {
+  const failures: string[] = [];
+  for (const line of (step.run ?? "").split("\n")) {
+    if (/^\s*set\s+-[a-z]*x/.test(line)) failures.push(`${id}: set -x`);
+    const unquoted = line.replace(/'[^']*'/g, "''");
+    if (/\b(?:echo|printf|cat)\b/.test(unquoted) && !/--password-stdin\b/.test(unquoted)
+      && names.some(name => new RegExp(`\\$\\{?${name}\\b`).test(unquoted))) failures.push(`${id}: prints a secret`);
+  }
+  return failures;
+}
+
+/** Triggers, secret placement and the approval gate. */
+function exposureContract(workflow: Workflow): string[] {
+  const failures: string[] = [];
+  const on = workflow.on as Record<string, { tags?: string[] } | null>;
+  if (JSON.stringify(Object.keys(on)) !== JSON.stringify(["push"]) || JSON.stringify(on.push) !== JSON.stringify({ tags: ["v*.*.*"] })) {
+    failures.push(`triggers are not a v*.*.* tag push only: ${Object.keys(on).join(", ")}`);
+  }
+  if (workflow.env?.AMC_RELEASE_TAG !== "${{ github.ref_name }}") failures.push("the release tag is not the ref that triggered the run");
+  if (JSON.stringify(workflow.env ?? {}).includes("secrets.")) failures.push("a secret is in the workflow env");
+  for (const [id, job] of Object.entries(workflow.jobs)) {
+    if (JSON.stringify(job.env ?? {}).includes("secrets.")) failures.push(`${id}: a secret is in the job env`);
+    for (const step of job.steps) {
+      if (JSON.stringify(step.with ?? {}).includes("secrets.")) failures.push(`${id}: a secret is passed to ${step.uses} as an input`);
+      if ((step.run ?? "").includes("secrets.")) failures.push(`${id}: a secret is interpolated into a script`);
+      const bound = Object.entries(step.env ?? {}).filter(([, value]) => String(value).includes("secrets."));
+      for (const [, value] of bound) {
+        const name = /secrets\.([A-Z_]+)/.exec(String(value))?.[1] ?? "";
+        if (!(SECRET_JOBS[name] ?? []).includes(id)) failures.push(`${id}: secret ${name} outside its step`);
+      }
+      failures.push(...secretPrints(id, step, [...bound.map(([key]) => key), ...(bound.length ? ["NODE_AUTH_TOKEN"] : [])]));
+    }
+  }
+  for (const id of SIGNED_OR_PUBLISHED) {
+    const job = workflow.jobs[id];
+    if (!job) { failures.push(`no ${id} job`); continue; }
+    if (environmentOf(job) !== "release") failures.push(`${id} does not run in the release environment`);
+    if (id !== "homebrew" && (job.if || job.steps.some(step => step.if))) failures.push(`${id} has an if: that can skip it`);
+  }
+  for (const id of AFTER_APPROVAL) if (workflow.jobs[id] && !upstream(workflow, id).has("approve")) failures.push(`${id} does not wait for approval`);
+  for (const id of ["release", "sign", "github-release"]) if (!upstream(workflow, id).has("gate")) failures.push(`${id} does not need the gate`);
+  const approve = workflow.jobs.approve ? runsOf(workflow.jobs.approve).join("\n") : "";
+  if (!/environments\/release/.test(approve) || !/required_reviewers/.test(approve) || !/deployment_branch_policy/.test(approve)) {
+    failures.push("approve does not refuse an unprotected release environment");
+  }
+  return failures;
+}
 const usesSecret = (job: Job, name: string) => JSON.stringify(job).includes(`secrets.${name}`);
 const environmentOf = (job: Job) => (typeof job.environment === "string" ? job.environment : job.environment?.name);
 
@@ -108,7 +169,10 @@ function jobContract(id: string, job: Job): string[] {
   if (usesSecret(job, "NPM_TOKEN") && id !== "release") failures.push(`${id} sees NPM_TOKEN`);
   if (usesSecret(job, "AMC_RELEASE_SIGNING_KEY") && id !== "sign") failures.push(`${id} sees the signing key`);
   if (permissions["id-token"] === "write" || usesSecret(job, "NPM_TOKEN")) failures.push(...privilegedContract(id, job));
-  if (id === "gate" || id === "npm-cli") return failures;
+  if (id === "gate" && job.steps.find(step => step.uses?.startsWith("actions/checkout"))?.with?.ref !== "${{ github.sha }}") {
+    failures.push("gate does not check out the commit the tag push names");
+  }
+  if (["approve", "gate", "npm-cli"].includes(id)) return failures;
   const needs = Array.isArray(job.needs) ? job.needs : [job.needs];
   const checkout = job.steps.find(step => step.uses?.startsWith("actions/checkout"));
   if (!needs.includes("gate") || checkout?.with?.ref !== GATED_COMMIT) failures.push(`${id} does not check out the gated commit`);
@@ -132,11 +196,12 @@ function releaseContract(text: string): string[] {
   }
   const tags = workflow.jobs["image-tags"] ? runsOf(workflow.jobs["image-tags"]).join("\n") : "";
   if (!/imagetools create[\s\S]*?@\$AMD64"\s+"[^"\n]*@\$ARM64"/.test(tags)) failures.push("image tags are not made from the qualified digests");
-  const upload = workflow.jobs["github-release"]?.steps.find(step => step.uses?.startsWith("softprops/action-gh-release"));
-  if (upload?.with?.fail_on_unmatched_files !== true) failures.push("release assets may be silently missing");
-  for (const asset of ["tmp/signed/sbom.cdx.json", "tmp/signed/licenses.json"]) {
-    if (!String(upload?.with?.files ?? "").includes(asset)) failures.push(`${asset} is not attached`);
+  const ghRelease = workflow.jobs["github-release"] ? runsOf(workflow.jobs["github-release"]).join("\n") : "";
+  if (!/shopt -s failglob/.test(ghRelease) || !/gh release create "\$AMC_RELEASE_TAG" --verify-tag/.test(ghRelease)) {
+    failures.push("release assets may be silently missing");
   }
+  for (const asset of ["tmp/signed/sbom.cdx.json", "tmp/signed/licenses.json"]) if (!ghRelease.includes(asset)) failures.push(`${asset} is not attached`);
+  failures.push(...exposureContract(workflow));
   for (const line of text.split("\n").filter(candidate => /^\s+(?:- )?uses: /.test(candidate))) {
     if (!/@[0-9a-f]{40}\b/.test(line) && !/# TODO\(P0-34 follow-up\): pin \S+ by full commit SHA/.test(line)) failures.push(`unpinned action without a TODO: ${line.trim()}`);
   }
@@ -189,12 +254,28 @@ describe("release workflow contract (P0-34)", () => {
     expect(mutate(/(\n  gate:\n[\s\S]*?permissions:\n)/, "$1      id-token: write\n")).toContain("gate has id-token");
     expect(mutate("permissions:\n  contents: read\n", "permissions:\n  contents: write\n")).toContain("workflow default permissions are not contents: read");
     expect(mutate(/NPM_CLI_INTEGRITY: sha512-\S+/, "NPM_CLI_INTEGRITY: latest")).toContain("the npm CLI is not pinned by exact version and integrity");
-    expect(mutate(/ # TODO\(P0-34 follow-up\): pin softprops\S+ by full commit SHA/, "")).toContain("unpinned action without a TODO: uses: softprops/action-gh-release@v2");
+    expect(mutate(/ # TODO\(P0-34 follow-up\): pin docker\/setup-buildx-action\S+ by full commit SHA/, ""))
+      .toContain("unpinned action without a TODO: uses: docker/setup-buildx-action@v4");
     expect(mutate('--npm-tarball "$AMC_NPM_TARBALL" ', "")).toContain("the signed bundle does not embed the gated tarball, SBOM and licences");
     expect(mutate(/npm pack --ignore-scripts/, "npm pack --ignore-scripts --pack-destination tmp && npm pack --ignore-scripts")).toContain("gate does not pack exactly once");
     expect(mutate("--pubkey trust/amc-release-signing.pub", "").some(failure => failure.startsWith("release verify without the pinned key"))).toBe(true);
     expect(mutate(/environment: release\n(\s+timeout-minutes: 15)/, "environment: staging\n$1")).toContain("release job environment is staging");
     expect(mutate(/AMC_PACKED_INSTALL_TARBALL: [^\n]+/, 'AMC_PACKED_INSTALL_TARBALL: ""')).toContain("release gate does not run on the packed tarball");
+    expect(mutate(/(\n  release:\n[\s\S]*?    timeout-minutes: 15\n    env:\n)/, "$1      LEAKED: ${{ secrets.NPM_TOKEN }}\n"))
+      .toContain("release: a secret is in the job env");
+    expect(mutate(/(GHCR_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\})/, "$1\n          SIGNING: ${{ secrets.AMC_RELEASE_SIGNING_KEY }}"))
+      .toContain("image: secret AMC_RELEASE_SIGNING_KEY outside its step");
+    expect(mutate(publishLine, '\n$2echo "token $NPM_TOKEN"$1')).toContain("release: prints a secret");
+    expect(mutate(publishLine, "\n$2set -x$1")).toContain("release: set -x");
+    expect(mutate("on:\n  push:\n", "on:\n  pull_request_target:\n  push:\n")).toContain("triggers are not a v*.*.* tag push only: pull_request_target, push");
+    expect(mutate("on:\n  push:\n", "on:\n  workflow_dispatch:\n    inputs:\n      ref: { type: string }\n  push:\n"))
+      .toContain("triggers are not a v*.*.* tag push only: workflow_dispatch, push");
+    expect(mutate(/\n {4}environment: release\n( {4}timeout-minutes: 15)/, "\n$1")).toContain("release does not run in the release environment");
+    expect(mutate("    needs: [approve, gate, npm-cli, sign]\n", "    needs: [npm-cli]\n")).toEqual(expect.arrayContaining([
+      "release does not wait for approval", "release does not need the gate"]));
+    expect(mutate(/(\n  release:\n)/, "$1    if: github.run_attempt == 1\n")).toContain("release has an if: that can skip it");
+    expect(mutate(/required_reviewers/g, "reviewers")).toContain("approve does not refuse an unprotected release environment");
+    expect(mutate(/ref: \$\{\{ github\.sha \}\}/, "ref: refs/heads/main")).toContain("gate does not check out the commit the tag push names");
     const publishing = read("npm-publish.yml").replace(/(version: node scripts\/release-prepare\.mjs[^\n]*\n)/, "$1          publish: npm run release\n");
     expect(versionPrContract(publishing)).toContain("release: changesets publish input");
   });

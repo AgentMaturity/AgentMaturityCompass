@@ -49,7 +49,7 @@ export const CREDENTIALS = {
   },
   HOMEBREW_TAP_TOKEN: {
     actions: ["homebrew"],
-    requiredFor: "B3 Homebrew tap update in release.yml (skipped when absent)",
+    requiredFor: "B3 Homebrew tap update in release.yml's homebrew job, which runs only with the repository variable AMC_HOMEBREW_TAP=enabled and then fails without it",
     configureAt: `${GH_SECRET}; a GitHub token with write access to the tap repository`
   },
   GHCR_TOKEN: {
