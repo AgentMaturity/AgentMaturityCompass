@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-03",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "deletion_gate",
+    "executor": "layer0-fixture",
+    "target": "logs",
+    "holds": "active"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "tenant_unmapped"
+  }
+}

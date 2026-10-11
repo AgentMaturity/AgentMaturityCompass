@@ -1,0 +1,116 @@
+[
+  {
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 30799,
+    "tail": "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp"
+  },
+  {
+    "cmd": "npm run -s typecheck",
+    "exit": 0,
+    "durationMs": 24988,
+    "tail": ""
+  },
+  {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0,
+    "durationMs": 34074,
+    "tail": ""
+  },
+  {
+    "cmd": "npm run -s lint",
+    "exit": 0,
+    "durationMs": 2945,
+    "tail": "Lint contract passed: three unsafe patterns rejected; safe counterparts accepted. / check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries."
+  },
+  {
+    "cmd": "npm run -s check:counts",
+    "exit": 0,
+    "durationMs": 556,
+    "tail": "Published source counts match the repository; this check does not execute tests."
+  },
+  {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0,
+    "durationMs": 465,
+    "tail": "Docs drift check passed (336 files scanned; truth claims and commands checked in 247 public files; 4 logged exceptions)."
+  },
+  {
+    "cmd": "npm run -s check:freeze",
+    "exit": 0,
+    "durationMs": 1796,
+    "tail": "Freeze guard passed: {\"cliCommandPaths\":1226,\"cliInventoryPaths\":1226,\"stationPacks\":41,\"stationPackQuestions\":632}"
+  },
+  {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 1717,
+    "tail": "  \"failures\": [] / }"
+  },
+  {
+    "cmd": "npm run -s check:gates",
+    "exit": 0,
+    "durationMs": 323,
+    "tail": "11 registered emitters, 4 evidence maps, 279 literal audit emissions classified, 9 evaluated gate requirements checked. / check:gates: every evaluated gate requirement has a registered, non-synthetic emitter."
+  },
+  {
+    "cmd": "npm run -s check:schemas",
+    "exit": 0,
+    "durationMs": 645,
+    "tail": "gen-spec-schemas: 38 schemas current; 75 contract fixtures agree"
+  },
+  {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0,
+    "durationMs": 205,
+    "tail": "docs/API_REFERENCE.md matches the source."
+  },
+  {
+    "cmd": "npm run -s check:threat-model",
+    "exit": 0,
+    "durationMs": 234,
+    "tail": "check-threat-model: ok (docs/security/channel-map.json)"
+  },
+  {
+    "cmd": "npm run -s check:citations",
+    "exit": 0,
+    "durationMs": 371,
+    "tail": "  CIT004 record-incomplete: findings=620 zero-tolerance=0 baseline=620 /   CIT005 status-type: findings=0 zero-tolerance=0 baseline=0"
+  },
+  {
+    "cmd": "npm run -s check:clean-source",
+    "exit": 0,
+    "durationMs": 180325,
+    "tail": "ok   amc agent-loop verify --json (1.1s) / ok   signed evidence and request reconstruction (2 expected turns)"
+  },
+  {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0,
+    "durationMs": 843,
+    "tail": "{\"scan\":\"duplicates\",\"baseline\":1250,\"current\":1267,\"new\":0,\"stale\":0,\"accepted\":17} / No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0,
+    "durationMs": 3931,
+    "tail": "{\"scan\":\"dead-code\",\"baseline\":2766,\"current\":2790,\"new\":0,\"stale\":0,\"accepted\":24} / No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
+  },
+  {
+    "cmd": "npm run -s check:qualification",
+    "exit": 0,
+    "durationMs": 305,
+    "tail": "Qualification receipts valid: 17 receipt(s) under qualification."
+  },
+  {
+    "cmd": "npx vitest run tests/catalog/l0/",
+    "exit": 0,
+    "durationMs": 12078,
+    "tail": "   Start at  00:51:35 /    Duration  11.47s (transform 20.12s, setup 365ms, import 32.42s, tests 30.39s, environment 1ms)"
+  },
+  {
+    "cmd": "npx vitest run tests/genCountsSemantics.test.ts tests/publicStatsDrift.test.ts tests/docsTruthReset.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/sourceQualityRatchet.test.ts tests/claims/d03Gates.test.ts tests/checkPackContents.test.ts",
+    "exit": 0,
+    "durationMs": 4450,
+    "tail": "   Start at  00:51:47 /    Duration  3.87s (transform 2.81s, setup 327ms, import 3.44s, tests 3.71s, environment 0ms)"
+  }
+]

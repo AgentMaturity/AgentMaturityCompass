@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-INV-01",
+  "polarity": "negative",
+  "evidenceClass": "cross_tenant",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "fixture-agent",
+    "entry": "signed_by_other_workspace"
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "signature_invalid"
+  }
+}

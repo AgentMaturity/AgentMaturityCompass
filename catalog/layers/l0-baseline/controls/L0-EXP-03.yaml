@@ -1,0 +1,137 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-EXP-03
+version: "0.1.0"
+support: experimental
+layer: 0
+family: explanation-notice-and-appeal
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Appeal reaches a human
+statement: >-
+  An explanation request or appeal is routed to a named human reviewer within the profile's deadline,
+  and the routing is recorded.
+riskRationale: >-
+  An appeal that loops back to the same automated system gives the person no real recourse.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [consequential_decision_about_people] }
+  reasons:
+    - Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33).
+  exclusions:
+    - when:
+        all:
+          - { fact: useCases, includesAny: [reconciliation] }
+          - { not: { fact: useCases, includesAny: [consequential_decision_about_people] } }
+      reason: >-
+        A reconciliation agent that makes no consequential decision about people is out of scope.
+citations:
+  - key: eu-gdpr-art-22
+    registerId: eu-gdpr
+    instrument: General Data Protection Regulation, Regulation (EU) 2016/679
+    clause: Art. 22
+    edition: Regulation (EU) 2016/679 (CELEX 32016R0679)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2018-05-25"
+    complianceDueDate: "2018-05-25"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32016R0679
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-gdpr records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: decisions based solely on automated processing with legal or similarly significant
+      effects, subject to the Art. 22(2) exceptions and safeguards.
+  - key: eu-ccd2-art-18
+    registerId: eu-ccd2
+    instrument: Consumer Credit Directive, Directive (EU) 2023/2225
+    clause: Art. 18
+    edition: Directive (EU) 2023/2225 (CELEX 32023L2225)
+    jurisdiction: EU
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2026-11-20"
+    complianceDueDate: "2026-11-20"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32023L2225
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ccd2 records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: useCases, includesAny: [credit_decision] }]
+    legalReview: null
+    note: >-
+      Register: where a creditworthiness assessment involves automated processing, consumers may request
+      human intervention. A directive: national transposition applies.
+  - key: us-co-sb26-189-deployers
+    registerId: us-co-sb26-189
+    instrument: Colorado SB26-189 (Part 17 of Article 1 of Title 6, C.R.S.)
+    clause: Deployer duties (register ref Deployers); section numbers to be pinned by the legal reviewer
+    edition: SB26-189 as signed 2026-05-14
+    jurisdiction: US-CO
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2027-01-01"
+    complianceDueDate: "2027-01-01"
+    dateNote: null
+    url: https://leg.colorado.gov/bills/sb26-189
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-co-sb26-189 records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [US-CO] }
+    legalReview: null
+    note: >-
+      Register: notice at points of interaction; a plain-language description within 30 days after an
+      adverse consequential decision; meaningful human review on request.
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Appeals open a case assigned to a named human reviewer with the profile's deadline; the assignment
+    and the decision are recorded.
+  parameters: []
+  manualDuty:
+    duty: Staff the appeal queue and meet the profile deadline.
+    ownerRole: senior_manager
+    cadence: continuous, drilled quarterly
+    evidenceOfPerformance: The drill record and the case log.
+tests:
+  - id: L0-EXP-03-T1
+    type: drill
+    oracle: { kind: system_of_record, observes: The case system's assignment record and timestamps. }
+    fixtures:
+      positive: [L0-EXP-03/positive/evidence-valid.json]
+      negative:
+        - L0-EXP-03/negative/evidence-contradictory.json
+        - L0-EXP-03/negative/evidence-cross-tenant.json
+        - L0-EXP-03/negative/evidence-empty.json
+        - L0-EXP-03/negative/evidence-replayed.json
+        - L0-EXP-03/negative/evidence-stale.json
+        - L0-EXP-03/negative/evidence-violation.json
+    passCriteria: >-
+      A drill appeal reaches a named human within the deadline and the routing is recorded.
+    attempts: 1
+evidence:
+  - id: L0-EXP-03-E1
+    producer: amc.explanation.appeal
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 180 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

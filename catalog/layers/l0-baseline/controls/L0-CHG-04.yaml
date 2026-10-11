@@ -1,0 +1,88 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-CHG-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: change-control-and-validation
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Vendor change notice
+statement: >-
+  Model and tool vendor change notices are tracked and trigger revalidation, and a notice unhandled
+  past its deadline raises a finding.
+riskRationale: >-
+  A vendor can change a model or tool under a stable name; an untracked notice leaves the deployment
+  running on something nobody validated.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations:
+  - key: eu-dora-art-28
+    registerId: eu-dora
+    instrument: Digital Operational Resilience Act, Regulation (EU) 2022/2554
+    clause: Art. 28
+    edition: Regulation (EU) 2022/2554 (CELEX 32022R2554)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2025-01-17"
+    complianceDueDate: "2025-01-17"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32022R2554
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-dora records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: entityTypes, includesAny: [eu_financial_entity] }]
+    legalReview: null
+    note: >-
+      Register: general principles of ICT third-party risk management, including model and agent-platform
+      providers. The legal reviewer pins the exit-strategy paragraph.
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    A named owner tracks vendor notices, sets a deadline for each and opens a revalidation; an overdue
+    notice raises a finding.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Track vendor change notices and start revalidation before each deadline.
+    ownerRole: head_of_qa
+    cadence: weekly
+    evidenceOfPerformance: The notice register with deadlines and outcomes.
+tests:
+  - id: L0-CHG-04-T1
+    type: document_review
+    oracle: { kind: human_assessor, observes: The notice register and the revalidation records. }
+    fixtures:
+      positive: [L0-CHG-04/positive/evidence-valid.json]
+      negative:
+        - L0-CHG-04/negative/evidence-contradictory.json
+        - L0-CHG-04/negative/evidence-cross-tenant.json
+        - L0-CHG-04/negative/evidence-empty.json
+        - L0-CHG-04/negative/evidence-replayed.json
+        - L0-CHG-04/negative/evidence-stale.json
+        - L0-CHG-04/negative/evidence-violation.json
+    passCriteria: >-
+      Every notice has a deadline and an outcome; overdue notices have findings.
+    attempts: 1
+evidence:
+  - id: L0-CHG-04-E1
+    producer: amc.manualDuty.record
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 90 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version]
+owner: { role: head_of_qa }
+clock: null
+levels: [L1]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

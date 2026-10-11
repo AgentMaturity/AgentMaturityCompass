@@ -1,0 +1,33 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "drift",
+    "thresholds": {
+      "overallDropGteHundredths": 50,
+      "layerDropGteHundredths": 70,
+      "integrityDropGtePercent": 15,
+      "correlationBelowPercent": 90
+    },
+    "previous": {
+      "overallHundredths": 480,
+      "integrityPercent": 95,
+      "correlationPercent": 99
+    },
+    "current": {
+      "overallHundredths": 478,
+      "integrityPercent": 95,
+      "correlationPercent": 99
+    },
+    "thenCall": {
+      "tool": "fixture.deploy",
+      "actionClass": "WRITE_HIGH"
+    }
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

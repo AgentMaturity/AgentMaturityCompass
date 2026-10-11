@@ -1,0 +1,71 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-MON-01
+version: "0.1.0"
+support: experimental
+layer: 0
+family: monitoring-incidents-and-resilience
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Drift alarms
+statement: >-
+  Declared quality and behaviour metrics are checked against thresholds, and a breach raises an alarm
+  with a recorded response.
+riskRationale: >-
+  Behaviour that degrades slowly goes unnoticed without thresholds, and an alarm without a recorded
+  response changes nothing.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    A drift check compares run reports with the signed alert thresholds; a breach writes a
+    DRIFT_REGRESSION_DETECTED event and a signed freeze, and the pipeline then refuses frozen action
+    classes.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-MON-01-T1
+    type: runtime_enforced
+    oracle:
+      kind: ledger_state
+      observes: >-
+        The drift result, the DRIFT_REGRESSION_DETECTED ledger event and the signed freeze incident.
+    fixtures:
+      positive: [L0-MON-01/positive/evidence-valid.json, L0-MON-01/positive/within-thresholds.json]
+      negative:
+        - L0-MON-01/negative/evidence-contradictory.json
+        - L0-MON-01/negative/evidence-cross-tenant.json
+        - L0-MON-01/negative/evidence-empty.json
+        - L0-MON-01/negative/evidence-replayed.json
+        - L0-MON-01/negative/evidence-stale.json
+        - L0-MON-01/negative/evidence-violation.json
+        - L0-MON-01/negative/regression.json
+    passCriteria: >-
+      A run within thresholds raises nothing; a regression beyond them raises the alarm and records a
+      signed freeze as the response.
+    attempts: 1
+evidence:
+  - id: L0-MON-01-E1
+    producer: amc.drift.detector
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, deployment_version, policy_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: INCIDENT_RESPONSE_PREPAREDNESS.FREEZE_CONTROLS
+    relation: partial
+    rationale: >-
+      Freeze controls are tracked; the audit map does not check metric thresholds.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }
