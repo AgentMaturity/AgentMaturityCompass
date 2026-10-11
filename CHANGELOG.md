@@ -30,7 +30,7 @@
 
   **Commands that never worked.** `amc correction add` failed on every invocation with a raw SQLite constraint error — the whole `amc correction` family was inert. `amc fp-submit` and `amc lab-create` returned identifiers no other command could resolve. `amc rollback-create` and `amc emergency-override` reported success while `canary-report` showed zero of each, and an override requiring a postmortem vanished from the drift report that chases it.
 
-  **Compliance reporting.** `amc residency-report` named the wrong data region, omitted active legal holds, and stamped COMPLIANT on a configuration it had never read, because tenants, policies and holds lived only in memory. `amc tenant-isolation-check` could never see two tenants. All three registers now persist to a signed, hash-chained store.
+  **Compliance reporting.** `amc residency-report` named the wrong data region, omitted active legal holds, and stamped `COMPLIANT` on a configuration it had never read, because tenants, policies and holds lived only in memory. `amc tenant-isolation-check` could never see two tenants. All three registers now persist to a signed, hash-chained store.
 
   **Scoring correctness.** Score modules credited any project whose directory names happened to match AMC's own source layout — an unrelated repository with `src/policy` and `src/enforce` was reported as having fail-secure governance controls it did not implement. Criteria that can only ever be met by AMC's own tree are now excluded from the denominator and disclosed, instead of silently capping every external score (ISO 42001 was pinned at 5 of 8 controls). Nineteen evidence paths pointed at modules that do not exist, so AMC under-credited itself for features it ships.
 

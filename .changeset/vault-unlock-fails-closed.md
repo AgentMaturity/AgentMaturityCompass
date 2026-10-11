@@ -1,5 +1,5 @@
 ---
-"agent-maturity-compass": patch
+"agent-maturity-compass": major
 ---
 
 A failed vault unlock now locks the vault. Before, a wrong passphrase, or a vault file replaced or corrupted on disk, made the unlock fail but left a session opened earlier unlocked, and that session kept serving its private keys. Unlock now also refuses, naming the file, when a public key in `.amc/keys/` is missing or does not match the vault's private key, which an interrupted key write leaves behind (AMC writes the encrypted vault before the public keys); docs/VAULT.md, "When unlock refuses", gives the recovery. A vault from before lease and session keys that holds a lease key but no session key now unlocks: unlock keeps its lease key and adds only the session key. Before, it generated a new lease key, the existing matching `lease_ed25519.pub` refused it, and the vault could never be unlocked. When `lease_ed25519.pub` or `session_ed25519.pub` exists but the vault holds no private key for it, unlock refuses and says how to let AMC create a new key.
