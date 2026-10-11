@@ -875,16 +875,14 @@ function writeEnforceResourceManifestUnlocked(input: {
   }
 }
 
-export function writeEnforceResourceManifest(input: {
-  workspace: string;
-  agentId?: string;
-}): WriteEnforceResourceManifestResult {
+/** `requireSignature`: refuse (MANIFEST_SIGNATURE_INVALID) before publishing anything that could not be signed. */
+export function writeEnforceResourceManifest(input: { workspace: string; agentId?: string; requireSignature?: boolean }): WriteEnforceResourceManifestResult {
   const workspace = resolve(input.workspace);
   const agentId = normalizeAgentId(input.agentId ?? "default");
   return withEnforceResourceLifecycleLock({
     workspace,
     agentId,
-    operation: () => writeEnforceResourceManifestUnlocked({ workspace, agentId }),
+    operation: () => writeEnforceResourceManifestUnlocked({ workspace, agentId, requireSignature: input.requireSignature === true }),
   });
 }
 
