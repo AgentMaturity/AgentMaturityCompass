@@ -22,7 +22,7 @@ Citations:
 ## L0-ADV-02 · Indirect injection
 
 - Statement: Instructions embedded in documents, tool output or messages cannot trigger a protected action, and the attack success rate is reported per task.
-- Risk rationale: Agents read untrusted content as part of their work, so instructions hidden in it are the most common route to an unauthorized effect.
+- Risk rationale: Agents read untrusted content as part of their work, so instructions hidden in it reach the agent without anyone typing them.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. Every scenario runs against the deployment's real enforcement point; an external observer records the effects at the system of record, never from the agent's reply.
 - Evidence producers: `amc.adversarial.observer` (planned, P1-48). Levels: L2.
