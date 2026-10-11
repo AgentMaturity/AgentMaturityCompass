@@ -129,7 +129,7 @@ function validatedLength(pattern: PiiPattern, text: string, start: number, value
 /**
  * UTF-16 offsets only; uses the same patterns and validators as scanForPII. A match that fails validation is retried as
  * shorter prefixes and then from the next character, so a greedy match that absorbed a neighbouring number or word
- * (e.g. "Qty 2 4111 1111 1111 1111", "ES9121000418450200051332 to Acme") cannot hide a real card or IBAN.
+ * (e.g. "Qty 2 4111 1111 1111 1111", "ES9121000418450200051332 to Acme") no longer hides a real card or IBAN.
  */
 export function findPIISpans(text: string): readonly PiiSpan[] {
   // ponytail: retrying from the next index re-matches digit-dense text, about 10x the single-pass cost on hostile input
