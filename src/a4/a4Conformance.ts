@@ -19,9 +19,11 @@ import { claimKindSchema, statusDimensionsSchema } from "../claims/eligibility/s
 import type { Applicability } from "../claims/eligibility/types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { a4ProjectsRoot } from "./a4Blobs.js";
-import { a4ConformanceStatementV1Schema, type A4ConformanceStatementV1, type A4Stage } from "./a4Schema.js";
+import type { A4ReadinessState } from "./a4Readiness.js";
+import { a4ConformanceStatementV1Schema, gatePolicyOf, type A4ConformanceStatementV1, type A4Stage } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
+import { acknowledgementOf, ADAPT_CLAIM_BOUNDARY, ownerOutOfScope, proposedPlan, understandingOf } from "./spec/adapt.js";
 
 const NO_LOADER = "NO_EVIDENCE_LOADER: no A4 loader binds runtime rows to this control's evidence contracts yet";
 const NOT_VERIFIED = "CONTROL_RESULTS_NOT_VERIFIED_LOCALLY";
@@ -142,4 +144,32 @@ export function conformanceStatement(input: {
     ownerOutOfScope: input.ownerOutOfScope, unsupported: [...input.unsupported], missingFacts: [...input.missingFacts],
     expertReview: input.expertReview, claim, claimBoundary: input.claimBoundary
   });
+}
+
+const NO_PLAN_BOUNDARY = "No compiled plan is evaluated at this stage: every control stays not_evaluated until Adapt compiles and reviews one.";
+const storedShape = z.object({ planDigest: z.string().min(1), resultsPath: z.string(), resultsSha256: z.string(), verified: z.boolean(), reason: z.string().nullable(),
+  controls: z.array(storedControlSchema), counts: z.object({ pass: z.number(), fail: z.number(), not_evaluated: z.number(), not_applicable: z.number(), unresolved: z.number() }) });
+
+/**
+ * GET …/conformance (design §10.5): the stage's statement, pure over the loaded rows. Adapt's is rebuilt from the
+ * control results its newest revision's Review recorded (signed, read back verified), with the owner's out-of-scope
+ * settlements and the sources acknowledgement as they stand now; a record that does not parse counts as none. Every
+ * other stage, and Adapt before its Review, carries no plan and says not_evaluated (Activate's own statement is P1-62's).
+ */
+export function conformanceView(state: A4ReadinessState, stage: A4Stage, now: number): A4ConformanceStatementV1 {
+  const revision = state.revisions.filter((row) => row.stage === stage).at(-1) ?? state.revisions.at(-1);
+  const revisionDigest = revision?.spec_digest ?? sha256Hex("");
+  const spec = revision === undefined ? {} : JSON.parse(revision.spec_json) as Record<string, unknown>;
+  const recorded = stage === "adapt" ? storedShape.safeParse((spec.review as { conformance?: unknown } | undefined)?.conformance) : null;
+  const plan = stage === "adapt" ? proposedPlan(spec) : null;
+  const stored = recorded?.success === true && plan !== null && recorded.data.planDigest === plan.digest ? recorded.data as StoredConformance : null;
+  const required = gatePolicyOf(state.chain).gates["adapt.completion"].requiredReviews.some((entry) => entry.kind === "review_record");
+  return conformanceStatement({ stage, revisionDigest, stored, evaluatedAt: new Date(now).toISOString(),
+    ownerOutOfScope: stored === null ? [] : ownerOutOfScope(state, plan, now),
+    unsupported: stored === null || plan === null ? [] : plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`),
+    missingFacts: stored === null ? [] : [...(understandingOf(spec)?.facts.followUps ?? [])],
+    expertReview: { required: stage === "adapt" && required,
+      records: stored === null ? [] : state.refs.filter((ref) => ref.revisionNo === revision!.revision_no && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
+      acknowledgement: stage === "adapt" ? acknowledgementOf(state, "regulatory_sources_status", now) : null },
+    claimBoundary: stored === null ? NO_PLAN_BOUNDARY : ADAPT_CLAIM_BOUNDARY, now });
 }
