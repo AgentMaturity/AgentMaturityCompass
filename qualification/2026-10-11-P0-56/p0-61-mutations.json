@@ -1,0 +1,129 @@
+{
+  "schema": "amc.mutation-batch.result.v1",
+  "commit": "f4b4a0380241903cf42275ee742e9ecb6ce3413e",
+  "startedAt": "2026-10-11T13:22:02.389Z",
+  "finishedAt": "2026-10-11T13:22:39.483Z",
+  "node": "v25.5.0",
+  "platform": "darwin arm64",
+  "summary": {
+    "entries": 3,
+    "killed": 3,
+    "survived": 0,
+    "equivalent": 0,
+    "equivalentKilled": 0,
+    "errors": 0,
+    "byIssue": {
+      "AMC-1545": {
+        "entries": 3,
+        "killed": 3,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      }
+    }
+  },
+  "baselines": [
+    {
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 9612,
+      "totals": {
+        "total": 20,
+        "passed": 20,
+        "failed": 0
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "1545-narrower-turns",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a child grant widens the inherited max-turns",
+      "line": 130,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9146,
+      "totals": {
+        "total": 20,
+        "passed": 15,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/nativeDelegationInheritance.test.ts > native child cancellation and inherited governance nested delegation receives numeric minima and snapshots the configured stops",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control the inheritance is recorded in the child's signed session before its first turn, naming every control that governed it",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow a grant timeout wider than the parent's",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow parent-only turns and timeout",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow parent-only turns with a grant-only timeout"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "1545-narrower-timeout",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a child grant widens the inherited timeout",
+      "line": 131,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9470,
+      "totals": {
+        "total": 20,
+        "passed": 18,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow a grant timeout wider than the parent's",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow parent-only turns and timeout"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1545-narrower-parent-only",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a parent-only limit is dropped when the grant sets none (branch named as a gap during scoping)",
+      "line": 129,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8423,
+      "totals": {
+        "total": 20,
+        "passed": 18,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow parent-only turns and timeout",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control descendant limits narrow parent-only turns with a grant-only timeout"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    }
+  ]
+}

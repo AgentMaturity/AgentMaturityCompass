@@ -101,15 +101,25 @@ def run(args,cwd,child_env=env,timeout=180,checked=True):
  if cleanup_error or not exited or (checked and child.returncode):raise RuntimeError(f'Public command {counter} failed or cleanup incomplete, see {file}')
  return subprocess.CompletedProcess(args,child.returncode,stdout,stderr)
 
-def ports():
- result=[]
- for i in range(7):
-  with socket.socket() as s:s.bind(('127.0.0.1',0));result.append(s.getsockname()[1])
- if len(set(result))!=len(result):return ports()
- return result
+def ports(count):
+ # P0-62: every socket stays bound until all are chosen, so no two picks (owner's or demo's) are the same port; and
+ # picks come from 20000-31999, below the OS ephemeral range (Linux 32768+, macOS 49152+), so an outbound connection
+ # cannot take a picked port before its server binds it (P0-62 run 14: the demo daemon died on EADDRINUSE).
+ held=[]
+ try:
+  for attempt in range(2000):
+   if len(held)==count:break
+   s=socket.socket()
+   try:s.bind(('127.0.0.1',20000+secrets.randbelow(12000)))
+   except OSError:s.close();continue
+   held.append(s)
+  if len(held)!=count:raise RuntimeError('Could not reserve fixture ports below the ephemeral range')
+  return [s.getsockname()[1] for s in held]
+ finally:
+  for s in held:s.close()
 
-def environment(workspace):
- e=dict(env);port=ports()
+def environment(workspace,port):
+ e=dict(env)
  e.update({'AMC_WORKSPACE_DIR':str(workspace),'AMC_STUDIO_PORT':str(port[0]),'AMC_HOST_PORT':str(port[0]),'AMC_GATEWAY_PORT':str(port[1]),'AMC_PROXY_PORT':str(port[2]),'AMC_TOOLHUB_PORT':str(port[3]),'AMC_METRICS_PORT':str(port[4]),'AMC_BIND':'127.0.0.1','AMC_HOST_BIND':'127.0.0.1','AMC_ENABLE_NOTARY':'0','AMC_VAULT_PASSPHRASE_FILE':str(private['vault']),'AMC_VAULT_PASSPHRASE':values['vault'],'AMC_BOOTSTRAP_OWNER_USERNAME_FILE':str(private['username']),'AMC_BOOTSTRAP_OWNER_PASSWORD_FILE':str(private['password'])})
  return e,port
 
@@ -130,7 +140,7 @@ try:
  cli=str(root/'installation'/'node_modules'/'agent-maturity-compass'/'dist'/'cli.js')
  assert pathlib.Path(cli).is_file() and sha(cli)==a.cli_sha256, 'Installed CLI does not match candidate'
  report['installedCliSha256']=sha(cli)
- owner_env,owner_ports=environment(root/'owner');demo_env,demo_ports=environment(root/'demo')
+ picked=ports(14);owner_env,owner_ports=environment(root/'owner',picked[:7]);demo_env,demo_ports=environment(root/'demo',picked[7:])
  run([node,cli,'bootstrap'],root/'owner',owner_env)
  run([node,cli,'--agent','browser-agent','--json'],root/'owner',owner_env)
  run([node,cli,'firewall','enable','--mode','block','--json'],root/'owner',owner_env)
@@ -169,7 +179,8 @@ finally:
    if pid:
     try:os.kill(pid,0);alive=True
     except ProcessLookupError:pass
-   group_exited=not group_alive(pgid) if pgid==pid else False
+   # No pid when `up` failed before the daemon wrote its state (P0-62): report it, do not crash on None.
+   group_exited=not group_alive(pgid) if pid and pgid==pid else False
    if alive and pgid==pid:reap_group(pgid)
    report['cleanup'].append({'resource':'owned demo daemon','signalCommandExit':stopped.returncode,'knownPid':pid,'groupId':pgid,'processGroupReaped':group_exited,'ok':stopped.returncode==0 and not alive and group_exited})
   except Exception as e:report['cleanup'].append({'resource':'owned demo daemon','ok':False,'error':scrub(str(e))})

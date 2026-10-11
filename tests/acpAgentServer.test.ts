@@ -187,6 +187,30 @@ describe("session/new", () => {
   });
 });
 
+describe("a JSONL workspace admits one session writer (P0-58)", () => {
+  it("refuses a second session up front with a typed reason", async () => {
+    vi.stubEnv("AMC_SESSION_STORE", "jsonl");
+    const h = await initialized();
+    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
+    await replied(h, 1);
+    const first = resultOf(replyTo(h.sent, 1))["sessionId"] as string;
+    expect(first).toBeTypeOf("string");
+    h.send({ jsonrpc: "2.0", id: 2, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
+    await replied(h, 2);
+    const refused = replyTo(h.sent, 2)?.["error"] as { code: number; message: string; data?: { reason?: string } };
+    expect(refused).toMatchObject({ code: -32602, data: { reason: "SESSION_STORE_SINGLE_WRITER" } });
+    expect(refused.message).toMatch(/JSONL.*one session writer/);
+    expect(replyTo(h.sent, 2)?.["result"]).toBeUndefined();
+  });
+
+  it("still opens several sessions on the default SQLite store", async () => {
+    const h = await initialized();
+    for (const id of [1, 2]) h.send({ jsonrpc: "2.0", id, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
+    await replied(h, 1); await replied(h, 2);
+    expect(resultOf(replyTo(h.sent, 2))["sessionId"]).toBeTypeOf("string");
+  });
+});
+
 describe("session/prompt and cancellation", () => {
   async function promptingHarness(): Promise<{ h: Harness; sessionId: string }> {
     const h = await initialized();
@@ -235,6 +259,16 @@ describe("session/prompt and cancellation", () => {
     await settle();
     // Cancelling pre-emptively would kill a turn the client never asked to stop.
     expect(h.cancels).toEqual([]);
+  });
+
+  it("names AMC's own budget refusal in the error data of a failed turn (P0-59)", async () => {
+    const { h, sessionId } = await promptingHarness();
+    h.send({ jsonrpc: "2.0", id: 2, method: "session/prompt", params: { sessionId, prompt: [{ type: "text", text: "hi" }] } });
+    await settle();
+    h.finish({ ok: false, reason: "signed turn 1 ended error; idle is not successful completion", failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] });
+    await replied(h, 2);
+    expect(replyTo(h.sent, 2)?.["error"]).toMatchObject({ code: -32603, message: "the turn did not complete",
+      data: { reason: expect.stringContaining("ended error"), failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] } });
   });
 
   it("refuses a second prompt on a session already running one", async () => {

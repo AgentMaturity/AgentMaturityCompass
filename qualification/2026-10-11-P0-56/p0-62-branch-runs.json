@@ -1,0 +1,369 @@
+{
+ "label": "Branch Studio lane (tarball cfb8f87f9, harness and source tree 9239cb96f); run-10 was cut short when the loop was stopped to diagnose and is not a result",
+ "environment": "local colima amc-s7f (Ubuntu 24.04, 6.8.0-117-generic, 4 vCPU) on macOS arm64; not CI",
+ "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0 + baked bubblewrap, python3-venv, Playwright 1.62.1, Chromium (local tag amc-p062-studio:arm64)",
+ "tarballSha256": "b6a15334544d4bbe0de43607d9143e17c1f61e96e9e654e3aa21d4aba870de5c",
+ "sourceCommit": "9239cb96fc287db6f0df4811da43e81a522f2738",
+ "runs": [
+  {
+   "run": "run-01",
+   "loadavgBefore": "0.51",
+   "studioStepExit": 0,
+   "studioStepSeconds": 112,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-02",
+   "loadavgBefore": "1.79",
+   "studioStepExit": 0,
+   "studioStepSeconds": 120,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-03",
+   "loadavgBefore": "1.75",
+   "studioStepExit": 0,
+   "studioStepSeconds": 108,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-04",
+   "loadavgBefore": "1.63",
+   "studioStepExit": 0,
+   "studioStepSeconds": 107,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-05",
+   "loadavgBefore": "1.82",
+   "studioStepExit": 1,
+   "studioStepSeconds": 160,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 7,
+    "failed": 1,
+    "notExercised": 5
+   },
+   "coldVerifiersValid": 6,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:25852\nCompass Console: http://127.0.0.1:25852/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "{\"ok\":false,\"qualification\":\"failed-or-incomplete\",\"counts\":{\"planned\":13,\"passed\":7,\"failed\":1,\"notExercised\":5},\"receipt\":\"/work/out/studio/browser/receipt.json\"}",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "run": "run-06",
+   "loadavgBefore": "0.95",
+   "studioStepExit": 0,
+   "studioStepSeconds": 167,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-07",
+   "loadavgBefore": "1.10",
+   "studioStepExit": 1,
+   "studioStepSeconds": 180,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 7,
+    "failed": 1,
+    "notExercised": 5
+   },
+   "coldVerifiersValid": 6,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:27342\nCompass Console: http://127.0.0.1:27342/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "{\"ok\":false,\"qualification\":\"failed-or-incomplete\",\"counts\":{\"planned\":13,\"passed\":7,\"failed\":1,\"notExercised\":5},\"receipt\":\"/work/out/studio/browser/receipt.json\"}",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "run": "run-08",
+   "loadavgBefore": "0.96",
+   "studioStepExit": 1,
+   "studioStepSeconds": 133,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 4,
+    "failed": 1,
+    "notExercised": 8
+   },
+   "coldVerifiersValid": 2,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:29542\nCompass Console: http://127.0.0.1:29542/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "{\"ok\":false,\"qualification\":\"failed-or-incomplete\",\"counts\":{\"planned\":13,\"passed\":4,\"failed\":1,\"notExercised\":8},\"receipt\":\"/work/out/studio/browser/receipt.json\"}",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  },
+  {
+   "run": "run-09",
+   "loadavgBefore": "0.94",
+   "studioStepExit": 0,
+   "studioStepSeconds": 167,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-10",
+   "loadavgBefore": "1.51",
+   "studioStepExit": 1,
+   "studioStepSeconds": 185,
+   "ok": false,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "AMC Studio local demo mode is running\nNo vault passphrase required; outputs are not verifier-ready.\nLocal demo data is mutable and the no-login session is restricted to loopback.\nWorkspace: /work/out/studio/demo\nHost data: /work/out/studio/demo/.amc/studio-demo-host\nDefault workspace: demo\nStudio API: http://127.0.0.1:29734\nCompass Console: http://127.0.0.1:29734/w/demo/console/\nAPI examples: Compass Console home > API Quickstart.\nAuto-open disabled (--no-open). Use the Compass Console URL above.\nVerifier boundary: use `amc up` with vault setup for signed artifacts.",
+   "downOutput": "node:internal/process/promises:394\n    triggerUncaughtException(err, true /* fromPromise */);\n    ^\n\npage.waitForResponse: Timeout 30000ms exceeded while waiting for event \"response\"\n    at NativeTasksPage.control (/work/src/tests/e2e/native-tasks-page.mjs:62:32)\n    at async file:///work/src/tests/e2e/native-tasks-page.mjs:303:7\n    at async step (/work/src/scripts/studio-native-browser-check.mjs:43:73)\n    at async runNativeStudioScenarios (/work/src/tests/e2e/native-tasks-page.mjs:296:5)\n    at async file:///work/src/scripts/studio-native-browser-check.mjs:50:3 {\n  log: [],\n  name: 'TimeoutError'\n}\n\nNode.js v24.21.0",
+   "demoDaemonLog": null,
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "signalCommandExit": 0,
+     "knownPid": 148,
+     "groupId": 148,
+     "processGroupReaped": true,
+     "ok": true
+    }
+   ]
+  }
+ ],
+ "passed": 6,
+ "failed": 4
+}

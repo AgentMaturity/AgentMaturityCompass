@@ -339,9 +339,10 @@ export class LlmRuntime {
     try {
       reserveNativeModelBudget(this.init.session, prepared.headerEventId);
     } catch (error) {
-      // Evidence that fails verification is not exhausted quota: label it so an operator checks the ledger, not the provider.
+      // AMC's own admission refused before dispatch; no provider was contacted, so this is never provider QUOTA (P0-59).
+      // Evidence that fails verification is not a budget decision either: label it so an operator checks the ledger.
       const integrity = error instanceof BudgetEvidenceIntegrityError;
-      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : LLM_FAILURE_CODE.QUOTA }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
+      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : "AMC_NATIVE_BUDGET_REFUSED" }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
     }
 
     let response: HttpResponse;

@@ -17,6 +17,8 @@ export interface NativeEvidenceVerdict {
 const INCOMPLETE = "Cold native verification did not complete. No verified result is claimed.";
 const REFUSED = "Cold native verification refused this evidence. Inspect the ledger before making claims.";
 const UNEXPECTED = "Native verification returned an unexpected result. No verified result is claimed.";
+/** P0-57: release hands the writer over for a later resume and never seals, and Studio verifies only a sealed target (P0-14). */
+const NOT_FINALIZED = "This native session is not closed and sealed, so it is not finalized: a release hands the writer over for a later resume and does not seal it. Studio verifies only a closed, sealed session. Resume the task and use Close and verify; no verified result is claimed.";
 const failed = (error: string): NativeEvidenceVerdict => ({ verification: "failed", scope: null, error });
 
 export function nativeEvidenceVerdict(report: unknown): NativeEvidenceVerdict {
@@ -26,6 +28,9 @@ export function nativeEvidenceVerdict(report: unknown): NativeEvidenceVerdict {
   if (typeof r.ok !== "boolean" || typeof r.prefixVerified !== "boolean" || typeof r.integrityOk !== "boolean"
     || (r.scope !== "complete-ledger" && r.scope !== "verified-prefix")
     || !Array.isArray(list) || !list.every((id): id is string => typeof id === "string")) return failed(UNEXPECTED);
+  // P0-57: decided from the verifier's own read. An unfinalized target is never verified; when it is the only failure it
+  // is named as such, and any other failure beside it stays an integrity refusal.
+  if (r.targetFinalized === false) return failed(r.intactUnlessUnfinalized === true ? NOT_FINALIZED : REFUSED);
   if (r.scope === "complete-ledger" && r.ok && !r.prefixVerified && list.length === 0) {
     return { verification: "externally-anchored", scope: { scope: "complete-ledger", unfinalizedSessions: [] }, error: null };
   }

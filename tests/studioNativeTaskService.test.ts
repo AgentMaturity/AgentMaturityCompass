@@ -1,5 +1,6 @@
-import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { createHash, randomUUID } from "node:crypto";
+import fs, { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, type PathLike, type StatSyncOptions } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -7,7 +8,8 @@ import { pathToFileURL } from "node:url";
 import { afterEach, beforeAll, beforeEach, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
-import { initBudgets } from "../src/budgets/budgets.js";
+import { budgetsPath, initBudgets, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import YAML from "yaml";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
@@ -26,7 +28,7 @@ beforeAll(async () => {
   if (!existsSync(file)) throw new Error("Build the coordinated candidate before native Studio process tests.");
   const built = await import(pathToFileURL(file).href) as typeof import("../src/studio/nativeTaskService.js");
   createService = built.createNativeTaskService;
-});
+}, 60_000); // importing the built module can outlast the 10 s default on a loaded host
 let root: string, credentialHome: string, prior: string | undefined;
 const services: NativeTaskService[] = [];
 const actor: NativeTaskActor = { principalId: "studio-test:owner", agentId: "default", demo: true };
@@ -34,18 +36,20 @@ const pass = "synthetic-studio-service-vault";
 beforeEach(() => {
   prior = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = pass;
   root = mkdtempSync(join(tmpdir(), "amc-studio-service-"));
-  credentialHome = join(root, "operator-home"); mkdirSync(credentialHome, { mode: 0o700 });
+  // The operator home (also HOME, so ~/.amc/control-checkpoints) stays OUTSIDE the
+  // governed workspace, as an installed operator's does (P0-57).
+  credentialHome = mkdtempSync(join(tmpdir(), "amc-studio-operator-home-"));
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
 });
 afterEach(async () => {
   const outcomes = await Promise.allSettled(services.splice(0).map(service => service.close()));
-  lockVault(root); rmSync(root, { recursive: true, force: true });
+  lockVault(root); rmSync(root, { recursive: true, force: true }); rmSync(credentialHome, { recursive: true, force: true });
   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;
   expect(outcomes.filter(outcome => outcome.status === "rejected")).toEqual([]);
 });
-function service(workspace = root): NativeTaskService {
+function service(workspace = root, extraEnvironment: Record<string, string> = {}): NativeTaskService {
   const value = createService({ workspace, credentialsHome: credentialHome, credentialsFile: join(credentialHome, ".credentials.yaml"),
-    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass } });
+    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, ...extraEnvironment } });
   services.push(value); return value;
 }
 function input(prompt = "Record this synthetic native Studio turn."): NativeTaskStart {
@@ -122,8 +126,9 @@ test("real stub turns are committed once, survive release/restart/resume and col
   task = await idle(restarted, task.taskId); expect(task.revision).toBe(3);
   await restarted.release(actor, task.taskId, 3);
   const verified = await restarted.verify(actor, task.taskId, 3);
-  // No operator pin admits the workspace's monitor key, so the intact run is untrusted, never verified (P0-51).
-  expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
+  // Release is a resumable writer handoff and never seals the session (the resume above depends on that). Studio verifies
+  // only a closed, sealed target (P0-14, 8c4bc10ec), so a released session is reported as not finalized, never verified.
+  expect(verified).toMatchObject({ verification: "failed", verificationScope: null, error: expect.stringContaining("not closed and sealed, so it is not finalized") });
   const recorded = rows(sessionId);
   expect(recorded.filter(row => row.event_type === "request/header")).toHaveLength(3);
   expect(recorded.every(row => row.writer_sig !== "unsigned" && extractEnvelope(row.meta_json)?.sessionId === sessionId)).toBe(true);
@@ -193,6 +198,100 @@ test("JSONL managed task cold inspection, verification and archive retain actual
   expect(loadSessionEventHistory({ workspace: root, sessionId: task.sessionId! }).events).toEqual(before.events);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 60_000);
+
+test("a turn AMC's own budget refused says so instead of a generic failure, and names no provider quota (P0-59)", async () => {
+  const config = loadBudgetsConfig(root); config.budgets.perAgent.default!.daily.maxLlmRequests = 1;
+  writeFileSync(budgetsPath(root), YAML.stringify(config)); signBudgetsConfig(root);
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic budget turn one."))).taskId);
+  await s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic budget turn two." });
+  const deadline = Date.now() + 25_000;
+  let current = s.poll(actor, task.taskId).task;
+  while (current.state === "running" && Date.now() < deadline) { await new Promise(done => setTimeout(done, 50)); current = s.poll(actor, task.taskId).task; }
+  expect(current.state).toBe("failed");
+  expect(current.error).toContain("Signed native budget admission refused this dispatch.");
+  expect(current.error).not.toMatch(/provider reported|quota/i);
+  expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(2);
+});
+
+// P0-62: a writer still appending while Studio reads. Every append moves the ledger file's identity, and the history
+// reader refuses a read whose files moved (CHANGED). `move(reads)` makes the next reads see a new identity on each lstat,
+// deterministically, as they would while a writer is still appending; `appendOnCall(n, write)` performs a real append
+// during the n-th lstat of the ledger, after that stat was taken, so the read in progress passes and the next one differs.
+function movingLedger(ledger: string) {
+  const real = fs.lstatSync; let calls = 0, bump = 0, seen = 0, appendAt = 0, write: (() => void) | undefined;
+  fs.lstatSync = ((path: PathLike, options?: StatSyncOptions) => {
+    const stats = real(path, options as never);
+    if (String(path) !== ledger || !stats) return stats;
+    if (++seen === appendAt && write) { const append = write; write = undefined; append(); }
+    if (calls <= 0) return stats;
+    calls--;
+    return Object.assign(Object.create(Object.getPrototypeOf(stats)), stats, { mtimeMs: stats.mtimeMs + ++bump });
+  }) as typeof fs.lstatSync;
+  syncBuiltinESMExports();
+  return { move(reads: number) { calls = 3 * reads; }, get pending() { return calls; }, get seen() { return seen; },
+    appendOnCall(n: number, append: () => void) { appendAt = seen + n; write = append; }, get appended() { return write === undefined && appendAt > 0; },
+    restore() { fs.lstatSync = real; syncBuiltinESMExports(); } };
+}
+test("a writer still appending neither fails the turn nor hides authenticated history; Studio waits for it to settle (P0-62)", async () => {
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic settle turn one."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    ledger.move(3); // the read after the turn's result meets a moving store three times, then it holds still
+    await s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic settle turn two." });
+    const settled = await idle(s, task.taskId);
+    expect(ledger.pending, "the post-turn reads met the moving store").toBe(0);
+    expect(settled.revision).toBe(2);
+    expect(rows(task.sessionId).filter(row => row.event_type === "turn/end")).toHaveLength(2);
+    await new Promise(done => setTimeout(done, 300));
+    ledger.move(1);
+    const shown = s.poll(actor, task.taskId).task;
+    expect(shown.history.status, "a moving store is not unavailable evidence").toBe("authenticated");
+    expect(shown).toMatchObject({ state: "idle", error: null });
+  } finally { ledger.restore(); }
+});
+
+/** A real append by another writer: a sealed audit session in the same workspace ledger. */
+function appendForeignSession(workspace: string): void {
+  const ledger = openLedger(workspace), sessionId = `p062-writer-${randomUUID()}`;
+  try {
+    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "p062-fixture-writer", binarySha256: "0".repeat(64) });
+    ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: "{}", payloadExt: "json", meta: { auditType: "P062_FIXTURE_WRITER" } });
+    ledger.sealSession(sessionId);
+  } finally { ledger.close(); }
+}
+test("a writer appending between Studio's pre-verify read and the verifier makes verification fail, not pass (P0-62 review)", async () => {
+  const monitor = createHash("sha256").update(readFileSync(join(root, ".amc", "keys", "monitor_ed25519.pub"))).digest("hex");
+  const s = service(root, { AMC_EXPECTED_MONITOR_FINGERPRINT: monitor });
+  const clean = await idle(s, (await s.start(actor, input("Synthetic pinned verify."))).taskId);
+  expect((await s.verify(actor, clean.taskId, 1)).verification, "control: the same flow verifies when nothing moves").toMatch(/^(externally-anchored|anchored-prefix)$/);
+  const task = await idle(s, (await s.start(actor, input("Synthetic moved verify."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    // Verify reads after close (lstat 1-3), then the pre-verify head (4-6): append as that read finishes.
+    ledger.appendOnCall(6, () => appendForeignSession(root));
+    const verified = await s.verify(actor, task.taskId, 1);
+    expect(ledger.appended).toBe(true);
+    expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("Recorded history changed during verification") });
+  } finally { ledger.restore(); }
+});
+test("a release that completes the task while its turn waits for settled history wins; the turn is not dispatched (P0-62 review)", async () => {
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic CAS turn one."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    ledger.move(1_000_000); // every read meets a moving store, so dispatch waits for settled history
+    const submitted = s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic CAS turn two." });
+    await new Promise(done => setTimeout(done, 200));
+    const released = await s.release(actor, task.taskId, 2);
+    expect(released.state).toBe("released");
+    ledger.move(0);
+    await expect(submitted).rejects.toMatchObject({ code: "NATIVE_TASK_CHANGED" });
+    expect(s.poll(actor, task.taskId).task.state).toBe("released");
+    expect(rows(task.sessionId).filter(row => row.event_type === "request/header"), "the waiting turn was never sent").toHaveLength(1);
+  } finally { ledger.restore(); }
+});
 
 test("archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart", async () => {
   const s = service(), request = input("Archive first recorded turn.");

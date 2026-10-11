@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -102,4 +102,39 @@ describe("amc up local demo mode", () => {
     expect(audit).not.toContain("No demo/dry-run mode");
     expect(audit).not.toContain("Carlos (⭐⭐⭐⭐) | Add richer API examples inside the demo Console after startup");
   });
+});
+
+describe("the Studio daemon start wait (P0-62)", () => {
+  // A stand-in for `dist/cli.js _studio-daemon`: startStudioDaemon spawns process.argv[1].
+  function fakeDaemon(dir: string, body: string): string {
+    const file = join(dir, "fake-daemon.mjs");
+    writeFileSync(file, `import { mkdirSync, writeFileSync } from "node:fs"; import { join } from "node:path";
+const ws = process.argv[process.argv.indexOf("--workspace") + 1];
+const ready = () => { mkdirSync(join(ws, ".amc", "studio"), { recursive: true });
+  writeFileSync(join(ws, ".amc", "studio", "state.json"), JSON.stringify({ pid: process.pid })); setInterval(() => {}, 1000); };
+${body}\n`);
+    return file;
+  }
+  async function start(script: string, dir: string) {
+    const { startStudioDaemon } = await import("../src/studio/studioSupervisor.js");
+    const prior = process.argv[1];
+    process.argv[1] = script;
+    try { return await startStudioDaemon(dir, { hostDir: join(dir, ".amc", "studio-demo-host") }); }
+    finally { process.argv[1] = prior; }
+  }
+
+  test("reports a daemon that exits during startup at once, with its exit and log, instead of a timeout", async () => {
+    const dir = workspace();
+    await import("../src/studio/studioSupervisor.js"); // module load is not part of the wait being measured
+    const began = Date.now();
+    await expect(start(fakeDaemon(dir, "process.exit(3);"), dir)).rejects.toThrow(/exited during startup \(exit code 3\).*studio\.log/);
+    expect(Date.now() - began).toBeLessThan(4_000);
+  });
+
+  test("keeps waiting for a live daemon that is slow to write its state, as under host load", async () => {
+    const dir = workspace();
+    const state = await start(fakeDaemon(dir, "setTimeout(ready, 7_000);"), dir);
+    try { expect(state.pid).toBeGreaterThan(0); }
+    finally { process.kill(state.pid, "SIGKILL"); }
+  }, 20_000);
 });
