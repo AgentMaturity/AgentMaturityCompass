@@ -1,9 +1,10 @@
-import { createHash } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { createHash, generateKeyPairSync } from "node:crypto";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
+import { highWaterPath } from "../../src/keys/highWater.js";
 import { keysetPaths } from "../../src/keys/keyset.js";
 import { getSigningKey, getSigningPublicKeyPem, resumeKeyRotation, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { lockVault, unlockVault, vaultPaths } from "../../src/vault/vault.js";
@@ -137,4 +138,73 @@ describe("atomic rotation (P1-08)", () => {
       expect(getPublicKeyPem(root, "monitor")).toBe(roles.monitor.publicPem);
     }
   }, 240_000);
+});
+
+/** Every file under `dir`, recursively, as paths. */
+function filesUnder(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? filesUnder(join(dir, entry.name)) : [join(dir, entry.name)]);
+}
+
+describe("key-set hardening (P1-08 self-audit)", () => {
+  it("after rotating one purpose, every other purpose's public key stays pinned", () => {
+    const root = workspace();
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    const sealPub = join(vaultPaths(root).keysDir, "artifact-seal.pub");
+    rmSync(sealPub);
+    writeFileSync(sealPub, generateKeyPairSync("ed25519").publicKey.export({ format: "pem", type: "spki" }).toString());
+    expect(() => getSigningKey(root, "receipt")).toThrow(/artifact-seal.pub does not have the digest/);
+  });
+
+  it("resume refuses a pending key set this workspace did not start, or one without its recovery manifest", () => {
+    const root = workspace();
+    const vaultBefore = readFileSync(vaultPaths(root).vaultFile);
+    const keyset = JSON.parse(readFileSync(keysetPaths(root).keyset, "utf8"));
+    writeFileSync(keysetPaths(root).pending, JSON.stringify({ ...keyset, generation: keyset.generation + 5 }));
+    // Even with a recovery manifest planted beside it.
+    const planted = join(keysetPaths(root).rotations, `gen-${keyset.generation + 5}`);
+    mkdirSync(planted, { recursive: true });
+    writeFileSync(join(planted, "manifest.json"), JSON.stringify({ generation: keyset.generation + 5, previousGeneration: keyset.generation, files: [] }));
+    expect(() => resumeKeyRotation(root)).toThrow(/not one this workspace started/);
+    writeFileSync(keysetPaths(root).pending, JSON.stringify({ ...keyset, generation: keyset.generation + 1 }));
+    expect(() => resumeKeyRotation(root)).toThrow(/no recovery manifest/);
+    expect(readFileSync(vaultPaths(root).vaultFile).equals(vaultBefore)).toBe(true);
+    expect(existsSync(keysetPaths(root).pending)).toBe(true);
+  });
+
+  it("rolling forward never overwrites a file it did not write, nor an earlier discarded copy", () => {
+    const root = workspace();
+    const total = renamesDuring(() => rotatePurposeKeys({ workspace: workspace(), purposes: ["artifact-seal"], passphrase: PASS }));
+    for (let k = 1; k <= total; k += 1) {
+      if (!crashAt(k, () => rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal"], passphrase: PASS }))) continue;
+      const staged = filesUnder(join(root, ".amc")).find(path => path.endsWith(".keyset-staged") && existsSync(keysetPaths(root).pending));
+      if (staged === undefined) { resumeKeyRotation(root); continue; }
+      const target = staged.slice(0, -".keyset-staged".length);
+      if (existsSync(target)) rmSync(target);
+      writeFileSync(target, "a file this generation did not write");
+      const generation = JSON.parse(readFileSync(keysetPaths(root).pending, "utf8")).generation;
+      const discarded = join(keysetPaths(root).rotations, `gen-${generation}`, "discarded");
+      const name = target.slice(join(root, ".amc").length + 1).replace(/\//g, "__");
+      cpSync(target, join(discarded, name)); // an earlier rollback's copy under the same name
+      writeFileSync(join(discarded, name), "an earlier discarded copy");
+      expect(resumeKeyRotation(root)).toMatchObject({ action: "completed" });
+      const kept = filesUnder(discarded).map(path => readFileSync(path, "utf8"));
+      expect(kept).toEqual(expect.arrayContaining(["a file this generation did not write", "an earlier discarded copy"]));
+      return;
+    }
+    expect.unreachable("no crash point left a staged file to roll forward");
+  }, 240_000);
+
+  it("raises the key-set mark when it reads a generation, so a restored older key set is refused", () => {
+    const root = workspace();
+    const backup = mkdtempSync(join(tmpdir(), "amc-keys-backup-"));
+    roots.push(backup);
+    cpSync(join(root, ".amc"), join(backup, ".amc"), { recursive: true });
+    rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal"], passphrase: PASS });
+    rmSync(highWaterPath()); // this machine lost its marks, or the commit crashed before raising its own
+    getSigningKey(root, "artifact-seal");
+    lockVault(root);
+    rmSync(join(root, ".amc"), { recursive: true });
+    cpSync(join(backup, ".amc"), join(root, ".amc"), { recursive: true });
+    expect(() => { unlockVault(root, PASS); getSigningKey(root, "artifact-seal"); }).toThrow(/ROLLBACK_DETECTED/);
+  });
 });

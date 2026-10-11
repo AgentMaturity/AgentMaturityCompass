@@ -146,8 +146,10 @@ export function assertKeysetComplete(workspace: string): Keyset | null {
     if (!pinned(rel)) continue;
     if (fileSha(workspace, keysetFileRel(rel)) !== digest) throw new KeysetIncompleteError(keyset.generation, `${rel} does not have the digest generation ${keyset.generation} recorded`);
   }
-  checkHighWater(markKey(workspace), keyset.generation, sha256Hex(canonicalize(keyset)));
-  checked.set(workspace, { stamp: now, keyset });
+  // Raised on read as well: a crash between the commit rename and its mark, or a machine that only ever signs here,
+  // still refuses an older generation from then on.
+  recordHighWater(markKey(workspace), keyset.generation, sha256Hex(canonicalize(keyset)));
+  checked.set(workspace, { stamp: statStamp([paths.keyset, highWaterPath(), ...listed.map(rel => join(amcDir(workspace), rel))]), keyset });
   return keyset;
 }
 
@@ -172,18 +174,20 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
     const current = containedExists(workspace, KEYSET_REL) ? assertKeysetComplete(workspace) : null;
     const generation = Math.max(current?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
     const rows = change.writes.map(write => ({ rel: relOf(workspace, write.path), write }));
-    const files = Object.fromEntries(rows.map(({ rel, write }) => [rel, sha256Hex(Buffer.from(write.bytes))]));
+    const written = Object.fromEntries(rows.map(({ rel, write }) => [rel, sha256Hex(Buffer.from(write.bytes))]));
+    // Every public key and statement in force stays pinned, not only the ones this generation rewrote.
+    const carried = Object.entries(current?.files ?? {}).filter(([rel]) => pinned(rel) && !Object.hasOwn(written, rel));
+    const files = { ...Object.fromEntries(carried), ...written };
     const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])] });
     const manifest = rows.map(({ rel, write }) => {
       const existed = containedExists(workspace, keysetFileRel(rel));
       return { rel, existed, mode: existed ? statSync(join(amcDir(workspace), rel)).mode & 0o777 : write.mode };
     });
-    if (manifest.some(row => row.existed)) {
-      for (const row of manifest) {
-        if (row.existed) writeContained(workspace, `${rotationsRel(generation)}/${recoveryName(row.rel)}`, readContained(workspace, keysetFileRel(row.rel), MAX_KEY_FILE), 0o600);
-      }
-      writeContained(workspace, `${rotationsRel(generation)}/manifest.json`, JSON.stringify({ generation, previousGeneration: current?.generation ?? null, files: manifest }, null, 2), 0o600);
+    // Always written before the pending intent: resume refuses a pending generation that has no manifest.
+    for (const row of manifest) {
+      if (row.existed) writeContained(workspace, `${rotationsRel(generation)}/${recoveryName(row.rel)}`, readContained(workspace, keysetFileRel(row.rel), MAX_KEY_FILE), 0o600);
     }
+    writeContained(workspace, `${rotationsRel(generation)}/manifest.json`, JSON.stringify({ generation, previousGeneration: current?.generation ?? null, files: manifest }, null, 2), 0o600);
     const bytes = canonicalize(next);
     try {
       for (const { rel, write } of rows) writeContained(workspace, `${keysetFileRel(rel)}${STAGED}`, write.bytes, write.mode);
@@ -209,28 +213,41 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
     const pending = readKeysetFile(workspace, PENDING_REL);
     if (pending === null) return { action: "nothing-pending" as const, generation: null };
+    // Only the generation commitKeyset would write next, with the manifest it writes first, is ever resumed.
+    const next = Math.max(readKeysetFile(workspace, KEYSET_REL)?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
+    const recovery = rotationsRel(pending.generation);
+    const saved = readContainedOrNull(workspace, `${recovery}/manifest.json`, MAX_BYTES);
+    if (pending.generation !== next || saved === null) {
+      throw new Error(`pending key set generation ${pending.generation} is not one this workspace started (next generation ${next}${saved === null ? ", no recovery manifest" : ""}); `
+        + `refusing to resume it. Inspect ${PENDING_REL} before removing it`);
+    }
+    const manifest = manifestSchema.parse(JSON.parse(saved.toString("utf8")));
+    if (manifest.files.some(row => !Object.hasOwn(pending.files, row.rel))) throw new Error(`key set generation ${pending.generation}: its recovery manifest names files the generation did not write`);
+    // Nothing is ever overwritten or deleted: a file that would be replaced moves to discarded/ first.
+    const discard = (from: string, rel: string, suffix = "") => {
+      const base = `${recovery}/discarded/${recoveryName(rel)}${suffix}`;
+      let name = base;
+      for (let n = 1; containedExists(workspace, name); n += 1) name = `${base}.${n}`;
+      renameContained(workspace, from, name);
+    };
     const entries = Object.entries(pending.files).map(([rel, digest]) => ({ rel, digest, target: keysetFileRel(rel) }));
     const ready = entries.every(({ target, digest }) => fileSha(workspace, `${target}${STAGED}`) === digest || fileSha(workspace, target) === digest);
     if (ready) {
-      for (const { target } of entries) if (containedExists(workspace, `${target}${STAGED}`)) renameContained(workspace, `${target}${STAGED}`, target);
+      for (const { rel, digest, target } of entries) {
+        if (!containedExists(workspace, `${target}${STAGED}`)) continue;
+        if (containedExists(workspace, target) && fileSha(workspace, target) !== digest) discard(target, rel);
+        renameContained(workspace, `${target}${STAGED}`, target);
+      }
       const bytes = canonicalize(pending);
       renameContained(workspace, PENDING_REL, KEYSET_REL);
       recordHighWater(markKey(workspace), pending.generation, sha256Hex(bytes));
       return { action: "completed" as const, generation: pending.generation };
     }
-    const recovery = rotationsRel(pending.generation);
-    // No manifest: the generation replaced nothing, so rolling back sets aside everything it was creating.
-    const saved = readContainedOrNull(workspace, `${recovery}/manifest.json`, MAX_BYTES);
-    const manifest = saved !== null
-      ? manifestSchema.parse(JSON.parse(saved.toString("utf8")))
-      : { files: Object.keys(pending.files).map(rel => ({ rel, existed: false, mode: 0o600 })) };
-    if (manifest.files.some(row => !Object.hasOwn(pending.files, row.rel))) throw new Error(`key set generation ${pending.generation}: its recovery manifest names files the generation did not write`);
-    // Rolling back never deletes key material: whatever the generation had put in place moves to discarded/ first.
     for (const { rel, existed, mode } of manifest.files) {
       const target = keysetFileRel(rel);
-      if (containedExists(workspace, target)) renameContained(workspace, target, `${recovery}/discarded/${recoveryName(rel)}`);
+      if (containedExists(workspace, target)) discard(target, rel);
       if (existed) writeContained(workspace, target, readContained(workspace, `${recovery}/${recoveryName(rel)}`, MAX_KEY_FILE), mode);
-      if (containedExists(workspace, `${target}${STAGED}`)) renameContained(workspace, `${target}${STAGED}`, `${recovery}/discarded/${recoveryName(rel)}${STAGED}`);
+      if (containedExists(workspace, `${target}${STAGED}`)) discard(`${target}${STAGED}`, rel, STAGED);
     }
     removeContained(workspace, PENDING_REL);
     return { action: "rolled-back" as const, generation: pending.generation };

@@ -146,6 +146,16 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     expect(existsSync(purposeKeyPaths(root, "receipt").publicFile)).toBe(true);
   });
 
+  it("a key-compromise rotation also drops the key from a purpose that split off it earlier (self-audit)", () => {
+    const root = workspace();
+    const shared = getSigningPublicKeyPem(root, "ledger-row");
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS }); // purpose-split: receipt's history keeps the shared key
+    expect(getPurposeKeyHistory(root, "receipt")).toContain(shared);
+    rotatePurposeKeys({ workspace: root, purposes: ["ledger-row"], reason: "key-compromise", rootPrivateKeyPems: [pem().privatePem], passphrase: PASS });
+    expect(getPurposeKeyHistory(root, "ledger-row")).not.toContain(shared);
+    expect(getPurposeKeyHistory(root, "receipt")).not.toContain(shared);
+  });
+
   it("old amc.monitor-key-rotation receipts still verify", () => {
     const previous = pem();
     const next = pem();
@@ -234,6 +244,7 @@ describe("self-audit: no downgrade to a pre-P1-08 workspace (P1-08, security rev
     const root = workspace();
     const elsewhere = mkdtempSync(join(tmpdir(), "amc-elsewhere-"));
     roots.push(elsewhere);
+    rmSync(keysetPaths(root).rotations, { recursive: true }); // the first generation's own recovery manifest
     symlinkSync(elsewhere, keysetPaths(root).rotations);
     expect(() => rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS })).toThrow(/symlink|outside/);
     expect(existsSync(keysetPaths(root).pending)).toBe(false);

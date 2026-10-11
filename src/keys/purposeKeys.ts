@@ -208,6 +208,15 @@ function rotationWrites(workspace: string, before: VaultPayloadV2, after: VaultP
     const entries = rebuiltEntries(prior.entries, compromised, [pem(after, purpose)]);
     writes.push({ path: historyFile, bytes: JSON.stringify(sealKeyHistory(purpose, entries, after.keys[purpose]!.privateKeyPem, prior.revision + 1), null, 2), mode: 0o600 });
   }
+  // A compromised key leaves every history that still admits it as an older key, not only the rotated purposes'.
+  const scrubbed = LOCAL_PURPOSES.filter(purpose => compromised.size > 0 && !targets.has(purpose) && purpose !== "lease" && purpose !== "session");
+  for (const purpose of scrubbed) {
+    // A history that does not authenticate admits no older key already.
+    const prior = readHistory(workspace, purpose, pem(after, purpose));
+    if (prior === null || !prior.entries.some(entry => compromised.has(entry.fingerprint))) continue;
+    writes.push({ path: purposeKeyPaths(workspace, purpose).historyFile,
+      bytes: JSON.stringify(sealKeyHistory(purpose, rebuiltEntries(prior.entries, compromised, []), after.keys[purpose]!.privateKeyPem, prior.revision + 1), null, 2), mode: 0o600 });
+  }
   for (const role of new Set([...targets].map(roleOfPurpose))) {
     const primary = ROLE_PRIMARY_PURPOSE[role as VaultKeyKind];
     const prior = authenticated(workspace, role, pem(before, primary));
