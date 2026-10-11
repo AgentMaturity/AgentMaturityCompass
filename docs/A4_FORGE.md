@@ -432,7 +432,8 @@ list and re-signs the file. Expect one notary call for every gate decision.
 The package also carries the prepared deployment under `deploy/`: the Compose overlay
 `docker-compose.a4-<releaseId>.yml` or the Helm values overlay `values.a4-<releaseId>.yaml`, and `deploy/plan.json` with
 the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollback), the receipt form and the gaps. The plan
-is signed `a4-deployment-plan`. AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
+is signed `a4-deployment-plan`. `GET …/releases/:rid` shows its steps only while that signature verifies and the
+verified package manifest lists the plan's digest (`plan: null` with the reason otherwise). AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
 tag (`IMAGE_TAG_ONLY`, until D-03 and P0-14), and a Helm topology is undecided (`TOPOLOGY_UNDECIDED`, until D-03). Both are
 WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
 workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders

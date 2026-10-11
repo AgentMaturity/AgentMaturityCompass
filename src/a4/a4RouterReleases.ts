@@ -138,6 +138,25 @@ function packageFiles(bytes: Buffer | null, packageDigest: string): { files: unk
 }
 
 /**
+ * The prepared plan as GET shows it: parsed only from bytes whose a4-deployment-plan signature verifies now and whose
+ * sha256 the verified package manifest lists for deploy/plan.json; otherwise `plan: null` with the reason, so changed or
+ * unsigned operator commands are never presented as AMC's (and bytes that do not parse are a reason, never a 500).
+ */
+function planView(plan: { valid: boolean; reason: string | null; artifactBytes: Buffer | null }, files: { files: unknown[] | null; reason: string | null }):
+  { signatureValid: boolean; reason: string | null; plan: unknown } {
+  const listed = (files.files as Array<{ path?: unknown; sha256?: unknown }> | null)?.find((file) => file.path === PLAN_PATH)?.sha256;
+  const reason = !plan.valid || plan.artifactBytes === null ? `PLAN_SIGNATURE_INVALID: ${plan.reason ?? "not verified"}`
+    : files.files === null ? `PLAN_NOT_IN_VERIFIED_MANIFEST: ${String(files.reason)}`
+      : sha256Hex(plan.artifactBytes) !== listed ? "PLAN_DIGEST_MISMATCH: the plan is not the one the package manifest lists" : null;
+  if (reason !== null) return { signatureValid: plan.valid, reason, plan: null };
+  try {
+    return { signatureValid: true, reason: null, plan: JSON.parse(plan.artifactBytes!.toString("utf8")) as unknown };
+  } catch {
+    return { signatureValid: true, reason: "PLAN_UNREADABLE: the signed plan does not parse", plan: null };
+  }
+}
+
+/**
  * GET …/releases[/:rid]: each release record as stored (chain-named a4_releases rows), its envelope checked against the
  * stored bytes now, the leases with their live status (production from the deployment approval's effect), the package's
  * file list, the eight-surface table with a reason for every surface not evaluated (Watch's SLO digest from the newest
@@ -184,7 +203,7 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
       && monitorResolves(state, link)).at(-1);
     const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
       maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
-    const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
+    const files = packageFiles(fileOf(record.packagePath), record.packageDigest);
     // The transparency entry the release effect appended once RELEASE committed (its EFFECT_FINISHED record), or why none.
     const entry = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
       ? (link.body.record as { transparency?: { releaseId?: unknown; entryId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
@@ -194,9 +213,9 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
       envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
       && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
     // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
-    deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
+    deployPlan: planView(plan, files),
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
-    packageFiles: packageFiles(fileOf(record.packagePath), record.packageDigest),
+    packageFiles: files,
     deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle, expertReview,
     // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
     lifecycleProduction: bridgeControls(state, "production", record.releaseId),

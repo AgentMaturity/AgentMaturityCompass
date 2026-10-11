@@ -196,8 +196,8 @@ function renderDeploy(ctx) {
   const plan = release.deployPlan;
   const check = checks.get(ctx.project.projectId);
   return `<p class="muted">Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment. Plan signature
-      <code>${plan?.signatureValid ? "valid under this workspace's keys" : esc(plan?.reason ?? "not checked")}</code>.</p>
-    ${planSteps(plan?.plan)}${receiptForm(ctx, release)}
+      <code>${plan?.signatureValid === true && plan.reason === null ? "valid under this workspace's keys, listed in the package manifest" : esc(plan?.reason ?? "not checked")}</code>.</p>
+    ${plan?.signatureValid === true && plan.reason === null ? planSteps(plan.plan) : "<p class=\"muted\">The prepared steps are not shown: the plan's signature, or its digest in the package manifest, did not verify.</p>"}${receiptForm(ctx, release)}
     <h4>Receipts: recorded by the operator, checked by AMC</h4>
     ${table(["Receipt", "Kind", "Recorded", "AMC check", "Status", "Check detail"], receiptRows(release.deployments), "No receipt recorded.")}
     <h4>AMC's check</h4>
