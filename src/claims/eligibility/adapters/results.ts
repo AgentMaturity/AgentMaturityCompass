@@ -156,17 +156,25 @@ export function envelopeFromDimensions(producer: string, claimKind: ClaimKind, s
 
 const EVIDENCE_ORDER: readonly EvidenceState[] = ["sufficient", "incomplete", "stale", "contradictory", "untrusted"];
 
+const isVerified = (member: ClaimEnvelope): boolean => member.claimKind === "observed" || member.claimKind === "independently_reviewed";
+
 /**
  * A fleet, organisation or report total claims no more than its weakest member: the weakest kind, the worst
- * evidence, the lowest eligible level, a pass only when every member passes and a fail when any fails.
+ * evidence, the lowest eligible level, a pass only when every member passes and a fail when any fails. A self-reported
+ * member's sufficient evidence (a D-03 pass) counts as incomplete, and its pass satisfies no total: D-03 lets a result
+ * show a self-reported pass, never lift a total to sufficient evidence or a pass.
  */
 export function envelopeForAggregate(producer: string, members: readonly ClaimEnvelope[], now: number): ClaimEnvelope {
   if (members.length === 0) return envelopeForUnverifiedResult({ producer, recordCount: 0, now });
   const weakest = members.reduce((a, b) => (CLAIM_KINDS.indexOf(b.claimKind) < CLAIM_KINDS.indexOf(a.claimKind) ? b : a));
+  const selfReportedPass = members.some((member) => !isVerified(member) && member.statusDimensions.result === "pass"
+    && member.statusDimensions.evidence === "sufficient");
   const results = members.map((member) => member.statusDimensions.result);
-  const result: ResultState = results.includes("fail") ? "fail" : results.every((value) => value === "pass") ? "pass" : "not_evaluated";
-  const evidence = members.map((member) => member.statusDimensions.evidence)
-    .reduce((a, b) => (EVIDENCE_ORDER.indexOf(b) > EVIDENCE_ORDER.indexOf(a) ? b : a));
+  const result: ResultState = results.includes("fail") ? "fail"
+    : results.every((value) => value === "pass") && !selfReportedPass ? "pass" : "not_evaluated";
+  const evidence = members.map((member) => (member.statusDimensions.evidence === "sufficient" && !isVerified(member) ? "incomplete"
+    : member.statusDimensions.evidence)).reduce((a, b) => (EVIDENCE_ORDER.indexOf(b) > EVIDENCE_ORDER.indexOf(a) ? b : a));
+  const memberReasons = members.flatMap((member) => member.reasons);
   const levels = members.map((member) => member.eligibleLevel);
   return {
     claimKind: weakest.claimKind,
@@ -174,6 +182,6 @@ export function envelopeForAggregate(producer: string, members: readonly ClaimEn
     provenance: { producer, method: weakest.provenance.method,
       evidenceRefs: [...new Set(members.flatMap((member) => member.provenance.evidenceRefs))] },
     eligibleLevel: levels.includes(null) ? null : Math.min(...(levels as number[])),
-    reasons: [...new Set(members.flatMap((member) => member.reasons))] as ClaimReasonCode[]
+    reasons: [...new Set(selfReportedPass ? [...memberReasons, "SELF_REPORTED_NO_POSITIVE_STATUS"] : memberReasons)] as ClaimReasonCode[]
   };
 }

@@ -44,7 +44,7 @@ describe("renderClaimLabel", () => {
   test("label per kind", () => {
     expect(Object.fromEntries(Object.entries(envelopes).map(([name, envelope]) => [name, renderClaimLabel(envelope).line]))).toEqual({
       synthetic: "Claim: Synthetic example (not evidence) · Result: not evaluated (synthetic example values are not evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable",
-      selfReported: "Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: unresolved",
+      selfReported: "Claim: Self-reported · Result: not evaluated (self-reported answers or records cannot satisfy a regulated control) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: unresolved",
       observed: "Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: enforced at gateway · Review: pending · Applicability: applicable",
       reviewed: "Claim: Independently reviewed · Result: pass · Evidence: sufficient · Enforcement: none · Review: approved · Applicability: applicable",
       legacy: "Claim: Legacy (1.x), self-reported · Result: pass · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable"
@@ -125,12 +125,17 @@ describe("claim-line producers without verified evidence", () => {
 
   test("a regulated self-reported result shows pass only with records attached, and says it is self-reported (D-03)", () => {
     const applicability = { state: "applicable" } as const;
-    const withRecords = unverifiedClaim("ingest", 2, { regulated: true, result: "pass", applicability });
+    // Records whose signature the caller verified in the same read (AMC's own workspace flow).
+    const withRecords = unverifiedClaim("ingest", 2, { regulated: true, result: "pass", applicability, signatureValid: true });
     expect(withRecords).toMatchObject({ claimKind: "self_reported", statusDimensions: { result: "pass", evidence: "sufficient" } });
     expect(renderClaimLabel(withRecords).line).toContain(
       "Claim: Self-reported · Result: pass (self-reported, evidence attached, not independently verified) · Evidence: sufficient");
-    const withoutRecords = unverifiedClaim("ingest", 0, { regulated: true, result: "pass", applicability });
+    const withoutRecords = unverifiedClaim("ingest", 0, { regulated: true, result: "pass", applicability, signatureValid: true });
     expect(withoutRecords.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
+    // Imported or unsigned records: no pass.
+    const unsigned = unverifiedClaim("ingest", 2, { regulated: true, result: "pass", applicability });
+    expect(unsigned.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
+    expect(renderClaimLabel(unsigned).line).toContain("Result: not evaluated (self-reported answers or records cannot satisfy a regulated control)");
     // Not regulated: no D-03 path, so its records stay incomplete.
     expect(unverifiedClaim("ingest", 2, { result: "pass" }).statusDimensions).toMatchObject({ result: "pass", evidence: "incomplete" });
   });
