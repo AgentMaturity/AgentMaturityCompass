@@ -105,15 +105,43 @@ export function scanForPII(text: string): ScanResult {
 
 export interface PiiSpan { readonly type: string; readonly start: number; readonly end: number }
 
-/** UTF-16 offsets only; uses the same patterns and validators as scanForPII. */
+/** Declared revision of the findPIISpans scan below; detector-set digests bind it. Bump it with any scan change. */
+export const PII_SPAN_SCAN_REVISION = "exec-retry-next-index-trailing-group-prefixes-v1";
+const TRAILING_GROUP = /[\s-]?[A-Z0-9]{1,4}$/i;
+const WHOLE_MATCH = new Map(PII_PATTERNS.map(pattern => [pattern, new RegExp(`^(?:${pattern.re.source})$`, pattern.re.flags.replace("g", ""))]));
+
+/**
+ * Length of the validated part of a match at `start`: the whole match, else the longest prefix left by stripping trailing
+ * groups, down to the shortest prefix that still matches the whole pattern, that ends on a word boundary in `text`; 0 if none.
+ */
+function validatedLength(pattern: PiiPattern, text: string, start: number, value: string): number {
+  if (!pattern.validate || pattern.validate(value)) return value.length;
+  const whole = WHOLE_MATCH.get(pattern)!;
+  // A trailing group is at most 5 characters, so matching only the last 5 keeps each strip constant-time.
+  for (let prefix = value, group = TRAILING_GROUP.exec(prefix.slice(-5)); group !== null; group = TRAILING_GROUP.exec(prefix.slice(-5))) {
+    prefix = prefix.slice(0, prefix.length - group[0].length);
+    if (!whole.test(prefix)) break; // below the pattern's minimum length (or no longer its shape)
+    if (!/\w/.test(text.charAt(start + prefix.length)) && pattern.validate(prefix)) return prefix.length;
+  }
+  return 0;
+}
+
+/**
+ * UTF-16 offsets only; uses the same patterns and validators as scanForPII. A match that fails validation is retried as
+ * shorter prefixes and then from the next character, so a greedy match that absorbed a neighbouring number or word
+ * (e.g. "Qty 2 4111 1111 1111 1111", "ES9121000418450200051332 to Acme") cannot hide a real card or IBAN.
+ */
 export function findPIISpans(text: string): readonly PiiSpan[] {
+  // ponytail: retrying from the next index re-matches digit-dense text, about 10x the single-pass cost on hostile input
+  // (~0.3 s per 1 MiB of "1 1 1 ..."); resume after the first absorbed group instead if that ever matters.
   const spans: PiiSpan[] = [];
   for (const pattern of PII_PATTERNS) {
-    for (const match of text.matchAll(cloneGlobal(pattern.re))) {
-      if (!pattern.validate || pattern.validate(match[0])) {
-        const start = match.index!;
-        spans.push(Object.freeze({ type: pattern.type, start, end: start + match[0].length }));
-      }
+    const re = cloneGlobal(pattern.re);
+    for (let match = re.exec(text); match !== null; match = re.exec(text)) {
+      const start = match.index;
+      const length = validatedLength(pattern, text, start, match[0]);
+      if (length > 0) spans.push(Object.freeze({ type: pattern.type, start, end: start + length }));
+      re.lastIndex = start + Math.max(length, 1);
     }
   }
   return Object.freeze(spans.sort((a, b) => a.start - b.start || a.end - b.end || (a.type < b.type ? -1 : a.type > b.type ? 1 : 0)));

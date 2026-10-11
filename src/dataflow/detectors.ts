@@ -1,7 +1,7 @@
 /** Experimental text heuristics. Binary media, clinical semantics, and complete detection are outside this detector set. */
 import type { EncodableRequest } from "../llm/request/requestSpec.js";
 import type { ProtectedDataClass } from "../vault/dataClassification.js";
-import { findPIISpans, getPIIDetectorMetadata } from "../vault/dlp.js";
+import { findPIISpans, getPIIDetectorMetadata, PII_SPAN_SCAN_REVISION } from "../vault/dlp.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -33,7 +33,8 @@ const NOISE_FILTERS: Readonly<Record<string, RegExp>> = Object.freeze({
 const MAX_DEPTH = 32;
 const MAX_TEXT_CHARS = 1_048_576;
 const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
-  schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), classMapping: CLASS_BY_TYPE,
+  schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), spanScanRevision: PII_SPAN_SCAN_REVISION,
+  classMapping: CLASS_BY_TYPE,
   noiseFilters: Object.fromEntries(Object.entries(NOISE_FILTERS).map(([type, re]) => [type, re.source])),
   traversalRevision: "request-json-leaves-password-context-malformed-args-as-text-per-leaf-limits-noise-filtered-v4",
   limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_TEXT_CHARS }
