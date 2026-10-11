@@ -24,7 +24,7 @@ import { latestGate, type A4ReadinessState } from "./a4Readiness.js";
 import { blockingExecutionsIn } from "./assembleLockout.js";
 import { cycleLinks, monitorResolves, PRODUCTION_LEASE_EFFECT_ID, RELEASE_EFFECT_ID } from "./spec/activate.js";
 
-export const MONITOR_SCHEMA = "amc.a4-monitor/v1";
+const MONITOR_SCHEMA = "amc.a4-monitor/v1";
 const KILL_SWITCH = "not available in this release (P2-26)";
 const SLO_NOTE = "in-memory measurements, unsigned: governanceSlo keeps its state in this process and writes no ledger row";
 /** Design §14.4's alert rules, as labelled proposals: nothing here evaluates them. */
