@@ -10,6 +10,7 @@ import {
   type EvidenceState,
   type ResultState
 } from "../../src/claims/eligibility/index.js";
+import { controlResultV1Schema } from "../../src/contracts/v1/controlResult.js";
 
 const NOW = Date.UTC(2026, 9, 5, 12, 0, 0);
 const DAY = 86_400_000;
@@ -177,9 +178,10 @@ const rows: Row[] = [
     kind: "self_reported", result: "pass", evidence: "incomplete"
   },
   {
+    // D-03 allows "pass" here, but control-result v1 needs sufficient evidence for a pass and has no state for it.
     name: "self-reported records, regulated pass with evidence provided (D-03)",
     input: withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED", "ATTESTED"] }, { regulated: true, applicability: applicable }),
-    kind: "self_reported", result: "pass", evidence: "incomplete"
+    kind: "self_reported", result: "not_evaluated", evidence: "incomplete", reason: "SELF_REPORTED_NO_POSITIVE_STATUS"
   },
   {
     name: "observed tier from a method that does not observe",
@@ -248,6 +250,25 @@ describe("evaluateClaimEligibility", () => {
         expect(["observed", "independently_reviewed"], row.name).toContain(envelope.claimKind);
         expect(row.input.evidence.eventCount, row.name).toBeGreaterThan(0);
       }
+    }
+  });
+
+  test("a regulated result is emitted only in a shape control-result v1 accepts", () => {
+    const v1 = (envelope: ClaimEnvelope) => controlResultV1Schema.safeParse({ type: "amc.control-result", version: 1,
+      controlId: "test.control", controlVersion: "1", evaluatedAt: new Date(NOW).toISOString(),
+      dimensions: envelope.statusDimensions, claimKind: envelope.claimKind, evidenceRefs: ["ref-1"], exceptions: [] });
+    const regulated = { regulated: true, applicability: applicable } as const;
+    const selfReported = evaluateClaimEligibility(withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED"] }, regulated));
+    expect(selfReported.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
+    expect(v1(selfReported).success).toBe(true);
+    const observed = evaluateClaimEligibility(input(regulated));
+    expect(observed.statusDimensions).toMatchObject({ result: "pass", evidence: "sufficient" });
+    expect(v1(observed).success).toBe(true);
+    // The shape this rule prevents: v1 refuses a pass on unverified evidence.
+    expect(v1({ ...selfReported, statusDimensions: { ...selfReported.statusDimensions, result: "pass" } }).success).toBe(false);
+    for (const row of rows.filter((candidate) => candidate.input.regulated)) {
+      const envelope = evaluateClaimEligibility(row.input);
+      if (envelope.statusDimensions.result === "pass") expect(envelope.statusDimensions.evidence, row.name).toBe("sufficient");
     }
   });
 

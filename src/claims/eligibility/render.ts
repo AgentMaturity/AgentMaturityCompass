@@ -19,7 +19,7 @@ export function claimKindLabel(kind: ClaimKind): string {
 
 export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   SYNTHETIC_VALUES: "synthetic example values are not evidence",
-  SELF_REPORTED_NO_POSITIVE_STATUS: "self-reported answers cannot pass a regulated control",
+  SELF_REPORTED_NO_POSITIVE_STATUS: "self-reported answers or records cannot pass a regulated control",
   SELF_REPORTED_LEVEL_CAP: "self-reported answers cannot support a level above 1",
   WEAK_METHOD: "keyword matches, unkeyed checksums and path checks cannot pass a regulated control or support a level above 1",
   EMPTY_EVIDENCE: "no evidence events were recorded",
