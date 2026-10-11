@@ -174,6 +174,31 @@ for (const file of walkSources("src")) {
   }
 }
 
+// ── The standalone verifier imports nothing but Node (P1-06) ─────────────
+//
+// packages/verifier ships with no dependencies so a third party can verify AMC records without AMC, a registry or a
+// workspace. Its source, bin and conformance runner may import only node: built-ins and modules inside the package.
+const VERIFIER_ROOT = "packages/verifier";
+function verifierFiles(dir, out = []) {
+  if (!existsSync(join(root, dir))) return out;
+  for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {
+    const rel = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) verifierFiles(rel, out);
+    else if (/\.(ts|mjs|js)$/.test(entry.name)) out.push(rel);
+  }
+  return out;
+}
+for (const file of ["src", "bin", "conformance"].flatMap(dir => verifierFiles(`${VERIFIER_ROOT}/${dir}`))) {
+  const source = readFileSync(join(root, file), "utf8");
+  for (const [, specifier] of source.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)["'`]([^"'`]+)["'`]/g)) {
+    const relative = specifier.startsWith("./") || specifier.startsWith("../");
+    const inside = relative && join(root, file, "..", specifier).startsWith(join(root, VERIFIER_ROOT) + "/");
+    if (!specifier.startsWith("node:") && !inside) {
+      fail(`${file} imports "${specifier}"; ${VERIFIER_ROOT} may import only node: built-ins and its own modules (P1-06).`);
+    }
+  }
+}
+
 // ── Private signing keys are taken per purpose (P1-08) ───────────────────
 //
 // getPrivateKeyPem( and getVaultPrivateKeyPem( hand out a role's key; every signing call site takes its key per
