@@ -13,6 +13,7 @@ import { z } from "zod";
 import { initApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
 import { CONTROL_HOOK_ROUTE } from "../../bridge/hookControl.js";
 import { revokeLeaseForCli } from "../../leases/leaseCli.js";
+import { getPublicKeyHistory } from "../../crypto/keys.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../../org/orgSigner.js";
 import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -52,6 +53,8 @@ const piManifestSchema = z.strictObject({
   tokenPath: z.literal(".amc/hooks/pi.lease"),
   ...leaseManifestFields,
   qualifiedPiVersions: z.array(z.string()),
+  /** AMC's monitor public keys at install; the extension accepts only decision receipts signed by one of them. */
+  receiptPublicKeys: z.array(z.string().min(1)).min(1),
   installedTs: z.number().int(),
   updatedTs: z.number().int(),
   control: z.strictObject({
@@ -110,6 +113,7 @@ function loadManifest(workspace: string, paths: PiPaths): PiManifest | null {
 }
 
 const fileSha = (path: string): string | null => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
+const sameKeys = (left: readonly string[], right: readonly string[]): boolean => [...left].sort().join("\n") === [...right].sort().join("\n");
 
 function result(operation: "install" | "remove", mode: HookMode, dryRun: boolean, applied: boolean, files: HookFileChange[],
   lease: { leaseId: string | null; expiresTs: number | null }): HookMutationResult {
@@ -136,10 +140,12 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
     const ignoreBytes = Buffer.from(addManagedIgnoreBlock(ignoreBefore.bytes?.toString("utf8") ?? null), "utf8");
     const existingLease = verifyManagedLease({ workspace, tokenPath: paths.token, expectedAgentId: agentId, mode });
     const moduleSha256 = sha256Hex(readFileSync(modulePath));
+    const receiptPublicKeys = getPublicKeyHistory(workspace, "monitor");
     const before = { extension: snapshot(paths.extension), ignore: ignoreBefore, token: snapshot(paths.token), manifest: snapshot(paths.manifest),
       signature: snapshot(paths.signature) };
     if (existing && existing.mode === mode && existing.agentId === agentId && existing.bridgeBase === bridgeBase
-      && existing.extensionSha256 === sha256Hex(extensionBytes) && existing.moduleSha256 === moduleSha256 && hasManagedIgnoreBlock(ignoreBefore.bytes?.toString("utf8") ?? null)
+      && existing.extensionSha256 === sha256Hex(extensionBytes) && existing.moduleSha256 === moduleSha256
+      && sameKeys(existing.receiptPublicKeys, receiptPublicKeys) && hasManagedIgnoreBlock(ignoreBefore.bytes?.toString("utf8") ?? null)
       && existingLease.valid && existingLease.payload?.leaseId === existing.leaseId) {
       const unchanged = [paths.extension, paths.ignore, paths.token, paths.manifest, paths.signature]
         .map((path) => ({ path, action: "unchanged" as const, sensitive: path === paths.token }));
@@ -163,7 +169,7 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
       extensionSha256: sha256Hex(extensionBytes), moduleSha256, modulePath, createdDirs, ignorePath: ".gitignore",
       ignoreExistedBefore: existing?.ignoreExistedBefore ?? ignoreBefore.existed, ignoreBlockSha256: ignoreBlockHash(),
       tokenPath: relativePortable(workspace, paths.token), agentId, bridgeBase, leaseId: lease.leaseId, leaseIssuedTs: lease.issuedTs,
-      leaseExpiresTs: lease.expiresTs, qualifiedPiVersions: [...QUALIFIED_PI_VERSIONS], installedTs: existing?.installedTs ?? now, updatedTs: now,
+      leaseExpiresTs: lease.expiresTs, qualifiedPiVersions: [...QUALIFIED_PI_VERSIONS], receiptPublicKeys, installedTs: existing?.installedTs ?? now, updatedTs: now,
       control: mode === "control" ? { endpoint: CONTROL_HOOK_ROUTE, localOnly: true, rawInputTransport: "loopback-memory-only",
         leaseScope: "hook:control", providerOutcomes: ["allow", "deny", "ask"] } : null,
     });
@@ -223,12 +229,14 @@ export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   else if (manifest && !configOwned) issues.push(".pi/extensions/amc.js changed after installation");
   const moduleDrifted = manifest !== null && fileSha(manifest.modulePath) !== manifest.moduleSha256;
   if (moduleDrifted) issues.push("AMC's Pi extension module changed after installation; reinstall to bind the new module");
+  const keysDrifted = manifest !== null && !sameKeys(manifest.receiptPublicKeys, getPublicKeyHistory(workspace, "monitor"));
+  if (keysDrifted) issues.push("AMC's receipt signing keys changed after installation; reinstall so the extension accepts them");
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
   const state: HookIntegrationStatus["state"] = !manifest || (!lease.valid && !lease.expired) || !ignoreProtected
     || issues.some((issue) => issue.includes("lease ID")) ? "invalid"
-    : lease.expired ? "expired" : !configOwned || moduleDrifted ? "drifted" : "installed";
+    : lease.expired ? "expired" : !configOwned || moduleDrifted || keysDrifted ? "drifted" : "installed";
   return { ...base, agentId: manifest?.agentId ?? null, mode: manifest?.mode ?? null, state, configOwned, manifestValid: manifest !== null,
     leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null,
     issues };

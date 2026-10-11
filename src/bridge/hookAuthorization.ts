@@ -6,6 +6,7 @@
  */
 import { authorizationRecordDigest, type AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import { bindAuthorization } from "../actions/authorize.js";
+import { piActionId } from "../adapters/pi/piIdentity.js";
 import { assertContract } from "../contracts/index.js";
 import type { ActionReceiptMembers } from "../receipts/receipt.js";
 import type { ActionClass } from "../types.js";
@@ -75,8 +76,8 @@ function bindHookAuthorization(input: {
 }
 
 /**
- * A decision that lets the effect proceed (allow or ask) binds the record; one that cannot bind is denied with the
- * reason, and a deny binds nothing. Only Pi requests bind today.
+ * An allow binds the record; one that cannot bind is denied with the reason. A deny binds nothing, and so does a Pi
+ * ask, which control denies because a Pi call cannot carry an AMC approval. Only Pi requests bind today.
  */
 export function authorizeHookDecision<R extends { decision: string; reason: string; target?: AuthorizationTarget | null }>(input: {
   workspace: string;
@@ -89,16 +90,17 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
   requested: R;
 }): { requested: R; authorization: HookAuthorization | null } {
   const { pi, requested } = input;
-  if (!pi || (requested.decision !== "allow" && requested.decision !== "ask")) return { requested, authorization: null };
+  if (!pi || requested.decision !== "allow") return { requested, authorization: null };
   const authorization: HookAuthorization = requested.target
-    ? bindHookAuthorization({ ...input, parentActionId: pi.parentActionId, idempotencyKey: pi.toolCallId, ...requested.target })
+    ? bindHookAuthorization({ ...input, idempotencyKey: pi.toolCallId, ...requested.target,
+        parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId) })
     : { ok: false, reason: "AMC could not bind an authorization record: no evaluated tool" };
   return { requested: authorization.ok ? requested : { ...requested, decision: "deny", reason: authorization.reason }, authorization };
 }
 
 /**
- * The v2 receipt members of one hook decision: allow is `authorized`, a native ask is `requested` (the provider asks
- * a person; that is not AMC approval), deny is `denied` with its reason. `enforced` only where the provider version
+ * The v2 receipt members of one hook decision: allow is `authorized`, deny is `denied` with its reason, and a native
+ * ask (another provider asking a person, which is not AMC approval) is `requested`. `enforced` only where the provider version
  * is qualified; otherwise the decision is advisory.
  */
 export function hookDecisionReceipt(input: {

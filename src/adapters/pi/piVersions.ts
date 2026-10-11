@@ -14,7 +14,10 @@ export function isQualifiedPiVersion(version: string): boolean {
   return QUALIFIED_PI_VERSIONS.includes(version);
 }
 
-/** Why control refuses every call from this Pi, or null. An unreadable version is recorded as unknown, not refused. */
+/** Why control refuses every call from this Pi, or null. An unreadable version is outside the qualified set too. */
 export function piVersionRefusal(version: string): string | null {
-  return version === UNKNOWN_PI_VERSION || isQualifiedPiVersion(version) ? null : `AMC has not qualified Pi ${version}`;
+  if (isQualifiedPiVersion(version)) return null;
+  return version === UNKNOWN_PI_VERSION
+    ? "AMC could not read Pi's version, so it cannot be a qualified one; control denies the call."
+    : `AMC has not qualified Pi ${version}`;
 }

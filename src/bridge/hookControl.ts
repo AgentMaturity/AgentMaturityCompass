@@ -34,6 +34,7 @@ import {
   type HookProvider, type PiControlContext, type ProviderControlResponse,
 } from "./hookProviders.js";
 import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
+import { piActionId } from "../adapters/pi/piIdentity.js";
 import { isQualifiedPiVersion, piVersionRefusal } from "../adapters/pi/piVersions.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
@@ -349,16 +350,17 @@ function normalizeProviderRequest(input: {
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   }
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
+  const pi = piControlContext(input.provider, parsed);
   const identity = resolveProviderHookRequestIdentity({
     provider: input.provider,
-    providerActionId: parsed.tool_use_id ?? parsed.tool_call_id,
+    // A Pi action id is AMC's own derivation from Pi's session and call id, never an id the payload names.
+    providerActionId: pi ? piActionId(pi.sessionId, pi.toolCallId) : parsed.tool_use_id ?? parsed.tool_call_id,
     sessionId: parsed.session_id,
     timestamp: parsed.timestamp,
     toolName: parsed.tool_name,
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
-  const pi = piControlContext(input.provider, parsed);
   const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
   const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
@@ -451,6 +453,11 @@ function evaluateCanonicalRequest(input: {
       reason: `Canonical tool ${input.request.name} is not allowed by signed ToolHub config.`,
       reasonCode: "TOOL_NOT_ALLOWED",
     };
+  }
+  const minimum = input.request.minimumActionClass;
+  if (minimum && ACTION_CLASS_RANK[tool.actionClass] < ACTION_CLASS_RANK[minimum]) {
+    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "TOOL_NOT_ALLOWED",
+      reason: `Signed ToolHub config gives ${tool.name} ${tool.actionClass}, below the ${minimum} the Pi mapping requires.` };
   }
   if (!input.request.argumentsReviewable) {
     return {
@@ -987,7 +994,7 @@ export function evaluateProviderHookControl(input: {
     });
     const materialized = materializeProviderDecision({
       provider,
-      pi: request.pi,
+      requestSha256: request.rawInputSha256,
       requestedDecision: requested.decision,
       reason: requested.reason,
     });

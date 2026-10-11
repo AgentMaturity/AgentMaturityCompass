@@ -9,7 +9,7 @@ import {
   type ShellCommandPlan,
   type ShellCommandSegment,
 } from "../enforce/shellCommandPlan.js";
-import type { RuntimeName } from "../types.js";
+import type { ActionClass, RuntimeName } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
@@ -46,6 +46,8 @@ export interface CanonicalToolRequest {
   args: Record<string, unknown>;
   segment: ShellCommandSegment | null;
   argumentsReviewable: boolean;
+  /** Set by a provider mapping table: control denies when the signed config gives the tool a lower class. */
+  minimumActionClass?: ActionClass;
 }
 
 export const providerSchema = z.enum(HOOK_PROVIDERS);
@@ -75,15 +77,17 @@ export function runtimeFor(provider: HookProvider): RuntimeName {
 }
 
 /**
- * What AMC's Pi extension adds to each Pi tool_call it forwards (docs/adapters/pi.md): Pi's version, run mode and
- * dialog support as Pi's ExtensionContext reports them, Pi's own call id, and the AMC action id of the calling tool.
+ * What AMC's Pi extension adds to each Pi tool_call it forwards (docs/adapters/pi.md): Pi's version and run mode,
+ * Pi's session id and call id (AMC derives the action id from them) and a fresh nonce, so each decision is bound to
+ * one request and can be made once. None of it is authority: identity and the decision come from AMC.
  */
 const piControlContextSchema = z.strictObject({
   version: z.string().min(1).max(64),
   mode: z.enum(["tui", "rpc", "json", "print"]),
-  hasUI: z.boolean(),
+  sessionId: z.string().min(1).max(512),
   toolCallId: z.string().min(1).max(512),
-  parentActionId: z.string().min(1).max(160).nullable(),
+  parentToolCallId: z.string().min(1).max(512).nullable(),
+  nonce: z.string().min(16).max(128),
 });
 export type PiControlContext = z.infer<typeof piControlContextSchema>;
 
@@ -97,16 +101,19 @@ export function piControlContext(provider: HookProvider, input: Record<string, u
   return parsed.data;
 }
 
-/** Claude Code can put an ask to a person; Pi only in its interactive terminal UI, never print, JSON, RPC or the SDK. */
-function supportsNativeAsk(provider: HookProvider, pi: PiControlContext | null): boolean {
-  return provider === "claude-code" || (pi !== null && pi.mode === "tui" && pi.hasUI);
+/**
+ * Only Claude Code carries an ask natively. A Pi tool call has no channel for an AMC approval, and a confirmation in
+ * Pi's own UI is not one, so every Pi ask is denied (capability-lossy).
+ */
+function supportsNativeAsk(provider: HookProvider): boolean {
+  return provider === "claude-code";
 }
 
 /** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
-function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider, pi: PiControlContext | null): string {
+function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): string {
   if (provider === "pi") {
     return outcome === "ask"
-      ? `Pi ${pi?.mode ?? "unknown"} mode has no interactive confirmation, so AMC denied the action.`
+      ? "A Pi tool call cannot carry an AMC approval, so AMC denied the action."
       : "Pi tool_call has no verified corrective retry outcome, so AMC denied the action.";
   }
   return outcome === "ask"
@@ -141,13 +148,14 @@ const geminiControlResponseSchema = z.union([
 ]);
 
 /**
- * Pi's ToolCallEventResult: `{ block: true, reason }` blocks, no block runs the tool. `ask: true` is AMC's own
- * instruction to its extension to confirm in Pi's UI; an extension that ignores it still blocks.
+ * Pi's ToolCallEventResult: `{ block: true, reason }` blocks, `{ block: false }` runs the tool. `requestSha256` is the
+ * digest of the exact request AMC decided; the signed receipt's body digest covers it, so a receipt authorizes only
+ * that request. Pi ignores the extra member.
  */
+const requestSha256Schema = z.string().regex(/^[a-f0-9]{64}$/);
 const piControlResponseSchema = z.union([
-  z.strictObject({ block: z.literal(false) }),
-  z.strictObject({ block: z.literal(true), reason: z.string().min(1).max(1_024) }),
-  z.strictObject({ block: z.literal(true), reason: z.string().min(1).max(1_024), ask: z.literal(true) }),
+  z.strictObject({ block: z.literal(false), requestSha256: requestSha256Schema }),
+  z.strictObject({ block: z.literal(true), reason: z.string().min(1).max(1_024), requestSha256: requestSha256Schema }),
 ]);
 
 const CONTROL_RESPONSE_SCHEMAS: Readonly<Record<HookProvider, z.ZodType>> = {
@@ -177,13 +185,13 @@ export function renderProviderControlResponse(
   providerInput: HookProvider,
   decision: HookControlDecision,
   reasonInput: string,
-  additionalContextInput?: string,
+  extra: { additionalContext?: string; requestSha256?: string } = {},
 ): ProviderControlResponse {
   const provider = parseProvider(providerInput);
   const reason = cleanReason(reasonInput);
   if (provider === "claude-code") {
-    const additionalContext = decision === "deny" && additionalContextInput
-      ? cleanReason(additionalContextInput)
+    const additionalContext = decision === "deny" && extra.additionalContext
+      ? cleanReason(extra.additionalContext)
       : null;
     return {
       hookSpecificOutput: {
@@ -195,8 +203,8 @@ export function renderProviderControlResponse(
     };
   }
   if (provider === "pi") {
-    if (decision === "allow") return { block: false };
-    return decision === "ask" ? { block: true, reason, ask: true } : { block: true, reason };
+    if (!extra.requestSha256) throw new Error("a Pi control response must bind the request it decided");
+    return decision === "allow" ? { block: false, requestSha256: extra.requestSha256 } : { block: true, reason, requestSha256: extra.requestSha256 };
   }
   if (decision === "allow") {
     return { decision: "allow" };
@@ -263,7 +271,8 @@ function canonicalShellToolRequest(
 /** The provider's response for AMC's requested outcome; an outcome the provider cannot carry becomes a lossy deny. */
 export function materializeProviderDecision(input: {
   provider: HookProvider;
-  pi: PiControlContext | null;
+  /** The digest of the exact request; Pi's response binds it. */
+  requestSha256: string;
   requestedDecision: HookControlOutcome;
   reason: string;
 }): {
@@ -281,6 +290,7 @@ export function materializeProviderDecision(input: {
   let capabilityLossy: boolean;
   let reason: string;
   let providerResponse: ProviderControlResponse;
+  const binding = { requestSha256: input.requestSha256 };
 
   if (input.requestedDecision === "steer") {
     decision = "deny";
@@ -289,36 +299,33 @@ export function materializeProviderDecision(input: {
       providerMapping = "corrective_deny";
       capabilityLossy = false;
       reason = cleanReason(input.reason);
-      providerResponse = renderProviderControlResponse(
-        input.provider,
-        "deny",
-        reason,
-        "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
-      );
+      providerResponse = renderProviderControlResponse(input.provider, "deny", reason, {
+        additionalContext: "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
+      });
     } else {
       effectiveOutcome = "deny";
       providerMapping = "fail_closed_deny";
       capabilityLossy = true;
-      reason = cleanReason(`${input.reason} ${lossyOutcomeNote("steer", input.provider, input.pi)}`);
-      providerResponse = renderProviderControlResponse(input.provider, "deny", reason);
+      reason = cleanReason(`${input.reason} ${lossyOutcomeNote("steer", input.provider)}`);
+      providerResponse = renderProviderControlResponse(input.provider, "deny", reason, binding);
     }
-  } else if (input.requestedDecision === "ask" && !supportsNativeAsk(input.provider, input.pi)) {
+  } else if (input.requestedDecision === "ask" && !supportsNativeAsk(input.provider)) {
     decision = "deny";
     effectiveOutcome = "deny";
     providerMapping = "fail_closed_deny";
     capabilityLossy = true;
-    reason = cleanReason(`${input.reason} ${lossyOutcomeNote("ask", input.provider, input.pi)}`);
+    reason = cleanReason(`${input.reason} ${lossyOutcomeNote("ask", input.provider)}`);
     // Gemini CLI's own renderer turns an ask into its deny; every other provider gets a plain deny.
     providerResponse = input.provider === "gemini-cli"
       ? renderProviderControlResponse(input.provider, "ask", input.reason)
-      : renderProviderControlResponse(input.provider, "deny", reason);
+      : renderProviderControlResponse(input.provider, "deny", reason, binding);
   } else {
     decision = input.requestedDecision;
     effectiveOutcome = input.requestedDecision;
     providerMapping = "native";
     capabilityLossy = false;
     reason = cleanReason(input.reason);
-    providerResponse = renderProviderControlResponse(input.provider, decision, reason);
+    providerResponse = renderProviderControlResponse(input.provider, decision, reason, binding);
   }
 
   return {
@@ -332,17 +339,29 @@ export function materializeProviderDecision(input: {
   };
 }
 
-/** Pi's built-in tools (1.0.2 and 1.0.4 schemas): `read` needs a path; grep, find and ls default to the cwd. */
+/**
+ * Every Pi tool AMC controls (the built-ins of Pi 1.0.2 and 1.0.4), its canonical ToolHub tool and the lowest action
+ * class the signed config may give that tool; a lower class is denied. `read` needs a path; grep, find and ls default
+ * to the working directory. Any tool not listed, extension and Codemode tools included, is denied until mapped here.
+ */
+const PI_TOOLS: Readonly<Record<string, { tool: "fs.read" | "fs.write" | "shell"; minimumActionClass: ActionClass; cwdDefault?: true }>> = {
+  read: { tool: "fs.read", minimumActionClass: "READ_ONLY" },
+  grep: { tool: "fs.read", minimumActionClass: "READ_ONLY", cwdDefault: true },
+  find: { tool: "fs.read", minimumActionClass: "READ_ONLY", cwdDefault: true },
+  ls: { tool: "fs.read", minimumActionClass: "READ_ONLY", cwdDefault: true },
+  write: { tool: "fs.write", minimumActionClass: "WRITE_LOW" },
+  edit: { tool: "fs.write", minimumActionClass: "WRITE_LOW" },
+  // An arbitrary binary is at least WRITE_HIGH; git subcommands keep the classes the signed config gives git.*.
+  bash: { tool: "shell", minimumActionClass: "WRITE_HIGH" },
+};
+
+const piTool = (toolName: string) => (Object.hasOwn(PI_TOOLS, toolName) ? PI_TOOLS[toolName]! : null);
+
 function piToolRequest(toolName: string, toolInput: Record<string, unknown>, workspace: string): Omit<CanonicalToolRequest, "segment"> | null {
-  const path = firstString(toolInput, ["path"]);
-  if (toolName === "read" || ["grep", "find", "ls"].includes(toolName)) {
-    const readPath = toolName === "read" ? path : path ?? workspace;
-    return readPath ? { name: "fs.read", args: { path: readPath }, argumentsReviewable: true } : null;
-  }
-  if (toolName === "write" || toolName === "edit") {
-    return path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
-  }
-  return null;
+  const entry = piTool(toolName);
+  if (!entry || entry.tool === "shell") return null;
+  const path = firstString(toolInput, ["path"]) ?? (entry.cwdDefault ? workspace : null);
+  return path ? { name: entry.tool, args: { path }, argumentsReviewable: true, minimumActionClass: entry.minimumActionClass } : null;
 }
 
 function shellCommandForProviderTool(
@@ -356,7 +375,7 @@ function shellCommandForProviderTool(
   if (provider === "gemini-cli" && toolName === "run_shell_command") {
     return firstString(toolInput, ["command"]) ?? "";
   }
-  if (provider === "pi" && toolName === "bash") {
+  if (provider === "pi" && piTool(toolName)?.tool === "shell") {
     return firstString(toolInput, ["command"]) ?? "";
   }
   return null;
@@ -374,7 +393,8 @@ export function canonicalToolRequests(
     return {
       commandPlan,
       requests: commandPlan.status === "parsed"
-        ? commandPlan.segments.map((segment) => canonicalShellToolRequest(segment, workspace))
+        ? commandPlan.segments.map((segment) => canonicalShellToolRequest(segment, workspace)).map((request) =>
+          provider === "pi" && request.name === "process.spawn" ? { ...request, minimumActionClass: PI_TOOLS.bash!.minimumActionClass } : request)
         : [],
     };
   }

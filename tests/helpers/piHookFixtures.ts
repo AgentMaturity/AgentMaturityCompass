@@ -63,25 +63,25 @@ function installObservedRun(workspace: string, agentId: string): void {
 export interface PiEnvelopeOptions {
   version?: string;
   mode?: "tui" | "rpc" | "json" | "print";
-  hasUI?: boolean;
-  actionId?: string;
-  parentActionId?: string | null;
+  sessionId?: string;
+  toolCallId?: string;
+  parentToolCallId?: string | null;
+  nonce?: string;
 }
 
-/** The body AMC's Pi extension posts for one Pi tool_call event. */
+/** The body AMC's Pi extension posts for one Pi tool_call event. AMC derives the action id from session and call id. */
 export function piEnvelope(toolName: string, input: Record<string, unknown>, options: PiEnvelopeOptions = {}): string {
-  const actionId = options.actionId ?? "pi.call-0001";
   return JSON.stringify({
     hook_event_name: "tool_call",
     tool_name: toolName,
-    tool_call_id: actionId,
     tool_input: input,
     pi: {
       version: options.version ?? "1.0.4",
       mode: options.mode ?? "print",
-      hasUI: options.hasUI ?? false,
-      toolCallId: `toolu_${actionId}`,
-      parentActionId: options.parentActionId ?? null,
+      sessionId: options.sessionId ?? "pi-session",
+      toolCallId: options.toolCallId ?? "toolu_0001",
+      parentToolCallId: options.parentToolCallId ?? null,
+      nonce: options.nonce ?? "nonce-0001-aaaaaaaaaaaa",
     },
   });
 }

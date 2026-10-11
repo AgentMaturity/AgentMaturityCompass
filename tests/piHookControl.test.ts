@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { authorizationRecordDigest } from "../src/actions/authorizationRecord.js";
+import { piActionId } from "../src/adapters/pi/piIdentity.js";
 import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { evaluateProviderHookControl, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
 import { HookControlError, validateProviderControlResponse } from "../src/bridge/hookProviders.js";
@@ -9,6 +10,9 @@ import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyReceipt } from "../src/receipts/receipt.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
+import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
+import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { controlledWorkspace, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const agentId = "pi-controlled";
@@ -40,38 +44,41 @@ function receiptPayload(workspace: string, receipt: string) {
   return verified.payload as Record<string, unknown>;
 }
 
+const requestSha256 = (rawInput: string) => sha256Hex(Buffer.from(rawInput, "utf8"));
+
 describe("Pi tool_call hook control", () => {
-  test("allows a permitted read with Pi's allow value, runtime pi, and a receipt bound to the authorization record", () => {
+  test("allows a permitted read and binds Pi's response, the record and the signed receipt to the exact request", () => {
     const workspace = controlledWorkspace(agentId);
-    const rawInput = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { actionId: "pi.allow-read" });
+    const rawInput = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { toolCallId: "toolu_allow" });
     const result = control(workspace, rawInput);
+    const actionId = piActionId("pi-session", "toolu_allow");
 
     expect(result).toMatchObject({ provider: "pi", decision: "allow", effectiveOutcome: "allow", providerMapping: "native",
-      capabilityLossy: false, canonicalToolName: "fs.read", actionId: "pi.allow-read" });
-    expect(result.providerResponse).toEqual({ block: false });
+      capabilityLossy: false, canonicalToolName: "fs.read", actionId });
+    expect(result.providerResponse).toEqual({ block: false, requestSha256: requestSha256(rawInput) });
     expect(validateProviderControlResponse("pi", result.providerResponse)).toBe(true);
 
     const row = decisionRow(workspace, result.eventId);
     expect(row.event.runtime).toBe("pi");
     expect(row.session.runtime).toBe("pi");
-    expect(row.meta).toMatchObject({ provider: "pi", piVersion: "1.0.4" });
+    expect(row.meta).toMatchObject({ provider: "pi", piVersion: "1.0.4", rawInputSha256: requestSha256(rawInput) });
     const record = assertContract("authorization-record", row.payload.authorizationRecord);
     const digest = authorizationRecordDigest(record);
     expect(row.payload).toMatchObject({ provider: "pi", piVersion: "1.0.4", authorizationRecordDigest: digest });
     expect(row.meta.authorizationRecordDigest).toBe(digest);
     expect(record).toMatchObject({
-      executionId: "pi.allow-read",
-      idempotencyKey: "toolu_pi.allow-read",
+      executionId: actionId,
+      idempotencyKey: "toolu_allow",
       principal: { principalId: "lease:lease_pi_fixture", kind: "service", authenticatedVia: "lease" },
       delegation: { leaseId: "lease_pi_fixture", depth: 0 },
       action: { toolName: "fs.read", actionClass: "READ_ONLY", adapterId: "hook:pi" },
-      session: { callId: "pi.allow-read", rootCallId: "pi.allow-read", parentToken: null },
+      session: { callId: actionId, rootCallId: actionId, parentToken: null },
     });
     expect(Date.parse(record.expiresAt)).toBeLessThanOrEqual(lease.expiresTs);
 
     expect(receiptPayload(workspace, result.receipt)).toMatchObject({
-      v: 2, kind: "action_state", state: "authorized", providerId: "hook-control:pi", executionId: "pi.allow-read",
-      idempotencyKey: "toolu_pi.allow-read", authorizationRecordDigest: digest,
+      v: 2, kind: "action_state", state: "authorized", providerId: "hook-control:pi", executionId: actionId,
+      idempotencyKey: "toolu_allow", authorizationRecordDigest: digest,
       enforcement: { level: "enforced", boundary: "pi:tool_call" }, body_sha256: result.providerResponseSha256,
     });
     expect(verifyProviderHookControlResult({ workspace, authenticatedAgentId: agentId, provider: "pi", rawInput, result }))
@@ -79,81 +86,101 @@ describe("Pi tool_call hook control", () => {
     expect(JSON.stringify(row)).not.toContain("public fixture");
   });
 
+  test("derives the action id from Pi's session and call id and ignores an action id the payload names", () => {
+    const workspace = controlledWorkspace(agentId);
+    const envelope = JSON.parse(piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { sessionId: "s-9", toolCallId: "c-9" }));
+    const result = control(workspace, JSON.stringify({ ...envelope, tool_call_id: "pi.forged-action", tool_use_id: "pi.forged-action" }));
+    expect(result.actionId).toBe(piActionId("s-9", "c-9"));
+    const nested = control(workspace, piEnvelope("read", { path: join(workspace, "workspace", "public.txt") },
+      { sessionId: "s-9", toolCallId: "c-9/1", parentToolCallId: "c-9" }));
+    const record = assertContract("authorization-record", decisionRow(workspace, nested.eventId).payload.authorizationRecord);
+    expect(record.session).toMatchObject({ callId: piActionId("s-9", "c-9/1"), parentToken: piActionId("s-9", "c-9") });
+  });
+
   test("denies an unmapped tool with Pi's block value and binds no authorization record", () => {
     const workspace = controlledWorkspace(agentId);
-    const result = control(workspace, piEnvelope("my_ext_tool", { secret: "DO_NOT_RETAIN" }, { actionId: "pi.unmapped" }));
+    const rawInput = piEnvelope("my_ext_tool", { secret: "DO_NOT_RETAIN" });
+    const result = control(workspace, rawInput);
+    const reason = "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool.";
 
     expect(result.decision).toBe("deny");
-    expect(result.providerResponse).toEqual({ block: true, reason: "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool." });
+    expect(result.providerResponse).toEqual({ block: true, reason, requestSha256: requestSha256(rawInput) });
     const row = decisionRow(workspace, result.eventId);
     expect(row.payload.authorizationRecordDigest).toBeNull();
-    expect(receiptPayload(workspace, result.receipt)).toMatchObject({
-      v: 2, state: "denied", authorizationRecordDigest: null, reason: "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool.",
-    });
+    expect(receiptPayload(workspace, result.receipt)).toMatchObject({ v: 2, state: "denied", authorizationRecordDigest: null, reason });
     expect(JSON.stringify(row)).not.toContain("DO_NOT_RETAIN");
   });
 
-  test("asks through Pi's confirmation only in the interactive TUI; every other mode denies as capability-lossy", () => {
+  test("an ask is denied in every Pi mode: a Pi confirmation is not AMC approval", () => {
     const workspace = controlledWorkspace(agentId);
-    const write = (mode: "tui" | "rpc" | "json" | "print", hasUI: boolean) => control(workspace,
-      piEnvelope("write", { path: join(workspace, "workspace", "output", "out.txt"), content: "PRIVATE" }, { actionId: `pi.ask-${mode}-${hasUI}`, mode, hasUI }));
-
-    const interactive = write("tui", true);
-    expect(interactive).toMatchObject({ requestedDecision: "ask", decision: "ask", providerMapping: "native", capabilityLossy: false });
-    expect(interactive.providerResponse).toEqual({ block: true, ask: true, reason: expect.stringContaining("human approval") });
-    expect(receiptPayload(workspace, interactive.receipt)).toMatchObject({ state: "requested", authorizationRecordDigest: expect.stringMatching(/^[a-f0-9]{64}$/) });
-
-    for (const [mode, hasUI] of [["print", false], ["json", false], ["rpc", true], ["tui", false]] as const) {
-      const lossy = write(mode, hasUI);
-      expect(lossy).toMatchObject({ requestedDecision: "ask", decision: "deny", effectiveOutcome: "deny",
+    for (const mode of ["tui", "rpc", "json", "print"] as const) {
+      const result = control(workspace,
+        piEnvelope("write", { path: join(workspace, "workspace", "output", "out.txt"), content: "PRIVATE" }, { mode, toolCallId: `ask-${mode}` }));
+      expect(result).toMatchObject({ requestedDecision: "ask", decision: "deny", effectiveOutcome: "deny",
         providerMapping: "fail_closed_deny", capabilityLossy: true });
-      expect(lossy.providerResponse).toEqual({ block: true, reason: expect.stringContaining("no interactive confirmation") });
-      expect(JSON.stringify(lossy)).not.toContain("PRIVATE");
+      expect(result.providerResponse).toMatchObject({ block: true, reason: expect.stringContaining("cannot carry an AMC approval") });
+      expect(receiptPayload(workspace, result.receipt)).toMatchObject({ state: "denied", authorizationRecordDigest: null });
+      expect(JSON.stringify(result)).not.toContain("PRIVATE");
     }
   });
 
-  test("denies instead of reducing an approval quorum to one Pi confirmation", () => {
+  test("denies instead of reducing an approval quorum to one Pi decision", () => {
     const workspace = controlledWorkspace(agentId);
     const policy = defaultApprovalPolicy();
     policy.approvalPolicy.actionClasses.WRITE_LOW = { requiredApprovals: 2, rolesAllowed: ["APPROVER", "OWNER"], requireDistinctUsers: true, ttlMinutes: 15 };
     initApprovalPolicy(workspace, policy);
-    const result = control(workspace, piEnvelope("edit", { path: join(workspace, "workspace", "output", "q.txt"), edits: [] }, { mode: "tui", hasUI: true }));
+    const result = control(workspace, piEnvelope("edit", { path: join(workspace, "workspace", "output", "q.txt"), edits: [] }, { mode: "tui" }));
     expect(result.decision).toBe("deny");
     expect(result.reason).toContain("cannot be reduced to one provider-local ask");
   });
 
-  test("replays the same Pi call id and input, and refuses the same call id with different input", () => {
-    const workspace = controlledWorkspace(agentId);
-    const first = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { actionId: "pi.replay" });
-    const original = control(workspace, first);
-    const replay = control(workspace, first);
-    expect(replay).toMatchObject({ idempotentReplay: true, eventId: original.eventId, receipt: original.receipt });
-    expect(() => control(workspace, piEnvelope("read", { path: join(workspace, "workspace", "other.txt") }, { actionId: "pi.replay" })))
-      .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT", statusCode: 409 }));
-  });
-
-  test("an unqualified Pi version blocks every call; an unreadable version is recorded as unknown and is not claimed enforced", () => {
+  test("a decision is single-use: the same call with a new nonce or other input is a conflict, never a second decision", () => {
     const workspace = controlledWorkspace(agentId);
     const path = join(workspace, "workspace", "public.txt");
-    const unqualified = control(workspace, piEnvelope("read", { path }, { actionId: "pi.v110", version: "1.1.0" }));
-    expect(unqualified.decision).toBe("deny");
-    expect(unqualified.providerResponse).toEqual({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+    const first = piEnvelope("read", { path }, { toolCallId: "toolu_once" });
+    const original = control(workspace, first);
+    expect(control(workspace, first)).toMatchObject({ idempotentReplay: true, eventId: original.eventId, receipt: original.receipt });
+    for (const reused of [piEnvelope("read", { path }, { toolCallId: "toolu_once", nonce: "nonce-0002-bbbbbbbbbbbb" }),
+      piEnvelope("read", { path: join(workspace, "workspace", "other.txt") }, { toolCallId: "toolu_once" })]) {
+      expect(() => control(workspace, reused))
+        .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_REPLAY_CONFLICT", statusCode: 409 }));
+    }
+  });
 
-    const unknown = control(workspace, piEnvelope("read", { path }, { actionId: "pi.unknown", version: "unknown" }));
-    expect(unknown.decision).toBe("allow");
+  test("a Pi version outside the qualified set is denied, readable or not; the receipt records it", () => {
+    const workspace = controlledWorkspace(agentId);
+    const path = join(workspace, "workspace", "public.txt");
+    const unqualified = control(workspace, piEnvelope("read", { path }, { toolCallId: "v110", version: "1.1.0" }));
+    expect(unqualified.decision).toBe("deny");
+    expect(unqualified.providerResponse).toMatchObject({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+
+    const unknown = control(workspace, piEnvelope("read", { path }, { toolCallId: "vunknown", version: "unknown" }));
+    expect(unknown.decision).toBe("deny");
+    expect(unknown.reason).toContain("could not read Pi's version");
     expect(decisionRow(workspace, unknown.eventId).payload).toMatchObject({ piVersion: "unknown" });
-    expect(receiptPayload(workspace, unknown.receipt)).toMatchObject({ enforcement: { level: "advisory" } });
+    expect(receiptPayload(workspace, unknown.receipt)).toMatchObject({ state: "denied", enforcement: { level: "advisory" } });
+  });
+
+  test("a signed tools config that gives a mapped tool a lower class than the Pi mapping table is denied", () => {
+    const workspace = controlledWorkspace(agentId);
+    const tools = defaultToolsConfig();
+    const write = tools.tools.allowedTools.find((tool) => tool.name === "fs.write")!;
+    write.actionClass = "READ_ONLY";
+    initToolsConfig(workspace, tools);
+    const result = control(workspace, piEnvelope("write", { path: join(workspace, "workspace", "output", "w.txt"), content: "x" }));
+    expect(result.decision).toBe("deny");
+    expect(result.reason).toContain("below the WRITE_LOW the Pi mapping requires");
   });
 
   test("a decision whose authorization record cannot bind is denied: expired lease, lease classes that do not cover the call", () => {
     const workspace = controlledWorkspace(agentId);
     const path = join(workspace, "workspace", "public.txt");
     const run = (id: string, hookLease: typeof lease & { executeActionClasses?: ["WRITE_LOW"] }) => evaluateProviderHookControl({
-      workspace, authenticatedAgentId: agentId, provider: "pi", rawInput: piEnvelope("read", { path }, { actionId: id }), lease: hookLease });
-    const expired = run("pi.expired", { leaseId: "lease_old", expiresTs: Date.now() - 1 });
+      workspace, authenticatedAgentId: agentId, provider: "pi", rawInput: piEnvelope("read", { path }, { toolCallId: id }), lease: hookLease });
+    const expired = run("expired", { leaseId: "lease_old", expiresTs: Date.now() - 1 });
     expect(expired.decision).toBe("deny");
     expect(expired.reason).toContain("could not bind an authorization record (capability_expired)");
-    const narrow = run("pi.narrow", { ...lease, executeActionClasses: ["WRITE_LOW"] });
+    const narrow = run("narrow", { ...lease, executeActionClasses: ["WRITE_LOW"] });
     expect(narrow.decision).toBe("deny");
     expect(narrow.reason).toContain("(scope_widened)");
     expect(receiptPayload(workspace, narrow.receipt)).toMatchObject({ state: "denied", authorizationRecordDigest: null });
@@ -167,14 +194,17 @@ describe("Pi tool_call hook control", () => {
     expect(record.delegation.leaseId).toBeNull();
   });
 
-  test("refuses a Pi request without the tool_call event, its Pi context, or with an unknown context field", () => {
+  test("refuses a Pi request without the tool_call event or a complete, known Pi context", () => {
     const workspace = controlledWorkspace(agentId);
     const envelope = JSON.parse(piEnvelope("read", { path: "x" })) as Record<string, unknown>;
+    const pi = envelope.pi as Record<string, unknown>;
     const refused = (body: unknown) => expect(() => control(workspace, JSON.stringify(body)))
       .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_INPUT_INVALID", statusCode: 400 }));
     refused({ ...envelope, hook_event_name: "PreToolUse" });
     refused({ ...envelope, pi: undefined });
-    refused({ ...envelope, pi: { ...(envelope.pi as object), extra: true } });
-    refused({ ...envelope, pi: { ...(envelope.pi as object), mode: "headless" } });
+    refused({ ...envelope, pi: { ...pi, extra: true } });
+    refused({ ...envelope, pi: { ...pi, mode: "headless" } });
+    for (const field of ["sessionId", "toolCallId", "nonce", "version"]) refused({ ...envelope, pi: { ...pi, [field]: undefined } });
+    refused({ ...envelope, tool_input: "not an object" });
   });
 });

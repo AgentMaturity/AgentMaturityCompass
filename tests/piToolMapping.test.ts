@@ -32,8 +32,17 @@ describe("Pi tool_call mapping to canonical ToolHub requests", () => {
     ]);
   });
 
+  test("every mapped Pi tool names the lowest action class the signed config may give it", () => {
+    const classes = (toolName: string, input: Record<string, unknown>) => map(toolName, input).requests.map((request) => request.minimumActionClass);
+    for (const tool of ["read", "grep", "find", "ls"]) expect(classes(tool, { path: "p" })).toEqual(["READ_ONLY"]);
+    for (const tool of ["write", "edit"]) expect(classes(tool, { path: "p" })).toEqual(["WRITE_LOW"]);
+    // An arbitrary binary is at least WRITE_HIGH; git subcommands keep the classes the signed config gives git.*.
+    expect(classes("bash", { command: "node x.js && git status" })).toEqual(["WRITE_HIGH", undefined]);
+  });
+
   test("unmapped tools and missing paths map to nothing, which control denies", () => {
-    for (const tool of ["my_ext_tool", "codemode", "powershell", "tool_search", "Read", "run_shell_command"]) {
+    for (const tool of ["my_ext_tool", "codemode", "powershell", "tool_search", "Read", "run_shell_command",
+      "constructor", "__proto__", "toString", "hasOwnProperty"]) {
       expect(map(tool, { path: "x", command: "ls" }).requests).toEqual([]);
     }
     expect(map("read", {}).requests).toEqual([]);
