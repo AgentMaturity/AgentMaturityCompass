@@ -16,7 +16,7 @@ const GATEWAY_GAPS = ["tool calls are not intercepted (gateway sees model traffi
 /** The table, keyed by path; every row parses as amc.a4-integration-claim/v1. */
 export const INTEGRATION_CLAIMS: Readonly<Record<A4IntegrationPath, A4IntegrationClaimV1>> = Object.fromEntries(([
   { path: "native", enforcementBoundary: "tool_pipeline", evidenceTier: "observed", supported: "supported", reason: null,
-    notCovered: ["the shell runs only on Linux (decideNativeShell); elsewhere the shell has no enforcement boundary",
+    notCovered: ["the shell (decideNativeShell) is confined by linux-bwrap or macos-seatbelt and refused when no backend is available; it has no enforcement boundary (enforcement none) only under the operator's macOS unconfined opt-in",
       "agent behaviour on the stub provider is not evaluated (synthetic_example)"] },
   { path: "claude-code", enforcementBoundary: "hook:PreToolUse", evidenceTier: "observed", supported: "preview", reason: "P1-23 (held on D-02)",
     notCovered: ["enforced only with a conformance receipt for the pinned version; none is recorded"] },

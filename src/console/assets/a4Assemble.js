@@ -42,7 +42,8 @@ function renderConversation(ctx) {
     <p class="muted">Tool pipeline ready: <code>${esc(facts.toolset?.ready ?? facts.toolset?.error ?? "unknown")}</code> · doctor
       <code>${esc(facts.doctor?.ok ? "ok" : "needs attention")}</code> ${codes(facts.doctor?.attention)} · outcome_unknown open:
       <code>${esc(facts.outcomeUnknown?.error ?? facts.outcomeUnknown ?? "unknown")}</code> · Enforce <code>${esc(facts.baseline?.error ?? facts.baseline)}</code>
-      · compiled plan <code>${esc(facts.compiledPolicy?.error ?? facts.compiledPolicy)}</code> · platform <code>${esc(facts.platform)}</code></p>
+      · compiled plan <code>${esc(facts.compiledPolicy?.error ?? facts.compiledPolicy)}</code> · platform <code>${esc(facts.platform)}</code>
+      · shell <code>${esc(facts.shell?.error ?? (facts.shell ? `${facts.shell.decision} (enforcement ${facts.shell.enforcement})` : "not read"))}</code></p>
     ${facts.native ? `<p class="muted">Per turn ${esc(facts.native.limits?.maxSteps)} steps and ${esc(facts.native.limits?.maxTokens)} tokens; at most
       ${esc(facts.native.limits?.maxActive)} active sessions across Studio. Providers: ${list(facts.native.providers).map((provider) =>
         `<code>${esc(provider.id)}</code>${provider.configured ? "" : " (credential not configured)"}`).join(" ")}</p>`
@@ -192,7 +193,8 @@ function renderReview(ctx) {
       <h4>Capabilities</h4>${table(["Capability", "Status", "Why"], list(review.capabilities).map((row) => [esc(row.capability), `<code>${esc(row.status)}</code>`,
         esc(row.reason)]), "None.")}
       <h4>Limitations</h4>${bullets(review.limitations)}
-      <p class="muted">Lifecycle: stays at <code>${esc(review.lifecycle?.stage)}</code>; unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code></p>` : ""}
+      <p class="muted">Lifecycle stage, as Review read it: <code>${esc(review.lifecycle?.stage)}</code>${review.lifecycle?.reason ? ` (${esc(review.lifecycle.reason)})` : ""};
+        unit_tests_passing <code>${esc(review.lifecycle?.unitTestsPassing)}</code>. Assemble does not advance it yet (the A4 lifecycle wrapper is not built).</p>` : ""}
     ${["manifest_active", "build_sessions_integrity", "lifecycle_bridge", "composition_bound"].map((id) => status(ctx, id)).join("")}
     <label>Findings <textarea name="content" rows="3" maxlength="65536"></textarea></label>
     <div class="row wrap">${view.actionButton("Review", "review", view.stepOffer(ctx.allowed.review, ctx, "review"))}</div>`;

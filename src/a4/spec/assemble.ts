@@ -51,6 +51,12 @@ export const APPLY_EFFECT_ID = "a4.assemble.apply";
 export const RESOLUTION_PURPOSE = "outcome_unknown_resolution";
 /** The seam the native task lane owns before composition.compositionDigest and composition.policyDigest can be recomputed per session. */
 export const COMPOSITION_SEAM_KEY = "NATIVE_TASK_COMPOSITION_DIGESTS";
+/**
+ * The seam before Assemble's completion can advance the lifecycle development → testing (design §7 item 9, §10.2): the
+ * A4 lifecycle wrapper (a4Lifecycle.advance, planned in P1-62's a4Lifecycle.ts, whose issue bridges only →staging and
+ * →production). Until it lands, nothing in A4 advances an agent past its recorded stage, and readiness says so.
+ */
+export const LIFECYCLE_SEAM_KEY = "A4_LIFECYCLE_WRAPPER";
 /** The workspace preset Build signs for the agent (src/presets/agentPresets.ts, `.amc/agents.yaml`). */
 export const presetIdOf = (agentId: string): string => `a4-${agentId}`;
 
@@ -295,10 +301,13 @@ function buildItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Reco
   items.push(item("composition_bound", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
     reasonCodes: ["COMPOSITION_SLOTS_UNBOUND", `KEY:${COMPOSITION_SEAM_KEY}`],
     nextAction: { label: "composition.compositionDigest and composition.policyDigest are not recomputed; the reviewed effective-policy receipts are bound through the review" } }));
-  const lifecycle = (review.lifecycle ?? {}) as { unitTestsPassing?: unknown };
+  // The stage Review read from lifecycle/state.json (not_evaluated when absent or unreadable), never a literal.
+  const lifecycle = (review.lifecycle ?? {}) as { stage?: unknown; reason?: unknown; unitTestsPassing?: unknown };
+  const stage = typeof lifecycle.stage === "string" ? lifecycle.stage : "not_evaluated";
   items.push(item("lifecycle_bridge", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
-    reasonCodes: [`UNIT_TESTS_PASSING:${typeof lifecycle.unitTestsPassing === "string" ? lifecycle.unitTestsPassing : "not_evaluated"}`],
-    nextAction: { label: "The agent stays at lifecycle stage development: Assemble advances no lifecycle stage (the A4 bridge is Activate's, P1-62)" } }));
+    reasonCodes: [`LIFECYCLE_STAGE:${stage}`, ...(typeof lifecycle.reason === "string" ? [lifecycle.reason] : []),
+      `UNIT_TESTS_PASSING:${typeof lifecycle.unitTestsPassing === "string" ? lifecycle.unitTestsPassing : "not_evaluated"}`, `KEY:${LIFECYCLE_SEAM_KEY}`],
+    nextAction: { label: `Lifecycle stage ${stage}, as Review read it. Assemble's development → testing bridge is not built (${LIFECYCLE_SEAM_KEY}): nothing in A4 advances it yet` } }));
   return items;
 }
 

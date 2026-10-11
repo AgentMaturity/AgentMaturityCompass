@@ -20,6 +20,7 @@ import { isActionClass } from "../../governor/actionCatalog.js";
 import { openLedger } from "../../ledger/ledger.js";
 import { listMechanicProfiles } from "../../mechanic/profiles.js";
 import { readPresets } from "../../presets/agentPresets.js";
+import { nativeShellReadiness } from "../../sandbox/nativeShellGate.js";
 import { listAvailableFrameworks } from "../../setup/integrationScaffold.js";
 import { compiledPolicyShows } from "../../tools/guards/compiledPolicyGuard.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -160,8 +161,13 @@ async function understandFacts(ctx: A4ProducerContext) {
   });
   const baseline = attempt(() => projectEnforceResourceLifecycleStatus({ workspace, agentId }).state);
   const compiled = attempt(() => loadActiveCompiledPolicy(workspace));
+  // The runtime's own shell decision, with the live service's opt-in (Studio's native task options route reads the same).
+  const shell = attempt(() => {
+    const readiness = nativeShellReadiness(workspace, ctx.native?.service.shellOptIn ?? undefined);
+    return { decision: readiness.decision, boundary: readiness.boundary, enforcement: readiness.enforcement, reason: readiness.reason?.slice(0, 500) ?? null };
+  });
   const facts = {
-    toolset, doctor: { ok: report.ok, attention: attention.map((check) => check.id) }, native, platform: process.platform,
+    toolset, doctor: { ok: report.ok, attention: attention.map((check) => check.id) }, native, platform: process.platform, shell,
     frameworks: listAvailableFrameworks().map((framework) => framework.id), mechanicProfiles: attempt(() => listMechanicProfiles(workspace).map((profile) => profile.id)),
     compiledPolicy: compiled === null ? "none" : "error" in compiled ? compiled : "active",
     workflowTool: compiled === null ? { visible: true, revision: null } : "error" in compiled ? compiled : workflowVisibility(compiled),
@@ -175,6 +181,7 @@ async function understandFacts(ctx: A4ProducerContext) {
     output("doctor checks needing attention, with first-run fixes", { ok: report.ok, attention: attention.map(({ id, status, message }) => ({ id, status, message })),
       fixes: firstRunFixCommands(report) }),
     output("native task providers, tool scope, limits and validation config (the live Studio service)", native ?? { error: nativeError }),
+    output("the native shell gate (nativeShellReadiness)", shell),
     output("integration frameworks, mechanic profiles, the compiled plan and whether it shows the workflow tool", { frameworks: facts.frameworks,
       mechanicProfiles: facts.mechanicProfiles, compiledPolicy: facts.compiledPolicy, workflowTool: facts.workflowTool }),
     output("outcome_unknown executions blocking this agent", { executions: outcomeUnknown }),
@@ -211,6 +218,7 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
   const open = typeof facts.outcomeUnknown === "number" ? facts.outcomeUnknown : null;
   const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const hidden = facts.workflowTool !== undefined && "denial" in facts.workflowTool ? facts.workflowTool : null;
+  const shell = facts.shell !== undefined && !("error" in facts.shell) ? facts.shell : null;
   return [
     { id: "enforced-vs-advisory", sources: ["compiledPolicyGuard", "bindAuthorization", "recheckAuthorization", "openActionJournal", "writeEffectivePolicyReceipt"], dataStatus: null,
       novice: "On AMC's own runtime every action the agent tries goes through AMC first: AMC can stop it, asks for approval when the rules say so, and keeps a record. Anything outside that runtime AMC can only advise on.",
@@ -228,14 +236,18 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
       novice: claim ? `You chose ${claim.path}: AMC ${claim.supported === "supported" ? "builds and controls it" : `can only ${claim.supported === "preview" ? "partly" : "not yet"} support it`} (${claim.reason ?? "fully supported"}).` : "No engineering path is chosen yet.",
       practitioner: claim ? `${claim.path}: enforcement boundary ${claim.enforcementBoundary}, evidence ${claim.evidenceTier}, ${claim.supported}${claim.reason ? ` (${claim.reason})` : ""}. Not covered: ${claim.notCovered.join("; ")}.` : "No path chosen.",
       expert: claim ? `IntegrationClaim ${JSON.stringify({ path: claim.path, enforcementBoundary: claim.enforcementBoundary, supported: claim.supported })}; enforced only for hook:*/pi:* with a conformance receipt for the pinned version.` : "integrationClaimFor(null) = null." },
-    { id: "shell", sources: ["decideNativeShell", "src/sandbox/nativeShellGate.ts"], dataStatus: null,
-      novice: facts.platform === "linux" ? "On this computer the agent's shell commands run in AMC's sandbox." : "On this computer AMC does not run the agent's shell commands: the sandbox needs Linux.",
-      practitioner: `Platform ${String(facts.platform ?? "unknown")}: the native shell is refused outside Linux unless the operator started Studio with the explicit unconfined opt-in (${facts.native?.shellOptIn ?? "none"}).`,
-      expert: "decideNativeShell: linux-bwrap confinement or refusal; the opt-in is the operator's environment at Studio start, never a request field." },
+    { id: "shell", sources: ["nativeShellReadiness", "decideNativeShell", "src/sandbox/nativeShellGate.ts"], dataStatus: null,
+      novice: shell === null ? "AMC has not read how this computer runs the agent's shell commands: run Understand."
+        : shell.decision === "confined" ? `On this computer the agent's shell commands run inside AMC's sandbox (${String(shell.boundary)}).`
+          : shell.decision === "unconfined-opt-in" ? "On this computer the agent's shell commands run with no sandbox and your full user rights: the operator chose that when starting Studio."
+            : "On this computer AMC does not run the agent's shell commands: no sandbox is available here.",
+      practitioner: shell === null ? `The shell gate was not read (${facts.shell !== undefined && "error" in facts.shell ? facts.shell.error : "Understand has not run"}).`
+        : `Platform ${String(facts.platform ?? "unknown")}: shell ${shell.decision}, boundary ${shell.boundary ?? "none"}, enforcement ${shell.enforcement}.${shell.reason === null ? "" : ` ${shell.reason}`}`,
+      expert: "decideNativeShell: confined by linux-bwrap on Linux and macos-seatbelt on macOS; refused when no backend is available (never an unconfined Linux shell; always refused on Windows and other platforms); enforcement none only under the macOS unconfined opt-in, which is the operator's environment at Studio start (AMC_UNSAFE_UNCONFINED_SHELL=1), never a request field." },
     { id: "stub", sources: ["design §10.1 keyless first run"], dataStatus: null,
       novice: "Without an AI key the build session uses a stand-in model. That shows how AMC records actions, not how good your agent is.",
-      practitioner: "On the stub provider every ref about the agent is synthetic_example; only runtime-written rows stay observed by reference, and the review says \"tool pipeline observed on a stub model; agent behaviour not evaluated\".",
-      expert: "Stub sessions: claimKind synthetic_example (method synthetic, reason SYNTHETIC_VALUES, lane implementation); verifyAgentRun is an integrity-section item." },
+      practitioner: "On the stub provider every ref about the agent is synthetic_example, and the review says \"tool pipeline observed on a stub model; agent behaviour not evaluated\". Review itself records no observed ref on any provider: it does not yet reference the session's runtime-written rows (ACTION_STATE, effective-policy receipts) as ledger refs (NO_OBSERVED_REF on a real provider); a member can add such a row by reference through the evidence route.",
+      expert: "Stub sessions: claimKind synthetic_example (method synthetic, reason SYNTHETIC_VALUES, lane implementation); verifyAgentRun is an integrity-section item; Review writes stage outputs only, no ledger_event ref to the session's runtime rows (NO_OBSERVED_REF)." },
     ...(workflow === null ? [] : [{ id: "workflow", sources: ["parseWorkflowPlan", "runWorkflowPlan", "spawnSubagent", "compiledPolicyShows"], dataStatus: null,
       novice: "A workflow splits the work across helper agents. AMC checks the plan you declared, but cannot run it from Studio yet: Studio's build sessions cannot start helper agents.",
       practitioner: `A declared workflow runs only through the agent's workflow tool, where each helper starts through spawnSubagent (depth limit, signed handoff packet, declared scope, a started/completed pair). Studio's native build sessions compose no delegation, so the workflow stays listed as unsupported until they do${hidden ? `; the active compiled plan (revision ${hidden.revision}) also hides the workflow tool` : ""}.`,

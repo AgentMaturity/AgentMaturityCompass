@@ -8,8 +8,8 @@
  * native task API under the session's owner, with the task's own cursor contract. Review reads each session through its
  * owner, refuses one that is not the start Build journaled, or that runs or has failed, and records AMC's verifyAgentRun
  * as an integrity self-check, the session and its validation as synthetic_example on the stub provider, the session's
- * effective-policy receipts and their downgrades, its four execution phases, Enforce's evaluation, and capabilities and
- * limitations.
+ * effective-policy receipts and their downgrades, its four execution phases, Enforce's evaluation, capabilities and
+ * limitations, and the agent's lifecycle stage as recorded (Assemble advances none: LIFECYCLE_SEAM_KEY).
  */
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
@@ -19,6 +19,7 @@ import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
+import { lifecyclePath, lifecycleStages } from "../lifecycle/lifecycle.js";
 import { evaluateEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus, proposeEnforceResourceLifecycle } from "../enforce/resourceManifest.js";
 import { writeTypedMultiAgentGraph } from "../fleet/typedGraph.js";
 import { assertOwnerMode } from "../mode/mode.js";
@@ -33,7 +34,7 @@ import { canonicalize } from "../utils/json.js";
 import type { A4ProducerContext, A4ProducerResult } from "./a4RouterStages.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
-import { ASSEMBLE_CLAIM_BOUNDARY, assembleSpecOf, presetIdOf, proposedFor, STUB_WORDING } from "./spec/assemble.js";
+import { ASSEMBLE_CLAIM_BOUNDARY, assembleSpecOf, LIFECYCLE_SEAM_KEY, presetIdOf, proposedFor, STUB_WORDING } from "./spec/assemble.js";
 import { answerValues, listValue } from "./spec/aspire.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
@@ -306,6 +307,22 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
 }
 
 /**
+ * The agent's lifecycle stage as `lifecycle/state.json` records it, read without writing (lifecycleStatus writes a
+ * default file when there is none): its `currentStage`, or not_evaluated with the reason when the file is absent,
+ * unreadable or not this agent's. The file is unsigned: the record names what was read, never more.
+ */
+function lifecycleStageOf(workspace: string, agentId: string): { stage: string; reason: string | null } {
+  let parsed: { agentId?: unknown; currentStage?: unknown } | null;
+  try {
+    parsed = JSON.parse(readFileSync(lifecyclePath(workspace, agentId), "utf8")) as { agentId?: unknown; currentStage?: unknown } | null;
+  } catch (error) {
+    return { stage: "not_evaluated", reason: (error as { code?: unknown }).code === "ENOENT" ? "LIFECYCLE_STATE_ABSENT" : "LIFECYCLE_STATE_UNREADABLE" };
+  }
+  return parsed?.agentId === agentId && (lifecycleStages as readonly unknown[]).includes(parsed.currentStage)
+    ? { stage: String(parsed.currentStage), reason: null } : { stage: "not_evaluated", reason: "LIFECYCLE_STATE_INVALID" };
+}
+
+/**
  * Review: every build session settled and verified, its validation and action-evidence coverage, Enforce's evaluation
  * of the pending changes, and the capabilities and limitations, plan against built. The review is written into the
  * revision the completion gate binds, stub wording included.
@@ -365,7 +382,7 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
     .filter((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === `assemble_${what}` && link.revisionNo === ctx.state.project.revision_no).length]));
   const capabilities = listValue(answerValues(answers).get("capabilities")).map((capability) => ({ capability,
     status: anyStub || sessions.length === 0 ? "not_evaluated" : "self_reported", reason: anyStub ? "stub provider"
-      : sessions.length === 0 ? external === null ? "no native build session" : "external path: AMC sees only what the gateway observes" : "exercised in a build session; not evaluated" }));
+      : sessions.length === 0 ? external === null ? "no native build session" : "external path: AMC sees only what the gateway observes" : "listed in the build prompt; not evaluated" }));
   const limitations = [...(spec.unsupported as Array<{ id: string; what: string; key: string }>).map((entry) => `${entry.what} (${entry.key})`),
     ...((spec.claim as { notCovered?: string[] } | undefined)?.notCovered ?? []),
     ...sessions.flatMap((session) => ((session.effectivePolicy as { downgrades: string[] }).downgrades)
@@ -375,11 +392,11 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
     : { lane: "recommendation" as const, method: null }), label: "assemble review: capabilities and limitations, plan against built", body: { capabilities, limitations } });
   const executedAll = sessions.length > 0 && sessions.every((session) => (session.validation as { allPassed: boolean }).allPassed);
   const unitTestsPassing = anyStub ? "not_evaluated (stub provider)" : sessions.length === 0 ? "not_evaluated (no executed test)"
-    : !executedAll ? "not_evaluated (checks pending, unavailable or failed)" : "evidence present (advanced only by Activate's lifecycle bridge, P1-62)";
+    : !executedAll ? "not_evaluated (checks pending, unavailable or failed)" : `evidence present (no A4 bridge advances the lifecycle yet: ${LIFECYCLE_SEAM_KEY})`;
   return {
     outputs,
     notEvaluated: anyStub ? ["SYNTHETIC_VALUES", "STUB_PROVIDER"] : ["NO_OBSERVED_REF"],
-    spec: { ...spec, review: { sessions, external, enforce, capabilities, limitations, lifecycle: { stage: "development", unitTestsPassing },
+    spec: { ...spec, review: { sessions, external, enforce, capabilities, limitations, lifecycle: { ...lifecycleStageOf(workspace, agentId), unitTestsPassing, advanced: false },
       wording: anyStub ? STUB_WORDING : null, claimBoundary: ASSEMBLE_CLAIM_BOUNDARY } }
   };
 }
