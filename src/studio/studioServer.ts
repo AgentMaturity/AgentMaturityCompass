@@ -200,7 +200,7 @@ import {
   verifyTransparencyMerkle
 } from "../transparency/merkleIndexStore.js";
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { appendHumanActionEvent } from "../auth/humanLog.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
@@ -1455,7 +1455,7 @@ function writeConsoleSnapshot(workspace: string): {
     const digest = sha256Hex(Buffer.from(JSON.stringify(payload), "utf8"));
     const sig = {
       digestSha256: digest,
-      signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+      signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
       signedTs: Date.now(),
       signer: "auditor"
     };

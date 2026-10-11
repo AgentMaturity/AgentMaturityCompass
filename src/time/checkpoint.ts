@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getPrivateKeyPem, getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
@@ -202,7 +202,7 @@ function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
   if (signingRoute(workspace, "MERKLE_ROOT") === "notary") {
     throw new Error("the trust config requires the notary for MERKLE_ROOT, and a C2SP note needs a raw Ed25519 signature the notary does not make");
   }
-  const note = Buffer.from(signNote(text, origin, getPrivateKeyPem(workspace, "auditor")), "utf8");
+  const note = Buffer.from(signNote(text, origin, getSigningKey(workspace, "artifact-seal")), "utf8");
   ensureDir(anchorsDir(workspace));
   writeFileSync(path, note, { flag: "wx", mode: 0o644 });
   return note;

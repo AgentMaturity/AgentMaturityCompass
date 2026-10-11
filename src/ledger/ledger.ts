@@ -15,7 +15,7 @@ import type {
   RuntimeName,
   SessionRecord
 } from "../types.js";
-import { getPrivateKeyPem, getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -211,7 +211,7 @@ export class Ledger {
   }
 
   private auditorPrivateKey(): string {
-    return getPrivateKeyPem(this.workspace, "auditor");
+    return getSigningKey(this.workspace, "artifact-seal");
   }
 
   // The ops policy, loaded (and validated) at most once per connection. See the

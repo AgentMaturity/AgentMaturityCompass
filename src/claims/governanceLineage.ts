@@ -21,7 +21,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import type { Claim, ClaimTransition, ClaimLifecycleState } from "./claimTypes.js";
 import {
   getClaimById,
@@ -388,7 +388,7 @@ export function linkTransitionToTransparency(
 
   let signature = "unsigned";
   try {
-    signature = signHexDigest(linkHash, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(linkHash, getSigningKey(workspace, "artifact-seal"));
   } catch {
     // No auditor key available
   }
@@ -522,7 +522,7 @@ export function recordPolicyChangeIntent(
 
   let signature = "unsigned";
   try {
-    signature = signHexDigest(intentHash, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(intentHash, getSigningKey(workspace, "artifact-seal"));
   } catch {
     // No auditor key
   }

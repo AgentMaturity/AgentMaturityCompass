@@ -17,7 +17,7 @@ import {
   recordIncidentClockEvent
 } from '../incidents/incidentClockEvents.js';
 import { recordWorkspaceOversight } from '../incidents/oversightRecord.js';
-import { signHexDigest, getPrivateKeyPem, getSigningKey, getPublicKeyHistory } from '../crypto/keys.js';
+import { signHexDigest, getSigningKey, getPublicKeyHistory } from '../crypto/keys.js';
 import { sha256Hex } from '../utils/hash.js';
 import { canonicalize } from '../utils/json.js';
 
@@ -110,7 +110,7 @@ async function handleIncidentClockRoute(
       rationale: text(body.rationale),
       clockIds: clockIds as string[],
       reviewedTs: Date.now(),
-      privateKeyPem: getPrivateKeyPem(workspace, 'auditor'),
+      privateKeyPem: getSigningKey(workspace, 'artifact-seal'),
       publicKeys: getPublicKeyHistory(workspace, 'auditor'),
     });
     apiSuccess(res, record, 201);

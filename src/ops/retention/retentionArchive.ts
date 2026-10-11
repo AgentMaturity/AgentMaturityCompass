@@ -2,7 +2,7 @@ import { gzipSync, gunzipSync } from "node:zlib";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { EvidenceEvent } from "../../types.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -71,7 +71,7 @@ function signPrunedRows(workspace: string, lastHash: string): void {
     ts: Date.now(),
     lastHash,
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
     signer: "auditor"
   });
   writeFileAtomic(prunedSealPath(workspace), JSON.stringify(seal, null, 2), 0o644);
@@ -187,7 +187,7 @@ export function writeRetentionSegment(params: {
   const digest = sha256Hex(readFileSync(manifestPath));
   const sig = retentionSegmentSignatureSchema.parse({
     digestSha256: digest,
-    signature: signHexDigest(digest, getPrivateKeyPem(params.workspace, "auditor")),
+    signature: signHexDigest(digest, getSigningKey(params.workspace, "artifact-seal")),
     signedTs: Date.now(),
     signer: "auditor"
   });

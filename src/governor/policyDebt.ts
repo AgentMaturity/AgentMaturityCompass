@@ -9,7 +9,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { readdirSync } from "node:fs";
 
@@ -128,7 +128,7 @@ export function addDebtEntry(
   const debtHash = sha256Hex(canonicalize(body));
   let signature = "unsigned";
   try {
-    signature = signHexDigest(debtHash, getPrivateKeyPem(workspace, "auditor"));
+    signature = signHexDigest(debtHash, getSigningKey(workspace, "artifact-seal"));
   } catch { /* no key */ }
 
   const entry: PolicyDebtEntry = { ...body, debt_hash: debtHash, signature };

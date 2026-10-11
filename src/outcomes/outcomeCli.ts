@@ -1,6 +1,6 @@
 import { parseWindowToMs } from "../utils/time.js";
 import { readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -132,7 +132,7 @@ export function outcomesAttestCli(params: {
       reason: params.reason,
       ts: Date.now()
     }));
-    const auditorAttestationSig = signHexDigest(attestationDigest, getPrivateKeyPem(params.workspace, "auditor"));
+    const auditorAttestationSig = signHexDigest(attestationDigest, getSigningKey(params.workspace, "artifact-seal"));
 
     const written = ledger.appendOutcomeEvent({
       agentId,

@@ -9,7 +9,8 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { dirname, join, resolve } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { activeControlPlanHead, loadActiveCompiledPolicy } from '../catalog/compiler/activate.js';
-import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
+import { ensureSigningKeys, getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from '../crypto/keys.js';
+import { ROLE_PRIMARY_PURPOSE } from '../vault/vaultPayload.js';
 import { canonicalize } from '../utils/json.js';
 import { sha256Hex } from '../utils/hash.js';
 import Database from 'better-sqlite3';
@@ -209,7 +210,7 @@ export function buildGuardDecisionReceipt(input: EmitGuardDecisionReceiptInput):
     metaHash: input.meta ? sha256Hex(canonicalize(input.meta)) : null,
   };
   const payloadHash = sha256Hex(canonicalize(payload));
-  const signature = signHexDigest(payloadHash, getPrivateKeyPem(workspace, signer));
+  const signature = signHexDigest(payloadHash, getSigningKey(workspace, ROLE_PRIMARY_PURPOSE[signer]));
   const receiptWithoutHash = { payload, payloadHash, signature };
   return {
     ...receiptWithoutHash,

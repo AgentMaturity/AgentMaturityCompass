@@ -107,7 +107,7 @@ import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingP
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
-import { getPrivateKeyPem, getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
@@ -8229,7 +8229,7 @@ incident
       }
       const record = recordWorkspaceOversight({
         workspace, incident: found, reviewerId: opts.reviewer, decision: opts.decision, rationale: opts.rationale,
-        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getPrivateKeyPem(workspace, "auditor"),
+        clockIds: opts.clock ?? [], reviewedTs: Date.now(), privateKeyPem: getSigningKey(workspace, "artifact-seal"),
         publicKeys: getPublicKeyHistory(workspace, "auditor")
       });
       console.log(chalk.green(`Oversight record ${record.recordId} appended (${record.decision})`));
