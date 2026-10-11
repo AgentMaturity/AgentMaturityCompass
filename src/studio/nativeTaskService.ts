@@ -23,8 +23,7 @@ import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { isActionClass } from "../governor/actionCatalog.js";
-import type { LeasePayload } from "../leases/leaseSchema.js";
-import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
@@ -74,16 +73,6 @@ export interface NativeTaskServiceOptions {
   readonly validationConfig?: string;
   readonly credentialsHome?: string; readonly credentialsFile?: string;
   readonly environment?: NodeJS.ProcessEnv;
-}
-
-/**
- * The user a native task's lease names (P1-78): the users.yaml user whose Studio session owns the task. A host-router
- * session is not a user of the signed users.yaml, and the bootstrap admin token names nobody: their leases name no
- * principal, so under a plan whose identity-binding requires one their tool calls are refused.
- */
-export function taskLeasePrincipal(principalId: string): LeasePayload["principal"] {
-  const local = /^session:LOCAL_USER:(.+)$/.exec(principalId);
-  return local ? { userId: local[1]! } : undefined;
 }
 
 /** One native ACP client per task. This is a fixed AMC protocol binding, not a command bridge. */
@@ -206,7 +195,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
    * lifetime). The token goes to the child alone. prepare records the id, and revokes the previous runtime's lease, only
    * once this runtime holds the session's writer claim, so a refused resume never touches another process's runtime.
    */
-  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueLeaseToken> | null {
+  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueLeaseForPrincipal> | null {
     const d = entry.descriptor;
     if (d.tools !== "workspace") return null;
     let plan: ReturnType<typeof loadActiveCompiledPolicy>;
@@ -215,14 +204,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!planRequiresAgentLease(plan)) return null;
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
-    const principal = taskLeasePrincipal(d.principalId);
-    let lease: ReturnType<typeof issueLeaseToken>;
+    let lease: ReturnType<typeof issueLeaseForPrincipal>;
     try {
-      lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
-        ...(principal ? { principal } : {}),
+      // P1-78: the lease names the task's Studio user when they are an active users.yaml user; none refuses here.
+      lease = issueLeaseForPrincipal({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+        principalKey: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : null,
         ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
         routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
     } catch (error) {
+      if (error instanceof LeasePrincipalRefused) throw new NativeTaskServiceError("PRINCIPAL_UNRESOLVED", 409, `${error.message}. Nothing was started. Sign in as an active workspace user.`);
       throw new NativeTaskServiceError("LEASE_UNAVAILABLE", 409, `The active compiled plan requires an agent lease for this runtime, and none could be minted (${reasonOf(error)}). Nothing was started.`);
     }
     entry.leaseId = lease.payload.leaseId; // From here stop() revokes it.

@@ -3,7 +3,7 @@ import YAML from "yaml";
 import type { CompiledPolicyFacts } from "../../actions/authorize.js";
 import { approvalPolicyPath, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
 import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
-import { activeControlPlanHead, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
+import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import type { ActionClass } from "../../types.js";
@@ -41,6 +41,21 @@ function identityDenial(params: Readonly<Record<string, ParamValue>>, execution:
 /** Whether the plan's `identity-binding` requires a verified agent lease (L0-IDN-01); only then is one minted or bound (P1-67). */
 export function planRequiresAgentLease(policy: ActiveCompiledPolicy | null): boolean {
   return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requireAgentLease === true) ?? false;
+}
+
+/**
+ * Whether the workspace's verified active plan sets `toolPipeline.requirePrincipal` (identity-binding, L0-IDN-01), read
+ * through the same verifying path the guard's session pins (P1-78). Fails closed: a plan that cannot be verified reads as
+ * requiring a principal.
+ */
+export function planRequiresPrincipal(workspace: string): boolean {
+  let policy: ActiveCompiledPolicy | null;
+  try {
+    policy = loadActiveCompiledPolicy(workspace);
+  } catch {
+    return true;
+  }
+  return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requirePrincipal === true) ?? false;
 }
 
 /** The live signed approval policy must be at least as strict as the compiled rule; read and verified in one read. */

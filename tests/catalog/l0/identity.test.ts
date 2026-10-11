@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
@@ -14,7 +14,8 @@ import { addUser, initUsersConfig, revokeUser, setUserRoles } from "../../../src
 import { parseLeaseTtlToMs } from "../../../src/leases/leaseCli.js";
 import type { LeasePayload, LeaseScope } from "../../../src/leases/leaseSchema.js";
 import { issueLeaseToken } from "../../../src/leases/leaseSigner.js";
-import { taskLeasePrincipal } from "../../../src/studio/nativeTaskService.js";
+import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../../../src/leases/leasePrincipal.js";
+import { planRequiresPrincipal } from "../../../src/tools/guards/compiledPolicyGuard.js";
 import { leaseRevocationPaths, revokeLease } from "../../../src/leases/leaseStore.js";
 import { toolEvidenceFor } from "../../../src/tools/toolEvidence.js";
 import { ToolPipeline, type ToolApprovalAsker } from "../../../src/tools/toolPipeline.js";
@@ -174,7 +175,7 @@ function leasePrincipal(ws: string, state: IdentitySetup["lease"]): { named: Lea
   const service = addUser({ workspace: ws, username: "layer0-scheduler", roles: ["AGENT"], password: "layer0-fixture-password" });
   if (state === "unregistered_principal") return { named: { userId: "user-not-in-users-yaml" } };
   const [user, kind] = state === "registered_service" ? [service, "service"] : [owner, "human"];
-  return { named: taskLeasePrincipal(`session:LOCAL_USER:${user.userId}`), expected: { principalId: user.userId, kind, authenticatedVia: "lease" } };
+  return { named: { userId: user.userId }, expected: { principalId: user.userId, kind, authenticatedVia: "lease" } };
 }
 
 /** The authorization records among the rows a call recorded. */
@@ -196,10 +197,34 @@ function activate(ws: string, profile: unknown): void {
 }
 
 describe("L0-IDN-01 unique agent identity under an active compiled plan (compiled-policy identity-binding)", () => {
-  it("a native task's lease names its users.yaml user; a host-router session and the admin token name nobody (P1-78)", () => {
-    expect(taskLeasePrincipal("session:LOCAL_USER:u-1")).toEqual({ userId: "u-1" });
-    expect(taskLeasePrincipal("session:WORKSPACE_ROUTER:u-1"), "not a user of the signed users.yaml").toBeUndefined();
-    expect(taskLeasePrincipal("bootstrap-admin")).toBeUndefined();
+  it("planRequiresPrincipal reads the verified active plan and fails closed (P1-78)", () => {
+    const ws = newWorkspace();
+    initApprovalPolicy(ws);
+    expect(planRequiresPrincipal(ws), "no plan, no requirement").toBe(false);
+    activate(ws, (catalog.fixtures.get("L0-IDN-01/positive/lease-and-principal.json")?.envelope?.setup as { profile: unknown }).profile);
+    expect(planRequiresPrincipal(ws)).toBe(true);
+    const heads = join(ws, ".amc", "control-plan", "heads");
+    const entries = readdirSync(heads, { recursive: true, withFileTypes: true }).filter((e) => e.isFile());
+    expect(entries.length, "the activation journal has entries to tamper with").toBeGreaterThan(0);
+    for (const e of entries) writeFileSync(join(e.parentPath, e.name), "{\"tampered\":true}\n");
+    expect(() => loadActiveCompiledPolicy(ws), "the tampered journal does not verify").toThrow();
+    expect(planRequiresPrincipal(ws), "an unverifiable plan reads as requiring a principal").toBe(true);
+  });
+
+  it("issueLeaseForPrincipal names an active users.yaml user and refuses before minting when none resolves (P1-78)", () => {
+    const ws = newWorkspace();
+    initApprovalPolicy(ws);
+    const { owner } = initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+    const lease = (principalKey: string | null) => issueLeaseForPrincipal({ workspace: ws, agentId: "default", ttlMs: 3_600_000,
+      scopes: ["toolhub:execute"], routeAllowlist: ["/"], modelAllowlist: ["*"], maxRequestsPerMinute: 10, maxTokensPerMinute: 10, maxCostUsdPerDay: null, principalKey });
+    expect(lease(null).payload.principal, "no plan: a lease naming no one, as before").toBeUndefined();
+    activate(ws, (catalog.fixtures.get("L0-IDN-01/positive/lease-and-principal.json")?.envelope?.setup as { profile: unknown }).profile);
+    expect(lease(`LOCAL_USER:${owner.userId}`).payload.principal).toEqual({ userId: owner.userId });
+    for (const key of [null, `WORKSPACE_ROUTER:${owner.userId}`, "LOCAL_USER:user-not-in-users-yaml", "bootstrap-admin"]) {
+      expect(() => lease(key), String(key)).toThrow(LeasePrincipalRefused);
+    }
+    revokeUser({ workspace: ws, username: "layer0-owner" });
+    expect(() => lease(`LOCAL_USER:${owner.userId}`), "a deactivated user").toThrow(/PRINCIPAL_UNRESOLVED/);
   });
 
   const fixtures = fixturesFor("compiled_identity", "L0-IDN-01");
