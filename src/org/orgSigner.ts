@@ -38,11 +38,12 @@ export interface SignedFileVerification {
   sigPath: string;
 }
 
-export function signFileWithAuditor(workspace: string, path: string): string {
+/** `bytes`: the exact content the caller wrote; signing them, not a re-read, leaves no window for a swapped file to be signed. */
+export function signFileWithAuditor(workspace: string, path: string, bytes?: Buffer): string {
   if (!pathExists(path)) {
     throw new Error(`File not found: ${path}`);
   }
-  const digest = sha256Hex(readFileSync(path));
+  const digest = sha256Hex(bytes ?? readFileSync(path));
   const signed = signDigestWithPolicy({
     workspace,
     kind: signKindForPath(path),
@@ -61,7 +62,8 @@ export function signFileWithAuditor(workspace: string, path: string): string {
   return sigPath;
 }
 
-export function verifySignedFileWithAuditor(workspace: string, path: string): SignedFileVerification {
+/** `bytes`: the content the caller read once and will use; the signature is checked over them, never over a second read. */
+export function verifySignedFileWithAuditor(workspace: string, path: string, bytes?: Buffer): SignedFileVerification {
   const sigPath = `${path}.sig`;
   if (!pathExists(path)) {
     return {
@@ -83,7 +85,7 @@ export function verifySignedFileWithAuditor(workspace: string, path: string): Si
   }
   try {
     const sig = orgSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const digest = sha256Hex(readFileSync(path));
+    const digest = sha256Hex(bytes ?? readFileSync(path));
     if (digest !== sig.digestSha256) {
       return {
         valid: false,
