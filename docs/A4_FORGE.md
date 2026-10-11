@@ -70,7 +70,13 @@ A signature proves who wrote a record and that it is unchanged since, never that
 
 **Notary mode.** In `NOTARY` mode with the default `trust.enforcement.denyLocalVaultSigningIfNotaryEnabled: true`, every
 `A4_RECORD` envelope is a notary call, so each gate decision adds one. At Activate the readiness item
-`signing.notary_route` reports the `A4_RECORD` and `A4_PACKAGE` routes (see Activate below).
+`signing.notary_route` reports the `A4_RECORD` and `A4_PACKAGE` routes (see Activate below). AMC's own notary signs
+only the kinds its notary config lists in `allowedSignKinds`, and its default list names neither `A4_RECORD` nor
+`A4_PACKAGE`: add both there, or every A4 signature fails as `NOTARY_UNREACHABLE`. A4's own checks of an `A4_RECORD` or
+`A4_PACKAGE` signature (a release record's `envelopeValid`, the packaged update policy, a value claim's envelope) accept
+the auditor key history or the notary the signed trust config pins. Artifact signatures (`.sig` files) are a known
+limit: in NOTARY mode they are signed by the notary, and AMC's artifact verifier admits only the auditor keys, so those
+files read unsigned until that verifier admits the pinned notary.
 
 ## Approvals and separation of duties
 
@@ -392,16 +398,23 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
 2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
    routes, 24 hours, bound to this workspace and agent, with the release as its work order.
-3. The manifest (`amc.a4-package/v1`, no absolute path) is signed `A4_PACKAGE` and the tarball `a4-package`.
+3. The manifest (`amc.a4-package/v1`, no absolute path; it names the staging lease by id and scope, never its token)
+   is signed `A4_PACKAGE` and the tarball `a4-package`.
    `RELEASE`'s own refusals (`RELEASE_STEP_MOVED`, `RELEASE_STAGE_REDONE`, `RELEASE_ATTEMPT_SETTLED`) are checked before
    anything is minted or signed. A failure that records no release revokes the lease it minted and removes the release
    directory and its tarball files.
 4. `RELEASE` records the release (`amc.a4-release/v1`): the eight-surface table (Score, Shield, Enforce, Vault, Watch,
    Comply, Fleet, Passport; Passport reads `not_evaluated` until P0-55), the previous and base release (TUNE lineage),
-   the staging lease id and its own `A4_RECORD` envelope.
+   the rollback target (the release running in production now: the newest one with a succeeded production deploy row
+   that was not rolled back, which the deploy plan's prepared rollback steps also name), the staging lease id and its
+   own `A4_RECORD` envelope.
 5. Only after `RELEASE` commits does the transparency log get an `a4-package` entry, so a refused release attests nothing
    there. `EFFECT_FINISHED` names the entry; a retry reuses the entry of the same release and package, and
-   `GET …/releases/:rid` shows the entry or the reason it is missing.
+   `GET …/releases/:rid` reads the entry from the log, or shows the reason it is missing. When the append fails the
+   release still finishes, but readiness item `package.transparency` is BLOCKED (`TRANSPARENCY_NOT_APPENDED`, or
+   `TRANSPARENCY_LOG_UNREADABLE`) until an entry in the log names the release's exact package digest, so the deployment
+   approval cannot be requested on an unanchored package. `POST …/releases/:rid/transparency { expectedHeadSeq }`
+   (owner, owner mode) appends it: idempotent, refused `EFFECT_RUNNING` while the release effect still runs.
 
 The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the attempt id,
 and a replay answers from the chain: `token: null` with `TOKEN_ALREADY_DELIVERED` once that attempt finished, the
@@ -410,7 +423,11 @@ retry revokes every lease an earlier attempt of the release minted before mintin
 record with its envelope checked now, each lease's live status and a reason for every surface not evaluated.
 
 The deployment approval is Activate's completion gate. Consuming it runs `a4.activate.production_lease` on its own
-quorum and answers the production lease's token once (the answered scopes, routes and caps). A `DENY` on an unconsumed
+quorum and answers the production lease's token once (the answered scopes, routes and caps). The token goes to the
+caller, so an owner that gate's quorum counted cannot complete it (409 `SOD_VIOLATION`): an effect's quorum excludes its
+caller, as the release effect's engine request already does. A retry of a failed effect applies the same rule against
+the keys its consumed grant or gate quorum counted. An effect step that finds the vault locked (the lease key, an
+artifact signature) answers 423 `A4_VAULT_LOCKED`. A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
 (`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's auditor key, even in NOTARY
 mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read, rather than recorded with the
@@ -420,7 +437,7 @@ staging lease left live. If a revocation still fails after the `DENY` is recorde
 the staging lease has expired before such a gate can.
 
 Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,
-`deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
+`package.transparency` (BLOCKED while the current release's package has no transparency entry), `deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
 target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_UNDECIDED` for Helm) and
 `deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
 until the production lease), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
@@ -428,7 +445,9 @@ until the production lease), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and
 NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both kinds route to the notary. The
 `requireNotaryFor` default (which now lists `A4_PACKAGE`) applies only to a `trust.yaml` that omits the field. An
 operator whose `trust.yaml` lists `requireNotaryFor` explicitly and sets that flag to `false` adds `A4_PACKAGE` to the
-list and re-signs the file. Expect one notary call for every gate decision.
+list and re-signs the file. Expect one notary call for every gate decision. With AMC's own notary, also add
+`A4_RECORD` and `A4_PACKAGE` to the notary config's `allowedSignKinds`: its default list names neither, and it refuses
+a kind it does not list, which A4 reports as `NOTARY_UNREACHABLE`.
 
 ## Activate: deployment, AMC's check, rollback and the lifecycle bridge
 
@@ -453,7 +472,10 @@ nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unles
 with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
 production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
 or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
-moves the project's `deployedReleaseId`; a succeeded rollback row moves it to the release rolled back to. Whoever
+moves the project's `deployedReleaseId`; a succeeded production rollback row moves it to the release rolled back to. A
+rollback row records the one rollback the approvers approved: it names that rollback's environment
+(`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise), and it is refused once a succeeded row of that rollback is recorded
+(`ROLLBACK_ROW_RECORDED`) or a succeeded production deploy followed the rollback (`ROLLBACK_SUPERSEDED`). Whoever
 records a deploy receipt counts as a builder of the revision: the deployment approval rests on their statement, so they
 cannot approve it (`builder_not_completion_approver`) and are among its excluded keys.
 
@@ -473,8 +495,9 @@ columns, for example "recorded: succeeded; AMC check: reachable, release identit
 
 Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
-separation of duties. The preview names the previous release, its Enforce manifest, the leases, the prepared commands
-and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+separation of duties. The preview names the rollback target from the release record (the release that ran in
+production when this one was built, never merely the previous release; 409 `ROLLBACK_TARGET_ROLLED_BACK` when it was
+rolled back since), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
 pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a second attempt while one runs is refused
 (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
@@ -495,10 +518,11 @@ it runs these steps:
 A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt
 whose outcome could not be written reads as lost (`PROCESS_LOST`). The next request settles it first, then re-runs the
 steps on the grant this rollback's execution already consumed, whose quorum is not asked again (a grant another
-execution consumed is refused `GRANT_ALREADY_USED`); the restore and the revocations are idempotent. Before it settles,
+execution consumed is refused `GRANT_ALREADY_USED`). Each attempt records the approver keys its quorum counted on
+`EFFECT_STARTED`, and a confirmer among them is refused `SOD_VIOLATION`. The restore and the revocations are idempotent. Before it settles,
 the rollback reads the lease journal again and revokes any lease minted after its first read. A replay of the request answers that attempt's outcome. A
 rollback may run on a held or frozen project, and the operator's rollback row after it may be recorded there too. The lifecycle is never moved backwards. The project's
-`deployedReleaseId` moves only when the operator records the rollback row.
+`deployedReleaseId` moves only when the operator records a production rollback row.
 
 The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves
 an agent still at development to testing (the Aspire charter gate, an executed non-stub validation and the brief's misuse
@@ -518,7 +542,8 @@ Readiness adds these items:
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
   approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
   later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,
-  and an owner may acknowledge either WAITING form. The acknowledgement records the receipt and check ids it saw and
+  and from Review on, once it names a receipt, an owner may acknowledge either WAITING form (before that the
+  acknowledgement could never count, so it is refused `A4_NOT_ACKNOWLEDGEABLE`). The acknowledgement records the receipt and check ids it saw and
   counts only while the item names the same ones, so it never carries over to a new receipt or check.
 - `backup.include_paths` (not mandatory): WAITING until the signed ops policy backs up `a4-releases/` and
   `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
@@ -526,7 +551,8 @@ Readiness adds these items:
 - `regulatory_sources_status` (D-21's regulated-production rule): on a regulated project it stays WAITING
   `EXPERT_REVIEW_PENDING` (`KEY:D-08`), mandatory from Review on and bound, until an owner acknowledges it at Activate
   before requesting the deployment approval. The acknowledgement counts on Activate's own revision only; one recorded at
-  Adapt does not carry over. The production lease effect refuses a regulated release without it (`EXPERT_REVIEW_PENDING`)
+  Adapt does not carry over, and one before Review is refused `A4_NOT_ACKNOWLEDGEABLE` (every earlier step records a
+  new revision). The production lease effect refuses a regulated release without it (`EXPERT_REVIEW_PENDING`)
   and records it; `GET …/releases/:rid` shows it as `expertReview`, and the Activate conformance statement lists it. An
   unregulated project reads READY `NOT_REGULATED`.
 
