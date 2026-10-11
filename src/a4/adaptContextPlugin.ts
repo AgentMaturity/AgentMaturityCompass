@@ -100,7 +100,7 @@ function contextPluginText(input: { projectId: string; revisionNo: number; answe
 }
 
 /** `<agent>/a4/context-plugin.json`: the literal Build wrote, beside the agent's own files (no Enforce resource kind holds it). */
-const contextPluginPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "a4", "context-plugin.json");
+export const contextPluginPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "a4", "context-plugin.json");
 
 /** The `context.contextPluginSha256` slot: the file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
 export function contextPluginSha256(workspace: string, agentId: string): string | null {

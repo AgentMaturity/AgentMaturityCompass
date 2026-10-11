@@ -385,7 +385,8 @@ Satisfaction (`satisfaction`), evaluated only when integrity and completeness pa
 - Every counted APPROVE passes separation of duties as of its own seq (`SOD_VIOLATION`, `src/a4/a4SoD.ts`): never the
   gate's requester or an excluded key, never the revision's author (except on a `policy` gate, whose proposal the
   requester authored), and on a completion gate never a principal with a build transition on the revision (a `STEP` to
-  `built` or an `EFFECT_STARTED`; fixture `builder-approved-own-revision`). A gate's counted decisions share one
+  `built`, a build-work evidence ref, an Activate `DEPLOYMENT` deploy receipt they recorded, or an `EFFECT_STARTED`;
+  fixture `builder-approved-own-revision`). A gate's counted decisions share one
   `auth_source` (`one_plane`).
 - `not-evaluated` with `SINGLE_USER_WORKSPACE` when a decision has `self_approved = 1`, or the project was created in a
   single-user workspace and never ratcheted; with `SYNTHETIC_VALUES` when a gate binds a `synthetic_example` ref. Such

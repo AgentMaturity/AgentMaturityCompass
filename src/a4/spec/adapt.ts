@@ -19,7 +19,7 @@ import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { LIFECYCLE_SEAM_KEY } from "./assemble.js";
 import { memoryPolicyFields } from "../adaptMemoryPolicy.js";
-import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "adapt", prompt, dependsOn, required, kind });
@@ -187,22 +187,22 @@ export function reached(state: A4ReadinessState, step: A4Step): boolean {
   return A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
 
-/** The consumption of an Adapt completion gate on `revisionNo`, or undefined while none is consumed. */
-export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: number): A4ReadinessState["chain"][number] | undefined {
-  const gateIds = new Set(state.gates.filter((row) => row.stage === "adapt" && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
+/** The consumption of an Adapt (or `stage`'s) completion gate on `revisionNo`, or undefined while none is consumed. */
+export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: number, stage: "adapt" | "activate" = "adapt"): A4ReadinessState["chain"][number] | undefined {
+  const gateIds = new Set(state.gates.filter((row) => row.stage === stage && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
   return state.chain.find((link) => link.kind === "GATE_CONSUMED" && typeof link.body.gateId === "string" && gateIds.has(link.body.gateId));
 }
 
 /**
- * The owner acknowledgement of `itemId` on `revisionNo` (the head by default). Once an Adapt completion gate on that
+ * The owner acknowledgement of `itemId` on `revisionNo` (the head by default). Once an Adapt (or `stage`'s) completion gate on that
  * revision is consumed, the one in force at the consumption (recorded before it, unexpired then) stays the record, after
  * it expires and after the head moves on (the conformance statement P1-62 binds). Before that, the newest one unexpired at
  * `now`, whether or not the evaluator counts it (acknowledgeable): conformanceView reads the evaluated item's
  * `acknowledged` there instead, and lists none on a revision the head moved past without a consumption. Null when none.
  */
-export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no):
+export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no, stage: "adapt" | "activate" = "adapt"):
   { by: string; ts: number; reason: string; expiresTs: number } | null {
-  const consumed = adaptCompletionConsumed(state, revisionNo);
+  const consumed = adaptCompletionConsumed(state, revisionNo, stage);
   const asOf = consumed === undefined ? now : typeof consumed.body.ts === "number" ? consumed.body.ts : Number.POSITIVE_INFINITY;
   const link = [...state.chain].reverse().find((candidate) => candidate.kind === "ACKNOWLEDGED" && candidate.body.itemId === itemId
     && candidate.revisionNo === revisionNo && (consumed === undefined || candidate.seq < consumed.seq));
@@ -234,7 +234,7 @@ interface BridgeRow { readonly target: "staging"; readonly controlId: string; re
  * an admitted external record (a role vote is an acknowledgement, never a review); `deployment_plan_approved` the
  * consumed Activate direction gate.
  */
-function stagingBridge(state: A4ReadinessState): BridgeRow[] {
+export function stagingBridge(state: A4ReadinessState): BridgeRow[] {
   const row = (controlId: string, evidenceRef: string | null, claimKind: string | null, reason: string): BridgeRow => ({ target: "staging", controlId,
     status: evidenceRef === null ? "not_evaluated" : "satisfied", evidenceRef, claimKind, reason,
     satisfiedBy: LIFECYCLE_BRIDGE.find((entry) => entry.controlId === controlId)?.satisfiedBy ?? "" });
@@ -531,6 +531,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
 export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = adaptSpecOf(state);
   const gaps = answerGaps(answers, carriedValues(state));
+  const askCodes = askGapCodes(gaps);
   const proposed = proposedFor(spec, answers);
   const understanding = understandingOf(spec);
   const regulated = isRegulated(state, query.floor);
@@ -539,10 +540,9 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     return FACTS[fact] === "list" ? factList(value) === null : factTerm(value) === null;
   });
   return [
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY")
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { nextAction: { label: gaps.carried.length > 0
-          ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY")
+      : waiting("ask_complete", askCodes, { nextAction: { label: gaps.carried.length > 0
+        ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"])
       : state.project.stage === "adapt" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })

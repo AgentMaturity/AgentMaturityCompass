@@ -39,7 +39,7 @@ import {
   APPLY_EFFECT_ID, ASSEMBLE_CLAIM_BOUNDARY, ASSEMBLE_SPEC_SCHEMA, CARRIED, answerGaps, assembleItems, assembleSpecOf, carriedValues, parseProvider, presetIdOf,
   workflowPlanOf
 } from "../spec/assemble.js";
-import { answersDigestOf, answerValues, aspireSpecOf, carryAnswers, listValue, textValue } from "../spec/aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, aspireSpecOf, carryAnswers, listValue, textValue } from "../spec/aspire.js";
 import { attempt, explanationResult, fail, relPath } from "./common.js";
 
 /** The agent's preset as a verified read of the signed presets file gives it; null when it has none; unreadable throws. */
@@ -276,9 +276,7 @@ function revisedGraph(ctx: A4ProducerContext, tools: "none" | "workspace", scope
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { workspace } = ctx;
   const { spec, answers } = assembleSpecOf(ctx.state);
-  const gaps = answerGaps(answers, carriedValues(ctx.state));
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
-    ...gaps.carried];
+  const codes = askGapCodes(answerGaps(answers, carriedValues(ctx.state)));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   for (const key of Object.keys(ctx.spec ?? {})) {
     if (canonicalize(ctx.spec![key] ?? null) !== canonicalize(spec[key] ?? null)) {

@@ -39,6 +39,8 @@ export const a4PackageV1Schema = z.strictObject({
     updatePolicySha256: sha256HexSchema, secretScanSha256: sha256HexSchema, sbomSha256: sha256HexSchema.nullable(), aibomSha256: z.null()
   }),
   approvals: z.array(a4ApprovalRefSchema),
+  /** The leases the release effect minted, by id and scope (never a token): the staging lease (design §10.4 Build). */
+  leases: z.array(z.strictObject({ leaseId: nonEmpty, scope: z.enum(["staging", "production"]) })),
   integration: a4IntegrationClaimV1Schema,
   quality: a4QualitySpecSchema,
   provenance: z.strictObject({ note: z.literal("AMC provenance record (not a formal SLSA claim)"), builtFrom: z.record(z.string(), z.string()) }),

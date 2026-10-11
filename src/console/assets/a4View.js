@@ -51,7 +51,7 @@ export function actionButton(label, action, allowed, attributes = "") {
 
 export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
-export const ACTIVATE_COMPLETE = "Activate completion is handled by the release card";
+export const ACTIVATE_COMPLETE = "Activate's release and deployment approval are completed on the Release card, which shows each lease token once";
 
 const cardLabel = (card) => {
   const [stage, id] = String(card ?? "").split(":");
@@ -294,11 +294,15 @@ function nextActionHtml(next) {
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
   "plan_unresolved", "path_supported", "unsupported_acknowledged", "context_probe_unavailable", "plan_activated"]);
 /**
- * acknowledgeable (src/a4/a4Readiness.ts) as the item shows it: plan_activated only when deferred and mandatory (from Review on),
- * plan_unresolved never when regulated.
+ * acknowledgeable (src/a4/a4Readiness.ts) as the item shows it at `stage`, the stage readiness was read for: plan_activated only
+ * when deferred and mandatory (from Review on), plan_unresolved never when regulated, Activate's regulatory_sources_status
+ * (D-21) only once mandatory (from Review on; Adapt's own is unchanged) and deployment.amc_check only once mandatory and
+ * naming a receipt. Anything else is refused (409 A4_NOT_ACKNOWLEDGEABLE), so no button offers it.
  */
-const acknowledgeable = (item) => ACKNOWLEDGEABLE.has(item.id) && !item.reasonCodes.includes("REGULATED_READY_PLAN_ONLY")
-  && (item.id !== "plan_activated" || (item.mandatory === true && item.reasonCodes.includes("PLAN_ACTIVATION_DEFERRED")));
+const acknowledgeable = (item, stage) => ACKNOWLEDGEABLE.has(item.id) && !item.reasonCodes.includes("REGULATED_READY_PLAN_ONLY")
+  && (item.id !== "plan_activated" || (item.mandatory === true && item.reasonCodes.includes("PLAN_ACTIVATION_DEFERRED")))
+  && (item.id !== "regulatory_sources_status" || stage !== "activate" || item.mandatory === true)
+  && (item.id !== "deployment.amc_check" || (item.mandatory === true && item.reasonCodes.some((code) => code.startsWith("RECEIPT:"))));
 
 /** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
 function retryButton(item, allowed) {
@@ -308,18 +312,18 @@ function retryButton(item, allowed) {
     `data-attempt="${esc(attempt.slice("ATTEMPT:".length))}" data-effect-stage="${esc(route[1])}" data-effect="${esc(route[2])}"`)}` : "";
 }
 
-function itemRow(item, allowed) {
+function itemRow(item, allowed, stage) {
   const ack = item.acknowledged;
   return `<li><code>${esc(item.id)}</code> <code>${esc(item.status)}</code>${item.kind ? ` <span class="chip">${esc(item.kind)}</span>` : ""}
     ${codes(item.reasonCodes)}${ack ? `<div class="muted">Acknowledged by ${esc(ack.by)} until ${time(ack.expiresTs)}: ${esc(ack.reason)};
       still ${esc(item.status)}</div>` : ""}${nextActionHtml(item.nextAction)}${retryButton(item, allowed)}${
-    !ack && item.status === "WAITING" && acknowledgeable(item) && allowed.acknowledge?.allowed === true
+    !ack && item.status === "WAITING" && acknowledgeable(item, stage) && allowed.acknowledge?.allowed === true
       ? ` ${actionButton("Acknowledge", "acknowledge", allowed.acknowledge, `data-item="${esc(item.id)}"`)}` : ""}</li>`;
 }
 
-export function renderMissing(readiness) {
+export function renderMissing(readiness, stage) {
   const open = readiness.items.filter((item) => !["READY", "COMPLETE"].includes(item.status));
-  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed)), "None.");
+  const group = (mandatory) => list(open.filter((item) => item.mandatory === mandatory).map((item) => itemRow(item, readiness.allowed, stage)), "None.");
   return `<p>Readiness <code>${esc(readiness.status)}</code>${nextActionHtml(readiness.nextAction)}</p>
     <h4>Mandatory</h4>${group(true)}<h4>Advisory</h4>${group(false)}`;
 }
@@ -448,7 +452,7 @@ function requestOffer(ctx, kind) {
   if (gate?.status === "PENDING" || gate?.status === "QUORUM_MET") offer = refuse(offer, "A4_GATE_OPEN");
   else if (gate?.status === "DENIED" && gate.revisionNo === ctx.project.revisionNo) offer = refuse(offer, "A4_GATE_DENIED");
   const unacknowledged = ctx.readiness.items.filter((item) => item.mandatory && item.status === "WAITING" && item.acknowledged === null
-    && acknowledgeable(item)).map((item) => item.id);
+    && acknowledgeable(item, ctx.stage)).map((item) => item.id);
   return unacknowledged.length ? refuse(offer, ...unacknowledged) : offer;
 }
 
@@ -482,7 +486,7 @@ export function renderApprovalsBar(ctx) {
       ${actionButton("Hold", "hold", allowed.hold)}
       ${actionButton("Request direction approval", "request-direction", requestOffer(ctx, "direction"))}
       ${actionButton("Request completion approval", "request-completion", requestOffer(ctx, "completion"))}
-      ${actionButton("Complete stage", "complete", stage === "activate" && met?.gate === "completion" ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
+      ${actionButton("Complete stage", "complete", stage === "activate" && met ? held(ACTIVATE_COMPLETE) : met ? pinned(allowed.progress) : null)}
     </div>
     <details data-a4-open="more"><summary>More</summary><div class="row wrap">${actionButton("Deny", "deny", open ? pinned(allowed.decide) : null)}
       ${allowed.resume ? actionButton("Resume", "resume", allowed.resume) : ""}</div></details></section>`;

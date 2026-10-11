@@ -5,7 +5,7 @@
  * producers live in src/a4/stages/aspire.ts and are loaded on first use. The item builders are pure: they read the
  * newest Aspire revision and the chain, never a file, and nothing here computes a maturity level. The answer helpers the
  * later stages share live here too: a stage's newest revision (stageSpecOf), a question bank's unanswered and stale
- * questions (askGaps) and the Aspire answers a stage carries (carriedValuesOf, carriedGaps, carryAnswers).
+ * questions (askGaps, askGapCodes) and the answers a stage carries (carriedValuesOf, carriedGaps, carryAnswers, mergeCarried).
  */
 import { z } from "zod";
 import { validateContextGraph } from "../../context/contextGraph.js";
@@ -108,6 +108,10 @@ export function askGaps(questions: readonly A4Question[], answers: readonly A4An
     && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
   return { missing, stale };
 }
+/** ask_complete's reason codes for a stage's answer gaps (each unanswered, stale and invalid question, then the carried gaps); none once Ask is complete. */
+export const askGapCodes = (gaps: { missing: readonly string[]; stale: readonly string[]; invalid: readonly string[]; carried?: readonly string[] }): string[] =>
+  [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
+    ...(gaps.carried ?? [])];
 
 /** Required questions with no answer, and answered ones whose dependencies changed since (to be asked again). */
 export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; stale: string[]; invalid: string[] } {
@@ -140,12 +144,12 @@ export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): Return
 
 /** A carrying stage's answer gaps: unanswered, to ask again, not one of their question's values, and carried (carriedGaps). */
 export interface CarryingAnswerGaps { missing: string[]; stale: string[]; invalid: string[]; carried: string[] }
-/** The Aspire answers a later stage carries (`ids`), as the newest Aspire revision records them (absent ones are left out). */
-export function carriedValuesOf(state: Pick<A4ReadinessState, "revisions">, ids: readonly string[]): Map<string, unknown> {
-  const values = answerValues(aspireSpecOf(state).answers);
+/** The answers a later stage carries (`ids`), as the newest revision of `from` (Aspire unless named) records them (absent ones are left out). */
+export function carriedValuesOf(state: Pick<A4ReadinessState, "revisions">, ids: readonly string[], from: A4Stage = "aspire"): Map<string, unknown> {
+  const values = answerValues(stageSpecOf(state, from).answers);
   return new Map(ids.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
 }
-/** The carried answers (`ids`) that are missing or no longer Aspire's (`carried`, as carriedValuesOf reads them); fail closed: re-carry at Understand. */
+/** The carried answers (`ids`) that are missing or no longer their stage's (`carried`, as carriedValuesOf reads them); fail closed: re-carry at Understand. */
 export function carriedGaps(ids: readonly string[], answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): string[] {
   const values = answerValues(answers);
   const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
@@ -164,6 +168,22 @@ export function carryAnswers(answers: readonly A4Answer[], ids: readonly string[
   const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
     dependencyDigest: dependencyDigest([], values) }));
   return { kept, values, carriedAnswers };
+}
+/**
+ * Understand's answers at a stage whose own questions depend on carried ones (carryAnswers, sorted by question id): an
+ * answer given before a carried question it depends on had any value here (the answers route digested it as null) and
+ * current then is stamped against the values carried now; one given against another, earlier carried value stays stale.
+ */
+export function mergeCarried(questions: readonly A4Question[], answers: readonly A4Answer[], ids: readonly string[], carried: ReadonlyMap<string, unknown>,
+  revisionNo: number): A4Answer[] {
+  const { kept, values, carriedAnswers } = carryAnswers(answers, ids, carried, revisionNo);
+  const previous = answerValues(answers);
+  const restamp = (answer: A4Answer): A4Answer => {
+    const dependsOn = questions.find((entry) => entry.id === answer.questionId)?.dependsOn ?? [];
+    const firstCarry = dependsOn.some((id) => ids.includes(id) && (previous.get(id) ?? null) === null);
+    return firstCarry && answer.dependencyDigest === dependencyDigest(dependsOn, previous) ? { ...answer, dependencyDigest: dependencyDigest(dependsOn, values) } : answer;
+  };
+  return [...kept.map(restamp), ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
 }
 
 /** Quality targets with neither an evidence source (blank counts as none) nor `measure: "not instrumented"`. */
@@ -314,16 +334,14 @@ function hypothesisItems(state: A4ReadinessState, spec: Record<string, unknown>,
 /** Aspire's readiness items (design §10.1); `sod` and the two gates are the governance items every stage carries. */
 export function aspireItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = aspireSpecOf(state);
-  const gaps = answerGaps(answers);
+  const askCodes = askGapCodes(answerGaps(answers));
   return [
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { nextAction: { label: "Run Understand, then confirm it" } })
       // Answers do not change after Aspire; at Aspire a confirmation counts only for an understanding of the current answers.
       : state.project.stage === "aspire" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
         : item("understanding_confirmed", "READY"),
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length === 0 ? item("ask_complete", "READY")
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)], { nextAction: { label: "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY") : waiting("ask_complete", askCodes, { nextAction: { label: "Answer or confirm the listed questions" } }),
     ...proposalItems(spec, answers),
     ...buildItems(state, spec, revisionNo, query.live.driftedSlots),
     ...hypothesisItems(state, spec, query.now)

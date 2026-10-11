@@ -93,7 +93,7 @@ export function memoryPolicyFields(values: ReadonlyMap<string, unknown>): { fiel
 }
 
 /** `<agent>/memory/policy.json`: inside the agent's `memory` Enforce resource (src/enforce/resourceManifest.ts). */
-const memoryPolicyPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "memory", "policy.json");
+export const memoryPolicyPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "memory", "policy.json");
 
 /** The `context.memoryPolicySha256` slot: the file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
 export function memoryPolicySha256(workspace: string, agentId: string): string | null {

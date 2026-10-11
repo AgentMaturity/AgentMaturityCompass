@@ -71,8 +71,12 @@ export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
   aspire: [...GOVERNANCE_BOUND_ITEMS],
   assemble: [...GOVERNANCE_BOUND_ITEMS],
   adapt: [...GOVERNANCE_BOUND_ITEMS],
-  // Consumed gates of the lineage, not this gate's votes: stable while this gate is open.
-  activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals"]
+  // Consumed gates of the lineage, not this gate's votes: stable while this gate is open. Activate's own items (P1-62)
+  // move only when a revision, a release, its transparency entry, a deployment receipt, an AMC check or a monitor ref is recorded (the receipt and
+  // check ids are their reason codes, so the deployment approval binds them); one that moves while a gate is open leaves
+  // it STALE (readinessMoved), as decide and complete refuse it.
+  activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals", "deployment.same_host", "package.transparency", "deployment.receipt", "deployment.amc_check",
+    "lease.scope", "monitoring.source", "regulatory_sources_status"]
 };
 
 /**

@@ -11,7 +11,7 @@ import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, typ
 import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { INTEGRATION_PATHS, integrationClaimFor } from "../assemblePaths.js";
-import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "assemble", prompt, dependsOn, required, kind });
@@ -311,6 +311,7 @@ export function assembleItems(state: A4ReadinessState, query: A4ReadinessQuery):
   const { spec, answers, revisionNo } = assembleSpecOf(state);
   const values = answerValues(answers);
   const gaps = answerGaps(answers, carriedValues(state));
+  const askCodes = askGapCodes(gaps);
   const proposed = proposedFor(spec, answers);
   const tools = textValue(values.get("autonomy")) === "act_with_approval";
   const claim = integrationClaimFor(textValue(values.get("path")));
@@ -320,9 +321,8 @@ export function assembleItems(state: A4ReadinessState, query: A4ReadinessQuery):
   const blockers = listValue(facts?.toolset?.blockers);
   const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   return [
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { section: "recommendation",
+    askCodes.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
+      : waiting("ask_complete", askCodes, { section: "recommendation",
         nextAction: { label: gaps.carried.length > 0 ? "Run Understand to carry the Aspire answers again"
           : workflow !== null && "error" in workflow ? `The workflow was refused: ${workflow.error.slice(0, 300)}` : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { section: "recommendation" })
