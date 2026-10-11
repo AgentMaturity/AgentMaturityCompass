@@ -123,7 +123,7 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 `tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-12-P1-22/pi-conformance.json`, hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-11T22:29:46.215Z on local macOS arm64 (not CI), AMC commit `e4240280fe58`.
+Run 2026-10-11T22:49:36.583Z on local macOS arm64 (not CI), AMC commit `d57b730575cc`.
 
 | Case | Pi 1.0.2 | Pi 1.0.4 |
 |---|---|---|
@@ -139,7 +139,7 @@ Run 2026-10-11T22:29:46.215Z on local macOS arm64 (not CI), AMC commit `e4240280
 | Bridge stopped: tool ran | no | no |
 | Decision receipts verified cold | 117 verified, 0 failed | 117 verified, 0 failed |
 | Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
-| Decision latency p50 / p95 (ms, n) | 60 / 101.8 (100) | 66.5 / 99.6 (100) |
+| Decision latency p50 / p95 (ms, n) | 204.7 / 293.1 (100) | 197.5 / 303.2 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).

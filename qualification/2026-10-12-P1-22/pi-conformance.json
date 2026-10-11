@@ -1,8 +1,8 @@
 {
   "schema": "amc.pi-conformance/v1",
   "key": "P1-22",
-  "amcCommit": "e4240280fe580c7fc442c6d95870bb003823ef5b",
-  "recordedAt": "2026-10-11T22:29:46.215Z",
+  "amcCommit": "d57b730575ccbfc6713dc935e5cb1b4722ac2a10",
+  "recordedAt": "2026-10-11T22:49:36.583Z",
   "recordedAtSource": "this machine's clock when the record was written, after the runs",
   "environment": {
     "label": "local macOS arm64 (not CI)",
@@ -99,8 +99,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 60,
-          "p95": 101.8,
+          "p50": 204.7,
+          "p95": 293.1,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
@@ -204,8 +204,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 66.5,
-          "p95": 99.6,
+          "p50": 197.5,
+          "p95": 303.2,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
@@ -224,7 +224,7 @@
     "@earendil-works/pi-coding-agent 1.1.0 (2026-10-07): not run; AMC denies it (AMC has not qualified Pi 1.1.0).",
     "Pi embedded through its SDK: it resolves @earendil-works/pi-agent-core from node_modules (1.1.0 here) and reports mode print; not run."
   ],
-  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured above it here, with a load average near 13 on the machine. The per-call disk recheck alone (extension file, AMC module, Pi bundle through the stat-keyed cache) measured p50 0.49 ms and p95 0.95 ms warm (200 runs, Pi 1.0.4 bundle).",
+  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured well above it here. The machine was heavily loaded (other worktrees' test runs, mediaanalysisd near 190% CPU, load average 7 to 14). The same session, the latency case alone on Pi 1.0.4: the previous per-call recheck p50 111.7 / p95 154.9 ms, this commit's p50 92.9 / p95 161.8 ms, so the rise is load, not the recheck. The per-call disk recheck alone (no-follow descriptor per file, stat-keyed cache, Pi 1.0.4 bundle) measured p50 1.49 ms and p95 2.81 ms warm over 200 runs.",
   "mutations": [
     {
       "mutation": "S1 binding: client skips the request digest check",
@@ -349,6 +349,10 @@
     {
       "mutation": "review D1 per-call: a swapped extension or Pi on disk is not rechecked at each call",
       "result": "RED Tests  1 failed | 7 passed (8) :: every call rechecks the extension and Pi on disk: after a swap the call is denied as not governed, never receipted enforced"
+    },
+    {
+      "mutation": "review D2 recheck: the digest reader follows a final symlink",
+      "result": "RED ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯ Tests 1 failed | 8 passed (9) :: the per-call recheck fails closed (symlink swap to identical bytes)"
     }
   ],
   "codeArtifacts": {
