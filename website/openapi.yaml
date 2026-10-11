@@ -4315,6 +4315,15 @@ components:
           type: string
           pattern: ^[A-Za-z0-9_-]{8,128}$
           description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Transparency:
+      type: object
+      additionalProperties: false
+      required:
+        - expectedHeadSeq
+      properties:
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
     A4Rollback:
       type: object
       additionalProperties: false
@@ -13298,7 +13307,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/acknowledge:
     post:
-      summary: Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days)
+      summary: Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days); 409
+        A4_NOT_ACKNOWLEDGEABLE for one that would not count (Activate's regulatory_sources_status and
+        deployment.amc_check before Review, the check before it names a receipt)
       tags:
         - Studio
         - A4 Forge
@@ -13606,7 +13617,8 @@ paths:
     post:
       summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or
         an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts; Activate
-        completion: a4.activate.production_lease), runs its effect and the response names the attempt; an inline
+        completion: a4.activate.production_lease), runs its effect and the response names the attempt (409
+        SOD_VIOLATION when the caller is an approver the production lease's gate quorum counted); an inline
         effect (the release, the production lease) runs before the response, which carries its lease token once
         (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
         failure code) or its failure code"
@@ -14035,9 +14047,11 @@ paths:
         a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
         the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
         TARGET_MISMATCH, DESTINATION_MISMATCH (a deploy row naming another destination than the release was
-        packaged for), RELEASE_ROLLED_BACK (a deploy row for a rolled-back release). A rollback row is
+        packaged for), RELEASE_ROLLED_BACK (a deploy row for a rolled-back release), and for a rollback row
+        ROLLBACK_ENVIRONMENT_MISMATCH (not the rollback's environment), ROLLBACK_ROW_RECORDED (a succeeded row
+        of it exists) or ROLLBACK_SUPERSEDED (a succeeded production deploy followed it). A rollback row is
         recordable on a held or frozen project. No lease is issued and no runtime run is created; a succeeded
-        production deploy, or a succeeded rollback row, moves deployedReleaseId
+        production deploy, or a succeeded production rollback row, moves deployedReleaseId
       tags:
         - Studio
         - A4 Forge
@@ -14240,10 +14254,116 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/transparency:
+    post:
+      summary: "Append the release package's transparency entry (owner, owner mode) when the release effect could
+        not: idempotent (an entry of this exact release and package digest is reused, never appended twice), 409
+        EFFECT_RUNNING while the release effect runs, 409 TRANSPARENCY_NOT_APPENDED with the reason, 423
+        A4_VAULT_LOCKED. Readiness item package.transparency is BLOCKED, and the deployment approval cannot be
+        requested, until the entry exists. Answers { releaseId, entryId, reason }"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Transparency"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/releases/{releaseId}/rollback/preview:
     post:
       summary: "Preview a rollback (owner, owner mode) and open its effect gate a4.activate.rollback: a DEPLOY
-        engine request binding the preview, decided separately under A4's separation of duties"
+        engine request binding the preview, decided separately under A4's separation of duties. The target is
+        the release record's rollback block: the release running in production when this one was built (409
+        ROLLBACK_TARGET_ROLLED_BACK when it was rolled back since)"
       tags:
         - Studio
         - A4 Forge
@@ -14346,12 +14466,13 @@ paths:
       summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound,
         journaled as an effect (EFFECT_STARTED first, pinned to expectedHeadSeq; 409 EFFECT_RUNNING while
         another attempt or the deployment approval's production-lease effect runs): the grant consumed (a re-run
-        uses the grant its own execution consumed; GRANT_ALREADY_USED when another execution consumed it), a
-        freeze first for a high or critical risk tier, the Enforce restore, every lease of the release revoked
-        (read again at execution, and the lease journal once more before it settles), the prepared commands, a
-        signed a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its
-        code and a replay answers the attempt's outcome; the lifecycle is never moved backwards and
-        deployedReleaseId moves when the operator records the rollback row"
+        uses the grant its own execution consumed, never for an approver its quorum counted: 409 SOD_VIOLATION;
+        GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or critical risk tier,
+        the Enforce restore, every lease of the release revoked (read again at execution, and the lease journal
+        once more before it settles), the prepared commands, a signed a4-rollback-receipt, then ROLLBACK with
+        EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code and a replay answers the attempt's
+        outcome; the lifecycle is never moved backwards and deployedReleaseId moves when the operator records a
+        production rollback row"
       tags:
         - Studio
         - A4 Forge
@@ -15651,7 +15772,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/effects/{effectId}/retry:
     post:
-      summary: Retry a failed effect under the liveness rule (owner)
+      summary: Retry a failed effect under the liveness rule (owner; 409 SOD_VIOLATION for an approver its consumed
+        grant or gate quorum counted)
       tags:
         - Studio
         - A4 Forge
