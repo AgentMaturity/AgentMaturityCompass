@@ -16,7 +16,7 @@ import { activeFreezeStatus } from "../../drift/freezeEngine.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../../ops/policy.js";
 import { requiredControlsForStage } from "../../lifecycle/lifecycle.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
+import type { A4ExplainFact, A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
 import { hostingNow, statusText } from "../a4Deploy.js";
 import { bridgeControls, lifecycleNow } from "../a4Lifecycle.js";
@@ -26,16 +26,14 @@ import { isRegulated } from "../a4Readiness.js";
 import { recordReviewResults } from "../a4Value.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
-import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, currentRelease, cycleLinks,
   IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
 } from "../spec/activate.js";
 import { updatePolicyOf } from "../a4UpdatePolicy.js";
-import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
-
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
+import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue } from "../spec/aspire.js";
+import { assertUnderstood, explanationResult, fail } from "./common.js";
 
 /** Readiness items and the two effects: the release (direction gate) and the production lease (completion gate). */
 export function register(registry: A4StageRegistry): void {
@@ -46,17 +44,7 @@ export function register(registry: A4StageRegistry): void {
 
 /** The router's entry (src/a4/spec/activate.ts PRODUCERS). */
 export async function produceActivate(step: "understand" | "explain" | "propose" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
-  if (step === "understand") return understand(ctx);
-  if (step === "explain") return explainStep(ctx);
-  if (step === "review") return review(ctx);
-  return propose(ctx);
-}
-
-/** Explain and Propose build on Understand's facts: 409 UNDERSTANDING_STALE unless Understand ran on these answers. */
-function assertUnderstood(spec: Record<string, unknown>, answers: readonly A4Answer[]): void {
-  if (!understandingCurrent(spec, answers)) {
-    throw fail(409, "A4_NOT_READY", "Understand has not run on the current answers; run Understand again, then confirm it.", { reasonCodes: ["UNDERSTANDING_STALE"] });
-  }
+  return { understand, explain: explainStep, propose, review }[step](ctx);
 }
 
 const orNull = <T>(read: () => T): T | null => {
@@ -108,20 +96,8 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
 function understand(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = activateSpecOf(ctx.state);
   const carried = carriedValues(ctx.state);
-  const revisionNo = ctx.state.project.revision_no + 1;
-  const kept = answers.filter((answer) => !(CARRIED as readonly string[]).includes(answer.questionId));
-  const values = answerValues(kept);
-  for (const [id, value] of carried) values.set(id, value);
-  const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
-    dependencyDigest: dependencyDigest([], values) }));
   // An answer given before a carried question had any value here (digested as null then) is stamped against the value carried now.
-  const previous = answerValues(answers);
-  const restamp = (answer: A4Answer): A4Answer => {
-    const dependsOn = QUESTIONS.find((entry) => entry.id === answer.questionId)?.dependsOn ?? [];
-    const firstCarry = dependsOn.some((id) => (CARRIED as readonly string[]).includes(id) && (previous.get(id) ?? null) === null);
-    return firstCarry && answer.dependencyDigest === dependencyDigest(dependsOn, previous) ? { ...answer, dependencyDigest: dependencyDigest(dependsOn, values) } : answer;
-  };
-  const merged = [...kept.map(restamp), ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
+  const merged = mergeCarried(QUESTIONS, answers, CARRIED, carried, ctx.state.project.revision_no + 1);
   const facts = understandFacts(ctx, textValue(answerValues(merged).get("target")));
   const understanding = { answersDigest: answersDigestOf(merged), carried: [...carried.keys()], facts };
   const output = (label: string, body: unknown, lane: "implementation" | "recommendation" = "recommendation") =>
@@ -186,10 +162,7 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const level: A4ExplainLevel = ctx.level ?? "practitioner";
   const { spec, answers } = activateSpecOf(ctx.state);
   assertUnderstood(spec, answers);
-  const facts = activateFacts(spec, answers);
-  const items = explain(facts, level);
-  return { outputs: [{ output: "explanation", label: `activate explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
-    spec: { ...spec, explanation: { level, facts } }, response: { explanation: { level, items } } };
+  return explanationResult("activate", spec, activateFacts(spec, answers), level);
 }
 
 const leaseView = (plan: LeasePlan) => ({ scope: plan.scope, scopes: plan.scopes, executeActionClasses: plan.executeActionClasses, routeAllowlist: plan.routeAllowlist,
@@ -203,9 +176,7 @@ const leaseView = (plan: LeasePlan) => ({ scope: plan.scope, scopes: plan.scopes
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { workspace, state } = ctx;
   const { spec, answers } = activateSpecOf(state);
-  const gaps = answerGaps(answers, carriedValues(state));
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`),
-    ...gaps.carried];
+  const codes = askGapCodes(answerGaps(answers, carriedValues(state)));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   assertUnderstood(spec, answers);
   for (const key of Object.keys(ctx.spec ?? {})) {

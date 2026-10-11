@@ -20,11 +20,11 @@ import { amcVersion } from "../version.js";
 import { assertAllowed, evaluateFor, governed, livePrincipal, loadA4State, type A4Call } from "./a4Gates.js";
 import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
-import { a4DeploymentReceiptV1Schema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
+import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackStarted, rolledBack } from "./spec/activate.js";
+import { fail } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
 /** The workspace inside the container: the base Compose file's AMC_WORKSPACE_DIR and the chart's workspace.mountPath. */
 const WORKSPACE_IN_CONTAINER = "/data/amc";
@@ -33,7 +33,7 @@ const NAMESPACE = /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/;
 /** Operator-stated times may run ahead of the server clock by at most this much (the incident-clock skew bound). */
 const SKEW_MS = 5 * 60_000;
 export const PLAN_PATH = "deploy/plan.json";
-export const CLAIM_BOUNDARY = "Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment: "
+const CLAIM_BOUNDARY = "Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment: "
   + "a receipt records what the operator stated, and AMC's check what its own probe found.";
 
 /**
@@ -179,7 +179,7 @@ export const deploymentBodySchema = z.strictObject({
   restartedAt: z.iso.datetime(), helmRevision: z.number().int().min(1).max(1_000_000_000).nullable(),
   leaseIds: z.array(z.string().regex(/^lease_[0-9a-f]{32}$/)).max(4), destinationRef: z.string().regex(DESTINATION_REF),
   operatorStated: z.strictObject({ status: z.enum(["succeeded", "failed", "partial"]) }),
-  expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/)
+  expectedHeadSeq: headSeqSchema, clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/)
 });
 export type DeploymentBody = z.infer<typeof deploymentBodySchema>;
 

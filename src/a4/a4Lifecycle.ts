@@ -109,7 +109,7 @@ export interface BridgeOutcome {
 }
 
 /** What `advance` would do from `from` (the lifecycle now unless given), without writing: what a release signs before the bridge runs. */
-export function bridgePlan(workspace: string, state: A4ReadinessState, target: BridgeTarget, releaseId: string,
+function bridgePlan(workspace: string, state: A4ReadinessState, target: BridgeTarget, releaseId: string,
   from = lifecycleNow(workspace, state.project.agent_id).stage): BridgeOutcome {
   const controls = bridgeControls(state, target, releaseId);
   const missing = controls.filter((control) => control.status !== "satisfied").map((control) => control.controlId);

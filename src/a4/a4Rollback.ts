@@ -13,7 +13,7 @@
  */
 import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
-import { join, dirname, relative, sep } from "node:path";
+import { join, dirname } from "node:path";
 import { z } from "zod";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalRequestBindingDigest, loadApprovalConsumed, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
@@ -31,16 +31,21 @@ import { assertCallerNotCounted, settleEffect, sweepA4Effects, verifyAndConsumeE
 import { A4_RUNTIME, assertAllowed, autoHold, engineRiskTier, evaluateFor, gateRowOf, livePrincipal, loadA4State, pendingExecutors, signedA4Floor, type A4Call } from "./a4Gates.js";
 import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
-import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
+import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, headSeqSchema, reasonSchema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { currentRelease, effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, ROLLBACK_EFFECT_ID, rollbackExecutionId } from "./spec/activate.js";
+import { fail, relPath } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const FROZEN_CLASSES: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
-const base = { environment: z.enum(["staging", "production"]), expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) };
+const base = { environment: z.enum(["staging", "production"]), expectedHeadSeq: headSeqSchema, clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) };
 export const rollbackPreviewSchema = z.strictObject(base);
-export const rollbackSchema = z.strictObject({ ...base, reason: z.string().trim().min(1).max(2000),
+export const rollbackSchema = z.strictObject({ ...base, reason: reasonSchema,
   toReleaseId: z.string().regex(/^a4r_[0-9a-f]{32}$/).nullable(), confirmManifestId: z.string().regex(/^enforce-resources-[0-9a-f]{16}$/).nullable() });
+
+/** A release rolls back once: 409 ROLLBACK_RECORDED once `chain` records its ROLLBACK (any cycle). */
+function assertNotRolledBack(chain: readonly A4ChainLink[], releaseId: string): void {
+  if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+}
 
 /** A rollback may run on a held or frozen project (it is the remedy); every other refusal of `rollback` stands. */
 function rollbackState(store: A4Store, projectId: string, input: A4Call, expectedHeadSeq: number, now: number): { state: A4ReadinessState; principal: ReturnType<typeof livePrincipal> } {
@@ -85,7 +90,7 @@ function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string,
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
-  if (state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+  assertNotRolledBack(state.chain, releaseId);
   const row = store.snapshot(state.project.project_id).rows.a4_releases.find((candidate) => candidate.release_id === releaseId);
   if (row === undefined) throw fail(409, "RELEASE_RECORD_MISSING", `release ${releaseId} has no release record`);
   const record = a4ReleaseV1Schema.parse({ ...JSON.parse(String(row.surfaces_json)) as Record<string, unknown>, envelope: JSON.parse(String(row.envelope_json)) });
@@ -178,7 +183,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
     throw fail(409, "ROLLBACK_CONFIRMATION_REQUIRED", "Confirm the exact release, Enforce manifest and environment the preview bound.",
       { toReleaseId: intent.toReleaseId, confirmManifestId: intent.confirmManifestId, environment: intent.environment });
   }
-  if (state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+  assertNotRolledBack(state.chain, releaseId);
   const { gate } = releaseAndGate(state, releaseId);
   const approvalRequestId = String(opened.body.approvalRequestId);
   // An earlier attempt that ran step 0 consumed the grant for this execution, which proved its quorum (retryEffect's rule):
@@ -208,7 +213,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   const attemptId = `a4e_${randomBytes(16).toString("hex")}`;
   const started = store.transition(projectId, principal, ({ ts }) => {
     const chain = store.readChain(projectId);
-    if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+    assertNotRolledBack(chain, releaseId);
     // The preview's checks again on the rows this transaction reads: a production deploy of a later release since then
     // superseded this one, and its target may have been rolled back since.
     assertRollbackCurrent(chain, releaseId, body.toReleaseId, body.environment);
@@ -254,7 +259,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
         try {
           const restored = restoreEnforceResourceSnapshot({ workspace: store.workspace, agentId, manifestPath: snapshotPath(store.workspace, agentId, body.confirmManifestId),
             apply: true, confirmManifestId: body.confirmManifestId });
-          restoreReceipt = restored.receiptPath === null ? null : relative(store.workspace, restored.receiptPath).split(sep).join("/");
+          restoreReceipt = restored.receiptPath === null ? null : relPath(store.workspace, restored.receiptPath);
         } catch (error) {
           throw fail(409, "ROLLBACK_RESTORE_FAILED", (error instanceof Error ? error.message : String(error)).slice(0, 300), { frozen });
         }
@@ -308,7 +313,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
     // is NOTARY_UNREACHABLE, the attempt stays unsettled (outcome unknown) and a new request records it.
     const settle = (): A4TransitionResult => notaryCoded(() => store.transition(projectId, A4_RUNTIME, ({ head, seq, ts }) => {
       const chain = store.readChain(projectId);
-      if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+      assertNotRolledBack(chain, releaseId);
       if (chain.some((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.effectId === attemptId)) {
         throw fail(409, "EFFECT_SETTLED", `effect attempt ${attemptId} already settled`);
       }

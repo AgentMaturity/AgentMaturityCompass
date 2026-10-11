@@ -14,7 +14,7 @@ export const UPDATE_POLICY_PATH = "update-policy.yaml";
 const ENFORCEMENT_NOTE = "Recorded and signed in the package; no runner enforces it yet (P2-34).";
 const text = z.string().min(1).max(500).nullable();
 
-export const a4UpdatePolicySchema = z.strictObject({
+const a4UpdatePolicySchema = z.strictObject({
   schema: z.literal("amc.a4-update-policy/v1"),
   channel: text,
   versionPin: text,

@@ -19,7 +19,7 @@ import type { A4Producer } from "../a4RouterStages.js";
 import { flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { LIFECYCLE_SEAM_KEY } from "./assemble.js";
 import { memoryPolicyFields } from "../adaptMemoryPolicy.js";
-import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "adapt", prompt, dependsOn, required, kind });
@@ -531,6 +531,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
 export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = adaptSpecOf(state);
   const gaps = answerGaps(answers, carriedValues(state));
+  const askCodes = askGapCodes(gaps);
   const proposed = proposedFor(spec, answers);
   const understanding = understandingOf(spec);
   const regulated = isRegulated(state, query.floor);
@@ -539,10 +540,9 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     return FACTS[fact] === "list" ? factList(value) === null : factTerm(value) === null;
   });
   return [
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY")
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { nextAction: { label: gaps.carried.length > 0
-          ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY")
+      : waiting("ask_complete", askCodes, { nextAction: { label: gaps.carried.length > 0
+        ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"])
       : state.project.stage === "adapt" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })

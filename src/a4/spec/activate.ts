@@ -9,12 +9,14 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { leaseScopeSchema, type LeaseScope } from "../../leases/leaseSchema.js";
 import type { ActionClass } from "../../types.js";
-import { isRegulated, latestGate, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { isRegulated, latestGate, readinessItemBuilders, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import { bridgeControls } from "../a4Lifecycle.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
-import { adaptSpecOf, CATALOG_EXPERIMENTAL_NOTICE } from "./adapt.js";
-import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
+import { flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
+import { CATALOG_EXPERIMENTAL_NOTICE } from "./adapt.js";
+import {
+  answersDigestOf, answerValues, askGapCodes, askGaps, carriedGaps, carriedValuesOf, listValue, stageSpecOf, textValue, understandingCurrent, type CarryingAnswerGaps
+} from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "activate", prompt, dependsOn, required, kind });
@@ -55,7 +57,7 @@ export const QUESTIONS: A4Question[] = [
 ];
 
 /** The values a choice question takes. */
-export const CHOICES: Readonly<Record<string, readonly string[]>> = { target: ["compose", "helm"], updateApproval: ["required", "not_required"] };
+const CHOICES: Readonly<Record<string, readonly string[]>> = { target: ["compose", "helm"], updateApproval: ["required", "not_required"] };
 
 export const ACTIVATE_SPEC_SCHEMA = "amc.a4-activate-spec/v1";
 export const ACTIVATE_CLAIM_BOUNDARY = "Deployment is recorded from the operator's receipt; AMC did not execute it. Recorded: what the operator stated. Checked: what AMC's own probe found.";
@@ -69,7 +71,7 @@ export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Rec
   const settled = new Set(chain.filter((link) => link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED").map((link) => link.body.effectId));
   return chain.some((link) => link.kind === "EFFECT_STARTED" && match(link.body) && !settled.has(link.body.effectId));
 }
-export const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
+const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
 export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
 
@@ -79,15 +81,8 @@ export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "prop
   .map((step) => ({ id: `activate.${step}`, step, run: async (ctx) => (await load()).produceActivate(step, ctx) }));
 
 /** The newest Activate revision's spec and answers, or those of Activate revision `revisionNo` (none when it is not one). */
-export function activateSpecOf(state: Pick<A4ReadinessState, "revisions">, revisionNo?: number): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revisions = state.revisions.filter((row) => row.stage === "activate");
-  const revision = revisionNo === undefined ? revisions.at(-1) : revisions.find((row) => row.revision_no === revisionNo);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers, revisionNo: revision?.revision_no ?? null };
+export function activateSpecOf(state: Pick<A4ReadinessState, "revisions">, revisionNo?: number): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(revisionNo === undefined ? state : { revisions: state.revisions.filter((row) => row.revision_no === revisionNo) }, "activate");
 }
 
 /**
@@ -103,8 +98,7 @@ export function releaseDestination(state: Pick<A4ReadinessState, "revisions" | "
 
 /** The Adapt answers Activate carries, as the newest Adapt revision records them (absent ones are left out). */
 export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<string, unknown> {
-  const values = answerValues(adaptSpecOf(state).answers);
-  return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+  return carriedValuesOf(state, CARRIED, "adapt");
 }
 
 /** A destinationRef: a lowercase host name or IPv4 literal and an optional port 1–65535; never a URL, a path or credentials. */
@@ -125,12 +119,9 @@ const positiveNumber = (value: unknown): number | null => {
  * Required questions with no answer, answered ones whose dependencies changed since, answers that are not one of their
  * question's values, and carried answers that are missing or no longer Adapt's (fail closed: re-carry at Understand).
  */
-export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
+export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): CarryingAnswerGaps {
   const values = answerValues(answers);
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const answered = (id: string): boolean => listValue(values.get(id)).length > 0;
   const bad: Record<string, boolean> = {
     ...Object.fromEntries(Object.entries(CHOICES).map(([id, allowed]) => [id, answered(id) && !allowed.includes(textValue(values.get(id)) ?? "")])),
@@ -145,9 +136,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     budgetCostUsdPerDay: answered("budgetCostUsdPerDay") && positiveNumber(values.get("budgetCostUsdPerDay")) === null,
     productionLeaseDays: answered("productionLeaseDays") && !((positiveInt(values.get("productionLeaseDays")) ?? 0) <= 90 && positiveInt(values.get("productionLeaseDays")) !== null)
   };
-  const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
-    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
-  return { missing, stale, invalid: Object.keys(bad).filter((id) => bad[id]), carried: carriedGaps };
+  return { missing, stale, invalid: Object.keys(bad).filter((id) => bad[id]), carried: carriedGaps(CARRIED, answers, carried) };
 }
 
 /** One lease AMC mints for the release: the issueLeaseToken input without workspace, agent or work order. */
@@ -227,15 +216,10 @@ export const productionLeaseOf = (chain: readonly A4ChainLink[], releaseId: stri
   cycleLinks(chain, "EFFECT_FINISHED").map((link) => (link.body.effect === PRODUCTION_LEASE_EFFECT_ID ? (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease : undefined))
     .filter((lease): lease is Record<string, unknown> => lease !== undefined && lease.releaseId === releaseId).at(-1) ?? null;
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "implementation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("implementation");
 
 /** Whether the project has reached `step` at Activate (a retired project has). */
-export function reached(state: A4ReadinessState, step: A4Step): boolean {
+function reached(state: A4ReadinessState, step: A4Step): boolean {
   if (state.project.stage === "retired") return true;
   return state.project.stage === "activate" && A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
@@ -460,6 +444,7 @@ function expertReviewItem(state: A4ReadinessState, regulated: boolean): A4Readin
 export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers } = activateSpecOf(state);
   const gaps = answerGaps(answers, carriedValues(state));
+  const askCodes = askGapCodes(gaps);
   const proposed = proposedFor(spec, answers);
   const facts = understandingCurrent(spec, answers) || proposed ? understandingOf(spec)?.facts ?? null : null;
   const target = textValue(answerValues(answers).get("target"));
@@ -467,10 +452,9 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
   const direction = latestGate(state, "activate", "direction");
   return [
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { section: "recommendation", nextAction: { label: gaps.carried.length > 0
-          ? "Run Understand to carry the Adapt answers again" : "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
+      : waiting("ask_complete", askCodes, { section: "recommendation", nextAction: { label: gaps.carried.length > 0
+        ? "Run Understand to carry the Adapt answers again" : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"], { section: "recommendation" })
       : state.project.stage === "activate" && !understandingCurrent(spec, answers) && !proposed
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { section: "recommendation", nextAction: { label: "Answers changed: run Understand again, then confirm it" } })

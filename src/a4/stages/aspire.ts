@@ -40,7 +40,7 @@ import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf, understandAspire } from "../aspireUnderstand.js";
 import {
-  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
+  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, askGapCodes, aspireItems, aspireSpecOf, dependencyDigest,
   hypothesisDigestOf, learningPlanSchema, listValue, misuseSchema, previousHypotheses, textValue, unmeasuredTargets
 } from "../spec/aspire.js";
 import { explanationResult, fail, relPath } from "./common.js";
@@ -550,8 +550,7 @@ function priorRiskTierOf(workspace: string, agentId: string): string | null {
 /** Propose: the brief and everything around it, from the answers; members may edit hypotheses, learning plan, quality and misuse. */
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = aspireSpecOf(ctx.state);
-  const gaps = answerGaps(answers);
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)];
+  const codes = askGapCodes(answerGaps(answers));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   for (const key of Object.keys(ctx.spec ?? {})) {
     if (!(EDITABLE as readonly string[]).includes(key) && canonicalize(ctx.spec![key] ?? null) !== canonicalize(spec[key] ?? null)) {

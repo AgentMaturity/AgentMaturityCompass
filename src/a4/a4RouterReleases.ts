@@ -26,7 +26,7 @@ import { bridgeControls } from "./a4Lifecycle.js";
 import { regularBytes } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackReplay, rollbackSchema, rollbackViews } from "./a4Rollback.js";
-import { a4PackageV1Schema, a4ReleaseV1Schema } from "./a4Schema.js";
+import { a4PackageV1Schema, a4ReleaseV1Schema, clientRequestIdSchema, headSeqSchema } from "./a4Schema.js";
 import type { A4Store } from "./a4Store.js";
 import { packageEntry, releaseEntries } from "./a4Transparency.js";
 import { UPDATE_POLICY_PATH, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
@@ -35,11 +35,10 @@ import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, effectUnsettled, monitorResolves }
 import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, precheck, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
 import { completeAndRun } from "./a4RouterStages.js";
 
-const releaseSchema = z.strictObject({ gateId: z.string().regex(/^a4gate_[0-9a-f]{32}$/), expectedHeadSeq: z.number().int().min(0),
-  clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -") });
+const releaseSchema = z.strictObject({ gateId: z.string().regex(/^a4gate_[0-9a-f]{32}$/), expectedHeadSeq: headSeqSchema, clientRequestId: clientRequestIdSchema });
 const RELEASE_ACTION = /^\/releases\/(a4r_[0-9a-f]{32})\/(deployments|verify|rollback\/preview|rollback|transparency)$/;
 // clientRequestId as on every A4 write; the append itself is idempotent (it reuses an entry), so a retry answers the same entry.
-const transparencySchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
+const transparencySchema = z.strictObject({ expectedHeadSeq: headSeqSchema, clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
 
 /**
  * POST …/releases/:rid/transparency (owner, owner mode): the package's transparency entry, appended when the release
@@ -190,7 +189,7 @@ function planView(plan: { valid: boolean; reason: string | null; artifactBytes: 
  * file list, the eight-surface table with a reason for every surface not evaluated (Watch's SLO digest from the newest
  * monitor ref that resolves) and the production bridge rows as they stand now. Integrity under this workspace's keys only.
  */
-export function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState): Array<Record<string, unknown>> {
+function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState): Array<Record<string, unknown>> {
   const { chain } = state;
   const now = Date.now();
   let revoked: Set<string> | null;

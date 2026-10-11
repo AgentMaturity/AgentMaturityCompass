@@ -15,7 +15,7 @@
  * this workspace holds at the release digest (v1 is a same-host restart, D-18).
  */
 import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, readdirSync, readFileSync, renameSync, rmSync } from "node:fs";
-import { dirname, isAbsolute, join, relative, sep } from "node:path";
+import { dirname, isAbsolute, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
@@ -66,6 +66,7 @@ import {
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
 import { assembleSpecOf } from "./spec/assemble.js";
+import { relPath } from "./stages/common.js";
 
 /** A coded failure: the effect runner records the message, whose first word is the code the route answers. */
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
@@ -75,8 +76,7 @@ const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace he
 /** AMC's own install root (src/a4/ or dist/a4/ → the package root): the runtime SBOM and the deploy base files are read there. */
 export const AMC_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
-export const a4ReleasesRoot = (workspace: string): string => join(workspace, "a4-releases");
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
+const a4ReleasesRoot = (workspace: string): string => join(workspace, "a4-releases");
 const hex = (value: unknown): string | null => {
   const text = typeof value === "string" ? value.replace(/^sha256:/, "") : "";
   return /^[0-9a-f]{64}$/.test(text) ? text : null;
@@ -122,7 +122,7 @@ function assertNoLinks(root: string, rel: string): void {
   }
 }
 /** `dir` exists as a real directory (created when absent), never a link. */
-export function realDir(dir: string): string {
+function realDir(dir: string): string {
   ensureDir(dir);
   if (!lstatSync(dir).isDirectory()) throw coded("PACKAGE_DIR_LINK", relative(dirname(dir), dir));
   return dir;
@@ -187,7 +187,7 @@ type PackageFile = { readonly path: string; readonly bytes: Buffer; readonly kin
  */
 function snapshotFiles(workspace: string, agentId: string, snapshot: { manifestId: string; resources: EnforceResource[] }): PackageFile[] {
   const root = join(dirname(latestEnforceResourceManifestPath(workspace, agentId)), "snapshots", snapshot.manifestId, "files");
-  assertNoLinks(getAgentPaths(workspace, agentId).rootDir, relative(getAgentPaths(workspace, agentId).rootDir, root).split(sep).join("/"));
+  assertNoLinks(getAgentPaths(workspace, agentId).rootDir, relPath(getAgentPaths(workspace, agentId).rootDir, root));
   const out: PackageFile[] = [];
   for (const resource of snapshot.resources.filter((entry) => entry.exists && entry.digest !== null)) {
     assertNoLinks(root, resource.path);
@@ -206,7 +206,7 @@ function snapshotFiles(workspace: string, agentId: string, snapshot: { manifestI
           const full = join(dir, entry.name);
           if (entry.isDirectory()) walk(full);
           else if (entry.isFile()) {
-            const rel = relative(path, full).split(sep).join("/");
+            const rel = relPath(path, full);
             const bytes = regularBytes(full, `${resource.path}/${rel}`);
             if (bytes === null) throw coded("SNAPSHOT_RESOURCE_MISSING", `${resource.path}/${rel}`);
             files.push({ path: rel, digest: sha256Hex(bytes) });
@@ -359,7 +359,7 @@ function approvalsOf(state: A4ReadinessState): A4ReleaseV1["approvals"] {
 
 
 /** releaseId from the execution id (stable across retries of one consumed approval). */
-export const releaseIdFor = (executionId: string): string => `a4r_${sha256Hex(executionId).slice(0, 32)}`;
+const releaseIdFor = (executionId: string): string => `a4r_${sha256Hex(executionId).slice(0, 32)}`;
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
 
 /**

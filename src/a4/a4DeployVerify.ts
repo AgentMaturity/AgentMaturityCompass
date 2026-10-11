@@ -24,16 +24,16 @@ import { statusText } from "./a4Deploy.js";
 import { assertAllowed, evaluateFor, governed, livePrincipal, loadA4State, type A4Call } from "./a4Gates.js";
 import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
-import { a4DeploymentReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
-import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
+import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink } from "./a4Schema.js";
+import type { A4ChangeSpec, A4Store, A4TransitionResult } from "./a4Store.js";
 import { cycleLinks, IDENTITY_NOT_EVALUATED, releaseDestination } from "./spec/activate.js";
+import { fail } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const TIMEOUT_MS = 5_000;
 const BODY_CAP = 256 * 1024;
 const RUNTIME_NOT_EVALUATED = "runtime behaviour at the destination: not evaluated (no probe turn; verify sends no credential)";
 
-export const verifyBodySchema = z.strictObject({ environment: z.enum(["staging", "production"]), expectedHeadSeq: z.number().int().min(0),
+export const verifyBodySchema = z.strictObject({ environment: z.enum(["staging", "production"]), expectedHeadSeq: headSeqSchema,
   clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
 
 // Strict on what AMC reads from the destination; anything else is REMOTE_BODY_INVALID.
