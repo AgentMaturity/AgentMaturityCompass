@@ -43,6 +43,11 @@ describe("docs truth reset (P0-28)", () => {
     expect(readme).not.toContain("142 Assurance");
     expect(readme).not.toContain("142 attack");
     expect(readme).toContain("Badges and certification marks will only come from a public registry (Gate G3).");
+    // A pack count outside a gen-counts marker is hand-typed.
+    const unmarked = (text: string) => text.replace(/<!-- amc:count:\w+ -->[^<]*<!-- \/amc:count -->/g, "");
+    for (const surface of ["README.md", "whitepaper/AMC_WHITEPAPER_v1.md", "website/index.html", "docs/PRICING.md"]) {
+      expect(unmarked(read(surface)), surface).not.toMatch(/\b\d[\d,]*(?:-pack CLI catalog|\s+(?:registered\s+|adversarial\s+)*(?:assurance|attack(?:\s+test)?|adversarial)\s+packs\b)/i);
+    }
     expect(readme).toContain("registered = packs returned by `listAssurancePacks()`; files on disk may differ");
   });
 
