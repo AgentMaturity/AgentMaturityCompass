@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * Renders the Pi conformance matrix in docs/adapters/pi.md from the P1-22 qualification receipt.
- * --write rewrites the section between the markers; --check fails when it differs from the receipt.
+ * Renders the Pi conformance matrix in docs/adapters/pi.md from the P1-22 qualification record
+ * (qualification/2026-10-12-P1-22/pi-conformance.json, hashed by that folder's receipt.json).
+ * --write rewrites the section between the markers; --check fails when it differs from the record.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 
-const RECEIPT = "qualification/2026-10-12-P1-22/receipt.json";
+const RECEIPT = "qualification/2026-10-12-P1-22/pi-conformance.json";
 const DOC = "docs/adapters/pi.md";
 const START = "<!-- pi-conformance-matrix:start -->";
 const END = "<!-- pi-conformance-matrix:end -->";

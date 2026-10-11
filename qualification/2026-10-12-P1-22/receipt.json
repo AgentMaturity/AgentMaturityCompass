@@ -1,295 +1,41 @@
 {
-  "schema": "amc.qualification-receipt/v1",
+  "schemaVersion": 1,
   "key": "P1-22",
-  "title": "Pi tool_call package: qualification of the AMC Pi extension against pinned Pi releases",
-  "recordedAt": "2026-10-11T20:16:23.081Z",
-  "recordedAtSource": "this machine's clock when the receipt was written, after the runs",
-  "amcCommit": "a9e49d49189952fcd493c8663045482571e65e86",
-  "environment": {
-    "label": "local macOS arm64 (not CI)",
-    "os": "macOS 26.6.2",
-    "arch": "arm64",
-    "node": "v25.5.0",
-    "npm": "11.10.1",
-    "load": "Another worktree's AMC test runs were active on this machine during these runs; latency was not measured on an idle host."
-  },
+  "date": "2026-10-12",
+  "commit": "a9e49d49189952fcd493c8663045482571e65e86",
+  "branch": "rtd/p1-22-pi-tool-call-package",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
   "commands": [
     {
-      "command": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.0.2=<prefix>,1.0.4=<prefix> AMC_PI_CONFORMANCE_OUT=<file> npx vitest run tests/conformance/piToolCall.conformance.test.ts",
-      "exitCode": 0,
-      "testFiles": 1,
-      "passed": 18,
-      "total": 18
+      "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.0.2=<prefix>,1.0.4=<prefix> AMC_PI_CONFORMANCE_OUT=<file> npx vitest run tests/conformance/piToolCall.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 18750
     },
     {
-      "command": "npx vitest run <18 Pi and hook test files: piToolMapping, piHookControl, amcPiExtension, connectHookIntegration, connectHookCli, hookControl, amc1476ProviderSteerOutcome, amc1483CompoundCommandBlastRadius, claudeHookFailClosed, claudeHookInstalledConfig, providerNeutralHookIngress, hookActionLifecycle, hookActionLifecycleSurfaces, amc1466HookActionLifecycleDocs, amc1480HookHealthDiagnostics, amc1472OutcomeOnboarding, amc1465AdapterCapabilityDocs, subagentHookInheritance>",
-      "exitCode": 0,
-      "testFiles": 18,
-      "passed": 193,
-      "total": 193
+      "cmd": "npx vitest run tests/piToolMapping.test.ts tests/piHookControl.test.ts tests/amcPiExtension.test.ts tests/connectHookIntegration.test.ts tests/connectHookCli.test.ts tests/hookControl.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/providerNeutralHookIngress.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/subagentHookInheritance.test.ts",
+      "exit": 0,
+      "durationMs": 36130
     },
     {
-      "command": "npx vitest run <8 test files covering the other changed modules: adapterCapabilityCli, adapterCapabilityReceipts, amc1464ProviderControlDocs, controlHttpResponsesParity, leaseRevocationFailClosed, runtimesAdapters, security/bridgeStreamingTruthguardBypass, pythonSdk>",
-      "exitCode": 0,
-      "testFiles": 8,
-      "passed": 122,
-      "total": 122
+      "cmd": "npx vitest run tests/adapterCapabilityCli.test.ts tests/adapterCapabilityReceipts.test.ts tests/amc1464ProviderControlDocs.test.ts tests/controlHttpResponsesParity.test.ts tests/leaseRevocationFailClosed.test.ts tests/runtimesAdapters.test.ts tests/security/bridgeStreamingTruthguardBypass.test.ts tests/pythonSdk.test.ts",
+      "exit": 0,
+      "durationMs": 10630
     }
   ],
-  "pi": [
-    {
-      "version": "1.0.2",
-      "package": "@earendil-works/pi-coding-agent",
-      "tarball": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.0.2.tgz",
-      "integrity": "sha512-3ZdIghMSELMGV3sKi5iASOb1Jwb696fLjmNu0aezaqDxTLLWWoRpqBYkGxJ1CgAMCbtfqXWEF0lcRrlVXmiEGQ==",
-      "gitHead": "cd32f7725fdbddbaecdff5b1e68491563394e0ca",
-      "cliBundleSha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
-      "install": "npm install --ignore-scripts --no-audit --no-fund --save-exact @earendil-works/pi-coding-agent@1.0.2 (scratch prefix outside the repository)",
-      "resolvedDependencies": {
-        "@earendil-works/chord": {
-          "version": "1.1.0",
-          "integrity": "sha512-gsHzKfyQ3t0ZIQ3cLBjJ5Vqy1TYnFyruHIV3g3BwmulCDYe5BW4yT9vaJk9QzN6YANILIO75uzuq+Gdxtzz1og=="
-        },
-        "@earendil-works/pi-agent-core": {
-          "version": "1.1.0",
-          "integrity": "sha512-aX1KZomNCPmwYnXa3OivF3VYLJ+WPUkIJlEIZTgwdOZdY/+oToWTQ334WYpQeOz9POpiYFNMJLPwIhXQ4e48kg=="
-        },
-        "@earendil-works/pi-ai": {
-          "version": "1.1.0",
-          "integrity": "sha512-1T7LAkc/5Bvc0v6w4vAGVdCrli0o/E0pEmYKTnixu95vSFArBjvbhS/G4ZwI0RUePgf0Imcu0VyqlM4EcXxqfw=="
-        },
-        "@earendil-works/pi-codemode": {
-          "version": "1.1.0",
-          "integrity": "sha512-8Asc2AzhoNaXS1snmRFa96OhcWIlFM5k1Kuiz6p2DvIYgi5QHQccRAmDVY9oO92TzWrizpvQpconZGQ7JhlI7Q=="
-        },
-        "@earendil-works/pi-mcp": {
-          "version": "1.1.0",
-          "integrity": "sha512-xGKwvu3SvVTeoIx8Z7UGoJprB4VK20wKORMhufcWGx61fIauhu3J+UqfB5eeoF1oE/geYBA598K6nh1SdABQkg=="
-        },
-        "@earendil-works/pi-telemetry": {
-          "version": "1.1.0",
-          "integrity": "sha512-8gAK05/2pPozZZz6hCLOi8x2vsqzvsmO9gG92kbvuvTPm0qMHaFlaXX98ndXsrOi5pmzha7vNLguuG4+0Rgxjw=="
-        },
-        "@earendil-works/pi-tui": {
-          "version": "1.1.0",
-          "integrity": "sha512-v7wkS0y2ErZvZkSfemqd9RrBZJ5x6p8Ujsv7NdJj01IXJyFM0kNL6rMdcKcvTe7EVTd6ugvDB9VPZSoaBF9QxQ=="
-        }
-      },
-      "cases": {
-        "allowedRead": {
-          "exit": 0,
-          "decision": "allow",
-          "piVersion": "1.0.2",
-          "ranTool": true
-        },
-        "deniedWrite": {
-          "exit": 0,
-          "fileCreated": false,
-          "reason": "Signed Approval Policy requires 1 human approval before WRITE_LOW. A Pi tool call cannot carry an AMC approval, so AMC denied the action."
-        },
-        "deniedBash": {
-          "exit": 0,
-          "fileCreated": false,
-          "reason": "Signed ToolHub policy rejected the current process.spawn arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
-        },
-        "unmappedExtensionTool": {
-          "exit": 0,
-          "effect": false,
-          "reason": "Pi tool amc_probe_effect is not mapped to an allowed ToolHub tool."
-        },
-        "codemode": {
-          "exit": 0,
-          "effect": false,
-          "reason": "Pi tool codemode is not mapped to an allowed ToolHub tool."
-        },
-        "codemodeNestedToolCall": {
-          "events": 4,
-          "nestedToolCallId": "call_codemode_probe/1",
-          "parentToolCallId": "call_codemode_probe"
-        },
-        "untrustedProjectLimit": {
-          "exit": 0,
-          "fileCreated": true,
-          "amcDecisions": 0
-        },
-        "latencyMs": {
-          "n": 100,
-          "p50": 39.3,
-          "p95": 54.6,
-          "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
-        },
-        "receiptsVerified": {
-          "decisions": 105,
-          "failures": 0
-        },
-        "bridgeStopped": {
-          "exit": 0,
-          "reason": "AMC control unavailable; action denied.",
-          "ranTool": false
-        }
-      }
-    },
-    {
-      "version": "1.0.4",
-      "package": "@earendil-works/pi-coding-agent",
-      "tarball": "https://registry.npmjs.org/@earendil-works/pi-coding-agent/-/pi-coding-agent-1.0.4.tgz",
-      "integrity": "sha512-+956nfMFHr5lDUVY/2Q4k+YzojzBuCaBXFgj0eSlXVGr7QVliVddKdc1Pz6yVg1dOlJQmb67doOVrlMsIcIdaw==",
-      "gitHead": "7c10bd4337495ee613f2224843ecdf349b80d1df",
-      "cliBundleSha256": "e79626f2dd6f94aa45d30f3fa63cd84319a6eefcd150b353cfaf274366926774",
-      "install": "npm install --ignore-scripts --no-audit --no-fund --save-exact @earendil-works/pi-coding-agent@1.0.4 (scratch prefix outside the repository)",
-      "resolvedDependencies": {
-        "@earendil-works/chord": {
-          "version": "1.1.0",
-          "integrity": "sha512-gsHzKfyQ3t0ZIQ3cLBjJ5Vqy1TYnFyruHIV3g3BwmulCDYe5BW4yT9vaJk9QzN6YANILIO75uzuq+Gdxtzz1og=="
-        },
-        "@earendil-works/pi-agent-core": {
-          "version": "1.1.0",
-          "integrity": "sha512-aX1KZomNCPmwYnXa3OivF3VYLJ+WPUkIJlEIZTgwdOZdY/+oToWTQ334WYpQeOz9POpiYFNMJLPwIhXQ4e48kg=="
-        },
-        "@earendil-works/pi-ai": {
-          "version": "1.1.0",
-          "integrity": "sha512-1T7LAkc/5Bvc0v6w4vAGVdCrli0o/E0pEmYKTnixu95vSFArBjvbhS/G4ZwI0RUePgf0Imcu0VyqlM4EcXxqfw=="
-        },
-        "@earendil-works/pi-codemode": {
-          "version": "1.1.0",
-          "integrity": "sha512-8Asc2AzhoNaXS1snmRFa96OhcWIlFM5k1Kuiz6p2DvIYgi5QHQccRAmDVY9oO92TzWrizpvQpconZGQ7JhlI7Q=="
-        },
-        "@earendil-works/pi-mcp": {
-          "version": "1.1.0",
-          "integrity": "sha512-xGKwvu3SvVTeoIx8Z7UGoJprB4VK20wKORMhufcWGx61fIauhu3J+UqfB5eeoF1oE/geYBA598K6nh1SdABQkg=="
-        },
-        "@earendil-works/pi-telemetry": {
-          "version": "1.1.0",
-          "integrity": "sha512-8gAK05/2pPozZZz6hCLOi8x2vsqzvsmO9gG92kbvuvTPm0qMHaFlaXX98ndXsrOi5pmzha7vNLguuG4+0Rgxjw=="
-        },
-        "@earendil-works/pi-tui": {
-          "version": "1.1.0",
-          "integrity": "sha512-v7wkS0y2ErZvZkSfemqd9RrBZJ5x6p8Ujsv7NdJj01IXJyFM0kNL6rMdcKcvTe7EVTd6ugvDB9VPZSoaBF9QxQ=="
-        }
-      },
-      "cases": {
-        "allowedRead": {
-          "exit": 0,
-          "decision": "allow",
-          "piVersion": "1.0.4",
-          "ranTool": true
-        },
-        "deniedWrite": {
-          "exit": 0,
-          "fileCreated": false,
-          "reason": "Signed Approval Policy requires 1 human approval before WRITE_LOW. A Pi tool call cannot carry an AMC approval, so AMC denied the action."
-        },
-        "deniedBash": {
-          "exit": 0,
-          "fileCreated": false,
-          "reason": "Signed ToolHub policy rejected the current process.spawn arguments. Pi tool_call has no verified corrective retry outcome, so AMC denied the action."
-        },
-        "unmappedExtensionTool": {
-          "exit": 0,
-          "effect": false,
-          "reason": "Pi tool amc_probe_effect is not mapped to an allowed ToolHub tool."
-        },
-        "codemode": {
-          "exit": 0,
-          "effect": false,
-          "reason": "Pi tool codemode is not mapped to an allowed ToolHub tool."
-        },
-        "codemodeNestedToolCall": {
-          "events": 4,
-          "nestedToolCallId": "call_codemode_probe/1",
-          "parentToolCallId": "call_codemode_probe"
-        },
-        "untrustedProjectLimit": {
-          "exit": 0,
-          "fileCreated": true,
-          "amcDecisions": 0
-        },
-        "latencyMs": {
-          "n": 100,
-          "p50": 37,
-          "p95": 56,
-          "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
-        },
-        "receiptsVerified": {
-          "decisions": 105,
-          "failures": 0
-        },
-        "bridgeStopped": {
-          "exit": 0,
-          "reason": "AMC control unavailable; action denied.",
-          "ranTool": false
-        }
-      }
-    }
-  ],
-  "qualifiedVersions": [
-    "1.0.2",
-    "1.0.4"
-  ],
-  "notQualified": [
-    "@earendil-works/pi-coding-agent 1.1.0 (2026-10-07): not run; AMC denies it (AMC has not qualified Pi 1.1.0).",
-    "Pi embedded through its SDK: it resolves @earendil-works/pi-agent-core from node_modules (1.1.0 here) and reports mode print; not run."
-  ],
-  "mutations": [
-    {
-      "mutation": "S1 binding: client skips the request digest check",
-      "result": "Tests 1 failed | 10 passed (11) :: control: an answer without a valid AMC signature over exactly this request is refused;"
-    },
-    {
-      "mutation": "S2 signature: client accepts any receipt signature",
-      "result": "Tests 1 failed | 10 passed (11) :: control: an answer without a valid AMC signature over exactly this request is refused;"
-    },
-    {
-      "mutation": "S3 freeze: allowed input left mutable",
-      "result": "Tests 1 failed | 10 passed (11) :: control: an allowed call's input is frozen, so a later Pi handler cannot change what runs;"
-    },
-    {
-      "mutation": "S4 version: unreadable Pi version allowed",
-      "result": "Tests 1 failed | 10 passed (11) :: a Pi version outside the qualified set is denied, readable or not; the receipt records it;"
-    },
-    {
-      "mutation": "S5 identity: server trusts the payload action id",
-      "result": "Tests 1 failed | 10 passed (11) :: derives the action id from Pi's session and call id and ignores an action id the payload names;"
-    },
-    {
-      "mutation": "S6 replay: extension reuses a fixed nonce",
-      "result": "Tests 1 failed | 10 passed (11) :: control: a decision is single-use; a restarted Pi re-sending the call gets no second decision and is blocked;"
-    },
-    {
-      "mutation": "S7 ask: Pi ask passes as native",
-      "result": "Tests 2 failed | 20 passed (22) :: an ask is denied in every Pi mode: a Pi confirmation is not AMC approval;control: a call that needs approval is blocked in every mode; nothing is asked inside Pi;"
-    },
-    {
-      "mutation": "S8 table: minimum action class not enforced",
-      "result": "Tests 1 failed | 10 passed (11) :: a signed tools config that gives a mapped tool a lower class than the Pi mapping table is denied;"
-    },
-    {
-      "mutation": "S9 table: prototype names treated as mapped",
-      "result": "Tests 1 failed | 4 passed (5) :: unmapped tools and missing paths map to nothing, which control denies;"
-    },
-    {
-      "mutation": "S10 shape: extension forwards unrecognised events",
-      "result": "Tests 1 failed | 10 passed (11) :: control refuses a Pi event it does not recognise before sending anything;"
-    },
-    {
-      "mutation": "S11 version gate: a readable unqualified version allowed",
-      "result": "Tests 2 failed | 20 passed (22) :: a Pi version outside the qualified set is denied, readable or not; the receipt records it;control: unmapped tools and unqualified Pi versions are blocked with AMC's reason;"
-    },
-    {
-      "mutation": "S12 binding: a record that cannot bind no longer denies",
-      "result": "Tests 1 failed | 10 passed (11) :: a decision whose authorization record cannot bind is denied: expired lease, lease classes that do not cover the call;"
-    },
-    {
-      "mutation": "S13 fail closed: extension allows on any control error",
-      "result": "Tests 5 failed | 6 passed (11) :: control: a decision is single-use; a restarted Pi re-sending the call gets no second decision and is blocked;control: an answer without a valid AMC signature over exactly this request is refused;control refuses a Pi event it does not recognise before sending anything;"
-    }
-  ],
-  "artifacts": {
-    "tests/fixtures/harness-hooks/pi/1.0.2/events.jsonl": "238376cd348a1cf89f7f2d62ee03942f2e9a9b7f7b69f2a7a7e1f1eae8a9588d",
-    "tests/fixtures/harness-hooks/pi/1.0.4/events.jsonl": "238376cd348a1cf89f7f2d62ee03942f2e9a9b7f7b69f2a7a7e1f1eae8a9588d",
-    "dist/adapters/pi/amcPiExtension.js": "ff1544855093fdac61e6b49c6fe513d7f356c3781e37faa84a35adfab63a24fa",
-    "dist/adapters/pi/piControlClient.js": "2ee304be8b1c805e0abecd92d2c28a98e5c1b2cc1c5f9e2da626f670c82e4019",
-    "conformance results (scratch, not tracked)": "7be9a7b4c0ec6f2e37c1653fa420cf35a245fc94cbfbb26cafc89266276d9ef8"
+  "tests": {
+    "total": 333,
+    "passed": 333,
+    "failed": 0,
+    "skipped": 0
   },
-  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured above it here."
+  "artifacts": [
+    {
+      "path": "pi-conformance.json",
+      "sha256": "789eac62cdfeca91177096f5a79e2d2f5278007918e8884baa8224da14e86cd8"
+    }
+  ],
+  "notes": "Local macOS arm64 run, not CI; another worktree's test runs were active. Pi 1.0.2 and 1.0.4 (pi CLI of @earendil-works/pi-coding-agent) installed from the public npm registry with --ignore-scripts into scratch prefixes outside the repository. pi-conformance.json holds tarball integrity, gitHeads, resolved @earendil-works dependencies, per-case conformance results per version, 13 mutation checks and decision latency (p95 54.6 and 56.0 ms, above the 50 ms target). Commands: conformance 18/18, focused Pi and hook suites 193/193, suites covering the other changed modules 122/122."
 }
