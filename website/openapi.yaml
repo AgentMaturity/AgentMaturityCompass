@@ -4194,6 +4194,162 @@ components:
         expectedRequestDigestSha256:
           type: string
           pattern: ^[a-f0-9]{64}$
+    A4Deployment:
+      type: object
+      additionalProperties: false
+      required:
+        - kind
+        - environment
+        - target
+        - packageDigest
+        - imageDigest
+        - overlayDigest
+        - restartedAt
+        - helmRevision
+        - leaseIds
+        - destinationRef
+        - operatorStated
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        kind:
+          type: string
+          enum:
+            - deploy
+            - rollback
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        target:
+          type: string
+          enum:
+            - compose
+            - helm
+        packageDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          nullable: true
+        imageDigest:
+          type: string
+          pattern: ^sha256:[0-9a-f]{64}$
+          nullable: true
+        overlayDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        restartedAt:
+          type: string
+          format: date-time
+          description: Operator-stated; recorded as a claim beside the server time.
+        helmRevision:
+          type: integer
+          minimum: 1
+          description: The helm history revision for a Helm target; null for Compose.
+          nullable: true
+        leaseIds:
+          type: array
+          maxItems: 4
+          items:
+            type: string
+            pattern: ^lease_[0-9a-f]{32}$
+        destinationRef:
+          type: string
+          description: host[:port]; never a URL or credentials.
+        operatorStated:
+          type: object
+          additionalProperties: false
+          required:
+            - status
+          properties:
+            status:
+              type: string
+              enum:
+                - succeeded
+                - failed
+                - partial
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Verify:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4RollbackPreview:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Rollback:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - reason
+        - toReleaseId
+        - confirmManifestId
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        toReleaseId:
+          type: string
+          pattern: ^a4r_[0-9a-f]{32}$
+          nullable: true
+        confirmManifestId:
+          type: string
+          pattern: ^enforce-resources-[0-9a-f]{16}$
+          nullable: true
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
     # END GENERATED A4 SCHEMAS
 
 tags:
@@ -13714,8 +13870,10 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/releases/{releaseId}:
     get:
-      summary: "One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status
-        and the eight-surface table with a reason for each surface not evaluated"
+      summary: "One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status,
+        the eight-surface table with a reason for each surface not evaluated, the prepared deployment plan and
+        update policy with their signatures checked now, the receipts in two columns (recorded by the operator;
+        checked by AMC), the rollbacks and the lifecycle bridge outcomes"
       tags:
         - Studio
         - A4 Forge
@@ -13742,6 +13900,492 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/deployments:
+    get:
+      summary: "The release's deploy and rollback receipts in two columns: recordedStatus as the operator stated it,
+        amcCheckStatus from AMC's newest check of that receipt; never merged"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+    post:
+      summary: Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed
+        a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
+        the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
+        TARGET_MISMATCH. No lease is issued and no runtime run is created; a succeeded production deploy, or a
+        succeeded rollback row, moves deployedReleaseId
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Deployment"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/verify:
+    post:
+      summary: "AMC's own check of the newest receipt's destinationRef (owner, owner mode, token-less):
+        resolveAndCheck with a pinned connection, TLS to the system CA set, no redirects, 5 s, 256 KiB.
+        reachable at best in v1 (image, package and plan-head checks not_evaluated until P2-40); failed on
+        DESTINATION_MISMATCH, READYZ_FAILED, REDIRECT_REFUSED or TLS_REFUSED; 409 VERIFY_EGRESS_REFUSED for a
+        non-public destination, with nothing recorded. recordedStatus is never touched"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Verify"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/rollback/preview:
+    post:
+      summary: "Preview a rollback (owner, owner mode) and open its effect gate a4.activate.rollback: a DEPLOY
+        engine request binding the preview, decided separately under A4's separation of duties"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4RollbackPreview"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/rollback:
+    post:
+      summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound: a
+        freeze first for a high or critical risk tier, the Enforce restore, every lease of the release revoked,
+        the prepared commands and a signed a4-rollback-receipt; the lifecycle is never moved backwards and
+        deployedReleaseId moves when the operator records the rollback row"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Rollback"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
         "400":
           description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
             HYPOTHESIS_SOURCE_MISMATCH.

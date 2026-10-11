@@ -29,6 +29,7 @@ const mutationHeaders = [
   { name: "Origin", in: "header", required: false, schema: string, description: "Required for cookie mutations; must match a configured browser origin and the request Host." }
 ];
 const project = path("projectId", { type: "string", pattern: "^a4p_[0-9a-f]{32}$" });
+const releasePath = path("releaseId", { type: "string", pattern: "^a4r_[0-9a-f]{32}$" });
 
 function operation(summary: string, response: string, options: { write?: boolean; body?: string; status?: string; parameters?: Array<Record<string, unknown>> } = {}): OpenApiOperation {
   const status = options.status ?? "200";
@@ -94,8 +95,18 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/stages/{stage}/complete`]: { post: write("Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts; Activate completion: a4.activate.production_lease), runs its effect and the response names the attempt; an inline effect (the release, the production lease) runs before the response, which carries its lease token once (a replay answers token: null, TOKEN_ALREADY_DELIVERED) or its failure code", "A4Complete", [stagePath]) },
     [`${p}/releases`]: { get: read("This project's release records (amc.a4-release/v1 summaries) with the leases' live status"),
       post: write("Release (owner): consume the release approval (Activate's direction gate) and run the opened a4.activate.release effect inline: a signed package from content-addressed inputs and the staging lease (WRITE_LOW at most, the staging routes, 24 h), whose token this response carries once; a replay answers token: null, TOKEN_ALREADY_DELIVERED", "A4Complete") },
-    [`${p}/releases/{releaseId}`]: { get: read("One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status and the eight-surface table with a reason for each surface not evaluated",
-      [path("releaseId", { type: "string", pattern: "^a4r_[0-9a-f]{32}$" })]) },
+    [`${p}/releases/{releaseId}`]: { get: read("One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status, the eight-surface table with a reason for each surface not evaluated, the prepared deployment plan and update policy with their signatures checked now, the receipts in two columns (recorded by the operator; checked by AMC), the rollbacks and the lifecycle bridge outcomes",
+      [releasePath]) },
+    [`${p}/releases/{releaseId}/deployments`]: {
+      get: read("The release's deploy and rollback receipts in two columns: recordedStatus as the operator stated it, amcCheckStatus from AMC's newest check of that receipt; never merged", [releasePath]),
+      post: write("Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE, TARGET_MISMATCH. No lease is issued and no runtime run is created; a succeeded production deploy, or a succeeded rollback row, moves deployedReleaseId",
+        "A4Deployment", [releasePath], "201") },
+    [`${p}/releases/{releaseId}/verify`]: { post: write("AMC's own check of the newest receipt's destinationRef (owner, owner mode, token-less): resolveAndCheck with a pinned connection, TLS to the system CA set, no redirects, 5 s, 256 KiB. reachable at best in v1 (image, package and plan-head checks not_evaluated until P2-40); failed on DESTINATION_MISMATCH, READYZ_FAILED, REDIRECT_REFUSED or TLS_REFUSED; 409 VERIFY_EGRESS_REFUSED for a non-public destination, with nothing recorded. recordedStatus is never touched",
+      "A4Verify", [releasePath], "201") },
+    [`${p}/releases/{releaseId}/rollback/preview`]: { post: write("Preview a rollback (owner, owner mode) and open its effect gate a4.activate.rollback: a DEPLOY engine request binding the preview, decided separately under A4's separation of duties",
+      "A4RollbackPreview", [releasePath], "201") },
+    [`${p}/releases/{releaseId}/rollback`]: { post: write("Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound: a freeze first for a high or critical risk tier, the Enforce restore, every lease of the release revoked, the prepared commands and a signed a4-rollback-receipt; the lifecycle is never moved backwards and deployedReleaseId moves when the operator records the rollback row",
+      "A4Rollback", [releasePath], "201") },
     [`${p}/hypotheses/{hypothesisId}/observe`]: { post: write("Observe a PMF hypothesis, once the project has left Aspire, with a runtime-written row inside its window", "A4Observe",
       [path("hypothesisId")], "201") },
     [`${p}/outcome-unknown/{executionId}/request`]: { post: write("Request a resolution of an outcome_unknown execution blocking the project's agent: the operator's statement as an amc.action.resolve engine request (self_reported)",
@@ -184,6 +195,16 @@ export function a4Schemas(): Record<string, unknown> {
     A4AssembleScaffold: control({ directory: { type: "string", minLength: 1, maxLength: 200, description: "Workspace-relative; plain names without a leading dot; no symbolic link or file on the way (400 PATH_NOT_PLAIN), so never under .amc/; must not exist yet." } }),
     A4AssembleConnect: control({ mode: { type: "string", enum: ["supervise", "sandbox"] }, adapterId: { type: ["string", "null"], pattern: "^[a-z0-9][a-z0-9._-]{0,63}$" } }, ["mode"]),
     A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or at the end (400 PATH_NOT_PLAIN), so never under .amc/. A source already imported is 409 IMPORT_EXISTS (an existing import is never rewritten or rolled back)." } }),
-    A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest })
+    A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest }),
+    A4Deployment: control({ kind: { type: "string", enum: ["deploy", "rollback"] }, environment: { type: "string", enum: ["staging", "production"] },
+      target: { type: "string", enum: ["compose", "helm"] }, packageDigest: { ...digest, type: ["string", "null"] },
+      imageDigest: { type: ["string", "null"], pattern: "^sha256:[0-9a-f]{64}$" }, overlayDigest: digest, restartedAt: { type: "string", format: "date-time", description: "Operator-stated; recorded as a claim beside the server time." },
+      helmRevision: { type: ["integer", "null"], minimum: 1, description: "The helm history revision for a Helm target; null for Compose." },
+      leaseIds: { type: "array", maxItems: 4, items: { type: "string", pattern: "^lease_[0-9a-f]{32}$" } }, destinationRef: { type: "string", description: "host[:port]; never a URL or credentials." },
+      operatorStated: object({ status: { type: "string", enum: ["succeeded", "failed", "partial"] } }) }),
+    A4Verify: control({ environment: { type: "string", enum: ["staging", "production"] } }),
+    A4RollbackPreview: control({ environment: { type: "string", enum: ["staging", "production"] } }),
+    A4Rollback: control({ environment: { type: "string", enum: ["staging", "production"] }, reason,
+      toReleaseId: { type: ["string", "null"], pattern: "^a4r_[0-9a-f]{32}$" }, confirmManifestId: { type: ["string", "null"], pattern: "^enforce-resources-[0-9a-f]{16}$" } })
   };
 }

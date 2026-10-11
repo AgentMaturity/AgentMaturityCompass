@@ -54,6 +54,7 @@ import { A4StoreError, openA4Store, type A4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { deploymentPlan, deploymentViews, PLAN_PATH } from "./a4Deploy.js";
 import { advance, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
+import { rollbackViews } from "./a4Rollback.js";
 import { UPDATE_POLICY_PATH, updatePolicyYaml, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
@@ -742,7 +743,7 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
     // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
     deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
-    deployments, lifecycleBridge: lifecycle,
+    deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle,
     leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),
     surfaceTable: [
       { surface: "score", ...recordedIf(surfaces.score.contextGraphSha256 !== null, "no context graph digest was bound"), values: surfaces.score },
