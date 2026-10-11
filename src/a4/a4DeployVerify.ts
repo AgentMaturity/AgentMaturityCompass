@@ -62,28 +62,34 @@ function fetchPinned(host: string, port: number, address: string, path: string, 
         resolve(value);
       }
     };
-    const req = request({ hostname: host, port, path, method: "GET", agent: false, lookup: pinnedLookup([address]), ca: systemCas(), rejectUnauthorized: true,
-      ...(isIP(host) === 0 ? { servername: host } : {}), headers: { accept: "application/json", "user-agent": "amc-a4-verify" }, signal },
-    (res) => {
-      const status = res.statusCode ?? 0;
-      if (status >= 300 && status < 400) {
-        res.destroy();
-        return done({ error: "REDIRECT_REFUSED" });
-      }
-      const chunks: Buffer[] = [];
-      let size = 0;
-      res.on("data", (chunk: Buffer) => {
-        size += chunk.length;
-        if (size > BODY_CAP) {
+    let req: ReturnType<typeof request>;
+    try {
+      req = request({ hostname: host, port, path, method: "GET", agent: false, lookup: pinnedLookup([address]), ca: systemCas(), rejectUnauthorized: true,
+        ...(isIP(host) === 0 ? { servername: host } : {}), headers: { accept: "application/json", "user-agent": "amc-a4-verify" }, signal },
+        (res) => {
+        const status = res.statusCode ?? 0;
+        if (status >= 300 && status < 400) {
           res.destroy();
-          done({ error: "BODY_TOO_LARGE" });
-        } else chunks.push(chunk);
-      });
-      res.on("end", () => done({ status, body: Buffer.concat(chunks) }));
-      res.on("error", () => done({ error: "CONNECT_FAILED" }));
-      // A response cut short settles too (after `end` this is a no-op).
-      res.on("close", () => done({ error: signal.aborted ? "TIMEOUT" : "CONNECT_FAILED" }));
-    });
+          return done({ error: "REDIRECT_REFUSED" });
+        }
+        const chunks: Buffer[] = [];
+        let size = 0;
+        res.on("data", (chunk: Buffer) => {
+          size += chunk.length;
+          if (size > BODY_CAP) {
+            res.destroy();
+            done({ error: "BODY_TOO_LARGE" });
+          } else chunks.push(chunk);
+        });
+        res.on("end", () => done({ status, body: Buffer.concat(chunks) }));
+        res.on("error", () => done({ error: "CONNECT_FAILED" }));
+        // A response cut short settles too (after `end` this is a no-op).
+        res.on("close", () => done({ error: signal.aborted ? "TIMEOUT" : "CONNECT_FAILED" }));
+        });
+    } catch {
+      // A request Node refuses to build (a bad port) is a coded failure, never a 500.
+      return done({ error: "CONNECT_FAILED" });
+    }
     req.on("error", (error: NodeJS.ErrnoException) => done({ error: error.name === "AbortError" || error.name === "TimeoutError" ? "TIMEOUT"
       : TLS_CODES.test(String(error.code ?? error.message)) ? "TLS_REFUSED" : "CONNECT_FAILED" }));
     req.end();
@@ -181,8 +187,10 @@ export async function verifyDeployment(store: A4Store, projectId: string, releas
   const checkId = `a4chk_${randomBytes(16).toString("hex")}`;
   const recorded = String(receipt.body.recordedStatus);
   const text = statusText(recorded, probed.amcCheckStatus, probed.reasonCodes);
-  const checkPath = `a4-releases/${projectId}/checks/${releaseId}/${checkId}.json`;
-  const report = buildVerifierReport({ artifact: { kind: "a4-amc-check", path: checkPath, sha256: probed.responseSha256 ?? "0".repeat(64) }, context: loadTrustContext(),
+  // The artifact this report speaks for is the /readyz response AMC fetched (never the check file, which embeds the report),
+  // and its digest is not_evaluated when nothing was fetched: never a placeholder digest.
+  const report = buildVerifierReport({ artifact: { kind: "a4-amc-check-readyz-response", path: `https://${destination}/readyz`,
+    sha256: probed.responseSha256 ?? "not_evaluated" }, context: loadTrustContext(),
     integrityErrors: probed.amcCheckStatus === "failed" ? probed.reasonCodes : [], signatures: [], verifiedAt: new Date(now),
     anchoring: { status: "not-applicable", detail: "a token-less reachability probe; nothing at the destination is signed until P2-40" },
     warnings: [`release identity: ${IDENTITY_NOT_EVALUATED}`, RUNTIME_NOT_EVALUATED] });

@@ -88,8 +88,9 @@ export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<s
   return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
 }
 
-/** A destinationRef: a lowercase host name or IPv4 literal and an optional port; never a URL, a path or credentials. */
-export const DESTINATION_REF = /^(?=.{1,253}(:|$))[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?$/;
+/** A destinationRef: a lowercase host name or IPv4 literal and an optional port 1–65535; never a URL, a path or credentials. */
+export const DESTINATION_REF =
+  /^(?=.{1,253}(:|$))[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$/;
 const ROUTE = /^\/[A-Za-z0-9._~/-]{0,199}$/;
 const SCOPES = leaseScopeSchema.options as readonly string[];
 const positiveInt = (value: unknown): number | null => {
