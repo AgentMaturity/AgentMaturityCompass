@@ -1,4 +1,5 @@
 #!/usr/bin/env node
-import { main } from "../dist/cli.js";
+// dist mirrors the repository layout because the package compiles the shared admission rule in src/trust/.
+import { main } from "../dist/packages/verifier/src/cli.js";
 
 process.exitCode = main(process.argv.slice(2));

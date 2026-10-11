@@ -8,9 +8,9 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "../..",
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["src", "../../src/trust/admissionRule.ts"]
 }

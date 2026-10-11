@@ -2,20 +2,13 @@
  * The shared verifier report (AMC's VerifierReportV1, spec/schemas/v1/verifier-report): six separate results, never one
  * merged verdict. `reasonCodes` carries the normative codes per dimension; `errors` and `reasons` say the same in words.
  */
-import { readFileSync } from "node:fs";
 import { DIMENSIONS, type Dimension, type DimensionStatus, type Finding, type ReasonCode } from "./codes.js";
 import type { DimResult, Evaluation } from "./evaluation.js";
 import type { IssuerAdmission } from "./trust.js";
 
 export const VERIFIER_NAME = "amc-verify";
-export const VERIFIER_VERSION: string = (() => {
-  try {
-    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version?: unknown };
-    return typeof pkg.version === "string" ? pkg.version : "unknown";
-  } catch {
-    return "unknown";
-  }
-})();
+/** Kept equal to package.json's version by tests/verifier/zeroDependency.test.ts; no file is read at run time. */
+export const VERIFIER_VERSION = "0.1.0";
 
 type Reasons = { status: DimensionStatus; reasons: string[] };
 

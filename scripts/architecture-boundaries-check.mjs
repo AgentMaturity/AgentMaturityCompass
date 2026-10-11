@@ -177,8 +177,10 @@ for (const file of walkSources("src")) {
 // ── The standalone verifier imports nothing but Node (P1-06) ─────────────
 //
 // packages/verifier ships with no dependencies so a third party can verify AMC records without AMC, a registry or a
-// workspace. Its source, bin and conformance runner may import only node: built-ins and modules inside the package.
+// workspace. Its source, bin and conformance runner may import only node: built-ins, modules inside the package and the
+// one admission rule AMC shares with it (src/trust/admissionRule.ts), which itself may import only node: built-ins.
 const VERIFIER_ROOT = "packages/verifier";
+const SHARED_RULE = "src/trust/admissionRule.ts";
 function verifierFiles(dir, out = []) {
   if (!existsSync(join(root, dir))) return out;
   for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {
@@ -192,11 +194,16 @@ for (const file of ["src", "bin", "conformance"].flatMap(dir => verifierFiles(`$
   const source = readFileSync(join(root, file), "utf8");
   for (const [, specifier] of source.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)["'`]([^"'`]+)["'`]/g)) {
     const relative = specifier.startsWith("./") || specifier.startsWith("../");
-    const inside = relative && join(root, file, "..", specifier).startsWith(join(root, VERIFIER_ROOT) + "/");
+    const target = join(root, file, "..", specifier);
+    const inside = relative && (target.startsWith(join(root, VERIFIER_ROOT) + "/") || target.replace(/\.js$/, ".ts") === join(root, SHARED_RULE));
     if (!specifier.startsWith("node:") && !inside) {
       fail(`${file} imports "${specifier}"; ${VERIFIER_ROOT} may import only node: built-ins and its own modules (P1-06).`);
     }
   }
+}
+
+for (const [, specifier] of readFileSync(join(root, SHARED_RULE), "utf8").matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)["'`]([^"'`]+)["'`]/g)) {
+  if (!specifier.startsWith("node:")) fail(`${SHARED_RULE} imports "${specifier}"; the admission rule the standalone verifier compiles may import only node: built-ins (P1-06).`);
 }
 
 // ── Private signing keys are taken per purpose (P1-08) ───────────────────

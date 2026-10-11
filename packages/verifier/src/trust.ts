@@ -3,6 +3,8 @@
  * one signing key for one purpose as of the verifier's as-of time. A key named or carried by the artifact is only looked
  * up here; it never vouches for itself, and the time an artifact claims never decides whether its key is admitted.
  */
+// The one admission rule AMC's verifiers also use; it imports only node: built-ins (check:architecture-boundaries).
+import { distrustAt, listsAt } from "../../../src/trust/admissionRule.js";
 import { canonicalize, ed25519KeyId, same, tagged, verifyEd25519 } from "./bytes.js";
 import type { Finding, KeyPurpose } from "./codes.js";
 import { signedTrustList, type DistrustEntry, type SignedTrustList, type TrustList, type TrustListEntry } from "./records/trustList.js";
@@ -63,7 +65,7 @@ export function listFacts(signed: SignedTrustList, roots: ReadonlySet<string>, a
   const seen = knownSequence(known, list.listId);
   return {
     signed, badSignature: badRow(signed),
-    pinned: signed.signatures.map(row => row.keyId).filter(keyId => roots.has(keyId) && !distrusted(distrust, keyId, asOf)),
+    pinned: signed.signatures.map(row => row.keyId).filter(keyId => roots.has(keyId) && !distrustAt(distrust, keyId, asOf)),
     threshold: Math.max(1, pinnedThreshold, list.rootThreshold ?? 1),
     expired: asOf >= Date.parse(list.expiresAt),
     rolledBackFrom: seen !== undefined && list.sequence < seen ? seen : null
@@ -166,42 +168,29 @@ const CODE = {
 
 type Verdict = { status: IssuerAdmission["status"]; listId: string | null; detail: string; entry?: TrustListEntry };
 
-/**
- * One trust-list entry as of `asOf`. The time a record claims is the record's own word, not a trusted timestamp, so it
- * never brings a key back: a key revoked (for any reason) or past its validTo as of `asOf` is refused even for records
- * that claim an earlier signing time. To judge a record as of an earlier moment, the verifier's user sets `asOf`.
- */
-function checkEntry(entry: TrustListEntry, listId: string, purpose: KeyPurpose, asOf: number): Verdict {
-  if (!entry.purposes.includes(purpose)) return { status: "wrong-purpose", listId, detail: `trust list ${listId} pins this key for ${entry.purposes.join(", ")}, not ${purpose}` };
-  if (asOf < Date.parse(entry.validFrom)) return { status: "not-yet-valid", listId, detail: `trust list ${listId} admits this key from ${entry.validFrom}` };
-  if (entry.validTo !== null && asOf >= Date.parse(entry.validTo)) return { status: "expired", listId, detail: `trust list ${listId} admitted this key until ${entry.validTo}` };
-  if (entry.revokedAt !== undefined && asOf >= Date.parse(entry.revokedAt)) {
-    return { status: "revoked", listId, detail: `trust list ${listId} revoked this key at ${entry.revokedAt} (${entry.revocationReason})` };
-  }
-  return { status: "admitted", listId, entry, detail: "admitted" };
-}
-
-const distrusted = (distrust: readonly DistrustEntry[], keyId: string, asOf: number) => distrust.find(entry => same(entry.keyId, keyId)
-  && (entry.distrustedFrom === null || asOf >= Date.parse(entry.distrustedFrom)));
-
-/** P0-09 step 1, as of the verifier's time: distrusted always when distrustedFrom is null, otherwise from that time on. */
+/** P0-09 step 1, as of the verifier's time (the shared rule): distrusted always when distrustedFrom is null, otherwise from that time on. */
 export function distrustOf(keyId: string, ctx: TrustContext): DistrustEntry | undefined {
-  return distrusted(ctx.distrust, keyId, ctx.asOf);
+  return distrustAt(ctx.distrust, keyId, ctx.asOf);
 }
 
+/**
+ * Distrust, then the counted lists, judged as of `asOf` by the rule AMC's own verifiers use (src/trust/admissionRule.ts).
+ * The time a record claims never brings a key back; to judge a record as of an earlier moment, the user sets `asOf`.
+ */
 function verdictFor(keyId: string, purpose: KeyPurpose, ctx: TrustContext): Verdict {
   const distrusted = distrustOf(keyId, ctx);
   if (distrusted) return { status: "distrusted", listId: null, detail: `key ${keyId} is distrusted (${distrusted.reason}, ${distrusted.source}): ${distrusted.note}` };
-  for (const list of ctx.lists) {
-    const compromised = list.entries.find(entry => same(entry.keyId, keyId) && entry.revocationReason === "key-compromise");
-    if (compromised) return { status: "revoked", listId: list.listId, detail: `trust list ${list.listId} revoked this key at ${compromised.revokedAt} (key-compromise)` };
-  }
-  const verdicts = ctx.lists.flatMap(list => list.entries.filter(entry => same(entry.keyId, keyId))
-    .map(entry => checkEntry(entry, list.listId, purpose, ctx.asOf)));
-  return verdicts.find(verdict => verdict.status === "admitted")
-    ?? verdicts.find(verdict => verdict.status !== "wrong-purpose")
-    ?? verdicts[0]
-    ?? { status: "not-pinned", listId: null, detail: `key ${keyId} is not pinned for ${purpose} by any supplied trust list` };
+  const found = listsAt(ctx.lists, keyId, purpose, ctx.asOf);
+  if (!found) return { status: "not-pinned", listId: null, detail: `key ${keyId} is not pinned for ${purpose} by any supplied trust list` };
+  const { entry, listId } = found;
+  const detail = {
+    "wrong-purpose": `trust list ${listId} pins this key for ${entry.purposes.join(", ")}, not ${purpose}`,
+    "not-yet-valid": `trust list ${listId} admits this key from ${entry.validFrom}`,
+    expired: `trust list ${listId} admitted this key until ${entry.validTo}`,
+    revoked: `trust list ${listId} revoked this key at ${entry.revokedAt} (${entry.revocationReason})`,
+    admitted: "admitted"
+  }[found.status];
+  return { status: found.status, listId, detail, ...(found.status === "admitted" ? { entry } : {}) };
 }
 
 /** Admits `keyId` for `purpose` as of the verifier's as-of time; never on the artifact's word or its claimed time. */
