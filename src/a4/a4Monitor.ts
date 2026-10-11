@@ -4,7 +4,7 @@
  * implementation, self_reported, whatever its sources say. Its body carries one ClaimEnvelope per source, each decided by
  * the eligibility service from that source's own tier (the action journal's rows; approvals per effect, human statements;
  * the freeze incidents; AMC's own check; the SLO state, self_reported with evidence incomplete: in-memory measurements,
- * unsigned), folded with envelopeForAggregate for display. Every field is `{ value, source, trustTier, window }`; a source
+ * unsigned, process-wide, so only summarised), folded with envelopeForAggregate for display. Every field is `{ value, source, trustTier, window }`; a source
  * that is missing is `source_unavailable` with `value: null`, never a default. Nothing counts as having observed the
  * deployed agent before the release's succeeded deploy receipt is recorded (the bound one): the journal counts only
  * executions started since that receipt's server-recorded time, outside A4's own probe sessions. The newest such row of
@@ -31,6 +31,9 @@ import { boundReceipt, cycleLinks, monitorResolves, PRODUCTION_LEASE_EFFECT_ID, 
 const MONITOR_SCHEMA = "amc.a4-monitor/v1";
 const KILL_SWITCH = "not available in this release (P2-26)";
 const SLO_NOTE = "in-memory measurements, unsigned: governanceSlo keeps its state in this process and writes no ledger row";
+/** governanceSlo's report covers every agent of this Studio and labels none, so it cannot be scoped to one project. */
+const SLO_SCOPE = "process_wide: this Studio process's SLO report labels no agent, so it is not scoped to this agent";
+const ALERT_SEVERITIES = ["WARN", "CRITICAL", "RECOVERY"] as const;
 /** Design §14.4's alert rules, as labelled proposals: nothing here evaluates them. */
 const ALERT_RULES = ["pod not ready", "ledger verify failure", "open outcome_unknown", "stale backup", "gateway failures", "/readyz"];
 
@@ -59,23 +62,27 @@ function envelopeOf(producer: string, method: ClaimMethod, tiers: readonly Claim
 
 /**
  * The SLO state this process holds (generateSloReport; evaluateSloAlerts is not called, since it advances the shared alert
- * state). It counts as a signal of the deployed agent only once a succeeded deploy receipt is recorded (`deployed`).
+ * state). It counts as a signal of the deployed agent only once a succeeded deploy receipt is recorded (`deployed`). The
+ * report is Studio-wide and labels no agent, and this record is served to every project viewer, so it keeps only the
+ * report's digest, window, measurement count and overall status and the alerts counted by severity, never the metrics,
+ * definitions, violations, alert bodies or the cost-of-trust and ROI figures.
  */
-function sloSource(producer: string, now: number, regulated: boolean, deployed: boolean): Source & { measurements: number; report: unknown; sha256: string } {
+function sloSource(producer: string, now: number, regulated: boolean, deployed: boolean): Source & { measurements: number; summary: Record<string, unknown>; sha256: string } {
   const report = generateSloReport();
   const measurements = report.metrics.reduce((sum, metric) => sum + metric.count, 0);
   const window = { from: iso(report.ts - report.windowMs), to: iso(report.ts) };
   const sha256 = sha256Hex(canonicalize(report));
+  const alertsBySeverity = Object.fromEntries(ALERT_SEVERITIES.map((severity) => [severity, report.recentAlerts.filter((alert) => alert.severity === severity).length]));
+  const summary = { scope: "process_wide", scopeNote: SLO_SCOPE, measurements, window, reportSha256: sha256, overallStatus: report.overallStatus };
   const base = envelopeOf(`${producer}:slo`, "runtime_observation", ["SELF_REPORTED"], measurements, report.ts, now, regulated);
   // Never sufficient: nothing signs these measurements (the diagnostic adapter's EVIDENCE_NOT_CLAIM_READY precedent).
   const envelope = { ...base, statusDimensions: { ...base.statusDimensions, evidence: "incomplete" as const },
     reasons: [...new Set([...base.reasons, "EVIDENCE_NOT_CLAIM_READY" as const])] };
   const none = unavailable(`no SLO measurement in this process's window (${SLO_NOTE})`);
-  return { measurements, report, sha256, envelope, available: measurements > 0, monitors: deployed && measurements > 0, fields: measurements > 0
-    ? { sloReportSha256: { ...field(sha256, "slo", "SELF_REPORTED", window), reason: SLO_NOTE },
-      alerts: field(report.recentAlerts.map((alert) => ({ alertId: alert.alertId, severity: alert.severity, sloId: alert.sloId, status: alert.status, ts: alert.ts })),
-        "slo", "SELF_REPORTED", window) }
-    : { sloReportSha256: none, alerts: none } };
+  return { measurements, summary, sha256, envelope, available: measurements > 0, monitors: deployed && measurements > 0, fields: measurements > 0
+    ? { sloReportSha256: { ...field(sha256, "slo", "SELF_REPORTED", window), reason: `${SLO_NOTE}; ${SLO_SCOPE}` },
+      alertCounts: { ...field(alertsBySeverity, "slo", "SELF_REPORTED", window), reason: SLO_SCOPE } }
+    : { sloReportSha256: none, alertCounts: none } };
 }
 
 /**
@@ -195,7 +202,7 @@ export function monitorRecord(workspace: string, state: A4ReadinessState, releas
     sources: Object.fromEntries(Object.entries(sources).map(([name, source]) => [name, source.available ? "ok" : "unavailable"])), envelopes,
     claim: envelopeForAggregate(producer, Object.values(envelopes), now), nonNullSources, monitoringSources: monitoring, contextSources: ["approvals", "freeze"],
     observedSince: receipt === null ? null : { deploymentId: receipt.body.deploymentId, recordedAt: iso(Number(receipt.body.ts)) },
-    sloMeasurements: slo.measurements, sloReport: slo.available ? slo.report : null,
+    sloMeasurements: slo.measurements, sloSummary: slo.available ? slo.summary : null,
     alertRules: ALERT_RULES.map((rule) => ({ rule, status: "proposal" })), killSwitch: KILL_SWITCH,
     claimKind: "self_reported", lane: "implementation",
     boundary: "A4 wrote this record from what this Studio could read at Review; it is self_reported. A ledger-backed source enters another lane only as its own ledger_event ref." };

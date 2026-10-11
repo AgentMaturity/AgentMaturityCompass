@@ -575,7 +575,11 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   implementation, `self_reported`, whatever its sources say. Each field is `{ value, source, trustTier, window }`, and each
   source has its own claim envelope from the eligibility service:
   - `slo`: the SLO state held by this process (`generateSloReport`). It is `self_reported` with evidence `incomplete`
-    (in-memory measurements, unsigned).
+    (in-memory measurements, unsigned). The report covers the whole Studio process and labels no agent, so it cannot be
+    scoped to this project, and the record is served to every project viewer. The record therefore keeps only
+    `sloSummary` (scope `process_wide`, not scoped to this agent: the measurement count, the window, the report's sha256
+    and `overallStatus`) and the field `alertCounts` (the alerts already emitted, counted by severity). The report's
+    metrics, definitions, violations, alert bodies and cost-of-trust and ROI figures are never copied.
   - `actionJournal`: the agent's open `outcome_unknown` executions, and its executions started since the release's
     succeeded deploy receipt was recorded (that window is on the field), outside A4's own probe sessions, at the newest
     such row's own tier.
@@ -584,8 +588,8 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   - `amcCheck`: AMC's newest check of the release's destination.
   - `runtime` and `backup`: always `source_unavailable` in v1, with `value: null`.
 
-  `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record lists the alerts
-  already emitted. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
+  `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record counts the alerts
+  already emitted by severity. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
   agent counts toward `monitoring.source`, and nothing does before the release's bound deploy receipt is recorded
   `succeeded`. After it, a source counts when it is an execution in the action journal started since that receipt (at
   its row's own tier; a row of A4's own probe session has none), an SLO measurement, or AMC's check of that receipt that
