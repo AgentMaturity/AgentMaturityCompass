@@ -28,7 +28,7 @@ const MAX_NODES = 10_000;
 const MAX_TEXT_CHARS = 1_048_576;
 const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), classMapping: CLASS_BY_TYPE,
-  traversalRevision: "request-json-leaves-password-context-v1",
+  traversalRevision: "request-json-leaves-password-context-malformed-args-as-text-v2",
   limits: { maxDepth: MAX_DEPTH, maxNodes: MAX_NODES, maxTextChars: MAX_TEXT_CHARS, maxJsonChars: MAX_TEXT_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
@@ -83,9 +83,12 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       }
       active.delete(value);
     };
+    // Empty or malformed tool-call arguments are committed by design; they are scanned as text, never refused.
     const json = (text: string) => {
       if (typeof text !== "string" || (jsonChars += text.length) > MAX_TEXT_CHARS) refused();
-      visit(JSON.parse(text) as unknown, 0);
+      let parsed: unknown;
+      try { parsed = JSON.parse(text); } catch { scan(text); return; }
+      visit(parsed, 0);
     };
 
     touch(); scan(request.model);
