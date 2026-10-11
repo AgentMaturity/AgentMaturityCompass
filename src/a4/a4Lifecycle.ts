@@ -13,7 +13,7 @@ import { advanceLifecycleStage, lifecyclePath, lifecycleStages } from "../lifecy
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { latestGate, type A4ReadinessState } from "./a4Readiness.js";
 import { stagingBridge } from "./spec/adapt.js";
-import { cycleLinks, IDENTITY_NOT_EVALUATED, monitorResolves } from "./spec/activate.js";
+import { cycleLinks, IDENTITY_NOT_EVALUATED } from "./spec/activate.js";
 import { misuseSchema } from "./spec/aspire.js";
 
 export type BridgeTarget = "testing" | "staging" | "production";
@@ -73,20 +73,18 @@ function testingRows(state: A4ReadinessState): BridgeControl[] {
 }
 
 /**
- * The production rows. `monitoring_slo_enabled` from the newest monitor ref of this cycle that carries an SLO
- * measurement (self_reported: the SLO source is in process and unsigned); the other three have no source in v1.
+ * The production rows; none has a source in v1. `monitoring_slo_enabled` reads monitoring.source's rule: the SLO report
+ * is process-wide (it labels no agent and is not limited to the time since the deploy receipt), so a monitor ref's SLO
+ * measurements are context and never evidence this agent's SLO monitoring.
  */
 function productionRows(state: A4ReadinessState, releaseId: string): BridgeControl[] {
   const deployments = cycleLinks(state.chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId);
   const stagingRollback = deployments.some((link) => link.body.deploymentKind === "rollback" && link.body.environment === "staging");
-  const monitor = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === releaseId
-    && typeof link.body.sloMeasurements === "number" && link.body.sloMeasurements > 0 && monitorResolves(state, link)).at(-1);
   return [
     row("assurance_pack_passing", null, null, "no assurance run artifact with a non-inconclusive VALID result is linked to this release (P0-19; the echo scenarios are P2-27)"),
     row("rollback_plan_validated", null, null, stagingRollback ? `rollback recorded by the operator, not checked by AMC: ${IDENTITY_NOT_EVALUATED}`
       : "no staging rollback row is recorded, and AMC's check cannot pass before P2-40"),
-    monitor === undefined ? row("monitoring_slo_enabled", null, null, "no monitor ref carries a first SLO measurement")
-      : row("monitoring_slo_enabled", `monitor:${String(monitor.body.refId)}`, "self_reported", "a monitor ref carries a first SLO measurement (in-process, unsigned: self_reported)"),
+    row("monitoring_slo_enabled", null, null, "the SLO report is process-wide: it labels no agent, so no measurement is attributed to this agent's deployment"),
     row("operator_handoff_acknowledged", null, null, deployments.some((link) => link.body.deploymentKind === "deploy")
       ? `the deploy row's AMC check cannot pass before P2-40: ${IDENTITY_NOT_EVALUATED}` : "no deploy row is recorded for this release")
   ];

@@ -4,7 +4,8 @@
  * implementation, self_reported, whatever its sources say. Its body carries one ClaimEnvelope per source, each decided by
  * the eligibility service from that source's own tier (the action journal's rows; approvals per effect, human statements;
  * the freeze incidents; AMC's own check; the SLO state, self_reported with evidence incomplete: in-memory measurements,
- * unsigned, process-wide, so only summarised), folded with envelopeForAggregate for display. Every field is `{ value, source, trustTier, window }`; a source
+ * unsigned, process-wide, so only summarised, and context only: it labels no agent), folded with envelopeForAggregate for
+ * display. Every field is `{ value, source, trustTier, window }`; a source
  * that is missing is `source_unavailable` with `value: null`, never a default. Nothing counts as having observed the
  * deployed agent before the release's succeeded deploy receipt is recorded (the bound one): the journal counts only
  * executions started since that receipt's server-recorded time, outside A4's own probe sessions. The newest such row of
@@ -41,8 +42,9 @@ type Window = { readonly from: string; readonly to: string };
 interface Field { readonly value: unknown; readonly source: string; readonly trustTier: string | null; readonly window: Window | null; readonly reason?: string }
 /**
  * `monitors`: the source observed the deployed agent once its succeeded deploy receipt was recorded (a journal execution
- * started since then at its row's own tier, an SLO measurement, AMC's check of that receipt that connected and found the
- * destination answering). Only those count toward `nonNullSources`; A4's own approvals and the freeze reading are context.
+ * started since then at its row's own tier, AMC's check of that receipt that connected and found the destination
+ * answering). Only those count toward `nonNullSources`; A4's own approvals, the freeze reading and the process-wide SLO
+ * report (it labels no agent and spans no window tied to the receipt) are context.
  */
 interface Source { readonly fields: Record<string, Field>; readonly envelope: ClaimEnvelope; readonly available: boolean; readonly monitors: boolean }
 /** A ledger row a monitor source rests on, for Review's post-commit step to record as its own ref. */
@@ -62,12 +64,12 @@ function envelopeOf(producer: string, method: ClaimMethod, tiers: readonly Claim
 
 /**
  * The SLO state this process holds (generateSloReport; evaluateSloAlerts is not called, since it advances the shared alert
- * state). It counts as a signal of the deployed agent only once a succeeded deploy receipt is recorded (`deployed`). The
- * report is Studio-wide and labels no agent, and this record is served to every project viewer, so it keeps only the
+ * state). It is context, never a signal of the deployed agent: the report is Studio-wide, labels no agent and is not
+ * limited to the time since the bound deploy receipt. This record is served to every project viewer, so it keeps only the
  * report's digest, window, measurement count and overall status and the alerts counted by severity, never the metrics,
  * definitions, violations, alert bodies or the cost-of-trust and ROI figures.
  */
-function sloSource(producer: string, now: number, regulated: boolean, deployed: boolean): Source & { measurements: number; summary: Record<string, unknown>; sha256: string } {
+function sloSource(producer: string, now: number, regulated: boolean): Source & { measurements: number; summary: Record<string, unknown>; sha256: string } {
   const report = generateSloReport();
   const measurements = report.metrics.reduce((sum, metric) => sum + metric.count, 0);
   const window = { from: iso(report.ts - report.windowMs), to: iso(report.ts) };
@@ -79,7 +81,7 @@ function sloSource(producer: string, now: number, regulated: boolean, deployed: 
   const envelope = { ...base, statusDimensions: { ...base.statusDimensions, evidence: "incomplete" as const },
     reasons: [...new Set([...base.reasons, "EVIDENCE_NOT_CLAIM_READY" as const])] };
   const none = unavailable(`no SLO measurement in this process's window (${SLO_NOTE})`);
-  return { measurements, summary, sha256, envelope, available: measurements > 0, monitors: deployed && measurements > 0, fields: measurements > 0
+  return { measurements, summary, sha256, envelope, available: measurements > 0, monitors: false, fields: measurements > 0
     ? { sloReportSha256: { ...field(sha256, "slo", "SELF_REPORTED", window), reason: `${SLO_NOTE}; ${SLO_SCOPE}` },
       alertCounts: { ...field(alertsBySeverity, "slo", "SELF_REPORTED", window), reason: SLO_SCOPE } }
     : { sloReportSha256: none, alertCounts: none } };
@@ -175,8 +177,8 @@ function checkSource(state: A4ReadinessState, releaseId: string, receipt: A4Chai
 /**
  * The monitor record of one review (design §14.4), built from reads only. `note` is what the ref's signed body carries
  * for readiness and the lifecycle bridge: the release, how many sources observed the deployed agent since its succeeded
- * deploy receipt (A4's own approvals and the freeze reading never count; none before that receipt), and the SLO
- * measurement count. `regulated` is the project's flag as Review read it (fail closed), so no source envelope is decided
+ * deploy receipt (A4's own approvals, the freeze reading and the process-wide SLO report never count; none before that
+ * receipt), and the SLO measurement count (context). `regulated` is the project's flag as Review read it (fail closed), so no source envelope is decided
  * as unregulated.
  */
 export function monitorRecord(workspace: string, state: A4ReadinessState, releaseId: string, now: number, regulated: boolean): { doc: Record<string, unknown>;
@@ -186,7 +188,7 @@ export function monitorRecord(workspace: string, state: A4ReadinessState, releas
   // The bound deploy receipt, recorded succeeded: before it nothing observed a deployed agent (MONITOR_NO_SOURCE).
   const bound = boundReceipt(state.chain, releaseId);
   const receipt = bound?.body.recordedStatus === "succeeded" && typeof bound.body.ts === "number" ? bound : null;
-  const slo = sloSource(producer, now, regulated, receipt !== null);
+  const slo = sloSource(producer, now, regulated);
   const journal = journalSource(workspace, agentId, producer, now, regulated, receipt === null ? null : Number(receipt.body.ts));
   const runtime: Source = { available: false, monitors: false, envelope: envelopeOf(`${producer}:runtime`, "runtime_observation", [], 0, null, now, regulated),
     fields: { runtimeRunId: unavailable("no lease-bound session has run the deployed runtime; runtimeRunIds stay empty (a receipt never creates a run)") } };
@@ -200,7 +202,7 @@ export function monitorRecord(workspace: string, state: A4ReadinessState, releas
   const envelopes = Object.fromEntries(Object.entries(sources).map(([name, source]) => [name, source.envelope]));
   const doc = { schema: MONITOR_SCHEMA, projectId, releaseId, revisionNo: state.project.revision_no, recordedAt: iso(now), fields,
     sources: Object.fromEntries(Object.entries(sources).map(([name, source]) => [name, source.available ? "ok" : "unavailable"])), envelopes,
-    claim: envelopeForAggregate(producer, Object.values(envelopes), now), nonNullSources, monitoringSources: monitoring, contextSources: ["approvals", "freeze"],
+    claim: envelopeForAggregate(producer, Object.values(envelopes), now), nonNullSources, monitoringSources: monitoring, contextSources: ["slo", "approvals", "freeze"],
     observedSince: receipt === null ? null : { deploymentId: receipt.body.deploymentId, recordedAt: iso(Number(receipt.body.ts)) },
     sloMeasurements: slo.measurements, sloSummary: slo.available ? slo.summary : null,
     alertRules: ALERT_RULES.map((rule) => ({ rule, status: "proposal" })), killSwitch: KILL_SWITCH,

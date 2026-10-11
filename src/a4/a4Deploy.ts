@@ -18,11 +18,11 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { amcVersion } from "../version.js";
 import { assertAllowed, evaluateFor, governed, livePrincipal, loadA4State, type A4Call } from "./a4Gates.js";
-import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
+import { recordEnvelope, vaultLocked, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackStarted, rolledBack } from "./spec/activate.js";
+import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackStarted, rolledBack } from "./spec/activate.js";
 import { fail } from "./stages/common.js";
 
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -226,7 +226,8 @@ export function assertStagingRevocable(store: A4Store, projectId: string, gateId
  * After a DENY on an unconsumed activate.completion gate (recordDecision refuses one on a consumed gate), and again on
  * every replay of that request: revokes the bound release's staging leases not yet revoked (design §6.4 step 7). A lease
  * it cannot revoke is never swallowed into the DENY's success: the answer is 409 LEASE_REVOKE_FAILED naming the lease ids
- * (the DENY stands), and the same request sent again retries it. Expiry needs no sweep: a completion gate lives at least
+ * (the DENY stands; 423 A4_VAULT_LOCKED when the vault is locked, also on a replay), and the same request sent again
+ * retries it. Expiry needs no sweep: a completion gate lives at least
  * a day and is requested after the release, so the staging lease (24 h) has expired by then. Answers the revoked ids.
  */
 export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId: string): Record<string, unknown> {
@@ -239,12 +240,18 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
     already = new Set(); // unverifiable: revoke them all again (revokeLease refuses an unverifiable store, which is a failure here)
   }
   const failed: string[] = [];
+  let locked = false;
   for (const leaseId of ids.filter((id) => !already.has(id))) {
     try {
       revokeLease(store.workspace, leaseId, `A4 deployment approval denied on gate ${gateId}`);
-    } catch {
+    } catch (error) {
       failed.push(leaseId);
+      locked ||= vaultLocked(error);
     }
+  }
+  if (locked) {
+    throw new A4StoreError(423, "A4_VAULT_LOCKED", "The DENY is recorded, but the staging lease it owes is still live: unlock the vault, then send the same "
+      + "request again (same clientRequestId) to retry the revocation.", { leaseIds: failed });
   }
   if (failed.length > 0) {
     throw new A4StoreError(409, "LEASE_REVOKE_FAILED", "The DENY is recorded, but the staging lease it owes is still live: send the same request again "
@@ -256,9 +263,9 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
 /**
  * The checks a receipt passes on one set of rows (before anything is written, and again on the rows the transaction
  * read): the release and its target, the same-host rule, operator times inside the skew bound, the package digest and
- * the lease ids its effects minted (a rollback row: the release it rolled back to, in the rollback's own environment,
- * once, before any later production deploy, and in production only while the rolled-back release is the one production
- * ran). Returns where `deployed_release_id` moves, if anywhere (production only).
+ * the lease ids its effects minted (a rollback row: the release it rolled back to, never one rolled back since, in the
+ * rollback's own environment, once, and in production only before any later succeeded production row and while the
+ * rolled-back release is the one production ran). Returns where `deployed_release_id` moves, if anywhere (production only).
  */
 function deploymentChecks(state: A4ReadinessState, releaseId: string, body: DeploymentBody, now: number): { deployed: string | null | undefined } {
   const release = releaseLink(state.chain, releaseId);
@@ -293,10 +300,12 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     }
     return { deployed: succeeded && body.environment === "production" ? releaseId : undefined };
   }
-  const rollback = cycleLinks(state.chain, "ROLLBACK").filter((link) => link.body.releaseId === releaseId).at(-1);
+  // Any cycle: the REOPEN or TUNE that RELEASE_ROLLED_BACK sends the owner to may come before the operator's row.
+  const rollback = state.chain.filter((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId).at(-1);
   if (rollback === undefined) throw fail(409, "ROLLBACK_NOT_RECORDED", "Roll back through POST …/rollback first; this row records what the operator then ran.");
-  // The row records the one rollback the approvers approved: its environment, until a row of it succeeded, and never once a
-  // production deploy followed it (a later row would move deployed_release_id back past that deploy).
+  // The row records the one rollback the approvers approved: its environment, until a row of it succeeded. A production row
+  // moves deployed_release_id, so never once another succeeded production row (a deploy, or another release's rollback row)
+  // followed the rollback: it would move it back past that row. A staging row moves nothing, so production rows never refuse it.
   if (body.environment !== rollback.body.environment) {
     throw fail(409, "ROLLBACK_ENVIRONMENT_MISMATCH", `The rollback was approved for ${String(rollback.body.environment)}; record its row there.`);
   }
@@ -304,8 +313,8 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
   if (since.some((link) => link.body.deploymentKind === "rollback" && link.body.releaseId === releaseId)) {
     throw fail(409, "ROLLBACK_ROW_RECORDED", "A succeeded row of this rollback is already recorded.");
   }
-  if (since.some((link) => link.body.deploymentKind === "deploy" && link.body.environment === "production")) {
-    throw fail(409, "ROLLBACK_SUPERSEDED", "A production deployment was recorded after this rollback; its row can no longer move the deployed release.");
+  if (body.environment === "production" && since.some((link) => link.body.environment === "production")) {
+    throw fail(409, "ROLLBACK_SUPERSEDED", "A production deployment or rollback row was recorded after this rollback; its row can no longer move the deployed release.");
   }
   // A production row moves deployed_release_id only while the rolled-back release is the one production ran, as the chain
   // read without this ROLLBACK names it: another release's production deploy recorded before the rollback superseded it too.
@@ -313,6 +322,10 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     throw fail(409, "ROLLBACK_SUPERSEDED", "Another release was deployed to production after the rolled-back one; this row can no longer move the deployed release.");
   }
   const toReleaseId = typeof rollback.body.toReleaseId === "string" ? rollback.body.toReleaseId : null;
+  // assertRollbackCurrent's rule: a release rolled back since (any cycle) is never where deployed_release_id moves.
+  if (toReleaseId !== null && rollbackRecorded(state.chain, toReleaseId)) {
+    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `Release ${toReleaseId}, the release rolled back to, was itself rolled back since; this row can no longer be recorded.`);
+  }
   const to = releaseLink(state.chain, toReleaseId);
   if (body.packageDigest !== (to?.body.packageDigest ?? null)) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not the package of the release rolled back to (null when none).");
   const minted = toReleaseId === null ? null : mintedLeases(state.chain, toReleaseId);

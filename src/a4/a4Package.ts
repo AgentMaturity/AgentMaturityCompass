@@ -61,7 +61,7 @@ import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rollbackStarted, type LeasePlan
+  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackStarted, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -71,7 +71,7 @@ import { relPath } from "./stages/common.js";
 /** A coded failure: the effect runner records the message, whose first word is the code the route answers. */
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
 /** The vault's own refusal ("🔐 Vault locked…"), which every step that signs with a vault key throws uncoded. */
-const vaultLocked = (error: unknown): boolean => /vault locked/i.test(error instanceof Error ? error.message : String(error));
+export const vaultLocked = (error: unknown): boolean => /vault locked/i.test(error instanceof Error ? error.message : String(error));
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // ponytail: one input file; raise it if an agent's resources outgrow it
 const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace held at the release digest (v1: a same-host restart of the hosted Studio "
   + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is P2-40.";
@@ -625,7 +625,8 @@ function lineageOf(state: A4ReadinessState, revisionNo: number, approvals: A4Rel
 
 /**
  * The release record (`amc.a4-release/v1`, design §14.1): the eight-surface table, TUNE lineage (previous and base release),
- * the rollback target (the release running in production now, productionReleaseOf) and the staging lease; signed with its own A4_RECORD envelope outside the ledger transaction, then RELEASE (step built)
+ * the rollback target (the release running in production now, productionReleaseOf; RELEASE carries it too, for readiness and
+ * the production-lease effect) and the staging lease; signed with its own A4_RECORD envelope outside the ledger transaction, then RELEASE (step built)
  * with the a4_releases row, refused when this execution's release exists, the stage was redone since the gate was
  * consumed, the step moved, or this attempt was already settled.
  */
@@ -695,7 +696,7 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
       return { kind: "RELEASE", stage: "activate", revisionNo: gate.revision_no, head: { step: "built" },
         payload: { releaseId: input.releaseId, executionId, packageDigest: input.packageDigest, packagePath: input.packagePath, tarballPath: input.tarballPath,
           tarballSha256: input.tarballSha256, transparencyEntryId: null, target: input.target, enforceManifestId: input.snapshotId,
-          previousReleaseId, baseReleaseId: state.project.base_release_id, recordSha256: envelope.digestSha256,
+          previousReleaseId, baseReleaseId: state.project.base_release_id, recordSha256: envelope.digestSha256, rollbackReleaseId: rollbackTo,
           leases: [{ leaseId: input.stagingLease.leaseId, scope: "staging", expiresAt: input.stagingLease.expiresAt }] },
         sideRows: [{ table: "a4_releases", values: { release_id: input.releaseId, project_id: projectId, revision_no: gate.revision_no, package_digest: input.packageDigest,
           package_path: input.packagePath, signature_path: input.signaturePath, transparency_entry_id: null, previous_release_id: previousReleaseId,
@@ -717,15 +718,18 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
  * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release, neither rolled
  * back nor being rolled back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK once any attempt of its rollback started,
  * settled or not: a failed one may have consumed its grant and restored the Enforce snapshot, so no lease is minted beside
- * it). Read from the store, not the executor's preloaded rows.
+ * it), and its recorded rollback target not rolled back since (ROLLBACK_TARGET_ROLLED_BACK: it could never restore it).
+ * Read from the store, not the executor's preloaded rows.
  */
 function assertProductionCurrent(workspace: string, projectId: string, gate: A4EffectContext["gate"], releaseId: string): void {
   const store = openA4Store(workspace);
   try {
     const head = store.readHead(projectId);
     const chain = store.readChain(projectId);
-    if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
+    if (rollbackRecorded(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
     if (rollbackStarted(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `a rollback of release ${releaseId} has started`);
+    const target = rolledBackTarget(chain, releaseId);
+    if (target !== null) throw coded("ROLLBACK_TARGET_ROLLED_BACK", `release ${target}, the rollback target of release ${releaseId}, was rolled back since: build the release again`);
     const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
     if (consumed === undefined || head?.stage !== "activate" || head.step !== "completion_approved" || head.revision_no !== gate.revision_no
       || currentRelease(chain)?.body.releaseId !== releaseId || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {

@@ -270,6 +270,18 @@ export const rollbackStarted = (chain: readonly A4ChainLink[], releaseId: string
 /** Whether `releaseId` was rolled back in this cycle (ROLLBACK, src/a4/a4Rollback.ts). */
 export const rolledBack = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
   cycleLinks(chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId);
+/** Whether a ROLLBACK names `releaseId` in any cycle (a release rolls back once). */
+export const rollbackRecorded = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
+  chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId);
+/**
+ * The rollback target `releaseId`'s record names (its RELEASE link carries the record's `rollback.releaseId`: the release
+ * running in production when it was built) once a ROLLBACK names that target (any cycle), else null. Such a release
+ * could never restore its target, so no deployment approval binds it and no production lease is minted for it.
+ */
+export function rolledBackTarget(chain: readonly A4ChainLink[], releaseId: string): string | null {
+  const target = chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId)?.body.rollbackReleaseId;
+  return typeof target === "string" && rollbackRecorded(chain, target) ? target : null;
+}
 /**
  * The release running in production as the chain records it (any cycle): the newest one with a succeeded production
  * deploy row that no ROLLBACK names, or null. A release's rollback restores this one, never merely the previous RELEASE,
@@ -290,16 +302,32 @@ const productionGaps = (state: A4ReadinessState, releaseId: string): string[] =>
   bridgeControls(state, "production", releaseId).filter((control) => control.status !== "satisfied").map((control) => control.controlId);
 
 /**
+ * Why no deployment approval may bind this cycle's release, as the production-lease effect and deploy rows refuse it:
+ * rolled back (terminal for this cycle; its leases were revoked), a rollback of it started (any attempt, settled or not:
+ * one that failed may have consumed its grant and restored the Enforce snapshot), or its recorded rollback target rolled
+ * back since (it could never restore it). Null when none applies.
+ */
+function releaseRefusal(chain: readonly A4ChainLink[], releaseId: string): { code: string; codes: string[]; label: string } | null {
+  if (rolledBack(chain, releaseId)) return { code: "RELEASE_ROLLED_BACK", codes: [], label: "This cycle's release was rolled back: reopen or tune Activate, then release again" };
+  if (rollbackStarted(chain, releaseId)) {
+    return { code: "RELEASE_ROLLBACK_STARTED", codes: [], label: "A rollback of this cycle's release has started: once it is recorded (run it again if it failed), reopen or tune Activate and release again" };
+  }
+  const target = rolledBackTarget(chain, releaseId);
+  return target === null ? null : { code: "ROLLBACK_TARGET_ROLLED_BACK", codes: [`ROLLBACK_TARGET:${target}`],
+    label: `Release ${target}, this release's rollback target, was rolled back since: reopen or tune Activate and build the release again` };
+}
+
+/**
  * The operator's receipt the deployment approval binds (design §10.4 Readiness, deployment approval): recorded
  * `succeeded`, its signed file resolving, naming the release's lease. The receipt id, status and leases are reason codes,
  * so a later receipt moves the bound readiness and an open deployment approval goes stale.
  */
 function receiptItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
   const mandatory = reached(state, "reviewed");
-  // A rolled-back release is terminal for this cycle: no deployment approval may bind it (its leases were revoked).
-  if (releaseId !== null && rolledBack(state.chain, releaseId)) {
-    return item("deployment.receipt", "BLOCKED", { kind: "scope_changed", reasonCodes: ["RELEASE_ROLLED_BACK", `RELEASE:${releaseId}`],
-      nextAction: { label: "This cycle's release was rolled back: reopen or tune Activate, then release again" } });
+  const refused = releaseId === null ? null : releaseRefusal(state.chain, releaseId);
+  if (refused !== null) {
+    return item("deployment.receipt", "BLOCKED", { kind: "scope_changed", reasonCodes: [refused.code, `RELEASE:${releaseId}`, ...refused.codes],
+      nextAction: { label: refused.label } });
   }
   const receipt = boundReceipt(state.chain, releaseId);
   if (receipt === undefined) return waiting("deployment.receipt", ["DEPLOYMENT_NOT_RECORDED"], { mandatory,
@@ -393,7 +421,7 @@ export const monitorResolves = (state: Pick<A4ReadinessState, "refs">, link: A4C
 
 /**
  * The newest monitor ref Review recorded for this cycle's release (src/a4/a4Monitor.ts): a ref with no source that
- * observed the deployed agent (A4's own approvals and the freeze reading never count) is not present, and one whose
+ * observed the deployed agent (A4's own approvals, the freeze reading and the process-wide SLO report never count) is not present, and one whose
  * signed record no longer resolves is BLOCKED, never read from the chain alone.
  */
 function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
@@ -407,7 +435,7 @@ function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4Re
   return sources > 0 ? item("monitoring.source", "READY", { reasonCodes: [`SOURCES:${sources}`, "SELF_REPORTED", `MONITOR:${String(monitor!.body.refId)}`] })
     : waiting("monitoring.source", ["MONITOR_NO_SOURCE"], { kind: "source_unavailable", mandatory,
       nextAction: { label: monitor === undefined ? "Review records the monitor ref (one per review)"
-        : "No source of the monitor ref observed the deployed agent since its succeeded deploy receipt (an execution in its journal, an SLO measurement or AMC's check that reached the destination); review again once one has" } });
+        : "No source of the monitor ref observed the deployed agent since its succeeded deploy receipt (an execution in its journal or AMC's check that reached the destination; the process-wide SLO report is context only); review again once one has" } });
 }
 
 /**

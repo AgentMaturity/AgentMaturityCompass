@@ -159,7 +159,7 @@ export const LIFECYCLE_BRIDGE: ReadonlyArray<{ readonly target: "testing" | "sta
   { target: "staging", controlId: "deployment_plan_approved", satisfiedBy: "Activate direction gate (release approval) consumed" },
   { target: "production", controlId: "assurance_pack_passing", satisfiedBy: "assurance run artifact with a non-inconclusive VALID result" },
   { target: "production", controlId: "rollback_plan_validated", satisfiedBy: "rollback drill receipt plus a staging rollback row with amc_check_status passed" },
-  { target: "production", controlId: "monitoring_slo_enabled", satisfiedBy: "monitor ref carrying a first SLO measurement (self_reported)" },
+  { target: "production", controlId: "monitoring_slo_enabled", satisfiedBy: "monitor ref carrying an SLO measurement of this agent since its deploy receipt (the SLO report labels no agent yet)" },
   { target: "production", controlId: "operator_handoff_acknowledged", satisfiedBy: "OWNER deployment approval with a deploy row whose amc_check_status is passed" }
 ];
 

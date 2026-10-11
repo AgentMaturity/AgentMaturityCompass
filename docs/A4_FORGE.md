@@ -439,7 +439,8 @@ completion gate revokes the staging lease of the release that gate binds; a deci
 (`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's auditor key, even in NOTARY
 mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read, rather than recorded with the
 staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
-409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success: sending the same request again (same
+409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success (423 `A4_VAULT_LOCKED`, also naming them, when the vault
+locked meanwhile, and on a replay sent while it is locked): sending the same request again (same
 `clientRequestId`) retries the revocation, or the operator revokes the lease with `amc lease revoke`. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
 the staging lease has expired before such a gate can.
 
@@ -480,11 +481,14 @@ with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names 
 production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
 or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
 moves the project's `deployedReleaseId`; a succeeded production rollback row moves it to the release rolled back to. A
-rollback row records the one rollback the approvers approved: it names that rollback's environment
-(`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise), and it is refused once a succeeded row of that rollback is recorded
-(`ROLLBACK_ROW_RECORDED`) or a succeeded production deploy followed the rollback (`ROLLBACK_SUPERSEDED`). A production
-rollback row is also `ROLLBACK_SUPERSEDED` unless the rolled-back release is the one production ran (read without that
-rollback), so it never moves `deployedReleaseId` back past a later release's production deploy. Whoever
+rollback row records the one rollback the approvers approved, found in any cycle (a reopen or tune recorded after the
+rollback leaves its row recordable): it names that rollback's environment (`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise),
+and it is refused once a succeeded row of that rollback is recorded (`ROLLBACK_ROW_RECORDED`) or once the release it
+rolled back to was itself rolled back (`ROLLBACK_TARGET_ROLLED_BACK`). A production rollback row is also
+`ROLLBACK_SUPERSEDED` once any succeeded production row (a deploy, or another release's rollback row) followed the
+rollback, and unless the rolled-back release is the one production ran (read without that rollback), so it never moves
+`deployedReleaseId` back past a later production row or to a rolled-back release. A staging row moves nothing, so
+production rows never refuse it. Whoever
 records a deploy receipt counts as a builder of the revision: the deployment approval rests on their statement, so they
 cannot approve it (`builder_not_completion_approver`) and are among its excluded keys.
 
@@ -508,7 +512,13 @@ separation of duties. Only the release running in the chosen environment rolls b
 with a succeeded production deploy that was not rolled back, in staging this cycle's release (409
 `ROLLBACK_RELEASE_NOT_RUNNING` otherwise, so a release a later one superseded never restores an older snapshot). The
 preview names the rollback target from the release record (the release that ran in production when this one was built,
-never merely the previous release; 409 `ROLLBACK_TARGET_ROLLED_BACK` when it was rolled back since), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+never merely the previous release), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. A
+recorded target that was itself rolled back since can never be restored, and its prepared commands would re-pin it, so
+the preview then names no target: no Enforce manifest and no prepared commands, only the revocations and the freeze, with
+a restore note naming the recorded target and saying it was rolled back. The engine request binds that preview, so its
+approvers see it. A target rolled back after the preview refuses the confirmation (409 `ROLLBACK_TARGET_ROLLED_BACK`);
+preview again. Such a release never reaches production in the first place: its deployment approval is BLOCKED and its
+production lease refused (`deployment.receipt` below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
 pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, on rows that still pass both preview refusals
 above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
@@ -543,15 +553,19 @@ every control of the bridge table has a ref, and records each control's ref, cla
 release record keeps the release bridge's rows, and the deployment approval's effect record keeps the production
 bridge's, which `GET …/releases/:rid` shows beside the production rows as they stand now. In v1 `rollback_plan_validated` and `operator_handoff_acknowledged` need a `passed` AMC check,
 so the agent stays at staging (P2-40). `assurance_pack_passing` needs an assurance run artifact.
-`monitoring_slo_enabled` needs a monitor ref that carries a first SLO measurement.
+`monitoring_slo_enabled` stays not evaluated: the SLO report is process-wide and labels no agent, so a monitor ref's SLO
+measurements are context, never this agent's SLO monitoring.
 
 Readiness adds these items:
 
 - `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
   a later receipt stales an open deployment approval. Once this cycle's release is rolled back it is BLOCKED
-  `RELEASE_ROLLED_BACK`, which stales an open deployment approval. A new `deploy` receipt for that release is refused
-  with the same code, and so is its production lease, both already once any attempt of its rollback has started (even
-  one that failed). Reopen or tune Activate to release again.
+  `RELEASE_ROLLED_BACK`, which stales an open deployment approval, and it reads BLOCKED `RELEASE_ROLLBACK_STARTED` once
+  any attempt of its rollback has started (even one that failed), so the deployment approval is refused before it is
+  consumed. A new `deploy` receipt for that release is refused with `RELEASE_ROLLED_BACK`, and so is its production lease,
+  both already once a rollback attempt started. It is also BLOCKED `ROLLBACK_TARGET_ROLLED_BACK` (naming
+  `ROLLBACK_TARGET:<id>`) once the release's recorded rollback target was rolled back: the release could never restore
+  it, so the production-lease effect refuses it with the same code. Reopen or tune Activate to release again.
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
   approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
   later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,
@@ -597,9 +611,10 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   already emitted by severity. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
   agent counts toward `monitoring.source`, and nothing does before the release's bound deploy receipt is recorded
   `succeeded`. After it, a source counts when it is an execution in the action journal started since that receipt (at
-  its row's own tier; a row of A4's own probe session has none), an SLO measurement, or AMC's check of that receipt that
-  connected and found the destination reachable. A failed or unconnected check, A4's own approvals and the freeze reading
-  are context and never count, so a record with none of the three leaves the item WAITING `MONITOR_NO_SOURCE`. Each
+  its row's own tier; a row of A4's own probe session has none), or AMC's check of that receipt that connected and found
+  the destination reachable. A failed or unconnected check, A4's own approvals, the freeze reading and the process-wide
+  SLO report (it labels no agent and is not limited to the time since that receipt) are context and never count, so a
+  record with neither leaves the item WAITING `MONITOR_NO_SOURCE`. Each
   source envelope carries the project's regulated flag.
 
 Once the review step has committed (never on a replay or a refusal), Review runs `createValueReport` once for the agent.
@@ -634,7 +649,8 @@ Readiness and the bridge read the monitor record only while its file resolves:
 - `monitoring.source` is READY when the newest monitor ref of the current release has a source with a value. It is
   WAITING `MONITOR_NO_SOURCE` before Review, and BLOCKED `MONITOR_REF_UNRESOLVED` when the signed record is missing or
   changed.
-- `monitoring_slo_enabled` is satisfied, `self_reported`, by a resolving monitor ref that carries an SLO measurement.
+- `monitoring_slo_enabled` stays not evaluated while the SLO report labels no agent: a monitor ref's SLO measurements
+  are process-wide context.
   `GET …/releases/:rid` shows the production bridge rows as they stand now, beside the rows recorded at release.
 - `release_effect` and `rollback_effect` (governance, not mandatory) name the open engine request of the release and
   of the rollback, so the Studio cards can decide them bound to their digests.

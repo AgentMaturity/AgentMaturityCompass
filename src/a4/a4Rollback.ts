@@ -33,7 +33,7 @@ import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, headSeqSchema, reasonSchema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, ROLLBACK_EFFECT_ID, rollbackExecutionId } from "./spec/activate.js";
+import { currentRelease, effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, ROLLBACK_EFFECT_ID, rollbackExecutionId, rollbackRecorded } from "./spec/activate.js";
 import { fail, relPath } from "./stages/common.js";
 
 const FROZEN_CLASSES: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
@@ -44,7 +44,7 @@ export const rollbackSchema = z.strictObject({ ...base, reason: reasonSchema,
 
 /** A release rolls back once: 409 ROLLBACK_RECORDED once `chain` records its ROLLBACK (any cycle). */
 function assertNotRolledBack(chain: readonly A4ChainLink[], releaseId: string): void {
-  if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+  if (rollbackRecorded(chain, releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
 }
 
 /** A rollback may run on a held or frozen project (it is the remedy); every other refusal of `rollback` stands. */
@@ -69,24 +69,27 @@ function releaseAndGate(state: A4ReadinessState, releaseId: string): { release: 
 /**
  * A rollback names the release running in its environment on `chain` (409 ROLLBACK_RELEASE_NOT_RUNNING otherwise): in
  * production the one productionReleaseOf names, in staging this cycle's release. A release a later one superseded would
- * restore a snapshot older than what runs, and its operator row would move deployed_release_id backwards. Its target
- * rolled back since is refused too (ROLLBACK_TARGET_ROLLED_BACK). Checked at the preview and again as the attempt starts.
+ * restore a snapshot older than what runs, and its operator row would move deployed_release_id backwards. A target
+ * rolled back since is refused too (ROLLBACK_TARGET_ROLLED_BACK): the preview names none then (previewOf), so this refuses
+ * only a confirmation whose bound target was rolled back after its preview. Checked at the preview and again as the
+ * attempt starts.
  */
 function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string, toReleaseId: string | null, environment: string): void {
   const running = environment === "production" ? productionReleaseOf(chain) : currentRelease(chain)?.body.releaseId ?? null;
   if (running !== releaseId) {
     throw fail(409, "ROLLBACK_RELEASE_NOT_RUNNING", `release ${releaseId} is not the release running in ${environment}; only that one rolls back there`, { running });
   }
-  if (toReleaseId !== null && chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === toReleaseId)) {
-    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `release ${toReleaseId}, the rollback target, was itself rolled back`);
+  if (toReleaseId !== null && rollbackRecorded(chain, toReleaseId)) {
+    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `release ${toReleaseId}, the rollback target, was itself rolled back since the preview; preview the rollback again`);
   }
 }
 
 /**
  * What a rollback of `releaseId` would do now (design §10.4 Rollback preview); the engine request binds its digest. The
  * release must be the one running in `environment` (assertRollbackCurrent). The target is the record's rollback block (the
- * release running in production when this one was built), never merely the previous RELEASE; a target rolled back since
- * is refused (ROLLBACK_TARGET_ROLLED_BACK).
+ * release running in production when this one was built), never merely the previous RELEASE. A recorded target rolled back
+ * since can never be restored (its prepared commands re-pin it), so the preview then names no target: no Enforce restore
+ * and no prepared re-pin, only the revocations and the freeze, and its restore note says why. The engine request binds it.
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
@@ -94,12 +97,16 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
   const row = store.snapshot(state.project.project_id).rows.a4_releases.find((candidate) => candidate.release_id === releaseId);
   if (row === undefined) throw fail(409, "RELEASE_RECORD_MISSING", `release ${releaseId} has no release record`);
   const record = a4ReleaseV1Schema.parse({ ...JSON.parse(String(row.surfaces_json)) as Record<string, unknown>, envelope: JSON.parse(String(row.envelope_json)) });
-  const toReleaseId = record.rollback.releaseId;
+  const recorded = record.rollback.releaseId;
+  const targetRolledBack = recorded !== null && rollbackRecorded(state.chain, recorded);
+  const toReleaseId = targetRolledBack ? null : recorded;
   assertRollbackCurrent(state.chain, releaseId, toReleaseId, environment);
   const to = toReleaseId === null ? undefined : state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === toReleaseId);
   const confirmManifestId = typeof to?.body.enforceManifestId === "string" ? to.body.enforceManifestId : null;
   const minted = mintedLeases(state.chain, releaseId);
-  let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: "no earlier release: nothing to restore" };
+  let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: targetRolledBack
+    ? `release ${recorded}, the recorded rollback target, was itself rolled back: nothing is restored or re-pinned; the release's leases are revoked`
+    : "no earlier release: nothing to restore" };
   if (confirmManifestId !== null) {
     try {
       const plan = restoreEnforceResourceSnapshot({ workspace: store.workspace, agentId: state.project.agent_id, manifestPath: snapshotPath(store.workspace, state.project.agent_id, confirmManifestId) });
@@ -110,7 +117,7 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
     }
   }
   return { schema: "amc.a4-rollback-preview/v1", releaseId, toReleaseId, confirmManifestId, environment, target: release.body.target,
-    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production])], preparedCommands: record.rollback.preparedCommands,
+    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production])], preparedCommands: targetRolledBack ? [] : record.rollback.preparedCommands,
     restore, freezeFirst: ["high", "critical"].includes(engineRiskTier(state)),
     lifecycle: "never moved backwards; deployed_release_id moves when the operator records the rollback row" };
 }
