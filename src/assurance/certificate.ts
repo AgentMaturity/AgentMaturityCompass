@@ -12,7 +12,7 @@ import { runBundleGate, parseGatePolicy, evaluateGatePolicy } from "../ci/gate.j
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { getPrivateKeyPem, getSigningKey, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
+import { getSigningKey, getSigningPublicKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { computeFailureRiskIndices } from "./indices.js";
@@ -647,8 +647,8 @@ export function revokeCertificate(params: {
 }): { outFile: string; certId: string } {
   const inspect = inspectCertificate(params.certFile);
   const certId = inspect.cert.certId;
-  const auditorPubPath = join(params.workspace, ".amc", "keys", "auditor_ed25519.pub");
-  const auditorPub = readUtf8(auditorPubPath);
+  // P1-08: the field keeps its name; it carries the revocation-list key that signs the revocation.
+  const auditorPub = getSigningPublicKeyPem(params.workspace, "revocation-list");
   const payloadBase = {
     certId,
     reason: params.reason,
@@ -657,7 +657,7 @@ export function revokeCertificate(params: {
     auditorPub
   };
   const digest = sha256Hex(canonicalize(payloadBase));
-  const signature = signHexDigest(digest, getPrivateKeyPem(params.workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(params.workspace, "revocation-list"));
   const payload: RevocationPayload = {
     ...payloadBase,
     signature
