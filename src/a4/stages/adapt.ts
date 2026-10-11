@@ -14,29 +14,31 @@ import { loadCatalog } from "../../catalog/loader.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
-import { writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
+import { openLedger } from "../../ledger/ledger.js";
 import { assertOwnerMode } from "../../mode/mode.js";
+import { pathExists } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
-import { RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
+import { driftedSlots, RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
 import { isRegulated } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
-import { gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
+import { flatSlots, gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
-  contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, promptPackSha256, promptPackStatus, writeContextPlugin
+  contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin, writeContextPlugin
 } from "../adaptContextPlugin.js";
 import {
   operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
 } from "../adaptPermissions.js";
 import {
-  activateBoundPlan, activationExecutionId, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
+  activateBoundPlan, activationExecutionId, activationWeakenings, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
 } from "../adaptPolicy.js";
 import {
   ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, acknowledgementOf, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, adaptItems, adaptSpecOf, answerGaps,
@@ -188,21 +190,25 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         + ` (${Object.entries(memory.sources).map(([field, from]) => `${field} ${from}`).join(", ")}). Enforcement ${MEMORY_ENFORCEMENT_NOTE}.`,
       expert: `amc.a4-memory-policy/v1 ${canonicalize(memory)}; enforcement: advisory (no reader of the file in src/learning).` },
     { id: "permissions", sources: ["buildOperatingProfile", "activateOperatingProfile({ dryRun: true })", "src/a4/adaptPermissions.ts"], dataStatus: null,
-      novice: permissions === null ? "Understand compares your station's recommended settings with the settings the workspace enforces today."
+      novice: permissions === null ? "Understand compares your station's recommended settings with the settings the workspace enforces today, without writing or signing anything."
         : permissions.error !== null ? `AMC could not compare the station's recommended settings with the workspace's (${permissions.error}).`
           : permissions.widenings.length === 0 ? `The ${String(permissions.station)} station's recommended settings would not loosen anything the workspace enforces today.`
             : `Applying the ${String(permissions.station)} station's recommended settings would loosen ${permissions.widenings.length} setting(s) the workspace enforces today, `
               + "so AMC refuses them unless a project owner accepts exactly that list. AMC never applies them for you.",
-      practitioner: permissions === null || permissions.error !== null ? `No dry run (${permissions?.error ?? "not run"}).`
-        : `${permissions.profilePath ?? "the proposal"} (signed with the workspace auditor key): ${permissions.widenings.length} widening(s)`
-          + `${permissions.widenings.length === 0 ? "" : `: ${permissions.widenings.slice(0, 5).join("; ")}`}. A4 never passes allowWidening; activation is the owner's amc domain apply --activate-profile.`,
-      expert: permissions === null ? "permissionsDryRun not run." : `activateOperatingProfile({ dryRun: true, allowWidening: true }) on ${permissions.profilePath ?? "none"}: widenings sha256 ${permissions.wideningsSha256 ?? "none"}; `
-        + `configs ${permissions.configs.map((entry) => `${entry.config}=${entry.sha256 ?? "stamped at write"}`).join(", ") || "none"}; error ${permissions.error ?? "none"}.` },
+      practitioner: permissions === null || permissions.error !== null ? `No comparison (${permissions?.error ?? "not run"}).`
+        : `The ${String(permissions.station)} station's profile, built in memory (no file, no signature): ${permissions.widenings.length} widening(s)`
+          + `${permissions.widenings.length === 0 ? "" : `: ${permissions.widenings.slice(0, 5).join("; ")}`}. A4 never passes allowWidening and never signs or activates a profile: `
+          + "an owner emits, reviews and signs it (amc domain apply --sign-profile), then activates it (--activate-profile).",
+      expert: permissions === null ? "permissionsDryRun not run." : `planActivation(workspace, buildOperatingProfile(...), agentId) on profile sha256 ${permissions.profileSha256 ?? "none"}: `
+        + `widenings sha256 ${permissions.wideningsSha256 ?? "none"}; configs ${permissions.configs.map((entry) => `${entry.config}=${entry.sha256 ?? "stamped at write"}`).join(", ") || "none"}; `
+        + `error ${permissions.error ?? "none"}. Not built yet: the effect a4.adapt.activate_profile, per-agent gatePolicy.json and lease caps, the prompt-pack build (A4_PROFILE_EFFECT).` },
     { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
       novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
         + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
       practitioner: "Build writes <agent>/a4/context-plugin.json (order 160, attributed to this project's revision). The probe runs one in-process turn on the stub provider "
-        + `and records that session's EFFECTIVE_POLICY row as the observed ref (${PROBE_LIMITATION}). Delivery to a model is not evaluated on the stub provider; delivery to native tasks and to a deployed agent is not evaluated (P2-37).`,
+        + `and records that session's EFFECTIVE_POLICY row as the observed ref that the policy reached the runtime; the frame is the session's signed user/message row `
+        + `holding the plugin's text, which AMC checks at the probe and again at Review (${PROBE_LIMITATION}). Delivery to a model is not evaluated on the stub provider; `
+        + "delivery to native tasks and to a deployed agent is not evaluated (P2-37).",
       expert: "ContextPlugin { name: \"a4:context\", order: 160 } through runComposedTurn({ promptProfile: { extraContextPlugins } }) (never contextPlugins, which drops AGENTS.md); "
         + "the receipt via writeEffectivePolicyReceipt on the session writer (bindToolSession); the user/message snapshot row must carry the frame's exact text." },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
@@ -276,6 +282,30 @@ function proposalOf(ctx: A4ProducerContext) {
   return { spec, plan };
 }
 
+/**
+ * The agent's Enforce resources against its signed manifest (none yet: Build writes the first). A manifest that does not
+ * verify, or any difference outside the resource kinds in `allowed`, is 409 ENFORCE_DRIFTED: Build never re-baselines
+ * drift it did not write (a resource tampered with before Propose would read ACTIVE, and the known-good rollback
+ * snapshot would be replaced). Codes and kinds only, never a path.
+ * ponytail: `allowed` is per kind (the agent's memory directory), so another file written under memory/ between this
+ * check and the snapshot would be re-baselined too; compare the directory digest Build expects if that matters.
+ */
+function assertEnforceCurrent(workspace: string, agentId: string, allowed: ReadonlySet<string> = new Set()): void {
+  if (!pathExists(latestEnforceResourceManifestPath(workspace, agentId))) return;
+  let verified: ReturnType<typeof verifyEnforceResourceManifest>;
+  try {
+    verified = verifyEnforceResourceManifest({ workspace, agentId });
+  } catch (error) {
+    throw fail(409, "ENFORCE_DRIFTED", "The agent's signed Enforce manifest could not be verified; review it in Enforce before building.",
+      { reasonCodes: [errorCodeOf(error, "MANIFEST_UNREADABLE")] });
+  }
+  const moved = [...verified.diff.added, ...verified.diff.removed, ...verified.diff.changed].filter((entry) => !allowed.has(entry.kind));
+  if (!verified.signature.valid || moved.length > 0) {
+    throw fail(409, "ENFORCE_DRIFTED", "The agent's resources differ from its signed Enforce manifest: review the drift in Enforce and re-baseline it there, then build again.",
+      { reasonCodes: [...(verified.signature.valid ? [] : ["MANIFEST_SIGNATURE_INVALID"]), ...[...new Set(moved.map((entry) => `DRIFTED:${entry.kind}`))].slice(0, 16)] });
+  }
+}
+
 /** The Enforce manifest after Build's writes (the agent stays ACTIVE, not DRIFTED), or the refusal's code; never a path in an error. */
 function enforceSnapshot(workspace: string, agentId: string): NonNullable<AdaptBuild["manifest"]> {
   try {
@@ -292,7 +322,9 @@ function enforceSnapshot(workspace: string, agentId: string): NonNullable<AdaptB
  * Build: the proposed plan signed (CONTROL_PLAN, a local audit trail under this workspace's keys; its review is filed at
  * the effect gate), then the memory policy written under the agent's memory resource, the attributed context plugin
  * beside the agent's files, and the Enforce manifest re-written.
- * Every refusal (agent mode, invalid memory answers, a weakening, the signing key, the spill cap) comes before the writes.
+ * Build is an owner's (it signs workspace artifacts: roleRefusals and the A4 access policy). Every refusal (agent mode,
+ * invalid memory answers, Enforce drift, a weakening, the signing key, the spill cap) comes before the writes; the
+ * Enforce manifest is re-written only when the writes moved nothing but the agent's memory directory.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
@@ -302,11 +334,13 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const values = answerValues(adaptSpecOf(ctx.state).answers);
   const invalid = memoryPolicyFields(values).invalid;
   if (invalid.length > 0) throw fail(409, "A4_NOT_READY", "The memory answers are not values the policy accepts.", { reasonCodes: invalid.map((id) => `ANSWER_INVALID:${id}`) });
+  assertEnforceCurrent(workspace, project.agent_id);
   const signed = signAdaptPlan(workspace, ctx.state, plan);
   const source = `a4:${project.project_id}@r${project.revision_no}`;
   const memory = writeMemoryPolicy({ workspace, agentId: project.agent_id, source, values });
   const context = writeContextPlugin({ workspace, agentId: project.agent_id, projectId: project.project_id, revisionNo: project.revision_no,
     answers: adaptSpecOf(ctx.state).answers, clocks: understandingOf(spec)?.facts.clocks ?? [] });
+  assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
   const manifest = enforceSnapshot(workspace, project.agent_id);
   const built: AdaptBuild = { ...signed, memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context, manifest };
   return {
@@ -323,6 +357,42 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   };
 }
 
+/** The slots Build's writes moved (and its revision bound as written): Review refuses when any moved since. */
+const BUILT_SLOTS = ["context.memoryPolicySha256", "context.contextPluginSha256", "enforce.resourcesSha256"] as const;
+
+/**
+ * 409 RESOURCE_DRIFTED before Review records anything when the memory policy, the context plugin or the agent's Enforce
+ * resources differ from what the head revision (Build's, or an earlier Review's that checked it) bound: Review's own
+ * revision would otherwise bind the changed bytes into the completion gate.
+ */
+function assertBuiltCurrent(ctx: A4ProducerContext): void {
+  const head = ctx.state.revisions.find((row) => row.revision_no === ctx.state.project.revision_no);
+  const bound = head === undefined ? {} : flatSlots(JSON.parse(head.resource_digests_json));
+  const drifted = driftedSlots(ctx.workspace, Object.fromEntries(BUILT_SLOTS.map((slot) => [slot, bound[slot] ?? null])), ctx.state.project.agent_id);
+  if (drifted.length > 0) {
+    throw fail(409, "RESOURCE_DRIFTED", `What Build wrote moved since (${drifted.join(", ")}); build again.`, { slots: drifted, reasonCodes: ["RESOURCE_DRIFTED"] });
+  }
+}
+
+/** Review's re-check of the probe's frame row (probeFrameStatus) against the plugin Build wrote; a code when it cannot be read. */
+function recheckFrame(ctx: A4ProducerContext, probe: Record<string, unknown>, fileSha256: string): string {
+  let text: string;
+  try {
+    text = readContextPlugin(ctx.workspace, ctx.state.project.agent_id, fileSha256).text;
+  } catch (error) {
+    return errorCodeOf(error, "CONTEXT_PLUGIN_UNREADABLE");
+  }
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  try {
+    ledger = openLedger(ctx.workspace, { readonly: true });
+    return probeFrameStatus(ledger, probe, text);
+  } catch (error) {
+    return errorCodeOf(error, "FRAME_ROW_UNREADABLE");
+  } finally {
+    ledger?.close();
+  }
+}
+
 /**
  * Review: the active compiled plan's head against the proposal, the plan diff, and the conformance statement's control
  * results (evaluated, written signed and read back verified). The context probe that observes the runtime frame is slice
@@ -332,6 +402,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
   if (buildOf(spec) === null) throw fail(409, "A4_NOT_READY", "Nothing was built for this plan.", { reasonCodes: ["PRODUCED_AT_BUILD"] });
   const project = ctx.state.project;
+  assertBuiltCurrent(ctx);
   const created = ctx.state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const conformance = recordControlResults({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
     plan, catalog: loadCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
@@ -354,6 +425,12 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   } catch (error) {
     head = { activePlan: { error: errorCodeOf(error, "COMPILED_POLICY_UNREADABLE") }, sameAsProposal: false, samePolicy: false };
   }
+  // What activateControlPlan would refuse against the active plan now (readiness's plan_activated reads it); an unreadable journal is a code.
+  try {
+    head = { ...head, weakensActive: activationWeakenings(ctx.workspace, plan).slice(0, 32) };
+  } catch (error) {
+    head = { ...head, weakensActive: { error: errorCodeOf(error, "COMPILED_POLICY_UNREADABLE") } };
+  }
   const diff = (spec.diff ?? null) as Parameters<typeof renderPlanDiffMarkdown>[0];
   const written = buildOf(spec)?.memoryPolicy;
   const memoryPolicy = written === undefined ? { parses: false, sameBytes: false, reason: "MEMORY_POLICY_NOT_BUILT" }
@@ -361,8 +438,9 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const context = buildOf(spec)?.context;
   const probeLink = context === undefined ? undefined : [...ctx.state.chain].reverse().find((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === PROBE_PURPOSE
     && link.body.contextPluginSha256 === context.sha256 && link.body.contextPluginFileSha256 === context.fileSha256);
-  const probe = probeLink === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
+  const probe = probeLink === undefined || context === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
     : { status: "recorded", receiptEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
+      snapshotEventId: probeLink.body.snapshotEventId, frame: recheckFrame(ctx, probeLink.body, context.fileSha256),
       compiledPolicyDigest: probeLink.body.compiledPolicyDigest, downgrades: probeLink.body.downgrades, modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated",
       limitation: PROBE_LIMITATION };
   const promptPack = promptPackStatus(ctx.workspace, project.agent_id);

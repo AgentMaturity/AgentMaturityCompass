@@ -75,7 +75,7 @@ export interface ActivationResult {
   recordPath: string | null;
 }
 
-interface PlannedConfig {
+export interface PlannedConfig {
   config: SignedConfigName;
   path: string;
   bytes: string | null;
@@ -281,9 +281,10 @@ const firewallFragmentSchema = z.object({ mode: z.enum(["observe", "warn", "bloc
 /**
  * Parses every fragment with the schema its signing command uses, compares it with the current
  * verified config (or the runtime default when none is written) and returns the writes.
- * Nothing is written here.
+ * Nothing is written here (each `write` runs only when a caller invokes it), and no signature is
+ * read from the profile: A4's Adapt lists the widenings of an unsigned, in-memory profile with it.
  */
-function planActivation(workspace: string, profile: OperatingProfile, agentId: string): { planned: PlannedConfig[]; widenings: string[] } {
+export function planActivation(workspace: string, profile: OperatingProfile, agentId: string): { planned: PlannedConfig[]; widenings: string[] } {
   const fragments = profile.proposedSignedConfigs;
   const approval = approvalPolicySchema.parse(fragments.approvalPolicy);
   const tools = toolsConfigSchema.parse(fragments.tools);

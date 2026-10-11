@@ -1,20 +1,21 @@
 /**
  * Adapt's permissions (P1-61 slice B; design §10.3 Understand, Explain and Review): the station operating profile
- * (buildOperatingProfile through emitOperatingProfile) for the primary station, written to A4's own proposal file
- * `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` (never the operator's own profile at the default
- * path; the bytes are a pure function of the station, the agent and the project's creation time, so re-running
- * Understand rewrites the same bytes), signed as `domain apply --sign-profile` signs it, and dry-run through
- * `activateOperatingProfile({ dryRun: true })`, which lists every change that would weaken the current verified configs
- * and writes nothing. A widening is refused (`scope_changed`, POLICY_WIDENING_REFUSED) unless a project owner's answer
- * accepts exactly that list (its digest), and A4 never activates a profile with `allowWidening`: activation stays the
- * owner's `amc domain apply --activate-profile` after review. Per-agent gatePolicy.json and lease caps are not proposed here.
+ * (buildOperatingProfile) for the primary station, built in memory and compared with the current verified configs by
+ * planActivation, the comparison activateOperatingProfile runs. Nothing is written and nothing is signed: the auditor
+ * signature activateOperatingProfile treats as proof of review stays the owner's `amc domain apply --sign-profile` on a
+ * profile they emitted and reviewed. The bytes compared are a pure function of the station, the agent and the project's
+ * creation time. A widening is refused (`scope_changed`, POLICY_WIDENING_REFUSED) unless a project owner's answer accepts
+ * exactly that list (its digest), and A4 never activates a profile: activation stays the owner's
+ * `amc domain apply --activate-profile` after review. Not built yet (follow-up KEY:A4_PROFILE_EFFECT): the effect
+ * a4.adapt.activate_profile, the per-agent gatePolicy.json and lease-cap proposal, and the prompt-pack build.
  */
-import { readdirSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
-import { activateOperatingProfile } from "../domains/operatingProfiles/operatingProfileActivation.js";
-import { emitOperatingProfile, OPERATING_PROFILE_DIR } from "../domains/operatingProfiles/operatingProfileEmit.js";
-import { signOperatingProfile } from "../domains/operatingProfiles/operatingProfileSignature.js";
+import { closeSync, constants, lstatSync, openSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { planActivation } from "../domains/operatingProfiles/operatingProfileActivation.js";
+import { buildOperatingProfile } from "../domains/operatingProfiles/operatingProfileBuilder.js";
+import { OPERATING_PROFILE_DIR } from "../domains/operatingProfiles/operatingProfileEmit.js";
 import { isStation, type Station } from "../domains/stations.js";
+import { boundedRead } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ReadinessItem, A4ReadinessState } from "./a4Readiness.js";
@@ -25,13 +26,16 @@ import { adaptSpecOf, factAnswer, factList, factTerm, understandingOf } from "./
 import { textValue } from "./spec/aspire.js";
 
 const MAX_WIDENINGS = 64;
+const MAX_PROFILE_BYTES = 4 * 1024 * 1024;
 const PROFILE_FILE = /^a4-[a-z]+\.operating-profile\.json$/;
 const ACTIVATION_FILE = /\.activation\.json$/;
+/** The follow-up that applies a profile through an A4 effect gate (design §6.1 a4.adapt.activate_profile). */
+export const PROFILE_EFFECT_KEY = "A4_PROFILE_EFFECT";
 
-/** What Understand records about the profile's dry run; `error` is a code, never a path or a message. */
+/** What Understand records about the profile comparison; `error` is a code, never a path or a message. */
 export interface AdaptPermissionsFacts {
   readonly station: string | null;
-  readonly profilePath: string | null;
+  /** sha256 of the profile bytes compared (as `domain apply --profile-out` would write them with the same generatedAt). */
   readonly profileSha256: string | null;
   readonly riskTier: string | null;
   readonly widenings: readonly string[];
@@ -52,48 +56,68 @@ const agentDir = (workspace: string, agentId: string): string => join(workspace,
 /** Errors of the profile functions carry messages only (paths, digests): a code is derived, the message never recorded. */
 function profileCode(error: unknown): string {
   const text = error instanceof Error ? error.message : String(error);
-  return /agent mode/.test(text) ? "AGENT_MODE" : /vault|passphrase|locked/i.test(text) ? "VAULT_LOCKED" : /does not verify/.test(text) ? "CONFIG_UNTRUSTED"
-    : /inconsistent/.test(text) ? "PROFILE_INCONSISTENT" : errorCodeOf(error, "PROFILE_DRY_RUN_FAILED");
+  return /does not verify/.test(text) ? "CONFIG_UNTRUSTED" : /inconsistent/.test(text) ? "PROFILE_INCONSISTENT" : errorCodeOf(error, "PROFILE_DRY_RUN_FAILED");
 }
 
 /**
- * Understand's dry run (writes the proposal file and its signature, nothing under `.amc/`): the widenings the current
- * verified configs would take from the profile, and the configs it would write. A step that cannot run is a code.
+ * Understand's comparison (read-only: no file, no signature): the widenings the current verified configs would take
+ * from the station's profile, and the configs activation would write. A step that cannot run is a code.
  */
 export function permissionsDryRun(input: { workspace: string; agentId: string; station: Station | null; generatedAt: string }): AdaptPermissionsFacts {
-  const none = { profilePath: null, profileSha256: null, riskTier: null, widenings: [], wideningsSha256: null, configs: [] };
+  const none = { profileSha256: null, riskTier: null, widenings: [], wideningsSha256: null, configs: [] };
   if (input.station === null) return { station: null, ...none, error: "PROFILE_STATION_UNKNOWN" };
-  const path = join(agentDir(input.workspace, input.agentId), `a4-${input.station}.operating-profile.json`);
   try {
-    const emitted = emitOperatingProfile({ workspacePath: input.workspace, station: input.station, agentId: input.agentId, outputPath: path, generatedAt: input.generatedAt });
-    if (!emitted.consistency.ok) return { station: input.station, ...none, error: "PROFILE_INCONSISTENT" };
-    signOperatingProfile(input.workspace, path);
-    const dry = activateOperatingProfile({ workspacePath: input.workspace, profilePath: path, agentId: input.agentId, dryRun: true, allowWidening: true });
-    const widenings = dry.widenings.slice(0, MAX_WIDENINGS).map((entry) => entry.slice(0, 300));
-    return { station: input.station, profilePath: relative(input.workspace, path).split(sep).join("/"), profileSha256: dry.profileSha256, riskTier: emitted.riskTier,
-      widenings, wideningsSha256: sha256Hex(canonicalize(dry.widenings)), configs: dry.configs.map((entry) => ({ config: entry.config, sha256: entry.sha256 })), error: null };
+    const profile = buildOperatingProfile({ station: input.station, agentId: input.agentId, generatedAt: input.generatedAt });
+    if (!profile.consistency.ok) return { station: input.station, ...none, error: "PROFILE_INCONSISTENT" };
+    const { planned, widenings: found } = planActivation(input.workspace, profile, input.agentId);
+    const widenings = found.slice(0, MAX_WIDENINGS).map((entry) => entry.slice(0, 300));
+    return { station: input.station, profileSha256: sha256Hex(`${JSON.stringify(profile, null, 2)}\n`), riskTier: profile.riskTier, widenings,
+      wideningsSha256: sha256Hex(canonicalize(found)),
+      configs: planned.map((entry) => ({ config: entry.config, sha256: entry.bytes === null ? null : sha256Hex(Buffer.from(entry.bytes, "utf8")) })), error: null };
   } catch (error) {
     return { station: input.station, ...none, error: profileCode(error) };
   }
 }
 
-/** sha256 over the named files of the agent's operating-profile directory (name and bytes), null when there are none. */
+/** A regular file (never a link, a FIFO or a device), read once through one descriptor, bounded. */
+function regularFileBytes(path: string): Buffer {
+  if (!lstatSync(path).isFile()) throw Object.assign(new Error("not a regular file"), { code: "NOT_REGULAR_FILE" });
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    return boundedRead(fd, MAX_PROFILE_BYTES);
+  } finally {
+    closeSync(fd);
+  }
+}
+
+/**
+ * sha256 over the named files of the agent's operating-profile directory (name and bytes), null when there are none. The
+ * directory sits outside `.amc/` and is writable by the agent, so the directory and its parent must be real directories
+ * (lstat) and each named entry a regular file, opened without following a link and size-capped; anything else is
+ * 409 RESOURCE_UNREADABLE, never a hang or a read outside.
+ */
 function dirDigest(workspace: string, agentId: string, pattern: RegExp, slot: string): string | null {
+  const unreadable = (error: unknown): A4StoreError => new A4StoreError(409, "RESOURCE_UNREADABLE",
+    `${slot} (the agent's operating profiles) could not be read (${(error as NodeJS.ErrnoException).code ?? "unknown error"})`);
+  const dir = agentDir(workspace, agentId);
   let names: string[];
   try {
-    names = readdirSync(agentDir(workspace, agentId)).filter((name) => pattern.test(name)).sort();
+    for (const path of [join(workspace, OPERATING_PROFILE_DIR), dir]) {
+      if (!lstatSync(path).isDirectory()) throw Object.assign(new Error("not a directory"), { code: "NOT_A_DIRECTORY" });
+    }
+    names = readdirSync(dir).filter((name) => pattern.test(name)).sort();
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw new A4StoreError(409, "RESOURCE_UNREADABLE", `${slot} (the agent's operating profiles) could not be read (${(error as NodeJS.ErrnoException).code ?? "unknown error"})`);
+    throw unreadable(error);
   }
   if (names.length === 0) return null;
   try {
-    return sha256Hex(canonicalize(names.map((name) => [name, sha256Hex(readFileSync(join(agentDir(workspace, agentId), name)))])));
+    return sha256Hex(canonicalize(names.map((name) => [name, sha256Hex(regularFileBytes(join(dir, name)))])));
   } catch (error) {
-    throw new A4StoreError(409, "RESOURCE_UNREADABLE", `${slot} (the agent's operating profiles) could not be read (${(error as NodeJS.ErrnoException).code ?? "unknown error"})`);
+    throw unreadable(error);
   }
 }
-/** `operatingProfile.sha256`: A4's proposal files for the agent. */
+/** `operatingProfile.sha256`: the agent's `a4-<station>` profile files (the ones an owner emits for A4's station and signs). */
 export const operatingProfileSha256 = (workspace: string, agentId: string): string | null =>
   dirDigest(workspace, agentId, PROFILE_FILE, "operatingProfile.sha256");
 /** `operatingProfile.activationSha256`: every activation record of the agent (any activation, in A4 or from the CLI, moves it). */
@@ -131,16 +155,18 @@ export function permissionItems(state: A4ReadinessState): A4ReadinessItem[] {
   if (facts.error !== null || facts.wideningsSha256 === null) {
     return [item("NOT_EVALUATED", { kind: facts.error === "PROFILE_STATION_UNKNOWN" ? "not_evaluated" : "source_unavailable", reasonCodes: [facts.error ?? "PROFILE_NOT_EVALUATED"],
       nextAction: { label: facts.error === "PROFILE_STATION_UNKNOWN" ? "Answer the primary station (or carry a station from Aspire) to compare the station's operating profile with your signed configs"
-        : "The operating profile's dry run could not run; Understand again once the cause is fixed (owner mode, an unlocked vault, configs that verify)" } })];
+        : "The operating profile could not be compared with your signed configs; Understand again once the cause is fixed (configs that verify)" } })];
   }
   const station = `STATION:${facts.station ?? "unknown"}`;
-  if (facts.widenings.length === 0) return [item("READY", { reasonCodes: ["NO_WIDENING", station] })];
+  if (facts.widenings.length === 0) return [item("READY", { reasonCodes: ["NO_WIDENING", station, `KEY:${PROFILE_EFFECT_KEY}`] })];
   const accepted = acceptedBy(state, answers, facts.wideningsSha256);
   const named = facts.widenings.slice(0, 8).map((entry) => `WIDENING:${entry.split(":")[0] ?? "config"}`);
   if (accepted !== null) {
-    return [item("READY", { kind: "scope_changed", reasonCodes: ["POLICY_WIDENING_ACCEPTED", `ACCEPTED_BY:${accepted}`, `WIDENINGS:${facts.widenings.length}`, station, ...named],
-      nextAction: { label: "An owner accepted these widenings in the revision. A4 never activates a widening profile: activation stays the owner's command after review",
-        command: `amc domain apply --agent ${state.project.agent_id} --activate-profile ${facts.profilePath ?? "<profile>"} --allow-widening` } })];
+    return [item("READY", { kind: "scope_changed", reasonCodes: ["POLICY_WIDENING_ACCEPTED", `ACCEPTED_BY:${accepted}`, `WIDENINGS:${facts.widenings.length}`, station, ...named,
+      `KEY:${PROFILE_EFFECT_KEY}`],
+      nextAction: { label: "An owner accepted these widenings in the revision. A4 writes, signs and activates no profile: an owner emits the station's profile, "
+        + "reviews it, signs it (amc domain apply --sign-profile) and activates it",
+        command: `amc domain apply --agent ${state.project.agent_id} --activate-profile <the profile you reviewed and signed> --allow-widening` } })];
   }
   return [item("BLOCKED", { kind: "scope_changed", reasonCodes: ["POLICY_WIDENING_REFUSED", `WIDENINGS:${facts.widenings.length}`,
     `WIDENINGS_SHA:${facts.wideningsSha256.slice(0, 16)}`, station, ...named],
