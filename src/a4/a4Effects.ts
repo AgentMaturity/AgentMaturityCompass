@@ -210,7 +210,8 @@ function sweepGateAttempts(store: A4Store, projectId: string, gateId: string, ef
  * the gate the effect `completes`, named under its own stage: `complete` runs whatever effect is opened on the gate, so
  * any other effect would stand in for the stage's own (409 A4_STEP_ORDER). Lost attempts of the effect on the gate are
  * settled first (process_lost), so a crashed executor never holds the re-open path shut; the head the client saw moves
- * by exactly those rows.
+ * by exactly those rows. Who may open and the documentary gate's quorum are checked on the rows read before the engine
+ * request is written (openRequest signs and files it), and again inside the transaction.
  * ponytail: the engine request is written before the project lock (files and a signature); one whose transition then
  * fails stays PENDING until it expires and is never consumed.
  */
@@ -227,6 +228,7 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
     throw fail(409, "A4_STEP_ORDER", `effect ${def.id} is not opened on the ${gate0.stage} ${gate0.gate} gate`);
   }
   if (def.consumes === "gate") throw fail(409, "A4_STEP_ORDER", `effect ${def.id} runs on the documentary gate's quorum; complete runs it`);
+  assertEffectOpenable(store, state0, principal, input, gate0, def, now);
   const regulated0 = isRegulated(state0, signedA4Floor(store.workspace));
   assertReopenable(store, state0, gate0, def, regulated0);
   const intentPayload = effectIntent(def, state0, gate0);
@@ -241,16 +243,26 @@ export function openEffectGate(store: A4Store, projectId: string, input: A4Call 
   return governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept }, (_ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
-    const { readiness, query } = evaluateFor(store, state, principal, input, row.stage, now);
-    assertAllowed(readiness, "openEffect");
-    const gate = gateStatus(state, row, query.policy, now);
-    const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
-    if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
-    if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
+    const { readiness, query } = assertEffectOpenable(store, state, principal, input, row, def, now);
     assertReopenable(store, state, row, def, isRegulated(state, query.floor));
     return { readiness, specs: { kind: "EFFECT_GATE_OPENED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, effect: def.id, approvalRequestId, requestDigestSha256, intentHash: sha256Hex(canonicalize(intentPayload)) } } };
   });
+}
+
+/**
+ * openEffect's own refusals on `state`: the role class and the global blockers (readiness `allowed.openEffect`), then the
+ * documentary gate's quorum, or a consumed gate whose executor consumes its own grant and whose stage was not redone.
+ */
+function assertEffectOpenable(store: A4Store, state: A4ReadinessState, principal: A4Principal, input: A4Call, row: A4GateRow, def: A4EffectDef,
+  now: number): ReturnType<typeof evaluateFor> {
+  const evaluated = evaluateFor(store, state, principal, input, row.stage, now);
+  assertAllowed(evaluated.readiness, "openEffect");
+  const gate = gateStatus(state, row, evaluated.query.policy, now);
+  const consumedForExecutor = gate.status === "CONSUMED" && def.consumes === "executor";
+  if (gate.status !== "QUORUM_MET" && !consumedForExecutor) throw fail(409, "A4_NOT_READY", `the documentary gate is ${gate.status}`, { reasonCodes: ["GATE_PENDING"] });
+  if (consumedForExecutor) assertNotRedone(state, row.stage, failuresOf(state.chain, row.gate_id, def.id).at(-1));
+  return evaluated;
 }
 
 /** An engine decision's userId as a principal with its plane: users.yaml or a live host session, exactly one, live roles. */
