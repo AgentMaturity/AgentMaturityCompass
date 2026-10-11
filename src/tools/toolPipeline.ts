@@ -222,8 +222,14 @@ export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinit
   return selectedDefinitions.get(execution);
 }
 
+/** Why a pipeline refuses every call once a record failed (P1-78): evidence that cannot be written is never skipped. */
+const lostEvidence = (error: unknown): string =>
+  `EVIDENCE_RECORDER_FAILED: a tool-evidence record failed (${error instanceof Error ? error.message : String(error)}); this pipeline refuses every later call`;
+
 export class ToolPipeline {
   private readonly gates: BoundApprovalGate[] = [];
+  /** Set by the first failed record (P1-78); from then on every call is refused before any stage runs. */
+  private recorderFailure: string | null = null;
 
   constructor(private readonly init: ToolPipelineInit) {}
 
@@ -248,6 +254,7 @@ export class ToolPipeline {
     return withWorkspaceScope(this.init.workspace, async () => {
       const visible = this.init.registry.visible(input.agentId);
       const definition = visible.get(input.name);
+      if (this.recorderFailure !== null) return this.refuseUnresolved(input, definition?.actionClass ?? null, this.recorderFailure, "authorization");
       if (this.collapses(input)) {
         // Terminates HERE, before pre-execute policy and before guards.
         //
@@ -295,11 +302,13 @@ export class ToolPipeline {
       }
       try {
         this.init.record?.(execution, outcome);
-      } catch {
+      } catch (error) {
         // The guarantee belongs HERE, not to each recorder. A recorder that
         // threw would turn an evidence problem into a tool failure, and the
-        // model would see a denial that policy never made. The gap shows in the
-        // spine as a missing row rather than as a wrong answer to the caller.
+        // model would see a denial that policy never made. This call keeps its
+        // real outcome (its effect may have happened); the failure latches, so
+        // every later call is refused before any stage runs (P1-78).
+        this.recorderFailure ??= lostEvidence(error);
         //
         // It was previously the caller's job, which made it untestable: proving
         // it required a recorder that genuinely failed, and every filesystem
@@ -323,16 +332,20 @@ export class ToolPipeline {
     });
   }
 
-  /** A visibility refusal, recorded like any other denial. A recorder that throws cannot change it (see `execute`). */
-  private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string): ToolOutcome {
-    const outcome = denialOutcome({ stage: "visibility", reason, guardLabel: null });
+  /**
+   * A refusal before the call became an execution (visibility, or a latched recorder failure), recorded like any other
+   * denial. A recorder that throws cannot change it, and latches like any failed record (see `execute`).
+   */
+  private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string,
+    stage: "visibility" | "authorization" = "visibility"): ToolOutcome {
+    const outcome = denialOutcome({ stage, reason, guardLabel: null });
     const callId = input.callId ?? randomUUID();
     try {
       this.init.record?.({ token: `tok_${randomUUID()}`, callId, rootCallId: input.rootCallId ?? callId, name: input.name, agentId: input.agentId,
         workspace: this.init.workspace, actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
         arguments: freezeToolArguments(input.arguments), parentToken: input.parentToken ?? null }, outcome);
-    } catch {
-      // The gap shows as a missing row, never as a different answer to the caller.
+    } catch (error) {
+      this.recorderFailure ??= lostEvidence(error);
     }
     return outcome;
   }
