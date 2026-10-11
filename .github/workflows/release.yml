@@ -169,7 +169,10 @@ jobs:
   release:
     needs: [desktop-assets, image]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # P0-34: the only job that publishes. Its secrets live in the protected `release` environment (P0-38).
+    environment: release
+    # Covers npm test, the build and the full release gate that npm publish re-runs in prepack (measured in qualification/2026-10-11-P0-34).
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v6
         with:
@@ -201,6 +204,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Version, one CHANGELOG heading, release notes, no pending changesets.
+      - name: Check the release candidate
+        run: node scripts/check-release-candidate.mjs
+
       - name: Test
         run: npm test
 
@@ -212,6 +219,9 @@ jobs:
 
       - name: Prepack release guardrails
         run: npm run release:prepack-check
+
+      - name: Check package contents and secret-scan the packed tarball
+        run: node scripts/check-pack-contents.mjs
 
       - name: Validate tag version matches package.json
         run: |
@@ -274,24 +284,28 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           echo "digest=$INDEX" >> "$GITHUB_OUTPUT"
 
-      - name: Build signed release bundle when signing is configured
+      # A release tag never ships unsigned, and the bundle is verified only against the release key P0-37 commits,
+      # never against a key the bundle or the signing secret carries.
+      - name: Build and verify the signed release bundle
         env:
           AMC_RELEASE_SIGNING_KEY: ${{ secrets.AMC_RELEASE_SIGNING_KEY }}
           AMC_DOCKER_IMAGE: ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
           AMC_DOCKER_DIGEST: ${{ steps.docker.outputs.digest }}
           AMC_DOCKER_PLATFORMS: linux/amd64,linux/arm64
         run: |
+          set -euo pipefail
           mkdir -p dist
           VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
           if [ -z "$AMC_RELEASE_SIGNING_KEY" ]; then
-            echo "Signed AMC release bundle not produced: AMC_RELEASE_SIGNING_KEY is not configured." | tee dist/release-verify.txt
-            exit 0
+            echo "::error::AMC_RELEASE_SIGNING_KEY is not set in the release environment (P0-38). A release is never published unsigned."
+            exit 1
+          fi
+          if [ ! -f trust/amc-release-signing.pub ]; then
+            echo "::error::trust/amc-release-signing.pub is missing (P0-37 commits the release public key). The bundle cannot be verified against a pinned key."
+            exit 1
           fi
           node dist/cli.js release pack --out "dist/amc-${VERSION}.amcrelease"
-          # P0-09: release verify admits only a pinned release key. Until P0-37/P0-38 publish its fingerprint, the
-          # job pins the public half of the signing secret it holds, never the key the bundle carries.
-          node -e 'const c=require("node:crypto");process.stdout.write(c.createPublicKey(Buffer.from(process.env.AMC_RELEASE_SIGNING_KEY.trim(),"base64").toString("utf8")).export({format:"pem",type:"spki"}))' > "$RUNNER_TEMP/release-signing.pub"
-          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" --pubkey "$RUNNER_TEMP/release-signing.pub" | tee dist/release-verify.txt
+          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" --pubkey trust/amc-release-signing.pub | tee dist/release-verify.txt
           tar -xzf "dist/amc-${VERSION}.amcrelease" -C dist
           cp dist/amc-release/artifacts/sbom/sbom.cdx.json dist/sbom.cdx.json
           cp dist/amc-release/artifacts/licenses/licenses.json dist/licenses.json
@@ -305,34 +319,46 @@ jobs:
           cp dist/sea/amc "dist/release-binaries/amc-linux-x64-sea-${VERSION}"
           cp dist/sea/manifest.json "dist/release-binaries/amc-linux-x64-sea-${VERSION}.manifest.json"
 
-      - name: Publish npm package when registry credentials are configured
+      # Trusted publishing needs npm 11.5.1 or later; pin the exact CLI the publish step logs.
+      - name: Pin the npm CLI
+        run: |
+          npm install -g npm@11.10.1
+          npm --version
+
+      # P0-38 chooses trusted publishing (no token; id-token: write is granted above) or a granular NPM_TOKEN in the
+      # release environment. Without either, npm publish fails and so does the job: nothing is skipped silently.
+      - name: Publish the npm package
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
+          set -euo pipefail
+          echo "npm $(npm --version)"
           PACKAGE_NAME=$(node -e 'process.stdout.write(require("./package.json").name)')
           VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
           if npm view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
-            echo "${PACKAGE_NAME}@${VERSION} already exists on npm; skipping duplicate publish."
+            echo "${PACKAGE_NAME}@${VERSION} is already on npm; not publishing it again."
             exit 0
           fi
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::notice::Skipping npm publish because NPM_TOKEN is not configured. GitHub release assets remain available."
-            exit 0
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "Publishing with the NPM_TOKEN of the release environment."
+            export NODE_AUTH_TOKEN="$NPM_TOKEN"
+          else
+            echo "No NPM_TOKEN: publishing through npm trusted publishing (OIDC)."
+            unset NODE_AUTH_TOKEN
           fi
           npm publish --provenance --access public
 
       - name: Build release notes
         run: |
+          set -euo pipefail
           VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
+          NOTES="docs/releases/${VERSION}.md"
+          [ -f "$NOTES" ] || { echo "::error::$NOTES is missing; run npm run release:prepare -- ${VERSION}"; exit 1; }
           {
-            echo "# AMC ${VERSION}"
+            cat "$NOTES"
             echo
-            echo "## Verified public downloads"
-            echo
-            echo "macOS, Linux, and Windows archives plus the npm-format tarball are attached with SHA256SUMS and amc-release-manifest.json."
-            echo
-            echo "## Signed bundle status"
+            echo "## Signed bundle verification"
             echo
             echo '```text'
             cat dist/release-verify.txt
@@ -365,7 +391,7 @@ jobs:
         with:
           tag_name: ${{ env.AMC_RELEASE_TAG }}
           body_path: dist/release-notes.md
-          fail_on_unmatched_files: false
+          fail_on_unmatched_files: true
           files: |
             dist/release-assets/*
             dist/*.amcrelease

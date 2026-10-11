@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Release engineering (P0-34): `release.yml` is the only workflow that publishes, and its `release` job runs in the protected `release` environment. It fails instead of skipping when the signing key, the committed release public key (`trust/amc-release-signing.pub`) or an npm credential is missing; it publishes through npm trusted publishing or an environment `NPM_TOKEN`, verifies the signed bundle only with `--pubkey trust/amc-release-signing.pub`, checks the candidate and the package contents before publishing, and uses `docs/releases/<version>.md` as the release body. `npm-publish.yml` only opens version PRs. `pnpm release` no longer publishes from a shell. New commands: `npm run release:prepare -- <version>` (version, notes, CHANGELOG and dry runs, never publishing), `npm run release:notes`, `npm run check:release-candidate` and `npm run check:pack-contents`. The packed-install check now also verifies that the A4 preview gate is closed in the installed package.

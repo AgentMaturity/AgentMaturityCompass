@@ -294,7 +294,8 @@ describe("truthful public distribution and brand contract", () => {
     expect(workflow).toContain("tag_name: ${{ env.AMC_RELEASE_TAG }}");
     expect(workflow).not.toContain("ghcr.io/${{ github.repository_owner }}/amc-studio");
     expect(workflow).toContain("secrets.NPM_TOKEN");
-    expect(workflow).toMatch(/if \[ -z "\$NODE_AUTH_TOKEN" \]/);
+    // P0-34: a missing credential fails the publish; tests/releaseWorkflowContract.test.ts owns that contract.
+    expect(workflow).not.toContain("Skipping npm publish");
   });
 
   test("keeps every pending changeset on the canonical package name", () => {
