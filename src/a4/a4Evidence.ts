@@ -54,8 +54,8 @@ const LANE_RANK: Record<A4Lane, number> = { recommendation: 0, implementation: 0
 const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
 const FILE_REF_KINDS = new Set(["stage_output", "artifact", "package", "deployment_receipt", "rollback_receipt", "value_claim",
   "outcome_report", "monitor", "manifest", "plan", "control_result", "verification"]);
-/** The artifact kind a file ref's signature must carry. Kinds without one yet accept any workspace artifact kind (P1-62 adds theirs). */
-const ARTIFACT_KIND_BY_REF: Readonly<Record<string, "a4-stage-output" | undefined>> = { stage_output: "a4-stage-output" };
+/** The artifact kind a file ref's signature must carry. Kinds without one yet accept any workspace artifact kind. */
+const ARTIFACT_KIND_BY_REF: Readonly<Record<string, "a4-stage-output" | "a4-package" | undefined>> = { stage_output: "a4-stage-output", package: "a4-package" };
 
 type Status = A4ResolvedRef["status"];
 

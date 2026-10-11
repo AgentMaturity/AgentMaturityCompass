@@ -39,6 +39,7 @@ import {
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
+import { revokeStagingAfterDeny } from "./a4Package.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 
@@ -486,6 +487,7 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     }
     const { body, request } = await readJson(route, decideSchema);
     const verdict = decision[2] as "approve" | "deny";
+    let revoked: Record<string, unknown> = {};
     return respond(route, projectId, request, () => {
       const result = recordDecision(store, projectId, { ...callOf(route, request), gateId, decision: verdict, reason: body.reason,
         expectedRequestDigestSha256: body.expectedRequestDigestSha256, expectedGateSeq: body.expectedGateSeq,
@@ -493,8 +495,10 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
       const head = store.readHead(projectId);
       if (!result.replay && head) auditA4(route.workspace, { type: "A4_GATE_DECIDED", agentId: head.agent_id, projectId, username: requirePrincipal(route).username,
         summary: `A4 gate ${verdict === "approve" ? "approved" : "denied"} on ${head.name}`, details: { gateId, decision: verdict, seq: result.seq } });
+      // A DENY recorded on an unconsumed Activate completion gate revokes the release's staging lease (design §6.4 step 7).
+      if (!result.replay && verdict === "deny") revoked = revokeStagingAfterDeny(store, projectId, gateId);
       return result;
-    }, 201);
+    }, 201, () => revoked);
   }
   const complete = /^\/stages\/([a-z]+)\/complete$/.exec(tail);
   if (complete !== null) {
