@@ -92,6 +92,11 @@ export interface A4LiveFacts {
   readonly unrecordedResolutions: readonly string[] | null;
   /** The engine status of the effect gates' requests and the open executions' resolution requests, by request id (read at Assemble only); null when unread. */
   readonly engineRequests: Readonly<Record<string, string>> | null;
+  /**
+   * Adapt only: the newest Adapt revision's signed control results checked again now (a4Conformance.controlResultsNow);
+   * null when Review recorded none, absent when not read (the item then says not re-checked, never verified).
+   */
+  readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -479,13 +484,15 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
  * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, at
  * Assemble, which signs the workspace presets file and starts native build sessions, and at Adapt, which signs the
- * compiled plan (CONTROL_PLAN) and re-signs the agent's Enforce manifest.
+ * compiled plan (CONTROL_PLAN) and re-signs the agent's Enforce manifest; so does Review at Adapt, which signs the
+ * control results with the workspace auditor key (CONTROL_RESULT).
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble" || stage === "adapt"));
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble" || stage === "adapt"))
+    || (action === "review" && stage === "adapt");
   const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
