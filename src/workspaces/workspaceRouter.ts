@@ -36,7 +36,7 @@ import {
 } from "../auth/authApi.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { initWorkspace } from "../workspace.js";
@@ -659,15 +659,15 @@ function verifyWorkspaceLeaseToken(
 ): { ok: boolean; error?: string; status: number } {
   try {
     return manager.withWorkspace(workspaceId, (context) => {
-      const revocationSig = verifyLeaseRevocationsSignature(context.workspaceDir);
-      if (!revocationSig.valid) {
+      const revocations = readRevokedLeaseIds(context.workspaceDir);
+      if (!revocations.ok) {
         return {
           ok: false,
-          error: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`,
+          error: `lease revocation signature invalid: ${revocations.reason}`,
           status: 401
         };
       }
-      const revokedLeaseIds = new Set(loadLeaseRevocations(context.workspaceDir).revocations.map((row) => row.leaseId));
+      const revokedLeaseIds = revocations.ids;
       const verification = verifyLeaseToken({
         workspace: context.workspaceDir,
         token: leaseToken,

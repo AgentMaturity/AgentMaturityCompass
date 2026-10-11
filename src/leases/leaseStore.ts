@@ -170,6 +170,18 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
 }
 
 /**
+ * The revoked lease ids from ONE read of the list, verified and parsed from those same bytes, or why that failed.
+ * Every consumer decides on this set: a list swapped on disk after the check is never read.
+ */
+export function readRevokedLeaseIds(workspace: string): { ok: true; ids: Set<string> } | { ok: false; reason: string } {
+  try {
+    return { ok: true, ids: new Set(readVerifiedRevocations(workspace).revocations.map((row) => row.leaseId)) };
+  } catch (error) {
+    return { ok: false, reason: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/**
  * The revoked lease ids, from a store whose signature verifies.
  *
  * Throws when it does not. This used to answer an unverifiable store with an
@@ -179,13 +191,7 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
  * and every caller then refuses every lease until the store is repaired.
  */
 export function revokedLeaseIdSet(workspace: string): Set<string> {
-  let revocations: LeaseRevocations;
-  try {
-    revocations = readVerifiedRevocations(workspace);
-  } catch (error) {
-    throw new Error(
-      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`
-    );
-  }
-  return new Set(revocations.revocations.map((row) => row.leaseId));
+  const read = readRevokedLeaseIds(workspace);
+  if (!read.ok) throw new Error(`lease revocation store unverifiable (${read.reason}); refusing to treat it as empty`);
+  return read.ids;
 }

@@ -1,5 +1,5 @@
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { NdjsonFramer } from "./ndjsonFraming.js";
 import { parseWireObject } from "./wireJson.js";
@@ -198,11 +198,6 @@ function reply(id: WireId, error: { code: WireErrorCode; message: string }): Buf
  * (../leases/leaseStore.ts) fails closed the same way: it throws.
  */
 function revokedLeaseIds(workspace: string): Set<string> | null {
-  const signature = verifyLeaseRevocationsSignature(workspace);
-  if (!signature.valid) return null;
-  try {
-    return new Set(loadLeaseRevocations(workspace).revocations.map((row) => row.leaseId));
-  } catch {
-    return null;
-  }
+  const read = readRevokedLeaseIds(workspace);
+  return read.ok ? read.ids : null;
 }

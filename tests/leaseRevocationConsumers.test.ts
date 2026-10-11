@@ -8,6 +8,7 @@ import { verifyBridgeLease } from "../src/bridge/bridgeAuth.js";
 import { initGatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import { leaseRevocationPaths, revokeLease } from "../src/leases/leaseStore.js";
@@ -26,6 +27,19 @@ import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
 // unrevoked lease on a valid list and refuses EVERY lease once the list cannot be verified: a revoked id removed
 // beside the old signature, or the list deleted with its signature kept.
 const ADMIN = "lease-consumers-fixture-admin";
+
+// A one-shot hook that runs right after the revocation list's signature verifies, to swap the file on disk
+// between that check and any later use of the list.
+const afterVerify = vi.hoisted(() => ({ next: null as null | { digest: string; run: () => void } }));
+vi.mock("../src/crypto/keys.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/crypto/keys.js")>();
+  return { ...actual, verifyHexDigestAny: (digest: string, signature: string, keys: string[]) => {
+    const valid = actual.verifyHexDigestAny(digest, signature, keys);
+    const hook = afterVerify.next;
+    if (valid && hook?.digest === digest) { afterVerify.next = null; hook.run(); }
+    return valid;
+  } };
+});
 const roots: string[] = [];
 const closers: Array<() => Promise<void>> = [];
 afterEach(async () => {
@@ -179,5 +193,23 @@ describe("AMC-1542 every revocation consumer refuses an unverifiable list", () =
 
     writeFileSync(paths.file, signedList);
     expect(await admits(live), "restored signed list").toBe(true);
+  }, 60_000);
+});
+
+describe("AMC-1542 a list swapped after its signature check is never used", () => {
+  it.each(consumers)("$name decides on the verified bytes only (P0-30)", async (consumer) => {
+    const { workspace, workspaceId, admits } = await consumer.setup();
+    const revoked = issue(workspace, consumer.scopes, consumer.routes, workspaceId);
+    revokeLease(workspace, leaseId(revoked), "consumer fixture revocation");
+    const paths = leaseRevocationPaths(workspace);
+    const signedList = readFileSync(paths.file);
+    const body = JSON.parse(signedList.toString("utf8"));
+    let swaps = 0;
+    afterVerify.next = { digest: sha256Hex(signedList), run: () => {
+      writeFileSync(paths.file, JSON.stringify({ ...body, revocations: [] }, null, 2));
+      swaps += 1;
+    } };
+    expect(await admits(revoked), "revoked lease after the list was emptied between check and use").toBe(false);
+    expect(swaps, "the swap ran between the signature check and the decision").toBe(1);
   }, 60_000);
 });
