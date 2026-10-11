@@ -7,13 +7,17 @@
  * loads only the instructions file and the time plugin, and nothing loads this plugin into it or into a deployed agent,
  * so `context.native_delivery` stays not_evaluated naming P2-37. The probe is one bounded in-process turn on the stub
  * provider (no network, no credential) that A4 composes and writes nothing into: its ref is the session's own signed
- * `session/open` row, recorded self_reported because A4 ran the turn (never observed). The probe writes no
+ * `session/open` row, recorded synthetic_example because A4 ran the turn on the stub provider (never observed). The
+ * runtime stamps that session's rows OBSERVED like any native run, so the session is named `a4probe-<uuid>` and the A4
+ * store records any ref to one of its rows synthetic_example, whoever cites it (A4_PROBE_SESSION_PREFIX); outside A4,
+ * ledger scoring reads them as any `amc agent-loop run --stub` turn's rows. The probe writes no
  * effective-policy receipt: the runtime writes one only before a governed tool call (agentToolset), and a tool-less turn
  * makes none, so the probe has none to cite. The frame is shown by the run's signed `user/message` row carrying the
  * plugin's exact text: the probe checks it when it runs and Review checks it again; that check is AMC's, and it is what
  * `context_reaches_runtime_frame` stands on. Delivery to a model is not evaluated on the stub provider, and a probe whose
  * turn did not end `complete` (blocked, error, cancelled, max steps) or whose row lacks the text never satisfies it.
  */
+import { randomUUID } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
@@ -25,6 +29,7 @@ import { getAgentPaths } from "../fleet/paths.js";
 import { CLOCK_REVIEW_STATUS } from "../incidents/regulatoryClocks.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
+import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
@@ -34,7 +39,7 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import type { A4ReadinessItem, A4ReadinessState } from "./a4Readiness.js";
+import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "./a4Readiness.js";
 import { a4Fail, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
@@ -42,7 +47,7 @@ import {
   ADAPT_CLAIM_BOUNDARY, CATALOG_EXPERIMENTAL_NOTICE, adaptSpecOf, buildOf, factAnswer, factList, factTerm, proposedFor, reached, type AdaptBuild
 } from "./spec/adapt.js";
 import { answerValues, listValue, textValue } from "./spec/aspire.js";
-import type { A4Answer } from "./a4Schema.js";
+import { A4_PROBE_SESSION_PREFIX, type A4Answer } from "./a4Schema.js";
 
 export const A4_CONTEXT_ORDER = 160;
 export const CONTEXT_PLUGIN_SCHEMA = "amc.a4-context-plugin/v1";
@@ -204,7 +209,7 @@ export interface ContextProbeOutcome {
   readonly turnStatus: string;
   /** The driver's terminal state (idle, failed): `idle` also follows a blocked or errored turn, so it decides nothing. */
   readonly driverStatus: string;
-  /** The session's signed `session/open` row (it names the agent): the probe's ref, self_reported. */
+  /** The session's signed `session/open` row (it names the agent): the probe's ref, synthetic_example. */
   readonly openRow: { readonly eventId: string; readonly sha256: string };
   /** The signed user/message row whose payload holds the plugin's exact text, verified now (and its event hash); null when none does. */
   readonly snapshotEventId: string | null;
@@ -255,10 +260,14 @@ export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unkn
 
 /**
  * One bounded in-process turn on the stub provider with the plugin as an extra context (never `contextPlugins`, which
- * would drop the workspace's own AGENTS.md). A4 composes the turn and writes nothing into its session: no tools, no
- * receipt of its own. A compiled plan that does not verify refuses it, as agentToolset refuses a session.
+ * would drop the workspace's own AGENTS.md), in a session named `a4probe-<uuid>` (A4_PROBE_SESSION_PREFIX). A4 composes
+ * the turn and writes nothing into its session: no tools, no receipt of its own. A compiled plan that does not verify
+ * refuses it, as agentToolset refuses a session; so does a JSONL session store (sticky per workspace), before any turn.
  */
 export async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
+  if (resolveSessionStoreBackend(input.workspace) === "jsonl") {
+    throw fail(409, "PROBE_NOT_RECORDED", "This workspace's session store is JSONL, which has no ledger row an A4 ref can name; nothing was run.", { reasonCodes: ["SESSION_STORE_JSONL"] });
+  }
   try {
     loadActiveCompiledPolicy(input.workspace);
   } catch (error) {
@@ -269,7 +278,7 @@ export async function runContextProbe(input: { workspace: string; agentId: strin
   let outcome: Awaited<ReturnType<typeof runner.runComposedTurn>>;
   try {
     outcome = await runner.runComposedTurn({
-      workspace: input.workspace, agentId: input.agentId, prompt: PROBE_PROMPT,
+      workspace: input.workspace, agentId: input.agentId, sessionId: `${A4_PROBE_SESSION_PREFIX}${randomUUID()}`, prompt: PROBE_PROMPT,
       promptProfile: { extraContextPlugins: [plugin] },
       route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: {} }, routes: [stubProviderRoute()], transport: stubProviderTransport(),
       config: { maxStepsPerTurn: 1 }, credentials: { watch: false }
@@ -292,9 +301,9 @@ const probeSchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0), c
 /**
  * POST …/stages/adapt/probe (after Build, before completion; owner, owner mode, as Build): the probe turn on the plugin
  * Build wrote, read back against the bytes Build recorded, then the session's `session/open` row recorded as a
- * self_reported ledger_event ref (A4 ran the turn: never observed) with what AMC's check of the frame row found beside
- * it. The project head is pinned: a project that moved while the turn ran is 409 A4_STALE_HEAD, and the stub session
- * stays in the ledger unreferenced (harmless).
+ * synthetic_example ledger_event ref (A4 ran the turn on the stub provider: never observed) with what AMC's check of the
+ * frame row found beside it. The project head is pinned: a project that moved while the turn ran is 409 A4_STALE_HEAD,
+ * and the stub session stays in the ledger unreferenced; any later A4 ref to its rows is synthetic_example too.
  */
 async function probe(route: A4Route, projectId: string): Promise<true> {
   const principal = requirePrincipal(route);
@@ -313,8 +322,8 @@ async function probe(route: A4Route, projectId: string): Promise<true> {
   const outcome = await runContextProbe({ workspace: route.workspace, agentId: state.project.agent_id, plugin, ledger: route.store.ledger });
   const inFrame = outcome.snapshotEventId !== null && outcome.snapshotSha256 !== null && outcome.turnStatus === "complete";
   const result = route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: outcome.openRow.eventId, sha256: outcome.openRow.sha256,
-    claimKind: "self_reported", method: null, column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request,
-    label: `adapt context probe: in-process session ${outcome.sessionId} that A4 ran on the stub provider (its session/open row; self_reported; ${PROBE_LIMITATION})`,
+    claimKind: "synthetic_example", method: "synthetic", column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request,
+    label: `adapt context probe: in-process session ${outcome.sessionId} that A4 ran on the stub provider (its session/open row; synthetic_example; ${PROBE_LIMITATION})`,
     note: { purpose: PROBE_PURPOSE, sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, snapshotEventId: outcome.snapshotEventId,
       snapshotSha256: outcome.snapshotSha256, contextPluginSha256: plugin.sha256, contextPluginFileSha256: context.fileSha256, inFrame, turnStatus: outcome.turnStatus,
       driverStatus: outcome.driverStatus, provider: STUB_PROVIDER_ID, effectivePolicyReceipt: "none: the turn made no governed tool call",
@@ -347,11 +356,13 @@ function probeOf(state: A4ReadinessState, context: NonNullable<AdaptBuild["conte
 
 /**
  * The context items (design §10.3 Readiness): `prompts_attributed`, `context_reaches_runtime_frame` (AMC's check of the
- * probe session's signed user/message row, at the probe and again at Review, behind a self_reported ref to that
+ * probe session's signed user/message row, at the probe and again at Review, behind a synthetic_example ref to that
  * session; never from a failed turn or a row without the text, and never the observed lane) and its two not-evaluated
- * deliveries. Pure: the chain, the resolved refs and the build record only.
+ * deliveries. A workspace whose session store is JSONL cannot record a probe: the frame item is NOT_EVALUATED there,
+ * and `context_probe_unavailable` waits for an owner's acknowledgement in its place (a separate item, so a probe that
+ * can run is never acknowledged away). Pure: the chain, the resolved refs, the build record and the live store kind.
  */
-export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
+export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQuery, "live">): A4ReadinessItem[] {
   const { spec, answers } = adaptSpecOf(state);
   const reviewed = (spec.review as { probe?: { refEventId?: unknown; frame?: unknown } } | undefined)?.probe;
   const build = proposedFor(spec, answers) ? buildOf(spec) : null;
@@ -373,6 +384,18 @@ export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   }
   const { link, ref } = probeOf(state, context);
   const route = `POST /api/v1/a4/projects/${state.project.project_id}/stages/adapt/probe`;
+  if (link === undefined && query.live.sessionStore === "jsonl") {
+    return [
+      item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
+        "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),
+      item("context_reaches_runtime_frame", "NOT_EVALUATED", { kind: "source_unavailable", mandatory: false, reasonCodes: ["SESSION_STORE_JSONL", "PROBE_NOT_RECORDABLE"],
+        nextAction: { label: "This workspace's session store is JSONL, so the probe cannot be recorded and the plugin's delivery to the runtime frame is not evaluated" } }),
+      item("context_probe_unavailable", "WAITING", { kind: "source_unavailable", reasonCodes: ["SESSION_STORE_JSONL"],
+        nextAction: { label: "An owner acknowledges, with a reason, that this project completes with the context plugin's delivery not evaluated (Acknowledge); "
+          + "a workspace on the SQLite session store runs the probe instead" } }),
+      ...deliveries, ...promptPackItem(spec)
+    ];
+  }
   // Review's re-check of the frame row applies to the probe it read; a probe run after it stands on its own check.
   const recheck = link !== undefined && reviewed !== undefined && reviewed.refEventId === link.body.refId ? reviewed.frame : undefined;
   const frame = link === undefined
@@ -389,13 +412,13 @@ export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
           ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: [typeof recheck === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(recheck)
             ? recheck : "FRAME_ROW_NOT_RECHECKED", `SNAPSHOT:${String(link.body.snapshotEventId)}`],
             nextAction: { label: "At Review the probe's user/message row no longer showed the plugin's text (gone, changed or unverified): probe again, then review again", route } })
-          // AMC's check of the signed user/message row (at the probe, and again at Review) behind A4's self_reported ref: never the observed lane.
+          // AMC's check of the signed user/message row (at the probe, and again at Review) behind A4's synthetic_example ref: never the observed lane.
           : item("context_reaches_runtime_frame", "READY", { reasonCodes: ["CONTEXT_IN_RUNTIME_FRAME", recheck === "resolved" ? "FRAME_ROW_RECHECKED_AT_REVIEW" : "FRAME_ROW_CHECKED_AT_PROBE",
-            `SNAPSHOT:${String(link.body.snapshotEventId)}`, "PROBE_SELF_REPORTED", "NO_EFFECTIVE_POLICY_RECEIPT", "IN_PROCESS_ONLY", `SESSION:${String(link.body.sessionId)}`],
-          evidence: [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: ref.trustTier, reasonCodes: ref.reasonCodes,
-            lane: "implementation", claimKind: "self_reported" }],
+            `SNAPSHOT:${String(link.body.snapshotEventId)}`, "PROBE_SYNTHETIC_EXAMPLE", "NO_EFFECTIVE_POLICY_RECEIPT", "IN_PROCESS_ONLY", `SESSION:${String(link.body.sessionId)}`],
+          evidence: [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: null, reasonCodes: ref.reasonCodes,
+            lane: "implementation", claimKind: "synthetic_example" }],
           nextAction: { label: `The plugin's exact text is in the session's signed user/message row ${String(link.body.snapshotEventId)} (AMC's check `
-            + `${recheck === "resolved" ? "at the probe and again at Review" : "at the probe"}). A4 ran this turn, so its ref is self_reported, and the runtime wrote no `
+            + `${recheck === "resolved" ? "at the probe and again at Review" : "at the probe"}). A4 ran this turn on the stub provider, so its ref is synthetic_example, and the runtime wrote no `
             + `effective-policy receipt (it writes one only before a governed tool call); ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
   return [
     item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,

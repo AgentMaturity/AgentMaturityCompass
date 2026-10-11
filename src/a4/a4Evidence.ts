@@ -16,7 +16,8 @@ import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignatu
 import { admitKey } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
-import { laneForClaimKind, type A4EvidenceRefRow, type A4Lane } from "./a4Schema.js";
+import type { EvidenceEvent } from "../types.js";
+import { A4_PROBE_SESSION_PREFIX, laneForClaimKind, type A4EvidenceRefRow, type A4Lane } from "./a4Schema.js";
 
 /**
  * An admitted external record (P2-24 review record, P3-21 registry record) behind a verified-lane ref. The loader
@@ -65,6 +66,18 @@ type Status = A4ResolvedRef["status"];
  * never the declared `meta.trustTier`. `found` is false only for a missing row. `integrity` memoises the O(ledger prefix)
  * chain verdict per (id, event_hash) for one caller's attempt; every other check reads the row afresh.
  */
+/**
+ * The claim A4 records for a ref to a ledger row: a row of a turn A4 composed itself (A4_PROBE_SESSION_PREFIX, Adapt's
+ * context probe on the stub provider) carries the runtime's OBSERVED tier, so it is a synthetic example with no tier,
+ * whoever cites it (A4 never fills the observed lane with a turn it ran); any other row keeps the caller's claim kind and
+ * method and its resolved tier.
+ */
+export function ledgerRefClaim(row: Pick<EvidenceEvent, "session_id">, claimKind: ClaimKind, method: string | null, tier: string | null):
+  { claimKind: ClaimKind; method: string | null; trustTier: string | null } {
+  return row.session_id.startsWith(A4_PROBE_SESSION_PREFIX) ? { claimKind: "synthetic_example", method: "synthetic", trustTier: null }
+    : { claimKind, method, trustTier: tier };
+}
+
 export function resolveLedgerEvent(ledger: Ledger, refId: string, sha256: string, reader: ReaderTrust | (() => ReaderTrust),
   reasons: string[], integrity?: Map<string, boolean>): { status: Status; tier: string | null; found: boolean } {
   const event = ledger.getEventById(refId);

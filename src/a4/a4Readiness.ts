@@ -46,7 +46,9 @@ export type A4Action = (typeof A4_ACTIONS)[number];
 export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status",
   "deployment.amc_check", "plan_unresolved",
   // Assemble (P1-60): an unsupported path or plan item stays listed; the owner records it out of scope with a reason (design §13).
-  "path_supported", "unsupported_acknowledged"];
+  "path_supported", "unsupported_acknowledged",
+  // Adapt (P1-61): only on a JSONL session store, where the context probe cannot be recorded (src/a4/adaptContextPlugin.ts).
+  "context_probe_unavailable"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
@@ -97,6 +99,8 @@ export interface A4LiveFacts {
    * null when Review recorded none, absent when not read (the item then says not re-checked, never verified).
    */
   readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
+  /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
+  readonly sessionStore?: "sqlite" | "jsonl";
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;

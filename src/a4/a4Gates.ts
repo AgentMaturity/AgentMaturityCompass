@@ -18,6 +18,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { assertOwnerMode } from "../mode/mode.js";
+import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -194,7 +195,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
- * and the signed control results Adapt's Review recorded only at Adapt.
+ * and the signed control results Adapt's Review recorded and the session store backend only at Adapt.
  */
 export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -224,7 +225,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
-    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state) } : {})
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {})
   };
 }
 

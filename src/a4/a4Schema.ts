@@ -76,6 +76,12 @@ export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
   activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals"]
 };
 
+/**
+ * The session-id prefix of the turns A4 composes itself (Adapt's context probe on the stub provider,
+ * src/a4/adaptContextPlugin.ts): a ref to one of their rows is synthetic_example (a4Evidence.ledgerRefClaim). A session
+ * another writer names so only downgrades its own refs. Not `a4-`: that namespace is the A4 store's own.
+ */
+export const A4_PROBE_SESSION_PREFIX = "a4probe-";
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 const OBSERVING_METHODS = new Set(["runtime_observation", "executed_test"]);
 
