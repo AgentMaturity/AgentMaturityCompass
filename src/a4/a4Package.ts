@@ -396,7 +396,7 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
     "- The image is pinned by tag only until D-03 and P0-14 add a digest (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03 (TOPOLOGY_UNDECIDED).",
     `- AMC's check of a destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}. Runtime behaviour at the destination is not evaluated.`,
     "- A re-snapshot into another workspace is P2-40. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
-    "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. leases.json names its id only.",
+    "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. The manifest and leases.json name its id only.",
     `- ${UPDATE_POLICY_PATH} is the signed update policy; nothing enforces it yet (P2-34).`, ""
   ].join("\n"), "utf8") });
   return { files, deploy };
@@ -531,7 +531,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
         signedConfigsSha256: sha256Hex(canonicalize(Object.fromEntries(Object.keys(CAPTURED_SLOTS).filter((slot) => slot.startsWith("signedConfigs.")).map((slot) => [slot, bound[slot] ?? null])))),
         presetSha256: hex(bound["composition.presetSha256"]), contextPluginSha256: hex(bound["context.contextPluginSha256"]),
         memoryPolicySha256: hex(bound["context.memoryPolicySha256"]), updatePolicySha256: shaOf(UPDATE_POLICY_PATH), secretScanSha256, sbomSha256, aibomSha256: null },
-      approvals: approvalsOf(state), integration, quality: quality.data,
+      approvals: approvalsOf(state), leases: [{ leaseId: stagingLease.leaseId, scope: "staging" }], integration, quality: quality.data,
       provenance: { note: "AMC provenance record (not a formal SLSA claim)", builtFrom: { enforceSnapshot: snapshotId, revisionDigest: revision.spec_digest,
         gateBindingDigest: gate.binding_digest, provenanceSha256, sbom: sbomSha256 === null ? "not generated (no lockfile in AMC's install root)"
           : "AMC runtime dependencies only; not the agent's AIBOM (P1-27/P2-18)" } },
