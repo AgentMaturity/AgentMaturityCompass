@@ -176,7 +176,7 @@ function reached(state: A4ReadinessState, step: A4Step): boolean {
 }
 
 /** The unexpired owner acknowledgement of `itemId` on the head revision, as the evaluator reads it; null when none. */
-function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number): { by: string; ts: number; reason: string; expiresTs: number } | null {
+export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number): { by: string; ts: number; reason: string; expiresTs: number } | null {
   const link = [...state.chain].reverse().find((candidate) => candidate.kind === "ACKNOWLEDGED" && candidate.body.itemId === itemId
     && candidate.revisionNo === state.project.revision_no);
   const { actorKey, ts, reason, expiresTs } = link?.body ?? {};

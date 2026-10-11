@@ -111,7 +111,8 @@ export function recordControlResults(input: { workspace: string; projectId: stri
     return { controlId: row.controlId, version: row.controlVersion, support: record.support, reviewStatus: record.review.status, planApplicability: row.applicability,
       dimensions, claimKind: stored?.claimKind ?? "self_reported", evidenceRefs: stored?.admitted.map((item) => item.ref.id) ?? [],
       notEvaluatedReason: dimensions.result !== "not_evaluated" ? null : stored === undefined ? reason ?? NOT_VERIFIED
-        : row.applicability === "unresolved" ? `unresolved: ${row.missingFacts.join(", ") || "see the plan"}` : stored.reasons[0] ?? NO_LOADER };
+        : row.applicability === "unresolved" ? `unresolved: ${row.missingFacts.join(", ") || "see the plan"}`
+          : row.applicability === "not_applicable" ? "not applicable (compiled plan)" : `${NO_LOADER} (${stored.reasons[0] ?? "no admitted records"})` };
   });
   return { planDigest: plan.digest, resultsPath: path, resultsSha256, verified: reason === null, reason, controls, counts: countsOf(controls) };
 }

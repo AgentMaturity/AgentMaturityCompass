@@ -12,6 +12,7 @@ import { activeControlPlanHead, loadActiveCompiledPolicy } from "../../catalog/c
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
+import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
@@ -21,13 +22,13 @@ import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
-import { recordControlResults } from "../a4Conformance.js";
+import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import {
   activateBoundPlan, activationExecutionId, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
 } from "../adaptPolicy.js";
 import {
-  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, adaptItems, adaptSpecOf, answerGaps,
-  buildOf, carriedValues, currentPlan, factAnswer, factList, proposedFor, proposedPlan, understandingOf
+  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, acknowledgementOf, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, adaptItems, adaptSpecOf, answerGaps,
+  buildOf, carriedValues, currentPlan, factAnswer, factList, ownerOutOfScope, proposedFor, proposedPlan, understandingOf
 } from "../spec/adapt.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
 
@@ -249,6 +250,16 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const created = ctx.state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const conformance = recordControlResults({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
     plan, catalog: loadCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
+  // As of this review: an owner's out_of_scope recorded later on the reviewed revision is read live by readiness and the cards.
+  const reviewed = ctx.state.revisions.find((row) => row.revision_no === project.revision_no);
+  const rule = gatePolicyOf(ctx.state.chain).gates["adapt.completion"];
+  const statement = conformanceStatement({ stage: "adapt", revisionDigest: reviewed?.spec_digest ?? sha256Hex(canonicalize(spec)), stored: conformance,
+    evaluatedAt: new Date(ctx.now).toISOString(), ownerOutOfScope: ownerOutOfScope(ctx.state, plan, ctx.now),
+    unsupported: plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`), missingFacts: [...(understandingOf(spec)?.facts.followUps ?? [])],
+    expertReview: { required: rule.requiredReviews.some((entry) => entry.kind === "review_record"),
+      records: ctx.state.refs.filter((ref) => ref.revisionNo === project.revision_no && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
+      acknowledgement: acknowledgementOf(ctx.state, "regulatory_sources_status", ctx.now) },
+    claimBoundary: ADAPT_CLAIM_BOUNDARY, now: ctx.now });
   let head: Record<string, unknown>;
   try {
     const active = loadActiveCompiledPolicy(ctx.workspace);
@@ -261,12 +272,12 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const diff = (spec.diff ?? null) as Parameters<typeof renderPlanDiffMarkdown>[0];
   return {
     outputs: [
-      { output: "review", label: "adapt review: control results per requirement (signed CONTROL_RESULT; counts, never a percentage)", lane: "recommendation", method: null,
-        body: { resultsPath: conformance.resultsPath, verified: conformance.verified, counts: conformance.counts, controls: conformance.controls } },
+      { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
+        lane: "recommendation", method: null, body: { statement, resultsPath: conformance.resultsPath, verified: conformance.verified } },
       { output: "review", label: "adapt review: the active compiled plan's head against the proposal", lane: "implementation", method: null, body: head },
       { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) }
     ],
     notEvaluated: ["NO_OBSERVED_REF", "CONTEXT_PROBE_NOT_RUN"],
-    spec: { ...spec, review: { conformance, head, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    spec: { ...spec, review: { conformance, statement, head, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }
