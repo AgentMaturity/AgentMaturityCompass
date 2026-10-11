@@ -104,7 +104,7 @@ import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
-import { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { loadLeaseRevocations, readRevokedLeaseIds, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
@@ -1146,15 +1146,15 @@ function verifyLeaseForScope(params: {
       error: "missing lease token"
     };
   }
-  const revocationSig = verifyLeaseRevocationsSignature(params.workspace);
-  if (!revocationSig.valid) {
+  const revocations = readRevokedLeaseIds(params.workspace);
+  if (!revocations.ok) {
     return {
       ok: false,
       status: 401,
-      error: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`
+      error: `lease revocation signature invalid: ${revocations.reason}`
     };
   }
-  const revoked = new Set(loadLeaseRevocations(params.workspace).revocations.map((row) => row.leaseId));
+  const revoked = revocations.ids;
   const expectedWorkspaceId = workspaceIdFromDirectory(params.workspace);
   const verification = verifyLeaseToken({
     workspace: params.workspace,

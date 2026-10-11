@@ -158,6 +158,21 @@ describe("AMC-1508 — persisted portal attribution after authentication", () =>
     expect(persistedRows()).toEqual(before);
   });
 
+  test("at the router seam a body naming someone else never becomes the stored submitter (P0-30)", async () => {
+    const before = persistedRows();
+    const forged = captureRes();
+    const body = { name: "job", type: "scan", submittedBy: "someone-else" };
+    expect(await handleProductRoute(pathname, "POST", jsonReq("POST", pathname, body), forged.res, { workspace, principal: "sid" })).toBe(true);
+    expect(forged.state.status).toBe(400);
+    expect(persistedRows()).toEqual(before);
+    const nested = captureRes();
+    const payload = { name: "job", type: "scan", payload: { submittedBy: "someone-else" } };
+    expect(await handleProductRoute(pathname, "POST", jsonReq("POST", pathname, payload), nested.res, { workspace, principal: "sid" })).toBe(true);
+    expect(nested.state.status).toBe(201);
+    const stored = JSON.parse(nested.state.body) as { data: { id: string } };
+    expect(openProductDb().prepare("SELECT submitted_by FROM portal_jobs WHERE id = ?").get(stored.data.id)).toEqual({ submitted_by: "sid" });
+  });
+
   test("the registry cannot manufacture an omitted principal", async () => {
     const before = persistedRows();
     const { res, state } = captureRes();

@@ -29,7 +29,7 @@ import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
@@ -460,17 +460,17 @@ function verifyLeaseAndMapError(input: {
     };
   }
 
-  const revocationSig = verifyLeaseRevocationsSignature(input.workspace);
-  if (!revocationSig.valid) {
+  const revocations = readRevokedLeaseIds(input.workspace);
+  if (!revocations.ok) {
     return {
       ok: false,
       statusCode: 401,
       auditType: "LEASE_INVALID_OR_MISSING",
-      message: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`
+      message: `lease revocation signature invalid: ${revocations.reason}`
     };
   }
 
-  const revoked = new Set(loadLeaseRevocations(input.workspace).revocations.map((row) => row.leaseId));
+  const revoked = revocations.ids;
   const verification = verifyLeaseToken({
     workspace: input.workspace,
     token: input.leaseToken,

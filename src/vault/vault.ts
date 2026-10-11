@@ -336,12 +336,7 @@ export function unlockVault(workspace: string, passphrase?: string): void {
     /* decryption or parse failed — rethrow with user-friendly message */
     throw new Error("Vault unlock failed: incorrect passphrase or corrupted vault.");
   }
-  session.unlocked = true;
-  session.payload = payload;
-  session.lastUnlockedTs = Date.now();
-  session.passphrase = phrase;
-  session.envelopeDigest = envelopeDigest;
-
+  let openedDigest: string | null = envelopeDigest;
   if (!payload.leasePrivateKeyPem || !payload.sessionPrivateKeyPem) {
     const leasePair = generateKeyPairSync("ed25519");
     const sessionPair = generateKeyPairSync("ed25519");
@@ -349,22 +344,34 @@ export function unlockVault(workspace: string, passphrase?: string): void {
     const leasePublicKeyPem = leasePair.publicKey.export({ format: "pem", type: "spki" }).toString();
     const sessionPrivateKeyPem = sessionPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
     const sessionPublicKeyPem = sessionPair.publicKey.export({ format: "pem", type: "spki" }).toString();
-    createVault({
-      workspace,
-      passphrase: phrase,
-      monitorPrivateKeyPem: payload.monitorPrivateKeyPem,
-      auditorPrivateKeyPem: payload.auditorPrivateKeyPem,
-      leasePrivateKeyPem,
-      sessionPrivateKeyPem,
-      monitorPublicKeyPem: readUtf8(vaultPaths(workspace).monitorPublic),
-      auditorPublicKeyPem: readUtf8(vaultPaths(workspace).auditorPublic),
-      leasePublicKeyPem,
-      sessionPublicKeyPem,
-      secrets: payload.secrets
-    });
-    const refreshed = parseVaultPayload(decryptVaultPayload(readEnvelope(workspace), phrase).toString("utf8"));
-    session.payload = refreshed;
+    try {
+      createVault({
+        workspace,
+        passphrase: phrase,
+        monitorPrivateKeyPem: payload.monitorPrivateKeyPem,
+        auditorPrivateKeyPem: payload.auditorPrivateKeyPem,
+        leasePrivateKeyPem,
+        sessionPrivateKeyPem,
+        monitorPublicKeyPem: readUtf8(vaultPaths(workspace).monitorPublic),
+        auditorPublicKeyPem: readUtf8(vaultPaths(workspace).auditorPublic),
+        leasePublicKeyPem,
+        sessionPublicKeyPem,
+        secrets: payload.secrets
+      });
+      payload = parseVaultPayload(decryptVaultPayload(readEnvelope(workspace), phrase).toString("utf8"));
+    } catch (error) {
+      // A failed upgrade leaves no session behind: not this partial payload, not one from an older envelope.
+      lockVault(workspace);
+      throw error;
+    }
+    openedDigest = null; // createVault replaced the envelope; the next unlock re-derives from the new bytes
   }
+  // Publish the session only once its payload is complete.
+  session.unlocked = true;
+  session.payload = payload;
+  session.lastUnlockedTs = Date.now();
+  session.passphrase = phrase;
+  session.envelopeDigest = openedDigest;
 }
 
 export function lockVault(workspace: string): void {

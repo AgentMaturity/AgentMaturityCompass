@@ -42,11 +42,23 @@ repair operation and must not certify altered older revocations. Only a genuinel
 absent list **and** signature use first-store bootstrap behavior.
 
 Review and restore the approved history before using a deliberate repair command.
-The signer prepares the next list's signature before publishing either file, so
-an unavailable signer does not replace the old list with an unsigned update. The
-two-file publication is not represented as a cross-process transactional lock:
-an interrupted or inconsistent pair must still be rejected by consumers. Keep
-the original bytes and operator evidence when diagnosing such a failure.
+
+How a list is published (`amc lease revoke`, `amc lease resign-revocations` and the
+first-store bootstrap in `amc lease issue` all use the same path, serialized by one
+lock):
+
+1. The signer signs the exact next list bytes, and the signature is verified against
+   the auditor key history. A locked vault, `AMC_NO_SIGN=1` (ephemeral keys) or a key that
+   does not match the history refuses here, and neither file changes.
+2. Both files are written under temporary names, then the list is renamed into
+   place, then the signature.
+3. The published pair is verified again; a failure is reported as an error.
+
+Two renames are not one atomic step. A crash between them leaves a new list beside
+the old signature. That pair does not verify, so every consumer refuses every lease
+(fail closed; no lease is admitted against an unverified list) until the owner
+reviews the list and runs `amc lease resign-revocations`. Keep the original bytes
+and operator evidence when diagnosing such a failure.
 
 ## Enforcement
 
