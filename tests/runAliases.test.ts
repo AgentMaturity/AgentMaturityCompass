@@ -5,6 +5,10 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { resolveRunReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { latestRunSummary } from "../src/diagnostic/runReportResolution.js";
+import { generateL5DeltaReport } from "../src/diagnostic/l5DeltaReport.js";
+import { collectAuditBinderData } from "../src/audit/binderCollector.js";
+import { loadAuditPolicy } from "../src/audit/auditPolicyStore.js";
+import { loadAuditMapActive } from "../src/audit/auditMapStore.js";
 import {
   aliasesForRun,
   listRunAliases,
@@ -79,5 +83,18 @@ describe("diagnostic run aliases", () => {
     const report = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default",
       claimMode: "auto", noSign: true });
     expect(latestRunSummary(ws, "default")?.runId).toBe(report.runId);
+  });
+
+  // P0-28: every other reader of .amc/agents/<id>/runs missed the default agent's runs the same way.
+  test("the L5 delta report and the agent audit binder read the run the runner wrote", async () => {
+    const ws = workspace();
+    const binderNotes = async () => JSON.stringify((await collectAuditBinderData({ workspace: ws,
+      scope: { type: "AGENT", id: "default" }, policy: loadAuditPolicy(ws), map: loadAuditMapActive(ws), nowTs: Date.now() })).binder);
+    expect(generateL5DeltaReport({ workspace: ws, agentId: "default" }).runId).toBeNull();
+    expect(await binderNotes()).toContain("No agent diagnostic runs were found.");
+    const report = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default",
+      claimMode: "auto", noSign: true });
+    expect(generateL5DeltaReport({ workspace: ws, agentId: "default" }).runId).toBe(report.runId);
+    expect(await binderNotes()).not.toContain("No agent diagnostic runs were found.");
   });
 });

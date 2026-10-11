@@ -8,7 +8,7 @@
  * that boundary visible.
  */
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { resolveRunAlias } from "./runAliases.js";
@@ -127,32 +127,31 @@ export function resolveRunReport(workspace: string, runId: string, agentId?: str
   }
 }
 
-/** The newest run file in the agent's runs directory, for the "Latest run" lines and `--run latest`. */
-export function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
+/**
+ * The agent's run files, oldest name first, in the runs directory the runner writes (getAgentPaths): `.amc/runs` for a
+ * root-scoped default agent, `.amc/agents/<id>/runs` otherwise. Every "latest run" reader goes through here.
+ */
+export function agentRunFiles(workspace: string, agentId: string): string[] {
   const runsDir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
+  if (!pathExists(runsDir)) return [];
+  return readdirSync(runsDir).filter((name) => name.endsWith(".json")).sort((a, b) => a.localeCompare(b))
+    .map((name) => join(runsDir, name));
+}
+
+/** The newest run file's id (its name), or null when the agent has none. */
+export function latestRunId(workspace: string, agentId: string): string | null {
+  const latest = agentRunFiles(workspace, agentId).at(-1);
+  return latest ? basename(latest, ".json") : null;
+}
+
+/** The newest run file's summary, for the "Latest run" lines and `--run latest`. */
+export function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
+  const latest = agentRunFiles(workspace, agentId).at(-1);
+  if (!latest) return null;
   try {
-    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
-      runId?: string;
-      integrityIndex?: number;
-      trustLabel?: string;
-    };
-    if (!parsed.runId) {
-      return null;
-    }
-    return {
-      runId: parsed.runId,
-      integrityIndex: Number(parsed.integrityIndex ?? 0),
-      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
-    };
+    const parsed = JSON.parse(readUtf8(latest)) as { runId?: string; integrityIndex?: number; trustLabel?: string };
+    if (!parsed.runId) return null;
+    return { runId: parsed.runId, integrityIndex: Number(parsed.integrityIndex ?? 0), trustLabel: String(parsed.trustLabel ?? "UNKNOWN") };
   } catch {
     return null;
   }

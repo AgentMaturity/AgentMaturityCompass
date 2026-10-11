@@ -1,8 +1,8 @@
-import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { loadRunReport } from "../diagnostic/runner.js";
+import { latestRunId } from "../diagnostic/runReportResolution.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -24,23 +24,9 @@ function questionIds(): string[] {
   return [...questionBank].map((q) => q.id).sort((a, b) => a.localeCompare(b));
 }
 
-function latestRunIdForAgent(workspace: string, agentId: string): string | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  return files[files.length - 1]!.replace(/\.json$/, "");
-}
-
 function measuredTargetMapping(workspace: string, scope: MechanicScope): Record<string, number> | null {
   const agentId = scope.type === "AGENT" ? resolveAgentId(workspace, scope.id) : "default";
-  const runId = latestRunIdForAgent(workspace, agentId);
+  const runId = latestRunId(workspace, agentId);
   if (!runId) {
     return null;
   }

@@ -15,8 +15,8 @@ import { join, dirname } from "node:path";
 import { questionBank } from "./questionBank.js";
 import { notEvaluatedLevel } from "./levelSemantics.js";
 import { classifyControls, type ControlEnforcementLevel } from "./controlClassification.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { readdirSync } from "node:fs";
+import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { agentRunFiles } from "./runReportResolution.js";
 import type { DiagnosticReport, QuestionScore } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -146,16 +146,10 @@ function getL5Requirements(questionId: string): { missing: string[]; evidence: s
 // ---------------------------------------------------------------------------
 
 function loadLatestReport(workspace: string, agentId: string): DiagnosticReport | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) return null;
-
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) return null;
-
+  const latest = agentRunFiles(workspace, agentId).at(-1);
+  if (!latest) return null;
   try {
-    return JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as DiagnosticReport;
+    return JSON.parse(readUtf8(latest)) as DiagnosticReport;
   } catch {
     return null;
   }
