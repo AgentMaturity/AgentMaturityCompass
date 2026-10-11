@@ -6,7 +6,7 @@
  * src/a4/stages/assemble.ts (Understand, Explain, Propose, the apply effect) and src/a4/assembleBuild.ts (Build, Review).
  */
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
-import { parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
+import { MAX_PLAN_NODES, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
 import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
@@ -49,6 +49,8 @@ export const STUB_WORDING = "tool pipeline observed on a stub model; agent behav
 export const APPLY_EFFECT_ID = "a4.assemble.apply";
 /** The EVIDENCE_REF purpose of an outcome_unknown resolution request (src/a4/assembleResolve.ts). */
 export const RESOLUTION_PURPOSE = "outcome_unknown_resolution";
+/** The seam the native task lane owns before composition.compositionDigest and composition.policyDigest can be recomputed per session. */
+export const COMPOSITION_SEAM_KEY = "NATIVE_TASK_COMPOSITION_DIGESTS";
 /** The workspace preset Build signs for the agent (src/presets/agentPresets.ts, `.amc/agents.yaml`). */
 export const presetIdOf = (agentId: string): string => `a4-${agentId}`;
 
@@ -87,9 +89,31 @@ export function parseProvider(value: unknown): { provider: (typeof NATIVE_PROVID
 }
 
 /**
+ * Whether `raw` holds at most MAX_PLAN_NODES nodes, counted iteratively and refused at the cap: parseWorkflowPlan recurses
+ * over the whole input before it counts, and readiness parses this answer on every read, so a deeply nested answer must
+ * never reach it (a stack overflow there would fail every read of the project).
+ */
+function withinNodeCap(raw: unknown): boolean {
+  const pending: unknown[] = [raw];
+  for (let nodes = 0; pending.length > 0; nodes += 1) {
+    if (nodes >= MAX_PLAN_NODES) return false;
+    const node = pending.pop();
+    if (node === null || typeof node !== "object" || Array.isArray(node)) continue;
+    for (const key of ["children", "stages"]) {
+      const children = (node as Record<string, unknown>)[key];
+      if (!Array.isArray(children)) continue;
+      if (children.length > MAX_PLAN_NODES) return false;
+      pending.push(...children);
+    }
+  }
+  return true;
+}
+
+/**
  * The declared workflow (design §10.2, the `workflow` executor), refused as data before anything could spawn: JSON runs
- * nothing, and parseWorkflowPlan checks node kinds, unique ids, scopes and the 64-node bound. A workflow delegates
- * through the signed workspace tools, so it needs autonomy act_with_approval. null when none is declared.
+ * nothing, the node cap is checked before any recursion (withinNodeCap), and parseWorkflowPlan checks node kinds, unique
+ * ids and scopes. A workflow delegates through the signed workspace tools, so it needs autonomy act_with_approval. null
+ * when none is declared.
  */
 export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: WorkflowNode; agents: number } | { error: string } | null {
   if (value === null || value === undefined || (typeof value === "string" && value.trim() === "")) return null;
@@ -101,6 +125,7 @@ export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: Workf
       return { error: "the workflow is not JSON" };
     }
   }
+  if (!withinNodeCap(raw)) return { error: `a workflow plan may contain at most ${MAX_PLAN_NODES} nodes` };
   const parsed = parseWorkflowPlan(raw);
   if (!parsed.ok) return { error: parsed.reason };
   if (textValue(autonomy) !== "act_with_approval") return { error: "a workflow delegates with the signed workspace tools: choose autonomy act_with_approval" };
@@ -174,7 +199,8 @@ function baselineItem(state: A4ReadinessState, spec: Record<string, unknown>): A
 /**
  * The outcome_unknown lockout (design §10.2 Explain): an open one blocks the agent's journaled calls and this stage. Each
  * open execution is named, with the resolution this project requested for it (`RESOLUTION_REQUESTED:<execution>:<engine
- * request>:<request digest>`, the digest an approver binds to from the card).
+ * request>:<request digest>:<engine status>`, the digest an approver binds to from the card; a DENIED, EXPIRED or
+ * CANCELLED request is requested again).
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem {
   const open = query.live.blockingExecutions;
@@ -183,17 +209,26 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery): A4Readin
   const requested = open.slice(0, 16).flatMap((id) => {
     const link = [...state.chain].reverse().find((candidate) => candidate.kind === "EVIDENCE_REF" && candidate.body.purpose === RESOLUTION_PURPOSE
       && candidate.body.executionId === id);
-    return link === undefined ? [] : [`RESOLUTION_REQUESTED:${id}:${String(link.body.refId)}:${String(link.body.sha256)}`];
+    const status = link === undefined ? null : query.live.engineRequests?.[String(link.body.refId)] ?? "UNREAD";
+    return link === undefined ? [] : [`RESOLUTION_REQUESTED:${id}:${String(link.body.refId)}:${String(link.body.sha256)}:${status}`];
   });
   return item("no_open_outcome_unknown", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["OUTCOME_UNKNOWN_OPEN", ...open.slice(0, 16).map((id) => `EXECUTION:${id}`), ...requested],
     nextAction: { label: "Request a resolution on the outcome_unknown card; a second person approves it, then it is recorded (self-reported)" } });
 }
 
-/** Review's integrity record: AMC's verifyAgentRun over each build session, a self-check under this workspace's keys. */
+/**
+ * Review's integrity record: AMC's verifyAgentRun over each build session, a self-check under this workspace's keys. A
+ * session with no head event to bind a report to was not verified: NOT_EVALUATED, never a digest made up for it.
+ */
 function integrityItem(review: Record<string, unknown>): A4ReadinessItem[] {
-  const sessions = Array.isArray(review.sessions) ? review.sessions as Array<{ integrity?: { integrityOk?: unknown; anchored?: unknown; report?: unknown };
-    stub?: unknown }> : [];
+  const sessions = Array.isArray(review.sessions) ? review.sessions as Array<{ integrity?: { integrityOk?: unknown; anchored?: unknown; report?: unknown;
+    notEvaluated?: unknown }; stub?: unknown }> : [];
   if (sessions.length === 0) return [];
+  const unverified = sessions.flatMap((session) => typeof session.integrity?.notEvaluated === "string" ? [session.integrity.notEvaluated] : []);
+  if (unverified.length > 0) {
+    return [item("build_sessions_integrity", "NOT_EVALUATED", { section: "integrity", kind: "not_evaluated", reasonCodes: [...new Set(unverified)],
+      nextAction: { label: "A build session recorded no head event, so verifyAgentRun has nothing to bind to; request changes and build again" } })];
+  }
   const ok = sessions.every((session) => session.integrity?.integrityOk === true);
   const anchored = sessions.every((session) => session.integrity?.anchored === true);
   const stub = sessions.some((session) => session.stub === true);
@@ -231,7 +266,12 @@ function buildItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Reco
     return items;
   }
   const enforce = (review.enforce ?? {}) as { state?: unknown; decision?: unknown; pending?: unknown };
-  const applied = state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === APPLY_EFFECT_ID);
+  // Only this cycle's completion gate counts: a TUNE or REOPEN leaves the earlier cycle's effect rows on the chain.
+  const completionGateId = [...state.chain].reverse().find((link) => link.kind === "GATE_REQUESTED" && link.body.stage === "assemble"
+    && link.body.gate === "completion" && link.revisionNo === revisionNo)?.body.gateId;
+  const onGate = (effectId: unknown): boolean => completionGateId !== undefined && state.chain.some((link) => link.kind === "EFFECT_STARTED"
+    && link.body.effectId === effectId && link.body.gateId === completionGateId);
+  const applied = state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === APPLY_EFFECT_ID && onGate(link.body.effectId));
   items.push(revisionNo === state.project.revision_no && query.live.driftedSlots?.includes("enforce.resourcesSha256") === true
     ? item("manifest_active", "BLOCKED", { kind: "scope_changed", reasonCodes: ["MANIFEST_DRIFTED", "RESOURCE_DRIFTED"],
       nextAction: { label: "The agent's resources changed since Review; review again (request changes on the completion gate)" } })
@@ -239,13 +279,22 @@ function buildItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Reco
       ? item("manifest_active", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["ENFORCE_BLOCKED", `ENFORCE_STATE:${String(enforce.state)}`] })
       : item("manifest_active", "READY", { reasonCodes: applied ? ["APPLIED"] : ["APPLIED_AT_COMPLETION", `PENDING_CHANGES:${Number(enforce.pending) || 0}`] }));
   items.push(...integrityItem(review));
-  // The completion effect's engine request, once an owner opened it: the card decides it bound to this digest.
-  const opened = [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.effect === APPLY_EFFECT_ID);
+  // The completion effect's engine request opened on this cycle's completion gate: the card decides it bound to this digest.
+  const opened = completionGateId === undefined ? undefined : [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED"
+    && link.body.effect === APPLY_EFFECT_ID && link.body.gateId === completionGateId);
+  const requestStatus = opened === undefined ? null : query.live.engineRequests?.[String(opened.body.approvalRequestId)] ?? "UNREAD";
   items.push(opened === undefined || typeof opened.body.requestDigestSha256 !== "string"
     ? item("effect_gate", "WAITING", { kind: "review_pending", mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"],
       nextAction: { label: "Once the completion gate has its quorum, an owner opens the effect gate (a4.assemble.apply); a second, separately decided request" } })
     : item("effect_gate", "READY", { section: "governance", mandatory: false,
-      reasonCodes: ["EFFECT_GATE_OPENED", `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`] }));
+      reasonCodes: ["EFFECT_GATE_OPENED", `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`,
+        `APPROVAL_STATUS:${requestStatus}`] }));
+  // Design §10.2 binds every build session's compositionDigest and policyDigest: no recomputer can read them per session
+  // yet (the native task view exposes neither), so the two slots stay unbound and the gap is listed, never hidden. Each
+  // session's effective-policy receipts are bound through the reviewed spec instead.
+  items.push(item("composition_bound", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
+    reasonCodes: ["COMPOSITION_SLOTS_UNBOUND", `KEY:${COMPOSITION_SEAM_KEY}`],
+    nextAction: { label: "composition.compositionDigest and composition.policyDigest are not recomputed; the reviewed effective-policy receipts are bound through the review" } }));
   const lifecycle = (review.lifecycle ?? {}) as { unitTestsPassing?: unknown };
   items.push(item("lifecycle_bridge", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
     reasonCodes: [`UNIT_TESTS_PASSING:${typeof lifecycle.unitTestsPassing === "string" ? lifecycle.unitTestsPassing : "not_evaluated"}`],

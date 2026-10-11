@@ -5,6 +5,7 @@
  * reachable only for `hook:*`/`pi:*` with a conformance receipt for the pinned version, and none exists yet, so no
  * external path reads enforced. The closure-stub adapters (src/integrations/langchainAdapter.ts) are never listed.
  */
+import type { IntegrationFramework } from "../setup/integrationScaffold.js";
 import { a4IntegrationClaimV1Schema, type A4IntegrationClaimV1 } from "./a4Schema.js";
 
 export type A4IntegrationPath = A4IntegrationClaimV1["path"];
@@ -34,3 +35,13 @@ export const INTEGRATION_PATHS = Object.keys(INTEGRATION_CLAIMS) as A4Integratio
 /** The claim for `path`; null for a path the table does not list. */
 export const integrationClaimFor = (path: unknown): A4IntegrationClaimV1 | null =>
   typeof path === "string" && Object.hasOwn(INTEGRATION_CLAIMS, path) ? INTEGRATION_CLAIMS[path as A4IntegrationPath] : null;
+
+/**
+ * The scaffold each external path gets (design §13; src/a4/assembleConnect.ts): the LangChain callback handler for the
+ * LangChain family, the generic HTTP guide for gateway-observed paths, the custom guide for `other`. Hook and pi paths
+ * connect instead, and the native path builds through native tasks.
+ */
+export const SCAFFOLD_FRAMEWORK: Readonly<Partial<Record<A4IntegrationPath, IntegrationFramework>>> = {
+  langgraph: "langchain", langchain: "langchain", crewai: "langchain", "openai-agents": "generic-http", "vercel-ai": "generic-http",
+  "generic-http": "generic-http", other: "custom"
+};

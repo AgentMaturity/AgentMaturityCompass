@@ -1,12 +1,12 @@
 /**
- * Assemble, creation (P1-60 slice A; design §10.2). Understand carries the Aspire answers it depends on and reads the
+ * Assemble, creation (P1-60; design §10.2). Understand carries the Aspire answers it depends on and reads the
  * workspace facts a build needs (toolset readiness, the doctor's checks, the native task limits, providers and tool
  * scope from the live Studio NativeTaskService, frameworks, mechanic profiles, the compiled plan, the outcome_unknown
  * count, the path table); Explain renders them at three levels; Propose builds the plan from the answers (revised typed
  * graph with node permissions, implementation plan by executor, preset, build session, validation plan, the
  * IntegrationClaim, unsupported items with their keys (a declared workflow among them while it cannot run), and the
- * baseline Enforce manifest). Build and Review are in
- * src/a4/assembleBuild.ts. Completion runs the effect a4.assemble.apply: the reviewed Enforce resources are applied
+ * baseline Enforce manifest). Build and Review are in src/a4/assembleBuild.ts; an external path's scaffold, connect and
+ * import in src/a4/assembleConnect.ts. Completion runs the effect a4.assemble.apply: the reviewed Enforce resources are applied
  * through applyEnforceResourceLifecycle after the effect gate's engine grant is consumed. Everything A4 writes here is
  * self_reported; a stub-provider session's agent-facing refs are synthetic_example.
  */
@@ -32,7 +32,7 @@ import type { A4GateRow } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
-import { INTEGRATION_CLAIMS, integrationClaimFor } from "../assemblePaths.js";
+import { INTEGRATION_CLAIMS, integrationClaimFor, SCAFFOLD_FRAMEWORK } from "../assemblePaths.js";
 import { buildAssemble, nativeActor, reviewAssemble } from "../assembleBuild.js";
 import { blockingExecutionsIn } from "../assembleLockout.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
@@ -82,15 +82,17 @@ async function applyManifest({ workspace, state, gate }: A4EffectContext): Promi
     const result = applyEnforceResourceLifecycle({ workspace, agentId: state.project.agent_id, dryRun: false, confirmManifestId });
     if (!result.applied || result.receiptPath === null) throw fail(409, "APPLY_NOT_RECORDED", "Enforce applied nothing.");
     const receipt = readFileSync(result.receiptPath);
-    return { receipt: { refKind: "receipt", refId: relPath(workspace, result.receiptPath), sha256: sha256Hex(receipt),
+    // An artifact ref: resolveRefs verifies the receipt's bytes and its artifact signature on every read.
+    return { receipt: { refKind: "artifact", refId: relPath(workspace, result.receiptPath), sha256: sha256Hex(receipt),
       label: `assemble completion: Enforce manifest ${confirmManifestId} applied (${result.receiptSigPath === null ? "receipt unsigned" : "signed receipt"})` } };
   } catch (error) {
     // EFFECT_FAILED stores the message: a code only (messages name absolute paths).
     throw new Error(errorCodeOf(error, "ASSEMBLE_APPLY_FAILED"));
   }
 }
+/** The execution id names the gate as well as the set: the same resource set applied again in a later cycle is a new execution, retryable on its own. */
 const APPLY_EFFECT: A4EffectDef = { id: APPLY_EFFECT_ID, toolName: "a4.assemble.apply_manifest", actionClass: "WRITE_HIGH", consumes: "A4",
-  completes: "assemble.completion", executionId: (_state, gate) => `a4-apply-${boundManifestId(gate) ?? "unbound"}`, run: applyManifest };
+  completes: "assemble.completion", executionId: (_state, gate) => `a4-apply-${gate.gate_id}-${boundManifestId(gate) ?? "unbound"}`, run: applyManifest };
 
 /** The router's entry (src/a4/spec/assemble.ts PRODUCERS). */
 export async function produceAssemble(step: "understand" | "explain" | "propose" | "build" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
@@ -319,11 +321,19 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     ...capabilities.map((capability) => `- ${capability}`)].join("\n").slice(0, 4000);
   const declared = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const workflow = declared === null || "error" in declared ? null : workflowTask(declared, facts.workflowTool, native);
+  const chosenTools = listValue(values.get("tools"));
+  const framework = SCAFFOLD_FRAMEWORK[claim.path];
   const unsupported = [
-    ...(native ? [] : [{ id: "external-path", what: `${claim.path}: scaffold, connect instructions, policy pack and trace import`, key: "P1-60 slice B" }]),
+    // A foreign child runs only under spawnSubagent from a parent session; Studio's native tasks compose no delegation.
+    ...(native ? [] : [{ id: "foreign-first-task", what: "one bounded first task through createForeignRunner (a foreign child runs only under spawnSubagent from a parent session)",
+      key: "NATIVE_TASKS_NO_DELEGATION" }]),
     ...listValue(values.get("connectors")).map((name) => ({ id: `connector:${name.slice(0, 64)}`, what: `MCP connector ${name}`, key: "NOT_MOUNTED_IN_NATIVE_TASKS" })),
-    ...listValue(values.get("tools")).filter((name) => !scopeTools.some((tool) => tool.name === name))
+    ...chosenTools.filter((name) => !scopeTools.some((tool) => tool.name === name))
       .map((name) => ({ id: `tool:${name.slice(0, 64)}`, what: `tool ${name}`, key: "NOT_IN_SIGNED_SCOPE" })),
+    // The session, the preset and the graph's permissions all take the whole signed scope: a narrower list is not enforced.
+    ...(tools === "workspace" && chosenTools.length > 0 && scopeTools.some((tool) => !chosenTools.includes(tool.name))
+      ? [{ id: "tool-subset", what: `the listed tools (${chosenTools.length}) are not enforced as a subset: the graph's permissions and the build session take all ${scopeTools.length} tools of the signed scope`,
+        key: "NATIVE_TASKS_WHOLE_SCOPE" }] : []),
     ...checkIds.filter((id) => !(config?.validation.checks ?? []).includes(id)).map((id) => ({ id: `check:${id.slice(0, 64)}`, what: `validation check ${id}`, key: "NOT_IN_VALIDATION_CONFIG" })),
     ...(workflow === null ? [] : [{ id: "workflow", what: `workflow ${workflow.plan.id} (${workflow.agents} delegated task(s))`, key: workflow.key }])
   ];
@@ -335,8 +345,16 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
         acceptance: "composition.presetSha256 recomputes to the signed preset", expectedEvidence: "implementation ref with the preset's sha256" },
       { id: "first-turn", title: "One bounded native build session on the chosen provider", executor: "native_turn", supported: true, key: null, prompt,
         acceptance: "the session settles; Review verifies it", expectedEvidence: "session ref with its head event hash (synthetic_example on the stub provider)" }
-    ] : [{ id: "scaffold", title: `Scaffold or connect the ${claim.path} agent`, executor: "scaffold", supported: false, key: "P1-60 slice B",
-      acceptance: "not available in this build", expectedEvidence: "none" }]),
+    ] : [
+      ...(framework === undefined ? [] : [{ id: "scaffold", title: `Scaffold the ${claim.path} agent: the ${framework} scaffold, contract tests and the policy pack, into a directory you name outside .amc/`,
+        executor: "scaffold", supported: true, key: null, acceptance: "the recorded manifest names every written file's sha256", expectedEvidence: "a manifest ref (self_reported)" }]),
+      { id: "connect", title: "Connect instructions: the gateway route, the command and a lease whose token is shown once and never stored (its leaseId is recorded)",
+        executor: "deterministic", supported: true, key: null, acceptance: "the record keeps the leaseId, never the token", expectedEvidence: "an external ref naming the lease (self_reported)" },
+      { id: "import", title: "Import the agent's traces through the neutral importer, originals retained", executor: "deterministic", supported: true, key: null,
+        acceptance: "the import's manifest is recorded; imported traces stay self_reported", expectedEvidence: "a manifest ref (self_reported)" },
+      { id: "first-task", title: "One bounded first task, run by you under supervision (createForeignRunner is listed as unsupported)", executor: "human", supported: true, key: null,
+        command: `amc supervise --agent ${agentId} -- <your agent's one-shot command>`, acceptance: "you run it; AMC never does", expectedEvidence: "the supervised session's own rows" }
+    ]),
     ...(workflow === null ? [] : [workflow]),
     { id: "review-resources", title: "Review the agent's pending Enforce changes", executor: "human", supported: true, key: null,
       command: `amc resource evaluate --agent ${agentId}`, acceptance: "Review records Enforce's decision", expectedEvidence: "Review's Enforce record" }
