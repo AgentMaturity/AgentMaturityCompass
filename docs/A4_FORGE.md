@@ -65,14 +65,12 @@ A signature proves who wrote a record and that it is unchanged since, never that
 | every transition | its `audit` ledger row (monitor key, hash-chained) with a receipt over the transition's bytes | this workspace wrote these bytes and has not changed them; the chain names every side row, so a deleted or altered row shows |
 | gate request, decision, release, deployment and rollback | additionally an `A4_RECORD` envelope (auditor key) | an auditor-key statement a verifier can admit from its own pinned trust list |
 | gate request | `binding_digest` over the request, stored in the signed row | the exact bytes approvers decided on; a decision with another digest counts for nothing |
-| stage output files | an `a4-stage-output` artifact signature | the file is unchanged since it was produced |
+| stage output files, Activate's monitor records and value claims | an `a4-stage-output` artifact signature (a value claim also carries its own `A4_RECORD` envelope) | the file is unchanged since it was produced |
 | binder slice | an `a4-binder` artifact signature over its manifest, plus a transparency entry | the slice's files are the ones exported |
 
 **Notary mode.** In `NOTARY` mode with the default `trust.enforcement.denyLocalVaultSigningIfNotaryEnabled: true`, every
-`A4_RECORD` envelope is a notary call, so each gate decision adds one. Today the readiness item `signing.notary_route`
-reports the `A4_RECORD` route only. `A4_PACKAGE` is not a sign kind yet: once Activate (P1-62) adds it, an operator whose
-`trust.yaml` lists `requireNotaryFor` explicitly keeps that list and must add `A4_PACKAGE` to it and re-sign
-`trust.yaml`.
+`A4_RECORD` envelope is a notary call, so each gate decision adds one. At Activate the readiness item
+`signing.notary_route` reports the `A4_RECORD` and `A4_PACKAGE` routes (see Activate below).
 
 ## Approvals and separation of duties
 
@@ -489,7 +487,75 @@ Readiness adds these items:
   `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
 - `lifecycle.production_controls` (not mandatory): names the controls that keep the agent at staging.
 
-Monitoring and value are P1-62 slice C.
+## Activate: review, monitoring and value
+
+Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews results; it approves nothing. It records:
+
+- The deployment rows in two columns, the production bridge as it stands and the remaining limitations, as a
+  self-reported output.
+- One monitor record of the release (`amc.a4-monitor/v1`, signed `a4-stage-output` under
+  `a4-releases/<projectId>/monitors/<releaseId>/`), as a `monitor` ref beside the step. A4 wrote it, so the ref is lane
+  implementation, `self_reported`, whatever its sources say. Each field is `{ value, source, trustTier, window }`, and each
+  source has its own claim envelope from the eligibility service:
+  - `slo`: the SLO state held by this process (`generateSloReport`). It is `self_reported` with evidence `incomplete`
+    (in-memory measurements, unsigned).
+  - `actionJournal`: the agent's executions and its open `outcome_unknown` ones, at its newest row's own tier.
+  - `approvals`: the counted approvals of the release and deployment approvals (human statements).
+  - `freeze`: the freeze and its incidents.
+  - `amcCheck`: AMC's newest check of the release's destination.
+  - `runtime` and `backup`: always `source_unavailable` in v1, with `value: null`.
+
+  `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record lists the alerts
+  already emitted. The kill switch is not available in this release (P2-26).
+
+Once the review step has committed (never on a replay or a refusal), Review runs `createValueReport` once for the agent.
+Then one transition by `amc-runtime` records:
+
+- One `amc.a4-value-claim/v1` per KPI of the agent's value contract (signed `a4-stage-output`, with an `A4_RECORD`
+  envelope; a `value_claim` ref, `self_reported`).
+- The action journal's newest row of this agent as its own `ledger_event` ref, whose lane derives from that row.
+
+`GET …/value` never runs the report and never appends a value event. A missing value contract records no claim
+(`VALUE_CONTRACT_MISSING`), and the review still stands.
+
+A value claim keeps four lanes side by side:
+
+- recommended: the contract's `minGood` bound.
+- implemented: the value contract, only when its signature verifies; `none` otherwise.
+- observed: the value snapshot's number, only while every ledger ref behind it resolves to a row of this agent and none
+  dangles. A value event with no ledger ref, or a ref past the 256th, counts as dangling. A dangling ref makes the value
+  `null` and is counted, never dropped. AMC checks that the rows resolve, not that the number recomputes from them.
+- independently reviewed: `not_evaluated` (`ATTESTATION_SCOPE_EXCLUDES_KPI`) until an admitted external record names
+  the KPI and its window (P2-24, P3-21).
+
+`GET …/value` resolves every claim's refs again on each read. It also lists the members' other objectives
+(self-reported, not evaluated), the ROI worksheet (not evaluated; numeric self-answers) and the PMF hypotheses, each
+shown predicted, observed (the row's value, lane observed only while its ref resolves there) and verdict
+(self-reported). A hypothesis leaves `proposed` only through `POST …/hypotheses/:id/observe`. `GET …/monitor` returns the
+newest monitor record of the current release while its signed file resolves.
+
+Readiness and the bridge read the monitor record only while its file resolves:
+
+- `monitoring.source` is READY when the newest monitor ref of the current release has a source with a value. It is
+  WAITING `MONITOR_NO_SOURCE` before Review, and BLOCKED `MONITOR_REF_UNRESOLVED` when the signed record is missing or
+  changed.
+- `monitoring_slo_enabled` is satisfied, `self_reported`, by a resolving monitor ref that carries an SLO measurement.
+  `GET …/releases/:rid` shows the production bridge rows as they stand now, beside the rows recorded at release.
+- `release_effect` and `rollback_effect` (governance, not mandatory) name the open engine request of the release and
+  of the rollback, so the Studio cards can decide them bound to their digests.
+
+The Studio cards on the Activate page:
+
+- Release: the draft, the release request and the release, the deployment approval, and each lease token shown once
+  in that page only. The generic Complete button does not complete Activate, because it would drop the token.
+- The release record: the eight-surface table, the lifecycle provenance and the package file list.
+- The prepared plan, with a copy button for each command (the lease secret is a placeholder), the receipt form for
+  either target, and AMC's check beside the operator's status.
+- The rollback preview and its confirmation.
+- The monitor tiles.
+- The four-column value table and the hypotheses, with the observe form.
+
+The release, value and monitor views are read when you press Load, never on render.
 
 ## Deployment boundary
 
