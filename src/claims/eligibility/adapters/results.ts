@@ -75,6 +75,21 @@ export function envelopeForUnverifiedResult(input: {
 }
 
 /**
+ * The claim of an artifact whose verification did not pass: FAILED (`signatureInvalid`), or integrity-only UNTRUSTED
+ * because its issuer is not pinned. The artifact then vouches for nothing it carries: its evidence is untrusted, it
+ * carries no pass and it is never more than self-reported. Rule 6 of evaluateClaimEligibility, applied to an envelope
+ * that was decided before the verdict was known.
+ */
+export function envelopeForFailedVerification(envelope: ClaimEnvelope, signatureInvalid: boolean): ClaimEnvelope {
+  const dimensions = envelope.statusDimensions;
+  const claimKind = CLAIM_KINDS.indexOf(envelope.claimKind) > CLAIM_KINDS.indexOf("self_reported") ? "self_reported" : envelope.claimKind;
+  const reasons: ClaimReasonCode[] = signatureInvalid && !envelope.reasons.includes("SIGNATURE_INVALID")
+    ? [...envelope.reasons, "SIGNATURE_INVALID"] : envelope.reasons;
+  return { ...envelope, claimKind, reasons, statusDimensions: { ...dimensions, evidence: "untrusted",
+    result: dimensions.result === "pass" ? "not_evaluated" : dimensions.result } };
+}
+
+/**
  * An executed test AMC ran against the agent (assurance packs, red-team plugins, benchmarks): observed when at
  * least one scenario reached the agent. A result read back from disk whose seal does not verify is untrusted and
  * self-reported; `sealVerified` is null for a result produced in this process.

@@ -12,10 +12,11 @@ function workspace(): string {
   return dir;
 }
 
-function runCli(cwd: string, args: string[]) {
+function runCli(cwd: string, args: string[], extraEnv: NodeJS.ProcessEnv = {}) {
   const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
   delete env.AMC_VAULT_PASSPHRASE;
   delete env.AMC_VAULT_PASSPHRASE_FILE;
+  Object.assign(env, extraEnv);
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
     cwd,
     env,
@@ -126,7 +127,8 @@ describe("fleet trust graph visualization", () => {
     seedDashboardRun(dir);
     seedTrustEdge(dir);
 
-    const result = runCli(dir, ["dashboard", "build", "--out", "dashboard"]);
+    // dashboard build creates the workspace vault, which needs the operator's passphrase (AMC has no default one).
+    const result = runCli(dir, ["dashboard", "build", "--out", "dashboard"], { AMC_VAULT_PASSPHRASE: "fleet-trust-graph-passphrase" });
 
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
     const data = JSON.parse(readFileSync(join(dir, "dashboard", "data.json"), "utf8")) as {

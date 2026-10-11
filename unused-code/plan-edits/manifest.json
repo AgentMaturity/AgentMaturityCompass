@@ -10,6 +10,13 @@
       "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
     },
     {
+      "path": "dist/org/orgRun.d.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/dist/org/orgRun.d.ts.landed",
+      "sha256": "f1aaf94001038ab59a7e8713c8fbd7e7076a8bcbb9a8f5b44138b35411138043"
+    },
+    {
       "path": "dist/sdk/nativeAgentClient.d.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -248,6 +255,13 @@
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
     },
     {
+      "path": "src/identity/hostVault.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/src/identity/hostVault.ts.landed",
+      "sha256": "cbae38554491659d7d71828c21c6d919a1433458f3bd84174e65fb9d0420935c"
+    },
+    {
       "path": "src/importers/dshSessionImport.ts",
       "issue": "P1-24",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
@@ -295,6 +309,13 @@
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
       "archivePath": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
       "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da"
+    },
+    {
+      "path": "src/org/orgRun.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/src/org/orgRun.ts.landed",
+      "sha256": "de6f8d70b8b3410b4476f1daa6169818bffbcf8e4fe131149df8a6c86cd2fcee"
     },
     {
       "path": "src/passport/passportCli.ts",
@@ -407,6 +428,13 @@
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
       "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1"
+    },
+    {
+      "path": "vitest.config.ts",
+      "issue": "P0-37",
+      "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
+      "archivePath": "unused-code/plan-edits/P0-37/vitest.config.ts.landed",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
     }
   ]
 }

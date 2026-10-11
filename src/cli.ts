@@ -11569,7 +11569,7 @@ cert
     const certPath = resolve(process.cwd(), file);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
-      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate")), null, 2));
+      console.log(JSON.stringify(withClaimFields(envelope, artifactClaim("trust-certificate", { sealVerified: false /* inspect checks no signature */ })), null, 2));
       return;
     }
     const inspected = inspectCertificate(certPath);

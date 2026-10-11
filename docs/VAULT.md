@@ -30,8 +30,21 @@ export AMC_VAULT_PASSPHRASE='<passphrase>'
 
 AMC never writes the passphrase to disk and never prints it.
 
+AMC has no default passphrase. `NODE_ENV=test`, `VITEST` and other test-runner variables never supply one, so a vault is never sealed with a passphrase written in AMC's source. AMC's own test suite sets `AMC_VAULT_PASSPHRASE` in `tests/setup/vaultPassphrase.ts`.
+
 ## Rotation
 
 `amc vault rotate-keys` rotates monitor signing key and updates public-key history so old artifacts remain verifiable.
 
 Rotation now requires authenticated history. Existing unsigned histories need explicit reviewed migration before historical keys are admitted. See [authenticated key history](KEY_HISTORY.md) for the public format, migration commands, external pin behavior, and rotation recovery files.
+
+## When unlock refuses
+
+A failed unlock locks the vault: a wrong passphrase, or a vault file that was replaced or corrupted, also closes a session opened earlier, so its keys are no longer used.
+
+Unlock checks that every private key in the vault matches its public key file in `.amc/keys/` (`monitor_ed25519.pub`, `auditor_ed25519.pub`, `lease_ed25519.pub`, `session_ed25519.pub`). AMC writes the encrypted vault first and the public keys after it, so a write interrupted in between (a crash, a full disk) leaves them disagreeing. Unlock then refuses and names the file, because signatures made with a key whose public half is not the published one would never verify. To recover, stop every AMC process that writes to the workspace, then:
+
+- If a monitor key rotation was interrupted, restore one coherent state from `.amc/keys/rotations/<timestamp>-<fingerprint>/`, as [authenticated key history](KEY_HISTORY.md) describes.
+- Otherwise restore the vault and the `.amc/keys/` directory together from the same backup. If the vault was created in the interrupted command and nothing was signed with it, you can instead move `.amc/vault.amcvault`, `.amc/vault.amcvault.meta.json` and `.amc/keys/` aside and run `amc init` again.
+
+A vault from before lease and session keys may hold only some of them. Unlock adds the missing keys and keeps the ones the vault has. If a `lease_ed25519.pub` or `session_ed25519.pub` exists for a key the vault does not hold, unlock refuses: AMC cannot check that file, and a new key would replace it. To let AMC create a new key, move that `.pub` file and its `*_history.json` aside; anything signed with the old key will then no longer verify.

@@ -69,9 +69,8 @@ function defaultPassphrase(): string {
   if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
     return process.env.AMC_VAULT_PASSPHRASE;
   }
-  if (process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1") {
-    return "amc-host-vault-test-passphrase";
-  }
+  // No fallback: a passphrase written here would be public, and NODE_ENV or VITEST is set by whoever controls the
+  // environment. Tests inject theirs through tests/setup/vaultPassphrase.ts.
   return "";
 }
 
@@ -148,7 +147,10 @@ export function initHostVault(hostDir: string, passphrase?: string): {
   sessionFingerprint: string;
 } {
   const phrase = passphrase ?? defaultPassphrase();
-  if (!phrase || phrase.length < 8) {
+  if (!phrase) {
+    throw new Error("Host vault passphrase is required: set AMC_HOST_VAULT_PASSPHRASE or AMC_VAULT_PASSPHRASE (AMC has no default).");
+  }
+  if (phrase.length < 8) {
     throw new Error("Host vault passphrase must be at least 8 characters.");
   }
   const auditorPair = generateKeyPairSync("ed25519");
