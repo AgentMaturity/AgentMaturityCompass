@@ -157,6 +157,13 @@
       "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f"
     },
     {
+      "path": "src/casebooks/casebookStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/casebooks/casebookStore.ts.landed",
+      "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
+    },
+    {
       "path": "src/ci/gate.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
