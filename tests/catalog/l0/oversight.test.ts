@@ -1,9 +1,9 @@
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
 import { DEPLOYMENT_NOT_BOUND } from "../../../src/actions/authorize.js";
-import { recordApprovalDecision } from "../../../src/approvals/approvalChainStore.js";
+import { listApprovalRequests, loadApprovalRequestRecord, recordApprovalDecision } from "../../../src/approvals/approvalChainStore.js";
 import { createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution } from "../../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../../src/approvals/approvalPolicyEngine.js";
 import type { UserRole } from "../../../src/auth/roles.js";
@@ -110,6 +110,8 @@ function quorumVerdict(ws: string, f: L0Fixture): { result: "pass" | "fail"; cod
   const { approval } = createApprovalForIntent({ workspace: ws, agentId: "default", intentId: `intent-${f.ref}`, toolName: "fixture.deploy",
     actionClass: s.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high", intentPayload: { fixture: f.ref },
     ...(s.initiator ? { initiator: s.initiator } : {}) });
+  // The signed request records who raised it, whatever the class's rule (P1-78).
+  expect(loadApprovalRequestRecord({ workspace: ws, agentId: "default", approvalRequestId: approval.approvalRequestId }).initiator).toBe(s.initiator);
   for (const d of s.decisions) {
     try {
       // "store" writes the decision past the engine's refusals, as a tampering or foreign writer would: only the quorum stands.
@@ -140,3 +142,27 @@ describe("L0-OVS-03 separation of duties (requireDistinctUsers in the approval e
     });
   }
 });
+
+describe("L0-OVS-03: the initiator check reads only the signed request (P1-78)", () => {
+  it("an unsigned copy that drops the initiator cannot make the initiator's approval count", () => {
+    const ws = newWorkspace();
+    const { approval, filePath } = createApprovalForIntent({ workspace: ws, agentId: "default", intentId: "intent-tamper", toolName: "fixture.deploy",
+      actionClass: "WRITE_HIGH", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high", intentPayload: { fixture: "tamper" },
+      initiator: "LOCAL_USER:approver-1" });
+    for (const userId of ["approver-1", "approver-2"]) {
+      recordApprovalDecision({ workspace: ws, agentId: "default", approvalRequestId: approval.approvalRequestId, userId, username: userId,
+        roles: ["OWNER"], decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision" });
+    }
+    const verify = () => verifyApprovalForExecution({ workspace: ws, approvalId: approval.approvalRequestId, expectedAgentId: "default",
+      expectedIntentId: "intent-tamper", expectedToolName: "fixture.deploy", expectedActionClass: "WRITE_HIGH" });
+    expect(verify().status, "the signed request excludes the initiator: one of two").toBe("PENDING");
+    const record = JSON.parse(readFileSync(filePath, "utf8")) as Record<string, unknown>;
+    delete record.initiator;
+    writeFileSync(filePath, JSON.stringify(record, null, 2));
+    const tampered = verify();
+    expect(tampered.ok).toBe(false);
+    expect(String(tampered.error)).toMatch(/invalid approval request signature/);
+    expect(listApprovalRequests({ workspace: ws, agentId: "default" }), "the copy is not listed either").toEqual([]);
+  });
+});
+

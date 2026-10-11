@@ -2,6 +2,7 @@ import type { UserRole } from "../auth/roles.js";
 import type { ApprovalPolicy } from "./approvalPolicySchema.js";
 import type { ApprovalDecisionRecord, ApprovalRequestRecord } from "./approvalChainStore.js";
 import { approvalRequestBindingDigest } from "./approvalChainStore.js";
+import { sha256Hex } from "../utils/hash.js";
 
 export interface QuorumState {
   status: "PENDING" | "QUORUM_MET" | "DENIED" | "EXPIRED" | "CONSUMED" | "CANCELLED";
@@ -14,14 +15,20 @@ export interface QuorumState {
 }
 
 /**
- * Whether `userId` is the request's recorded initiator (P1-78). An initiator keyed as A4 keys principals
- * (`LOCAL_USER:<userId>`, `WORKSPACE_ROUTER:<userId>`) names the user id an engine decision records; A4 resolves an engine
- * decision's user id to exactly one plane (resolveApprover), so this matches every decision A4 would key the same, and
- * also a same-named user of the other plane (the conservative direction). Any other initiator is a user id.
+ * Whether a reviewer is the request's recorded initiator (P1-78), matched on their user id or username as the engine's
+ * distinct-user check matches. An initiator keyed as A4 keys principals (`LOCAL_USER:<userId>`, `WORKSPACE_ROUTER:<userId>`)
+ * names the user id an engine decision records; A4 resolves an engine decision's user id to exactly one plane
+ * (resolveApprover), so this matches every decision A4 would key the same, and also a same-named user of the other plane
+ * (the conservative direction). `sha256-16:<hex>` names a user only by the first 16 hex of their id's sha256 (an audit
+ * evidence request keeps its requester that way). Any other initiator is a user id, or the CLI's self-reported OS user.
  */
-export function isApprovalInitiator(request: Pick<ApprovalRequestRecord, "initiator">, userId: string): boolean {
+export function isApprovalInitiator(request: Pick<ApprovalRequestRecord, "initiator">,
+  reviewer: Pick<ApprovalDecisionRecord, "userId" | "username">): boolean {
   if (request.initiator === undefined) return false;
-  return (/^(?:LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(request.initiator)?.[1] ?? request.initiator) === userId;
+  const hashed = /^sha256-16:([a-f0-9]{16})$/.exec(request.initiator)?.[1];
+  if (hashed !== undefined) return [reviewer.userId, reviewer.username].some((value) => sha256Hex(value).slice(0, 16) === hashed);
+  const id = /^(?:LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(request.initiator)?.[1] ?? request.initiator;
+  return id === reviewer.userId || id === reviewer.username;
 }
 
 function hasAllowedRole(roles: readonly UserRole[], allowed: readonly UserRole[]): boolean {
@@ -109,8 +116,9 @@ export function evaluateApprovalQuorum(params: {
     if (decision.decision !== "APPROVE_EXECUTE") {
       continue;
     }
-    // Initiator is never approver (P1-78): such a decision was refused at write, so one on disk is never counted.
-    if (isApprovalInitiator(request, decision.userId)) {
+    // Where the request requires distinct users, the initiator is never an approver (P1-78): such a decision was refused
+    // at write, so one on disk is never counted.
+    if (request.requireDistinctUsers && isApprovalInitiator(request, decision)) {
       continue;
     }
     if (request.requireDistinctUsers && approverUserIds.includes(decision.userId)) {

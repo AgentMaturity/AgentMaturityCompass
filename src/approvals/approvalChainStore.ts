@@ -484,11 +484,18 @@ export function listApprovalRequests(params: {
       continue;
     }
     const path = join(dir, file);
-    if (!verifyArtifact(params.workspace, path).valid) {
+    // One read: the bytes verified are the bytes parsed (P1-78; this list feeds quorum decisions).
+    let bytes: Buffer;
+    try {
+      bytes = readFileSync(path);
+    } catch {
+      continue;
+    }
+    if (!verifyArtifact(params.workspace, path, bytes).valid) {
       continue;
     }
     try {
-      out.push(approvalRequestSchema.parse(JSON.parse(readUtf8(path)) as unknown));
+      out.push(approvalRequestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown));
     } catch {
       continue;
     }

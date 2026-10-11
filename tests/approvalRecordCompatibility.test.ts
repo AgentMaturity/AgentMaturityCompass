@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema } from "../src/approvals/approvalChainStore.js";
 import { evaluateApprovalQuorum } from "../src/approvals/approvalQuorum.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 /**
  * Records written before P1-78 keep parsing and keep their binding digest (A4 constraints 3 and 4). The fixture was built
@@ -60,5 +61,12 @@ describe("a request that records its initiator (P1-78)", () => {
     const bare = evaluateApprovalQuorum({ request: { ...request, initiator: "requester-1" }, now, decisions: [decision("requester-1", "APPROVE_EXECUTE")] });
     expect(bare.received, "an unprefixed initiator is a user id").toBe(0);
     expect(evaluateApprovalQuorum({ request, now, decisions: [decision("requester-1", "DENY")] }).status).toBe("DENIED");
+    const single = evaluateApprovalQuorum({ request: { ...request, requireDistinctUsers: false }, now,
+      // The decision is bound to no digest here: this request differs from the one the fixture decision bound.
+      decisions: [{ ...decision("requester-1", "APPROVE_EXECUTE"), requestDigestSha256: undefined }] });
+    expect(single.received, "without distinct users the initiator's approval counts").toBe(1);
+    const hashed = evaluateApprovalQuorum({ request: { ...request, initiator: `sha256-16:${sha256Hex("requester-1").slice(0, 16)}` }, now,
+      decisions: [{ ...decision("requester-1", "APPROVE_EXECUTE"), requestDigestSha256: undefined }] });
+    expect(hashed.received, "an initiator kept as an id hash still matches its user").toBe(0);
   });
 });

@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { userInfo } from "node:os";
 import { join } from "node:path";
 import type { ActionClass, ExecutionMode } from "../types.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -9,6 +10,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
   a4FloorFor,
+  approvalRuleForAction,
   evaluateApprovalRequestPolicy,
   initApprovalPolicy,
   loadApprovalPolicy,
@@ -57,6 +59,18 @@ export interface ApprovalRequestInput {
    * records none and nothing changes.
    */
   initiator?: string;
+}
+
+/**
+ * The OS account running this process (P1-78): the initiator a CLI command records, and a record's principal when nothing
+ * else names one. Self-reported, so as an initiator it can only refuse that same user id's approval, never allow anything.
+ */
+export function cliInitiator(): string {
+  try {
+    return userInfo().username || "unknown";
+  } catch {
+    return process.env.USER ?? "unknown";
+  }
 }
 
 function fileDigestOrFallback(workspace: string, rel: string, fallback = ""): string {
@@ -327,8 +341,11 @@ export function decideApprovalForIntent(params: {
   }
   const reviewerUserId = params.userId ?? "owner";
   const reviewerUsername = params.username ?? "owner";
-  if (params.decision === "APPROVED" && isApprovalInitiator(request, reviewerUserId)) {
-    throw new Error("initiator cannot approve their own request; a different approver is required");
+  // Initiator is never approver where distinct users are required (P1-78): by the signed request's own rule, or by the
+  // class's rule in the signed approval policy now (the lookup operator resolutions use, P1-04).
+  if (params.decision === "APPROVED" && isApprovalInitiator(request, { userId: reviewerUserId, username: reviewerUsername })
+    && (request.requireDistinctUsers || approvalRuleForAction(loadApprovalPolicy(params.workspace), request.actionClass).requireDistinctUsers)) {
+    throw new Error("initiator cannot approve their own request; this action class requires a different approver (approval policy requireDistinctUsers)");
   }
   if (request.requireDistinctUsers && params.decision === "APPROVED") {
     const priorApproval = listApprovalDecisions({

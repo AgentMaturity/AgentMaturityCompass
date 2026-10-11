@@ -23,8 +23,8 @@ binding:
   points: [approvals]
   mechanism: >-
     The approval engine refuses a second decision by the same user when the signed policy requires
-    distinct users, refuses an approval by the request's recorded initiator, and counts only distinct
-    approvers other than the initiator toward the quorum.
+    distinct users, and then also refuses an approval by the request's recorded initiator; the quorum
+    counts only distinct approvers other than that initiator.
   parameters: []
   manualDuty: null
 tests:
@@ -35,6 +35,7 @@ tests:
       positive:
         - L0-OVS-03/positive/distinct-approvers.json
         - L0-OVS-03/positive/evidence-valid.json
+        - L0-OVS-03/positive/initiator-approves-single-user-class.json
         - L0-OVS-03/positive/initiator-excluded-distinct-approvers.json
       negative:
         - L0-OVS-03/negative/evidence-contradictory.json
@@ -48,9 +49,10 @@ tests:
         - L0-OVS-03/negative/same-user-twice.json
         - L0-OVS-03/negative/single-approver.json
     passCriteria: >-
-      Two distinct approvers meet the quorum; the same user deciding twice is refused. A request that
-      records its initiator refuses the initiator's approval, and an approval by the initiator written
-      past the engine's refusal is not counted toward the quorum.
+      Two distinct approvers meet the quorum; the same user deciding twice is refused. Where the class
+      requires distinct users, a request's recorded initiator cannot approve it, and an approval by the
+      initiator written past the engine's refusal is not counted; where it does not (a single-user
+      class), the initiator's approval counts and the initiator stays recorded.
     attempts: 1
 evidence:
   - id: L0-OVS-03-E1
