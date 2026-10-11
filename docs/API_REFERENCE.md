@@ -5999,6 +5999,7 @@ Rotate one purpose's key with a signed, chained statement; --resume completes or
 | `--overlap-days <n>` | - |
 | `--root-key <file...>` | - |
 | `--resume` | - |
+| `--restore` | - |
 
 #### `amc lab-compare`
 
