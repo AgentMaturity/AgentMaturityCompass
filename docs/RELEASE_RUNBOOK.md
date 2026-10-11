@@ -43,7 +43,8 @@ wait.**
 ### B2 — Release candidate
 
 ```bash
-git rev-parse HEAD                      # the pinned candidate commit
+npm run release:prepare -- <version>    # version, notes, CHANGELOG, version files, checks and dry runs; never publishes
+git rev-parse HEAD                      # the pinned candidate commit, after committing what release:prepare wrote
 pnpm release:gate -- --json --out tmp/release-gate/candidate.json
 pnpm release:prepack-check
 pnpm check:packed-install               # in a fresh clone of the candidate commit
@@ -56,12 +57,10 @@ record its SHA256 (`shasum -a 256 dist/amc-<version>.amcrelease`).
 
 ### B3 — Publish — **CONFIRM WITH SID FIRST**
 
-`pnpm release` runs `changeset publish`.
+Publishing is pushing the `v<version>` tag (section 3 below). It runs `release.yml`, the only publisher, whose
+`release` job then waits for a required reviewer of the `release` environment. `pnpm release` no longer publishes.
 **Do not run it until you have shown Sid the version, the artifact SHA256, the gate result, and the B0 disposition, and he has said yes in this conversation.**
-Publishing is irreversible and outward-facing.
-
-Pushing a `v<version>` tag (section 3 below) runs `release.yml`, which also
-publishes to npm when `NPM_TOKEN` is configured. A tag push is a B3 action.
+Publishing is irreversible and outward-facing. The tag push and the environment approval are both B3 actions.
 
 ### B4 — Live deployment — **CONFIRM WITH SID FIRST**
 
@@ -99,10 +98,13 @@ commit, the image digest and the verifier result JSON.
 
 ## 0) Preconditions
 
-- Release PR merged to `main`
+- `npm run release:prepare -- <version>` passed and its result is merged to `main`: no pending changesets, one
+  CHANGELOG heading for the version, `docs/releases/<version>.md` present (`node scripts/check-release-candidate.mjs`)
 - CI green on the exact release commit (frozen pnpm install, build and tests)
-- At least one approved changeset in `.changeset/`
-- Release signing key available in CI (`AMC_RELEASE_SIGNING_KEY` or `AMC_RELEASE_SIGNING_KEY_FILE`)
+- The `release` environment holds `AMC_RELEASE_SIGNING_KEY` and, for token publishing, `NPM_TOKEN` (P0-38); without them
+  the release job fails
+- The release public key is committed at `trust/amc-release-signing.pub` (P0-37); the job verifies the bundle only
+  against it
 - Rollback owner on-call and aware of release window
 
 ---
@@ -191,7 +193,9 @@ git tag v<version>
 git push origin v<version>
 ```
 
-3. GitHub Actions `Release` workflow runs automatically
+3. GitHub Actions `Release` workflow runs automatically. Its `release` job waits in the `release` environment:
+   approve it only for the version Sid confirmed. Without the signing key, the committed release public key or an
+   npm credential the job fails; it never skips publishing silently.
 
 ---
 
@@ -208,11 +212,16 @@ Validate published assets:
 - npm package published successfully
 - GHCR image published with expected tag
 
-Offline verification:
+Offline verification, pinned to the release key committed at the tag (check its fingerprint against the copies
+P0-37 publishes outside the repository first). Never verify against a key the bundle carries:
 
 ```bash
-amc release verify dist/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
+git show v<version>:trust/amc-release-signing.pub > amc-release-signing.pub
+amc release verify amc-<version>.amcrelease --pubkey amc-release-signing.pub
 ```
+
+Then record the new npm version in `website/publication-status.json` (with the evidence of the check):
+`release:prepare` plans the next version from it.
 
 ---
 
