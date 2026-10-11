@@ -6,13 +6,20 @@
 import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
+import { approvalPolicyPath, approvalPolicySigPath, verifyApprovalPolicySignature } from "../../approvals/approvalPolicyEngine.js";
+import { ensureLeaseRevocationStore, issueLeaseForCli, parseLeaseTtlToMs } from "../../leases/leaseCli.js";
+import { leasePayloadSchema, type LeasePayload } from "../../leases/leaseSchema.js";
+import { workspaceIdFromDirectory } from "../../workspaces/workspaceId.js";
+import { verifyManagedLease } from "../managedHookLease.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { writeFileAtomic } from "../../utils/fs.js";
 
 export const HOOK_INTEGRATION_ID = "amc-observe-v1";
 export const HOOK_CONTROL_INTEGRATION_ID = "amc-control-v1";
 export const HOOK_TOKEN_MODE = 0o600;
-export const DEFAULT_BRIDGE_BASE = "http://127.0.0.1:3212";
+const DEFAULT_BRIDGE_BASE = "http://127.0.0.1:3212";
+const DEFAULT_HOOK_TTL = "7d";
+const DEFAULT_HOOK_RPM = 120;
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const STALE_INSTALL_LOCK_MS = 5 * 60_000;
@@ -20,6 +27,14 @@ const GITIGNORE_MARKER = "# AMC managed hook credentials";
 const GITIGNORE_ENTRY = ".amc/hooks/";
 
 export const hookModeSchema = z.enum(["observe", "control"]);
+/** The installation manifest fields that bind an agent, its Bridge and its dedicated lease. */
+export const leaseManifestFields = {
+  agentId: z.string().min(1),
+  bridgeBase: z.string().url(),
+  leaseId: z.string().min(1),
+  leaseIssuedTs: z.number().int(),
+  leaseExpiresTs: z.number().int(),
+};
 export type HookMode = "observe" | "control";
 
 export type HookIntegrationErrorCode =
@@ -245,7 +260,7 @@ export function fileChange(path: string, sensitive: boolean, before: FileSnapsho
   };
 }
 
-export function decodeLeasePayload(token: string): unknown {
+function decodeLeasePayload(token: string): unknown {
   const [payloadPart] = token.split(".");
   if (!payloadPart) throw new HookIntegrationError("HOOK_TOKEN_INVALID", "issued lease token has no payload");
   const normalized = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
@@ -255,4 +270,100 @@ export function decodeLeasePayload(token: string): unknown {
   } catch {
     throw new HookIntegrationError("HOOK_TOKEN_INVALID", "issued lease payload is invalid");
   }
+}
+
+/**
+ * The approval policy files a control installation depends on, snapshotted for rollback. Control refuses a policy
+ * file without its signature (or the reverse) and a policy whose signature does not verify; a missing pair is created
+ * by the installer.
+ */
+export function controlApprovalPolicy(workspace: string, mode: HookMode) {
+  const path = approvalPolicyPath(workspace);
+  const sigPath = approvalPolicySigPath(workspace);
+  const before = snapshot(path);
+  const sigBefore = snapshot(sigPath);
+  if (mode === "control") {
+    if (before.existed !== sigBefore.existed) {
+      throw new HookIntegrationError(
+        "HOOK_CONTROL_POLICY_INVALID",
+        "control mode requires a complete signed approval policy; repair it with amc policy approval init",
+      );
+    }
+    if (before.existed) {
+      const approvalVerification = verifyApprovalPolicySignature(workspace);
+      if (!approvalVerification.valid) {
+        throw new HookIntegrationError(
+          "HOOK_CONTROL_POLICY_INVALID",
+          `control mode requires a valid approval policy signature: ${approvalVerification.reason ?? "verification failed"}`,
+        );
+      }
+    }
+  }
+  return { path, sigPath, before, sigBefore };
+}
+
+/** The install options every provider shares, validated: mode, workspace, agent, Bridge origin, lease TTL and RPM. */
+export function parseInstallOptions(options: {
+  workspace: string; agentId: string; mode?: HookMode; bridgeBase?: string; ttl?: string; rpm?: number;
+}): { mode: HookMode; workspace: string; agentId: string; bridgeBase: string; ttl: string; rpm: number } {
+  const mode = parseMode(options.mode);
+  const workspace = resolve(options.workspace);
+  const agentId = validateAgentId(options.agentId);
+  const bridgeBase = normalizeBridgeBase(options.bridgeBase);
+  assertControlBridgeLocal(mode, bridgeBase);
+  const ttl = options.ttl ?? DEFAULT_HOOK_TTL;
+  if (!Number.isFinite(parseLeaseTtlToMs(ttl)) || parseLeaseTtlToMs(ttl) <= 0) {
+    throw new HookIntegrationError("HOOK_TOKEN_INVALID", "hook lease TTL must be positive");
+  }
+  const rpm = options.rpm ?? DEFAULT_HOOK_RPM;
+  if (!Number.isInteger(rpm) || rpm < 1) {
+    throw new HookIntegrationError("HOOK_TOKEN_INVALID", "hook lease RPM must be a positive integer");
+  }
+  return { mode, workspace, agentId, bridgeBase, ttl, rpm };
+}
+
+/** The installation's dedicated hook lease: the valid one already on disk, or a new one scoped to `/hooks` and the mode. */
+export function obtainHookLease(input: {
+  workspace: string; agentId: string; mode: HookMode; ttl: string; rpm: number; tokenPath: string;
+  existing: ReturnType<typeof verifyManagedLease>;
+}): { token: string; payload: LeasePayload; issued: boolean } {
+  const revocations = ensureLeaseRevocationStore(input.workspace);
+  if (!revocations.signatureValid) {
+    throw new HookIntegrationError("HOOK_TOKEN_INVALID", "lease revocation store signature is invalid");
+  }
+  if (input.existing.valid && input.existing.payload) {
+    return { token: readFileSync(input.tokenPath, "utf8").trim(), payload: input.existing.payload, issued: false };
+  }
+  const token = issueLeaseForCli({
+    workspace: input.workspace,
+    workspaceId: workspaceIdFromDirectory(input.workspace),
+    agentId: input.agentId,
+    ttl: input.ttl,
+    scopes: leaseScopes(input.mode).join(","),
+    routes: "/hooks",
+    models: "*",
+    rpm: input.rpm,
+    tpm: 1,
+    maxCostUsdPerDay: null
+  }).token;
+  return { token, payload: leasePayloadSchema.parse(decodeLeasePayload(token)), issued: true };
+}
+
+/** The installation's lease as `status` reports it; appends its issues to `issues`. */
+export function managedLeaseStatus(workspace: string, tokenPath: string,
+  manifest: { agentId: string; mode: HookMode; leaseId: string } | null, issues: string[]): ReturnType<typeof verifyManagedLease> {
+  const lease = verifyManagedLease({
+    workspace,
+    tokenPath,
+    expectedAgentId: manifest?.agentId,
+    mode: manifest?.mode ?? "observe"
+  });
+  if (!lease.valid) {
+    if (lease.error === "lease token permissions must be 0600") issues.push(lease.error);
+    else issues.push(`lease invalid: ${lease.error ?? "verification failed"}`);
+  }
+  if (manifest && lease.payload && lease.payload.leaseId !== manifest.leaseId) {
+    issues.push("lease ID differs from the signed installation manifest");
+  }
+  return lease;
 }

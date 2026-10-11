@@ -1,15 +1,5 @@
-import {
-  closeSync,
-  existsSync,
-  lstatSync,
-  mkdirSync,
-  openSync,
-  readFileSync,
-  statSync,
-  unlinkSync,
-  writeFileSync
-} from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { existsSync, readFileSync, statSync, unlinkSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 import { z } from "zod";
@@ -25,37 +15,25 @@ import {
   verifyProviderHookControlResult,
   type ProviderHookControlResult,
 } from "../bridge/hookControl.js";
-import { renderProviderControlResponse, type HookControlDecision, type ProviderControlResponse } from "../bridge/hookProviders.js";
+import { renderProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse } from "../bridge/hookProviders.js";
+import { installPiHook, piHookStatus, PI_HOOK_SOURCE, removePiHook } from "./hookProviders/pi.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { boundedFetchSignal, CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
-import {
-  approvalPolicyPath,
-  approvalPolicySigPath,
-  initApprovalPolicy,
-  verifyApprovalPolicySignature,
-} from "../approvals/approvalPolicyEngine.js";
+import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
-import {
-  ensureLeaseRevocationStore,
-  issueLeaseForCli,
-  parseLeaseTtlToMs,
-  revokeLeaseForCli
-} from "../leases/leaseCli.js";
-import { leasePayloadSchema, type LeasePayload } from "../leases/leaseSchema.js";
+import { revokeLeaseForCli } from "../leases/leaseCli.js";
 import { verifyManagedLease } from "./managedHookLease.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
-import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   isSafeProviderActionId,
   resolveProviderHookRequestIdentity,
   type HookActionIdentitySource,
 } from "../bridge/hookActionIdentity.js";
-
 import {
-  addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, decodeLeasePayload,
-  DEFAULT_BRIDGE_BASE, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError,
+  addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
+  leaseManifestFields, obtainHookLease, parseInstallOptions, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError,
   hasManagedIgnoreBlock, hookModeSchema, ignoreBlockHash, integrationId, leaseScopes, normalizeBridgeBase, parseMode, relativePortable,
   removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
 } from "./hookProviders/installFiles.js";
@@ -95,11 +73,11 @@ const LEGACY_HOOK_SOURCES = {
 export const MAX_PROVIDER_HOOK_INPUT_BYTES = 262_144;
 
 const MAX_PROVIDER_CONFIG_BYTES = 4 * 1024 * 1024;
-const DEFAULT_HOOK_TTL = "7d";
-const DEFAULT_HOOK_RPM = 120;
 const CLAUDE_STATUS_MESSAGE = `AMC Observe [${HOOK_INTEGRATION_ID}]`;
 const CLAUDE_CONTROL_STATUS_MESSAGE = `AMC Control [${HOOK_CONTROL_INTEGRATION_ID}]`;
-export type HookProvider = "claude-code" | "gemini-cli";
+/** The providers configured through a JSON hooks file; Pi installs through src/adapters/hookProviders/pi.ts. */
+type ConfigHookProvider = Exclude<HookProvider, "pi">;
+export type { HookProvider };
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
 const nativeHookEventNameSchema = z.enum([
   "AfterTool",
@@ -124,11 +102,7 @@ const manifestCommonSchema = z.object({
   configPath: z.string().min(1),
   ignorePath: z.string().min(1),
   tokenPath: z.string().min(1),
-  agentId: z.string().min(1),
-  bridgeBase: z.string().url(),
-  leaseId: z.string().min(1),
-  leaseIssuedTs: z.number().int(),
-  leaseExpiresTs: z.number().int(),
+  ...leaseManifestFields,
   configExistedBefore: z.boolean(),
   ignoreExistedBefore: z.boolean(),
   ignoreBlockSha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -181,7 +155,7 @@ export interface HookMutationResult {
   operation: "install" | "remove";
   provider: HookProvider;
   mode: HookMode;
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE;
   dryRun: boolean;
   applied: boolean;
   changed: boolean;
@@ -201,7 +175,7 @@ export interface HookIntegrationStatus {
   agentId: string | null;
   mode: HookMode | null;
   state: "not-installed" | "installed" | "drifted" | "expired" | "invalid";
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE;
   configOwned: boolean;
   manifestValid: boolean;
   leaseValid: boolean;
@@ -256,7 +230,7 @@ interface ProviderHookSpec {
   eventType: "action.requested" | "action.completed" | "action.failed";
 }
 
-function providerHookSpecs(provider: HookProvider): ProviderHookSpec[] {
+function providerHookSpecs(provider: ConfigHookProvider): ProviderHookSpec[] {
   return provider === "claude-code"
     ? [
         { eventName: "PostToolUse", phase: "completed", eventType: "action.completed" },
@@ -269,17 +243,17 @@ function providerHookSpecs(provider: HookProvider): ProviderHookSpec[] {
       ];
 }
 
-function providerObservedEventTypes(provider: HookProvider): Array<"action.requested" | "action.completed" | "action.failed"> {
+function providerObservedEventTypes(provider: ConfigHookProvider): Array<"action.requested" | "action.completed" | "action.failed"> {
   return provider === "claude-code"
     ? ["action.requested", "action.completed", "action.failed"]
     : ["action.requested", "action.completed", "action.failed"];
 }
 
-function providerSource(provider: HookProvider): typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE {
+function providerSource(provider: ConfigHookProvider): typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE {
   return provider === "claude-code" ? CLAUDE_CODE_HOOK_SOURCE : GEMINI_CLI_HOOK_SOURCE;
 }
 
-function parseProvider(provider: unknown): HookProvider {
+function parseProvider(provider: unknown): ConfigHookProvider {
   const parsed = hookProviderSchema.safeParse(provider);
   if (!parsed.success) {
     throw new HookIntegrationError(
@@ -290,11 +264,11 @@ function parseProvider(provider: unknown): HookProvider {
   return parsed.data;
 }
 
-function providerControlOutcomes(provider: HookProvider): HookControlDecision[] {
+function providerControlOutcomes(provider: ConfigHookProvider): HookControlDecision[] {
   return provider === "claude-code" ? ["allow", "deny", "ask"] : ["allow", "deny"];
 }
 
-function managedPaths(workspaceInput: string, provider: HookProvider): ManagedPaths {
+function managedPaths(workspaceInput: string, provider: ConfigHookProvider): ManagedPaths {
   const workspace = resolve(workspaceInput);
   const config = provider === "claude-code"
     ? join(workspace, ".claude", "settings.local.json")
@@ -354,7 +328,7 @@ function loadConfig(path: string): { value: JsonObject; existed: boolean; raw: s
 
 function forwardArgs(input: {
   workspace: string;
-  provider: HookProvider;
+  provider: ConfigHookProvider;
   mode: HookMode;
   agentId: string;
   bridgeBase: string;
@@ -388,7 +362,7 @@ export function amcCliScriptPath(mode: HookMode, moduleUrl = import.meta.url): s
 
 function expectedHandler(input: {
   workspace: string;
-  provider: HookProvider;
+  provider: ConfigHookProvider;
   mode: HookMode;
   agentId: string;
   bridgeBase: string;
@@ -467,7 +441,7 @@ function eventGroups(config: JsonObject, eventName: string, create: boolean): un
   return current;
 }
 
-function isOwnedHandler(provider: HookProvider, handler: unknown): handler is JsonObject {
+function isOwnedHandler(provider: ConfigHookProvider, handler: unknown): handler is JsonObject {
   if (!isJsonObject(handler)) return false;
   if (provider === "gemini-cli") {
     return handler.name === HOOK_INTEGRATION_ID || handler.name === HOOK_CONTROL_INTEGRATION_ID;
@@ -475,7 +449,7 @@ function isOwnedHandler(provider: HookProvider, handler: unknown): handler is Js
   return handler.statusMessage === CLAUDE_STATUS_MESSAGE || handler.statusMessage === CLAUDE_CONTROL_STATUS_MESSAGE;
 }
 
-function locateOwnedHandlers(config: JsonObject, provider: HookProvider): LocatedHandler[] {
+function locateOwnedHandlers(config: JsonObject, provider: ConfigHookProvider): LocatedHandler[] {
   const found: LocatedHandler[] = [];
   for (const { eventName } of providerHookSpecs(provider)) {
     const groups = eventGroups(config, eventName, false) ?? [];
@@ -498,7 +472,7 @@ function locateOwnedHandlers(config: JsonObject, provider: HookProvider): Locate
 
 function addOwnedHandler(
   config: JsonObject,
-  provider: HookProvider,
+  provider: ConfigHookProvider,
   eventName: NativeHookEventName,
   handler: JsonObject,
 ): void {
@@ -588,7 +562,7 @@ function loadSignedManifest(workspace: string, paths: ManagedPaths): HookManifes
   }
 }
 
-function validateManifestPaths(workspace: string, provider: HookProvider, paths: ManagedPaths, manifest: HookManifest): void {
+function validateManifestPaths(workspace: string, provider: ConfigHookProvider, paths: ManagedPaths, manifest: HookManifest): void {
   const expectedSource = manifest.v === 1 ? LEGACY_HOOK_SOURCES[provider] : providerSource(provider);
   const expectedControl = manifest.mode === "control";
   const lifecycleBindingValid = manifest.v === 1
@@ -621,7 +595,7 @@ function validateManifestPaths(workspace: string, provider: HookProvider, paths:
   }
 }
 
-function limitations(provider: HookProvider, mode: HookMode): string[] {
+function limitations(provider: ConfigHookProvider, mode: HookMode): string[] {
   return [
     mode === "control"
       ? "control is loopback-only; raw provider input is evaluated in memory and never retained"
@@ -638,7 +612,7 @@ function limitations(provider: HookProvider, mode: HookMode): string[] {
 
 function unchangedInstallResult(input: {
   workspace: string;
-  provider: HookProvider;
+  provider: ConfigHookProvider;
   paths: ManagedPaths;
   manifest: HookManifest;
   dryRun: boolean;
@@ -674,20 +648,9 @@ function unchangedInstallResult(input: {
 }
 
 export function installHookIntegration(options: InstallHookIntegrationOptions): HookMutationResult {
+  if (options.provider === "pi") return installPiHook(options, join(dirname(amcCliScriptPath(parseMode(options.mode))), "adapters", "pi", "amcPiExtension.js"));
   const provider = parseProvider(options.provider);
-  const mode = parseMode(options.mode);
-  const workspace = resolve(options.workspace);
-  const agentId = validateAgentId(options.agentId);
-  const bridgeBase = normalizeBridgeBase(options.bridgeBase);
-  assertControlBridgeLocal(mode, bridgeBase);
-  const ttl = options.ttl ?? DEFAULT_HOOK_TTL;
-  if (!Number.isFinite(parseLeaseTtlToMs(ttl)) || parseLeaseTtlToMs(ttl) <= 0) {
-    throw new HookIntegrationError("HOOK_TOKEN_INVALID", "hook lease TTL must be positive");
-  }
-  const rpm = options.rpm ?? DEFAULT_HOOK_RPM;
-  if (!Number.isInteger(rpm) || rpm < 1) {
-    throw new HookIntegrationError("HOOK_TOKEN_INVALID", "hook lease RPM must be a positive integer");
-  }
+  const { mode, workspace, agentId, bridgeBase, ttl, rpm } = parseInstallOptions(options);
   const paths = managedPaths(workspace, provider);
   assertAllPathsSafe(workspace, Object.values(paths));
 
@@ -707,27 +670,8 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", "managed hook handler set differs from the signed installation manifest");
     }
 
-    const approvalPath = approvalPolicyPath(workspace);
-    const approvalSigPath = approvalPolicySigPath(workspace);
-    const approvalBefore = snapshot(approvalPath);
-    const approvalSigBefore = snapshot(approvalSigPath);
-    if (mode === "control") {
-      if (approvalBefore.existed !== approvalSigBefore.existed) {
-        throw new HookIntegrationError(
-          "HOOK_CONTROL_POLICY_INVALID",
-          "control mode requires a complete signed approval policy; repair it with amc policy approval init",
-        );
-      }
-      if (approvalBefore.existed) {
-        const approvalVerification = verifyApprovalPolicySignature(workspace);
-        if (!approvalVerification.valid) {
-          throw new HookIntegrationError(
-            "HOOK_CONTROL_POLICY_INVALID",
-            `control mode requires a valid approval policy signature: ${approvalVerification.reason ?? "verification failed"}`,
-          );
-        }
-      }
-    }
+    const { path: approvalPath, sigPath: approvalSigPath, before: approvalBefore, sigBefore: approvalSigBefore } =
+      controlApprovalPolicy(workspace, mode);
 
     const desiredHandler = expectedHandler({ workspace, provider, mode, agentId, bridgeBase, tokenPath: paths.token });
     const desiredHandlerHash = handlerHash(desiredHandler);
@@ -811,32 +755,9 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       };
     }
 
-    const revocations = ensureLeaseRevocationStore(workspace);
-    if (!revocations.signatureValid) {
-      throw new HookIntegrationError("HOOK_TOKEN_INVALID", "lease revocation store signature is invalid");
-    }
-    let token: string;
-    let leasePayload: LeasePayload;
-    let issuedNewLease = false;
-    if (existingLease.valid && existingLease.payload) {
-      token = readFileSync(paths.token, "utf8").trim();
-      leasePayload = existingLease.payload;
-    } else {
-      token = issueLeaseForCli({
-        workspace,
-        workspaceId: workspaceIdFromDirectory(workspace),
-        agentId,
-        ttl,
-        scopes: leaseScopes(mode).join(","),
-        routes: "/hooks",
-        models: "*",
-        rpm,
-        tpm: 1,
-        maxCostUsdPerDay: null
-      }).token;
-      leasePayload = leasePayloadSchema.parse(decodeLeasePayload(token));
-      issuedNewLease = true;
-    }
+    const { token, payload: leasePayload, issued: issuedNewLease } = obtainHookLease({
+      workspace, agentId, mode, ttl, rpm, tokenPath: paths.token, existing: existingLease,
+    });
 
     const now = Date.now();
     const manifest = manifestSchema.parse({
@@ -954,6 +875,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
 }
 
 export function getHookIntegrationStatus(input: { workspace: string; provider: HookProvider }): HookIntegrationStatus {
+  if (input.provider === "pi") return piHookStatus(input.workspace);
   const provider = parseProvider(input.provider);
   const workspace = resolve(input.workspace);
   const paths = managedPaths(workspace, provider);
@@ -1035,19 +957,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   const ignoreProtected = hasManagedIgnoreBlock(ignoreRaw);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
 
-  const lease = verifyManagedLease({
-    workspace,
-    tokenPath: paths.token,
-    expectedAgentId: manifest?.agentId,
-    mode: manifest?.mode ?? "observe"
-  });
-  if (!lease.valid) {
-    if (lease.error === "lease token permissions must be 0600") issues.push(lease.error);
-    else issues.push(`lease invalid: ${lease.error ?? "verification failed"}`);
-  }
-  if (manifest && lease.payload && lease.payload.leaseId !== manifest.leaseId) {
-    issues.push("lease ID differs from the signed installation manifest");
-  }
+  const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
 
   let state: HookIntegrationStatus["state"] = "installed";
   if (!manifestValid || !lease.valid && !lease.expired || !ignoreProtected || issues.some((issue) => issue.includes("signature") || issue.includes("permissions") || issue.includes("lease ID"))) {
@@ -1074,6 +984,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
 }
 
 export function removeHookIntegration(options: RemoveHookIntegrationOptions): HookMutationResult {
+  if (options.provider === "pi") return removePiHook(options);
   const provider = parseProvider(options.provider);
   const workspace = resolve(options.workspace);
   const paths = managedPaths(workspace, provider);
@@ -1206,7 +1117,7 @@ export interface ProviderHookEventInspection {
   correlationSha256: string;
 }
 
-function stablePrivateId(prefix: string, provider: HookProvider, value: string): string {
+function stablePrivateId(prefix: string, provider: ConfigHookProvider, value: string): string {
   return `${prefix}_${sha256Hex(`${provider}:${value}`).slice(0, 32)}`;
 }
 
@@ -1230,7 +1141,7 @@ function hasProviderError(value: unknown): boolean {
   return error !== undefined && error !== null && error !== false && error !== "";
 }
 
-function hookEventSpec(provider: HookProvider, parsed: ParsedProviderHookInput): ProviderHookSpec {
+function hookEventSpec(provider: ConfigHookProvider, parsed: ParsedProviderHookInput): ProviderHookSpec {
   const spec = providerHookSpecs(provider).find((row) => row.eventName === parsed.hook_event_name);
   if (!spec) {
     throw new HookIntegrationError(
@@ -1244,7 +1155,7 @@ function hookEventSpec(provider: HookProvider, parsed: ParsedProviderHookInput):
   return spec;
 }
 
-function hookCorrelationSha256(provider: HookProvider, parsed: ParsedProviderHookInput, rawInputSha256: string): {
+function hookCorrelationSha256(provider: ConfigHookProvider, parsed: ParsedProviderHookInput, rawInputSha256: string): {
   actionId: string;
   correlationSha256: string;
   source: HookActionIdentitySource;
@@ -1369,7 +1280,7 @@ function resolveTokenPath(workspace: string, tokenFile: string): string {
 
 function authorizeForwardInvocation(input: {
   workspace: string;
-  provider: HookProvider;
+  provider: ConfigHookProvider;
   mode: HookMode;
   agentId: string;
   bridgeBase: string;
@@ -1422,7 +1333,7 @@ function delay(ms: number): Promise<void> {
 
 async function resolveProviderTerminalAction(input: {
   authorization: { bridgeBase: string; token: string };
-  provider: HookProvider;
+  provider: ConfigHookProvider;
   correlationSha256: string;
   retryDelayMs: number;
   timeoutMs: number;
