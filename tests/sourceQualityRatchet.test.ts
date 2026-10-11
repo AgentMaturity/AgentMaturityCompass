@@ -1,10 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  baselineEntries, compareToBaseline, configSha256, duplicateFindings, knipFindings, parseBaseline,
+  baseCheck, baselineEntries, compareToBaseline, configSha256, duplicateFindings, knipFindings, parseBaseline,
   ratchet, serializeBaseline, trendRow
 } from "../scripts/source-quality.mjs";
 
@@ -235,6 +235,72 @@ describe("source-quality ratchet", () => {
       { scan: "dead-code", baseline: 20, current: 19, new: 0, stale: 2, accepted: 1 }
     ]);
     expect(row).toBe("| 2026-10-11 | 0123456789ab | 10 / 20 | 11 / 19 | 1 / 0 | 0 / 2 | 0 / 1 |");
+  });
+
+  it("refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)", () => {
+    const root = mkdtempSync(join(tmpdir(), "amc-source-quality-base-"));
+    roots.push(root);
+    const git = (...args: string[]) => {
+      const result = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+      if (result.status !== 0) throw new Error(result.stderr);
+      return result.stdout.trim();
+    };
+    const commit = (baseline: unknown) => {
+      if (baseline === null) writeFileSync(join(root, "README.md"), "fixture\n");
+      else {
+        mkdirSync(join(root, "scripts/quality"), { recursive: true });
+        writeFileSync(join(root, "scripts/quality/source-quality-baseline.json"), typeof baseline === "string" ? baseline : serializeBaseline(baseline));
+      }
+      git("add", "-A");
+      git("commit", "-q", "-m", "fixture");
+    };
+    git("init", "-q", "-b", "main");
+    git("config", "user.name", "Test");
+    git("config", "user.email", "test@example.invalid");
+    git("config", "commit.gpgsign", "false");
+    const findings = knipFindings(fixture("knip-report.json"));
+    const base = baselineFor("dead-code", findings.slice(1));
+    const handAdded = { ...base, deadCode: baselineEntries("dead-code", findings) };
+    const [addedId] = compareToBaseline("dead-code", findings, base).newIds;
+
+    // One-time bootstrap: the base has no baseline file at all.
+    commit(null);
+    git("checkout", "-q", "-b", "feature");
+    expect(baseCheck(root, "dead-code", handAdded, { base: "main" })).toMatchObject({ exitCode: 0, messages: [expect.stringMatching(/one-time bootstrap/)] });
+
+    git("checkout", "-q", "main");
+    commit(base);
+    git("checkout", "-q", "-B", "feature");
+    expect(baseCheck(root, "dead-code", base, { base: "main" })).toEqual({ exitCode: 0, messages: [] });
+    const refused = baseCheck(root, "dead-code", handAdded, { base: "main" });
+    expect(refused.exitCode).toBe(1);
+    expect(refused.messages.join("\n")).toContain(addedId);
+    expect(refused.messages.join("\n")).toContain("--accept");
+    expect(baseCheck(root, "dead-code", { ...base, deadCode: base.deadCode.slice(1) }, { base: "main" }).exitCode).toBe(0);
+    const accepted = { ...base, accepted: [{ id: addedId, scan: "dead-code", reason: "kept for the P0-14 compose verify profile", acceptedBy: "Test", date: "2026-10-11" }] };
+    expect(baseCheck(root, "dead-code", accepted, { base: "main" }).exitCode).toBe(0);
+    // A reviewed rebaseline after tool or config drift may add entries.
+    expect(baseCheck(root, "dead-code", { ...handAdded, tools: { ...handAdded.tools, knip: "6.40.0" } }, { base: "main" }).exitCode).toBe(0);
+
+    // The merge-base decides: main shrinking after the fork does not fail the branch's older entries.
+    git("checkout", "-q", "main");
+    commit({ ...base, deadCode: base.deadCode.slice(1) });
+    git("checkout", "-q", "feature");
+    expect(baseCheck(root, "dead-code", base, { base: "main" }).exitCode).toBe(0);
+
+    // Without origin/main the default base is int; without either it fails closed unless overridden.
+    git("branch", "int", "main");
+    expect(baseCheck(root, "dead-code", handAdded).exitCode).toBe(1);
+    git("branch", "-D", "int");
+    expect(baseCheck(root, "dead-code", base)).toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/Cannot read .* int/)] });
+    expect(baseCheck(root, "dead-code", base, { allowMissingBase: true })).toMatchObject({ exitCode: 0, messages: [expect.stringMatching(/--allow-missing-base/)] });
+    expect(baseCheck(root, "dead-code", base, { base: "no-such-ref" }).exitCode).toBe(1);
+
+    // An unreadable base baseline is not the bootstrap case.
+    git("checkout", "-q", "main");
+    commit("{ not json");
+    git("checkout", "-q", "-b", "after-garbage");
+    expect(baseCheck(root, "dead-code", base, { base: "main" })).toMatchObject({ exitCode: 1, messages: [expect.stringMatching(/Cannot read/)] });
   });
 
   it("commits a valid baseline under 1 MB for the current configs", () => {

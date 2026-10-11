@@ -227,18 +227,54 @@ export function trendRow(date, commit, summaries) {
 }
 
 function git(root, args) {
-  const result = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
   if (result.error || result.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${result.error?.message ?? result.stderr.trim()}`);
   return result.stdout.trim();
 }
+
+/**
+ * Every unaccepted entry of `scan` must already be in the baseline at the merge-base of HEAD and `base`
+ * (default origin/main, else int): a new finding enters only through --accept with a reason, and removals always
+ * pass. Additions are allowed only when the scan's tool version or config hash changed since the base (a reviewed
+ * --rebaseline). A base without any baseline file is the one-time bootstrap; any other unreadable base fails closed
+ * unless `allowMissingBase`.
+ */
+export function baseCheck(root, scan, baseline, { base, allowMissingBase = false } = {}) {
+  const spec = scanSpec(scan);
+  const ref = base ?? (spawnSync("git", ["rev-parse", "--verify", "-q", "origin/main^{commit}"], { cwd: root }).status === 0 ? "origin/main" : "int");
+  let at;
+  let prior;
+  try {
+    const mergeBase = git(root, ["merge-base", "HEAD", ref]);
+    at = `${ref} (merge-base ${mergeBase.slice(0, 12)})`;
+    prior = git(root, ["ls-tree", "--name-only", mergeBase, "--", BASELINE])
+      ? parseBaseline(git(root, ["show", `${mergeBase}:${BASELINE}`])) : null;
+  } catch (error) {
+    const message = `Cannot read the source-quality baseline at the merge-base with ${ref}: ${error.message}`;
+    return allowMissingBase ? { exitCode: 0, messages: [`${message} (--allow-missing-base: base check skipped)`] }
+      : { exitCode: 1, messages: [`${message}. Pass --base <ref>, or --allow-missing-base to skip this check.`] };
+  }
+  if (!prior) return { exitCode: 0, messages: [`No source-quality baseline at ${at}: one-time bootstrap, base check skipped`] };
+  if (prior.tools[spec.tool] !== baseline.tools[spec.tool] || prior.config[spec.configKey] !== baseline.config[spec.configKey]) {
+    return { exitCode: 0, messages: [`${spec.tool} version or ${spec.config} changed since ${at}: a reviewed --rebaseline may add ${scan} entries`] };
+  }
+  const known = new Set(prior[spec.list].map(entry => entry.id));
+  const added = baseline[spec.list].filter(entry => !known.has(entry.id));
+  return { exitCode: added.length ? 1 : 0, messages: added.map(entry => `baseline entry ${entry.id} `
+    + `(${entry.paths ? entry.paths.join(" <-> ") : `${entry.file} ${entry.kind}`}) is not in the baseline at ${at}; `
+    + "a new finding enters only through --accept <id> --reason") };
+}
 function main(argv, root = process.cwd()) {
   const { values, positionals } = parseArgs({ args: argv, allowPositionals: true, strict: true, options: {
-    shrink: { type: "boolean" }, rebaseline: { type: "boolean" }, accept: { type: "string" }, reason: { type: "string" }
+    shrink: { type: "boolean" }, rebaseline: { type: "boolean" }, accept: { type: "string" }, reason: { type: "string" },
+    base: { type: "string" }, "allow-missing-base": { type: "boolean" }
   } });
   const [scan, ...extra] = positionals;
   if (extra.length) throw new Error(`Unexpected arguments: ${extra.join(" ")}`);
   if (scan !== "trend") scanSpec(scan);
   checkOptions(values);
+  const write = values.shrink || values.accept !== undefined || values.rebaseline;
+  if (write && (values.base !== undefined || values["allow-missing-base"])) throw new Error("--base and --allow-missing-base apply only to a check run");
   const baselinePath = join(root, BASELINE);
   const baseline = existsSync(baselinePath) ? parseBaseline(readFileSync(baselinePath, "utf8")) : null;
   if (scan === "trend") {
@@ -259,9 +295,11 @@ function main(argv, root = process.cwd()) {
   if (out.changed) writeFileSync(baselinePath, serializeBaseline(out.baseline));
   mkdirSync(join(root, SUMMARY_DIR), { recursive: true });
   writeFileSync(join(root, SUMMARY_DIR, `${scan}.json`), `${JSON.stringify(out.summary, null, 2)}\n`);
+  const based = write ? { exitCode: 0, messages: [] }
+    : baseCheck(root, scan, out.baseline, { base: values.base, allowMissingBase: values["allow-missing-base"] });
   console.log(JSON.stringify(out.summary));
-  for (const line of out.messages) console.error(line);
-  return out.exitCode;
+  for (const line of [...out.messages, ...based.messages]) console.error(line);
+  return Math.max(out.exitCode, based.exitCode);
 }
 
 if (isEntrypoint(import.meta.url)) {
