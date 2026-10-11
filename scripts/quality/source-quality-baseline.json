@@ -4048,7 +4048,9 @@
     {"id":"20f67376c7db251cf905784371629af4dfd67539748e431d9b2e145bba9baad8","file":"tests/helpers/llmStubUpstream.ts","kind":"types"},
     {"id":"cd29b70bdc8a4dad3d6ee8239b709fd07de3be19f8d00baaeddb814d06bde21e","file":"tests/helpers/sessionProjectionFixtures.ts","kind":"exports"}
   ],
-  "accepted": [],
+  "accepted": [
+    {"id":"c8d705d096f83bfd7c2b531857f1b88bfd5adc1140a282da36804d37ba7959b2","scan":"dead-code","reason":"system mkfifo creates the FIFO fixture for the lease-store special-file regression; Node has no mkfifo API","acceptedBy":"AgentMaturity","date":"2026-10-11"}
+  ],
   "rebaselines": [
     {"scan":"duplicates","toolFrom":"","toolTo":"5.4.0","configFrom":"","configTo":"b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209","added":1254,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"},
     {"scan":"dead-code","toolFrom":"","toolTo":"6.39.0","configFrom":"","configTo":"43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1","added":2787,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"}
