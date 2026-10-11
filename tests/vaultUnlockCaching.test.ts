@@ -1,5 +1,4 @@
 import { legacyV1Payload } from "./helpers/legacyVault.js";
-import { purposeKeyPaths } from "../src/vault/vault.js";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -25,6 +24,22 @@ import { publicKeyFromPrivate } from "../src/crypto/keyHistoryEnvelope.js";
  * disk. Keying it on the passphrase alone would be faster and wrong: a vault
  * replaced underneath a running process would keep serving the old keys.
  */
+/**
+ * Turns a P1-08 workspace back into the 1.x layout these legacy cases model: no key set, no purpose files, no key
+ * revocation list, and a machine that never committed a key set for it (a fresh AMC home). On the machine that did, a
+ * replaced vault or a deleted key set is refused by the key-set binding (tests/keys/workspaceWriter.test.ts).
+ */
+function asLegacyWorkspace(dir: string): void {
+  const keys = vaultPaths(dir).keysDir;
+  for (const name of readdirSync(keys)) {
+    if (name === "keyset.json" || name === "revocations.signed.json" || name === "rotations" || name === "statements"
+      || (/^[a-z-]+(\.pub|_history\.json)$/.test(name) && !/^(monitor|auditor|lease|session)(_ed25519\.pub|_history\.json)$/.test(name))) {
+      rmSync(join(keys, name), { recursive: true, force: true });
+    }
+  }
+  vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-legacy-home-")));
+}
+
 const PASS = "vault-unlock-caching-pass";
 const OTHER_PASS = "vault-unlock-caching-other";
 const roots: string[] = [];
@@ -232,6 +247,7 @@ describe("unlocking an already-unlocked vault", () => {
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     writeFileSync(path, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
+    asLegacyWorkspace(dir);
     const before = diskState(dir);
     // A lease.pub with no lease key behind it cannot be checked, and a new lease key would silently replace it.
     expect(() => unlockVault(dir, PASS)).toThrow(/lease_ed25519\.pub exists, but this older vault holds no lease private key[\s\S]*move/);
@@ -262,9 +278,8 @@ describe("unlocking an already-unlocked vault", () => {
     writeFileSync(paths.vaultFile, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
     rmSync(paths.sessionPublic);
     rmSync(paths.sessionHistory);
-    // P1-08 files a 1.x workspace never had.
-    rmSync(purposeKeyPaths(dir, "session").publicFile);
-    rmSync(join(paths.keysDir, "keyset.json"));
+    // P1-08 files a 1.x workspace never had, on a machine that never committed a key set for it.
+    asLegacyWorkspace(dir);
     const leasePublic = readFileSync(paths.leasePublic, "utf8");
     const leaseHistory = readFileSync(paths.leaseHistory, "utf8");
 

@@ -146,7 +146,12 @@ export function ensureSigningKeys(workspace: string): void {
  * resolves it, so a fail-early probe can check the very key its later signer uses.
  */
 export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session" | LocalPurpose): string {
-  return isLocalPurpose(kind) ? getSigningKey(workspace, kind) : getVaultPrivateKeyPem(workspace, kind);
+  if (isLocalPurpose(kind)) {
+    // The probe form must fail closed: never an ephemeral no-sign key where the caller is about to need a real signer.
+    if (process.env.AMC_NO_SIGN === "1") throw new Error(`no-sign mode holds no ${kind} signing key`);
+    return getSigningKey(workspace, kind);
+  }
+  return getVaultPrivateKeyPem(workspace, kind);
 }
 
 /** The role's current public key; refused while a key change is pending (P1-08 key set). */

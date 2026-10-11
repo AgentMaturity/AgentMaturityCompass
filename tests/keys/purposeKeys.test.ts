@@ -1,6 +1,6 @@
 import { generateKeyPairSync } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { highWaterPath } from "../../src/keys/highWater.js";
+import { highWaterPath, workspaceScope } from "../../src/keys/highWater.js";
 import { keysetPaths } from "../../src/keys/keyset.js";
 import { encodeSignedRevocationList, nextRevocationList, readAnchoredRevocationList, revocationListSha256, signRevocationList } from "../../src/keys/revocationList.js";
 import { canonicalize } from "../../src/utils/json.js";
@@ -59,7 +59,9 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const v2 = JSON.parse(decryptVaultPayload(JSON.parse(readFileSync(paths.vaultFile, "utf8")), PASS).toString("utf8"));
     expect(v2.v).toBe(2);
     expect(v2.secrets).toEqual({ kept: "secret" });
-    expect(readFileSync(paths.previousVaultFile, "utf8")).toBe(envelope);
+    // The v1 envelope is key material: kept in AMC home with the recovery copies, never in the workspace (review round 2).
+    expect(existsSync(paths.previousVaultFile)).toBe(false);
+    expect(readFileSync(join(process.env.AMC_HOME!, "state", "keyset-recovery", workspaceScope(root), "previous-vault.amcvault"), "utf8")).toBe(envelope);
     for (const role of ["monitor", "auditor", "lease", "session"] as const) expect(readFileSync(paths[`${role}Public`], "utf8")).toBe(before[role]);
     expect(getSigningPublicKeyPem(root, "ledger-row")).toBe(roles.monitor.publicPem);
     expect(getSigningPublicKeyPem(root, "receipt")).toBe(roles.monitor.publicPem);
@@ -246,8 +248,9 @@ describe("self-audit: no downgrade to a pre-P1-08 workspace (P1-08, security rev
     expect(getSigningKey(root, "receipt")).toBeTruthy();
     rmSync(keysetPaths(root).keyset);
     rmSync(highWaterPath(), { force: true });
-    expect(() => getSigningKey(root, "receipt")).toThrow(/no key set/);
-    expect(() => getPrivateKeyPem(root, "monitor")).toThrow(/no key set/);
+    // Refused before the vault is even consulted: purpose files without keyset.json mean the key set was removed.
+    expect(() => getSigningKey(root, "receipt")).toThrow(/no key set|keyset\.json is missing/);
+    expect(() => getPrivateKeyPem(root, "monitor")).toThrow(/no key set|keyset\.json is missing/);
   });
 
   it("a recovery directory planted as a symlink is refused before anything is copied into it", () => {

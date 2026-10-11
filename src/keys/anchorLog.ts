@@ -3,6 +3,7 @@
  * (src/crypto/keys.ts, src/vault/vault.ts) never loads the log writer and its import graph, which reaches the ledger
  * and the question bank and would close an import cycle through them.
  */
+import { signingRoute } from "../crypto/signing/signer.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { anchorArtifact, registerAnchorLogWriter, type AnchorTarget } from "./anchors.js";
 
@@ -11,4 +12,7 @@ export function logSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash
   return appendTransparencyEntry({ workspace: target.workspace, type: target.type, agentId: "workspace", artifact: anchorArtifact(target) }).hash;
 }
 
-registerAnchorLogWriter(logSequence);
+registerAnchorLogWriter(logSequence, workspace => {
+  // The seal of every log append is signed by the route the trust config names; an unverifiable config refuses here.
+  signingRoute(workspace, "TRANSPARENCY_ROOT");
+});

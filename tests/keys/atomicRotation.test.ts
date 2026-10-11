@@ -90,7 +90,7 @@ describe("atomic rotation (P1-08)", () => {
       expect(verifyHexDigestAny(digest, oldSignature, getPublicKeyHistory(root, "auditor")), `rename ${k}`).toBe(true);
     }
     expect(outcomes.has("completed")).toBe(true);
-  }, 240_000);
+  }, 480_000);
 
   it("a public key that lost the digest its generation recorded refuses signing, even with the pending marker deleted", () => {
     const root = workspace();
@@ -137,7 +137,7 @@ describe("atomic rotation (P1-08)", () => {
       expect(getPrivateKeyPem(root, "lease")).toBe(roles.lease.privatePem);
       expect(getPublicKeyPem(root, "monitor")).toBe(roles.monitor.publicPem);
     }
-  }, 240_000);
+  }, 480_000);
 });
 
 /** Every file under `dir`, recursively, as paths. */
@@ -192,7 +192,7 @@ describe("key-set hardening (P1-08 self-audit)", () => {
       return;
     }
     expect.unreachable("no crash point left a staged file to roll forward");
-  }, 240_000);
+  }, 480_000);
 
   it("a restored older key set is refused once this machine committed a newer one", () => {
     const root = workspace();

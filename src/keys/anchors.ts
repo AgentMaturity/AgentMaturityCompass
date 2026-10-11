@@ -108,10 +108,17 @@ export function historyLogId(workspace: string, subject: string): string {
 
 type LogWriter = (target: Omit<AnchorTarget, "fileSha256" | "entryHash">) => string;
 let logWriter: LogWriter | null = null;
+let logPreflight: ((workspace: string) => void) | null = null;
 
 /** src/keys/anchorLog.ts registers the transparency-log writer when it loads; key reads never import it (import cycle). */
-export function registerAnchorLogWriter(writer: LogWriter): void {
+export function registerAnchorLogWriter(writer: LogWriter, preflight: (workspace: string) => void): void {
   logWriter = writer;
+  logPreflight = preflight;
+}
+
+/** Throws now whatever would make logging a history revision refuse after a commit (the log's signer and its trust config). */
+export function preflightHistoryLog(workspace: string): void {
+  logPreflight?.(workspace);
 }
 
 /**

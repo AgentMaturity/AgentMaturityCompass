@@ -34,7 +34,7 @@ AMC has no default passphrase. `NODE_ENV=test`, `VITEST` and other test-runner v
 
 ## Payload v2 and purpose keys (P1-08)
 
-The vault holds one key per signing purpose (payload v2). The first unlock after upgrading rewrites a v1 vault as v2 with the same key bytes and keeps the v1 file as `.amc/previous-vault.amcvault`; AMC 1.2.0 cannot read v2, so downgrading is unsupported. Signing call sites take their key per purpose, every key change is an atomic key-set generation, and an unlocked vault without its key set (`.amc/keys/keyset.json`) refuses to sign. See `docs/KEY_LIFECYCLE.md`.
+The vault holds one key per signing purpose (payload v2). The first unlock after upgrading rewrites a v1 vault as v2 with the same key bytes and keeps the v1 file in AMC home (`<AMC home>/state/keyset-recovery/<workspace scope>/previous-vault.amcvault`), out of the workspace; AMC 1.2.0 cannot read v2, so downgrading is unsupported. Signing call sites take their key per purpose, every key change is an atomic key-set generation, and an unlocked vault without its key set (`.amc/keys/keyset.json`) refuses to sign. See `docs/KEY_LIFECYCLE.md`.
 
 ## Rotation
 

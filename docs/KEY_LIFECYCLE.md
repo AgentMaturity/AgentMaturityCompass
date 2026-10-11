@@ -24,7 +24,7 @@ Every signing call site takes its key from `getSigningKey(workspace, purpose)`. 
 
 ## Vault payload v2 and migration
 
-The vault now holds one key per purpose (`{ "v": 2, "keys": { "<purpose>": { "keyId", "privateKeyPem", "createdTs" } }, "secrets": {} }`). On the first unlock after upgrading, a v1 vault is rewritten as v2 with the same key bytes: each role's key serves every purpose it signed before, so no public key changes and nothing needs re-pinning. The v1 envelope is kept as `.amc/previous-vault.amcvault`. AMC 1.2.0 cannot read a v2 vault; downgrading is unsupported.
+The vault now holds one key per purpose (`{ "v": 2, "keys": { "<purpose>": { "keyId", "privateKeyPem", "createdTs" } }, "secrets": {} }`). On the first unlock after upgrading, a v1 vault is rewritten as v2 with the same key bytes: each role's key serves every purpose it signed before, so no public key changes and nothing needs re-pinning. The v1 envelope is kept in AMC home (`<AMC home>/state/keyset-recovery/<workspace scope>/previous-vault.amcvault`), out of the workspace. AMC 1.2.0 cannot read a v2 vault; downgrading is unsupported.
 
 Public files: `.amc/keys/<purpose>.pub` and `<purpose>_history.json` (key-history envelope v2, whose `role` is the purpose). Lease and session keep their role history. The role files stay as a compatible view: a role's `<role>_ed25519.pub` names its primary purpose's key (monitor: `ledger-row`, auditor: `artifact-seal`), and its `<role>_history.json` admits every key its purposes use, so verifiers that read role histories keep verifying after a purpose is split off.
 
@@ -41,7 +41,11 @@ Creating a vault, the v1 migration and every rotation are one key-set generation
 
 While a change is pending, signing and verifying refuse with "key set generation N is incomplete; run `amc keys rotate --resume`". `files` lists what the generation wrote plus every public key and statement still in force. Signers also refuse when one of those public keys or statements lost its digest, and when the unlocked vault does not hold exactly the key ids the key set names.
 
-`keyset.json` is unsigned, so it never vouches for itself. This machine's mark (`<AMC home>/state/high-water.json`) records the generation and digest of the key set it committed, and is raised only when this machine commits or resumes a generation, never when it reads one. Once a mark exists, signers and verifiers accept only that exact key set. They refuse an older generation (`ROLLBACK_DETECTED`), other bytes at the same generation (`FORK_DETECTED`), a newer generation this machine never committed, and a missing `keyset.json`. A machine that never changed keys for the workspace has no mark and takes the key set as found. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
+`keyset.json` is unsigned, so it never vouches for itself. This machine's mark (`<AMC home>/state/high-water.json`) records the generation and digest of the key set it committed, and is raised only when this machine commits or resumes a generation, never when it reads one. Once a mark exists, signers and verifiers accept only that exact key set. They refuse an older generation (`ROLLBACK_DETECTED`), other bytes at the same generation (`FORK_DETECTED`), a newer generation this machine never committed, and a missing `keyset.json`. Unlock and key creation check this first: once a mark exists, AMC never creates a new vault or adopts key files from the workspace, and a vault whose key ids differ from the bound key set is refused at unlock.
+
+A lost key set is never re-created automatically. Each committed generation also keeps its `keyset.json` and the files it wrote in AMC home (`gen-<N>/committed/`), and `amc keys rotate --restore`, in owner mode, puts back exactly the key set this machine committed. It restores `keyset.json` when its copy matches the mark, and every listed file that is missing or, for a public key or statement, lost its digest. A file it replaces is copied aside first.
+
+A machine that never committed the workspace's key set uses it on trust on first use, and does so visibly. It records the generation it adopted, so an older or forked key set is refused there too. Each process prints, on exit, that the key set was "adopted unanchored (trust on first use)", and `keysetAnchoring()` reports the same state for receipts and reports. A workspace that has purpose key files but no `keyset.json` is refused on any machine. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
 
 `amc keys rotate --resume` rolls a pending generation forward when every staged file is intact. Otherwise it restores the previous bytes. Those copies hold older key material (the previous vault, public keys and histories), so they live in AMC home, under `<AMC home>/state/keyset-recovery/<workspace scope>/gen-<N>/`. Only the manifest, which names the files and their modes, stays in `.amc/keys/rotations/gen-<N>/`. Resume accepts only the generation this workspace would write next, or one this machine already marked before a crash, and only with that manifest; any other pending file is refused for the owner to inspect. Resuming never overwrites or deletes a file: one it would replace is copied to `gen-<N>/discarded/` in AMC home first, under a new name if that name is taken.
 
@@ -135,6 +139,7 @@ Identity claims between agents bind the issuing agent, audience, key purpose and
 amc keys list [--json]
 amc keys rotate --purpose <p> [--reason scheduled|superseded|purpose-split|key-compromise] [--overlap-days <n>] [--root-key <file>...]
 amc keys rotate --resume
+amc keys rotate --restore   # owner mode: put back the key set this machine committed
 amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|unspecified
 amc keys export-public --purpose <p>
 ```

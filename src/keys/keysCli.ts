@@ -5,7 +5,9 @@
 import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { exportPublicKey, listKeys, resumeKeyRotation, revokeKey, rotatePurposeKeys, type KeyRevocationReason } from "./purposeKeys.js";
+import { restoreCommittedKeyset } from "./keyset.js";
 import { ROTATION_REASONS, type RotationReason } from "./rotationStatement.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { promptPassphrase } from "../vault/vaultCli.js";
 import { isLocalPurpose, type LocalPurpose } from "../vault/vaultPayload.js";
 
@@ -16,9 +18,14 @@ function purposeOption(value: string | undefined): LocalPurpose {
   return value;
 }
 
-interface RotateOptions { purpose?: string; reason?: string; overlapDays?: string; rootKey?: string[]; resume?: boolean }
+interface RotateOptions { purpose?: string; reason?: string; overlapDays?: string; rootKey?: string[]; resume?: boolean; restore?: boolean }
 
 export async function rotateKeysForCli(workspace: string, opts: RotateOptions): Promise<unknown> {
+  if (opts.restore) {
+    if (opts.resume || opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--restore takes no other options");
+    assertOwnerMode(workspace, "keys rotate --restore");
+    return restoreCommittedKeyset(workspace);
+  }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--resume takes no other options");
     return resumeKeyRotation(workspace);
@@ -53,6 +60,7 @@ export function registerKeysCommands(program: Command): void {
     .option("--overlap-days <n>", "days both keys may be valid (0-30, default 7; none for key-compromise)")
     .option("--root-key <file...>", "trust-list root private key file(s) held outside AMC; key-compromise needs one")
     .option("--resume", "complete or roll back an interrupted key change")
+    .option("--restore", "owner mode: put back the key set this machine committed, from the copies in AMC home")
     .action(async (opts: RotateOptions) => {
       console.log(JSON.stringify(await rotateKeysForCli(process.cwd(), opts), null, 2));
     });

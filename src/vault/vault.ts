@@ -7,14 +7,14 @@ import { decryptVaultPayload, encryptVaultPayload, type VaultEnvelope } from "./
 import { buildKeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import { keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
-import { assertKeysetComplete, commitKeyset, type KeysetWrite } from "../keys/keyset.js";
-import { logHistoryRevisions, machineMark } from "../keys/anchors.js";
+import { assertKeysetComplete, boundKeyset, commitKeyset, keepPreviousVault, keysetCommittedMark, type KeysetWrite } from "../keys/keyset.js";
+import { logHistoryRevisions, machineMark, preflightHistoryLog } from "../keys/anchors.js";
 import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
 import { containedExists } from "../utils/containedFs.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
+  LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
   type LocalPurpose, type VaultPayloadV2
 } from "./vaultPayload.js";
 
@@ -280,6 +280,8 @@ function persistVault(workspace: string, payload: VaultPayload, passphrase: stri
     ...publicKeyWrites(workspace, payload, existingVault),
     ...emptyKeyRevocationList(workspace, payload)
   ];
+  // Anything that would refuse after the commit (the transparency log's signer, its trust config) refuses before it.
+  preflightHistoryLog(workspace);
   commitKeyset(workspace, { keys: keyIdsOf(payload), writes });
   const written = markWrittenHistories(workspace, writes);
   // The envelope on disk just changed, so any session opened from the previous one must derive again.
@@ -403,6 +405,9 @@ function openVaultSession(workspace: string, phrase: string): void {
     session.lastUnlockedTs = Date.now();
     return;
   }
+  // P1-08: once this machine committed a key set here, keyset.json must be exactly that generation (missing, older,
+  // forked or newer is refused) before any vault opens, and the vault must hold the key ids it names.
+  const keyset = boundKeyset(workspace);
   let decoded: ReturnType<typeof decodePayload>;
   try {
     decoded = decodePayload(envelopeRaw, phrase);
@@ -411,6 +416,10 @@ function openVaultSession(workspace: string, phrase: string): void {
     throw new Error("Vault unlock failed: incorrect passphrase or corrupted vault.");
   }
   let payload = decoded.payload;
+  if (keyset !== null && LOCAL_PURPOSES.some(purpose => keyset.keys[purpose] !== payload.keys[purpose]?.keyId)) {
+    throw new Error(`Vault unlock refused: the vault does not hold the keys key set generation ${keyset.generation} names (a replaced or restored vault). `
+      + "Restore the committed vault with `amc keys rotate --restore`.");
+  }
   assertPublishedKeysMatch(workspace, payload);
   let openedDigest: string | null = envelopeDigest;
   let migrated: ReturnType<typeof persistVault> = [];
@@ -421,8 +430,9 @@ function openVaultSession(workspace: string, phrase: string): void {
     const created = Date.now();
     const fresh = () => purposeKey(generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString(), created);
     payload = { ...payload, keys: { ...payload.keys, lease: payload.keys.lease ?? fresh(), session: payload.keys.session ?? fresh() } };
-    const previous = vaultPaths(workspace).previousVaultFile;
-    migrated = persistVault(workspace, payload, phrase, decoded.sourceVersion === 1 && !pathExists(previous) ? [{ path: previous, bytes: envelopeRaw, mode: 0o600 }] : []);
+    // The v1 envelope is key material: it is kept in AMC home with the other recovery copies, never in the workspace.
+    if (decoded.sourceVersion === 1) keepPreviousVault(workspace, envelopeRaw);
+    migrated = persistVault(workspace, payload, phrase);
     payload = decodePayload(readEnvelopeRaw(workspace), phrase).payload;
     openedDigest = null; // the envelope was replaced; the next unlock re-derives from the new bytes
   }
@@ -507,25 +517,26 @@ function signingPayload(workspace: string): { payload: VaultPayload; keysetPrese
 
 /** P1-08: a key is resolved only when the workspace key revocation list, read now, does not name it. */
 function usableKey(workspace: string, resolved: { payload: VaultPayload; keysetPresent: boolean }, purpose: LocalPurpose): string {
-  const key = resolved.payload.keys[purpose];
-  if (!key) return "";
+  if (!isLocalPurpose(purpose)) throw new Error(`${JSON.stringify(purpose)} is not a workspace signing purpose`);
+  const key = Object.hasOwn(resolved.payload.keys, purpose) ? resolved.payload.keys[purpose] : undefined;
+  if (!key) throw new Error(`The vault holds no ${purpose} key.`);
   assertKeyNotRevoked(workspace, resolved.keysetPresent, key.keyId, purpose);
   return key.privateKeyPem;
 }
 
 export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): string {
+  if (!(KEY_KINDS as readonly string[]).includes(kind)) throw new Error(`${JSON.stringify(kind)} is not a vault key role`);
   const resolved = signingPayload(workspace);
   return resolved === null ? generateEphemeralKey(kind) : usableKey(workspace, resolved, ROLE_PRIMARY_PURPOSE[kind]);
 }
 
 /** P1-08: the private key for one local signing purpose (src/keys/purposeKeys.ts getSigningKey). */
 export function getVaultPurposeKeyPem(workspace: string, purpose: LocalPurpose): string {
+  if (!isLocalPurpose(purpose)) throw new Error(`${JSON.stringify(purpose)} is not a workspace signing purpose`);
   const resolved = signingPayload(workspace);
   // No-sign mode: one ephemeral key per role, as before purposes, so purposes that share a role still share a key.
   if (resolved === null) return generateEphemeralKey(roleOfPurpose(purpose));
-  const pem = usableKey(workspace, resolved, purpose);
-  if (!pem) throw new Error(`The vault holds no ${purpose} key.`);
-  return pem;
+  return usableKey(workspace, resolved, purpose);
 }
 
 /** Unlocks with `passphrase` and returns the payload for a key change (rotation); never served in no-sign mode. */
@@ -544,6 +555,12 @@ export function forgetVaultEnvelope(workspace: string): void {
 export function ensureVaultAndPublicKeys(workspace: string): void {
   const paths = vaultPaths(workspace);
   ensureDir(paths.keysDir);
+  // P1-08: a missing, older or forked keyset.json refuses here, before anything is created or adopted.
+  boundKeyset(workspace);
+  if (!vaultExists(workspace) && keysetCommittedMark(workspace) !== null) {
+    throw new Error(`the vault is missing from a workspace whose key set this machine committed; refusing to create a new vault or adopt key files. `
+      + "Restore it with `amc keys rotate --restore` (owner mode).");
+  }
 
   const legacyMonitorPrivate = pathExists(paths.legacyMonitorPrivate) ? readFileSync(paths.legacyMonitorPrivate, "utf8") : null;
   const legacyAuditorPrivate = pathExists(paths.legacyAuditorPrivate) ? readFileSync(paths.legacyAuditorPrivate, "utf8") : null;
@@ -555,8 +572,9 @@ export function ensureVaultAndPublicKeys(workspace: string): void {
     if (unlockPhrase) {
       try {
         unlockVault(workspace, unlockPhrase);
-      } catch {
-        /* passphrase unavailable or incorrect — keep vault locked */
+      } catch (error) {
+        // A wrong passphrase keeps the vault locked; any other refusal (a replaced key set or vault) is reported.
+        if (!/incorrect passphrase or corrupted vault/.test(error instanceof Error ? error.message : String(error))) throw error;
       }
     }
     if (legacyMonitorPrivate && pathExists(paths.legacyMonitorPrivate)) {

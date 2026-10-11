@@ -92,6 +92,8 @@ describe("amc verify and the ledger trust root", () => {
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("UNANCHORED");
     expect(result.output).not.toContain("Ledger verification PASSED");
+    // A machine that never committed the key set says it adopted it on trust (P1-08 review round 2).
+    expect(result.output).toContain("adopted unanchored (trust on first use)");
   });
 
   it("names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor", () => {

@@ -125,7 +125,48 @@ const checked = new Map<string, { stamp: string; keyset: Keyset | null }>();
 
 /** Whether this workspace has, or this machine accepted, a key set: P1-08 purpose files must then exist. */
 export function keysetDeclared(workspace: string): boolean {
-  return containedExists(workspace, KEYSET_REL) || containedExists(workspace, PENDING_REL) || readHighWater(markKey(workspace)) !== null;
+  return containedExists(workspace, KEYSET_REL) || containedExists(workspace, PENDING_REL) || readHighWater(markKey(workspace)) !== null
+    || readHighWater(adoptedKey(workspace)) !== null;
+}
+
+/** This machine's committed mark for the workspace's key set: null when it never committed one here. */
+export function keysetCommittedMark(workspace: string): { sequence: number; sha256: string } | null {
+  return readHighWater(markKey(workspace));
+}
+
+/** Files every P1-08 key set comes with: one of them without keyset.json means the key set was removed. */
+const PURPOSE_FILES = [...LOCAL_PURPOSES.map(purpose => `.amc/keys/${purpose}.pub`), ".amc/keys/revocations.signed.json"];
+const adoptedKey = (workspace: string) => highWaterKey("keyset-adopted", workspaceScope(workspace));
+const warnedAdoptions = new Set<string>();
+const adoptionNotes: string[] = [];
+
+/**
+ * Trust on first use, made visible: a machine that never committed this workspace's key set takes it as found, records
+ * that it did (a later older or forked key set is then refused here too) and says so once per process, so a receipt or
+ * verify output can tell an unanchored key set from one this machine committed.
+ */
+function adoptUnanchored(workspace: string, keyset: Keyset): void {
+  recordHighWater(adoptedKey(workspace), keyset.generation, sha256Hex(canonicalize(keyset)));
+  const note = `${workspaceScope(workspace)}#${keyset.generation}`;
+  if (warnedAdoptions.has(note)) return;
+  // Printed when the process exits, after any verdict, so a verifier's first stderr line stays its verdict.
+  if (warnedAdoptions.size === 0) process.once("exit", () => { for (const line of adoptionNotes) console.warn(line); });
+  warnedAdoptions.add(note);
+  adoptionNotes.push(`[amc] key set generation ${keyset.generation} of ${workspace} adopted unanchored (trust on first use): this machine never committed it, `
+    + "so a workspace writer could have replaced it. Pin keys (a trust list, --pubkey, --expect-monitor) for a verdict that must not depend on it.");
+}
+
+/** The adoption notes this process will print on exit (for a receipt or a verify report to include now). */
+export function keysetAdoptionNotes(): readonly string[] {
+  return adoptionNotes;
+}
+
+/** How this machine holds the workspace's key set: committed here, adopted on first use, or none. */
+export function keysetAnchoring(workspace: string): { state: "committed" | "adopted-unanchored" | "none"; generation: number | null } {
+  const committed = readHighWater(markKey(workspace));
+  if (committed !== null) return { state: "committed", generation: committed.sequence };
+  const adopted = readHighWater(adoptedKey(workspace));
+  return adopted === null ? { state: "none", generation: null } : { state: "adopted-unanchored", generation: adopted.sequence };
 }
 
 /** Verifiers and signers: refuse while a key change is pending. */
@@ -145,21 +186,32 @@ const bound = new Map<string, { stamp: string; keyset: Keyset | null }>();
  * bytes at it FORK_DETECTED, and a newer one was never committed on this machine and is refused. A machine that never
  * changed keys for this workspace has no mark and takes the file as found (portable verdicts need pinned keys).
  */
-function boundKeyset(workspace: string): Keyset | null {
+export function boundKeyset(workspace: string): Keyset | null {
   assertNoPendingKeyset(workspace);
   const stamp = statStamp([keysetPaths(workspace).keyset, highWaterPath()]);
   const memo = bound.get(workspace);
   if (memo && memo.stamp === stamp) return memo.keyset;
   const keyset = readKeysetFile(workspace, KEYSET_REL);
   const mark = readHighWater(markKey(workspace));
+  const restore = "restore it with `amc keys rotate --restore` (owner mode) on the machine that committed it";
   if (mark !== null) {
-    if (keyset === null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}`);
+    if (keyset === null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}; ${restore}`);
     if (keyset.generation > mark.sequence) {
       throw new AntiRollbackError("FORK_DETECTED", `key set generation ${keyset.generation} was never committed on this machine (it committed ${mark.sequence}); refusing it`);
     }
     compareHighWater(markKey(workspace), mark, keyset.generation, sha256Hex(canonicalize(keyset)));
+  } else if (keyset === null) {
+    const adopted = readHighWater(adoptedKey(workspace));
+    if (adopted !== null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine adopted generation ${adopted.sequence}; ${restore}`);
+    // Not memoized: a removed key set is noticed as soon as any purpose file is present.
+    if (PURPOSE_FILES.some(rel => containedExists(workspace, rel))) {
+      throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing from a workspace with purpose keys; refusing every key. ${restore}`);
+    }
+    return null;
+  } else {
+    adoptUnanchored(workspace, keyset);
   }
-  bound.set(workspace, { stamp, keyset });
+  bound.set(workspace, { stamp: statStamp([keysetPaths(workspace).keyset, highWaterPath()]), keyset });
   return keyset;
 }
 
@@ -210,9 +262,9 @@ function recoveryName(rel: string): string {
 export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; writes: readonly KeysetWrite[]; statements?: readonly string[] }): Keyset {
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
-    if (containedExists(workspace, PENDING_REL)) assertKeysetComplete(workspace);
-    // A key set re-created after its files were removed continues past the generation this machine accepted.
-    const current = containedExists(workspace, KEYSET_REL) ? assertKeysetComplete(workspace) : null;
+    // Refuses a pending change, and, once this machine committed a key set here, a keyset.json that is missing or is not
+    // exactly that generation: a lost key set is restored by `amc keys rotate --restore`, never re-created.
+    const current = assertKeysetComplete(workspace);
     const generation = Math.max(current?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
     const rows = change.writes.map(write => ({ rel: relOf(workspace, write.path), write }));
     const written = Object.fromEntries(rows.map(({ rel, write }) => [rel, sha256Hex(Buffer.from(write.bytes))]));
@@ -239,6 +291,7 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
       throw error;
     }
     for (const { rel } of rows) renameContained(workspace, `${keysetFileRel(rel)}${STAGED}`, keysetFileRel(rel));
+    keepCommittedCopies(workspace, generation, rows.map(({ rel, write }) => ({ rel, bytes: Buffer.from(write.bytes) })), bytes);
     // The mark rises before the commit rename: a crash in between leaves a pending generation that resume rolls forward.
     recordHighWater(markKey(workspace), generation, sha256Hex(bytes));
     renameContained(workspace, PENDING_REL, KEYSET_REL);
@@ -287,6 +340,7 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
         if (containedExists(workspace, target) && fileSha(workspace, target) !== digest) discard(target, rel);
         renameContained(workspace, `${target}${STAGED}`, target);
       }
+      keepCommittedCopies(workspace, pending.generation, manifest.files.map(({ rel }) => ({ rel, bytes: readContained(workspace, keysetFileRel(rel), MAX_KEY_FILE) })), bytes);
       if (!markedHere) recordHighWater(markKey(workspace), pending.generation, sha256Hex(bytes));
       renameContained(workspace, PENDING_REL, KEYSET_REL);
       return { action: "completed" as const, generation: pending.generation };
@@ -301,4 +355,60 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
     removeContained(workspace, PENDING_REL);
     return { action: "rolled-back" as const, generation: pending.generation };
   } });
+}
+
+/** The committed bytes of a generation (its key set and every file it wrote), kept in AMC home for an explicit restore. */
+function keepCommittedCopies(workspace: string, generation: number, files: ReadonlyArray<{ rel: string; bytes: Buffer }>, keysetBytes: string): void {
+  const home = amcHome();
+  const dir = `${recoveryRel(workspace, generation)}/committed`;
+  for (const { rel, bytes } of files) writeContained(home, `${dir}/${recoveryName(rel)}`, bytes, 0o600);
+  writeContained(home, `${dir}/keyset.json`, keysetBytes, 0o600);
+}
+
+const restoredMode = (rel: string) => rel.endsWith(".pub") || rel.endsWith(".meta.json") || rel.startsWith("keys/statements/") || rel === "keys/revocations.signed.json" ? 0o644 : 0o600;
+
+/**
+ * `amc keys rotate --restore` (owner mode): puts back the key set this machine committed, from the copies kept in AMC
+ * home. keyset.json comes back only when its copy matches this machine's mark, and with it every file it lists that is
+ * missing or, for a public key or statement, lost its digest; a file that is replaced is copied aside first. Nothing is
+ * restored automatically, and nothing this machine did not commit.
+ */
+export function restoreCommittedKeyset(workspace: string): { generation: number; restored: string[]; missing: string[] } {
+  ensureContainedDir(workspace, ".amc/keys");
+  return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
+    const mark = readHighWater(markKey(workspace));
+    if (mark === null) throw new Error("this machine never committed a key set for this workspace; there is nothing to restore");
+    const home = amcHome();
+    const copyOf = (generation: number, name: string) => readContainedOrNull(home, `${recoveryRel(workspace, generation)}/committed/${name}`, MAX_KEY_FILE);
+    const keysetBytes = copyOf(mark.sequence, "keyset.json");
+    if (keysetBytes === null || sha256Hex(keysetBytes) !== mark.sha256) {
+      throw new Error(`AMC home holds no copy of key set generation ${mark.sequence} that matches this machine's mark; nothing was restored`);
+    }
+    const keyset = keysetSchema.parse(parseCanonicalJson(keysetBytes));
+    const restored: string[] = [];
+    const missing: string[] = [];
+    for (const [rel, digest] of Object.entries(keyset.files)) {
+      const target = keysetFileRel(rel);
+      const present = fileSha(workspace, target);
+      if (present === digest || (present !== null && !pinned(rel))) continue; // a vault, list or history that changed since stays
+      let bytes: Buffer | null = null;
+      for (let generation = mark.sequence; generation >= 1 && bytes === null; generation -= 1) {
+        const copy = copyOf(generation, recoveryName(rel));
+        if (copy !== null && sha256Hex(copy) === digest) bytes = copy;
+      }
+      if (bytes === null) { missing.push(rel); continue; }
+      if (present !== null) writeContained(home, `${recoveryRel(workspace, mark.sequence)}/discarded/restore-${Date.now()}-${recoveryName(rel)}`, readContained(workspace, target, MAX_KEY_FILE), 0o600);
+      writeContained(workspace, target, bytes, restoredMode(rel));
+      restored.push(rel);
+    }
+    writeContained(workspace, KEYSET_REL, keysetBytes, 0o600);
+    return { generation: mark.sequence, restored, missing };
+  } });
+}
+
+/** The v1 vault a migration replaced, kept in AMC home with the recovery copies (it holds the pre-migration keys). */
+export function keepPreviousVault(workspace: string, envelope: string): void {
+  const rel = `state/keyset-recovery/${workspaceScope(workspace)}/previous-vault.amcvault`;
+  const home = amcHome();
+  if (!containedExists(home, rel)) writeContained(home, rel, envelope, 0o600);
 }
