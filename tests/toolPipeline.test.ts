@@ -88,6 +88,21 @@ describe("a call traverses the full pipeline", () => {
     expect(outcome.denied?.stage).toBe("visibility");
     expect(outcome.denied?.guardLabel).toBeNull();
   });
+
+  it("records the visibility refusal of an unknown tool, with no class, exactly once (P1-78)", async () => {
+    const recorded: Array<{ name: string; actionClass: string | null; callId: string; stage: string | undefined }> = [];
+    const pipeline = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE,
+      record: (execution, outcome) => recorded.push({ name: execution.name, actionClass: execution.actionClass, callId: execution.callId, stage: outcome.denied?.stage }) });
+    const outcome = await pipeline.execute({ name: "nope", agentId: "a", arguments: { x: 1 }, requestedMode: "EXECUTE", callId: "call-1" });
+    expect(outcome.denied?.stage).toBe("visibility");
+    expect(recorded).toEqual([{ name: "nope", actionClass: null, callId: "call-1", stage: "visibility" }]);
+  });
+
+  it("returns the visibility refusal unchanged when the recorder throws", async () => {
+    const pipeline = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE, record: () => { throw new Error("ledger down"); } });
+    const outcome = await pipeline.execute({ name: "nope", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(outcome.denied).toEqual({ stage: "visibility", reason: 'unknown tool "nope"', guardLabel: null });
+  });
 });
 
 describe("a guard cannot launder a denial by ordering", () => {

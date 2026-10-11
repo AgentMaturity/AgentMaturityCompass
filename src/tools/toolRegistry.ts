@@ -185,7 +185,7 @@ export class ToolRegistry {
    * tool-call receipts"), and it is not derivable from a denial that never
    * happened. Pure — it runs no guard.
    */
-  guardLabelsFor(execution: ToolExecution): string[] {
+  guardLabelsFor(execution: Pick<ToolExecution, "agentId">): string[] {
     const scopeLayer = this.scopes.get(execution.agentId);
     return [...this.global.guards, ...(scopeLayer?.guards ?? [])].map((entry) => entry.label);
   }

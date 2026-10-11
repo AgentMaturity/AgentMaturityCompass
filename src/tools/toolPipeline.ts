@@ -19,7 +19,8 @@ import {
   type ToolDenial,
   type ToolExecution,
   type ToolMode,
-  type ToolOutcome
+  type ToolOutcome,
+  type RecordedToolCall
 } from "./toolTypes.js";
 
 /**
@@ -111,8 +112,8 @@ export interface ToolPipelineInit {
   /** Action classes that must be approved before guards are consulted. */
   readonly approvalRequiredFor?: ReadonlySet<string>;
   readonly filters?: readonly ToolOutputFilter[];
-  /** Called exactly once per call, after the outcome is final. */
-  readonly record?: (execution: ToolExecution, outcome: ToolOutcome) => void;
+  /** Called exactly once per call, after the outcome is final; a visibility refusal is recorded too (P1-78). */
+  readonly record?: (execution: RecordedToolCall, outcome: ToolOutcome) => void;
   /** Classes whose calls are bound to an authorization record and rechecked before the body. */
   readonly authorizeClasses?: ReadonlySet<string>;
   /** Authorized classes that need a signed approval through `authority` even with no gate bound (hooks, ToolHub). */
@@ -245,33 +246,23 @@ export class ToolPipeline {
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
     return withWorkspaceScope(this.init.workspace, async () => {
-      const collapsed = this.collapses(input);
-      if (collapsed) {
+      const visible = this.init.registry.visible(input.agentId);
+      const definition = visible.get(input.name);
+      if (this.collapses(input)) {
         // Terminates HERE, before pre-execute policy and before guards.
         //
         // A collapsed call can only ever fail, and letting the policy pipeline
         // observe it would mean asking a human to approve — and recording an
         // approval for — something that was never going to run. It would also
         // spend budget and produce guard decisions about a call that does not
-        // exist in any meaningful sense.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
-          guardLabel: null
-        });
+        // exist in any meaningful sense. The refusal itself is still recorded.
+        return this.refuseUnresolved(input, definition?.actionClass ?? null,
+          `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`);
       }
-
-      const visible = this.init.registry.visible(input.agentId);
-      const definition = visible.get(input.name);
       if (!definition) {
-        // No execution exists yet, so there is nothing to record against and
-        // nothing for a guard to have seen. An invisible tool is not a policy
-        // decision about a call; it is the absence of a call.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `unknown tool "${input.name}"`,
-          guardLabel: null
-        });
+        // No guard sees a call that resolved to no tool, but the refusal is recorded: a call that leaves no trace
+        // is one nobody can review (P1-78, L0-TOOL-01).
+        return this.refuseUnresolved(input, null, `unknown tool "${input.name}"`);
       }
 
       const callId = input.callId ?? randomUUID();
@@ -330,6 +321,20 @@ export class ToolPipeline {
       }
       return outcome;
     });
+  }
+
+  /** A visibility refusal, recorded like any other denial. A recorder that throws cannot change it (see `execute`). */
+  private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string): ToolOutcome {
+    const outcome = denialOutcome({ stage: "visibility", reason, guardLabel: null });
+    const callId = input.callId ?? randomUUID();
+    try {
+      this.init.record?.({ token: `tok_${randomUUID()}`, callId, rootCallId: input.rootCallId ?? callId, name: input.name, agentId: input.agentId,
+        workspace: this.init.workspace, actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
+        arguments: freezeToolArguments(input.arguments), parentToken: input.parentToken ?? null }, outcome);
+    } catch {
+      // The gap shows as a missing row, never as a different answer to the caller.
+    }
+    return outcome;
   }
 
   /**
