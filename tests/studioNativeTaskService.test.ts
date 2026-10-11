@@ -126,8 +126,9 @@ test("real stub turns are committed once, survive release/restart/resume and col
   task = await idle(restarted, task.taskId); expect(task.revision).toBe(3);
   await restarted.release(actor, task.taskId, 3);
   const verified = await restarted.verify(actor, task.taskId, 3);
-  // No operator pin admits the workspace's monitor key, so the intact run is untrusted, never verified (P0-51).
-  expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
+  // Release is a resumable writer handoff and never seals the session (the resume above depends on that). Studio verifies
+  // only a closed, sealed target (P0-14, 8c4bc10ec), so a released session is reported as not finalized, never verified.
+  expect(verified).toMatchObject({ verification: "failed", verificationScope: null, error: expect.stringContaining("not closed and sealed, so it is not finalized") });
   const recorded = rows(sessionId);
   expect(recorded.filter(row => row.event_type === "request/header")).toHaveLength(3);
   expect(recorded.every(row => row.writer_sig !== "unsigned" && extractEnvelope(row.meta_json)?.sessionId === sessionId)).toBe(true);

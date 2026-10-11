@@ -196,6 +196,13 @@ export interface AgentRunVerification {
   readonly scope?: "complete-ledger" | "verified-prefix";
   readonly unfinalizedSessions?: readonly string[];
   /**
+   * P0-57, live scope only: whether the target session is closed with a valid seal, and whether every check other than
+   * that one passed, both from the same read as the chain verdict, so a caller decides finalization and integrity on
+   * one snapshot.
+   */
+  readonly targetFinalized?: boolean;
+  readonly intactUnlessUnfinalized?: boolean;
+  /**
    * What the verdict above rests on.
    *
    * `anchored` is false when no expected monitor fingerprint was supplied,
@@ -283,6 +290,10 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   }));
   const integrityOk = result.chain.ok && sessionChainErrors.length === 0 && unsignedRowIds.length === 0
     && requests.every((request) => request.status === "reconstructed");
+  const targetFinalized = result.sessions.closed.includes(sessionId);
+  const finalizationErrors = live && !targetFinalized ? 1 : 0; // the one pushed above for an unfinalized live target
+  const intactUnlessUnfinalized = result.chain.ok && sessionChainErrors.length === finalizationErrors && unsignedRowIds.length === 0
+    && requests.every((request) => request.status === "reconstructed");
   const anchoredOk = trust === undefined || result.trustRoot.anchored;
   const scope = live && unfinalizedSessions.length > 0 ? "verified-prefix" : "complete-ledger";
   return {
@@ -297,6 +308,8 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
     requests,
     scope,
     unfinalizedSessions,
+    // Only the live scope requires a finalized target (P0-14); the strict verifier keeps its own rules.
+    ...(live ? { targetFinalized, intactUnlessUnfinalized } : {}),
     trustRoot: result.trustRoot
   };
 }
