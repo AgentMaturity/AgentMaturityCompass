@@ -1,0 +1,18 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-04",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "egress_guard",
+    "tool": "fixture.fetch",
+    "allowHosts": [
+      "api.allowed.example"
+    ],
+    "url": "https://exfil.example.net/upload"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "guard_denied:network-egress"
+  }
+}

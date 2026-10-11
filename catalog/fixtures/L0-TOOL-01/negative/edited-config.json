@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-01",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "harness": "tool_allowlist",
+    "tool": "fixture.listed",
+    "actionClass": "WRITE_HIGH",
+    "listed": [
+      "fixture.listed"
+    ],
+    "config": "edited_after_signing"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "guard_denied:tool-allowlist"
+  }
+}

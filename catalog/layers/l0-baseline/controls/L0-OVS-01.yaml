@@ -1,0 +1,108 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-OVS-01
+version: "0.1.0"
+support: experimental
+layer: 0
+family: decision-authority-and-oversight
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Recommend versus finalize
+statement: >-
+  Actions the profile marks recommend-only cannot be finalized by the agent, and finalizing one needs
+  a recorded human decision at the enforcement point.
+riskRationale: >-
+  If the agent can finalize what should only be recommended, human oversight becomes a label rather
+  than a control.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations:
+  - key: eu-ai-act-art-26
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 26
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2024-08-01"
+    complianceDueDate: "2027-12-02"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: roles, includesAny: [deployer] }]
+    legalReview: null
+    note: >-
+      Register: deployers of high-risk AI systems assign human oversight, monitor operation and keep
+      automatically generated logs.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline, approvals]
+  mechanism: >-
+    Action classes that need approval are refused at the pipeline until signed human approvals are named
+    through the trusted channel; the approvals are consumed when the call runs.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-OVS-01-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: >-
+        The authorization denial or the consumed approval, and the receipt for the call.
+    fixtures:
+      positive: [L0-OVS-01/positive/evidence-valid.json, L0-OVS-01/positive/signed-approval.json]
+      negative:
+        - L0-OVS-01/negative/denied-approval.json
+        - L0-OVS-01/negative/evidence-contradictory.json
+        - L0-OVS-01/negative/evidence-cross-tenant.json
+        - L0-OVS-01/negative/evidence-empty.json
+        - L0-OVS-01/negative/evidence-replayed.json
+        - L0-OVS-01/negative/evidence-stale.json
+        - L0-OVS-01/negative/evidence-violation.json
+        - L0-OVS-01/negative/no-approval.json
+        - L0-OVS-01/negative/quorum-not-met.json
+    passCriteria: >-
+      Without a signed human approval the call is refused with approval_missing and no tool body runs;
+      with one it runs once and the approval is consumed. AMC has no separate recommend-only marker:
+      approval-required classes stand for it.
+    attempts: 1
+evidence:
+  - id: L0-OVS-01-E1
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-OVS-01-E2
+    producer: amc.toolPipeline.receipt
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.APPROVALS
+    relation: partial
+    rationale: >-
+      Dual-control approvals are related; the audit map does not check that an unapproved call is refused.
+  - framework: amc-audit-map-v1
+    clause: MODEL_TOOL_GOVERNANCE.HIGH_RISK_APPROVALS
+    relation: partial
+    rationale: >-
+      High-risk tool actions require approvals; the audit map reads configuration, not refusals.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

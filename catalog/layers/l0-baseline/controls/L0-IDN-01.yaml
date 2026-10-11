@@ -82,6 +82,7 @@ tests:
     fixtures:
       positive:
         - L0-IDN-01/positive/lease-and-principal.json
+        - L0-IDN-01/positive/evidence-valid.json
       negative:
         - L0-IDN-01/negative/no-lease.json
         - L0-IDN-01/negative/expired-lease.json
@@ -91,10 +92,12 @@ tests:
         - L0-IDN-01/negative/contradictory-receipts.json
         - L0-IDN-01/negative/empty-window.json
     passCriteria: >-
-      Guard fixtures are denied with IDENTITY_UNRESOLVED or PRINCIPAL_UNRESOLVED
-      and no tool body runs; the contradictory and empty evidence fixtures give
-      not_evaluated; the positive fixture is allowed and its receipt names
-      agentId and principalId.
+      Under an active compiled plan, calls with no lease, an expired lease or a
+      lease from another workspace are denied with IDENTITY_UNRESOLVED and no
+      tool body runs, and a call with a verified lease is allowed. The
+      no-principal, replayed, contradictory and empty evidence fixtures give
+      not_evaluated through the evidence evaluator. A lease counts as a service
+      principal today, so a missing human principal is not refused (P1-75).
     attempts: 1
 evidence:
   - id: L0-IDN-01-E1
