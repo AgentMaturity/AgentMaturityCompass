@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { loadAssurancePolicy, verifyAssurancePolicySignature } from "../assurance/assurancePolicyStore.js";
@@ -11,6 +11,7 @@ import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
 import { loadRunReport } from "../diagnostic/runner.js";
+import { latestRunId } from "../diagnostic/runReportResolution.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
@@ -183,18 +184,6 @@ function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
     return "LOW";
   }
   return "MEDIUM";
-}
-
-function findLatestAgentRunId(workspace: string, agentId: string): string | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) return null;
-  return files[files.length - 1]!.replace(/\.json$/, "");
 }
 
 function byDimensionFromRun(run: ReturnType<typeof loadRunReport>): {
@@ -765,7 +754,7 @@ export async function collectAuditBinderData(params: {
   let runCount = 0;
 
   if (scope.type === "AGENT") {
-    const runId = findLatestAgentRunId(params.workspace, scope.id);
+    const runId = latestRunId(params.workspace, scope.id);
     if (runId) {
       const run = loadRunReport(params.workspace, runId, scope.id);
       assertNotExample(run, "included in an audit binder");
@@ -1120,7 +1109,7 @@ export async function collectAuditBinderData(params: {
       recurrence: {
         diagnosticCadence: {
           configuredHours: tuning?.diagnosticCadenceHours ?? null,
-          lastRunTs: scope.type === "AGENT" ? (findLatestAgentRunId(params.workspace, scope.id) ? loadRunReport(params.workspace, findLatestAgentRunId(params.workspace, scope.id)!, scope.id).ts : null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
+          lastRunTs: scope.type === "AGENT" ? (latestRunId(params.workspace, scope.id) ? loadRunReport(params.workspace, latestRunId(params.workspace, scope.id)!, scope.id).ts : null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
           nextRunTs: tuning?.diagnosticCadenceHours && maturityOverall !== null
             ? nowTs + tuning.diagnosticCadenceHours * 60 * 60 * 1000
             : null,

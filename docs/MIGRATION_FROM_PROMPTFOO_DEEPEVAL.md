@@ -38,7 +38,7 @@
 | **`promptfoo eval`** | **`amc score`** | Run a full maturity assessment |
 | **`promptfoo view`** | **`amc report`** | Generate HTML/PDF trust reports |
 | **Cache** | **Evidence vault** | AMC's vault is append-only with Merkle proofs |
-| **Share** (`promptfoo share`) | **Badge + certificate** | `amc badge` generates embeddable trust badges |
+| **Share** (`promptfoo share`) | **Passport + signed bundles** | `amc badge` prints the passport badge line AMC recorded; no level or score can be typed in |
 
 ### DeepEval → AMC
 

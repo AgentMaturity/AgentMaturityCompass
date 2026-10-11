@@ -110,6 +110,12 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
   } else if (applicability.state === "unresolved") {
     blockPass("APPLICABILITY_UNRESOLVED");
   }
+  // 10. Evidence is sufficient only when it is verified: observed by AMC or approved by a pinned independent reviewer.
+  // Self-reported, legacy and unchecked records read incomplete however many there are, except under D-03: a regulated
+  // self-reported pass that every rule above let through (so its records exist, rule 3) keeps the sufficient evidence
+  // control-result v1 requires for a pass. Its kind stays self_reported and its label says so (render.ts).
+  const d03Pass = regulated && kind === "self_reported" && result === "pass";
+  if (kind !== "observed" && kind !== "independently_reviewed" && !d03Pass) evidence = worse(evidence, "incomplete");
 
   return {
     claimKind: kind,
