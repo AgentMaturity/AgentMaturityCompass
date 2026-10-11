@@ -40,3 +40,25 @@ describe("approval records written before P1-78", () => {
     expect(quorum).toMatchObject({ status: "PENDING", received: 1, approverUserIds: ["approver-1"] });
   });
 });
+
+describe("a request that records its initiator (P1-78)", () => {
+  const withInitiator = { ...fixture.engineRequest.record, initiator: "LOCAL_USER:requester-1" };
+  const decision = (userId: string, kind: "APPROVE_EXECUTE" | "DENY") =>
+    approvalDecisionSchema.parse({ ...fixture.engineDecision.record, approvalDecisionId: `apprdec_${userId}`, userId, username: userId, decision: kind });
+
+  it("parses under the strict schema and digests exactly as it would without an initiator (constraint 4)", () => {
+    const parsed = strictRequest.parse(withInitiator);
+    expect(parsed.initiator).toBe("LOCAL_USER:requester-1");
+    expect(approvalRequestBindingDigest(parsed)).toBe(fixture.engineRequest.bindingDigest);
+  });
+
+  it("does not count the initiator's approval, matched by the user id an A4 key names (constraint 5); its DENY still denies", () => {
+    const request = approvalRequestSchema.parse(withInitiator);
+    const now = request.createdTs + 1;
+    const counted = evaluateApprovalQuorum({ request, now, decisions: [decision("requester-1", "APPROVE_EXECUTE"), decision("approver-2", "APPROVE_EXECUTE")] });
+    expect(counted).toMatchObject({ status: "PENDING", received: 1, approverUserIds: ["approver-2"] });
+    const bare = evaluateApprovalQuorum({ request: { ...request, initiator: "requester-1" }, now, decisions: [decision("requester-1", "APPROVE_EXECUTE")] });
+    expect(bare.received, "an unprefixed initiator is a user id").toBe(0);
+    expect(evaluateApprovalQuorum({ request, now, decisions: [decision("requester-1", "DENY")] }).status).toBe("DENIED");
+  });
+});

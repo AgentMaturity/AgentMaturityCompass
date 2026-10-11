@@ -13,6 +13,17 @@ export interface QuorumState {
   remainingRequired: number;
 }
 
+/**
+ * Whether `userId` is the request's recorded initiator (P1-78). An initiator keyed as A4 keys principals
+ * (`LOCAL_USER:<userId>`, `WORKSPACE_ROUTER:<userId>`) names the user id an engine decision records; A4 resolves an engine
+ * decision's user id to exactly one plane (resolveApprover), so this matches every decision A4 would key the same, and
+ * also a same-named user of the other plane (the conservative direction). Any other initiator is a user id.
+ */
+export function isApprovalInitiator(request: Pick<ApprovalRequestRecord, "initiator">, userId: string): boolean {
+  if (request.initiator === undefined) return false;
+  return (/^(?:LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(request.initiator)?.[1] ?? request.initiator) === userId;
+}
+
 function hasAllowedRole(roles: readonly UserRole[], allowed: readonly UserRole[]): boolean {
   for (const role of roles) {
     if (allowed.includes(role)) {
@@ -96,6 +107,10 @@ export function evaluateApprovalQuorum(params: {
       continue;
     }
     if (decision.decision !== "APPROVE_EXECUTE") {
+      continue;
+    }
+    // Initiator is never approver (P1-78): such a decision was refused at write, so one on disk is never counted.
+    if (isApprovalInitiator(request, decision.userId)) {
       continue;
     }
     if (request.requireDistinctUsers && approverUserIds.includes(decision.userId)) {

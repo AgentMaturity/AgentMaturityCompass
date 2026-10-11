@@ -3,6 +3,7 @@ import YAML from "yaml";
 import { describe, expect, it, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../../src/actions/actionJournal.js";
 import { DEPLOYMENT_NOT_BOUND } from "../../../src/actions/authorize.js";
+import { recordApprovalDecision } from "../../../src/approvals/approvalChainStore.js";
 import { createApprovalForIntent, decideApprovalForIntent, verifyApprovalForExecution } from "../../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../../src/approvals/approvalPolicyEngine.js";
 import type { UserRole } from "../../../src/auth/roles.js";
@@ -23,7 +24,7 @@ import { newWorkspace } from "./workspaces.js";
 type Approver = { userId: string; roles: UserRole[]; decision?: "APPROVED" | "DENIED" };
 type BoundSetup = { tool: string; actionClass: ActionClass; approved: Record<string, string>; call: Record<string, string>;
   approvers: Approver[]; scenario: "approved" | "no_approval" | "expired" | "second_use" };
-type QuorumSetup = { actionClass: ActionClass; decisions: Approver[] };
+type QuorumSetup = { actionClass: ActionClass; decisions: Approver[]; initiator?: string; writePath?: "store" };
 
 function signPayTool(ws: string, name: string, actionClass: ActionClass): void {
   const config = loadToolsConfig(ws);
@@ -107,12 +108,18 @@ describe("L0-OVS-01 and L0-OVS-02: a signed human approval bound to the exact ac
 function quorumVerdict(ws: string, f: L0Fixture): { result: "pass" | "fail"; code: string | null } {
   const s = f.envelope.setup as unknown as QuorumSetup;
   const { approval } = createApprovalForIntent({ workspace: ws, agentId: "default", intentId: `intent-${f.ref}`, toolName: "fixture.deploy",
-    actionClass: s.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high", intentPayload: { fixture: f.ref } });
+    actionClass: s.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high", intentPayload: { fixture: f.ref },
+    ...(s.initiator ? { initiator: s.initiator } : {}) });
   for (const d of s.decisions) {
     try {
-      decide(ws, approval.approvalRequestId, d);
+      // "store" writes the decision past the engine's refusals, as a tampering or foreign writer would: only the quorum stands.
+      if (s.writePath === "store") {
+        recordApprovalDecision({ workspace: ws, agentId: "default", approvalRequestId: approval.approvalRequestId, userId: d.userId, username: d.userId,
+          roles: d.roles, decision: "APPROVE_EXECUTE", reason: "layer0 fixture decision" });
+      } else decide(ws, approval.approvalRequestId, d);
     } catch (error) {
       if (/distinct approver required/.test(String(error))) return { result: "fail", code: "distinct_approver_required" };
+      if (/initiator cannot approve/.test(String(error))) return { result: "fail", code: "initiator_cannot_approve" };
       throw error;
     }
   }

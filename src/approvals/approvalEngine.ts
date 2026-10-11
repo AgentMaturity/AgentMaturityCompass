@@ -30,7 +30,7 @@ import {
   type ApprovalDecisionKind,
   type ApprovalRequestRecord
 } from "./approvalChainStore.js";
-import { evaluateApprovalQuorum } from "./approvalQuorum.js";
+import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js";
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
@@ -51,6 +51,12 @@ export interface ApprovalRequestInput {
    * by intersection, and the TTL by max up to the signed policy's `a4.maxTtlMinutes` (never past the rule without it).
    */
   quorumFloor?: { requiredApprovals?: number; requireDistinctUsers?: boolean; rolesAllowed?: UserRole[]; ttlMinutes?: number };
+  /**
+   * Who raises the request (P1-78), from the caller's authenticated principal, never from a request body: a principal key
+   * as A4 keys one (`<plane>:<userId>`) or a user id. That principal can never approve it. Optional: absent, the request
+   * records none and nothing changes.
+   */
+  initiator?: string;
 }
 
 function fileDigestOrFallback(workspace: string, rel: string, fallback = ""): string {
@@ -242,7 +248,8 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     requiredAssurancePacks: rule.requireAssurancePacks,
     boundHashes: requestBoundHashes(input),
     // Kept with the signed request so an approver sees the protected facts and a recheck can name what changed.
-    ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {})
+    ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {}),
+    ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   return {
     approval: {
@@ -320,6 +327,9 @@ export function decideApprovalForIntent(params: {
   }
   const reviewerUserId = params.userId ?? "owner";
   const reviewerUsername = params.username ?? "owner";
+  if (params.decision === "APPROVED" && isApprovalInitiator(request, reviewerUserId)) {
+    throw new Error("initiator cannot approve their own request; a different approver is required");
+  }
   if (request.requireDistinctUsers && params.decision === "APPROVED") {
     const priorApproval = listApprovalDecisions({
       workspace: params.workspace,
