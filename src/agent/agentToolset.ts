@@ -130,6 +130,20 @@ export interface AgentToolsetOptions {
   };
 }
 
+/**
+ * A row a writer-less toolset refused to write (P1-78): its session is not open in the ledger, so the row would reference
+ * a missing session, or land after the seal, and fail verification. Pass the session writer, or start the session in the
+ * ledger before the toolset records into it and seal it after.
+ */
+export class UnverifiableToolEvidence extends Error {
+  readonly code = "UNVERIFIABLE_TOOL_EVIDENCE";
+  constructor(readonly sessionId: string, readonly state: "missing" | "sealed") {
+    super(`UNVERIFIABLE_TOOL_EVIDENCE: session ${sessionId} is ${state === "missing" ? "not in the ledger" : "already sealed"}; `
+      + "no session writer was passed, so the row would fail verification and is not written");
+    this.name = "UnverifiableToolEvidence";
+  }
+}
+
 /** What a workspace still needs before a governed agent can do anything. */
 export interface ToolsetReadiness {
   readonly ready: boolean;
@@ -280,12 +294,16 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // Use the actual native session writer. An owned session refuses raw
   // ledger appends; a receipt write failure also prevents tool success.
   // Returns the row's evidence event id when the writer reports one.
+  // Without a writer, rows go to the raw ledger only into a session it holds open (P1-78): never an unverifiable row.
+  const rawLedger = (): ReturnType<typeof openLedger> => {
+    ledgerHandle ??= openLedger(workspace);
+    const session = ledgerHandle.getSessionById(options.sessionId);
+    if (!session || session.ended_ts !== null) throw new UnverifiableToolEvidence(options.sessionId, session ? "sealed" : "missing");
+    return ledgerHandle;
+  };
   const recordAudit = (receipt: Record<string, unknown>): string | null => {
     const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
-    if (!options.recorder) {
-      ledgerHandle ??= openLedger(workspace);
-      return ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
-    }
+    if (!options.recorder) return rawLedger().appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
     const ref = options.recorder.recordProjectedEvidence(row) as { readonly eventId?: unknown } | null | undefined;
     return typeof ref?.eventId === "string" ? ref.eventId : null;
   };
@@ -430,10 +448,6 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     // No try/catch here: `ToolPipeline` owns the guarantee that a failing
     // recorder cannot break a call, which is where it can actually be tested.
     record: (execution, outcome) => {
-      // One handle for the run, not one per call. Measured: opening and
-      // closing the ledger costs 1.6ms, which on a path this hot is a third of
-      // the whole governed call. `close()` on the toolset releases it.
-      ledgerHandle ??= openLedger(workspace);
       // The guards COMPOSED for this call, not just the one that denied.
       // A permitted call is a receipt that the control evaluated it, which is
       // what the question bank asks for; a denial alone cannot say which
@@ -454,7 +468,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
           });
         }
       } else {
-        ledgerHandle.appendEvidenceBatch(
+        // One handle for the run, not one per call (opening the ledger costs a third of a governed call); `close()` releases it.
+        rawLedger().appendEvidenceBatch(
           evidence.map((row) => ({
             sessionId: options.sessionId,
             runtime: "amc" as const,

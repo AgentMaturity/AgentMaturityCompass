@@ -4,6 +4,7 @@ import { join } from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
@@ -51,6 +52,10 @@ function readyWorkspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-toolev-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  // P1-78: a toolset with no session writer records only into a session the ledger holds open.
+  const ledger = openLedger(dir);
+  ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
+  ledger.close();
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   mkdirSync(join(dir, "workspace", "output"), { recursive: true });

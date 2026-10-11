@@ -72,17 +72,34 @@ describe("tool evidence names a session that exists", () => {
     expect(verdict.errors).toEqual([]);
   });
 
-  it("reports a tool call recorded against a session nobody started", async () => {
-    const dir = workspace();
-    // Exactly what the old default produced. Kept as a test so the failure this
-    // fix removes is a thing the suite can still SEE — otherwise a future change
-    // reintroducing an unstarted-session default would look fine.
-    const toolset = agentToolset({ workspace: dir, agentId: "default", sessionId: "toolset-default" });
-    open.push(toolset);
-    await toolset.seam.execute(call("fs.read", { path: "workspace/n.txt" }, "toolset-default"));
-    toolset.close();
+  // P1-78: these rows used to be written and then failed verification ("references missing session"). A writer-less
+  // toolset now refuses to write a row its session cannot make verifiable, so the call is refused and nothing is written.
+  for (const [state, prepare] of [
+    ["a session nobody started", (_dir: string) => undefined],
+    ["a session already sealed", (dir: string) => {
+      const ledger = openLedger(dir);
+      ledger.startSession({ sessionId: "toolset-default", runtime: "amc", binaryPath: "test", binarySha256: "abc" });
+      ledger.sealSession("toolset-default");
+      ledger.close();
+    }]
+  ] as const) {
+    it(`refuses, and writes nothing, for a tool call recorded against ${state}`, async () => {
+      const dir = workspace();
+      prepare(dir);
+      const toolset = agentToolset({ workspace: dir, agentId: "default", sessionId: "toolset-default" });
+      open.push(toolset);
+      const result = await toolset.seam.execute(call("fs.read", { path: "workspace/n.txt" }, "toolset-default"));
+      toolset.close();
 
-    const verdict = await verifyLedgerIntegrity(dir);
-    expect(verdict.errors.some((e) => e.includes("references missing session"))).toBe(true);
-  });
+      expect(JSON.stringify(result)).not.toContain('"outcome":"OK"');
+      expect(JSON.stringify(result)).toContain("UNVERIFIABLE_TOOL_EVIDENCE");
+      const ledger = openLedger(dir);
+      try {
+        expect(ledger.getAllEvents().filter((event) => event.session_id === "toolset-default")).toEqual([]);
+      } finally {
+        ledger.close();
+      }
+      expect((await verifyLedgerIntegrity(dir)).errors).toEqual([]);
+    });
+  }
 });
