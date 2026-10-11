@@ -9,7 +9,7 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { leaseScopeSchema, type LeaseScope } from "../../leases/leaseSchema.js";
 import type { ActionClass } from "../../types.js";
-import { redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { latestGate, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import { bridgeControls } from "../a4Lifecycle.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
@@ -61,13 +61,14 @@ export const ACTIVATE_SPEC_SCHEMA = "amc.a4-activate-spec/v1";
 export const ACTIVATE_CLAIM_BOUNDARY = "Deployment is recorded from the operator's receipt; AMC did not execute it. Recorded: what the operator stated. Checked: what AMC's own probe found.";
 export const RELEASE_EFFECT_ID = "a4.activate.release";
 export const PRODUCTION_LEASE_EFFECT_ID = "a4.activate.production_lease";
+export const ROLLBACK_EFFECT_ID = "a4.activate.rollback";
 export const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
 export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";
 
 const load = () => import("../stages/activate.js");
-/** Activate's producers (slice A: Understand, Explain, Propose); Build is the release effect (POST …/releases). */
-export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "propose"] as const)
+/** Activate's producers (Understand, Explain, Propose, Review); Build is the release effect (POST …/releases). */
+export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "propose", "review"] as const)
   .map((step) => ({ id: `activate.${step}`, step, run: async (ctx) => (await load()).produceActivate(step, ctx) }));
 
 /** The newest Activate revision's spec and answers. */
@@ -336,14 +337,41 @@ function leaseScopeItem(release: A4ChainLink | null, production: Record<string, 
     nextAction: { label: "The staging lease (WRITE_LOW at most, staging routes, 24 h) is live; the production lease is minted at the deployment approval" } });
 }
 
-/** The newest monitor ref of this cycle (slice C): a ref with no non-null source is not present. */
-function monitoringItem(state: A4ReadinessState): A4ReadinessItem {
-  const monitor = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor").at(-1);
+/** Whether a monitor link's signed record still resolves to the ref's bytes (its ref as this load resolved it). */
+export const monitorResolves = (state: Pick<A4ReadinessState, "refs">, link: A4ChainLink): boolean =>
+  state.refs.some((ref) => ref.refKind === "monitor" && ref.refId === link.body.refId && ref.sha256 === link.body.sha256 && ref.status === "resolved");
+
+/**
+ * The newest monitor ref Review recorded for this cycle's release (src/a4/a4Monitor.ts): a ref with no non-null source is
+ * not present, and one whose signed record no longer resolves is BLOCKED, never read from the chain alone.
+ */
+function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
+  const mandatory = reached(state, "reviewed");
+  const monitor = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === releaseId).at(-1);
+  if (monitor !== undefined && !monitorResolves(state, monitor)) {
+    return item("monitoring.source", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["MONITOR_REF_UNRESOLVED", `MONITOR:${String(monitor.body.refId)}`],
+      nextAction: { label: "The signed monitor record is missing, changed or unsigned: restore it, or reopen Activate and review again" } });
+  }
   const sources = typeof monitor?.body.nonNullSources === "number" ? monitor.body.nonNullSources : 0;
-  return sources > 0 ? item("monitoring.source", "READY", { reasonCodes: [`SOURCES:${sources}`, "SELF_REPORTED"] })
-    : waiting("monitoring.source", ["MONITOR_NO_SOURCE"], { kind: "source_unavailable", mandatory: reached(state, "reviewed"),
-      nextAction: { label: "A monitor ref needs at least one source with a value; an all-null ref is not present" } });
+  return sources > 0 ? item("monitoring.source", "READY", { reasonCodes: [`SOURCES:${sources}`, "SELF_REPORTED", `MONITOR:${String(monitor!.body.refId)}`] })
+    : waiting("monitoring.source", ["MONITOR_NO_SOURCE"], { kind: "source_unavailable", mandatory,
+      nextAction: { label: monitor === undefined ? "Review records the monitor ref (one per review)" : "The monitor ref has no source with a value; an all-null ref is not present" } });
 }
+
+/**
+ * An effect's engine request opened on `gateId` (EFFECT_GATE_OPENED), for the card to decide bound to its digest: the
+ * release (on the direction gate) and the rollback of the current release. Never mandatory and never bound; the engine
+ * request's own status is the card's to read.
+ */
+function effectRequestItem(id: string, opened: A4ChainLink | undefined, done: boolean, label: string): A4ReadinessItem {
+  if (done) return item(id, "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_RECORDED"] });
+  return opened === undefined || typeof opened.body.requestDigestSha256 !== "string"
+    ? waiting(id, ["EFFECT_GATE_NOT_OPEN"], { kind: "review_pending", section: "governance", mandatory: false, nextAction: { label } })
+    : item(id, "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "REVIEW_STATUS_NOT_READ",
+      `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`] });
+}
+const newestOpened = (state: A4ReadinessState, match: (link: A4ChainLink) => boolean): A4ChainLink | undefined =>
+  [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && match(link));
 
 /** Activate's readiness items (design §10.4 Readiness); the gates, `sod`, signing and lineage are the governance items. */
 export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery): A4ReadinessItem[] {
@@ -354,6 +382,7 @@ export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery)
   const target = textValue(answerValues(answers).get("target"));
   const release = currentRelease(state.chain);
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
+  const direction = latestGate(state, "activate", "direction");
   return [
     gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY", { section: "recommendation" })
       : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
@@ -376,8 +405,14 @@ export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery)
     leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
     receiptItem(state, releaseId),
     amcCheckItem(state, releaseId),
-    monitoringItem(state),
+    monitoringItem(state, releaseId),
     backupItem(facts),
-    lifecycleItem(state, releaseId)
+    lifecycleItem(state, releaseId),
+    effectRequestItem("release_effect", direction === null ? undefined
+      : newestOpened(state, (link) => link.body.effect === RELEASE_EFFECT_ID && link.body.gateId === direction.gate_id), release !== null,
+    `Once the release approval has its quorum, an owner opens ${RELEASE_EFFECT_ID}: a second, separately decided DEPLOY request`),
+    effectRequestItem("rollback_effect", newestOpened(state, (link) => link.body.effect === ROLLBACK_EFFECT_ID
+      && (link.body.intent as { releaseId?: unknown } | undefined)?.releaseId === releaseId),
+    cycleLinks(state.chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId), "An owner previews the rollback, which opens its DEPLOY request")
   ];
 }

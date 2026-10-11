@@ -72,6 +72,12 @@ export interface A4ProducerResult {
     readonly method: string | null; readonly body: unknown; readonly claimKind?: "self_reported" | "synthetic_example" }>;
   /** A new revision at the stage with this spec (the producer carries the answers). */
   readonly spec?: Record<string, unknown>;
+  /**
+   * Files the producer wrote and signed itself (Activate's monitor record under a4-releases/), each recorded beside the
+   * step as its own ref: lane implementation, self_reported, never observed. `note` joins the ref's signed body.
+   */
+  readonly refs?: ReadonlyArray<{ readonly refKind: "monitor"; readonly refId: string; readonly sha256: string; readonly label: string;
+    readonly note: Readonly<Record<string, unknown>> }>;
   /** Review only: the reason codes of the explicit not_evaluated output `reviewed` records without an observed ref. */
   readonly notEvaluated?: readonly string[];
   /** Signed onto the STEP body (checks whose result is no evidence ref, such as integrity self-checks). */
@@ -285,12 +291,16 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
       if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
       // A revision recorded here comes first, so the outputs and the step land on it.
       const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
-      for (const entry of outputs) {
-        const claimKind = "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" : "self_reported";
-        specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
-          claimKind, output: entry.output, producer: entry.producer },
+      const refs = [...outputs.map((entry) => ({ refKind: "stage_output" as const, refId: entry.refId, sha256: entry.sha256, lane: entry.lane, method: entry.method,
+        label: entry.label, claimKind: "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" as const : "self_reported" as const,
+        note: { output: entry.output, producer: entry.producer } })),
+      ...(produced?.refs ?? []).map((ref) => ({ ...ref, lane: "implementation" as const, method: null, claimKind: "self_reported" as const,
+        note: { ...ref.note, producer: producer!.id } }))];
+      for (const entry of refs) {
+        specs.push({ kind: "EVIDENCE_REF", stage, payload: { ...entry.note, refKind: entry.refKind, refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
+          claimKind: entry.claimKind },
           sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
-            lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: claimKind, trust_tier: null,
+            lane: entry.lane, ref_kind: entry.refKind, ref_id: entry.refId, sha256: entry.sha256, claim_kind: entry.claimKind, trust_tier: null,
             method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
       }
       if (def.to !== null && def.to !== project.step) {

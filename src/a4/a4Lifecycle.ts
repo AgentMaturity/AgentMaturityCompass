@@ -13,7 +13,7 @@ import { advanceLifecycleStage, lifecyclePath, lifecycleStages } from "../lifecy
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { latestGate, type A4ReadinessState } from "./a4Readiness.js";
 import { stagingBridge } from "./spec/adapt.js";
-import { cycleLinks, IDENTITY_NOT_EVALUATED } from "./spec/activate.js";
+import { cycleLinks, IDENTITY_NOT_EVALUATED, monitorResolves } from "./spec/activate.js";
 import { misuseSchema } from "./spec/aspire.js";
 
 export type BridgeTarget = "testing" | "staging" | "production";
@@ -79,8 +79,8 @@ function testingRows(state: A4ReadinessState): BridgeControl[] {
 function productionRows(state: A4ReadinessState, releaseId: string): BridgeControl[] {
   const deployments = cycleLinks(state.chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId);
   const stagingRollback = deployments.some((link) => link.body.deploymentKind === "rollback" && link.body.environment === "staging");
-  const monitor = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor"
-    && typeof link.body.sloMeasurements === "number" && link.body.sloMeasurements > 0).at(-1);
+  const monitor = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === releaseId
+    && typeof link.body.sloMeasurements === "number" && link.body.sloMeasurements > 0 && monitorResolves(state, link)).at(-1);
   return [
     row("assurance_pack_passing", null, null, "no assurance run artifact with a non-inconclusive VALID result is linked to this release (P0-19; the echo scenarios are P2-27)"),
     row("rollback_plan_validated", null, null, stagingRollback ? `rollback recorded by the operator, not checked by AMC: ${IDENTITY_NOT_EVALUATED}`

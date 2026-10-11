@@ -53,7 +53,7 @@ import {
 import { A4StoreError, openA4Store, type A4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { deploymentPlan, deploymentViews, PLAN_PATH } from "./a4Deploy.js";
-import { advance, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
+import { advance, bridgeControls, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
 import { rollbackViews } from "./a4Rollback.js";
 import { UPDATE_POLICY_PATH, updatePolicyYaml, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
@@ -61,7 +61,7 @@ import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
+  monitorResolves, PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
 } from "./spec/activate.js";
 import { adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -272,11 +272,11 @@ function artifactSignature(workspace: string, artifactKind: ArtifactSignature["a
   }
 }
 /**
- * A JSON record about a release (a receipt, an AMC check, a rollback) at `a4-releases/<projectId>/<folder>/<releaseId>/<id>.json`
+ * A JSON record about a release (a receipt, an AMC check, a rollback, a monitor record, a value claim) at `a4-releases/<projectId>/<folder>/<releaseId>/<id>.json`
  * with its artifact signature beside it; every directory on the way is a real one, never a link. Named by a fresh id and
  * harmless when the transition that would name it is refused. Returns its workspace-relative path and sha256.
  */
-export function writeReleaseRecord(workspace: string, projectId: string, folder: "receipts" | "checks" | "rollbacks", releaseId: string, id: string,
+export function writeReleaseRecord(workspace: string, projectId: string, folder: "receipts" | "checks" | "rollbacks" | "monitors" | "value", releaseId: string, id: string,
   doc: unknown, artifactKind: ArtifactSignature["artifactKind"]): { path: string; sha256: string } {
   if (!/^[a-z0-9_]{1,80}$/.test(id) || !/^a4r_[0-9a-f]{32}$/.test(releaseId)) throw new A4StoreError(400, "INPUT_INVALID", "not an A4 record id");
   const dir = [projectId, folder, releaseId].reduce((parent, segment) => realDir(join(parent, segment)), realDir(a4ReleasesRoot(workspace)));
@@ -290,6 +290,18 @@ export function writeReleaseRecord(workspace: string, projectId: string, folder:
     throw asStoreError(error);
   }
   return { path: relPath(workspace, path), sha256: sha256Hex(bytes) };
+}
+
+/**
+ * A record writeReleaseRecord wrote, read once under a4-releases/: its bytes when they hash to the chain-named `sha256`
+ * and carry a valid `artifactKind` signature, else the reason (a missing, changed or unsigned record is never read as present).
+ */
+export function readReleaseRecord(workspace: string, path: string, sha256: string, artifactKind: ArtifactSignature["artifactKind"]): { bytes: Buffer } | { reason: string } {
+  if (!/^a4-releases(\/[A-Za-z0-9_.-]+)+\.json$/.test(path) || path.split("/").includes("..")) return { reason: "PATH_OUTSIDE_RELEASES" };
+  const read = readAndVerifyArtifactFileSignature({ workspace, path: join(workspace, path), artifactKind, maxArtifactBytes: 4 * 1024 * 1024, maxSignatureBytes: 64 * 1024 });
+  if (read.artifactBytes === null) return { reason: "RECORD_UNREADABLE" };
+  if (sha256Hex(read.artifactBytes) !== sha256) return { reason: "RECORD_DIGEST_MISMATCH" };
+  return read.valid ? { bytes: read.artifactBytes } : { reason: "RECORD_UNSIGNED" };
 }
 
 /** The lease ids each attempt minted for a release, journaled before its token leaves, so a retry revokes them first (design §6.5). */
@@ -700,11 +712,24 @@ function liveLease(lease: Record<string, unknown>, revoked: Set<string> | null, 
 }
 
 /**
- * GET …/releases[/:rid]: each release record as stored (chain-named a4_releases rows), its envelope checked against the
- * stored bytes now, the leases with their live status (production from the deployment approval's effect) and the
- * eight-surface table with a reason for every surface not evaluated. Integrity under this workspace's keys only.
+ * The package's file list from its manifest, read once and listed only when those bytes hash to the release record's
+ * package digest; null with the reason otherwise.
  */
-export function releaseViews(store: A4Store, projectId: string, chain: readonly A4ChainLink[]): Array<Record<string, unknown>> {
+function packageFiles(bytes: Buffer | null, packageDigest: string): { files: unknown[] | null; reason: string | null } {
+  if (bytes === null) return { files: null, reason: "MANIFEST_UNREADABLE" };
+  if (sha256Hex(bytes) !== packageDigest) return { files: null, reason: "MANIFEST_DIGEST_MISMATCH" };
+  // Bytes with the package digest are the manifest the release wrote (json(manifest)), so they parse.
+  return { files: a4PackageV1Schema.parse(JSON.parse(bytes.toString("utf8"))).files, reason: null };
+}
+
+/**
+ * GET …/releases[/:rid]: each release record as stored (chain-named a4_releases rows), its envelope checked against the
+ * stored bytes now, the leases with their live status (production from the deployment approval's effect), the package's
+ * file list, the eight-surface table with a reason for every surface not evaluated (Watch's SLO digest from the newest
+ * monitor ref that resolves) and the production bridge rows as they stand now. Integrity under this workspace's keys only.
+ */
+export function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState): Array<Record<string, unknown>> {
+  const { chain } = state;
   const now = Date.now();
   let revoked: Set<string> | null;
   try {
@@ -735,6 +760,9 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
     const receipt = deployments.filter((entry) => entry.kind === "deploy").at(-1);
     const lifecycle = outcomes.filter((outcome) => outcome.releaseId === record.releaseId);
     const dir = dirname(record.packagePath);
+    // Review's monitor record of this release, only while its signed file still resolves to the ref's bytes.
+    const monitor = cycleLinks(chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === record.releaseId
+      && monitorResolves(state, link)).at(-1);
     const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
       maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
     const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
@@ -743,7 +771,10 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
     // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
     deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
+    packageFiles: packageFiles(fileOf(record.packagePath), record.packageDigest),
     deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle,
+    // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
+    lifecycleProduction: bridgeControls(state, "production", record.releaseId),
     leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),
     surfaceTable: [
       { surface: "score", ...recordedIf(surfaces.score.contextGraphSha256 !== null, "no context graph digest was bound"), values: surfaces.score },
@@ -752,7 +783,8 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
       { surface: "vault", status: "recorded", reason: null, values: surfaces.vault },
       { surface: "watch", ...(receipt === undefined ? notEvaluated("no deployment receipt is recorded; runtime runs stay empty until a lease-bound session observes one")
         : { status: "recorded", reason: "the operator's receipt (self_reported); runtime runs stay empty until a lease-bound session observes one" }),
-      values: { ...surfaces.watch, deploymentReceiptRef: receipt === undefined ? null : String(receipt.deploymentId) } },
+      values: { ...surfaces.watch, deploymentReceiptRef: receipt === undefined ? null : String(receipt.deploymentId),
+        sloReportSha256: typeof monitor?.body.sloReportSha256 === "string" ? monitor.body.sloReportSha256 : null } },
       { surface: "comply", ...recordedIf(surfaces.comply.planDigest !== null, "no compiled plan was proposed at Adapt"), values: surfaces.comply },
       { surface: "fleet", ...recordedIf(surfaces.fleet.agentConfigSha256 !== null, "no agent config digest was bound"),
         values: { ...surfaces.fleet, lifecycleTransitionId: lifecycle.filter((outcome) => outcome.advanced === true).at(-1)?.transitionId ?? null } },

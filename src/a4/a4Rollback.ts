@@ -29,9 +29,9 @@ import { writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
+import { ROLLBACK_EFFECT_ID } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-export const ROLLBACK_EFFECT_ID = "a4.activate.rollback";
 const FROZEN_CLASSES: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
 const base = { environment: z.enum(["staging", "production"]), expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) };
 export const rollbackPreviewSchema = z.strictObject(base);

@@ -7,6 +7,7 @@
  * (src/a4/a4Package.ts, POST …/releases); the deployment approval's effect mints the production lease. Everything A4
  * writes here is self_reported; nothing here deploys, holds a credential or reads one.
  */
+import { randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { approvalRuleForAction, loadVerifiedApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
@@ -16,17 +17,20 @@ import { loadOpsPolicy, verifyOpsPolicySignature } from "../../ops/policy.js";
 import { requiredControlsForStage } from "../../lifecycle/lifecycle.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
-import { RESOURCE_SLOTS } from "../a4Gates.js";
-import { hostingNow } from "../a4Deploy.js";
-import { lifecycleNow } from "../a4Lifecycle.js";
-import { AMC_ROOT, captureInputs, enforceSnapshot, PRODUCTION_LEASE_EFFECT, RELEASE_EFFECT } from "../a4Package.js";
+import { RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
+import { hostingNow, statusText } from "../a4Deploy.js";
+import { bridgeControls, lifecycleNow } from "../a4Lifecycle.js";
+import { monitorRecord } from "../a4Monitor.js";
+import { AMC_ROOT, captureInputs, enforceSnapshot, PRODUCTION_LEASE_EFFECT, RELEASE_EFFECT, writeReleaseRecord } from "../a4Package.js";
+import { isRegulated } from "../a4Readiness.js";
+import { recordReviewResults } from "../a4Value.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
+  ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, currentRelease, cycleLinks,
+  IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
 } from "../spec/activate.js";
 import { updatePolicyOf } from "../a4UpdatePolicy.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
@@ -41,9 +45,10 @@ export function register(registry: A4StageRegistry): void {
 }
 
 /** The router's entry (src/a4/spec/activate.ts PRODUCERS). */
-export async function produceActivate(step: "understand" | "explain" | "propose", ctx: A4ProducerContext): Promise<A4ProducerResult> {
+export async function produceActivate(step: "understand" | "explain" | "propose" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
   if (step === "understand") return understand(ctx);
   if (step === "explain") return explainStep(ctx);
+  if (step === "review") return review(ctx);
   return propose(ctx);
 }
 
@@ -94,7 +99,8 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
     deployRule: rule === null ? null : { requiredApprovals: rule.requiredApprovals, requireDistinctUsers: rule.requireDistinctUsers, rolesAllowed: rule.rolesAllowed },
     previousReleases: state.chain.filter((link) => link.kind === "RELEASE").map((link) => ({ releaseId: link.body.releaseId, packageDigest: link.body.packageDigest, revisionNo: link.revisionNo })),
     backup: backupCoverage(workspace),
-    notEvaluated: { lastBackup: "the age of the last backup is not read here (verifyBackup needs the backup file)", value: "value readiness lands with P1-62 slice C" }
+    notEvaluated: { lastBackup: "the age of the last backup is not read here (verifyBackup needs the backup file)",
+      value: "the value report runs once, at Review (createValueReport appends value events on every call); one value claim per value-contract KPI" }
   };
 }
 
@@ -226,7 +232,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     updatePolicy: updatePolicyOf(answers),
     ownership: { releaseOwner: textValue(values.get("releaseOwner")), onCall: textValue(values.get("onCall")), claimKind: "self_reported" },
     access: { roles: listValue(values.get("accessRoles")), networks: listValue(values.get("accessNetworks")) },
-    surfaces: { score: "context graph digest bound by the revision", shield: "assurance runs linked at Review (P1-62 slice C)", enforce: "the Enforce snapshot the bound resources digest names",
+    surfaces: { score: "context graph digest bound by the revision", shield: "no assurance run is linked to a release yet (P0-19)", enforce: "the Enforce snapshot the bound resources digest names",
       vault: "the A4_PACKAGE signing route", watch: "the deployment receipt (self_reported) once recorded; runtime runs only when a lease-bound session observes one",
       comply: "Adapt's compiled plan and conformance statement", fleet: "agent config and typed graph digests", passport: "not evaluated until P0-55 (signature verified; statements not evaluated)" },
     packagePlan: { inputs: [...Object.values(CAPTURED_SLOTS), "resources/ (Enforce snapshot)", "plan/compiled-plan.json", "conformance/adapt.json", "update-policy.yaml", "deploy/ (the prepared overlay and plan)", "leases.json"],
@@ -240,7 +246,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
         target(values) === "helm" ? "helm rollback <release> <rev> --wait" : "re-pin the previous release's overlay and docker compose up -d (never down -v)",
         "the operator records the rollback row; deployed_release_id moves then"], lifecycle: "never moved backwards" },
     valueReportingPlan: { kpis: kpis.map((kpi) => ({ kpi, evidenceSource: null, method: "not_yet_decided" })), sustainability: listValue(values.get("sustainabilityObjectives")),
-      social: listValue(values.get("socialObjectives")), claimKind: "self_reported", note: "one amc.a4-value-claim/v1 per KPI per release (P1-62 slice C)" },
+      social: listValue(values.get("socialObjectives")), claimKind: "self_reported", note: "one amc.a4-value-claim/v1 per value-contract KPI per release, recorded at Review" },
     completion: { effect: PRODUCTION_LEASE_EFFECT_ID, note: "the deployment approval mints the production lease, then the lifecycle bridge moves staging → production only with every production control evidenced (P2-40 for two of them)" }
   };
   return {
@@ -252,3 +258,55 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   };
 }
 const target = (values: ReadonlyMap<string, unknown>): string | null => textValue(values.get("target"));
+
+const LIMITATIONS = [
+  `AMC's check of the destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}; runtime behaviour there is not evaluated.`,
+  "The image is pinned by tag until D-03 and P0-14 (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03.",
+  "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass (P2-40), so the lifecycle stays at staging.",
+  "The update policy is signed and not enforced (P2-34); the kill switch is not available in this release (P2-26).",
+  "The SLO source is in-memory and unsigned: the monitor record carries it self_reported with evidence incomplete.",
+  "Independently reviewed value needs an admitted external record naming the KPI and its window (P2-24, P3-21)."
+];
+
+/**
+ * Review (design §10.4 Review, §14.4, §15): results are reviewed, never approved. Records the monitor record of this
+ * release (signed under a4-releases/, a self_reported `monitor` ref beside the step), the deployment rows in two columns
+ * and the lifecycle bridge as it stands; then, once the step committed (never on a replay or a refusal), the value report
+ * runs once and the value claims and the monitor's ledger-backed sources are recorded (src/a4/a4Value.ts). Nothing at
+ * the destination is observed, so `reviewed` records not_evaluated with the reason.
+ */
+function review(ctx: A4ProducerContext): A4ProducerResult {
+  const { workspace, state } = ctx;
+  const { project_id: projectId, agent_id: agentId } = state.project;
+  const release = currentRelease(state.chain);
+  const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
+  if (releaseId === null) throw fail(409, "A4_NOT_READY", "This Activate cycle has no release to review.", { reasonCodes: ["NO_RELEASE"] });
+  let regulated = true;
+  try {
+    regulated = isRegulated(state, signedA4Floor(workspace));
+  } catch {
+    // An unverified approval policy reads regulated (fail closed).
+  }
+  const monitor = monitorRecord(workspace, state, releaseId, ctx.now);
+  // Named by a fresh id: harmless when the step is then refused (nothing names it), as receipts are.
+  const file = writeReleaseRecord(workspace, projectId, "monitors", releaseId, `a4mon_${randomBytes(16).toString("hex")}`, monitor.doc, "a4-stage-output");
+  const of = (kind: string) => cycleLinks(state.chain, kind).filter((link) => link.body.releaseId === releaseId);
+  const checks = of("VERIFICATION");
+  const deployments = of("DEPLOYMENT").map((link) => {
+    const check = checks.filter((entry) => entry.body.receiptId === link.body.deploymentId).at(-1);
+    const amc = typeof check?.body.amcCheckStatus === "string" ? check.body.amcCheckStatus : "not_evaluated";
+    return { deploymentId: link.body.deploymentId, kind: link.body.deploymentKind, environment: link.body.environment, target: link.body.target,
+      recordedStatus: link.body.recordedStatus, amcCheckStatus: amc, statusText: statusText(String(link.body.recordedStatus), amc, (check?.body.reasonCodes as string[] | undefined) ?? []) };
+  });
+  const lifecycle = bridgeControls(state, "production", releaseId);
+  return {
+    outputs: [{ output: "review", label: "activate review: the deployment rows in two columns, the production bridge as it stands and the remaining limitations",
+      lane: "implementation", method: null, body: { releaseId, deployments, lifecycle, limitations: LIMITATIONS, claimBoundary: ACTIVATE_CLAIM_BOUNDARY } }],
+    refs: [{ refKind: "monitor", refId: file.path, sha256: file.sha256, note: monitor.note,
+      label: `monitor record of ${releaseId}: one envelope per source, ${String(monitor.note.nonNullSources)} with a value (self_reported)` }],
+    notEvaluated: ["DEPLOYMENT_IDENTITY_NOT_EVALUATED", "KEY:P2-40"],
+    response: { monitor: { refId: file.path, nonNullSources: monitor.note.nonNullSources, sources: monitor.doc.sources } },
+    afterCommit: () => recordReviewResults({ workspace, projectId, agentId, releaseId, revisionNo: state.project.revision_no, regulated, now: ctx.now,
+      ledgerRefs: monitor.ledgerRefs })
+  };
+}

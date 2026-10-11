@@ -84,7 +84,7 @@ export async function handleA4ReleaseRoute(route: A4Route, projectId: string, ta
   assertQuery(route.params, []);
   const state = loadA4State(store, projectId, Date.now());
   assertVisible(route, state.members);
-  const views = releaseViews(store, projectId, state.chain);
+  const views = releaseViews(store, projectId, state);
   if (read === null) {
     apiSuccess(route.res, { projectId, releases: views.map((view) => ({ releaseId: view.releaseId, revisionNo: view.revisionNo, version: view.version,
       packageDigest: view.packageDigest, target: (view.deploymentTarget as { kind: string }).kind, previousReleaseId: view.previousReleaseId, baseReleaseId: view.baseReleaseId,
