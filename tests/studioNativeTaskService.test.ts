@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import fs, { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, type PathLike, type StatSyncOptions } from "node:fs";
 import { syncBuiltinESMExports } from "node:module";
 import { spawn } from "node:child_process";
@@ -47,9 +47,9 @@ afterEach(async () => {
   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;
   expect(outcomes.filter(outcome => outcome.status === "rejected")).toEqual([]);
 });
-function service(workspace = root): NativeTaskService {
+function service(workspace = root, extraEnvironment: Record<string, string> = {}): NativeTaskService {
   const value = createService({ workspace, credentialsHome: credentialHome, credentialsFile: join(credentialHome, ".credentials.yaml"),
-    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass } });
+    environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, ...extraEnvironment } });
   services.push(value); return value;
 }
 function input(prompt = "Record this synthetic native Studio turn."): NativeTaskStart {
@@ -214,18 +214,22 @@ test("a turn AMC's own budget refused says so instead of a generic failure, and 
 });
 
 // P0-62: a writer still appending while Studio reads. Every append moves the ledger file's identity, and the history
-// reader refuses a read whose files moved (CHANGED). Here the next `calls` lstat calls on the ledger see a new identity
-// each time, deterministically, as they would while a writer is still appending.
+// reader refuses a read whose files moved (CHANGED). `move(reads)` makes the next reads see a new identity on each lstat,
+// deterministically, as they would while a writer is still appending; `appendOnCall(n, write)` performs a real append
+// during the n-th lstat of the ledger, after that stat was taken, so the read in progress passes and the next one differs.
 function movingLedger(ledger: string) {
-  const real = fs.lstatSync; let calls = 0, bump = 0;
+  const real = fs.lstatSync; let calls = 0, bump = 0, seen = 0, appendAt = 0, write: (() => void) | undefined;
   fs.lstatSync = ((path: PathLike, options?: StatSyncOptions) => {
     const stats = real(path, options as never);
-    if (calls <= 0 || String(path) !== ledger || !stats) return stats;
+    if (String(path) !== ledger || !stats) return stats;
+    if (++seen === appendAt && write) { const append = write; write = undefined; append(); }
+    if (calls <= 0) return stats;
     calls--;
     return Object.assign(Object.create(Object.getPrototypeOf(stats)), stats, { mtimeMs: stats.mtimeMs + ++bump });
   }) as typeof fs.lstatSync;
   syncBuiltinESMExports();
-  return { move(reads: number) { calls = 2 * reads; }, get pending() { return calls; },
+  return { move(reads: number) { calls = 3 * reads; }, get pending() { return calls; }, get seen() { return seen; },
+    appendOnCall(n: number, append: () => void) { appendAt = seen + n; write = append; }, get appended() { return write === undefined && appendAt > 0; },
     restore() { fs.lstatSync = real; syncBuiltinESMExports(); } };
 }
 test("a writer still appending neither fails the turn nor hides authenticated history; Studio waits for it to settle (P0-62)", async () => {
@@ -244,6 +248,47 @@ test("a writer still appending neither fails the turn nor hides authenticated hi
     const shown = s.poll(actor, task.taskId).task;
     expect(shown.history.status, "a moving store is not unavailable evidence").toBe("authenticated");
     expect(shown).toMatchObject({ state: "idle", error: null });
+  } finally { ledger.restore(); }
+});
+
+/** A real append by another writer: a sealed audit session in the same workspace ledger. */
+function appendForeignSession(workspace: string): void {
+  const ledger = openLedger(workspace), sessionId = `p062-writer-${randomUUID()}`;
+  try {
+    ledger.startSession({ sessionId, runtime: "amc", binaryPath: "p062-fixture-writer", binarySha256: "0".repeat(64) });
+    ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: "{}", payloadExt: "json", meta: { auditType: "P062_FIXTURE_WRITER" } });
+    ledger.sealSession(sessionId);
+  } finally { ledger.close(); }
+}
+test("a writer appending between Studio's pre-verify read and the verifier makes verification fail, not pass (P0-62 review)", async () => {
+  const monitor = createHash("sha256").update(readFileSync(join(root, ".amc", "keys", "monitor_ed25519.pub"))).digest("hex");
+  const s = service(root, { AMC_EXPECTED_MONITOR_FINGERPRINT: monitor });
+  const clean = await idle(s, (await s.start(actor, input("Synthetic pinned verify."))).taskId);
+  expect((await s.verify(actor, clean.taskId, 1)).verification, "control: the same flow verifies when nothing moves").toMatch(/^(externally-anchored|anchored-prefix)$/);
+  const task = await idle(s, (await s.start(actor, input("Synthetic moved verify."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    // Verify reads after close (lstat 1-3), then the pre-verify head (4-6): append as that read finishes.
+    ledger.appendOnCall(6, () => appendForeignSession(root));
+    const verified = await s.verify(actor, task.taskId, 1);
+    expect(ledger.appended).toBe(true);
+    expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("Recorded history changed during verification") });
+  } finally { ledger.restore(); }
+});
+test("a release that completes the task while its turn waits for settled history wins; the turn is not dispatched (P0-62 review)", async () => {
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic CAS turn one."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    ledger.move(1_000_000); // every read meets a moving store, so dispatch waits for settled history
+    const submitted = s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic CAS turn two." });
+    await new Promise(done => setTimeout(done, 200));
+    const released = await s.release(actor, task.taskId, 2);
+    expect(released.state).toBe("released");
+    ledger.move(0);
+    await expect(submitted).rejects.toMatchObject({ code: "NATIVE_TASK_CHANGED" });
+    expect(s.poll(actor, task.taskId).task.state).toBe("released");
+    expect(rows(task.sessionId).filter(row => row.event_type === "request/header"), "the waiting turn was never sent").toHaveLength(1);
   } finally { ledger.restore(); }
 });
 

@@ -226,13 +226,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
       entry.projectionError = undefined; entry.changedSince = undefined;
-      if (entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
+      // A later read never softens a failed verdict; it only withdraws a positive one whose head moved.
+      if (entry.verification !== "failed" && entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
       entry.projectionAt = Date.now();
       return true;
     } catch (error) {
       const moving = error instanceof SessionHistoryRefused && error.code === "CHANGED";
       entry.changedSince = moving ? entry.changedSince ?? Date.now() : undefined;
-      entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
+      if (entry.verification !== "failed") entry.verification = "not-verified";
+      entry.verificationStoreHead = undefined;
       if (moving && Date.now() - entry.changedSince! < SETTLE_MS) {
         if (!entry.projection) entry.projectionError = MOVING;
         return false;
@@ -408,8 +410,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   }
   async function dispatch(entry: Entry, input: PreparedNativeTaskInput): Promise<void> {
     if (!entry.session) throw new NativeTaskServiceError("NOT_ACTIVE", 409, "Explicitly resume the released native session before submitting a new turn.");
-    const prior = entry.state; entry.state = "running"; // holds off another admission while the history settles
-    if (!await settledRefresh(entry) || !entry.projection) {
+    const prior = entry.state, session = entry.session, revision = entry.descriptor.revision;
+    entry.state = "running"; // holds off another admission while the history settles
+    const fresh = await settledRefresh(entry);
+    // Compare-and-set: dispatch only if nothing released, cancelled or replaced this task while its history settled.
+    if (entry.finishing || entry.startupCancelled || shuttingDown || entry.state !== "running" || entry.session !== session
+      || entry.descriptor.revision !== revision) {
+      throw new NativeTaskServiceError("TASK_CHANGED", 409, "The task was released, cancelled or changed while its history settled. This turn was not dispatched.");
+    }
+    if (!fresh || !entry.projection) {
       entry.state = prior;
       throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, entry.changedSince === undefined
         ? "The native session did not authenticate before dispatch. No provider request was submitted." : `${UNSETTLED} No provider request was submitted.`);
@@ -425,11 +434,14 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         // The turn result is the runtime's completion signal; judge it only from a read taken while the store holds still.
         await turn.result;
         if (!await settledRefresh(entry) && entry.changedSince !== undefined) throw new NativeTaskServiceError("EVIDENCE_UNSETTLED", 409, UNSETTLED);
-        const reason = entry.projection?.ending;
-        if (!reason || entry.projection?.endingId === precedingEndingId) throw new Error("No new authenticated turn ending");
+        // The outcome comes from that one authenticated snapshot, and is recorded only through the descriptor's
+        // compare-and-set on the revision it was decided for (persist throws TASK_CHANGED otherwise).
+        const snapshot = entry.projection, reason = snapshot?.ending;
+        if (!snapshot || !reason || snapshot.endingId === precedingEndingId) throw new Error("No new authenticated turn ending");
+        if (entry.descriptor.revision !== revision) throw new NativeTaskServiceError("TASK_CHANGED", 409, "The task changed while its turn settled; no outcome was recorded from it.");
+        persist(entry, { pendingTurn: false });
         entry.state = reason === "error" || reason === "interrupted" ? "failed" : "idle";
         entry.error = reason === "error" || reason === "interrupted" ? `The signed native turn ended with ${reason}; no successful task is claimed.` : null;
-        persist(entry, { pendingTurn: false });
       } catch (error) {
         entry.state = "failed";
         entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
@@ -539,7 +551,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       return view(entry);
     },
     cancel(actor, taskId, expectedRevision) { const entry = control(actor, taskId, expectedRevision);
-      if (entry.preparation || entry.state === "starting") { entry.startupCancelled = true; void stop(entry); }
+      if (entry.preparation || entry.state === "starting" || (entry.state === "running" && !entry.turn)) { entry.startupCancelled = true; void stop(entry); }
       else if (entry.turn) { entry.state = "cancel-requested"; entry.turn.cancel(); }
       return view(entry); },
     async release(actor, taskId, expectedRevision) { const entry = control(actor, taskId, expectedRevision);
@@ -618,7 +630,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.projectionAt = 0;
         const sameHead = refresh(entry) && verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
         const passed = verdict.verification !== "failed";
-        entry.verification = !passed ? "failed" : !sameHead ? "not-verified" : verdict.verification;
+        // The verdict and finalization come from the verifier's one read; it counts only if the authenticated store head
+        // was the same before and after that read. A writer appending meanwhile makes it fail, never pass (P0-62).
+        entry.verification = !passed || !sameHead ? "failed" : verdict.verification;
         entry.verificationStoreHead = sameHead ? verificationHead : undefined;
         entry.verificationScope = verdict.scope;
         entry.error = passed && !sameHead ? "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current." : verdict.error;
