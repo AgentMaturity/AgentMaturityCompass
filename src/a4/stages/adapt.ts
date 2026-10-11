@@ -11,7 +11,7 @@
  * except the probe's ref to the stub-provider turn A4 ran, which is synthetic_example.
  */
 import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
-import { dirname, relative, sep } from "node:path";
+import { dirname } from "node:path";
 import { loadCatalog } from "../../catalog/loader.js";
 import { activeControlPlanHead } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
@@ -25,13 +25,12 @@ import { pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
-import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
+import type { A4ExplainFact, A4ExplainLevel } from "../a4Explain.js";
 import { driftedSlots, RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
 import { isRegulated } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { flatSlots, gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
 import { assertNoSecrets } from "../a4Router.js";
-import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyDraft, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
@@ -51,9 +50,8 @@ import {
   answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
 import { answersDigestOf, answerValues, carryAnswers, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
+import { explanationResult, fail, relPath } from "./common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 /** The largest proposal Propose records: Build's record (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB. */
 const SPEC_ROOM_FOR_BUILD = 240 * 1024; // ponytail: Build's record is ~3 KiB plus the signed plan diff; Build checks the exact record before it writes
 const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicalize(spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
@@ -101,11 +99,7 @@ const ACTIVATE_PLAN_EFFECT: A4EffectDef = {
 
 /** The router's entry (src/a4/spec/adapt.ts PRODUCERS). */
 export async function produceAdapt(step: "understand" | "explain" | "propose" | "build" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
-  if (step === "understand") return understand(ctx);
-  if (step === "explain") return explainStep(ctx);
-  if (step === "propose") return propose(ctx);
-  if (step === "build") return build(ctx);
-  return review(ctx);
+  return { understand, explain: explainStep, propose, build, review }[step](ctx);
 }
 
 /** Explain and Propose build on Understand's facts: 409 UNDERSTANDING_STALE unless Understand ran on these answers. */
@@ -252,9 +246,7 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const weakens = understood?.activationWeakenings;
   const elsewhere = typeof activeProfile === "string" && activeProfile !== profileIdOf(ctx.state.project.project_id) && Array.isArray(weakens) && weakens.length > 0;
   const facts = adaptFacts(spec, answers, ctx.state.chain, !regulatedNow(ctx) ? "not_regulated" : elsewhere ? "active_elsewhere" : "regulated");
-  const items = explain(facts, level);
-  return { outputs: [{ output: "explanation", label: `adapt explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
-    spec: { ...spec, explanation: { level, facts } }, response: { explanation: { level, items } } };
+  return explanationResult("adapt", spec, facts, level);
 }
 
 /** Readiness's own rule (isRegulated) on the producer's rows and the signed floor; an unverified policy reads regulated (fail closed). */

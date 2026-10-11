@@ -34,8 +34,8 @@ import {
   ADAPT_SPEC_SCHEMA, ACTIVATE_PLAN_EFFECT_ID, CATALOG_EXPERIMENTAL_NOTICE, FACTS, buildOf, factAnswer, factList, factTerm, lockDigestOf, profileIdOf, proposedPlan,
   type AdaptBuild, type AdaptFact
 } from "./spec/adapt.js";
+import { attempt, fail } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const hexOf = (digest: string): string => digest.replace(/^sha256:/, "");
 
 let shippedLock: string | undefined;
@@ -67,15 +67,6 @@ function profileFromAnswers(input: { projectId: string; workspaceId: string; age
     ...Object.fromEntries((Object.keys(FACTS) as AdaptFact[]).map((name) => [name, fact(name)])),
     euRoleRecord: null, art63Record: null, operatingProfile: null, exceptions: []
   };
-}
-
-/** One reader's answer, or the error's code: a fact that cannot be read is recorded as such, never as "fine". */
-function attempt<T>(read: () => T): T | { error: string } {
-  try {
-    return read();
-  } catch (error) {
-    return { error: errorCodeOf(error, "UNREADABLE") };
-  }
 }
 
 /** A signed config's state: valid, missing (no file) or invalid (present and not verifying). A code only, never a path. */
