@@ -442,7 +442,7 @@ function createStore(workspace: string, ledger: Ledger) {
   /** 423 before anything is written when no vault can sign the audit row (locked, and no AMC_VAULT_PASSPHRASE). */
   const requireSigningKey = (): void => {
     try {
-      getPrivateKeyPem(workspace, "monitor");
+      for (const purpose of ["ledger-row", "receipt", "artifact-seal"] as const) getPrivateKeyPem(workspace, purpose); // P1-08: the audit row, its receipt and the A4 record
     } catch (error) {
       if (/vault locked/i.test(error instanceof Error ? error.message : String(error))) throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault to record this.");
       throw error;

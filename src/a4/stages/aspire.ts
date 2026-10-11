@@ -208,7 +208,7 @@ function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readon
  * Returns whether the agent has a (verified) value contract.
  */
 function assertContractsWritable(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): boolean {
-  getPrivateKeyPem(workspace, "auditor");
+  for (const purpose of ["artifact-seal", "config-signature"] as const) getPrivateKeyPem(workspace, purpose); // P1-08: value contract and receipt; outcome contract, agent config and target profile
   if (metrics.length > 0) trustedOutcomeContract(workspace, agentId);
   return trustedValueContract(workspace, agentId);
 }
