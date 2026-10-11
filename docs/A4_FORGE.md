@@ -152,7 +152,9 @@ framework through a scaffold, connect instructions and a trace import.
   and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
   file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
   never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
-  retained; imported traces are self-reported). A bounded first task through `createForeignRunner` is not run: a foreign
+  retained; imported traces are self-reported). The scaffold directory and the import source are workspace paths of
+  plain names with no symbolic link on the way (each component is checked; `PATH_NOT_PLAIN` otherwise), so a link
+  such as `docs -> .amc` cannot lead either into `.amc/`. A bounded first task through `createForeignRunner` is not run: a foreign
   child runs only under `spawnSubagent`, which Studio's native tasks cannot do (`NATIVE_TASKS_NO_DELEGATION`); the plan
   gives a supervised command for you to run.
 - **Review** is run by the session's owner and refuses a session that is not the start Build journaled
@@ -161,8 +163,12 @@ framework through a scaffold, connect instructions and a trace import.
   verifier report attached; a session with no head event is not evaluated. Review also records each session's
   effective-policy receipts and their downgrades, and four execution phases (admission, model completion, side-effect
   completion, evidence verification). On the stub provider every ref about the agent is `synthetic_example` and the
-  review reads "tool pipeline observed on a stub model; agent behaviour not evaluated"; the agent stays at lifecycle
-  stage `development`. `unit_tests_passing` needs every pinned check executed and passed on a non-stub provider.
+  review reads "tool pipeline observed on a stub model; agent behaviour not evaluated". Review records the agent's
+  lifecycle stage as `lifecycle/state.json` holds it (`not_evaluated` with the reason when the file is absent or
+  unreadable) and advances nothing: the development → testing bridge (design §7 item 9) waits for the A4 lifecycle
+  wrapper, so `lifecycle_bridge` reads NOT_EVALUATED with `KEY:A4_LIFECYCLE_WRAPPER`. `unit_tests_passing` needs every
+  pinned check executed and passed on a non-stub provider. Review itself records no observed ref yet: it does not
+  reference the session's runtime-written rows as ledger refs.
   `composition.compositionDigest` and `composition.policyDigest` are not recomputed per session yet (`composition_bound`
   is not evaluated); the reviewed receipts are bound through the review.
 - **Completion** runs the effect `a4.assemble.apply`: an owner opens the effect gate once the completion gate has its
@@ -173,8 +179,9 @@ framework through a scaffold, connect instructions and a trace import.
 - **outcome_unknown.** A cancelled or failed journaled call blocks the agent's journaled calls and this stage
   (`no_open_outcome_unknown`). The Outcome unknown card requests a resolution (the operator's statement, an
   `amc.action.resolve` engine request), another project approver or owner decides it from the card, and the resolution
-  is recorded once A4's dual control holds: approvals bound to the request from members other than the operator, two
-  distinct live-checked identities when the project is regulated. The note is sealed in the project's blob store; the
+  is recorded once A4's dual control holds: approvals bound to the request from members other than the operator, the
+  principals who built at Assemble and the owners of its build sessions, two distinct live-checked identities when the
+  project is regulated. The note is sealed in the project's blob store; the
   engine request and the action journal carry only a reference naming the sealed blob and the note's sha256. The
   resolution is the operator's statement, `self_reported`, never observed. A denied or expired request is requested
   again from the same card.

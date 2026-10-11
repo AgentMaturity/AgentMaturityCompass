@@ -96,7 +96,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       [path("hypothesisId")], "201") },
     [`${p}/outcome-unknown/{executionId}/request`]: { post: write("Request a resolution of an outcome_unknown execution blocking the project's agent: the operator's statement as an amc.action.resolve engine request (self_reported)",
       "A4OutcomeRequest", [path("executionId")], "201") },
-    [`${p}/outcome-unknown/{executionId}/resolve`]: { post: write("Record the approved resolution (resolveManually) once A4's dual control holds (bound approvals from project approvers or owners other than the operator; two live-checked keys when regulated; else 409 RESOLUTION_QUORUM_INSUFFICIENT); its ACTION_STATE row is a ledger_event ref, self_reported, never observed",
+    [`${p}/outcome-unknown/{executionId}/resolve`]: { post: write("Record the approved resolution (resolveManually) once A4's dual control holds (bound approvals from project approvers or owners other than the operator, Assemble's builders and its build sessions' owners; two live-checked keys when regulated; else 409 RESOLUTION_QUORUM_INSUFFICIENT); its ACTION_STATE row is a ledger_event ref, self_reported, never observed",
       "A4Control", [path("executionId")], "201") },
     [`${p}/stages/assemble/scaffold`]: { post: write("External path, after Build (owner, owner mode): the path's scaffold, contract tests and policy pack into a new workspace directory outside .amc/, written after a manifest ref (self_reported) binding every file's sha256 is recorded",
       "A4AssembleScaffold", [], "201") },
@@ -175,9 +175,9 @@ export function a4Schemas(): Record<string, unknown> {
     A4Observe: control({ verdict: { type: "string", enum: ["observed", "refuted"] }, evidenceRef: object({ refId: string, sha256: digest }) }),
     A4OutcomeRequest: control({ effect: { type: "string", enum: ["applied", "not_applied"] }, externalRef: { type: ["string", "null"], maxLength: 512 },
       note: { type: "string", minLength: 1, maxLength: 4000, description: "Scanned for secrets, then sealed in the project's encrypted blob store; the engine request and the action journal carry only a reference naming the sealed blob and the note's sha256." } }),
-    A4AssembleScaffold: control({ directory: { type: "string", minLength: 1, maxLength: 200, description: "Workspace-relative; plain names without a leading dot; must not exist yet." } }),
+    A4AssembleScaffold: control({ directory: { type: "string", minLength: 1, maxLength: 200, description: "Workspace-relative; plain names without a leading dot; no symbolic link or file on the way (400 PATH_NOT_PLAIN), so never under .amc/; must not exist yet." } }),
     A4AssembleConnect: control({ mode: { type: "string", enum: ["supervise", "sandbox"] }, adapterId: { type: ["string", "null"], pattern: "^[a-z0-9][a-z0-9._-]{0,63}$" } }, ["mode"]),
-    A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory (not a symbolic link, not under .amc/)." } }),
+    A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or at the end (400 PATH_NOT_PLAIN), so never under .amc/." } }),
     A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest })
   };
 }

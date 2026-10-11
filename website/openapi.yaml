@@ -4125,7 +4125,8 @@ components:
           type: string
           minLength: 1
           maxLength: 200
-          description: Workspace-relative; plain names without a leading dot; must not exist yet.
+          description: Workspace-relative; plain names without a leading dot; no symbolic link or file on the way (400
+            PATH_NOT_PLAIN), so never under .amc/; must not exist yet.
         expectedHeadSeq:
           type: integer
           minimum: 0
@@ -4169,7 +4170,8 @@ components:
           type: string
           minLength: 1
           maxLength: 512
-          description: A workspace file or directory (not a symbolic link, not under .amc/).
+          description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or
+            at the end (400 PATH_NOT_PLAIN), so never under .amc/."
         expectedHeadSeq:
           type: integer
           minimum: 0
@@ -13740,9 +13742,9 @@ paths:
   /v1/a4/projects/{projectId}/outcome-unknown/{executionId}/resolve:
     post:
       summary: Record the approved resolution (resolveManually) once A4's dual control holds (bound approvals from
-        project approvers or owners other than the operator; two live-checked keys when regulated; else 409
-        RESOLUTION_QUORUM_INSUFFICIENT); its ACTION_STATE row is a ledger_event ref, self_reported, never
-        observed
+        project approvers or owners other than the operator, Assemble's builders and its build sessions' owners;
+        two live-checked keys when regulated; else 409 RESOLUTION_QUORUM_INSUFFICIENT); its ACTION_STATE row is
+        a ledger_event ref, self_reported, never observed
       tags:
         - Studio
         - A4 Forge
