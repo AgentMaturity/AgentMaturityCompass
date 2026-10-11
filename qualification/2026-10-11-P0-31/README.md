@@ -15,7 +15,7 @@ Runs were local only, keyless, and not CI. Windows and Linux AMD64 are not quali
 | Packed with | `npm pack --ignore-scripts`. npm 10.9.4 (Node 22) and npm 11.19.0 (Node 24) produced the same bytes. |
 
 - The release is 2.0.0 (D-12), but the package is not versioned yet. The tarball therefore still says 1.2.0.
-- Commits after the RC on this branch add only `qualification/2026-10-11-P0-31/`. That folder is not in the package `files`, so the tarball does not change. The final check is in `receipt.json`.
+- Commits after the RC touch only `tests/`, `qualification/2026-10-11-P0-31/` and the regenerated published counts. Packing the final branch head gives sha256 `c8eba8e4…`; against the RC, `diff -rq` shows only `package/README.md` (the test-file count, 1,640 to 1,642), and `dist/cli.js` is the same bytes. P0-39 packs the versioned 2.0.0 tarball anyway, and that tarball differs again.
 - The Linux `qualify:platform` lane packs its own root, so it ran on a repack of the extracted RC. That repack has a different gzip stream but a byte-identical tar; see `rc-tar-identity.txt`. Every other lane installed the RC tarball itself and checked its sha256.
 
 ## Cells

@@ -158,6 +158,96 @@
       "cmd": "npx vitest run tests/qualificationNodeVersions.test.ts tests/studioNativeTaskArchiveNegatives.test.ts tests/dshRunnerReverify.test.ts tests/nativeRecoveryControl.test.ts tests/nativeManagedRecovery.test.ts tests/studioNativeTaskService.test.ts",
       "exit": 1,
       "durationMs": 47000
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 48000
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 39000
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 64000
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 5000
+    },
+    {
+      "cmd": "npm run -s check:counts (before node scripts/gen-counts.mjs --write)",
+      "exit": 1,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write (committed 86b9038b)",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5000
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 5000
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1000
     }
   ],
   "tests": {
@@ -169,7 +259,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "44b6a4ec16146b838fcd6ff82b07fb80178a90b0667ead4f02f4205dd39ea744"
+      "sha256": "a3f988cb1058d4b7118ae13bd6a6b8b64a663dd88841746137eb747e9ade743b"
     },
     {
       "path": "cells/linux-arm64-node22/crash-receipt.json",
@@ -468,5 +558,5 @@
       "sha256": "6564d9b408c561be51d394992902fa0ed8ec5c2f923d7862edff37a130bc1a2d"
     }
   ],
-  "notes": "Release candidate: commit 756bd6977dce19f4ef781bdb492c38d6777964f7; npm pack tarball agent-maturity-compass-1.2.0.tgz sha256 21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340 (release 2.0.0 not yet versioned, D-12); installed dist/cli.js sha256 8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165. Every cell installed that tarball; the Linux qualify:platform lane repacked the extracted RC (gzip differs, uncompressed tar identical: rc-tar-identity.txt). Local runs on macOS arm64 (this host) and colima amc-s7f Linux arm64 containers, not CI. Non-zero exits: linux-arm64-node22 Studio attempt 1 exit 2 = harness wrapper bug (headless shell path in linux-cell.sh), rerun passed 13/13; linux-arm64-node24 Studio attempt 1 exit 1 at amc up --demo (P0-62), rerun passed 13/13; mutation batch exit 1 = 5 survivors (three 1511-* handed to P2-12 with this evidence, two 1545-* opened as P0-61); the first qualificationNodeVersions run is the intended red run; focused vitest exit 1 = 8 pre-existing failures in tests/studioNativeTaskService.test.ts (HOME inside the workspace, P0-57), all other files pass. Follow-ups blocking P0-39: P0-56, P0-57, P0-58, P0-59, P0-60 (Sid), P0-61, P0-62 (follow-ups.md). Node: macOS cells Homebrew node@22 22.22.0 and node@24 24.21.0; Linux cells node:22-bookworm (22.23.3) and node:24-bookworm (24.21.0) pinned by digest; repository checks ran under Node 25.5.0."
+  "notes": "Release candidate: commit 756bd6977dce19f4ef781bdb492c38d6777964f7; npm pack tarball agent-maturity-compass-1.2.0.tgz sha256 21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340 (release 2.0.0 not yet versioned, D-12); installed dist/cli.js sha256 8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165. Every cell installed that tarball; the Linux qualify:platform lane repacked the extracted RC (gzip differs, uncompressed tar identical: rc-tar-identity.txt). Local runs on macOS arm64 (this host) and colima amc-s7f Linux arm64 containers, not CI. Non-zero exits: linux-arm64-node22 Studio attempt 1 exit 2 = harness wrapper bug (headless shell path in linux-cell.sh), rerun passed 13/13; linux-arm64-node24 Studio attempt 1 exit 1 at amc up --demo (P0-62), rerun passed 13/13; mutation batch exit 1 = 5 survivors (three 1511-* handed to P2-12 with this evidence, two 1545-* opened as P0-61); the first qualificationNodeVersions run is the intended red run; check:counts exit 1 = stale published test-file count from this item's two new test files, regenerated and committed, then check:counts exit 0; focused vitest exit 1 = 8 pre-existing failures in tests/studioNativeTaskService.test.ts (HOME inside the workspace, P0-57), all other files pass. Follow-ups blocking P0-39: P0-56, P0-57, P0-58, P0-59, P0-60 (Sid), P0-61, P0-62 (follow-ups.md). Node: macOS cells Homebrew node@22 22.22.0 and node@24 24.21.0; Linux cells node:22-bookworm (22.23.3) and node:24-bookworm (24.21.0) pinned by digest; repository checks ran under Node 25.5.0. Branch head after this item (counts regenerated): npm pack of the worktree with a fresh build gives sha256 c8eba8e44441179fded27d96e013bac31cc496a297bb9f76c7a32da6f6181f5c; `diff -rq` against the extracted RC shows only package/README.md (the published test-file count, 1,640 to 1,642); dist/cli.js is the same 8b9ec221\u2026 bytes. Commits after the RC touch only tests/, qualification/ and the regenerated count lines."
 }
