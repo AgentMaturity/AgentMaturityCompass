@@ -172,7 +172,8 @@ finally:
    if pid:
     try:os.kill(pid,0);alive=True
     except ProcessLookupError:pass
-   group_exited=not group_alive(pgid) if pgid==pid else False
+   # No pid when `up` failed before the daemon wrote its state (P0-62): report it, do not crash on None.
+   group_exited=not group_alive(pgid) if pid and pgid==pid else False
    if alive and pgid==pid:reap_group(pgid)
    report['cleanup'].append({'resource':'owned demo daemon','signalCommandExit':stopped.returncode,'knownPid':pid,'groupId':pgid,'processGroupReaped':group_exited,'ok':stopped.returncode==0 and not alive and group_exited})
   except Exception as e:report['cleanup'].append({'resource':'owned demo daemon','ok':False,'error':scrub(str(e))})
