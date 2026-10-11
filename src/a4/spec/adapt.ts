@@ -195,22 +195,32 @@ export function reached(state: A4ReadinessState, step: A4Step): boolean {
   return A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
 
-/** The unexpired owner acknowledgement of `itemId` on the head revision, as the evaluator reads it; null when none. */
-export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number): { by: string; ts: number; reason: string; expiresTs: number } | null {
+/**
+ * The owner acknowledgement of `itemId` on `revisionNo` (the head by default): the newest one, unexpired at `now`, as the
+ * evaluator reads it. Once an Adapt completion gate on that revision is consumed, the one in force at the consumption
+ * (recorded before it, unexpired then) stays the record, after it expires and after the head moves on (the conformance
+ * statement P1-62 binds). Null when none.
+ */
+export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no):
+  { by: string; ts: number; reason: string; expiresTs: number } | null {
+  const gateIds = new Set(state.gates.filter((row) => row.stage === "adapt" && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
+  const consumed = state.chain.find((link) => link.kind === "GATE_CONSUMED" && typeof link.body.gateId === "string" && gateIds.has(link.body.gateId));
+  const asOf = consumed === undefined ? now : typeof consumed.body.ts === "number" ? consumed.body.ts : Number.POSITIVE_INFINITY;
   const link = [...state.chain].reverse().find((candidate) => candidate.kind === "ACKNOWLEDGED" && candidate.body.itemId === itemId
-    && candidate.revisionNo === state.project.revision_no);
+    && candidate.revisionNo === revisionNo && (consumed === undefined || candidate.seq < consumed.seq));
   const { actorKey, ts, reason, expiresTs } = link?.body ?? {};
-  return typeof actorKey === "string" && typeof ts === "number" && typeof reason === "string" && typeof expiresTs === "number" && expiresTs > now
+  return typeof actorKey === "string" && typeof ts === "number" && typeof reason === "string" && typeof expiresTs === "number" && expiresTs > asOf
     ? { by: actorKey, ts, reason, expiresTs } : null;
 }
 
 /**
  * The owner-settled requirements (design §10.3 Exceptions): each mandatory requirement the plan leaves unresolved, under
- * the owner's live acknowledgement of `plan_unresolved`. They stay `unresolved` in the plan and in every count; P2-24
- * owns a true exception.
+ * the owner's acknowledgement of `plan_unresolved` on `revisionNo` (acknowledgementOf). They stay `unresolved` in the
+ * plan and in every count; P2-24 owns a true exception.
  */
-export function ownerOutOfScope(state: A4ReadinessState, plan: CompiledPlan | null, now: number): Array<{ controlId: string; by: string; ts: number; reason: string }> {
-  const ack = acknowledgementOf(state, "plan_unresolved", now);
+export function ownerOutOfScope(state: A4ReadinessState, plan: CompiledPlan | null, now: number, revisionNo = state.project.revision_no):
+  Array<{ controlId: string; by: string; ts: number; reason: string }> {
+  const ack = acknowledgementOf(state, "plan_unresolved", now, revisionNo);
   if (ack === null || plan === null) return [];
   return plan.requirements.filter((row) => row.mandatory && row.applicability === "unresolved").map((row) => ({ controlId: row.controlId, by: ack.by, ts: ack.ts, reason: ack.reason }));
 }
@@ -300,10 +310,11 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
  * (regulated) or opened, a plan activateControlPlan is certain to refuse reads BLOCKED before any gate is consumed: a
  * blocked plan, or one weaker than the workspace's active plan (Review's check of this build, else Understand's).
  */
-function signingItems(state: A4ReadinessState, spec: Record<string, unknown>, answers: readonly A4Answer[], revisionNo: number | null, regulated: boolean): A4ReadinessItem[] {
+function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Record<string, unknown>, answers: readonly A4Answer[], revisionNo: number | null,
+  regulated: boolean): A4ReadinessItem[] {
   const proposed = proposedFor(spec, answers);
   const build = proposed ? buildOf(spec) : null;
-  const review = (proposed && build !== null ? spec.review ?? null : null) as { conformance?: { verified?: unknown; reason?: unknown;
+  const review = (proposed && build !== null ? spec.review ?? null : null) as { conformance?: { status?: unknown; reason?: unknown;
     counts?: Record<string, unknown> }; head?: { weakensActive?: unknown } } | null;
   const completionGateId = [...state.chain].reverse().find((link) => link.kind === "GATE_REQUESTED" && link.body.stage === "adapt"
     && link.body.gate === "completion" && link.revisionNo === revisionNo)?.body.gateId;
@@ -352,11 +363,24 @@ function signingItems(state: A4ReadinessState, spec: Record<string, unknown>, an
             + `non-regulated project). Activation is an explicit owner effect (${ACTIVATE_PLAN_EFFECT_ID} on the completion gate); once it finishes this project `
             + "is regulated, and so is every project whose next revision records the active plan" } })
   ];
-  // AMC's own CONTROL_RESULT signature check: integrity of bytes under this workspace's keys, never a lane, never a claim.
+  // AMC's own CONTROL_RESULT signature check, as Review recorded it and as the file reads now (live): integrity of bytes
+  // under this workspace's keys, never a lane, never a claim. Only a notary-route signature or an unpinned issuer is a
+  // local limit (not evaluated); any other failure, at Review or since (edited, deleted, re-signed), blocks.
   if (conformance !== null) {
-    items.push(conformance.verified === true ? item("adapt.control_results_signature", "READY", { section: "integrity", reasonCodes: ["SELF_CHECK", "UNANCHORED"] })
-      : item("adapt.control_results_signature", "NOT_EVALUATED", { section: "integrity", kind: "not_evaluated", mandatory: false,
-        reasonCodes: ["CONTROL_RESULTS_NOT_VERIFIED_LOCALLY", ...(typeof conformance.reason === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(conformance.reason) ? [conformance.reason] : [])] }));
+    const code = (value: unknown): string[] => typeof value === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(value) ? [value] : [];
+    const recorded = conformance.status === "verified" || conformance.status === "not_evaluated" ? conformance.status : "failed";
+    const live = query.live.controlResults;
+    const check = recorded === "failed" ? { status: "failed", reason: conformance.reason } : live === undefined || live === null
+      ? { status: "unread", reason: "CONTROL_RESULTS_NOT_RECHECKED" } : recorded === "not_evaluated" && live.status === "verified" ? { status: recorded, reason: conformance.reason }
+        : live;
+    items.push(check.status === "verified" ? item("adapt.control_results_signature", "READY", { section: "integrity", reasonCodes: ["SELF_CHECK", "UNANCHORED"] })
+      : check.status === "not_evaluated" ? item("adapt.control_results_signature", "NOT_EVALUATED", { section: "integrity", kind: "not_evaluated", mandatory: false,
+        reasonCodes: ["CONTROL_RESULTS_NOT_VERIFIED_LOCALLY", ...code(check.reason)] })
+        : check.status === "unread" ? item("adapt.control_results_signature", "NOT_EVALUATED", { section: "integrity", kind: "source_unavailable",
+          reasonCodes: ["CONTROL_RESULTS_NOT_RECHECKED"], nextAction: { label: "The signed control results could not be checked again now; reload" } })
+          : item("adapt.control_results_signature", "BLOCKED", { section: "integrity", kind: "evidence_untrusted",
+            reasonCodes: ["CONTROL_RESULTS_INTEGRITY_FAILED", ...code(check.reason)],
+            nextAction: { label: "The signed control results are missing, changed, unparsable or no longer verify: review again (Review writes a new signed set)" } }));
   }
   return items;
 }
@@ -474,7 +498,7 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     proposed ? item("plan_proposed", "READY")
       : waiting("plan_proposed", [spec.schema === ADAPT_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { nextAction: { label: "Propose the plan" } }),
     ...planItems(state, query, spec, answers, regulated),
-    ...signingItems(state, spec, answers, revisionNo, regulated),
+    ...signingItems(state, query, spec, answers, revisionNo, regulated),
     lockoutItem(state, query, regulated),
     memoryItem(state, spec, answers),
     ...contextItems(state, query, answers, understanding)

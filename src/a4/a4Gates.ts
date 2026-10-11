@@ -23,6 +23,7 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
+import { controlResultsNow } from "./a4Conformance.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
@@ -192,7 +193,8 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
- * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble.
+ * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
+ * and the signed control results Adapt's Review recorded only at Adapt.
  */
 export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -221,7 +223,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
-    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null
+    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state) } : {})
   };
 }
 

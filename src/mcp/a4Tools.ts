@@ -272,7 +272,7 @@ export function registerA4Tools(server: McpServer, host: Host): void {
       const state = readable(ctx, args.projectId);
       // The router's answer (conformanceView): counts per result, never a percentage; a stage without a reviewed plan says not_evaluated.
       const stage = args.stage ?? headStage(state.project);
-      const statement = conformanceView(state, stage, ctx.now);
+      const statement = conformanceView(ctx.store.workspace, state, stage, ctx.now);
       const { pass, fail, not_evaluated: notEvaluated, not_applicable: notApplicable, unresolved } = statement.counts;
       const body = { projectId: args.projectId, view: "conformance", stage, statement, claim: statement.claim };
       return withClaim(`A4 conformance for ${args.projectId} at ${stage}: ${statement.controls.length} control(s); pass ${pass}, fail ${fail}, `

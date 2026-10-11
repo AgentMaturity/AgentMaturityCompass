@@ -624,7 +624,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/conformance") {
     assertQuery(params, params.has("stage") ? ["stage"] : []);
     const stage = params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project);
-    const statement = conformanceView(state, stage, now);
+    const statement = conformanceView(route.workspace, state, stage, now);
     apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
     return true;
   }
