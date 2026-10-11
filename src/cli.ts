@@ -794,7 +794,7 @@ import {
   standardVerifyCli
 } from "./standard/standardCli.js";
 import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
-
+import { registerA4Commands } from "./cli-a4-commands.js";
 async function readStdinAll(): Promise<string> {
   return new Promise((resolve) => {
     let data = "";
@@ -24359,7 +24359,7 @@ registerAgentCommands(program);
 registerNativeProviderCommands(program);
 registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
-
+registerA4Commands(program);
 function isTopLevelHelpRequest(argv: string[]): boolean {
   const args = argv.slice(2);
   if (!args.some((arg) => arg === "--help" || arg === "-h")) {

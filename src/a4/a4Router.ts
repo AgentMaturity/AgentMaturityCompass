@@ -58,11 +58,14 @@ const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
 const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "approvalId", "token"];
 
 
-/** One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. */
+/**
+ * One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. `native`
+ * is Studio's native task service; an in-process caller (the CLI, P1-65) has none, so Assemble's build sessions refuse there.
+ */
 export interface A4Route {
   readonly workspace: string;
   readonly store: A4Store;
-  readonly native: NativeTaskApiContext;
+  readonly native?: NativeTaskApiContext;
   readonly principal: A4Principal | null;
   readonly pathname: string;
   readonly method: "GET" | "POST";
@@ -270,7 +273,7 @@ export const projectView = (row: A4ProjectRow, members: readonly A4Member[], rea
 
 const createSchema = z.strictObject({
   clientRequestId: clientRequestIdSchema,
-  name: z.string().trim().min(1).max(200),
+  name: z.string().trim().min(1).max(200).refine((value) => !/[\x00-\x1f\x7f-\x9f]/.test(value), "The project name cannot contain control characters."),
   agentId: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,127}$/, "Choose a valid agent ID.").optional(),
   archetype: z.string().trim().min(1).max(128).optional(),
   expertise: z.enum(["novice", "practitioner", "expert"])
@@ -320,7 +323,7 @@ function options(route: A4Route): void {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
-    workspace: { signingRoute: route_, readOnly: !route.native.executionAllowed() },
+    workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true },
     // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
     // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
     integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)"
@@ -738,20 +741,29 @@ export async function handleA4Route(pathname: string, method: string, req: Incom
   const verb = method.toUpperCase();
   if (verb !== "GET" && verb !== "POST") return refuse(res, 405, "METHOD_NOT_ALLOWED", "A4 routes take GET or POST.");
   res.setHeader("cache-control", "no-store");
+  await serveA4({ workspace: context.workspace, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
+    params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+  return true;
+}
+
+/**
+ * The router behind admission: one store, the dispatch, and errors as the API answers them. The HTTP entry above calls
+ * it after its refusals; the CLI (P1-65, src/cli-a4-commands.ts) calls it with the principal its login token resolved
+ * to (admission native_login_token), so both run the same routes, gate functions and refusals.
+ */
+export async function serveA4(route: Omit<A4Route, "store">): Promise<void> {
   let store: A4Store;
   try {
-    store = openA4Store(context.workspace);
+    store = openA4Store(route.workspace);
   } catch (error) {
-    sendError(res, error, null);
-    return true;
+    sendError(route.res, error, null);
+    return;
   }
   try {
-    await dispatch({ workspace: context.workspace, store, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
-      params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+    await dispatch({ ...route, store });
   } catch (error) {
-    sendError(res, error, PROJECT_PATH.exec(pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
+    sendError(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
   } finally {
     store.close();
   }
-  return true;
 }
