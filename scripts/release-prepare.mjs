@@ -5,8 +5,9 @@
  *   npm run release:prepare -- 2.0.0
  *     1. With pending changesets: refuse unless they give 2.0.0 from the last published version
  *        (website/publication-status.json); regenerate docs/releases/2.0.0.md from them (refusing a missing
- *        migration item or a banned claim word); set package.json to the published version and run
- *        `changeset version`, so it never versions on top of the unpublished 1.2.0.
+ *        migration item or a banned claim word); then apply the version: package.json, a `## 2.0.0` CHANGELOG
+ *        section in changesets' default format, and the consumed changesets removed. The changesets CLI cannot do
+ *        this here: pnpm-workspace.yaml lists only vendor/* and packages/*, so it never sees the root package.
  *     2. Fold CHANGELOG sections of never-published versions (1.2.0) into the release section: one heading.
  *     3. Sync the version-coupled files (install channel, Helm appVersion, "<version> source" prose, the
  *        changelog page and sbom.json), build, and run check-release-candidate.
@@ -20,12 +21,45 @@
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isEntrypoint } from "./lib/entrypoint.mjs";
 import { generateReleaseNotes, plannedVersion, publishedVersion, readChangesets } from "./release-notes.mjs";
 
 const GROUP_ORDER = ["Major Changes", "Minor Changes", "Patch Changes"];
+const GROUP_OF = { major: "Major Changes", minor: "Minor Changes", patch: "Patch Changes" };
+
+/** One CHANGELOG entry as @changesets/cli/changelog writes it: "- <short commit>: <first line>", the rest indented. */
+export function changelogEntry(body, commit) {
+  const [first, ...rest] = body.split("\n").map((line) => line.trimEnd());
+  const lead = `- ${commit ? `${commit.slice(0, 7)}: ` : ""}${first}`;
+  return rest.length ? `${lead}\n${rest.map((line) => (line ? `  ${line}` : "")).join("\n")}` : lead;
+}
+
+/** The commit that added a changeset, as changesets reports it; empty when git knows none. */
+function addedCommit(root) {
+  return (slug) => {
+    const log = spawnSync("git", ["log", "--diff-filter=A", "--format=%h", "-n", "1", "--", `.changeset/${slug}.md`], { cwd: root, encoding: "utf8" });
+    return log.status === 0 ? log.stdout.trim() : "";
+  };
+}
+
+/** The `## <version>` section the pending changesets give, inserted before the newest release heading. */
+function applyChangesets(root, version, changesets, commitOf) {
+  const path = join(root, "CHANGELOG.md");
+  const changelog = readFileSync(path, "utf8");
+  if (new RegExp(`^## \\[?${version.replaceAll(".", "\\.")}\\b`, "m").test(changelog)) {
+    throw new Error(`CHANGELOG.md already has ## ${version} while changesets are pending; restore it from git and rerun`);
+  }
+  const groups = GROUP_ORDER.map((title) => [title, changesets.filter((changeset) => GROUP_OF[changeset.level] === title)])
+    .filter(([, members]) => members.length > 0)
+    .map(([title, members]) => `### ${title}\n\n${members.map((changeset) => changelogEntry(changeset.body, commitOf(changeset.slug))).join("\n")}\n`);
+  const section = `## ${version}\n\n${groups.join("\n")}\n`;
+  const at = changelog.search(/^## /m);
+  writeFileSync(path, at < 0 ? `${changelog.trimEnd()}\n\n${section}` : `${changelog.slice(0, at)}${section}${changelog.slice(at)}`);
+  rewrite(root, "package.json", (text) => text.replace(/("version":\s*")[^"]+(")/, `$1${version}$2`));
+  for (const changeset of changesets) unlinkSync(join(root, ".changeset", `${changeset.slug}.md`));
+}
 const SOURCE_PROSE = ["docs/GETTING_STARTED.md", "docs/INSTALL.md", "docs/NATIVE_AGENT_WORKFLOW.md", "website/install-channel.json"];
 
 const headingOf = (part) => /^## \[?([^\]\s]+)/.exec(part)?.[1];
@@ -82,8 +116,9 @@ function defaultRun(root) {
   };
 }
 
-/** @param {{ root?: string; version?: string; versionOnly?: boolean; run?: (command: string, args: string[], env?: Record<string, string>) => void; log?: (line: string) => void }} options */
-export function prepareRelease({ root = process.cwd(), version, versionOnly = false, run = defaultRun(root), log = console.log } = {}) {
+/** @param {{ root?: string; version?: string; versionOnly?: boolean; run?: (command: string, args: string[], env?: Record<string, string>) => void; log?: (line: string) => void; commitOf?: (slug: string) => string }} options */
+export function prepareRelease({ root = process.cwd(), version, versionOnly = false, run = defaultRun(root), log = console.log,
+  commitOf = addedCommit(root) } = {}) {
   const changesets = readChangesets(root);
   const packagePath = join(root, "package.json");
   const node = (...args) => run(process.execPath, args);
@@ -98,10 +133,8 @@ export function prepareRelease({ root = process.cwd(), version, versionOnly = fa
     if (notes.problems.length) throw new Error(`${notes.relative}: ${notes.problems.join("; ")}`);
     writeFileSync(notes.path, notes.after);
     log(`${notes.relative}: regenerated from ${changesets.length} changesets.`);
-    rewrite(root, "package.json", (text) => text.replace(/("version":\s*")[^"]+(")/, `$1${plan.published}$2`));
-    run(join(root, "node_modules", ".bin", "changeset"), ["version"]);
-    const versioned = JSON.parse(readFileSync(packagePath, "utf8")).version;
-    if (versioned !== target) throw new Error(`changeset version produced ${versioned}, expected ${target}`);
+    applyChangesets(root, target, changesets, commitOf);
+    log(`Versioned ${target}: ${changesets.length} changesets moved into CHANGELOG.md and removed from .changeset/.`);
   } else {
     const current = JSON.parse(readFileSync(packagePath, "utf8")).version;
     if (!target || current !== target) throw new Error(`no pending changesets, and package.json is ${current}, not ${target ?? "(no target given)"}`);

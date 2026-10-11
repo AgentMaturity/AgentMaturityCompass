@@ -35,7 +35,7 @@ The `release` job fails instead of skipping:
 - no `AMC_RELEASE_SIGNING_KEY` in the environment, or no committed release public key at `trust/amc-release-signing.pub` (P0-37): the job fails before anything is published;
 - no npm credential: `npm publish` fails, and so does the job. The only skip left is "this version is already on npm".
 
-`npm-publish.yml` only opens version PRs (when `CHANGESETS_GITHUB_TOKEN` is set); it never publishes, tags or creates a release. `pnpm release` no longer publishes from a shell: it exits 1 and points here.
+`npm-publish.yml` only opens version PRs (when `CHANGESETS_GITHUB_TOKEN` is set), through `release-prepare.mjs --version-only`; it never publishes, tags or creates a release. The changesets CLI itself cannot version this repository: `pnpm-workspace.yaml` lists only `vendor/*` and `packages/*`, so `changeset version` and `changeset status` never see the root package (since the 2026-08-22 vendoring). `pnpm release` no longer publishes from a shell: it exits 1 and points here.
 
 ### Needs Sid: the `release` environment (P0-38)
 
@@ -65,7 +65,7 @@ One command, run on a clean checkout of the release commit:
 npm run release:prepare -- 2.0.0
 ```
 
-It refuses unless the pending changesets give that version from the last published one (`website/publication-status.json`), regenerates `docs/releases/<version>.md` (`npm run release:notes` regenerates its two generated blocks on their own), runs `changeset version` from the published version so it never versions on top of the unpublished 1.2.0, folds 1.2.0 into the release's single CHANGELOG heading, syncs the version-coupled files and runs `check-release-candidate`. It then packs the tarball once into `tmp/npm-release/` and runs the full release gate, `check-pack-contents`, the packed-install check and `npm publish <tarball> --dry-run` against that file, as the `gate` job does, and prints its SHA-256. It never publishes, tags or commits; the tag's own run packs and gates its tarball again at the tagged commit. Rerunning it is safe: once versioned, nothing is pending, and it repeats the checks and dry runs. Review and commit the result, then follow the [release runbook](RELEASE_RUNBOOK.md).
+It refuses unless the pending changesets give that version from the last published one (`website/publication-status.json`), regenerates `docs/releases/<version>.md` (`npm run release:notes` regenerates its two generated blocks on their own), applies the version from the published one (package.json, a CHANGELOG section in changesets' format, the consumed changesets removed) so it never versions on top of the unpublished 1.2.0, folds 1.2.0 into the release's single CHANGELOG heading, syncs the version-coupled files and runs `check-release-candidate`. It then packs the tarball once into `tmp/npm-release/` and runs the full release gate, `check-pack-contents`, the packed-install check and `npm publish <tarball> --dry-run` against that file, as the `gate` job does, and prints its SHA-256. It never publishes, tags or commits; the tag's own run packs and gates its tarball again at the tagged commit. Rerunning it is safe: once versioned, nothing is pending, and it repeats the checks and dry runs. Review and commit the result, then follow the [release runbook](RELEASE_RUNBOOK.md).
 
 ### Package metadata
 

@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { dropUnlistedPageEntries, foldChangelog, prepareRelease, syncVersionText } from "../scripts/release-prepare.mjs";
+import { changelogEntry, dropUnlistedPageEntries, foldChangelog, prepareRelease, syncVersionText } from "../scripts/release-prepare.mjs";
 
 const dirs: string[] = [];
 afterEach(() => { for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -34,7 +34,7 @@ function fixture(): string {
   return root;
 }
 
-/** Stands in for the external tools: `changeset version` as changesets does it, every other command recorded. */
+/** Stands in for the external tools; every command is recorded. */
 function fakeRunner(root: string) {
   const calls: string[] = [];
   const envs: Record<string, Record<string, string> | undefined> = {};
@@ -46,18 +46,10 @@ function fakeRunner(root: string) {
       mkdirSync(join(root, args[3]), { recursive: true });
       writeFileSync(join(root, args[3], "agent-maturity-compass-2.0.0.tgz"), "packed once");
     }
-    if (command.endsWith("changeset") && args[0] === "version") {
-      const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-      if (pkg.version !== "1.1.1") throw new Error(`changeset version ran on ${pkg.version}`);
-      writeFileSync(join(root, "package.json"), readFileSync(join(root, "package.json"), "utf8").replace('"1.1.1"', '"2.0.0"'));
-      const changelog = readFileSync(join(root, "CHANGELOG.md"), "utf8");
-      writeFileSync(join(root, "CHANGELOG.md"), changelog.replace("# Changelog\n\n",
-        "# Changelog\n\n## 2.0.0\n\n### Major Changes\n\n- abc1234: Breaking: drop x.\n\n### Patch Changes\n\n- def5678: Fix y.\n\n"));
-      for (const file of readdirSync(join(root, ".changeset"))) if (file.endsWith(".md") && file !== "README.md") unlinkSync(join(root, ".changeset", file));
-    }
   };
   return { calls, envs, run };
 }
+const commitOf = (slug: string) => ({ drop: "abc1234", fix: "def5678" })[slug] ?? "";
 
 describe("release:prepare (P0-34)", () => {
   test("folds the unpublished 1.2.0 section into the release heading and is idempotent", () => {
@@ -71,6 +63,11 @@ describe("release:prepare (P0-34)", () => {
       .toThrow(/text outside a ### group/);
   });
 
+  test("changelog entries follow changesets' default format: short commit, first line, later lines indented", () => {
+    expect(changelogEntry("First line.\n\nSecond paragraph.\n- a list", "abcdef1234")).toBe("- abcdef1: First line.\n\n  Second paragraph.\n  - a list");
+    expect(changelogEntry("Only line.", "")).toBe("- Only line.");
+  });
+
   test("version-coupled text follows the release; unrelated versions stay", () => {
     expect(syncVersionText("The repository is **1.2.0 source**; npm has 1.1.1 assets.", "2.0.0"))
       .toBe("The repository is **2.0.0 source**; npm has 1.1.1 assets.");
@@ -80,11 +77,12 @@ describe("release:prepare (P0-34)", () => {
   test("versions from the published release, regenerates notes, syncs files, then runs the checks and dry runs", () => {
     const root = fixture();
     const fake = fakeRunner(root);
-    prepareRelease({ root, version: "2.0.0", run: fake.run, log: () => {} });
+    prepareRelease({ root, version: "2.0.0", run: fake.run, log: () => {}, commitOf });
     expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version).toBe("2.0.0");
     const changelog = readFileSync(join(root, "CHANGELOG.md"), "utf8");
-    expect(changelog.match(/^## /gm)).toHaveLength(2);
-    expect(changelog).toContain("- def5678: Fix y.\n- old patch\n");
+    expect(changelog).toBe("# Changelog\n\n## 2.0.0\n\n### Major Changes\n\n- abc1234: Breaking: drop x.\n\n### Minor Changes\n\n- old minor\n\n"
+      + "### Patch Changes\n\n- def5678: Fix y.\n- old patch\n\n## 1.1.1\n\n### Patch Changes\n\n- shipped\n");
+    expect(readdirSync(join(root, ".changeset")).sort()).toEqual(["README.md", "config.json"]);
     expect(readFileSync(join(root, "docs", "releases", "2.0.0.md"), "utf8")).toContain("- Drop x. (`drop`)");
     expect(readFileSync(join(root, "website", "install-channel.json"), "utf8"))
       .toBe('{\n  "packageVersion": "2.0.0",\n  "reason": "Current 2.0.0 source features; published 1.1.1 assets."\n}\n');
@@ -93,14 +91,14 @@ describe("release:prepare (P0-34)", () => {
     expect(readFileSync(join(root, "website", "changelog.html"), "utf8")).not.toContain("release-1-2-0");
     const gated = ["npm pack --ignore-scripts --pack-destination tmp/npm-release", "npm run release:gate -- --json --out tmp/release-gate/prepare.json",
       `node scripts/check-pack-contents.mjs --tarball ${TGZ}`, `node scripts/packed-install-check.mjs --tarball ${TGZ}`, `npm publish ${TGZ} --dry-run`];
-    expect(fake.calls).toEqual(["changeset version", "npm run build", "node dist/cli.js release sbom --out sbom.json",
+    expect(fake.calls).toEqual(["npm run build", "node dist/cli.js release sbom --out sbom.json",
       "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", ...gated]);
     expect(fake.envs["npm run release:gate -- --json --out tmp/release-gate/prepare.json"]).toEqual({ AMC_PACKED_INSTALL_TARBALL: TGZ });
 
     const again = fakeRunner(root);
     const before = readFileSync(join(root, "CHANGELOG.md"), "utf8");
     writeFileSync(join(root, "sbom.json"), JSON.stringify({ metadata: { component: { version: "2.0.0" } } }));
-    prepareRelease({ root, version: "2.0.0", run: again.run, log: () => {} });
+    prepareRelease({ root, version: "2.0.0", run: again.run, log: () => {}, commitOf });
     expect(readFileSync(join(root, "CHANGELOG.md"), "utf8")).toBe(before);
     expect(again.calls).toEqual(["npm run build", "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", ...gated]);
   });
@@ -113,12 +111,16 @@ describe("release:prepare (P0-34)", () => {
     expect(fake.calls).toEqual([]);
     expect(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version).toBe("1.2.0");
     expect(readFileSync(join(root, "docs", "releases", "2.0.0.md"), "utf8")).toBe(NOTES);
+    writeFileSync(join(root, "CHANGELOG.md"), CHANGELOG.replace("## 1.2.0", "## 2.0.0\n\n### Patch Changes\n\n- half done\n\n## 1.2.0"));
+    expect(() => prepareRelease({ root, version: "2.0.0", run: fake.run, log: () => {}, commitOf }))
+      .toThrow("CHANGELOG.md already has ## 2.0.0 while changesets are pending");
+    expect(existsSync(join(root, ".changeset", "drop.md"))).toBe(true);
   });
 
   test("--version-only stops after the version files; notes problems stop the run before any write", () => {
     const root = fixture();
     const fake = fakeRunner(root);
-    prepareRelease({ root, versionOnly: true, run: fake.run, log: () => {} });
+    prepareRelease({ root, versionOnly: true, run: fake.run, log: () => {}, commitOf });
     expect(fake.calls.at(-1)).toBe("node scripts/check-release-candidate.mjs");
     const broken = fixture();
     writeFileSync(join(broken, "docs", "releases", "2.0.0.md"), NOTES.replace("(`drop`)", ""));
