@@ -14,6 +14,7 @@ const END = "<!-- pi-conformance-matrix:end -->";
 const yesNo = (value) => (value ? "yes" : "no");
 const ROWS = [
   ["Allowed `read` runs; recorded Pi version", (c) => `${yesNo(c.allowedRead?.ranTool)}; ${c.allowedRead?.piVersion ?? "none"}`],
+  ["Session registered before its first call; claim", (c) => `${yesNo(c.allowedRead?.sessionRegistered)}; ${c.allowedRead?.claim ?? "none"}`],
   ["`write` needing approval: file created", (c) => yesNo(c.deniedWrite?.fileCreated)],
   ["Denied `bash`: effect", (c) => yesNo(c.deniedBash?.fileCreated)],
   ["Unmapped extension tool: effect", (c) => yesNo(c.unmappedExtensionTool?.effect)],
@@ -21,7 +22,7 @@ const ROWS = [
   ["Codemode nested call emits `tool_call` (parent id)", (c) => (c.codemodeNestedToolCall?.parentToolCallId ? `yes (${c.codemodeNestedToolCall.nestedToolCallId})` : "no")],
   ["Bridge stopped: tool ran", (c) => yesNo(c.bridgeStopped?.ranTool)],
   ["Decision receipts verified cold", (c) => `${c.receiptsVerified?.decisions ?? 0} verified, ${c.receiptsVerified?.failures ?? "?"} failed`],
-  ["Limit, untrusted project: write ran; AMC decisions", (c) => `${yesNo(c.untrustedProjectLimit?.fileCreated)}; ${c.untrustedProjectLimit?.amcDecisions ?? "?"}`],
+  ["Limit, untrusted project: write ran; AMC decisions; registrations", (c) => `${yesNo(c.untrustedProjectLimit?.fileCreated)}; ${c.untrustedProjectLimit?.amcDecisions ?? "?"}; ${c.untrustedProjectLimit?.newRegistrations ?? "?"}`],
   ["Decision latency p50 / p95 (ms, n)", (c) => `${c.latencyMs?.p50} / ${c.latencyMs?.p95} (${c.latencyMs?.n})`],
 ];
 

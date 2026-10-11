@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-22",
   "date": "2026-10-12",
-  "commit": "a9e49d49189952fcd493c8663045482571e65e86",
+  "commit": "faac56b00c66198c2832125a8b0270902d21c40d",
   "branch": "rtd/p1-22-pi-tool-call-package",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -12,30 +12,30 @@
     {
       "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.0.2=<prefix>,1.0.4=<prefix> AMC_PI_CONFORMANCE_OUT=<file> npx vitest run tests/conformance/piToolCall.conformance.test.ts",
       "exit": 0,
-      "durationMs": 18750
+      "durationMs": 22820
     },
     {
-      "cmd": "npx vitest run tests/piToolMapping.test.ts tests/piHookControl.test.ts tests/amcPiExtension.test.ts tests/connectHookIntegration.test.ts tests/connectHookCli.test.ts tests/hookControl.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/providerNeutralHookIngress.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/subagentHookInheritance.test.ts",
+      "cmd": "npx vitest run tests/piToolMapping.test.ts tests/piHookControl.test.ts tests/piSessionRegistration.test.ts tests/amcPiExtension.test.ts tests/connectHookIntegration.test.ts tests/connectHookCli.test.ts tests/hookControl.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/providerNeutralHookIngress.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/subagentHookInheritance.test.ts tests/receipts.test.ts",
       "exit": 0,
-      "durationMs": 36130
+      "durationMs": 74090
     },
     {
-      "cmd": "npx vitest run tests/adapterCapabilityCli.test.ts tests/adapterCapabilityReceipts.test.ts tests/amc1464ProviderControlDocs.test.ts tests/controlHttpResponsesParity.test.ts tests/leaseRevocationFailClosed.test.ts tests/runtimesAdapters.test.ts tests/security/bridgeStreamingTruthguardBypass.test.ts tests/pythonSdk.test.ts",
+      "cmd": "npx vitest run tests/adapterCapabilityCli.test.ts tests/adapterCapabilityReceipts.test.ts tests/amc1464ProviderControlDocs.test.ts tests/controlHttpResponsesParity.test.ts tests/leaseRevocationFailClosed.test.ts tests/runtimesAdapters.test.ts tests/security/bridgeStreamingTruthguardBypass.test.ts tests/pythonSdk.test.ts tests/receiptChainPersistence.test.ts tests/keys/a4SigningProbe.test.ts tests/keys/workspaceWriter.test.ts",
       "exit": 0,
-      "durationMs": 10630
+      "durationMs": 41700
     }
   ],
   "tests": {
-    "total": 333,
-    "passed": 333,
+    "total": 391,
+    "passed": 391,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "pi-conformance.json",
-      "sha256": "789eac62cdfeca91177096f5a79e2d2f5278007918e8884baa8224da14e86cd8"
+      "sha256": "e08859d1aeef90a85bfeafa347b90b98ed5d2e9dcb0a51c0f691bfeb695bc9e3"
     }
   ],
-  "notes": "Local macOS arm64 run, not CI; another worktree's test runs were active. Pi 1.0.2 and 1.0.4 (pi CLI of @earendil-works/pi-coding-agent) installed from the public npm registry with --ignore-scripts into scratch prefixes outside the repository. pi-conformance.json holds tarball integrity, gitHeads, resolved @earendil-works dependencies, per-case conformance results per version, 13 mutation checks and decision latency (p95 54.6 and 56.0 ms, above the 50 ms target). Commands: conformance 18/18, focused Pi and hook suites 193/193, suites covering the other changed modules 122/122."
+  "notes": "Local macOS arm64 run, not CI, after merging int (P1-08 purpose keys); another worktree's test runs were active. Pi 1.0.2 and 1.0.4 (pi CLI of @earendil-works/pi-coding-agent) installed from the public npm registry with --ignore-scripts into scratch prefixes outside the repository. pi-conformance.json holds tarball integrity, gitHeads, resolved @earendil-works dependencies, per-case conformance results per version (each Pi session registered before its first call; the untrusted-project run registered nothing), 20 mutation checks and decision latency (p95 62.2 and 76.1 ms, above the 50 ms target). Commands: 18/18, 214/214, 159/159."
 }

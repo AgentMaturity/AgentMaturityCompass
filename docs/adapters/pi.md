@@ -116,20 +116,21 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 `tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-12-P1-22/pi-conformance.json`, hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-11T20:20:18.824Z on local macOS arm64 (not CI), AMC commit `a9e49d491899`.
+Run 2026-10-11T21:03:15.555Z on local macOS arm64 (not CI), AMC commit `faac56b00c66`.
 
 | Case | Pi 1.0.2 | Pi 1.0.4 |
 |---|---|---|
 | Allowed `read` runs; recorded Pi version | yes; 1.0.2 | yes; 1.0.4 |
+| Session registered before its first call; claim | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call |
 | `write` needing approval: file created | no | no |
 | Denied `bash`: effect | no | no |
 | Unmapped extension tool: effect | no | no |
 | `codemode` tool: effect | no | no |
 | Codemode nested call emits `tool_call` (parent id) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) |
 | Bridge stopped: tool ran | no | no |
-| Decision receipts verified cold | 105 verified, 0 failed | 105 verified, 0 failed |
-| Limit, untrusted project: write ran; AMC decisions | yes; 0 | yes; 0 |
-| Decision latency p50 / p95 (ms, n) | 39.3 / 54.6 (100) | 37 / 56 (100) |
+| Decision receipts verified cold | 111 verified, 0 failed | 111 verified, 0 failed |
+| Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
+| Decision latency p50 / p95 (ms, n) | 46.2 / 62.2 (100) | 55.9 / 76.1 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).
