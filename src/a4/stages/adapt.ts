@@ -5,7 +5,9 @@
  * scope and the declared data handling; Build signs the plan (CONTROL_PLAN); Review records the conformance statement's
  * signed control results (src/a4/a4Conformance.ts). Completion of a regulated project runs a4.adapt.activate_plan, whose
  * executor activateControlPlan consumes the plan review's grant itself; a non-regulated project completes with the plan
- * signed and not activated, and an owner may still open that effect. Everything A4 writes here is self_reported.
+ * signed and not activated, and an owner may still open that effect. Slice B adds the operating-profile dry run and the
+ * prompt pack at Understand, the memory policy and the context plugin at Build (the probe that observes the plugin in an
+ * in-process frame is src/a4/adaptContextPlugin.ts), and their re-checks at Review. Everything A4 writes here is self_reported.
  */
 import { relative, sep } from "node:path";
 import { loadCatalog } from "../../catalog/loader.js";
@@ -288,7 +290,8 @@ function enforceSnapshot(workspace: string, agentId: string): NonNullable<AdaptB
 
 /**
  * Build: the proposed plan signed (CONTROL_PLAN, a local audit trail under this workspace's keys; its review is filed at
- * the effect gate), then the memory policy written under the agent's memory resource and the Enforce manifest re-written.
+ * the effect gate), then the memory policy written under the agent's memory resource, the attributed context plugin
+ * beside the agent's files, and the Enforce manifest re-written.
  * Every refusal (agent mode, invalid memory answers, a weakening, the signing key, the spill cap) comes before the writes.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
