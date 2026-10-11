@@ -71,7 +71,7 @@ describe("trust the caller supplies", () => {
 
   test("a root rotation of a root set the verifier did not pin is not authorized", () => {
     const { bytes, options } = loadCase("valid-root-rotation");
-    const report = run(bytes, { ...options, trustRoots: [options.trustRoots[0]!] });
+    const report = run(bytes, { ...options, trustRoots: [options.trustRoots[0]!], rootThreshold: 1 });
     expect(report.issuerAdmission.status).toBe("fail");
     expect(report.reasonCodes.issuerAdmission).toContain("ISSUER_NOT_PINNED");
   });
@@ -103,6 +103,8 @@ describe("evidence and options", () => {
 
   test.each([
     ["a trust root that is not 64 hex", { trustRoots: ["ABC"] }],
+    ["a root threshold above the pinned roots", { rootThreshold: 5 }],
+    ["a root threshold of zero", { rootThreshold: 0 }],
     ["an invalid asOf", { asOf: new Date("nope") }],
     ["a negative known sequence", { knownSequences: { subject: -1 } }],
     ["an empty expected tenant", { expectScope: { tenant: "" } }],

@@ -64,13 +64,12 @@ export function evaluateExternalEvidence(value: unknown, env: Env): Evaluation {
   }
   const claimed = Date.parse(profile.normalization.ingestedAt);
   const admission = admit({ signature: profile.signature === null ? "signature (none: unsigned profile)" : "signature", keyId,
-    purpose: "evidence-authority", claimedAt: claimed }, env.ctx);
+    purpose: "evidence-authority" }, env.ctx);
   const entry = admission.entry;
   return {
     kind: "external-evidence", integrity, unverifiable, admissions: [admission],
     admissionFindings: entry ? authorityScope(profile, entry, env) : [],
-    anchoring: { status: "not-applicable", detail: null }, claimedAt: profile.normalization.ingestedAt,
-    warnings: admission.warning ? [admission.warning] : [],
+    anchoring: { status: "not-applicable", detail: null }, claimedAt: profile.normalization.ingestedAt, warnings: [],
     scope: () => scopeResult({ subject: profile.session.id }, env.expect),
     freshness: () => {
       const findings: Finding<"freshness">[] = [];

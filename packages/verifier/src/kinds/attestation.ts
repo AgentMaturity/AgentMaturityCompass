@@ -122,13 +122,12 @@ export function evaluateAttestation(value: unknown, env: Env): Evaluation {
   }
   const view = readEvidence(attestation, env, integrity);
   // The carried key only locates the signer: admission looks its id up in the verifier's own trust lists.
-  const admission = admit({ signature: "signature", keyId: attestation.issuerKeyId, purpose: "independent-attestation", claimedAt: at(attestation.issuedAt) }, env.ctx);
+  const admission = admit({ signature: "signature", keyId: attestation.issuerKeyId, purpose: "independent-attestation" }, env.ctx);
   const foreign = [...view.receipts].filter(([, receipt]) => receipt.workspaceId !== attestation.workspaceId || receipt.agentId !== attestation.subjectId)
     .map(([ref, receipt]): Finding<"scope"> => ({ code: "FOREIGN_EVIDENCE", detail: `evidence ${ref} names workspace ${receipt.workspaceId} and agent ${receipt.agentId}` }));
   return {
     kind: "scoped-attestation", integrity, unverifiable: [], admissions: [admission], admissionFindings: [],
-    anchoring: { status: "not-applicable", detail: null }, claimedAt: attestation.issuedAt,
-    warnings: admission.warning ? [admission.warning] : [],
+    anchoring: { status: "not-applicable", detail: null }, claimedAt: attestation.issuedAt, warnings: [],
     scope: () => scopeResult({ tenant: attestation.tenantId, deployment: attestation.deployment.deploymentId,
       subject: attestation.subjectId, profile: attestation.profile.id }, env.expect, foreign),
     freshness: () => {

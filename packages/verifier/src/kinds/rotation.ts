@@ -14,8 +14,8 @@ import { parseCanonical, refused, rollback, statementTail } from "./common.js";
 const DAY_MS = 86_400_000;
 const MAX_OVERLAP_DAYS = 30;
 
-const distrusted = (keyId: string, claimed: number, env: Env, role: string): Finding<"issuerAdmission">[] =>
-  distrustOf(keyId, claimed, env.ctx) ? [{ code: "ISSUER_DISTRUSTED", detail: `the ${role} key ${keyId} is distrusted` }] : [];
+const distrusted = (keyId: string, env: Env, role: string): Finding<"issuerAdmission">[] =>
+  distrustOf(keyId, env.ctx) ? [{ code: "ISSUER_DISTRUSTED", detail: `the ${role} key ${keyId} is distrusted` }] : [];
 
 export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env): Evaluation {
   const parsed = parseCanonical(signedKeyRotation, value, bytes);
@@ -29,7 +29,6 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
     integrity.push({ code: "MALFORMED", detail: `overlap must be null for key-compromise, otherwise positive and at most ${MAX_OVERLAP_DAYS} days` });
   }
   const message = tagged("AMC_KEY_ROTATION_V1", canonicalize(statement));
-  const claimed = Date.parse(statement.issuedAt);
   const admissions: Admission[] = [];
   const admissionFindings: Finding<"issuerAdmission">[] = [];
   const isRotated = (keyId: string) => same(keyId, statement.nextKeyId) || (statement.previousKeyId !== null && same(keyId, statement.previousKeyId));
@@ -43,7 +42,7 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
       continue;
     }
     if (row.by === "root" && !env.ctx.roots.has(row.keyId)) {
-      admissions.push(rootAdmission(`root signature ${row.keyId}`, row.keyId, claimed, env.ctx));
+      admissions.push(rootAdmission(`root signature ${row.keyId}`, row.keyId, env.ctx));
       continue;
     }
     const pem = row.by === "next" ? statement.nextPublicKeyPem : row.by === "previous" ? listedPem(env.ctx, row.keyId) : env.ctx.rootPems.get(row.keyId) ?? null;
@@ -51,7 +50,7 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
     else if (!verifyEd25519(message, pem, Buffer.from(row.signature, "base64"))) {
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "root") {
-      const admission = rootAdmission(`root signature ${row.keyId}`, row.keyId, claimed, env.ctx);
+      const admission = rootAdmission(`root signature ${row.keyId}`, row.keyId, env.ctx);
       admissions.push(admission);
       if (!admission.finding) rootsSigned += 1;
     }
@@ -65,16 +64,16 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
   } else if (!signatures.some(row => row.by === "previous")) {
     admissionFindings.push({ code: "ISSUER_NOT_PINNED", detail: "no previous signature: the rotation is not authorized by the key it replaces" });
   } else {
-    const previous = admit({ signature: "previous signature", keyId: statement.previousKeyId, purpose: statement.purpose, claimedAt: claimed }, env.ctx);
+    const previous = admit({ signature: "previous signature", keyId: statement.previousKeyId, purpose: statement.purpose }, env.ctx);
     admissions.push(previous);
     signerValidFrom = previous.entry?.validFrom ?? null;
   }
-  admissionFindings.push(...distrusted(statement.nextKeyId, claimed, env, "next"),
+  admissionFindings.push(...distrusted(statement.nextKeyId, env, "next"),
     ...rollback(`${statement.workspaceId}/${statement.purpose}`, statement.sequence, env));
   return {
     kind: "key-rotation", integrity, unverifiable, admissions, admissionFindings,
     anchoring: { status: "not-applicable", detail: null }, claimedAt: statement.issuedAt,
-    warnings: admissions.flatMap(admission => (admission.warning ? [admission.warning] : [])),
+    warnings: [],
     ...statementTail(env, statement.issuedAt, statement.previousStatementSha256, signerValidFrom)
   };
 }
@@ -89,7 +88,6 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
     integrity.push({ code: "MALFORMED", detail: "it lowers the threshold or the set size without allowDecrease" });
   }
   const message = tagged("amc.root-rotation/v1", canonicalize(statement));
-  const claimed = Date.parse(statement.issuedAt);
   const admissions: Admission[] = [];
   let newSigned = 0;
   let currentSigned = 0;
@@ -104,7 +102,7 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "new") newSigned += 1;
     else {
-      const admission = rootAdmission(`current signature ${row.keyId}`, row.keyId, claimed, env.ctx);
+      const admission = rootAdmission(`current signature ${row.keyId}`, row.keyId, env.ctx);
       admissions.push(admission);
       if (!admission.finding) currentSigned += 1;
     }
@@ -117,7 +115,7 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
   }
   const required = Math.max(statement.previousThreshold, env.ctx.rootThreshold);
   if (currentSigned < required) admissionFindings.push({ code: "ISSUER_NOT_PINNED", detail: `needs ${required} signatures by the pinned current roots; ${currentSigned} verified` });
-  admissionFindings.push(...statement.newRoots.flatMap(root => distrusted(root, claimed, env, "new root")),
+  admissionFindings.push(...statement.newRoots.flatMap(root => distrusted(root, env, "new root")),
     ...rollback(statement.rootSetId, statement.sequence, env));
   return {
     kind: "root-rotation", integrity, unverifiable, admissions, admissionFindings,

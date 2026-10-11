@@ -38,6 +38,7 @@ amc-verify verify attestation.json \
 | --- | --- |
 | `--trust-list <file>` | A signed trust list (docs/TRUST_LIST.md). Repeatable. At most 1 MiB. |
 | `--trust-root <sha256>` | A pinned trust-list root key id. Repeatable. A list counts only with enough signatures by these roots. |
+| `--root-threshold <n>` | How many distinct pinned roots must sign each trust list (default 1, at most the number of `--trust-root` keys). A list's own `rootThreshold` can raise it, never lower it. |
 | `--as-of <RFC 3339>` | Every time comparison is made as of this instant. Default: now. |
 | `--expect-tenant`, `--expect-deployment`, `--expect-subject`, `--expect-profile` | What the record must be about. A record without the field fails scope. |
 | `--known-sequence <id>=<n>` | The highest sequence you already saw for an id (below). Repeatable. |
@@ -53,22 +54,27 @@ same report. It does no I/O. Bad options (a root that is not 64 hex, an invalid 
 
 ## Trust
 
-1. You pin root key ids with `--trust-root`.
-2. A supplied trust list counts only when every signature row on it verifies, at least `max(1, rootThreshold)` distinct
-   pinned roots signed it, it has not expired as of `--as-of`, and its sequence is not below `--known-sequence
-   <listId>=<n>`. Any supplied list that fails makes issuer admission fail (`TRUST_LIST_SIGNATURE_INVALID`,
-   `TRUST_LIST_EXPIRED` or `ROLLBACK_DETECTED`), even if another list would admit the key.
-3. A key is admitted for a purpose only by an entry of a counted list, with P0-09's rules at the signature's claimed
-   time: distrust first (the package's built-in list, equal to AMC's `src/trust/amc-distrust.json`, plus every counted
-   list's `distrust`), then a `key-compromise` revocation in any list (refused for every claimed time), then the entry's
-   purpose, validity window and other revocations (a `superseded` key is admitted for claims before `revokedAt`, with a
-   warning). A record that carries or names a key only tells the verifier which key to look up.
-4. Time is claimed: comparisons use the time the record states (`timeBasis: "claimed"`), so a holder of a superseded key
-   could backdate. P1-25 adds attested time.
+1. You pin root key ids with `--trust-root` and the m-of-n with `--root-threshold`.
+2. A supplied trust list counts only when every signature row on it verifies, at least `max(--root-threshold,
+   rootThreshold)` distinct pinned roots that nothing distrusts signed it, it has not expired as of `--as-of`, and its
+   sequence is not below `--known-sequence <listId>=<n>`. A list that fails contributes no entry, distrust or root key,
+   and makes issuer admission fail (`TRUST_LIST_SIGNATURE_INVALID`, `TRUST_LIST_EXPIRED` or `ROLLBACK_DETECTED`), even
+   if another list would admit the key.
+3. A key is admitted for a purpose only by an entry of a counted list, judged as of `--as-of`: distrust first (the
+   package's built-in list, equal to AMC's `src/trust/amc-distrust.json`, plus every counted list's `distrust`, from its
+   `distrustedFrom`), then a `key-compromise` revocation in any list, then the entry's purpose, validity window and any
+   other revocation. A record that carries or names a key only tells the verifier which key to look up.
+4. The time a record claims never decides admission. It is the record's own word, not a trusted timestamp, so a key
+   revoked, distrusted or past its `validTo` as of `--as-of` is refused even for a record that claims an earlier
+   signing time. To judge a record as of an earlier moment, set `--as-of`: the cut-off is the verifier's choice. The
+   claimed time feeds freshness only (`timeBasis: "claimed"` until P1-25 adds attested time).
+5. P1-08 statements are verified as records; none is applied to admission. Only a counted trust list changes what is
+   admitted.
 
-One difference from AMC's own admission: when a record claims a signing time before the key's `validFrom`, AMC's
-verify commands refuse the key (`not-yet-valid`); `amc-verify` admits it if the key is valid as of `--as-of` and fails
-freshness with `CLAIMED_TIME_BEFORE_KEY_VALIDITY` instead. Both refuse the record.
+Differences from AMC's own admission (src/trust/admission.ts): AMC judges validity and non-compromise revocations at the
+signature's claimed time, so it admits a superseded or expired key for an earlier claim with a warning, and refuses a
+claim before `validFrom` as `not-yet-valid`. `amc-verify` judges all of them as of `--as-of` and reports a claim before
+`validFrom` under freshness (`CLAIMED_TIME_BEFORE_KEY_VALIDITY`).
 
 ## The six results
 

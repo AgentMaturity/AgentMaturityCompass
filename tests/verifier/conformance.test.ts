@@ -33,11 +33,13 @@ describe("normative fixtures, in process", () => {
     if (report.satisfaction.status === "pass") expect(DIMENSIONS.every(dimension => report[dimension].status === "pass")).toBe(true);
   });
 
-  test("the superseded-key case passes only with a claimed-time warning", () => {
-    const { bytes, options } = loadCase("revoked-superseded-earlier-claim");
-    const report = verifyArtifact(bytes, options);
-    expect(report.warnings.join("\n")).toMatch(/timeBasis: claimed/);
-    expect(report.issuerAdmission.signatures[0]).toMatchObject({ status: "admitted", timeBasis: "claimed" });
+  test("admission never rests on the record's claimed time: only the verifier's as-of time decides it", () => {
+    const refused = loadCase("revoked-superseded-earlier-claim");
+    expect(verifyArtifact(refused.bytes, refused.options).issuerAdmission.signatures[0]).toMatchObject({ status: "revoked", timeBasis: null });
+    const before = loadCase("revoked-superseded-as-of-before-revocation");
+    const report = verifyArtifact(before.bytes, before.options);
+    expect(report.issuerAdmission.signatures[0]).toMatchObject({ status: "admitted", timeBasis: null });
+    expect(report.warnings).toEqual([]);
   });
 });
 

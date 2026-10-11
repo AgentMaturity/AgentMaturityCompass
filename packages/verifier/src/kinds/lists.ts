@@ -12,12 +12,11 @@ export function evaluateTrustList(value: unknown, env: Env): Evaluation {
   const parsed = attempt(signedTrustList, value);
   if (!parsed.ok) return refused("trust-list", { code: parsed.error.code, detail: parsed.error.message });
   const { list } = parsed.value;
-  const facts = listFacts(parsed.value, env.ctx.roots, env.ctx.asOf, env.ctx.knownSequences, env.ctx.distrust);
+  const facts = listFacts(parsed.value, env.ctx.roots, env.ctx.asOf, env.ctx.knownSequences, env.ctx.pinnedThreshold, env.ctx.distrust);
   const integrity: Finding<"integrity">[] = facts.badSignature === null ? []
     : [{ code: "SIGNATURE_INVALID", detail: `the signature by ${facts.badSignature} does not verify` }];
-  const claimed = Date.parse(list.issuedAt);
   const admissions = parsed.value.signatures.filter(row => env.ctx.roots.has(row.keyId))
-    .map(row => rootAdmission(`signatures[${row.keyId}]`, row.keyId, claimed, env.ctx));
+    .map(row => rootAdmission(`signatures[${row.keyId}]`, row.keyId, env.ctx));
   const admissionFindings: Finding<"issuerAdmission">[] = [];
   if (facts.pinned.length < facts.threshold) {
     admissionFindings.push({ code: "ISSUER_NOT_PINNED", detail: `${facts.pinned.length} signature(s) by pinned roots; the list requires ${facts.threshold}` });
@@ -43,13 +42,12 @@ export function evaluateRevocationList(value: unknown, bytes: Uint8Array, env: E
   if (pem !== null && !verifyEd25519(tagged("AMC_REVOCATION_LIST_V1", canonicalize(list)), pem, Buffer.from(signature.signature, "base64"))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify" });
   }
-  const admission = admit({ signature: "signature", keyId: signature.keyId, purpose: "revocation-list", claimedAt: Date.parse(list.issuedAt) }, env.ctx);
+  const admission = admit({ signature: "signature", keyId: signature.keyId, purpose: "revocation-list" }, env.ctx);
   return {
     kind: "revocation-list", integrity, unverifiable: pem === null ? ["signature: the signing key is not in the supplied trust lists"] : [],
     admissions: [admission], admissionFindings: rollback(list.listId, list.sequence, env),
     anchoring: { status: "not-applicable", detail: null }, claimedAt: list.issuedAt,
-    warnings: [admission.warning, anchor === null ? null : "anchor.transparencyEntryHash names a workspace transparency entry; it is not checked offline"]
-      .filter((item): item is string => item !== null),
+    warnings: anchor === null ? [] : ["anchor.transparencyEntryHash names a workspace transparency entry; it is not checked offline"],
     ...statementTail(env, list.issuedAt, list.previousSha256, admission.entry?.validFrom ?? null)
   };
 }

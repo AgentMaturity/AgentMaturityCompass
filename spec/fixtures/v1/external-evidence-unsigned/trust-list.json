@@ -96,6 +96,30 @@
         "source": "operator"
       },
       {
+        "keyId": "b4eb86f19c62eb2f23240c3194aee0d7e2a98c7d2b3496006f80121287fc41cc",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA6LwHAjG1rcpmLJ+3DoMFjbkND1Nw+VgAp3U1Oy07El8=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY rotated key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2026-09-15T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "d0f5e8f95ed20c16f9823f6d66915214fade1a512d2b06ea8c1c299282456e6f",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAX/pWsCbyrnAKnxSphKYOqYv+2l61V5x+/DMOmp23n5E=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY late-distrust key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
         "keyId": "d578b9d007fa5abbe9451622cb234fa1cd2fa7b77591fd18936c22e953746cdd",
         "algorithm": "ed25519",
         "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAWqHrcGAtCcEJY3eoYVSqaNhARCd+1HOlBEZ1D2nG/KA=\n-----END PUBLIC KEY-----\n",
@@ -160,6 +184,13 @@
         "reason": "exposed-in-public-history",
         "note": "TEST ONLY: this fixture key's seed is published",
         "source": "operator"
+      },
+      {
+        "keyId": "d0f5e8f95ed20c16f9823f6d66915214fade1a512d2b06ea8c1c299282456e6f",
+        "distrustedFrom": "2026-09-20T00:00:00.000Z",
+        "reason": "key-compromise",
+        "note": "TEST ONLY: distrusted after the fixture attestation's claimed issuance",
+        "source": "operator"
       }
     ]
   },
@@ -167,7 +198,7 @@
     {
       "keyId": "7284d995184959356042352b876f5eb02b11b250dc7bdd99f58a584e70a1390c",
       "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+RvnJ7Y9OxXFAueT8a4qeRLWVRGGzTFOY0fMeuhkXtk=\n-----END PUBLIC KEY-----\n",
-      "signature": "AhzMjnZdCvbGdxIcikNQBqGt6FbCHdyFDAnlWqRKNCO2PoA2P7gDNqVSs2TWZx++0Ju/q3D/S4g1qFuR03hoAw=="
+      "signature": "+jrYd7oJdg7/k5PVhYksRS5NVWkcM9uwkYYmIfNX3gigFY+izqr3Nwu6pPHVoHQerQ7Z7G2zknR/TpMidblFCw=="
     }
   ]
 }

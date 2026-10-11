@@ -42,6 +42,7 @@ function argsFor(dir) {
   const args = ["verify", join(dir, "artifact.json")];
   if (existsSync(join(dir, "trust-list.json"))) args.push("--trust-list", join(dir, "trust-list.json"));
   for (const root of params.trustRoots ?? []) args.push("--trust-root", root);
+  if (params.rootThreshold !== undefined) args.push("--root-threshold", String(params.rootThreshold));
   if (params.asOf) args.push("--as-of", params.asOf);
   for (const [key, value] of Object.entries(params.expect ?? {})) args.push(`--expect-${key}`, value);
   for (const [id, sequence] of Object.entries(params.knownSequences ?? {})) args.push("--known-sequence", `${id}=${sequence}`);

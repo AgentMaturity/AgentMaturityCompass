@@ -1,7 +1,7 @@
 /**
- * Trust from the verifier's user only: signed trust lists checked against pinned root key ids, and admission of one
- * signing key for one purpose at the signature's claimed time. A key named or carried by the artifact is only looked up
- * here; it never vouches for itself.
+ * Trust from the verifier's user only: signed trust lists checked m-of-n against pinned root key ids, and admission of
+ * one signing key for one purpose as of the verifier's as-of time. A key named or carried by the artifact is only looked
+ * up here; it never vouches for itself, and the time an artifact claims never decides whether its key is admitted.
  */
 import { canonicalize, ed25519KeyId, same, tagged, verifyEd25519 } from "./bytes.js";
 import type { Finding, KeyPurpose } from "./codes.js";
@@ -17,11 +17,13 @@ export const BUILT_IN_DISTRUST: readonly DistrustEntry[] = [];
 export interface TrustContext {
   asOf: number;
   roots: ReadonlySet<string>;
+  /** The m-of-n the verifier's user pinned (--root-threshold, default 1). */
+  pinnedThreshold: number;
   /** Lists whose signatures, root threshold, expiry and sequence all checked out. */
   lists: readonly TrustList[];
   /** Public keys of pinned roots, as the verified lists' signature rows carry them. */
   rootPems: ReadonlyMap<string, string>;
-  /** The highest m-of-n floor any verified list declares (at least 1). */
+  /** The pinned m-of-n threshold, raised to the highest floor any verified list declares. */
   rootThreshold: number;
   distrust: readonly DistrustEntry[];
   knownSequences: Readonly<Record<string, number>>;
@@ -42,8 +44,12 @@ export interface ListFacts {
   rolledBackFrom: number | null;
 }
 
+/**
+ * `pinnedThreshold` is the verifier's own m-of-n: a list's `rootThreshold` may raise it, never lower it. Distrust of a
+ * root is judged as of `asOf`.
+ */
 export function listFacts(signed: SignedTrustList, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>,
-  distrust: readonly DistrustEntry[] = BUILT_IN_DISTRUST): ListFacts {
+  pinnedThreshold: number, distrust: readonly DistrustEntry[] = BUILT_IN_DISTRUST): ListFacts {
   const { list } = signed;
   const bytes = tagged("AMC_TRUST_LIST_V1", canonicalize(list));
   const bad = signed.signatures.find(row => !same(ed25519KeyId(row.publicKeyPem) ?? "", row.keyId)
@@ -51,18 +57,18 @@ export function listFacts(signed: SignedTrustList, roots: ReadonlySet<string>, a
   const seen = known[list.listId];
   return {
     signed, badSignature: bad?.keyId ?? null,
-    pinned: signed.signatures.map(row => row.keyId).filter(keyId => roots.has(keyId) && !distrust.some(entry => same(entry.keyId, keyId))),
-    threshold: Math.max(1, list.rootThreshold ?? 1),
+    pinned: signed.signatures.map(row => row.keyId).filter(keyId => roots.has(keyId) && !distrusted(distrust, keyId, asOf)),
+    threshold: Math.max(1, pinnedThreshold, list.rootThreshold ?? 1),
     expired: asOf >= Date.parse(list.expiresAt),
     rolledBackFrom: seen !== undefined && list.sequence < seen ? seen : null
   };
 }
 
 /** A supplied trust list's problems; none means it can admit keys. */
-function listProblems(value: unknown, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>): { facts: ListFacts | null; problems: Finding<"issuerAdmission">[] } {
+function listProblems(value: unknown, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>, pinnedThreshold: number): { facts: ListFacts | null; problems: Finding<"issuerAdmission">[] } {
   const parsed = attempt(signedTrustList, value);
   if (!parsed.ok) return { facts: null, problems: [{ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `not a valid signed trust list (${parsed.error.message})` }] };
-  const facts = listFacts(parsed.value, roots, asOf, known);
+  const facts = listFacts(parsed.value, roots, asOf, known, pinnedThreshold);
   const id = `list "${parsed.value.list.listId}"`;
   const problems: Finding<"issuerAdmission">[] = [];
   if (facts.badSignature) problems.push({ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `${id} carries a signature by ${facts.badSignature} that does not verify` });
@@ -74,12 +80,14 @@ function listProblems(value: unknown, roots: ReadonlySet<string>, asOf: number, 
   return { facts, problems };
 }
 
-export function trustContext(lists: readonly unknown[], roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>): TrustContext {
+/** Only lists that pass every check contribute entries, distrust or root keys; a list that fails contributes nothing. */
+export function trustContext(lists: readonly unknown[], roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>,
+  pinnedThreshold: number): TrustContext {
   const verified: TrustList[] = [];
   const rootPems = new Map<string, string>();
   const problems: Finding<"issuerAdmission">[] = [];
   for (const value of lists) {
-    const checked = listProblems(value, roots, asOf, known);
+    const checked = listProblems(value, roots, asOf, known, pinnedThreshold);
     problems.push(...checked.problems);
     if (checked.facts && checked.problems.length === 0) {
       verified.push(checked.facts.signed.list);
@@ -87,8 +95,8 @@ export function trustContext(lists: readonly unknown[], roots: ReadonlySet<strin
     }
   }
   return {
-    asOf, roots, lists: verified, rootPems, problems, knownSequences: known,
-    rootThreshold: Math.max(1, ...verified.map(list => list.rootThreshold ?? 1)),
+    asOf, roots, pinnedThreshold, lists: verified, rootPems, problems, knownSequences: known,
+    rootThreshold: Math.max(1, pinnedThreshold, ...verified.map(list => list.rootThreshold ?? 1)),
     distrust: [...BUILT_IN_DISTRUST, ...verified.flatMap(list => list.distrust)]
   };
 }
@@ -110,7 +118,6 @@ export interface Admission {
   finding: Finding<"issuerAdmission"> | null;
   /** The trust-list entry that admitted the key. */
   entry: TrustListEntry | null;
-  warning: string | null;
 }
 
 const CODE = {
@@ -118,74 +125,70 @@ const CODE = {
   expired: "KEY_EXPIRED", revoked: "ISSUER_REVOKED", distrusted: "ISSUER_DISTRUSTED"
 } as const;
 
-type Verdict = { status: IssuerAdmission["status"]; listId: string | null; detail: string; entry?: TrustListEntry; warning?: string };
+type Verdict = { status: IssuerAdmission["status"]; listId: string | null; detail: string; entry?: TrustListEntry };
 
 /**
- * One trust-list entry at time `at` (the claimed signing time when it is not after `asOf`, else `asOf`). A
- * key-compromise revocation is handled before this; other revocations refuse claims at or after `revokedAt` and admit
- * earlier claims, saying the admission rests on the claimed time.
+ * One trust-list entry as of `asOf`. The time a record claims is the record's own word, not a trusted timestamp, so it
+ * never brings a key back: a key revoked (for any reason) or past its validTo as of `asOf` is refused even for records
+ * that claim an earlier signing time. To judge a record as of an earlier moment, the verifier's user sets `asOf`.
  */
-function checkEntry(entry: TrustListEntry, listId: string, purpose: KeyPurpose, claimed: number | null, asOf: number): Verdict {
+function checkEntry(entry: TrustListEntry, listId: string, purpose: KeyPurpose, asOf: number): Verdict {
   if (!entry.purposes.includes(purpose)) return { status: "wrong-purpose", listId, detail: `trust list ${listId} pins this key for ${entry.purposes.join(", ")}, not ${purpose}` };
   if (asOf < Date.parse(entry.validFrom)) return { status: "not-yet-valid", listId, detail: `trust list ${listId} admits this key from ${entry.validFrom}` };
-  const at = claimed !== null && claimed <= asOf ? claimed : asOf;
-  if (entry.validTo !== null && at >= Date.parse(entry.validTo)) return { status: "expired", listId, detail: `trust list ${listId} admitted this key until ${entry.validTo}` };
-  if (entry.revokedAt !== undefined) {
-    if (at >= Date.parse(entry.revokedAt)) return { status: "revoked", listId, detail: `trust list ${listId} revoked this key at ${entry.revokedAt} (${entry.revocationReason})` };
-    return { status: "admitted", listId, entry, detail: `admitted on the signature's claimed time only`,
-      warning: `key ${entry.keyId} was revoked at ${entry.revokedAt} (${entry.revocationReason}); admitted because the signature claims an earlier time (timeBasis: claimed)` };
+  if (entry.validTo !== null && asOf >= Date.parse(entry.validTo)) return { status: "expired", listId, detail: `trust list ${listId} admitted this key until ${entry.validTo}` };
+  if (entry.revokedAt !== undefined && asOf >= Date.parse(entry.revokedAt)) {
+    return { status: "revoked", listId, detail: `trust list ${listId} revoked this key at ${entry.revokedAt} (${entry.revocationReason})` };
   }
-  const expiredNow = entry.validTo !== null && asOf >= Date.parse(entry.validTo);
-  return { status: "admitted", listId, entry, detail: expiredNow ? "admitted on the signature's claimed time only" : "admitted",
-    ...(expiredNow ? { warning: `key ${entry.keyId} expired at ${entry.validTo}; admitted because the signature claims an earlier time (timeBasis: claimed)` } : {}) };
+  return { status: "admitted", listId, entry, detail: "admitted" };
 }
 
-/** P0-09 step 1: distrusted for every claim when distrustedFrom is null, otherwise for claims at or after it (or no claim). */
-export function distrustOf(keyId: string, claimed: number | null, ctx: TrustContext): DistrustEntry | undefined {
-  return ctx.distrust.find(entry => same(entry.keyId, keyId)
-    && (entry.distrustedFrom === null || claimed === null || claimed >= Date.parse(entry.distrustedFrom)));
+const distrusted = (distrust: readonly DistrustEntry[], keyId: string, asOf: number) => distrust.find(entry => same(entry.keyId, keyId)
+  && (entry.distrustedFrom === null || asOf >= Date.parse(entry.distrustedFrom)));
+
+/** P0-09 step 1, as of the verifier's time: distrusted always when distrustedFrom is null, otherwise from that time on. */
+export function distrustOf(keyId: string, ctx: TrustContext): DistrustEntry | undefined {
+  return distrusted(ctx.distrust, keyId, ctx.asOf);
 }
 
-function verdictFor(keyId: string, purpose: KeyPurpose, claimed: number | null, ctx: TrustContext): Verdict {
-  const distrusted = distrustOf(keyId, claimed, ctx);
+function verdictFor(keyId: string, purpose: KeyPurpose, ctx: TrustContext): Verdict {
+  const distrusted = distrustOf(keyId, ctx);
   if (distrusted) return { status: "distrusted", listId: null, detail: `key ${keyId} is distrusted (${distrusted.reason}, ${distrusted.source}): ${distrusted.note}` };
   for (const list of ctx.lists) {
     const compromised = list.entries.find(entry => same(entry.keyId, keyId) && entry.revocationReason === "key-compromise");
     if (compromised) return { status: "revoked", listId: list.listId, detail: `trust list ${list.listId} revoked this key at ${compromised.revokedAt} (key-compromise)` };
   }
   const verdicts = ctx.lists.flatMap(list => list.entries.filter(entry => same(entry.keyId, keyId))
-    .map(entry => checkEntry(entry, list.listId, purpose, claimed, ctx.asOf)));
+    .map(entry => checkEntry(entry, list.listId, purpose, ctx.asOf)));
   return verdicts.find(verdict => verdict.status === "admitted")
     ?? verdicts.find(verdict => verdict.status !== "wrong-purpose")
     ?? verdicts[0]
     ?? { status: "not-pinned", listId: null, detail: `key ${keyId} is not pinned for ${purpose} by any supplied trust list` };
 }
 
-/** Admits `keyId` for `purpose` at the claimed signing time; never on the artifact's word. */
-export function admit(input: { signature: string; keyId: string | null; purpose: KeyPurpose; claimedAt: number | null }, ctx: TrustContext): Admission {
+/** Admits `keyId` for `purpose` as of the verifier's as-of time; never on the artifact's word or its claimed time. */
+export function admit(input: { signature: string; keyId: string | null; purpose: KeyPurpose }, ctx: TrustContext): Admission {
   const verdict: Verdict = input.keyId === null
     ? { status: "not-pinned", listId: null, detail: "no supplied trust list holds a key that made this signature" }
-    : verdictFor(input.keyId, input.purpose, input.claimedAt, ctx);
+    : verdictFor(input.keyId, input.purpose, ctx);
   const admitted = verdict.status === "admitted";
   const record: IssuerAdmission = {
     signature: input.signature, purpose: input.purpose, keyId: input.keyId, status: verdict.status,
-    source: admitted ? "trust-list" : null, listId: verdict.listId,
-    timeBasis: admitted && input.claimedAt !== null ? "claimed" : null, detail: verdict.detail
+    source: admitted ? "trust-list" : null, listId: verdict.listId, timeBasis: null, detail: verdict.detail
   };
-  return { record, entry: verdict.entry ?? null, warning: verdict.warning ?? null,
+  return { record, entry: verdict.entry ?? null,
     finding: admitted ? null : { code: CODE[verdict.status as keyof typeof CODE], detail: `${input.signature}: ${verdict.detail}` } };
 }
 
 /** A trust-list root's signature: admitted when the verifier's user pinned the key (--trust-root) and nothing distrusts it. */
-export function rootAdmission(signature: string, keyId: string, claimedAt: number | null, ctx: TrustContext): Admission {
-  const distrusted = distrustOf(keyId, claimedAt, ctx);
+export function rootAdmission(signature: string, keyId: string, ctx: TrustContext): Admission {
+  const distrusted = distrustOf(keyId, ctx);
   const status = distrusted ? "distrusted" : ctx.roots.has(keyId) ? "admitted" : "not-pinned";
   const detail = distrusted ? `root ${keyId} is distrusted (${distrusted.reason}): ${distrusted.note}`
     : status === "admitted" ? "pinned trust-list root" : `root ${keyId} is not pinned with --trust-root`;
   return {
     record: { signature, purpose: "trust-list-root", keyId, status, source: status === "admitted" ? "explicit-key" : null, listId: null,
-      timeBasis: status === "admitted" && claimedAt !== null ? "claimed" : null, detail },
-    entry: null, warning: null,
+      timeBasis: null, detail },
+    entry: null,
     finding: status === "admitted" ? null : { code: status === "distrusted" ? "ISSUER_DISTRUSTED" : "ISSUER_NOT_PINNED", detail: `${signature}: ${detail}` }
   };
 }

@@ -17,6 +17,8 @@ export interface VerifyOptions {
   trustLists: readonly unknown[];
   /** Pinned trust-list root key ids (64 lowercase hex). */
   trustRoots: readonly string[];
+  /** How many distinct pinned roots must sign a trust list (default 1). A list's own rootThreshold can only raise it. */
+  rootThreshold?: number;
   /** Every time comparison is made as of this instant. Default: now. */
   asOf?: Date;
   expectScope?: ScopeExpectation;
@@ -32,6 +34,10 @@ export interface VerifyOptions {
 function checkOptions(options: VerifyOptions): void {
   if (!Array.isArray(options.trustLists) || !Array.isArray(options.trustRoots)) throw new TypeError("trustLists and trustRoots must be arrays");
   for (const root of options.trustRoots) if (typeof root !== "string" || !/^[0-9a-f]{64}$/.test(root)) throw new TypeError(`trust root ${String(root)} is not 64 lowercase hex`);
+  const threshold = options.rootThreshold ?? 1;
+  if (!Number.isSafeInteger(threshold) || threshold < 1 || threshold > Math.max(1, new Set(options.trustRoots).size)) {
+    throw new TypeError(`rootThreshold ${String(options.rootThreshold)} must be an integer from 1 to the number of pinned roots`);
+  }
   if (options.asOf !== undefined && !(options.asOf instanceof Date && Number.isFinite(options.asOf.getTime()))) throw new TypeError("asOf must be a valid Date");
   for (const [id, sequence] of Object.entries(options.knownSequences ?? {})) {
     if (!id || !Number.isSafeInteger(sequence) || sequence < 0) throw new TypeError(`known sequence ${id}=${sequence} must be a non-negative integer`);
@@ -64,7 +70,7 @@ function evaluate(value: unknown, bytes: Uint8Array, env: Env): Evaluation {
 export function verifyArtifact(bytes: Uint8Array, options: VerifyOptions): VerifierReport {
   checkOptions(options);
   const asOf = options.asOf ?? new Date();
-  const ctx = trustContext(options.trustLists, new Set(options.trustRoots), asOf.getTime(), options.knownSequences ?? {});
+  const ctx = trustContext(options.trustLists, new Set(options.trustRoots), asOf.getTime(), options.knownSequences ?? {}, options.rootThreshold ?? 1);
   const evidence = new EvidenceStore(options.evidence ?? []);
   const env: Env = { ctx, evidence, expect: options.expectScope ?? {} };
   const extraIntegrity: Finding<"integrity">[] = evidence.mismatched

@@ -18,6 +18,7 @@ export interface Expected {
 interface Params {
   asOf?: string;
   trustRoots?: string[];
+  rootThreshold?: number;
   expect?: VerifyOptions["expectScope"];
   knownSequences?: Record<string, number>;
 }
@@ -41,7 +42,7 @@ export function loadCase(name: string, dir = FIXTURES): { bytes: Buffer; options
     expected: json<Expected>(join(root, "expected.json")),
     params,
     options: {
-      trustLists: [json<unknown>(join(root, "trust-list.json"))], trustRoots: params.trustRoots ?? [],
+      trustLists: [json<unknown>(join(root, "trust-list.json"))], trustRoots: params.trustRoots ?? [], rootThreshold: params.rootThreshold,
       asOf: params.asOf ? new Date(params.asOf) : undefined, expectScope: params.expect, knownSequences: params.knownSequences, evidence,
       path: `${name}/artifact.json`
     }

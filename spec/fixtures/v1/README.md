@@ -16,7 +16,7 @@ Every file is JSON (UTF-8), except evidence items, which are raw bytes.
 | --- | --- |
 | `artifact.json` | The record to verify. A receipt is its token as a JSON string. P1-08 records (rotation statements, revocation lists) are in their one canonical encoding. |
 | `trust-list.json` | One signed trust list (P0-09 format) the verifier is given. |
-| `params.json` | `asOf` (RFC 3339), `trustRoots` (pinned root key ids), optional `expect` (`tenant`, `deployment`, `subject`, `profile`) and optional `knownSequences` (`{ "<id>": <n> }`). |
+| `params.json` | `asOf` (RFC 3339), `trustRoots` (pinned root key ids), optional `rootThreshold` (the pinned m-of-n), optional `expect` (`tenant`, `deployment`, `subject`, `profile`) and optional `knownSequences` (`{ "<id>": <n> }`). |
 | `evidence/<sha256>` | Optional evidence items, each named by the sha256 of its bytes. |
 | `expected.json` | `case`, `normative`, `dimensions` (the six statuses), `reasonCodes` (per dimension, the codes that must be reported) and `exitCode`. |
 | `README.md` | What is wrong with the record and why it must not pass (or why it must). |
@@ -33,14 +33,14 @@ node packages/verifier/conformance/run.mjs --cmd "<command>" [--fixtures spec/fi
 ```
 
 For each case the runner calls `<command> verify artifact.json --trust-list trust-list.json --trust-root <id>...
---as-of <asOf> [--expect-<key> <value>]... [--known-sequence <id>=<n>]... [--evidence-dir evidence] --json` and reads a
+[--root-threshold <n>] --as-of <asOf> [--expect-<key> <value>]... [--known-sequence <id>=<n>]... [--evidence-dir evidence] --json` and reads a
 verifier report (spec/schemas/v1/verifier-report.schema.json) from standard output: `<dimension>.status` and
 `reasonCodes.<dimension>`. `<command> --version` names the implementation. The command is split on whitespace and run
 without a shell. Results go to `conformance-results.json`:
 
 ```json
 { "suite": "amc-verifier-fixtures", "version": "v1", "implementation": "<name>@<version>",
-  "ranAt": "<RFC 3339>", "passed": 42, "failed": 0,
+  "ranAt": "<RFC 3339>", "passed": 46, "failed": 0,
   "cases": [{ "case": "cross-tenant", "result": "pass", "diff": null }] }
 ```
 
@@ -64,4 +64,6 @@ The 19 cases P1-06 names: `valid-attestation`, `valid-external-evidence-attested
 `unpinned-issuer`, `wrong-purpose`, `revoked-key-compromise`, `revoked-superseded-earlier-claim`, `distrusted-key`,
 `stale-attestation`, `stale-trust-list`, `replayed`, `contradictory`, `cross-tenant`, `empty`, `missing-evidence`,
 `unanchored`, `backdated`, `tampered` and `rollback-revocation-list`. The others give every reason code and every record
-kind at least one case. Do not claim interoperability until an independently built verifier (P3-03) passes them all.
+kind at least one case. The spec expected `revoked-superseded-earlier-claim` to pass with a claimed-time warning; it is
+refused here (`ISSUER_REVOKED`) because a claimed time is not a trusted timestamp, and
+`revoked-superseded-as-of-before-revocation` shows the cut-off the verifier's user sets with `--as-of`. Do not claim interoperability until an independently built verifier (P3-03) passes them all.

@@ -1,5 +1,5 @@
 /**
- * amc-verify verify <artifact> --trust-list <file>... --trust-root <sha256>... [--as-of <RFC 3339>]
+ * amc-verify verify <artifact> --trust-list <file>... --trust-root <sha256>... [--root-threshold <n>] [--as-of <RFC 3339>]
  *   [--expect-tenant|--expect-deployment|--expect-subject|--expect-profile <id>] [--known-sequence <id>=<n>]...
  *   [--evidence-dir <dir>] [--json]
  * Exit codes: 0 every dimension passes; 1 any fails; 3 none fails, some not evaluated; 64 usage error. There is no flag
@@ -13,7 +13,7 @@ import { DIMENSIONS } from "./codes.js";
 import { exitCode, VERIFIER_NAME, VERIFIER_VERSION, type VerifierReport } from "./report.js";
 import { verifyArtifact } from "./verify.js";
 
-const USAGE = `usage: amc-verify verify <artifact> [--trust-list <file>]... [--trust-root <sha256>]... [--as-of <RFC 3339>]
+const USAGE = `usage: amc-verify verify <artifact> [--trust-list <file>]... [--trust-root <sha256>]... [--root-threshold <n>] [--as-of <RFC 3339>]
   [--expect-tenant <id>] [--expect-deployment <id>] [--expect-subject <id>] [--expect-profile <id>]
   [--known-sequence <id>=<n>]... [--evidence-dir <dir>] [--json]
        amc-verify --version
@@ -81,7 +81,7 @@ function options(args: string[]) {
   const { values, positionals } = parseArgs({
     args, allowPositionals: true, strict: true,
     options: {
-      "trust-list": many, "trust-root": many, "as-of": many, "expect-tenant": many, "expect-deployment": many, "expect-subject": many,
+      "trust-list": many, "trust-root": many, "root-threshold": many, "as-of": many, "expect-tenant": many, "expect-deployment": many, "expect-subject": many,
       "expect-profile": many, "known-sequence": many, "evidence-dir": many, json: { type: "boolean" }
     }
   });
@@ -93,6 +93,11 @@ function options(args: string[]) {
     if (!/^[0-9a-fA-F]{64}$/.test(root)) throw new UsageError(`--trust-root ${root} is not a 64 hex sha256 key id`);
     return root.toLowerCase();
   });
+  const thresholdText = single(values["root-threshold"], "--root-threshold");
+  const rootThreshold = thresholdText === undefined ? undefined : Number(thresholdText);
+  if (thresholdText !== undefined && (!/^[1-9][0-9]{0,1}$/.test(thresholdText) || rootThreshold! > new Set(trustRoots).size)) {
+    throw new UsageError(`--root-threshold ${thresholdText} must be from 1 to the number of --trust-root keys`);
+  }
   const knownSequences: Record<string, number> = {};
   for (const pair of values["known-sequence"] ?? []) {
     const at = pair.lastIndexOf("=");
@@ -115,7 +120,7 @@ function options(args: string[]) {
   const path = positionals[1]!;
   return {
     path, json: values.json === true, bytes: readBounded(path, LIMITS.artifact),
-    verify: { trustLists, trustRoots, asOf, expectScope, knownSequences, evidence: evidenceDir === undefined ? undefined : readEvidenceDir(evidenceDir), path }
+    verify: { trustLists, trustRoots, rootThreshold, asOf, expectScope, knownSequences, evidence: evidenceDir === undefined ? undefined : readEvidenceDir(evidenceDir), path }
   };
 }
 

@@ -3,12 +3,16 @@
   "normative": true,
   "dimensions": {
     "integrity": "pass",
-    "issuerAdmission": "pass",
-    "scope": "pass",
-    "freshness": "pass",
-    "completeness": "pass",
-    "satisfaction": "pass"
+    "issuerAdmission": "fail",
+    "scope": "not-evaluated",
+    "freshness": "not-evaluated",
+    "completeness": "not-evaluated",
+    "satisfaction": "not-evaluated"
   },
-  "reasonCodes": {},
-  "exitCode": 0
+  "reasonCodes": {
+    "issuerAdmission": [
+      "ISSUER_REVOKED"
+    ]
+  },
+  "exitCode": 1
 }

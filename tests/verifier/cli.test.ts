@@ -23,12 +23,18 @@ function argsFor(name: string, extra: string[] = []): string[] {
   const { params } = loadCase(name);
   const dir = join(FIXTURES, name);
   return ["verify", join(dir, "artifact.json"), "--trust-list", join(dir, "trust-list.json"), ...(params.trustRoots ?? []).flatMap(root => ["--trust-root", root]),
+    ...(params.rootThreshold === undefined ? [] : ["--root-threshold", String(params.rootThreshold)]),
     ...(params.asOf ? ["--as-of", params.asOf] : []), ...Object.entries(params.expect ?? {}).flatMap(([key, value]) => [`--expect-${key}`, value!]),
     ...Object.entries(params.knownSequences ?? {}).flatMap(([id, sequence]) => ["--known-sequence", `${id}=${sequence}`]),
     "--evidence-dir", join(dir, "evidence"), ...extra];
 }
 
 describe("amc-verify", () => {
+  test("--root-threshold reaches the trust lists", () => {
+    expect(main(argsFor("root-threshold-downgrade"))).toBe(1);
+    expect(out).toMatch(/issuerAdmission\s+fail\s+.*TRUST_LIST_SIGNATURE_INVALID/);
+  });
+
   test("prints six separate results and exits 0, 1 or 3 by them", () => {
     expect(main(argsFor("valid-attestation"))).toBe(0);
     expect(out).toMatch(/integrity\s+pass/);
@@ -61,6 +67,9 @@ describe("amc-verify", () => {
     ["a bad --as-of", ["verify", join(dir, "artifact.json"), "--as-of", "yesterday"]],
     ["two --as-of", ["verify", join(dir, "artifact.json"), "--as-of", "2026-10-01T00:00:00Z", "--as-of", "2026-10-02T00:00:00Z"]],
     ["a short --trust-root", ["verify", join(dir, "artifact.json"), "--trust-root", "abc"]],
+    ["a --root-threshold of 0", ["verify", join(dir, "artifact.json"), "--trust-root", "a".repeat(64), "--root-threshold", "0"]],
+    ["a --root-threshold above the pinned roots", ["verify", join(dir, "artifact.json"), "--trust-root", "a".repeat(64), "--root-threshold", "2"]],
+    ["two --root-threshold", ["verify", join(dir, "artifact.json"), "--trust-root", "a".repeat(64), "--root-threshold", "1", "--root-threshold", "1"]],
     ["a bad --known-sequence", ["verify", join(dir, "artifact.json"), "--known-sequence", "subject=-1"]],
     ["a repeated --known-sequence id", ["verify", join(dir, "artifact.json"), "--known-sequence", "a=1", "--known-sequence", "a=2"]],
     ["an empty --expect-tenant", ["verify", join(dir, "artifact.json"), "--expect-tenant", ""]],

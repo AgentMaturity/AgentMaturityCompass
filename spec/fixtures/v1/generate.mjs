@@ -42,7 +42,7 @@ function key(name) {
 const signBytes = (bytes, signer) => sign(null, bytes, signer.privateKey);
 
 const K = Object.fromEntries(["root", "root2", "rogue-root", "attester", "seal", "compromised", "superseded", "distrusted", "outsider",
-  "forger", "late", "expired", "receipt", "ledger", "rogue-ledger", "authority", "revoker", "next-seal", "new-root-1", "new-root-2"]
+  "forger", "late", "expired", "rotated", "late-distrust", "receipt", "ledger", "rogue-ledger", "authority", "revoker", "next-seal", "new-root-1", "new-root-2"]
   .map(name => [name, key(name)]));
 
 // ── Times ──
@@ -68,13 +68,17 @@ const BASE_ENTRIES = [
   entry(K.distrusted, ["independent-attestation"]),
   entry(K.late, ["independent-attestation"], { validFrom: "2026-09-10T00:00:00.000Z" }),
   entry(K.expired, ["independent-attestation"], { validFrom: "2026-01-01T00:00:00.000Z", validTo: "2026-09-01T00:00:00.000Z" }),
+  entry(K.rotated, ["independent-attestation"], { validFrom: "2026-01-01T00:00:00.000Z", validTo: "2026-09-15T00:00:00.000Z" }),
+  entry(K["late-distrust"], ["independent-attestation"]),
   entry(K.receipt, ["receipt"]),
   entry(K.ledger, ["ledger-row"]),
   entry(K.authority, ["evidence-authority"], { authority: { producers: ["pi-callback"], captureMethods: ["producer-callback"], maxTrustTier: "ATTESTED" } }),
   entry(K.revoker, ["revocation-list"])
 ];
 const BASE_DISTRUST = [{ keyId: K.distrusted.keyId, distrustedFrom: null, reason: "exposed-in-public-history",
-  note: "TEST ONLY: this fixture key's seed is published", source: "operator" }];
+  note: "TEST ONLY: this fixture key's seed is published", source: "operator" },
+{ keyId: K["late-distrust"].keyId, distrustedFrom: "2026-09-20T00:00:00.000Z", reason: "key-compromise",
+  note: "TEST ONLY: distrusted after the fixture attestation's claimed issuance", source: "operator" }];
 
 function trustList({ roots = [K.root], ...overrides } = {}) {
   const list = { type: "amc.trust-list", version: 1, listId: "fixtures-v1", sequence: 3, issuedAt: T.listIssued, expiresAt: T.listExpires,
@@ -218,8 +222,14 @@ addCase("wrong-purpose", "Signed by a key the trust list pins for artifact-seal 
   { artifact: attestation({ signer: K.seal, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_WRONG_PURPOSE"] } });
 addCase("revoked-key-compromise", "Signed by a key the trust list revoked for key-compromise. Its claimed signing time is before the revocation, but a compromised key can backdate, so it is refused for every claimed time.",
   { artifact: attestation({ signer: K.compromised, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_REVOKED"] } });
-addCase("revoked-superseded-earlier-claim", "Signed by a key revoked as superseded after the attestation's claimed issuance. A superseded (not compromised) key is admitted for earlier claims, so it passes, but the report carries a warning that the admission rests on a claimed time (timeBasis: claimed) until trusted time exists.",
-  { artifact: attestation({ signer: K.superseded, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PPPPPP" });
+addCase("revoked-superseded-earlier-claim", "Signed by a key revoked as superseded on 2026-09-15; the attestation claims issuance on 2026-09-02. That date is the record's own word, not a trusted timestamp, so it cannot reach back before the revocation: as of 2026-10-01 the key admits nothing.",
+  { artifact: attestation({ signer: K.superseded, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_REVOKED"] } });
+addCase("revoked-superseded-as-of-before-revocation", "The same attestation, verified as of 2026-09-10, before the key's revocation. The verifier's user chose that time, so the key is admitted and every dimension passes: a dated cut-off comes from the verifier, never from the record.",
+  { artifact: attestation({ signer: K.superseded, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, params: { ...PARAMS, asOf: "2026-09-10T00:00:00.000Z" }, verdict: "PPPPPP" });
+addCase("rotated-out-key-earlier-claim", "Signed by a key whose validity ended on 2026-09-15 (rotated out); the attestation claims issuance before that. As of 2026-10-01 the key is no longer valid, and a claimed signing time does not bring it back.",
+  { artifact: attestation({ signer: K.rotated, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["KEY_EXPIRED"] } });
+addCase("distrusted-after-claim", "Signed by a key distrusted from 2026-09-20, while the attestation claims issuance on 2026-09-02. Whoever holds a distrusted key can write any date, so distrust is judged as of the verification time, not the claimed one.",
+  { artifact: attestation({ signer: K["late-distrust"], controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_DISTRUSTED"] } });
 addCase("distrusted-key", "Signed by a key the trust list pins and also distrusts (its seed is public). Distrust beats every pin, so it must not pass.",
   { artifact: attestation({ signer: K.distrusted, controlResultsDigest: good.controlResultsDigest }), ...withEvidence, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_DISTRUSTED"] } });
 addCase("stale-attestation", "A valid attestation verified as of a time after its expiresAt. An expired statement must not pass as current.",
@@ -298,10 +308,12 @@ addCase("valid-key-rotation", "A scheduled artifact-seal rotation signed by the 
   { artifact: keyRotation(), raw: true, params: { asOf: T.asOf, trustRoots: [K.root.keyId] }, verdict: "PPNPPN" });
 addCase("key-compromise-rotation-without-root", "A key-compromise rotation signed only by the compromised key and the new key. A compromised key has no authority over its replacement; a pinned root must sign.",
   { artifact: keyRotation({ reason: "key-compromise" }), raw: true, params: { asOf: T.asOf, trustRoots: [K.root.keyId] }, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_NOT_PINNED"] } });
-addCase("valid-root-rotation", "A root-set rotation authorized by both pinned current roots (whose keys the supplied list carries) and proven by both new roots. It never changes a pin by itself (exit 3).",
-  { artifact: rootRotation(), raw: true, trust: trustList({ roots: [K.root, K.root2] }), params: { asOf: T.asOf, trustRoots: [K.root.keyId, K.root2.keyId].sort() },
+addCase("valid-root-rotation", "A root-set rotation authorized by both pinned current roots (whose keys the supplied list carries, signed 2-of-2 as the verifier requires) and proven by both new roots. It never changes a pin by itself (exit 3).",
+  { artifact: rootRotation(), raw: true, trust: trustList({ roots: [K.root, K.root2] }), params: { asOf: T.asOf, trustRoots: [K.root.keyId, K.root2.keyId].sort(), rootThreshold: 2 },
     verdict: "PPNPPN" });
 
+addCase("root-threshold-downgrade", "The verifier pins two roots and requires both (--root-threshold 2), but the only trust list is signed by one root and declares no threshold of its own. A list cannot lower the m-of-n its verifier pinned, so it admits nobody.",
+  { artifact: valid, ...withEvidence, params: { ...PARAMS, trustRoots: [K.root.keyId, K.root2.keyId].sort(), rootThreshold: 2 }, verdict: "PFNNNN", codes: { issuerAdmission: ["TRUST_LIST_SIGNATURE_INVALID"] } });
 const EXTERNAL_PARAMS = { asOf: T.asOf, trustRoots: [K.root.keyId], expect: { subject: "session-ext-1" } };
 addCase("external-evidence-unsigned", "An unsigned profile, as every import is. Its digests check out, but it names no signer, so no authority is admitted and it stays self-reported.",
   { artifact: externalProfile({ signed: false }), evidence: [ORIGINAL], params: EXTERNAL_PARAMS, verdict: "PFNNNN", codes: { issuerAdmission: ["ISSUER_NOT_PINNED"] } });

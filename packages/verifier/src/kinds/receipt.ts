@@ -44,7 +44,7 @@ function anchorOf(payload: ReceiptPayload, env: Env, integrity: Finding<"integri
   const signature = row.value.writerSignature;
   const signer = isCanonicalSignatureBase64(signature) ? signerOf(Buffer.from(row.value.eventHash, "hex"), Buffer.from(signature, "base64"), env.ctx) : null;
   if (signer === null) return unanchored("no key in the supplied trust lists signed the ledger row");
-  const admission = admit({ signature: "ledger row writerSignature", keyId: signer, purpose: "ledger-row", claimedAt: row.value.ts }, env.ctx);
+  const admission = admit({ signature: "ledger row writerSignature", keyId: signer, purpose: "ledger-row" }, env.ctx);
   if (admission.finding) return unanchored(`the ledger row's signer is not admitted for ledger-row (${admission.record.status})`, admission);
   return { anchoring: { status: "anchored", detail: `ledger row signed by ${signer}, admitted for ledger-row` }, admission, finding: null };
 }
@@ -82,13 +82,13 @@ export function evaluateReceipt(token: string, env: Env): Evaluation {
     else integrity.push({ code: "MALFORMED", detail: `the receipt body is not a valid amc.action-receipt/v1 (${checked.error.message})` });
   }
   const signer = signerOf(payloadBytes, signature, env.ctx);
-  const admission = admit({ signature: "receipt", keyId: signer, purpose: "receipt", claimedAt: payload.ts }, env.ctx);
+  const admission = admit({ signature: "receipt", keyId: signer, purpose: "receipt" }, env.ctx);
   const anchor = anchorOf(payload, env, integrity);
   return {
     kind: "receipt", integrity, admissions: [admission, ...(anchor.admission ? [anchor.admission] : [])],
     unverifiable: signer === null ? ["receipt: no key in the supplied trust lists made this signature"] : [],
     admissionFindings: anchor.finding ? [anchor.finding] : [], anchoring: anchor.anchoring,
-    claimedAt: Number.isNaN(new Date(payload.ts).getTime()) ? String(payload.ts) : new Date(payload.ts).toISOString(), warnings: [admission.warning, anchor.admission?.warning].filter((item): item is string => !!item),
+    claimedAt: Number.isNaN(new Date(payload.ts).getTime()) ? String(payload.ts) : new Date(payload.ts).toISOString(), warnings: [],
     scope: () => scopeResult({ subject: payload.agentId }, env.expect),
     freshness: () => {
       const findings: Finding<"freshness">[] = [];
