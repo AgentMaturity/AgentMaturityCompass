@@ -56,7 +56,10 @@ export function evaluateControl(record: EvaluableControl, items: readonly Eviden
       // set never lifts the kind.
       tiers: evidence === "sufficient" && admitted.length > 0 && admitted.every((row) => isObservedTier(row.trustTier)) ? ["OBSERVED"] : ["SELF_REPORTED"],
       newestTs: Number.isFinite(newest) ? newest : null,
-      boundToControl: true, sameScope: true, contradictory: evidence === "contradictory", signatureValid: null, issuerPinned: null
+      // Admission verified every admitted item's provenance from its bytes (ledger chain, producer): AMC's own signed
+      // workspace flow, which D-03 requires before a self-reported regulated pass is shown.
+      boundToControl: true, sameScope: true, contradictory: evidence === "contradictory",
+      signatureValid: admitted.length > 0 ? true : null, issuerPinned: null
     },
     evidenceRefs: admitted.map(({ item }) => item.ref.id),
     applicability,

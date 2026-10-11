@@ -189,9 +189,10 @@ const rows: Row[] = [
     kind: "self_reported", result: "not_evaluated", evidence: "incomplete", reason: "EMPTY_EVIDENCE"
   },
   {
+    // A 1.x result is untrusted input: D-03 never applies to it, signed or not.
     name: "legacy 1.1.1, regulated pass",
     input: input({ regulated: true, applicability: applicable, legacy: { version: "1.1.1" } }),
-    kind: "self_reported", result: "pass", evidence: "sufficient", reason: "LEGACY_1X_UNVERIFIED"
+    kind: "self_reported", result: "not_evaluated", evidence: "incomplete", reason: "SELF_REPORTED_NO_POSITIVE_STATUS"
   },
   {
     name: "observed tier from a method that does not observe",
@@ -259,7 +260,8 @@ describe("evaluateClaimEligibility", () => {
       if (envelope.statusDimensions.evidence !== "sufficient") continue;
       expect(row.input.evidence.eventCount, row.name).toBeGreaterThan(0);
       if (envelope.claimKind === "self_reported") {
-        expect(row.input.regulated && envelope.statusDimensions.result === "pass", row.name).toBe(true);
+        expect(row.input.regulated && envelope.statusDimensions.result === "pass" && !row.input.legacy
+          && row.input.evidence.signatureValid === true, row.name).toBe(true);
       } else {
         expect(["observed", "independently_reviewed"], row.name).toContain(envelope.claimKind);
       }

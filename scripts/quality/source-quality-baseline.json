@@ -1872,7 +1872,6 @@
     {"id":"6bc2915b51cf4a98361caac97ebd461a33d7c579c7c4adc964f77e0cff97ca4b","file":"src/catalog/compiler/types.ts","kind":"exports"},
     {"id":"2ee9c64610035ec848577f09500220a48ba712c4a42f9bc534e9d7575af81f02","file":"src/catalog/compiler/types.ts","kind":"types"},
     {"id":"3caf4371c8d1fc18df31511dc9da7d79d55f2aa5b6850f5d6bcfab5b7f1cfc51","file":"src/catalog/evidence/signedResults.ts","kind":"exports"},
-    {"id":"bf68cbc42129887dd3de6cfc962c817f82ffa06082c9f00cc14391b623271e6c","file":"src/catalog/evidence/signedResults.ts","kind":"exports"},
     {"id":"e32c3b3f787a6afd1c5ff223e2e784d9c0f1a1062b31f27df7bf793b126c2db2","file":"src/catalog/evidence/types.ts","kind":"types"},
     {"id":"faa77a31a12548aa0ee873be240bcc0fc62bfd6a8bba04c5747bab1dbc54cd47","file":"src/catalog/evidence/types.ts","kind":"types"},
     {"id":"d58696149867d460b30748e82c7818aede57c856b8f7a10de751208fdc6dbe5a","file":"src/catalog/index.ts","kind":"files"},
