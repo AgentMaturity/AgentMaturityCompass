@@ -213,7 +213,8 @@ describe("P3.2 — the run reconstructs and is signed", () => {
         ledger.close();
       }
       const keys = join(snapshot, ".amc", "keys");
-      const keyBytes = () => Object.fromEntries(readdirSync(keys).sort().map((file) => [file, {
+      // Every file under keys/, recursively (P1-08 keeps key-set recovery manifests in keys/rotations/).
+      const keyBytes = () => Object.fromEntries(readdirSync(keys, { recursive: true }).map(String).filter((file) => statSync(join(keys, file)).isFile()).sort().map((file) => [file, {
         sha256: sha256Hex(readFileSync(join(keys, file))),
         mtimeMs: statSync(join(keys, file)).mtimeMs
       }]));

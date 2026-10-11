@@ -120,7 +120,9 @@ test("public-only ledger verification preserves the supplied trust anchors witho
     ledger.close();
   }
   const keysDir = join(snapshot, ".amc", "keys");
-  const keyBytes = () => Object.fromEntries(readdirSync(keysDir).sort().map((file) => [file, sha256Hex(readFileSync(join(keysDir, file)))]));
+  // Every file under keys/, recursively (P1-08 keeps key-set recovery manifests in keys/rotations/).
+  const keyBytes = () => Object.fromEntries(readdirSync(keysDir, { recursive: true }).map(String).filter((file) => statSync(join(keysDir, file)).isFile()).sort()
+    .map((file) => [file, sha256Hex(readFileSync(join(keysDir, file)))]));
   const before = keyBytes();
   const result = verifyLedgerIntegrity(snapshot);
   expect(result.errors).toEqual([]);

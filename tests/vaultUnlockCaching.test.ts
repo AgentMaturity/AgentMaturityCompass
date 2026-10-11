@@ -51,7 +51,8 @@ function diskState(dir: string): Record<string, { bytes: string; mtimeMs: number
   return Object.fromEntries([
     paths.vaultFile,
     paths.metaFile,
-    ...readdirSync(paths.keysDir).sort().map((name) => join(paths.keysDir, name))
+    // Every file under keys/, recursively: each key-set generation keeps its recovery manifest in keys/rotations/ (P1-08).
+    ...readdirSync(paths.keysDir, { recursive: true }).map(String).sort().map((name) => join(paths.keysDir, name)).filter((path) => statSync(path).isFile())
   ].map((path) => {
     const stat = statSync(path);
     return [path, { bytes: readFileSync(path).toString("hex"), mtimeMs: stat.mtimeMs, mode: stat.mode }];
