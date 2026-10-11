@@ -2,7 +2,7 @@
 
 Environment: local macOS arm64 (Darwin 25.6.0), Node v22.23.0, pnpm 10.33.0. Not CI. Homebrew's Node 25.5.0 stopped loading mid-session (its libsimdjson.29 was replaced by version 34), so every run here used a separate Node 22 install. No Linux run was evaluated. Load average was 9 to 22 during the runs.
 
-Branch `rtd/p1-08-key-lifecycle`, from `int` at `42dfa8375`. The checks were run at `186a0fe24` and the last full-suite run at `ff625ca4e`, after both rounds of the independent review. The receipt commit adds only this folder.
+Branch `rtd/p1-08-key-lifecycle`, from `int` at `42dfa8375`. The checks and the last full-suite run were on the tree committed as `ff625ca4e`, after both rounds of the independent review; the focused and rollback suites ran at `186a0fe24`, which only updates one test. The receipt commit adds only this folder.
 
 ## What was checked
 

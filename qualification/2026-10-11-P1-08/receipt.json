@@ -114,7 +114,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "b99ce5683fae3127a574895baef0bd65195d8cf4e063b0425b7d7cd7dba1163f"
+      "sha256": "2828f8c4dca98740d34beb0e8caa98d8276a986e67c57b2cfd1dff471ca6b773"
     },
     {
       "path": "checks.txt",
@@ -177,5 +177,5 @@
       "sha256": "2ef0308c691a12234782465aff27bedebd58513be5b6a2aadb0abe09d5af3cbe"
     }
   ],
-  "notes": "Full suite at the commit above; checks, focused and rollback suites at 186a0fe24 (one test update later). Failures are classified in full-suite.txt and README.md. Independent-review fixes, two rounds: RED in red/review.txt and red/review2.txt, mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
+  "notes": "Full suite at the commit above; checks on the same tree; focused and rollback suites at 186a0fe24 (one test update later). Failures are classified in full-suite.txt and README.md. Independent-review fixes, two rounds: RED in red/review.txt and red/review2.txt, mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
 }
