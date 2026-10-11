@@ -62,7 +62,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # Covers install, build, packing and the full release gate (measured in qualification/2026-10-11-P0-34).
+    # Measured 2026-10-11 (local macOS arm64, load about 20; qualification/2026-10-11-P0-34): the release gate took
+    # 1,242 s with its full suite stopped at the gate's own 900 s cap. The gate's per-step caps sum to 6,195 s;
+    # install, build, prepack guardrails, packing, SBOM and SEA add about 15 minutes. 150 minutes covers both.
     timeout-minutes: 150
     outputs:
       commit: ${{ steps.commit.outputs.sha }}
@@ -223,8 +225,8 @@ jobs:
           if-no-files-found: error
 
   # P0-35: build, qualify and push the Studio image natively per architecture.
-  # Only the per-architecture tags are pushed here; the release job creates the
-  # public multi-platform tags from these digests after its tests pass.
+  # Only the per-architecture tags are pushed here; the image-tags job creates the
+  # public multi-platform tags from these digests after the gate passed.
   image:
     needs: [approve, gate, desktop-assets]
     strategy:
