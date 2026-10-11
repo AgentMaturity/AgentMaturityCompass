@@ -353,8 +353,9 @@ export const monitorResolves = (state: Pick<A4ReadinessState, "refs">, link: A4C
   state.refs.some((ref) => ref.refKind === "monitor" && ref.refId === link.body.refId && ref.sha256 === link.body.sha256 && ref.status === "resolved");
 
 /**
- * The newest monitor ref Review recorded for this cycle's release (src/a4/a4Monitor.ts): a ref with no non-null source is
- * not present, and one whose signed record no longer resolves is BLOCKED, never read from the chain alone.
+ * The newest monitor ref Review recorded for this cycle's release (src/a4/a4Monitor.ts): a ref with no source that
+ * observed the deployed agent (A4's own approvals and the freeze reading never count) is not present, and one whose
+ * signed record no longer resolves is BLOCKED, never read from the chain alone.
  */
 function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
   const mandatory = reached(state, "reviewed");
@@ -366,7 +367,8 @@ function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4Re
   const sources = typeof monitor?.body.nonNullSources === "number" ? monitor.body.nonNullSources : 0;
   return sources > 0 ? item("monitoring.source", "READY", { reasonCodes: [`SOURCES:${sources}`, "SELF_REPORTED", `MONITOR:${String(monitor!.body.refId)}`] })
     : waiting("monitoring.source", ["MONITOR_NO_SOURCE"], { kind: "source_unavailable", mandatory,
-      nextAction: { label: monitor === undefined ? "Review records the monitor ref (one per review)" : "The monitor ref has no source with a value; an all-null ref is not present" } });
+      nextAction: { label: monitor === undefined ? "Review records the monitor ref (one per review)"
+        : "No source of the monitor ref observed the deployed agent (an execution in its journal, an SLO measurement or AMC's check); review again once one has" } });
 }
 
 /**

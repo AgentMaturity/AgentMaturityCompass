@@ -287,7 +287,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   } catch {
     // An unverified approval policy reads regulated (fail closed).
   }
-  const monitor = monitorRecord(workspace, state, releaseId, ctx.now);
+  const monitor = monitorRecord(workspace, state, releaseId, ctx.now, regulated);
   // Named by a fresh id: harmless when the step is then refused (nothing names it), as receipts are.
   const file = writeReleaseRecord(workspace, projectId, "monitors", releaseId, `a4mon_${randomBytes(16).toString("hex")}`, monitor.doc, "a4-stage-output");
   const of = (kind: string) => cycleLinks(state.chain, kind).filter((link) => link.body.releaseId === releaseId);

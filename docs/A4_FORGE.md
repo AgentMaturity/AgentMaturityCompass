@@ -530,7 +530,10 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   - `runtime` and `backup`: always `source_unavailable` in v1, with `value: null`.
 
   `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record lists the alerts
-  already emitted. The kill switch is not available in this release (P2-26).
+  already emitted. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
+  agent counts toward `monitoring.source`: an execution in the action journal at its row's own tier, an SLO measurement,
+  or AMC's check. A4's own approvals and the freeze reading are context and never count, so a record with none of the
+  three leaves the item WAITING `MONITOR_NO_SOURCE`. Each source envelope carries the project's regulated flag.
 
 Once the review step has committed (never on a replay or a refusal), Review runs `createValueReport` once for the agent.
 Then one transition by `amc-runtime` records:
