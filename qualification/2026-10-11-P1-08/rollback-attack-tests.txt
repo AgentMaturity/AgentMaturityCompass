@@ -1,62 +1,71 @@
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > m-of-n of the current set authorizes, m-of-n of the new set proves possession, and the new set then signs lists 126ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > signatures from the new set alone, or one current signature under a threshold of 2, never authorize 17ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses a threshold decrease signed only by the new set, a silent decrease, and a rotation to m=1 32ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses replaying an applied rotation and a fork from the version before last 53ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses a rotation for another root set, and duplicate signatures from one key 5ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > once rotated, an edited trust-roots.json or a missing anchored statement fails closed 29ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > an apply interrupted after its anchor is finished by applying the same statement again 27ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > after a rotation, a trust-roots.json that drops or changes rootSetId, or is deleted, fails closed 48ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > a forged statement in the stored chain, with this machine's mark lost, installs nothing 28ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses to overwrite a different, never-anchored statement left at the next sequence 24ms
- ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > an older list signed by roots that survive the rotation stays refused after it 66ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > a list signed by a pinned root parses, with the spec's signed bytes 10ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > m-of-n of the current set authorizes, m-of-n of the new set proves possession, and the new set then signs lists 125ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > signatures from the new set alone, or one current signature under a threshold of 2, never authorize 19ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses a threshold decrease signed only by the new set, a silent decrease, and a rotation to m=1 44ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses replaying an applied rotation and a fork from the version before last 102ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses a rotation for another root set, and duplicate signatures from one key 13ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > once rotated, an edited trust-roots.json or a missing anchored statement fails closed 55ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > an apply interrupted after its anchor is finished by applying the same statement again 59ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > after a rotation, a trust-roots.json that drops or changes rootSetId, or is deleted, fails closed 133ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > a forged statement in the stored chain, with this machine's mark lost, installs nothing 79ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > refuses to overwrite a different, never-anchored statement left at the next sequence 41ms
+ ✓ tests/trust/rootRotation.test.ts > trust-list root-set rotation (P1-08, security review) > an older list signed by roots that survive the rotation stays refused after it 110ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a list signed by a pinned root parses, with the spec's signed bytes 16ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID 2ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > a purpose added after signing invalidates the list 2ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a purpose added after signing invalidates the list 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > a signature whose public key does not hash to its key id is refused 1ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > an expired list gives TRUST_LIST_EXPIRED 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > an expired list gives TRUST_LIST_EXPIRED 2ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses duplicate key id 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses empty purposes 2ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses duplicate purposes 2ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses duplicate purposes 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses revokedAt without a reason 2ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses validTo not after validFrom 2ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a PEM whose sha256 is not the key id 1ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an RSA key 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses validTo not after validFrom 3ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a PEM whose sha256 is not the key id 2ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an RSA key 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a private key in place of the public key 0ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-canonical (CRLF) PEM 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-canonical (CRLF) PEM 0ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown entry field 0ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown list field 3ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-UTC time 2ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown list field 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-UTC time 5ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an evidence-authority key without authority 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a bad list id 0ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > accepts an evidence-authority key that carries its authority, and a dated revocation with a reason 1ms
  ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown signature field 0ms
- ✓ tests/trust/trustList.test.ts > signed trust lists > accepts 4,096 distinct entries and refuses 4,097 on the size limit 637ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > accepts 4,096 distinct entries and refuses 4,097 on the size limit 969ms
  ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > needs threshold distinct pinned roots; an unpinned signer never counts 2ms
  ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > refuses the same root counted twice 0ms
- ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > refuses a bit-flipped extra row even beside enough valid signatures 0ms
- ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > refuses a re-spelled base64 signature that decodes to the same bytes 0ms
- ✓ tests/trust/trustList.test.ts > trust-list files > a reordered JSON file still verifies 2ms
- ✓ tests/trust/trustList.test.ts > trust-list files > refuses a __proto__ field at any level, which a parsed object would otherwise drop 2ms
- ✓ tests/trust/trustList.test.ts > trust-list files > refuses a duplicated JSON key, which JSON.parse would collapse to its last value (P1-08) 1ms
- ✓ tests/trust/trustList.test.ts > trust-list files > refuses files over 1 MiB and symlinks 1ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > records the highest sequence with mode 0600 and never lowers it 23ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > refuses a lower sequence with ROLLBACK_DETECTED and other bytes at the same sequence with FORK_DETECTED 10ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > refuses trust list sequence 6 after 7, and another list at sequence 7 87ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > reads the state file only in its canonical encoding 29ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > fails closed on a symlinked, malformed or unreadable state file 20ms
- ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > keeps deciding, and warns once, when AMC home is read-only 8ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > reads a 1.x pair until the first write, which replaces it with one sequenced file anchored on the old digest 930ms
- ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > replaying the older validly signed list is ROLLBACK_DETECTED and the lease stays revoked 958ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > ignores and reports a stale pair restored next to the newer single file 721ms
- ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > deleting the store files never reads as an empty bootstrap once a list was anchored 694ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > fails closed in every interrupted migration state 594ms
- ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > with the high-water anchor deleted, the transparency log still refuses the older list and the deleted store 648ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > rolls a write forward when it crashed after logging, and back when it crashed before 708ms
- ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > a symlinked anchor fails closed, even when it points at a valid mark 623ms
- ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > another validly signed list at the accepted sequence is FORK_DETECTED 907ms
- ✓ tests/keys/antiRollback.test.ts > key history rollback (P1-08) > restoring an older validly signed key history gives ROLLBACK_DETECTED and admits only the current key 364ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > prunes revocations of leases that expired, keeping the sequence monotonic 885ms
- ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > refuses a list signed by another auditor purpose's key after a purpose split (self-audit) 1008ms
- Test Files  4 passed (4)
-      Tests  59 passed (59)
-   Duration  9.64s (transform 6.93s, setup 120ms, import 9.69s, tests 10.37s, environment 0ms)
+ ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > refuses a bit-flipped extra row even beside enough valid signatures 1ms
+ ✓ tests/trust/trustList.test.ts > m-of-n roots and one encoding per signature set (P1-08, security review) > refuses a re-spelled base64 signature that decodes to the same bytes 1ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > a reordered JSON file still verifies 7ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > refuses a __proto__ field at any level, which a parsed object would otherwise drop 5ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > refuses a duplicated JSON key, which JSON.parse would collapse to its last value (P1-08) 2ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > refuses files over 1 MiB and symlinks 3ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > records the highest sequence with mode 0600 and never lowers it 21ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > refuses a lower sequence with ROLLBACK_DETECTED and other bytes at the same sequence with FORK_DETECTED 11ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > refuses trust list sequence 6 after 7, and another list at sequence 7 106ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > reads the state file only in its canonical encoding 67ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > fails closed on a symlinked, malformed or unreadable state file 21ms
+ ✓ tests/keys/antiRollback.test.ts > high-water marks (P1-08 anti-rollback) > keeps deciding, and warns once, when AMC home is read-only 14ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > reads a 1.x pair until the first write, which replaces it with one sequenced file anchored on the old digest 1298ms
+ ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > replaying the older validly signed list is ROLLBACK_DETECTED and the lease stays revoked 1341ms
+ ✓ tests/keys/workspaceWriter.test.ts > H1: the key set is bound to this machine's mark > restoring the pre-compromise vault and keys under a rewritten keyset.json is refused 1957ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > ignores and reports a stale pair restored next to the newer single file 1159ms
+ ✓ tests/keys/workspaceWriter.test.ts > H1: the key set is bound to this machine's mark > reading a key set never raises this machine's mark 843ms
+ ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > deleting the store files never reads as an empty bootstrap once a list was anchored 1216ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > fails closed in every interrupted migration state 1024ms
+ ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > with the high-water anchor deleted, the transparency log still refuses the older list and the deleted store 1019ms
+ ✓ tests/keys/workspaceWriter.test.ts > H2: verifiers refuse a public key the bound key set does not name > a swapped revocation-list.pub cannot un-revoke a lease, and a swapped lease key cannot mint one 995ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > rolls a write forward when it crashed after logging, and back when it crashed before 1229ms
+ ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > a symlinked anchor fails closed, even when it points at a valid mark 924ms
+ ✓ tests/keys/antiRollback.test.ts > lease revocation rollback attacks (P1-08; security review HIGH) > another validly signed list at the accepted sequence is FORK_DETECTED 992ms
+ ✓ tests/keys/antiRollback.test.ts > key history rollback (P1-08) > restoring an older validly signed key history gives ROLLBACK_DETECTED and admits only the current key 775ms
+ ✓ tests/keys/workspaceWriter.test.ts > M1: key-compromise authority comes from the pinned trust-list roots > refuses a --root-key this machine does not pin, and accepts a pinned one 1349ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > prunes revocations of leases that expired, keeping the sequence monotonic 1015ms
+ ✓ tests/leases/revocationListAtomic.test.ts > single-file signed lease revocations (P1-08) > refuses a list signed by another auditor purpose's key after a purpose split (self-audit) 1284ms
+ ✓ tests/keys/workspaceWriter.test.ts > M3: the workspace log is the key-history floor once this machine's marks are gone > a restored pre-scrub history does not readmit the compromised key 1408ms
+ ✓ tests/keys/workspaceWriter.test.ts > M3: the workspace log is the key-history floor once this machine's marks are gone > logs every history revision, including the ones vault creation and an explicit admission write 587ms
+ ✓ tests/keys/workspaceWriter.test.ts > review lows > a planted, unverified chain head never raises this machine's rotation mark 632ms
+ ✓ tests/keys/workspaceWriter.test.ts > review lows > a stat stamp changes when a file is rewritten in place and its mtime is set back 1ms
+ ✓ tests/keys/workspaceWriter.test.ts > review lows > amc lease revoke --token records the lease's expiry so the revocation can be pruned 538ms
+ Test Files  5 passed (5)
+      Tests  68 passed (68)
+   Duration  14.33s (transform 12.71s, setup 214ms, import 18.14s, tests 23.68s, environment 1ms)

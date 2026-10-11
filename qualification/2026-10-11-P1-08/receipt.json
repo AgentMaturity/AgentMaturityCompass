@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-08",
   "date": "2026-10-11",
-  "commit": "11e9fb9e568ce5c6d484ad7b1e464c74642daee1",
+  "commit": "f26b6557e917564a15b9d275c0fce43c75b56e70",
   "branch": "rtd/p1-08-key-lifecycle",
   "node": "v22.23.0",
   "pnpm": "10.33.0",
@@ -80,6 +80,11 @@
       "durationMs": 0
     },
     {
+      "cmd": "npm run -s check:deploy-pack",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
       "cmd": "node needs-snapshot.mjs int (printed none)",
       "exit": 0,
       "durationMs": 0
@@ -87,41 +92,46 @@
     {
       "cmd": "npx vitest run tests/keys tests/leases/revocationListAtomic.test.ts tests/score/crossAgentTrustHmac.test.ts tests/crypto/keyHistoryAdmission.test.ts tests/crypto/keyHistoryForgery.test.ts",
       "exit": 0,
-      "durationMs": 123000
+      "durationMs": 0
     },
     {
-      "cmd": "npx vitest run tests/keys/antiRollback.test.ts tests/leases/revocationListAtomic.test.ts tests/trust/rootRotation.test.ts tests/trust/trustList.test.ts --reporter=verbose",
+      "cmd": "npx vitest run tests/keys/antiRollback.test.ts tests/keys/workspaceWriter.test.ts tests/leases/revocationListAtomic.test.ts tests/trust/rootRotation.test.ts tests/trust/trustList.test.ts --reporter=verbose",
       "exit": 0,
-      "durationMs": 11000
+      "durationMs": 14330
+    },
+    {
+      "cmd": "helm template t deploy/helm/amc && helm lint deploy/helm/amc",
+      "exit": 0,
+      "durationMs": 0
     },
     {
       "cmd": "npx vitest run (full suite)",
       "exit": 1,
-      "durationMs": 1248000
+      "durationMs": 1212000
     }
   ],
   "tests": {
-    "total": 23428,
-    "passed": 23377,
-    "failed": 41,
-    "skipped": 10
+    "total": 23442,
+    "passed": 23399,
+    "failed": 43,
+    "skipped": 0
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "402fbd2c90c8e78865d25b6c59b54f07a60ed4915af8d16c536f6b98e00aef69"
+      "sha256": "f6a4751bc3315395998941ba7842fe017472e419f92dd0b1f00f782e077ce7fc"
     },
     {
       "path": "checks.txt",
-      "sha256": "0ae1b4ac0d8c89212fbbf50024055ef16dd2ac6cc53731d82673fba391de74db"
+      "sha256": "6a945dda8e6c57940963689bf240bb89e838dcf90239ff5b4101d0efe65f4894"
     },
     {
       "path": "full-suite.txt",
-      "sha256": "09e3bff3ba15b6ade044730594baf7d9a243951a30735a8eb2dd465a55df5ca6"
+      "sha256": "5119c01a056ae83f3550b8b2b32dcb8bbc39c24e833d47b695ad7461742457ea"
     },
     {
       "path": "mutations.txt",
-      "sha256": "0f43cf633cf2308e099e3ccff4f01b0a4a577891d34fc3135544a8538dc444fa"
+      "sha256": "d037048da6c52a67f7e1bb586f78c019c85e9118088d4b98749b512c2902d0cd"
     },
     {
       "path": "red/containment.txt",
@@ -138,6 +148,10 @@
     {
       "path": "red/lease.txt",
       "sha256": "ad9d6e9e3fe09bb2a3b7d1b4b0b30f8719aecac69be6c564715a57db5931354f"
+    },
+    {
+      "path": "red/review.txt",
+      "sha256": "f76217fc28f71307ccbc7c7be234652d7ab897bc574ae573f40081d568399d36"
     },
     {
       "path": "red/revocation-paths.txt",
@@ -161,8 +175,8 @@
     },
     {
       "path": "rollback-attack-tests.txt",
-      "sha256": "864601eb7299658868f8b416cbbb5811f451c15c9aab3c426a5beb84bc4ced5c"
+      "sha256": "43adee68910f2224cc18c58d4fb8e8c30150d8c9bba8cde7193e163f942698bd"
     }
   ],
-  "notes": "Full-suite failures are classified in full-suite.txt and README.md: base-branch failures, a known build-dependent baseline, and load timeouts that passed when rerun alone. Mutations in mutations.txt; RED evidence in red/. Not CI; no real key rotation (P0-37 stays with Sid)."
+  "notes": "Full-suite failures are classified in full-suite.txt and README.md: base-branch failures, a build-dependent baseline, and load timeouts that passed when rerun alone. Independent-review fixes: RED in red/review.txt, 15 mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
 }

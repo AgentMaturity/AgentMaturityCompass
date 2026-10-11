@@ -1,0 +1,20 @@
+     × reports a valid shared-secret claim as SELF_REPORTED: never trusted, at most limited, no scopes (P1-08) 9ms
+     × an HMAC-verified claim never exceeds SELF_REPORTED, even at full score: never trusted, at most limited, no scope (review low) 10ms
+     × a session key bound to agent A cannot speak for agent B, even when B is granted and the key is admitted 2ms
+     × a shared secret counts only for the issuers the verifier bound it to 1ms
+     × composite score >= 0.80 produces 'full' trust level for an attested claim, and a shared-secret claim stays self-reported 21ms
+     × persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4) 6ms
+     × verify honours the threshold <AMC home>/trust/trust-roots.json sets (review low) 511ms
+     × a refused receipt key stops project creation before any A4 side effect, though the monitor role key still works 1418ms
+     × restoring the pre-compromise vault and keys under a rewritten keyset.json is refused 1273ms
+     × reading a key set never raises this machine's mark 450ms
+     × a swapped revocation-list.pub cannot un-revoke a lease, and a swapped lease key cannot mint one 498ms
+     × refuses a --root-key this machine does not pin, and accepts a pinned one 698ms
+     × a restored pre-scrub history does not readmit the compromised key 842ms
+     × logs every history revision, including the ones vault creation and an explicit admission write 434ms
+     × a planted, unverified chain head never raises this machine's rotation mark 470ms
+     × a stat stamp changes when a file is rewritten in place and its mtime is set back 1ms
+     × amc lease revoke --token records the lease's expiry so the revocation can be pruned 485ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  7 failed (7)
+      Tests  17 failed | 129 passed (146)
