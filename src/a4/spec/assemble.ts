@@ -7,11 +7,11 @@
  */
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { MAX_PLAN_NODES, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
+import { flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { INTEGRATION_PATHS, integrationClaimFor } from "../assemblePaths.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "assemble", prompt, dependsOn, required, kind });
@@ -68,14 +68,8 @@ export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "prop
   .map((step) => ({ id: `assemble.${step}`, step, run: async (ctx) => (await load()).produceAssemble(step, ctx) }));
 
 /** The newest Assemble revision's spec and answers. */
-export function assembleSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "assemble").at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers, revisionNo: revision?.revision_no ?? null };
+export function assembleSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "assemble");
 }
 
 /** The Aspire answers Assemble carries, as the newest Aspire revision records them (absent ones are left out). */
@@ -171,12 +165,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
 export const proposedFor = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
   spec.schema === ASSEMBLE_SPEC_SCHEMA && spec.answersDigest === answersDigestOf(answers);
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "implementation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("implementation");
 
 /** Whether the project has reached `step` at Assemble (any later stage counts; Aspire has not). */
 function reached(state: A4ReadinessState, step: A4Step): boolean {

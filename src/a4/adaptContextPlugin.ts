@@ -39,7 +39,7 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "./a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "./a4Readiness.js";
 import { a4Fail, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
@@ -339,11 +339,7 @@ export async function handleAdaptRoute(route: A4Route, projectId: string, tail: 
   return probe(route, projectId);
 }
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "implementation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
+const { item } = readinessItemBuilders("implementation");
 
 /** The newest probe of exactly this build's plugin (its text's and its file's sha256), and its ref as resolved at this read. */
 function probeOf(state: A4ReadinessState, context: NonNullable<AdaptBuild["context"]>) {

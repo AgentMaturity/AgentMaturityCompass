@@ -12,9 +12,9 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { parseStation, STATIONS } from "../../domains/stations.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Step } from "../a4Schema.js";
+import { a4AnswerSchema, a4HypothesisSchema, type A4Answer, type A4Hypothesis, type A4Question, type A4Stage, type A4Step } from "../a4Schema.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "aspire", prompt, dependsOn, required, kind });
@@ -114,15 +114,19 @@ export function answerGaps(answers: readonly A4Answer[]): { missing: string[]; s
   return { missing, stale, invalid };
 }
 
-/** The newest Aspire revision's spec and answers (the stage's record). */
-export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "aspire").at(-1);
+/** The newest revision recorded at `stage`: its spec, its answers (one that does not parse is left out) and its number. */
+export function stageSpecOf(state: Pick<A4ReadinessState, "revisions">, stage: A4Stage): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
+  const revision = state.revisions.filter((row) => row.stage === stage).at(-1);
   const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
   const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
     const parsed = a4AnswerSchema.safeParse(answer);
     return parsed.success ? [parsed.data] : [];
   }) : [];
   return { spec, answers, revisionNo: revision?.revision_no ?? null };
+}
+/** The newest Aspire revision's spec and answers (the stage's record). */
+export function aspireSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "aspire");
 }
 
 /** Quality targets with neither an evidence source (blank counts as none) nor `measure: "not instrumented"`. */
@@ -152,13 +156,7 @@ export const learningPlanSchema = z.array(z.strictObject({
   dependsOn: z.array(z.string()), status: z.literal("planned")
 })).min(1);
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "recommendation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem =>
-  item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("recommendation");
 
 /** Whether the project has reached `step` at Aspire (any later stage counts). */
 function reached(state: A4ReadinessState, step: A4Step): boolean {
