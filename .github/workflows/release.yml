@@ -74,8 +74,100 @@ jobs:
             dist/release-assets/*.zip
           if-no-files-found: error
 
-  release:
+  # P0-35: build, qualify and push the Studio image natively per architecture.
+  # Only the per-architecture tags are pushed here; the release job creates the
+  # public multi-platform tags from these digests after its tests pass.
+  image:
     needs: desktop-assets
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.AMC_RELEASE_TAG }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve lowercase GHCR image repository
+        id: image
+        run: |
+          OWNER=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          echo "repository=ghcr.io/${OWNER}/amc-studio" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image for qualification
+        id: runtime_image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: studio
+          load: true
+          push: false
+          platforms: linux/${{ matrix.arch }}
+          tags: ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}-${{ matrix.arch }}
+
+      - name: Qualify exact loaded Studio image
+        env:
+          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+        run: node scripts/container-smoke.mjs --studio-image "$AMC_STUDIO_IMAGE" --out tmp/container-smoke.json
+
+      - name: Upload container qualification receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-container-smoke-${{ matrix.arch }}
+          path: tmp/container-smoke.json
+
+      - name: Push qualified per-architecture image to GHCR
+        env:
+          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
+          AMC_REPOSITORY: ${{ steps.image.outputs.repository }}
+          AMC_ARCH: ${{ matrix.arch }}
+        run: |
+          tag="$AMC_REPOSITORY:$AMC_RELEASE_TAG-$AMC_ARCH"
+          [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_STUDIO_IMAGE" ]
+          docker push "$tag"
+          mkdir -p tmp/image-digest
+          docker image inspect "$tag" | node -e '
+            const image = JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0];
+            const digest = image.RepoDigests.find(value => value.startsWith(process.argv[1] + "@"))?.split("@")[1];
+            if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? "")) throw Error("pushed image digest missing");
+            if (image.Id !== process.env.AMC_STUDIO_IMAGE || image.Architecture !== process.env.AMC_ARCH) throw Error("pushed image is not the qualified image");
+            const receipt = require("node:crypto").createHash("sha256").update(require("node:fs").readFileSync("tmp/container-smoke.json")).digest("hex");
+            console.log(JSON.stringify({ arch: process.env.AMC_ARCH, platform: "linux/" + process.env.AMC_ARCH, imageId: image.Id, digest, containerSmokeSha256: receipt }));
+          ' "$AMC_REPOSITORY" > "tmp/image-digest/$AMC_ARCH.json"
+          cat "tmp/image-digest/$AMC_ARCH.json"
+
+      - name: Upload per-architecture digest
+        uses: actions/upload-artifact@v7
+        with:
+          name: image-digest-${{ matrix.arch }}
+          path: tmp/image-digest/${{ matrix.arch }}.json
+          if-no-files-found: error
+
+  release:
+    needs: [desktop-assets, image]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -147,55 +239,47 @@ jobs:
           OWNER=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
           echo "repository=ghcr.io/${OWNER}/amc-studio" >> "$GITHUB_OUTPUT"
 
-      - name: Build Docker image for qualification
-        id: runtime_image
-        uses: docker/build-push-action@v7
+      - name: Download qualified per-architecture digests
+        uses: actions/download-artifact@v8
         with:
-          context: .
-          file: ./Dockerfile
-          target: studio
-          load: true
-          push: false
-          platforms: linux/amd64
-          tags: |
-            ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
-            ${{ steps.image.outputs.repository }}:latest
+          pattern: image-digest-*
+          path: tmp/image-digests
+          merge-multiple: true
 
-      - name: Qualify exact loaded Studio image
-        env:
-          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
-        run: node scripts/container-smoke.mjs --studio-image "$AMC_STUDIO_IMAGE" --out tmp/container-smoke.json
-
-      - name: Upload container qualification receipt
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: release-container-smoke
-          path: tmp/container-smoke.json
-
-      - name: Push qualified Docker image to GHCR
+      # The public tags reference only the digests the image job qualified and pushed.
+      - name: Create multi-platform release tags from the qualified digests
         id: docker
         env:
-          AMC_STUDIO_IMAGE: ${{ steps.runtime_image.outputs.imageid }}
           AMC_REPOSITORY: ${{ steps.image.outputs.repository }}
         run: |
-          for tag in "$AMC_REPOSITORY:$AMC_RELEASE_TAG" "$AMC_REPOSITORY:latest"; do
-            [ "$(docker image inspect --format '{{.Id}}' "$tag")" = "$AMC_STUDIO_IMAGE" ]
-            docker push "$tag"
-          done
-          docker image inspect "$AMC_REPOSITORY:$AMC_RELEASE_TAG" | node -e '
-            const image = JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0];
-            const digest = image.RepoDigests.find(value => value.startsWith(process.argv[1] + "@"))?.split("@")[1];
-            if (!/^sha256:[a-f0-9]{64}$/.test(digest ?? "")) throw Error("pushed image digest missing");
-            console.log("digest=" + digest);
-          ' "$AMC_REPOSITORY" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          digest() { jq -er --arg arch "$1" 'select(.arch == $arch) | .digest | select(test("^sha256:[a-f0-9]{64}$"))' "tmp/image-digests/$1.json"; }
+          AMD64=$(digest amd64)
+          ARM64=$(digest arm64)
+          docker buildx imagetools create -t "$AMC_REPOSITORY:$AMC_RELEASE_TAG" -t "$AMC_REPOSITORY:latest" \
+            "$AMC_REPOSITORY@$AMD64" "$AMC_REPOSITORY@$ARM64"
+          RAW=$(docker buildx imagetools inspect --raw "$AMC_REPOSITORY:$AMC_RELEASE_TAG")
+          LISTED=$(jq -r '[.manifests[] | select(.platform.os == "linux") | "\(.platform.architecture)=\(.digest)"] | sort | join(",")' <<<"$RAW")
+          [ "$LISTED" = "amd64=$AMD64,arm64=$ARM64" ] || { echo "index lists $LISTED"; exit 1; }
+          INDEX=$(docker buildx imagetools inspect "$AMC_REPOSITORY:$AMC_RELEASE_TAG" --format '{{json .Manifest}}' | jq -er '.digest')
+          jq -s --arg repository "$AMC_REPOSITORY" --arg tag "$AMC_RELEASE_TAG" --arg index "$INDEX" \
+            '{repository: $repository, tags: [$tag, "latest"], indexDigest: $index, platforms: sort_by(.arch)}' \
+            tmp/image-digests/amd64.json tmp/image-digests/arm64.json > dist/release-assets/image-digests.json
+          {
+            echo "### Studio image digests"
+            echo
+            echo '```json'
+            cat dist/release-assets/image-digests.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "digest=$INDEX" >> "$GITHUB_OUTPUT"
 
       - name: Build signed release bundle when signing is configured
         env:
           AMC_RELEASE_SIGNING_KEY: ${{ secrets.AMC_RELEASE_SIGNING_KEY }}
           AMC_DOCKER_IMAGE: ${{ steps.image.outputs.repository }}:${{ env.AMC_RELEASE_TAG }}
           AMC_DOCKER_DIGEST: ${{ steps.docker.outputs.digest }}
-          AMC_DOCKER_PLATFORMS: linux/amd64
+          AMC_DOCKER_PLATFORMS: linux/amd64,linux/arm64
         run: |
           mkdir -p dist
           VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')

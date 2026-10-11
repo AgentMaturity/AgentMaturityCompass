@@ -81,16 +81,26 @@ describe("container source build and runtime contracts", () => {
   it("qualifies the exact loaded image before either publication workflow pushes it", () => {
     for (const file of [".github/workflows/docker-runner.yml", ".github/workflows/release.yml"]) {
       const workflow = YAML.parse(read(file));
-      const steps = Object.values(workflow.jobs).flatMap((job: any) => job.steps ?? []) as any[];
+      // P0-35: one native build per architecture; each leg qualifies and pushes only its own loaded image.
+      const buildJob = Object.values(workflow.jobs).find((job: any) => (job.steps ?? []).some((step: any) => step.id === "runtime_image")) as any;
+      expect(buildJob.strategy.matrix.include).toEqual([{ arch: "amd64", runner: "ubuntu-latest" }, { arch: "arm64", runner: "ubuntu-24.04-arm" }]);
+      expect(buildJob["runs-on"]).toBe("${{ matrix.runner }}");
+      const steps = buildJob.steps as any[];
       const buildIndex = steps.findIndex((step) => step.id === "runtime_image");
       const build = steps[buildIndex];
-      expect(build.with).toMatchObject({ load: true, push: false, platforms: "linux/amd64" });
+      expect(build.with).toMatchObject({ load: true, push: false, platforms: "linux/${{ matrix.arch }}" });
       const qualifyIndex = steps.findIndex((step) => String(step.run ?? "").includes("scripts/container-smoke.mjs"));
       expect(qualifyIndex).toBeGreaterThan(buildIndex);
       expect(Object.values(steps[qualifyIndex].env)).toContain("${{ steps.runtime_image.outputs.imageid }}");
       const pushIndex = steps.findIndex((step) => String(step.run ?? "").includes('docker push "$tag"'));
       expect(pushIndex).toBeGreaterThan(qualifyIndex);
       expect(String(steps[pushIndex].run)).toContain("docker image inspect --format '{{.Id}}'");
+      // Public tags are created only from the qualified per-architecture digests.
+      const create = Object.values(workflow.jobs).flatMap((job: any) => job.steps ?? [])
+        .find((step: any) => String(step.run ?? "").includes("docker buildx imagetools create")) as any;
+      expect(String(create.run)).toMatch(/"\$AMC_REPOSITORY@\$AMD64" "\$AMC_REPOSITORY@\$ARM64"/);
+      expect(String(create.run)).toContain('[ "$LISTED" = "amd64=$AMD64,arm64=$ARM64" ]');
+      expect(String(create.run)).not.toContain("docker push");
     }
   });
 
