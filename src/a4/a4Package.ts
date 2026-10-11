@@ -6,11 +6,13 @@
  * digest names (`snapshots/<manifestId>/files`, verified against its signed manifest), and the context files and signed
  * configs Propose copied into `a4-projects/<projectId>/<revisionNo>/<sha256>`, each asserted equal to its bound slot —
  * scans it (PASS required), mints the narrowed staging lease (WRITE_LOW at most, the staging routes, 24 h, work order =
- * the release), signs the manifest (`A4_PACKAGE`) and the tarball (`a4-package`), appends the transparency entry and
- * records the release (`amc.a4-release/v1`, its own `A4_RECORD` envelope) with a RELEASE transition. The staging token is
- * answered once in the response that ran the effect and stored nowhere. The production lease is the deployment
- * approval's own effect (`a4.activate.production_lease`, on activate.completion's quorum). AMC never deploys: the package
- * is the signed provenance record of what this workspace holds at the release digest (v1 is a same-host restart, D-18).
+ * the release), signs the manifest (`A4_PACKAGE`), the update policy (`A4_PACKAGE`), the prepared deployment plan
+ * (`a4-deployment-plan`, slice B) and the tarball (`a4-package`), appends the transparency entry and records the release
+ * (`amc.a4-release/v1`, its own `A4_RECORD` envelope) with a RELEASE transition, after which the lifecycle bridge may move
+ * the agent to testing and staging. The staging token is answered once in the response that ran the effect and stored nowhere. The
+ * production lease is the deployment approval's own effect (`a4.activate.production_lease`, on activate.completion's
+ * quorum), followed by the bridge to production. AMC never deploys: the package is the signed provenance record of what
+ * this workspace holds at the release digest (v1 is a same-host restart, D-18).
  */
 import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, readdirSync, readFileSync, renameSync, rmSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, sep } from "node:path";
@@ -24,8 +26,7 @@ import { getAgentPaths } from "../fleet/paths.js";
 import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { revokedLeaseIdSet, revokeLease } from "../leases/leaseStore.js";
-import { signArtifactFile } from "../lifecycle/artifactSignature.js";
-import { lifecyclePath, lifecycleStages } from "../lifecycle/lifecycle.js";
+import { readAndVerifyArtifactFileSignature, signArtifactBytes, signArtifactFile, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
 import { generateProvenanceRecord } from "../release/releaseProvenance.js";
@@ -51,14 +52,17 @@ import {
 } from "./a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
+import { deploymentPlan, deploymentViews, PLAN_PATH } from "./a4Deploy.js";
+import { advance, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
+import { UPDATE_POLICY_PATH, updatePolicyYaml, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, updatePolicyOf, type LeasePlan
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
+  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
 } from "./spec/activate.js";
-import { adaptSpecOf, lockDigestOf, proposedPlan, stagingBridge } from "./spec/adapt.js";
+import { adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
 import { assembleSpecOf } from "./spec/assemble.js";
 
@@ -81,7 +85,7 @@ const hex = (value: unknown): string | null => {
  * One regular file read through one descriptor, never through a link at its last component; null when absent. `label`
  * names it in a refusal (an effect's error is recorded in the chain, so never an absolute path).
  */
-function regularBytes(path: string, label: string): Buffer | null {
+export function regularBytes(path: string, label: string): Buffer | null {
   let fd: number;
   try {
     fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
@@ -117,7 +121,7 @@ function assertNoLinks(root: string, rel: string): void {
   }
 }
 /** `dir` exists as a real directory (created when absent), never a link. */
-function realDir(dir: string): string {
+export function realDir(dir: string): string {
   ensureDir(dir);
   if (!lstatSync(dir).isDirectory()) throw coded("PACKAGE_DIR_LINK", relative(dirname(dir), dir));
   return dir;
@@ -244,6 +248,48 @@ function signDigest(workspace: string, kind: "A4_PACKAGE" | "A4_RECORD", digestH
     throw coded(signerOf(workspace, kind).route === "notary" ? "NOTARY_UNREACHABLE" : "SIGNING_FAILED", `${kind}: ${text.slice(0, 200)}`);
   }
 }
+/** A coded signing failure as the route answers it: 423 for a locked vault, 409 otherwise (NOTARY_UNREACHABLE, never a 500). */
+const asStoreError = (error: unknown): unknown => {
+  const code = (error as { code?: unknown }).code;
+  return typeof code === "string" && error instanceof Error ? new A4StoreError(code === "A4_VAULT_LOCKED" ? 423 : 409, code, error.message) : error;
+};
+/** An A4_RECORD envelope over `digestHex` for a side row (design §4.3), signed outside any ledger transaction. */
+export function recordEnvelope(workspace: string, digestHex: string): SignedDigest {
+  try {
+    return signDigest(workspace, "A4_RECORD", digestHex);
+  } catch (error) {
+    throw asStoreError(error);
+  }
+}
+/** An artifact signature over exact bytes, its failures coded as signDigest's are. */
+function artifactSignature(workspace: string, artifactKind: ArtifactSignature["artifactKind"], bytes: Buffer): ArtifactSignature {
+  try {
+    return signArtifactBytes({ workspace, artifactKind, bytes });
+  } catch (error) {
+    const text = error instanceof Error ? error.message : String(error);
+    throw /vault locked/i.test(text) ? coded("A4_VAULT_LOCKED", `unlock the vault to sign ${artifactKind}`) : coded("SIGNING_FAILED", `${artifactKind}: ${text.slice(0, 200)}`);
+  }
+}
+/**
+ * A JSON record about a release (a receipt, an AMC check, a rollback) at `a4-releases/<projectId>/<folder>/<releaseId>/<id>.json`
+ * with its artifact signature beside it; every directory on the way is a real one, never a link. Named by a fresh id and
+ * harmless when the transition that would name it is refused. Returns its workspace-relative path and sha256.
+ */
+export function writeReleaseRecord(workspace: string, projectId: string, folder: "receipts" | "checks" | "rollbacks", releaseId: string, id: string,
+  doc: unknown, artifactKind: ArtifactSignature["artifactKind"]): { path: string; sha256: string } {
+  if (!/^[a-z0-9_]{1,80}$/.test(id) || !/^a4r_[0-9a-f]{32}$/.test(releaseId)) throw new A4StoreError(400, "INPUT_INVALID", "not an A4 record id");
+  const dir = [projectId, folder, releaseId].reduce((parent, segment) => realDir(join(parent, segment)), realDir(a4ReleasesRoot(workspace)));
+  const path = join(dir, `${id}.json`);
+  const bytes = json(doc);
+  try {
+    const signature = artifactSignature(workspace, artifactKind, bytes);
+    writeFileAtomic(path, bytes, 0o644);
+    writeFileAtomic(`${path}.sig`, json(signature), 0o644);
+  } catch (error) {
+    throw asStoreError(error);
+  }
+  return { path: relPath(workspace, path), sha256: sha256Hex(bytes) };
+}
 
 /** The lease ids each attempt minted for a release, journaled before its token leaves, so a retry revokes them first (design §6.5). */
 const leaseJournalPath = (workspace: string, projectId: string, releaseId: string): string => join(a4ReleasesRoot(workspace), projectId, `${releaseId}.leases.json`);
@@ -282,18 +328,6 @@ const revokeQuietly = (workspace: string, leaseId: string, reason: string): void
 };
 const TOKEN_NOTICE = "The lease token is shown once, in this response; AMC does not store it. Mount it as an operator-supplied secret file.";
 
-/** The lifecycle stage as lifecycle/state.json records it, read without writing a default (lifecycleStatus writes one when absent). */
-export function lifecycleStageNow(workspace: string, agentId: string): string {
-  try {
-    const bytes = regularBytes(lifecyclePath(workspace, agentId), "lifecycle state");
-    if (bytes === null) return "development";
-    const stage = (JSON.parse(bytes.toString("utf8")) as { currentStage?: unknown }).currentStage;
-    return typeof stage === "string" && (lifecycleStages as readonly string[]).includes(stage) ? stage : "unknown";
-  } catch {
-    return "unknown";
-  }
-}
-
 /** The approvals of the latest consumed documentary gate per stage and kind: each counted APPROVE bound to its gate's digest. */
 function approvalsOf(state: A4ReadinessState): A4ReleaseV1["approvals"] {
   const consumed = new Map<string, string>();
@@ -316,10 +350,10 @@ const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, nu
  * What a package holds besides its leases and reports, each read by content address and asserted equal to its bound
  * slot (design §6.5): the Enforce snapshot, the captured context files and signed configs, Adapt's compiled plan (bytes of
  * its revision in the verified chain; its lock must be the bound catalog lock), Adapt's conformance statement as it reads
- * now, the update policy and the README.
+ * now, the update policy, the prepared deployment (src/a4/a4Deploy.ts) and the README.
  */
 function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionNo: number, bound: Record<string, string | null>,
-  answers: Parameters<typeof updatePolicyOf>[0], target: string): PackageFile[] {
+  answers: Parameters<typeof updatePolicyYaml>[0], deployInput: Parameters<typeof deploymentPlan>[0]): { files: PackageFile[]; deploy: ReturnType<typeof deploymentPlan> } {
   const resources = bound["enforce.resourcesSha256"] ?? null;
   if (resources === null) throw coded("ENFORCE_RESOURCES_NOT_PRODUCED", "the bound revision names no Enforce resources digest");
   const snapshot = enforceSnapshot(workspace, state.project.agent_id, resources);
@@ -336,17 +370,25 @@ function packageInputs(workspace: string, state: A4ReadinessState, gateRevisionN
     files.push({ path: "plan/compiled-plan.json", bytes: json(plan), kind: "plan" });
   }
   files.push({ path: "conformance/adapt.json", bytes: json(conformanceView(workspace, state, "adapt", Date.now(), () => [])), kind: "conformance" });
-  files.push({ path: "update-policy.json", bytes: json(updatePolicyOf(answers)), kind: "update-policy" });
+  files.push({ path: UPDATE_POLICY_PATH, bytes: updatePolicyYaml(answers), kind: "update-policy" });
+  const deploy = deploymentPlan(deployInput);
+  files.push(...deploy.files);
   files.push({ path: "README.md", kind: "readme", bytes: Buffer.from([
-    `# A4 agent package (${target})`, "", PACKAGE_BOUNDARY, "", ACTIVATE_CLAIM_BOUNDARY, "",
+    `# A4 agent package (${deployInput.target})`, "", PACKAGE_BOUNDARY, "", ACTIVATE_CLAIM_BOUNDARY, "",
+    `- deploy/ holds the prepared ${deployInput.target} overlay and ${PLAN_PATH} (steps, the receipt form, the gaps), signed a4-deployment-plan. AMC never runs them.`,
     "- v1 deployment is a same-host restart with a pinned image: the overlay restarts the hosted Studio that built this agent; receipts are recordable only for an agent built in that Studio (D-18).",
     "- The image is pinned by tag only until D-03 and P0-14 add a digest (IMAGE_TAG_ONLY); a Helm topology is undecided until D-03 (TOPOLOGY_UNDECIDED).",
     `- AMC's check of a destination establishes reachability only: ${IDENTITY_NOT_EVALUATED}. Runtime behaviour at the destination is not evaluated.`,
     "- A re-snapshot into another workspace is P2-40. The SBOM lists AMC's runtime dependencies only; the agent's AIBOM is P1-27/P2-18.",
-    "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. leases.json names its id only.", ""
+    "- The staging lease token is delivered once to the release owner and stored nowhere; mount it as an operator-supplied secret file. leases.json names its id only.",
+    `- ${UPDATE_POLICY_PATH} is the signed update policy; nothing enforces it yet (P2-34).`, ""
   ].join("\n"), "utf8") });
-  return files;
+  return { files, deploy };
 }
+
+/** What the effect records about the lifecycle bridge it ran (EFFECT_FINISHED record): ids and reasons, never a credential. */
+const lifecycleRecord = (releaseId: string, outcome: BridgeOutcome) => ({ releaseId, target: outcome.target, from: outcome.from, to: outcome.to, advanced: outcome.advanced,
+  transitionId: outcome.transitionId, missing: [...outcome.missing], reason: outcome.reason });
 
 /** The EFFECT_FINISHED receipt: the signed tarball, an implementation ref (self_reported). */
 const receiptOf = (release: Record<string, unknown>): NonNullable<A4EffectOutcome["receipt"]> => ({ refKind: "package", refId: String(release.tarballPath),
@@ -367,14 +409,16 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const releaseId = releaseIdFor(executionId);
   const recorded = state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId);
   if (recorded !== undefined) {
-    return { receipt: receiptOf(recorded.body), deliver: { release: { releaseId, packageDigest: recorded.body.packageDigest }, staging: { token: null,
+    return { receipt: receiptOf(recorded.body), record: { lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) }, deliver: { release: { releaseId, packageDigest: recorded.body.packageDigest }, staging: { token: null,
       reasonCode: "TOKEN_DELIVERY_UNKNOWN", note: "An earlier attempt recorded this release and answered its staging token then, if at all; revoke it if it was lost." } } };
   }
   const revision = state.revisions.find((row) => row.revision_no === gate.revision_no && row.stage === "activate");
   const activate = activateSpecOf({ revisions: revision === undefined ? [] : [revision] });
   const plans = leasePlans(activate.answers);
-  const target = (activate.spec.proposal as { deploymentTarget?: { kind?: unknown } } | undefined)?.deploymentTarget?.kind;
-  if (revision === undefined || !proposedFor(activate.spec, activate.answers) || plans === null || (target !== "compose" && target !== "helm")) {
+  const proposed = (activate.spec.proposal as { deploymentTarget?: { kind?: unknown; destinationRef?: unknown; hostHint?: unknown } } | undefined)?.deploymentTarget;
+  const target = proposed?.kind;
+  if (revision === undefined || !proposedFor(activate.spec, activate.answers) || plans === null || (target !== "compose" && target !== "helm")
+    || typeof proposed?.destinationRef !== "string") {
     throw coded("RELEASE_NOT_PROPOSED", "the gate's revision holds no current proposal");
   }
   const bound = (JSON.parse(gate.intent_json) as { resourceDigests: Record<string, string | null> }).resourceDigests;
@@ -388,7 +432,10 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const finalDir = join(projectDir, releaseId);
   let minted: string | null = null;
   try {
-    const files = packageInputs(workspace, state, gate.revision_no, bound, activate.answers, target);
+    const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1)?.body.releaseId;
+    const { files, deploy } = packageInputs(workspace, state, gate.revision_no, bound, activate.answers, { releaseId, projectId, agentId: state.project.agent_id, target,
+      destinationRef: proposed!.destinationRef as string, hostHint: typeof proposed!.hostHint === "string" ? proposed!.hostHint : null,
+      previousReleaseId: typeof previous === "string" ? previous : null });
     for (const file of files) writeFileAtomic(join(staging, file.path), file.bytes, 0o644);
     const scan = scanExtractedReleaseForSecrets(staging);
     if (scan.status !== "PASS") throw coded("SECRET_SCAN_FAILED", [...new Set(scan.findings.filter((row) => row.severity === "HIGH").map((row) => row.type))].join(", "));
@@ -414,6 +461,9 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
       const found = files.find((file) => file.path === path);
       return found === undefined ? null : sha256Hex(found.bytes);
     };
+    // Signed after the scan (a signature is not text the scan judges) and listed in the manifest beside what it signs.
+    add(`${UPDATE_POLICY_PATH}.sig`, json(signDigest(workspace, "A4_PACKAGE", shaOf(UPDATE_POLICY_PATH)!)), "update-policy-signature");
+    add(`${PLAN_PATH}.sig`, json(artifactSignature(workspace, "a4-deployment-plan", files.find((file) => file.path === PLAN_PATH)!.bytes)), "deploy-plan-signature");
     const signer = signerOf(workspace, "A4_PACKAGE");
     const snapshotId = enforceManifestIdFor(bound["enforce.resourcesSha256"]!);
     const manifest: A4PackageV1 = a4PackageV1Schema.parse({
@@ -424,7 +474,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
       artifacts: { enforceSnapshotSha256: bound["enforce.resourcesSha256"], compiledPlanSha256: shaOf("plan/compiled-plan.json"),
         signedConfigsSha256: sha256Hex(canonicalize(Object.fromEntries(Object.keys(CAPTURED_SLOTS).filter((slot) => slot.startsWith("signedConfigs.")).map((slot) => [slot, bound[slot] ?? null])))),
         presetSha256: hex(bound["composition.presetSha256"]), contextPluginSha256: hex(bound["context.contextPluginSha256"]),
-        memoryPolicySha256: hex(bound["context.memoryPolicySha256"]), updatePolicySha256: shaOf("update-policy.json"), secretScanSha256, sbomSha256, aibomSha256: null },
+        memoryPolicySha256: hex(bound["context.memoryPolicySha256"]), updatePolicySha256: shaOf(UPDATE_POLICY_PATH), secretScanSha256, sbomSha256, aibomSha256: null },
       approvals: approvalsOf(state), integration, quality: quality.data,
       provenance: { note: "AMC provenance record (not a formal SLSA claim)", builtFrom: { enforceSnapshot: snapshotId, revisionDigest: revision.spec_digest,
         gateBindingDigest: gate.binding_digest, provenanceSha256, sbom: sbomSha256 === null ? "not generated (no lockfile in AMC's install root)"
@@ -448,11 +498,12 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
       ?? appendTransparencyEntry({ workspace, type: "A4_PACKAGE_SIGNED", agentId: state.project.agent_id, artifact: { kind: "a4-package", sha256: packageDigest, id: releaseId } });
     const release = { releaseId, packageDigest, packagePath: relPath(workspace, join(finalDir, "manifest.json")), signaturePath: relPath(workspace, join(finalDir, "manifest.sig")),
       tarballPath: relPath(workspace, tarPath), tarballSha256: sha256Hex(tarball), transparencyEntryId: entry.hash };
-    recordRelease(ctx, { ...release, revisionDigest: revision.spec_digest, version: manifest.package.version, snapshotId, target, hostHint: (activate.spec.proposal as
-      { deploymentTarget?: { hostHint?: unknown } }).deploymentTarget?.hostHint ?? null, integration, quality: quality.data, approvals: manifest.approvals,
-    updatePolicySha256: manifest.artifacts.updatePolicySha256, conformanceSha256: shaOf("conformance/adapt.json")!, stagingLease, signingRoute: signer.route,
-    principal: ctx.principal });
-    return { receipt: receiptOf(release), deliver: { release, staging: { leaseId: stagingLease.leaseId, token: stagingLease.token, expiresAt: stagingLease.expiresAt,
+    recordRelease(ctx, { ...release, revisionDigest: revision.spec_digest, version: manifest.package.version, snapshotId, target, hostHint: proposed!.hostHint ?? null,
+      integration, quality: quality.data, approvals: manifest.approvals, updatePolicySha256: manifest.artifacts.updatePolicySha256,
+      conformanceSha256: shaOf("conformance/adapt.json")!, stagingLease, signingRoute: signer.route, principal: ctx.principal, deploy,
+      lifecycle: releaseBridge(workspace, state, releaseId, false) });
+    // The lifecycle bridge runs after RELEASE commits (a refused record moves no lifecycle); its outcome is EFFECT_FINISHED's record.
+    return { receipt: receiptOf(release), record: { lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) }, deliver: { release, staging: { leaseId: stagingLease.leaseId, token: stagingLease.token, expiresAt: stagingLease.expiresAt,
       scope: "staging", tokenNotice: TOKEN_NOTICE } } };
   } catch (error) {
     if (minted !== null) revokeQuietly(workspace, minted, "A4 release attempt failed before its release was recorded; the token was never delivered");
@@ -466,6 +517,7 @@ type RecordInput = {
   revisionDigest: string; version: string; snapshotId: string; target: "compose" | "helm"; hostHint: unknown; integration: A4ReleaseV1["integration"];
   quality: A4ReleaseV1["quality"]; approvals: A4ReleaseV1["approvals"]; updatePolicySha256: string; conformanceSha256: string;
   stagingLease: ReturnType<typeof mintLease>; signingRoute: "vault" | "notary"; principal: A4Principal;
+  deploy: ReturnType<typeof deploymentPlan>; lifecycle: BridgeOutcome;
 };
 
 /** The approvals lineage (design §5.3): self-approved consumed gates, the degradations recorded, the owner's acknowledgement. */
@@ -504,20 +556,19 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
   const resources = a4ResourceDigestsSchema.parse({ ...digests, enforce: { ...digests.enforce, manifestId: input.snapshotId },
     release: { ...digests.release, packageDigest: input.packageDigest } });
   const adapt = adaptSpecOf(state).spec;
-  const stage = lifecycleStageNow(workspace, state.project.agent_id);
-  const claimKinds = new Set(["self_reported", "observed", "independently_reviewed", "synthetic_example"]);
   const body = {
     schema: "amc.a4-release/v1", releaseId: input.releaseId, projectId, revisionNo: gate.revision_no, revisionDigest: input.revisionDigest, version: input.version,
     packageDigest: input.packageDigest, packagePath: input.packagePath, signaturePath: input.signaturePath, transparencyEntryId: input.transparencyEntryId,
     previousReleaseId, baseReleaseId: state.project.base_release_id, resources, approvals: input.approvals, integration: input.integration, quality: input.quality,
     updatePolicySha256: input.updatePolicySha256,
-    deploymentTarget: { kind: input.target, sameHost: true, imageDigest: null, chartOrComposeDigest: null, valuesDigest: null, hostHint: typeof input.hostHint === "string" ? input.hostHint : null },
+    // The overlay digest is the composeDigest of a Compose release and the valuesDigest of a Helm one (a chart digest is the operator's helm package).
+    deploymentTarget: { kind: input.target, sameHost: true, imageDigest: null, chartOrComposeDigest: input.target === "compose" ? input.deploy.overlaySha256 : null,
+      valuesDigest: input.target === "helm" ? input.deploy.overlaySha256 : null, hostHint: typeof input.hostHint === "string" ? input.hostHint : null },
     rollback: { releaseId: previousReleaseId, enforceManifestId: typeof previous?.body.enforceManifestId === "string" ? previous.body.enforceManifestId : null,
-      leaseIds: [input.stagingLease.leaseId], preparedCommands: [] },
+      leaseIds: [input.stagingLease.leaseId], preparedCommands: input.deploy.rollbackCommands },
     leases: [{ leaseId: input.stagingLease.leaseId, scope: "staging", scopes: input.stagingLease.projection.scopes, expiresAt: input.stagingLease.expiresAt, status: "active" }],
-    // The bridge rows as evidence; the lifecycle stage itself is advanced by the A4 lifecycle wrapper (slice B), never here.
-    lifecycle: { from: stage, to: stage, controls: stagingBridge(state).map((row) => ({ controlId: row.controlId, status: row.status, evidenceRef: row.evidenceRef,
-      claimKind: row.claimKind !== null && claimKinds.has(row.claimKind) ? row.claimKind : null, satisfiedBy: row.status === "satisfied" ? "a4_bridge" : null, reason: row.reason })) },
+    // The bridge rows as evidence and where the bridge will move the lifecycle; it runs after RELEASE commits (src/a4/a4Lifecycle.ts).
+    lifecycle: { from: input.lifecycle.from, to: input.lifecycle.to, controls: recordControls(input.lifecycle) },
     approvalsLineage: lineageOf(state, gate.revision_no, input.approvals, now),
     surfaces: {
       score: { contextGraphSha256: hex(resources.brief.contextGraphSha256), latestSealedRunId: null },
@@ -580,7 +631,8 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
 /**
  * The deployment approval's effect (design §10.4 Completion): the production lease (scopes, routes, classes and caps from
  * the Ask answers, work order = the release), minted only once activate.completion is consumed, its token answered once.
- * The lifecycle bridge to production lands with the A4 lifecycle wrapper (slice B); this records that it did not run.
+ * Then the lifecycle bridge to production (src/a4/a4Lifecycle.ts), which advances only with every production control
+ * evidenced and otherwise records the missing ones.
  */
 async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const { workspace, state } = ctx;
@@ -593,7 +645,8 @@ async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcom
   if (plans === null) throw coded("LEASE_PLAN_INVALID", "the Activate answers no longer give a lease plan");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
   const lease = mintLease(workspace, state, releaseId, plans.production);
-  return { record: { lease: lease.projection, lifecycle: { advanced: false, reason: "the lifecycle bridge to production lands with the A4 lifecycle wrapper (P1-62 slice B)" } },
+  // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).
+  return { record: { lease: lease.projection, lifecycle: lifecycleRecord(releaseId, advance(workspace, state, "production", releaseId)) },
     deliver: { production: { leaseId: lease.leaseId, token: lease.token, expiresAt: lease.expiresAt, scope: "production", tokenNotice: TOKEN_NOTICE } } };
 }
 
@@ -658,7 +711,17 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
   } catch {
     revoked = null;
   }
-  return store.snapshot(projectId).rows.a4_releases.map((row) => {
+  const { rows } = store.snapshot(projectId);
+  const outcomes: Array<Record<string, unknown>> = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => ({ effect: link.body.effect,
+    ...(link.body.record as { lifecycle?: Record<string, unknown> } | undefined)?.lifecycle }));
+  const fileOf = (path: string): Buffer | null => {
+    try {
+      return regularBytes(join(store.workspace, path), path);
+    } catch {
+      return null;
+    }
+  };
+  return rows.a4_releases.map((row) => {
     const bytes = String(row.surfaces_json);
     const envelope = JSON.parse(String(row.envelope_json ?? "null")) as SignedDigest | null;
     const record = a4ReleaseV1Schema.parse({ ...JSON.parse(bytes) as Record<string, unknown>, envelope });
@@ -667,17 +730,31 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
     const notEvaluated = (reason: string) => ({ status: "not_evaluated", reason });
     const recordedIf = (present: boolean, reason: string) => present ? { status: "recorded", reason: null } : notEvaluated(reason);
     const { surfaces } = record;
+    const deployments = deploymentViews(rows.a4_deployments, record.releaseId);
+    const receipt = deployments.filter((entry) => entry.kind === "deploy").at(-1);
+    const lifecycle = outcomes.filter((outcome) => outcome.releaseId === record.releaseId);
+    const dir = dirname(record.packagePath);
+    const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
+      maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
+    const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
     return { ...record, envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
       && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
+    // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
+    deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
+    updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
+    deployments, lifecycleBridge: lifecycle,
     leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),
     surfaceTable: [
       { surface: "score", ...recordedIf(surfaces.score.contextGraphSha256 !== null, "no context graph digest was bound"), values: surfaces.score },
       { surface: "shield", ...notEvaluated("no assurance run is linked to this release yet"), values: surfaces.shield },
       { surface: "enforce", ...recordedIf(surfaces.enforce.manifestId !== null, "no Enforce snapshot"), values: surfaces.enforce },
       { surface: "vault", status: "recorded", reason: null, values: surfaces.vault },
-      { surface: "watch", ...notEvaluated("no deployment receipt is recorded; runtime runs stay empty until a lease-bound session observes one"), values: surfaces.watch },
+      { surface: "watch", ...(receipt === undefined ? notEvaluated("no deployment receipt is recorded; runtime runs stay empty until a lease-bound session observes one")
+        : { status: "recorded", reason: "the operator's receipt (self_reported); runtime runs stay empty until a lease-bound session observes one" }),
+      values: { ...surfaces.watch, deploymentReceiptRef: receipt === undefined ? null : String(receipt.deploymentId) } },
       { surface: "comply", ...recordedIf(surfaces.comply.planDigest !== null, "no compiled plan was proposed at Adapt"), values: surfaces.comply },
-      { surface: "fleet", ...recordedIf(surfaces.fleet.agentConfigSha256 !== null, "no agent config digest was bound"), values: surfaces.fleet },
+      { surface: "fleet", ...recordedIf(surfaces.fleet.agentConfigSha256 !== null, "no agent config digest was bound"),
+        values: { ...surfaces.fleet, lifecycleTransitionId: lifecycle.filter((outcome) => outcome.advanced === true).at(-1)?.transitionId ?? null } },
       { surface: "passport", ...notEvaluated("P0-55: the token-verify path does not yet refuse unsigned verdicts; signature verified, statements not evaluated"), values: surfaces.passport }
     ], boundary: ACTIVATE_CLAIM_BOUNDARY };
   });

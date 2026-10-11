@@ -502,7 +502,7 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
   ask: "builder", understand: "builder", explain: "builder", propose: "builder", requestGate: "builder", decide: "approver",
   requestChanges: "reviewer", build: "builder", review: "builder", progress: "builder", hold: "owner", resume: "owner", reopen: "owner",
   tune: "owner", retire: "owner", addMember: "owner", changeGatePolicy: "owner", acknowledge: "owner", openEffect: "owner", retryEffect: "owner",
-  release: "owner", recordDeployment: "builder", verifyDeployment: "builder", rollback: "owner", observeHypothesis: "builder"
+  release: "owner", recordDeployment: "owner", verifyDeployment: "owner", rollback: "owner", observeHypothesis: "builder"
 };
 
 /**

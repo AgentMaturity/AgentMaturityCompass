@@ -10,6 +10,7 @@ import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { leaseScopeSchema, type LeaseScope } from "../../leases/leaseSchema.js";
 import type { ActionClass } from "../../types.js";
 import { redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { bridgeControls } from "../a4Lifecycle.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
 import { adaptSpecOf } from "./adapt.js";
@@ -86,7 +87,8 @@ export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<s
   return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
 }
 
-const HOST = /^(?=.{1,253}(:|$))[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?$/;
+/** A destinationRef: a lowercase host name or IPv4 literal and an optional port; never a URL, a path or credentials. */
+export const DESTINATION_REF = /^(?=.{1,253}(:|$))[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*(:[0-9]{1,5})?$/;
 const ROUTE = /^\/[A-Za-z0-9._~/-]{0,199}$/;
 const SCOPES = leaseScopeSchema.options as readonly string[];
 const positiveInt = (value: unknown): number | null => {
@@ -111,7 +113,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
   const answered = (id: string): boolean => listValue(values.get(id)).length > 0;
   const bad: Record<string, boolean> = {
     ...Object.fromEntries(Object.entries(CHOICES).map(([id, allowed]) => [id, answered(id) && !allowed.includes(textValue(values.get(id)) ?? "")])),
-    destinationRef: answered("destinationRef") && !HOST.test(textValue(values.get("destinationRef")) ?? ""),
+    destinationRef: answered("destinationRef") && !DESTINATION_REF.test(textValue(values.get("destinationRef")) ?? ""),
     stagingRoutes: listValue(values.get("stagingRoutes")).some((route) => !ROUTE.test(route)),
     productionRoutes: listValue(values.get("productionRoutes")).some((route) => !ROUTE.test(route)),
     leaseScopes: listValue(values.get("leaseScopes")).some((scope) => !SCOPES.includes(scope)),
@@ -166,15 +168,6 @@ export function leasePlans(answers: readonly A4Answer[]): { staging: LeasePlan; 
     production: { ...common, scope: "production", executeActionClasses: classes.length > 0 ? [...new Set(classes)] : ["READ_ONLY"], routeAllowlist: [...new Set(production)],
       ttlMs: Math.min(days, 90) * 24 * 60 * 60 * 1000 }
   };
-}
-
-/** The update policy from the answers; signed inside the package, enforced by nothing until a runner exists (P2-34). */
-export function updatePolicyOf(answers: readonly A4Answer[]): Record<string, unknown> {
-  const values = answerValues(answers);
-  return { schema: "amc.a4-update-policy/v1", channel: textValue(values.get("updateChannel")), versionPin: textValue(values.get("updateVersionPin")),
-    approvalRequired: textValue(values.get("updateApproval")) !== "not_required", windows: textValue(values.get("updateWindows")),
-    autoRollbackOn: listValue(values.get("autoRollbackOn")), enforcement: "none",
-    enforcementNote: "Recorded and signed in the package; no runner enforces it yet (P2-34)." };
 }
 
 /** Whether `spec` is the proposal Propose built for exactly these answers. */
@@ -262,19 +255,77 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
     + "Installing a package into another workspace is P2-40." } });
 }
 
-/** The newest AMC check of this cycle's release (slice B writes VERIFICATION rows): BLOCKED on failed, READY only on passed. */
+/** The newest deploy receipt of this cycle's release (DEPLOYMENT, src/a4/a4Deploy.ts): the one the deployment approval binds. */
+export const boundReceipt = (chain: readonly A4ChainLink[], releaseId: string | null): A4ChainLink | undefined => releaseId === null ? undefined
+  : cycleLinks(chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId && link.body.deploymentKind === "deploy").at(-1);
+const codes = (value: unknown): string[] => Array.isArray(value) ? value.filter((code): code is string => typeof code === "string" && /^[A-Z][A-Za-z0-9_:.-]{0,127}$/.test(code)) : [];
+/** The production controls the lifecycle bridge cannot evidence now (src/a4/a4Lifecycle.ts). */
+const productionGaps = (state: A4ReadinessState, releaseId: string): string[] =>
+  bridgeControls(state, "production", releaseId).filter((control) => control.status !== "satisfied").map((control) => control.controlId);
+
+/**
+ * The operator's receipt the deployment approval binds (design §10.4 Readiness, deployment approval): recorded
+ * `succeeded`, its signed file resolving, naming the release's lease. The receipt id, status and leases are reason codes,
+ * so a later receipt moves the bound readiness and an open deployment approval goes stale.
+ */
+function receiptItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
+  const mandatory = reached(state, "reviewed");
+  const receipt = boundReceipt(state.chain, releaseId);
+  if (receipt === undefined) return waiting("deployment.receipt", ["DEPLOYMENT_NOT_RECORDED"], { mandatory,
+    nextAction: { label: "Run the prepared commands (deploy/plan.json in the package), then record the operator's receipt (owner)" } });
+  const ref = state.refs.find((candidate) => candidate.refKind === "deployment_receipt" && candidate.refId === receipt.body.receiptPath);
+  const recorded = [`RECEIPT:${String(receipt.body.deploymentId)}`, `RECORDED_STATUS:${String(receipt.body.recordedStatus)}`, `ENVIRONMENT:${String(receipt.body.environment)}`,
+    ...codes((receipt.body.leaseIds as unknown[] | undefined)?.map((id) => `LEASE:${String(id)}`))];
+  if (ref === undefined || ref.status !== "resolved") {
+    return item("deployment.receipt", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: [`RECEIPT_${(ref?.status ?? "dangling").toUpperCase()}`, ...recorded],
+      nextAction: { label: "The signed receipt file is missing, changed or unsigned: record the receipt again" } });
+  }
+  const evidence = [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: null, reasonCodes: ref.reasonCodes,
+    lane: "implementation" as const, claimKind: "self_reported" as const }];
+  return receipt.body.recordedStatus === "succeeded" ? item("deployment.receipt", "READY", { reasonCodes: ["SELF_REPORTED", ...recorded], evidence })
+    : waiting("deployment.receipt", ["RECEIPT_NOT_SUCCEEDED", ...recorded], { kind: "review_pending", mandatory, evidence,
+      nextAction: { label: "The operator recorded a deployment that did not succeed; deploy again and record the new receipt" } });
+}
+
+/**
+ * The newest AMC check of the bound receipt (VERIFICATION, src/a4/a4DeployVerify.ts): BLOCKED on failed (never
+ * acknowledgeable), READY only on passed (unreachable before P2-40), WAITING otherwise. The receipt and check ids are
+ * reason codes, so a later check moves the bound readiness.
+ */
 function amcCheckItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
   const mandatory = reached(state, "reviewed");
-  const check = releaseId === null ? undefined : cycleLinks(state.chain, "VERIFICATION").filter((link) => link.body.releaseId === releaseId).at(-1);
+  const receipt = boundReceipt(state.chain, releaseId);
+  const check = receipt === undefined ? undefined
+    : cycleLinks(state.chain, "VERIFICATION").filter((link) => link.body.receiptId === receipt.body.deploymentId).at(-1);
   const status = check?.body.amcCheckStatus;
-  const reasons = Array.isArray(check?.body.reasonCodes) ? (check.body.reasonCodes as unknown[]).filter((code): code is string => typeof code === "string") : [];
-  if (status === "failed") return item("deployment.amc_check", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: ["AMC_CHECK_FAILED", ...reasons],
+  const bound = [...(receipt === undefined ? [] : [`RECEIPT:${String(receipt.body.deploymentId)}`]), `CHECK:${check === undefined ? "none" : String(check.body.checkId)}`];
+  if (status === "failed") return item("deployment.amc_check", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: ["AMC_CHECK_FAILED", ...codes(check?.body.reasonCodes), ...bound],
     nextAction: { label: "AMC's check of the deployment failed while the operator's receipt may say succeeded; fix the deployment and check again" } });
-  if (status === "passed") return item("deployment.amc_check", "READY", { reasonCodes: ["AMC_CHECK_PASSED"] });
-  if (status === "reachable") return waiting("deployment.amc_check", ["DEPLOYMENT_IDENTITY_NOT_EVALUATED", "KEY:P2-40"], { kind: "review_pending", mandatory,
+  if (status === "passed") return item("deployment.amc_check", "READY", { reasonCodes: ["AMC_CHECK_PASSED", ...bound] });
+  if (status === "reachable") return waiting("deployment.amc_check", ["DEPLOYMENT_IDENTITY_NOT_EVALUATED", "KEY:P2-40", ...bound], { kind: "review_pending", mandatory,
     nextAction: { label: `The destination answered; the release's identity there is not evaluated: ${IDENTITY_NOT_EVALUATED}` } });
-  return waiting("deployment.amc_check", ["DEPLOYMENT_UNCHECKED"], { kind: "review_pending", mandatory,
+  return waiting("deployment.amc_check", ["DEPLOYMENT_UNCHECKED", ...bound], { kind: "review_pending", mandatory,
     nextAction: { label: "Record the operator's deployment receipt, then run AMC's check of the destination (owner)" } });
+}
+
+/** Backups cover a4-releases/ and a4-projects/ only when the signed ops policy's includePaths list them (Understand reads it). */
+function backupItem(facts: Record<string, unknown> | null): A4ReadinessItem {
+  const backup = (facts?.backup ?? null) as { missing?: unknown; reason?: unknown } | null;
+  if (backup === null) return waiting("backup.include_paths", ["PRODUCED_AT_UNDERSTAND"], { mandatory: false, section: "governance" });
+  const missing = Array.isArray(backup.missing) ? backup.missing.map(String) : [];
+  return missing.length === 0 ? item("backup.include_paths", "READY", { mandatory: false, section: "governance" })
+    : waiting("backup.include_paths", [...(typeof backup.reason === "string" ? [backup.reason] : []), ...missing.map((path) => `BACKUP_PATH_MISSING:${path}`)],
+      { mandatory: false, section: "governance", nextAction: { label: "Add a4-releases/ and a4-projects/ to the ops policy's backups.includePaths and re-sign it: "
+        + "a restore without a4-projects/ orphans every blob ref. Do it before proposing, since the release binds the signed ops policy." } });
+}
+
+/** The lifecycle bridge to production as it stands (src/a4/a4Lifecycle.ts): the controls not evaluated keep the agent at staging. */
+function lifecycleItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
+  const missing = releaseId === null ? [] : productionGaps(state, releaseId);
+  if (releaseId === null) return waiting("lifecycle.production_controls", ["NO_RELEASE"], { mandatory: false, section: "governance" });
+  return missing.length === 0 ? item("lifecycle.production_controls", "READY", { mandatory: false, section: "governance" })
+    : waiting("lifecycle.production_controls", missing.map((id) => `CONTROL_NOT_EVALUATED:${id}`), { mandatory: false, section: "governance", kind: "not_evaluated",
+      nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two need P2-40)" } });
 }
 
 /** Which of the release's leases is live as recorded (staging from the release effect, production from the deployment approval). */
@@ -323,7 +374,10 @@ export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery)
     waiting("deployment.image_pinned", ["IMAGE_TAG_ONLY", "KEY:P0-14"], { kind: "review_pending", mandatory: false,
       nextAction: { label: "The prepared files pin the image by tag; digest pinning waits for D-03 and P0-14 (the README names the gap)" } }),
     leaseScopeItem(release, releaseId === null ? null : productionLeaseOf(state.chain, releaseId)),
+    receiptItem(state, releaseId),
     amcCheckItem(state, releaseId),
-    monitoringItem(state)
+    monitoringItem(state),
+    backupItem(facts),
+    lifecycleItem(state, releaseId)
   ];
 }

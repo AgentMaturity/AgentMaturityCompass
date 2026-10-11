@@ -7,24 +7,28 @@
  * (src/a4/a4Package.ts, POST …/releases); the deployment approval's effect mints the production lease. Everything A4
  * writes here is self_reported; nothing here deploys, holds a credential or reads one.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { approvalRuleForAction, loadVerifiedApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
 import { signingRoute } from "../../crypto/signing/signer.js";
 import { activeFreezeStatus } from "../../drift/freezeEngine.js";
+import { loadOpsPolicy, verifyOpsPolicySignature } from "../../ops/policy.js";
 import { requiredControlsForStage } from "../../lifecycle/lifecycle.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
-import { AMC_ROOT, captureInputs, enforceSnapshot, lifecycleStageNow, PRODUCTION_LEASE_EFFECT, RELEASE_EFFECT } from "../a4Package.js";
+import { hostingNow } from "../a4Deploy.js";
+import { lifecycleNow } from "../a4Lifecycle.js";
+import { AMC_ROOT, captureInputs, enforceSnapshot, PRODUCTION_LEASE_EFFECT, RELEASE_EFFECT } from "../a4Package.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, updatePolicyOf, type LeasePlan
+  PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
 } from "../spec/activate.js";
+import { updatePolicyOf } from "../a4UpdatePolicy.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
@@ -60,13 +64,15 @@ const orNull = <T>(read: () => T): T | null => {
 const fileSha = (path: string): string | null => orNull(() => sha256Hex(readFileSync(path)));
 
 /**
- * Where this Studio runs (v1 deploys by restarting it, D-18): Kubernetes sets KUBERNETES_SERVICE_HOST in every pod (helm);
- * Docker and Podman leave a marker file (compose). ponytail: container markers only; a plain `docker run` reads as compose.
+ * Whether backups cover the A4 artefacts (design §14.5): only the ops policy's `includePaths` are backed up, and a restore
+ * without `a4-projects/` orphans every blob ref. Read from a policy whose signature verifies; anything else is unverified.
  */
-function hostingNow(): { kind: "compose" | "helm" | null; signal: string | null } {
-  if ((process.env.KUBERNETES_SERVICE_HOST ?? "").length > 0) return { kind: "helm", signal: "KUBERNETES_SERVICE_HOST" };
-  const marker = ["/.dockerenv", "/run/.containerenv"].find((path) => existsSync(path));
-  return marker === undefined ? { kind: null, signal: null } : { kind: "compose", signal: marker };
+function backupCoverage(workspace: string): { includePaths: string[] | null; missing: string[]; reason: string | null } {
+  const signed = orNull(() => verifyOpsPolicySignature(workspace).valid) === true;
+  const paths = signed ? orNull(() => loadOpsPolicy(workspace).opsPolicy.backups.includePaths) : null;
+  if (paths === null) return { includePaths: null, missing: ["a4-releases/", "a4-projects/"], reason: "BACKUP_POLICY_UNVERIFIED" };
+  const covered = (dir: string): boolean => paths.some((path) => [".", "./", "", dir, `${dir}/`].includes(path));
+  return { includePaths: paths, missing: ["a4-releases", "a4-projects"].filter((dir) => !covered(dir)).map((dir) => `${dir}/`), reason: null };
 }
 
 /** What Understand reads (design §10.4 Understand); each unreadable source is null, never "all clear". */
@@ -77,7 +83,7 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
   const rule = policy === null ? null : approvalRuleForAction(policy, "DEPLOY");
   const freeze = orNull(() => activeFreezeStatus(workspace, agentId));
   return {
-    lifecycle: { currentStage: lifecycleStageNow(workspace, agentId), requiredForStaging: requiredControlsForStage("staging"),
+    lifecycle: { currentStage: lifecycleNow(workspace, agentId).stage, requiredForStaging: requiredControlsForStage("staging"),
       requiredForProduction: requiredControlsForStage("production"), note: "A4 advances the lifecycle only through its bridge table, never by a typed control" },
     deployBase: { compose: fileSha(join(AMC_ROOT, "deploy", "compose", "docker-compose.yml")), helm: fileSha(join(AMC_ROOT, "deploy", "helm", "amc", "values.yaml")) },
     image: { digest: null, reason: "the bootstrap report records no image digest; pinning waits for D-03 and P0-14 (IMAGE_TAG_ONLY)" },
@@ -87,7 +93,8 @@ function understandFacts(ctx: A4ProducerContext, target: string | null): Record<
     signing: { A4_RECORD: orNull(() => signingRoute(workspace, "A4_RECORD")), A4_PACKAGE: orNull(() => signingRoute(workspace, "A4_PACKAGE")) },
     deployRule: rule === null ? null : { requiredApprovals: rule.requiredApprovals, requireDistinctUsers: rule.requireDistinctUsers, rolesAllowed: rule.rolesAllowed },
     previousReleases: state.chain.filter((link) => link.kind === "RELEASE").map((link) => ({ releaseId: link.body.releaseId, packageDigest: link.body.packageDigest, revisionNo: link.revisionNo })),
-    notEvaluated: { backup: "the last backup and its includePaths are read at the deployment approval (P1-62 slice B)", value: "value readiness lands with P1-62 slice C" }
+    backup: backupCoverage(workspace),
+    notEvaluated: { lastBackup: "the age of the last backup is not read here (verifyBackup needs the backup file)", value: "value readiness lands with P1-62 slice C" }
   };
 }
 
@@ -118,8 +125,8 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
       output("lifecycle stage and the controls staging and production require", facts.lifecycle, "implementation"),
       output("deploy base files, image identity, topology and where this Studio runs", { deployBase: facts.deployBase, image: facts.image, topology: facts.topology,
         hosting: facts.hosting }, "implementation"),
-      output("freeze, signing routes, the DEPLOY approval rule and earlier releases", { freeze: facts.freeze, signing: facts.signing, deployRule: facts.deployRule,
-        previousReleases: facts.previousReleases, notEvaluated: facts.notEvaluated }, "implementation")
+      output("freeze, signing routes, the DEPLOY approval rule, earlier releases and backup coverage", { freeze: facts.freeze, signing: facts.signing, deployRule: facts.deployRule,
+        previousReleases: facts.previousReleases, backup: facts.backup, notEvaluated: facts.notEvaluated }, "implementation")
     ],
     spec: { ...spec, answers: merged, understanding },
     response: { understanding: { answersDigest: understanding.answersDigest, carried: understanding.carried, hosting: facts.hosting } }
@@ -154,7 +161,7 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
       practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated, `
         + "operator_handoff_acknowledged and monitoring_slo_enabled stay not evaluated in v1 (AMC's check reaches reachability only).",
-      expert: "a4Lifecycle.advance computes controlsSatisfied from LIFECYCLE_BRIDGE only (slice B); advanceLifecycleStage is never called backwards." },
+      expert: "a4Lifecycle.advance computes controlsSatisfied from LIFECYCLE_BRIDGE only, testing → staging after RELEASE and staging → production after the deployment approval; advanceLifecycleStage is never called backwards." },
     { id: "receipts", sources: ["design §10.4 Record deployment", "D-18 option 1"], dataStatus: null,
       novice: "Each deployment has two columns: what the operator says happened, and what AMC's own check found. They are never merged.",
       practitioner: `recorded_status comes from the operator; amc_check_status is AMC's probe of the destination, reachable at best in v1: ${IDENTITY_NOT_EVALUATED}. A failed check blocks the deployment approval.`,
@@ -219,20 +226,22 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     updatePolicy: updatePolicyOf(answers),
     ownership: { releaseOwner: textValue(values.get("releaseOwner")), onCall: textValue(values.get("onCall")), claimKind: "self_reported" },
     access: { roles: listValue(values.get("accessRoles")), networks: listValue(values.get("accessNetworks")) },
-    surfaces: { score: "context graph digest bound by the revision", shield: "assurance runs linked at Review (slice B)", enforce: "the Enforce snapshot the bound resources digest names",
+    surfaces: { score: "context graph digest bound by the revision", shield: "assurance runs linked at Review (P1-62 slice C)", enforce: "the Enforce snapshot the bound resources digest names",
       vault: "the A4_PACKAGE signing route", watch: "the deployment receipt (self_reported) once recorded; runtime runs only when a lease-bound session observes one",
       comply: "Adapt's compiled plan and conformance statement", fleet: "agent config and typed graph digests", passport: "not evaluated until P0-55 (signature verified; statements not evaluated)" },
-    packagePlan: { inputs: [...Object.values(CAPTURED_SLOTS), "resources/ (Enforce snapshot)", "plan/compiled-plan.json", "conformance/adapt.json", "update-policy.json", "leases.json"],
+    packagePlan: { inputs: [...Object.values(CAPTURED_SLOTS), "resources/ (Enforce snapshot)", "plan/compiled-plan.json", "conformance/adapt.json", "update-policy.yaml", "deploy/ (the prepared overlay and plan)", "leases.json"],
       effect: RELEASE_EFFECT_ID },
     monitoringPlan: { expectations: textValue(values.get("monitoringExpectations")), slos: ["readyz", "ledger_verify", "outcome_unknown_open", "backup_age", "gateway_failures"],
       alerts: ["pod not ready", "ledger verify failure", "open outcome_unknown", "stale backup", "gateway failures", "/readyz"].map((rule) => ({ rule, status: "proposal" })),
       killSwitch: "not available in this release (P2-26)" },
     rollbackPlan: { previousReleaseId: typeof previous?.body.releaseId === "string" ? previous.body.releaseId : null, acceptance: textValue(values.get("rollbackAcceptance")),
-      steps: ["restoreEnforceResourceSnapshot to the previous release's snapshot", "revoke this release's leases", target(values) === "helm" ? "helm rollback <release> <rev> --wait"
-        : "re-pin the previous image and docker compose up -d (never down -v)"], lifecycle: "never moved backwards" },
+      steps: ["a high or critical risk tier: an incident freeze first, and the project holds", "an owner previews the rollback and opens its DEPLOY engine request (a4.activate.rollback)",
+        "restoreEnforceResourceSnapshot to the previous release's snapshot, confirmed by its exact manifest id", "revoke this release's leases",
+        target(values) === "helm" ? "helm rollback <release> <rev> --wait" : "re-pin the previous release's overlay and docker compose up -d (never down -v)",
+        "the operator records the rollback row; deployed_release_id moves then"], lifecycle: "never moved backwards" },
     valueReportingPlan: { kpis: kpis.map((kpi) => ({ kpi, evidenceSource: null, method: "not_yet_decided" })), sustainability: listValue(values.get("sustainabilityObjectives")),
       social: listValue(values.get("socialObjectives")), claimKind: "self_reported", note: "one amc.a4-value-claim/v1 per KPI per release (P1-62 slice C)" },
-    completion: { effect: PRODUCTION_LEASE_EFFECT_ID, note: "the deployment approval mints the production lease; the lifecycle bridge to production lands with slice B" }
+    completion: { effect: PRODUCTION_LEASE_EFFECT_ID, note: "the deployment approval mints the production lease, then the lifecycle bridge moves staging → production only with every production control evidenced (P2-40 for two of them)" }
   };
   return {
     outputs: [{ output: "proposal", label: "activate propose: the release draft (eight surfaces, package, lease, update, monitoring, rollback and value plans)", lane: "recommendation",
