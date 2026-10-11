@@ -119,6 +119,8 @@ export interface A4LiveFacts {
   readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
   /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
   readonly sessionStore?: "sqlite" | "jsonl";
+  /** Activate only: who signs A4_PACKAGE (null: the trust config does not verify); absent when not read. */
+  readonly packageSigningRoute?: "vault" | "notary" | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -354,8 +356,10 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
       : item("members.candidates", "READY", { reasonCodes: live.hostMode ? ["MEMBER_CANDIDATES_LIMITED"] : [], mandatory: false }),
     live.vaultUnlocked === null ? unread("signing.available", "VAULT_LOCKED")
       : item("signing.available", live.vaultUnlocked ? "READY" : "WAITING", live.vaultUnlocked ? {} : { kind: "source_unavailable", reasonCodes: ["VAULT_LOCKED"] }),
-    live.signingRoute === null ? item("signing.notary_route", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["CONFIG_UNTRUSTED"] })
-      : item("signing.notary_route", "READY", { reasonCodes: live.signingRoute === "vault" ? ["NOTARY_ROUTE_VAULT"] : [] }),
+    // At Activate the route of each kind A4 signs is named: A4_RECORD (every record) and A4_PACKAGE (the package manifest).
+    live.signingRoute === null || live.packageSigningRoute === null ? item("signing.notary_route", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["CONFIG_UNTRUSTED"] })
+      : item("signing.notary_route", "READY", { reasonCodes: [...(live.signingRoute === "vault" ? ["NOTARY_ROUTE_VAULT"] : []),
+        ...(live.packageSigningRoute === undefined ? [] : [`A4_RECORD:${live.signingRoute}`, `A4_PACKAGE:${live.packageSigningRoute}`])] }),
     live.signingRoute === "notary" && live.notaryReachable === false
       ? item("signing.notary_reachable", "WAITING", { kind: "source_unavailable", reasonCodes: ["NOTARY_UNREACHABLE"] }) : item("signing.notary_reachable", "READY"),
     // Integrity of bytes, checked against this workspace's own keys: a self-check, never anchored, never a claim.

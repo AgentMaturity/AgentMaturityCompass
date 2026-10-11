@@ -17,6 +17,7 @@ import type { ApprovalA4Floor } from "../approvals/approvalPolicySchema.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
+import type { SignKind } from "../crypto/signing/signerTypes.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
@@ -200,12 +201,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
-  let route: "vault" | "notary" | null;
-  try {
-    route = signingRoute(workspace, "A4_RECORD");
-  } catch {
-    route = null;
-  }
+  const route = collectRoute(workspace);
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const blocking = stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null;
@@ -225,7 +221,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
-    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {})
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {}),
+    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE") } : {})
   };
 }
 
@@ -357,9 +354,10 @@ export function governed(store: A4Store, projectId: string, actor: A4Principal, 
     throw error;
   }
 }
-const collectRoute = (workspace: string): "vault" | "notary" | null => {
+/** Who signs `kind` under the workspace's trust config; null when that config's signature is invalid. */
+const collectRoute = (workspace: string, kind: SignKind = "A4_RECORD"): "vault" | "notary" | null => {
   try {
-    return signingRoute(workspace, "A4_RECORD");
+    return signingRoute(workspace, kind);
   } catch {
     return null;
   }
