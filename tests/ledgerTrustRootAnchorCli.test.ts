@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { forgeKeysetKey } from "./helpers/forgeKeyset.js";
 import { generateKeyPairSync, sign, type KeyObject } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -70,6 +71,8 @@ function forge(workspace: string): void {
   }
   db.close();
   writeFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), publicKey.export({ format: "pem", type: "spki" }).toString());
+  // The verifying CLI runs with a fresh AMC home (no mark), so the attacker also re-points the unsigned key set (P1-08).
+  forgeKeysetKey(workspace, "ledger-row", publicKey.export({ format: "pem", type: "spki" }).toString());
 }
 
 function amcVerify(cwd: string, args: string[] = []) {

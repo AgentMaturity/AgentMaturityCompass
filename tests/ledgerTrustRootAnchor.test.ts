@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { generateKeyPairSync, sign, type KeyObject } from "node:crypto";
 import Database from "better-sqlite3";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { forgeKeysetKey } from "./helpers/forgeKeyset.js";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger, canonicalMetadataForHash } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
@@ -110,18 +111,30 @@ describe("the ledger's trust root", () => {
 
       const { privateKey, publicKey } = generateKeyPairSync("ed25519");
       forgeLedger(workspace, privateKey);
-      // The step that makes it work: replace the key the verifier reads.
-      writeFileSync(
-        join(workspace, ".amc", "keys", "monitor_ed25519.pub"),
-        publicKey.export({ format: "pem", type: "spki" }).toString()
-      );
+      // The step that makes it work: replace the key the verifier reads, and the unsigned key set that names it.
+      const forgedPem = publicKey.export({ format: "pem", type: "spki" }).toString();
+      writeFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), forgedPem);
+      forgeKeysetKey(workspace, "ledger-row", forgedPem);
 
-      const verdict = await verifyLedgerIntegrity(workspace);
-      // This assertion is uncomfortable on purpose. Unanchored verification
-      // proves internal consistency and nothing about authorship, and pinning
-      // that fact stops anyone claiming otherwise from the passing result.
-      expect(verdict.chain.ok, "unanchored verification cannot see a substituted key").toBe(true);
-      expect(verdict.trustRoot.anchored, "and it reports that it is unanchored").toBe(false);
+      // The machine that committed the key set holds its mark and refuses the rewritten one (P1-08 review H2).
+      let local: string;
+      try { local = JSON.stringify(await verifyLedgerIntegrity(workspace)); } catch (error) { local = String(error); }
+      expect(local, "this machine's key-set mark refuses the substituted key").toMatch(/FORK_DETECTED|never committed on this machine/);
+
+      // Any other machine starts without that mark.
+      const freshHome = mkdtempSync(join(tmpdir(), "amc-trustroot-home-"));
+      vi.stubEnv("AMC_HOME", freshHome);
+      try {
+        const verdict = await verifyLedgerIntegrity(workspace);
+        // This assertion is uncomfortable on purpose. Unanchored verification
+        // proves internal consistency and nothing about authorship, and pinning
+        // that fact stops anyone claiming otherwise from the passing result.
+        expect(verdict.chain.ok, "unanchored verification cannot see a substituted key").toBe(true);
+        expect(verdict.trustRoot.anchored, "and it reports that it is unanchored").toBe(false);
+      } finally {
+        vi.unstubAllEnvs();
+        rmSync(freshHome, { recursive: true, force: true });
+      }
     } finally {
       rmSync(workspace, { recursive: true, force: true });
     }
