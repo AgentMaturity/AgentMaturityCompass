@@ -1,7 +1,7 @@
 /**
  * The Pi releases AMC has qualified for enforcement at Pi's tool_call hook (P1-22): the `pi` CLI of
  * @earendil-works/pi-coding-agent at these versions, run through tests/conformance/piToolCall.conformance.test.ts.
- * Package integrity and per-case results: qualification/2026-10-11-P1-22/receipt.json. Add a version only with a
+ * Package integrity and per-case results: qualification/2026-10-12-P1-22/receipt.json. Add a version only with a
  * passing conformance receipt for it.
  */
 export const QUALIFIED_PI_VERSIONS: readonly string[] = ["1.0.2", "1.0.4"];

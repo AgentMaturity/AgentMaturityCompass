@@ -527,8 +527,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       const controlled = evaluateProviderHookControl({
         workspace: options.workspace,
         authenticatedAgentId: auth.payload.agentId,
-        provider,
-        lease: auth.payload,
+        provider, lease: auth.payload,
         rawInput: rawBody.toString("utf8"),
       });
       writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);
