@@ -238,8 +238,10 @@ function git(root, args) {
  * pass. Additions are allowed only when the scan's tool version or config hash changed since the base (a reviewed
  * --rebaseline). A base without any baseline file is the one-time bootstrap; any other unreadable base fails closed
  * unless `allowMissingBase`.
+ * @param {{ base?: string, allowMissingBase?: boolean }} [options]
  */
-export function baseCheck(root, scan, baseline, { base, allowMissingBase = false } = {}) {
+export function baseCheck(root, scan, baseline, options = {}) {
+  const { base, allowMissingBase = false } = options;
   const spec = scanSpec(scan);
   const ref = base ?? (spawnSync("git", ["rev-parse", "--verify", "-q", "origin/main^{commit}"], { cwd: root }).status === 0 ? "origin/main" : "int");
   let at;
