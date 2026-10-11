@@ -9,13 +9,25 @@
  * receipt, …/verify runs AMC's token-less check of the receipt's destination, and …/rollback/preview then …/rollback roll
  * the release back through its own effect gate.
  */
+import { dirname, join } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
-import { deploymentBodySchema, deploymentViews, recordDeployment } from "./a4Deploy.js";
+import { verifySignedDigest } from "../crypto/signing/signer.js";
+import type { SignedDigest } from "../crypto/signing/signerTypes.js";
+import { revokedLeaseIdSet } from "../leases/leaseStore.js";
+import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
+import { sha256Hex } from "../utils/hash.js";
+import { deploymentBodySchema, deploymentViews, PLAN_PATH, recordDeployment } from "./a4Deploy.js";
 import { verifyBodySchema, verifyDeployment } from "./a4DeployVerify.js";
 import { loadA4State } from "./a4Gates.js";
-import { releaseViews } from "./a4Package.js";
-import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackReplay, rollbackSchema } from "./a4Rollback.js";
+import { bridgeControls } from "./a4Lifecycle.js";
+import { regularBytes } from "./a4Package.js";
+import type { A4ReadinessState } from "./a4Readiness.js";
+import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackReplay, rollbackSchema, rollbackViews } from "./a4Rollback.js";
+import { a4PackageV1Schema, a4ReleaseV1Schema } from "./a4Schema.js";
+import type { A4Store } from "./a4Store.js";
+import { UPDATE_POLICY_PATH, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
+import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, monitorResolves } from "./spec/activate.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
 import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
 import { completeAndRun } from "./a4RouterStages.js";
@@ -103,4 +115,105 @@ export async function handleA4ReleaseRoute(route: A4Route, projectId: string, ta
   }
   apiSuccess(route.res, view);
   return true;
+}
+
+/**
+ * A lease as GET shows it: `status` live (revoked, expired, active, or unknown when the revocation list does not verify),
+ * `recordedStatus` as the signed record states it.
+ */
+function liveLease(lease: Record<string, unknown>, revoked: Set<string> | null, now: number): Record<string, unknown> {
+  const status = revoked === null ? "unknown" : revoked.has(String(lease.leaseId)) ? "revoked" : Date.parse(String(lease.expiresAt)) <= now ? "expired" : "active";
+  return { ...lease, recordedStatus: lease.status, status, ...(revoked === null ? { reasonCode: "LEASE_REVOCATIONS_UNVERIFIED" } : {}) };
+}
+
+/**
+ * The package's file list from its manifest, read once and listed only when those bytes hash to the release record's
+ * package digest; null with the reason otherwise.
+ */
+function packageFiles(bytes: Buffer | null, packageDigest: string): { files: unknown[] | null; reason: string | null } {
+  if (bytes === null) return { files: null, reason: "MANIFEST_UNREADABLE" };
+  if (sha256Hex(bytes) !== packageDigest) return { files: null, reason: "MANIFEST_DIGEST_MISMATCH" };
+  // Bytes with the package digest are the manifest the release wrote (json(manifest)), so they parse.
+  return { files: a4PackageV1Schema.parse(JSON.parse(bytes.toString("utf8"))).files, reason: null };
+}
+
+/**
+ * GET …/releases[/:rid]: each release record as stored (chain-named a4_releases rows), its envelope checked against the
+ * stored bytes now, the leases with their live status (production from the deployment approval's effect), the package's
+ * file list, the eight-surface table with a reason for every surface not evaluated (Watch's SLO digest from the newest
+ * monitor ref that resolves) and the production bridge rows as they stand now. Integrity under this workspace's keys only.
+ */
+export function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState): Array<Record<string, unknown>> {
+  const { chain } = state;
+  const now = Date.now();
+  let revoked: Set<string> | null;
+  try {
+    revoked = revokedLeaseIdSet(store.workspace);
+  } catch {
+    revoked = null;
+  }
+  const { rows } = store.snapshot(projectId);
+  const outcomes: Array<Record<string, unknown>> = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => ({ effect: link.body.effect,
+    ...(link.body.record as { lifecycle?: Record<string, unknown> } | undefined)?.lifecycle }));
+  const fileOf = (path: string): Buffer | null => {
+    try {
+      return regularBytes(join(store.workspace, path), path);
+    } catch {
+      return null;
+    }
+  };
+  return rows.a4_releases.map((row) => {
+    const bytes = String(row.surfaces_json);
+    const envelope = JSON.parse(String(row.envelope_json ?? "null")) as SignedDigest | null;
+    const record = a4ReleaseV1Schema.parse({ ...JSON.parse(bytes) as Record<string, unknown>, envelope });
+    const production = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease)
+      .filter((lease): lease is Record<string, unknown> => lease?.releaseId === record.releaseId && lease.scope === "production");
+    // D-21 as the deployment approval's effect recorded it: the owner's acknowledgement of the pending expert review.
+    const expertReview = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
+      ? (link.body.record as { expertReview?: Record<string, unknown> } | undefined)?.expertReview : undefined)
+      .find((entry) => entry?.releaseId === record.releaseId) ?? { status: "not_recorded", reason: "the deployment approval's effect has not run" };
+    const notEvaluated = (reason: string) => ({ status: "not_evaluated", reason });
+    const recordedIf = (present: boolean, reason: string) => present ? { status: "recorded", reason: null } : notEvaluated(reason);
+    const { surfaces } = record;
+    const deployments = deploymentViews(rows.a4_deployments, record.releaseId);
+    const receipt = deployments.filter((entry) => entry.kind === "deploy").at(-1);
+    const lifecycle = outcomes.filter((outcome) => outcome.releaseId === record.releaseId);
+    const dir = dirname(record.packagePath);
+    // Review's monitor record of this release, only while its signed file still resolves to the ref's bytes.
+    const monitor = cycleLinks(chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === record.releaseId
+      && monitorResolves(state, link)).at(-1);
+    const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
+      maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
+    const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
+    // The transparency entry the release effect appended once RELEASE committed (its EFFECT_FINISHED record), or why none.
+    const entry = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
+      ? (link.body.record as { transparency?: { releaseId?: unknown; entryId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
+      .find((candidate) => candidate?.releaseId === record.releaseId);
+    return { ...record, transparencyEntryId: typeof entry?.entryId === "string" ? entry.entryId : null,
+      transparency: { reason: entry === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof entry.reason === "string" ? entry.reason : null },
+      envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
+      && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
+    // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
+    deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
+    updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
+    packageFiles: packageFiles(fileOf(record.packagePath), record.packageDigest),
+    deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle, expertReview,
+    // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
+    lifecycleProduction: bridgeControls(state, "production", record.releaseId),
+    leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),
+    surfaceTable: [
+      { surface: "score", ...recordedIf(surfaces.score.contextGraphSha256 !== null, "no context graph digest was bound"), values: surfaces.score },
+      { surface: "shield", ...notEvaluated("no assurance run is linked to this release yet"), values: surfaces.shield },
+      { surface: "enforce", ...recordedIf(surfaces.enforce.manifestId !== null, "no Enforce snapshot"), values: surfaces.enforce },
+      { surface: "vault", status: "recorded", reason: null, values: surfaces.vault },
+      { surface: "watch", ...(receipt === undefined ? notEvaluated("no deployment receipt is recorded; runtime runs stay empty until a lease-bound session observes one")
+        : { status: "recorded", reason: "the operator's receipt (self_reported); runtime runs stay empty until a lease-bound session observes one" }),
+      values: { ...surfaces.watch, deploymentReceiptRef: receipt === undefined ? null : String(receipt.deploymentId),
+        sloReportSha256: typeof monitor?.body.sloReportSha256 === "string" ? monitor.body.sloReportSha256 : null } },
+      { surface: "comply", ...recordedIf(surfaces.comply.planDigest !== null, "no compiled plan was proposed at Adapt"), values: surfaces.comply },
+      { surface: "fleet", ...recordedIf(surfaces.fleet.agentConfigSha256 !== null, "no agent config digest was bound"),
+        values: { ...surfaces.fleet, lifecycleTransitionId: lifecycle.filter((outcome) => outcome.advanced === true).at(-1)?.transitionId ?? null } },
+      { surface: "passport", ...notEvaluated("P0-55: the token-verify path does not yet refuse unsigned verdicts; signature verified, statements not evaluated"), values: surfaces.passport }
+    ], boundary: ACTIVATE_CLAIM_BOUNDARY };
+  });
 }

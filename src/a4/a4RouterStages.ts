@@ -39,7 +39,7 @@ import {
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
-import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Package.js";
+import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Deploy.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 

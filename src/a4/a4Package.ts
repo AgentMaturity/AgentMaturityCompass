@@ -18,14 +18,14 @@ import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, read
 import { dirname, isAbsolute, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
-import { getPrivateKeyPem, getPublicKeyPem } from "../crypto/keys.js";
-import { signDigestWithPolicy, signingRoute, verifySignedDigest } from "../crypto/signing/signer.js";
+import { getPublicKeyPem } from "../crypto/keys.js";
+import { signDigestWithPolicy, signingRoute } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
-import { revokedLeaseIdSet, revokeLease } from "../leases/leaseStore.js";
+import { revokeLease } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature, signArtifactBytes, signArtifactFile, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
@@ -51,18 +51,17 @@ import {
   a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
   type A4ReleaseV1
 } from "./a4Schema.js";
-import { A4StoreError, openA4Store, type A4Store } from "./a4Store.js";
+import { A4StoreError, openA4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
-import { deploymentPlan, deploymentViews, PLAN_PATH } from "./a4Deploy.js";
-import { advance, bridgeControls, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
-import { rollbackViews } from "./a4Rollback.js";
-import { UPDATE_POLICY_PATH, updatePolicyYaml, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
+import { deploymentPlan, PLAN_PATH } from "./a4Deploy.js";
+import { advance, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
+import { UPDATE_POLICY_PATH, updatePolicyYaml } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  monitorResolves, PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
+  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -771,148 +770,3 @@ export const PRODUCTION_LEASE_EFFECT: A4EffectDef = {
   executionId: (_state, gate) => `a4-production-lease-${gate.binding_digest.slice(0, 32)}`,
   run: mintProductionLease
 };
-
-/** The staging lease ids a DENY of `gateId` revokes: this cycle's release's, when it is an Activate completion gate; else null. */
-function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[] | null {
-  const requested = chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
-  const release = currentRelease(chain);
-  if (requested?.body.stage !== "activate" || requested.body.gate !== "completion" || release === null) return null;
-  return (Array.isArray(release.body.leases) ? release.body.leases as Array<{ leaseId?: unknown; scope?: unknown }> : [])
-    .filter((lease) => lease.scope === "staging" && typeof lease.leaseId === "string").map((lease) => String(lease.leaseId));
-}
-
-/**
- * Before a DENY on an Activate completion gate: the revocation it owes is signed with the vault's auditor key (even in
- * NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused 423 A4_VAULT_LOCKED while that key
- * cannot be read, never recorded with the staging lease left live.
- */
-export function assertStagingRevocable(store: A4Store, projectId: string, gateId: string): void {
-  if ((stagingLeasesOf(store.readChain(projectId), gateId) ?? []).length === 0) return;
-  try {
-    getPrivateKeyPem(store.workspace, "auditor");
-  } catch {
-    throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault: denying the deployment approval revokes the release's staging lease, which signs with the auditor key.");
-  }
-}
-
-/**
- * After a DENY on an unconsumed activate.completion gate (recordDecision refuses one on a consumed gate): revokes this
- * cycle's staging lease (design §6.4 step 7). Expiry needs no sweep: a completion gate lives at least a day and is
- * requested after the release, so the staging lease (24 h) has expired by then. Answers what it revoked.
- */
-export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId: string): Record<string, unknown> {
-  const ids = stagingLeasesOf(store.readChain(projectId), gateId);
-  if (ids === null) return {};
-  const revoked: string[] = [];
-  const failed: string[] = [];
-  for (const leaseId of ids) {
-    try {
-      revokeLease(store.workspace, leaseId, `A4 deployment approval denied on gate ${gateId}`);
-      revoked.push(leaseId);
-    } catch {
-      failed.push(leaseId);
-    }
-  }
-  return { stagingLeases: { revoked, failed } };
-}
-
-/**
- * A lease as GET shows it: `status` live (revoked, expired, active, or unknown when the revocation list does not verify),
- * `recordedStatus` as the signed record states it.
- */
-function liveLease(lease: Record<string, unknown>, revoked: Set<string> | null, now: number): Record<string, unknown> {
-  const status = revoked === null ? "unknown" : revoked.has(String(lease.leaseId)) ? "revoked" : Date.parse(String(lease.expiresAt)) <= now ? "expired" : "active";
-  return { ...lease, recordedStatus: lease.status, status, ...(revoked === null ? { reasonCode: "LEASE_REVOCATIONS_UNVERIFIED" } : {}) };
-}
-
-/**
- * The package's file list from its manifest, read once and listed only when those bytes hash to the release record's
- * package digest; null with the reason otherwise.
- */
-function packageFiles(bytes: Buffer | null, packageDigest: string): { files: unknown[] | null; reason: string | null } {
-  if (bytes === null) return { files: null, reason: "MANIFEST_UNREADABLE" };
-  if (sha256Hex(bytes) !== packageDigest) return { files: null, reason: "MANIFEST_DIGEST_MISMATCH" };
-  // Bytes with the package digest are the manifest the release wrote (json(manifest)), so they parse.
-  return { files: a4PackageV1Schema.parse(JSON.parse(bytes.toString("utf8"))).files, reason: null };
-}
-
-/**
- * GET …/releases[/:rid]: each release record as stored (chain-named a4_releases rows), its envelope checked against the
- * stored bytes now, the leases with their live status (production from the deployment approval's effect), the package's
- * file list, the eight-surface table with a reason for every surface not evaluated (Watch's SLO digest from the newest
- * monitor ref that resolves) and the production bridge rows as they stand now. Integrity under this workspace's keys only.
- */
-export function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState): Array<Record<string, unknown>> {
-  const { chain } = state;
-  const now = Date.now();
-  let revoked: Set<string> | null;
-  try {
-    revoked = revokedLeaseIdSet(store.workspace);
-  } catch {
-    revoked = null;
-  }
-  const { rows } = store.snapshot(projectId);
-  const outcomes: Array<Record<string, unknown>> = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => ({ effect: link.body.effect,
-    ...(link.body.record as { lifecycle?: Record<string, unknown> } | undefined)?.lifecycle }));
-  const fileOf = (path: string): Buffer | null => {
-    try {
-      return regularBytes(join(store.workspace, path), path);
-    } catch {
-      return null;
-    }
-  };
-  return rows.a4_releases.map((row) => {
-    const bytes = String(row.surfaces_json);
-    const envelope = JSON.parse(String(row.envelope_json ?? "null")) as SignedDigest | null;
-    const record = a4ReleaseV1Schema.parse({ ...JSON.parse(bytes) as Record<string, unknown>, envelope });
-    const production = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease)
-      .filter((lease): lease is Record<string, unknown> => lease?.releaseId === record.releaseId && lease.scope === "production");
-    // D-21 as the deployment approval's effect recorded it: the owner's acknowledgement of the pending expert review.
-    const expertReview = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
-      ? (link.body.record as { expertReview?: Record<string, unknown> } | undefined)?.expertReview : undefined)
-      .find((entry) => entry?.releaseId === record.releaseId) ?? { status: "not_recorded", reason: "the deployment approval's effect has not run" };
-    const notEvaluated = (reason: string) => ({ status: "not_evaluated", reason });
-    const recordedIf = (present: boolean, reason: string) => present ? { status: "recorded", reason: null } : notEvaluated(reason);
-    const { surfaces } = record;
-    const deployments = deploymentViews(rows.a4_deployments, record.releaseId);
-    const receipt = deployments.filter((entry) => entry.kind === "deploy").at(-1);
-    const lifecycle = outcomes.filter((outcome) => outcome.releaseId === record.releaseId);
-    const dir = dirname(record.packagePath);
-    // Review's monitor record of this release, only while its signed file still resolves to the ref's bytes.
-    const monitor = cycleLinks(chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "monitor" && link.body.releaseId === record.releaseId
-      && monitorResolves(state, link)).at(-1);
-    const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
-      maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
-    const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
-    // The transparency entry the release effect appended once RELEASE committed (its EFFECT_FINISHED record), or why none.
-    const entry = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
-      ? (link.body.record as { transparency?: { releaseId?: unknown; entryId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
-      .find((candidate) => candidate?.releaseId === record.releaseId);
-    return { ...record, transparencyEntryId: typeof entry?.entryId === "string" ? entry.entryId : null,
-      transparency: { reason: entry === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof entry.reason === "string" ? entry.reason : null },
-      envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
-      && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
-    // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
-    deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
-    updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
-    packageFiles: packageFiles(fileOf(record.packagePath), record.packageDigest),
-    deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle, expertReview,
-    // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
-    lifecycleProduction: bridgeControls(state, "production", record.releaseId),
-    leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),
-    surfaceTable: [
-      { surface: "score", ...recordedIf(surfaces.score.contextGraphSha256 !== null, "no context graph digest was bound"), values: surfaces.score },
-      { surface: "shield", ...notEvaluated("no assurance run is linked to this release yet"), values: surfaces.shield },
-      { surface: "enforce", ...recordedIf(surfaces.enforce.manifestId !== null, "no Enforce snapshot"), values: surfaces.enforce },
-      { surface: "vault", status: "recorded", reason: null, values: surfaces.vault },
-      { surface: "watch", ...(receipt === undefined ? notEvaluated("no deployment receipt is recorded; runtime runs stay empty until a lease-bound session observes one")
-        : { status: "recorded", reason: "the operator's receipt (self_reported); runtime runs stay empty until a lease-bound session observes one" }),
-      values: { ...surfaces.watch, deploymentReceiptRef: receipt === undefined ? null : String(receipt.deploymentId),
-        sloReportSha256: typeof monitor?.body.sloReportSha256 === "string" ? monitor.body.sloReportSha256 : null } },
-      { surface: "comply", ...recordedIf(surfaces.comply.planDigest !== null, "no compiled plan was proposed at Adapt"), values: surfaces.comply },
-      { surface: "fleet", ...recordedIf(surfaces.fleet.agentConfigSha256 !== null, "no agent config digest was bound"),
-        values: { ...surfaces.fleet, lifecycleTransitionId: lifecycle.filter((outcome) => outcome.advanced === true).at(-1)?.transitionId ?? null } },
-      { surface: "passport", ...notEvaluated("P0-55: the token-verify path does not yet refuse unsigned verdicts; signature verified, statements not evaluated"), values: surfaces.passport }
-    ], boundary: ACTIVATE_CLAIM_BOUNDARY };
-  });
-}
