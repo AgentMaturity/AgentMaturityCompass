@@ -312,7 +312,7 @@ function mountProject(projectId, options) {
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>Differences</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
-      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness)}</section>
+      <section class="card"><h4>Missing requirements</h4>${view.renderMissing(readiness, stage)}</section>
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderPlanTimeline(root.querySelector("#a4Rail"), view.railPlan(project));

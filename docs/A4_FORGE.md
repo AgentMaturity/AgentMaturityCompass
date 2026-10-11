@@ -107,7 +107,8 @@ self-approved decision is recorded with `self_approved = 1` and its facts, and a
 An owner may acknowledge some WAITING items (for example `sod.self_provisioned`). The item stays WAITING with
 `OWNER_ACKNOWLEDGED`, is bound into the next gate when it is one of the stage's bound items, lapses after 90 days and is
 never cleared. A BLOCKED item cannot be acknowledged. An item is acknowledged only at the project's current stage
-(`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there). Acknowledge before requesting the gate: an
+(`409 A4_STEP_ORDER` at any other, and Studio offers Acknowledge only there, and only for an item whose acknowledgement
+would count, by the same rule as the server). Acknowledge before requesting the gate: an
 acknowledgement supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
 project, `409 A4_NOT_ACKNOWLEDGEABLE`, and one recorded earlier does not count there), `regulatory_sources_status`,
 `context_probe_unavailable` (a JSONL session store) and `plan_activated` (only from Review on while its activation is
