@@ -5,6 +5,8 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { highWaterPath } from "../../src/keys/highWater.js";
+import { sha256Hex } from "../../src/utils/hash.js";
+import { canonicalize } from "../../src/utils/json.js";
 import { keysetPaths, keysetRecoveryDir } from "../../src/keys/keyset.js";
 import { getSigningKey, getSigningPublicKeyPem, resumeKeyRotation, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { lockVault, unlockVault, vaultPaths } from "../../src/vault/vault.js";
@@ -164,8 +166,18 @@ describe("key-set hardening (P1-08 self-audit)", () => {
     const planted = join(keysetPaths(root).rotations, `gen-${keyset.generation + 5}`);
     mkdirSync(planted, { recursive: true });
     writeFileSync(join(planted, "manifest.json"), JSON.stringify({ generation: keyset.generation + 5, previousGeneration: keyset.generation, files: [] }));
+    // First refusal: no write-ahead record in AMC home (P1-08 final review).
+    expect(() => resumeKeyRotation(root)).toThrow(/no write-ahead record in AMC home/);
+    // Behind it, with a record planted as if AMC home were writable too: the generation and manifest checks still refuse.
+    const recordIntent = (pending: unknown, generation: number) => {
+      const dir = keysetRecoveryDir(root, generation);
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(join(dir, "intent.json"), JSON.stringify({ generation, sha256: sha256Hex(canonicalize(pending)) }));
+    };
+    recordIntent({ ...keyset, generation: keyset.generation + 5 }, keyset.generation + 5);
     expect(() => resumeKeyRotation(root)).toThrow(/not one this workspace started/);
     writeFileSync(keysetPaths(root).pending, JSON.stringify({ ...keyset, generation: keyset.generation + 1 }));
+    recordIntent({ ...keyset, generation: keyset.generation + 1 }, keyset.generation + 1);
     expect(() => resumeKeyRotation(root)).toThrow(/no recovery manifest/);
     expect(readFileSync(vaultPaths(root).vaultFile).equals(vaultBefore)).toBe(true);
     expect(existsSync(keysetPaths(root).pending)).toBe(true);

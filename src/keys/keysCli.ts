@@ -43,7 +43,7 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
   }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--resume takes no other options");
-    return resumeKeyRotation(workspace);
+    return resumeKeyRotation(workspace, process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):")));
   }
   const purpose = purposeOption(opts.purpose);
   if (opts.reason !== undefined && !(ROTATION_REASONS as readonly string[]).includes(opts.reason)) throw new Error(`--reason must be one of ${ROTATION_REASONS.join(", ")}`);

@@ -98,6 +98,18 @@ const amcHome = () => {
 const recoveryRel = (workspace: string, generation: number) => `state/keyset-recovery/${workspaceScope(workspace)}/gen-${generation}`;
 
 /** Where a generation's recovery copies and discarded files are kept (in AMC home). */
+const intentRel = (workspace: string, generation: number) => `${recoveryRel(workspace, generation)}/intent.json`;
+
+/** Whether commitKeyset on this machine recorded, before writing to the workspace, that it was committing these bytes. */
+function recordedIntent(workspace: string, generation: number, keysetBytes: string): boolean {
+  const raw = readContainedOrNull(amcHome(), intentRel(workspace, generation), MAX_BYTES);
+  if (raw === null) return false;
+  let intent: unknown = null;
+  try { intent = JSON.parse(raw.toString("utf8")); } catch { return false; } // an unreadable record names nothing
+  const record = intent as { generation?: unknown; sha256?: unknown } | null;
+  return record?.generation === generation && record.sha256 === sha256Hex(keysetBytes);
+}
+
 export function keysetRecoveryDir(workspace: string, generation: number): string {
   return join(amcHome(), recoveryRel(workspace, generation));
 }
@@ -290,17 +302,28 @@ export function acceptAdoptedKeyset(workspace: string, input: { generation: numb
  */
 export function quarantineUnboundPurposeFiles(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): { quarantined: string[]; directory: string | null } {
   assertOwnerMode(workspace, "keys quarantine");
-  assertNoPendingKeyset(workspace);
-  ownerVaultKeyIds(workspace, opts.vaultKeyIds, "quarantining purpose key files");
-  if (readHighWater(markKey(workspace)) !== null) throw new Error("this machine committed this workspace's key set: run `amc keys rotate --restore` instead");
-  if (containedExists(workspace, KEYSET_REL)) throw new Error("keyset.json binds the purpose key files; nothing is unbound");
-  const candidates = [...PURPOSE_FILES, ...LOCAL_PURPOSES.filter(p => p !== "lease" && p !== "session").map(p => `.amc/keys/${p}_history.json`)];
-  const unbound = candidates.filter(rel => containedExists(workspace, rel));
+  ownerVaultKeyIds(workspace, opts.vaultKeyIds, "quarantining unbound key-set files");
+  const unbound: string[] = [];
+  // A pending generation with no write-ahead record in AMC home was not started here: it and its staged files go.
+  const pending = readKeysetFile(workspace, PENDING_REL);
+  if (pending !== null && !recordedIntent(workspace, pending.generation, canonicalize(pending))) {
+    unbound.push(PENDING_REL, ...Object.keys(pending.files).map(rel => `${keysetFileRel(rel)}${STAGED}`).filter(rel => containedExists(workspace, rel)));
+    if (containedExists(workspace, `${rotationsRel(pending.generation)}/manifest.json`)) unbound.push(`${rotationsRel(pending.generation)}/manifest.json`);
+  } else {
+    assertNoPendingKeyset(workspace);
+  }
+  // Purpose files are unbound only with no keyset.json and no key set this machine committed or adopted: a marked key set
+  // names its files, which are restored or copied back, never moved aside.
+  const marked = readHighWater(markKey(workspace)) !== null || readHighWater(adoptedKey(workspace)) !== null;
+  if (!marked && !containedExists(workspace, KEYSET_REL)) {
+    const candidates = [...PURPOSE_FILES, ...LOCAL_PURPOSES.filter(p => p !== "lease" && p !== "session").map(p => `.amc/keys/${p}_history.json`)];
+    unbound.push(...candidates.filter(rel => containedExists(workspace, rel)));
+  }
   if (unbound.length === 0) return { quarantined: [], directory: null };
   const dir = `.amc/quarantine/keys/${new Date().toISOString().replace(/[:.]/g, "-")}`;
   for (const rel of unbound) {
     const bytes = readContained(workspace, rel, MAX_KEY_FILE);
-    renameContained(workspace, rel, `${dir}/${rel.split("/").pop()!}`);
+    renameContained(workspace, rel, `${dir}/${rel.replace(/^\.amc\//, "").replace(/\//g, "__")}`);
     logRepair(workspace, { action: "quarantine", file: rel, sha256: sha256Hex(bytes), to: dir });
   }
   return { quarantined: unbound, directory: join(workspace, dir) };
@@ -377,12 +400,15 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
       const existed = containedExists(workspace, keysetFileRel(rel));
       return { rel, existed, mode: existed ? statSync(join(amcDir(workspace), rel)).mode & 0o777 : write.mode };
     });
+    // Write-ahead, outside the workspace and before anything is written to it: the generation and digest this machine
+    // is about to commit. Resume finishes only a pending generation this record names.
+    const bytes = canonicalize(next);
+    writeContained(amcHome(), intentRel(workspace, generation), JSON.stringify({ generation, sha256: sha256Hex(bytes) }), 0o600);
     // Always written before the pending intent: resume refuses a pending generation that has no manifest.
     for (const row of manifest) {
       if (row.existed) writeContained(amcHome(), `${recoveryRel(workspace, generation)}/${recoveryName(row.rel)}`, readContained(workspace, keysetFileRel(row.rel), MAX_KEY_FILE), 0o600);
     }
     writeContained(workspace, `${rotationsRel(generation)}/manifest.json`, JSON.stringify({ generation, previousGeneration: current?.generation ?? null, files: manifest }, null, 2), 0o600);
-    const bytes = canonicalize(next);
     try {
       for (const { rel, write } of rows) writeContained(workspace, `${keysetFileRel(rel)}${STAGED}`, write.bytes, write.mode);
       writeContained(workspace, PENDING_REL, bytes, 0o600);
@@ -404,8 +430,7 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
  * `amc keys rotate --resume`: completes a pending generation when every file is staged intact or already in place,
  * otherwise restores the previous bytes saved in `.amc/keys/rotations/gen-<N>/` and drops the pending generation.
  */
-export function resumeKeyset(workspace: string): { action: "nothing-pending" | "completed" | "rolled-back"; generation: number | null } {
-  // A pending generation cannot be unlocked (every key use refuses it), so resume is gated by owner mode alone.
+export function resumeKeyset(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): { action: "nothing-pending" | "completed" | "rolled-back"; generation: number | null } {
   assertOwnerMode(workspace, "keys resume");
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
@@ -416,6 +441,11 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
     const mark = readHighWater(markKey(workspace));
     const next = Math.max(readKeysetFile(workspace, KEYSET_REL)?.generation ?? 0, mark?.sequence ?? 0) + 1;
     const bytes = canonicalize(pending);
+    if (!recordedIntent(workspace, pending.generation, bytes)) {
+      throw new Error(`pending key set generation ${pending.generation} has no write-ahead record in AMC home (${join(amcHome(), intentRel(workspace, pending.generation))}): `
+        + "AMC on this machine never started it, so it is not resumed. Move it and its staged files to .amc/quarantine/keys/ with "
+        + "`amc keys rotate --quarantine-unbound-pub` (owner mode); then, if this machine committed the key set, `amc keys rotate --restore`.");
+    }
     const markedHere = mark !== null && mark.sequence === pending.generation && mark.sha256 === sha256Hex(bytes);
     const recovery = rotationsRel(pending.generation);
     const saved = readContainedOrNull(workspace, `${recovery}/manifest.json`, MAX_BYTES);
@@ -437,6 +467,21 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
     };
     const entries = Object.entries(pending.files).map(([rel, digest]) => ({ rel, digest, target: keysetFileRel(rel) }));
     const ready = entries.every(({ target, digest }) => fileSha(workspace, `${target}${STAGED}`) === digest || fileSha(workspace, target) === digest);
+    // The owner's vault, opened with the real passphrase, must hold the keys the generation that goes live names.
+    const vaultDigest = pending.files["vault.amcvault"];
+    const vaultCandidates = [".amc/vault.amcvault.keyset-staged", ".amc/vault.amcvault"].map(rel => readContainedOrNull(workspace, rel, MAX_KEY_FILE));
+    if (ready) {
+      const live = vaultCandidates.find(candidate => candidate !== null && (vaultDigest === undefined || sha256Hex(candidate) === vaultDigest)) ?? null;
+      const held = live === null ? null : opts.vaultKeyIds(live);
+      if (held === null || LOCAL_PURPOSES.some(purpose => held[purpose] !== pending.keys[purpose])) {
+        throw new Error(`key set generation ${pending.generation}: the vault it puts in place ${held === null ? "does not open with this passphrase" : "does not hold the keys it names"}; not resumed`);
+      }
+    } else {
+      const preImage = readContainedOrNull(home, `${saves}/${recoveryName("vault.amcvault")}`, MAX_KEY_FILE);
+      if (![...vaultCandidates, preImage].some(candidate => candidate !== null && opts.vaultKeyIds(candidate) !== null)) {
+        throw new Error(`key set generation ${pending.generation}: rolling back needs the vault opened with the owner's passphrase; no vault copy opens with it`);
+      }
+    }
     if (ready) {
       for (const { rel, digest, target } of entries) {
         if (!containedExists(workspace, `${target}${STAGED}`)) continue;

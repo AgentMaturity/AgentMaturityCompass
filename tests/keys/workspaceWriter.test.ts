@@ -378,7 +378,7 @@ describe("review round 3: upgrade availability (brick)", () => {
     expect(() => unlockVault(root, PASS)).toThrow(/session\.pub is not this vault's session key and no key set binds it[\s\S]*--quarantine-unbound-pub/);
     const moved = await rotateKeysForCli(root, { quarantineUnboundPub: true }) as { quarantined: string[]; directory: string };
     expect(moved.quarantined).toEqual([".amc/keys/session.pub"]);
-    expect(existsSync(join(moved.directory, "session.pub"))).toBe(true);
+    expect(existsSync(join(moved.directory, "keys__session.pub"))).toBe(true);
     expect(readFileSync(join(process.env.AMC_HOME!, "state", "keyset-recovery", workspaceScope(root), "repairs.jsonl"), "utf8")).toMatch(/"action":"quarantine","file":".amc\/keys\/session.pub"/);
     unlockVault(root, PASS); // migrates
     expect(getSigningPublicKeyPem(root, "session")).toBe(roles.session.publicPem);
@@ -446,7 +446,7 @@ describe("key-set mutations are owner-only inside the functions, not only in the
     expect(() => rotateMonitorKeyInVault(root, "not-the-passphrase")).toThrow(AGENT);
     expect(() => revokeKey(root, "receipt", "a".repeat(64), "superseded", PASS)).toThrow(AGENT);
     expect(() => resumeKeyRotation(root)).toThrow(AGENT);
-    expect(() => resumeKeyset(root)).toThrow(AGENT);
+    expect(() => resumeKeyset(root, { vaultKeyIds: ids(PASS) })).toThrow(AGENT);
     expect(() => restoreCommittedKeyset(root, { vaultKeyIds: ids(PASS) })).toThrow(AGENT);
     expect(() => acceptAdoptedKeyset(root, { generation: 2, digest: "0".repeat(64), vaultKeyIds: ids(PASS) })).toThrow(AGENT);
     expect(() => quarantineUnboundPurposeFiles(root, { vaultKeyIds: ids(PASS) })).toThrow(AGENT);
@@ -491,5 +491,60 @@ describe("key-set mutations are owner-only inside the functions, not only in the
     expect(() => acceptAdoptedKeyset(root, { generation: shown.generation, digest: shown.sha256, vaultKeyIds: ids(PASS) })).toThrow(/skips generations[\s\S]*--allow-gap/);
     expect(acceptAdoptedKeyset(root, { generation: shown.generation, digest: shown.sha256, vaultKeyIds: ids(PASS), allowGap: "machine B was offline for both rotations" }))
       .toEqual({ generation: shown.generation, sha256: shown.sha256 });
+  });
+});
+
+// Final review: a pending generation planted by a workspace writer is never rolled forward by `amc keys rotate --resume`.
+describe("resume finishes only a generation this machine started", () => {
+  /** A writer's "ready" pending generation: its receipt key, staged beside the real one, with a manifest. */
+  function plantPending(root: string): { attacker: string; generation: number } {
+    const amc = join(root, ".amc");
+    const keyset = JSON.parse(readFileSync(join(amc, "keys", "keyset.json"), "utf8"));
+    const attacker = keyPair().publicPem;
+    const generation = keyset.generation + 1;
+    const pending = { ...keyset, generation, keys: { ...keyset.keys, receipt: ed25519KeyId(attacker) }, files: { "keys/receipt.pub": sha256Hex(Buffer.from(attacker)) } };
+    writeFileSync(join(amc, "keys", "receipt.pub.keyset-staged"), attacker);
+    const manifestDir = join(amc, "keys", "rotations", `gen-${generation}`);
+    mkdirSync(manifestDir, { recursive: true });
+    writeFileSync(join(manifestDir, "manifest.json"), JSON.stringify({ generation, previousGeneration: keyset.generation, files: [{ rel: "keys/receipt.pub", existed: true, mode: 420 }] }));
+    writeFileSync(join(amc, "keys", "keyset.pending.json"), canonicalize(pending));
+    return { attacker, generation };
+  }
+
+  it("a planted pending generation has no write-ahead record: refused, the mark stays, and quarantine clears it", async () => {
+    const root = workspace();
+    const receipt = getSigningPublicKeyPem(root, "receipt");
+    const mark = readHighWater(highWaterKey("keyset", workspaceScope(root)));
+    lockVault(root);
+    plantPending(root);
+    expect(() => resumeKeyRotation(root, PASS)).toThrow(/no write-ahead record in AMC home[\s\S]*--quarantine-unbound-pub/);
+    expect(readHighWater(highWaterKey("keyset", workspaceScope(root)))).toEqual(mark);
+    expect(readFileSync(join(root, ".amc", "keys", "receipt.pub"), "utf8")).toBe(receipt);
+    const moved = await rotateKeysForCli(root, { quarantineUnboundPub: true }) as { quarantined: string[] };
+    expect(moved.quarantined).toEqual(expect.arrayContaining([".amc/keys/keyset.pending.json", ".amc/keys/receipt.pub.keyset-staged"]));
+    unlockVault(root, PASS);
+    expect(getSigningPublicKeyPem(root, "receipt")).toBe(receipt);
+    expect(getSigningKey(root, "receipt")).toBeTruthy();
+  });
+
+  it("even with a write-ahead record, the vault must hold the keys the pending generation names", () => {
+    const root = workspace();
+    lockVault(root);
+    const { generation } = plantPending(root);
+    // As if AMC home were writable to the attacker as well: the owner's vault still does not back these keys.
+    const pendingBytes = readFileSync(join(root, ".amc", "keys", "keyset.pending.json"), "utf8");
+    mkdirSync(keysetRecoveryDir(root, generation), { recursive: true });
+    writeFileSync(join(keysetRecoveryDir(root, generation), "intent.json"), JSON.stringify({ generation, sha256: sha256Hex(canonicalize(JSON.parse(pendingBytes))) }));
+    expect(() => resumeKeyRotation(root, PASS)).toThrow(/does not hold the keys it names; not resumed/);
+  });
+
+  it("quarantine never moves the purpose files of a key set this machine adopted", async () => {
+    const root = workspace();
+    lockVault(root);
+    vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-ws-writer-machine-e-")));
+    getSigningPublicKeyPem(root, "receipt"); // adopts generation 1
+    rmSync(join(root, ".amc", "keys", "keyset.json"));
+    await expect(rotateKeysForCli(root, { quarantineUnboundPub: true })).resolves.toEqual({ quarantined: [], directory: null });
+    expect(existsSync(join(root, ".amc", "keys", "receipt.pub"))).toBe(true);
   });
 });

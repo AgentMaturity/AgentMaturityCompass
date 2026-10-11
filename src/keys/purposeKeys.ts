@@ -19,7 +19,7 @@ import { listContainedDir, readContained, readContainedOrNull } from "../utils/c
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  encryptedVaultBytes, forgetVaultEnvelope, getVaultPurposeKeyPem, keyIdsOf, markWrittenHistories, purposeKeyPaths, unlockVault,
+  encryptedVaultBytes, forgetVaultEnvelope, getVaultPurposeKeyPem, keyIdsOf, markWrittenHistories, purposeKeyPaths, unlockVault, vaultEnvelopeKeyIds,
   unlockedPayloadForKeyChange, vaultMetaBytes, vaultPaths, type VaultKeyKind
 } from "../vault/vault.js";
 import {
@@ -270,8 +270,9 @@ export function rotateMonitorKeyInVault(workspace: string, passphrase?: string):
 }
 
 /** `amc keys rotate --resume`: completes or rolls back an interrupted key change. */
-export function resumeKeyRotation(workspace: string): ReturnType<typeof resumeKeyset> {
-  const result = resumeKeyset(workspace);
+export function resumeKeyRotation(workspace: string, passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): ReturnType<typeof resumeKeyset> {
+  if (!passphrase) throw new Error("Resuming a key change requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
+  const result = resumeKeyset(workspace, { vaultKeyIds: bytes => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase) });
   forgetVaultEnvelope(workspace);
   return result;
 }
