@@ -1,0 +1,26 @@
+Neutral import neutral-import-16c499ecae1354a5
+Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable
+  Mode: import
+  Status: ready
+  Artifacts: 1
+  Categories: agent-config
+  Redactions: 0
+  Source trust: SELF_REPORTED; evaluation: NOT_EVALUATED
+  Mapping: 0 traces; 0 reported failures
+  Records: 1 (0 mapped, 1 retained only, 0 malformed, 0 unsupported)
+  Files skipped: 0 (0 malformed, 0 unsupported, 0 oversized)
+  Unknown timing: 0 event times; 0 durations
+  Normalizer: amc-neutral/2026-09-08; semantic digest: 7b270da63e2b810c90d508ead5687939700935b32b538753bffba9dd59cb0929
+  Redacted source artifacts are retained; only recognized trace fields are projected into the failure index.
+  Source item counts include records or config fields; they are not a trace coverage percentage.
+  No cost or maturity result is inferred from import completion. Source claims remain self-reported.
+  Original bytes not retained by operator choice; only the SHA-256 digest is kept.
+  Source: agent.config.json; SHA-256 4a6ba4a678d5d6d9e30e33359a0dd64541803ef139bd90d6c81d03d900fa3251; format json
+  Next: inspect with amc imports show neutral-import-16c499ecae1354a5
+  Imported as SELF_REPORTED evidence. No maturity evaluation was performed.
+  Episode: episode-neutral-import-16c499ecae1354a5
+  Lifecycle: lifecycle-neutral-import-16c499ecae1354a5
+  Trace index: -
+  Manifest: enforce-resources-ece648970614340a
+  Original: SHA-256 4a6ba4a678d5d6d9e30e33359a0dd64541803ef139bd90d6c81d03d900fa3251; 151 bytes; json v?; not retained (operator opt-out)
+  Portable evidence: <run>/ws-config/.amc/imports/runs/neutral-import-16c499ecae1354a5/external-evidence/0-0.json

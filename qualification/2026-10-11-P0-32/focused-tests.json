@@ -1,0 +1,338 @@
+{
+  "baseCommit": "60d0255c43f7a54bae88e665e38d326b3232fcd5",
+  "environment": "local macOS 26.6.2 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; not CI",
+  "runs": [
+    {
+      "issue": "AMC-1506",
+      "run": "AMC-1506",
+      "command": "npx vitest run tests/importProvenance.test.ts tests/neutralImporter.test.ts",
+      "exit": 0,
+      "durationMs": 9153,
+      "files": [
+        {
+          "path": "tests/importProvenance.test.ts",
+          "tests": 3,
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/neutralImporter.test.ts",
+          "tests": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1507",
+      "run": "AMC-1507",
+      "command": "npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceFailureUnknownTime.test.ts tests/traceIngestionTiming.test.ts",
+      "exit": 0,
+      "durationMs": 2591,
+      "files": [
+        {
+          "path": "tests/piSessionImport.test.ts",
+          "tests": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/piSessionImportBoundaries.test.ts",
+          "tests": 15,
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/traceFailureUnknownTime.test.ts",
+          "tests": 2,
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/traceIngestionTiming.test.ts",
+          "tests": 3,
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 31,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1509",
+      "run": "AMC-1509",
+      "command": "npx vitest run tests/cleanSourceDocs.test.ts",
+      "exit": 0,
+      "durationMs": 284,
+      "files": [
+        {
+          "path": "tests/cleanSourceDocs.test.ts",
+          "tests": 8,
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1514",
+      "run": "AMC-1514",
+      "command": "npx vitest run tests/agentLoopRetry.test.ts tests/providerToolNameBinding.test.ts tests/providerToolNames.test.ts",
+      "exit": 0,
+      "durationMs": 8204,
+      "files": [
+        {
+          "path": "tests/agentLoopRetry.test.ts",
+          "tests": 13,
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/providerToolNameBinding.test.ts",
+          "tests": 16,
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/providerToolNames.test.ts",
+          "tests": 25,
+          "passed": 25,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 54,
+      "passed": 54,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1521",
+      "run": "AMC-1521",
+      "command": "npx vitest run tests/reconciliationDefectsReleaseGate.test.ts tests/releaseGateExecution.test.ts",
+      "exit": 0,
+      "durationMs": 247,
+      "files": [
+        {
+          "path": "tests/reconciliationDefectsReleaseGate.test.ts",
+          "tests": 3,
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/releaseGateExecution.test.ts",
+          "tests": 22,
+          "passed": 22,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 25,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1522",
+      "run": "AMC-1522",
+      "command": "npx vitest run tests/surfaceHistoryCompaction.test.ts",
+      "exit": 0,
+      "durationMs": 8627,
+      "files": [
+        {
+          "path": "tests/surfaceHistoryCompaction.test.ts",
+          "tests": 14,
+          "passed": 14,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1522",
+      "run": "AMC-1522-spill",
+      "command": "npx vitest run tests/bundleSpill.test.ts tests/cliSpillCommands.test.ts tests/retentionSpill.test.ts tests/sessionSpillCommitment.test.ts tests/sessionSpillRead.test.ts tests/spillEncryption.test.ts tests/spillLifecycle.test.ts",
+      "exit": 0,
+      "durationMs": 18313,
+      "files": [
+        {
+          "path": "tests/bundleSpill.test.ts",
+          "tests": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/cliSpillCommands.test.ts",
+          "tests": 65,
+          "passed": 65,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/retentionSpill.test.ts",
+          "tests": 5,
+          "passed": 5,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/sessionSpillCommitment.test.ts",
+          "tests": 15,
+          "passed": 15,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/sessionSpillRead.test.ts",
+          "tests": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/spillEncryption.test.ts",
+          "tests": 25,
+          "passed": 25,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/spillLifecycle.test.ts",
+          "tests": 19,
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 144,
+      "passed": 144,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-1531",
+      "run": "AMC-1531-1545",
+      "command": "npx vitest run tests/nativeDelegationInheritance.test.ts tests/subagentHookInheritance.test.ts",
+      "exit": 0,
+      "durationMs": 9239,
+      "files": [
+        {
+          "path": "tests/nativeDelegationInheritance.test.ts",
+          "tests": 9,
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/subagentHookInheritance.test.ts",
+          "tests": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-484",
+      "run": "AMC-484",
+      "command": "npx vitest run tests/architectureBoundaries.test.ts",
+      "exit": 0,
+      "durationMs": 4728,
+      "files": [
+        {
+          "path": "tests/architectureBoundaries.test.ts",
+          "tests": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-482",
+      "run": "AMC-482",
+      "command": "npx vitest run tests/apiRouters.test.ts tests/guardrailControlState.test.ts",
+      "exit": 0,
+      "durationMs": 9746,
+      "files": [
+        {
+          "path": "tests/apiRouters.test.ts",
+          "tests": 31,
+          "passed": 31,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/guardrailControlState.test.ts",
+          "tests": 12,
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 43,
+      "passed": 43,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "issue": "AMC-482",
+      "run": "AMC-482-extra",
+      "command": "npx vitest run tests/apiRequestErrorRoutes.test.ts tests/apiRouterResponseParity.test.ts",
+      "exit": 0,
+      "durationMs": 3700,
+      "files": [
+        {
+          "path": "tests/apiRequestErrorRoutes.test.ts",
+          "tests": 64,
+          "passed": 64,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "path": "tests/apiRouterResponseParity.test.ts",
+          "tests": 145,
+          "passed": 145,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "total": 209,
+      "passed": 209,
+      "failed": 0,
+      "skipped": 0
+    }
+  ]
+}
