@@ -135,7 +135,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc backup print` | Print backup manifest summary | - | - |
 | `amc backup restore` | Restore a verified backup into target directory | `--to <dir>`<br>`--force`<br>`--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned` | - |
 | `amc backup verify` | Verify signed backup bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
-| `amc badge` | Generate maturity badge for README/docs (markdown, HTML, or URL) | `--agent <agentId>`<br>`--level <0-5>`<br>`--score <0-100>`<br>`--format <format>` | - |
+| `amc badge` | Print the agent's passport badge line, from what AMC recorded (no level or score override) | `--agent <agentId>` | - |
 | `amc bench` | Public benchmark registry + ecosystem comparative view | - | - |
 | `amc bench compare` | Compute local vs imported ecosystem comparison | `--scope <scope>`<br>`--id <id>`<br>`--against <mode>` | - |
 | `amc bench comparison-latest` | Read latest bench comparison artifact | - | - |

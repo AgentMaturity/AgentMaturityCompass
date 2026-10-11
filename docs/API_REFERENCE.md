@@ -148,7 +148,7 @@ AMC provides 1,236 public CLI command paths in the live command inventory.
 | 129 | `amc backup print` | Print backup manifest summary |
 | 130 | `amc backup restore` | Restore a verified backup into target directory |
 | 131 | `amc backup verify` | Verify signed backup bundle offline |
-| 132 | `amc badge` | Generate maturity badge for README/docs (markdown, HTML, or URL) |
+| 132 | `amc badge` | Print the agent's passport badge line, from what AMC recorded (no level or score override) |
 | 133 | `amc bench` | Public benchmark registry + ecosystem comparative view |
 | 134 | `amc bench compare` | Compute local vs imported ecosystem comparison |
 | 135 | `amc bench comparison-latest` | Read latest bench comparison artifact |
@@ -2095,15 +2095,12 @@ Verify signed backup bundle offline
 
 #### `amc badge`
 
-Generate maturity badge for README/docs (markdown, HTML, or URL)
+Print the agent's passport badge line, from what AMC recorded (no level or score override)
 
 
 | Option | Description |
 |--------|-------------|
 | `--agent <agentId>` | - |
-| `--level <0-5>` | - |
-| `--score <0-100>` | - |
-| `--format <format>` | - |
 
 #### `amc bench compare`
 

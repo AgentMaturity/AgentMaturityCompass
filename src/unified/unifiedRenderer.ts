@@ -126,7 +126,7 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
     lines.push(`  ${GREEN}3.${RESET} Re-run anytime with one command: ${WHITE}amc start${RESET}`);
   } else {
     lines.push(`  ${DIM}CI gate:${RESET}    ${WHITE}amc run --fail-below B${RESET}`);
-    lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge --style full${RESET}`);
+    lines.push(`  ${DIM}Badge:${RESET}      ${WHITE}amc badge${RESET}`);
     lines.push(`  ${DIM}Improve:${RESET}    ${WHITE}amc mechanic plan${RESET}`);
   }
   lines.push("");

@@ -1114,71 +1114,22 @@ export function registerLateStageCliCommands({
     });
 
   // ── Blocker #3: top-level `amc badge` command ──────────────────────────────────
+  // A badge shows only what AMC recorded for the agent: no flag sets its level or score (P0-28).
   program
     .command("badge")
-    .description("Generate maturity badge for README/docs (markdown, HTML, or URL)")
+    .description("Print the agent's passport badge line, from what AMC recorded (no level or score override)")
     .option("--agent <agentId>", "agent ID (default: 'default')")
-    .option("--level <0-5>", "override level (instead of reading from latest score)")
-    .option("--score <0-100>", "override score (instead of reading from latest score)")
-    .option("--format <format>", "output format: markdown | html | url | svg", "markdown")
-    .action(async (opts: { agent?: string; level?: string; score?: string; format?: string }) => {
-      const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+    .action((opts: { agent?: string }) => {
       const agentId = opts.agent ?? "default";
-      const format = (opts.format ?? "markdown").toLowerCase();
-
-      let level: number;
-      let score: number;
-
-      if (opts.level != null) {
-        level = Number(opts.level);
-        score = opts.score != null ? Number(opts.score) : level * 20;
-      } else if (opts.score != null) {
-        score = Number(opts.score);
-        level = scoreToLevel(score);
-      } else {
-        // Try reading from latest quickscore cache
-        try {
-          const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
-          console.log(out.badge);
-          printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
-          return;
-        } catch {
-          // No cached passport — inform user to specify level
-          console.error(chalk.yellow("No cached score found for agent '" + agentId + "'. Specify --level or --score."));
-          console.log(chalk.gray("\nExamples:"));
-          console.log(chalk.gray("  amc badge --level 3              # Generate L3 badge"));
-          console.log(chalk.gray("  amc badge --score 72.5           # Badge from score"));
-          console.log(chalk.gray("  amc quickscore && amc badge      # Score first, then badge"));
-          console.log(chalk.gray("  amc badge --format html --level 4 # HTML img tag"));
-          console.log(chalk.gray("  amc badge --format url --level 3  # Raw shields.io URL"));
-          console.log(chalk.gray("  amc badge --format svg --level 3  # Full SVG output"));
-          process.exitCode = 1;
-          return;
-        }
+      try {
+        const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
+        console.log(out.badge);
+        printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
+      } catch (error) {
+        console.error(chalk.yellow(`No badge for agent '${agentId}': ${toErrorMessage(error)}`));
+        console.error(chalk.gray("Record an assessment first (amc run), then run amc badge again."));
+        process.exitCode = 1;
       }
-
-      const badgeColor = level >= 4 ? "brightgreen" : level >= 3 ? "green" : level >= 2 ? "yellow" : "red";
-      const shieldsUrl = `https://img.shields.io/badge/AMC-L${level}_(${score.toFixed(1)})-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
-
-      switch (format) {
-        case "url":
-          console.log(shieldsUrl);
-          break;
-        case "html":
-          console.log(`<a href="https://github.com/AgentMaturity/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${level}" /></a>`);
-          break;
-        case "svg": {
-          const svg = generateBadgeSvg(score, level, agentId);
-          console.log(svg);
-          break;
-        }
-        case "markdown":
-        default:
-          console.log(`[![AMC L${level}](${shieldsUrl})](https://github.com/AgentMaturity/AgentMaturityCompass)`);
-          break;
-      }
-      // A level or score given on the command line is the caller's own statement. stderr keeps the badge pipeable.
-      printClaimResult(unverifiedClaim("badge", 1), { stderr: true });
     });
 
   /* ── Runtime Observability: watch, monitor, costs, guide, rate, integrations ── */

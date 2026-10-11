@@ -202,7 +202,7 @@ amc run --question-set lifecycle    # 244 default questions + 20 lifecycle quest
 
 ```bash
 amc quickscore --rapid    # lightweight pulse check, not the full score
-amc badge                 # README badge after a scored run
+amc badge                 # passport badge line from what AMC recorded
 ```
 
 For CI or other non-interactive runs, pass answer levels as JSON instead of relying on a TTY prompt:

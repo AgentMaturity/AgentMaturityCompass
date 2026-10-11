@@ -114,7 +114,7 @@ describe("claim-line producers without verified evidence", () => {
     ["audit binder create on an empty workspace", () => artifactClaim("audit:binder")],
     ["a passport", () => artifactClaim("passport")],
     ["a 1.x artifact", () => artifactClaim("bundle", { amcVersion: "1.1.1" })],
-    ["amc badge", () => unverifiedClaim("badge", 1)],
+    ["amc badge", () => unverifiedClaim("passport:badge", 1)],
     ["a regulated self-reported pass with records (D-03)", () => unverifiedClaim("comms-check", 1, { regulated: true, result: "pass",
       applicability: { state: "applicable" } })],
     ["a control-surface scorer that found a file", () => controlSurfaceClaim("score:failSecure", { score: 40, level: 2 })]
