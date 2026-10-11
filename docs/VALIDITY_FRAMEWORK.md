@@ -1,6 +1,8 @@
 # AMC Validity Framework
-**Scientific Basis for the Agent Maturity Certification Assessment**
-*Version 1.0 | Generated 2026-02-19*
+**How the Agent Maturity Compass assessment would show validity, and what has been measured so far**
+*Version 1.0 | Generated 2026-02-19 | Revised 2026-10-11 (plan item P0-28)*
+
+> **Status (2026-10-11):** no validity study has been run for this version, and no figure below is a measured validity statistic. The case-study figures come from two example agents (ContentModerationBot and DataPipelineBot) assessed in test harnesses on the legacy Python platform, not from production systems or independent assessors. Rows that were never measured say "not measured". The planned studies are plan items P2-21 (inter-rater agreement) and P3-18 (predictive validity against real incidents).
 
 ---
 
@@ -8,7 +10,7 @@
 
 Validity in assessment science refers to whether a tool measures what it claims to measure. For AMC, the central claim is: **"AMC scores accurately reflect an AI agent system's operational maturity and predict real-world reliability outcomes."**
 
-This document presents the scientific validity framework for AMC across five dimensions of validity evidence, grounded in empirical case study data and established psychometric principles.
+This document sets out five kinds of validity evidence AMC would need, what the two case studies showed, and what has not been measured.
 
 ---
 
@@ -20,7 +22,7 @@ This document presents the scientific validity framework for AMC across five dim
 
 AMC defines **agent maturity** as: *the degree to which an AI agent system exhibits governed, secure, reliable, observable, evaluated, cost-efficient, and operationally sustainable behavior in production.*
 
-This construct is operationalized through 5 dimensions and 138 questions, each mapped to observable, executable evidence artifacts.
+This construct is operationalized through 5 dimensions and the default diagnostic question bank, each question mapped to observable, executable evidence artifacts.
 
 ### Empirical Evidence
 
@@ -34,7 +36,7 @@ This construct is operationalized through 5 dimensions and 138 questions, each m
 | Known Production Gaps at L1 | No governance, no audit trail, no injection detection, no cost tracking |
 | Actual Behavior at L1 | Ad-hoc keyword matching; no policy enforcement; silent failures |
 | Known Production Capabilities at L5 | Full governance audit, DLP, circuit breakers, structured logging, metering |
-| Actual Behavior at L5 | Edge case handling confirmed via W4 Safety TestKit; 100% policy enforcement rate |
+| Actual Behavior at L5 | Edge case handling exercised with the W4 Safety TestKit in a test harness; policy enforcement rate not measured |
 
 **Construct validity evidence:** CMB's low initial score (53) corresponded exactly to documented operational gaps. The high final score (96) corresponded to verified module functionality. The *score reflects the actual system state* — not a theoretical checklist.
 
@@ -52,20 +54,20 @@ This construct is operationalized through 5 dimensions and 138 questions, each m
 | Operating Model Score | 78/100 |
 | Known Production Gaps | No autonomous improvement loop; limited evaluation tooling |
 | Score Prediction | L4 = "Managed with known gaps" |
-| Actual System State | Confirmed: solid operational foundation, gaps in evaluation depth and self-correction |
+| Actual System State | Described by its authors as a solid operational foundation with gaps in evaluation depth and self-correction (not independently checked) |
 
 **Construct validity evidence:** DPB scored 80/100 — interpreted as "production-ready with known improvement areas." This accurately described the system: stable, monitored, but not yet running autonomous test-and-fix cycles. The score differentiated DPB from both L1 (chaotic) and L5 (self-optimizing) systems correctly.
 
 ### Convergent Validity
 
-AMC scores correlate with evidence from independent standards:
+Not measured. The authors' reading of how the case-study scores line up with independent standards:
 - CMB's L5 score aligns with meeting all NIST AI RMF MEASURE requirements
 - DPB's L4 score aligns with meeting ISO 42001 Clause 8–9 requirements but not all Clause 10 (improvement) requirements
 - Both assessments align with EU AI Act Art 9–14 readiness levels
 
 ### Discriminant Validity
 
-AMC **does not** correlate with:
+Not measured. By design, AMC is not meant to correlate with:
 - Raw model intelligence (a GPT-4o agent and a Llama-3 agent can both score L1 or L4)
 - System complexity (simple agents can be highly mature; complex agents can be ad-hoc)
 - Team size (a 2-person team with good practices scores higher than a 50-person team without them)
@@ -76,7 +78,9 @@ This is intentional: AMC measures *organizational and architectural maturity*, n
 
 ## 2. Content Validity
 
-**Definition:** Do the 138 questions comprehensively cover the content domain of agent maturity?
+**Definition:** Do the questions comprehensively cover the content domain of agent maturity?
+
+Not measured. This section describes how the legacy Python platform's 42-question bank (GOV-1 to OPS-6) was derived; the current default bank is different (see [QUESTION_BANK](QUESTION_BANK.md)), and its content validity has not been reviewed.
 
 ### Domain Derivation Methodology
 
@@ -185,7 +189,7 @@ These observations are consistent with the predictive model but are based on sim
   - Customer-reported agent failure rate
   - MTTD and MTTR for agent failures
 - **Analysis:** Pearson correlation between baseline AMC score and incident frequency; regression controlling for team size, industry, and agent complexity
-- **Timeline:** Study planned for launch Q3 2026 with first results Q1 2027
+- **Timeline:** not started; the predictive validity study is plan item P3-18
 
 **Statistical Power Calculation:**
 - Required sample: n=50 organizations to detect correlation of r≥0.4 with α=0.05, power=0.80
@@ -201,9 +205,9 @@ These observations are consistent with the predictive model but are based on sim
 
 Most maturity frameworks suffer from **assessor variability**: two different consultants assess the same organization and produce scores that differ by 15–30 points. This undermines the framework's credibility and creates gaming opportunities ("shop for a friendly assessor").
 
-### AMC's Solution: Execution-Proof Evidence
+### AMC's Approach: Execution-Proof Evidence
 
-AMC eliminates assessor subjectivity through a two-layer approach:
+AMC aims to reduce assessor subjectivity. The two layers below describe the legacy Python platform's harness. In the current release, keyword matches never count toward a level and self-reported input never yields more than L1 (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)).
 
 **Layer 1: Automated Evidence Collection**
 
@@ -241,10 +245,10 @@ The rubric is applied identically regardless of assessor. A human can't give 20 
 - Score at iteration 0 *re-run*: 53/100 (identical)
 - Evidence artifacts are deterministic: module output → score mapping is 1:1
 
-**Simulated inter-rater test:**
-Three independent executions of the AMC scoring harness on the same CMB codebase (frozen at iteration 10) produced identical scores: 68/100, 68/100, 68/100. Cohen's κ = 1.0 (perfect agreement).
+**Repeatability check (same harness, same input):**
+Three executions of the AMC scoring harness on the same CMB codebase (frozen at iteration 10) were reported to give the same score each time. No run record is kept. Repeating one harness on one input shows determinism, not agreement between assessors; inter-rater agreement is not measured (P2-21).
 
-**Limitation:** Organizational questions (GOV-1, OPS-5) still require human input. In these cases, the rubric reduces but does not eliminate inter-rater variance. Estimated remaining inter-rater variance for qualitative questions: ±5 points (vs. ±20–30 points in traditional frameworks).
+**Limitation:** Organizational questions (GOV-1, OPS-5) still require human input. In these cases, the rubric reduces but does not eliminate inter-rater variance. Inter-rater variance for these questions is not measured (P2-21).
 
 ### Anti-Gaming Properties
 
@@ -278,13 +282,13 @@ The clearest test of discriminant validity is whether AMC separates genuinely di
 
 ### AMC Scores Do NOT Correlate With:
 
-| Non-Target Construct | Expected Correlation | Reason |
-|---|---|---|
-| Model intelligence / benchmark performance | ~0.0 | AMC measures org controls, not model capability |
-| Team size | ~0.0 | Small teams with good process score higher than large teams without |
-| Age of agent system | ~0.0 | Legacy systems can be mature; new systems can be ad-hoc |
-| Number of features | ~0.0 | Feature count ≠ maturity; some feature-rich agents are ungoverned |
-| Monthly LLM spend | ~0.0 (unconditional) | Spend without controls scores low; spend with controls scores high |
+| Non-Target Construct | Expected Correlation (hypothesis) | Measured | Reason |
+|---|---|---|---|
+| Model intelligence / benchmark performance | ~0.0 | not measured | AMC measures org controls, not model capability |
+| Team size | ~0.0 | not measured | Small teams with good process score higher than large teams without |
+| Age of agent system | ~0.0 | not measured | Legacy systems can be mature; new systems can be ad-hoc |
+| Number of features | ~0.0 | not measured | Feature count ≠ maturity; some feature-rich agents are ungoverned |
+| Monthly LLM spend | ~0.0 (unconditional) | not measured | Spend without controls scores low; spend with controls scores high |
 
 ---
 
@@ -292,11 +296,11 @@ The clearest test of discriminant validity is whether AMC separates genuinely di
 
 | Validity Type | Evidence Status | Strength | Plan to Strengthen |
 |---|---|---|---|
-| **Construct** | Two case studies (CMB, DPB) | Moderate — simulated environments | Production deployments + independent replication |
-| **Content** | Expert derivation from CMMI + NIST + enterprise discovery | Strong — multi-source | External expert panel review (Q2 2026) |
-| **Predictive** | Theoretical model + simulation evidence | Weak — no longitudinal data yet | Longitudinal study launch Q3 2026 |
-| **Inter-Rater** | Execution-proof evidence + rubrics; deterministic in automated modules | Strong for automated questions | Extend automation to organizational questions |
-| **Discriminant** | Clear L1/L4 differentiation; independence from model quality confirmed | Moderate | Large-N study across diverse agents |
+| **Construct** | Two case studies (CMB, DPB) on example agents in test harnesses | Not measured | Production deployments + independent replication |
+| **Content** | Derivation of the legacy bank from CMMI + NIST + enterprise discovery | Not measured; no external review | External expert panel review (not scheduled) |
+| **Predictive** | Theoretical model + simulation evidence | Not measured; no longitudinal data | Predictive validity study (P3-18) |
+| **Inter-Rater** | Execution-proof evidence + rubrics; repeatability of one harness | Not measured | Inter-rater agreement study (P2-21) |
+| **Discriminant** | L1/L4 differentiation in the two case studies; independence from model quality not measured | Not measured | Large-N study across diverse agents |
 
 ---
 
@@ -318,17 +322,9 @@ The clearest test of discriminant validity is whether AMC separates genuinely di
 
 ## 8. Planned Validation Roadmap
 
-| Quarter | Milestone |
+The earlier quarterly roadmap (an expert panel review and a longitudinal study, both dated in the past) has no study record and was removed on 2026-10-11. The studies are now plan items:
+
+| Plan item | Milestone |
 |---|---|
-| Q2 2026 | External expert panel review of 126-question content validity |
-| Q3 2026 | Longitudinal study launch (n=70 organizations recruited) |
-| Q4 2026 | First inter-rater reliability study with independent assessors (n=5 pairs) |
-| Q1 2027 | 6-month longitudinal data; first predictive validity report |
-| Q2 2027 | Submission to peer review (ACM FACCT or similar venue) |
-| Q4 2027 | First ISO 17024 conformity assessment submission (certifier accreditation path) |
-
----
-
-*Files created: `/Users/sid/.openclaw/workspace/AMC_OS/DOCS/VALIDITY_FRAMEWORK.md`*
-*Acceptance checks: Verify CMB/DPB scores match PLATFORM reports; verify all 5 validity types covered with evidence and limitations.*
-*Next actions: Commission external expert panel; initiate longitudinal study recruitment protocol.*
+| P2-21 | Validity study 1: inter-rater agreement, with published assessor criteria |
+| P3-18 | Validity study 2: predictive validity against real incidents |
