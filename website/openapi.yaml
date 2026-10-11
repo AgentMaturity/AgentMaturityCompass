@@ -12902,7 +12902,11 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/value:
     get:
-      summary: "Value view: not evaluated until Activate's producer (P1-62)"
+      summary: "The current release's value claims (amc.a4-value-claim/v1, one per value-contract KPI, recorded once
+        per Activate Review) in four lanes never merged: recommended, implemented, observed (re-resolved now;
+        null while a ref dangles) and independently reviewed (not_evaluated without an admitted record naming
+        the KPI); the members' other objectives, the ROI worksheet (not evaluated) and the hypotheses predicted
+        vs observed vs verdict. Reads only: never runs the value report or appends a value event"
       tags:
         - Studio
         - A4 Forge
@@ -12972,7 +12976,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/monitor:
     get:
-      summary: "Monitor view: not evaluated until Activate's producer (P1-62)"
+      summary: "The current release's newest monitor record (Activate Review; lane implementation, self_reported):
+        one claim envelope per source, every field { value, source, trustTier, window }, a missing source
+        source_unavailable with value null; read only while its signed file resolves"
       tags:
         - Studio
         - A4 Forge
@@ -13871,9 +13877,10 @@ paths:
   /v1/a4/projects/{projectId}/releases/{releaseId}:
     get:
       summary: "One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status,
-        the eight-surface table with a reason for each surface not evaluated, the prepared deployment plan and
-        update policy with their signatures checked now, the receipts in two columns (recorded by the operator;
-        checked by AMC), the rollbacks and the lifecycle bridge outcomes"
+        the package's file list (when the manifest still hashes to the package digest), the eight-surface table
+        with a reason for each surface not evaluated, the prepared deployment plan and update policy with their
+        signatures checked now, the receipts in two columns (recorded by the operator; checked by AMC), the
+        rollbacks, the lifecycle bridge outcomes and the production bridge rows as they stand now"
       tags:
         - Studio
         - A4 Forge

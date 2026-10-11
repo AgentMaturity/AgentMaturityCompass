@@ -18,6 +18,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { apiError, apiSuccess, isRequestBodyError } from "../api/apiHelpers.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -32,11 +33,13 @@ import { A4BlobError, getPrivate } from "./a4Blobs.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
   acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGate, resumeProject, retireProject,
-  tuneProject, type A4Call
+  signedA4Floor, tuneProject, type A4Call
 } from "./a4Gates.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
-import { gateStatus, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { monitorView } from "./a4Monitor.js";
+import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
@@ -45,6 +48,7 @@ import {
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
+import { currentRelease } from "./spec/activate.js";
 
 export const A4_API_PREFIX = "/api/v1/a4";
 const BODY_LIMIT = 1024 * 1024;
@@ -630,12 +634,25 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
     apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
     return true;
   }
-  const unproduced = /^\/(value|monitor)$/.exec(rest)?.[1];
-  if (unproduced !== undefined) {
-    // The producers land with Activate (P1-62, value and monitor); until then nothing is evaluated.
+  if (rest === "/value") {
+    // Reads only: the value report ran once, at Review; GET never runs it and never appends a value event (C-30).
     assertQuery(params, []);
-    apiSuccess(route.res, { projectId, view: unproduced, status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
-      claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
+    let regulated = true;
+    try {
+      regulated = isRegulated(state, signedA4Floor(route.workspace));
+    } catch {
+      // An unverified approval policy reads regulated (fail closed).
+    }
+    apiSuccess(route.res, valueView(store, state, regulated, now));
+    return true;
+  }
+  if (rest === "/monitor") {
+    assertQuery(params, []);
+    const release = currentRelease(state.chain);
+    const view = monitorView(route.workspace, state, typeof release?.body.releaseId === "string" ? release.body.releaseId : null);
+    // The record's own aggregate when it resolves (one envelope per source, weakest member); otherwise nothing is evaluated.
+    const recorded = (view.monitor as { claim?: ClaimEnvelope } | null)?.claim;
+    apiSuccess(route.res, { projectId, view: "monitor", ...view, claim: recorded ?? unboundClaim(projectId, "monitor", false) });
     return true;
   }
   return false;
