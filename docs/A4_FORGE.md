@@ -114,6 +114,10 @@ and re-approve.
 An activated compiled plan whose identity binding requires a lease used to deny every native tool call from Studio
 tasks, which carry none. P1-67 has Studio mint a lease per native task runtime; Adapt (P1-61) models the remaining
 cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NATIVE_SESSION`) rather than hiding them.
+Every revision now binds `plan.journalEntrySha256` (the active compiled-plan journal's head; any activation, in A4 or
+from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock). A revision
+recorded before these slots existed binds them as null, so its open gates read `RESOURCE_DRIFTED` once: record a new
+revision.
 
 ## Assemble: building the agent
 
@@ -200,6 +204,52 @@ framework through a scaffold, connect instructions and a trace import.
   again from the same card. If the journal settled a resolution but its project record was refused, the item stays
   BLOCKED (`RESOLUTION_UNRECORDED`) and the card keeps "Record the resolution" for it. Decisions cast from the card on
   engine requests are mirrored to the human action log (`HUMAN_APPROVAL_DECISION`), as Studio's approvals page does.
+
+## Adapt: the compiled plan
+
+Adapt makes the agent specific to its audiences, markets, sector and data. This first slice is the plan: applicability,
+signing, activation and the conformance statement. Prompts, permissions, memory policy and the context probe follow.
+
+- **Ask and Understand.** Adapt asks for audiences, workflows, preferences, languages, accessibility, the compiler's
+  nine facts (jurisdictions, primary station, domains, roles, entity types, risk class, use cases, data classes; the
+  stations are carried), excluded uses, data residency, retention and processors, and deployment needs. Understand
+  carries `markets` and `stations` from Aspire. An empty or `unknown` fact stays unknown (null) and is never guessed;
+  `jurisdictions` left empty uses the carried markets. Every fact is the member's assertion (`provenance: asserted`,
+  source `a4:<projectId>@r<revision>`). Understand compiles the plan with `compilePlan` on that profile and records the
+  applicability per requirement with its reasons and missing facts, each citation's `appliesWhen`, the register entries
+  of the stations with `verified` as recorded, the reporting-clock candidates (each `NEEDS_CLASSIFICATION`, with
+  `CLOCK_REVIEW_STATUS`), the signed configs' states and the active plan's head. The missing facts name the questions
+  that resolve them.
+- **Explain** quotes the catalog's own notice, never a sentence of Adapt's: "Every record here is `experimental`: it
+  was drafted by an agent, its citations are not yet fetched, hashed or legally reviewed, and no named expert has
+  approved it." (D-08). It renders applicability, missing facts, the required reviews of the completion rule (a role's
+  approval is an acknowledgement, not an expert review), activation and the lockout, and what is declared but not
+  enforced (data handling: P2-01, P2-02; reporting clocks: P3-23).
+- **Propose** freezes the profile, the plan, the diff against this project's previous proposal, the operating scope
+  and the declared data handling (`enforcement: none`). **Build** signs the plan (`CONTROL_PLAN`, checked against this
+  workspace's keys: a local audit trail). A plan weaker than the plan this project put in force is refused
+  (`POLICY_WIDENING_REFUSED`). **Review** evaluates every requirement with `evaluateControl` (no loader binds runtime
+  rows to catalog evidence contracts yet, so each reads `not_evaluated`), writes the set signed (`CONTROL_RESULT`) under
+  `a4-projects/<projectId>/control-results/` and reads it back verified. A set that does not verify locally, such as a
+  notary-route signature, is `not_evaluated`. Review records no observed ref (`CONTEXT_PROBE_NOT_RUN`).
+- **Conformance statement** (`amc.a4-conformance-statement/v1`): five dimensions per control and counts, never a
+  percentage. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
+  `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays
+  unresolved in the counts with `OWNER_OUT_OF_SCOPE` and `OWNER_ACKNOWLEDGED` (a true exception is P2-24).
+- **Completion.** A regulated project activates its plan at completion through the effect `a4.adapt.activate_plan`.
+  Once the completion gate has its quorum, an owner opens it: `signPlan` files the plan review (`SECURITY`, two distinct
+  people when regulated) and approvers decide it from the A4 card. `complete` verifies that grant and re-checks
+  separation of duties and membership; `activateControlPlan` then consumes it itself (`activate-<digest32>`, recorded on
+  `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the effect gate. Only a ready plan activates
+  (`plan_activated` is BLOCKED with `PLAN_BLOCKED` otherwise). A non-regulated project completes with the plan signed
+  and not activated (`PLAN_SIGNED_NOT_ACTIVATED`); an owner may still open the effect, which makes the workspace
+  regulated. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
+  (P1-67); tasks started before it, CLI agent sessions and delegated children are denied every call.
+- **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
+  `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`
+  only from a `review_record` entry met by an admitted external record (an AUDITOR role vote alone leaves it
+  `not_evaluated` with `REVIEW_NOT_INDEPENDENT`), `deployment_plan_approved` from the consumed Activate direction gate.
+  Adapt never advances the lifecycle; the A4 lifecycle wrapper (P1-62) does.
 
 ## Deployment boundary
 
