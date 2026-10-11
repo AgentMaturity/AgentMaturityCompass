@@ -12887,8 +12887,10 @@ paths:
   /v1/a4/projects/{projectId}/conformance:
     get:
       summary: "The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's
-        signed control results, with the owner's out-of-scope settlements read now; every other stage carries no
-        plan and says not_evaluated"
+        signed control results, checked again now (a results file edited, deleted or no longer verifying reads
+        not_evaluated with its reason), with the owner's out-of-scope settlements and the sources
+        acknowledgement recorded on that Adapt revision; every other stage carries no plan and says
+        not_evaluated"
       tags:
         - Studio
         - A4 Forge
@@ -14133,10 +14135,11 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/adapt/probe:
     post:
-      summary: "Adapt context probe, after Build (builder or owner, owner mode): one in-process turn on the stub
-        provider with the A4 context plugin; the session's EFFECTIVE_POLICY row becomes a ledger_event ref
-        (observed when the row earns it) beside whether the plugin's exact text is in the session's signed
-        snapshot; delivery to a model and to native tasks is not evaluated"
+      summary: "Adapt context probe, after Build (owner, owner mode): one in-process turn on the stub provider with
+        the A4 context plugin, into which A4 writes nothing; the session's session/open row becomes a
+        self_reported ledger_event ref (A4 ran the turn: never observed) beside whether the plugin's exact text
+        is in the session's signed user/message row; the turn makes no tool call, so the runtime writes no
+        effective-policy receipt; delivery to a model and to native tasks is not evaluated"
       tags:
         - Studio
         - A4 Forge
@@ -15370,8 +15373,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
-      summary: "Build (step built): the stage's producer (aspire and assemble: owner, owner mode; assemble's native
-        build session starts after the step is recorded and the response names it), or a self_reported
+      summary: "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's
+        native build session starts after the step is recorded and the response names it), or a self_reported
         human-authored implementation ref while it has none"
       tags:
         - Studio
@@ -15476,8 +15479,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/review:
     post:
-      summary: "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an
-        observed ref"
+      summary: "Review (step reviewed): the stage's producer checks (adapt: owner, owner mode, since it signs the
+        control results), or human findings; not_evaluated without an observed ref"
       tags:
         - Studio
         - A4 Forge

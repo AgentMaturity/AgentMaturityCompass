@@ -50,7 +50,7 @@ synthetic refs are exported labelled, never stripped.
 | --- | --- | --- | --- |
 | Aspire | the brief, hypotheses and quality targets as people stated them | a hypothesis leaves `proposed` only through a runtime-written row inside its window | not available until P2-24 or P3-21 |
 | Assemble | the architecture and build outputs | runtime rows of native builds | not available |
-| Adapt | prompts, permissions, memory policy and the compiled applicability, every regulatory record marked `experimental` (D-08) | runtime rows only | not available |
+| Adapt | prompts, permissions, memory policy and the compiled applicability, every regulatory record marked `experimental` (D-08) | none: the context probe is a turn A4 runs, so its ref is `self_reported` | not available |
 | Activate | the package, the deployment plans and the operator's deployment receipts | AMC's own check of a destination is `self_reported`, kept apart from the operator's statement | not available |
 
 AMC's own integrity checks (signatures, the chain, side rows) are a separate integrity section. They describe bytes,
@@ -242,12 +242,24 @@ the agent's prompt pack.
   the agent's Enforce manifest. Before it writes, the agent's resources must match its signed Enforce manifest (else
   `409 ENFORCE_DRIFTED`: review the drift in Enforce and re-baseline it there), and it re-writes the manifest only when
   its own writes moved nothing but the agent's memory directory. A plan weaker than the plan this project put in force
-  is refused (`POLICY_WIDENING_REFUSED`). **Review** refuses with `409 RESOURCE_DRIFTED` when the memory policy, the
-  context plugin or the agent's Enforce resources moved since Build, then evaluates every requirement with `evaluateControl` (no loader binds runtime
-  rows to catalog evidence contracts yet, so each reads `not_evaluated`), writes the set signed (`CONTROL_RESULT`) under
-  `a4-projects/<projectId>/control-results/` and reads it back verified. A set that does not verify locally, such as a
-  notary-route signature, is `not_evaluated`. Review's own revision carries no observed ref; the probe's ref sits on the
-  revision it was recorded on.
+  is refused (`POLICY_WIDENING_REFUSED`). Every refusal comes before Build writes, including the router's own size
+  (256 KiB) and credential checks of the record Build makes (`413 INPUT_TOO_LARGE`; Propose already refuses a proposal
+  that leaves Build no room). When a write fails, or the step is not recorded after Build returned (the head moved, the
+  transition was refused, a replay answered), the memory policy, the context plugin and the Enforce manifest and its
+  signature are put back as they were, so no change stays behind that no revision records. **Review** is an owner's too
+  (owner mode): it signs the control results with the workspace auditor key. It refuses with `409 RESOURCE_DRIFTED` when
+  the memory policy, the context plugin or the agent's Enforce resources moved since Build, then evaluates every
+  requirement with `evaluateControl` (no loader binds runtime rows to catalog evidence contracts yet, so each reads
+  `not_evaluated`; a requirement whose control the shipped catalog no longer holds stays listed, `not_evaluated` with
+  `CONTROL_NOT_IN_SHIPPED_CATALOG`), writes the set signed (`CONTROL_RESULT`) under
+  `a4-projects/<projectId>/control-results/` (each directory made plain, never through a link) and reads it back. Only
+  two read-back outcomes are local limits, recorded `not_evaluated`: a notary-route signature (the pinned notary's key,
+  which does not verify under this workspace's keys) and a workspace key the operator's trust list does not pin
+  (`ISSUER_NOT_PINNED`). Anything else (missing, changed, unsigned, a signature that does not verify, a distrusted or
+  revoked signer, bytes or a shape that do not parse) is an integrity failure: `adapt.control_results_signature` reads
+  BLOCKED (`CONTROL_RESULTS_INTEGRITY_FAILED`) and holds the gates. Readiness and the conformance view check the file
+  again on every read, so a results file edited or deleted after Review reads the same way. Nothing in Adapt is an
+  observed ref.
 - **Context plugin.** Build writes the members' audience, market, sector, language, accessibility, data-handling and
   regulatory-note answers as one attributed context plugin (`# A4 context: <section>`, source
   `a4:<projectId>@r<revision>`, order 160, the catalog's notice quoted) to `<agent>/a4/context-plugin.json`. The only
@@ -255,20 +267,21 @@ the agent's prompt pack.
   native task loads only the instructions file and the time plugin, and nothing loads the plugin into a deployed agent:
   `context.native_delivery` stays `not_evaluated` (P2-37), and a native task started after Adapt shows no A4 context
   plugin in its frame.
-- **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; builder or owner; owner mode) runs
-  one in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. The
-  session writer records the session's effective-policy receipt before the turn, and the probe checks that the run's
-  signed `user/message` row carries the plugin's exact text and reads the turn's signed `turn/end` reason. The receipt
-  row becomes a `ledger_event` ref, observed when the row earns it: it shows that the policy reached the runtime (the
-  receipt has no context-plugin field). The frame is shown by the `user/message` row, which carries no agent id and so
-  is not an A4 ref of its own: the probe checks it, Review checks it again, and `context_reaches_runtime_frame` names it
-  (`SNAPSHOT:<row>`) as AMC's check, in the implementation section ("observed in-process, not in a Studio native
-  session"). A turn that did not end `complete` (blocked, error, cancelled, max steps: `PROBE_DENIED`), a row without
-  the text (`CONTEXT_NOT_IN_FRAME`), or a row Review finds gone or changed never satisfies it. Whoever runs the probe
-  counts as a builder of the revision, so they cannot approve the completion gate or the activation. Delivery
-  to a model (`model_delivery`) is `not_evaluated` on the stub provider. The item is mandatory once Adapt is built, so a
-  regulated project's plan is activated only after the probe. A workspace whose session store is JSONL has no ledger row
-  for the ref, and the probe is refused (`PROBE_NOT_RECORDED`).
+- **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; owner; owner mode) runs one
+  in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. A4
+  composes the turn and writes nothing into its session: no tools and no receipt of its own. The runtime writes an
+  effective-policy receipt only before a governed tool call, and this turn makes none, so there is no receipt to cite.
+  The probe checks that the run's signed `user/message` row carries the plugin's exact text and reads the turn's signed
+  `turn/end` reason, and records the session's own signed `session/open` row (which names the agent) as a `ledger_event`
+  ref, `self_reported`: A4 ran the turn, so it is never observed. `context_reaches_runtime_frame` stands on AMC's check
+  of the `user/message` row (named `SNAPSHOT:<row>`), made by the probe and again by Review, in the implementation
+  section ("observed in-process, not in a Studio native session"). A turn that did not end `complete` (blocked, error,
+  cancelled, max steps: `PROBE_DENIED`), a row without the text (`CONTEXT_NOT_IN_FRAME`), a session row that no longer
+  resolves (`PROBE_REF_UNRESOLVED`), or a row Review finds gone or changed never satisfies it. Whoever runs the probe
+  counts as a builder of the revision, so they cannot approve the completion gate or the activation. Delivery to a model
+  (`model_delivery`) is `not_evaluated` on the stub provider. The item is mandatory once Adapt is built, so a regulated
+  project's plan is activated only after the probe. A workspace whose session store is JSONL has no ledger row for the
+  ref, and the probe is refused (`PROBE_NOT_RECORDED`).
 - **Memory policy.** Four optional questions (privacy class, retention days, review days, consumers) build
   `amc.a4-memory-policy/v1` with `ReasoningMemoryItem`'s field names. An empty answer takes the stated default
   (restricted, 90 days, 30 days, every consumer), labelled `default`. Build writes it to `<agent>/memory/policy.json`,
@@ -276,8 +289,8 @@ the agent's prompt pack.
   bytes Build wrote, and other bytes, even ones that parse, read BLOCKED (`MEMORY_POLICY_CHANGED`). Enforcement is
   `advisory`: the reasoning-memory writer does not read the file yet.
 - **Permissions.** Understand builds the primary station's operating profile in memory (deterministic bytes) and
-  compares it with the current verified configs through `planActivation`, the comparison `activateOperatingProfile`
-  runs. It writes no file and signs nothing: the auditor signature that makes a profile activatable stays the owner's
+  compares it with the current verified configs through `planActivationWidenings`, a read-only view of the comparison
+  `activateOperatingProfile` runs (no write closure leaves that module). It writes no file and signs nothing: the auditor signature that makes a profile activatable stays the owner's
   `amc domain apply --sign-profile` on a profile they emitted and reviewed. `profile_no_widening` lists each widening as
   `scope_changed` (`POLICY_WIDENING_REFUSED`) until a project owner's revision answers `acceptWidenings` with exactly
   their digest. A4 never passes `allowWidening` and never activates a profile: activation stays the owner's
@@ -289,8 +302,11 @@ the agent's prompt pack.
   Score resource; the runtime does not load it into a model's prompt, and Adapt does not build one.
 - **Conformance statement** (`amc.a4-conformance-statement/v1`): five dimensions per control and counts, never a
   percentage. `GET /api/v1/a4/projects/:id/conformance?stage=` and the `amc_a4_conformance` MCP tool return it: Adapt's
-  from the results its newest Review recorded, with owner settlements read now; every other stage, and Adapt before its
-  Review, carries no plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
+  from the results its newest Review recorded, with the results file checked again (one that no longer verifies reads
+  `not_evaluated` with its reason), and with the owner's out-of-scope settlement and the sources acknowledgement recorded
+  on that Adapt revision; once its completion gate is consumed, the acknowledgement in force then stays on the statement
+  after it expires and after Activate records new revisions. Every other stage, and Adapt before its Review, carries no
+  plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
   `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays
   unresolved in the counts with `OWNER_OUT_OF_SCOPE` and `OWNER_ACKNOWLEDGED` (a true exception is P2-24).
 - **Completion.** A regulated project activates its plan at completion through the effect `a4.adapt.activate_plan`

@@ -117,7 +117,8 @@ function renderConformance(ctx) {
     `<code>${esc(control.dimensions?.evidence)}</code>`, `<code>${esc(control.dimensions?.result)}</code>`, `<code>${esc(control.dimensions?.enforcement?.state)}</code>`,
     `<code>${esc(control.dimensions?.review)}</code>`, `<code>${esc(control.claimKind)}</code>`, esc(control.notEvaluatedReason ?? "")]);
   return `<p class="muted">Counts: ${Object.entries(isObject(conformance.counts) ? conformance.counts : {}).map(([key, value]) => `${esc(key)} <code>${esc(value)}</code>`).join(" · ")}.
-    Signed results <code>${esc(conformance.resultsPath)}</code> (${conformance.verified ? "verified under this workspace's keys" : "not verified locally"}).</p>
+    Signed results <code>${esc(conformance.resultsPath)}</code> (at Review: ${conformance.status === "verified" ? "verified under this workspace's keys"
+      : conformance.status === "not_evaluated" ? "not verified locally" : "integrity failure"}; checked again now: see the integrity item below).</p>
     ${table(["Control", "Applicability", "Evidence", "Result", "Enforcement", "Review", "Claim", "Not evaluated because"], rows, "No control.")}
     ${settled ? `<p class="muted">Owner out of scope (still unresolved): ${codes(coded(itemOf(ctx, "plan_unresolved"), "UNRESOLVED").map(([id]) => id))} by
       <code>${esc(settled.by)}</code>: ${esc(settled.reason)}</p>` : ""}
@@ -133,7 +134,8 @@ function renderContext(ctx) {
   const probeOffer = ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step) ? ctx.allowed.build : view.held("The probe runs after Build");
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
       context plugin (order 160). Only an in-process run loads it: a Studio native task started now shows no A4 context plugin in its frame, and a deployed
-      agent does not load it either (P2-37). The probe runs one turn on the stub provider and records that session's effective-policy receipt.</p>
+      agent does not load it either (P2-37). The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
+      plugin's text. A4 ran the turn, so the probe is self-reported, never observed, and the runtime writes no effective-policy receipt for a turn with no tool call.</p>
     ${isObject(context) ? `<p class="muted">Plugin <code>${esc(context.name)}</code> · sha256 <code>${esc(context.sha256)}</code> · source <code>${esc(context.source)}</code>
       · file <code>${esc(context.path)}</code></p>` : "<p class=\"muted\">No context plugin built yet.</p>"}
     <div class="row wrap">${view.actionButton("Run the context probe", "probe", isObject(context) ? probeOffer : view.held("Build writes the context plugin first"))}</div>
