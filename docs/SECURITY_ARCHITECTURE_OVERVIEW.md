@@ -100,6 +100,12 @@ Evidence decay ensures that AMC scores reflect current agent behavior, not histo
 
 ---
 
+## Residency routing and storage admission (P2-01, partial source)
+
+`src/residency/checkEgress.ts` checks outbound routes and session storage against the operator-signed destination registry and the profile pinned by the active compiled plan. Both checks are opt-in: they apply only to a workspace with an active compiled plan or a destination registry. A workspace with neither returns `no_rule`, which is not a residency assessment. A present but invalid registry, an active plan that does not verify, or an unregistered or disallowed destination refuses with a typed `EgressBlocked` decision.
+
+The control checkpoint root must sit outside the workspace. When the workspace contains it, as when the workspace is the home directory, no plan can be activated there. A workspace with no `.amc/control-plan/` and no registry is then not opted in. One with either is refused as `control_checkpoint_root_in_workspace`, and the message names the root and `AMC_CONTROL_CHECKPOINT_DIR`. This configuration error is never reported as an unverifiable plan. Route decisions record operator declarations; they are not legal approval or proof of physical location. See [OPS_HARDENING.md](OPS_HARDENING.md#residency-routing-p2-01-source-slice).
+
 ## Protected native model requests (P2-02, partial source)
 
 The native `LlmRuntime.prepare` boundary reuses the existing committed request assembly and capability assertion. Experimental detectors reuse the DLP patterns and their Luhn/IBAN checks, then identify candidate `phi`, `pii`, `card_number`, `bank_account` and `credential` classes in supported request text. Detected classes require a verified operator processor and purpose declaration before encoding or request-header creation. A permitted request keeps its original content, encoder and digest, preserving historical reconstruction. Supported requests without detections keep the existing flow. Unsupported or excessive traversal refuses preparation with a sanitized error; this is not proof that uninspected content is safe.
