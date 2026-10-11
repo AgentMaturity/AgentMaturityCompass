@@ -53,7 +53,7 @@ const signatureRowSchema = z.strictObject({
 type SignatureRow = z.infer<typeof signatureRowSchema>;
 const rowOrder = (a: SignatureRow, b: SignatureRow) => ROLE_ORDER.indexOf(a.by) - ROLE_ORDER.indexOf(b.by) || a.keyId.localeCompare(b.keyId);
 
-const signedKeyRotationStatementSchema = z.strictObject({
+export const signedKeyRotationStatementSchema = z.strictObject({
   statement: keyRotationStatementSchema,
   signatures: z.array(signatureRowSchema).min(1).max(64).refine(
     rows => rows.every((row, index) => index === 0 || rowOrder(rows[index - 1]!, row) < 0),

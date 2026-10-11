@@ -1,6 +1,10 @@
 {
   "type": "amc.scoped-attestation",
   "version": 1,
+  "tenantId": "tenant-a",
+  "workspaceId": "ws-payments",
+  "subjectId": "agent-payments",
+  "sequence": 1,
   "snapshotDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "deployment": {
     "deploymentId": "payments-prod",

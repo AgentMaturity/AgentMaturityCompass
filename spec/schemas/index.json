@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
       "name": "a4-readiness.schema.json",
-      "sha256": "f4ce96bbd89cdd690d4ec3aaa7b6f35e2463418284e5e5b8d0e56ec110092616"
+      "sha256": "9660fd66a6a79f1e39d3e89f9365cb4916497136d8e94efe82f200786e297d1e"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
@@ -173,7 +173,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
       "name": "scoped-attestation.schema.json",
-      "sha256": "dcfbf0beade62578c1fe69e83d5ad241e443bcaed1513c43196d6bed2c6da5df"
+      "sha256": "b56f8e01f07549336234d9eebdae45ceabd6a10d4ced2d70086a4bb64d4f800e"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",
@@ -188,7 +188,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
       "name": "verifier-report.schema.json",
-      "sha256": "2078d2ca3175b36aabe92b1fb5163c4fb1c7b0b39ceb0aa4f57fad9a6b972927"
+      "sha256": "6940bf882d2b0d1e8668eaf85f12a9c5e8d4d423cdb058a26304cca040e21134"
     }
   ],
   "version": 1

@@ -67,6 +67,8 @@ const signedSchema = z.strictObject({
     "signatures sorted by role then key id, one per key and role")
 });
 export type RootRotationStatement = z.infer<typeof statementSchema>;
+/** The signed statement's schema, for parity checks against independent verifiers (P1-06). */
+export { signedSchema as signedRootRotationSchema };
 type SignedRootRotation = z.infer<typeof signedSchema>;
 
 const bytesToSign = (statement: RootRotationStatement) => Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);

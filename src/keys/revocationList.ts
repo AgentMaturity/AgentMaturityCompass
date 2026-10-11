@@ -39,7 +39,7 @@ export const revocationListSchema = z.strictObject({
   })).max(1_000_000)
 }).refine(list => new Set(list.revoked.map(row => `${row.kind}:${row.id}`)).size === list.revoked.length, "one row per revoked id");
 
-const signedRevocationListSchema = z.strictObject({
+export const signedRevocationListSchema = z.strictObject({
   list: revocationListSchema,
   signature: z.strictObject({
     keyId: hexSchema,
