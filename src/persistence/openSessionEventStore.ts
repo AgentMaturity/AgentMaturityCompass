@@ -107,9 +107,6 @@ export function openSessionEventStore(
     : new SqliteSessionEventStore(workspace, options);
 }
 
-/** The typed reason a caller that needs a second session writer refuses with on JSONL (P0-58). */
-export const SESSION_STORE_SINGLE_WRITER = "SESSION_STORE_SINGLE_WRITER";
-
 /**
  * JSONL declares `concurrentWriters: false` and its writer lock refuses a second
  * writer, even in the same process. A caller that would open a second writer
@@ -117,7 +114,8 @@ export const SESSION_STORE_SINGLE_WRITER = "SESSION_STORE_SINGLE_WRITER";
  * before opening anything, rather than failing midway on the lock.
  */
 export class SessionStoreSingleWriterError extends Error {
-  readonly code = SESSION_STORE_SINGLE_WRITER;
+  /** The typed reason (P0-58). */
+  readonly code = "SESSION_STORE_SINGLE_WRITER";
   constructor(needs: string) {
     super(`${needs} needs a second session writer, but this workspace's session store is JSONL, which admits one session writer `
       + "per workspace. Nothing was opened. Use a workspace on the default SQLite session store for this.");
