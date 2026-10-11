@@ -346,6 +346,13 @@
       "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da"
     },
     {
+      "path": "src/ops/retention/retentionArchive.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/ops/retention/retentionArchive.ts.landed",
+      "sha256": "5b0f86069ea1a4efe7f0810274ee9701c91f1a4d664da490caf82d308a423445"
+    },
+    {
       "path": "src/org/orgRun.ts",
       "issue": "P0-37",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
