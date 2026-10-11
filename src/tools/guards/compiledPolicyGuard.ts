@@ -29,7 +29,9 @@ function named(policy: ActiveCompiledPolicy, controlIds: readonly string[]): str
 /** `identity-binding`: the lease and the principal come from the authorization record bound for this call. */
 function identityDenial(params: Readonly<Record<string, ParamValue>>, execution: ToolExecution): string | null {
   const record = execution.authorization?.record;
-  if (params.requireAgentLease === true && !record?.delegation.leaseId) return "IDENTITY_UNRESOLVED: the call carries no verified agent lease";
+  if (params.requireAgentLease === true && !record?.delegation.leaseId) {
+    return "IDENTITY_UNRESOLVED: the call carries no verified agent lease, or its lease names a principal that does not resolve";
+  }
   if (params.requirePrincipal === true && (!record || record.principal.authenticatedVia === "cli-os-user")) {
     return "PRINCIPAL_UNRESOLVED: no authenticated principal is bound to the call (an OS user name is self-reported)";
   }

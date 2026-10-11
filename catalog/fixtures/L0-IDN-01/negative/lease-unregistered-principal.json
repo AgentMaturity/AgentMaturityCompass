@@ -94,10 +94,10 @@
     "args": {
       "path": "workspace/n.txt"
     },
-    "lease": "unregistered_service"
+    "lease": "unregistered_principal"
   },
   "expected": {
     "result": "deny",
-    "reasonCode": "PRINCIPAL_UNRESOLVED"
+    "reasonCode": "IDENTITY_UNRESOLVED"
   }
 }

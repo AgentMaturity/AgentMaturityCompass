@@ -81,8 +81,10 @@ describe("L0-IDN-02 short-lived scoped credentials (lease check at the authoriza
       const ws = newWorkspace();
       const signer = s.lease.state === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
       // Signed by this workspace's own lease key, naming another workspace: only the workspace check refuses it (P1-78).
+      if (s.lease.state === "names_unregistered_principal") initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
       const token = issue(signer, s.lease.agentId, s.lease.scopes, s.lease.state === "expired" ? "60s" : "1h",
-        s.lease.state === "names_other_workspace" ? "other-workspace" : undefined);
+        s.lease.state === "names_other_workspace" ? "other-workspace" : undefined,
+        s.lease.state === "names_unregistered_principal" ? { userId: "user-not-in-users-yaml" } : undefined);
       if (s.lease.state === "revoked") revokeLease(ws, leaseIdOf(token), "layer0 fixture");
       if (s.lease.state === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });
@@ -149,15 +151,19 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
  * token's own identity is never a principal, so a lease naming none, or naming an unregistered service, is refused.
  */
 type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>;
-  lease: "valid" | "none" | "expired" | "signed_by_other_workspace" | "valid_without_principal" | "registered_service" | "unregistered_service" };
+  lease: "valid" | "none" | "expired" | "signed_by_other_workspace" | "valid_without_principal" | "registered_service" | "unregistered_principal" };
 
-/** The principal the fixture's lease names. "valid" leases name a Studio user, as a native task's lease does. */
-function leasePrincipal(ws: string, state: IdentitySetup["lease"]): LeasePayload["principal"] {
-  if (state === "none" || state === "valid_without_principal") return undefined;
-  if (state !== "registered_service" && state !== "unregistered_service") return taskLeasePrincipal("session:LOCAL_USER:layer0-owner");
-  initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+/**
+ * The user the fixture's lease names, and the record principal the bind must resolve from the signed users.yaml. "valid"
+ * names the owner, as a native task's lease names its Studio user; "registered_service" an AGENT-only user.
+ */
+function leasePrincipal(ws: string, state: IdentitySetup["lease"]): { named: LeasePayload["principal"]; expected?: Record<string, string> } {
+  if (state === "none" || state === "valid_without_principal") return { named: undefined };
+  const { owner } = initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
   const service = addUser({ workspace: ws, username: "layer0-scheduler", roles: ["AGENT"], password: "layer0-fixture-password" });
-  return { principalId: state === "registered_service" ? service.userId : "svc-not-in-users-yaml", kind: "service" };
+  if (state === "unregistered_principal") return { named: { userId: "user-not-in-users-yaml" } };
+  const [user, kind] = state === "registered_service" ? [service, "service"] : [owner, "human"];
+  return { named: taskLeasePrincipal(`session:LOCAL_USER:${user.userId}`), expected: { principalId: user.userId, kind, authenticatedVia: "lease" } };
 }
 
 /** The authorization records among the rows a call recorded. */
@@ -179,11 +185,10 @@ function activate(ws: string, profile: unknown): void {
 }
 
 describe("L0-IDN-01 unique agent identity under an active compiled plan (compiled-policy identity-binding)", () => {
-  it("a native task's lease names the Studio user it belongs to; the admin token names nobody (P1-78)", () => {
-    expect(taskLeasePrincipal("session:LOCAL_USER:u-1")).toEqual({ principalId: "LOCAL_USER:u-1", kind: "human" });
-    expect(taskLeasePrincipal("session:WORKSPACE_ROUTER:u-2")).toEqual({ principalId: "WORKSPACE_ROUTER:u-2", kind: "human" });
+  it("a native task's lease names its users.yaml user; a host-router session and the admin token name nobody (P1-78)", () => {
+    expect(taskLeasePrincipal("session:LOCAL_USER:u-1")).toEqual({ userId: "u-1" });
+    expect(taskLeasePrincipal("session:WORKSPACE_ROUTER:u-1"), "not a user of the signed users.yaml").toBeUndefined();
     expect(taskLeasePrincipal("bootstrap-admin")).toBeUndefined();
-    expect(taskLeasePrincipal("session:OTHER:u-3")).toBeUndefined();
   });
 
   const fixtures = fixturesFor("compiled_identity", "L0-IDN-01");
@@ -201,7 +206,7 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
       expect(loadActiveCompiledPolicy(ws)?.controls.some((c) => c.controlId === "L0-IDN-01")).toBe(true);
       const signer = s.lease === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
       const principal = leasePrincipal(ws, s.lease);
-      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h", undefined, principal);
+      const token = s.lease === "none" ? undefined : issue(signer, "default", ["toolhub:execute"], s.lease === "expired" ? "60s" : "1h", undefined, principal.named);
       if (s.lease === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });
         vi.setSystemTime(Date.now() + 2 * 3_600_000);
@@ -228,7 +233,7 @@ describe("L0-IDN-01 unique agent identity under an active compiled plan (compile
         expect(records.length, "the call was bound to an authorization record").toBeGreaterThan(0);
         for (const record of records) {
           expect(record.scope).toMatchObject({ tenantId: "tenant-a", deploymentId: "dep-a" });
-          expect(record.principal, "the principal the lease names, never the lease itself").toEqual({ ...principal, authenticatedVia: "lease" });
+          expect(record.principal, "resolved from the signed users.yaml, never the lease itself").toEqual(principal.expected);
         }
         return;
       }

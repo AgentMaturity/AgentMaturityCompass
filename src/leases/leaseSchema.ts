@@ -38,12 +38,9 @@ export const leasePayloadSchema = z.object({
   maxRequestsPerMinute: z.number().int().positive(),
   maxCostUsdPerDay: z.number().positive().nullable(),
   nonce: z.string().min(8),
-  // The accountable principal the issuer names (P1-78): a human, or a service registered in the signed users.yaml. The
-  // lease token's own identity is never a principal. Absent on leases issued before P1-78 and by the CLI.
-  principal: z.strictObject({
-    principalId: z.string().min(1).refine((id) => !id.startsWith("lease:"), "a lease cannot name itself as its principal"),
-    kind: z.enum(["human", "service"])
-  }).optional()
+  // The users.yaml user the lease is issued for (P1-78). Only a pointer: the bind resolves it against the signed users.yaml
+  // and refuses one that is not an active user there. Absent on leases issued before P1-78 and by the CLI.
+  principal: z.strictObject({ userId: z.string().min(1) }).optional()
 });
 
 export type LeaseScope = z.infer<typeof leaseScopeSchema>;

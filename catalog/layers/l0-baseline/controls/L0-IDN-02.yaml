@@ -50,9 +50,11 @@ tests:
         - L0-IDN-02/negative/other-workspace-id-lease.json
         - L0-IDN-02/negative/out-of-scope-lease.json
         - L0-IDN-02/negative/revoked-lease.json
+        - L0-IDN-02/negative/unregistered-principal-lease.json
     passCriteria: >-
       A valid lease is allowed; expired, revoked, out-of-scope, foreign-signed and other-workspace
-      leases are refused at the authorization stage with a denied receipt and no tool body run.
+      leases, and a lease naming a user who is not active in the signed users.yaml, are refused at the
+      authorization stage with a denied receipt and no tool body run.
     attempts: 1
 evidence:
   - id: L0-IDN-02-E1

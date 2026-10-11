@@ -77,13 +77,13 @@ export interface NativeTaskServiceOptions {
 }
 
 /**
- * The principal a native task's lease names (P1-78): the Studio user the task belongs to, keyed as A4 keys it
- * (`<plane>:<userId>`). The bootstrap admin token names nobody, so under a plan whose identity-binding requires a
- * principal its tool calls are refused (PRINCIPAL_UNRESOLVED).
+ * The user a native task's lease names (P1-78): the users.yaml user whose Studio session owns the task. A host-router
+ * session is not a user of the signed users.yaml, and the bootstrap admin token names nobody: their leases name no
+ * principal, so under a plan whose identity-binding requires one their tool calls are refused.
  */
 export function taskLeasePrincipal(principalId: string): LeasePayload["principal"] {
-  const human = /^session:(LOCAL_USER|WORKSPACE_ROUTER):(.+)$/.exec(principalId);
-  return human ? { principalId: `${human[1]}:${human[2]}`, kind: "human" } : undefined;
+  const local = /^session:LOCAL_USER:(.+)$/.exec(principalId);
+  return local ? { userId: local[1]! } : undefined;
 }
 
 /** One native ACP client per task. This is a fixed AMC protocol binding, not a command bridge. */

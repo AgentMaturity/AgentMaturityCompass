@@ -192,23 +192,24 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
 }
 
 /**
- * The principal a verified lease names (P1-78), or null when it names none or names a service that is not an active user
- * of the signed users.yaml (read and verified here). A human is the one the issuer authenticated, e.g. the Studio session
- * a native task's lease was minted for. The lease token's own identity is never a principal.
+ * The accountable principal of a lease-bound call (P1-78), from authenticated server state only: the lease names a user
+ * id, and the principal is that user's record in the signed users.yaml, read and verified here. A lease naming nobody
+ * contributes no principal (identity-binding then refuses the call); one naming a user that is not active there, or a
+ * users.yaml that does not verify, refuses the bind. The lease token's own identity is never a principal. A user whose
+ * only role is AGENT is a registered service; any other user is a human.
  */
 function leasePrincipal(workspace: string, payload: LeasePayload): AuthorizationRecordV1["principal"] | null | Failed {
   const named = payload.principal;
   if (!named) return null;
-  if (named.kind === "service") {
-    let users: ReturnType<typeof listVerifiedUsers>["users"];
-    try {
-      users = listVerifiedUsers(workspace).users;
-    } catch (error) {
-      return failed("authority_store_unavailable", `the lease names service ${named.principalId}, and users.yaml could not be verified: ${message(error)}`);
-    }
-    if (!users.some((user) => user.userId === named.principalId && user.status === "ACTIVE")) return null;
+  let users: ReturnType<typeof listVerifiedUsers>["users"];
+  try {
+    users = listVerifiedUsers(workspace).users;
+  } catch (error) {
+    return failed("authority_store_unavailable", `the lease names user ${named.userId}, and users.yaml could not be verified: ${message(error)}`);
   }
-  return { principalId: named.principalId, kind: named.kind, authenticatedVia: "lease" };
+  const user = users.find((candidate) => candidate.userId === named.userId && candidate.status === "ACTIVE");
+  if (!user) return failed("principal_unresolved", `the lease names user ${named.userId}, who is not an active user of the signed users.yaml`);
+  return { principalId: user.userId, kind: user.roles.every((role) => role === "AGENT") ? "service" : "human", authenticatedVia: "lease" };
 }
 
 function osUser(): string {
