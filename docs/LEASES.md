@@ -33,7 +33,7 @@ amc lease resign-revocations --expect-digest <sha256>
 ```
 
 Since P1-08 revocations are one signed, sequenced file:
-- `.amc/studio/leases/revocations.signed.json` (an `amc.revocation-list`, listId `leases:<workspaceId>`; see [KEY_LIFECYCLE.md](KEY_LIFECYCLE.md))
+- `.amc/studio/leases/revocations.signed.json` (an `amc.revocation-list`, listId `leases:<workspaceId>`; see `docs/KEY_LIFECYCLE.md`)
 
 Its signature (revocation-list purpose) covers the whole list, including a strictly increasing `sequence` and the
 previous list's digest. Each write is also appended to the workspace transparency log and recorded in this machine's

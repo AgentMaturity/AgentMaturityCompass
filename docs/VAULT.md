@@ -34,7 +34,7 @@ AMC has no default passphrase. `NODE_ENV=test`, `VITEST` and other test-runner v
 
 ## Payload v2 and purpose keys (P1-08)
 
-The vault holds one key per signing purpose (payload v2). The first unlock after upgrading rewrites a v1 vault as v2 with the same key bytes and keeps the v1 file as `.amc/previous-vault.amcvault`; AMC 1.2.0 cannot read v2, so downgrading is unsupported. Signing call sites take their key per purpose, every key change is an atomic key-set generation, and an unlocked vault without its key set (`.amc/keys/keyset.json`) refuses to sign. See [KEY_LIFECYCLE.md](KEY_LIFECYCLE.md).
+The vault holds one key per signing purpose (payload v2). The first unlock after upgrading rewrites a v1 vault as v2 with the same key bytes and keeps the v1 file as `.amc/previous-vault.amcvault`; AMC 1.2.0 cannot read v2, so downgrading is unsupported. Signing call sites take their key per purpose, every key change is an atomic key-set generation, and an unlocked vault without its key set (`.amc/keys/keyset.json`) refuses to sign. See `docs/KEY_LIFECYCLE.md`.
 
 ## Rotation
 
@@ -48,7 +48,7 @@ A failed unlock locks the vault: a wrong passphrase, or a vault file that was re
 
 Unlock checks that every private key in the vault matches its public key file in `.amc/keys/` (`monitor_ed25519.pub`, `auditor_ed25519.pub`, `lease_ed25519.pub`, `session_ed25519.pub`, and since P1-08 each `<purpose>.pub`). AMC writes the encrypted vault first and the public keys after it, so a write interrupted in between (a crash, a full disk) leaves them disagreeing. Unlock then refuses and names the file, because signatures made with a key whose public half is not the published one would never verify. To recover, stop every AMC process that writes to the workspace, then:
 
-- If a key rotation was interrupted, run `amc keys rotate --resume`: it completes the change or restores the previous key set from `.amc/keys/rotations/gen-<N>/` ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md)). Recovery directories from rotations before P1-08 (`.amc/keys/rotations/<timestamp>-<fingerprint>/`) are still restored by hand, as [authenticated key history](KEY_HISTORY.md) describes.
+- If a key rotation was interrupted, run `amc keys rotate --resume`: it completes the change or restores the previous key set from `.amc/keys/rotations/gen-<N>/` (`docs/KEY_LIFECYCLE.md`). Recovery directories from rotations before P1-08 (`.amc/keys/rotations/<timestamp>-<fingerprint>/`) are still restored by hand, as [authenticated key history](KEY_HISTORY.md) describes.
 - Otherwise restore the vault and the `.amc/keys/` directory together from the same backup. If the vault was created in the interrupted command and nothing was signed with it, you can instead move `.amc/vault.amcvault`, `.amc/vault.amcvault.meta.json` and `.amc/keys/` aside and run `amc init` again.
 
 A vault from before lease and session keys may hold only some of them. Unlock adds the missing keys and keeps the ones the vault has. If a `lease_ed25519.pub` or `session_ed25519.pub` exists for a key the vault does not hold, unlock refuses: AMC cannot check that file, and a new key would replace it. To let AMC create a new key, move that `.pub` file and its `*_history.json` aside; anything signed with the old key will then no longer verify.
