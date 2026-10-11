@@ -12,6 +12,7 @@ import {
   type ClaimEligibilityInput,
   type ClaimEnvelope
 } from "../../src/claims/eligibility/index.js";
+import { artifactClaim, controlSurfaceClaim, unverifiedClaim } from "../../src/cli/claimOutput.js";
 
 const NOW = Date.UTC(2026, 9, 5, 12, 0, 0);
 const base: ClaimEligibilityInput = {
@@ -46,7 +47,7 @@ describe("renderClaimLabel", () => {
       selfReported: "Claim: Self-reported · Result: not evaluated (self-reported answers cannot pass a regulated control) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: unresolved",
       observed: "Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: enforced at gateway · Review: pending · Applicability: applicable",
       reviewed: "Claim: Independently reviewed · Result: pass · Evidence: sufficient · Enforcement: none · Review: approved · Applicability: applicable",
-      legacy: "Claim: Legacy (1.x), self-reported · Result: pass · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      legacy: "Claim: Legacy (1.x), self-reported · Result: pass · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable"
     });
   });
 
@@ -104,5 +105,29 @@ describe("schemas", () => {
     expect(badge).toContain('class="claim-badge pill"');
     expect(badge).toContain('href="#claim-legend"');
     expect(badge).not.toMatch(/>0</);
+  });
+});
+
+// P0-28: these producers printed "Evidence: sufficient" with nothing verified behind it.
+describe("claim-line producers without verified evidence", () => {
+  test.each<[string, () => ClaimEnvelope]>([
+    ["audit binder create on an empty workspace", () => artifactClaim("audit:binder")],
+    ["a passport", () => artifactClaim("passport")],
+    ["a 1.x artifact", () => artifactClaim("bundle", { amcVersion: "1.1.1" })],
+    ["amc badge", () => unverifiedClaim("badge", 1)],
+    ["a regulated self-reported pass with records (D-03)", () => unverifiedClaim("comms-check", 1, { regulated: true, result: "pass",
+      applicability: { state: "applicable" } })],
+    ["a control-surface scorer that found a file", () => controlSurfaceClaim("score:failSecure", { score: 40, level: 2 })]
+  ])("%s claims incomplete evidence, never sufficient", (_, claim) => {
+    const envelope = claim();
+    expect(envelope.claimKind).toBe("self_reported");
+    expect(envelope.statusDimensions.evidence).toBe("incomplete");
+    expect(renderClaimLabel(envelope).line).toContain(" · Evidence: incomplete · ");
+  });
+
+  test("a regulated self-reported result keeps its pass only when records were provided (D-03)", () => {
+    const applicability = { state: "applicable" } as const;
+    expect(unverifiedClaim("comms-check", 1, { regulated: true, result: "pass", applicability }).statusDimensions.result).toBe("pass");
+    expect(unverifiedClaim("comms-check", 0, { regulated: true, result: "pass", applicability }).statusDimensions.result).toBe("not_evaluated");
   });
 });

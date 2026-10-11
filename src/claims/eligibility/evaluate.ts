@@ -98,8 +98,10 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
     result = "not_evaluated";
     reasons.push("UNBOUND_EVIDENCE");
   }
-  // 8. Kind for everything else.
+  // 8. Kind for everything else. Evidence is sufficient only when it is verified: observed by AMC or approved by a
+  // pinned independent reviewer. Self-reported, legacy and unchecked records read incomplete however many there are.
   if (kind === null) kind = decideKind(input, reasons);
+  if (kind !== "observed" && kind !== "independently_reviewed") evidence = worse(evidence, "incomplete");
   // 9. Applicability. Truth rule 2: unknown applicability means not evaluated, so an unresolved
   // result cannot pass (APPLICABILITY_UNRESOLVED goes beyond the issue's 14 codes; see D-03).
   const applicability: Applicability = input.applicability

@@ -147,7 +147,7 @@ const rows: Row[] = [
     name: "independent approved review, issuer pinned",
     input: withEvidence({ tiers: ["ATTESTED"], issuerPinned: true },
       { method: "human_review", review: { state: "approved", independent: true } }),
-    kind: "independently_reviewed", result: "pass"
+    kind: "independently_reviewed", result: "pass", evidence: "sufficient"
   },
   {
     name: "approved review by the producer itself",
@@ -163,12 +163,28 @@ const rows: Row[] = [
   {
     name: "path presence, pass L4",
     input: input({ method: "path_presence", proposed: { result: "pass", level: 4 } }),
-    eligibleLevel: 1, reason: "WEAK_METHOD"
+    kind: "self_reported", evidence: "incomplete", eligibleLevel: 1, reason: "WEAK_METHOD"
   },
   {
     name: "legacy 1.1.1, OBSERVED pass L4",
     input: input({ proposed: { result: "pass", level: 4 }, legacy: { version: "1.1.1", originalTier: "OBSERVED" } }),
-    kind: "self_reported", reason: "LEGACY_1X_UNVERIFIED"
+    kind: "self_reported", evidence: "incomplete", reason: "LEGACY_1X_UNVERIFIED"
+  },
+  // P0-28: records AMC did not verify are evidence of nothing, however many there are.
+  {
+    name: "self-reported records, not regulated",
+    input: withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED"] }),
+    kind: "self_reported", result: "pass", evidence: "incomplete"
+  },
+  {
+    name: "self-reported records, regulated pass with evidence provided (D-03)",
+    input: withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED", "ATTESTED"] }, { regulated: true, applicability: applicable }),
+    kind: "self_reported", result: "pass", evidence: "incomplete"
+  },
+  {
+    name: "observed tier from a method that does not observe",
+    input: withEvidence({ tiers: ["OBSERVED"] }, { method: "unkeyed_checksum" }),
+    kind: "self_reported", evidence: "incomplete", eligibleLevel: 1, reason: "WEAK_METHOD"
   },
   {
     name: "not applicable",
@@ -223,6 +239,16 @@ describe("evaluateClaimEligibility", () => {
       proposed: { result: "pass", level: 5 } }));
     expect(empty.statusDimensions.result).toBe("not_evaluated");
     expect(empty.eligibleLevel).toBeNull();
+  });
+
+  test("evidence is sufficient only when it is verified: observed by AMC or approved by a pinned independent reviewer", () => {
+    for (const row of rows) {
+      const envelope = evaluateClaimEligibility(row.input);
+      if (envelope.statusDimensions.evidence === "sufficient") {
+        expect(["observed", "independently_reviewed"], row.name).toContain(envelope.claimKind);
+        expect(row.input.evidence.eventCount, row.name).toBeGreaterThan(0);
+      }
+    }
   });
 
   test("does not mutate its input", () => {
