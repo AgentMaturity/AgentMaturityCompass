@@ -183,7 +183,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
       "name": "trust-list.schema.json",
-      "sha256": "2b6af58b33879b08373990e9fc3d0b9144d81758557df2641d8a626c7be165d5"
+      "sha256": "f0f90a6be05e3ffea31bcece22c025bf547d94e7ffbc199fa616df94599f078e"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
