@@ -104,6 +104,34 @@ function verifiedReceiptPayload(receipt: unknown, publicKeys: readonly string[])
   return JSON.parse(payload.toString("utf8")) as Record<string, unknown>;
 }
 
+/** The registration this extension sent, which AMC's answer must bind. */
+export interface ExpectedPiRegistration {
+  readonly agentId: string;
+  readonly piSessionSha256: string;
+  readonly piVersion: string;
+  readonly extensionSha256: string;
+  readonly requestSha256: string;
+}
+
+/**
+ * Checks AMC's answer to a session registration: the record names this agent, session digest, Pi version, module
+ * digest and request, and its receipt (`work_accepted`) is signed by a pinned `receipt` purpose key over that record.
+ * Anything else throws, so the session stays unregistered and its calls are blocked.
+ */
+export function verifyPiRegistrationAnswer(answer: unknown, expected: ExpectedPiRegistration, publicKeys: readonly string[]): void {
+  const value = (answer ?? {}) as Record<string, unknown>;
+  const record = (value.record ?? {}) as Record<string, unknown>;
+  const bound = value.registered === true && value.provider === "pi" && record.kind === "amc.pi-session-registration/v1"
+    && Object.entries(expected).every(([key, field]) => record[key] === field) && typeof record.qualified === "boolean"
+    && Object.keys(record).length === 8;
+  if (!bound) throw new Error("AMC session registration answer is malformed or not bound to this session");
+  const receipt = verifiedReceiptPayload(value.receipt, publicKeys);
+  if (receipt.kind !== "work_accepted" || receipt.providerId !== "hook-registration:pi" || receipt.agentId !== expected.agentId
+    || receipt.body_sha256 !== sha256Hex(Buffer.from(canonicalize(record), "utf8"))) {
+    throw new Error("AMC session registration receipt is not bound to this session");
+  }
+}
+
 /**
  * What to return to Pi for an AMC control answer. The answer must be a decision for exactly this call: AMC's action id,
  * a Pi response that names the digest of the request sent, that response's digest, and a receipt signed by an AMC

@@ -1,11 +1,12 @@
 import { generateKeyPairSync } from "node:crypto";
 import { chmodSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { installHookIntegration } from "../src/adapters/hookIntegration.js";
 import { createAmcPiExtension, type PiExtensionApi, type PiToolCallContext } from "../src/adapters/pi/amcPiExtension.js";
-import { piActionId } from "../src/adapters/pi/piIdentity.js";
+import { piActionId, piSessionSha256 } from "../src/adapters/pi/piIdentity.js";
+import { piGovernance } from "../src/bridge/piSessionRegistry.js";
 import { PI_CONTROL_PATH, PI_OBSERVE_PATH } from "../src/adapters/pi/piControlClient.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { CONTROL_HOOK_PATH } from "../src/bridge/hookControl.js";
@@ -54,15 +55,18 @@ function fakePi() {
   return { api, handlers, emit };
 }
 
-function context(mode: PiToolCallContext["mode"] = "print"): PiToolCallContext {
-  return { mode, hasUI: mode === "tui" || mode === "rpc", sessionManager: { getSessionId: () => "pi-session-1" },
+function context(mode: PiToolCallContext["mode"] = "print", sessionId = "pi-session-1"): PiToolCallContext {
+  return { mode, hasUI: mode === "tui" || mode === "rpc", sessionManager: { getSessionId: () => sessionId },
     ui: { notify: () => undefined } };
 }
 
-async function loaded(workspace: string, mode: "control" | "observe", options: { piVersion?: string | null; timeoutMs?: number } = {}) {
+/** The module the installation bound; the tests run the TypeScript source, so they name it. */
+const MODULE = resolve("dist", "adapters", "pi", "amcPiExtension.js");
+
+async function loaded(workspace: string, mode: "control" | "observe", options: { piVersion?: string | null; timeoutMs?: number; modulePath?: string } = {}) {
   const pi = fakePi();
   await createAmcPiExtension({ workspace, mode, piVersion: options.piVersion === undefined ? "1.0.4" : options.piVersion,
-    timeoutMs: options.timeoutMs ?? 2_000 })(pi.api);
+    timeoutMs: options.timeoutMs ?? 2_000, modulePath: options.modulePath ?? MODULE })(pi.api);
   return pi;
 }
 
@@ -73,12 +77,28 @@ async function withBridge(workspace: string, mode: "control" | "observe") {
   installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${port}`, mode });
 }
 
-/** A loopback server that answers every request with `respond`, installed as the workspace's Bridge. */
-async function withFakeBridge(workspace: string, respond: (res: ServerResponse, body: string, req: IncomingMessage) => void) {
+/** A registration answer signed with `key` (default: the workspace's real receipt purpose key), as AMC returns it. */
+function registrationAnswer(workspace: string, body: string, key = getPrivateKeyPem(workspace, "receipt")): string {
+  const pi = (JSON.parse(body) as { pi: { version: string; mode: string; sessionId: string; extensionSha256: string } }).pi;
+  const record = { kind: "amc.pi-session-registration/v1", agentId, piSessionSha256: piSessionSha256(pi.sessionId), piVersion: pi.version,
+    extensionSha256: pi.extensionSha256, mode: pi.mode, qualified: true, requestSha256: sha256Hex(Buffer.from(body, "utf8")) };
+  const { receipt } = mintReceipt({ kind: "work_accepted", ts: Date.now(), agentId, providerId: "hook-registration:pi", model: null,
+    eventHash: "0".repeat(64), bodySha256: sha256Hex(Buffer.from(canonicalize(record), "utf8")), sessionId: "s", privateKeyPem: key });
+  return JSON.stringify({ registered: true, idempotentReplay: false, provider: "pi", record, receipt });
+}
+
+/**
+ * A loopback server installed as the workspace's Bridge. It answers session registrations as AMC would (signed with the
+ * real receipt key) and every other request with `respond`, so the control answer is what each case varies.
+ */
+async function withFakeBridge(workspace: string, respond: (res: ServerResponse, body: string, req: IncomingMessage) => void,
+  registrationKey?: () => string) {
   const server = createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => { body += String(chunk); });
-    req.on("end", () => respond(res, body, req));
+    req.on("end", () => body.includes('"session_start"')
+      ? void res.writeHead(201, { "content-type": "application/json" }).end(registrationAnswer(workspace, body, registrationKey?.()))
+      : respond(res, body, req));
   });
   servers.push(server);
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -143,10 +163,10 @@ describe("AMC Pi extension", () => {
       .toEqual({ block: true, reason: "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool." });
 
     const old = await loaded(workspace, "control", { piVersion: "1.1.0" });
-    expect(await old.emit("tool_call", { toolName: "read", toolCallId: "c2", input: { path: "workspace/public.txt" } }, context()))
+    expect(await old.emit("tool_call", { toolName: "read", toolCallId: "c2", input: { path: "workspace/public.txt" } }, context("print", "session-110")))
       .toEqual({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
     const unreadable = await loaded(workspace, "control", { piVersion: null });
-    expect(await unreadable.emit("tool_call", { toolName: "read", toolCallId: "c3", input: { path: "workspace/public.txt" } }, context()))
+    expect(await unreadable.emit("tool_call", { toolName: "read", toolCallId: "c3", input: { path: "workspace/public.txt" } }, context("print", "session-unknown")))
       .toEqual({ block: true, reason: expect.stringContaining("could not read Pi's version") });
   });
 
@@ -215,6 +235,31 @@ describe("AMC Pi extension", () => {
       expect(await (await loaded(workspace, "control")).emit("tool_call", { toolName: "read", toolCallId: "c", input: { path: "workspace/public.txt" } }, context()))
         .toEqual(UNAVAILABLE);
     }
+  });
+
+  test("control: a session registers at session_start, before any call, as signed proof the extension ran", async () => {
+    const workspace = controlledWorkspace(agentId);
+    await withBridge(workspace, "control");
+    const pi = await loaded(workspace, "control");
+    expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "not_governed", registeredSessions: 0 });
+    for (const handler of pi.handlers.get("session_start") ?? []) await handler({ type: "session_start", reason: "startup" }, context());
+    expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "enforced_at_pi_tool_call", registeredSessions: 1, qualifiedSessions: 1 });
+  });
+
+  test("control: no session registration, no call: a module AMC did not install or a forged registration answer blocks", async () => {
+    const call = { toolName: "read", toolCallId: "c", input: { path: "workspace/public.txt" } };
+    const foreignModule = controlledWorkspace(agentId);
+    await withBridge(foreignModule, "control");
+    expect(await (await loaded(foreignModule, "control", { modulePath: resolve("package.json") })).emit("tool_call", call, context())).toEqual(UNAVAILABLE);
+    expect(piGovernance(foreignModule, agentId)).toMatchObject({ registeredSessions: 0 });
+
+    const forged = controlledWorkspace(agentId);
+    let controlRequests = 0;
+    const foreignKey = generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+    await withFakeBridge(forged, (res) => { controlRequests += 1; res.writeHead(201, { "content-type": "application/json" }).end("{}"); }, () => foreignKey);
+    expect(await (await loaded(forged, "control")).emit("tool_call", call, context())).toEqual(UNAVAILABLE);
+    // Registration comes first; when its answer does not verify, nothing else is sent.
+    expect(controlRequests).toBe(0);
   });
 
   test("control refuses a Pi event it does not recognise before sending anything", async () => {

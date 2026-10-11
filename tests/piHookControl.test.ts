@@ -15,11 +15,29 @@ import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { controlledWorkspace, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const agentId = "pi-controlled";
 const lease = { leaseId: "lease_pi_fixture", expiresTs: Date.now() + 3_600_000 };
 
 afterEach(removeFixtureWorkspaces);
+
+/** Register a Pi session the way AMC's extension does at session_start (see tests/piSessionRegistration.test.ts). */
+function register(workspace: string, sessionId = "pi-session", version = "1.0.4"): void {
+  handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "pi", lease, rawInput: JSON.stringify({ hook_event_name: "session_start",
+    pi: { version, mode: "print", sessionId, extensionSha256: sha256Hex(readFileSync(resolve("dist", "adapters", "pi", "amcPiExtension.js"))) } }) });
+}
+
+/** A workspace with a signed Pi control installation and the default Pi session registered. */
+function piWorkspace(): string {
+  const workspace = controlledWorkspace(agentId);
+  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control" });
+  register(workspace);
+  return workspace;
+}
 
 function control(workspace: string, rawInput: string, withLease = true) {
   return evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider: "pi", rawInput, ...(withLease ? { lease } : {}) });
@@ -49,7 +67,7 @@ const requestSha256 = (rawInput: string) => sha256Hex(Buffer.from(rawInput, "utf
 
 describe("Pi tool_call hook control", () => {
   test("allows a permitted read and binds Pi's response, the record and the signed receipt to the exact request", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const rawInput = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { toolCallId: "toolu_allow" });
     const result = control(workspace, rawInput);
     const actionId = piActionId("pi-session", "toolu_allow");
@@ -88,7 +106,8 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("derives the action id from Pi's session and call id and ignores an action id the payload names", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
+    register(workspace, "s-9");
     const envelope = JSON.parse(piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { sessionId: "s-9", toolCallId: "c-9" }));
     const result = control(workspace, JSON.stringify({ ...envelope, tool_call_id: "pi.forged-action", tool_use_id: "pi.forged-action" }));
     expect(result.actionId).toBe(piActionId("s-9", "c-9"));
@@ -99,7 +118,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("denies an unmapped tool with Pi's block value and binds no authorization record", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const rawInput = piEnvelope("my_ext_tool", { secret: "DO_NOT_RETAIN" });
     const result = control(workspace, rawInput);
     const reason = "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool.";
@@ -113,7 +132,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("an ask is denied in every Pi mode: a Pi confirmation is not AMC approval", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     for (const mode of ["tui", "rpc", "json", "print"] as const) {
       const result = control(workspace,
         piEnvelope("write", { path: join(workspace, "workspace", "output", "out.txt"), content: "PRIVATE" }, { mode, toolCallId: `ask-${mode}` }));
@@ -126,7 +145,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("denies instead of reducing an approval quorum to one Pi decision", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const policy = defaultApprovalPolicy();
     policy.approvalPolicy.actionClasses.WRITE_LOW = { requiredApprovals: 2, rolesAllowed: ["APPROVER", "OWNER"], requireDistinctUsers: true, ttlMinutes: 15 };
     initApprovalPolicy(workspace, policy);
@@ -136,7 +155,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("a decision is single-use: the same call with a new nonce or other input is a conflict, never a second decision", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const path = join(workspace, "workspace", "public.txt");
     const first = piEnvelope("read", { path }, { toolCallId: "toolu_once" });
     const original = control(workspace, first);
@@ -149,13 +168,15 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("a Pi version outside the qualified set is denied, readable or not; the receipt records it", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const path = join(workspace, "workspace", "public.txt");
-    const unqualified = control(workspace, piEnvelope("read", { path }, { toolCallId: "v110", version: "1.1.0" }));
+    register(workspace, "s-110", "1.1.0");
+    register(workspace, "s-unknown", "unknown");
+    const unqualified = control(workspace, piEnvelope("read", { path }, { sessionId: "s-110", toolCallId: "v110", version: "1.1.0" }));
     expect(unqualified.decision).toBe("deny");
     expect(unqualified.providerResponse).toMatchObject({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
 
-    const unknown = control(workspace, piEnvelope("read", { path }, { toolCallId: "vunknown", version: "unknown" }));
+    const unknown = control(workspace, piEnvelope("read", { path }, { sessionId: "s-unknown", toolCallId: "vunknown", version: "unknown" }));
     expect(unknown.decision).toBe("deny");
     expect(unknown.reason).toContain("could not read Pi's version");
     expect(decisionRow(workspace, unknown.eventId).payload).toMatchObject({ piVersion: "unknown" });
@@ -163,7 +184,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("a signed tools config that gives a mapped tool a lower class than the Pi mapping table is denied", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const tools = defaultToolsConfig();
     const write = tools.tools.allowedTools.find((tool) => tool.name === "fs.write")!;
     write.actionClass = "READ_ONLY";
@@ -174,7 +195,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("a decision whose authorization record cannot bind is denied: expired lease, lease classes that do not cover the call", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const path = join(workspace, "workspace", "public.txt");
     const run = (id: string, hookLease: typeof lease & { executeActionClasses?: ["WRITE_LOW"] }) => evaluateProviderHookControl({
       workspace, authenticatedAgentId: agentId, provider: "pi", rawInput: piEnvelope("read", { path }, { toolCallId: id }), lease: hookLease });
@@ -188,7 +209,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("decision receipts are signed and verified with the receipt purpose's key (P1-08), also after only that key rotates", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     rotatePurposeKeys({ workspace, purposes: ["receipt"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
     const rawInput = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { toolCallId: "rotated" });
     const result = control(workspace, rawInput);
@@ -198,7 +219,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("without a lease the record names the self-reported OS user, never a lease", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const result = control(workspace, piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }), false);
     const record = assertContract("authorization-record", decisionRow(workspace, result.eventId).payload.authorizationRecord);
     expect(record.principal.authenticatedVia).toBe("cli-os-user");
@@ -206,7 +227,7 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("refuses a Pi request without the tool_call event or a complete, known Pi context", () => {
-    const workspace = controlledWorkspace(agentId);
+    const workspace = piWorkspace();
     const envelope = JSON.parse(piEnvelope("read", { path: "x" })) as Record<string, unknown>;
     const pi = envelope.pi as Record<string, unknown>;
     const refused = (body: unknown) => expect(() => control(workspace, JSON.stringify(body)))

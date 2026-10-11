@@ -16,6 +16,7 @@ import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { createAmcPiExtension, type PiExtensionApi, type PiToolCallContext } from "../../src/adapters/pi/amcPiExtension.js";
 import { QUALIFIED_PI_VERSIONS } from "../../src/adapters/pi/piVersions.js";
 import { startBridgeServer } from "../../src/bridge/bridgeServer.js";
+import { piGovernance } from "../../src/bridge/piSessionRegistry.js";
 import { getPurposeKeyHistory } from "../../src/keys/signingKeys.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../../src/ledger/ledger.js";
 import { verifyReceipt } from "../../src/receipts/receipt.js";
@@ -170,7 +171,10 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
         const run = await runPi([{ tool: "read", args: { path }, id: "call_read_ok" }, { text: "done" }]);
         const result = toolResult(run.requests, "call_read_ok");
         const decision = piDecisions().find((meta) => meta.canonicalToolName === "fs.read" && meta.decision === "allow");
-        cases.allowedRead = { exit: run.status, decision: decision?.decision ?? null, piVersion: decision?.piVersion ?? null, ranTool: result.includes("public fixture") };
+        const governance = piGovernance(workspace, agentId);
+        cases.allowedRead = { exit: run.status, decision: decision?.decision ?? null, piVersion: decision?.piVersion ?? null, ranTool: result.includes("public fixture"),
+          sessionRegistered: governance.registeredSessions >= 1, claim: governance.claim };
+        expect(governance).toMatchObject({ claim: "enforced_at_pi_tool_call", invalidRegistrations: 0 });
         expect(run.status, run.stderr).toBe(0);
         expect(result).toContain("public fixture");
         expect(decision).toMatchObject({ decision: "allow", piVersion: version });
@@ -230,18 +234,22 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
       test("limit: Pi loads no project extension for an untrusted project, so AMC decides nothing and the write runs", async () => {
         const path = join(workspace, "workspace", "output", "untrusted.txt");
         const before = piDecisions().length;
+        const registeredBefore = piGovernance(workspace, agentId).registeredSessions;
         const run = await runPi([{ tool: "write", args: { path, content: "untrusted" }, id: "call_untrusted_write" }, { text: "done" }], { trust: false });
         const amcDecisions = piDecisions().length - before;
-        cases.untrustedProjectLimit = { exit: run.status, fileCreated: existsSync(path), amcDecisions };
+        const newRegistrations = piGovernance(workspace, agentId).registeredSessions - registeredBefore;
+        cases.untrustedProjectLimit = { exit: run.status, fileCreated: existsSync(path), amcDecisions, newRegistrations };
         expect(existsSync(path)).toBe(true);
         expect(amcDecisions).toBe(0);
+        // AMC never saw this session, so nothing claims it is governed.
+        expect(newRegistrations).toBe(0);
         rmSync(path);
       });
 
       test("decision latency through the extension and the local Bridge", async () => {
         const handlers = new Map<string, (event: unknown, ctx: PiToolCallContext) => Promise<unknown>>();
         const api: PiExtensionApi = { on: (name, handler) => handlers.set(name, handler as never) };
-        await createAmcPiExtension({ workspace, mode: "control", piVersion: version })(api);
+        await createAmcPiExtension({ workspace, mode: "control", piVersion: version, modulePath: join("dist", "adapters", "pi", "amcPiExtension.js") })(api);
         const ctx: PiToolCallContext = { mode: "print", hasUI: false, sessionManager: { getSessionId: () => `latency-${version}` }, ui: { notify: () => undefined } };
         const samples: number[] = [];
         for (let index = 0; index < 100; index += 1) {

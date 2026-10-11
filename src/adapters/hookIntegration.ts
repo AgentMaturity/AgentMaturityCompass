@@ -17,6 +17,7 @@ import {
 } from "../bridge/hookControl.js";
 import { renderProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse } from "../bridge/hookProviders.js";
 import { installPiHook, piHookStatus, PI_HOOK_SOURCE, removePiHook } from "./hookProviders/pi.js";
+import type { PiGovernance } from "../bridge/piSessionRegistry.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { boundedFetchSignal, CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -182,13 +183,9 @@ export interface HookIntegrationStatus {
   leaseId: string | null;
   expiresTs: number | null;
   issues: string[];
-  files: {
-    config: string;
-    ignore: string;
-    token: string;
-    manifest: string;
-    signature: string;
-  };
+  files: { config: string; ignore: string; token: string; manifest: string; signature: string };
+  /** Pi only: what AMC may claim for the agent's Pi sessions, from verified session registrations. */
+  governance?: PiGovernance;
 }
 
 export interface InstallHookIntegrationOptions {

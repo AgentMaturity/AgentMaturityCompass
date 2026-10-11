@@ -37,7 +37,7 @@ import {
 export { HookControlError } from "./hookProviders.js";
 import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
-import { isQualifiedPiVersion, piVersionRefusal } from "../adapters/pi/piVersions.js";
+import { piVersionRefusal } from "../adapters/pi/piVersions.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -987,9 +987,9 @@ export function evaluateProviderHookControl(input: {
       );
     }
     // Pi decisions that let an effect proceed bind P1-02's authorization record; P1-23 extends this to Claude Code.
-    const { requested, authorization } = authorizeHookDecision({
+    const { requested, authorization, enforced } = authorizeHookDecision({
       workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
-      pi: request.pi, toolInput: request.toolInput,
+      pi: request.pi, toolInput: request.toolInput, ledger,
       requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
     const materialized = materializeProviderDecision({
@@ -1059,7 +1059,7 @@ export function evaluateProviderHookControl(input: {
         bodySha256: materialized.providerResponseSha256,
         ...(request.pi ? {
           action: hookDecisionReceipt({ provider, actionId: request.actionId, idempotencyKey: request.pi.toolCallId,
-            decision: materialized.decision, reason: materialized.reason, authorization, enforced: isQualifiedPiVersion(request.pi.version) }),
+            decision: materialized.decision, reason: materialized.reason, authorization, enforced }),
         } : {}),
       },
     });

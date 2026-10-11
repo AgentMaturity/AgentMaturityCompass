@@ -34,8 +34,8 @@ import {
   CONTROL_HOOK_PATH,
   CONTROL_HOOK_ROUTE,
   MAX_CONTROL_HOOK_BODY_BYTES,
-  evaluateProviderHookControl,
 } from "./hookControl.js";
+import { handleHookControlRequest } from "./hookControlRoute.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
@@ -524,7 +524,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
-      const controlled = evaluateProviderHookControl({
+      const controlled = handleHookControlRequest({
         workspace: options.workspace,
         authenticatedAgentId: auth.payload.agentId,
         provider, lease: auth.payload,

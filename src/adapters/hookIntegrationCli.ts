@@ -13,6 +13,7 @@ import {
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
+  type HookIntegrationStatus,
   type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
@@ -111,6 +112,12 @@ function printControlVerification(control: ClaudeControlVerification): void {
   for (const note of control.notes) console.log(chalk.yellow(`Note: ${note}`));
 }
 
+/** Pi: the claim comes from verified session registrations; sessions Pi ran without the extension are invisible. */
+function printGovernance(governance: NonNullable<HookIntegrationStatus["governance"]>): void {
+  console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered Pi session(s), ${governance.qualifiedSessions} on a qualified Pi)`);
+  console.log(chalk.gray(governance.note));
+}
+
 function printFileChanges(files: HookFileChange[]): void {
   for (const file of files) {
     const sensitivity = file.sensitive ? " (secret, mode 0600)" : "";
@@ -197,6 +204,7 @@ export function registerHookIntegrationCommands(
         console.log(`Config owned: ${status.configOwned ? "yes" : "no"}`);
         console.log(`Manifest valid: ${status.manifestValid ? "yes" : "no"}`);
         console.log(`Lease valid: ${status.leaseValid ? "yes" : "no"}`);
+        if (status.governance) printGovernance(status.governance);
         if (status.expiresTs) console.log(`Expires: ${new Date(status.expiresTs).toISOString()}`);
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
         if (control) printControlVerification(control);
@@ -242,6 +250,7 @@ export function registerHookIntegrationCommands(
         console.log(`Provider: ${health.provider}`);
         console.log(`Agent: ${health.agentId ?? "not bound"}`);
         console.log(`Installation: ${health.installation.state}`);
+        if (health.installation.governance) printGovernance(health.installation.governance);
         console.log(`Observed events: ${health.evidence.eventCount}`);
         if (health.evidence.lastEvent) {
           console.log(`Last verified event: ${health.evidence.lastEvent.eventType}`);

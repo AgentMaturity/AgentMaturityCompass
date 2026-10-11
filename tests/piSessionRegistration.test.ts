@@ -1,0 +1,118 @@
+import { readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { afterEach, describe, expect, test } from "vitest";
+import { getHookIntegrationStatus, installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { HookControlError } from "../src/bridge/hookProviders.js";
+import { NOT_GOVERNED_NOTE, piGovernance } from "../src/bridge/piSessionRegistry.js";
+import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { verifyReceipt } from "../src/receipts/receipt.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { controlledWorkspace, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+
+const agentId = "pi-registered";
+const lease = { leaseId: "lease_pi_fixture", expiresTs: Date.now() + 3_600_000 };
+const moduleSha256 = () => sha256Hex(readFileSync(resolve("dist", "adapters", "pi", "amcPiExtension.js")));
+
+afterEach(removeFixtureWorkspaces);
+
+function installed(): string {
+  const workspace = controlledWorkspace(agentId);
+  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control" });
+  return workspace;
+}
+
+const registration = (options: { sessionId?: string; version?: string; extensionSha256?: string } = {}) => JSON.stringify({
+  hook_event_name: "session_start",
+  pi: { version: options.version ?? "1.0.4", mode: "print", sessionId: options.sessionId ?? "pi-session", extensionSha256: options.extensionSha256 ?? moduleSha256() },
+});
+
+const route = (workspace: string, rawInput: string) =>
+  handleHookControlRequest({ workspace, authenticatedAgentId: agentId, provider: "pi", rawInput, lease });
+
+const readPath = (workspace: string) => join(workspace, "workspace", "public.txt");
+
+describe("Pi session registration (proof the AMC extension ran)", () => {
+  test("no registration: the call is denied as not governed, nothing reads enforced, and status says not governed", () => {
+    const workspace = installed();
+    const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "unregistered" }));
+    expect(decision).toMatchObject({ decision: "deny", reason: expect.stringContaining("not governed") });
+    const receipt = verifyReceipt((decision as { receipt: string }).receipt, getPurposeKeyHistory(workspace, "receipt"));
+    expect(receipt.payload).toMatchObject({ state: "denied", enforcement: { level: "advisory" } });
+    expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "not_governed", registeredSessions: 0, note: NOT_GOVERNED_NOTE });
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" }).governance).toMatchObject({ claim: "not_governed" });
+  });
+
+  test("a registered session of a qualified Pi is allowed and enforced; the registration is signed, bound and idempotent", () => {
+    const workspace = installed();
+    const registered = route(workspace, registration()) as unknown as Record<string, unknown> & { receipt: string; record: Record<string, unknown> };
+    expect(registered).toMatchObject({ registered: true, idempotentReplay: false, record: {
+      kind: "amc.pi-session-registration/v1", agentId, piVersion: "1.0.4", qualified: true, extensionSha256: moduleSha256(),
+      piSessionSha256: sha256Hex("pi\0pi-session"), requestSha256: sha256Hex(registration()) } });
+    const signed = verifyReceipt(registered.receipt, getPurposeKeyHistory(workspace, "receipt"));
+    expect(signed.ok).toBe(true);
+    expect(signed.payload).toMatchObject({ kind: "work_accepted", providerId: "hook-registration:pi", agentId });
+    expect(route(workspace, registration())).toMatchObject({ registered: true, idempotentReplay: true, receipt: registered.receipt });
+
+    const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "registered" }));
+    expect(decision).toMatchObject({ decision: "allow" });
+    expect(verifyReceipt((decision as { receipt: string }).receipt, getPurposeKeyHistory(workspace, "receipt")).payload)
+      .toMatchObject({ state: "authorized", enforcement: { level: "enforced", boundary: "pi:tool_call" } });
+    expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "enforced_at_pi_tool_call", registeredSessions: 1, qualifiedSessions: 1 });
+  });
+
+  test("a registration from an unqualified Pi is recorded but not enforced, and its calls are denied", () => {
+    const workspace = installed();
+    expect(route(workspace, registration({ version: "1.1.0" }))).toMatchObject({ registered: true, record: { qualified: false } });
+    const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "old", version: "1.1.0" }));
+    expect(decision).toMatchObject({ decision: "deny", reason: "AMC has not qualified Pi 1.1.0" });
+    expect(verifyReceipt((decision as { receipt: string }).receipt, getPurposeKeyHistory(workspace, "receipt")).payload)
+      .toMatchObject({ enforcement: { level: "advisory" } });
+    expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "not_governed", registeredSessions: 1, qualifiedSessions: 0 });
+    // A call claiming another Pi version than its session registered is denied too.
+    route(workspace, registration({ sessionId: "s-2" }));
+    expect(route(workspace, piEnvelope("read", { path: readPath(workspace) }, { sessionId: "s-2", toolCallId: "skew", version: "1.0.2" })))
+      .toMatchObject({ decision: "deny", reason: expect.stringContaining("registered Pi 1.0.4") });
+  });
+
+  test("tampered registrations are refused: a foreign extension digest, a conflicting re-registration, an altered ledger row", () => {
+    const workspace = installed();
+    const refused = (rawInput: string, code: string) => expect(() => route(workspace, rawInput))
+      .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: code as HookControlError["code"] }));
+    refused(registration({ extensionSha256: "0".repeat(64) }), "HOOK_CONTROL_INPUT_INVALID");
+    route(workspace, registration({ sessionId: "s-3" }));
+    refused(registration({ sessionId: "s-3", version: "1.0.2" }), "HOOK_CONTROL_REPLAY_CONFLICT");
+
+    route(workspace, registration({ sessionId: "s-4" }));
+    const ledger = openLedger(workspace);
+    const row = ledger.db.prepare("SELECT id, meta_json FROM evidence_events WHERE id LIKE 'pi_registration_%' ORDER BY rowid DESC LIMIT 1")
+      .get() as { id: string; meta_json: string };
+    // An attacker with write access to the database: drop the immutability triggers, then edit the recorded version.
+    for (const trigger of ["protect_evidence_immutable", "no_update_evidence"]) ledger.db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
+    ledger.db.prepare("UPDATE evidence_events SET meta_json = ? WHERE id = ?").run(row.meta_json.replace('"1.0.4"', '"1.0.2"'), row.id);
+    ledger.close();
+    expect(route(workspace, piEnvelope("read", { path: readPath(workspace) }, { sessionId: "s-4", toolCallId: "tampered", version: "1.0.2" })))
+      .toMatchObject({ decision: "deny", reason: expect.stringContaining("failed verification") });
+    expect(piGovernance(workspace, agentId)).toMatchObject({ invalidRegistrations: 1 });
+
+    // A row whose record and receipt still match but whose place in the hash chain moved: only the integrity check sees it.
+    route(workspace, registration({ sessionId: "s-5" }));
+    const chain = openLedger(workspace);
+    const moved = chain.db.prepare("SELECT id FROM evidence_events WHERE id LIKE 'pi_registration_%' ORDER BY rowid DESC LIMIT 1").get() as { id: string };
+    chain.db.prepare("UPDATE evidence_events SET ts = ts + 1 WHERE id = ?").run(moved.id);
+    chain.close();
+    expect(route(workspace, piEnvelope("read", { path: readPath(workspace) }, { sessionId: "s-5", toolCallId: "moved" })))
+      .toMatchObject({ decision: "deny", reason: expect.stringContaining("failed verification") });
+    expect(piGovernance(workspace, agentId)).toMatchObject({ invalidRegistrations: 2 });
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "invalid",
+      issues: expect.arrayContaining([expect.stringContaining("failed verification")]) });
+  });
+
+  test("an observe installation cannot register: registration proves control ran", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "pi", agentId });
+    expect(() => route(workspace, registration())).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_INPUT_INVALID" }));
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" }).governance).toMatchObject({ claim: "observed" });
+  });
+});

@@ -7,6 +7,7 @@
 import { authorizationRecordDigest, type AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import { bindAuthorization } from "../actions/authorize.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
+import { piSessionRegistration } from "./piSessionRegistry.js";
 import { assertContract } from "../contracts/index.js";
 import type { ActionReceiptMembers } from "../receipts/receipt.js";
 import type { ActionClass } from "../types.js";
@@ -75,9 +76,19 @@ function bindHookAuthorization(input: {
   }
 }
 
+/** Why a Pi call is not governed: its session has no verified registration of this Pi (piSessionRegistry.ts), or null. */
+function registrationRefusal(found: ReturnType<typeof piSessionRegistration>, pi: PiControlContext): string | null {
+  if (found.status === "missing") return "This Pi session has no AMC registration, so it is not governed; AMC denied the call.";
+  if (found.status === "invalid") return `${found.reason}; this Pi session is not governed, so AMC denied the call.`;
+  return found.record.piVersion === pi.version ? null
+    : `This call names Pi ${pi.version}, but its session registered Pi ${found.record.piVersion}; AMC denied the call.`;
+}
+
 /**
- * An allow binds the record; one that cannot bind is denied with the reason. A deny binds nothing, and so does a Pi
- * ask, which control denies because a Pi call cannot carry an AMC approval. Only Pi requests bind today.
+ * A Pi call is governed only in a session with a verified registration of this Pi; otherwise it is denied and nothing
+ * reads enforced. `enforced` holds only for a registered session of a qualified Pi. An allow binds the record; one that
+ * cannot bind is denied with the reason. A deny binds nothing, and so does a Pi ask, which control denies because a Pi
+ * call cannot carry an AMC approval. Only Pi requests bind today.
  */
 export function authorizeHookDecision<R extends { decision: string; reason: string; target?: AuthorizationTarget | null }>(input: {
   workspace: string;
@@ -87,15 +98,22 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
   actionId: string;
   pi: PiControlContext | null;
   toolInput: Readonly<Record<string, unknown>>;
+  ledger: Parameters<typeof piSessionRegistration>[0];
   requested: R;
-}): { requested: R; authorization: HookAuthorization | null } {
-  const { pi, requested } = input;
-  if (!pi || requested.decision !== "allow") return { requested, authorization: null };
+}): { requested: R; authorization: HookAuthorization | null; enforced: boolean } {
+  const { pi } = input;
+  if (!pi) return { requested: input.requested, authorization: null, enforced: false };
+  const found = piSessionRegistration(input.ledger, input.agentId, pi.sessionId);
+  const refusal = registrationRefusal(found, pi);
+  if (refusal) return { requested: { ...input.requested, decision: "deny", reason: refusal }, authorization: null, enforced: false };
+  const enforced = found.status === "registered" && found.record.qualified;
+  const requested = input.requested;
+  if (requested.decision !== "allow") return { requested, authorization: null, enforced };
   const authorization: HookAuthorization = requested.target
     ? bindHookAuthorization({ ...input, idempotencyKey: pi.toolCallId, ...requested.target,
         parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId) })
     : { ok: false, reason: "AMC could not bind an authorization record: no evaluated tool" };
-  return { requested: authorization.ok ? requested : { ...requested, decision: "deny", reason: authorization.reason }, authorization };
+  return { requested: authorization.ok ? requested : { ...requested, decision: "deny", reason: authorization.reason }, authorization, enforced };
 }
 
 /**

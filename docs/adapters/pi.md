@@ -14,6 +14,8 @@ Pi has no sandbox, and every Pi extension, AMC's included, runs inside the Pi pr
 
 - Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only.
 - Not covered: OS containment; effects that bypass `tool_call` (another extension's own I/O, Pi Durable, Codemode-internal calls unless step 2 confirms they emit `tool_call`).
+- AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
+- Pi ask is always denied until an AMC approval path exists.
 - Observe mode and `tool_result` data: "observed", never "enforced".
 - An `ask` answered in Pi's UI is a provider-local prompt, not AMC approval quorum; quorum policies deny.
 - A receipt proves AMC signed a decision, not that Pi honoured it; the pinned-version conformance run supports that.
@@ -53,7 +55,7 @@ amc connect hooks remove --provider pi
 
 - `.pi/extensions/amc.js`: imports AMC's `dist/adapters/pi/amcPiExtension.js` by absolute path and starts it for this workspace and mode. It reads Pi's `VERSION` itself, because Pi resolves its own module only for files it loads directly.
 - `.amc/hooks/pi.lease`: a dedicated lease (`hook:observe`, plus `hook:control` in control mode), mode `0600`.
-- `.amc/hooks/pi.json` and `.sig`: a manifest signed by the workspace auditor key. It binds the SHA-256 of `.pi/extensions/amc.js` and of AMC's extension module, the lease, the Bridge origin, the qualified versions and AMC's monitor public keys at install.
+- `.amc/hooks/pi.json` and `.sig`: a manifest signed by the workspace auditor key. It binds the SHA-256 of `.pi/extensions/amc.js` and of AMC's extension module, the lease, the Bridge origin, the qualified versions and the public keys of AMC's `receipt` signing purpose (P1-08) at install.
 - the managed `.gitignore` block for `.amc/hooks/`.
 
 `status` reports an edited extension file, a changed AMC module or changed AMC receipt keys as `drifted`; reinstall to bind them. `remove` deletes only these files and the `.pi` directories the install created, and revokes the lease.
@@ -62,13 +64,23 @@ amc connect hooks remove --provider pi
 
 Pi loads `.pi/extensions/` only for a trusted project (Pi's `docs/security.md`, "Understand project trust"). Print, JSON and RPC modes skip it unless the project is trusted (`/trust`), `defaultProjectTrust` is `"always"`, or the run passes `--approve`. `pi -e .pi/extensions/amc.js` loads it explicitly. If Pi does not load it (trust declined, `--no-extensions` without `-e`, a load error), nothing is enforced and AMC records nothing. The conformance run pins this: with `--no-approve` a write that AMC would deny runs, and AMC records no decision. `hooks health` showing no events for a project you expect to be controlled is the signal.
 
+## Session registration: proof the extension ran
+
+A claim for a Pi session comes only from AMC's own record that its extension ran in that session. In control mode the extension registers each Pi session at `session_start` (and, if that failed, before the session's first call): `{ hook_event_name: "session_start", pi: { version, mode, sessionId, extensionSha256 } }`, where `extensionSha256` is the SHA-256 of the extension module that is running. AMC refuses a registration from an installation that is not a signed control installation, for another agent, or whose module digest differs from the one the signed manifest bound. Otherwise it records a registration (`amc.pi-session-registration/v1`: agent, SHA-256 of the session id, Pi version, module digest, mode, qualified or not, request digest) with a `work_accepted` receipt signed by the `receipt` purpose key. The extension accepts it only if that receipt verifies under the pinned keys and binds what it sent. Re-registering a session with other values is a conflict.
+
+- A call in a Pi session without a verified registration is denied: the session is not governed, and nothing reads "enforced".
+- A call naming another Pi version than its session registered is denied.
+- A registration whose ledger row or receipt fails verification counts as none: the call is denied and `status` reports the workspace invalid.
+- `amc connect hooks status|health --provider pi` derive the claim from registrations: `enforced_at_pi_tool_call` when at least one registered session runs a qualified Pi, otherwise `not_governed` (observe installations read `observed`). They always add: AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
+
 ## How a decision is made and bound
 
 1. On `tool_call` the extension checks the event shape (`toolName`, `toolCallId`, plain-object `input`), posts an `action.requested` observation, then posts `{ hook_event_name: "tool_call", tool_name, tool_input, pi: { version, mode, sessionId, toolCallId, parentToolCallId, nonce } }` to `/bridge/hooks/control/v1` with the lease. Its wait is bounded at 5 s.
 2. AMC derives the action id from Pi's session id and call id (an id the payload names is ignored), refuses a Pi version outside the qualified set (an unreadable one included), maps the tool with the table above and evaluates the signed ToolHub config, Action Policy and Approval Policy.
-3. An allow binds a P1-02 authorization record: principal and delegation from the hook lease, normalized-argument and policy digests, idempotency key = Pi's call id, execution id = AMC's action id. A record that cannot bind (expired lease, a class the lease does not cover) denies.
-4. Pi's response is `{ block: false, requestSha256 }` or `{ block: true, reason, requestSha256 }`, where `requestSha256` is the digest of the exact request. AMC records a v2 `action_state` receipt (`authorized` or `denied`, with the record digest and `enforcement: { level: "enforced", boundary: "pi:tool_call" }` for qualified versions) whose body digest covers that response.
-5. The extension allows only if the receipt verifies under an AMC monitor key pinned at install and binds this action, call id, request digest and state. It then freezes the call's input: a Pi handler that runs after AMC and tries to change it throws, and Pi blocks a throwing handler.
+3. AMC requires a verified registration of this Pi session for this Pi version (above); without one the call is denied.
+4. An allow binds a P1-02 authorization record: principal and delegation from the hook lease, normalized-argument and policy digests, idempotency key = Pi's call id, execution id = AMC's action id. A record that cannot bind (expired lease, a class the lease does not cover) denies.
+5. Pi's response is `{ block: false, requestSha256 }` or `{ block: true, reason, requestSha256 }`, where `requestSha256` is the digest of the exact request. AMC records a v2 `action_state` receipt (`authorized` or `denied`, with the record digest and `enforcement: { level: "enforced", boundary: "pi:tool_call" }` only for a registered session of a qualified Pi) whose body digest covers that response. Receipts are signed with P1-08's `receipt` purpose key.
+6. The extension allows only if the receipt verifies under a `receipt` purpose key pinned at install and binds this action, call id, request digest and state. It then freezes the call's input: a Pi handler that runs after AMC and tries to change it throws, and Pi blocks a throwing handler.
 
 Each request carries a fresh nonce, so a decision is single-use: re-sending the same call (for example from a restarted Pi) is a conflict, never a second decision, and the call is blocked. Any error, timeout, HTTP error, malformed or unbound answer, bad signature, missing or non-`0600` lease, missing or mismatched manifest, unrecognised event or Bridge outage blocks the call with `AMC control unavailable; action denied.` Observe mode never blocks.
 
@@ -80,7 +92,7 @@ On `tool_result` the extension posts `action.completed` or `action.failed` witho
 - Pi runs `tool_call` handlers in load order (project `.pi/extensions`, then `~/.pi/agent/extensions`, then configured and `-e` paths) and stops at the first block. An extension loaded before AMC can change the input AMC sees (AMC decides on what it sees, which is what runs). One loaded after AMC cannot change an allowed call's input, but it can block it or act outside `tool_call`.
 - Pi waits on a handler without a limit; AMC bounds its own wait (5 s). A handler from another extension can still hang a call.
 - Qualification covers the `pi` CLI, whose bundle embeds its agent runtime. Embedding Pi through its SDK resolves `@earendil-works/pi-agent-core` from `node_modules` (1.1.0 on 2026-10-12) and reports mode `print`; it is not qualified.
-- Receipts are signed with the workspace's monitor key: a local audit trail, not a portable verdict.
+- Receipts and registrations are signed with the workspace's `receipt` purpose key: a local audit trail, not a portable verdict.
 - Decision latency on the qualification machine is above the 50 ms p95 overhead target (see below).
 
 ## Confirmed Pi contract

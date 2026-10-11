@@ -12,6 +12,7 @@ import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { initApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
 import { CONTROL_HOOK_ROUTE } from "../../bridge/hookControl.js";
+import { NOT_GOVERNED_NOTE, piGovernance, type PiGovernance } from "../../bridge/piSessionRegistry.js";
 import { revokeLeaseForCli } from "../../leases/leaseCli.js";
 import { getPurposeKeyHistory } from "../../keys/signingKeys.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../../org/orgSigner.js";
@@ -214,6 +215,17 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
   return options.dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);
 }
 
+/** Observe mode claims "observed" only; control claims come from verified session registrations (piSessionRegistry.ts). */
+function sessionGovernance(workspace: string, manifest: PiManifest): PiGovernance {
+  const none = { registeredSessions: 0, qualifiedSessions: 0, invalidRegistrations: 0, latestRegistrationAt: null, note: NOT_GOVERNED_NOTE };
+  if (manifest.mode === "observe") return { claim: "observed", ...none };
+  try {
+    return piGovernance(workspace, manifest.agentId);
+  } catch {
+    return { claim: "not_evaluated", ...none };
+  }
+}
+
 export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   const workspace = resolve(workspaceInput);
   const paths = piPaths(workspace);
@@ -242,12 +254,14 @@ export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
+  const governance = manifest ? sessionGovernance(workspace, manifest) : undefined;
+  if (governance?.invalidRegistrations) issues.push(`${governance.invalidRegistrations} Pi session registration(s) failed verification`);
   const state: HookIntegrationStatus["state"] = !manifest || (!lease.valid && !lease.expired) || !ignoreProtected
-    || issues.some((issue) => issue.includes("lease ID")) ? "invalid"
+    || issues.some((issue) => issue.includes("lease ID") || issue.includes("failed verification")) ? "invalid"
     : lease.expired ? "expired" : !configOwned || moduleDrifted || keysDrifted ? "drifted" : "installed";
   return { ...base, agentId: manifest?.agentId ?? null, mode: manifest?.mode ?? null, state, configOwned, manifestValid: manifest !== null,
     leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null,
-    issues };
+    issues, ...(governance ? { governance } : {}) };
 }
 
 export function removePiHook(options: RemoveHookIntegrationOptions): HookMutationResult {

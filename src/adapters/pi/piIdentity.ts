@@ -8,3 +8,8 @@ import { sha256Hex } from "../../utils/hash.js";
 export function piActionId(sessionId: string, toolCallId: string): string {
   return `pi.${sha256Hex(`${sessionId}\0${toolCallId}`).slice(0, 40)}`;
 }
+
+/** The digest of a Pi session id a session registration records; the raw id is not stored. */
+export function piSessionSha256(sessionId: string): string {
+  return sha256Hex(`pi\0${sessionId}`);
+}
