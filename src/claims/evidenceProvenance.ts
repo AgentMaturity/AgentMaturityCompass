@@ -30,7 +30,13 @@ export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProduce
   "feedback.ingest": "manual",
   webhook: "external-report",
   // A4 Forge rows are human statements recorded by AMC, never runtime observations (P1-56).
-  "a4-store": "manual"
+  "a4-store": "manual",
+  // Self-report-shaped labels used elsewhere (A4 answer provenance, quick-score self answers, a policy default). None is
+  // an evidence source today; mapped so that any future row carrying one can never count as AMC runtime evidence.
+  user: "manual",
+  inferred: "manual",
+  numeric_self_answer: "manual",
+  default: "manual"
 });
 
 const metaCache = new WeakMap<object, Record<string, unknown>>();

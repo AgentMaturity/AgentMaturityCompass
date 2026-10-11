@@ -54,7 +54,8 @@ export function scoreFailSecureGovernance(cwd?: string): FailSecureGovernanceRes
   failsClosedByDefault = failsClosedByDefaultOutcome.met;
 
   // Tool call whitelist
-  const whitelistPaths = [".amc/tool_allowlist.json", "src/enforce/allowlist.ts", "src/policy"];
+  // AMC's tool-call whitelist is the signed ToolHub allowlist; src/policy holds effective-policy receipts, not a whitelist.
+  const whitelistPaths = [".amc/tool_allowlist.json", "src/enforce/allowlist.ts", "src/toolhub/toolhubValidators.ts"];
   const hasToolCallWhitelistOutcome = assessCriterion(root, whitelistPaths);
   hasToolCallWhitelist = hasToolCallWhitelistOutcome.met;
 
@@ -78,8 +79,10 @@ export function scoreFailSecureGovernance(cwd?: string): FailSecureGovernanceRes
   const hasToolCallAuditLogOutcome = assessCriterion(root, auditPaths);
   hasToolCallAuditLog = hasToolCallAuditLogOutcome.met;
 
-  // Excessive agency controls (scope limits, autonomy caps)
-  const agencyPaths = ["src/assurance/packs/governanceBypassPack.ts", "src/enforce", "src/policy"];
+  // Excessive agency controls (scope limits, autonomy caps): scope-limited signed leases and signed per-agent budget
+  // admission enforce them; src/policy only records what was enforced.
+  const agencyPaths = ["src/assurance/packs/governanceBypassPack.ts", "src/enforce", "src/leases/leaseVerifier.ts",
+    "src/budgets/nativeBudgetAdmission.ts"];
   const hasExcessiveAgencyControlsOutcome = assessCriterion(root, agencyPaths);
   hasExcessiveAgencyControls = hasExcessiveAgencyControlsOutcome.met;
 

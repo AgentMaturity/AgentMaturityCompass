@@ -2,12 +2,12 @@
 // Guided operator declarations. All journal, schema and recording admission stays in capture/intake.
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { COMMON_PROTOCOL, COMMON_TASK, MODEL_REVISION_CONTRACT_VERSION } from "./human-first-use-intake.mjs";
 import {
   LIMITS, CAPTURE_VERSION, MODEL_REVISION_CAPTURE_VERSION, hasCredentialContract, intakeSchemaForCapture, CaptureError, prepareDraft, readCaptureJson, createCapture,
   loadCapture, captureStatus, projectSession, declareRecordNow, appendCapture, finalizeCapture
 } from "./human-first-use-capture.mjs";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const BOUNDARY = "Operator declarations only: preparation is not participation; hashes bind bytes, not humans. Export is not task success, study qualification or issue Done.";
 const HELP = `Guided local observer (no recording, harness/model execution, network or uploads).
@@ -577,6 +577,6 @@ export async function runCli(args = process.argv.slice(2), io = {}) {
   } finally { terminal?.close(); }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   process.exitCode = await runCli();
 }

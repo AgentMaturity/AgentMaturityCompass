@@ -37,6 +37,15 @@ describe("agentProtocolSecurity", () => {
     expect(r.hasProtocolAuthZ).toBe(true);
   });
 
+  it("never credits protocol authZ to src/policy, which only records what was enforced (P1-12)", () => {
+    markAsAmcCheckout(tmp);
+    mkdirSync(join(tmp, "src/policy"), { recursive: true });
+    expect(scoreAgentProtocolSecurity(tmp).hasProtocolAuthZ).toBe(false);
+    mkdirSync(join(tmp, "src/actions"), { recursive: true });
+    writeFileSync(join(tmp, "src/actions/authorize.ts"), "");
+    expect(scoreAgentProtocolSecurity(tmp).hasProtocolAuthZ).toBe(true);
+  });
+
   it("returns full score when all artifacts present", () => {
     markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, ".amc"), { recursive: true });

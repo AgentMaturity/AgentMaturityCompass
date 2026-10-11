@@ -292,7 +292,7 @@ Specific audit event types that indicate non-compliance:
 
 ## Compliance Status
 
-Each control category carries five status dimensions and a claim kind (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules and [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions) for the decision table), and a `status` derived from its result:
+Each control category carries five status dimensions and a claim kind (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules and [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions) for the decision table), and a `status` derived from its result:
 
 - **SATISFIED** (pass): every evidence requirement passed on admitted, control-bound AMC runtime evidence and a compiled plan records that the control applies
 - **MISSING** (fail): an admitted record shows a requirement failed

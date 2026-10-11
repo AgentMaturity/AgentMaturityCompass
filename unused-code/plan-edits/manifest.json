@@ -31,6 +31,13 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "scripts/source-quality.mjs",
+      "issue": "P0-14",
+      "baseCommit": "691a041dc552e57688175331959ada75e302e0c0",
+      "archivePath": "unused-code/plan-edits/P0-14/scripts/source-quality.mjs.landed",
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
       "path": "src/agent/nativeToolCapabilities.ts",
       "issue": "P1-43",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
@@ -92,6 +99,13 @@
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
+    },
+    {
+      "path": "src/audit/binderArtifact.ts",
+      "issue": "P1-16",
+      "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
+      "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+      "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
     },
     {
       "path": "src/auth/authApi.ts",
