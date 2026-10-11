@@ -13608,7 +13608,8 @@ paths:
         an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts; Activate
         completion: a4.activate.production_lease), runs its effect and the response names the attempt; an inline
         effect (the release, the production lease) runs before the response, which carries its lease token once
-        (a replay answers token: null, TOKEN_ALREADY_DELIVERED) or its failure code"
+        (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
+        failure code) or its failure code"
       tags:
         - Studio
         - A4 Forge
@@ -13782,7 +13783,7 @@ paths:
       summary: "Release (owner): consume the release approval (Activate's direction gate) and run the opened
         a4.activate.release effect inline: a signed package from content-addressed inputs and the staging lease
         (WRITE_LOW at most, the staging routes, 24 h), whose token this response carries once; a replay answers
-        token: null, TOKEN_ALREADY_DELIVERED"
+        token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's failure code"
       tags:
         - Studio
         - A4 Forge
@@ -14031,8 +14032,9 @@ paths:
       summary: Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed
         a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
         the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
-        TARGET_MISMATCH. No lease is issued and no runtime run is created; a succeeded production deploy, or a
-        succeeded rollback row, moves deployedReleaseId
+        TARGET_MISMATCH, RELEASE_ROLLED_BACK (a deploy row for a rolled-back release). A rollback row is
+        recordable on a held or frozen project. No lease is issued and no runtime run is created; a succeeded
+        production deploy, or a succeeded rollback row, moves deployedReleaseId
       tags:
         - Studio
         - A4 Forge
@@ -14337,10 +14339,13 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/releases/{releaseId}/rollback:
     post:
-      summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound: a
-        freeze first for a high or critical risk tier, the Enforce restore, every lease of the release revoked,
-        the prepared commands and a signed a4-rollback-receipt; the lifecycle is never moved backwards and
-        deployedReleaseId moves when the operator records the rollback row"
+      summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound,
+        journaled as an effect (EFFECT_STARTED first, pinned to expectedHeadSeq; 409 EFFECT_RUNNING while
+        another attempt runs): the grant consumed, a freeze first for a high or critical risk tier, the Enforce
+        restore, every lease of the release revoked (read again at execution), the prepared commands, a signed
+        a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code
+        and a replay answers the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId
+        moves when the operator records the rollback row"
       tags:
         - Studio
         - A4 Forge
