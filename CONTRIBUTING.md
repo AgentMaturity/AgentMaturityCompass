@@ -8,6 +8,7 @@ Working on a Ready-to-Deploy plan issue? Read [docs/program/READY_TO_DEPLOY.md](
 
 - [Quick Setup](#quick-setup)
 - [Running Tests](#running-tests)
+- [Duplicate and Dead-Code Ratchet](#duplicate-and-dead-code-ratchet)
 - [Public Site and Docs](#public-site-and-docs)
 - [Types of Contributions](#types-of-contributions)
 - [Writing an Assurance Pack](#writing-an-assurance-pack)
@@ -54,6 +55,33 @@ cd platform/python && python3 -m pytest tests/ -q # Python
 The root suite contains <!-- amc:count:testFiles -->1,624<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
 
 All tests must pass before submitting a PR.
+
+---
+
+## Duplicate and Dead-Code Ratchet
+
+`npm run check:duplicates` (jscpd over `src/`) and `npm run check:dead-code` (Knip over the `knip.json` workspaces) compare the current findings with `scripts/quality/source-quality-baseline.json` (decision D-11, option A). Existing debt is recorded there; a check fails only when:
+
+- a finding is **new** (not in the baseline). The message prints its id and its two paths (relative to `src/`) or its file, category and symbol. Remove the duplicate or the dead code. If the finding must stay, accept it with a reason of at least 20 characters; your `git config user.name` and today's date are recorded with it:
+  ```bash
+  npm run quality:baseline -- dead-code --accept <id> --reason "why this finding stays, and who owns it"
+  ```
+  Run one `--accept` per new finding in the PR that adds it. Renaming or moving a file makes its duplicate pairs new; accept them in the refactor PR the same way.
+- an entry is **stale** (its finding is gone, including an accepted one). After you pay down debt, shrink the baseline and commit it. `--shrink` only removes entries; it never adds one:
+  ```bash
+  npm run quality:baseline -- duplicates --shrink
+  ```
+- the **config or tool version drifted**: the SHA-256 of `.jscpd.json` or `knip.json`, or the installed jscpd or Knip version, differs from the baseline. Regenerate in its own reviewed PR, with the reason in the PR description, from a clean, committed tree:
+  ```bash
+  npm run quality:baseline -- dead-code --rebaseline --reason "knip 6.40.0 upgrade: new findings reviewed"
+  ```
+
+Never rebaseline to turn a red check green. Each run writes `{ scan, baseline, current, new, stale, accepted }` to `tmp/source-quality/<scan>.json` (CI uploads it as the `source-quality-summary` artifact). `node scripts/source-quality.mjs trend` prints one weekly trend row, each cell as `duplicates / dead-code`, under this header:
+
+```
+| Date | Commit | Baseline | Current | New | Stale | Accepted |
+|---|---|---|---|---|---|---|
+```
 
 ---
 
