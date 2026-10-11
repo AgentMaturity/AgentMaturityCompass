@@ -483,7 +483,7 @@ pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a secon
 A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt
 whose outcome could not be written reads as lost (`PROCESS_LOST`). The next request settles it first, then re-runs the
 steps; the restore and the revocations are idempotent. A replay of the request answers that attempt's outcome. A
-rollback may run on a held or frozen project. The lifecycle is never moved backwards. The project's
+rollback may run on a held or frozen project, and the operator's rollback row after it may be recorded there too. The lifecycle is never moved backwards. The project's
 `deployedReleaseId` moves only when the operator records the rollback row.
 
 The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves

@@ -257,8 +257,10 @@ export function recordDeployment(store: A4Store, projectId: string, releaseId: s
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 deployment record");
   const now = Date.now();
+  // A rollback row records what the operator ran after a rollback, which may have raised a freeze and a hold: allowed then.
+  const ignored = body.kind === "rollback" ? ["ON_HOLD", "FREEZE_ACTIVE"] : [];
   const before = loadA4State(store, projectId, now);
-  assertAllowed(evaluateFor(store, before, principal, input, headStage(before), now).readiness, "recordDeployment");
+  assertAllowed(evaluateFor(store, before, principal, input, headStage(before), now).readiness, "recordDeployment", ignored);
   if (before.project.head_seq !== body.expectedHeadSeq) throw fail(409, "A4_STALE_HEAD", "The project moved; reload and retry.", { headSeq: before.project.head_seq });
   deploymentChecks(before, releaseId, body, now);
   const deploymentId = `a4dep_${randomBytes(16).toString("hex")}`;
@@ -276,7 +278,7 @@ export function recordDeployment(store: A4Store, projectId: string, releaseId: s
     response: { deploymentId, receiptPath: file.path, statusText: text } }, (ts, load) => {
     const state = load(now);
     const { readiness } = evaluateFor(store, state, principal, input, headStage(state), now);
-    assertAllowed(readiness, "recordDeployment");
+    assertAllowed(readiness, "recordDeployment", ignored);
     const { deployed } = deploymentChecks(state, releaseId, body, now);
     const label = `${body.kind} receipt ${deploymentId} (${body.environment}, ${body.target}): ${text} (self_reported)`;
     const spec: A4ChangeSpec = { kind: "DEPLOYMENT", stage: state.project.stage, payload: { deploymentId, releaseId, deploymentKind: body.kind, environment: body.environment,
@@ -291,7 +293,7 @@ export function recordDeployment(store: A4Store, projectId: string, releaseId: s
         label, actor_key: principal.key, ts } }],
     ...(deployed === undefined ? {} : { head: { deployed_release_id: deployed } }) };
     return { readiness, specs: spec };
-  });
+  }, body.kind === "rollback");
   return { result, deploymentId, receiptPath: file.path, statusText: text };
 }
 

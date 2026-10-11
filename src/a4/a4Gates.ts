@@ -308,7 +308,7 @@ export function refuseOnFreeze(store: A4Store, projectId: string): void {
 type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | readonly A4ChangeSpec[] };
 
 /**
- * One governed write (design §4.3, C-26): the freeze refusal, the plan on rows read under the project lock, the store's
+ * One governed write (design §4.3, C-26): the freeze refusal (not for a `remedy`), the plan on rows read under the project lock, the store's
  * envelope signing outside the transaction, and the same plan again inside it. The transition records that evaluation's
  * fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the automatic hold; a
  * notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
@@ -322,8 +322,9 @@ type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness
  * fullDigest does not cover: a revocation is 403 A4_USER_DISABLED, any other role change 409 A4_STALE_HEAD.
  */
 export function governed(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
-  plan: Plan): A4TransitionResult {
-  refuseOnFreeze(store, projectId);
+  plan: Plan, remedy = false): A4TransitionResult {
+  // A remedy (recording a rollback) runs under a freeze; its plan still applies every other refusal.
+  if (!remedy) refuseOnFreeze(store, projectId);
   let planned: string | null = null;
   let snapshot: ReturnType<A4Store["snapshot"]> | null = null;
   const integrity = new Map<string, boolean>();
