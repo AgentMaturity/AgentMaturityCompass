@@ -245,7 +245,7 @@ function claimRow(store: A4Store, state: A4ReadinessState, link: A4ChainLink, re
 }
 
 /**
- * GET …/value: the four-lane view of the current release's value claims, the members' other objectives (self_reported,
+ * GET …/value: the four-lane view of the current release's value claims (the newest review's), the members' other objectives (self_reported,
  * not evaluated), the ROI worksheet (a recommendation, numeric self-answers) and the hypotheses. It reads; it never runs
  * createValueReport and never appends a value event.
  */
@@ -253,7 +253,10 @@ export function valueView(store: A4Store, state: A4ReadinessState, regulated: bo
   const projectId = state.project.project_id;
   const release = currentRelease(state.chain);
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
-  const links = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "value_claim" && link.body.releaseId === releaseId);
+  // One claim per KPI per release: only the newest review's (a review after requested changes records them again).
+  const recorded = cycleLinks(state.chain, "EVIDENCE_REF").filter((link) => link.body.refKind === "value_claim" && link.body.releaseId === releaseId);
+  const newestReview = recorded.at(-1)?.body.reviewSeq;
+  const links = recorded.filter((link) => link.body.reviewSeq === newestReview);
   const rows = links.map((link) => claimRow(store, state, link, regulated, now));
   const values = answerValues(activateSpecOf(state).answers);
   const objectives = ([["business", "businessOutcomes"], ["sustainability", "sustainabilityObjectives"], ["social", "socialObjectives"]] as const)
