@@ -71,7 +71,7 @@ file exists when checked under the lock, and never once a list was anchored.
 
 How a list is published (revoke, resign and bootstrap share one path, serialized by one lock):
 
-1. The next list is signed, and the signature is verified against the auditor key history before anything is written.
+1. The next list is signed, and the signature is verified against the revocation-list key history (the auditor key history before the workspace migrated) before anything is written.
    A locked vault, `AMC_NO_SIGN=1` or a key that does not match the history refuses here.
 2. The signed list is staged as `revocations.signed.json.pending`, appended to the transparency log, then written in
    place with its anchor and recorded in the high-water file; the stage is removed.

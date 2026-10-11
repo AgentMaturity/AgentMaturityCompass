@@ -37,9 +37,9 @@ Creating a vault, the v1 migration and every rotation are one key-set generation
   "statements": ["<sha256>"] }
 ```
 
-While a change is pending, signing and verifying refuse with "key set generation N is incomplete; run `amc keys rotate --resume`". Signers also refuse when a public key or statement listed in the committed generation lost its digest, when the unlocked vault does not hold the key ids the key set names, and when the key set is older than this machine accepted. A missing `keyset.json` in a workspace that had one refuses too. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
+While a change is pending, signing and verifying refuse with "key set generation N is incomplete; run `amc keys rotate --resume`". `files` lists what the generation wrote plus every public key and statement still in force. Signers also refuse when one of those public keys or statements lost its digest, when the unlocked vault does not hold the key ids the key set names, and when the key set is older than this machine accepted; reading a generation raises this machine's mark to it. A missing `keyset.json` in a workspace that had one refuses too. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
 
-`amc keys rotate --resume` rolls a pending generation forward when every staged file is intact, otherwise it restores the previous bytes from `.amc/keys/rotations/gen-<N>/`. Rolling back never deletes key material: what the generation had written moves to `gen-<N>/discarded/`.
+`amc keys rotate --resume` rolls a pending generation forward when every staged file is intact, otherwise it restores the previous bytes from `.amc/keys/rotations/gen-<N>/`. It resumes only the generation this workspace would write next, with the recovery manifest every generation writes first; any other pending file is refused for the owner to inspect. Resuming never overwrites or deletes a file: one it would replace moves to `gen-<N>/discarded/` first, under a new name if that name is taken.
 
 Key, history, statement, revocation and anti-rollback files are read and written through `src/utils/containedFs.ts`: every directory below the workspace (or AMC home) must be a real directory, a file must be a regular file with one link opened without following a symlink, and writes go through a fresh temporary file that is fsynced and renamed. Node has no `openat`, so a directory swapped and swapped back between the check and the read is outside what AMC can see; a lasting swap is refused.
 
@@ -60,7 +60,7 @@ The signed bytes are `AMC_KEY_ROTATION_V1`, one 0x00 byte and the canonical stat
 Authority never comes from the statement's own fields. The verifier names the chain (workspace and purpose) and the key it already trusts for that purpose; `previousKeyId` must be that key, and the `previous` signature is checked against it. The `next` signature only proves possession of the new key.
 
 - `scheduled`, `superseded` and `purpose-split` need valid `previous` and `next` signatures.
-- `key-compromise` gives the previous key no authority: it needs `next` and at least one pinned trust-list root (`--root-key <file>`, a key held outside AMC). It has no overlap. AMC also moves every purpose that shares the compromised key and drops that key from every history.
+- `key-compromise` gives the previous key no authority: it needs `next` and at least one pinned trust-list root (`--root-key <file>`, a key held outside AMC). It has no overlap. AMC also moves every purpose that shares the compromised key and drops that key from every history, including the history of a purpose that split off it earlier.
 - A purpose's first key, likewise, needs a root.
 - Overlap is at most 30 days (`keys.maxOverlapDays`); `--overlap-days` defaults to 7.
 - A sequence gap or a wrong `previousStatementSha256` is refused.
