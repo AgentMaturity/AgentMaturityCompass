@@ -19,7 +19,8 @@ import {
   type ToolDenial,
   type ToolExecution,
   type ToolMode,
-  type ToolOutcome
+  type ToolOutcome,
+  type RecordedToolCall
 } from "./toolTypes.js";
 
 /**
@@ -111,8 +112,8 @@ export interface ToolPipelineInit {
   /** Action classes that must be approved before guards are consulted. */
   readonly approvalRequiredFor?: ReadonlySet<string>;
   readonly filters?: readonly ToolOutputFilter[];
-  /** Called exactly once per call, after the outcome is final. */
-  readonly record?: (execution: ToolExecution, outcome: ToolOutcome) => void;
+  /** Called exactly once per call, after the outcome is final; a visibility refusal is recorded too (P1-78). */
+  readonly record?: (execution: RecordedToolCall, outcome: ToolOutcome) => void;
   /** Classes whose calls are bound to an authorization record and rechecked before the body. */
   readonly authorizeClasses?: ReadonlySet<string>;
   /** Authorized classes that need a signed approval through `authority` even with no gate bound (hooks, ToolHub). */
@@ -221,8 +222,14 @@ export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinit
   return selectedDefinitions.get(execution);
 }
 
+/** Why a pipeline refuses every call once a record failed (P1-78): evidence that cannot be written is never skipped. */
+const lostEvidence = (error: unknown): string =>
+  `EVIDENCE_RECORDER_FAILED: a tool-evidence record failed (${error instanceof Error ? error.message : String(error)}); this pipeline refuses every later call`;
+
 export class ToolPipeline {
   private readonly gates: BoundApprovalGate[] = [];
+  /** Set by the first failed record (P1-78); from then on every call is refused before any stage runs. */
+  private recorderFailure: string | null = null;
 
   constructor(private readonly init: ToolPipelineInit) {}
 
@@ -245,33 +252,24 @@ export class ToolPipeline {
 
   async execute(input: ToolCallInput): Promise<ToolOutcome> {
     return withWorkspaceScope(this.init.workspace, async () => {
-      const collapsed = this.collapses(input);
-      if (collapsed) {
+      const visible = this.init.registry.visible(input.agentId);
+      const definition = visible.get(input.name);
+      if (this.recorderFailure !== null) return this.refuseUnresolved(input, definition?.actionClass ?? null, this.recorderFailure, "authorization");
+      if (this.collapses(input)) {
         // Terminates HERE, before pre-execute policy and before guards.
         //
         // A collapsed call can only ever fail, and letting the policy pipeline
         // observe it would mean asking a human to approve — and recording an
         // approval for — something that was never going to run. It would also
         // spend budget and produce guard decisions about a call that does not
-        // exist in any meaningful sense.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`,
-          guardLabel: null
-        });
+        // exist in any meaningful sense. The refusal itself is still recorded.
+        return this.refuseUnresolved(input, definition?.actionClass ?? null,
+          `"${input.name}" cannot be called directly under code mode; dispatch it from inside ${RUN_CODE_TOOL}`);
       }
-
-      const visible = this.init.registry.visible(input.agentId);
-      const definition = visible.get(input.name);
       if (!definition) {
-        // No execution exists yet, so there is nothing to record against and
-        // nothing for a guard to have seen. An invisible tool is not a policy
-        // decision about a call; it is the absence of a call.
-        return denialOutcome({
-          stage: "visibility",
-          reason: `unknown tool "${input.name}"`,
-          guardLabel: null
-        });
+        // No guard sees a call that resolved to no tool, but the refusal is recorded: a call that leaves no trace
+        // is one nobody can review (P1-78, L0-TOOL-01).
+        return this.refuseUnresolved(input, null, `unknown tool "${input.name}"`);
       }
 
       const callId = input.callId ?? randomUUID();
@@ -304,11 +302,13 @@ export class ToolPipeline {
       }
       try {
         this.init.record?.(execution, outcome);
-      } catch {
+      } catch (error) {
         // The guarantee belongs HERE, not to each recorder. A recorder that
         // threw would turn an evidence problem into a tool failure, and the
-        // model would see a denial that policy never made. The gap shows in the
-        // spine as a missing row rather than as a wrong answer to the caller.
+        // model would see a denial that policy never made. This call keeps its
+        // real outcome (its effect may have happened); the failure latches, so
+        // every later call is refused before any stage runs (P1-78).
+        this.recorderFailure ??= lostEvidence(error);
         //
         // It was previously the caller's job, which made it untestable: proving
         // it required a recorder that genuinely failed, and every filesystem
@@ -330,6 +330,24 @@ export class ToolPipeline {
       }
       return outcome;
     });
+  }
+
+  /**
+   * A refusal before the call became an execution (visibility, or a latched recorder failure), recorded like any other
+   * denial. A recorder that throws cannot change it, and latches like any failed record (see `execute`).
+   */
+  private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string,
+    stage: "visibility" | "authorization" = "visibility"): ToolOutcome {
+    const outcome = denialOutcome({ stage, reason, guardLabel: null });
+    const callId = input.callId ?? randomUUID();
+    try {
+      this.init.record?.({ token: `tok_${randomUUID()}`, callId, rootCallId: input.rootCallId ?? callId, name: input.name, agentId: input.agentId,
+        workspace: this.init.workspace, actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
+        arguments: freezeToolArguments(input.arguments), parentToken: input.parentToken ?? null }, outcome);
+    } catch (error) {
+      this.recorderFailure ??= lostEvidence(error);
+    }
+    return outcome;
   }
 
   /**

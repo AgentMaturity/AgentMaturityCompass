@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
@@ -96,6 +97,7 @@ export async function pluginInstallCli(params: {
 }) {
   return requestPluginInstall({
     workspace: params.workspace,
+    initiator: cliInitiator(),
     agentId: resolveAgentId(params.workspace, params.agentId),
     registryId: params.registryId,
     pluginRef: params.pluginRef,
@@ -110,6 +112,7 @@ export function pluginRemoveCli(params: {
 }) {
   return requestPluginRemove({
     workspace: params.workspace,
+    initiator: cliInitiator(),
     agentId: resolveAgentId(params.workspace, params.agentId),
     pluginId: params.pluginId
   });

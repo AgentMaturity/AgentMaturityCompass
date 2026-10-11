@@ -148,7 +148,9 @@ export interface EvidencePlan {
 export interface CompiledPlan {
   planVersion: 1;
   compiler: { name: "amc-catalog-compiler"; version: string };
-  profile: { profileId: string; sha256: string; factProvenance: Record<FactName, FactProvenance | "unknown"> };
+  /** `deployment` is absent from plans compiled before P1-78; records under such a plan bind no deployment. */
+  profile: { profileId: string; sha256: string; factProvenance: Record<FactName, FactProvenance | "unknown">;
+             deployment?: { tenantId: string; deploymentId: string } };
   lock: CatalogLockfile;                // P1-09's lock: pins catalog and sources
   status: "ready" | "blocked";          // blocked: unresolved conflict or unresolved mandatory control
   requirements: RequirementDecision[];  // sorted by controlId

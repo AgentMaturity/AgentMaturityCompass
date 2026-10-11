@@ -48,9 +48,12 @@ tests:
         - L0-TOOL-01/negative/foreign-signature.json
         - L0-TOOL-01/negative/signature-removed.json
         - L0-TOOL-01/negative/unlisted-tool.json
+        - L0-TOOL-01/negative/unregistered-tool.json
     passCriteria: >-
       A listed tool runs; an unlisted tool, an edited configuration, a missing signature and a foreign
-      signature are refused by the tool-allowlist guard with a denied receipt and no tool body run.
+      signature are refused by the tool-allowlist guard with a denied receipt and no tool body run. A call
+      to a tool name the registry does not hold is refused at visibility and still leaves a TOOL_CALL_DENIED
+      record.
     attempts: 1
 evidence:
   - id: L0-TOOL-01-E1

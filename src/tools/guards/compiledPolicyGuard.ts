@@ -3,7 +3,7 @@ import YAML from "yaml";
 import type { CompiledPolicyFacts } from "../../actions/authorize.js";
 import { approvalPolicyPath, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
 import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
-import { activeControlPlanHead, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
+import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import type { ActionClass } from "../../types.js";
@@ -29,7 +29,9 @@ function named(policy: ActiveCompiledPolicy, controlIds: readonly string[]): str
 /** `identity-binding`: the lease and the principal come from the authorization record bound for this call. */
 function identityDenial(params: Readonly<Record<string, ParamValue>>, execution: ToolExecution): string | null {
   const record = execution.authorization?.record;
-  if (params.requireAgentLease === true && !record?.delegation.leaseId) return "IDENTITY_UNRESOLVED: the call carries no verified agent lease";
+  if (params.requireAgentLease === true && !record?.delegation.leaseId) {
+    return "IDENTITY_UNRESOLVED: the call carries no verified agent lease, or its lease names a principal that does not resolve";
+  }
   if (params.requirePrincipal === true && (!record || record.principal.authenticatedVia === "cli-os-user")) {
     return "PRINCIPAL_UNRESOLVED: no authenticated principal is bound to the call (an OS user name is self-reported)";
   }
@@ -39,6 +41,21 @@ function identityDenial(params: Readonly<Record<string, ParamValue>>, execution:
 /** Whether the plan's `identity-binding` requires a verified agent lease (L0-IDN-01); only then is one minted or bound (P1-67). */
 export function planRequiresAgentLease(policy: ActiveCompiledPolicy | null): boolean {
   return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requireAgentLease === true) ?? false;
+}
+
+/**
+ * Whether the workspace's verified active plan sets `toolPipeline.requirePrincipal` (identity-binding, L0-IDN-01), read
+ * through the same verifying path the guard's session pins (P1-78). Fails closed: a plan that cannot be verified reads as
+ * requiring a principal.
+ */
+export function planRequiresPrincipal(workspace: string): boolean {
+  let policy: ActiveCompiledPolicy | null;
+  try {
+    policy = loadActiveCompiledPolicy(workspace);
+  } catch {
+    return true;
+  }
+  return policy?.runtimePolicy.toolPipeline.guards.some((g) => g.id === "identity-binding" && g.params.requirePrincipal === true) ?? false;
 }
 
 /** The live signed approval policy must be at least as strict as the compiled rule; read and verified in one read. */
@@ -111,6 +128,7 @@ export function compiledPolicyFacts(policy: ActiveCompiledPolicy): CompiledPolic
   return {
     digest: policy.runtimePolicy.policyDigest.replace(/^sha256:/, ""),
     revision: policy.revision,
+    deployment: policy.deployment,
     // The rule that admitted the call: its class's approval rule first, then the compiled guards every call passes.
     controlFor: (actionClass) => {
       const id = [...(policy.runtimePolicy.approvals[actionClass]?.controlIds ?? []), ...policy.runtimePolicy.toolPipeline.guards.flatMap((g) => g.controlIds)][0];

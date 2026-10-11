@@ -4,7 +4,7 @@ import {
   projectMatchingRuleIds,
   projectQuestionIds
 } from "../diagnostic/liveEvidenceProjection.js";
-import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
+import type { RecordedToolCall, ToolOutcome } from "./toolTypes.js";
 
 /**
  * What a governed tool call contributes to the evidence spine (P5.1/P5.2a).
@@ -60,7 +60,7 @@ export interface ToolEvidenceRecord {
  * `metric` row says what it cost. A single row carrying both would be counted
  * once by a gate that wanted either.
  */
-export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome): ToolEvidenceRecord[] {
+export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcome): ToolEvidenceRecord[] {
   const auditType: ToolAuditType = outcome.denied !== null
     ? "TOOL_CALL_DENIED"
     : outcome.ok ? "TOOL_CALL_ALLOWED" : "TOOL_CALL_FAILED";

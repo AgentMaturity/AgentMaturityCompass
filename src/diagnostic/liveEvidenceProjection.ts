@@ -89,7 +89,7 @@ export interface LiveProjectionRule {
  */
 export function ruleMatches(
   rule: LiveProjectionRule,
-  execution: ToolExecution,
+  execution: Pick<ToolExecution, "appliedGuards">,
   outcome: ToolOutcome
 ): boolean {
   if (rule.guardLabel === null) {
@@ -185,7 +185,7 @@ export const DEFERRED_PROJECTIONS: ReadonlyArray<{
  * twice for one call would count double against `minEvents` and make three
  * days of traffic look like six.
  */
-export function projectQuestionIds(execution: ToolExecution, outcome: ToolOutcome): string[] {
+export function projectQuestionIds(execution: Pick<ToolExecution, "appliedGuards">, outcome: ToolOutcome): string[] {
   const seen = new Set<string>();
   for (const rule of LIVE_PROJECTION_RULES) {
     if (!ruleMatches(rule, execution, outcome)) {
@@ -199,6 +199,6 @@ export function projectQuestionIds(execution: ToolExecution, outcome: ToolOutcom
 }
 
 /** The rules that fired, for a report that needs to explain a binding. */
-export function projectMatchingRuleIds(execution: ToolExecution, outcome: ToolOutcome): string[] {
+export function projectMatchingRuleIds(execution: Pick<ToolExecution, "appliedGuards">, outcome: ToolOutcome): string[] {
   return LIVE_PROJECTION_RULES.filter((rule) => ruleMatches(rule, execution, outcome)).map((rule) => rule.id);
 }

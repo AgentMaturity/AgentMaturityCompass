@@ -18,6 +18,8 @@ export async function prepareAcpNativeSession(options: {
   readonly credentialsFile?: string;
   readonly signal: AbortSignal;
   readonly onApprovalRaised: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+  /** Recorded on every approval request this session raises (P1-78). */
+  readonly initiator: string;
 }): Promise<AgentSession> {
   if (options.signal.aborted) throw new Error("Native session preparation was cancelled.");
   // Re-read before composing readiness. No process or session is created merely
@@ -34,7 +36,7 @@ export async function prepareAcpNativeSession(options: {
       const inner = context.toolset?.seam ?? EMPTY_TOOL_SEAM;
       if (!options.approval) return inner;
       const approval = new ApprovalSeam({ session: context.session, workspace: options.session.workspace,
-        agentId: options.session.agentId, onRaised: options.onApprovalRaised });
+        agentId: options.session.agentId, onRaised: options.onApprovalRaised, initiator: options.initiator });
       return gateToolCallsOnApproval(inner, approval, options.approval);
     }
   };

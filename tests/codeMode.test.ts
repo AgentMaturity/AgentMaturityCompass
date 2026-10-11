@@ -93,6 +93,16 @@ describe("mode collapse", () => {
     expect(guardSaw, "no guard should be consulted about a call that cannot run").toBe(0);
   });
 
+  it("records the collapsed call's refusal under the tool's own class (P1-78)", async () => {
+    const registry = new ToolRegistry();
+    registry.define(echoTool);
+    const recorded: Array<[string, string | null, string | undefined]> = [];
+    const pipeline = new ToolPipeline({ registry, workspace: workdir(), mode: "code",
+      record: (execution, outcome) => recorded.push([execution.name, execution.actionClass, outcome.denied?.stage]) });
+    await pipeline.execute({ name: "echo", agentId: "alice", arguments: {}, requestedMode: "EXECUTE" });
+    expect(recorded).toEqual([["echo", "READ_ONLY", "visibility"]]);
+  });
+
   it("does not collapse a SUB-call, which is the whole point", async () => {
     const h = harness({ tools: [echoTool] });
     const outcome = await h.run('return await tools.echo({ text: "from code" });');

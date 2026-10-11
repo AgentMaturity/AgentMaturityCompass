@@ -291,6 +291,8 @@ export async function auditBinderExportForApi(params: {
 export function auditBinderExportRequestForApi(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   scopeType?: string | null;
   scopeId?: string | null;
   outFile?: string | null;
@@ -310,6 +312,7 @@ export function auditBinderExportRequestForApi(params: {
   const intentId = `audit-export-${requestId}`;
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "audit.binder.export",
