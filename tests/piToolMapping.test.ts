@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 import { canonicalToolRequests } from "../src/bridge/hookProviders.js";
 
@@ -48,5 +50,20 @@ describe("Pi tool_call mapping to canonical ToolHub requests", () => {
     expect(map("read", {}).requests).toEqual([]);
     expect(map("write", { content: "x" }).requests).toEqual([]);
     expect(map("edit", { path: "   " }).requests).toEqual([]);
+  });
+
+  test("maps the tool_call events real Pi emitted in the conformance run (Codemode and its nested read)", () => {
+    const root = join("tests", "fixtures", "harness-hooks", "pi");
+    for (const version of readdirSync(root)) {
+      const events = readFileSync(join(root, version, "events.jsonl"), "utf8").trim().split("\n")
+        .map((line) => JSON.parse(line) as { type: string; toolName: string; parentToolCallId: string | null; input: Record<string, unknown> });
+      const calls = events.filter((event) => event.type === "tool_call");
+      expect(calls.map((event) => event.toolName), version).toEqual(["codemode", "read"]);
+      expect(map(calls[0]!.toolName, calls[0]!.input).requests).toEqual([]);
+      expect(calls[1]!.parentToolCallId).not.toBeNull();
+      expect(map(calls[1]!.toolName, calls[1]!.input).requests).toEqual([
+        expect.objectContaining({ name: "fs.read", args: { path: "<workspace>/workspace/public.txt" }, minimumActionClass: "READ_ONLY" }),
+      ]);
+    }
   });
 });

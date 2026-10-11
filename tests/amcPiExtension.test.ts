@@ -57,9 +57,10 @@ function context(mode: PiToolCallContext["mode"] = "print"): PiToolCallContext {
     ui: { notify: () => undefined } };
 }
 
-async function loaded(workspace: string, mode: "control" | "observe", options: { piVersion?: string; timeoutMs?: number } = {}) {
+async function loaded(workspace: string, mode: "control" | "observe", options: { piVersion?: string | null; timeoutMs?: number } = {}) {
   const pi = fakePi();
-  await createAmcPiExtension({ workspace, mode, piVersion: options.piVersion ?? "1.0.4", timeoutMs: options.timeoutMs ?? 2_000 })(pi.api);
+  await createAmcPiExtension({ workspace, mode, piVersion: options.piVersion === undefined ? "1.0.4" : options.piVersion,
+    timeoutMs: options.timeoutMs ?? 2_000 })(pi.api);
   return pi;
 }
 
@@ -129,6 +130,9 @@ describe("AMC Pi extension", () => {
     const old = await loaded(workspace, "control", { piVersion: "1.1.0" });
     expect(await old.emit("tool_call", { toolName: "read", toolCallId: "c2", input: { path: "workspace/public.txt" } }, context()))
       .toEqual({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+    const unreadable = await loaded(workspace, "control", { piVersion: null });
+    expect(await unreadable.emit("tool_call", { toolName: "read", toolCallId: "c3", input: { path: "workspace/public.txt" } }, context()))
+      .toEqual({ block: true, reason: expect.stringContaining("could not read Pi's version") });
   });
 
   test("control: a decision is single-use; a restarted Pi re-sending the call gets no second decision and is blocked", async () => {

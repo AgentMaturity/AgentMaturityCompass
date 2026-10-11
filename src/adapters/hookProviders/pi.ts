@@ -74,13 +74,21 @@ function piPaths(workspace: string) {
 }
 type PiPaths = ReturnType<typeof piPaths>;
 
-/** The installed extension file: it loads AMC's extension module for this workspace and mode, nothing else. */
+/**
+ * The installed extension file: it loads AMC's extension module for this workspace and mode. It reads Pi's version
+ * itself, because only a file Pi loads directly resolves Pi's own module (a nested ESM import does not); a version it
+ * cannot read is "unknown", which control denies, rather than a load failure that would leave Pi running without AMC.
+ */
 function extensionSource(workspace: string, mode: HookMode, modulePath: string): string {
   return [
     `// AMC managed Pi extension [${integrationId(mode)}], written by \`amc connect hooks install --provider pi\`. Do not edit;`,
     "// remove it with `amc connect hooks remove --provider pi`.",
     `import { createAmcPiExtension } from ${JSON.stringify(modulePath)};`,
-    `export default createAmcPiExtension({ workspace: ${JSON.stringify(workspace)}, mode: ${JSON.stringify(mode)} });`,
+    "export default async function amc(pi) {",
+    "  let piVersion;",
+    "  try { piVersion = (await import(\"@earendil-works/pi-coding-agent\")).VERSION; } catch { piVersion = undefined; }",
+    `  return createAmcPiExtension({ workspace: ${JSON.stringify(workspace)}, mode: ${JSON.stringify(mode)}, piVersion })(pi);`,
+    "}",
     "",
   ].join("\n");
 }

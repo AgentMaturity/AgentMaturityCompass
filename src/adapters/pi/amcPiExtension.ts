@@ -20,8 +20,6 @@ const AMC_CONTROL_UNAVAILABLE = "AMC control unavailable; action denied.";
 const DEFAULT_TIMEOUT_MS = 5_000;
 /** Pi's built-in tools; any other tool name is an extension's. */
 const PI_BUILTIN_TOOLS = new Set(["read", "bash", "edit", "write", "grep", "find", "ls", "powershell"]);
-/** Pi aliases this module for extensions (Pi's virtual-modules.js); widened so tsc does not resolve it. */
-const PI_MODULE: string = "@earendil-works/pi-coding-agent";
 
 /** The part of Pi's ExtensionContext the extension reads. */
 export interface PiToolCallContext {
@@ -50,8 +48,8 @@ export interface AmcPiExtensionOptions {
   /** Written into the installed extension file; a manifest naming another mode is refused. */
   readonly mode: "observe" | "control";
   readonly timeoutMs?: number;
-  /** Pi's version; read from Pi when omitted. */
-  readonly piVersion?: string;
+  /** Pi's VERSION, read by the installed extension file; anything but a non-empty string is "unknown", which control denies. */
+  readonly piVersion?: unknown;
 }
 
 /** Pi's tool_call and tool_result shape (1.0.2, 1.0.4); anything else is an event AMC does not recognise. */
@@ -68,15 +66,6 @@ function deepFreeze(value: unknown): void {
   if (typeof value !== "object" || value === null || Object.isFrozen(value)) return;
   Object.freeze(value);
   for (const item of Object.values(value)) deepFreeze(item);
-}
-
-async function readPiVersion(): Promise<string> {
-  try {
-    const pi = await import(PI_MODULE) as { VERSION?: unknown };
-    return typeof pi.VERSION === "string" && pi.VERSION.length > 0 ? pi.VERSION : UNKNOWN_PI_VERSION;
-  } catch {
-    return UNKNOWN_PI_VERSION;
-  }
 }
 
 function report(ctx: PiToolCallContext, message: string): void {
@@ -102,7 +91,7 @@ function observation(config: PiHookConfig, version: string, actionId: string, to
 export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExtensionApi) => Promise<void> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   return async (pi) => {
-    const version = options.piVersion ?? await readPiVersion();
+    const version = typeof options.piVersion === "string" && options.piVersion.length > 0 ? options.piVersion : UNKNOWN_PI_VERSION;
     const observe = async (event: unknown, ctx: PiToolCallContext, type: Parameters<typeof observation>[4]) => {
       try {
         if (!isPiToolEvent(event)) throw new Error("Pi sent a tool event AMC does not recognise");

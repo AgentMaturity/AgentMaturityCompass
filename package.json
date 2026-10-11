@@ -160,6 +160,10 @@
       "types": "./dist/sdk/nativeAgentClient.d.ts",
       "import": "./dist/sdk/nativeAgentClient.js"
     },
+    "./pi": {
+      "types": "./dist/adapters/pi/amcPiExtension.d.ts",
+      "import": "./dist/adapters/pi/amcPiExtension.js"
+    },
     "./standard/external-evidence": {
       "types": "./dist/standard/externalEvidenceProfile.d.ts",
       "import": "./dist/standard/externalEvidenceProfile.js"

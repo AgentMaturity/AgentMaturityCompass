@@ -1233,7 +1233,8 @@ describe("AMC Pi hook installation (P1-22)", () => {
 
     const extension = readFileSync(files.extension, "utf8");
     expect(extension).toContain(`import { createAmcPiExtension } from ${JSON.stringify(piModule)};`);
-    expect(extension).toContain(`createAmcPiExtension({ workspace: ${JSON.stringify(resolve(workspace))}, mode: "control" })`);
+    expect(extension).toContain(`createAmcPiExtension({ workspace: ${JSON.stringify(resolve(workspace))}, mode: "control", piVersion })(pi)`);
+    expect(extension).toContain('piVersion = (await import("@earendil-works/pi-coding-agent")).VERSION;');
     expect(statSync(files.token).mode & 0o777).toBe(0o600);
     const manifest = readJson(files.manifest);
     expect(manifest).toMatchObject({
