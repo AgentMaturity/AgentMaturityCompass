@@ -59,7 +59,10 @@ export const QUESTIONS: A4Question[] = [
   question("memoryPrivacyClass", "Privacy class of what the agent may remember: public, internal or restricted. Leave empty for restricted.", "text", false),
   question("memoryRetentionDays", "How many days may a remembered item be kept? A whole number from 1 to 3650; leave empty for 90.", "text", false),
   question("memoryReviewDays", "After how many days must a remembered item be reviewed? A whole number up to the retention; leave empty for 30.", "text", false),
-  question("memoryConsumers", "Which AMC consumers may read the agent's memory (score, recommendation, fixer, studio)? One per line; leave empty for all four.", "list", false)
+  question("memoryConsumers", "Which AMC consumers may read the agent's memory (score, recommendation, fixer, studio)? One per line; leave empty for all four.", "list", false),
+  // Permissions (slice B): accepted only when a project owner's revision records exactly the digest Understand listed.
+  question("acceptWidenings", "Project owner only: to accept the permission widenings Understand listed (the Permissions card shows them), enter their digest exactly. Leave empty to refuse them.",
+    "text", false)
 ];
 
 export const ADAPT_SPEC_SCHEMA = "amc.a4-adapt-spec/v1";
@@ -132,6 +135,8 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     return fact === "primaryStation" && terms.length > 0 && !(factList(values.get("stations")) ?? []).includes(terms[0]!);
   });
   invalid.push(...memoryPolicyFields(values).invalid);
+  const accept = textValue(values.get("acceptWidenings"));
+  if (accept !== null && !/^[0-9a-f]{64}$/.test(accept)) invalid.push("acceptWidenings");
   const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
     : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
   return { missing, stale, invalid, carried: carriedGaps };

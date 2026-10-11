@@ -29,6 +29,9 @@ import { conformanceStatement, recordControlResults } from "../a4Conformance.js"
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import { contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, writeContextPlugin } from "../adaptContextPlugin.js";
 import {
+  operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
+} from "../adaptPermissions.js";
+import {
   activateBoundPlan, activationExecutionId, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
 } from "../adaptPolicy.js";
 import {
@@ -57,7 +60,9 @@ export function register(registry: A4StageRegistry): void {
   RESOURCE_SLOTS["plan.lockDigest"] = () => shippedLockDigest();
   RESOURCE_SLOTS["context.memoryPolicySha256"] = memoryPolicySha256;
   RESOURCE_SLOTS["context.contextPluginSha256"] = contextPluginSha256;
-  registry.items.push(contextItems);
+  RESOURCE_SLOTS["operatingProfile.sha256"] = operatingProfileSha256;
+  RESOURCE_SLOTS["operatingProfile.activationSha256"] = operatingProfileActivationSha256;
+  registry.items.push(contextItems, permissionItems);
   registry.registerEffect(ACTIVATE_PLAN_EFFECT);
 }
 
@@ -104,8 +109,10 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
   const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,
     dependencyDigest: dependencyDigest([], values) }));
   const merged = [...kept, ...carriedAnswers].sort((a, b) => a.questionId.localeCompare(b.questionId));
-  const facts = understandAdapt({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
-    answers: merged, now: ctx.now });
+  const facts = { ...understandAdapt({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
+    answers: merged, now: ctx.now }),
+  // The station's operating profile, dry-run against the current verified configs (A4's own proposal file; nothing under .amc/).
+  permissions: permissionsDryRun({ workspace: ctx.workspace, agentId: project.agent_id, station: profileStation(merged), generatedAt: profileGeneratedAt(ctx.state) }) };
   const understanding = { answersDigest: answersDigestOf(merged), carried: [...carried.keys()], facts };
   const plan = facts.plan;
   const output = (label: string, body: unknown, lane: "implementation" | "recommendation" = "recommendation") =>
@@ -118,7 +125,8 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
           unsupported: plan.unsupported, followUps: facts.followUps, notice: facts.notice }),
       output("register entries of the stations, with verified as recorded", facts.register),
       output("reporting-clock candidates (each needs classification)", { reviewStatus: CLOCK_REVIEW_STATUS, clocks: facts.clocks }),
-      output("signed configs and the active compiled plan", { configs: facts.configs, activePlan: facts.activePlan }, "implementation")
+      output("signed configs and the active compiled plan", { configs: facts.configs, activePlan: facts.activePlan }, "implementation"),
+      output("the station operating profile's dry run: widenings activateOperatingProfile({ allowWidening: false }) refuses", facts.permissions, "implementation")
     ],
     spec: { ...spec, answers: merged, understanding },
     response: { understanding: { answersDigest: understanding.answersDigest, carried: understanding.carried, planDigest: plan?.digest ?? null,
@@ -138,6 +146,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
   const clocks = facts?.clocks ?? [];
   const jurisdictions = factList(factAnswer(answers, "jurisdictions")?.value);
   const memory = memoryPolicyFields(answerValues(answers)).fields;
+  const permissions = understandingCurrent(spec, answers) ? permissionsOf(spec) : null;
   return [
     { id: "applicability", sources: ["compilePlan", "evaluatePredicate", "catalog/"], dataStatus: "experimental",
       novice: plan === null ? "AMC could not work out yet which requirements apply: the answers did not compile into a plan."
@@ -171,6 +180,17 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       practitioner: `Build writes <agent>/memory/policy.json: retentionTag ${memory.retentionTag}, consumers ${memory.allowedConsumers.join(", ")}`
         + ` (${Object.entries(memory.sources).map(([field, from]) => `${field} ${from}`).join(", ")}). Enforcement ${MEMORY_ENFORCEMENT_NOTE}.`,
       expert: `amc.a4-memory-policy/v1 ${canonicalize(memory)}; enforcement: advisory (no reader of the file in src/learning).` },
+    { id: "permissions", sources: ["buildOperatingProfile", "activateOperatingProfile({ dryRun: true })", "src/a4/adaptPermissions.ts"], dataStatus: null,
+      novice: permissions === null ? "Understand compares your station's recommended settings with the settings the workspace enforces today."
+        : permissions.error !== null ? `AMC could not compare the station's recommended settings with the workspace's (${permissions.error}).`
+          : permissions.widenings.length === 0 ? `The ${String(permissions.station)} station's recommended settings would not loosen anything the workspace enforces today.`
+            : `Applying the ${String(permissions.station)} station's recommended settings would loosen ${permissions.widenings.length} setting(s) the workspace enforces today, `
+              + "so AMC refuses them unless a project owner accepts exactly that list. AMC never applies them for you.",
+      practitioner: permissions === null || permissions.error !== null ? `No dry run (${permissions?.error ?? "not run"}).`
+        : `${permissions.profilePath ?? "the proposal"} (signed with the workspace auditor key): ${permissions.widenings.length} widening(s)`
+          + `${permissions.widenings.length === 0 ? "" : `: ${permissions.widenings.slice(0, 5).join("; ")}`}. A4 never passes allowWidening; activation is the owner's amc domain apply --activate-profile.`,
+      expert: permissions === null ? "permissionsDryRun not run." : `activateOperatingProfile({ dryRun: true, allowWidening: true }) on ${permissions.profilePath ?? "none"}: widenings sha256 ${permissions.wideningsSha256 ?? "none"}; `
+        + `configs ${permissions.configs.map((entry) => `${entry.config}=${entry.sha256 ?? "stamped at write"}`).join(", ") || "none"}; error ${permissions.error ?? "none"}.` },
     { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
       novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
         + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
