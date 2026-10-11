@@ -13,7 +13,7 @@
  *   whose record is refused was never delivered and is revoked.
  * - import: the neutral importer over a workspace file or directory reached with no symbolic link on the way, originals
  *   retained (P1-24): imported traces stay self_reported. The record binds the import's manifest; a refused record rolls
- *   the import back.
+ *   the import back. A source already imported is 409 IMPORT_EXISTS: an existing import is never rewritten or rolled back.
  * The bounded first task through `createForeignRunner` is not run here: a foreign child runs only under `spawnSubagent`
  * from a parent session, and Studio's native tasks compose no delegation (NATIVE_TASKS_NO_DELEGATION, the workflow
  * executor's blocker); Propose lists it as unsupported with that key.
@@ -274,14 +274,28 @@ async function importTraces(route: A4Route, projectId: string): Promise<true> {
   const { state, claim } = externalPrecheck(route, projectId, body.expectedHeadSeq);
   assertOwnerMode(route.workspace, "a4 import");
   const source = importSource(route.workspace, body.inputPath);
-  let imported: NeutralImportResult;
-  try {
-    imported = runNeutralImport({ workspace: route.workspace, inputPath: source.abs, agentId: state.project.agent_id, mode: "import", retainOriginals: true });
-  } catch (error) {
-    throw a4Fail(422, errorCodeOf(error, "IMPORT_REFUSED"), "The neutral importer refused this source; check it with `amc import --help`.");
+  const run = (mode: "dry-run" | "import", expectedSemanticDigest?: string): NeutralImportResult => {
+    try {
+      return runNeutralImport({ workspace: route.workspace, inputPath: source.abs, agentId: state.project.agent_id, mode, retainOriginals: true,
+        ...(expectedSemanticDigest === undefined ? {} : { expectedSemanticDigest }) });
+    } catch (error) {
+      throw a4Fail(422, errorCodeOf(error, "IMPORT_REFUSED"), "The neutral importer refused this source; check it with `amc import --help`.");
+    }
+  };
+  // The importId is deterministic per source and agent: a second import of the same source (a double click, a retry, a
+  // re-import after request-changes) would rewrite, and on a refused record roll back, the files an earlier record names.
+  // So nothing this import writes may exist yet (the shared originals store and blobs are not per import), and only an
+  // import this call created is ever rolled back.
+  const planned = run("dry-run");
+  if (planned.plan.wouldWrite.some((rel) => rel.includes(planned.importId) && present(join(route.workspace, rel)))) {
+    throw a4Fail(409, "IMPORT_EXISTS", `This source was already imported as ${planned.importId}; AMC never rewrites or rolls back an existing import.`,
+      { reasonCodes: [`IMPORT:${planned.importId}`] });
   }
+  const imported = run("import", planned.plan.normalization?.semanticDigest);
+  if (imported.importId !== planned.importId) throw a4Fail(409, "IMPORT_SOURCE_CHANGED", "The source changed while it was imported; nothing was recorded.");
   const rollback = (): void => {
     try {
+      // This call created the import (nothing of it existed before), so no earlier record names its files.
       rollbackNeutralImport({ workspace: route.workspace, importId: imported.importId });
     } catch {
       // Reported by the import's own manifest; the A4 record names nothing.

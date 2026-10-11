@@ -4171,7 +4171,8 @@ components:
           minLength: 1
           maxLength: 512
           description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or
-            at the end (400 PATH_NOT_PLAIN), so never under .amc/."
+            at the end (400 PATH_NOT_PLAIN), so never under .amc/. A source already imported is 409 IMPORT_EXISTS
+            (an existing import is never rewritten or rolled back)."
         expectedHeadSeq:
           type: integer
           minimum: 0

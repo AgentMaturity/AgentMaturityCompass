@@ -177,7 +177,7 @@ export function a4Schemas(): Record<string, unknown> {
       note: { type: "string", minLength: 1, maxLength: 4000, description: "Scanned for secrets, then sealed in the project's encrypted blob store; the engine request and the action journal carry only a reference naming the sealed blob and the note's sha256." } }),
     A4AssembleScaffold: control({ directory: { type: "string", minLength: 1, maxLength: 200, description: "Workspace-relative; plain names without a leading dot; no symbolic link or file on the way (400 PATH_NOT_PLAIN), so never under .amc/; must not exist yet." } }),
     A4AssembleConnect: control({ mode: { type: "string", enum: ["supervise", "sandbox"] }, adapterId: { type: ["string", "null"], pattern: "^[a-z0-9][a-z0-9._-]{0,63}$" } }, ["mode"]),
-    A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or at the end (400 PATH_NOT_PLAIN), so never under .amc/." } }),
+    A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory: plain names without a leading dot, no symbolic link on the way or at the end (400 PATH_NOT_PLAIN), so never under .amc/. A source already imported is 409 IMPORT_EXISTS (an existing import is never rewritten or rolled back)." } }),
     A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest })
   };
 }
