@@ -22,6 +22,8 @@ Individual setup and integration guides for each supported adapter.
 | 14 | `generic-cli` | Any CLI Agent | [generic-cli.md](generic-cli.md) |
 | 15 | `deepseek-harness` | DeepSeek Harness headless capture (qualification pending) | [deepseek-harness.md](deepseek-harness.md) |
 
+Pi is connected through its `tool_call` hook rather than an adapter id: `amc connect hooks install --provider pi`. See [pi.md](pi.md) for what is enforced, for which Pi versions, and what is not covered.
+
 ## Quick Start
 
 ```bash

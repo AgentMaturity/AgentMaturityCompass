@@ -294,7 +294,7 @@ AMC provides 1,226 public CLI command paths in the live command inventory.
 | 275 | `amc connect` | Connect an agent runtime and track first action, decision, and proof |
 | 276 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks |
 | 277 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event |
-| 278 | `amc connect hooks install` | Install a reversible project hook for Claude Code or Gemini CLI |
+| 278 | `amc connect hooks install` | Install a reversible project hook for Claude Code, Gemini CLI or Pi |
 | 279 | `amc connect hooks lifecycle` | Verify one requested, controlled, and terminal provider action lifecycle |
 | 280 | `amc connect hooks remove` | Remove only the signed AMC-owned hook and revoke its lease |
 | 281 | `amc connect hooks status` | Verify provider config ownership, mode, signed manifest, and hook lease |
@@ -3270,7 +3270,7 @@ Verify signed hook setup and show the latest verified provider event
 
 #### `amc connect hooks install`
 
-Install a reversible project hook for Claude Code or Gemini CLI
+Install a reversible project hook for Claude Code, Gemini CLI or Pi
 
 
 | Option | Description |
