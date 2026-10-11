@@ -27,7 +27,7 @@ function taskView(value) {
       || value.recovery.eligible !== (value.recovery.state !== "blocked")))
     || !(value.resumeBlockedReason === null || typeof value.resumeBlockedReason === "string")
     || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean" || typeof value.archived !== "boolean"
-    || !["not-verified","workspace-key-consistency","externally-anchored","failed"].includes(value.verification)) {
+    || !["not-verified","workspace-key-consistency","externally-anchored","anchored-prefix","failed"].includes(value.verification)) {
     throw new Error("Studio returned an unsupported task state. Refresh this page after updating Studio.");
   }
   return value;

@@ -1,6 +1,7 @@
 image_repository = "ghcr.io/your-org/amc-studio"
 image_tag        = "latest"
-replica_count    = 2
+# image_digest   = "sha256:<64 hex>"  # wins over image_tag when set
+replica_count    = 1
 
 # Optional production overrides:
 # values_files            = ["../../helm/amc/examples/values-ingress-tls.yaml"]

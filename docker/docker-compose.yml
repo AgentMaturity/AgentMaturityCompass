@@ -21,6 +21,8 @@ services:
       - NODE_ENV=production
       - AMC_BIND=0.0.0.0
       - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      # Native routes admit only the bind host or these origins; amc-verify calls http://amc-studio:3212.
+      - AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212
       - AMC_BOOTSTRAP=1
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username
@@ -39,6 +41,33 @@ services:
       - /home/amc:uid=10001,gid=10001,mode=0700
     secrets:
       - amc_vault_passphrase
+      - amc_owner_username
+      - amc_owner_password
+
+  # One-shot governed-turn check: `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`.
+  # Same probe as the Helm test pod (scripts/deploy/governed-turn-probe.mjs); exits 0 only on a verified turn.
+  amc-verify:
+    profiles: ["verify"]
+    image: amc-studio:local
+    depends_on:
+      amc-studio:
+        condition: service_healthy
+    entrypoint: ["node", "/probe/governed-turn-probe.mjs"]
+    command:
+      - --base-url
+      - http://amc-studio:3212
+      - --username-file
+      - /run/secrets/amc_owner_username
+      - --password-file
+      - /run/secrets/amc_owner_password
+      - --ready-timeout-ms
+      - "60000"
+    volumes:
+      - ../scripts/deploy/governed-turn-probe.mjs:/probe/governed-turn-probe.mjs:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    secrets:
       - amc_owner_username
       - amc_owner_password
 

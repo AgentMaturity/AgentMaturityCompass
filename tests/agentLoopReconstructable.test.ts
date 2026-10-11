@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
@@ -6,6 +6,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { verifySessionChains } from "../src/ledger/sessionVerification.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { SessionService } from "../src/session/sessionService.js";
 import { deriveRecordedRequest } from "../src/llm/request/deriveRequest.js";
 import { readAgentRunSummary, renderVerifyReport, verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
@@ -245,6 +246,148 @@ describe("P3.2 — the run reconstructs and is signed", () => {
       rmSync(source, { recursive: true, force: true });
       rmSync(snapshot, { recursive: true, force: true });
     }
+  });
+
+  /**
+   * A native run beside a gateway session that is still open, as in any running Studio. gatewayFirst opens the
+   * gateway session before the turn, so later rows chain over its row; finish=false leaves the target unclosed.
+   */
+  async function runBesideLiveGateway({ gatewayFirst = false, finish = true } = {}): Promise<LoopHarness> {
+    const harness = loopHarness({ scripts: [textStep("done")] });
+    open.push(harness);
+    const gateway = (stage: string) => {
+      const ledger = openLedger(harness.dir);
+      try {
+        if (!ledger.getAllSessions().some((session) => session.session_id === "gateway-live")) {
+          ledger.startSession({ sessionId: "gateway-live", runtime: "gateway", binaryPath: "gateway", binarySha256: "fixture" });
+        }
+        ledger.appendEvidence({ sessionId: "gateway-live", runtime: "gateway", eventType: "gateway", payload: `{"stage":"${stage}"}`, inline: true });
+      } finally {
+        ledger.close();
+      }
+    };
+    if (gatewayFirst) gateway("start");
+    harness.driver.followup("say hello");
+    await harness.driver.whenIdle();
+    if (finish) harness.finish();
+    gateway(gatewayFirst ? "request" : "start");
+    return harness;
+  }
+  const live = (dir: string, sessionId: string) => verifyAgentRun(dir, sessionId, undefined, { allowLiveLegacySessions: true });
+  /** An attacker with the database file drops the append-only and immutability triggers first. */
+  function withoutTriggers(dir: string, edit: (db: Database.Database) => void): void {
+    const db = new Database(join(dir, ".amc", "evidence.sqlite"));
+    try {
+      for (const { name } of db.prepare("SELECT name FROM sqlite_master WHERE type='trigger'").all() as { name: string }[]) db.exec(`DROP TRIGGER "${name}"`);
+      edit(db);
+    } finally {
+      db.close();
+    }
+  }
+
+  test("P0-14: beside a live gateway the complete verdict fails; the live scope gives a verified prefix, never ok", async () => {
+    const harness = await runBesideLiveGateway();
+    const complete = await verifyAgentRun(harness.dir, harness.sessionId);
+    expect(complete).toMatchObject({ ok: false, integrityOk: false, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: [] });
+    expect(complete.ledgerErrors).toEqual(["Session gateway-live missing seal"]);
+
+    const prefix = await live(harness.dir, harness.sessionId);
+    // A verified prefix is its own state: ok stays false, so nothing that decides on ok treats it as a full verification.
+    expect(prefix).toMatchObject({ ok: false, prefixVerified: true, integrityOk: true, ledgerErrors: [], scope: "verified-prefix", unfinalizedSessions: ["gateway-live"] });
+    const text = renderVerifyReport(prefix);
+    expect(text.split("\n")[0]).toBe(`session ${harness.sessionId}: VERIFIED PREFIX (not finalized: gateway-live)`);
+    expect(text).toContain("scope               verified-prefix (not finalized: gateway-live)");
+
+    // With nothing unfinalized the same option is the complete verdict.
+    const ledger = openLedger(harness.dir);
+    try { ledger.sealSession("gateway-live"); } finally { ledger.close(); }
+    expect(await live(harness.dir, harness.sessionId)).toMatchObject({ ok: true, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: [] });
+  });
+
+  test("NEGATIVE P0-14: in the live scope the target itself must be closed and sealed", async () => {
+    const unclosed = await runBesideLiveGateway({ finish: false });
+    const report = await live(unclosed.dir, unclosed.sessionId);
+    expect(report).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false });
+    expect(report.sessionChainErrors).toContain(`Session ${unclosed.sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
+
+    const unsealed = await runBesideLiveGateway();
+    withoutTriggers(unsealed.dir, (db) => db.prepare("UPDATE sessions SET session_final_event_hash=NULL, session_seal_sig=NULL WHERE session_id=?").run(unsealed.sessionId));
+    const stripped = await live(unsealed.dir, unsealed.sessionId);
+    expect(stripped).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false });
+    expect(stripped.ledgerErrors).toContain(`Session ${unsealed.sessionId} missing seal`);
+  });
+
+  test("NEGATIVE P0-14: every row of an unfinalized session is still checked, and a stripped seal is named", async () => {
+    const truncated = await runBesideLiveGateway();
+    withoutTriggers(truncated.dir, (db) => db.prepare("UPDATE evidence_events SET payload_inline=substr(payload_inline, 1, 5) WHERE session_id=?").run("gateway-live"));
+    expect(await live(truncated.dir, truncated.sessionId)).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false });
+
+    // A cut row that later rows chained over breaks the ledger chain.
+    const cut = await runBesideLiveGateway({ gatewayFirst: true });
+    withoutTriggers(cut.dir, (db) => db.prepare("DELETE FROM evidence_events WHERE rowid = (SELECT min(rowid) FROM evidence_events WHERE session_id=?)").run("gateway-live"));
+    const cutReport = await live(cut.dir, cut.sessionId);
+    expect(cutReport).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false });
+    expect(cutReport.ledgerErrors.length).toBeGreaterThan(0);
+
+    // A sealed legacy session whose seal and end are stripped is never hidden: the verdict names it.
+    const named = await runBesideLiveGateway();
+    const ledger = openLedger(named.dir);
+    try {
+      ledger.startSession({ sessionId: "legacy-sealed", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+      ledger.appendEvidence({ sessionId: "legacy-sealed", runtime: "unknown", eventType: "stdout", payload: "sealed", inline: true });
+      ledger.sealSession("legacy-sealed");
+    } finally {
+      ledger.close();
+    }
+    withoutTriggers(named.dir, (db) => db.prepare("UPDATE sessions SET ended_ts=NULL, session_final_event_hash=NULL, session_seal_sig=NULL WHERE session_id=?").run("legacy-sealed"));
+    const report = await live(named.dir, named.sessionId);
+    expect(report).toMatchObject({ ok: false, scope: "verified-prefix" });
+    expect([...(report.unfinalizedSessions ?? [])].sort()).toEqual(["gateway-live", "legacy-sealed"]);
+  });
+
+  test("NEGATIVE P0-14: another native session whose close and seal were cut is named, and fails a complete verdict", async () => {
+    for (const withGateway of [false, true]) {
+      const harness = loopHarness({ scripts: [textStep("done")] });
+      open.push(harness);
+      harness.driver.followup("say hello");
+      await harness.driver.whenIdle();
+      harness.finish();
+      const second = new SessionService(harness.dir);
+      second.open({ agentId: "default", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p" });
+      second.recordSystemPrompt("second");
+      second.close({ reason: "completed" });
+      const other = second.sessionId;
+      if (withGateway) {
+        const ledger = openLedger(harness.dir);
+        try { ledger.startSession({ sessionId: "gateway-live", runtime: "gateway", binaryPath: "gateway", binarySha256: "fixture" }); } finally { ledger.close(); }
+      }
+      // Intact: the other session is closed and sealed, so it is not named.
+      expect((await live(harness.dir, harness.sessionId)).unfinalizedSessions).toEqual(withGateway ? ["gateway-live"] : []);
+      // Cut its tail (its session/close is the ledger's last row) and clear its seal columns.
+      withoutTriggers(harness.dir, (db) => {
+        db.prepare("DELETE FROM evidence_events WHERE session_id=? AND event_type='session/close'").run(other);
+        db.prepare("UPDATE sessions SET ended_ts=NULL, session_final_event_hash=NULL, session_seal_sig=NULL WHERE session_id=?").run(other);
+      });
+      const prefix = await live(harness.dir, harness.sessionId);
+      expect(prefix).toMatchObject({ ok: false, scope: "verified-prefix" });
+      expect([...(prefix.unfinalizedSessions ?? [])].sort()).toEqual([other, ...(withGateway ? ["gateway-live"] : [])].sort());
+      const strict = await verifyAgentRun(harness.dir, harness.sessionId);
+      expect(strict).toMatchObject({ ok: false, prefixVerified: false, integrityOk: false, scope: "complete-ledger" });
+      expect(strict.sessionChainErrors).toContain(`Session ${other} is not finalized; a complete-ledger verdict needs every other session closed and sealed`);
+    }
+  });
+
+  test("NEGATIVE P0-14: the live scope needs a positive SQLite store marker; unknown or missing evidence fails closed", async () => {
+    const unknown = await runBesideLiveGateway();
+    writeFileSync(join(unknown.dir, ".amc", "session-store.json"), JSON.stringify({ v: 1, backend: "something-else" }));
+    const strict = await live(unknown.dir, unknown.sessionId);
+    expect(strict).toMatchObject({ ok: false, prefixVerified: false, scope: "complete-ledger", unfinalizedSessions: [] });
+    expect(strict.ledgerErrors).toContain("Session gateway-live missing seal");
+
+    const missing = await runBesideLiveGateway();
+    rmSync(join(missing.dir, ".amc", "evidence.sqlite"));
+    // No ledger: the verifier throws rather than returning a verdict (Studio maps a throw to "failed").
+    await expect(live(missing.dir, missing.sessionId)).rejects.toThrow();
   });
 
   test("NEGATIVE: an unsigned workspace does not pass, and says which rows are unsigned", async () => {

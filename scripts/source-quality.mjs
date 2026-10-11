@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const require = createRequire(import.meta.url);
 function tool(name) {
@@ -81,7 +81,7 @@ export function scanSourceQuality(kind, root = process.cwd()) {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const result = scanSourceQuality(process.argv[2]);
   console.log(JSON.stringify({ status: result.findings.length ? "failed" : "passed", tool: result.tool,
     version: result.version, findingCount: result.findings.length, statistics: result.statistics,

@@ -21,7 +21,7 @@ const view: NativeTaskView = { taskId, sessionId: "route-unit-session", agentId:
   clientRequestId: requestId, lastClientRequestId: requestId, provider: "gemini-audio", model: "fixture-model", tools: "none", toolsDigest: null,
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: null, error: null,
   validationSelection: null, validationOutputs: [], validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
-  verification: "not-verified", approvals: [], approvalError: null, nextCursor: 0, firstCursor: 1, droppedEvents: 0, canResume: false,
+  verification: "not-verified", verificationScope: null, approvals: [], approvalError: null, nextCursor: 0, firstCursor: 1, droppedEvents: 0, canResume: false,
   resumeBlockedReason: null, history: { status: "not-started", backend: null, headEventHash: null, eventCount: 0, message: "Synthetic routing fixture" } };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "default", demo: false,
   providers: [{ id: "gemini-audio", local: false, model: "required", credential: { ref: "GEMINI_API_KEY", configured: false, source: null }, input: nativeTaskInputCapabilities("gemini-audio") }],
@@ -111,6 +111,25 @@ describe("P10 native media HTTP admission", () => {
     expect((await f.rawPost("/api/v1/native-tasks", raw)).status).toBe(400);
     expect((await f.rawPost("/api/v1/native-tasks", JSON.stringify(body).slice(0, -1))).status).toBe(400);
     expect(f.service.start).not.toHaveBeenCalled();
+  });
+
+  test("P0-14: no request body, query string or header can enable the live verification scope", async () => {
+    const f = await fixture(), path = `/api/v1/native-tasks/${taskId}/verify?agentId=default`;
+    for (const body of [{ expectedRevision: 1, allowLiveLegacySessions: true }, { expectedRevision: 1, scope: "verified-prefix" },
+      { expectedRevision: 1, options: { allowLiveLegacySessions: true } }]) {
+      expect((await f.post(path, body)).status).toBe(400);
+    }
+    expect(f.service.verify).not.toHaveBeenCalled();
+    const flagged = await f.post(`${path}&allowLiveLegacySessions=true`, { expectedRevision: 1 }, { "x-amc-allow-live-legacy-sessions": "true" });
+    if (flagged.status === 200) {
+      // Accepted only with the flag ignored: the service receives exactly the actor, the task and the revision.
+      expect(f.service.verify).toHaveBeenCalledTimes(1);
+      expect(f.service.verify.mock.calls[0]).toHaveLength(3);
+      expect(f.service.verify.mock.calls[0]!.slice(1)).toEqual([taskId, 1]);
+    } else {
+      expect(flagged.status).toBe(400);
+      expect(f.service.verify).not.toHaveBeenCalled();
+    }
   });
 
   test("follow-ups cannot mutate validation, model or authority, and require an exact revision", async () => {

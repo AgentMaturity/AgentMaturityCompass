@@ -32,9 +32,9 @@
     },
     {
       "path": "scripts/source-quality.mjs",
-      "issue": "P1-52",
-      "baseCommit": "e1e1a1bb52043ef28ee58eed24613604430e7d24",
-      "archivePath": "unused-code/plan-edits/P1-52/scripts/source-quality.mjs.landed",
+      "issue": "P0-14",
+      "baseCommit": "691a041dc552e57688175331959ada75e302e0c0",
+      "archivePath": "unused-code/plan-edits/P0-14/scripts/source-quality.mjs.landed",
       "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
     },
     {

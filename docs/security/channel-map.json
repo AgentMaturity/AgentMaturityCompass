@@ -287,16 +287,17 @@
       "id": "helm-compose",
       "name": "Helm and Compose",
       "enforcementPoints": [
-        { "path": "deploy/helm/amc/templates/secret.yaml", "symbol": "change-me-vault-passphrase" },
+        { "path": "deploy/helm/amc/templates/secret.yaml", "symbol": "createSecret" },
+        { "path": "deploy/helm/amc/templates/_helpers.tpl", "symbol": "amc.bootstrapValue" },
         { "path": "deploy/compose/docker-compose.yml", "symbol": "AMC_VAULT_PASSPHRASE_FILE" }
       ],
-      "evidence": "None at deploy on main",
-      "status": "none",
+      "evidence": "Render refusals; helm test and deploy-verify results the operator keeps",
+      "status": "advisory",
       "bypasses": [
-        "The Helm secret template ships change-me values for the vault, owner and notary secrets",
+        "A workspace bootstrapped by chart 0.1.0 keeps the published vault passphrase; no amc vault command changes a passphrase",
         "Compose reads file secrets the operator must create; nothing checks them"
       ],
-      "owners": ["P0-14", "P0-35"],
+      "owners": ["P0-35", "P0-37"],
       "asi": ["ASI04"]
     }
   ],

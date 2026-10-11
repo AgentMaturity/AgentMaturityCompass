@@ -6,6 +6,97 @@ Use it for every production release.
 
 ---
 
+## Phase B gates (B0–B4)
+
+These steps follow `plans/2026-09-09-amc-execution-brief.md` §6. Phase B starts
+only after the Phase A queue is Done and the full release gate is green at a
+single pinned commit. **B3 and B4 are owner-confirmation gates.** Nothing past
+them runs until Sid has said yes in the conversation, and the yes covers only
+the exact version, SHA256 or digest that was shown to him.
+
+### B0 — Blocking security gate
+
+A hard blocker on any public exposure. Record the disposition of every B0 item
+in the brief: key-rotation proof, trust-root findings, passphrases and
+public-repo hygiene. If there is no in-repo proof that the flagged keys were
+rotated, **stop and ask Sid**.
+
+### B1 — Credentials check, up front
+
+```bash
+node scripts/credentials-presence-check.mjs                      # every credential; exit 1 if any is absent
+node scripts/credentials-presence-check.mjs --for publish,sign-release
+node scripts/credentials-presence-check.mjs --for deploy-railway  # or deploy-vercel, push-image
+gh secret list --repo AgentMaturity/AgentMaturityCompass          # names only; GitHub never returns values
+```
+
+The script reports `present`/`absent` for each name, what needs it and where
+it is configured, and never a value. `--json` prints
+`{ NAME: { present, requiredFor, configureAt } }`. `NPMRC_AUTH_TOKEN_LINE` is
+whether `$HOME/.npmrc` has an `_authToken` line; the line is never printed. It
+exits 1 and prints `missing for <action>: <names>` when a required credential
+is absent. It reads the shell it runs in. CI secrets live in the repository
+settings, so check those with `gh secret list`. **If any credential is absent:
+stop, list what is needed and where it goes (the script prints both), and
+wait.**
+
+### B2 — Release candidate
+
+```bash
+git rev-parse HEAD                      # the pinned candidate commit
+pnpm release:gate -- --json --out tmp/release-gate/candidate.json
+pnpm release:prepack-check
+pnpm check:packed-install               # in a fresh clone of the candidate commit
+pnpm check:clean-source                 # in a fresh clone of the candidate commit
+pnpm release:verify-version
+```
+
+Name every skipped gate check with its reason. Produce the signed artifact and
+record its SHA256 (`shasum -a 256 dist/amc-<version>.amcrelease`).
+
+### B3 — Publish — **CONFIRM WITH SID FIRST**
+
+`pnpm release` runs `changeset publish`.
+**Do not run it until you have shown Sid the version, the artifact SHA256, the gate result, and the B0 disposition, and he has said yes in this conversation.**
+Publishing is irreversible and outward-facing.
+
+Pushing a `v<version>` tag (section 3 below) runs `release.yml`, which also
+publishes to npm when `NPM_TOKEN` is configured. A tag push is a B3 action.
+
+### B4 — Live deployment — **CONFIRM WITH SID FIRST**
+
+Before deploying:
+
+```bash
+docker build -t amc-studio:<version> .
+docker image inspect amc-studio:<version> --format '{{.Id}}'   # record; RepoDigests after push
+```
+
+- Record the image digests (`Dockerfile`, `docker/docker-compose.yml`,
+  `docker/Dockerfile.quickstart`).
+- Prove that no default or demo passphrase is present in the deployed
+  configuration.
+- Have a tested rollback (section 5).
+- **Then show Sid the target, the digest, the rollback, and wait for an explicit yes.**
+
+After deploying, the deploy counts as verified only when a governed turn passes
+against it:
+
+```bash
+node scripts/credentials-presence-check.mjs --for deploy-verify
+node scripts/deploy-verify.mjs --target <studio-url> --gateway <gateway-url> \
+  --monitor-pubkey <pinned monitor_ed25519.pub> --out tmp/deploy-verify/<version>.json
+```
+
+See [`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md) for what this
+proves and what it does not. The `railway.json` and `vercel.json` targets serve
+only the lightweight scoring API, which cannot pass this check. Live
+deployment health has been an explicitly skipped gate in every prior receipt,
+so do not report it as previously qualified. Record the live URL, the deployed
+commit, the image digest and the verifier result JSON.
+
+---
+
 ## 0) Preconditions
 
 - Release PR merged to `main`
@@ -91,7 +182,8 @@ At minimum:
 
 ## 3) Cut release
 
-1. Confirm `package.json` version is final
+1. Confirm `package.json` version is final, and that the B3 owner confirmation
+   (above) has been given for this exact version
 2. Create and push tag:
 
 ```bash
