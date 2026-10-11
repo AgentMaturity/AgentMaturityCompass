@@ -13,6 +13,7 @@ import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalStatusPayload } from "../approvals/approvalEngine.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import type { A4ChainLink } from "./a4Schema.js";
+import { RESOLUTION_PURPOSE } from "./spec/assemble.js";
 
 export function blockingExecutionsIn(db: Database.Database, workspace: string, agentId: string): string[] {
   const staleBefore = Date.now() - DEFAULT_ACTION_STALE_AFTER_MS;
@@ -31,14 +32,23 @@ export function blockingExecutionsIn(db: Database.Database, workspace: string, a
 
 /**
  * The engine status (PENDING, QUORUM_MET, DENIED, EXPIRED, CONSUMED, CANCELLED; UNREADABLE when its record does not
- * verify) of the newest engine requests this project's chain names: an effect gate it opened, an `approval` ref it
- * recorded (an outcome_unknown resolution request). Readiness names it so a card never offers a vote on a closed request.
+ * verify) of exactly the engine requests readiness names, looked up by their own ids from links only this lane writes:
+ * each effect gate's newest opened request (EFFECT_GATE_OPENED, an owner's), and the newest resolution request
+ * (EVIDENCE_REF with purpose outcome_unknown_resolution, which the generic evidence route cannot set) of each execution
+ * blocking the agent now. A generic `approval` ref a member adds is never read, so none can push these out. Readiness
+ * names the status so a card never offers a vote on a closed request.
  */
-export function engineRequestStatusesIn(workspace: string, agentId: string, chain: readonly A4ChainLink[]): Record<string, string> {
-  const ids = [...new Set([...chain].reverse().flatMap((link) => {
-    const id = link.kind === "EFFECT_GATE_OPENED" ? link.body.approvalRequestId : link.kind === "EVIDENCE_REF" && link.body.refKind === "approval" ? link.body.refId : null;
-    return typeof id === "string" && /^apprreq_[a-f0-9]{32}$/.test(id) ? [id] : [];
-  }))].slice(0, 32);
+export function engineRequestStatusesIn(workspace: string, agentId: string, chain: readonly A4ChainLink[], blocking: readonly string[]): Record<string, string> {
+  const newest = [...chain].reverse();
+  const gates = new Set<unknown>();
+  const effectRequests = newest.flatMap((link) => {
+    if (link.kind !== "EFFECT_GATE_OPENED" || gates.has(link.body.gateId)) return [];
+    gates.add(link.body.gateId);
+    return [link.body.approvalRequestId];
+  }).slice(0, 16);
+  const resolutionRequests = blocking.slice(0, 16).map((executionId) => newest.find((link) => link.kind === "EVIDENCE_REF"
+    && link.body.purpose === RESOLUTION_PURPOSE && link.body.executionId === executionId)?.body.refId);
+  const ids = [...new Set([...effectRequests, ...resolutionRequests].filter((id): id is string => typeof id === "string" && /^apprreq_[a-f0-9]{32}$/.test(id)))];
   return Object.fromEntries(ids.map((approvalId) => {
     try {
       return [approvalId, approvalStatusPayload({ workspace, agentId, approvalId }).status];

@@ -197,6 +197,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
   }
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
+  const blocking = stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null;
   return {
     activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
@@ -210,8 +211,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
-    blockingExecutions: stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null,
-    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain) : null
+    blockingExecutions: blocking,
+    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null
   };
 }
 
