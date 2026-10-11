@@ -392,11 +392,16 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
 2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
    routes, 24 hours, bound to this workspace and agent, with the release as its work order.
-3. The manifest (`amc.a4-package/v1`, no absolute path) is signed `A4_PACKAGE`, the tarball `a4-package`, and the
-   transparency log gets an `a4-package` entry.
+3. The manifest (`amc.a4-package/v1`, no absolute path) is signed `A4_PACKAGE` and the tarball `a4-package`.
+   `RELEASE`'s own refusals (`RELEASE_STEP_MOVED`, `RELEASE_STAGE_REDONE`, `RELEASE_ATTEMPT_SETTLED`) are checked before
+   anything is minted or signed. A failure that records no release revokes the lease it minted and removes the release
+   directory and its tarball files.
 4. `RELEASE` records the release (`amc.a4-release/v1`): the eight-surface table (Score, Shield, Enforce, Vault, Watch,
    Comply, Fleet, Passport; Passport reads `not_evaluated` until P0-55), the previous and base release (TUNE lineage),
    the staging lease id and its own `A4_RECORD` envelope.
+5. Only after `RELEASE` commits does the transparency log get an `a4-package` entry, so a refused release attests nothing
+   there. `EFFECT_FINISHED` names the entry; a retry reuses the entry of the same release and package, and
+   `GET …/releases/:rid` shows the entry or the reason it is missing.
 
 The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the attempt id,
 and a replay answers from the chain: `token: null` with `TOKEN_ALREADY_DELIVERED` once that attempt finished, the
@@ -459,15 +464,23 @@ Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { envi
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
 separation of duties. The preview names the previous release, its Enforce manifest, the leases, the prepared commands
 and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
-then confirms the exact ids the preview bound and runs these steps:
+then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
+pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a second attempt while one runs is refused
+(`EFFECT_RUNNING`). Then it runs these steps:
 
-1. An incident freeze, first, for a high or critical risk tier.
-2. `restoreEnforceResourceSnapshot({ apply: true, confirmManifestId })`.
-3. Every lease of the release revoked.
-4. The prepared operator commands answered.
-5. A signed `a4-rollback-receipt` written and a `ROLLBACK` transition recorded. The project holds when a freeze was raised.
+1. The engine grant, consumed by this rollback's execution.
+2. An incident freeze, first, for a high or critical risk tier.
+3. `restoreEnforceResourceSnapshot({ apply: true, confirmManifestId })`.
+4. Every lease of the release revoked, read again at this point: the preview's, a production lease minted after the
+   preview, and any lease a failed attempt journaled. The receipt and `ROLLBACK` list them all.
+5. The prepared operator commands answered.
+6. A signed `a4-rollback-receipt` written, and `ROLLBACK` with `EFFECT_FINISHED` recorded in one transaction. The project
+   holds when a freeze was raised.
 
-A rollback may run on a held or frozen project. The lifecycle is never moved backwards. The project's
+A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt
+whose outcome could not be written reads as lost (`PROCESS_LOST`). The next request settles it first, then re-runs the
+steps; the restore and the revocations are idempotent. A replay of the request answers that attempt's outcome. A
+rollback may run on a held or frozen project. The lifecycle is never moved backwards. The project's
 `deployedReleaseId` moves only when the operator records the rollback row.
 
 The lifecycle bridge runs after `RELEASE` and after the deployment approval's production lease. After `RELEASE` it moves

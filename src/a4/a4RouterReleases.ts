@@ -15,7 +15,7 @@ import { deploymentBodySchema, deploymentViews, recordDeployment } from "./a4Dep
 import { verifyBodySchema, verifyDeployment } from "./a4DeployVerify.js";
 import { loadA4State } from "./a4Gates.js";
 import { releaseViews } from "./a4Package.js";
-import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackSchema } from "./a4Rollback.js";
+import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackReplay, rollbackSchema } from "./a4Rollback.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
 import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
 import { completeAndRun } from "./a4RouterStages.js";
@@ -53,12 +53,14 @@ async function releaseAction(route: A4Route, projectId: string, releaseId: strin
   }
   const { body, request } = await readJson(route, rollbackSchema);
   const replay = priorReplay(store, request, projectId);
-  if (replay) return (apiSuccess(route.res, replay), true);
+  if (replay) return (apiSuccess(route.res, rollbackReplay(store, projectId, replay)), true);
   assertNoSecrets(body.reason, "The reason");
   const done = rollbackRelease(store, projectId, releaseId, { ...callOf(route, request), body });
-  // Lease ids and commands are answered here, never stored in the request's replay row.
-  apiSuccess(route.res, mutationResult(done.result, { rollbackId: done.rollbackId, receiptPath: done.receiptPath, leaseIdsRevoked: done.leaseIdsRevoked,
-    preparedCommands: done.preparedCommands, freezeIncidentId: done.frozen, deployedReleaseId: "moves when the operator records the rollback row" }), 201);
+  if (done.result.replay) return (apiSuccess(route.res, rollbackReplay(store, projectId, mutationResult(done.result))), true);
+  // Lease ids and commands are answered here, never stored in the request's replay row (it keeps the attempt id).
+  apiSuccess(route.res, mutationResult(done.result, { attemptId: done.attemptId, rollbackId: done.rollbackId, receiptPath: done.receiptPath,
+    leaseIdsRevoked: done.leaseIdsRevoked, preparedCommands: done.preparedCommands, freezeIncidentId: done.frozen,
+    deployedReleaseId: "moves when the operator records the rollback row" }), 201);
   return true;
 }
 

@@ -311,6 +311,9 @@ function journaledLeases(workspace: string, projectId: string, releaseId: string
   const bytes = regularBytes(leaseJournalPath(workspace, projectId, releaseId), "lease journal");
   return bytes === null ? [] : JSON.parse(bytes.toString("utf8")) as Array<{ leaseId: string; scope: string }>;
 }
+/** Every lease id the release's attempts journaled, of any scope (a failed attempt's too); throws when the journal does not read. */
+export const journaledLeaseIds = (workspace: string, projectId: string, releaseId: string): string[] =>
+  journaledLeases(workspace, projectId, releaseId).map((row) => String(row.leaseId));
 /** Revokes every journaled lease of `scope` not in `keep`; any failure refuses the attempt (a lease of a failed attempt may still be live). */
 function revokeJournaled(workspace: string, projectId: string, releaseId: string, scope: "staging" | "production", keep: readonly string[] = []): void {
   for (const entry of journaledLeases(workspace, projectId, releaseId).filter((row) => row.scope === scope && !keep.includes(row.leaseId))) {

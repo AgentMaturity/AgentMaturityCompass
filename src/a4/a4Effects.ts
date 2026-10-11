@@ -512,7 +512,7 @@ export function completeStage(store: A4Store, projectId: string, input: A4Call &
 }
 
 /** EFFECT_FINISHED / EFFECT_FAILED by amc-runtime, settling the liveness row in the same transaction; once per attempt. */
-function settleEffect(store: A4Store, projectId: string, attemptId: string, kind: "EFFECT_FINISHED" | "EFFECT_FAILED", payload: Record<string, unknown>,
+export function settleEffect(store: A4Store, projectId: string, attemptId: string, kind: "EFFECT_FINISHED" | "EFFECT_FAILED", payload: Record<string, unknown>,
   receipt?: A4EffectOutcome["receipt"]): A4TransitionResult {
   return store.transition(projectId, A4_RUNTIME, ({ seq, ts }) => {
     const chain = store.readChain(projectId);

@@ -444,11 +444,15 @@ function effectsItem(state: A4ReadinessState, lost: readonly string[]): A4Readin
     }
   }
   const states = [...latest.values()].map((link) => link.kind);
-  const retry = (link: A4ChainLink) => `POST /api/v1/a4/projects/${state.project.project_id}/stages/${String(link.body.stage)}/effects/${String(link.body.effect)}/retry`;
+  // A rollback (src/a4/a4Rollback.ts, execution a4-rollback-<releaseId>) is run again by its own route, any number of times.
+  const rollback = (link: A4ChainLink): boolean => link.body.effect === "a4.activate.rollback";
+  const retry = (link: A4ChainLink) => rollback(link)
+    ? `POST /api/v1/a4/projects/${state.project.project_id}/releases/${String(link.body.executionId).replace(/^a4-rollback-/, "")}/rollback`
+    : `POST /api/v1/a4/projects/${state.project.project_id}/stages/${String(link.body.stage)}/effects/${String(link.body.effect)}/retry`;
   const failed = [...latest.values()].find((link) => link.kind === "EFFECT_FAILED");
   if (failed !== undefined) {
     const code = /^[A-Za-z][A-Za-z0-9_]{0,63}/.exec(String(failed.body.error ?? ""))?.[0] ?? "UNKNOWN";
-    const second = state.chain.filter((link) => link.kind === "EFFECT_FAILED" && link.body.executionId === failed.body.executionId).length >= 2;
+    const second = !rollback(failed) && state.chain.filter((link) => link.kind === "EFFECT_FAILED" && link.body.executionId === failed.body.executionId).length >= 2;
     return item("effects.failed", "BLOCKED", { kind: "effect_failed", reasonCodes: ["EFFECT_FAILED", `EFFECT_ERROR:${code}`, `ATTEMPT:${String(failed.body.effectId)}`],
       nextAction: second ? { label: "A second failure needs a new revision of the stage: reopen it (design §6.5)" }
         : { label: `An owner retries attempt ${String(failed.body.effectId)} (recorded error ${code}; an effect that consumes its own grant is re-opened and completed instead)`,
