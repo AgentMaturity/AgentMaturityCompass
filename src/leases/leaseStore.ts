@@ -1,10 +1,10 @@
 import { rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { assertNeverAnchored, assertNotRolledBack, loggedAnchor, logSequence, markSequence } from "../keys/anchors.js";
+import { assertNeverAnchored, loggedAnchor } from "../keys/anchors.js";
 import {
-  encodeSignedRevocationList, revocationListSchema, revocationListSha256, signRevocationList, verifySignedRevocationListBytes,
-  type RevocationListV1, type SignedRevocationList
+  MAX_REVOCATION_LIST_BYTES, nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList,
+  revocationListSchema, revocationListSha256, type AnchoredListLocation, type RevocationListV1, type SignedRevocationList
 } from "../keys/revocationList.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { pathExists, readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
@@ -36,7 +36,7 @@ export function leaseRevocationPaths(workspace: string): { file: string; pending
   return { file, pending: `${file}.pending`, legacyFile, legacySig: `${legacyFile}.sig` };
 }
 
-const MAX_LIST_BYTES = 64 * 1024 * 1024;
+const MAX_LIST_BYTES = MAX_REVOCATION_LIST_BYTES;
 const MAX_SIG_BYTES = 64 * 1024;
 /** A revocation of a credential that expired this long ago is pruned on the next write: verifiers refuse it anyway. */
 const PRUNE_GRACE_MS = 5 * 60 * 1000;
@@ -48,6 +48,10 @@ function listIdFor(workspace: string): string {
 
 function trustedKeys(workspace: string): string[] {
   return getPublicKeyHistory(workspace, "auditor");
+}
+
+function location(workspace: string): AnchoredListLocation {
+  return { workspace, path: leaseRevocationPaths(workspace).file, listId: listIdFor(workspace), trustedPublicKeyPems: trustedKeys(workspace) };
 }
 
 function defaultLeaseRevocations(): LeaseRevocations {
@@ -84,65 +88,17 @@ function readLegacyPair(workspace: string): { store: LeaseRevocations; digest: s
 /** One verified read; the caller holds the revocations lock or has seen no interrupted write. Throws the reason. */
 function readCurrent(workspace: string): Current {
   const paths = leaseRevocationPaths(workspace);
-  const listId = listIdFor(workspace);
-  if (pathExists(paths.file)) {
-    const bytes = readRegularFileNoFollow(paths.file, MAX_LIST_BYTES);
-    const signed = verifySignedRevocationListBytes(bytes, { listId, trustedPublicKeyPems: trustedKeys(workspace) });
-    assertNotRolledBack({ workspace, type: ANCHOR, id: listId, sequence: signed.list.sequence, sha256: revocationListSha256(signed.list),
-      fileSha256: sha256Hex(bytes), entryHash: signed.anchor?.transparencyEntryHash ?? null });
-    return { kind: "signed", signed };
-  }
+  if (pathExists(paths.file)) return { kind: "signed", signed: readAnchoredRevocationList(location(workspace))! };
   // No signed list: the 1.x pair, or nothing, may stand only if no signed list was ever anchored.
-  assertNeverAnchored(workspace, ANCHOR, listId);
+  assertNeverAnchored(workspace, ANCHOR, listIdFor(workspace));
   if (pathExists(paths.legacyFile) || pathExists(paths.legacySig)) return { kind: "legacy", ...readLegacyPair(workspace) };
   return { kind: "empty" };
 }
 
-/**
- * Completes or discards a write interrupted after its signed list was staged. Rolls forward only when the transparency
- * log already holds that exact sequence and content; otherwise the write never committed and the stage is removed.
- * Caller holds the revocations lock.
- */
-function recoverPendingLocked(workspace: string): void {
-  const paths = leaseRevocationPaths(workspace);
-  if (!pathExists(paths.pending)) return;
-  const listId = listIdFor(workspace);
-  const staged = verifySignedRevocationListBytes(readRegularFileNoFollow(paths.pending, MAX_LIST_BYTES), { listId, trustedPublicKeyPems: trustedKeys(workspace) });
-  const logged = loggedAnchor(workspace, ANCHOR, listId);
-  if (logged !== null && logged.sequence === staged.list.sequence && logged.sha256 === revocationListSha256(staged.list)) {
-    writeFinal(workspace, { ...staged, anchor: { transparencyEntryHash: logged.entryHash } });
-  }
-  rmSync(paths.pending, { force: true });
-}
-
-function writeFinal(workspace: string, signed: SignedRevocationList): void {
-  const paths = leaseRevocationPaths(workspace);
-  const bytes = encodeSignedRevocationList(signed);
-  writeFileAtomic(paths.file, bytes, 0o644);
-  markSequence({ workspace, type: ANCHOR, id: signed.list.listId, sequence: signed.list.sequence, sha256: revocationListSha256(signed.list), fileSha256: sha256Hex(bytes) });
-}
-
-/**
- * Signs, stages, logs and publishes the next list. Nothing is written unless the signature verifies against the
- * auditor key history (a locked vault or an AMC_NO_SIGN ephemeral key refuses here). The stage lands before the log
- * entry, so a crash after logging rolls forward (recoverPendingLocked) instead of leaving the anchor ahead of the file.
- * A superseded 1.x pair is then replaced by a tombstone. Caller holds the revocations lock.
- */
+/** Publishes the next list, then replaces a superseded 1.x pair with a tombstone. Caller holds the revocations lock. */
 function publishLocked(workspace: string, list: RevocationListV1): SignedRevocationList {
   const paths = leaseRevocationPaths(workspace);
-  const signed = signRevocationList(list, getPrivateKeyPem(workspace, "auditor"));
-  const staged = encodeSignedRevocationList(signed);
-  try {
-    verifySignedRevocationListBytes(staged, { listId: list.listId, trustedPublicKeyPems: trustedKeys(workspace) });
-  } catch (error) {
-    throw new Error(`lease revocation signature would not verify against the auditor key history; nothing was published (${error instanceof Error ? error.message : String(error)})`);
-  }
-  writeFileAtomic(paths.pending, staged, 0o644);
-  const sha256 = revocationListSha256(signed.list);
-  const entryHash = logSequence({ workspace, type: ANCHOR, id: list.listId, sequence: list.sequence, sha256 });
-  const published = { ...signed, anchor: { transparencyEntryHash: entryHash } };
-  writeFinal(workspace, published);
-  rmSync(paths.pending, { force: true });
+  const published = publishRevocationList(location(workspace), list, getPrivateKeyPem(workspace, "auditor"));
   if (pathExists(paths.legacyFile) || pathExists(paths.legacySig)) {
     writeFileAtomic(paths.legacySig, JSON.stringify({ type: "amc.revocation-list-moved", to: "revocations.signed.json", previousSha256: list.previousSha256 }), 0o644);
     rmSync(paths.legacyFile, { force: true });
@@ -157,14 +113,7 @@ function previousOf(current: Current): { sequence: number; sha256: string } | nu
 }
 
 function nextList(workspace: string, previous: { sequence: number; sha256: string } | null, rows: RevocationListV1["revoked"]): RevocationListV1 {
-  const now = Date.now();
-  return {
-    type: "amc.revocation-list", version: 1, listId: listIdFor(workspace),
-    sequence: (previous?.sequence ?? 0) + 1,
-    previousSha256: previous?.sha256 ?? null,
-    issuedAt: new Date(now).toISOString(),
-    revoked: rows.filter(row => row.expiresAt === undefined || Date.parse(row.expiresAt) > now - PRUNE_GRACE_MS)
-  };
+  return nextRevocationList(listIdFor(workspace), previous, rows, PRUNE_GRACE_MS);
 }
 
 function currentRows(current: Current): RevocationListV1["revoked"] {
@@ -177,7 +126,7 @@ function currentRows(current: Current): RevocationListV1["revoked"] {
 
 function withRevocationsLock<T>(workspace: string, operation: () => T): T {
   return withControlFileLock({ root: dirname(leaseRevocationPaths(workspace).file), name: "revocations", operation: () => {
-    recoverPendingLocked(workspace);
+    recoverPendingRevocationList(location(workspace));
     return operation();
   } });
 }

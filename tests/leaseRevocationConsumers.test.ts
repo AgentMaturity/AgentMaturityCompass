@@ -1,4 +1,4 @@
-import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -31,13 +31,14 @@ const ADMIN = "lease-consumers-fixture-admin";
 // A one-shot hook that runs right after the revocation list's signature verifies, to swap the file on disk
 // between that check and any later use of the list.
 const afterVerify = vi.hoisted(() => ({ next: null as null | { digest: string; run: () => void } }));
-// P1-08: the store is one signed file, verified from its bytes by verifySignedRevocationListBytes.
+// P1-08: the store is one signed file, read once and verified by readAnchoredRevocationList.
 vi.mock("../src/keys/revocationList.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../src/keys/revocationList.js")>();
-  return { ...actual, verifySignedRevocationListBytes: (bytes: Buffer, opts: Parameters<typeof actual.verifySignedRevocationListBytes>[1]) => {
-    const signed = actual.verifySignedRevocationListBytes(bytes, opts);
+  return { ...actual, readAnchoredRevocationList: (location: Parameters<typeof actual.readAnchoredRevocationList>[0]) => {
+    const bytes = existsSync(location.path) ? readFileSync(location.path) : null;
+    const signed = actual.readAnchoredRevocationList(location);
     const hook = afterVerify.next;
-    if (hook?.digest === sha256Hex(bytes)) { afterVerify.next = null; hook.run(); }
+    if (bytes !== null && hook?.digest === sha256Hex(bytes)) { afterVerify.next = null; hook.run(); }
     return signed;
   } };
 });

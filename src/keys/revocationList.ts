@@ -7,11 +7,14 @@
  * checked against the log and the machine mark covers the whole file (src/keys/anchors.ts).
  */
 import { sign, verify } from "node:crypto";
+import { rmSync } from "node:fs";
 import { z } from "zod";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { ed25519KeyId } from "../trust/trustList.js";
+import { pathExists, readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+import { assertNotRolledBack, loggedAnchor, logSequence, markSequence } from "./anchors.js";
 
 const DOMAIN_TAG = "AMC_REVOCATION_LIST_V1";
 const hexSchema = z.string().regex(/^[0-9a-f]{64}$/);
@@ -74,7 +77,7 @@ export function encodeSignedRevocationList(signed: SignedRevocationList): Buffer
  * Parses and verifies one file's bytes: canonical encoding, the expected list id, and a signature by one of
  * `trustedPublicKeyPems` (the verifier's own key history for the revocation-list purpose). Throws the reason.
  */
-export function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: string; trustedPublicKeyPems: readonly string[] }): SignedRevocationList {
+function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: string; trustedPublicKeyPems: readonly string[] }): SignedRevocationList {
   let signed: SignedRevocationList;
   try {
     signed = signedRevocationListSchema.parse(parseCanonicalJson(bytes));
@@ -91,4 +94,85 @@ export function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: s
   } catch { /* reported below */ }
   if (!valid) throw new Error("revocation list signature verification failed");
   return signed;
+}
+
+/** Where one anchored list lives and which keys may sign it (the verifier's own history for the purpose). */
+export interface AnchoredListLocation {
+  workspace: string;
+  path: string;
+  listId: string;
+  trustedPublicKeyPems: readonly string[];
+}
+
+export const MAX_REVOCATION_LIST_BYTES = 64 * 1024 * 1024;
+const ANCHOR = "REVOCATION_LIST" as const;
+
+function anchorOf(location: AnchoredListLocation, signed: SignedRevocationList, bytes: Buffer) {
+  return { workspace: location.workspace, type: ANCHOR, id: location.listId, sequence: signed.list.sequence,
+    sha256: revocationListSha256(signed.list), fileSha256: sha256Hex(bytes), entryHash: signed.anchor?.transparencyEntryHash ?? null };
+}
+
+/** One verified, rollback-checked read; null only when the file does not exist (the caller decides what absence means). */
+export function readAnchoredRevocationList(location: AnchoredListLocation): SignedRevocationList | null {
+  if (!pathExists(location.path)) return null;
+  const bytes = readRegularFileNoFollow(location.path, MAX_REVOCATION_LIST_BYTES);
+  const signed = verifySignedRevocationListBytes(bytes, location);
+  assertNotRolledBack(anchorOf(location, signed, bytes));
+  return signed;
+}
+
+function writeFinal(location: AnchoredListLocation, signed: SignedRevocationList): void {
+  const bytes = encodeSignedRevocationList(signed);
+  writeFileAtomic(location.path, bytes, 0o644);
+  markSequence(anchorOf(location, signed, bytes));
+}
+
+/**
+ * Completes or discards a write interrupted after its list was staged: rolls forward only when the transparency log
+ * already holds that exact sequence and content; otherwise the write never committed and the stage is removed.
+ * Caller holds the list's lock.
+ */
+export function recoverPendingRevocationList(location: AnchoredListLocation): void {
+  const pending = `${location.path}.pending`;
+  if (!pathExists(pending)) return;
+  const staged = verifySignedRevocationListBytes(readRegularFileNoFollow(pending, MAX_REVOCATION_LIST_BYTES), location);
+  const logged = loggedAnchor(location.workspace, ANCHOR, location.listId);
+  if (logged !== null && logged.sequence === staged.list.sequence && logged.sha256 === revocationListSha256(staged.list)) {
+    writeFinal(location, { ...staged, anchor: { transparencyEntryHash: logged.entryHash } });
+  }
+  rmSync(pending, { force: true });
+}
+
+/**
+ * Signs, stages, logs and publishes `list`. Nothing is written unless the signature verifies against the trusted keys
+ * (a locked vault or an AMC_NO_SIGN ephemeral key refuses here). The stage lands before the log entry, so a crash after
+ * logging rolls forward instead of leaving the anchor ahead of the file. Caller holds the list's lock.
+ */
+export function publishRevocationList(location: AnchoredListLocation, list: RevocationListV1, privateKeyPem: string): SignedRevocationList {
+  const signed = signRevocationList(list, privateKeyPem);
+  const staged = encodeSignedRevocationList(signed);
+  try {
+    verifySignedRevocationListBytes(staged, location);
+  } catch (error) {
+    throw new Error(`revocation list signature would not verify against the trusted key history; nothing was published (${error instanceof Error ? error.message : String(error)})`);
+  }
+  const pending = `${location.path}.pending`;
+  writeFileAtomic(pending, staged, 0o644);
+  const entryHash = logSequence({ workspace: location.workspace, type: ANCHOR, id: list.listId, sequence: list.sequence, sha256: revocationListSha256(signed.list) });
+  const published = { ...signed, anchor: { transparencyEntryHash: entryHash } };
+  writeFinal(location, published);
+  rmSync(pending, { force: true });
+  return published;
+}
+
+/** The next list after `previous` (sequence + 1, previousSha256 its digest), issued now, without rows past their expiry. */
+export function nextRevocationList(listId: string, previous: { sequence: number; sha256: string } | null, rows: RevocationListV1["revoked"], pruneGraceMs: number): RevocationListV1 {
+  const now = Date.now();
+  return {
+    type: "amc.revocation-list", version: 1, listId,
+    sequence: (previous?.sequence ?? 0) + 1,
+    previousSha256: previous?.sha256 ?? null,
+    issuedAt: new Date(now).toISOString(),
+    revoked: rows.filter(row => row.expiresAt === undefined || Date.parse(row.expiresAt) > now - pruneGraceMs)
+  };
 }

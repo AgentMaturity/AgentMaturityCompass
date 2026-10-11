@@ -73,6 +73,11 @@ export function assertNotRolledBack(target: AnchorTarget): void {
   recordHighWater(key, target.sequence, identity);
 }
 
+/** This machine's mark for `id` alone (no log scan). */
+export function machineMark(workspace: string, type: AnchorType, id: string): { sequence: number; sha256: string } | null {
+  return readHighWater(markKey({ workspace, type, id }));
+}
+
 /** A missing file is never read as an empty bootstrap once either anchor has recorded it. */
 export function assertNeverAnchored(workspace: string, type: AnchorType, id: string): void {
   const recorded = readHighWater(markKey({ workspace, type, id })) ?? loggedAnchor(workspace, type, id);

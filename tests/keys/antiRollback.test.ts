@@ -6,7 +6,7 @@ import { AntiRollbackError, checkHighWater, highWaterPath, readHighWater, record
 import { loadTrustContext, signTrustList } from "../../src/trust/index.js";
 import { listEntry, testKey, trustList } from "../trust/trustFixtures.js";
 import { existsSync } from "node:fs";
-import { getPrivateKeyPem } from "../../src/crypto/keys.js";
+import { addPublicKeyToHistory, ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, verifyKeyHistoryChain } from "../../src/crypto/keys.js";
 import { encodeSignedRevocationList, signRevocationList } from "../../src/keys/revocationList.js";
 import { issueLeaseForCli, verifyLeaseForCli } from "../../src/leases/leaseCli.js";
 import { bootstrapLeaseRevocations, leaseRevocationPaths, readVerifiedLeaseRevocations, revokeLease } from "../../src/leases/leaseStore.js";
@@ -159,5 +159,28 @@ describe("lease revocation rollback attacks (P1-08; security review HIGH)", () =
     const original = signRevocationList(list, getPrivateKeyPem(root, "auditor"));
     writeFileSync(path, encodeSignedRevocationList({ ...original, anchor: { transparencyEntryHash: "0".repeat(64) } }));
     expect(readVerifiedLeaseRevocations(root)).toEqual({ ok: false, reason: expect.stringMatching(/FORK_DETECTED.*names transparency entry/) });
+  });
+});
+
+describe("key history rollback (P1-08)", () => {
+  it("restoring an older validly signed key history gives ROLLBACK_DETECTED and admits only the current key", () => {
+    const root = mkdtempSync(join(tmpdir(), "amc-history-rollback-"));
+    try {
+      ensureSigningKeys(root);
+      const path = join(root, ".amc", "keys", "auditor_history.json");
+      const older = readFileSync(path);
+      const extra = testKey();
+      addPublicKeyToHistory(root, "auditor", extra.publicKeyPem);
+      expect(getPublicKeyHistory(root, "auditor")).toContain(extra.publicKeyPem);
+      const newer = readFileSync(path);
+      writeFileSync(path, older);
+      expect(verifyKeyHistoryChain(root, "auditor")).toMatchObject({ ok: false, reason: expect.stringMatching(/ROLLBACK_DETECTED/) });
+      expect(getPublicKeyHistory(root, "auditor")).toEqual([getPublicKeyPem(root, "auditor")]);
+      writeFileSync(path, newer);
+      expect(verifyKeyHistoryChain(root, "auditor").ok).toBe(true);
+    } finally {
+      lockVault(root);
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

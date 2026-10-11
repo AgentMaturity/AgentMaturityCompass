@@ -1,3 +1,5 @@
+import { legacyV1Payload } from "./helpers/legacyVault.js";
+import { purposeKeyPaths } from "../src/vault/vault.js";
 import { spawnSync } from "node:child_process";
 import { copyFileSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -157,7 +159,7 @@ describe("unlocking an already-unlocked vault", () => {
   it("refreshes legacy secrets in memory without upgrading missing lease or session keys", () => {
     const dir = workspace(PASS);
     const paths = vaultPaths(dir);
-    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(paths.vaultFile, "utf8")), PASS).toString("utf8"));
+    const payload = legacyV1Payload(paths.vaultFile, PASS);
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     payload.secrets["legacy-token"] = "legacy-value";
@@ -225,7 +227,7 @@ describe("unlocking an already-unlocked vault", () => {
     // A legacy payload without lease and session keys, beside an existing lease.pub: unlock's upgrade refuses
     // to replace that public key without an authenticated rotation, and throws after decryption succeeded.
     const path = vaultPaths(dir).vaultFile;
-    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(path, "utf8")), PASS).toString("utf8"));
+    const payload = legacyV1Payload(path, PASS);
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     writeFileSync(path, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
@@ -254,11 +256,14 @@ describe("unlocking an already-unlocked vault", () => {
     const dir = workspace(PASS);
     lockVault(dir);
     const paths = vaultPaths(dir);
-    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(paths.vaultFile, "utf8")), PASS).toString("utf8"));
+    const payload = legacyV1Payload(paths.vaultFile, PASS);
     delete payload.sessionPrivateKeyPem;
     writeFileSync(paths.vaultFile, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
     rmSync(paths.sessionPublic);
     rmSync(paths.sessionHistory);
+    // P1-08 files a 1.x workspace never had.
+    rmSync(purposeKeyPaths(dir, "session").publicFile);
+    rmSync(join(paths.keysDir, "keyset.json"));
     const leasePublic = readFileSync(paths.leasePublic, "utf8");
     const leaseHistory = readFileSync(paths.leaseHistory, "utf8");
 

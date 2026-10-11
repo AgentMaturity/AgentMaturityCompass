@@ -4,6 +4,8 @@ import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { AntiRollbackError, highWaterKey, recordHighWater } from "../keys/highWater.js";
+import { getPurposeKeyHistory, workspaceKeyRevocations } from "../keys/purposeKeys.js";
+import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -129,18 +131,30 @@ function operatorDistrust(now: Date): DistrustEntry[] {
 /**
  * For internal round trips only (an export re-checking what this workspace just signed). The keys come from the
  * workspace under test, so this is a self-check: never wire it into a CLI or API verdict, and never treat it as an
- * independent issuer. Only the role purposes are pinned, so independent-attestation and evidence-authority never pass.
- * The operator's distrust still applies (operatorDistrust).
+ * independent issuer. Only the local purposes are pinned, so independent-attestation and evidence-authority never pass.
+ * Since P1-08 each purpose pins its own key history (`<purpose>.pub`), so a key split off for one purpose is refused for
+ * another (wrong-purpose); a workspace not yet migrated pins its role histories as before. The operator's distrust and
+ * the workspace's own signed key revocations (`amc keys revoke`) still apply.
  */
 export function workspaceSelfTrust(workspace: string, now: Date = new Date()): TrustContext {
-  const explicitPins = (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
-    if (!existsSync(join(workspace, ".amc", "keys", `${role}_ed25519.pub`))) return [];
-    return getPublicKeyHistory(workspace, role).flatMap(pem => {
+  const migrated = existsSync(join(workspace, ".amc", "keys", "artifact-seal.pub"));
+  const explicitPins = migrated
+    ? LOCAL_PURPOSES.flatMap(purpose => getPurposeKeyHistory(workspace, purpose).flatMap(pem => {
       const keyId = ed25519KeyId(pem);
-      return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
+      return keyId ? [{ keyId, purposes: [purpose], origin: `workspace-self:${purpose}` }] : [];
+    }))
+    : (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {
+      if (!existsSync(join(workspace, ".amc", "keys", `${role}_ed25519.pub`))) return [];
+      return getPublicKeyHistory(workspace, role).flatMap(pem => {
+        const keyId = ed25519KeyId(pem);
+        return keyId ? [{ keyId, purposes: ROLE_PURPOSES[role], origin: `workspace-self:${role}` }] : [];
+      });
     });
-  });
-  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: operatorDistrust(now), allowUnpinned: false, allowUnanchored: false };
+  const revoked = migrated ? workspaceKeyRevocations(workspace).map((row): DistrustEntry => ({
+    keyId: row.keyId, distrustedFrom: row.reason === "key-compromise" ? null : row.revokedAt, reason: row.reason,
+    note: `revoked by amc keys revoke at ${row.revokedAt}`, source: "workspace-key-revocations"
+  })) : [];
+  return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: [...operatorDistrust(now), ...revoked], allowUnpinned: false, allowUnanchored: false };
 }
 
 /**

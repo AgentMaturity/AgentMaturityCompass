@@ -60,6 +60,16 @@ export function highWaterKey(kind: HighWaterKind, id: string): string {
   return `${kind}:${id}`;
 }
 
+/** One workspace key history's mark: its revision and the sha256 of its canonical envelope. */
+export function keyHistoryMarkKey(workspace: string, subject: string): string {
+  return highWaterKey("key-history", `${subject}@${workspaceScope(workspace)}`);
+}
+
+/** The revision a newly sealed history starts at: above any this machine accepted, so a re-created workspace is no rollback. */
+export function nextKeyHistoryRevision(workspace: string, subject: string): number {
+  return (readHighWater(keyHistoryMarkKey(workspace, subject))?.sequence ?? 0) + 1;
+}
+
 function errorCode(error: unknown): string | undefined {
   return (error as NodeJS.ErrnoException | null)?.code;
 }

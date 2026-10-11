@@ -1,3 +1,4 @@
+import { legacyV1Payload } from "./helpers/legacyVault.js";
 import { spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -75,7 +76,7 @@ test.each(["current", "legacy"] as const)("cold-process %s vault verification re
   const { workspace, phrase } = encryptedWorkspace();
   if (format === "legacy") {
     const path = vaultPaths(workspace).vaultFile;
-    const payload = JSON.parse(decryptVaultPayload(JSON.parse(readFileSync(path, "utf8")), phrase).toString("utf8"));
+    const payload = legacyV1Payload(path, phrase);
     delete payload.leasePrivateKeyPem;
     delete payload.sessionPrivateKeyPem;
     writeFileSync(path, JSON.stringify(encryptVaultPayload(Buffer.from(JSON.stringify(payload)), phrase)));
