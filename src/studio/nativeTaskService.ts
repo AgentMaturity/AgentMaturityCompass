@@ -8,6 +8,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AMCNativeClient, AMCNativeRefusedError, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
 import { nativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
+import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { credentialRef } from "../credentials/credentialRef.js";
@@ -41,6 +42,10 @@ const CREDENTIALED = ["openai", "openai-responses", "anthropic", "deepseek", "ge
 type CredentialedProvider = typeof CREDENTIALED[number];
 const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is CredentialedProvider => (CREDENTIALED as readonly string[]).includes(provider);
 const SWEEP_MS = 10_000;
+/** P0-62: how long reads may keep meeting a moving store (CHANGED) before Studio fails closed and names that cause. */
+const SETTLE_MS = 30_000;
+const MOVING = "Committed history was changing while it was read, so no authenticated snapshot is shown yet. Nothing was concluded from a partial read; refresh in a moment.";
+const UNSETTLED = "Committed history kept changing while it was read, for 30 s, so no authenticated snapshot could be taken. Nothing was concluded from a partial read; refresh once writers are quiet.";
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
 /** AMC's own budget refused the turn's next model request, as the runtime's ACP error data names it (P0-59). */
 const BUDGET_GUIDANCE = nativeFailureGuidance("AMC_NATIVE_BUDGET_REFUSED");
@@ -55,6 +60,8 @@ interface Entry {
   startupCancelled: boolean; startupAbort: AbortController;
   validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
+  /** P0-62: when reads began to be refused because another writer moved the store during the read (CHANGED). */
+  changedSince?: number;
   verificationStoreHead?: string;
   verification: NativeTaskView["verification"]; verificationScope?: NativeTaskView["verificationScope"]; finishing?: Promise<void>;
   /** Process closure is distinct from a successful signed session handover. */
@@ -208,17 +215,41 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     entry.leaseId = lease.payload.leaseId; // From here stop() revokes it.
     return lease;
   }
-  function refresh(entry: Entry): void {
-    if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return;
+  /**
+   * Read the session's authenticated projection; true only for a fresh, complete read. CHANGED (another writer appended
+   * while this read ran) is not unauthenticated evidence (P0-62): the last authenticated snapshot stays for display
+   * until SETTLE_MS of continuous change, which fails closed with that cause. Every other refusal fails closed at once.
+   * Decisions (dispatch, a turn's outcome, verification, resume) use only fresh reads.
+   */
+  function refresh(entry: Entry): boolean {
+    if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return entry.projection !== undefined;
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
-      entry.projectionError = undefined;
+      entry.projectionError = undefined; entry.changedSince = undefined;
       if (entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
       entry.projectionAt = Date.now();
-    } catch {
-      entry.projection = undefined;
+      return true;
+    } catch (error) {
+      const moving = error instanceof SessionHistoryRefused && error.code === "CHANGED";
+      entry.changedSince = moving ? entry.changedSince ?? Date.now() : undefined;
       entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
-      entry.projectionError = "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
+      if (moving && Date.now() - entry.changedSince! < SETTLE_MS) {
+        if (!entry.projection) entry.projectionError = MOVING;
+        return false;
+      }
+      entry.projection = undefined;
+      entry.projectionError = moving ? UNSETTLED : "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
+      return false;
+    }
+  }
+  /** A fresh read that waits, with bounded backoff, for a moving store to settle (P0-62); false when none was taken. */
+  async function settledRefresh(entry: Entry): Promise<boolean> {
+    const deadline = Date.now() + SETTLE_MS;
+    for (let delay = 25; ; delay = Math.min(delay * 2, 1_000)) {
+      entry.projectionAt = 0;
+      if (refresh(entry)) return true;
+      if (entry.changedSince === undefined || Date.now() + delay > deadline) return false;
+      await new Promise(done => setTimeout(done, delay));
     }
   }
   function reconcileClosedClient(entry: Entry): void {
@@ -375,10 +406,14 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     })();
     return entry.finishing;
   }
-  function dispatch(entry: Entry, input: PreparedNativeTaskInput): void {
+  async function dispatch(entry: Entry, input: PreparedNativeTaskInput): Promise<void> {
     if (!entry.session) throw new NativeTaskServiceError("NOT_ACTIVE", 409, "Explicitly resume the released native session before submitting a new turn.");
-    entry.projectionAt = 0; refresh(entry);
-    if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "The native session did not authenticate before dispatch. No provider request was submitted.");
+    const prior = entry.state; entry.state = "running"; // holds off another admission while the history settles
+    if (!await settledRefresh(entry) || !entry.projection) {
+      entry.state = prior;
+      throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, entry.changedSince === undefined
+        ? "The native session did not authenticate before dispatch. No provider request was submitted." : `${UNSETTLED} No provider request was submitted.`);
+    }
     const precedingEndingId = entry.projection.endingId;
     entry.validationPriorTurn = entry.projection.validation.turn;
     entry.state = "running"; entry.error = null; entry.verification = "not-verified"; entry.touchedAt = Date.now();
@@ -387,8 +422,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const turn = entry.turn;
     entry.work = (async () => {
       try {
+        // The turn result is the runtime's completion signal; judge it only from a read taken while the store holds still.
         await turn.result;
-        entry.projectionAt = 0; refresh(entry);
+        if (!await settledRefresh(entry) && entry.changedSince !== undefined) throw new NativeTaskServiceError("EVIDENCE_UNSETTLED", 409, UNSETTLED);
         const reason = entry.projection?.ending;
         if (!reason || entry.projection?.endingId === precedingEndingId) throw new Error("No new authenticated turn ending");
         entry.state = reason === "error" || reason === "interrupted" ? "failed" : "idle";
@@ -397,6 +433,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       } catch (error) {
         entry.state = "failed";
         entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
+          : error instanceof NativeTaskServiceError ? error.message
           : "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent.";
       }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
@@ -457,7 +494,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       if (!admitted) return view(entry);
       entry.state = "starting";
       try { entry.preparation = prepare(actor, entry, false, preparedInput!); await entry.preparation;
-        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); dispatch(entry, preparedInput!); }
+        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); await dispatch(entry, preparedInput!); }
       catch (error) { entry.error = error instanceof NativeTaskServiceError ? error.message : "Native startup did not finish. No model request was automatically retried; inspect setup and task status."; await stop(entry); entry.state = "failed"; }
       finally { entry.preparation = undefined; }
       return view(entry);
@@ -498,7 +535,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
           submissions: [...d.submissions, { clientRequestId: input.clientRequestId, bodyHash, revision: d.revision + 1 }] };
         descriptors.write(entry.descriptor); admitted = true;
       });
-      if (admitted) dispatch(entry, preparedInput!);
+      if (admitted) await dispatch(entry, preparedInput!);
       return view(entry);
     },
     cancel(actor, taskId, expectedRevision) { const entry = control(actor, taskId, expectedRevision);
@@ -515,8 +552,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       if (!entry.descriptor.sessionId || entry.descriptor.closed) throw new NativeTaskServiceError(
         entry.descriptor.archivedAt !== undefined ? "TASK_ARCHIVED" : "NOT_RESUMABLE", 409,
         entry.descriptor.archivedAt !== undefined ? "Archived tasks retain their evidence and cannot be resumed. Create a new task." : "This task has no resumable recorded native session.");
-      entry.projectionAt = 0; refresh(entry);
-      if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+      entry.projectionAt = 0;
+      if (!refresh(entry) || !entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
         "Resume requires authenticated original session history. Restore it and refresh; no replacement session was created.");
       if (entry.projection.history.backend === "jsonl") {
         const recovery = inspectJsonlSessionRecovery({ workspace, sessionId: entry.descriptor.sessionId, agentId: entry.descriptor.agentId });
@@ -569,17 +606,17 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       entry.state = "verifying";
       try {
         if (entry.client) { await entry.client.close(); entry.client = undefined; entry.session = undefined;
-          entry.projectionAt = 0; refresh(entry); if (entry.projection?.closed) persist(entry, { closed: true }); }
-        entry.projectionAt = 0; refresh(entry);
-        const verificationHead = entry.projection?.storeHeadEventHash;
+          entry.projectionAt = 0; if (refresh(entry) && entry.projection?.closed) persist(entry, { closed: true }); }
+        entry.projectionAt = 0;
+        const verificationHead = refresh(entry) ? entry.projection?.storeHeadEventHash : undefined;
         // P0-51: the operator's trust (the AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT in Studio's environment)
         // decides, as `amc agent-loop verify` does; with it, report.ok also needs the monitor key admitted.
         const trust = loadTrustContext({ env: environment, ...(options.credentialsHome ? { amcHome: options.credentialsHome } : {}) });
         // P0-14: Studio's own gateway session stays open while it serves. The verdict may name it as unfinalized, as a
         // separate "anchored-prefix" state; any throw or unexpected result is "failed" (nativeTaskVerdict.ts).
         const verdict = await verifyNativeTaskEvidence(workspace, entry.descriptor.sessionId, trust);
-        entry.projectionAt = 0; refresh(entry);
-        const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
+        entry.projectionAt = 0;
+        const sameHead = refresh(entry) && verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
         const passed = verdict.verification !== "failed";
         entry.verification = !passed ? "failed" : !sameHead ? "not-verified" : verdict.verification;
         entry.verificationStoreHead = sameHead ? verificationHead : undefined;

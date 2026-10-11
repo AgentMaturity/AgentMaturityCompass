@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import fs, { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, type PathLike, type StatSyncOptions } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -27,7 +28,7 @@ beforeAll(async () => {
   if (!existsSync(file)) throw new Error("Build the coordinated candidate before native Studio process tests.");
   const built = await import(pathToFileURL(file).href) as typeof import("../src/studio/nativeTaskService.js");
   createService = built.createNativeTaskService;
-});
+}, 60_000); // importing the built module can outlast the 10 s default on a loaded host
 let root: string, credentialHome: string, prior: string | undefined;
 const services: NativeTaskService[] = [];
 const actor: NativeTaskActor = { principalId: "studio-test:owner", agentId: "default", demo: true };
@@ -210,6 +211,40 @@ test("a turn AMC's own budget refused says so instead of a generic failure, and 
   expect(current.error).toContain("Signed native budget admission refused this dispatch.");
   expect(current.error).not.toMatch(/provider reported|quota/i);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(2);
+});
+
+// P0-62: a writer still appending while Studio reads. Every append moves the ledger file's identity, and the history
+// reader refuses a read whose files moved (CHANGED). Here the next `calls` lstat calls on the ledger see a new identity
+// each time, deterministically, as they would while a writer is still appending.
+function movingLedger(ledger: string) {
+  const real = fs.lstatSync; let calls = 0, bump = 0;
+  fs.lstatSync = ((path: PathLike, options?: StatSyncOptions) => {
+    const stats = real(path, options as never);
+    if (calls <= 0 || String(path) !== ledger || !stats) return stats;
+    calls--;
+    return Object.assign(Object.create(Object.getPrototypeOf(stats)), stats, { mtimeMs: stats.mtimeMs + ++bump });
+  }) as typeof fs.lstatSync;
+  syncBuiltinESMExports();
+  return { move(reads: number) { calls = 2 * reads; }, get pending() { return calls; },
+    restore() { fs.lstatSync = real; syncBuiltinESMExports(); } };
+}
+test("a writer still appending neither fails the turn nor hides authenticated history; Studio waits for it to settle (P0-62)", async () => {
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic settle turn one."))).taskId);
+  const ledger = movingLedger(join(fs.realpathSync(root), ".amc", "evidence.sqlite"));
+  try {
+    ledger.move(3); // the read after the turn's result meets a moving store three times, then it holds still
+    await s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic settle turn two." });
+    const settled = await idle(s, task.taskId);
+    expect(ledger.pending, "the post-turn reads met the moving store").toBe(0);
+    expect(settled.revision).toBe(2);
+    expect(rows(task.sessionId).filter(row => row.event_type === "turn/end")).toHaveLength(2);
+    await new Promise(done => setTimeout(done, 300));
+    ledger.move(1);
+    const shown = s.poll(actor, task.taskId).task;
+    expect(shown.history.status, "a moving store is not unavailable evidence").toBe("authenticated");
+    expect(shown).toMatchObject({ state: "idle", error: null });
+  } finally { ledger.restore(); }
 });
 
 test("archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart", async () => {
