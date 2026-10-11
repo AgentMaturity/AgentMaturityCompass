@@ -88,6 +88,7 @@
     "check:api-ref": "node scripts/gen-api-ref.cjs --check",
     "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
     "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
+    "gen:pi-conformance-matrix": "node scripts/gen-pi-conformance-matrix.mjs --write",
     "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
     "check:gates": "node scripts/check-gate-reachability.mjs",
     "test:coverage": "vitest run --coverage",
@@ -161,6 +162,10 @@
     "./sdk/native": {
       "types": "./dist/sdk/nativeAgentClient.d.ts",
       "import": "./dist/sdk/nativeAgentClient.js"
+    },
+    "./pi": {
+      "types": "./dist/adapters/pi/amcPiExtension.d.ts",
+      "import": "./dist/adapters/pi/amcPiExtension.js"
     },
     "./standard/external-evidence": {
       "types": "./dist/standard/externalEvidenceProfile.d.ts",

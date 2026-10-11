@@ -535,6 +535,19 @@ The default `observe` mode preserves unrelated provider settings, adds a managed
 
 `--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. Claude Code can receive `allow`, `deny`, or `ask`. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex, Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
+Pi connects through an optional AMC extension at Pi's `tool_call` hook rather than a hooks file:
+
+```bash
+amc connect hooks install --provider pi --mode control --agent my-agent
+```
+
+- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only (1.0.2 and 1.0.4), in a Pi session registered under the current installation, and only while Pi's tool registry names Pi's own built-in for that tool name.
+- Not covered: OS containment; effects that bypass `tool_call` (another extension's own I/O, Pi Durable, Codemode-internal calls unless step 2 confirms they emit `tool_call`).
+- Not covered: an extension that rewrites Pi's tool registry itself. AMC denies a mapped tool name when Pi's registry does not name Pi's built-in for it (an extension tool registered under a built-in's name), but extensions run in Pi's process with full rights.
+- AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
+- A session registration is a lease-holder attestation: registration made with the session lease and matching on-disk extension and Pi digests. A process holding the lease can still attest without Pi. AMC cannot prove Pi executed the hook; it can prove only that every allowed call went through AMC with a signed receipt.
+- Pi loads `.pi/extensions/amc.js` only for a trusted project; while it does not, nothing is enforced. Calls in an unregistered session are denied. Pi ask is always denied until an AMC approval path exists. See [Pi tool_call control](docs/adapters/pi.md).
+
 Track real first-run outcomes without creating traffic or evidence:
 
 ```bash

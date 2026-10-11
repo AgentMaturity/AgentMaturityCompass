@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-22",
+  "date": "2026-10-12",
+  "commit": "d57b730575ccbfc6713dc935e5cb1b4722ac2a10",
+  "branch": "rtd/p1-22-pi-tool-call-package",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.0.2=<prefix>,1.0.4=<prefix> AMC_PI_CONFORMANCE_OUT=<file> npx vitest run tests/conformance/piToolCall.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 93760
+    },
+    {
+      "cmd": "npx vitest run tests/piToolMapping.test.ts tests/piHookControl.test.ts tests/piSessionRegistration.test.ts tests/amcPiExtension.test.ts tests/connectHookIntegration.test.ts tests/connectHookCli.test.ts tests/hookControl.test.ts tests/amc1476ProviderSteerOutcome.test.ts tests/amc1483CompoundCommandBlastRadius.test.ts tests/claudeHookFailClosed.test.ts tests/claudeHookInstalledConfig.test.ts tests/providerNeutralHookIngress.test.ts tests/hookActionLifecycle.test.ts tests/hookActionLifecycleSurfaces.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/subagentHookInheritance.test.ts tests/receipts.test.ts tests/receiptVerifierPins.test.ts tests/piConformanceMatrix.test.ts",
+      "exit": 0,
+      "durationMs": 273330
+    },
+    {
+      "cmd": "npx vitest run tests/adapterCapabilityCli.test.ts tests/adapterCapabilityReceipts.test.ts tests/amc1464ProviderControlDocs.test.ts tests/controlHttpResponsesParity.test.ts tests/leaseRevocationFailClosed.test.ts tests/runtimesAdapters.test.ts tests/security/bridgeStreamingTruthguardBypass.test.ts tests/pythonSdk.test.ts tests/receiptChainPersistence.test.ts tests/keys/a4SigningProbe.test.ts tests/keys/workspaceWriter.test.ts tests/studioCredentialBindingHttp.test.ts tests/studioAgentCredentialBinding.test.ts tests/federationComplianceIntegrationMerkle.test.ts",
+      "exit": 0,
+      "durationMs": 85550
+    }
+  ],
+  "tests": {
+    "total": 436,
+    "passed": 436,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "pi-conformance.json",
+      "sha256": "469d0d291a52dd2136f6f11d12a5e4477e7755b1553fada172d7d72279df3f76"
+    }
+  ],
+  "notes": "Local macOS arm64 run, not CI, after merging int (P1-08 purpose keys); another worktree's test runs were active. Pi 1.0.2 and 1.0.4 (pi CLI of @earendil-works/pi-coding-agent) installed from the public npm registry with --ignore-scripts into scratch prefixes outside the repository. pi-conformance.json holds tarball integrity, gitHeads, resolved @earendil-works dependencies, per-case conformance results per version (each Pi session registered before its first call, checked against the bound Pi install on disk; an @-prefixed read ran and a read through a symlink into .amc was denied; an extension tool registered under a built-in's name was denied; the untrusted-project run registered nothing), 32 mutation checks and decision latency (p95 293.1 and 303.2 ms, above the 50 ms target). Commands: 22/22, 229/229, 185/185."
+}

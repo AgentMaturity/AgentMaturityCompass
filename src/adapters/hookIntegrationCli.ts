@@ -13,10 +13,12 @@ import {
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
+  type HookIntegrationStatus,
   type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
-import { serializeProviderControlResponse } from "../bridge/hookControl.js";
+import { isHookProvider, serializeProviderControlResponse } from "../bridge/hookProviders.js";
+import { findPiPackage } from "./pi/piInstall.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
@@ -111,15 +113,17 @@ function printControlVerification(control: ClaudeControlVerification): void {
   for (const note of control.notes) console.log(chalk.yellow(`Note: ${note}`));
 }
 
+/** Pi: the claim comes from verified session registrations; sessions Pi ran without the extension are invisible. */
+function printGovernance(governance: NonNullable<HookIntegrationStatus["governance"]>): void {
+  console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered Pi session(s), ${governance.qualifiedSessions} on a qualified Pi)`);
+  console.log(chalk.gray(governance.note));
+}
+
 function printFileChanges(files: HookFileChange[]): void {
   for (const file of files) {
     const sensitivity = file.sensitive ? " (secret, mode 0600)" : "";
     console.log(`  ${file.action.padEnd(12)} ${file.path}${sensitivity}`);
   }
-}
-
-function isHookProvider(value: string): value is HookProvider {
-  return value === "claude-code" || value === "gemini-cli";
 }
 
 export function registerHookIntegrationCommands(
@@ -132,8 +136,8 @@ export function registerHookIntegrationCommands(
 
   hooks
     .command("install")
-    .description("Install a reversible project hook for Claude Code or Gemini CLI")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .description("Install a reversible project hook for Claude Code, Gemini CLI or Pi")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi")
     .option("--mode <mode>", "observe|control", "observe")
     .option("--agent <agentId>", "agent ID (defaults to active agent)")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
@@ -162,7 +166,9 @@ export function registerHookIntegrationCommands(
         bridgeBase: opts.bridgeUrl,
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
-        dryRun: opts.dryRun
+        dryRun: opts.dryRun,
+        // Pi control binds the Pi a person gets by running `pi` here.
+        piPackageDir: opts.provider === "pi" ? findPiPackage() ?? undefined : undefined
       });
       if (opts.json) {
         console.log(JSON.stringify(result, null, 2));
@@ -178,12 +184,13 @@ export function registerHookIntegrationCommands(
       console.log(result.mode === "control"
         ? "Boundary: control is loopback-only and raw provider input is never retained."
         : "Boundary: observation only; provider control decisions are unchanged.");
+      if (result.provider === "pi") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
     });
 
   hooks
     .command("status")
     .description("Verify provider config ownership, mode, signed manifest, and hook lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi")
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const status = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
@@ -200,6 +207,7 @@ export function registerHookIntegrationCommands(
         console.log(`Config owned: ${status.configOwned ? "yes" : "no"}`);
         console.log(`Manifest valid: ${status.manifestValid ? "yes" : "no"}`);
         console.log(`Lease valid: ${status.leaseValid ? "yes" : "no"}`);
+        if (status.governance) printGovernance(status.governance);
         if (status.expiresTs) console.log(`Expires: ${new Date(status.expiresTs).toISOString()}`);
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
         if (control) printControlVerification(control);
@@ -210,11 +218,11 @@ export function registerHookIntegrationCommands(
   hooks
     .command("health")
     .description("Verify signed hook setup and show the latest verified provider event")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi")
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: string; json: boolean }) => {
       if (!isHookProvider(opts.provider)) {
-        const message = "provider must be claude-code or gemini-cli";
+        const message = "provider must be claude-code, gemini-cli or pi";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
         else console.error(chalk.red(message));
         process.exitCode = 2;
@@ -245,6 +253,7 @@ export function registerHookIntegrationCommands(
         console.log(`Provider: ${health.provider}`);
         console.log(`Agent: ${health.agentId ?? "not bound"}`);
         console.log(`Installation: ${health.installation.state}`);
+        if (health.installation.governance) printGovernance(health.installation.governance);
         console.log(`Observed events: ${health.evidence.eventCount}`);
         if (health.evidence.lastEvent) {
           console.log(`Last verified event: ${health.evidence.lastEvent.eventType}`);
@@ -261,7 +270,7 @@ export function registerHookIntegrationCommands(
   hooks
     .command("remove")
     .description("Remove only the signed AMC-owned hook and revoke its lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi")
     .option("--dry-run", "show exact files without changing provider config", false)
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; dryRun: boolean; json: boolean }) => {
