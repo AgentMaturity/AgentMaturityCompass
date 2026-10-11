@@ -7,7 +7,7 @@
  * the engine request signPlan files when an owner opens the effect gate, and activateControlPlan consumes that grant
  * itself. Every catalog record is experimental (D-08); nothing here says a requirement is met.
  */
-import { activateControlPlan, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { activateControlPlan, activeControlPlan, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { compilePlan, parseDeploymentProfile } from "../catalog/compiler/compile.js";
 import { diffPlans } from "../catalog/compiler/diff.js";
 import { evaluatePredicate } from "../catalog/compiler/evaluatePredicate.js";
@@ -95,6 +95,14 @@ function configStates(workspace: string): Record<string, { state: "valid" | "mis
   };
 }
 
+/**
+ * What activateControlPlan would refuse for `plan` now: planWeakenings against the journal's active plan, as it runs it
+ * (with no active plan, a reviewer-exception waiver still counts). A workspace has one active plan for every agent, so a
+ * plan compiled for another agent drops that agent's budgets and is refused until per-agent plans exist. Throws when the
+ * journal does not verify (activation would refuse too).
+ */
+export const activationWeakenings = (workspace: string, plan: CompiledPlan): string[] => planWeakenings(activeControlPlan(workspace), plan);
+
 /** Per requirement: the catalog's own status of the record (verbatim) and each citation's appliesWhen, three-valued. */
 function whyView(plan: CompiledPlan, profile: DeploymentProfile, catalog: LoadedCatalog) {
   return plan.requirements.map((row) => {
@@ -134,6 +142,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
     id: entry.id, instrument: entry.instrument, jurisdiction: entry.jurisdiction, status: entry.status, bindingForce: entry.bindingForce, verified: entry.verified,
     openQuestions: entry.openQuestions.length }])).values()];
   const active = attempt(() => loadActiveCompiledPolicy(input.workspace));
+  const weakens = plan === null ? [] : attempt(() => activationWeakenings(input.workspace, plan!).slice(0, 32));
   const requirements = plan !== null && profile !== null && catalog !== null ? whyView(plan, profile, catalog) : [];
   return {
     notice: CATALOG_EXPERIMENTAL_NOTICE, profile, plan, compileError,
@@ -142,7 +151,9 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
     requirements,
     register, clocks: clockCandidates(stations, jurisdictions), configs: configStates(input.workspace),
     activePlan: active === null ? null : "error" in active ? active : { revision: active.revision, planDigest: active.planDigest, lockDigest: active.lockDigest,
-      policyDigest: active.runtimePolicy.policyDigest, entrySha256: active.entrySha256 }
+      policyDigest: active.runtimePolicy.policyDigest, entrySha256: active.entrySha256 },
+    // What activation would refuse against the active plan now (a list, or the journal's error code); Review checks it again.
+    activationWeakenings: weakens
   };
 }
 
@@ -167,8 +178,10 @@ export const proposalDiff = (state: A4ReadinessState, plan: CompiledPlan): PlanD
  * checked by activateControlPlan itself, against the journal head, at activation.
  */
 export function inForcePlan(state: A4ReadinessState, planDigest: string): SignedPlan | null {
+  // The attempt's own execution id (EFFECT_STARTED's, copied onto EFFECT_FINISHED), never the consumed record's, which
+  // is absent when that record could not be read after a successful activation (fail closed: the baseline stays).
   const activated = new Set(state.chain.filter((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID)
-    .map((link) => String(link.body.consumedExecutionId ?? "")));
+    .map((link) => String(link.body.executionId ?? "")));
   for (const row of [...state.revisions].reverse()) {
     if (row.stage !== "adapt") continue;
     const spec = JSON.parse(row.spec_json) as Record<string, unknown>;
@@ -217,10 +230,23 @@ export const activationExecutionId = (plan: Pick<CompiledPlan, "digest">): strin
 
 /**
  * The effect gate's engine request (design §6.1): signPlan files the plan review (planReviewIntent, SECURITY, riskTier
- * high) under the project's agent, with `quorumFloor` (two distinct keys when regulated). Returns its id.
+ * high) under the project's agent, with `quorumFloor` (two distinct keys when regulated). Returns its id. A plan that
+ * activateControlPlan is certain to refuse never gets a review: a blocked plan (409 PLAN_BLOCKED) or one weaker than the
+ * active plan (409 PLAN_WEAKENS_ACTIVE_PLAN, read from the journal now), so no gate is consumed for an activation that fails.
  */
 export function openPlanReview(input: { workspace: string; state: A4ReadinessState; gate: A4GateRow; quorumFloor: ApprovalRequestInput["quorumFloor"] }): string {
   const { plan } = boundPlanOf(input.state, input.gate);
+  if (plan.status !== "ready") throw fail(409, "PLAN_BLOCKED", "Only a ready plan can be activated; resolve every mandatory requirement first.", { reasonCodes: ["PLAN_BLOCKED"] });
+  let weakens: string[];
+  try {
+    weakens = activationWeakenings(input.workspace, plan);
+  } catch (error) {
+    throw fail(409, errorCodeOf(error, "COMPILED_POLICY_UNREADABLE"), "The active compiled plan does not verify, so activation would be refused; restore it first.");
+  }
+  if (weakens.length > 0) {
+    throw fail(409, "PLAN_WEAKENS_ACTIVE_PLAN", "Activation would weaken the active plan (a workspace has one active plan for every agent); it would be refused.",
+      { reasonCodes: ["PLAN_WEAKENS_ACTIVE_PLAN"], weakenings: weakens.slice(0, 32) });
+  }
   const previous = inForcePlan(input.state, plan.digest);
   let id: string | null;
   try {
