@@ -6,7 +6,7 @@ import { installClaimStrip } from "./components/claimBadge.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { renderPlanTimeline } from "./components/planTimeline.js";
 import { definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
-import { stageCards } from "./a4Cards.js";
+import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import { register as registerAspire } from "./a4Aspire.js";
 import { register as registerAssemble } from "./a4Assemble.js";
@@ -468,7 +468,17 @@ function mountProject(projectId, options) {
         // revision and stage from the head.
         return post("Comment", projectPath("/comments"), { cardId: `${stage}:${card}`, body, clientRequestId: uuid() }, [`${card}:comment`]);
       }
-      default: throw new Error(`Unknown A4 action ${name}.`);
+      default: {
+        // A stage lane's own action (registerStageAction): only this project's routes or a native task route, or a local
+        // one (`local: true`, e.g. a read the card shows) that sends nothing here and re-renders once its `pending` settles.
+        const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath });
+        if (!custom) throw new Error(`Unknown A4 action ${name}.`);
+        if (custom.local === true) return custom;
+        if (typeof custom.path !== "string" || !(custom.path.startsWith(`${projectPath("")}/`) || /^\/api\/v1\/native-tasks(?:\/|$)/.test(custom.path))) {
+          throw new Error(`The ${name} action names a route outside this project. Nothing was sent.`);
+        }
+        return post(custom.label, custom.path, custom.body, custom.clears ?? [], typeof custom.got === "function" ? custom.got : undefined);
+      }
     }
   }
 
@@ -556,7 +566,12 @@ function mountProject(projectId, options) {
       conflict = null;
       return run(specAction(merged, base));
     }
-    return run(actionFor(name, button));
+    const action = actionFor(name, button);
+    if (action.local === true) {
+      await action.pending;
+      return render();
+    }
+    return run(action);
   }
 
   function focusCard(card) {

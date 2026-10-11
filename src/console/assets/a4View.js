@@ -292,7 +292,7 @@ function nextActionHtml(next) {
 
 /** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
-  "plan_unresolved"]);
+  "plan_unresolved", "path_supported", "unsupported_acknowledged"]);
 
 /** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
 function retryButton(item, allowed) {

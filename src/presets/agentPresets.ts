@@ -1,7 +1,8 @@
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { DELEGATION_SCOPE_TOKENS } from "../agent/delegationScope.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
@@ -123,8 +124,10 @@ export function initPresets(workspace: string): void {
 export function savePresets(workspace: string, presets: readonly unknown[]): void {
   ensureDir(join(workspace, ".amc"));
   const parsed = presets.map((one) => parsePreset(one));
-  writeFileAtomic(presetsPath(workspace), YAML.stringify({ presets: parsed }), 0o644);
-  signFileWithAuditor(workspace, presetsPath(workspace));
+  const bytes = Buffer.from(YAML.stringify({ presets: parsed }), "utf8");
+  writeFileAtomic(presetsPath(workspace), bytes, 0o644);
+  // The bytes written are the bytes signed: a file swapped in between fails verification instead of being signed.
+  signFileWithAuditor(workspace, presetsPath(workspace), bytes);
 }
 
 export type ReadPresets =
@@ -135,7 +138,14 @@ export function readPresets(workspace: string): ReadPresets {
   const path = presetsPath(workspace);
   if (!pathExists(path)) return { ok: true, presets: [] };
 
-  const signature = verifySignedFileWithAuditor(workspace, path);
+  // One read: the signature is checked over these bytes and the same bytes are parsed (no verify-then-reread).
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(path);
+  } catch (error) {
+    return { ok: false, reason: `${path} could not be read: ${String(error)}` };
+  }
+  const signature = verifySignedFileWithAuditor(workspace, path, bytes);
   if (!signature.valid) {
     return {
       ok: false,
@@ -145,7 +155,7 @@ export function readPresets(workspace: string): ReadPresets {
   try {
     const parsed = z
       .object({ presets: z.array(presetSchema).default([]) })
-      .parse(YAML.parse(readUtf8(path)) ?? {});
+      .parse(YAML.parse(bytes.toString("utf8")) ?? {});
     return { ok: true, presets: parsed.presets };
   } catch (error) {
     return { ok: false, reason: `${path} could not be read: ${String(error)}` };
