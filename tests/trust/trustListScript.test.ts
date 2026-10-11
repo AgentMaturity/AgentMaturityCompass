@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -86,5 +87,21 @@ describe("scripts/trust-list.mjs (maintainer tooling)", () => {
     expect(bad.status).toBe(1);
     expect(bad.stderr).toContain("TRUST_LIST_INVALID");
     expect(readFileSync(list, "utf8")).toBe(before);
+  });
+  it("root-rotate writes a signed root rotation and root-apply replaces the pinned root (P1-08)", () => {
+    for (const name of ["old-root", "next-root"]) expect(run("keygen", "--out", dir, "--name", name).status).toBe(0);
+    const home = join(dir, "home");
+    const rootsFile = join(home, "trust", "trust-roots.json");
+    const pubId = (name: string) => createHash("sha256").update(readFileSync(join(dir, `${name}.pub`), "utf8")).digest("hex");
+    mkdirSync(join(home, "trust"), { recursive: true });
+    writeFileSync(rootsFile, JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [pubId("old-root")] }));
+    const statement = join(dir, "rotation.json");
+    const rotated = run("root-rotate", "--replace", join(dir, "old-root.pub"), "--next-key", join(dir, "next-root.key"),
+      "--previous-key", join(dir, "old-root.key"), "--out", statement);
+    expect(rotated.status, rotated.stderr).toBe(0);
+    const applied = spawnSync(process.execPath, [SCRIPT, "root-apply", "--statement", statement, "--root-pub", join(dir, "old-root.pub")],
+      { cwd: dir, encoding: "utf8", env: { ...process.env, AMC_HOME: home } });
+    expect(applied.status, applied.stderr).toBe(0);
+    expect(JSON.parse(readFileSync(rootsFile, "utf8")).roots).toEqual([pubId("next-root")]);
   });
 });

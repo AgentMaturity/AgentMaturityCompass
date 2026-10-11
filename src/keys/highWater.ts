@@ -153,3 +153,18 @@ export function recordHighWater(key: string, sequence: number, sha256: string, o
     return false;
   }
 }
+
+/**
+ * Re-records every mark whose key `rename` maps to a new key (never lowering one there). A trust-root rotation uses
+ * it so the trust-list marks kept under the old root set keep binding the new one.
+ */
+export function carryHighWaterMarks(rename: (key: string) => string | null, opts: HighWaterOptions = {}): number {
+  let carried = 0;
+  for (const [key, entry] of Object.entries(readEntries(opts))) {
+    const target = rename(key);
+    if (target === null) continue;
+    recordHighWater(target, entry.sequence, entry.sha256, opts);
+    carried += 1;
+  }
+  return carried;
+}

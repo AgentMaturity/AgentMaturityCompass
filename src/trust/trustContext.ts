@@ -47,7 +47,7 @@ export interface LoadTrustContextOptions {
 }
 
 /** P1-08: `threshold` (default 1) distinct pinned roots must sign each list (m-of-n). */
-const trustRootsSchema = z.strictObject({
+export const trustRootsSchema = z.strictObject({
   type: z.literal("amc.trust-roots"),
   version: z.literal(1),
   roots: z.array(z.string().regex(/^[0-9a-f]{64}$/)).min(1).refine(roots => new Set(roots).size === roots.length, "roots must be unique"),
@@ -112,8 +112,13 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
  * lower list version is refused; and the highest m-of-n threshold ever required for the list stays required, so a later
  * single-signature policy or list cannot downgrade it.
  */
+/** The id that scopes trust-list marks to one pinned root set. */
+export function trustRootSetId(roots: readonly string[]): string {
+  return sha256Hex([...roots].sort().join(",")).slice(0, 16);
+}
+
 function trustListMarks(listId: string, roots: readonly string[], opts: { amcHome: string | undefined; env: NodeJS.ProcessEnv }) {
-  const rootSet = sha256Hex([...roots].sort().join(",")).slice(0, 16);
+  const rootSet = trustRootSetId(roots);
   const key = (kind: "trust-list" | "trust-list-version" | "trust-list-threshold") => highWaterKey(kind, `${listId}@${rootSet}`);
   const rethrow = (error: unknown): never => {
     if (error instanceof AntiRollbackError) throw new TrustListError(error.code, `list "${listId}": ${error.message}`);

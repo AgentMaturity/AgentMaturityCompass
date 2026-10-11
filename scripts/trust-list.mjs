@@ -22,7 +22,13 @@ Commands:
            [--from <utc>] [--reference <id or URL>] [--source operator]
                                                  add a distrust entry (removes existing signatures)
   sign     --list <file> --key <private pem>     sign with a trust-list root key
-  verify   --list <file> --root <sha256>...      verify under pinned roots; exit 1 when refused`;
+  verify   --list <file> --root <sha256>...      verify under pinned roots; exit 1 when refused
+  root-rotate --replace <old root .pub> --next-key <new root key> --out <file>
+           [--previous-key <old root key>] [--root-key <other root key>...]
+                                                 write a signed trust-list-root rotation statement (P1-08): signed by the
+                                                 new root, and by the old root or by threshold other roots
+  root-apply  --statement <file> --root-pub <pem>...
+                                                 apply a verified root rotation to <AMC home>/trust/trust-roots.json`;
 
 const OPTIONS = {
   out: { type: "string" }, name: { type: "string" }, "list-id": { type: "string" }, days: { type: "string" },
@@ -30,7 +36,9 @@ const OPTIONS = {
   subject: { type: "string" }, "valid-from": { type: "string" }, "valid-to": { type: "string" },
   "allow-key-history": { type: "boolean" }, source: { type: "string" }, "key-id": { type: "string" }, reason: { type: "string" },
   note: { type: "string" }, from: { type: "string" }, reference: { type: "string" }, key: { type: "string" },
-  root: { type: "string", multiple: true }, help: { type: "boolean" }
+  root: { type: "string", multiple: true }, help: { type: "boolean" },
+  replace: { type: "string" }, "next-key": { type: "string" }, "previous-key": { type: "string" }, statement: { type: "string" },
+  "root-pub": { type: "string", multiple: true }, "root-key": { type: "string", multiple: true }
 };
 
 async function trust() {
@@ -115,6 +123,27 @@ const COMMANDS = {
     const others = (current.signatures ?? []).filter(existing => existing.keyId !== signature.keyId);
     writeJson(path, { list: current.list, signatures: [...others, signature] });
     console.log(`Signed ${path} with root ${signature.keyId}`);
+  },
+  async "root-rotate"(values) {
+    const { ed25519KeyId } = await trust();
+    const { encodeRotationStatement, signRotationStatement } = await import("../dist/keys/rotationStatement.js");
+    const { createPublicKey } = await import("node:crypto");
+    const nextKey = readFileSync(required(values, "next-key"), "utf8");
+    const nextPublicKeyPem = createPublicKey(nextKey).export({ type: "spki", format: "pem" }).toString();
+    const statement = {
+      type: "amc.key-rotation", version: 1, workspaceId: "trust-roots", purpose: "trust-list-root", sequence: 1, previousStatementSha256: null,
+      previousKeyId: ed25519KeyId(readFileSync(required(values, "replace"), "utf8")), nextKeyId: ed25519KeyId(nextPublicKeyPem), nextPublicKeyPem,
+      reason: "scheduled", overlap: null, issuedAt: new Date().toISOString()
+    };
+    const signed = signRotationStatement(statement, { next: nextKey, previous: values["previous-key"] ? readFileSync(values["previous-key"], "utf8") : null,
+      roots: (values["root-key"] ?? []).map(path => readFileSync(path, "utf8")) });
+    writeFileSync(required(values, "out"), encodeRotationStatement(signed), { mode: 0o600, flag: "wx" });
+    console.log(`Wrote root rotation ${statement.previousKeyId} -> ${statement.nextKeyId}`);
+  },
+  async "root-apply"(values) {
+    const { applyTrustRootRotation } = await trust();
+    const result = applyTrustRootRotation({ statement: readFileSync(required(values, "statement")), rootPublicKeyPems: required(values, "root-pub").map(path => readFileSync(path, "utf8")) });
+    console.log(`Rotated root ${result.replaced} -> ${result.added}; ${result.roots.length} roots, threshold ${result.threshold}`);
   },
   async verify(values) {
     const { readSignedTrustListFile, verifySignedTrustList } = await trust();
