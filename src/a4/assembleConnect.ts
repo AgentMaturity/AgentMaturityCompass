@@ -4,14 +4,16 @@
  * what AMC produced as an implementation ref, self_reported: AMC wrote files or minted a lease; nothing about the agent
  * is observed.
  * - scaffold: `generateScaffold` for the path's framework, `generateContractTests` and `exportPolicyPack` (its own sha256
- *   manifest), into a directory the owner names inside the workspace, outside `.amc/`, that does not exist yet. Every
- *   byte is produced in memory or in a private temporary directory first; the record binds a manifest of every file's
- *   sha256, and the files are written only after the record commits (a refused record writes nothing).
+ *   manifest), into a directory the owner names inside the workspace, outside `.amc/`, with no symbolic link on the way
+ *   (every component lstat-checked), that does not exist yet. Every byte is produced in memory or in a private temporary
+ *   directory first; the record binds a manifest of every file's sha256, and the files are written only after the
+ *   record commits (a refused record writes nothing).
  * - connect: `buildConnectInstructions` with `mode` always passed (without one it prompts on a terminal). The lease token
  *   is in this response only and is never stored; the record keeps the leaseId, and a replay answers token: null. A lease
  *   whose record is refused was never delivered and is revoked.
- * - import: the neutral importer over a workspace file or directory, originals retained (P1-24): imported traces stay
- *   self_reported. The record binds the import's manifest; a refused record rolls the import back.
+ * - import: the neutral importer over a workspace file or directory reached with no symbolic link on the way, originals
+ *   retained (P1-24): imported traces stay self_reported. The record binds the import's manifest; a refused record rolls
+ *   the import back.
  * The bounded first task through `createForeignRunner` is not run here: a foreign child runs only under `spawnSubagent`
  * from a parent session, and Studio's native tasks compose no delegation (NATIVE_TASKS_NO_DELEGATION, the workflow
  * executor's blocker); Propose lists it as unsupported with that key.
@@ -74,7 +76,6 @@ const present = (path: string): boolean => {
     return false;
   }
 };
-const inside = (root: string, path: string): boolean => path === root || path.startsWith(`${root}${sep}`);
 
 /** A workspace-relative path the owner named: its segments, refused when one is not a plain name. */
 function segmentsOf(input: string, what: string): string[] {
@@ -85,20 +86,34 @@ function segmentsOf(input: string, what: string): string[] {
   return segments;
 }
 
-/** The nearest existing ancestor of `path`, resolved, must stay inside the resolved workspace (no symlink leads out). */
-function assertInsideWorkspace(workspace: string, path: string): void {
-  let probe = path;
-  while (!present(probe)) probe = dirname(probe);
-  if (!inside(realpathSync(workspace), realpathSync(probe))) throw a4Fail(400, "PATH_OUTSIDE_WORKSPACE", "The path leads outside the workspace.");
+/**
+ * Walks `segments` under the workspace with lstat on every prefix and refuses (400 PATH_NOT_PLAIN) a component that is a
+ * symbolic link, or a directory on the way that is not one: the typed names never start with a dot, so with no link on
+ * the way a planted `docs -> .amc` cannot lead a scaffold or an import into `.amc/` or out of the workspace. With
+ * `create`, each missing directory is made on its own (never recursively) and checked once it exists. Returns the path.
+ * ponytail: lstat-then-use, not openat; a workspace writer racing directory swaps between the check and the use is not
+ * excluded (Node has no no-follow directory open). The resolved-path re-check in writeScaffold narrows it.
+ */
+function plainPath(workspace: string, segments: readonly string[], create: boolean): string {
+  let path = workspace;
+  for (const [index, segment] of segments.entries()) {
+    path = join(path, segment);
+    if (create && !present(path)) mkdirSync(path);
+    if (!present(path)) break;
+    const stat = lstatSync(path);
+    if (stat.isSymbolicLink() || (!stat.isDirectory() && (create || index < segments.length - 1))) {
+      throw a4Fail(400, "PATH_NOT_PLAIN", "The path goes through a symbolic link or a file; name plain directories inside the workspace.");
+    }
+  }
+  return path;
 }
 
-/** The scaffold directory: inside the workspace, outside `.amc/`, not present yet (nothing is ever overwritten). */
-function scaffoldDirectory(workspace: string, input: string): { rel: string; abs: string } {
+/** The scaffold directory: inside the workspace, outside `.amc/`, no link on the way, not present yet (nothing is ever overwritten). */
+function scaffoldDirectory(workspace: string, input: string): { rel: string; segments: string[] } {
   const segments = segmentsOf(input, "directory");
-  const abs = join(workspace, ...segments);
-  if (present(abs)) throw a4Fail(409, "SCAFFOLD_DIRECTORY_EXISTS", "Name a directory that does not exist yet; AMC never writes into an existing one.");
-  assertInsideWorkspace(workspace, abs);
-  return { rel: segments.join("/"), abs };
+  plainPath(workspace, segments, false);
+  if (present(join(workspace, ...segments))) throw a4Fail(409, "SCAFFOLD_DIRECTORY_EXISTS", "Name a directory that does not exist yet; AMC never writes into an existing one.");
+  return { rel: segments.join("/"), segments };
 }
 
 /**
@@ -129,16 +144,17 @@ function scaffoldFiles(workspace: string, agentId: string, framework: Integratio
 }
 
 /**
- * After the record committed: the parent re-checked inside the workspace before the new directory is created
- * exclusively, its resolved path re-checked, every file created exclusively.
+ * After the record committed: the parents re-walked (plainPath, made one at a time and lstat-checked, before anything
+ * is created under them), the new directory created exclusively, its resolved path required to be exactly the typed one
+ * under the resolved workspace (so never under `.amc/`), every file created exclusively.
  */
-function writeScaffold(workspace: string, target: { abs: string }, files: readonly FileOut[]): void {
-  const root = realpathSync(workspace);
-  mkdirSync(dirname(target.abs), { recursive: true });
-  if (!inside(root, realpathSync(dirname(target.abs)))) throw a4Fail(400, "PATH_OUTSIDE_WORKSPACE", "The directory leads outside the workspace.");
-  mkdirSync(target.abs);
-  const real = realpathSync(target.abs);
-  if (!inside(root, real)) throw a4Fail(400, "PATH_OUTSIDE_WORKSPACE", "The directory leads outside the workspace.");
+function writeScaffold(workspace: string, target: { segments: readonly string[] }, files: readonly FileOut[]): void {
+  const parent = plainPath(workspace, target.segments.slice(0, -1), true);
+  const dir = join(parent, target.segments.at(-1)!);
+  mkdirSync(dir);
+  plainPath(workspace, target.segments, false);
+  const real = realpathSync(dir);
+  if (real !== join(realpathSync(workspace), ...target.segments)) throw a4Fail(400, "PATH_NOT_PLAIN", "The directory does not resolve to the path named.");
   for (const file of files) {
     const path = join(real, ...file.path.split("/"));
     mkdirSync(dirname(path), { recursive: true });
@@ -238,13 +254,11 @@ async function connect(route: A4Route, projectId: string): Promise<true> {
   return true;
 }
 
-/** A workspace file or directory the owner named for import: inside the workspace (resolved), outside `.amc/`, not a symlink. */
+/** A workspace file or directory the owner named for import: inside the workspace, outside `.amc/`, no symbolic link on the way or at the end. */
 function importSource(workspace: string, input: string): { rel: string; abs: string } {
   const segments = segmentsOf(input, "inputPath");
-  const abs = join(workspace, ...segments);
+  const abs = plainPath(workspace, segments, false);
   if (!present(abs)) throw a4Fail(404, "IMPORT_SOURCE_MISSING", "No such file or directory in the workspace.");
-  if (lstatSync(abs).isSymbolicLink()) throw a4Fail(400, "INPUT_INVALID", "inputPath: name the file itself, not a symbolic link.");
-  assertInsideWorkspace(workspace, abs);
   return { rel: segments.join("/"), abs };
 }
 
