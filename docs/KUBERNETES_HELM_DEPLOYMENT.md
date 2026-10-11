@@ -97,7 +97,7 @@ helm upgrade --install amc deploy/helm/amc \
   --create-namespace \
   --atomic \
   --wait \
-  --set image.repository=ghcr.io/your-org/amc-studio \
+  --set image.repository=ghcr.io/agentmaturity/amc-studio \
   --set image.tag=latest
 ```
 
@@ -108,7 +108,7 @@ helm upgrade --install amc deploy/helm/amc \
   --namespace amc-system \
   --atomic \
   --wait \
-  --set image.repository=ghcr.io/your-org/amc-studio \
+  --set image.repository=ghcr.io/agentmaturity/amc-studio \
   --set image.digest=sha256:<64 hex> \
   --set image.requireDigest=true
 ```
@@ -135,7 +135,7 @@ helm upgrade --install amc deploy/helm/amc \
   --atomic \
   --wait \
   -f deploy/helm/amc/examples/values-ingress-tls.yaml \
-  --set image.repository=ghcr.io/your-org/amc-studio \
+  --set image.repository=ghcr.io/agentmaturity/amc-studio \
   --set image.tag=latest
 ```
 
@@ -224,7 +224,7 @@ The example under `deploy/pulumi/helm-release/` manages the same local Helm char
 cd deploy/pulumi/helm-release
 npm install
 pulumi stack init dev
-pulumi config set imageRepository ghcr.io/your-org/amc-studio
+pulumi config set imageRepository ghcr.io/agentmaturity/amc-studio
 pulumi config set imageTag latest
 pulumi preview
 pulumi up

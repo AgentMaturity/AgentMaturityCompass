@@ -20,7 +20,7 @@ const provider = new k8s.Provider("amc-k8s", providerArgs);
 const releaseName = config.get("releaseName") ?? "amc";
 const namespace = config.get("namespace") ?? "amc-system";
 const chartPath = config.get("chartPath") ?? "../../helm/amc";
-const imageRepository = config.get("imageRepository") ?? "ghcr.io/your-org/amc-studio";
+const imageRepository = config.get("imageRepository") ?? "ghcr.io/agentmaturity/amc-studio";
 const imageTag = config.get("imageTag") ?? "latest";
 // sha256:<64 hex>; when set the chart deploys repository@digest and ignores the tag.
 const imageDigest = config.get("imageDigest") ?? "";
