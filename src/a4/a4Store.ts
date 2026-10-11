@@ -163,8 +163,11 @@ const integrityFailed = (projectId: string, problems: readonly string[]): A4Stor
   new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId} failed verification`, problems);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 
-/** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private. */
-function readOnlyNow(workspace: string): boolean | null {
+/**
+ * Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private. Null
+ * when unreadable. `amc a4` (P1-65) refuses writes on it as Studio's native admission does.
+ */
+export function readOnlyNow(workspace: string): boolean | null {
   try {
     const users = verifyUsersConfigSignature(workspace);
     return (users.signatureExists && !users.valid) || !verifyTrustConfigSignature(workspace).valid;
