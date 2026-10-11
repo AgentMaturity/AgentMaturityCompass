@@ -11,6 +11,8 @@ import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { CONTROL_HOOK_PATH } from "../src/bridge/hookControl.js";
 import { OBSERVED_AEP_HOOK_PATH } from "../src/bridge/hookIngress.js";
 import { getPrivateKeyPem } from "../src/crypto/keys.js";
+import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
+import { getHookIntegrationStatus } from "../src/adapters/hookIntegration.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { mintReceipt } from "../src/receipts/receipt.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -120,6 +122,19 @@ describe("AMC Pi extension", () => {
     expect(all).not.toContain(path);
   });
 
+  test("control: after the receipt key rotates, status reports drift and a reinstall pins the new key, so allowed reads run", async () => {
+    const workspace = controlledWorkspace(agentId);
+    await withBridge(workspace, "control");
+    rotatePurposeKeys({ workspace, purposes: ["receipt"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
+    const call = (id: string) => ({ toolName: "read", toolCallId: id, input: { path: join(workspace, "workspace", "public.txt") } });
+    expect(await (await loaded(workspace, "control")).emit("tool_call", call("before-reinstall"), context())).toEqual(UNAVAILABLE);
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted",
+      issues: expect.arrayContaining([expect.stringContaining("receipt signing keys changed")]) });
+    const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as { bridgeBase: string };
+    installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control" });
+    expect(await (await loaded(workspace, "control")).emit("tool_call", call("after-reinstall"), context())).toBeUndefined();
+  });
+
   test("control: unmapped tools and unqualified Pi versions are blocked with AMC's reason", async () => {
     const workspace = controlledWorkspace(agentId);
     await withBridge(workspace, "control");
@@ -169,12 +184,22 @@ describe("AMC Pi extension", () => {
     const forged = generateKeyPairSync("ed25519").privateKey.export({ type: "pkcs8", format: "pem" }).toString();
     const signers: Array<(workspace: string) => { key: string; request?: string; actionId?: string }> = [
       () => ({ key: forged }),
-      (workspace) => ({ key: getPrivateKeyPem(workspace, "monitor"), request: "{\"another\":\"request\"}" }),
-      (workspace) => ({ key: getPrivateKeyPem(workspace, "monitor"), actionId: "pi.another-action" }),
+      // A ledger-row key that was never a receipt key shares the monitor role but is not pinned: only receipt keys are.
+      (workspace) => {
+        rotatePurposeKeys({ workspace, purposes: ["receipt"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
+        rotatePurposeKeys({ workspace, purposes: ["ledger-row"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
+        const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as { bridgeBase: string };
+        installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control" });
+        return { key: getPrivateKeyPem(workspace, "ledger-row") };
+      },
+      // A real AMC key of another purpose: only the receipt purpose's keys, pinned at install, are accepted.
+      (workspace) => ({ key: getPrivateKeyPem(workspace, "artifact-seal") }),
+      (workspace) => ({ key: getPrivateKeyPem(workspace, "receipt"), request: "{\"another\":\"request\"}" }),
+      (workspace) => ({ key: getPrivateKeyPem(workspace, "receipt"), actionId: "pi.another-action" }),
     ];
     for (const signer of signers) {
       const workspace = controlledWorkspace(agentId);
-      const signing = signer(workspace);
+      let signing: ReturnType<typeof signer> = { key: forged };
       await withFakeBridge(workspace, (res, body, req) => {
         if (req.url === PI_OBSERVE_PATH) return void res.writeHead(201, { "content-type": "application/json" }).end("{}");
         const actionId = signing.actionId ?? piActionId("pi-session-1", "c");
@@ -186,6 +211,7 @@ describe("AMC Pi extension", () => {
         res.writeHead(201, { "content-type": "application/json" }).end(JSON.stringify({ controlled: true, provider: "pi",
           actionId: piActionId("pi-session-1", "c"), decision: "allow", providerResponse, providerResponseSha256, receipt }));
       });
+      signing = signer(workspace);
       expect(await (await loaded(workspace, "control")).emit("tool_call", { toolName: "read", toolCallId: "c", input: { path: "workspace/public.txt" } }, context()))
         .toEqual(UNAVAILABLE);
     }

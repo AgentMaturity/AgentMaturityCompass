@@ -16,7 +16,7 @@ import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { createAmcPiExtension, type PiExtensionApi, type PiToolCallContext } from "../../src/adapters/pi/amcPiExtension.js";
 import { QUALIFIED_PI_VERSIONS } from "../../src/adapters/pi/piVersions.js";
 import { startBridgeServer } from "../../src/bridge/bridgeServer.js";
-import { getPublicKeyHistory } from "../../src/crypto/keys.js";
+import { getPurposeKeyHistory } from "../../src/keys/signingKeys.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../../src/ledger/ledger.js";
 import { verifyReceipt } from "../../src/receipts/receipt.js";
 import { inspectHookActionLifecycle } from "../../src/watch/hookActionLifecycle.js";
@@ -256,7 +256,7 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
 
       test("every decision receipt and event verifies cold", async () => {
         const ledger = openLedger(workspace);
-        const keys = getPublicKeyHistory(workspace, "monitor");
+        const keys = getPurposeKeyHistory(workspace, "receipt");
         const decisions = ledger.getAllEvents().filter((row) => row.event_type === "audit" && (JSON.parse(row.meta_json) as { provider?: string }).provider === "pi");
         const failures = decisions.filter((row) => {
           const meta = JSON.parse(row.meta_json) as { receipt: string };

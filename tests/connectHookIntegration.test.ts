@@ -40,6 +40,7 @@ import { signFileWithAuditor } from "../src/org/orgSigner.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { PI_HOOK_SOURCE } from "../src/adapters/hookProviders/pi.js";
+import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { createAmcPiExtension } from "../src/adapters/pi/amcPiExtension.js";
 import { inspectHookHealth } from "../src/watch/hookHealthDiagnostics.js";
 
@@ -1241,7 +1242,7 @@ describe("AMC Pi hook installation (P1-22)", () => {
       provider: "pi", mode: "control", extensionPath: ".pi/extensions/amc.js", modulePath: piModule,
       extensionSha256: sha256Hex(readFileSync(files.extension)), moduleSha256: sha256Hex(readFileSync(piModule)),
       createdDirs: [".pi", ".pi/extensions"], qualifiedPiVersions: ["1.0.2", "1.0.4"],
-      receiptPublicKeys: getPublicKeyHistory(workspace, "monitor"),
+      receiptPublicKeys: getPurposeKeyHistory(workspace, "receipt"),
       control: { endpoint: "/hooks/control/v1", leaseScope: "hook:control", providerOutcomes: ["allow", "deny", "ask"] },
     });
     expect(readFileSync(files.ignore, "utf8")).toContain(".amc/hooks/");

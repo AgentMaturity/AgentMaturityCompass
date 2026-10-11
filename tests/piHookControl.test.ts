@@ -6,7 +6,8 @@ import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/appr
 import { evaluateProviderHookControl, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
 import { HookControlError, validateProviderControlResponse } from "../src/bridge/hookProviders.js";
 import { assertContract } from "../src/contracts/index.js";
-import { getPublicKeyHistory } from "../src/crypto/keys.js";
+import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
+import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyReceipt } from "../src/receipts/receipt.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
@@ -39,7 +40,7 @@ function decisionRow(workspace: string, eventId: string) {
 }
 
 function receiptPayload(workspace: string, receipt: string) {
-  const verified = verifyReceipt(receipt, getPublicKeyHistory(workspace, "monitor"));
+  const verified = verifyReceipt(receipt, getPurposeKeyHistory(workspace, "receipt"));
   expect(verified.ok).toBe(true);
   return verified.payload as Record<string, unknown>;
 }
@@ -184,6 +185,16 @@ describe("Pi tool_call hook control", () => {
     expect(narrow.decision).toBe("deny");
     expect(narrow.reason).toContain("(scope_widened)");
     expect(receiptPayload(workspace, narrow.receipt)).toMatchObject({ state: "denied", authorizationRecordDigest: null });
+  });
+
+  test("decision receipts are signed and verified with the receipt purpose's key (P1-08), also after only that key rotates", () => {
+    const workspace = controlledWorkspace(agentId);
+    rotatePurposeKeys({ workspace, purposes: ["receipt"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
+    const rawInput = piEnvelope("read", { path: join(workspace, "workspace", "public.txt") }, { toolCallId: "rotated" });
+    const result = control(workspace, rawInput);
+    expect(verifyReceipt(result.receipt, getPurposeKeyHistory(workspace, "receipt")).ok).toBe(true);
+    expect(control(workspace, rawInput)).toMatchObject({ idempotentReplay: true, receipt: result.receipt });
+    expect(verifyProviderHookControlResult({ workspace, authenticatedAgentId: agentId, provider: "pi", rawInput, result })).toEqual({ ok: true, error: null });
   });
 
   test("without a lease the record names the self-reported OS user, never a lease", () => {

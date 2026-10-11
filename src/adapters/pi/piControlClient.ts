@@ -25,7 +25,7 @@ export interface PiHookConfig {
   readonly agentId: string;
   readonly bridgeBase: string;
   readonly token: string;
-  /** AMC's monitor public keys at install time; a control answer's receipt must verify under one of them. */
+  /** The keys of AMC's `receipt` signing purpose (P1-08) at install; a control answer's receipt must verify under one of them. */
   readonly receiptPublicKeys: readonly string[];
 }
 
@@ -107,7 +107,7 @@ function verifiedReceiptPayload(receipt: unknown, publicKeys: readonly string[])
 /**
  * What to return to Pi for an AMC control answer. The answer must be a decision for exactly this call: AMC's action id,
  * a Pi response that names the digest of the request sent, that response's digest, and a receipt signed by an AMC
- * monitor key pinned at install whose body digest, execution id, idempotency key (Pi's call id), agent and state match.
+ * `receipt` purpose key pinned at install whose body digest, execution id, idempotency key (Pi's call id), agent and state match.
  * Anything else throws, which blocks the call.
  */
 export function piControlAnswer(answer: unknown, expected: ExpectedPiDecision, publicKeys: readonly string[]): PiToolCallResult {

@@ -13,7 +13,7 @@ import { z } from "zod";
 import { initApprovalPolicy } from "../../approvals/approvalPolicyEngine.js";
 import { CONTROL_HOOK_ROUTE } from "../../bridge/hookControl.js";
 import { revokeLeaseForCli } from "../../leases/leaseCli.js";
-import { getPublicKeyHistory } from "../../crypto/keys.js";
+import { getPurposeKeyHistory } from "../../keys/signingKeys.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../../org/orgSigner.js";
 import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -53,7 +53,7 @@ const piManifestSchema = z.strictObject({
   tokenPath: z.literal(".amc/hooks/pi.lease"),
   ...leaseManifestFields,
   qualifiedPiVersions: z.array(z.string()),
-  /** AMC's monitor public keys at install; the extension accepts only decision receipts signed by one of them. */
+  /** The keys of AMC's `receipt` signing purpose (P1-08) at install; the extension accepts only decision receipts they sign. */
   receiptPublicKeys: z.array(z.string().min(1)).min(1),
   installedTs: z.number().int(),
   updatedTs: z.number().int(),
@@ -148,7 +148,7 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
     const ignoreBytes = Buffer.from(addManagedIgnoreBlock(ignoreBefore.bytes?.toString("utf8") ?? null), "utf8");
     const existingLease = verifyManagedLease({ workspace, tokenPath: paths.token, expectedAgentId: agentId, mode });
     const moduleSha256 = sha256Hex(readFileSync(modulePath));
-    const receiptPublicKeys = getPublicKeyHistory(workspace, "monitor");
+    const receiptPublicKeys = getPurposeKeyHistory(workspace, "receipt");
     const before = { extension: snapshot(paths.extension), ignore: ignoreBefore, token: snapshot(paths.token), manifest: snapshot(paths.manifest),
       signature: snapshot(paths.signature) };
     if (existing && existing.mode === mode && existing.agentId === agentId && existing.bridgeBase === bridgeBase
@@ -237,7 +237,7 @@ export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   else if (manifest && !configOwned) issues.push(".pi/extensions/amc.js changed after installation");
   const moduleDrifted = manifest !== null && fileSha(manifest.modulePath) !== manifest.moduleSha256;
   if (moduleDrifted) issues.push("AMC's Pi extension module changed after installation; reinstall to bind the new module");
-  const keysDrifted = manifest !== null && !sameKeys(manifest.receiptPublicKeys, getPublicKeyHistory(workspace, "monitor"));
+  const keysDrifted = manifest !== null && !sameKeys(manifest.receiptPublicKeys, getPurposeKeyHistory(workspace, "receipt"));
   if (keysDrifted) issues.push("AMC's receipt signing keys changed after installation; reinstall so the extension accepts them");
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");

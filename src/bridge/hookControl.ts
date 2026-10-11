@@ -1,7 +1,7 @@
 import { canonicalize } from "../utils/json.js";
 import { z } from "zod";
 import YAML from "yaml";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import {
   loadApprovalPolicy,
@@ -819,7 +819,7 @@ function recoverControlResult(input: {
     requireReceipt: true,
     requireSealedSession: true,
   });
-  const receipt = verifyReceipt(stored.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const receipt = verifyReceipt(stored.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
   const receiptKind = input.request.pi ? "action_state" : "guard_check";
   const responseSha256 = sha256Hex(Buffer.from(
     serializeProviderControlResponse(stored.providerResponse),
