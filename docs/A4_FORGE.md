@@ -371,6 +371,60 @@ the agent's prompt pack.
   `not_evaluated` with `REVIEW_NOT_INDEPENDENT`), `deployment_plan_approved` from the consumed Activate direction gate.
   Adapt never advances the lifecycle; the A4 lifecycle wrapper (P1-62) does.
 
+## Activate: the release, the package and the leases
+
+Activate asks where and how the release runs: the target (`compose` or `helm`, both recordable in v1), the
+`destinationRef` host that a receipt and AMC's check must name (a host name and port, never a URL with credentials), the
+lease scopes, action classes, staging and production routes, models and caps, release ownership, the update policy,
+outcomes, monitoring expectations and rollback acceptance. Adapt's `deploymentNeeds` is carried as an answer, and the
+destination questions depend on it. Understand reads the lifecycle stage and the controls staging and production
+require, the deploy base files, image identity (null: the bootstrap report records no image digest, so
+`GET /api/v1/a4/options` answers `imageDigest: null` with its reason), where this Studio runs, freeze, the signing route
+of `A4_RECORD` and `A4_PACKAGE`, the DEPLOY approval rule and earlier releases. Explain renders them at three levels.
+Propose freezes the release draft (the eight-surface table, package, lease, update, monitoring, rollback and value
+plans) and copies the agent's context files and the signed configs into `a4-projects/<projectId>/<revision>/<sha256>`.
+
+The release approval is Activate's direction gate (DEPLOY floor). Once it has its quorum, an owner opens the effect gate
+`a4.activate.release` (a second, separately decided DEPLOY request), and `POST …/releases { gateId, expectedHeadSeq,
+clientRequestId }` (owner) consumes the release approval and runs the effect inside the request:
+
+1. The package is built only from content-addressed inputs: the Enforce snapshot that the bound resources digest names
+   (`snapshots/<manifestId>/files`, each resource digested as Enforce digests it and equal to the signed snapshot) and
+   the captured files read by the digest the gate bound. A file edited after the gate opened is
+   `EFFECT_FAILED: RESOURCE_DRIFTED <slot>` and no package is written.
+2. The package must scan `PASS` for secrets. Only then is the staging lease minted: `WRITE_LOW` at most, the staging
+   routes, 24 hours, bound to this workspace and agent, with the release as its work order.
+3. The manifest (`amc.a4-package/v1`, no absolute path) is signed `A4_PACKAGE`, the tarball `a4-package`, and the
+   transparency log gets an `a4-package` entry.
+4. `RELEASE` records the release (`amc.a4-release/v1`): the eight-surface table (Score, Shield, Enforce, Vault, Watch,
+   Comply, Fleet, Passport; Passport reads `not_evaluated` until P0-55), the previous and base release (TUNE lineage),
+   the staging lease id and its own `A4_RECORD` envelope.
+
+The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the projection,
+and a replay answers `token: null` with `TOKEN_ALREADY_DELIVERED`. A failed attempt revokes the lease it minted, and a
+retry revokes every lease an earlier attempt of the release minted before minting again. `GET …/releases/:rid` shows the
+record with its envelope checked now, each lease's live status and a reason for every surface not evaluated.
+
+The deployment approval is Activate's completion gate. Consuming it runs `a4.activate.production_lease` on its own
+quorum and answers the production lease's token once (the answered scopes, routes and caps). A `DENY` on an unconsumed
+completion gate revokes the staging lease; a decision on a consumed gate is refused (`A4_GATE_STALE: consumed`) and
+revokes nothing. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
+the staging lease has expired before such a gate can.
+
+Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,
+`deployment.same_host` (BLOCKED `DEPLOYMENT_NOT_SAME_HOST`, naming P2-40, unless this Studio runs under the chosen
+target: v1 deploys by restarting it), `deployment.topology` (`TOPOLOGY_UNDECIDED` for Helm) and
+`deployment.image_pinned` (`IMAGE_TAG_ONLY`), both WAITING and never mandatory, `lease.scope` (`LEASE_STAGING_ONLY`
+until the production lease), `deployment.amc_check` (`DEPLOYMENT_UNCHECKED`) and `monitoring.source`
+(`MONITOR_NO_SOURCE`). `signing.notary_route` names both routes as `A4_RECORD:<route>` and `A4_PACKAGE:<route>`. In
+NOTARY mode, with the default `denyLocalVaultSigningIfNotaryEnabled: true`, both kinds route to the notary. The
+`requireNotaryFor` default (which now lists `A4_PACKAGE`) applies only to a `trust.yaml` that omits the field. An
+operator whose `trust.yaml` lists `requireNotaryFor` explicitly and sets that flag to `false` adds `A4_PACKAGE` to the
+list and re-signs the file. Expect one notary call for every gate decision.
+
+Not yet: prepared Compose and Helm files, deployment receipts, AMC's verify, rollback, the lifecycle bridge, monitoring
+and value (P1-62 slices B and C). Back up `a4-releases/` with the workspace.
+
 ## Deployment boundary
 
 AMC prepares deployment plans and records what the operator says happened; it never deploys, never holds deployment

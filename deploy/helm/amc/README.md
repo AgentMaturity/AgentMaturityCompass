@@ -60,3 +60,7 @@ The example under `deploy/terraform/helm-release/` deploys this chart with Terra
 ## Pulumi
 
 The example under `deploy/pulumi/helm-release/` deploys this chart with Pulumi's Kubernetes Helm v3 Release resource while keeping bootstrap secrets outside Pulumi stack config/state.
+
+## A4 Forge releases (preview)
+
+With `AMC_A4_PREVIEW=1`, an A4 project's Activate stage signs an agent package and records the release; AMC never runs `helm`. In v1 a deployment is a same-host restart with a pinned image: the values overlay restarts this hosted Studio, the one that built the agent, whose volume holds the agent's resources. A deployment receipt can be recorded against `target: helm` only for an agent built in this hosted Studio; an agent built elsewhere has no v1 deployment path (`DEPLOYMENT_NOT_SAME_HOST`), and installing a package into another workspace is P2-40. The chart has no `image.digest` field yet, so the image stays pinned by tag (`IMAGE_TAG_ONLY`) and the topology stays undecided until D-03 (`TOPOLOGY_UNDECIDED`); both are WAITING items, never blockers. The staging lease token is shown once by the release response: create it as a Kubernetes secret yourself; the chart's `change-me-*` defaults are never used for it. AMC's check of a deployment establishes reachability only; release identity at the destination is not evaluated until P2-40.
