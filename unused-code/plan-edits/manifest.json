@@ -416,6 +416,13 @@
       "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
     },
     {
+      "path": "src/storage/blobs/blobStore.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/storage/blobs/blobStore.ts.landed",
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+    },
+    {
       "path": "src/studio/studioServer.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
