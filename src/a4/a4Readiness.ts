@@ -209,12 +209,17 @@ export function riskTierOf(state: A4ReadinessState): string | null {
 
 /** Risk tiers by rank, in every spelling A4 meets (C-25); a tier not listed ranks as high (unknown risk is not low risk). */
 export const TIER_RANK: Readonly<Record<string, number>> = { low: 0, med: 1, medium: 1, high: 2, critical: 3 };
+/** Adapt's plan activation (src/a4/stages/adapt.ts): its finish makes the project regulated (isRegulated). */
+const ACTIVATE_PLAN_EFFECT = "a4.adapt.activate_plan";
 
 /**
  * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier other than low or
  * medium (an unstated, unknown or differently spelled tier counts: unknown risk is not low risk, as engineRiskTier maps
  * it to high), a brief tier below the agent's own tier before it (`brief.priorRiskTier`, recorded by Aspire's Propose:
- * a lowering is decided under the rules of the tier it lowers), or a head Adapt revision carrying an activated plan.
+ * a lowering is decided under the rules of the tier it lowers), or an active compiled plan: any active plan makes the
+ * workspace regulated, so a revision of any stage that records the plan journal's head (every revision binds that slot)
+ * counts, and so does this project's own activation (EFFECT_FINISHED of Adapt's a4.adapt.activate_plan), whose Adapt
+ * revisions all predate it. A plan is never deactivated, so once either holds it holds for good.
  */
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
@@ -223,9 +228,11 @@ export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): bo
   const brief = latestRevision(state, "aspire");
   const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
   if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
-  const adapt = latestRevision(state, "adapt");
-  const digests = adapt ? parseJson(adapt.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null : null;
-  return typeof digests?.plan?.journalEntrySha256 === "string";
+  if (state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT)) return true;
+  return state.revisions.some((revision) => {
+    const digests = parseJson(revision.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null;
+    return typeof digests?.plan?.journalEntrySha256 === "string";
+  });
 }
 
 /**
@@ -470,14 +477,15 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 /**
  * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
- * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, and at
- * Assemble, which signs the workspace presets file and starts native build sessions.
+ * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, at
+ * Assemble, which signs the workspace presets file and starts native build sessions, and at Adapt, which signs the
+ * compiled plan (CONTROL_PLAN) and re-signs the agent's Enforce manifest.
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble"));
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble" || stage === "adapt"));
   const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
