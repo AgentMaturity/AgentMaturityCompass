@@ -23,13 +23,13 @@ const CLASS_BY_TYPE: Readonly<Record<string, ProtectedDataClass>> = Object.freez
   eu_vat: "pii", eu_national_id: "pii", passport_number: "pii", health_record_id: "phi",
   api_key_openai: "credential", api_key_github: "credential", api_key_aws: "credential", password_json: "credential"
 });
+// Per-leaf and nesting bounds only. Request-wide totals refused every long session, so they are gone.
 const MAX_DEPTH = 32;
-const MAX_NODES = 10_000;
 const MAX_TEXT_CHARS = 1_048_576;
 const DETECTOR_SET_DIGEST = sha256Hex(canonicalize({
   schema: "amc.protected-detectors/v1", support: "experimental", patterns: getPIIDetectorMetadata(), classMapping: CLASS_BY_TYPE,
-  traversalRevision: "request-json-leaves-password-context-malformed-args-as-text-v2",
-  limits: { maxDepth: MAX_DEPTH, maxNodes: MAX_NODES, maxTextChars: MAX_TEXT_CHARS, maxJsonChars: MAX_TEXT_CHARS }
+  traversalRevision: "request-json-leaves-password-context-malformed-args-as-text-per-leaf-limits-v3",
+  limits: { maxDepth: MAX_DEPTH, maxLeafChars: MAX_TEXT_CHARS }
 }));
 function refused(): never { throw new Error("Protected request detection refused unsupported or excessive traversal"); }
 const dataClass = (type: string): ProtectedDataClass => Object.hasOwn(CLASS_BY_TYPE, type) ? CLASS_BY_TYPE[type]! : refused();
@@ -42,16 +42,17 @@ export function detectProtectedText(text: string): readonly ProtectedDataSpan[] 
   })));
 }
 
-/** Read-only inspection, once per text leaf. Counts are heuristic findings, not distinct people or verified data classes. */
+/**
+ * Read-only inspection, once per text leaf. Counts are heuristic findings, not distinct people or verified data classes.
+ * An over-long leaf, excessive nesting or an unsupported shape throws; it is never skipped.
+ */
 export function detectProtectedRequest(request: EncodableRequest): ProtectedDataDetection {
   try {
     const counts: Partial<Record<ProtectedDataClass, number>> = {};
     const active = new Set<object>();
-    let nodes = 0, chars = 0, jsonChars = 0;
-    const touch = () => { if (++nodes > MAX_NODES) refused(); };
     const add = (kind: ProtectedDataClass) => { counts[kind] = (counts[kind] ?? 0) + 1; };
     const scan = (text: string, key?: string) => {
-      if (typeof text !== "string" || (chars += text.length) > MAX_TEXT_CHARS) refused();
+      if (typeof text !== "string") refused();
       const spans = detectProtectedText(text);
       for (const span of spans) add(span.dataClass);
       // Keep the existing JSON-password heuristic without rescanning every object or double-counting its credential value.
@@ -62,7 +63,6 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       }
     };
     const visit = (value: unknown, depth: number, key?: string): void => {
-      touch();
       if (depth > MAX_DEPTH) refused();
       if (typeof value === "string") { scan(value, key); return; }
       if (typeof value === "number") { if (!Number.isFinite(value)) refused(); scan(String(value)); return; }
@@ -73,34 +73,32 @@ export function detectProtectedRequest(request: EncodableRequest): ProtectedData
       const array = Array.isArray(value), prototype = Object.getPrototypeOf(value);
       if (!array && prototype !== Object.prototype && prototype !== null) refused();
       const keys = Object.keys(value);
-      if (keys.length > MAX_NODES - nodes || (Array.isArray(value) && (keys.length !== value.length || keys.some((field, index) => field !== String(index))))) refused();
+      if (Array.isArray(value) && (keys.length !== value.length || keys.some((field, index) => field !== String(index)))) refused();
       active.add(value);
       for (const field of keys) {
         const descriptor = Object.getOwnPropertyDescriptor(value, field);
         if (!descriptor || !("value" in descriptor)) refused();
-        if (!array) { touch(); scan(field); }
+        if (!array) scan(field);
         visit(descriptor.value, depth + 1, array ? undefined : field);
       }
       active.delete(value);
     };
     // Empty or malformed tool-call arguments are committed by design; they are scanned as text, never refused.
     const json = (text: string) => {
-      if (typeof text !== "string" || (jsonChars += text.length) > MAX_TEXT_CHARS) refused();
+      if (typeof text !== "string") refused();
       let parsed: unknown;
       try { parsed = JSON.parse(text); } catch { scan(text); return; }
       visit(parsed, 0);
     };
 
-    touch(); scan(request.model);
-    if (request.system !== null) { touch(); scan(request.system); }
+    scan(request.model);
+    if (request.system !== null) scan(request.system);
     visit(request.params, 0);
     visit(request.tools, 0);
-    if (!Array.isArray(request.messages) || request.messages.length > MAX_NODES - nodes) refused();
+    if (!Array.isArray(request.messages)) refused();
     for (const message of request.messages) {
-      touch();
-      if (!Array.isArray(message.parts) || message.parts.length > MAX_NODES - nodes) refused();
+      if (!Array.isArray(message.parts)) refused();
       for (const part of message.parts) {
-        touch();
         switch (part.kind) {
           case "text": case "thinking": case "tool_result": scan(part.text); break;
           case "tool_use": scan(part.toolName); json(part.argumentsJson); break;
