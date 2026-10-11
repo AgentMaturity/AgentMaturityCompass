@@ -241,7 +241,9 @@ signing, activation and the conformance statement. Prompts, permissions, memory 
   people when regulated) and approvers decide it from the A4 card. `complete` verifies that grant and re-checks
   separation of duties and membership; `activateControlPlan` then consumes it itself (`activate-<digest32>`, recorded on
   `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the effect gate. Only a ready plan activates
-  (`plan_activated` is BLOCKED with `PLAN_BLOCKED` otherwise). A non-regulated project completes with the plan signed
+  (`plan_activated` is BLOCKED with `PLAN_BLOCKED` otherwise). A workspace has one active plan for every agent:
+  activating replaces it, and a plan weaker than the active one is refused (`REPLACES_ACTIVE_PLAN` names an active plan
+  of another profile). A non-regulated project completes with the plan signed
   and not activated (`PLAN_SIGNED_NOT_ACTIVATED`); an owner may still open the effect, which makes the workspace
   regulated. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
   (P1-67); tasks started before it, CLI agent sessions and delegated children are denied every call.

@@ -294,6 +294,10 @@ function signingItems(state: A4ReadinessState, spec: Record<string, unknown>, an
   const conformance = review?.conformance ?? null;
   const counts = conformance?.counts ?? {};
   const plan = currentPlan(spec, answers);
+  // The workspace has one active plan for every agent: activating this one replaces it, and activateControlPlan refuses
+  // a plan weaker than it (Adapt never passes allowWeakening), so another profile's active plan is named up front.
+  const active = understandingOf(spec)?.facts.activePlan as { planDigest?: unknown } | null | undefined;
+  const replaces = typeof active?.planDigest === "string" && active.planDigest !== plan?.digest ? ["REPLACES_ACTIVE_PLAN"] : [];
   const items = [
     build !== null ? item("plan_signed", "READY", { section: "implementation", reasonCodes: ["CONTROL_PLAN_SIGNED", "WORKSPACE_KEYS_ONLY"] })
       : waiting("plan_signed", ["PRODUCED_AT_BUILD"], { section: "implementation", mandatory: reached(state, "direction_approved") }),
@@ -308,10 +312,10 @@ function signingItems(state: A4ReadinessState, spec: Record<string, unknown>, an
     finished ? item("plan_activated", "READY", { reasonCodes: ["PLAN_ACTIVATED"] })
       : regulated && plan !== null && plan.status !== "ready" ? item("plan_activated", "BLOCKED", { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
         nextAction: { label: "A regulated project activates its plan at completion, and only a ready plan activates: resolve every mandatory requirement" } })
-      : opened !== undefined ? item("plan_activated", "READY", { reasonCodes: ["ACTIVATED_AT_COMPLETION"] })
-        : regulated ? waiting("plan_activated", ["PLAN_NOT_ACTIVATED"], { kind: "review_pending",
+      : opened !== undefined ? item("plan_activated", "READY", { reasonCodes: ["ACTIVATED_AT_COMPLETION", ...replaces] })
+        : regulated ? waiting("plan_activated", ["PLAN_NOT_ACTIVATED", ...replaces], { kind: "review_pending",
           nextAction: { label: `A regulated project activates its plan at completion: once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}` } })
-          : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED"], nextAction: { label: "Plan signed, not activated (the default for a "
+          : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: "Plan signed, not activated (the default for a "
             + `non-regulated project). Activation is an explicit owner effect (${ACTIVATE_PLAN_EFFECT_ID} on the completion gate) and makes the workspace regulated` } })
   ];
   // AMC's own CONTROL_RESULT signature check: integrity of bytes under this workspace's keys, never a lane, never a claim.
