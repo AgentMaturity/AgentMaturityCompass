@@ -237,6 +237,15 @@ describe("source-quality ratchet", () => {
     expect(row).toBe("| 2026-10-11 | 0123456789ab | 10 / 20 | 11 / 19 | 1 / 0 | 0 / 2 | 0 / 1 |");
   });
 
+  it("commits a valid baseline under 1 MB for the current configs", () => {
+    const text = readFileSync("scripts/quality/source-quality-baseline.json", "utf8");
+    expect(Buffer.byteLength(text)).toBeLessThan(1_000_000);
+    const baseline = parseBaseline(text);
+    expect(serializeBaseline(baseline)).toBe(text);
+    expect(baseline.config).toEqual({ jscpdSha256: configSha256(".", "duplicates"), knipSha256: configSha256(".", "dead-code") });
+    expect(baseline.sourceCommit).toMatch(/^[0-9a-f]{40}$/);
+  });
+
   it("refuses an acceptance without a reason before scanning", () => {
     const result = spawnSync(process.execPath, ["scripts/source-quality.mjs", "dead-code", "--accept", "b".repeat(64)], { encoding: "utf8" });
     expect(result.status).toBe(1);
