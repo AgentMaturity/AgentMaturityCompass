@@ -1,4 +1,3 @@
-build exit=0 :: bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/co
 typecheck exit=0 :: 
 typecheck:tests exit=0 :: 
 lint exit=0 :: check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries.

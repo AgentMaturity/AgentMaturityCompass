@@ -2,18 +2,13 @@
   "schemaVersion": 1,
   "key": "P1-08",
   "date": "2026-10-11",
-  "commit": "f26b6557e917564a15b9d275c0fce43c75b56e70",
+  "commit": "ff625ca4eb60e083b660a61886f96eae8e596dd7",
   "branch": "rtd/p1-08-key-lifecycle",
   "node": "v22.23.0",
   "pnpm": "10.33.0",
   "os": "darwin 25.6.0, local, not CI",
   "arch": "arm64",
   "commands": [
-    {
-      "cmd": "npm run -s build",
-      "exit": 0,
-      "durationMs": 0
-    },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
@@ -97,7 +92,7 @@
     {
       "cmd": "npx vitest run tests/keys/antiRollback.test.ts tests/keys/workspaceWriter.test.ts tests/leases/revocationListAtomic.test.ts tests/trust/rootRotation.test.ts tests/trust/trustList.test.ts --reporter=verbose",
       "exit": 0,
-      "durationMs": 14330
+      "durationMs": 20060
     },
     {
       "cmd": "helm template t deploy/helm/amc && helm lint deploy/helm/amc",
@@ -107,31 +102,31 @@
     {
       "cmd": "npx vitest run (full suite)",
       "exit": 1,
-      "durationMs": 1212000
+      "durationMs": 1741000
     }
   ],
   "tests": {
-    "total": 23442,
-    "passed": 23399,
+    "total": 23451,
+    "passed": 23337,
     "failed": 43,
-    "skipped": 0
+    "skipped": 71
   },
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "f6a4751bc3315395998941ba7842fe017472e419f92dd0b1f00f782e077ce7fc"
+      "sha256": "b99ce5683fae3127a574895baef0bd65195d8cf4e063b0425b7d7cd7dba1163f"
     },
     {
       "path": "checks.txt",
-      "sha256": "6a945dda8e6c57940963689bf240bb89e838dcf90239ff5b4101d0efe65f4894"
+      "sha256": "4ed03904ff29c25741793d53a2b216da34afc6925b186db6739b6f92e716184f"
     },
     {
       "path": "full-suite.txt",
-      "sha256": "5119c01a056ae83f3550b8b2b32dcb8bbc39c24e833d47b695ad7461742457ea"
+      "sha256": "7fb8c6a9b082b641b643aca08cbad1762ad5c2cffd2a6e5eae5021d15a6954be"
     },
     {
       "path": "mutations.txt",
-      "sha256": "d037048da6c52a67f7e1bb586f78c019c85e9118088d4b98749b512c2902d0cd"
+      "sha256": "5c6d647400c3c66578e92dabfcec14d8ed48a5a2def7fcad051b6b259890c90d"
     },
     {
       "path": "red/containment.txt",
@@ -152,6 +147,10 @@
     {
       "path": "red/review.txt",
       "sha256": "f76217fc28f71307ccbc7c7be234652d7ab897bc574ae573f40081d568399d36"
+    },
+    {
+      "path": "red/review2.txt",
+      "sha256": "063be9d2c4b68766c6ca1c54c79a396d90e34922025ce867a815e04091bc16be"
     },
     {
       "path": "red/revocation-paths.txt",
@@ -175,8 +174,8 @@
     },
     {
       "path": "rollback-attack-tests.txt",
-      "sha256": "43adee68910f2224cc18c58d4fb8e8c30150d8c9bba8cde7193e163f942698bd"
+      "sha256": "2ef0308c691a12234782465aff27bedebd58513be5b6a2aadb0abe09d5af3cbe"
     }
   ],
-  "notes": "Full-suite failures are classified in full-suite.txt and README.md: base-branch failures, a build-dependent baseline, and load timeouts that passed when rerun alone. Independent-review fixes: RED in red/review.txt, 15 mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
+  "notes": "Full suite at the commit above; checks, focused and rollback suites at 186a0fe24 (one test update later). Failures are classified in full-suite.txt and README.md. Independent-review fixes, two rounds: RED in red/review.txt and red/review2.txt, mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
 }
