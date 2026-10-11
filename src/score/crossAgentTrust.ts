@@ -72,6 +72,11 @@ export interface ClaimExpectation {
   issuer: string;
   requestedScope: string;
   grants: Readonly<Record<string, readonly string[]>>;
+  /**
+   * The key ids the verifier binds to each issuer: an Ed25519 session key id, or an HMAC secret's claimHmacKeyId. A
+   * claim verifies only with a key bound to the issuer it names, so one agent's key never speaks for another.
+   */
+  issuerKeyIds: Readonly<Record<string, readonly string[]>>;
   replay: ClaimReplayCache;
   revokedKeyIds?: readonly string[];
   now?: Date;
@@ -175,6 +180,8 @@ function bindingProblems(claim: AgentIdentityClaim, expected: ClaimExpectation |
   if (claim.keyPurpose !== keyPurpose || claim.keyId !== keyId) problems.push('claim names another key or key purpose');
   if (expected.revokedKeyIds?.includes(keyId)) problems.push(`key ${keyId} is revoked`);
   if (claim.agentId !== expected.issuer) problems.push(`claim is from ${claim.agentId}, not the expected ${expected.issuer}`);
+  const boundKeys = Object.hasOwn(expected.issuerKeyIds, expected.issuer) ? expected.issuerKeyIds[expected.issuer] : undefined;
+  if (!boundKeys?.includes(keyId)) problems.push(`key ${keyId} is not bound to issuer ${expected.issuer}`);
   if (claim.audience !== expected.audience) problems.push(`claim is for ${claim.audience ?? 'no audience'}, not ${expected.audience}`);
   const issued = claim.issuedAt instanceof Date ? claim.issuedAt.getTime() : Number.NaN;
   const expires = claim.expiresAt instanceof Date ? claim.expiresAt.getTime() : Number.NaN;
@@ -217,6 +224,13 @@ function finish(scored: Omit<TrustVerificationResult, 'integrity' | 'trustTier'>
   const admitted = expected.replay.admit(keyId, claim.nonce!, claim.expiresAt!.getTime(), (expected.now ?? new Date()).getTime());
   if (admitted !== 'ok') return refused(integrity, [`claim refused by the replay cache: ${admitted}`]);
   const allowed = expected.grants[expected.issuer]!;
+  // A self-reported claim (a shared secret any verifier holds, or a key no admission vouches for) authorizes nothing:
+  // it is reported, never trusted, and at most "limited", matching the claim vocabulary's SELF_REPORTED.
+  if (trustTier !== 'ATTESTED') {
+    const trustLevel = scored.trustLevel === 'untrusted' ? 'untrusted' : 'limited';
+    return { ...scored, trusted: false, trustLevel, grantedScopes: [], integrity, trustTier,
+      reasons: [...scored.reasons, `${trustTier}: the claim's integrity does not attest the issuer, so it grants no scope`] };
+  }
   const grantedScopes = scored.grantedScopes.filter(scope => allowed.includes(scope));
   const trusted = scored.trusted && grantedScopes.includes(expected.requestedScope);
   return { ...scored, trusted, grantedScopes, integrity, trustTier };

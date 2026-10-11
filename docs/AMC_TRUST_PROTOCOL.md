@@ -125,11 +125,12 @@ const result = verifyAgentClaim(agentBClaim, policy, sharedSecret, {
   issuer: 'agent-b',                // the peer expected; read from the verified claim, never from the caller
   requestedScope: 'read',           // what agent B asks to do
   grants: { 'agent-b': ['read'] },  // the verifier's own policy: unknown issuer or scope refuses
+  issuerKeyIds: { 'agent-b': [claimHmacKeyId(sharedSecret)] }, // keys bound to each issuer; any other key refuses
   replay: claimReplayCache,         // a ClaimReplayCache shared by this verifier
 });
 ```
 
-Since P1-08 a claim proved by a shared secret carries `integrity: "shared-secret"` and `trustTier: "SELF_REPORTED"`: every holder of the secret, every verifier included, can mint one. An Ed25519 claim (`createSignedAgentClaim`, `verifySignedAgentClaim`) by a session key that issuer admission admits for `session` can be `ATTESTED`. A claim that fails any binding, expiry, replay or grant check is refused with score 0.
+Since P1-08 a claim proved by a shared secret carries `integrity: "shared-secret"` and `trustTier: "SELF_REPORTED"`: every holder of the secret, every verifier included, can mint one. A `SELF_REPORTED` claim (a shared secret, or an Ed25519 key issuer admission does not vouch for) is reported but never trusted: `trusted: false`, `trustLevel` at most `limited`, no granted scope. An Ed25519 claim (`createSignedAgentClaim`, `verifySignedAgentClaim`) by a session key that issuer admission admits for `session` is `ATTESTED`, and only such a claim can be trusted. The claim's key must be one `issuerKeyIds` binds to the issuer it names, so a key admitted for agent A never speaks for agent B. A claim that fails any binding, expiry, replay or grant check is refused with score 0.
 
 **Step 5 — Trust Assignment**  
 Based on the composite trust score, Agent A assigns a trust level:

@@ -19,6 +19,7 @@ import {
   type DelegationPolicy,
   type TrustVerificationResult,
   ClaimReplayCache,
+  claimHmacKeyId,
   type ClaimExpectation,
 } from '../src/score/crossAgentTrust.js';
 
@@ -39,7 +40,7 @@ function makeValidClaim(opts?: { score?: number; level?: string }): AgentIdentit
 // P1-08: verification needs the verifier's expectation (audience, issuer, scope, grants, replay cache).
 function expected(issuer = 'agent-test-001'): ClaimExpectation {
   return { audience: 'agent-peer', issuer, requestedScope: 'read',
-    grants: { [issuer]: ['read', 'write', 'execute', 'delegate'] }, replay: new ClaimReplayCache() };
+    grants: { [issuer]: ['read', 'write', 'execute', 'delegate'] }, issuerKeyIds: { [issuer]: [claimHmacKeyId(SECRET)] }, replay: new ClaimReplayCache() };
 }
 
 function makePolicy(overrides: Partial<TrustPolicyRule> = {}): TrustPolicyRule {
@@ -53,13 +54,11 @@ function makePolicy(overrides: Partial<TrustPolicyRule> = {}): TrustPolicyRule {
 // ── Route: POST /api/v1/score/trust/verify-claim ───────────────────────────
 
 describe('Trust API — verify-claim', () => {
-  it('returns trusted:true for a valid, fresh claim with matching policy', () => {
+  it('reports a valid shared-secret claim as SELF_REPORTED: never trusted, at most limited, no scopes (P1-08)', () => {
     const claim = makeValidClaim({ score: 80, level: 'L4' });
     const policy = makePolicy({ minAmcScore: 70, minAmcLevel: 'L3' });
     const result = verifyAgentClaim(claim, policy, SECRET, expected());
-    expect(result.trusted).toBe(true);
-    expect(result.trustLevel).toBe('full');
-    expect(result.grantedScopes).toContain('read');
+    expect(result).toMatchObject({ trusted: false, trustLevel: 'limited', trustTier: 'SELF_REPORTED', integrity: 'shared-secret', grantedScopes: [] });
   });
 
   it('returns trusted:false when score is below minimum', () => {
