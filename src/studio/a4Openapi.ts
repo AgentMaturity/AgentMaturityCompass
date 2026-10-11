@@ -127,7 +127,8 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       "A4Response", { write: true, body: "A4EngineDecision", status: "201", parameters: [project, path("approvalRequestId", { type: "string", pattern: "^apprreq_[a-f0-9]{32}$" })] }) };
   }
   for (const verdict of ["approve", "deny"]) {
-    paths[`${p}/gates/{gateId}/${verdict}`] = { post: write(`${verdict === "approve" ? "Approve" : "Deny"} a gate (bound to its request digest and seq; separation of duties refused at write)`,
+    paths[`${p}/gates/{gateId}/${verdict}`] = { post: write(`${verdict === "approve" ? "Approve" : "Deny"} a gate (bound to its request digest and seq; separation of duties refused at write)${verdict === "deny"
+      ? ". A DENY of an unconsumed Activate completion gate revokes its release's staging lease (423 A4_VAULT_LOCKED while that cannot be signed; 409 LEASE_REVOKE_FAILED naming the lease ids when it fails after the DENY is recorded, which stands, and the same request retries it)" : ""}`,
       "A4Decide", [path("gateId", { type: "string", pattern: "^a4gate_[0-9a-f]{32}$" })], "201") };
   }
   for (const [action, summary] of [["open", "Open or re-open the effect gate (owner)"], ["retry", "Retry a failed effect under the liveness rule (owner)"]] as const) {
