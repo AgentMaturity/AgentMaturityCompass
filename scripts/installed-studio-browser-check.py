@@ -101,15 +101,18 @@ def run(args,cwd,child_env=env,timeout=180,checked=True):
  if cleanup_error or not exited or (checked and child.returncode):raise RuntimeError(f'Public command {counter} failed or cleanup incomplete, see {file}')
  return subprocess.CompletedProcess(args,child.returncode,stdout,stderr)
 
-def ports():
- result=[]
- for i in range(7):
-  with socket.socket() as s:s.bind(('127.0.0.1',0));result.append(s.getsockname()[1])
- if len(set(result))!=len(result):return ports()
- return result
+def ports(count):
+ # Every socket stays bound until all are chosen, so no two picks (owner's or demo's) can be the same port (P0-62).
+ held=[]
+ try:
+  for i in range(count):
+   s=socket.socket();held.append(s);s.bind(('127.0.0.1',0))
+  return [s.getsockname()[1] for s in held]
+ finally:
+  for s in held:s.close()
 
-def environment(workspace):
- e=dict(env);port=ports()
+def environment(workspace,port):
+ e=dict(env)
  e.update({'AMC_WORKSPACE_DIR':str(workspace),'AMC_STUDIO_PORT':str(port[0]),'AMC_HOST_PORT':str(port[0]),'AMC_GATEWAY_PORT':str(port[1]),'AMC_PROXY_PORT':str(port[2]),'AMC_TOOLHUB_PORT':str(port[3]),'AMC_METRICS_PORT':str(port[4]),'AMC_BIND':'127.0.0.1','AMC_HOST_BIND':'127.0.0.1','AMC_ENABLE_NOTARY':'0','AMC_VAULT_PASSPHRASE_FILE':str(private['vault']),'AMC_VAULT_PASSPHRASE':values['vault'],'AMC_BOOTSTRAP_OWNER_USERNAME_FILE':str(private['username']),'AMC_BOOTSTRAP_OWNER_PASSWORD_FILE':str(private['password'])})
  return e,port
 
@@ -130,7 +133,7 @@ try:
  cli=str(root/'installation'/'node_modules'/'agent-maturity-compass'/'dist'/'cli.js')
  assert pathlib.Path(cli).is_file() and sha(cli)==a.cli_sha256, 'Installed CLI does not match candidate'
  report['installedCliSha256']=sha(cli)
- owner_env,owner_ports=environment(root/'owner');demo_env,demo_ports=environment(root/'demo')
+ picked=ports(14);owner_env,owner_ports=environment(root/'owner',picked[:7]);demo_env,demo_ports=environment(root/'demo',picked[7:])
  run([node,cli,'bootstrap'],root/'owner',owner_env)
  run([node,cli,'--agent','browser-agent','--json'],root/'owner',owner_env)
  run([node,cli,'firewall','enable','--mode','block','--json'],root/'owner',owner_env)
