@@ -26,6 +26,7 @@ import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, purposeKey, roleOfPurpose, type LocalPurpose, type VaultPayloadV2
 } from "../vault/vaultPayload.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { readPinnedTrustRoots } from "../trust/rootRotation.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -108,8 +109,10 @@ function authenticated(workspace: string, subject: KeyHistorySubject, currentPub
  * to every purpose that holds a compromised key, drops those keys from every history and needs a root signature.
  */
 export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult {
-  if (process.env.AMC_NO_SIGN === "1") throw new Error("Key rotation is unavailable in no-sign mode");
   const { workspace } = input;
+  // Checked here as well as by the CLI, so an SDK, API or script caller cannot skip it.
+  assertOwnerMode(workspace, "keys rotate");
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Key rotation is unavailable in no-sign mode");
   const passphrase = input.passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!passphrase) throw new Error("Key rotation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
   const payload = unlockedPayloadForKeyChange(workspace, passphrase);
@@ -332,7 +335,12 @@ export function listKeys(workspace: string): { generation: number | null; digest
  * purpose still signs with is refused: rotate it first. The workspace's own self-check honours the list; portable
  * verifiers learn of it when the trust-list owner publishes the revocation.
  */
-export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason): { listId: string; sequence: number } {
+export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
+  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number } {
+  assertOwnerMode(workspace, "keys revoke");
+  if (!passphrase) throw new Error("Key revocation requires the vault passphrase (AMC_VAULT_PASSPHRASE or interactive input).");
+  // The owner's gate, as for a rotation: the real passphrase opens the vault and its keys match the published ones.
+  unlockedPayloadForKeyChange(workspace, passphrase);
   const local = assertLocal(purpose);
   if (!/^[0-9a-f]{64}$/.test(keyId)) throw new Error("--key-id must be a 64 hex key id");
   if (!(KEY_REVOCATION_REASONS as readonly string[]).includes(reason)) throw new Error(`--reason must be one of ${KEY_REVOCATION_REASONS.join(", ")}`);

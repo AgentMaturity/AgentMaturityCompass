@@ -6002,6 +6002,7 @@ Rotate one purpose's key with a signed, chained statement; --resume completes or
 | `--restore` | - |
 | `--accept <generation>` | - |
 | `--digest <sha256>` | - |
+| `--allow-gap <reason>` | - |
 | `--quarantine-unbound-pub` | - |
 
 #### `amc lab-compare`

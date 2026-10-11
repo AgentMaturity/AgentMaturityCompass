@@ -141,7 +141,13 @@ Identity claims between agents bind the issuing agent, audience, key purpose and
 
 ## When a key set is refused: recovery paths
 
-Every repair below runs in owner mode, and each is logged in `<AMC home>/state/keyset-recovery/<workspace scope>/repairs.jsonl`. Nothing is ever deleted: a file that a repair replaces or moves is kept, either in AMC home or in `.amc/quarantine/keys/`.
+Every repair below runs in owner mode and needs the vault passphrase. Each is logged in `<AMC home>/state/keyset-recovery/<workspace scope>/repairs.jsonl`.
+
+The checks sit inside the functions that change keys, not only in the CLI, so an SDK, API or script caller cannot skip them. That covers rotate, revoke, resume, restore, accept, quarantine and every key-set commit:
+
+- Agent mode refuses all of them.
+- Rotate, revoke, restore, accept and quarantine also open the workspace vault with the real passphrase.
+- `amc keys list` and `amc keys export-public` stay unprivileged and print no private material. Nothing is ever deleted: a file that a repair replaces or moves is kept, either in AMC home or in `.amc/quarantine/keys/`.
 
 | Refusal | Where | Recovery |
 |---|---|---|
@@ -150,7 +156,7 @@ Every repair below runs in owner mode, and each is logged in `<AMC home>/state/k
 | `Vault unlock refused: the vault does not hold the keys key set generation N names` | the committing machine | `amc keys rotate --restore` opens the vault with your passphrase. If its key ids are wrong, it restores the newest committed copy that holds the right ones. If AMC home holds none, it says so: restore `vault.amcvault` from a backup taken after generation N. |
 | `the vault is missing from a workspace whose key set this machine committed` | the committing machine | `amc keys rotate --restore`. |
 | `keyset.json is missing, but this machine adopted generation N` | a machine that adopted the key set | Copy that `keyset.json` back from the committing machine. There, `amc keys rotate --restore` recreates it if needed. |
-| `key set generation N+1 (sha256 D) is newer than generation N, which this machine adopted` | a machine that adopted the key set | Compare `D` with `amc keys list` on the committing machine. If they match, run `amc keys rotate --accept N+1 --digest D`; if not, the workspace was rewritten, so restore it from the committing machine. |
+| `key set generation N+1 (sha256 D) is newer than generation N, which this machine adopted` | a machine that adopted the key set | Compare `D` with `amc keys list` on the committing machine. If they match, run `amc keys rotate --accept N+1 --digest D`; if not, the workspace was rewritten, so restore it from the committing machine. Accept reads `keyset.json` once and checks that digest against those same bytes. The workspace vault, opened with your passphrase, must hold the keys that generation names. A generation further ahead than N+1 also needs `--allow-gap "<reason>"`. |
 | `keyset.json is missing from a workspace with purpose key files` | any machine with no record | On the committing machine, `amc keys rotate --restore`. Elsewhere, copy `keyset.json` from it. For strays in a 1.x workspace, `amc keys rotate --quarantine-unbound-pub`. |
 | `Vault unlock refused: <purpose>.pub is not this vault's <purpose> key and no key set binds it` | 1.x upgrade | `amc keys rotate --quarantine-unbound-pub` moves the file to `.amc/quarantine/keys/<time>/`; the next unlock migrates. |
 | `revocations.signed.json ... no key set binds it` | 1.x upgrade or a new vault | `amc keys rotate --quarantine-unbound-pub`. |
@@ -165,7 +171,7 @@ amc keys list [--json]
 amc keys rotate --purpose <p> [--reason scheduled|superseded|purpose-split|key-compromise] [--overlap-days <n>] [--root-key <file>...]
 amc keys rotate --resume
 amc keys rotate --restore   # owner mode: put back the key set this machine committed
-amc keys rotate --accept <generation> --digest <sha256>   # owner mode, on a machine that adopted the key set
+amc keys rotate --accept <generation> --digest <sha256> [--allow-gap <reason>]   # owner mode, on a machine that adopted the key set
 amc keys rotate --quarantine-unbound-pub                  # owner mode, with no keyset.json: move unbound purpose files aside
 amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|unspecified
 amc keys export-public --purpose <p>

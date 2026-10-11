@@ -21,7 +21,7 @@ function purposeOption(value: string | undefined): LocalPurpose {
 
 interface RotateOptions {
   purpose?: string; reason?: string; overlapDays?: string; rootKey?: string[]; resume?: boolean; restore?: boolean;
-  accept?: string; digest?: string; quarantineUnboundPub?: boolean;
+  accept?: string; digest?: string; allowGap?: string; quarantineUnboundPub?: boolean;
 }
 
 export async function rotateKeysForCli(workspace: string, opts: RotateOptions): Promise<unknown> {
@@ -31,14 +31,15 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
       throw new Error("--restore, --accept and --quarantine-unbound-pub each run alone");
     }
     assertOwnerMode(workspace, "keys rotate (key-set repair)");
-    if (opts.quarantineUnboundPub) return quarantineUnboundPurposeFiles(workspace);
+    // Every repair opens the workspace vault with the owner's passphrase.
+    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+    const vaultKeyIds = (bytes: Buffer) => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase);
+    if (opts.quarantineUnboundPub) return quarantineUnboundPurposeFiles(workspace, { vaultKeyIds });
     if (opts.accept !== undefined) {
       if (!/^[1-9][0-9]{0,15}$/.test(opts.accept) || !/^[0-9a-f]{64}$/i.test(opts.digest ?? "")) throw new Error("--accept <generation> needs --digest <sha256>, as `amc keys list` shows it on the committing machine");
-      return acceptAdoptedKeyset(workspace, Number(opts.accept), opts.digest!);
+      return acceptAdoptedKeyset(workspace, { generation: Number(opts.accept), digest: opts.digest!, vaultKeyIds, allowGap: opts.allowGap });
     }
-    // The vault is checked by its key ids, opened with the owner's passphrase.
-    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase to check the vault:"));
-    return restoreCommittedKeyset(workspace, { vaultKeyIds: bytes => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase) });
+    return restoreCommittedKeyset(workspace, { vaultKeyIds });
   }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--resume takes no other options");
@@ -77,6 +78,7 @@ export function registerKeysCommands(program: Command): void {
     .option("--restore", "owner mode: put back the key set this machine committed, from the copies in AMC home")
     .option("--accept <generation>", "owner mode, on a machine that adopted the key set: accept this newer generation (with --digest)")
     .option("--digest <sha256>", "with --accept: the key-set digest `amc keys list` shows on the committing machine")
+    .option("--allow-gap <reason>", "with --accept: accept a generation that skips others, stating why (20+ characters)")
     .option("--quarantine-unbound-pub", "owner mode, with no keyset.json: move purpose key files no key set binds to .amc/quarantine/keys/")
     .action(async (opts: RotateOptions) => {
       console.log(JSON.stringify(await rotateKeysForCli(process.cwd(), opts), null, 2));
@@ -86,8 +88,9 @@ export function registerKeysCommands(program: Command): void {
     .requiredOption("--purpose <purpose>", "the purpose the key served")
     .requiredOption("--key-id <id>", "64 hex key id")
     .requiredOption("--reason <reason>", "key-compromise, superseded or unspecified")
-    .action((opts: { purpose: string; keyId: string; reason: string }) => {
-      console.log(JSON.stringify(revokeKey(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason), null, 2));
+    .action(async (opts: { purpose: string; keyId: string; reason: string }) => {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
+      console.log(JSON.stringify(revokeKey(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason, passphrase), null, 2));
     });
   keys.command("export-public")
     .description("Print a purpose's public key, key id and proof of possession, for an organisation's trust list")

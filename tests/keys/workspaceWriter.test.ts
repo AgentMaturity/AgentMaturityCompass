@@ -4,7 +4,12 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { addPublicKeyToHistory, ensureSigningKeys, getPrivateKeyPem } from "../../src/crypto/keys.js";
-import { keysetAdoptionNotes, keysetAnchoring, keysetIdentity, keysetRecoveryDir } from "../../src/keys/keyset.js";
+import {
+  acceptAdoptedKeyset, commitKeyset, keysetAdoptionNotes, keysetAnchoring, keysetIdentity, keysetRecoveryDir, quarantineUnboundPurposeFiles,
+  restoreCommittedKeyset, resumeKeyset
+} from "../../src/keys/keyset.js";
+import { exportPublicKey, listKeys, resumeKeyRotation, revokeKey, rotateMonitorKeyInVault } from "../../src/keys/purposeKeys.js";
+import { setMode } from "../../src/mode/mode.js";
 import { rotateKeysForCli } from "../../src/keys/keysCli.js";
 import { ClaimReplayCache, createAgentClaim, verifyAgentClaim, type ClaimExpectation } from "../../src/score/crossAgentTrust.js";
 import { v1Workspace } from "../helpers/legacyVault.js";
@@ -19,7 +24,7 @@ import { ed25519KeyId } from "../../src/trust/trustList.js";
 import { statStamp } from "../../src/utils/containedFs.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { canonicalize } from "../../src/utils/json.js";
-import { lockVault, unlockVault, vaultExists, vaultPaths } from "../../src/vault/vault.js";
+import { lockVault, unlockVault, vaultEnvelopeKeyIds, vaultExists, vaultPaths } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
 
 // Regression tests for the P1-08 independent review: each attack is a workspace-only writer (no vault passphrase, no write
@@ -425,5 +430,66 @@ describe("review round 3: restore puts back the vault the key set names", () => 
     const refusal = rotateKeysForCli(root, { restore: true });
     await expect(refusal).rejects.toThrow(/not the ones key set generation \d+ names[\s\S]*restore vault\.amcvault from a backup/);
     await expect(refusal).rejects.not.toThrow(/amc keys rotate --restore/);
+  });
+});
+
+// Review flag "authorization in src/keys/keysCli.ts": every state-changing key-set function checks owner mode itself.
+describe("key-set mutations are owner-only inside the functions, not only in the CLI", () => {
+  const ids = (passphrase: string) => (bytes: Buffer) => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase);
+  const AGENT = /blocked in agent mode/;
+
+  it("each mutating function refuses in agent mode, called directly", () => {
+    const root = workspace();
+    setMode(root, "agent");
+    // Refused before any other work: a wrong passphrase would otherwise be the first error.
+    expect(() => rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: "not-the-passphrase" })).toThrow(AGENT);
+    expect(() => rotateMonitorKeyInVault(root, "not-the-passphrase")).toThrow(AGENT);
+    expect(() => revokeKey(root, "receipt", "a".repeat(64), "superseded", PASS)).toThrow(AGENT);
+    expect(() => resumeKeyRotation(root)).toThrow(AGENT);
+    expect(() => resumeKeyset(root)).toThrow(AGENT);
+    expect(() => restoreCommittedKeyset(root, { vaultKeyIds: ids(PASS) })).toThrow(AGENT);
+    expect(() => acceptAdoptedKeyset(root, { generation: 2, digest: "0".repeat(64), vaultKeyIds: ids(PASS) })).toThrow(AGENT);
+    expect(() => quarantineUnboundPurposeFiles(root, { vaultKeyIds: ids(PASS) })).toThrow(AGENT);
+    expect(() => commitKeyset(root, { keys: {}, writes: [] })).toThrow(AGENT);
+    // Read-only commands stay available and print no private material.
+    const listed = JSON.stringify(listKeys(root));
+    const exported = JSON.stringify(exportPublicKey(root, "receipt"));
+    for (const output of [listed, exported]) expect(output).not.toMatch(/PRIVATE KEY|keyset-recovery/);
+  });
+
+  it("revoke needs the owner's real passphrase", () => {
+    const root = workspace();
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    const retired = getPurposeKeyHistory(root, "receipt").map(pem => ed25519KeyId(pem)!).find(id => id !== ed25519KeyId(getSigningPublicKeyPem(root, "receipt")))!;
+    expect(() => revokeKey(root, "receipt", retired, "superseded", "not-the-passphrase")).toThrow(/incorrect passphrase/);
+  });
+
+  it("accept takes exactly the next generation, backed by the owner's vault, unless a gap is stated", async () => {
+    const root = workspace();
+    const homeA = process.env.AMC_HOME!;
+    lockVault(root);
+    const homeB = mkdtempSync(join(tmpdir(), "amc-ws-writer-machine-d-"));
+    vi.stubEnv("AMC_HOME", homeB);
+    getSigningPublicKeyPem(root, "receipt"); // B adopts generation 1
+    // A writer's key set with a correct digest of its own bytes: the owner's vault does not hold its keys.
+    const keysetFile = join(root, ".amc", "keys", "keyset.json");
+    const genuine = readFileSync(keysetFile);
+    const keyset = JSON.parse(genuine.toString("utf8"));
+    writeFileSync(keysetFile, canonicalize({ ...keyset, generation: 2, keys: { ...keyset.keys, receipt: "f".repeat(64) } }));
+    const forged = keysetIdentity(root)!;
+    expect(() => acceptAdoptedKeyset(root, { generation: 2, digest: forged.sha256, vaultKeyIds: ids(PASS) })).toThrow(/vault does not hold the keys/);
+    expect(() => acceptAdoptedKeyset(root, { generation: 2, digest: forged.sha256, vaultKeyIds: ids("not-the-passphrase") })).toThrow(/does not open with this passphrase/);
+    // Two genuine rotations on A: B is two generations behind.
+    writeFileSync(keysetFile, genuine);
+    vi.stubEnv("AMC_HOME", homeA);
+    unlockVault(root, PASS);
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal"], passphrase: PASS });
+    const shown = keysetIdentity(root)!;
+    lockVault(root);
+    vi.stubEnv("AMC_HOME", homeB);
+    expect(() => acceptAdoptedKeyset(root, { generation: shown.generation, digest: shown.sha256, vaultKeyIds: ids(PASS) })).toThrow(/skips generations[\s\S]*--allow-gap/);
+    expect(acceptAdoptedKeyset(root, { generation: shown.generation, digest: shown.sha256, vaultKeyIds: ids(PASS), allowGap: "machine B was offline for both rotations" }))
+      .toEqual({ generation: shown.generation, sha256: shown.sha256 });
   });
 });
