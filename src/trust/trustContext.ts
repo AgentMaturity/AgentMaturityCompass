@@ -6,7 +6,7 @@ import { getPublicKeyHistory } from "../crypto/keys.js";
 import { AntiRollbackError, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
 import { readKeyRevocations } from "../keys/keyRevocations.js";
 import { keysetDeclared } from "../keys/keyset.js";
-import { getPurposeKeyHistory } from "../keys/purposeKeys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { readPinnedTrustRoots, trustRootSetIdOf } from "./rootRotation.js";
 import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";

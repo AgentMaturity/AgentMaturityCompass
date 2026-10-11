@@ -13,7 +13,7 @@ import { ed25519KeyId } from "../trust/trustList.js";
 import { readContainedOrNull, removeContained, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
-import { assertNotRolledBack, loggedAnchor, logSequence, markSequence } from "./anchors.js";
+import { assertNotRolledBack, loggedAnchor, markSequence, type AnchorTarget } from "./anchors.js";
 
 const DOMAIN_TAG = "AMC_REVOCATION_LIST_V1";
 const hexSchema = z.string().regex(/^[0-9a-f]{64}$/);
@@ -150,9 +150,11 @@ export function recoverPendingRevocationList(location: AnchoredListLocation): vo
 /**
  * Signs, stages, logs and publishes `list`. Nothing is written unless the signature verifies against the trusted keys
  * (a locked vault or an AMC_NO_SIGN ephemeral key refuses here). The stage lands before the log entry, so a crash after
- * logging rolls forward instead of leaving the anchor ahead of the file. Caller holds the list's lock.
+ * logging rolls forward instead of leaving the anchor ahead of the file. Caller holds the list's lock. `logSequence` is
+ * src/keys/anchorLog.ts's, passed in so that reading a list never loads the log writer.
  */
-export function publishRevocationList(location: AnchoredListLocation, list: RevocationListV1, privateKeyPem: string): SignedRevocationList {
+export function publishRevocationList(location: AnchoredListLocation, list: RevocationListV1, privateKeyPem: string,
+  logSequence: (target: Omit<AnchorTarget, "fileSha256" | "entryHash">) => string): SignedRevocationList {
   const signed = signRevocationList(list, privateKeyPem);
   const staged = encodeSignedRevocationList(signed);
   try {

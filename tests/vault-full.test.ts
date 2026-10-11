@@ -12,7 +12,7 @@ import { checkInvoice } from '../src/vault/invoiceFraud.js';
 import { scrubMetadata } from '../src/vault/metadataScrubber.js';
 import { classifyData } from '../src/vault/dataClassification.js';
 import { PrivacyBudget } from '../src/vault/privacyBudget.js';
-import { rotateMonitorKeyInVault } from '../src/vault/vault.js';
+import { rotateMonitorKeyInVault } from '../src/keys/purposeKeys.js';
 
 describe('V1 — Secrets Broker', () => {
   it('stores and retrieves secrets', () => {

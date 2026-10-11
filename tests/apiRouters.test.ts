@@ -693,10 +693,10 @@ vi.mock("../src/vault/vault.js", () => ({
   vaultStatus: m.vaultStatus,
   unlockVault: m.unlockVault,
   lockVault: m.lockVault,
-  rotateMonitorKeyInVault: m.rotateMonitorKeyInVault,
   setVaultSecret: m.setVaultSecret,
   getVaultSecret: m.getVaultSecret
 }));
+vi.mock("../src/keys/purposeKeys.js", () => ({ rotateMonitorKeyInVault: m.rotateMonitorKeyInVault }));
 vi.mock("../src/fleet/registry.js", () => ({ loadFleetConfig: m.loadFleetConfig }));
 
 vi.mock("../src/drift/driftCli.js", () => ({

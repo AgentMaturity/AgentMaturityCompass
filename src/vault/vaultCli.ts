@@ -1,5 +1,6 @@
 import inquirer from "inquirer";
-import { createVault, ensureVaultAndPublicKeys, lockVault, rotateMonitorKeyInVault, unlockVault, vaultExists, vaultPaths, vaultStatus } from "./vault.js";
+import { rotateMonitorKeyInVault } from "../keys/purposeKeys.js";
+import { createVault, ensureVaultAndPublicKeys, lockVault, unlockVault, vaultExists, vaultPaths, vaultStatus } from "./vault.js";
 import { generateKeyPairSync } from "node:crypto";
 
 export async function promptPassphrase(message: string): Promise<string> {

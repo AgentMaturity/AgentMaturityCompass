@@ -4,7 +4,6 @@
  * list, rotation statement and key-history revision is appended as `<id>#<sequence>`. The log lives in the workspace,
  * so it is not independent of a workspace writer; P1-26 anchors it publicly.
  */
-import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { transparencyEntrySchema, type TransparencyArtifactKind } from "../transparency/logSchema.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
 import {
@@ -88,14 +87,9 @@ export function assertNeverAnchored(workspace: string, type: AnchorType, id: str
   }
 }
 
-/** Appends the transparency entry for `target` and returns its hash. Raise the machine mark once the file is final. */
-export function logSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash">): string {
-  return appendTransparencyEntry({
-    workspace: target.workspace,
-    type: target.type,
-    agentId: "workspace",
-    artifact: { kind: ANCHOR_KINDS[target.type].artifact, sha256: target.sha256, id: `${target.id}#${target.sequence}` }
-  }).hash;
+/** The transparency artifact that anchors `target` (appended by src/keys/anchorLog.ts). */
+export function anchorArtifact(target: Omit<AnchorTarget, "fileSha256" | "entryHash">): { kind: TransparencyArtifactKind; sha256: string; id: string } {
+  return { kind: ANCHOR_KINDS[target.type].artifact, sha256: target.sha256, id: `${target.id}#${target.sequence}` };
 }
 
 /** Raises this machine's mark to the final file (refusing a lower or forked one). */

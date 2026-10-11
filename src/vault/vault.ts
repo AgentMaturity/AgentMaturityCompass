@@ -18,7 +18,6 @@ import {
   type LocalPurpose, type VaultPayloadV2
 } from "./vaultPayload.js";
 
-export { rotateMonitorKeyInVault } from "../keys/purposeKeys.js";
 
 export type VaultKeyKind = "monitor" | "auditor" | "lease" | "session";
 type VaultPayload = VaultPayloadV2;

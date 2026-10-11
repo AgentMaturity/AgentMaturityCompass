@@ -1,5 +1,6 @@
 import { dirname, join } from "node:path";
 import { getSigningKey, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { logSequence } from "../keys/anchorLog.js";
 import { assertNeverAnchored, loggedAnchor } from "../keys/anchors.js";
 import {
   MAX_REVOCATION_LIST_BYTES, nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList,
@@ -105,7 +106,7 @@ function readCurrent(workspace: string): Current {
 
 /** Publishes the next list, then replaces a superseded 1.x pair with a tombstone. Caller holds the revocations lock. */
 function publishLocked(workspace: string, list: RevocationListV1): SignedRevocationList {
-  const published = publishRevocationList(location(workspace), list, getSigningKey(workspace, "revocation-list"));
+  const published = publishRevocationList(location(workspace), list, getSigningKey(workspace, "revocation-list"), logSequence);
   if (has(workspace, "legacyFile") || has(workspace, "legacySig")) {
     writeContained(workspace, REL.legacySig, JSON.stringify({ type: "amc.revocation-list-moved", to: "revocations.signed.json", previousSha256: list.previousSha256 }), 0o644);
     removeContained(workspace, REL.legacyFile);

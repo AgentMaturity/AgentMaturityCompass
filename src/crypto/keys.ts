@@ -9,7 +9,7 @@ import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
 
 /** P1-08: signing call sites take their key per purpose; re-exported here so callers keep one import. */
-export { getSigningKey, getSigningPublicKeyPem } from "../keys/purposeKeys.js";
+export { getSigningKey, getSigningPublicKeyPem } from "../keys/signingKeys.js";
 import {
   buildKeyHistoryEntry
 } from "./keyHistoryChain.js";
