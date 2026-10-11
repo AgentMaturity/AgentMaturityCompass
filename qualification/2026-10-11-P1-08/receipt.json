@@ -85,16 +85,6 @@
       "durationMs": 0
     },
     {
-      "cmd": "npx vitest run tests/keys tests/leases/revocationListAtomic.test.ts tests/score/crossAgentTrustHmac.test.ts tests/crypto/keyHistoryAdmission.test.ts tests/crypto/keyHistoryForgery.test.ts",
-      "exit": 0,
-      "durationMs": 0
-    },
-    {
-      "cmd": "npx vitest run tests/keys/antiRollback.test.ts tests/keys/workspaceWriter.test.ts tests/leases/revocationListAtomic.test.ts tests/trust/rootRotation.test.ts tests/trust/trustList.test.ts --reporter=verbose",
-      "exit": 0,
-      "durationMs": 20060
-    },
-    {
       "cmd": "helm template t deploy/helm/amc && helm lint deploy/helm/amc",
       "exit": 0,
       "durationMs": 0
@@ -103,6 +93,21 @@
       "cmd": "npx vitest run (full suite)",
       "exit": 1,
       "durationMs": 1741000
+    },
+    {
+      "cmd": "npx vitest run tests/keys tests/leases/revocationListAtomic.test.ts tests/score/crossAgentTrustHmac.test.ts tests/crypto/keyHistoryAdmission.test.ts tests/crypto/keyHistoryForgery.test.ts (150 passed)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/keys/antiRollback.test.ts tests/keys/workspaceWriter.test.ts tests/leases/revocationListAtomic.test.ts tests/trust/rootRotation.test.ts tests/trust/trustList.test.ts --reporter=verbose (86 passed)",
+      "exit": 0,
+      "durationMs": 27340
+    },
+    {
+      "cmd": "npx vitest run <95 affected test files> (1362 passed)",
+      "exit": 0,
+      "durationMs": 0
     }
   ],
   "tests": {
@@ -114,7 +119,7 @@
   "artifacts": [
     {
       "path": "README.md",
-      "sha256": "2828f8c4dca98740d34beb0e8caa98d8276a986e67c57b2cfd1dff471ca6b773"
+      "sha256": "aab7ba0453e73b7655ad45d9f5b056e45f8638ed890a6407b97e8593f418b59f"
     },
     {
       "path": "checks.txt",
@@ -126,7 +131,11 @@
     },
     {
       "path": "mutations.txt",
-      "sha256": "5c6d647400c3c66578e92dabfcec14d8ed48a5a2def7fcad051b6b259890c90d"
+      "sha256": "76ed7b6551832515e6a601ab9c694de5917bf8f281c4f72f8dbe83b89d37c19b"
+    },
+    {
+      "path": "red/authz.txt",
+      "sha256": "a6fa61577043ca537b398b3951bcb71660fa0bba421505836822fc0200c17334"
     },
     {
       "path": "red/containment.txt",
@@ -153,6 +162,10 @@
       "sha256": "063be9d2c4b68766c6ca1c54c79a396d90e34922025ce867a815e04091bc16be"
     },
     {
+      "path": "red/review3.txt",
+      "sha256": "dddb234bffa531722d9f520d1c7315c8fde25c370e40d9f2a7d6008fd879233b"
+    },
+    {
       "path": "red/revocation-paths.txt",
       "sha256": "16cb2e4f1a6ef67fce6ac557e6c7223490e1d4fcdd5fee027ce087e71cd7a206"
     },
@@ -174,8 +187,8 @@
     },
     {
       "path": "rollback-attack-tests.txt",
-      "sha256": "2ef0308c691a12234782465aff27bedebd58513be5b6a2aadb0abe09d5af3cbe"
+      "sha256": "d47db6aa740123ea2d68d8026fc9c86cbc3073fc441b61a9e1dd197ff43c985a"
     }
   ],
-  "notes": "Full suite at the commit above; checks on the same tree; focused and rollback suites at 186a0fe24 (one test update later). Failures are classified in full-suite.txt and README.md. Independent-review fixes, two rounds: RED in red/review.txt and red/review2.txt, mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
+  "notes": "Full suite at the commit above (review round 2). Round 3 and the authorization flag changed only src/keys, src/vault/vault.ts and src/mode/mode.ts; checks, focused (150), rollback (86) and every affected suite (1,362 tests) passed at 74e2be14923198a15554b7f54376e529ad6b9f33. RED in red/, mutations in mutations.txt. Not CI; no real key rotation (P0-37 stays with Sid)."
 }
