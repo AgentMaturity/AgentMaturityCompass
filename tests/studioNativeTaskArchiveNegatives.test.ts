@@ -19,7 +19,7 @@ beforeAll(async () => {
   const file = resolve("dist/studio/nativeTaskService.js");
   if (!existsSync(file)) throw new Error("Build the candidate before native Studio process tests.");
   createService = (await import(pathToFileURL(file).href) as typeof import("../src/studio/nativeTaskService.js")).createNativeTaskService;
-});
+}, 60_000); // Loading the built service graph exceeds the 10 s default hook timeout under parallel load.
 
 const pass = "synthetic-archive-negatives-vault";
 const actor: NativeTaskActor = { principalId: "studio-test:owner", agentId: "default", demo: true };
@@ -30,13 +30,13 @@ beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), "amc-archive-negatives-"));
   home = mkdtempSync(join(tmpdir(), "amc-archive-negatives-home-")); mkdirSync(join(home, ".amc"), { mode: 0o700 });
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
-});
+}, 60_000);
 afterEach(async () => {
   const outcomes = await Promise.allSettled(services.splice(0).map(service => service.close()));
   lockVault(root); rmSync(root, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true });
   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;
   expect(outcomes.filter(outcome => outcome.status === "rejected")).toEqual([]);
-});
+}, 60_000);
 
 function service(): NativeTaskService {
   const value = createService({ workspace: root, credentialsHome: home, credentialsFile: join(home, ".credentials.yaml"),
