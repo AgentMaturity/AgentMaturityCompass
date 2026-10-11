@@ -83,7 +83,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       post: write("Attach an evidence ref (builder or owner; self_reported unless a runtime-written ledger row earns observed)", "A4Evidence", [], "201") },
     [`${p}/value`]: { get: read("Value view: not evaluated until Activate's producer (P1-62)") },
     [`${p}/monitor`]: { get: read("Monitor view: not evaluated until Activate's producer (P1-62)") },
-    [`${p}/conformance`]: { get: read("Conformance statement: not evaluated until Adapt's producer (P1-61)", [query("stage", stage, "Stage.")]) },
+    [`${p}/conformance`]: { get: read("The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's signed control results, with the owner's out-of-scope settlements read now; every other stage carries no plan and says not_evaluated", [query("stage", stage, "Defaults to the head stage.")]) },
     [`${p}/verify`]: { get: read("verifyA4Chain over this project under the server operator's trust list (no query parameters)") },
     [`${p}/gate-policy`]: { post: write("Open a policy gate with a proposed gate policy, or apply a decided one (owner)", "A4GatePolicyChange") },
     [`${p}/acknowledge`]: { post: write("Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days)", "A4Acknowledge") },
@@ -103,7 +103,9 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/stages/assemble/connect`]: { post: write("External path, after Build (owner, owner mode): connect instructions with a lease whose token is in this response once and never stored; the record keeps the leaseId (a replay answers token: null)",
       "A4AssembleConnect", [], "201") },
     [`${p}/stages/assemble/import`]: { post: write("External path, after Build (owner, owner mode): the neutral importer over a workspace file or directory, originals retained; its manifest is a self_reported ref, and a refused record rolls the import back",
-      "A4AssembleImport", [], "201") }
+      "A4AssembleImport", [], "201") },
+    [`${p}/stages/adapt/probe`]: { post: write("Adapt context probe, after Build (builder or owner, owner mode): one in-process turn on the stub provider with the A4 context plugin; the session's EFFECTIVE_POLICY row becomes a ledger_event ref (observed when the row earns it) beside whether the plugin's exact text is in the session's signed snapshot; delivery to a model and to native tasks is not evaluated",
+      "A4Control", [], "201") }
   };
   for (const verdict of ["approve", "deny"]) {
     paths[`${p}/approvals/{approvalRequestId}/${verdict}`] = { post: operation(`${verdict === "approve" ? "Approve" : "Deny"} an engine request this project named (an effect gate it opened, an outcome_unknown resolution it requested), as a live project approver or owner, bound to the request digest`,

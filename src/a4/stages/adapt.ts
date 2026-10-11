@@ -27,6 +27,7 @@ import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
+import { contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, writeContextPlugin } from "../adaptContextPlugin.js";
 import {
   activateBoundPlan, activationExecutionId, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
 } from "../adaptPolicy.js";
@@ -55,6 +56,8 @@ export function register(registry: A4StageRegistry): void {
   };
   RESOURCE_SLOTS["plan.lockDigest"] = () => shippedLockDigest();
   RESOURCE_SLOTS["context.memoryPolicySha256"] = memoryPolicySha256;
+  RESOURCE_SLOTS["context.contextPluginSha256"] = contextPluginSha256;
+  registry.items.push(contextItems);
   registry.registerEffect(ACTIVATE_PLAN_EFFECT);
 }
 
@@ -168,6 +171,13 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       practitioner: `Build writes <agent>/memory/policy.json: retentionTag ${memory.retentionTag}, consumers ${memory.allowedConsumers.join(", ")}`
         + ` (${Object.entries(memory.sources).map(([field, from]) => `${field} ${from}`).join(", ")}). Enforcement ${MEMORY_ENFORCEMENT_NOTE}.`,
       expert: `amc.a4-memory-policy/v1 ${canonicalize(memory)}; enforcement: advisory (no reader of the file in src/learning).` },
+    { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
+      novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
+        + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
+      practitioner: "Build writes <agent>/a4/context-plugin.json (order 160, attributed to this project's revision). The probe runs one in-process turn on the stub provider "
+        + `and records that session's EFFECTIVE_POLICY row as the observed ref (${PROBE_LIMITATION}). Delivery to a model is not evaluated on the stub provider; delivery to native tasks and to a deployed agent is not evaluated (P2-37).`,
+      expert: "ContextPlugin { name: \"a4:context\", order: 160 } through runComposedTurn({ promptProfile: { extraContextPlugins } }) (never contextPlugins, which drops AGENTS.md); "
+        + "the receipt via writeEffectivePolicyReceipt on the session writer (bindToolSession); the user/message snapshot row must carry the frame's exact text." },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
       novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, what the agent may remember, and which incident reporting deadlines apply.",
       practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
@@ -267,15 +277,19 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const signed = signAdaptPlan(workspace, ctx.state, plan);
   const source = `a4:${project.project_id}@r${project.revision_no}`;
   const memory = writeMemoryPolicy({ workspace, agentId: project.agent_id, source, values });
+  const context = writeContextPlugin({ workspace, agentId: project.agent_id, projectId: project.project_id, revisionNo: project.revision_no,
+    answers: adaptSpecOf(ctx.state).answers, clocks: understandingOf(spec)?.facts.clocks ?? [] });
   const manifest = enforceSnapshot(workspace, project.agent_id);
-  const built: AdaptBuild = { ...signed, memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, manifest };
+  const built: AdaptBuild = { ...signed, memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context, manifest };
   return {
     outputs: [
       { output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
         lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
           diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
       { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
-        lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } }
+        lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } },
+      { output: "build", label: "adapt build: the attributed A4 context plugin (order 160; delivered only to an in-process run; native tasks and a deployed agent do not load it, P2-37)",
+        lane: "implementation", method: null, body: context }
     ],
     spec: { ...spec, build: built }
   };
@@ -316,15 +330,25 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const written = buildOf(spec)?.memoryPolicy;
   const memoryPolicy = written === undefined ? { parses: false, sameBytes: false, reason: "MEMORY_POLICY_NOT_BUILT" }
     : checkMemoryPolicy(ctx.workspace, project.agent_id, written.sha256);
+  const context = buildOf(spec)?.context;
+  const probeLink = context === undefined ? undefined : [...ctx.state.chain].reverse().find((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === PROBE_PURPOSE
+    && link.body.contextPluginSha256 === context.sha256 && link.body.contextPluginFileSha256 === context.fileSha256);
+  const probe = probeLink === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
+    : { status: "recorded", receiptEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
+      compiledPolicyDigest: probeLink.body.compiledPolicyDigest, downgrades: probeLink.body.downgrades, modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated",
+      limitation: PROBE_LIMITATION };
   return {
     outputs: [
       { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
         lane: "recommendation", method: null, body: { statement, resultsPath: conformance.resultsPath, verified: conformance.verified } },
       { output: "review", label: "adapt review: the active compiled plan's head against the proposal", lane: "implementation", method: null, body: head },
       { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) },
-      { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy }
+      { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy },
+      { output: "review", label: "adapt review: the context probe's effective-policy receipt and downgrades (stub provider; the observed ref is the receipt row itself)",
+        lane: "implementation", method: null, body: probe }
     ],
-    notEvaluated: ["NO_OBSERVED_REF", "CONTEXT_PROBE_NOT_RUN"],
-    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    // The probe's observed ref sits on the revision it was recorded on; this review's own revision has none.
+    notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_OBSERVED_ON_EARLIER_REVISION"],
+    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }
