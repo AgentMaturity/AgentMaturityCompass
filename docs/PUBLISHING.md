@@ -22,7 +22,9 @@ npm serves 1.1.1 (published 15 July 2026). Version 1.2.0 was prepared in the rep
 
 Only the `release` job of `.github/workflows/release.yml` publishes. It runs on a `v*.*.*` tag (or a dispatch naming an existing tag) inside the protected GitHub environment `release`, whose required reviewers approve each run (P0-38).
 
-It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM, licence inventory and SEA binary there, and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the signed bundle embeds it with the gated SBOM and licence inventory, and the `release` job publishes `npm publish <gated tarball>` after checking the tag and the record once more. That job never installs the workspace, builds or packs: it runs the release tooling from the gated package itself. The Studio image tags are made only from the per-architecture digests the image job qualified.
+It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM, licence inventory and SEA binary there, and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the `image-tags` job makes the Studio image tags only from the per-architecture digests the image job qualified, and the `sign` job (which holds only the signing key, in its signing step) builds the signing tool from the frozen lockfile and signs a bundle that embeds the gated tarball, SBOM and licence inventory byte for byte.
+
+The `release` job is the only job with `id-token: write` or an npm credential. It installs, builds and downloads nothing and uses no action but checkout and artifact download. It checks the tag and the record, unpacks the npm CLI that the unprivileged `npm-cli` job fetched and checked against the pinned version and integrity (`NPM_CLI_VERSION`, `NPM_CLI_INTEGRITY` at the top of `release.yml`), checks that integrity, the tag and the record again, and runs `npm publish <gated tarball>` with the runner's Node. The `github-release` job, which holds only `contents: write`, then attaches the verified files. Every job declares least-privilege `permissions:`; the workflow default is `contents: read`. Actions stay at `@version` with a TODO for Sid to pin each by full commit SHA, as in `deploy-pack.yml`.
 
 The `release` job fails instead of skipping:
 
@@ -33,7 +35,7 @@ The `release` job fails instead of skipping:
 
 ### npm credentials (P0-38 picks one)
 
-- **Trusted publishing (preferred, no token):** on npmjs.com, add a GitHub Actions trusted publisher for `AgentMaturity/AgentMaturityCompass`, workflow `release.yml`, environment `release`. The job already grants `id-token: write`. Trusted publishing needs npm 11.5.1 or later; the job pins npm 11.10.1 and logs `npm --version`.
+- **Trusted publishing (preferred, no token):** on npmjs.com, add a GitHub Actions trusted publisher for `AgentMaturity/AgentMaturityCompass`, workflow `release.yml`, environment `release`. The `release` job grants `id-token: write`. Trusted publishing needs npm 11.5.1 or later; the workflow pins npm 11.10.1 by integrity and logs the Node and npm versions it publishes with.
 - **Granular token:** an npm granular access token limited to `agent-maturity-compass`, stored as the `release` environment secret `NPM_TOKEN` (`gh secret set NPM_TOKEN --env release`), never at repository level.
 
 Both publish with `--provenance --access public`.
@@ -69,10 +71,14 @@ git push origin v<version>
 #    run the full release gate, the content check and the publish dry run on that file, upload it
 # 2. desktop-assets: wrap the gated tarball in the macOS, Linux and Windows archives; emit SHA256SUMS + manifest
 # 3. image: build, qualify and push the Studio image per architecture at the gated commit (P0-35)
-# 4. release, in the release environment after approval: refuse a moved tag, verify the record, make the image tags
-#    from the qualified digests, sign the bundle around the gated files and verify it with
-#    --pubkey trust/amc-release-signing.pub (fail without the key), publish the gated tarball (fail without a
-#    credential), and create the GitHub Release with docs/releases/<version>.md as its body, failing if an asset is missing
+# 4. image-tags: create the multi-platform tags from the qualified digests (packages: write)
+# 5. npm-cli: fetch the pinned npm CLI tarball and check its integrity (unprivileged)
+# 6. sign, in the release environment after approval: sign the bundle around the gated files and verify it with
+#    --pubkey trust/amc-release-signing.pub; fail without the key
+# 7. release, in the release environment after approval: verify the tag, the record and the npm CLI, publish the
+#    gated tarball; fail without a credential
+# 8. github-release: create the GitHub Release from verified files with docs/releases/<version>.md as its body,
+#    failing if an asset is missing
 ```
 
 ---

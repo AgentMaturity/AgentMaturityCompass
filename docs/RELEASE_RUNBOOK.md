@@ -193,8 +193,8 @@ git tag v<version>
 git push origin v<version>
 ```
 
-3. GitHub Actions `Release` workflow runs automatically. Its `release` job waits in the `release` environment:
-   approve it only for the version Sid confirmed. It publishes only the tarball the `gate` job packed and gated at the
+3. GitHub Actions `Release` workflow runs automatically. Its `sign` job and then its `release` job each wait in the
+   `release` environment: approve both only for the version Sid confirmed. It publishes only the tarball the `gate` job packed and gated at the
    commit the tag named (`tmp/npm-release/record.json`), and refuses when the tag moved during the run. Without the
    signing key, the committed release public key or an npm credential the job fails; it never skips publishing silently.
 
