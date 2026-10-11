@@ -1,6 +1,6 @@
 # Sandbox Mode
 
-Sandbox mode executes agent commands in Docker and writes explicit sandbox attestation evidence.
+Sandbox mode executes agent commands in Docker and records sandbox execution evidence (`SANDBOX_EXECUTION_ENABLED` audit events).
 
 ## Native shell by platform
 
@@ -283,4 +283,4 @@ amc sandbox run --agent salesbot \
 
 ## Why It Matters for Scoring
 
-For high-risk agents/questions, level 5 support requires sandbox attestation evidence in the selected window (otherwise capped).
+Level 5 is not evaluated in this version: it needs a scoped attestation from a registry under pinned trust (P0-09, P3-04), and no registry issues one yet (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)). The runner also keeps a cap for high-risk agents and questions: without `SANDBOX_EXECUTION_ENABLED` evidence in the window, a level-5 result is capped. While level 5 is not evaluated, that cap changes no result.
