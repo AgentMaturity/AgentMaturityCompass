@@ -33,7 +33,8 @@ const keyRotationStatementSchema = z.strictObject({
   type: z.literal("amc.key-rotation"),
   version: z.literal(1),
   workspaceId: z.string().min(1).max(256),
-  purpose: z.enum(KEY_PURPOSES),
+  // A trust-list root set rotates with an amc.root-rotation statement (src/trust/rootRotation.ts), never this one.
+  purpose: z.enum(KEY_PURPOSES).refine(purpose => purpose !== "trust-list-root", "trust-list roots rotate with amc.root-rotation"),
   sequence: z.number().int().positive().safe(),
   previousStatementSha256: keyIdSchema.nullable(),
   previousKeyId: keyIdSchema.nullable(),
@@ -170,7 +171,7 @@ function overlapProblem(statement: KeyRotationStatementV1, maxDays: number): str
  * verifier trusts, every signature verifies under the key its role names, and the statement has authority: `next`
  * always (possession); `previous` (the trusted current key) for scheduled, superseded and purpose-split. For
  * key-compromise, and for a purpose's first key, the previous key has no authority and `threshold` (default 1) pinned
- * roots must sign; a trust-list-root rotation may instead carry `threshold` signatures from other pinned roots.
+ * roots must sign.
  */
 export function verifyRotationStatement(bytes: Buffer, opts: VerifyRotationOptions): RotationVerdict {
   const fail = (reason: string): RotationVerdict => ({ valid: false, reason });
@@ -207,7 +208,6 @@ export function verifyRotationStatement(bytes: Buffer, opts: VerifyRotationOptio
     return rootAuthority ? { valid: true, signed } : fail(`needs ${threshold} pinned root signature(s): the previous key has no authority here`);
   }
   if (seen.previous) return { valid: true, signed };
-  if (statement.purpose === "trust-list-root" && rootAuthority) return { valid: true, signed };
   return fail("no previous signature: the rotation is not authorized by the key it replaces");
 }
 

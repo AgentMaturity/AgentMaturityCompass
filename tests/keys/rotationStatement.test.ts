@@ -170,18 +170,11 @@ describe("key rotation statements (P1-08)", () => {
     expect(verifyRotationChain([bytes(first), bytes(second({ sequence: 3 }))], { expected: EXPECTED, initialPublicKeyPem: k0.publicPem })).toMatchObject({ valid: false, index: 1 });
   });
 
-  it("a trust-list-root rotation is authorized by the old and new roots, or by threshold other roots", () => {
-    const other1 = pair();
-    const other2 = pair();
+  it("refuses a trust-list-root key rotation: root sets rotate only with amc.root-rotation", () => {
+    const other = pair();
     const expected = { workspaceId: "trust-roots", purpose: "trust-list-root" } as const;
-    const rootRotation = statement(k0, k1, expected);
-    const byOthers = signRotationStatement(rootRotation, { next: k1.privatePem, roots: [other1.privatePem] });
-    const roots = { publicKeyPems: [other1.publicPem, other2.publicPem], threshold: 2 };
-    const opts = { expected, trustedCurrentPublicKeyPem: k0.publicPem, previous: null, roots };
-    expect(verifyRotationStatement(bytes(byOthers), opts)).toMatchObject({ valid: false });
-    expect(verifyRotationStatement(bytes(addRotationSignature(byOthers, "root", other2.privatePem)), opts)).toMatchObject({ valid: true });
-    const byOldAndNew = signRotationStatement(rootRotation, { previous: k0.privatePem, next: k1.privatePem });
-    expect(verifyRotationStatement(bytes(byOldAndNew), { ...opts, roots: undefined })).toMatchObject({ valid: true });
+    expect(() => signRotationStatement(statement(k0, k1, expected), { previous: k0.privatePem, next: k1.privatePem, roots: [other.privatePem] }))
+      .toThrow(/amc.root-rotation/);
   });
 
   it("refuses a tampered statement and a signature by the wrong key", () => {
