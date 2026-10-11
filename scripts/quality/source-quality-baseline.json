@@ -24,7 +24,6 @@
     {"id":"d13df414d122c928a8235e5fed312dccd78cec4ce0ab87b46309c490b8e1fcae","paths":["adapters/hookIntegration.ts","adapters/hookIntegration.ts"],"format":"typescript"},
     {"id":"d1a418eeffbd38457ce08714ddeb42b1793a07d43ac4f48d7f0ad27c30fd1156","paths":["adapters/hookIntegration.ts","adapters/hookIntegration.ts"],"format":"typescript"},
     {"id":"f53a3b0d544d7dddbc487e3a38e22d0b57891c00749ec2bdcb47da6ffc8150c0","paths":["adapters/hookIntegration.ts","adapters/hookIntegration.ts"],"format":"typescript"},
-    {"id":"e43489db81a6361b3b17f6e3fda52cca9f99e9cd0b49f0eb17a8a0caf5c2fe54","paths":["adapters/hookIntegrationCli.ts","adapters/hookIntegrationCli.ts"],"format":"typescript"},
     {"id":"90e76462844bd9ff17d0259809c7defc397adf5f387d1d0e8b2131503b288576","paths":["agent/agentDriver.ts","kernel/services/agentLoopServices.ts"],"format":"typescript"},
     {"id":"35b6362277fb048b1942d84da5280e8872b0837d6bec17e5675e85d130b969cd","paths":["agents/autoTestGen.ts","agents/sessionEval.ts"],"format":"typescript"},
     {"id":"12c36e0ce28a01d0b91c36a9cb386972c42f1781767637d49a44e7bf8ce72488","paths":["agents/customerSupportBot.ts","agents/metricTemplates.ts"],"format":"typescript"},

@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C670-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C671-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -541,10 +541,12 @@ Pi connects through an optional AMC extension at Pi's `tool_call` hook rather th
 amc connect hooks install --provider pi --mode control --agent my-agent
 ```
 
-- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only (1.0.2 and 1.0.4).
+- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only (1.0.2 and 1.0.4), in a Pi session registered under the current installation, and only while Pi's tool registry names Pi's own built-in for that tool name.
 - Not covered: OS containment; effects that bypass `tool_call` (another extension's own I/O, Pi Durable, Codemode-internal calls unless step 2 confirms they emit `tool_call`).
+- Not covered: an extension that rewrites Pi's tool registry itself. AMC denies a mapped tool name when Pi's registry does not name Pi's built-in for it (an extension tool registered under a built-in's name), but extensions run in Pi's process with full rights.
 - AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
-- Pi loads `.pi/extensions/amc.js` only for a trusted project; while it does not, nothing is enforced. A claim needs AMC's signed registration of the Pi session, and calls in an unregistered session are denied. Pi ask is always denied until an AMC approval path exists. See [Pi tool_call control](docs/adapters/pi.md).
+- A session registration is a lease-holder attestation: registration made with the session lease and matching on-disk extension and Pi digests. A process holding the lease can still attest without Pi. AMC cannot prove Pi executed the hook; it can prove only that every allowed call went through AMC with a signed receipt.
+- Pi loads `.pi/extensions/amc.js` only for a trusted project; while it does not, nothing is enforced. Calls in an unregistered session are denied. Pi ask is always denied until an AMC approval path exists. See [Pi tool_call control](docs/adapters/pi.md).
 
 Track real first-run outcomes without creating traffic or evidence:
 
@@ -928,7 +930,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,670<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,671<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

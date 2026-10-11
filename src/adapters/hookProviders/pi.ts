@@ -4,7 +4,8 @@
  * Pi has no hook config: an extension module registers a `tool_call` handler. AMC writes `.pi/extensions/amc.js`,
  * which loads AMC's own extension (`dist/adapters/pi/amcPiExtension.js`) for this workspace and mode, next to the
  * signed manifest, dedicated lease and .gitignore block the other providers use. The manifest binds the SHA-256 of the
- * extension file and of AMC's extension module. Pi loads project extensions only for a trusted project, so an
+ * extension file and of AMC's extension module and, in control mode, the Pi install sessions must run (piInstall.ts),
+ * which AMC measures again at each session registration. Pi loads project extensions only for a trusted project, so an
  * installation enforces nothing until Pi trusts the project or loads the file with `-e` (docs/adapters/pi.md).
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmdirSync, unlinkSync } from "node:fs";
@@ -20,6 +21,7 @@ import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
+import { measurePiInstall } from "../pi/piInstall.js";
 import { QUALIFIED_PI_VERSIONS } from "../pi/piVersions.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, controlApprovalPolicy, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID,
@@ -54,6 +56,8 @@ const piManifestSchema = z.strictObject({
   tokenPath: z.literal(".amc/hooks/pi.lease"),
   ...leaseManifestFields,
   qualifiedPiVersions: z.array(z.string()),
+  /** Control mode: the Pi install sessions must run, as measured at install; null when none was given or found. */
+  piInstall: z.strictObject({ packageDir: z.string().min(1), version: z.string().min(1), sha256: sha256Schema }).nullable(),
   /** The keys of AMC's `receipt` signing purpose (P1-08) at install; the extension accepts only decision receipts they sign. */
   receiptPublicKeys: z.array(z.string().min(1)).min(1),
   installedTs: z.number().int(),
@@ -101,7 +105,8 @@ function limitations(mode: HookMode): string[] {
       : "observation only; Pi tool calls are not controlled",
     "Pi loads .pi/extensions/amc.js only for a trusted project (or with pi -e); nothing is enforced while Pi does not load it",
     "not covered: OS containment, Pi Durable, effects outside tool_call (another extension's own I/O), Codemode-internal calls",
-    "a Pi confirmation answers an ask locally; it is not AMC approval quorum, and quorum policies deny",
+    "Pi ask is always denied until an AMC approval path exists",
+    "a session registration is a lease-holder attestation checked against disk, not proof that Pi ran the hook",
   ];
 }
 
@@ -134,6 +139,10 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
   const { mode, workspace, agentId, bridgeBase, ttl, rpm } = parseInstallOptions(options);
   const modulePath = resolve(modulePathInput);
   if (!existsSync(modulePath)) throw new HookIntegrationError("HOOK_PATH_UNSAFE", `AMC's Pi extension module is missing: ${modulePath}; build or reinstall AMC`);
+  const piInstall = mode === "control" && options.piPackageDir ? measurePiInstall(resolve(options.piPackageDir)) : null;
+  if (mode === "control" && options.piPackageDir && !piInstall) {
+    throw new HookIntegrationError("HOOK_PATH_UNSAFE", `not a Pi package (${resolve(options.piPackageDir)}); name the @earendil-works/pi-coding-agent directory`);
+  }
   const paths = piPaths(workspace);
   assertAllPathsSafe(workspace, Object.values(paths));
 
@@ -155,6 +164,7 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
     if (existing && existing.mode === mode && existing.agentId === agentId && existing.bridgeBase === bridgeBase
       && existing.extensionSha256 === sha256Hex(extensionBytes) && existing.moduleSha256 === moduleSha256
       && sameKeys(existing.receiptPublicKeys, receiptPublicKeys) && hasManagedIgnoreBlock(ignoreBefore.bytes?.toString("utf8") ?? null)
+      && JSON.stringify(existing.piInstall) === JSON.stringify(piInstall)
       && existingLease.valid && existingLease.payload?.leaseId === existing.leaseId) {
       const unchanged = [paths.extension, paths.ignore, paths.token, paths.manifest, paths.signature]
         .map((path) => ({ path, action: "unchanged" as const, sensitive: path === paths.token }));
@@ -178,7 +188,7 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
       extensionSha256: sha256Hex(extensionBytes), moduleSha256, modulePath, createdDirs, ignorePath: ".gitignore",
       ignoreExistedBefore: existing?.ignoreExistedBefore ?? ignoreBefore.existed, ignoreBlockSha256: ignoreBlockHash(),
       tokenPath: relativePortable(workspace, paths.token), agentId, bridgeBase, leaseId: lease.leaseId, leaseIssuedTs: lease.issuedTs,
-      leaseExpiresTs: lease.expiresTs, qualifiedPiVersions: [...QUALIFIED_PI_VERSIONS], receiptPublicKeys, installedTs: existing?.installedTs ?? now, updatedTs: now,
+      leaseExpiresTs: lease.expiresTs, qualifiedPiVersions: [...QUALIFIED_PI_VERSIONS], piInstall, receiptPublicKeys, installedTs: existing?.installedTs ?? now, updatedTs: now,
       control: mode === "control" ? { endpoint: CONTROL_HOOK_ROUTE, localOnly: true, rawInputTransport: "loopback-memory-only",
         leaseScope: "hook:control", providerOutcomes: ["allow", "deny", "ask"] } : null,
     });
@@ -226,6 +236,19 @@ function sessionGovernance(workspace: string, manifest: PiManifest): PiGovernanc
   }
 }
 
+/** Control mode: whether the bound Pi install is missing or changed on disk (an issue each); unbound is an issue, not drift. */
+function piInstallDrifted(manifest: PiManifest | null, issues: string[]): boolean {
+  if (manifest?.mode !== "control") return false;
+  if (!manifest.piInstall) {
+    issues.push("the control installation binds no Pi install (none was given or on PATH at install); Pi sessions cannot register and are not governed");
+    return false;
+  }
+  const measured = measurePiInstall(manifest.piInstall.packageDir);
+  if (measured?.sha256 === manifest.piInstall.sha256 && measured.version === manifest.piInstall.version) return false;
+  issues.push("Pi on disk changed after installation (upgrade, edit or removal); reinstall to bind it");
+  return true;
+}
+
 export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   const workspace = resolve(workspaceInput);
   const paths = piPaths(workspace);
@@ -251,14 +274,17 @@ export function piHookStatus(workspaceInput: string): HookIntegrationStatus {
   if (moduleDrifted) issues.push("AMC's Pi extension module changed after installation; reinstall to bind the new module");
   const keysDrifted = manifest !== null && !sameKeys(manifest.receiptPublicKeys, getPurposeKeyHistory(workspace, "receipt"));
   if (keysDrifted) issues.push("AMC's receipt signing keys changed after installation; reinstall so the extension accepts them");
+  const piDrifted = piInstallDrifted(manifest, issues);
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
-  const governance = manifest ? sessionGovernance(workspace, manifest) : undefined;
-  if (governance?.invalidRegistrations) issues.push(`${governance.invalidRegistrations} Pi session registration(s) failed verification`);
+  const counted = manifest ? sessionGovernance(workspace, manifest) : undefined;
+  if (counted?.invalidRegistrations) issues.push(`${counted.invalidRegistrations} Pi session registration(s) failed verification`);
   const state: HookIntegrationStatus["state"] = !manifest || (!lease.valid && !lease.expired) || !ignoreProtected
     || issues.some((issue) => issue.includes("lease ID") || issue.includes("failed verification")) ? "invalid"
-    : lease.expired ? "expired" : !configOwned || moduleDrifted || keysDrifted ? "drifted" : "installed";
+    : lease.expired ? "expired" : !configOwned || moduleDrifted || keysDrifted || piDrifted ? "drifted" : "installed";
+  // Only an intact installation keeps an enforced claim; a drifted, expired or invalid one is not governed.
+  const governance = counted?.claim === "enforced_at_pi_tool_call" && state !== "installed" ? { ...counted, claim: "not_governed" as const } : counted;
   return { ...base, agentId: manifest?.agentId ?? null, mode: manifest?.mode ?? null, state, configOwned, manifestValid: manifest !== null,
     leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null,
     issues, ...(governance ? { governance } : {}) };

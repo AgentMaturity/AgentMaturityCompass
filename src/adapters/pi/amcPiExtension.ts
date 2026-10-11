@@ -1,12 +1,15 @@
 /**
  * AMC's Pi extension (P1-22). In control mode it first registers each Pi session with AMC (`session_start`, or before the
- * session's first call): Pi's version, the session id and its own module's SHA-256, which AMC checks against the signed
- * installation and records as signed proof that the extension ran; a session without a registration is not governed
- * and its calls are blocked. It then sends every Pi `tool_call` to AMC's hook control route and applies
- * AMC's decision. It allows a call only for an answer whose AMC-signed receipt binds exactly this request (tool,
- * arguments, Pi call id, session, version and a fresh nonce), and it then freezes the call's input so a later Pi
- * handler cannot change what runs. Any error, timeout, malformed or unbound answer, bad signature, lease failure,
- * unknown event shape or outage blocks the call. In both modes it records each call's request and outcome
+ * session's first call): Pi's version, the session id and its own module's SHA-256. AMC checks them against the signed
+ * installation and the extension file, AMC module and Pi install on disk, and records a signed registration: a
+ * lease-holder attestation, not proof that Pi ran the hook. A session without one is not governed and its calls are
+ * blocked. It then sends every Pi `tool_call` to AMC's hook control route, with Pi's working directory and whether
+ * Pi's registry names Pi's own built-in for the tool, and applies AMC's decision. Before sending, it requires the
+ * call's input to be plain JSON data and freezes it in place: Pi runs that very object (pi-agent-core
+ * `prepareToolCall`), so nothing can change what runs while AMC decides or after. It allows a call only for an answer
+ * whose AMC-signed receipt binds exactly this request (tool, arguments, Pi call id, session, version and a fresh
+ * nonce). Any error, timeout, malformed or unbound answer, bad signature, lease failure, unknown event shape, input
+ * that is not plain data or outage blocks the call. In both modes it records each call's request and outcome
  * (`tool_result`) as observations without arguments or output. Observe mode never blocks.
  *
  * Structural Pi types only: AMC has no Pi runtime dependency. The contract (event fields, `{ block: true, reason }`,
@@ -16,6 +19,7 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { types } from "node:util";
 import { sha256Hex } from "../../utils/hash.js";
 import { piControlAnswer, postToBridge, readPiHookConfig, verifyPiRegistrationAnswer, PI_CONTROL_PATH, PI_OBSERVE_PATH, type PiHookConfig } from "./piControlClient.js";
 import { piActionId, piSessionSha256 } from "./piIdentity.js";
@@ -30,6 +34,8 @@ const PI_BUILTIN_TOOLS = new Set(["read", "bash", "edit", "write", "grep", "find
 export interface PiToolCallContext {
   readonly mode: "tui" | "rpc" | "json" | "print";
   readonly hasUI: boolean;
+  /** Pi's working directory, against which Pi resolves relative tool paths. */
+  readonly cwd: string;
   readonly sessionManager: { getSessionId(): string };
   readonly ui: { notify(message: string, type?: "info" | "warning" | "error"): void };
 }
@@ -37,6 +43,8 @@ export interface PiToolCallContext {
 /** The part of Pi's ExtensionAPI the extension uses. */
 export interface PiExtensionApi {
   on(event: string, handler: (event: never, ctx: PiToolCallContext) => unknown): unknown;
+  /** Pi's tool registry: each name's effective tool and where it came from (`builtin:<name>` for Pi's own). */
+  getAllTools?(): ReadonlyArray<{ readonly name: string; readonly sourceInfo?: { readonly source?: string; readonly path?: string } }>;
 }
 
 interface PiToolEvent {
@@ -68,11 +76,41 @@ function isPiToolEvent(event: unknown): event is PiToolEvent {
     && typeof value.input === "object" && value.input !== null && !Array.isArray(value.input);
 }
 
-/** Freeze the input Pi will run, all the way down: a later handler's mutation throws, and Pi blocks a throwing handler. */
-function deepFreeze(value: unknown): void {
-  if (typeof value !== "object" || value === null || Object.isFrozen(value)) return;
+const notPlain = () => new Error("Pi tool input is not plain JSON data");
+
+/**
+ * Require `value` to be plain JSON data (no getters, proxies, class instances, symbol keys, holes or non-finite
+ * numbers) and freeze it, all the way down, before AMC sees it: what AMC evaluates is then what Pi runs, and any later
+ * mutation throws, which Pi turns into a block.
+ */
+function freezePlainInput(value: unknown, depth = 0): void {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw notPlain();
+    return;
+  }
+  if (typeof value !== "object" || depth > 64 || types.isProxy(value)) throw notPlain();
+  const array = Array.isArray(value);
+  const prototype = Object.getPrototypeOf(value) as unknown;
+  if (array ? prototype !== Array.prototype : prototype !== Object.prototype && prototype !== null) throw notPlain();
+  if (Object.getOwnPropertySymbols(value).length > 0) throw notPlain();
+  const fields = Object.entries(Object.getOwnPropertyDescriptors(value)).filter(([key]) => !(array && key === "length"));
+  if (array && fields.length !== (value as unknown[]).length) throw notPlain();
+  for (const [, field] of fields) {
+    if (!("value" in field) || !field.enumerable) throw notPlain();
+    if (!(field.value === undefined && !array)) freezePlainInput(field.value, depth + 1);
+  }
   Object.freeze(value);
-  for (const item of Object.values(value)) deepFreeze(item);
+}
+
+/** Whether Pi's registry names Pi's own built-in for `toolName`; an extension may register a tool under a built-in's name. */
+function isPiBuiltinTool(pi: PiExtensionApi, toolName: string): boolean {
+  try {
+    const source = pi.getAllTools?.().find((tool) => tool.name === toolName)?.sourceInfo;
+    return source?.source === "builtin" && source.path === `builtin:${toolName}`;
+  } catch {
+    return false;
+  }
 }
 
 function report(ctx: PiToolCallContext, message: string): void {
@@ -140,6 +178,8 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
       }
       try {
         if (!isPiToolEvent(event)) throw new Error("Pi sent a tool_call event AMC does not recognise");
+        freezePlainInput(event.input);
+        const input = JSON.stringify(event.input);
         const sessionId = ctx.sessionManager.getSessionId();
         const actionId = piActionId(sessionId, event.toolCallId);
         const config = readPiHookConfig(options.workspace, "control");
@@ -149,13 +189,14 @@ export function createAmcPiExtension(options: AmcPiExtensionOptions): (pi: PiExt
           hook_event_name: "tool_call",
           tool_name: event.toolName,
           tool_input: event.input,
-          pi: { version, mode: ctx.mode, sessionId, toolCallId: event.toolCallId, parentToolCallId: event.parentToolCallId ?? null, nonce: randomUUID() },
+          pi: { version, mode: ctx.mode, sessionId, toolCallId: event.toolCallId, parentToolCallId: event.parentToolCallId ?? null, nonce: randomUUID(),
+            cwd: ctx.cwd, builtinTool: isPiBuiltinTool(pi, event.toolName) },
         });
         const answer = await postToBridge(config, PI_CONTROL_PATH, body, timeoutMs, { "x-amc-hook-provider": "pi" });
         const result = piControlAnswer(answer, { agentId: config.agentId, actionId, toolCallId: event.toolCallId,
           requestSha256: sha256Hex(Buffer.from(body, "utf8")) }, config.receiptPublicKeys);
         if (result.block) return result;
-        deepFreeze(event.input);
+        if (JSON.stringify(event.input) !== input) throw new Error("Pi tool input changed while AMC decided");
         return undefined;
       } catch (error) {
         report(ctx, `${AMC_CONTROL_UNAVAILABLE} ${error instanceof Error ? error.message : String(error)}`);

@@ -1,5 +1,5 @@
 import { generateKeyPairSync } from "node:crypto";
-import { chmodSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -19,7 +19,7 @@ import { mintReceipt } from "../src/receipts/receipt.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
-import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { controlledWorkspace, fakePiPackage, freePort, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const agentId = "pi-extension-agent";
 const UNAVAILABLE = { block: true, reason: "AMC control unavailable; action denied." };
@@ -32,14 +32,22 @@ afterEach(async () => {
 
 type Handler = (event: Record<string, unknown>, ctx: PiToolCallContext) => unknown;
 
-/** Pi's dispatch as the 1.0.2 and 1.0.4 bundles run it: handlers in order, the first block wins, a throw blocks. */
-function fakePi() {
+const BUILTINS = ["read", "bash", "edit", "write", "grep", "find", "ls"];
+type ToolInfo = { name: string; sourceInfo: { source: string; path: string } };
+const builtinInfo = (name: string): ToolInfo => ({ name, sourceInfo: { source: "builtin", path: `builtin:${name}` } });
+
+/**
+ * Pi's dispatch as the 1.0.2 and 1.0.4 bundles run it: handlers in order, the first block wins, a throw blocks. Its
+ * tool registry (`getAllTools`) lists Pi's built-ins unless `tools` says otherwise.
+ */
+function fakePi(tools: ToolInfo[] | null = BUILTINS.map(builtinInfo)) {
   const handlers = new Map<string, Handler[]>();
   const api: PiExtensionApi = {
     on: (name, handler) => {
       handlers.set(name, [...(handlers.get(name) ?? []), handler as Handler]);
       return () => undefined;
     },
+    ...(tools ? { getAllTools: () => tools } : {}),
   };
   const emit = async (name: string, event: Record<string, unknown>, ctx: PiToolCallContext) => {
     for (const handler of handlers.get(name) ?? []) {
@@ -55,33 +63,38 @@ function fakePi() {
   return { api, handlers, emit };
 }
 
+/** Pi's context; `cwd` is filled in by `loaded` with the workspace's physical path, as Pi's process.cwd() reports it. */
 function context(mode: PiToolCallContext["mode"] = "print", sessionId = "pi-session-1"): PiToolCallContext {
-  return { mode, hasUI: mode === "tui" || mode === "rpc", sessionManager: { getSessionId: () => sessionId },
+  return { mode, hasUI: mode === "tui" || mode === "rpc", cwd: "", sessionManager: { getSessionId: () => sessionId },
     ui: { notify: () => undefined } };
 }
 
 /** The module the installation bound; the tests run the TypeScript source, so they name it. */
 const MODULE = resolve("dist", "adapters", "pi", "amcPiExtension.js");
 
-async function loaded(workspace: string, mode: "control" | "observe", options: { piVersion?: string | null; timeoutMs?: number; modulePath?: string } = {}) {
-  const pi = fakePi();
+async function loaded(workspace: string, mode: "control" | "observe",
+  options: { piVersion?: string | null; timeoutMs?: number; modulePath?: string; tools?: ToolInfo[] | null } = {}) {
+  const pi = fakePi(options.tools);
   await createAmcPiExtension({ workspace, mode, piVersion: options.piVersion === undefined ? "1.0.4" : options.piVersion,
-    timeoutMs: options.timeoutMs ?? 2_000, modulePath: options.modulePath ?? MODULE })(pi.api);
-  return pi;
+    timeoutMs: options.timeoutMs ?? 10_000, modulePath: options.modulePath ?? MODULE })(pi.api);
+  const cwd = realpathSync.native(workspace);
+  return { ...pi, emit: (name: string, event: Record<string, unknown>, ctx: PiToolCallContext) => pi.emit(name, event, { ...ctx, cwd: ctx.cwd || cwd }) };
 }
 
-async function withBridge(workspace: string, mode: "control" | "observe") {
+/** A workspace's Pi control or observe installation, bound to a Pi `piVersion` on disk, served by a real Bridge. */
+async function withBridge(workspace: string, mode: "control" | "observe", piVersion = "1.0.4") {
   const port = await freePort();
   const bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
   servers.push({ close: (done: () => void) => void bridge.close().then(done) } as unknown as Server);
-  installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${port}`, mode });
+  installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${port}`, mode, piPackageDir: fakePiPackage(piVersion) });
 }
 
 /** A registration answer signed with `key` (default: the workspace's real receipt purpose key), as AMC returns it. */
 function registrationAnswer(workspace: string, body: string, key = getPrivateKeyPem(workspace, "receipt")): string {
   const pi = (JSON.parse(body) as { pi: { version: string; mode: string; sessionId: string; extensionSha256: string } }).pi;
   const record = { kind: "amc.pi-session-registration/v1", agentId, piSessionSha256: piSessionSha256(pi.sessionId), piVersion: pi.version,
-    extensionSha256: pi.extensionSha256, mode: pi.mode, qualified: true, requestSha256: sha256Hex(Buffer.from(body, "utf8")) };
+    extensionSha256: pi.extensionSha256, piInstallSha256: "1".repeat(64), manifestSha256: "2".repeat(64), mode: pi.mode, qualified: true,
+    requestSha256: sha256Hex(Buffer.from(body, "utf8")) };
   const { receipt } = mintReceipt({ kind: "work_accepted", ts: Date.now(), agentId, providerId: "hook-registration:pi", model: null,
     eventHash: "0".repeat(64), bodySha256: sha256Hex(Buffer.from(canonicalize(record), "utf8")), sessionId: "s", privateKeyPem: key });
   return JSON.stringify({ registered: true, idempotentReplay: false, provider: "pi", record, receipt });
@@ -104,7 +117,7 @@ async function withFakeBridge(workspace: string, respond: (res: ServerResponse, 
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
   if (!address || typeof address === "string") throw new Error("no port");
-  installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${address.port}`, mode: "control" });
+  installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${address.port}`, mode: "control", piPackageDir: fakePiPackage() });
 }
 
 function decisionRows(workspace: string, actionId: string) {
@@ -150,8 +163,8 @@ describe("AMC Pi extension", () => {
     expect(await (await loaded(workspace, "control")).emit("tool_call", call("before-reinstall"), context())).toEqual(UNAVAILABLE);
     expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted",
       issues: expect.arrayContaining([expect.stringContaining("receipt signing keys changed")]) });
-    const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as { bridgeBase: string };
-    installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control" });
+    const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as { bridgeBase: string; piInstall: { packageDir: string } };
+    installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control", piPackageDir: manifest.piInstall.packageDir });
     expect(await (await loaded(workspace, "control")).emit("tool_call", call("after-reinstall"), context())).toBeUndefined();
   });
 
@@ -162,12 +175,32 @@ describe("AMC Pi extension", () => {
     expect(await pi.emit("tool_call", { toolName: "my_ext_tool", toolCallId: "c1", input: {} }, context()))
       .toEqual({ block: true, reason: "Pi tool my_ext_tool is not mapped to an allowed ToolHub tool." });
 
+    // A session reporting another Pi than the one bound on disk, or none it can read, cannot register: blocked.
     const old = await loaded(workspace, "control", { piVersion: "1.1.0" });
     expect(await old.emit("tool_call", { toolName: "read", toolCallId: "c2", input: { path: "workspace/public.txt" } }, context("print", "session-110")))
-      .toEqual({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+      .toEqual(UNAVAILABLE);
     const unreadable = await loaded(workspace, "control", { piVersion: null });
     expect(await unreadable.emit("tool_call", { toolName: "read", toolCallId: "c3", input: { path: "workspace/public.txt" } }, context("print", "session-unknown")))
-      .toEqual({ block: true, reason: expect.stringContaining("could not read Pi's version") });
+      .toEqual(UNAVAILABLE);
+
+    const unqualified = controlledWorkspace(agentId);
+    await withBridge(unqualified, "control", "1.1.0");
+    expect(await (await loaded(unqualified, "control", { piVersion: "1.1.0" })).emit("tool_call",
+      { toolName: "read", toolCallId: "c4", input: { path: "workspace/public.txt" } }, context("print", "session-110")))
+      .toEqual({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+  }, 120_000);
+
+  test("control: a mapped tool name an extension took over in Pi's registry, or a registry AMC cannot read, is blocked", async () => {
+    const workspace = controlledWorkspace(agentId);
+    await withBridge(workspace, "control");
+    const call = (id: string) => ({ toolName: "read", toolCallId: id, input: { path: "workspace/public.txt" } });
+    const replaced = [...BUILTINS.filter((name) => name !== "read").map(builtinInfo),
+      { name: "read", sourceInfo: { source: "local", path: "/elsewhere/.pi/extensions/evil.js" } }];
+    expect(await (await loaded(workspace, "control", { tools: replaced })).emit("tool_call", call("ext"), context()))
+      .toEqual({ block: true, reason: expect.stringContaining("not Pi's built-in") });
+    expect(await (await loaded(workspace, "control", { tools: null })).emit("tool_call", call("none"), context()))
+      .toEqual({ block: true, reason: expect.stringContaining("not Pi's built-in") });
+    expect(await (await loaded(workspace, "control")).emit("tool_call", call("builtin"), context())).toBeUndefined();
   });
 
   test("control: a decision is single-use; a restarted Pi re-sending the call gets no second decision and is blocked", async () => {
@@ -177,6 +210,45 @@ describe("AMC Pi extension", () => {
     expect(await (await loaded(workspace, "control")).emit("tool_call", { ...call, input: { ...call.input } }, context())).toBeUndefined();
     expect(await (await loaded(workspace, "control")).emit("tool_call", { ...call, input: { ...call.input } }, context())).toEqual(UNAVAILABLE);
     expect(decisionRows(workspace, piActionId("pi-session-1", "toolu_restart"))).toHaveLength(1);
+  });
+
+  test("control: the input is frozen before it is sent, so a mutation while AMC decides cannot change what runs", async () => {
+    const workspace = controlledWorkspace(agentId);
+    await withBridge(workspace, "control");
+    const pi = await loaded(workspace, "control");
+    const path = join(workspace, "workspace", "public.txt");
+    const call = { toolName: "read", toolCallId: "toolu_inflight", input: { path } };
+    // Any code holding Pi's input object (another extension, a timer) tries to change it once the control request is on the wire.
+    const realFetch = globalThis.fetch;
+    let attempted = false;
+    let mutated = false;
+    globalThis.fetch = (async (url: Parameters<typeof fetch>[0], init?: RequestInit) => {
+      if (String(init?.body).includes('"tool_call"')) {
+        attempted = true;
+        try { (call.input as { path: string }).path = "/etc/hosts"; mutated = true; } catch { mutated = false; }
+      }
+      return realFetch(url, init);
+    }) as typeof fetch;
+    try {
+      expect(await pi.emit("tool_call", call, context())).toBeUndefined();
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    expect({ attempted, mutated, path: call.input.path, frozen: Object.isFrozen(call.input) }).toEqual({ attempted: true, mutated: false, path, frozen: true });
+  });
+
+  test("control: input that is not plain data (getters, proxies, class instances, symbol keys, holes) is refused before anything is sent", async () => {
+    const workspace = controlledWorkspace(agentId);
+    let requests = 0;
+    await withFakeBridge(workspace, (res) => { requests += 1; res.writeHead(500).end(); });
+    const pi = await loaded(workspace, "control");
+    const getter = Object.defineProperty({}, "path", { get: () => "workspace/public.txt", enumerable: true });
+    const inputs: unknown[] = [getter, new Proxy({ path: "workspace/public.txt" }, {}), { path: new URL("file:///etc/hosts") },
+      { path: "x", [Symbol("s")]: 1 }, { path: "x", edits: new Array(2) }, { path: "x", limit: Number.NaN }, Object.assign(Object.create({ inherited: 1 }), { path: "x" })];
+    for (const [index, input] of inputs.entries()) {
+      expect(await pi.emit("tool_call", { toolName: "read", toolCallId: `plain-${index}`, input }, context()), String(index)).toEqual(UNAVAILABLE);
+    }
+    expect(requests).toBe(0);
   });
 
   test("control: an allowed call's input is frozen, so a later Pi handler cannot change what runs", async () => {
@@ -209,7 +281,7 @@ describe("AMC Pi extension", () => {
         rotatePurposeKeys({ workspace, purposes: ["receipt"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
         rotatePurposeKeys({ workspace, purposes: ["ledger-row"], passphrase: process.env.AMC_VAULT_PASSPHRASE });
         const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as { bridgeBase: string };
-        installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control" });
+        installHookIntegration({ workspace, provider: "pi", agentId, bridgeBase: manifest.bridgeBase, mode: "control", piPackageDir: fakePiPackage() });
         return { key: getPrivateKeyPem(workspace, "ledger-row") };
       },
       // A real AMC key of another purpose: only the receipt purpose's keys, pinned at install, are accepted.
@@ -235,9 +307,9 @@ describe("AMC Pi extension", () => {
       expect(await (await loaded(workspace, "control")).emit("tool_call", { toolName: "read", toolCallId: "c", input: { path: "workspace/public.txt" } }, context()))
         .toEqual(UNAVAILABLE);
     }
-  });
+  }, 120_000);
 
-  test("control: a session registers at session_start, before any call, as signed proof the extension ran", async () => {
+  test("control: a session registers at session_start, before any call, as a lease-holder attestation AMC checks on disk", async () => {
     const workspace = controlledWorkspace(agentId);
     await withBridge(workspace, "control");
     const pi = await loaded(workspace, "control");
@@ -260,7 +332,7 @@ describe("AMC Pi extension", () => {
     expect(await (await loaded(forged, "control")).emit("tool_call", call, context())).toEqual(UNAVAILABLE);
     // Registration comes first; when its answer does not verify, nothing else is sent.
     expect(controlRequests).toBe(0);
-  });
+  }, 120_000);
 
   test("control refuses a Pi event it does not recognise before sending anything", async () => {
     const workspace = controlledWorkspace(agentId);
@@ -292,9 +364,9 @@ describe("AMC Pi extension", () => {
     }
 
     const down = controlledWorkspace(agentId);
-    installHookIntegration({ workspace: down, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${await freePort()}`, mode: "control" });
+    installHookIntegration({ workspace: down, provider: "pi", agentId, bridgeBase: `http://127.0.0.1:${await freePort()}`, mode: "control", piPackageDir: fakePiPackage() });
     expect(await (await loaded(down, "control")).emit("tool_call", { toolName: "read", toolCallId: "c", input: { path: "x" } }, context())).toEqual(UNAVAILABLE);
-  });
+  }, 120_000);
 
   test("control fails closed on the lease and the installation: missing lease, lease mode 0644, no manifest, mode mismatch, no receipt keys", async () => {
     const call = { toolName: "read", toolCallId: "c", input: { path: "workspace/public.txt" } };
@@ -317,7 +389,7 @@ describe("AMC Pi extension", () => {
       setup(workspace);
       expect(await (await loaded(workspace, "control")).emit("tool_call", call, context())).toEqual(UNAVAILABLE);
     }
-  });
+  }, 120_000);
 
   test("observe: never blocks, even with the Bridge down, and records outcomes only", async () => {
     const workspace = controlledWorkspace(agentId);
@@ -339,5 +411,5 @@ describe("AMC Pi extension", () => {
     const quiet = await loaded(down, "observe", { timeoutMs: 300 });
     expect(await quiet.emit("tool_call", call, context())).toBeUndefined();
     await expect(quiet.emit("tool_result", { ...call, content: [], isError: false }, context())).resolves.toBeUndefined();
-  });
+  }, 120_000);
 });

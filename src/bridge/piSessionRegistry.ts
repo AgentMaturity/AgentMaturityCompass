@@ -1,15 +1,20 @@
 /**
- * Pi session registrations (P1-22): proof that AMC's Pi extension ran in a Pi session. In control mode the extension
- * registers each Pi session at `session_start`, through the hook control route, with Pi's version, its session id and
- * the SHA-256 of its own module. AMC checks the module against the signed installation manifest and records a signed
- * registration bound to that session. Claims derive from registrations: a Pi session without a verified registration
- * is not governed, its calls are denied, and nothing reads "enforced" for it. AMC cannot see a Pi session in which Pi
- * did not load the extension at all; it is reported as not governed.
+ * Pi session registrations (P1-22): a lease-holder attestation, made with the installation's hook lease, that AMC's Pi
+ * extension is running in a Pi session. In control mode the extension registers each Pi session at `session_start`,
+ * through the hook control route, with Pi's version, its session id and the SHA-256 of its own module. AMC itself then
+ * measures the installed `.pi/extensions/amc.js`, AMC's extension module and the bound Pi install on disk, compares
+ * them with the signed installation manifest, and records a signed registration bound to that session and to that
+ * manifest. Any mismatch refuses the registration. What this does not prove: a process holding the lease can still
+ * register without Pi running, and AMC cannot prove Pi executed the hook; it proves only that every allowed call went
+ * through AMC with a signed receipt. Claims derive from registrations under the current installation: a Pi session
+ * without one is not governed, its calls are denied, and nothing reads "enforced" for it. AMC cannot see a Pi session
+ * in which Pi did not load the extension at all; it is reported as not governed.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { piSessionSha256 } from "../adapters/pi/piIdentity.js";
+import { measurePiInstall, type PiInstall } from "../adapters/pi/piInstall.js";
 import { isQualifiedPiVersion } from "../adapters/pi/piVersions.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
@@ -41,6 +46,10 @@ const recordSchema = z.strictObject({
   piSessionSha256: sha256Schema,
   piVersion: z.string().min(1),
   extensionSha256: sha256Schema,
+  /** AMC's own measurement of the bound Pi install at registration (piInstall.ts). */
+  piInstallSha256: sha256Schema,
+  /** The signed installation manifest the registration was made under; a reinstall starts with no registrations. */
+  manifestSha256: sha256Schema,
   mode: z.string().min(1),
   qualified: z.boolean(),
   requestSha256: sha256Schema,
@@ -65,7 +74,10 @@ export type PiSessionRegistration =
 
 type LedgerHandle = ReturnType<typeof openLedger>;
 
-const eventIdFor = (agentId: string, sessionId: string) => `pi_registration_${sha256Hex(canonicalize({ agentId, session: piSessionSha256(sessionId) })).slice(0, 44)}`;
+const eventIdFor = (agentId: string, sessionId: string, manifestSha256: string) =>
+  `pi_registration_${sha256Hex(canonicalize({ agentId, session: piSessionSha256(sessionId), manifest: manifestSha256 })).slice(0, 44)}`;
+const manifestPath = (workspace: string) => join(workspace, ".amc", "hooks", "pi.json");
+const fileSha256 = (path: string) => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
 const ledgerSessionFor = (eventId: string) => `pi-registration-session-${sha256Hex(eventId).slice(0, 36)}`;
 const bodySha256 = (record: PiRegistrationRecord) => sha256Hex(Buffer.from(canonicalize(record), "utf8"));
 const invalid = (message: string) => new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, message);
@@ -79,21 +91,39 @@ export function isPiSessionStart(rawInput: string): boolean {
   }
 }
 
-/** The signed control installation's agent and AMC extension module digest; anything else refuses registration. */
-function signedControlManifest(workspace: string): { agentId: string; moduleSha256: string } {
-  const path = join(workspace, ".amc", "hooks", "pi.json");
-  let verified = false;
+const signedManifestSchema = z.object({
+  mode: z.literal("control"), agentId: z.string().min(1), extensionSha256: sha256Schema, moduleSha256: sha256Schema, modulePath: z.string().min(1),
+  piInstall: z.strictObject({ packageDir: z.string().min(1), version: z.string().min(1), sha256: sha256Schema }).nullable(),
+});
+
+/** The signed control installation and the SHA-256 of its manifest bytes; anything else refuses registration. */
+function signedControlManifest(workspace: string): z.infer<typeof signedManifestSchema> & { manifestSha256: string } {
+  const path = manifestPath(workspace);
   try {
-    verified = verifySignedFileWithAuditor(workspace, path).valid;
+    const bytes = readFileSync(path);
+    if (!verifySignedFileWithAuditor(workspace, path).valid) throw new Error("unsigned");
+    return { ...signedManifestSchema.parse(JSON.parse(bytes.toString("utf8"))), manifestSha256: sha256Hex(bytes) };
   } catch {
-    verified = false;
-  }
-  if (!verified) throw invalid("Pi session registration needs a signed Pi control installation");
-  const manifest = JSON.parse(readFileSync(path, "utf8")) as { mode?: unknown; agentId?: unknown; moduleSha256?: unknown };
-  if (manifest.mode !== "control" || typeof manifest.agentId !== "string" || typeof manifest.moduleSha256 !== "string") {
     throw invalid("Pi session registration needs a signed Pi control installation");
   }
-  return { agentId: manifest.agentId, moduleSha256: manifest.moduleSha256 };
+}
+
+/**
+ * AMC's own measurements at registration: the installed extension file, AMC's extension module and the bound Pi install
+ * must all be what the signed installation recorded, and the session must report the bound Pi's version.
+ */
+function measuredPi(workspace: string, manifest: ReturnType<typeof signedControlManifest>, reportedVersion: string): PiInstall {
+  if (fileSha256(join(workspace, ".pi", "extensions", "amc.js")) !== manifest.extensionSha256) {
+    throw invalid("the installed .pi/extensions/amc.js is not the file the signed installation wrote");
+  }
+  if (fileSha256(manifest.modulePath) !== manifest.moduleSha256) throw invalid("AMC's Pi extension module on disk is not the module the signed installation bound");
+  if (!manifest.piInstall) throw invalid("the signed installation binds no Pi install; reinstall with Pi on PATH");
+  const measured = measurePiInstall(manifest.piInstall.packageDir);
+  if (!measured || measured.sha256 !== manifest.piInstall.sha256 || measured.version !== manifest.piInstall.version) {
+    throw invalid("the Pi on disk is not the Pi the signed installation bound; reinstall to bind it");
+  }
+  if (reportedVersion !== measured.version) throw invalid(`this session reports Pi ${reportedVersion}, but the Pi on disk is ${measured.version}`);
+  return measured;
 }
 
 /** One recorded registration, verified whole: the row's integrity, its signed receipt (receipt purpose) and its binding. */
@@ -115,9 +145,12 @@ function verifiedRegistration(ledger: LedgerHandle, eventId: string, agentId: st
   }
 }
 
-/** The verified registration of Pi session `sessionId` for `agentId`, read through an open ledger. */
+/** The verified registration of Pi session `sessionId` for `agentId` under the current installation, read through an open ledger. */
 export function piSessionRegistration(ledger: LedgerHandle, agentId: string, sessionId: string): PiSessionRegistration {
-  return verifiedRegistration(ledger, eventIdFor(agentId, sessionId), agentId);
+  const manifestSha256 = fileSha256(manifestPath(ledger.workspace));
+  if (manifestSha256 === null) return { status: "missing" };
+  const found = verifiedRegistration(ledger, eventIdFor(agentId, sessionId, manifestSha256), agentId);
+  return found.status === "registered" && found.record.manifestSha256 !== manifestSha256 ? { status: "missing" } : found;
 }
 
 /** Record (or replay) the registration of one Pi session. A different registration for a recorded session is a conflict. */
@@ -132,12 +165,13 @@ export function registerPiSession(input: { workspace: string; authenticatedAgent
   const manifest = signedControlManifest(input.workspace);
   if (manifest.agentId !== input.authenticatedAgentId) throw invalid("Pi session registration is for another agent's installation");
   if (manifest.moduleSha256 !== parsed.pi.extensionSha256) throw invalid("the running Pi extension is not the module the signed installation bound");
+  const pi = measuredPi(input.workspace, manifest, parsed.pi.version);
   const record: PiRegistrationRecord = {
     kind: RECORD_KIND, agentId: input.authenticatedAgentId, piSessionSha256: piSessionSha256(parsed.pi.sessionId),
-    piVersion: parsed.pi.version, extensionSha256: parsed.pi.extensionSha256, mode: parsed.pi.mode,
-    qualified: isQualifiedPiVersion(parsed.pi.version), requestSha256: sha256Hex(Buffer.from(input.rawInput, "utf8")),
+    piVersion: pi.version, extensionSha256: parsed.pi.extensionSha256, piInstallSha256: pi.sha256, manifestSha256: manifest.manifestSha256,
+    mode: parsed.pi.mode, qualified: isQualifiedPiVersion(pi.version), requestSha256: sha256Hex(Buffer.from(input.rawInput, "utf8")),
   };
-  const eventId = eventIdFor(input.authenticatedAgentId, parsed.pi.sessionId);
+  const eventId = eventIdFor(input.authenticatedAgentId, parsed.pi.sessionId, manifest.manifestSha256);
   const sessionId = ledgerSessionFor(eventId);
   const ledger = openLedger(input.workspace);
   try {
@@ -177,10 +211,13 @@ export interface PiGovernance {
 }
 
 /**
- * What AMC may claim for an agent's Pi sessions, from verified registrations only: "enforced at Pi's tool_call hook"
- * for registered sessions of a qualified Pi, otherwise not governed. Sessions Pi ran without the extension are invisible.
+ * What AMC may claim for an agent's Pi sessions, from verified registrations under the current installation only:
+ * "enforced at Pi's tool_call hook" for registered sessions of a qualified Pi, otherwise not governed. The installer's
+ * status lowers the claim to not governed unless the installation itself is intact. Sessions Pi ran without the
+ * extension are invisible.
  */
 export function piGovernance(workspace: string, agentId: string): PiGovernance {
+  const manifestSha256 = fileSha256(manifestPath(workspace));
   const ledger = openLedger(workspace);
   try {
     const rows = ledger.db.prepare("SELECT id, ts, meta_json FROM evidence_events WHERE event_type = 'audit' AND id LIKE 'pi_registration_%' ORDER BY ts ASC")
@@ -191,7 +228,7 @@ export function piGovernance(workspace: string, agentId: string): PiGovernance {
       if (!row.meta_json.includes(`"agentId":${JSON.stringify(agentId)}`)) continue;
       const found = verifiedRegistration(ledger, row.id, agentId);
       if (found.status === "invalid") invalidCount += 1;
-      if (found.status !== "registered") continue;
+      if (found.status !== "registered" || found.record.manifestSha256 !== manifestSha256) continue;
       registered += 1;
       if (found.record.qualified) qualified += 1;
       latest = row.ts;

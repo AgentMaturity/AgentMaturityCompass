@@ -115,7 +115,8 @@ export interface ExpectedPiRegistration {
 
 /**
  * Checks AMC's answer to a session registration: the record names this agent, session digest, Pi version, module
- * digest and request, and its receipt (`work_accepted`) is signed by a pinned `receipt` purpose key over that record.
+ * digest and request, plus AMC's digests of the Pi install and installation it measured, and its receipt
+ * (`work_accepted`) is signed by a pinned `receipt` purpose key over that record.
  * Anything else throws, so the session stays unregistered and its calls are blocked.
  */
 export function verifyPiRegistrationAnswer(answer: unknown, expected: ExpectedPiRegistration, publicKeys: readonly string[]): void {
@@ -123,7 +124,8 @@ export function verifyPiRegistrationAnswer(answer: unknown, expected: ExpectedPi
   const record = (value.record ?? {}) as Record<string, unknown>;
   const bound = value.registered === true && value.provider === "pi" && record.kind === "amc.pi-session-registration/v1"
     && Object.entries(expected).every(([key, field]) => record[key] === field) && typeof record.qualified === "boolean"
-    && Object.keys(record).length === 8;
+    && [record.piInstallSha256, record.manifestSha256].every((digest) => typeof digest === "string" && /^[a-f0-9]{64}$/.test(digest))
+    && Object.keys(record).length === 10;
   if (!bound) throw new Error("AMC session registration answer is malformed or not bound to this session");
   const receipt = verifiedReceiptPayload(value.receipt, publicKeys);
   if (receipt.kind !== "work_accepted" || receipt.providerId !== "hook-registration:pi" || receipt.agentId !== expected.agentId

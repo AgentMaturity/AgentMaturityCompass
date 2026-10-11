@@ -1,7 +1,7 @@
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { getHookIntegrationStatus, installHookIntegration } from "../src/adapters/hookIntegration.js";
+import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { HookControlError } from "../src/bridge/hookProviders.js";
 import { NOT_GOVERNED_NOTE, piGovernance } from "../src/bridge/piSessionRegistry.js";
@@ -9,7 +9,7 @@ import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { verifyReceipt } from "../src/receipts/receipt.js";
 import { sha256Hex } from "../src/utils/hash.js";
-import { controlledWorkspace, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { controlledWorkspace, fakePiPackage, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const agentId = "pi-registered";
 const lease = { leaseId: "lease_pi_fixture", expiresTs: Date.now() + 3_600_000 };
@@ -17,15 +17,20 @@ const moduleSha256 = () => sha256Hex(readFileSync(resolve("dist", "adapters", "p
 
 afterEach(removeFixtureWorkspaces);
 
-function installed(): string {
+let piPackage = "";
+/** A workspace with a signed Pi control installation bound to a Pi `version` on disk (`piPackage`). */
+function installed(version = "1.0.4"): string {
   const workspace = controlledWorkspace(agentId);
-  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control" });
+  piPackage = fakePiPackage(version);
+  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control", piPackageDir: piPackage });
   return workspace;
 }
+const refusedWith = (workspace: string, rawInput: string, code: string, message?: string) => expect(() => route(workspace, rawInput))
+  .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: code as HookControlError["code"], ...(message ? { message: expect.stringContaining(message) } : {}) }));
 
-const registration = (options: { sessionId?: string; version?: string; extensionSha256?: string } = {}) => JSON.stringify({
+const registration = (options: { sessionId?: string; version?: string; extensionSha256?: string; mode?: string } = {}) => JSON.stringify({
   hook_event_name: "session_start",
-  pi: { version: options.version ?? "1.0.4", mode: "print", sessionId: options.sessionId ?? "pi-session", extensionSha256: options.extensionSha256 ?? moduleSha256() },
+  pi: { version: options.version ?? "1.0.4", mode: options.mode ?? "print", sessionId: options.sessionId ?? "pi-session", extensionSha256: options.extensionSha256 ?? moduleSha256() },
 });
 
 const route = (workspace: string, rawInput: string) =>
@@ -33,7 +38,7 @@ const route = (workspace: string, rawInput: string) =>
 
 const readPath = (workspace: string) => join(workspace, "workspace", "public.txt");
 
-describe("Pi session registration (proof the AMC extension ran)", () => {
+describe("Pi session registration (a lease-holder attestation checked against disk)", () => {
   test("no registration: the call is denied as not governed, nothing reads enforced, and status says not governed", () => {
     const workspace = installed();
     const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "unregistered" }));
@@ -49,7 +54,8 @@ describe("Pi session registration (proof the AMC extension ran)", () => {
     const registered = route(workspace, registration()) as unknown as Record<string, unknown> & { receipt: string; record: Record<string, unknown> };
     expect(registered).toMatchObject({ registered: true, idempotentReplay: false, record: {
       kind: "amc.pi-session-registration/v1", agentId, piVersion: "1.0.4", qualified: true, extensionSha256: moduleSha256(),
-      piSessionSha256: sha256Hex("pi\0pi-session"), requestSha256: sha256Hex(registration()) } });
+      piSessionSha256: sha256Hex("pi\0pi-session"), requestSha256: sha256Hex(registration()),
+      manifestSha256: sha256Hex(readFileSync(join(workspace, ".amc", "hooks", "pi.json"))), piInstallSha256: expect.stringMatching(/^[a-f0-9]{64}$/) } });
     const signed = verifyReceipt(registered.receipt, getPurposeKeyHistory(workspace, "receipt"));
     expect(signed.ok).toBe(true);
     expect(signed.payload).toMatchObject({ kind: "work_accepted", providerId: "hook-registration:pi", agentId });
@@ -63,7 +69,7 @@ describe("Pi session registration (proof the AMC extension ran)", () => {
   });
 
   test("a registration from an unqualified Pi is recorded but not enforced, and its calls are denied", () => {
-    const workspace = installed();
+    const workspace = installed("1.1.0");
     expect(route(workspace, registration({ version: "1.1.0" }))).toMatchObject({ registered: true, record: { qualified: false } });
     const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "old", version: "1.1.0" }));
     expect(decision).toMatchObject({ decision: "deny", reason: "AMC has not qualified Pi 1.1.0" });
@@ -71,9 +77,55 @@ describe("Pi session registration (proof the AMC extension ran)", () => {
       .toMatchObject({ enforcement: { level: "advisory" } });
     expect(piGovernance(workspace, agentId)).toMatchObject({ claim: "not_governed", registeredSessions: 1, qualifiedSessions: 0 });
     // A call claiming another Pi version than its session registered is denied too.
-    route(workspace, registration({ sessionId: "s-2" }));
+    route(workspace, registration({ sessionId: "s-2", version: "1.1.0" }));
     expect(route(workspace, piEnvelope("read", { path: readPath(workspace) }, { sessionId: "s-2", toolCallId: "skew", version: "1.0.2" })))
-      .toMatchObject({ decision: "deny", reason: expect.stringContaining("registered Pi 1.0.4") });
+      .toMatchObject({ decision: "deny", reason: expect.stringContaining("registered Pi 1.1.0") });
+  });
+
+  test("AMC checks a registration against disk: no bound Pi, Pi changed, another version, or a changed extension file or module is refused", () => {
+    const unbound = controlledWorkspace(agentId);
+    installHookIntegration({ workspace: unbound, provider: "pi", agentId, mode: "control" });
+    refusedWith(unbound, registration(), "HOOK_CONTROL_INPUT_INVALID", "binds no Pi install");
+    expect(getHookIntegrationStatus({ workspace: unbound, provider: "pi" })).toMatchObject({
+      issues: expect.arrayContaining([expect.stringContaining("no Pi install")]), governance: { claim: "not_governed" } });
+
+    const workspace = installed();
+    refusedWith(workspace, registration({ version: "1.0.2" }), "HOOK_CONTROL_INPUT_INVALID", "Pi on disk is 1.0.4");
+    appendFileSync(join(piPackage, "dist", "bundle", "chunks", "runtime.js"), "export const patched = true;\n");
+    refusedWith(workspace, registration(), "HOOK_CONTROL_INPUT_INVALID", "not the Pi the signed installation bound");
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted",
+      issues: expect.arrayContaining([expect.stringContaining("Pi on disk changed")]) });
+
+    const extension = controlledWorkspace(agentId);
+    installHookIntegration({ workspace: extension, provider: "pi", agentId, mode: "control", piPackageDir: fakePiPackage() });
+    writeFileSync(join(extension, ".pi", "extensions", "amc.js"), "export default function () {}\n");
+    refusedWith(extension, registration(), "HOOK_CONTROL_INPUT_INVALID", ".pi/extensions/amc.js");
+    expect(piGovernance(extension, agentId)).toMatchObject({ registeredSessions: 0 });
+  });
+
+  test("the claim follows the current installation: a drifted or reinstalled one reads not governed until a session registers under it", () => {
+    const workspace = installed();
+    route(workspace, registration());
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" }).governance).toMatchObject({ claim: "enforced_at_pi_tool_call", registeredSessions: 1 });
+
+    const extensionFile = join(workspace, ".pi", "extensions", "amc.js");
+    const original = readFileSync(extensionFile);
+    writeFileSync(extensionFile, "export default function () {}\n");
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted", governance: { claim: "not_governed" } });
+    writeFileSync(extensionFile, original);
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "installed", governance: { claim: "enforced_at_pi_tool_call" } });
+
+    removeHookIntegration({ workspace, provider: "pi" });
+    installHookIntegration({ workspace, provider: "pi", agentId, mode: "control", piPackageDir: piPackage });
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "installed",
+      governance: { claim: "not_governed", registeredSessions: 0 } });
+    // The session registered under the removed installation is not registered under this one.
+    expect(route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: "old-session" })))
+      .toMatchObject({ decision: "deny", reason: expect.stringContaining("not governed") });
+    route(workspace, registration({ sessionId: "after-reinstall" }));
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" }).governance).toMatchObject({ claim: "enforced_at_pi_tool_call", registeredSessions: 1 });
+    rmSync(join(piPackage, "package.json"));
+    expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "drifted", governance: { claim: "not_governed" } });
   });
 
   test("tampered registrations are refused: a foreign extension digest, a conflicting re-registration, an altered ledger row", () => {
@@ -82,7 +134,7 @@ describe("Pi session registration (proof the AMC extension ran)", () => {
       .toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: code as HookControlError["code"] }));
     refused(registration({ extensionSha256: "0".repeat(64) }), "HOOK_CONTROL_INPUT_INVALID");
     route(workspace, registration({ sessionId: "s-3" }));
-    refused(registration({ sessionId: "s-3", version: "1.0.2" }), "HOOK_CONTROL_REPLAY_CONFLICT");
+    refused(registration({ sessionId: "s-3", mode: "tui" }), "HOOK_CONTROL_REPLAY_CONFLICT");
 
     route(workspace, registration({ sessionId: "s-4" }));
     const ledger = openLedger(workspace);
@@ -109,7 +161,7 @@ describe("Pi session registration (proof the AMC extension ran)", () => {
       issues: expect.arrayContaining([expect.stringContaining("failed verification")]) });
   });
 
-  test("an observe installation cannot register: registration proves control ran", () => {
+  test("an observe installation cannot register: only a control installation's lease can attest", () => {
     const workspace = controlledWorkspace(agentId);
     installHookIntegration({ workspace, provider: "pi", agentId });
     expect(() => route(workspace, registration())).toThrowError(expect.objectContaining<Partial<HookControlError>>({ code: "HOOK_CONTROL_INPUT_INVALID" }));

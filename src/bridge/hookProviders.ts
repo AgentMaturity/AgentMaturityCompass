@@ -12,6 +12,8 @@ import {
 import type { ActionClass, RuntimeName } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { piCwdRefusal, piPathLocations } from "../adapters/pi/piPaths.js";
+import { piVersionRefusal } from "../adapters/pi/piVersions.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
 const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
@@ -88,6 +90,10 @@ const piControlContextSchema = z.strictObject({
   toolCallId: z.string().min(1).max(512),
   parentToolCallId: z.string().min(1).max(512).nullable(),
   nonce: z.string().min(16).max(128),
+  /** Pi's working directory (ExtensionContext.cwd), against which Pi resolves relative paths. */
+  cwd: z.string().min(1).max(4096),
+  /** Whether Pi's tool registry names Pi's own built-in for this tool name, rather than an extension's tool. */
+  builtinTool: z.boolean(),
 });
 export type PiControlContext = z.infer<typeof piControlContextSchema>;
 
@@ -357,11 +363,22 @@ const PI_TOOLS: Readonly<Record<string, { tool: "fs.read" | "fs.write" | "shell"
 
 const piTool = (toolName: string) => (Object.hasOwn(PI_TOOLS, toolName) ? PI_TOOLS[toolName]! : null);
 
-function piToolRequest(toolName: string, toolInput: Record<string, unknown>, workspace: string): Omit<CanonicalToolRequest, "segment"> | null {
+/** Why AMC refuses a Pi call before mapping it: an unqualified Pi, another working directory, or a mapped name an extension took over. */
+export function piRefusal(pi: Pick<PiControlContext, "version" | "cwd" | "builtinTool">, workspace: string, toolName: string): string | null {
+  return piVersionRefusal(pi.version) ?? piCwdRefusal(pi.cwd, workspace) ?? (piTool(toolName) && !pi.builtinTool
+    ? `Pi's ${toolName} tool is an extension's tool, not Pi's built-in; AMC maps only Pi's built-ins and denied the call.` : null);
+}
+
+/** A path tool's request at every location Pi opens for it (piPaths.ts); none when the path is missing or unresolvable. */
+function piToolRequest(toolName: string, toolInput: Record<string, unknown>, workspace: string, cwd: string): Omit<CanonicalToolRequest, "segment"> | null {
   const entry = piTool(toolName);
   if (!entry || entry.tool === "shell") return null;
-  const path = firstString(toolInput, ["path"]) ?? (entry.cwdDefault ? workspace : null);
-  return path ? { name: entry.tool, args: { path }, argumentsReviewable: true, minimumActionClass: entry.minimumActionClass } : null;
+  // Pi's own default: `path || "."` for grep, find and ls; read, write and edit require a path.
+  const raw = entry.cwdDefault && (toolInput.path === undefined || toolInput.path === "") ? "." : toolInput.path;
+  const locations = typeof raw === "string" && raw.length > 0 ? piPathLocations(toolName, raw, cwd, workspace) : null;
+  if (!locations) return null;
+  return { name: entry.tool, args: { path: locations.length === 1 ? locations[0]! : locations }, argumentsReviewable: true,
+    minimumActionClass: entry.minimumActionClass };
 }
 
 function shellCommandForProviderTool(
@@ -386,7 +403,9 @@ export function canonicalToolRequests(
   toolName: string,
   toolInput: Record<string, unknown>,
   workspace: string,
+  pi: Pick<PiControlContext, "cwd"> | null = null,
 ): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
+  if (provider === "pi" && !pi) return { requests: [], commandPlan: null };
   const command = shellCommandForProviderTool(provider, toolName, toolInput);
   if (command !== null) {
     const commandPlan = parseShellCommandPlan(command);
@@ -417,7 +436,7 @@ export function canonicalToolRequests(
         : null;
     }
   } else if (provider === "pi") {
-    request = piToolRequest(toolName, toolInput, workspace);
+    request = pi ? piToolRequest(toolName, toolInput, workspace, pi.cwd) : null;
   } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
     request = {
       name: "fs.read",

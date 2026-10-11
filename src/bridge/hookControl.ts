@@ -29,7 +29,7 @@ import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
   canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, HookControlError, materializeProviderDecision,
-  parseProvider, piControlContext, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
+  parseProvider, piControlContext, piRefusal, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
   type CanonicalToolRequest, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
   type HookProvider, type PiControlContext, type ProviderControlResponse,
 } from "./hookProviders.js";
@@ -37,7 +37,6 @@ import {
 export { HookControlError } from "./hookProviders.js";
 import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
 import { piActionId } from "../adapters/pi/piIdentity.js";
-import { piVersionRefusal } from "../adapters/pi/piVersions.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
@@ -361,7 +360,7 @@ function normalizeProviderRequest(input: {
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
-  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
+  const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace, pi);
   const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
     provider: input.provider,
@@ -594,7 +593,7 @@ function requestedControlDecision(input: {
   agentId: string;
   request: NormalizedProviderToolRequest;
 }): RequestedControlDecision {
-  const versionRefusal = input.request.pi ? piVersionRefusal(input.request.pi.version) : null;
+  const versionRefusal = input.request.pi ? piRefusal(input.request.pi, input.workspace, input.request.providerToolName) : null;
   if (versionRefusal) return { decision: "deny", reason: versionRefusal, commandBlastRadius: null };
   const signatureChecks = [
     ["action policy", verifyActionPolicySignature(input.workspace)],

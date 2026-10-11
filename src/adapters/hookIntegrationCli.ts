@@ -18,6 +18,7 @@ import {
   type HookProvider
 } from "./hookIntegration.js";
 import { isHookProvider, serializeProviderControlResponse } from "../bridge/hookProviders.js";
+import { findPiPackage } from "./pi/piInstall.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
@@ -165,7 +166,9 @@ export function registerHookIntegrationCommands(
         bridgeBase: opts.bridgeUrl,
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
-        dryRun: opts.dryRun
+        dryRun: opts.dryRun,
+        // Pi control binds the Pi a person gets by running `pi` here.
+        piPackageDir: opts.provider === "pi" ? findPiPackage() ?? undefined : undefined
       });
       if (opts.json) {
         console.log(JSON.stringify(result, null, 2));

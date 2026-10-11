@@ -14,11 +14,13 @@ import { readEventPayload } from "../src/session/eventPayload.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { sha256Hex } from "../src/utils/hash.js";
-import { controlledWorkspace, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { controlledWorkspace, fakePiPackage, piEnvelope, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 import { installHookIntegration } from "../src/adapters/hookIntegration.js";
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { resolve } from "node:path";
+import { protectedPathGlobs } from "../src/toolhub/protectedPaths.js";
 
 const agentId = "pi-controlled";
 const lease = { leaseId: "lease_pi_fixture", expiresTs: Date.now() + 3_600_000 };
@@ -31,11 +33,11 @@ function register(workspace: string, sessionId = "pi-session", version = "1.0.4"
     pi: { version, mode: "print", sessionId, extensionSha256: sha256Hex(readFileSync(resolve("dist", "adapters", "pi", "amcPiExtension.js"))) } }) });
 }
 
-/** A workspace with a signed Pi control installation and the default Pi session registered. */
-function piWorkspace(): string {
+/** A workspace with a signed Pi control installation bound to a Pi `piVersion` on disk and the default Pi session registered. */
+function piWorkspace(piVersion = "1.0.4"): string {
   const workspace = controlledWorkspace(agentId);
-  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control" });
-  register(workspace);
+  installHookIntegration({ workspace, provider: "pi", agentId, mode: "control", piPackageDir: fakePiPackage(piVersion) });
+  register(workspace, "pi-session", piVersion);
   return workspace;
 }
 
@@ -168,19 +170,51 @@ describe("Pi tool_call hook control", () => {
   });
 
   test("a Pi version outside the qualified set is denied, readable or not; the receipt records it", () => {
-    const workspace = piWorkspace();
+    const workspace = piWorkspace("1.1.0");
     const path = join(workspace, "workspace", "public.txt");
-    register(workspace, "s-110", "1.1.0");
-    register(workspace, "s-unknown", "unknown");
-    const unqualified = control(workspace, piEnvelope("read", { path }, { sessionId: "s-110", toolCallId: "v110", version: "1.1.0" }));
+    const unqualified = control(workspace, piEnvelope("read", { path }, { toolCallId: "v110", version: "1.1.0" }));
     expect(unqualified.decision).toBe("deny");
     expect(unqualified.providerResponse).toMatchObject({ block: true, reason: "AMC has not qualified Pi 1.1.0" });
+    expect(receiptPayload(workspace, unqualified.receipt)).toMatchObject({ state: "denied", enforcement: { level: "advisory" } });
 
+    // A Pi whose version the extension cannot read cannot register: the bound Pi on disk names its own version.
+    expect(() => register(workspace, "s-unknown", "unknown")).toThrowError(expect.objectContaining({ code: "HOOK_CONTROL_INPUT_INVALID" }));
     const unknown = control(workspace, piEnvelope("read", { path }, { sessionId: "s-unknown", toolCallId: "vunknown", version: "unknown" }));
     expect(unknown.decision).toBe("deny");
-    expect(unknown.reason).toContain("could not read Pi's version");
     expect(decisionRow(workspace, unknown.eventId).payload).toMatchObject({ piVersion: "unknown" });
     expect(receiptPayload(workspace, unknown.receipt)).toMatchObject({ state: "denied", enforcement: { level: "advisory" } });
+  });
+
+  test("evaluates the location Pi opens: with ./** allowed, @-prefixed, home, file-URL and symlinked paths into AMC state are denied", () => {
+    const workspace = piWorkspace();
+    const tools = defaultToolsConfig();
+    for (const tool of tools.tools.allowedTools.filter((entry) => entry.name === "fs.read" || entry.name === "fs.write")) {
+      tool.allow = { ...tool.allow, paths: ["./**"] };
+      tool.deny = { ...tool.deny, paths: [...protectedPathGlobs(), "**/.git/**"] };
+    }
+    initToolsConfig(workspace, tools);
+    const steered = (toolName: string, path: string, id: string) => {
+      const result = control(workspace, piEnvelope(toolName, { path, content: "x" }, { toolCallId: id }));
+      expect(result.decision, `${toolName} ${path}`).toBe("deny");
+      expect(receiptPayload(workspace, result.receipt), `${toolName} ${path}`).toMatchObject({ state: "denied", authorizationRecordDigest: null });
+    };
+    let id = 0;
+    for (const toolName of ["read", "write", "edit", "grep", "find", "ls"]) {
+      for (const path of ["@.amc/hooks/pi.json", "@.amc/keys/receipt.pub", "~/.ssh/authorized_keys", "file:///etc/hosts",
+        `file://${resolve(workspace)}/.amc/hooks/pi.json`, `@${homedir()}/.ssh/authorized_keys`]) steered(toolName, path, `p${(id += 1)}`);
+    }
+    // The same widened config still allows an ordinary workspace path, written the way Pi accepts it.
+    expect(control(workspace, piEnvelope("read", { path: "@workspace/public.txt" }, { toolCallId: "plain" })).decision).toBe("allow");
+  });
+
+  test("denies a Pi working in another directory and a mapped tool name an extension replaced", () => {
+    const workspace = piWorkspace();
+    const path = join(workspace, "workspace", "public.txt");
+    const elsewhere = control(workspace, piEnvelope("read", { path }, { toolCallId: "cwd", cwd: join(workspace, "workspace") }));
+    expect(elsewhere).toMatchObject({ decision: "deny", reason: expect.stringContaining("working directory") });
+    const replaced = control(workspace, piEnvelope("read", { path }, { toolCallId: "ext-read", builtinTool: false }));
+    expect(replaced).toMatchObject({ decision: "deny", reason: expect.stringContaining("not Pi's built-in") });
+    expect(receiptPayload(workspace, replaced.receipt)).toMatchObject({ state: "denied", authorizationRecordDigest: null });
   });
 
   test("a signed tools config that gives a mapped tool a lower class than the Pi mapping table is denied", () => {
@@ -236,7 +270,7 @@ describe("Pi tool_call hook control", () => {
     refused({ ...envelope, pi: undefined });
     refused({ ...envelope, pi: { ...pi, extra: true } });
     refused({ ...envelope, pi: { ...pi, mode: "headless" } });
-    for (const field of ["sessionId", "toolCallId", "nonce", "version"]) refused({ ...envelope, pi: { ...pi, [field]: undefined } });
+    for (const field of ["sessionId", "toolCallId", "nonce", "version", "cwd", "builtinTool"]) refused({ ...envelope, pi: { ...pi, [field]: undefined } });
     refused({ ...envelope, tool_input: "not an object" });
   });
 });

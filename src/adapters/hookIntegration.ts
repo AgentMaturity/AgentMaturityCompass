@@ -197,6 +197,8 @@ export interface InstallHookIntegrationOptions {
   ttl?: string;
   rpm?: number;
   dryRun?: boolean;
+  /** Pi control mode: the installed @earendil-works/pi-coding-agent package sessions must run (the CLI finds it on PATH). */
+  piPackageDir?: string;
 }
 
 export interface RemoveHookIntegrationOptions {

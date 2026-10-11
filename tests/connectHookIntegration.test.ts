@@ -43,6 +43,7 @@ import { PI_HOOK_SOURCE } from "../src/adapters/hookProviders/pi.js";
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { createAmcPiExtension } from "../src/adapters/pi/amcPiExtension.js";
 import { inspectHookHealth } from "../src/watch/hookHealthDiagnostics.js";
+import { fakePiPackage, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const roots: string[] = [];
 
@@ -1206,6 +1207,7 @@ describe("AMC provider hook integration", () => {
 });
 
 describe("AMC Pi hook installation (P1-22)", () => {
+  afterEach(removeFixtureWorkspaces);
   const piFiles = (workspace: string) => ({
     extension: join(workspace, ".pi", "extensions", "amc.js"),
     ignore: join(workspace, ".gitignore"),
@@ -1228,7 +1230,10 @@ describe("AMC Pi hook installation (P1-22)", () => {
   test("install writes the extension, a 0600 lease and a signed manifest binding both SHA-256s; reinstall changes nothing", () => {
     const workspace = newWorkspace();
     const files = piFiles(workspace);
-    const installed = installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control" });
+    expect(() => installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control", piPackageDir: workspace }))
+      .toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PATH_UNSAFE" }));
+    const piPackageDir = fakePiPackage();
+    const installed = installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control", piPackageDir });
     expect(installed).toMatchObject({ applied: true, changed: true, lease: { scopes: ["hook:observe", "hook:control"] } });
     expect(installed.limitations.join("\n")).toContain("trusted project");
 
@@ -1243,12 +1248,13 @@ describe("AMC Pi hook installation (P1-22)", () => {
       extensionSha256: sha256Hex(readFileSync(files.extension)), moduleSha256: sha256Hex(readFileSync(piModule)),
       createdDirs: [".pi", ".pi/extensions"], qualifiedPiVersions: ["1.0.2", "1.0.4"],
       receiptPublicKeys: getPurposeKeyHistory(workspace, "receipt"),
+      piInstall: { packageDir: piPackageDir, version: "1.0.4", sha256: expect.stringMatching(/^[a-f0-9]{64}$/) },
       control: { endpoint: "/hooks/control/v1", leaseScope: "hook:control", providerOutcomes: ["allow", "deny", "ask"] },
     });
     expect(readFileSync(files.ignore, "utf8")).toContain(".amc/hooks/");
     expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({ state: "installed", mode: "control", configOwned: true, issues: [] });
 
-    const again = installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control" });
+    const again = installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control", piPackageDir });
     expect(again).toMatchObject({ changed: false, lease: { leaseId: installed.lease.leaseId } });
   });
 
@@ -1264,7 +1270,7 @@ describe("AMC Pi hook installation (P1-22)", () => {
   test("status reports an edited extension as drifted and a tampered manifest or lease as invalid", () => {
     const workspace = newWorkspace();
     const files = piFiles(workspace);
-    installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control" });
+    installHookIntegration({ workspace, provider: "pi", agentId: "pi-agent", mode: "control", piPackageDir: fakePiPackage() });
     writeFileSync(files.extension, `${readFileSync(files.extension, "utf8")}// edited\n`);
     expect(getHookIntegrationStatus({ workspace, provider: "pi" })).toMatchObject({
       state: "drifted", configOwned: false, issues: [".pi/extensions/amc.js changed after installation"] });

@@ -1,5 +1,5 @@
 /** Workspace and request fixtures for the Pi tool_call control tests (P1-22). Same setup as tests/hookControl.test.ts. */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,11 +11,13 @@ import type { DiagnosticReport } from "../../src/types.js";
 import { initWorkspace } from "../../src/workspace.js";
 
 const roots: string[] = [];
+const workspaces: string[] = [];
 
 /** A fresh workspace with signed default policies, an observed high-trust run for `agentId`, and READ_ONLY/WRITE_LOW execution allowed. */
 export function controlledWorkspace(agentId: string): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-pi-control-"));
   roots.push(workspace);
+  workspaces.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "pi-control-test-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initApprovalPolicy(workspace);
@@ -37,7 +39,19 @@ export function controlledWorkspace(agentId: string): string {
   return workspace;
 }
 
+/** A stand-in for an installed Pi package (package.json and dist/bundle) at `version`, for a control installation to bind. */
+export function fakePiPackage(version = "1.0.4"): string {
+  const dir = mkdtempSync(join(tmpdir(), "amc-fake-pi-"));
+  roots.push(dir);
+  mkdirSync(join(dir, "dist", "bundle", "chunks"), { recursive: true });
+  writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "@earendil-works/pi-coding-agent", version, bin: { pi: "dist/bundle/cli.js" } }));
+  writeFileSync(join(dir, "dist", "bundle", "cli.js"), "#!/usr/bin/env node\n");
+  writeFileSync(join(dir, "dist", "bundle", "chunks", "runtime.js"), "export const hooks = true;\n");
+  return dir;
+}
+
 export function removeFixtureWorkspaces(): void {
+  workspaces.length = 0;
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 }
 
@@ -67,6 +81,10 @@ export interface PiEnvelopeOptions {
   toolCallId?: string;
   parentToolCallId?: string | null;
   nonce?: string;
+  /** Pi's working directory; by default the physical path of the latest fixture workspace, as Pi's process.cwd() reports it. */
+  cwd?: string;
+  /** Whether Pi's tool registry names Pi's own built-in for this tool (not an extension's tool of the same name). */
+  builtinTool?: boolean;
 }
 
 /** The body AMC's Pi extension posts for one Pi tool_call event. AMC derives the action id from session and call id. */
@@ -82,6 +100,8 @@ export function piEnvelope(toolName: string, input: Record<string, unknown>, opt
       toolCallId: options.toolCallId ?? "toolu_0001",
       parentToolCallId: options.parentToolCallId ?? null,
       nonce: options.nonce ?? "nonce-0001-aaaaaaaaaaaa",
+      cwd: options.cwd ?? realpathSync.native(workspaces.at(-1) ?? "."),
+      builtinTool: options.builtinTool ?? true,
     },
   });
 }

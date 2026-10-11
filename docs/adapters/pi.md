@@ -12,12 +12,13 @@ Pi has no sandbox, and every Pi extension, AMC's included, runs inside the Pi pr
 
 ## What AMC may claim
 
-- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only.
+- Control mode: "enforced at Pi's `tool_call` hook", per mapped tool, for qualified Pi versions only, in a Pi session registered under the current installation, and only while Pi's tool registry names Pi's own built-in for that tool name.
 - Not covered: OS containment; effects that bypass `tool_call` (another extension's own I/O, Pi Durable, Codemode-internal calls unless step 2 confirms they emit `tool_call`).
+- Not covered: an extension that rewrites Pi's tool registry itself. AMC denies a mapped tool name when Pi's registry does not name Pi's built-in for it (an extension tool registered under a built-in's name), but extensions run in Pi's process with full rights.
 - AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
+- A session registration is a lease-holder attestation: registration made with the session lease and matching on-disk extension and Pi digests. A process holding the lease can still attest without Pi. AMC cannot prove Pi executed the hook; it can prove only that every allowed call went through AMC with a signed receipt.
 - Pi ask is always denied until an AMC approval path exists.
 - Observe mode and `tool_result` data: "observed", never "enforced".
-- An `ask` answered in Pi's UI is a provider-local prompt, not AMC approval quorum; quorum policies deny.
 - A receipt proves AMC signed a decision, not that Pi honoured it; the pinned-version conformance run supports that.
 
 What step 2 found for these lines:
@@ -30,20 +31,22 @@ What step 2 found for these lines:
 
 | Pi tool | AMC evaluates it as | Lowest class the signed config may give it | Claim in control mode |
 |---|---|---|---|
-| `read` | `fs.read` on `input.path` (required) | `READ_ONLY` | enforced at Pi's `tool_call` hook |
-| `grep`, `find`, `ls` | `fs.read` on `input.path`, else the working directory | `READ_ONLY` | enforced at Pi's `tool_call` hook |
-| `write`, `edit` | `fs.write` on `input.path` (required) | `WRITE_LOW` | enforced at Pi's `tool_call` hook |
+| `read` | `fs.read` on every location Pi may open for `input.path` (required), its macOS name variants included | `READ_ONLY` | enforced at Pi's `tool_call` hook |
+| `grep`, `find`, `ls` | `fs.read` on the location Pi opens for `input.path`, else the working directory | `READ_ONLY` | enforced at Pi's `tool_call` hook |
+| `write`, `edit` | `fs.write` on the location Pi opens for `input.path` (required) | `WRITE_LOW` | enforced at Pi's `tool_call` hook |
 | `bash` | the shell command plan of `input.command`: `process.spawn` per command, `git.*` for git subcommands | `WRITE_HIGH` for `process.spawn`; `git.*` keep their signed classes | enforced at Pi's `tool_call` hook |
 | `powershell`, `codemode`, `tool_search`, MCP tools, any extension tool, any other name | not mapped | none | denied (the deny is enforced at the hook) |
 | effects outside `tool_call` | not seen | none | not covered |
 
-A signed ToolHub config that gives a mapped tool a lower class than this table is denied, never treated as permission. Under AMC's default signed policies `read` is allowed inside `./workspace/**`, `write` and `edit` need one approval (so Pi denies them) and `bash` runs `process.spawn`, which needs an exec ticket (so Pi denies it). Widening that posture is an operator decision.
+A mapped name whose tool in Pi's registry is not Pi's built-in (`sourceInfo.path` other than `builtin:<name>`) is denied. A signed ToolHub config that gives a mapped tool a lower class than this table is denied, never treated as permission.
+
+AMC evaluates the location Pi opens, not the string the model wrote, so ToolHub's path lists and its protected `.amc` floor apply to the real target. It resolves a path as Pi 1.0.2 and 1.0.4 do (`dist/utils/paths.js`, `dist/core/tools/path-utils.js`): Unicode spaces become spaces, a leading `@` is stripped, `file://` URLs are converted and the rest resolves against Pi's working directory. It then follows symlinks as the OS does, with the case the file system stores. AMC denies a path it cannot resolve as Pi does: `~` and `~/…` (Pi expands them with its own HOME), a file URL Pi rejects, a dangling symlink, any path on Windows, and any call from a Pi whose working directory is not the AMC workspace. Under AMC's default signed policies `read` is allowed inside `./workspace/**`, `write` and `edit` need one approval (so Pi denies them) and `bash` runs `process.spawn`, which needs an exec ticket (so Pi denies it). Widening that posture is an operator decision.
 
 ## Install
 
 ```bash
 amc up                                                   # the loopback Bridge control needs
-amc connect hooks install --provider pi --agent my-agent --mode control --dry-run
+amc connect hooks install --provider pi --agent my-agent --mode control --dry-run   # with the `pi` you run on PATH
 amc connect hooks install --provider pi --agent my-agent --mode control
 amc connect hooks status --provider pi
 amc connect hooks health --provider pi
@@ -55,41 +58,44 @@ amc connect hooks remove --provider pi
 
 - `.pi/extensions/amc.js`: imports AMC's `dist/adapters/pi/amcPiExtension.js` by absolute path and starts it for this workspace and mode. It reads Pi's `VERSION` itself, because Pi resolves its own module only for files it loads directly.
 - `.amc/hooks/pi.lease`: a dedicated lease (`hook:observe`, plus `hook:control` in control mode), mode `0600`.
-- `.amc/hooks/pi.json` and `.sig`: a manifest signed by the workspace auditor key. It binds the SHA-256 of `.pi/extensions/amc.js` and of AMC's extension module, the lease, the Bridge origin, the qualified versions and the public keys of AMC's `receipt` signing purpose (P1-08) at install.
+- `.amc/hooks/pi.json` and `.sig`: a manifest signed by the workspace auditor key. It binds the SHA-256 of `.pi/extensions/amc.js` and of AMC's extension module, the lease, the Bridge origin, the qualified versions and the public keys of AMC's `receipt` signing purpose (P1-08) at install. In control mode it also binds the Pi install sessions must run: the `@earendil-works/pi-coding-agent` package behind `pi` on `PATH` (the `piPackageDir` option names it programmatically), its version and one SHA-256 over its `package.json` and the directory holding its `bin.pi` entry (`dist/bundle`, the code the CLI runs). With no Pi found it binds none, and no session can register.
 - the managed `.gitignore` block for `.amc/hooks/`.
 
-`status` reports an edited extension file, a changed AMC module or changed AMC receipt keys as `drifted`; reinstall to bind them. `remove` deletes only these files and the `.pi` directories the install created, and revokes the lease.
+`status` reports an edited extension file, a changed AMC module, changed AMC receipt keys or a changed, upgraded or removed Pi install as `drifted`; reinstall to bind them. A reinstall starts with no registered sessions, so running Pi sessions must restart. `remove` deletes only these files and the `.pi` directories the install created, and revokes the lease.
 
 ### Pi must load the extension
 
 Pi loads `.pi/extensions/` only for a trusted project (Pi's `docs/security.md`, "Understand project trust"). Print, JSON and RPC modes skip it unless the project is trusted (`/trust`), `defaultProjectTrust` is `"always"`, or the run passes `--approve`. `pi -e .pi/extensions/amc.js` loads it explicitly. If Pi does not load it (trust declined, `--no-extensions` without `-e`, a load error), nothing is enforced and AMC records nothing. The conformance run pins this: with `--no-approve` a write that AMC would deny runs, and AMC records no decision. `hooks health` showing no events for a project you expect to be controlled is the signal.
 
-## Session registration: proof the extension ran
+## Session registration: a lease-holder attestation
 
-A claim for a Pi session comes only from AMC's own record that its extension ran in that session. In control mode the extension registers each Pi session at `session_start` (and, if that failed, before the session's first call): `{ hook_event_name: "session_start", pi: { version, mode, sessionId, extensionSha256 } }`, where `extensionSha256` is the SHA-256 of the extension module that is running. AMC refuses a registration from an installation that is not a signed control installation, for another agent, or whose module digest differs from the one the signed manifest bound. Otherwise it records a registration (`amc.pi-session-registration/v1`: agent, SHA-256 of the session id, Pi version, module digest, mode, qualified or not, request digest) with a `work_accepted` receipt signed by the `receipt` purpose key. The extension accepts it only if that receipt verifies under the pinned keys and binds what it sent. Re-registering a session with other values is a conflict.
+A claim for a Pi session comes only from a registration AMC recorded for that session under the current installation. In control mode the extension registers each Pi session at `session_start` (and, if that failed, before the session's first call): `{ hook_event_name: "session_start", pi: { version, mode, sessionId, extensionSha256 } }`, where `extensionSha256` is the SHA-256 of the extension module that is running. AMC refuses a registration from an installation that is not a signed control installation, or for another agent. It then measures the disk itself and refuses any mismatch with the signed manifest: the installed `.pi/extensions/amc.js`, AMC's extension module, and the bound Pi install (version and digest). The session must report the bound Pi's version. Otherwise AMC records a registration (`amc.pi-session-registration/v1`: agent, SHA-256 of the session id, the Pi version read from disk, module digest, AMC's digest of the Pi install, the manifest's digest, mode, qualified or not, request digest) with a `work_accepted` receipt signed by the `receipt` purpose key. The extension accepts it only if that receipt verifies under the pinned keys and binds what it sent. Re-registering a session with other values is a conflict.
 
-- A call in a Pi session without a verified registration is denied: the session is not governed, and nothing reads "enforced".
+What a registration is: registration made with the session lease and matching on-disk extension and Pi digests. What it is not: proof that Pi ran. A process holding the lease can still attest without Pi. AMC cannot prove Pi executed the hook; it can prove only that every allowed call went through AMC with a signed receipt.
+
+- A call in a Pi session without a verified registration under the current installation is denied: the session is not governed, and nothing reads "enforced".
 - A call naming another Pi version than its session registered is denied.
 - A registration whose ledger row or receipt fails verification counts as none: the call is denied and `status` reports the workspace invalid.
-- `amc connect hooks status|health --provider pi` derive the claim from registrations: `enforced_at_pi_tool_call` when at least one registered session runs a qualified Pi, otherwise `not_governed` (observe installations read `observed`). They always add: AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
+- `amc connect hooks status|health --provider pi` derive the claim from registrations under the current manifest: `enforced_at_pi_tool_call` when the installation's status is `installed` and at least one such session runs a qualified Pi, otherwise `not_governed` (observe installations read `observed`). A drifted, expired or invalid installation, or a reinstall no session has registered under yet, reads `not_governed`. They always add: AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
 
 ## How a decision is made and bound
 
-1. On `tool_call` the extension checks the event shape (`toolName`, `toolCallId`, plain-object `input`), posts an `action.requested` observation, then posts `{ hook_event_name: "tool_call", tool_name, tool_input, pi: { version, mode, sessionId, toolCallId, parentToolCallId, nonce } }` to `/bridge/hooks/control/v1` with the lease. Its wait is bounded at 5 s.
-2. AMC derives the action id from Pi's session id and call id (an id the payload names is ignored), refuses a Pi version outside the qualified set (an unreadable one included), maps the tool with the table above and evaluates the signed ToolHub config, Action Policy and Approval Policy.
+1. On `tool_call` the extension checks the event shape (`toolName`, `toolCallId`, plain-object `input`). It requires the input to be plain JSON data (no getters, proxies, class instances, symbol keys, array holes or non-finite numbers) and freezes it in place, all the way down, before anything is sent. Pi runs that very object (pi-agent-core `prepareToolCall` passes the same `args` to the hook and to `execute`), so no code can change what runs while AMC decides or afterwards: a mutation throws, and Pi blocks a throwing handler. It then posts an `action.requested` observation and `{ hook_event_name: "tool_call", tool_name, tool_input, pi: { version, mode, sessionId, toolCallId, parentToolCallId, nonce, cwd, builtinTool } }` to `/bridge/hooks/control/v1` with the lease, where `cwd` is Pi's working directory and `builtinTool` says whether Pi's registry (`getAllTools()`) names Pi's own built-in for this tool. Its wait is bounded at 5 s.
+2. AMC derives the action id from Pi's session id and call id (an id the payload names is ignored), refuses a Pi version outside the qualified set (an unreadable one included), a working directory other than the workspace and a mapped name that is not Pi's built-in, maps the tool with the table above at the locations Pi opens, and evaluates the signed ToolHub config, Action Policy and Approval Policy.
 3. AMC requires a verified registration of this Pi session for this Pi version (above); without one the call is denied.
 4. An allow binds a P1-02 authorization record: principal and delegation from the hook lease, normalized-argument and policy digests, idempotency key = Pi's call id, execution id = AMC's action id. A record that cannot bind (expired lease, a class the lease does not cover) denies.
 5. Pi's response is `{ block: false, requestSha256 }` or `{ block: true, reason, requestSha256 }`, where `requestSha256` is the digest of the exact request. AMC records a v2 `action_state` receipt (`authorized` or `denied`, with the record digest and `enforcement: { level: "enforced", boundary: "pi:tool_call" }` only for a registered session of a qualified Pi) whose body digest covers that response. Receipts are signed with P1-08's `receipt` purpose key.
-6. The extension allows only if the receipt verifies under a `receipt` purpose key pinned at install and binds this action, call id, request digest and state. It then freezes the call's input: a Pi handler that runs after AMC and tries to change it throws, and Pi blocks a throwing handler.
+6. The extension allows only if the receipt verifies under a `receipt` purpose key pinned at install and binds this action, call id, request digest and state, and only if the input still serialises to what it sent.
 
-Each request carries a fresh nonce, so a decision is single-use: re-sending the same call (for example from a restarted Pi) is a conflict, never a second decision, and the call is blocked. Any error, timeout, HTTP error, malformed or unbound answer, bad signature, missing or non-`0600` lease, missing or mismatched manifest, unrecognised event or Bridge outage blocks the call with `AMC control unavailable; action denied.` Observe mode never blocks.
+Each request carries a fresh nonce, so a decision is single-use: re-sending the same call (for example from a restarted Pi) is a conflict, never a second decision, and the call is blocked. Any error, timeout, HTTP error, malformed or unbound answer, bad signature, missing or non-`0600` lease, missing or mismatched manifest, unrecognised event, input that is not plain data or Bridge outage blocks the call with `AMC control unavailable; action denied.` Observe mode never blocks.
 
 On `tool_result` the extension posts `action.completed` or `action.failed` without arguments, output or error text. These are observations, never enforcement.
 
 ## Limits
 
 - AMC decides before Pi executes and cannot recheck at execution the way AMC's own tool pipeline does; the receipt records the decision, the conformance run supports that Pi honours it.
-- Pi runs `tool_call` handlers in load order (project `.pi/extensions`, then `~/.pi/agent/extensions`, then configured and `-e` paths) and stops at the first block. An extension loaded before AMC can change the input AMC sees (AMC decides on what it sees, which is what runs). One loaded after AMC cannot change an allowed call's input, but it can block it or act outside `tool_call`.
+- Pi runs `tool_call` handlers in load order (project `.pi/extensions`, then `~/.pi/agent/extensions`, then configured and `-e` paths) and stops at the first block. An extension loaded before AMC can change the input AMC sees (AMC decides on what it sees, which is what runs). Once AMC's handler starts, no code can change the input, but a later handler can block the call or act outside `tool_call`.
+- AMC resolves paths when it decides; Pi opens them when it runs. A symlink swapped in between is outside the hook (OS containment is not covered).
 - Pi waits on a handler without a limit; AMC bounds its own wait (5 s). A handler from another extension can still hang a call.
 - Qualification covers the `pi` CLI, whose bundle embeds its agent runtime. Embedding Pi through its SDK resolves `@earendil-works/pi-agent-core` from `node_modules` (1.1.0 on 2026-10-12) and reports mode `print`; it is not qualified.
 - Receipts and registrations are signed with the workspace's `receipt` purpose key: a local audit trail, not a portable verdict.
