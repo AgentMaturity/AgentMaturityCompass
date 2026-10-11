@@ -8,6 +8,7 @@
  */
 import type { CompiledPlan, PlanDiff } from "../../catalog/compiler/types.js";
 import { digestOf } from "../../catalog/digest.js";
+import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { STATIONS } from "../../domains/stations.js";
 import {
@@ -143,6 +144,12 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
   return { missing, stale, invalid, carried: carriedGaps };
 }
+
+/**
+ * The `plan.lockDigest` digest of a catalog lock: digestOf the lock without `generatedBy` (the AMC version that built it),
+ * which verifyCatalogLock ignores as informational, so an AMC upgrade with an unchanged catalog moves nothing.
+ */
+export const lockDigestOf = (lock: CatalogLockfile): string => digestOf({ ...lock, generatedBy: null });
 
 /** Whether `spec` is the proposal Propose built for exactly these answers. */
 export const proposedFor = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
@@ -280,7 +287,7 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
   const settled = ownerOutOfScope(state, plan, query.now);
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const boundLock = revision === undefined ? null : flatSlots(JSON.parse(revision.resource_digests_json))["plan.lockDigest"] ?? null;
-  const lockMoved = query.live.driftedSlots?.includes("plan.lockDigest") === true || (boundLock !== null && boundLock !== digestOf(plan.lock));
+  const lockMoved = query.live.driftedSlots?.includes("plan.lockDigest") === true || (boundLock !== null && boundLock !== lockDigestOf(plan.lock));
   return [
     item("plan_compiled", "READY", { reasonCodes: [`PLAN_STATUS:${plan.status}`, `PLAN:${plan.digest.replace(/^sha256:/, "").slice(0, 16)}`,
       `REQUIREMENTS:${plan.requirements.length}`] }),
@@ -301,25 +308,38 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
   ];
 }
 
+/** This project's DeploymentProfile id (adaptPolicy.profileFromAnswers): one profile per project. */
+export const profileIdOf = (projectId: string): string => `a4-${projectId}`;
+
 /**
  * The signing and activation items. Build signs the proposed plan; Review records the conformance statement. A regulated
  * project activates the plan at completion through the effect a4.adapt.activate_plan, so `plan_activated` waits, from
- * Review on (it never holds the direction gate), until an owner opens it on this cycle's completion gate (complete then
- * runs it; consumeGate refuses a plain consumption while it is open). A non-regulated project completes with the plan
- * signed and not activated (PLAN_SIGNED_NOT_ACTIVATED); an owner may still open the effect. Whenever activation is due
- * (regulated) or opened, a plan activateControlPlan is certain to refuse reads BLOCKED before any gate is consumed: a
- * blocked plan, or one weaker than the workspace's active plan (Review's check of this build, else Understand's).
+ * Review on (it never holds the direction gate), until an owner opens it on this cycle's completion gate before
+ * completing (complete then runs it; consumeGate refuses a plain consumption while it is open). A non-regulated project
+ * completes with the plan signed and not activated (PLAN_SIGNED_NOT_ACTIVATED, once Build signed it); an owner may still
+ * open the effect before completing. So does a regulated project while another profile's plan is active: the workspace
+ * has one active plan for every agent, and activating this one would replace it (activateControlPlan refuses it as a
+ * weakening while each plan carries one agent's budgets). Whenever activation is due or opened, a plan
+ * activateControlPlan is certain to refuse reads BLOCKED from Review on, before any gate is consumed (before Review, a
+ * WAITING item that is not mandatory, so it never holds the direction gate): a blocked plan, or one weaker than the
+ * workspace's active plan (Review's check of this build, else Understand's). An open made after the gate was consumed
+ * counts only once an attempt follows it (rerunExecutorEffect).
  */
 function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Record<string, unknown>, answers: readonly A4Answer[], revisionNo: number | null,
   regulated: boolean): A4ReadinessItem[] {
   const proposed = proposedFor(spec, answers);
   const build = proposed ? buildOf(spec) : null;
   const review = (proposed && build !== null ? spec.review ?? null : null) as { conformance?: { status?: unknown; reason?: unknown;
-    counts?: Record<string, unknown> }; head?: { weakensActive?: unknown } } | null;
+    counts?: Record<string, unknown> }; head?: { weakensActive?: unknown; activePlan?: unknown } } | null;
   const completionGateId = [...state.chain].reverse().find((link) => link.kind === "GATE_REQUESTED" && link.body.stage === "adapt"
     && link.body.gate === "completion" && link.revisionNo === revisionNo)?.body.gateId;
+  const consumed = completionGateId === undefined ? undefined
+    : state.chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === completionGateId);
+  const startedAfter = (seq: number): boolean => state.chain.some((link) => link.kind === "EFFECT_STARTED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID
+    && link.body.gateId === completionGateId && link.seq > seq);
   const opened = completionGateId === undefined ? undefined : [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED"
-    && link.body.effect === ACTIVATE_PLAN_EFFECT_ID && link.body.gateId === completionGateId);
+    && link.body.effect === ACTIVATE_PLAN_EFFECT_ID && link.body.gateId === completionGateId
+    && (consumed === undefined || link.seq < consumed.seq || startedAfter(link.seq)));
   // Only this cycle's activation counts: a TUNE or REOPEN leaves an earlier cycle's EFFECT_FINISHED on the chain.
   const attempts = new Set(state.chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID
     && completionGateId !== undefined && link.body.gateId === completionGateId).map((link) => link.body.effectId));
@@ -329,13 +349,30 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
   const plan = currentPlan(spec, answers);
   // The workspace has one active plan for every agent: activating this one replaces it, and activateControlPlan refuses
   // a plan weaker than it (Adapt never passes allowWeakening), so another profile's active plan is named up front.
+  // Review's read of this build, else Understand's; an unknown profile (unreadable, not recorded) counts as this project's.
   const facts = understandingOf(spec)?.facts;
-  const active = facts?.activePlan as { planDigest?: unknown } | null | undefined;
-  const replaces = typeof active?.planDigest === "string" && active.planDigest !== plan?.digest ? ["REPLACES_ACTIVE_PLAN"] : [];
+  const active = (review?.head !== undefined ? review.head.activePlan : facts?.activePlan) as { planDigest?: unknown; profileId?: unknown } | null | undefined;
+  const otherProfile = typeof active?.profileId === "string" && active.profileId !== profileIdOf(state.project.project_id);
+  const replaces = typeof active?.planDigest === "string" && active.planDigest !== plan?.digest
+    ? ["REPLACES_ACTIVE_PLAN", ...(otherProfile ? ["ACTIVE_PLAN_OF_ANOTHER_PROFILE"] : [])] : [];
   const weakens = review?.head?.weakensActive ?? (plan === null ? undefined : facts?.activationWeakenings);
   const refusal = Array.isArray(weakens) ? (weakens.length === 0 ? null : ["PLAN_WEAKENS_ACTIVE_PLAN", `WEAKENINGS:${weakens.length}`])
     : weakens === undefined || weakens === null ? null : ["ACTIVE_PLAN_UNREADABLE"];
-  const activating = regulated || opened !== undefined;
+  const due = (regulated && !otherProfile) || opened !== undefined;
+  const blocker: Fields | null = !due || finished ? null
+    : plan !== null && plan.status !== "ready" ? { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
+      nextAction: { label: "Only a ready plan activates (activateControlPlan refuses any other): resolve every mandatory requirement" } }
+      : refusal === null ? null : { kind: refusal[0] === "ACTIVE_PLAN_UNREADABLE" ? "source_unavailable" : "scope_changed", reasonCodes: [...refusal, ...replaces],
+        nextAction: { label: refusal[0] === "ACTIVE_PLAN_UNREADABLE"
+          ? "The workspace's active compiled plan does not verify, so activation would be refused: restore it, then run Understand or Review again"
+          : "Activation would weaken the workspace's active plan, and activateControlPlan refuses that. A workspace has one active plan for every agent, so "
+            + "a plan compiled for this agent cannot replace another agent's active plan until per-agent plans exist" } };
+  const signedNotActivated = otherProfile
+    ? "Plan signed, not activated: another profile's plan is active in this workspace, and a workspace has one active plan for every agent. Activating "
+      + "this one would replace it (activateControlPlan refuses that as a weakening until per-agent plans exist), so this project completes with its plan signed"
+    : "Plan signed, not activated (the default for a non-regulated project). Activation is an explicit owner effect: open "
+      + `${ACTIVATE_PLAN_EFFECT_ID} on the completion gate before completing; once it finishes this project is regulated, and so is every project whose `
+      + "next revision records the active plan";
   const items = [
     build !== null ? item("plan_signed", "READY", { section: "implementation", reasonCodes: ["CONTROL_PLAN_SIGNED", "WORKSPACE_KEYS_ONLY"] })
       : waiting("plan_signed", ["PRODUCED_AT_BUILD"], { section: "implementation", mandatory: reached(state, "direction_approved") }),
@@ -349,19 +386,16 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
       : item("plan_review_opened", "WAITING", { kind: "review_pending", section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"],
         nextAction: { label: `Once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}: a second, separately decided plan review` } }),
     finished ? item("plan_activated", "READY", { reasonCodes: ["PLAN_ACTIVATED"] })
-      : activating && plan !== null && plan.status !== "ready" ? item("plan_activated", "BLOCKED", { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
-        nextAction: { label: "Only a ready plan activates (activateControlPlan refuses any other): resolve every mandatory requirement" } })
-      : activating && refusal !== null ? item("plan_activated", "BLOCKED", { kind: refusal[0] === "ACTIVE_PLAN_UNREADABLE" ? "source_unavailable" : "scope_changed",
-        reasonCodes: [...refusal, ...replaces], nextAction: { label: refusal[0] === "ACTIVE_PLAN_UNREADABLE"
-          ? "The workspace's active compiled plan does not verify, so activation would be refused: restore it, then run Understand or Review again"
-          : "Activation would weaken the workspace's active plan, and activateControlPlan refuses that. A workspace has one active plan for every agent, so "
-            + "a plan compiled for this agent cannot replace another agent's active plan until per-agent plans exist" } })
-      : opened !== undefined ? item("plan_activated", "READY", { reasonCodes: ["ACTIVATED_AT_COMPLETION", ...replaces] })
-        : regulated ? waiting("plan_activated", ["PLAN_NOT_ACTIVATED", ...replaces], { kind: "review_pending", mandatory: reached(state, "reviewed"),
+      : blocker !== null ? item("plan_activated", reached(state, "reviewed") ? "BLOCKED" : "WAITING", { ...blocker, mandatory: reached(state, "reviewed") })
+      : opened !== undefined ? (consumed === undefined ? item("plan_activated", "READY", { reasonCodes: ["ACTIVATED_AT_COMPLETION", ...replaces] })
+        : waiting("plan_activated", ["PLAN_ACTIVATION_NOT_FINISHED", ...replaces], { kind: "review_pending", mandatory: false,
+          nextAction: { label: `The activation complete started has not finished (effects.failed says why): after a failure an owner re-opens ${ACTIVATE_PLAN_EFFECT_ID}, then complete runs it again` } }))
+        : due ? waiting("plan_activated", ["PLAN_NOT_ACTIVATED", ...replaces], { kind: "review_pending", mandatory: reached(state, "reviewed"),
           nextAction: { label: `A regulated project activates its plan at completion: once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}` } })
-          : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: "Plan signed, not activated (the default for a "
-            + `non-regulated project). Activation is an explicit owner effect (${ACTIVATE_PLAN_EFFECT_ID} on the completion gate); once it finishes this project `
-            + "is regulated, and so is every project whose next revision records the active plan" } })
+          : build === null ? waiting("plan_activated", ["PRODUCED_AT_BUILD", ...replaces], { mandatory: false,
+            nextAction: { label: "Build signs the plan; this project then completes with it signed, not activated, unless an owner opens the activation" } })
+            // Another profile's plan is never this plan (the profile id is part of the plan), so `replaces` names it.
+            : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: signedNotActivated } })
   ];
   // AMC's own CONTROL_RESULT signature check, as Review recorded it and as the file reads now (live): integrity of bytes
   // under this workspace's keys, never a lane, never a claim. Only a notary-route signature or an unpinned issuer is a
@@ -390,9 +424,18 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
  * lease. Since P1-67 a Studio workspace-tools task started or resumed after activation runs under a lease Studio mints
  * with the workspace's lease key, so the item is READY through P1-67 and names who is still denied rather than hiding
  * them. Studio refuses to start such a task when no lease can be minted (LEASE_UNAVAILABLE), so a locked vault keeps the
- * item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY.
+ * item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound
+ * journal head decides only while it is current: a head moved since (an activation from the CLI or another project), a
+ * journal that no longer verifies (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated: boolean): A4ReadinessItem {
+  const drifted = query.live.driftedSlots;
+  if (drifted === null || drifted.includes("plan.journalEntrySha256")) {
+    return item("adapt.plan.nativeSessionsAllowed", "NOT_EVALUATED", { section: "governance", mandatory: false,
+      kind: drifted === null ? "source_unavailable" : "scope_changed", reasonCodes: [drifted === null ? "PLAN_JOURNAL_UNREAD" : "PLAN_HEAD_MOVED_OR_UNREADABLE", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`],
+      nextAction: { label: "The compiled-plan journal's head moved since this revision (an activation, this project's own included), or it does not verify "
+        + "(then every session is refused): the next revision records the head again" } });
+  }
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const head = revision === undefined ? null : flatSlots(JSON.parse(revision.resource_digests_json))["plan.journalEntrySha256"] ?? null;
   const active = head !== null || state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID);
@@ -436,7 +479,7 @@ function memoryItem(state: A4ReadinessState, spec: Record<string, unknown>, answ
     return waiting("memory_policy_present", [`ENFORCE_MANIFEST_NOT_WRITTEN:${manifest === undefined ? "UNKNOWN" : manifest.error}`, ...facts], { section: "implementation",
       nextAction: { label: "Build wrote the memory policy but no signed Enforce manifest after it, so the agent reads DRIFTED in Enforce: build again" } });
   }
-  return item("memory_policy_present", "READY", { section: "implementation", reasonCodes: [...facts, checked === null ? "CHECKED_AT_REVIEW" : "MEMORY_POLICY_PARSES"] });
+  return item("memory_policy_present", "READY", { section: "implementation", reasonCodes: [...facts, checked === null ? "REVIEW_RECHECK_PENDING" : "MEMORY_POLICY_PARSES"] });
 }
 
 /** Informational items: clocks to classify, the completion rule's required reviews by kind, the sources' status, data handling. */

@@ -31,8 +31,8 @@ import type { A4Answer } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import {
-  ADAPT_SPEC_SCHEMA, ACTIVATE_PLAN_EFFECT_ID, CATALOG_EXPERIMENTAL_NOTICE, FACTS, buildOf, factAnswer, factList, factTerm, proposedPlan, type AdaptBuild,
-  type AdaptFact
+  ADAPT_SPEC_SCHEMA, ACTIVATE_PLAN_EFFECT_ID, CATALOG_EXPERIMENTAL_NOTICE, FACTS, buildOf, factAnswer, factList, factTerm, lockDigestOf, profileIdOf, proposedPlan,
+  type AdaptBuild, type AdaptFact
 } from "./spec/adapt.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
@@ -40,13 +40,14 @@ const hexOf = (digest: string): string => digest.replace(/^sha256:/, "");
 
 let shippedLock: string | undefined;
 /**
- * digestOf the lock of the catalog this AMC ships (`plan.lockDigest`), the digest an active plan's lockfile is checked
- * against. ponytail: memoized per process; the shipped catalog changes only with an AMC upgrade, which restarts Studio.
+ * The lock digest (lockDigestOf: `generatedBy` left out, as verifyCatalogLock leaves it out) of the catalog this AMC
+ * ships (`plan.lockDigest`), the digest an active plan's lockfile is checked against. ponytail: memoized per process;
+ * the shipped catalog changes only with an AMC upgrade, which restarts Studio.
  */
 export function shippedLockDigest(): string {
   if (shippedLock !== undefined) return shippedLock;
   try {
-    shippedLock = digestOf(buildCatalogLock(loadCatalog()));
+    shippedLock = lockDigestOf(buildCatalogLock(loadCatalog()));
   } catch {
     throw fail(409, "RESOURCE_UNREADABLE", "plan.lockDigest: the shipped catalog did not load cleanly");
   }
@@ -61,7 +62,7 @@ export function profileFromAnswers(input: { projectId: string; workspaceId: stri
     return { value, provenance: "asserted", source: `a4:${input.projectId}${answer === undefined ? "" : `@r${answer.answeredAtRevision}`}`, reviewedBy: null };
   };
   return {
-    profileVersion: 1, profileId: `a4-${input.projectId}`,
+    profileVersion: 1, profileId: profileIdOf(input.projectId),
     deployment: { tenantId: input.workspaceId, workspaceId: input.workspaceId, deploymentId: input.projectId, agentIds: [input.agentId] },
     ...Object.fromEntries((Object.keys(FACTS) as AdaptFact[]).map((name) => [name, fact(name)])),
     euRoleRecord: null, art63Record: null, operatingProfile: null, exceptions: []
@@ -93,6 +94,21 @@ function configStates(workspace: string): Record<string, { state: "valid" | "mis
     firewall: typeof firewall === "string" ? { state: firewall === "trusted" ? "valid" : firewall === "uninitialized" ? "missing" : "invalid", reason: null }
       : { state: "invalid", reason: firewall.error }
   };
+}
+
+/**
+ * The active compiled plan's head as Adapt records it (Understand and Review), with the profile it was compiled for;
+ * null when none is active. Throws when the journal or the shipped catalog against its lock does not verify. The
+ * profile id is read from the journal's plan of the same digest, else null (unknown: readiness then treats the plan
+ * as this project's, so activation stays due).
+ */
+export function activePlanRecord(workspace: string): { revision: number; planDigest: string; lockDigest: string; policyDigest: string; entrySha256: string;
+  profileId: string | null } | null {
+  const active = loadActiveCompiledPolicy(workspace);
+  if (active === null) return null;
+  const plan = activeControlPlan(workspace);
+  return { revision: active.revision, planDigest: active.planDigest, lockDigest: active.lockDigest, policyDigest: active.runtimePolicy.policyDigest,
+    entrySha256: active.entrySha256, profileId: plan?.digest === active.planDigest ? plan.profile.profileId : null };
 }
 
 /**
@@ -141,7 +157,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
   const register = [...new Map(stations.flatMap((station) => getRegisterEntriesForStation(station)).map((entry) => [entry.id, {
     id: entry.id, instrument: entry.instrument, jurisdiction: entry.jurisdiction, status: entry.status, bindingForce: entry.bindingForce, verified: entry.verified,
     openQuestions: entry.openQuestions.length }])).values()];
-  const active = attempt(() => loadActiveCompiledPolicy(input.workspace));
+  const active = attempt(() => activePlanRecord(input.workspace));
   const weakens = plan === null ? [] : attempt(() => activationWeakenings(input.workspace, plan!).slice(0, 32));
   const requirements = plan !== null && profile !== null && catalog !== null ? whyView(plan, profile, catalog) : [];
   return {
@@ -150,8 +166,7 @@ export function understandAdapt(input: { workspace: string; projectId: string; w
     followUps: [...new Set(requirements.flatMap((row) => [...row.missingFacts, ...row.citations.flatMap((citation) => citation.missingFacts)]))].sort(),
     requirements,
     register, clocks: clockCandidates(stations, jurisdictions), configs: configStates(input.workspace),
-    activePlan: active === null ? null : "error" in active ? active : { revision: active.revision, planDigest: active.planDigest, lockDigest: active.lockDigest,
-      policyDigest: active.runtimePolicy.policyDigest, entrySha256: active.entrySha256 },
+    activePlan: active,
     // What activation would refuse against the active plan now (a list, or the journal's error code); Review checks it again.
     activationWeakenings: weakens
   };
