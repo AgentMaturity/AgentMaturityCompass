@@ -3,7 +3,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-conformance-statement.schema.json",
       "name": "a4-conformance-statement.schema.json",
-      "sha256": "ac4ffb3cc6e95f70c6896b918f8c2b46a4e6a6a0db964d994016ab7f44d7d08b"
+      "sha256": "fb61776a00ccfb5fbfd696d7d1c855d64c06577675638c975c3ea2fb7d53fde8"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-decision.schema.json",

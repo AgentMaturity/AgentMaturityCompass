@@ -12886,7 +12886,12 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/conformance:
     get:
-      summary: "Conformance statement: not evaluated until Adapt's producer (P1-61)"
+      summary: "The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's
+        signed control results, checked again now (a results file edited, deleted or no longer verifying reads
+        not_evaluated with its reason), with the owner's out-of-scope settlements, the sources acknowledgement
+        and the deferred-activation acknowledgement on that Adapt revision as readiness counts them (once its
+        completion gate is consumed, the ones in force then); every other stage carries no plan and says
+        not_evaluated"
       tags:
         - Studio
         - A4 Forge
@@ -12910,7 +12915,7 @@ paths:
               - assemble
               - adapt
               - activate
-          description: Stage.
+          description: Defaults to the head stage.
       responses:
         "200":
           description: Current A4 state; no-store.
@@ -14129,6 +14134,104 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/stages/adapt/probe:
+    post:
+      summary: "Adapt context probe, after Build (owner, owner mode): one in-process turn on the stub provider with
+        the A4 context plugin, into which A4 writes nothing; the session's session/open row becomes a
+        self_reported ledger_event ref (A4 ran the turn: never observed) beside whether the plugin's exact text
+        is in the session's signed user/message row; the turn makes no tool call, so the runtime writes no
+        effective-policy receipt; delivery to a model and to native tasks is not evaluated"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Control"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/approvals/{approvalRequestId}/approve:
     post:
       summary: Approve an engine request this project named (an effect gate it opened, an outcome_unknown resolution
@@ -15271,8 +15374,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
-      summary: "Build (step built): the stage's producer (aspire and assemble: owner, owner mode; assemble's native
-        build session starts after the step is recorded and the response names it), or a self_reported
+      summary: "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's
+        native build session starts after the step is recorded and the response names it), or a self_reported
         human-authored implementation ref while it has none"
       tags:
         - Studio
@@ -15377,8 +15480,8 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/review:
     post:
-      summary: "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an
-        observed ref"
+      summary: "Review (step reviewed): the stage's producer checks (adapt: owner, owner mode, since it signs the
+        control results), or human findings; not_evaluated without an observed ref"
       tags:
         - Studio
         - A4 Forge

@@ -22,8 +22,9 @@ import { networkInterfaces } from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z, ZodError } from "zod";
 import { A4BlobError } from "../a4/a4Blobs.js";
+import { conformanceView } from "../a4/a4Conformance.js";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
-import { A4_API_PREFIX, headStage, unboundClaim as a4UnboundClaim } from "../a4/a4Router.js";
+import { A4_API_PREFIX, headStage } from "../a4/a4Router.js";
 import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage } from "../a4/a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
@@ -268,11 +269,14 @@ export function registerA4Tools(server: McpServer, host: Host): void {
 
   server.tool("amc_a4_conformance", TOOLS[3]!.description, { projectId, stage, workspace }, async (args) =>
     a4Tool(host, "amc_a4_conformance", args.workspace, `${projectPath(args.projectId)}/conformance`, "GET", (ctx) => {
-      readable(ctx, args.projectId);
-      // The router's answer until Adapt (P1-61) registers the producer: nothing is evaluated.
-      const body = { projectId: args.projectId, view: "conformance", status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
-        claim: a4UnboundClaim(args.projectId, "conformance", true) };
-      return withClaim(`A4 conformance for ${args.projectId}: not evaluated (NO_PRODUCER_REGISTERED).`, body.claim, body);
+      const state = readable(ctx, args.projectId);
+      // The router's answer (conformanceView): counts per result, never a percentage; a stage without a reviewed plan says not_evaluated.
+      const stage = args.stage ?? headStage(state.project);
+      const statement = conformanceView(ctx.store.workspace, state, stage, ctx.now, () => readinessAt(ctx, state, "adapt").items);
+      const { pass, fail, not_evaluated: notEvaluated, not_applicable: notApplicable, unresolved } = statement.counts;
+      const body = { projectId: args.projectId, view: "conformance", stage, statement, claim: statement.claim };
+      return withClaim(`A4 conformance for ${args.projectId} at ${stage}: ${statement.controls.length} control(s); pass ${pass}, fail ${fail}, `
+        + `not evaluated ${notEvaluated}, not applicable ${notApplicable}, unresolved ${unresolved}.`, statement.claim, body);
     }));
 
   server.tool("amc_a4_comment", TOOLS[4]!.description, {

@@ -83,7 +83,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       post: write("Attach an evidence ref (builder or owner; self_reported unless a runtime-written ledger row earns observed)", "A4Evidence", [], "201") },
     [`${p}/value`]: { get: read("Value view: not evaluated until Activate's producer (P1-62)") },
     [`${p}/monitor`]: { get: read("Monitor view: not evaluated until Activate's producer (P1-62)") },
-    [`${p}/conformance`]: { get: read("Conformance statement: not evaluated until Adapt's producer (P1-61)", [query("stage", stage, "Stage.")]) },
+    [`${p}/conformance`]: { get: read("The stage's conformance statement (amc.a4-conformance-statement/v1): Adapt's from its Review's signed control results, checked again now (a results file edited, deleted or no longer verifying reads not_evaluated with its reason), with the owner's out-of-scope settlements, the sources acknowledgement and the deferred-activation acknowledgement on that Adapt revision as readiness counts them (once its completion gate is consumed, the ones in force then); every other stage carries no plan and says not_evaluated", [query("stage", stage, "Defaults to the head stage.")]) },
     [`${p}/verify`]: { get: read("verifyA4Chain over this project under the server operator's trust list (no query parameters)") },
     [`${p}/gate-policy`]: { post: write("Open a policy gate with a proposed gate policy, or apply a decided one (owner)", "A4GatePolicyChange") },
     [`${p}/acknowledge`]: { post: write("Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days)", "A4Acknowledge") },
@@ -103,7 +103,9 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/stages/assemble/connect`]: { post: write("External path, after Build (owner, owner mode): connect instructions with a lease whose token is in this response once and never stored; the record keeps the leaseId (a replay answers token: null)",
       "A4AssembleConnect", [], "201") },
     [`${p}/stages/assemble/import`]: { post: write("External path, after Build (owner, owner mode): the neutral importer over a workspace file or directory, originals retained; its manifest is a self_reported ref, and a refused record rolls the import back",
-      "A4AssembleImport", [], "201") }
+      "A4AssembleImport", [], "201") },
+    [`${p}/stages/adapt/probe`]: { post: write("Adapt context probe, after Build (owner, owner mode): one in-process turn on the stub provider with the A4 context plugin, into which A4 writes nothing; the session's session/open row becomes a self_reported ledger_event ref (A4 ran the turn: never observed) beside whether the plugin's exact text is in the session's signed user/message row; the turn makes no tool call, so the runtime writes no effective-policy receipt; delivery to a model and to native tasks is not evaluated",
+      "A4Control", [], "201") }
   };
   for (const verdict of ["approve", "deny"]) {
     paths[`${p}/approvals/{approvalRequestId}/${verdict}`] = { post: operation(`${verdict === "approve" ? "Approve" : "Deny"} an engine request this project named (an effect gate it opened, an outcome_unknown resolution it requested), as a live project approver or owner, bound to the request digest`,
@@ -123,8 +125,8 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     ["confirm-understanding", "A4ConfirmUnderstanding", "Confirm the understanding (step understood)"],
     ["explain", "A4Explain", "Explain at a level (step explained): the stage's producer, or the human-authored text while it has none"],
     ["propose", "A4Propose", "Freeze the proposed specification as a revision (step proposed)"],
-    ["build", "A4StageContent", "Build (step built): the stage's producer (aspire and assemble: owner, owner mode; assemble's native build session starts after the step is recorded and the response names it), or a self_reported human-authored implementation ref while it has none"],
-    ["review", "A4StageContent", "Review (step reviewed): the stage's producer checks, or human findings; not_evaluated without an observed ref"]
+    ["build", "A4StageContent", "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's native build session starts after the step is recorded and the response names it), or a self_reported human-authored implementation ref while it has none"],
+    ["review", "A4StageContent", "Review (step reviewed): the stage's producer checks (adapt: owner, owner mode, since it signs the control results), or human findings; not_evaluated without an observed ref"]
   ] as const) {
     paths[`${p}/stages/{stage}/${action}`] = { post: write(summary, body, [stagePath], "201") };
   }
