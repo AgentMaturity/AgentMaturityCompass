@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P0-30",
   "date": "2026-10-11",
-  "commit": "91678253fb17b62c8ee3e8701b8c927d1cf42b8b",
+  "commit": "e46bd29d9cd0e1e4018a1a5ae7f323f0bd8143f4",
   "branch": "rtd/p0-30-security-mutations",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -10,82 +10,82 @@
   "arch": "arm64",
   "commands": [
     {
-      "cmd": "node scripts/mutation-batch.mjs --batch qualification/2026-10-11-P0-30/mutations.batch.json --out mutations.json",
+      "cmd": "(at 91678253) node scripts/mutation-batch.mjs --batch qualification/2026-10-11-P0-30/mutations.batch.json --out mutations.json",
       "exit": 0,
       "durationMs": 1291000
     },
     {
-      "cmd": "npx vitest run tests/mutationBatch.test.ts tests/crypto/keyHistoryMutationGuards.test.ts tests/leaseRevocationConsumers.test.ts tests/studioCredentialBindingHttp.test.ts tests/portalAttribution.test.ts tests/nativeBudgets.test.ts tests/leaseRevocationWriterIntegrity.test.ts",
+      "cmd": "(at 91678253) npx vitest run tests/mutationBatch.test.ts tests/crypto/keyHistoryMutationGuards.test.ts tests/leaseRevocationConsumers.test.ts tests/studioCredentialBindingHttp.test.ts tests/portalAttribution.test.ts tests/nativeBudgets.test.ts tests/leaseRevocationWriterIntegrity.test.ts",
       "exit": 0,
       "durationMs": 19865
     },
     {
-      "cmd": "npm test -- --maxWorkers=4",
+      "cmd": "(at 91678253) npm test -- --maxWorkers=4",
       "exit": 1,
       "durationMs": 1054000
     },
     {
-      "cmd": "npm run build",
+      "cmd": "(at 91678253) npm run build",
       "exit": 0,
       "durationMs": 49418
     },
     {
-      "cmd": "npm run typecheck",
+      "cmd": "(at 91678253) npm run typecheck",
       "exit": 0,
       "durationMs": 42614
     },
     {
-      "cmd": "npm run typecheck:tests",
+      "cmd": "(at 91678253) npm run typecheck:tests",
       "exit": 0,
       "durationMs": 66691
     },
     {
-      "cmd": "npm run lint",
+      "cmd": "(at 91678253) npm run lint",
       "exit": 0,
       "durationMs": 4419
     },
     {
-      "cmd": "npm run check:counts",
+      "cmd": "(at 91678253) npm run check:counts",
       "exit": 0,
       "durationMs": 765
     },
     {
-      "cmd": "npm run check:docs-drift",
+      "cmd": "(at 91678253) npm run check:docs-drift",
       "exit": 0,
       "durationMs": 366
     },
     {
-      "cmd": "npm run check:freeze",
+      "cmd": "(at 91678253) npm run check:freeze",
       "exit": 0,
       "durationMs": 2607
     },
     {
-      "cmd": "npm run check:architecture-boundaries",
+      "cmd": "(at 91678253) npm run check:architecture-boundaries",
       "exit": 0,
       "durationMs": 2112
     },
     {
-      "cmd": "npm run check:gates",
+      "cmd": "(at 91678253) npm run check:gates",
       "exit": 0,
       "durationMs": 438
     },
     {
-      "cmd": "npm run check:schemas",
+      "cmd": "(at 91678253) npm run check:schemas",
       "exit": 0,
       "durationMs": 846
     },
     {
-      "cmd": "npm run check:api-ref",
+      "cmd": "(at 91678253) npm run check:api-ref",
       "exit": 0,
       "durationMs": 274
     },
     {
-      "cmd": "npm run check:threat-model",
+      "cmd": "(at 91678253) npm run check:threat-model",
       "exit": 0,
       "durationMs": 247
     },
     {
-      "cmd": "npm run check:clean-source",
+      "cmd": "(at 91678253) npm run check:clean-source",
       "exit": 0,
       "durationMs": 79384
     },
@@ -125,29 +125,103 @@
       "durationMs": 11980
     },
     {
+      "cmd": "node scripts/mutation-batch.mjs --batch qualification/2026-10-11-P0-30/mutations.batch.json --out mutations.rerun.json --only <19 lease, key-history/vault and spill ids>",
+      "exit": 0,
+      "durationMs": 293000
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 36708
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 30125
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 46745
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3025
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 522
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 308
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1904
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1660
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 329
+    },
+    {
+      "cmd": "npm run check:schemas",
+      "exit": 0,
+      "durationMs": 661
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 192
+    },
+    {
+      "cmd": "npm run check:threat-model",
+      "exit": 0,
+      "durationMs": 227
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=4",
+      "exit": 1,
+      "durationMs": 851000
+    },
+    {
       "cmd": "npm run check:qualification",
       "exit": 0,
-      "durationMs": 291
+      "durationMs": 296
     }
   ],
   "tests": {
-    "total": 23136,
-    "passed": 23022,
-    "failed": 114,
+    "total": 23251,
+    "passed": 23219,
+    "failed": 32,
     "skipped": 0
   },
   "artifacts": [
     {
       "path": "mutations.batch.json",
-      "sha256": "8c48eb88f80e834c54f751037137a65c93f00091fcb44b6437f1ac8fa5ca138d"
+      "sha256": "8ad278b32edbe6555170568451923a52dac97e90dcf7dbaf1af04860ba62b3d1"
     },
     {
       "path": "mutations.json",
       "sha256": "ab96f23b2bb2d7741225e8f98b7287f0980f02c1aaa1dd7527407c17be3f6649"
     },
     {
+      "path": "mutations.rerun.json",
+      "sha256": "f5f203ad1aa4752ca799dea0dc91f4b2908c6e5375b75868dbae3af595d79afb"
+    },
+    {
       "path": "outcomes.json",
-      "sha256": "9dfa8cc39ba124c6c9f3248dac0039b514226cc522f0c3a60bf019aa9c7e9b0d"
+      "sha256": "59079096310c41a4897a4ae547ff2001c41d7b66e03355e4374950822170f0f8"
     },
     {
       "path": "notary-rerun.txt",
@@ -162,5 +236,5 @@
       "sha256": "ba08a9c720da6a6f7e877a48a7066bbc99dcde4cd58a9a2fe772e8d642c2be97"
     }
   ],
-  "notes": "Batch commit 91678253 = main cc063bdac plus the P0-30 commits; product source differs from main only in src/leases/leaseStore.ts and a comment in src/wire/wireDispatcher.ts. Mutation batch: 71 entries, 70 killed, 0 survived, 1 equivalent (S7-M23, callbackTelemetryCapture.ts:113), 0 errors. npm test exited 1: 114 of 23,136 tests failed, in 21 files. 113 are the int baseline failures (the same 20 files with the same counts, none touched by P0-30); the 114th, tests/publicDocsArtifact.test.ts, fails only in this git-worktree checkout and passed at 91678253 in a fresh clone and at cc063bdac. Fresh-clone runs were at 910a63ba, whose src and tests equal 91678253 (the later commits change only published counts and the batch file). The Docker image was built at 885bd72c (same product source) on local colima (linux/arm64), not CI; the compose plugin is not installed, so the notary and Studio services ran under docker run (notary-rerun.txt). The installed subset run used npm pack of 910a63ba (tarball sha256 ecaad05b68ab1310c00e77c0698778e5e77ad19b347a8965d44a685a785390cf). All secrets were synthetic and stayed in temporary directories or volumes, which were removed afterwards."
+  "notes": "Receipt commit e46bd29d = main cc063bdac + the P0-30 commits + a merge of int a1aef9d6 (count conflicts regenerated) + the review fixes (lease TOCTOU 8d9077a4, vault unlock 34e7dbb7, spill tests d04d2733). The full mutation batch ran at 91678253 (mutations.json): 71 entries, 70 killed, 0 survived, 1 equivalent, 0 errors. The 19 lease, key-history/vault and spill entries reran at e46bd29d (mutations.rerun.json): 17 killed, 2 equivalent (early session publish; transport `..` check unreachable through parseIndex), 0 survived, 0 errors. Commands prefixed (at 91678253) ran before the merge; the rest of the npm commands ran at e46bd29d. The full suite at e46bd29d exited 1: 32 of 23,251 tests failed in 7 files. 31 are in six files already in the int baseline triage (jsonlWriterResume 19, studioNativeTaskService 8, llmResponsesCapabilities 1, privateModuleHelperVisibility 1, publicDocsGraph 1, dataResidencyPersistence 1), none touched by P0-30. The 32nd, tests/publicDocsArtifact.test.ts, fails only in this git-worktree checkout and passed in a fresh clone at 91678253 and at cc063bdac. At 91678253 the suite had 114 failures, 113 of them the int baseline's. Spec drift (AMC-1508): the spec expected a body submittedBy to be overridden; the route refuses it with 400 and stores nothing, and is left unchanged. Fresh-clone runs were at 910a63ba (src and tests equal to 91678253). The Docker image was built at 885bd72c (same product source as 91678253) on local colima (linux/arm64), not CI. The compose plugin is not installed, so the notary and Studio services ran under docker run (notary-rerun.txt). The installed subset run used npm pack of 910a63ba (tarball sha256 ecaad05b68ab1310c00e77c0698778e5e77ad19b347a8965d44a685a785390cf). All secrets were synthetic and stayed in temporary directories or volumes, which were removed afterwards."
 }

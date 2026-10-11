@@ -4,9 +4,10 @@ Branch `rtd/p0-30-security-mutations`, from `int` = `main` `cc063bdac`. The batc
 
 ## Files
 
-- `mutations.batch.json`: the 71 entries the batch ran. 27 are new for P0-30, and 44 are S7's entries from candidate `37c1466b`, re-pointed at main's paths.
-- `mutations.json`: the result written by `scripts/mutation-batch.mjs`. It holds the commit, one baseline per distinct test set (each set ran once with no mutation), and per entry the outcome, the mutated line, the exit code, the duration and up to 20 failing test names.
-- `outcomes.json`: one line per old issue.
+- `mutations.batch.json`: 76 entries (71 in the full run plus 5 added with the review fixes). 32 are new for P0-30, and 44 are S7's entries from candidate `37c1466b`, re-pointed at main's paths.
+- `mutations.rerun.json`: the rerun of the 19 lease, key-history/vault and spill entries at `e46bd29d`, after the review fixes below.
+- `mutations.json`: the full batch result written by `scripts/mutation-batch.mjs`. It holds the commit, one baseline per distinct test set (each set ran once with no mutation), and per entry the outcome, the mutated line, the exit code, the duration and up to 20 failing test names.
+- `outcomes.json`: one line per old issue, from the latest outcome of each entry.
 - `notary-rerun.txt`: the AMC-1529 container rerun (step 8).
 - `installed-subset.json`: the AMC-1537 run from the packed tarball (step 9).
 - `lease-consumers-fresh-clone.log`: the AMC-1542 consumer tamper reproduction, run in a fresh clone.
@@ -64,6 +65,34 @@ An earlier run at `910a63ba` produced 60 killed, 1 equivalent and 10 `baseline-f
 - `910a63bae` chore(qualification): add the P0-30 security mutation batch (71 entries)
 - `634c25b0b` chore: regenerate published counts for the four P0-30 test files
 - `91678253f` chore(qualification): run S7's bwrap entries without the file that fails on main (P0-30)
+- `8284b4ba6` docs(qualification): add the P0-30 receipt (batch, outcomes, notary rerun, installed subset)
+- `4b50ff3e0` Merge branch 'int' into rtd/p0-30-security-mutations
+- `ed0a4686b` chore: snapshot src/workspaces/workspaceRouter.ts before P0-30 edits it (D-15)
+- `8d9077a4f` fix(leases): decide on the verified revocation bytes only (P0-30)
+- `34e7dbb7f` fix(vault): publish an unlocked session only after the key upgrade succeeds (P0-30)
+- `d04d27333` test(spill): pin the export inventory guard and the spill-root boundary (P0-30)
+- `e46bd29d9` chore(qualification): batch entries for the TOCTOU, vault-unlock and spill-root fixes (P0-30)
+
+## Review fixes and rerun (`e46bd29d`)
+
+- **Merge.** `int` (`a1aef9d6`) was merged in (`4b50ff3e`). The count conflicts were resolved by taking int's files and rerunning `node scripts/gen-counts.mjs --write`.
+- **Lease TOCTOU (`8d9077a4`).** bridgeAuth, the gateway, the workspace router, Studio's `verifyLeaseForScope` and the wire dispatcher verified the list's signature and then read the file again.
+    - They now use `readRevokedLeaseIds`, which reads the list once, verifies and parses those bytes, and returns the set or the reason. `revokedLeaseIdSet` uses it too.
+    - A new test swaps the file right after the signature check. Before the fix, those five consumers admitted the revoked lease.
+    - Mutation `P30-1542-reread-after-verify` (verify, then build the set from a second read) is killed by all 7 swap cases.
+- **Vault unlock (`34e7dbb7`).** `unlockVault` published the session before the legacy lease/session key upgrade, which can throw.
+    - The session is now published only after the upgrade succeeds, and a throw locks it.
+    - The test covers a previously locked and a previously unlocked vault. Before the fix, both stayed unlocked.
+    - Removing the lock in the catch is killed. Publishing early is equivalent, because the catch still locks.
+- **Spill tests (`d04d2733`).**
+    - Export of a conflicting or tampered history refuses and writes nothing. Before this test, a broken export guard would have written an empty index.
+    - A spill root outside the workspace is refused (`spillStore.ts` `storageRoot`); its mutation is killed. `spillStore.ts` source is unchanged.
+    - The transport `..` check (`spillLifecycle.ts` `transportDirectory`) cannot be reached through the public API, because `parseIndex` pins every object file to `objects/<sha256>.blob`. Its mutation survives all 159 spill tests and is recorded as equivalent.
+- **Rerun.** The 19 lease, key-history/vault and spill entries ran at `e46bd29d`: 17 killed, 2 equivalent, 0 survived, 0 errors (exit 0, 293 s).
+
+## Spec drift: AMC-1508
+
+The spec asks that a body `submittedBy` that differs from the authenticated principal be overridden, so the stored job names the principal. The route instead refuses such a body with 400 and stores nothing. That is stricter than the spec, and it is left unchanged. A nested `payload.submittedBy` is stored as data while the job names the principal. Known limit: the product DB is one per-process singleton (`openProductDb`), so attribution holds per process, not per tenant.
 
 ## Steps 7 to 9
 
@@ -84,10 +113,11 @@ An earlier run at `910a63ba` produced 60 killed, 1 equivalent and 10 `baseline-f
 
 ## Full suite and checks
 
-- `npm test -- --maxWorkers=4` at `91678253`: 23,136 tests, 23,022 passed, 114 failed, 0 skipped. The tree was clean afterwards.
-    - 113 of the failures are in the 20 files the int baseline triage already lists (session 7fccbbfa `baseline-triage.md`), with the same counts. None of those files is touched by P0-30.
-    - The 114th is `tests/publicDocsArtifact.test.ts` (1 case, a typedoc source-link assertion). It fails only in this item's git worktree checkout. It passed at the same commit in a fresh clone, and at `cc063bdac`.
-- build, typecheck, typecheck:tests, lint, check:counts, check:docs-drift, check:freeze, check:architecture-boundaries, check:gates, check:schemas, check:api-ref, check:threat-model and check:clean-source all exited 0 at `91678253`.
+- At `91678253` (before the merge), `npm test -- --maxWorkers=4` ran 23,136 tests: 23,022 passed and 114 failed. 113 of the failures were the int baseline's 20 files, with the same counts.
+- At `e46bd29d` (after the merge and the review fixes), `npx vitest run --maxWorkers=4` ran 23,251 tests: 23,219 passed and 32 failed. The tree was clean afterwards.
+    - 31 of the 32 are in six files that the int baseline triage already lists (session 7fccbbfa `baseline-triage.md`): jsonlWriterResume 19, studioNativeTaskService 8, llmResponsesCapabilities 1, privateModuleHelperVisibility 1, publicDocsGraph 1 and dataResidencyPersistence 1. P0-30 touches none of these files. The other baseline failures were fixed on int.
+    - The 32nd is `tests/publicDocsArtifact.test.ts` (1 case, a typedoc source-link assertion). It fails only in this item's git worktree checkout. It passed in a fresh clone at `91678253` and at `cc063bdac`.
+- At `e46bd29d`, these all exited 0: build, typecheck, typecheck:tests, lint, check:counts, check:docs-drift, check:freeze, check:architecture-boundaries, check:gates, check:schemas, check:api-ref and check:threat-model. `node needs-snapshot.mjs int` printed `none`.
 
 ## Reproduce
 
