@@ -71,6 +71,7 @@ All tests must pass before submitting a PR.
   ```bash
   npm run quality:baseline -- duplicates --shrink
   ```
+- a baseline entry is **not in the base branch's baseline**: every entry outside `accepted` must already exist in the baseline at the merge-base of `HEAD` and `--base <ref>` (default `origin/main`, else `int`; CI passes the PR's target branch). Hand-adding entries fails; use `--accept`. Removing entries always passes. When the base has no baseline file at all (the one-time bootstrap), the check is skipped. Any other unreadable base fails unless you pass `--allow-missing-base`. A scan whose tool version or config hash changed since the base may add entries through a reviewed `--rebaseline`.
 - the **config or tool version drifted**: the SHA-256 of `.jscpd.json` or `knip.json`, or the installed jscpd or Knip version, differs from the baseline. Regenerate in its own reviewed PR, with the reason in the PR description, from a clean, committed tree:
   ```bash
   npm run quality:baseline -- dead-code --rebaseline --reason "knip 6.40.0 upgrade: new findings reviewed"

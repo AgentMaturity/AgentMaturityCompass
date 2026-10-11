@@ -99,13 +99,17 @@ jobs:
 
       # D-11 option A: both checks are a ratchet against
       # scripts/quality/source-quality-baseline.json (P1-52) and fail only on
-      # new or stale findings or on config/tool drift. Still report-only here
-      # until P0-33 makes the step required.
+      # new or stale findings, on config/tool drift, or on a baseline entry
+      # missing from the target branch's baseline at the merge-base (only
+      # --accept may add one). Still report-only here until P0-33 makes the
+      # step required.
       - name: Source duplication and reachability
         continue-on-error: true
+        env:
+          QUALITY_BASE: origin/${{ github.base_ref || 'main' }}
         run: |
-          npm run check:duplicates
-          npm run check:dead-code
+          npm run check:duplicates -- --base "$QUALITY_BASE"
+          npm run check:dead-code -- --base "$QUALITY_BASE"
 
       - name: Upload source-quality summary
         if: ${{ always() && matrix.node-version == '24' }}
