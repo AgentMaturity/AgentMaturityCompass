@@ -449,7 +449,9 @@ nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unles
 with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
 production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
 or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
-moves the project's `deployedReleaseId`; a succeeded rollback row moves it to the release rolled back to.
+moves the project's `deployedReleaseId`; a succeeded rollback row moves it to the release rolled back to. Whoever
+records a deploy receipt counts as a builder of the revision: the deployment approval rests on their statement, so they
+cannot approve it (`builder_not_completion_approver`) and are among its excluded keys.
 
 `POST …/releases/:rid/verify { environment }` (owner, owner mode) is AMC's own check of the newest receipt's
 `destinationRef`. It sends no credential, and a body naming a URL is 400. A receipt whose destination is not the one the
