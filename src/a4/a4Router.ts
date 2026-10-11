@@ -629,8 +629,8 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/conformance") {
     assertQuery(params, params.has("stage") ? ["stage"] : []);
     const stage = params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project);
-    // Adapt's acknowledgements as readiness counts them, evaluated only when the statement reads them live.
-    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt("adapt").items);
+    // Adapt's (or Activate's D-21) acknowledgements as readiness counts them, evaluated only when the statement reads them live.
+    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt(stage === "activate" ? "activate" : "adapt").items);
     apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
     return true;
   }

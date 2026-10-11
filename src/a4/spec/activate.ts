@@ -9,11 +9,11 @@ import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { leaseScopeSchema, type LeaseScope } from "../../leases/leaseSchema.js";
 import type { ActionClass } from "../../types.js";
-import { latestGate, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
+import { isRegulated, latestGate, redoneStages, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import { bridgeControls } from "../a4Lifecycle.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, type A4Answer, type A4ChainLink, type A4Question, type A4Step } from "../a4Schema.js";
-import { adaptSpecOf } from "./adapt.js";
+import { adaptSpecOf, CATALOG_EXPERIMENTAL_NOTICE } from "./adapt.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
@@ -376,8 +376,23 @@ function effectRequestItem(id: string, opened: A4ChainLink | undefined, done: bo
 const newestOpened = (state: A4ReadinessState, match: (link: A4ChainLink) => boolean): A4ChainLink | undefined =>
   [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && match(link));
 
+/** The item D-21's regulated-production rule reads (Adapt carries its own of the same id, for the plan's approval). */
+export const EXPERT_REVIEW_ITEM = "regulatory_sources_status";
+
+/**
+ * D-21's regulated-production rule at the deployment approval: on a regulated project the regulatory sources still wait
+ * on a named expert's review (D-08; every record is experimental and no agent approves it), so the item stays WAITING
+ * EXPERT_REVIEW_PENDING, mandatory from Review on and bound, until an owner acknowledges it at Activate (90 days; the
+ * acknowledgement counts on Activate's own revision only). The production lease effect records the acknowledgement.
+ */
+function expertReviewItem(state: A4ReadinessState, regulated: boolean): A4ReadinessItem {
+  if (!regulated) return item(EXPERT_REVIEW_ITEM, "READY", { section: "governance", mandatory: false, reasonCodes: ["NOT_REGULATED"] });
+  return waiting(EXPERT_REVIEW_ITEM, ["EXPERT_REVIEW_PENDING", "KEY:D-08", "KEY:D-21"], { kind: "review_pending", section: "governance", mandatory: reached(state, "reviewed"),
+    nextAction: { label: `${CATALOG_EXPERIMENTAL_NOTICE} On a regulated project an owner acknowledges this before requesting the deployment approval (D-21).` } });
+}
+
 /** Activate's readiness items (design §10.4 Readiness); the gates, `sod`, signing and lineage are the governance items. */
-export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery): A4ReadinessItem[] {
+export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers } = activateSpecOf(state);
   const gaps = answerGaps(answers, carriedValues(state));
   const proposed = proposedFor(spec, answers);
@@ -411,6 +426,7 @@ export function activateItems(state: A4ReadinessState, _query: A4ReadinessQuery)
     monitoringItem(state, releaseId),
     backupItem(facts),
     lifecycleItem(state, releaseId),
+    expertReviewItem(state, isRegulated(state, query.floor)),
     effectRequestItem("release_effect", direction === null ? undefined
       : newestOpened(state, (link) => link.body.effect === RELEASE_EFFECT_ID && link.body.gateId === direction.gate_id), release !== null,
     `Once the release approval has its quorum, an owner opens ${RELEASE_EFFECT_ID}: a second, separately decided DEPLOY request`),

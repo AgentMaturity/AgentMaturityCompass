@@ -339,8 +339,9 @@ export function controlResultsNow(workspace: string, state: Pick<A4ReadinessStat
  * once that gate is consumed, the ones in force at the consumption, even once they expire and the head moves on
  * (acknowledgementOf); on a revision the head moved past without consuming that gate (a reopen), none, since readiness
  * counts acknowledgements on the head only. Review stores none of them. A record that does not parse counts as none.
- * Every other stage, and Adapt before its Review, carries no plan and says not_evaluated (Activate's own statement is
- * P1-62's).
+ * Every other stage, and Adapt before its Review, carries no plan and says not_evaluated. Activate's statement carries
+ * D-21's acknowledgement of the pending expert review (its `regulatory_sources_status` item) by the same rule, on its
+ * completion gate.
  */
 export function conformanceView(workspace: string, state: A4ReadinessState, stage: A4Stage, now: number,
   counted: () => readonly Pick<A4ReadinessItem, "id" | "acknowledged">[]): A4ConformanceStatementV1 {
@@ -352,11 +353,13 @@ export function conformanceView(workspace: string, state: A4ReadinessState, stag
   const plan = stage === "adapt" ? proposedPlan(spec) : null;
   const revisionNo = revision?.revision_no ?? state.project.revision_no;
   const required = gatePolicyOf(state.chain).gates["adapt.completion"].requiredReviews.some((entry) => entry.kind === "review_record");
-  const consumed = stage === "adapt" ? adaptCompletionConsumed(state, revisionNo) : undefined;
-  const items = stage === "adapt" && revisionNo === state.project.revision_no && consumed === undefined ? counted() : null;
-  const ackOf = (itemId: string) => stage !== "adapt" ? null
+  const own = stage === "adapt" || stage === "activate" ? stage : null;
+  const consumed = own === null ? undefined : adaptCompletionConsumed(state, revisionNo, own);
+  const items = own !== null && revisionNo === state.project.revision_no && consumed === undefined ? counted() : null;
+  // Activate records only D-21's acknowledgement of the pending expert review (its regulatory_sources_status item).
+  const ackOf = (itemId: string) => own === null || (own === "activate" && itemId !== "regulatory_sources_status") ? null
     : items !== null ? items.find((entry) => entry.id === itemId)?.acknowledged ?? null
-    : consumed !== undefined ? acknowledgementOf(state, itemId, now, revisionNo) : null;
+    : consumed !== undefined ? acknowledgementOf(state, itemId, now, revisionNo, own) : null;
   return conformanceStatement({ stage, revisionDigest, stored, evaluatedAt: new Date(now).toISOString(),
     ownerOutOfScope: stored === null ? [] : ownerOutOfScope(plan, ackOf("plan_unresolved")),
     unsupported: stored === null || plan === null ? [] : plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`),

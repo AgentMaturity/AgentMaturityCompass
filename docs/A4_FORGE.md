@@ -502,6 +502,12 @@ Readiness adds these items:
 - `backup.include_paths` (not mandatory): WAITING until the signed ops policy backs up `a4-releases/` and
   `a4-projects/`. Fix it before proposing, because the release binds the signed ops policy.
 - `lifecycle.production_controls` (not mandatory): names the controls that keep the agent at staging.
+- `regulatory_sources_status` (D-21's regulated-production rule): on a regulated project it stays WAITING
+  `EXPERT_REVIEW_PENDING` (`KEY:D-08`), mandatory from Review on and bound, until an owner acknowledges it at Activate
+  before requesting the deployment approval. The acknowledgement counts on Activate's own revision only; one recorded at
+  Adapt does not carry over. The production lease effect refuses a regulated release without it (`EXPERT_REVIEW_PENDING`)
+  and records it; `GET …/releases/:rid` shows it as `expertReview`, and the Activate conformance statement lists it. An
+  unregulated project reads READY `NOT_REGULATED`.
 
 ## Activate: review, monitoring and value
 

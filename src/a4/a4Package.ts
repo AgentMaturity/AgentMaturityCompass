@@ -61,10 +61,10 @@ import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
   monitorResolves, PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
 } from "./spec/activate.js";
-import { adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
+import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
 import { assembleSpecOf } from "./spec/assemble.js";
 
@@ -741,10 +741,20 @@ async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcom
   const revision = state.revisions.find((row) => row.revision_no === gate.revision_no && row.stage === "activate");
   const plans = revision === undefined ? null : leasePlans(activateSpecOf({ revisions: [revision] }).answers);
   if (plans === null) throw coded("LEASE_PLAN_INVALID", "the deployment approval's revision gives no lease plan");
+  // D-21: a regulated deployment approval carries the owner's acknowledgement of the pending expert review, in force when it was consumed.
+  let regulated = true;
+  try {
+    regulated = isRegulated(state, signedA4Floor(workspace));
+  } catch {
+    // An unverified policy reads regulated (fail closed).
+  }
+  const acknowledgement = acknowledgementOf(state, EXPERT_REVIEW_ITEM, Date.now(), gate.revision_no, "activate");
+  if (regulated && acknowledgement === null) throw coded("EXPERT_REVIEW_PENDING", "a regulated deployment approval needs the owner's acknowledgement of the pending expert review (D-21)");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
   const lease = mintLease(workspace, state, releaseId, plans.production);
   // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).
-  return { record: { lease: lease.projection, lifecycle: lifecycleRecord(releaseId, advance(workspace, state, "production", releaseId)) },
+  return { record: { lease: lease.projection, expertReview: { releaseId, regulated, itemId: EXPERT_REVIEW_ITEM, status: regulated ? "EXPERT_REVIEW_PENDING" : "NOT_REGULATED",
+    acknowledgement: regulated ? acknowledgement : null }, lifecycle: lifecycleRecord(releaseId, advance(workspace, state, "production", releaseId)) },
     deliver: { production: { leaseId: lease.leaseId, token: lease.token, expiresAt: lease.expiresAt, scope: "production", tokenNotice: TOKEN_NOTICE } } };
 }
 
@@ -838,6 +848,10 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     const record = a4ReleaseV1Schema.parse({ ...JSON.parse(bytes) as Record<string, unknown>, envelope });
     const production = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease)
       .filter((lease): lease is Record<string, unknown> => lease?.releaseId === record.releaseId && lease.scope === "production");
+    // D-21 as the deployment approval's effect recorded it: the owner's acknowledgement of the pending expert review.
+    const expertReview = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
+      ? (link.body.record as { expertReview?: Record<string, unknown> } | undefined)?.expertReview : undefined)
+      .find((entry) => entry?.releaseId === record.releaseId) ?? { status: "not_recorded", reason: "the deployment approval's effect has not run" };
     const notEvaluated = (reason: string) => ({ status: "not_evaluated", reason });
     const recordedIf = (present: boolean, reason: string) => present ? { status: "recorded", reason: null } : notEvaluated(reason);
     const { surfaces } = record;
@@ -863,7 +877,7 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
     packageFiles: packageFiles(fileOf(record.packagePath), record.packageDigest),
-    deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle,
+    deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle, expertReview,
     // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
     lifecycleProduction: bridgeControls(state, "production", record.releaseId),
     leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),

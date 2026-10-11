@@ -77,7 +77,7 @@ export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
   // check ids are their reason codes, so the deployment approval binds them); one that moves while a gate is open leaves
   // it STALE (readinessMoved), as decide and complete refuse it.
   activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals", "deployment.same_host", "deployment.receipt", "deployment.amc_check", "lease.scope",
-    "monitoring.source"]
+    "monitoring.source", "regulatory_sources_status"]
 };
 
 /**
