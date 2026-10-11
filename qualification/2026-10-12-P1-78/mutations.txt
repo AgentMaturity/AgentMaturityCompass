@@ -53,3 +53,31 @@ M6c. gap 6 (fail-closed): a lost row does not refuse later calls (src/agent/agen
     × refuses every later call once a row is lost after a body ran 620ms
     Test Files  1 failed (1)
     Tests  1 failed | 5 passed (6)
+R1. pipeline: no refusal after a failed record (latch ignored) (src/tools/toolPipeline.ts): caught
+    × refuses every later call, before its body, once a recorder write failed (P1-78) 3ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 20 passed (21)
+R2. recheck: principal's users.yaml state not compared (a demotion passes) (src/actions/authorize.ts): caught
+    × L0-IDN-04/negative/principal-demoted-in-flight.json: deny recheck_failed:principal_unresolved 1587ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 24 passed (25)
+R3. planRequiresPrincipal: an unverifiable plan reads as not requiring a principal (src/tools/guards/compiledPolicyGuard.ts): caught
+    × planRequiresPrincipal reads the verified active plan and fails closed (P1-78) 1196ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 24 passed (25)
+R4. issueLeaseForPrincipal: mints with no principal under a plan that requires one (src/leases/leasePrincipal.ts): caught
+    × issueLeaseForPrincipal names an active users.yaml user and refuses before minting when none resolves (P1-78) 1566ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 24 passed (25)
+R5. engine: initiator refused whatever the class's rule (single-user classes break) (src/approvals/approvalEngine.ts): caught
+    × L0-OVS-03/positive/initiator-approves-single-user-class.json: pass  882ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 18 passed (19)
+R6. listApprovalRequests: an unsigned copy is listed (src/approvals/approvalChainStore.ts): caught
+    × an unsigned copy that drops the initiator cannot make the initiator's approval count 1100ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 18 passed (19)
+R7. seam: the session's initiator is not recorded on the engine request (src/approvals/seam/approvalSeam.ts): caught
+    × records the session's initiator, whose own approval then never counts toward a distinct-user quorum (P1-78) 859ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 13 passed (14)

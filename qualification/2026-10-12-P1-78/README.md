@@ -27,5 +27,10 @@ What changed, per gap (L0 control in brackets). Each was driven through the real
    before its body (UNVERIFIABLE_TOOL_EVIDENCE). After a row is lost to an effect that already ran, every later call is
    refused.
 
+Round two (coordinator, before landing): a failed evidence record refuses every later pipeline call; a lease's
+principal is rechecked at execution; `planRequiresPrincipal` and `issueLeaseForPrincipal` let Studio and A4 refuse a
+native task with no resolvable principal before minting; every approval request outside A4 records its initiator, who
+cannot approve where the class requires distinct users, read only from the signed request.
+
 An executed test shows how the enforcement point behaves on the fixtures in a temporary workspace. It is not a result
 for any deployment. Every Layer 0 control stays `experimental`, agent-drafted and not independently reviewed (D-08).

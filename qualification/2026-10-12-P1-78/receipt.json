@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "key": "P1-78",
  "date": "2026-10-12",
- "commit": "820e1f3a02115c54e7b373b50e5be1cd3451d80e",
+ "commit": "b9a3a60463384c29222b97a87500501bac10ab8b",
  "branch": "rtd/p1-78-layer0-enforcement-gaps",
  "node": "v25.5.0",
  "pnpm": "10.33.0",
@@ -12,107 +12,107 @@
   {
    "cmd": "npm run -s build",
    "exit": 0,
-   "durationMs": 45058
+   "durationMs": 43141
   },
   {
    "cmd": "npm run -s typecheck",
    "exit": 0,
-   "durationMs": 93947
+   "durationMs": 30318
   },
   {
    "cmd": "npm run -s typecheck:tests",
    "exit": 0,
-   "durationMs": 63234
+   "durationMs": 41804
   },
   {
    "cmd": "npm run -s lint",
    "exit": 0,
-   "durationMs": 88982
+   "durationMs": 3220
   },
   {
    "cmd": "npm run -s check:counts",
    "exit": 0,
-   "durationMs": 19422
+   "durationMs": 944
   },
   {
    "cmd": "npm run -s check:docs-drift",
    "exit": 0,
-   "durationMs": 10326
+   "durationMs": 526
   },
   {
    "cmd": "npm run -s check:freeze",
    "exit": 0,
-   "durationMs": 60400
+   "durationMs": 2330
   },
   {
    "cmd": "npm run -s check:architecture-boundaries",
    "exit": 0,
-   "durationMs": 69768
+   "durationMs": 2222
   },
   {
    "cmd": "npm run -s check:gates",
    "exit": 0,
-   "durationMs": 9740
+   "durationMs": 388
   },
   {
    "cmd": "npm run -s check:schemas",
    "exit": 0,
-   "durationMs": 18419
+   "durationMs": 751
   },
   {
    "cmd": "npm run -s check:api-ref",
    "exit": 0,
-   "durationMs": 6386
+   "durationMs": 253
   },
   {
    "cmd": "npm run -s check:threat-model",
    "exit": 0,
-   "durationMs": 5991
+   "durationMs": 272
   },
   {
    "cmd": "npm run -s check:qualification",
    "exit": 0,
-   "durationMs": 13363
+   "durationMs": 319
   },
   {
    "cmd": "npm run -s check:duplicates",
    "exit": 0,
-   "durationMs": 25354
+   "durationMs": 729
   },
   {
    "cmd": "npm run -s check:dead-code",
    "exit": 0,
-   "durationMs": 49802
+   "durationMs": 3430
   },
   {
-   "cmd": "npx vitest run <the 141 files in related-tests.txt>",
+   "cmd": "npx vitest run <the 176 files in related-tests.txt>",
    "exit": 1,
-   "durationMs": 1019766
+   "durationMs": 782015
   }
  ],
  "tests": {
-  "total": 1874,
-  "passed": 1848,
-  "failed": 26,
+  "total": 2486,
+  "passed": 2464,
+  "failed": 22,
   "skipped": 0
  },
  "artifacts": [
   {
    "path": "red.txt",
-   "sha256": "f3aa14985ab30857e6ec5c502fc696966d62f00d3ffc7dca49be98c9a083e3be"
+   "sha256": "ad866f71b7da82349bfe2cc592afb4093e80bd041b6bdb88866e149e2b823f83"
   },
   {
    "path": "mutations.txt",
-   "sha256": "37293ec4c58ee1c16dd749d4ceaf1af3cb4114a3756089388375896b86624171"
+   "sha256": "9f35c85a749fca6214f48a813e7be0aa52416bb344ef12f06285618c2e0e6cdf"
   },
   {
    "path": "checks.json",
-   "sha256": "4ec4c79af8a8802165ad4f86d895fcd5acaa98c19c33e35e079d6b475e075f60"
+   "sha256": "4ef60fa127f13f240c717663115b65cf95500f9c73c8ee0f9efffc3dbaa8e502"
   },
   {
    "path": "related-tests.txt",
-   "sha256": "d7ec11b471885c9530ec2ef8706dbc436f2081ccdf818f5e2c1cfe5ed05c1c20"
+   "sha256": "b843391059f90a0655bad54f3fc332ebb3943dae6b3b916fbeef2edfd0dbdc35"
   }
  ],
- "notes": "Every test file that imports a module P1-78 changed, plus every test file it changed (related-tests.txt), at this commit; int (8d1e8e7d7) did not move, so the merge was a no-op. 26 failures in 7 files, none from P1-78: llmResponsesCapabilities (1) and jsonlWriterResume (19, EgressBlocked active_policy_unverifiable in SessionService.open) fail the same way on a git archive of int; amc1471ApprovalDelivery (1), nativeShellComposition (1), sessionSpillCommitment (1) and nativeValidationOutcomeSurfaces (2) pass when run alone; performance/sessionSpine (1) is a timing ratio that passes alone on the int archive and failed one of its two cases per run on the branch while other sessions' suites ran on this machine (P1-78 adds one method to SessionSpine and nothing on the append path). The full suite was not run. All 15 checks exit 0 (checks.json). red.txt: each gap's tests failing before its fix; mutations.txt: 11 mutations, all caught. Local run on macOS arm64, not CI; no network."
+ "notes": "Every test file that imports a module P1-78 changed, plus every test file it changed (related-tests.txt, 176 files), at this commit, after merging int (8cef83b82; P1-62 a4Rollback.ts is not on int yet). 22 failures in 3 files, none from P1-78: jsonlWriterResume (19, EgressBlocked active_policy_unverifiable in SessionService.open) and llmResponsesCapabilities (1) fail the same way on a git archive of int; performance/sessionSpine (2) is a timing ratio that passed alone on the int archive and fails under load while other sessions' suites run on this machine (P1-78 adds one method to SessionSpine and nothing on the append path). The full suite was not run. checks.json: 15 checks at this commit, all exit 0 (check:duplicates after re-keying two findings whose hash P1-78's initiator line moved, accepted with reasons). red.txt: each gap's tests failing before its fix; mutations.txt: 18 mutations, all caught. Local run on macOS arm64, not CI; no network."
 }

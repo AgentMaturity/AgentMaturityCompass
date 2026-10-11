@@ -84,3 +84,18 @@ npx vitest run tests/agentToolsetSession.test.ts (fail-closed writer cases, befo
 ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
  Test Files  1 failed (1)
       Tests  3 failed | 3 passed (6)
+
+== round 2: pipeline latch (npx vitest run tests/toolPipeline.test.ts, before the fix)
+     × refuses every later call, before its body, once a recorder write failed (P1-78) 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+
+== round 2: principal recheck (npx vitest run tests/catalog/l0/identity.test.ts -t L0-IDN-04, before the fix)
+     × L0-IDN-04/negative/principal-deactivated-in-flight.json: deny recheck_failed:principal_unresolved 4114ms
+     × L0-IDN-04/negative/principal-demoted-in-flight.json: deny recheck_failed:principal_unresolved 4418ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed | 18 skipped (24)
+
+== round 2: planRequiresPrincipal, issueLeaseForPrincipal and the initiator rules (seam record, single-user class, signed-only read) were tested alongside their code; mutations R3 to R7 in mutations.txt show each test failing with its guard removed.

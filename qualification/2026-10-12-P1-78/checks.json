@@ -2,7 +2,7 @@
  {
   "cmd": "npm run -s build",
   "exit": 0,
-  "durationMs": 45058,
+  "durationMs": 43141,
   "tail": [
    "bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp"
   ]
@@ -10,19 +10,19 @@
  {
   "cmd": "npm run -s typecheck",
   "exit": 0,
-  "durationMs": 93947,
+  "durationMs": 30318,
   "tail": []
  },
  {
   "cmd": "npm run -s typecheck:tests",
   "exit": 0,
-  "durationMs": 63234,
+  "durationMs": 41804,
   "tail": []
  },
  {
   "cmd": "npm run -s lint",
   "exit": 0,
-  "durationMs": 88982,
+  "durationMs": 3220,
   "tail": [
    "Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.",
    "check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 10; 16 random marker(s); 0 pending entries."
@@ -31,7 +31,7 @@
  {
   "cmd": "npm run -s check:counts",
   "exit": 0,
-  "durationMs": 19422,
+  "durationMs": 944,
   "tail": [
    "Published source counts match the repository; this check does not execute tests."
   ]
@@ -39,7 +39,7 @@
  {
   "cmd": "npm run -s check:docs-drift",
   "exit": 0,
-  "durationMs": 10326,
+  "durationMs": 526,
   "tail": [
    "Docs drift check passed (336 files scanned; truth claims and commands checked in 247 public files; 4 logged exceptions)."
   ]
@@ -47,7 +47,7 @@
  {
   "cmd": "npm run -s check:freeze",
   "exit": 0,
-  "durationMs": 60400,
+  "durationMs": 2330,
   "tail": [
    "Freeze guard passed: {\"cliCommandPaths\":1231,\"cliInventoryPaths\":1231,\"stationPacks\":41,\"stationPackQuestions\":632}"
   ]
@@ -55,7 +55,7 @@
  {
   "cmd": "npm run -s check:architecture-boundaries",
   "exit": 0,
-  "durationMs": 69768,
+  "durationMs": 2222,
   "tail": [
    "  \"prefixBranchCount\": 2,",
    "  \"failures\": []",
@@ -65,7 +65,7 @@
  {
   "cmd": "npm run -s check:gates",
   "exit": 0,
-  "durationMs": 9740,
+  "durationMs": 388,
   "tail": [
    "",
    "11 registered emitters, 4 evidence maps, 279 literal audit emissions classified, 9 evaluated gate requirements checked.",
@@ -75,7 +75,7 @@
  {
   "cmd": "npm run -s check:schemas",
   "exit": 0,
-  "durationMs": 18419,
+  "durationMs": 751,
   "tail": [
    "gen-spec-schemas: 38 schemas current; 75 contract fixtures agree"
   ]
@@ -83,7 +83,7 @@
  {
   "cmd": "npm run -s check:api-ref",
   "exit": 0,
-  "durationMs": 6386,
+  "durationMs": 253,
   "tail": [
    "docs/API_REFERENCE.md matches the source."
   ]
@@ -91,7 +91,7 @@
  {
   "cmd": "npm run -s check:threat-model",
   "exit": 0,
-  "durationMs": 5991,
+  "durationMs": 272,
   "tail": [
    "check-threat-model: ok (/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-78/docs/security/channel-map.json)"
   ]
@@ -99,26 +99,26 @@
  {
   "cmd": "npm run -s check:qualification",
   "exit": 0,
-  "durationMs": 13363,
+  "durationMs": 319,
   "tail": [
-   "Qualification receipts valid: 19 receipt(s) under qualification."
+   "Qualification receipts valid: 21 receipt(s) under qualification."
   ]
  },
  {
   "cmd": "npm run -s check:duplicates",
   "exit": 0,
-  "durationMs": 25354,
+  "durationMs": 729,
   "tail": [
-   "{\"scan\":\"duplicates\",\"baseline\":1242,\"current\":1264,\"new\":0,\"stale\":0,\"accepted\":22}",
+   "{\"scan\":\"duplicates\",\"baseline\":1234,\"current\":1261,\"new\":0,\"stale\":0,\"accepted\":27}",
    "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
   ]
  },
  {
   "cmd": "npm run -s check:dead-code",
   "exit": 0,
-  "durationMs": 49802,
+  "durationMs": 3430,
   "tail": [
-   "{\"scan\":\"dead-code\",\"baseline\":2763,\"current\":2787,\"new\":0,\"stale\":0,\"accepted\":24}",
+   "{\"scan\":\"dead-code\",\"baseline\":2761,\"current\":2785,\"new\":0,\"stale\":0,\"accepted\":24}",
    "No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped"
   ]
  }
