@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseCookieHeader, issueSessionToken, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
@@ -104,7 +104,7 @@ function signUsersConfig(workspace: string): string {
     throw new Error(`users config not found: ${path}`);
   }
   const digest = sha256Hex(readFileSync(path));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const payload: UsersSignature = {
     digestSha256: digest,
     signature,

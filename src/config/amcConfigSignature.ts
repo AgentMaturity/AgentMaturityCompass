@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
-  getPrivateKeyPem,
+  getSigningKey,
   getPublicKeyHistory,
   signHexDigest,
   verifyHexDigestAny
@@ -24,7 +24,7 @@ export function signAmcConfig(workspace: string): string {
     throw new Error(`Cannot sign missing config: ${configPath}`);
   }
   const digest = sha256Hex(readFileSync(configPath));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   const sigPath = `${configPath}.sig`;
   writeFileAtomic(
     sigPath,

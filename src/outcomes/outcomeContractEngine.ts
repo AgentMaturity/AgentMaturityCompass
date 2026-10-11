@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import YAML from "yaml";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -139,7 +139,7 @@ function signContractBytes(workspace: string, bytes: Buffer): SignaturePayload {
   const digestSha256 = sha256Hex(bytes);
   return {
     digestSha256,
-    signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };
