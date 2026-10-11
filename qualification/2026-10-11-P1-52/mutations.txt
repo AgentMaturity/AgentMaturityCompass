@@ -1,0 +1,27 @@
+P1-52 mutation checks, local macOS arm64, Node v25.5.0, 2026-10-11.
+Each mutation was applied to scripts/source-quality.mjs (or the committed baseline), then
+`npx vitest run tests/sourceQualityRatchet.test.ts` was run, then the file was restored
+byte-for-byte from a copy (cmp confirmed).
+
+1. ignore-newIds (spec mutation 1): compareToBaseline returns `newIds: []`.
+   Result: 6 failed | 8 passed (14), including
+   "fails on one new duplicate pair and names both paths".
+
+2. shrink-adds (spec mutation 2): --shrink also appends the current new findings to the baseline.
+   Result: 1 failed | 13 passed (14):
+   "--shrink with new and stale findings removes the stale ids and adds nothing".
+
+3. reason-min: the `reason.trim().length < MIN_REASON` refusal is disabled.
+   Result: 1 failed | 13 passed (14):
+   "accepts a new finding only with a recorded reason of at least 20 characters".
+
+4. drift-off: the tool-version/config-hash drift test is disabled.
+   Result: 1 failed | 13 passed (14):
+   "fails with the drift message when .jscpd.json or a tool version changes".
+
+5. Committed-baseline pin (test added after the baseline commit; 15 tests in the file):
+   a. jscpdSha256 in scripts/quality/source-quality-baseline.json changed by one hex digit
+      -> "commits a valid baseline under 1 MB for the current configs" fails.
+   b. an accepted entry with reason "ok" added by hand
+      -> the same test fails with "has no valid recorded reason".
+   The baseline was restored from a copy; `git status` showed it unchanged.

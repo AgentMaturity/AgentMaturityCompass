@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-52",
+  "date": "2026-10-11",
+  "commit": "b81fb7ef755d7c174bb795f5aad4602acef5d6fd",
+  "branch": "rtd/p1-52-source-quality-ratchet",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "git merge --no-edit int (a1aef9d69); manifest.json conflict resolved to P0-14 entry (same bytes archived)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs duplicates --rebaseline --reason \"initial baseline (D-11)\" (at 35c193fdc)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs dead-code --rebaseline --reason \"initial baseline (D-11)\" (at 35c193fdc)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s check:duplicates (expect 1)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s check:dead-code (expect 1)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s quality:baseline -- dead-code --accept <id> --reason short (expect 1)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s quality:baseline -- dead-code --accept <id> --reason \"fixture PR demo: kept to show the accept path\"",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: file removed; npm run -s check:dead-code (expect 1, stale)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s quality:baseline -- dead-code --shrink",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "fixture PR: npm run -s check:dead-code && npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "releaseGate() with an executor running only source-duplicates and source-dead-code (at 0e9f383da)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "4 mutation runs of npx vitest run tests/sourceQualityRatchet.test.ts (each expected to fail; see mutations.txt)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 69495
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 59185
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 85703
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3426
+    },
+    {
+      "cmd": "npx vitest run tests/sourceQualityRatchet.test.ts tests/sourceQuality.test.ts tests/releaseGateExecution.test.ts",
+      "exit": 0,
+      "durationMs": 4012
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 962
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5034
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs trend",
+      "exit": 0,
+      "durationMs": 4220
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 430
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 361
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 2238
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2241
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 415
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 880
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 228
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 270
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 287
+    }
+  ],
+  "tests": {
+    "total": 42,
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.json",
+      "sha256": "c1d7a4dad911e15a2f3592c155d188c1160c010bfc44cff0247db7134209ed73"
+    },
+    {
+      "path": "fixture-pr.log",
+      "sha256": "fe9e48abdb7828a169b65aa3e5e87b01763938be317c1046c21b1aa8308866e2"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "125f421f9f73a3b3abfac4581319c7edaf01cd67a789ffcfe4e0957442dd310e"
+    },
+    {
+      "path": "release-gate-source-steps.json",
+      "sha256": "df943f0c7ae2b8fa0202e4d04bff2fce424f4b740dc7fd2422600fb074892d93"
+    }
+  ],
+  "notes": "tests = npx vitest run tests/sourceQualityRatchet.test.ts tests/sourceQuality.test.ts tests/releaseGateExecution.test.ts at b81fb7ef7 (3 files). Before the last test was added, 33 related test files (ci.yml, source-quality, CONTRIBUTING, D-15 manifest, release gate) ran 309/309 passed. durationMs 0 means the command was not timed. Non-zero exits are expected: the fixture-PR steps that must fail (new duplicate and dead-code findings, a short --reason, a stale accepted entry) and the deliberate mutation runs. Baseline: 1,254 duplicate and 2,787 dead-code findings, 0 accepted, 586,489 bytes, jscpd 5.4.0, knip 6.39.0, sourceCommit 35c193fdc. Not evaluated: Linux CI, the full npm run release:gate."
+}
