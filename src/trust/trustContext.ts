@@ -7,6 +7,7 @@ import { AntiRollbackError, highWaterKey, readHighWater, recordHighWater } from 
 import { readKeyRevocations } from "../keys/keyRevocations.js";
 import { keysetDeclared } from "../keys/keyset.js";
 import { getPurposeKeyHistory } from "../keys/purposeKeys.js";
+import { readPinnedTrustRoots, trustRootSetIdOf } from "./rootRotation.js";
 import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -46,13 +47,6 @@ export interface LoadTrustContextOptions {
   now?: Date;
 }
 
-/** P1-08: `threshold` (default 1) distinct pinned roots must sign each list (m-of-n). */
-export const trustRootsSchema = z.strictObject({
-  type: z.literal("amc.trust-roots"),
-  version: z.literal(1),
-  roots: z.array(z.string().regex(/^[0-9a-f]{64}$/)).min(1).refine(roots => new Set(roots).size === roots.length, "roots must be unique"),
-  threshold: z.number().int().positive().optional()
-}).refine(file => (file.threshold ?? 1) <= file.roots.length, "threshold cannot exceed the number of roots");
 const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySchema) });
 
 /** Shipped with the package; no flag or environment variable disables it, and it beats any pin. */
@@ -87,7 +81,8 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   const rootsFile = join(trustDir, "trust-roots.json");
   // The operator's m-of-n policy is read whenever lists are checked and the file exists, --trust-root flags included:
   // a flag replaces the root set, never the threshold, and an unreadable policy is refused, never skipped (P1-08).
-  const policy = listPaths.length && existsSync(rootsFile) ? parseTrustValue(trustRootsSchema, readSignedTrustListFile(rootsFile), rootsFile) : null;
+  // The file is also checked against this machine's verified root-set rotations (src/trust/rootRotation.ts).
+  const policy = listPaths.length ? readPinnedTrustRoots(join(trustDir, "..")) : null;
   const roots = opts.trustRoots?.length ? opts.trustRoots.map(root => fingerprint(root, "--trust-root")) : policy?.roots ?? [];
   const now = opts.now ?? new Date();
   const lists = listPaths.map(path => {
@@ -112,13 +107,8 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
  * lower list version is refused; and the highest m-of-n threshold ever required for the list stays required, so a later
  * single-signature policy or list cannot downgrade it.
  */
-/** The id that scopes trust-list marks to one pinned root set. */
-export function trustRootSetId(roots: readonly string[]): string {
-  return sha256Hex([...roots].sort().join(",")).slice(0, 16);
-}
-
 function trustListMarks(listId: string, roots: readonly string[], opts: { amcHome: string | undefined; env: NodeJS.ProcessEnv }) {
-  const rootSet = trustRootSetId(roots);
+  const rootSet = trustRootSetIdOf(roots);
   const key = (kind: "trust-list" | "trust-list-version" | "trust-list-threshold") => highWaterKey(kind, `${listId}@${rootSet}`);
   const rethrow = (error: unknown): never => {
     if (error instanceof AntiRollbackError) throw new TrustListError(error.code, `list "${listId}": ${error.message}`);

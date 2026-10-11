@@ -88,20 +88,28 @@ describe("scripts/trust-list.mjs (maintainer tooling)", () => {
     expect(bad.stderr).toContain("TRUST_LIST_INVALID");
     expect(readFileSync(list, "utf8")).toBe(before);
   });
-  it("root-rotate writes a signed root rotation and root-apply replaces the pinned root (P1-08)", () => {
-    for (const name of ["old-root", "next-root"]) expect(run("keygen", "--out", dir, "--name", name).status).toBe(0);
+  it("root-rotate, root-sign and root-apply rotate a 2-of-2 root set, each holder signing alone (P1-08)", () => {
+    for (const name of ["root-1", "root-2", "new-1", "new-2"]) expect(run("keygen", "--out", dir, "--name", name).status).toBe(0);
     const home = join(dir, "home");
     const rootsFile = join(home, "trust", "trust-roots.json");
     const pubId = (name: string) => createHash("sha256").update(readFileSync(join(dir, `${name}.pub`), "utf8")).digest("hex");
     mkdirSync(join(home, "trust"), { recursive: true });
-    writeFileSync(rootsFile, JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [pubId("old-root")] }));
+    writeFileSync(rootsFile, JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [pubId("root-1"), pubId("root-2")], threshold: 2, rootSetId: "acme-roots" }));
     const statement = join(dir, "rotation.json");
-    const rotated = run("root-rotate", "--replace", join(dir, "old-root.pub"), "--next-key", join(dir, "next-root.key"),
-      "--previous-key", join(dir, "old-root.key"), "--out", statement);
+    const rotated = run("root-rotate", "--roots", rootsFile, "--new-pub", join(dir, "new-1.pub"), "--new-pub", join(dir, "new-2.pub"),
+      "--new-threshold", "2", "--current-key", join(dir, "root-1.key"), "--out", statement);
     expect(rotated.status, rotated.stderr).toBe(0);
-    const applied = spawnSync(process.execPath, [SCRIPT, "root-apply", "--statement", statement, "--root-pub", join(dir, "old-root.pub")],
+    const apply = () => spawnSync(process.execPath, [SCRIPT, "root-apply", "--statement", statement, "--root-pub", join(dir, "root-1.pub"), "--root-pub", join(dir, "root-2.pub")],
       { cwd: dir, encoding: "utf8", env: { ...process.env, AMC_HOME: home } });
+    expect(apply().stderr).toContain("needs 2 distinct signatures from the current root set");
+    expect(run("root-sign", "--statement", statement, "--key", join(dir, "new-1.key"), "--as", "current").stderr).toContain("is not a key of the current root set");
+    for (const [key, as] of [["root-2", "current"], ["new-1", "new"], ["new-2", "new"]]) {
+      const signed = run("root-sign", "--statement", statement, "--key", join(dir, `${key}.key`), "--as", as!);
+      expect(signed.status, signed.stderr).toBe(0);
+    }
+    const applied = apply();
     expect(applied.status, applied.stderr).toBe(0);
-    expect(JSON.parse(readFileSync(rootsFile, "utf8")).roots).toEqual([pubId("next-root")]);
+    expect(JSON.parse(readFileSync(rootsFile, "utf8"))).toMatchObject({ roots: [pubId("new-1"), pubId("new-2")], threshold: 2, rootSetId: "acme-roots" });
+    expect(apply().stderr).toContain("already applied");
   });
 });

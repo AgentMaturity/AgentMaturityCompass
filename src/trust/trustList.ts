@@ -207,8 +207,19 @@ export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds:
  * refused too: JSON.parse keeps the last one, and another verifier's parser may keep the first.
  */
 export function readSignedTrustListFile(path: string): unknown {
+  let bytes: Buffer;
   try {
-    const text = boundedFile(path, TRUST_LIST_MAX_BYTES).toString("utf8");
+    bytes = boundedFile(path, TRUST_LIST_MAX_BYTES);
+  } catch (error) {
+    throw new TrustListError("TRUST_LIST_INVALID", `${path}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  return parseTrustJson(bytes, path);
+}
+
+/** JSON for trust files: refuses `__proto__` and repeated keys, throwing TRUST_LIST_INVALID. */
+export function parseTrustJson(bytes: Buffer, what: string): unknown {
+  try {
+    const text = bytes.toString("utf8");
     const value = JSON.parse(text, (key, value: unknown) => {
       if (key === "__proto__") throw new Error("unknown field __proto__");
       return value;
@@ -216,6 +227,6 @@ export function readSignedTrustListFile(path: string): unknown {
     assertNoDuplicateJsonKeys(text);
     return value;
   } catch (error) {
-    throw new TrustListError("TRUST_LIST_INVALID", `${path}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new TrustListError("TRUST_LIST_INVALID", `${what}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

@@ -13,4 +13,4 @@ export {
 } from "./verifierReport.js";
 export { checkDigestSignature, checkSignature, envelopePublicKey, type SignatureCheck, type SignatureCheckInput } from "./signatureCheck.js";
 export { requestTrustOverride } from "./requestTrust.js";
-export { applyTrustRootRotation } from "./rootRotation.js";
+export { addRootRotationSignature, applyTrustRootRotation, signRootRotation, type RootRotationStatement } from "./rootRotation.js";

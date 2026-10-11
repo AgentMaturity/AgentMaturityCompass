@@ -14,7 +14,7 @@ import { ensureContainedDir, readContainedOrNull, writeContained } from "../util
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 
-export type HighWaterKind = "trust-list" | "trust-list-version" | "trust-list-threshold" | "revocation-list" | "key-history" | "rotation" | "keyset";
+export type HighWaterKind = "trust-list" | "trust-list-version" | "trust-list-threshold" | "trust-root-set" | "revocation-list" | "key-history" | "rotation" | "keyset";
 export type AntiRollbackCode = "ROLLBACK_DETECTED" | "FORK_DETECTED";
 
 export class AntiRollbackError extends Error {
@@ -99,6 +99,12 @@ function readEntries(opts: HighWaterOptions): Record<string, HighWaterEntry> {
   const parsed = fileSchema.safeParse(value);
   if (!parsed.success) throw new Error(`anti-rollback state ${path} is not a valid amc.high-water file; refusing to decide on rollback`);
   return parsed.data.entries;
+}
+
+/** The ids of every mark of one kind on this machine. */
+export function highWaterIds(kind: HighWaterKind, opts: HighWaterOptions = {}): string[] {
+  const prefix = `${kind}:`;
+  return Object.keys(readEntries(opts)).filter(key => key.startsWith(prefix)).map(key => key.slice(prefix.length));
 }
 
 export function readHighWater(key: string, opts: HighWaterOptions = {}): HighWaterEntry | null {
