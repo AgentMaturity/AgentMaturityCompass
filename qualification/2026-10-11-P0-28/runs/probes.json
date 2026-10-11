@@ -1,0 +1,26 @@
+{
+  "afterUp1": {
+    "listeners": [
+      "127.0.0.1:3210",
+      "127.0.0.1:3211",
+      "127.0.0.1:3212",
+      "127.0.0.1:4173"
+    ],
+    "consoleHttpStatus": 200
+  },
+  "afterDown1": {
+    "listeners": []
+  },
+  "afterUp2": {
+    "listeners": [
+      "127.0.0.1:3210",
+      "127.0.0.1:3211",
+      "127.0.0.1:3212",
+      "127.0.0.1:4173"
+    ],
+    "consoleHttpStatus": 200
+  },
+  "afterDown2": {
+    "listeners": []
+  }
+}

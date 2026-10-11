@@ -1,0 +1,44 @@
+Docs drift check failed:
+- docs/A4_FORGE.md:153: `amc a4` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/AGENT_GUIDE.md:245: prohibited truth claim "compliant" (D-03 vocabulary): - **Agent-readable rules** — your agent can follow these to become compliant ### EU AI Act Deadline The EU AI Act's high-risk obligations (Articl
+- docs/API_REFERENCE.md:3839: `amc subscribe` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/API_REFERENCE.md:4053: `amc activate` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/API_REFERENCE.md:8250: `amc activate` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/API_REFERENCE.md:8296: `amc inspect` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/API_REFERENCE.md:8455: `amc rm` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ASSURANCE_LAB.md:73: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ASSURANCE_LAB.md:73: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ASSURANCE_LAB.md:106: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ASSURANCE_LAB.md:106: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ASSURANCE_LAB.md:120: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ATTESTATION_EVIDENCE_PATHS.md:30: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/CLOUD_REFERENCE_ARCHITECTURES.md:132: prohibited truth claim "certified" (D-03 vocabulary): modules for VPC/VNet, clusters, load balancers, DNS, and registries. - Provider-certified production hardening for every regulated workload. Use
+- docs/CONTINUOUS_MONITORING.md:523: `amc drift alerts` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/DOMAIN_PACKS.md:361: prohibited truth claim "Certification readiness" (D-03 vocabulary): ain ID. - Compliance gaps include regulatory references and remediation text. - Certification readiness is domain-threshold aware and sensitive to critical L1 g
+- docs/INCIDENT_RESPONSE_READINESS.md:29: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/ISO_42001_ALIGNMENT.md:169: prohibited truth claim "certification-ready" (D-03 vocabulary): | Conformity Evidence | Machine-readable, certification-ready audit evidence packages | Requirements: - artifact + audit
+- docs/MCP_SERVER.md:343: `amc score run` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/MIGRATION_FROM_PROMPTFOO_DEEPEVAL.md:149: `amc assurance create` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/MIGRATION_FROM_PROMPTFOO_DEEPEVAL.md:51: `amc assurance generate` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/QUICKSTART.md:372: `amc diagnostic run` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/RED_TEAMING_GUIDE.md:42: prohibited truth claim "compliant" (D-03 vocabulary): MCP servers that change behavior after N calls | | Score gaming | Agent appears compliant on paper but isn't in practice | Keyword-stuffed responses that pass r
+- docs/RED_TEAMING_GUIDE.md:425: prohibited truth claim "compliant" (D-03 vocabulary): licting instructions. **Fix within 1 week.** - **Low:** Agent was slightly more compliant than ideal under social pressure, or resource limits weren't tight eno
+- docs/RED_TEAMING_GUIDE.md:627: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/RED_TEAMING_GUIDE.md:627: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/SHIELD_ENFORCE_REFERENCE.md:91: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/SHIELD_ENFORCE_REFERENCE.md:97: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/SHIELD_ENFORCE_REFERENCE.md:89: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/SHIELD_ENFORCE_REFERENCE.md:95: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/SUPPLY_CHAIN.md:50: prohibited truth claim "Guaranteed" (D-03 vocabulary): ) - signed manifest ( + ) ## What Is Guaranteed - Artifact hashes are checked against the signed manifest. - Manifes
+- docs/SYSTEM_CAPABILITIES.md:23: `amc workspace` is not in docs/CLI_COMMAND_INVENTORY.md
+- docs/compliance/iso-42001-aims-manual.md:10: prohibited truth claim "certification-readiness" (D-03 vocabulary): ), using available repo evidence and identifying mandatory gaps to close before certification-readiness. ## 2. Scope and Boundary ### In scope - AMC governan
+- docs/compliance/iso-42001-aims-manual.md:144: prohibited truth claim "Certification Readiness" (D-03 vocabulary): nd should be wrapped with formal management-system governance artifacts. ## 7. Certification Readiness Assessment Current readiness: **Low-to-Moderate (techni
+- docs/compliance/iso-42001-aims-manual.md:148: prohibited truth claim "certification-readiness" (D-03 vocabulary): g, management system weakly formalized)**. Blocking items before ISO/IEC 42001 certification-readiness claim: - Missing formal AIMS policy and scope package. -
+- docs/compliance/iso-42001-aims-manual.md:171: prohibited truth claim "certification-readiness" (D-03 vocabulary): 0 1. Stand up CAPA register with effectiveness verification. 2. Run end-to-end certification-readiness rehearsal and evidence walk-through. 3. Freeze document
+- website/docs/cli.html:260: `amc telemetry` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/cli.html:261: `amc telemetry` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/cli.html:392: `amc observe compare` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/cli.html:393: `amc correction log` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/cli.html:537: `amc assurance cert` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/cli.html:566: `amc certification` is not in docs/CLI_COMMAND_INVENTORY.md
+- website/docs/competitive-analysis.md:414: prohibited truth claim "compliant" (D-03 vocabulary): th LLMs, code, or humans - Catch regressions in CI - SOC 2 Type II, GDPR, HIPAA compliant - SSO, RBAC, hybrid deployment - Custom-built trace database (Brainsto

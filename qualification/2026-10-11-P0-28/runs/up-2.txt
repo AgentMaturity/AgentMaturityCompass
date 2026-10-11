@@ -1,0 +1,87 @@
+$ amc up --no-open --no-remember
+# exit 0
+
+✓ AMC is running. (agent: default)
+
+  Open your report card:  http://127.0.0.1:3212/console
+  Advanced endpoints (optional): Gateway :3210 · Proxy :3211 · Dashboard :4173 · Studio API :3212 · Bridge :3212/bridge
+  Latest run: none — running your first one below
+
+No prior assessment found — running the first 8-surface baseline (amc run)...
+
+  ╭────────────────────────────────────────────────────────╮
+  │  AMC Full Assessment — default                       │
+  ╰────────────────────────────────────────────────────────╯
+
+  First run — a low score here is completely normal.
+  AMC hasn't watched your agent do real work yet, so there is little
+  to score. Nothing is inflated: every grade below is only what AMC
+  can prove right now. Connect your agent and let it run — the score
+  climbs as real evidence builds up.
+
+  ① Score ······················ F
+    244 questions scored, 244 below target
+    🔴 Strategic Agent Operations: 0.0/5.0
+    🔴 Leadership & Autonomy: 0.0/5.0
+
+  ② Shield ····················· F
+    Assurance run failed
+    🔴 No real agent target available: no model configured for the agent under test
+
+  ③ Enforce ···················· —   (Connected agent: Configure an agent connection, then run one real action.)
+    3/3 signed control configs verified; runtime activation 0/4 (NOT_STARTED).
+    🔴 Connected agent: Configure an agent connection, then run one real action.
+    🔴 First observed action: Waiting for a signed runtime action receipt.
+    +2 more
+
+  ④ Vault ······················ F
+    Vault or ledger proof is incomplete.
+    🔴 ledger integrity: Session aa71f720-6a09-4da9-bf1b-6d605d758153 missing seal
+
+  ⑤ Watch ······················ —   (records contain derived state but no observed runtime signal or decision)
+    1 persisted observability record(s), 0 observed signal(s), 0 observed decision(s).
+    🔴 records contain derived state but no observed runtime signal or decision
+
+  ⑥ Comply ····················· F
+    Compliance maps are missing or fail signature verification.
+    🔴 compliance maps: compliance maps missing
+
+  ⑦ Fleet ······················ —   (fleet governance requires at least two registered agents; single-agent config is readiness only)
+    1/1 agent config(s) signed; 0 fleet lifecycle artifact(s).
+    🔴 fleet governance requires at least two registered agents; single-agent config is readiness only
+    🔴 no fleet lifecycle run artifact exists
+
+  ⑧ Passport ··················· —   (no portable .amcpass export exists)
+    0/0 portable passport export(s) verified.
+    🔴 no portable .amcpass export exists
+
+  ────────────────────────────────────────────────────────
+  Overall Grade:  F  (10/100)
+  Surface coverage: 4/8 evaluated; 4 pending; 3 failed
+  ────────────────────────────────────────────────────────
+
+  Top fixes (biggest grade impact):
+  1. Improve weakest dimensions
+     Score → F (+22.5 overall)
+     amc improve
+  2. Fix 1 Shield failures
+     Shield → F (+22.5 overall)
+     amc shield analyze
+  3. Map compliance controls to evidence
+     Comply → F (+9.0 overall)
+     amc comply report --framework EU_AI_ACT
+  4. Initialize signing vault
+     Vault → F (+7.2 overall)
+     amc vault init
+
+  Evidence:   5 signed records saved under .amc/ (full paths in the JSON report)
+
+  What to do next
+  1. Open the Compass Console shown above and follow the steps.
+  2. Let AMC watch your agent work: amc connect --status
+  3. Re-run anytime with one command: amc start
+
+✓ Baseline complete — your first score is saved. Follow "What to do next" above.
+
+# stderr
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).
