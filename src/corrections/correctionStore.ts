@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import type { CorrectionEvent, CorrectionStatus } from "./correctionTypes.js";
 
 /**
@@ -417,7 +417,7 @@ export function markLinkedEvidenceAsCorrected(
     };
   }
 
-  const privateKey = getPrivateKeyPem(params.workspace, "monitor");
+  const privateKey = getSigningKey(params.workspace, "ledger-row");
   const insert = db.prepare(
     `INSERT OR IGNORE INTO evidence_corrections
      (link_id, evidence_event_id, correction_id, status, verified_ts, verified_by, source, created_ts, signature)

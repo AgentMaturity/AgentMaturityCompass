@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPrivateKeyPem, getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
@@ -146,7 +146,7 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
   ensureDir(checkpointsDir(workspace));
   // "wx": a concurrent writer of the same sequence fails here instead of forking the chain.
   writeFileSync(join(checkpointsDir(workspace), `${checkpoint.sequence}.json`),
-    `${JSON.stringify({ checkpoint, sha256: digest, signature: signHexDigest(digest, getPrivateKeyPem(workspace, "monitor")) }, null, 2)}\n`,
+    `${JSON.stringify({ checkpoint, sha256: digest, signature: signHexDigest(digest, getSigningKey(workspace, "ledger-row")) }, null, 2)}\n`,
     { flag: "wx", mode: 0o644 });
   const result = await stampCheckpoint(workspace, { checkpoint, sha256: digest }, trust);
   if (result.status === "pending" && config.required) {

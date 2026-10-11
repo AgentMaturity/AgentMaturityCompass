@@ -107,7 +107,7 @@ import { exportFindingProofs, listFindingProofs, loadFindingProof, writeFindingP
 import { exportLifecycleChangeReceipts, listLifecycleChangeReceipts, loadLifecycleChangeReceipt, writeLifecycleChangeReceipts } from "./lifecycle/changeReceipt.js";
 import { exportLifecycleRunArtifact, listLifecycleRunArtifacts, loadLifecycleRunArtifact, writeLifecycleRunArtifact } from "./lifecycle/lifecycleRunArtifact.js";
 import { listObservabilityLaneRecords, loadObservabilityLaneRecord, writeObservabilityLaneRecord } from "./lifecycle/observabilityLane.js";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
+import { getPrivateKeyPem, getSigningKey, getPublicKeyHistory, signHexDigest } from "./crypto/keys.js";
 import { computeIncidentHash, createIncidentStore } from "./incidents/incidentStore.js";
 import {
   RECORDABLE_TRIGGERS,
@@ -8033,7 +8033,7 @@ incident
 
       const incidentHash = computeIncidentHash(incidentBase as unknown as Parameters<typeof computeIncidentHash>[0]);
       const signatureDigest = sha256Hex(canonicalize({ ...incidentBase, incident_hash: incidentHash }));
-      const signature = signHexDigest(signatureDigest, getPrivateKeyPem(workspace, "monitor"));
+      const signature = signHexDigest(signatureDigest, getSigningKey(workspace, "ledger-row"));
 
       store.insertIncident({
         ...incidentBase,
@@ -8089,7 +8089,7 @@ incident
         evidence: [opts.evidence],
         addedTs: now,
         addedBy: "OWNER",
-        signature: signHexDigest(edgeDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(edgeDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Linked evidence ${opts.evidence} to incident ${incidentId}`));
@@ -8141,7 +8141,7 @@ incident
         toState: "RESOLVED",
         reason: opts.resolution,
         ts: now,
-        signature: signHexDigest(transitionDigest, getPrivateKeyPem(workspace, "monitor"))
+        signature: signHexDigest(transitionDigest, getSigningKey(workspace, "ledger-row"))
       });
 
       console.log(chalk.green(`Incident closed: ${id}`));
@@ -8182,7 +8182,7 @@ incident
           triggerOrClockId: (opts.trigger ?? opts.notified)!,
           ts: parseIsoTimestamp(opts.at!, "--at"),
           recordedBy: "cli",
-          privateKeyPem: getPrivateKeyPem(workspace, "monitor"),
+          privateKeyPem: getSigningKey(workspace, "ledger-row"),
           publicKeys
         });
         if (!opts.json) console.log(chalk.green(`Recorded ${event.kind} ${event.triggerOrClockId}: ${event.eventId}`));
