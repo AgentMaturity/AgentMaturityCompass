@@ -213,3 +213,20 @@ describe("AMC-1542 a list swapped after its signature check is never used", () =
     expect(swaps, "the swap ran between the signature check and the decision").toBe(1);
   }, 60_000);
 });
+
+describe("Studio /leases/status reports from one verified read (P0-30 follow-up)", () => {
+  it("takes the count from the bytes whose signature verified, and none from an unverified list", async () => {
+    const workspace = newWorkspace();
+    const server = await startStudioApiServer({ workspace, host: "127.0.0.1", port: 0, token: ADMIN });
+    closers.push(() => server.close());
+    revokeLease(workspace, "status-revoked", "status fixture revocation");
+    const paths = leaseRevocationPaths(workspace);
+    const signedList = readFileSync(paths.file);
+    const status = async () => (await fetch(new URL("/leases/status", server.url), { headers: { "x-amc-admin-token": ADMIN } })).json();
+    afterVerify.next = { digest: sha256Hex(signedList), run: () => {
+      writeFileSync(paths.file, JSON.stringify({ ...JSON.parse(signedList.toString("utf8")), revocations: [] }, null, 2));
+    } };
+    expect(await status()).toMatchObject({ revocationSignatureValid: true, revokedLeaseCount: 1 });
+    expect(await status()).toMatchObject({ revocationSignatureValid: false, revokedLeaseCount: null, updatedTs: null });
+  }, 60_000);
+});

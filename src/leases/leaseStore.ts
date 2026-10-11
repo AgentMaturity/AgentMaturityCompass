@@ -210,16 +210,22 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
   } });
 }
 
-/**
- * The revoked lease ids from ONE read of the list, verified and parsed from those same bytes, or why that failed.
- * Every consumer decides on this set: a list swapped on disk after the check is never read.
- */
-export function readRevokedLeaseIds(workspace: string): { ok: true; ids: Set<string> } | { ok: false; reason: string } {
+/** The store from ONE read of the list, verified and parsed from those same bytes, or why that failed. */
+export function readVerifiedLeaseRevocations(workspace: string): { ok: true; store: LeaseRevocations } | { ok: false; reason: string } {
   try {
-    return { ok: true, ids: new Set(readVerifiedRevocations(workspace).revocations.map((row) => row.leaseId)) };
+    return { ok: true, store: readVerifiedRevocations(workspace) };
   } catch (error) {
     return { ok: false, reason: error instanceof Error ? error.message : String(error) };
   }
+}
+
+/**
+ * The revoked lease ids from ONE verified read (`readVerifiedLeaseRevocations`), or why that failed.
+ * Every consumer decides on this set: a list swapped on disk after the check is never read.
+ */
+export function readRevokedLeaseIds(workspace: string): { ok: true; ids: Set<string> } | { ok: false; reason: string } {
+  const read = readVerifiedLeaseRevocations(workspace);
+  return read.ok ? { ok: true, ids: new Set(read.store.revocations.map((row) => row.leaseId)) } : read;
 }
 
 /**
