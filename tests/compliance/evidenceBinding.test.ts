@@ -78,7 +78,10 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "legacy-unverified",
   // A trust-context distrust entry's source (P1-08, src/trust/trustContext.ts): the workspace's own key revocation list,
   // never an evidence event's meta.source.
-  "workspace-key-revocations"
+  "workspace-key-revocations",
+  // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
+  // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
+  "source_unavailable", "value_contract"
 ]);
 
 function sourceFiles(dir: string): string[] {
