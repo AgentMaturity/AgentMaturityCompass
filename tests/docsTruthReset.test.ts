@@ -72,6 +72,15 @@ describe("docs truth reset (P0-28)", () => {
     expect(saml).toContain("Standard SAML 2.0 responses with XML signatures are not supported");
   });
 
+  test("the quickstart image is run without a second amc and with no example passphrase", () => {
+    for (const surface of ["README.md", "website/docs/getting-started.html"]) {
+      const text = read(surface);
+      expect(text, surface).not.toMatch(/amc-quickstart\s+amc\b/);
+      expect(text, surface).not.toMatch(/AMC_VAULT_PASSPHRASE=\S/);
+      expect(text, surface).toContain("docker run --rm amc-quickstart --version");
+    }
+  });
+
   test("no CLI description still says 126-question", () => {
     expect(read("src/cli.ts")).not.toContain("126-question");
     expect(read("src/score/domainPacks.ts")).not.toContain("126-question");

@@ -159,7 +159,8 @@ Each installer pins the published AMC release, downloads the platform archive an
 **Docker**
 ```bash
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
-docker run -it --rm amc-quickstart amc
+docker run --rm amc-quickstart --version   # the entry point is already amc
+docker run -it --rm amc-quickstart         # default command: amc quickscore (interactive)
 ```
 
 Use the local build command unless a GHCR package has been verified public.
@@ -740,7 +741,8 @@ Both scripts install the published 1.1.1 GitHub release after SHA-256 verificati
 ### Docker
 ```bash
 docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
-docker run -it --rm amc-quickstart amc
+docker run --rm amc-quickstart --version   # the entry point is already amc
+docker run -it --rm amc-quickstart         # default command: amc quickscore (interactive)
 ```
 
 Use the local build command unless a GHCR package has been verified public.
