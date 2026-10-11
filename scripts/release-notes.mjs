@@ -11,7 +11,7 @@
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { findTruthClaims } from "./docs-drift-check.mjs";
+import { findTruthClaims, findUnknownCommands, forbiddenSourceNames, loadKnownCommands } from "./docs-drift-check.mjs";
 import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const PACKAGE = "agent-maturity-compass";
@@ -98,6 +98,25 @@ export function uncoveredBreaking(text, changesets) {
     .map((changeset) => changeset.slug);
 }
 
+/**
+ * website/changelog.html shows each changeset's first line, and docs-drift checks that page in the release gate. Check
+ * the lines while the changesets are still pending, so a release is refused before anything is consumed.
+ */
+export function pageLineProblems(root, changesets) {
+  const inventory = join(root, "docs", "CLI_COMMAND_INVENTORY.md");
+  const known = existsSync(inventory) ? loadKnownCommands(readFileSync(inventory, "utf8")) : null;
+  return changesets.flatMap(({ slug, body }) => {
+    const line = body.split("\n")[0];
+    return [
+      ...(known ? findUnknownCommands("changelog.md", line, known) : []).map((found) =>
+        `changeset \`${slug}\`: the changelog page would name \`${found.command}\`, which docs/CLI_COMMAND_INVENTORY.md does not list`),
+      ...forbiddenSourceNames.filter((pattern) => pattern.test(line)).map((pattern) =>
+        `changeset \`${slug}\`: the changelog page would match the forbidden name ${pattern}`),
+      ...findTruthClaims("changelog.md", line).map((claim) => `changeset \`${slug}\`: banned claim word "${claim.match}" on the changelog page`)
+    ];
+  });
+}
+
 export function generateReleaseNotes(root, version, changesets = readChangesets(root)) {
   const relative = `docs/releases/${version}.md`;
   const path = join(root, relative);
@@ -106,7 +125,8 @@ export function generateReleaseNotes(root, version, changesets = readChangesets(
   const after = applyBlocks(before, renderBlocks(changesets));
   const problems = [
     ...uncoveredBreaking(after, changesets).map((slug) => `breaking changeset \`${slug}\` is not cited in the Migration section`),
-    ...findTruthClaims(relative, after).map((claim) => `line ${claim.line}: banned claim word "${claim.match}": ${claim.context}`)
+    ...findTruthClaims(relative, after).map((claim) => `line ${claim.line}: banned claim word "${claim.match}": ${claim.context}`),
+    ...pageLineProblems(root, changesets)
   ];
   return { path, relative, before, after, problems };
 }

@@ -56,6 +56,16 @@ describe("release notes generator (P0-34)", () => {
     ]);
   });
 
+  test("refuses a changeset whose changelog-page line names an unknown command or a forbidden name (P0-34)", () => {
+    const root = fixture({ ghost: ["patch", "`amc ghost run` is fixed.\n\nMore."], net: ["patch", "Refuses multicast addresses."],
+      named: ["patch", "Mentions Multica by name."], real: ["patch", "`amc real` works."] }, NOTES(""));
+    writeFileSync(join(root, "docs", "CLI_COMMAND_INVENTORY.md"), "| Command | Description | Options | Aliases |\n| `amc real` | Real | - | - |\n");
+    expect(generateReleaseNotes(root, "2.0.0").problems).toEqual([
+      "changeset `ghost`: the changelog page would name `amc ghost`, which docs/CLI_COMMAND_INVENTORY.md does not list",
+      "changeset `named`: the changelog page would match the forbidden name /multica(?!st)/i"
+    ]);
+  });
+
   test("refuses notes without markers or a missing notes file", () => {
     expect(() => applyBlocks("# no markers\n", { breaking: "", changes: "" })).toThrow(/release-notes:breaking/);
     const root = fixture({ a: ["minor", "Add a."] }, NOTES(""));

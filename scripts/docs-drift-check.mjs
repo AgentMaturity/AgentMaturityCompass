@@ -21,7 +21,7 @@ const checkedRoots = [
   "AMC_OS"
 ];
 
-const forbiddenSourceNames = [
+export const forbiddenSourceNames = [
   /AgentScope/i,
   /agentscope/i,
   /future-agi/i,
@@ -35,7 +35,7 @@ const forbiddenSourceNames = [
   /Lucien/i,
   /thewisecrab/i,
   /wisecrab/i,
-  /multica/i,
+  /multica(?!st)/i,
   /andrej/i,
   /Karpathy/
 ];
