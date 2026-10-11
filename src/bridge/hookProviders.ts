@@ -9,11 +9,16 @@ import {
   type ShellCommandPlan,
   type ShellCommandSegment,
 } from "../enforce/shellCommandPlan.js";
+import type { RuntimeName } from "../types.js";
+import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
-export type HookProvider = "claude-code" | "gemini-cli";
+export const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
+export type HookProvider = (typeof HOOK_PROVIDERS)[number];
 export type HookControlDecision = "allow" | "deny" | "ask";
+export type HookControlOutcome = HookControlDecision | "steer";
+export type HookControlProviderMapping = "native" | "corrective_deny" | "fail_closed_deny";
 export type ProviderControlResponse = Record<string, unknown>;
 
 export type HookControlErrorCode =
@@ -43,8 +48,71 @@ export interface CanonicalToolRequest {
   argumentsReviewable: boolean;
 }
 
-export const providerSchema = z.enum(["claude-code", "gemini-cli"]);
+export const providerSchema = z.enum(HOOK_PROVIDERS);
 export const controlDecisionSchema = z.enum(["allow", "deny", "ask"]);
+
+export function isHookProvider(value: unknown): value is HookProvider {
+  return providerSchema.safeParse(value).success;
+}
+
+/** The event each provider's control hook sends; control accepts no other. */
+export const CONTROL_HOOK_EVENTS: Readonly<Record<HookProvider, string>> = {
+  "claude-code": "PreToolUse",
+  "gemini-cli": "BeforeTool",
+  pi: "tool_call",
+};
+
+export function runtimeFor(provider: HookProvider): RuntimeName {
+  switch (provider) {
+    case "claude-code": return "claude";
+    case "gemini-cli": return "gemini";
+    case "pi": return "pi";
+    default: {
+      const unreachable: never = provider;
+      throw new Error(`unknown hook provider ${String(unreachable)}`);
+    }
+  }
+}
+
+/**
+ * What AMC's Pi extension adds to each Pi tool_call it forwards (docs/adapters/pi.md): Pi's version, run mode and
+ * dialog support as Pi's ExtensionContext reports them, Pi's own call id, and the AMC action id of the calling tool.
+ */
+const piControlContextSchema = z.strictObject({
+  version: z.string().min(1).max(64),
+  mode: z.enum(["tui", "rpc", "json", "print"]),
+  hasUI: z.boolean(),
+  toolCallId: z.string().min(1).max(512),
+  parentActionId: z.string().min(1).max(160).nullable(),
+});
+export type PiControlContext = z.infer<typeof piControlContextSchema>;
+
+/** The Pi context of a pi request, or null for other providers. A pi request without a valid one is refused. */
+export function piControlContext(provider: HookProvider, input: Record<string, unknown>): PiControlContext | null {
+  if (provider !== "pi") return null;
+  const parsed = piControlContextSchema.safeParse(input.pi);
+  if (!parsed.success) {
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Pi hook input needs a valid pi context");
+  }
+  return parsed.data;
+}
+
+/** Claude Code can put an ask to a person; Pi only in its interactive terminal UI, never print, JSON, RPC or the SDK. */
+export function supportsNativeAsk(provider: HookProvider, pi: PiControlContext | null): boolean {
+  return provider === "claude-code" || (pi !== null && pi.mode === "tui" && pi.hasUI);
+}
+
+/** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
+export function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider, pi: PiControlContext | null): string {
+  if (provider === "pi") {
+    return outcome === "ask"
+      ? `Pi ${pi?.mode ?? "unknown"} mode has no interactive confirmation, so AMC denied the action.`
+      : "Pi tool_call has no verified corrective retry outcome, so AMC denied the action.";
+  }
+  return outcome === "ask"
+    ? "Gemini CLI BeforeTool does not support ask, so AMC denied the action."
+    : "Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.";
+}
 
 const claudeControlResponseSchema = z.object({
   hookSpecificOutput: z.object({
@@ -71,6 +139,22 @@ const geminiControlResponseSchema = z.union([
     reason: z.string().min(1).max(1_024),
   }).strict(),
 ]);
+
+/**
+ * Pi's ToolCallEventResult: `{ block: true, reason }` blocks, no block runs the tool. `ask: true` is AMC's own
+ * instruction to its extension to confirm in Pi's UI; an extension that ignores it still blocks.
+ */
+const piControlResponseSchema = z.union([
+  z.strictObject({ block: z.literal(false) }),
+  z.strictObject({ block: z.literal(true), reason: z.string().min(1).max(1_024) }),
+  z.strictObject({ block: z.literal(true), reason: z.string().min(1).max(1_024), ask: z.literal(true) }),
+]);
+
+const CONTROL_RESPONSE_SCHEMAS: Readonly<Record<HookProvider, z.ZodType>> = {
+  "claude-code": claudeControlResponseSchema,
+  "gemini-cli": geminiControlResponseSchema,
+  pi: piControlResponseSchema,
+};
 
 export function parseProvider(provider: unknown): HookProvider {
   const parsed = providerSchema.safeParse(provider);
@@ -110,6 +194,10 @@ export function renderProviderControlResponse(
       },
     };
   }
+  if (provider === "pi") {
+    if (decision === "allow") return { block: false };
+    return decision === "ask" ? { block: true, reason, ask: true } : { block: true, reason };
+  }
   if (decision === "allow") {
     return { decision: "allow" };
   }
@@ -132,9 +220,7 @@ export function validateProviderControlResponse(
   providerInput: HookProvider,
   response: unknown,
 ): response is ProviderControlResponse {
-  const provider = parseProvider(providerInput);
-  return (provider === "claude-code" ? claudeControlResponseSchema : geminiControlResponseSchema)
-    .safeParse(response).success;
+  return CONTROL_RESPONSE_SCHEMAS[parseProvider(providerInput)].safeParse(response).success;
 }
 
 function firstString(input: Record<string, unknown>, keys: string[]): string | null {
@@ -174,6 +260,91 @@ function canonicalShellToolRequest(
   };
 }
 
+/** The provider's response for AMC's requested outcome; an outcome the provider cannot carry becomes a lossy deny. */
+export function materializeProviderDecision(input: {
+  provider: HookProvider;
+  pi: PiControlContext | null;
+  requestedDecision: HookControlOutcome;
+  reason: string;
+}): {
+  decision: HookControlDecision;
+  effectiveOutcome: HookControlOutcome;
+  providerMapping: HookControlProviderMapping;
+  capabilityLossy: boolean;
+  reason: string;
+  providerResponse: ProviderControlResponse;
+  providerResponseSha256: string;
+} {
+  let decision: HookControlDecision;
+  let effectiveOutcome: HookControlOutcome;
+  let providerMapping: HookControlProviderMapping;
+  let capabilityLossy: boolean;
+  let reason: string;
+  let providerResponse: ProviderControlResponse;
+
+  if (input.requestedDecision === "steer") {
+    decision = "deny";
+    if (input.provider === "claude-code") {
+      effectiveOutcome = "steer";
+      providerMapping = "corrective_deny";
+      capabilityLossy = false;
+      reason = cleanReason(input.reason);
+      providerResponse = renderProviderControlResponse(
+        input.provider,
+        "deny",
+        reason,
+        "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
+      );
+    } else {
+      effectiveOutcome = "deny";
+      providerMapping = "fail_closed_deny";
+      capabilityLossy = true;
+      reason = cleanReason(`${input.reason} ${lossyOutcomeNote("steer", input.provider, input.pi)}`);
+      providerResponse = renderProviderControlResponse(input.provider, "deny", reason);
+    }
+  } else if (input.requestedDecision === "ask" && !supportsNativeAsk(input.provider, input.pi)) {
+    decision = "deny";
+    effectiveOutcome = "deny";
+    providerMapping = "fail_closed_deny";
+    capabilityLossy = true;
+    reason = cleanReason(`${input.reason} ${lossyOutcomeNote("ask", input.provider, input.pi)}`);
+    // Gemini CLI's own renderer turns an ask into its deny; every other provider gets a plain deny.
+    providerResponse = input.provider === "gemini-cli"
+      ? renderProviderControlResponse(input.provider, "ask", input.reason)
+      : renderProviderControlResponse(input.provider, "deny", reason);
+  } else {
+    decision = input.requestedDecision;
+    effectiveOutcome = input.requestedDecision;
+    providerMapping = "native";
+    capabilityLossy = false;
+    reason = cleanReason(input.reason);
+    providerResponse = renderProviderControlResponse(input.provider, decision, reason);
+  }
+
+  return {
+    decision,
+    effectiveOutcome,
+    providerMapping,
+    capabilityLossy,
+    reason,
+    providerResponse,
+    providerResponseSha256: sha256Hex(Buffer.from(serializeProviderControlResponse(providerResponse), "utf8")),
+  };
+}
+
+/** Pi's built-in tools (1.0.2 and 1.0.4 schemas): `read` needs a path; grep, find and ls default to the cwd. */
+function piToolRequest(toolName: string, toolInput: Record<string, unknown>, workspace: string): Omit<CanonicalToolRequest, "segment"> | null {
+  const path = firstString(toolInput, ["path"]);
+  if (toolName === "read" || ["grep", "find", "ls"].includes(toolName)) {
+    const readPath = toolName === "read" ? path : path ?? workspace;
+    return readPath ? { name: "fs.read", args: { path: readPath }, argumentsReviewable: true } : null;
+  }
+  if (toolName === "write" || toolName === "edit") {
+    return path ? { name: "fs.write", args: { path }, argumentsReviewable: true } : null;
+  }
+  return null;
+}
+
 function shellCommandForProviderTool(
   provider: HookProvider,
   toolName: string,
@@ -183,6 +354,9 @@ function shellCommandForProviderTool(
     return firstString(toolInput, ["command"]) ?? "";
   }
   if (provider === "gemini-cli" && toolName === "run_shell_command") {
+    return firstString(toolInput, ["command"]) ?? "";
+  }
+  if (provider === "pi" && toolName === "bash") {
     return firstString(toolInput, ["command"]) ?? "";
   }
   return null;
@@ -222,6 +396,8 @@ export function canonicalToolRequests(
         ? { name: "http.fetch", args: { url, method: "GET" }, argumentsReviewable: true }
         : null;
     }
+  } else if (provider === "pi") {
+    request = piToolRequest(toolName, toolInput, workspace);
   } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
     request = {
       name: "fs.read",

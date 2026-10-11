@@ -20,7 +20,7 @@ import {
   validateToolRequest,
   verifyToolsConfigSignature,
 } from "../toolhub/toolhubValidators.js";
-import type { ActionClass, RiskTier, RuntimeName } from "../types.js";
+import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
@@ -28,27 +28,18 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
 import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  canonicalToolRequests,
-  cleanReason,
-  controlDecisionSchema,
-  HookControlError,
-  parseProvider,
-  providerSchema,
-  renderProviderControlResponse,
-  serializeProviderControlResponse,
-  validateProviderControlResponse,
-  type CanonicalToolRequest,
-  type HookControlDecision,
-  type HookProvider,
-  type ProviderControlResponse,
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, HookControlError, materializeProviderDecision,
+  parseProvider, piControlContext, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
+  type CanonicalToolRequest, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
+  type HookProvider, type PiControlContext, type ProviderControlResponse,
 } from "./hookProviders.js";
+import { authorizeHookDecision, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
+import { isQualifiedPiVersion, piVersionRefusal } from "../adapters/pi/piVersions.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
 export const MAX_CONTROL_HOOK_BODY_BYTES = 262_144;
 
-export type HookControlOutcome = HookControlDecision | "steer";
-export type HookControlProviderMapping = "native" | "corrective_deny" | "fail_closed_deny";
 
 export type CompoundCommandBlastRadiusReasonCode =
   | "SIGNED_AUTHORITY_UNTRUSTED"
@@ -118,8 +109,9 @@ interface NormalizedProviderToolRequest {
   canonicalRequests: CanonicalToolRequest[];
   commandPlan: ShellCommandPlan | null;
   rawInputSha256: string;
+  pi: PiControlContext | null;
+  toolInput: Record<string, unknown>;
 }
-
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 const controlOutcomeSchema = z.enum(["allow", "deny", "ask", "steer"]);
@@ -285,7 +277,7 @@ function controlMappingValid(value: ControlMappingFields): boolean {
       && value.effectiveOutcome === "steer"
       && !value.capabilityLossy;
   }
-  return value.provider === "gemini-cli"
+  return value.provider !== "claude-code"
     && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
     && value.decision === "deny"
     && value.effectiveOutcome === "deny"
@@ -352,13 +344,9 @@ function normalizeProviderRequest(input: {
   rawInput: string;
 }): NormalizedProviderToolRequest {
   const parsed = parseProviderInput(input.rawInput);
-  const expectedEvent = input.provider === "claude-code" ? "PreToolUse" : "BeforeTool";
+  const expectedEvent = CONTROL_HOOK_EVENTS[input.provider];
   if (parsed.hook_event_name !== expectedEvent) {
-    throw new HookControlError(
-      "HOOK_CONTROL_INPUT_INVALID",
-      400,
-      `hook control accepts only ${expectedEvent} events`,
-    );
+    throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, `hook control accepts only ${expectedEvent} events`);
   }
   const rawInputSha256 = sha256Hex(Buffer.from(input.rawInput, "utf8"));
   const identity = resolveProviderHookRequestIdentity({
@@ -370,6 +358,7 @@ function normalizeProviderRequest(input: {
     toolInput: parsed.tool_input,
     rawInputSha256,
   });
+  const pi = piControlContext(input.provider, parsed);
   const mapped = canonicalToolRequests(input.provider, parsed.tool_name, parsed.tool_input, input.workspace);
   const canonicalToolName = mapped.requests.length === 1 ? mapped.requests[0]?.name ?? null : null;
   return {
@@ -380,6 +369,8 @@ function normalizeProviderRequest(input: {
     canonicalRequests: mapped.requests,
     commandPlan: mapped.commandPlan,
     rawInputSha256,
+    pi,
+    toolInput: parsed.tool_input,
   };
 }
 
@@ -583,15 +574,21 @@ function completeCommandReview(
   };
 }
 
+interface RequestedControlDecision {
+  decision: HookControlOutcome;
+  reason: string;
+  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
+  /** The highest-class canonical tool evaluated: what an authorization record for this call names. */
+  target?: AuthorizationTarget | null;
+}
+
 function requestedControlDecision(input: {
   workspace: string;
   agentId: string;
   request: NormalizedProviderToolRequest;
-}): {
-  decision: HookControlOutcome;
-  reason: string;
-  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
-} {
+}): RequestedControlDecision {
+  const versionRefusal = input.request.pi ? piVersionRefusal(input.request.pi.version) : null;
+  if (versionRefusal) return { decision: "deny", reason: versionRefusal, commandBlastRadius: null };
   const signatureChecks = [
     ["action policy", verifyActionPolicySignature(input.workspace)],
     ["approval policy", verifyApprovalPolicySignature(input.workspace)],
@@ -628,7 +625,7 @@ function requestedControlDecision(input: {
   if (input.request.canonicalRequests.length === 0) {
     return {
       decision: "deny",
-      reason: `Provider tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
+      reason: `${input.request.provider === "pi" ? "Pi" : "Provider"} tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
       commandBlastRadius: null,
     };
   }
@@ -650,6 +647,7 @@ function requestedControlDecision(input: {
         decision: evaluation.outcome,
         reason: evaluation.reason,
         commandBlastRadius: null,
+        target: evaluation.actionClass ? { toolName: evaluation.request.name, actionClass: evaluation.actionClass } : null,
       };
     }
     const review = completeCommandReview(input.request.commandPlan, evaluations);
@@ -659,7 +657,9 @@ function requestedControlDecision(input: {
     const reason = review.compound
       ? `Compound command review: ${review.segmentCount} steps; highest action class ${review.highestActionClass ?? "UNKNOWN"}; step ${(review.decisiveStepIndex ?? 0) + 1} requires ${review.aggregateOutcome}.`
       : decisive?.reason ?? "AMC control evaluation failed closed.";
-    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review };
+    const top = evaluations.find((evaluation) => evaluation.actionClass === review.highestActionClass);
+    const target = top?.actionClass ? { toolName: top.request.name, actionClass: top.actionClass } : null;
+    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review, target };
   } catch {
     return {
       decision: "deny",
@@ -675,85 +675,12 @@ function requestedControlDecision(input: {
   }
 }
 
-function materializeProviderDecision(input: {
-  provider: HookProvider;
-  requestedDecision: HookControlOutcome;
-  reason: string;
-}): {
-  decision: HookControlDecision;
-  effectiveOutcome: HookControlOutcome;
-  providerMapping: HookControlProviderMapping;
-  capabilityLossy: boolean;
-  reason: string;
-  providerResponse: ProviderControlResponse;
-  providerResponseSha256: string;
-} {
-  let decision: HookControlDecision;
-  let effectiveOutcome: HookControlOutcome;
-  let providerMapping: HookControlProviderMapping;
-  let capabilityLossy: boolean;
-  let reason: string;
-  let providerResponse: ProviderControlResponse;
-
-  if (input.requestedDecision === "steer") {
-    decision = "deny";
-    if (input.provider === "claude-code") {
-      effectiveOutcome = "steer";
-      providerMapping = "corrective_deny";
-      capabilityLossy = false;
-      reason = cleanReason(input.reason);
-      providerResponse = renderProviderControlResponse(
-        input.provider,
-        "deny",
-        reason,
-        "Correct the tool arguments to satisfy the signed ToolHub constraints, then retry as a new action. AMC did not rewrite the input and will re-evaluate every control on the retry.",
-      );
-    } else {
-      effectiveOutcome = "deny";
-      providerMapping = "fail_closed_deny";
-      capabilityLossy = true;
-      reason = cleanReason(
-        `${input.reason} Gemini CLI BeforeTool does not support a verified corrective retry outcome, so AMC denied the action.`,
-      );
-      providerResponse = renderProviderControlResponse(input.provider, "deny", reason);
-    }
-  } else if (input.provider === "gemini-cli" && input.requestedDecision === "ask") {
-    decision = "deny";
-    effectiveOutcome = "deny";
-    providerMapping = "fail_closed_deny";
-    capabilityLossy = true;
-    providerResponse = renderProviderControlResponse(input.provider, "ask", input.reason);
-    reason = cleanReason(`${input.reason} Gemini CLI BeforeTool does not support ask, so AMC denied the action.`);
-  } else {
-    decision = input.requestedDecision;
-    effectiveOutcome = input.requestedDecision;
-    providerMapping = "native";
-    capabilityLossy = false;
-    reason = cleanReason(input.reason);
-    providerResponse = renderProviderControlResponse(input.provider, decision, reason);
-  }
-
-  return {
-    decision,
-    effectiveOutcome,
-    providerMapping,
-    capabilityLossy,
-    reason,
-    providerResponse,
-    providerResponseSha256: sha256Hex(Buffer.from(serializeProviderControlResponse(providerResponse), "utf8")),
-  };
-}
-
 function deterministicEventId(agentId: string, provider: HookProvider, actionId: string): string {
   return `hook_control_${sha256Hex(canonicalize({ agentId, provider, actionId })).slice(0, 44)}`;
 }
 
 function deterministicSessionId(agentId: string, provider: HookProvider, actionId: string): string {
   return `hook-control-session-${sha256Hex(canonicalize({ agentId, provider, actionId })).slice(0, 36)}`;
-}
-
-function runtimeFor(provider: HookProvider): RuntimeName {
-  return provider === "claude-code" ? "claude" : "gemini";
 }
 
 function sealSession(ledger: ReturnType<typeof openLedger>, sessionId: string): void {
@@ -886,6 +813,7 @@ function recoverControlResult(input: {
     requireSealedSession: true,
   });
   const receipt = verifyReceipt(stored.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const receiptKind = input.request.pi ? "action_state" : "guard_check";
   const responseSha256 = sha256Hex(Buffer.from(
     serializeProviderControlResponse(stored.providerResponse),
     "utf8",
@@ -894,7 +822,7 @@ function recoverControlResult(input: {
     !integrity.ok
     || !validateProviderControlResponse(stored.provider, stored.providerResponse)
     || !receipt.ok
-    || receipt.payload?.kind !== "guard_check"
+    || receipt.payload?.kind !== receiptKind
     || receipt.payload.agentId !== input.agentId
     || receipt.payload.providerId !== `hook-control:${input.request.provider}`
     || receipt.payload.body_sha256 !== stored.providerResponseSha256
@@ -904,7 +832,7 @@ function recoverControlResult(input: {
       ...integrity.errors,
       !validateProviderControlResponse(stored.provider, stored.providerResponse) ? "provider response shape invalid" : null,
       receipt.error ?? null,
-      receipt.payload?.kind !== "guard_check" ? "receipt kind mismatch" : null,
+      receipt.payload?.kind !== receiptKind ? "receipt kind mismatch" : null,
       receipt.payload?.agentId !== input.agentId ? "receipt agent mismatch" : null,
       receipt.payload?.providerId !== `hook-control:${input.request.provider}` ? "receipt provider mismatch" : null,
       receipt.payload?.body_sha256 !== stored.providerResponseSha256 ? "receipt response hash mismatch" : null,
@@ -1007,6 +935,8 @@ export function evaluateProviderHookControl(input: {
   authenticatedAgentId: string;
   provider: HookProvider;
   rawInput: string;
+  /** The hook lease the Bridge verified; it names the principal of a bound authorization record. */
+  lease?: HookLease;
   now?: number;
 }): ProviderHookControlResult {
   const provider = parseProvider(input.provider);
@@ -1049,16 +979,21 @@ export function evaluateProviderHookControl(input: {
         "existing hook control session contains an unrelated event",
       );
     }
-    const requested = requestedControlDecision({
-      workspace: input.workspace,
-      agentId: input.authenticatedAgentId,
-      request,
+    // Pi decisions that let an effect proceed bind P1-02's authorization record; P1-23 extends this to Claude Code.
+    const { requested, authorization } = authorizeHookDecision({
+      workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
+      pi: request.pi, toolInput: request.toolInput,
+      requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
     const materialized = materializeProviderDecision({
       provider,
+      pi: request.pi,
       requestedDecision: requested.decision,
       reason: requested.reason,
     });
+    const bound = request.pi
+      ? { piVersion: request.pi.version, authorizationRecordDigest: authorization?.ok ? authorization.digest : null }
+      : {};
     const payload = {
       kind: "hook_control_decision",
       version: 2,
@@ -1075,6 +1010,8 @@ export function evaluateProviderHookControl(input: {
       reason: materialized.reason,
       providerResponseSha256: materialized.providerResponseSha256,
       rawPayloadStored: false,
+      ...bound,
+      ...(request.pi ? { authorizationRecord: authorization?.ok ? authorization.record : null } : {}),
     };
     const appended = ledger.appendEvidenceWithReceipt({
       id: eventId,
@@ -1105,13 +1042,18 @@ export function evaluateProviderHookControl(input: {
         providerResponse: materialized.providerResponse,
         providerResponseSha256: materialized.providerResponseSha256,
         bodySha256: materialized.providerResponseSha256,
+        ...bound,
       },
       receipt: {
-        kind: "guard_check",
+        kind: request.pi ? "action_state" : "guard_check",
         agentId: input.authenticatedAgentId,
         providerId: `hook-control:${provider}`,
         model: null,
         bodySha256: materialized.providerResponseSha256,
+        ...(request.pi ? {
+          action: hookDecisionReceipt({ provider, actionId: request.actionId, idempotencyKey: request.pi.toolCallId,
+            decision: materialized.decision, reason: materialized.reason, authorization, enforced: isQualifiedPiVersion(request.pi.version) }),
+        } : {}),
       },
     });
     sealSession(ledger, sessionId);
