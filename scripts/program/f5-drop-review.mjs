@@ -23,7 +23,7 @@ const drops = readJson("docs/program/f5/drops.json");
 const decisions = readJson("docs/program/f5/decisions.json");
 const decisionOf = new Map(decisions.items.map((item) => [item.id, item]));
 const packs = new Map(listIndustryPacks().map((pack) => [pack.id, pack]));
-const SELF = [":!src/domains/industryPacks.ts", ":!docs/program/f5", `:!${OUT}`, ":!qualification/*-P0-26", ":!tests/f5DropDecisions.test.ts"];
+const SELF = [":!src/domains/industryPacks.ts", ":!docs/program/f5", `:!${OUT}`, ":!qualification/*-P0-26/*", ":!tests/f5DropDecisions.test.ts"];
 
 const short = (sha) => sha.slice(0, 8);
 const cell = (text) => String(text).replaceAll("|", "\\|").replaceAll("\n", " ");
