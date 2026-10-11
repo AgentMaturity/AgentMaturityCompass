@@ -48,6 +48,17 @@ Every call in an authorized class (by default every class except `READ_ONLY` and
   `POST /toolhub/execute` does), agent tokens minted from the lease are narrowed, and the recheck applies it.
 - **Evidence.** Every tool evidence row of the call carries `authorizationId` and `authorizationDigest`, and one
   `AUTHORIZATION_RECORD` audit row carries the full record.
+- **Principal (P1-78).** The record's principal is a signed approval's approvers; otherwise the active user of the
+  signed `users.yaml` the lease names (`LeasePayload.principal.userId`, read and verified at bind; a user whose only
+  role is `AGENT` is a registered service); otherwise the OS user, self-reported (`cli-os-user`). The lease token's own
+  identity is never a principal. A lease naming a user who is not active in `users.yaml` denies `principal_unresolved`;
+  an unverifiable `users.yaml` denies `authority_store_unavailable`. Identity-binding refuses `cli-os-user`.
+- **Workspace (P1-78).** The lease check passes the workspace id the lease issuers use (`workspaceIdFromDirectory`);
+  a lease naming another workspace denies `scope_widened` even when this workspace's key signed it.
+- **Deployment (P1-78).** `scope.tenantId` and `scope.deploymentId` come from the verified active plan, whose profile
+  block records the deployment profile's `{ tenantId, deploymentId }`. With no active plan, or one compiled before
+  P1-78, `deploymentId` is `not_bound` and `tenantId` null: the record is bound to its workspace and
+  `deploymentDigest` only and claims no deployment. Recompile and reactivate to bind one.
 
 ## Consequences
 
@@ -65,8 +76,7 @@ Every call in an authorized class (by default every class except `READ_ONLY` and
 
 ## Not done here
 
-- Tenant, deployment id, compiled policy digest and control ids stay null or `unregistered` until P1-12 compiles
-  a policy that names them. The record's expiry is not clamped to a parent record (P2-25 brings workload identity).
+- The record's expiry is not clamped to a parent record (P2-25 brings workload identity).
 - A freeze incident that fails to parse or verify is ignored by `activeFreezeStatus` rather than reported as an
   unreadable store; that engine is unchanged.
 - Intent journal and receipt states (P1-03), idempotency keys (P1-04) and hooks (P1-22, P1-23) build on this record.

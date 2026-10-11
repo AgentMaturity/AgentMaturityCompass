@@ -146,6 +146,7 @@ A failed, duplicated, reordered, expired, or replayed notification cannot approv
 
 - Auditor signatures protect requests, decisions, consumption records, policies, and delivery evidence.
 - Quorum enforces allowed roles, distinct users, expiry, and requested mode.
+- A request may record its initiator (`createApprovalForIntent({ initiator })`, P1-78): a principal key such as `LOCAL_USER:<userId>` or a user id, from the caller's authenticated principal. The engine refuses that user's approval ("initiator cannot approve their own request") and the quorum never counts one; the initiator's denial still denies. The binding digest leaves the initiator out, so a request digests the same with or without one; the request's signature covers it. No AMC surface names an initiator yet.
 - Execution rechecks intent, tool, action class, work order, policy, tools, budgets, and lease bindings.
 - Session revocation, user status, and current roles are revalidated on every authenticated request.
 - Hosted workspace sessions preserve their mapped roles through the proxy; client bootstrap-admin headers are stripped and logout revokes the tracked session.

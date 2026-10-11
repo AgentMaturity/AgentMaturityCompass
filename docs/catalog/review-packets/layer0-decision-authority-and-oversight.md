@@ -41,8 +41,8 @@ Citations:
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point approvals. The approval engine refuses a second decision by the same user when the signed policy requires distinct users, and counts only distinct approvers toward the quorum.
 - Evidence producers: `amc.approvals.engine` (available). Levels: L2, L3.
-- Tests: L0-OVS-03-T1 runtime (1 attempt): Two distinct approvers meet the quorum; the same user deciding twice is refused. Today the request records no initiator, so initiator-approver separation is not enforced.
-- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user and counts only distinct approvers. Requests record no initiator, so initiator-approver separation is not enforced (P1-78).
+- Tests: L0-OVS-03-T1 runtime (1 attempt): Two distinct approvers meet the quorum; the same user deciding twice is refused. A request that records its initiator refuses the initiator's approval, and an approval by the initiator written past the engine's refusal is not counted toward the quorum.
+- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user and an approval by a request's recorded initiator, and the quorum counts neither. Only a caller that names the initiator gets that separation; no AMC surface names one yet (A4 can pass its requester key), and the approval policy has no rule that requires it.
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.APPROVALS (partial).
 
 Citations:

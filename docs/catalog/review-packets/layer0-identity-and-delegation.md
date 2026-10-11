@@ -11,8 +11,8 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. A tool-pipeline guard denies any call whose lease is missing, expired, revoked or issued for another workspace, or whose authorization record names no principal, before the tool body runs.
 - Evidence producers: `amc.authorizationRecord` (available), `amc.leases.issuer` (available). Levels: L2, L3.
-- Tests: L0-IDN-01-T1 runtime (1 attempt): Under an active compiled plan, calls with no lease, an expired lease or a lease from another workspace are denied with IDENTITY_UNRESOLVED and no tool body runs, and a call with a verified lease is allowed. The no-principal, replayed, contradictory and empty evidence fixtures give not_evaluated through the evidence evaluator. A lease counts as a service principal today, so a missing human principal is not refused (P1-78).
-- Executed test: yes (identity.test.ts). Partial. Under an active compiled plan a call without a verified lease is refused (IDENTITY_UNRESOLVED). A lease also counts as the principal, so a lease-bound call with no human principal is allowed (P1-78).
+- Tests: L0-IDN-01-T1 runtime (1 attempt): Under an active compiled plan, calls with no lease, an expired lease, a lease from another workspace or a lease naming a user who is not active in the signed users.yaml are denied with IDENTITY_UNRESOLVED, and a lease that names no principal is denied with PRINCIPAL_UNRESOLVED; no tool body runs. A call under a verified lease naming a human principal or a registered service is allowed, and its authorization record names that principal and the plan's deployment. The no-principal, replayed, contradictory and empty evidence fixtures give not_evaluated through the evidence evaluator.
+- Executed test: yes (identity.test.ts). Full at the tool pipeline under an active compiled plan whose identity-binding requires a lease and a principal. A call without a verified lease, or whose lease names a user who is not active in the signed users.yaml, is refused (IDENTITY_UNRESOLVED); a lease naming no principal is refused (PRINCIPAL_UNRESOLVED). The lease token's own identity never counts as the principal. Studio native task leases name the task's users.yaml user; host-router sessions and the admin token name none. A registered service (an AGENT-only user) also counts, which the statement's "human principal" leaves to D-08.
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.LEASE_SCOPING (partial).
 
 Citations:
@@ -27,8 +27,8 @@ Citations:
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. The authorization stage verifies the call's lease (signature, expiry, revocation list, agent, execute scope and action classes) before the tool body runs.
 - Evidence producers: `amc.toolPipeline.receipt` (available), `amc.leases.issuer` (available). Levels: L2, L3.
-- Tests: L0-IDN-02-T1 runtime (1 attempt): A valid lease is allowed; expired, revoked, out-of-scope and foreign-signed leases are refused at the authorization stage with a denied receipt and no tool body run.
-- Executed test: yes (identity.test.ts). Partial. Expired, revoked, out-of-scope, other-agent and foreign-signed leases are refused at the authorization stage. The pipeline's lease check passes no workspace id, so a same-signer lease naming another workspace is not refused there (P1-78).
+- Tests: L0-IDN-02-T1 runtime (1 attempt): A valid lease is allowed; expired, revoked, out-of-scope, foreign-signed and other-workspace leases, and a lease naming a user who is not active in the signed users.yaml, are refused at the authorization stage with a denied receipt and no tool body run.
+- Executed test: yes (identity.test.ts). Full at the tool pipeline. Expired, revoked, out-of-scope, other-agent, foreign-signed and other-workspace leases, and a lease naming a user who is not active in the signed users.yaml, are refused at the authorization stage.
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.LEASE_SCOPING (partial).
 
 Citations:

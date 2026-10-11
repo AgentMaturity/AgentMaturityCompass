@@ -130,7 +130,9 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
 
 `compilePlan({ profile, catalog, asOf })` returns a `CompiledPlan` (types in `src/catalog/compiler/types.ts`):
 
-- `profile`: id, the SHA-256 of the canonical normalized profile, and fact provenance.
+- `profile`: id, the SHA-256 of the canonical normalized profile, fact provenance, and the profile's
+  `{ tenantId, deploymentId }`, which authorization records under the active plan bind (P1-78; absent from plans
+  compiled before it).
 - `lock`: the P1-09 catalog lockfile.
 - `requirements`, sorted by control id, with `reasons`, `missingFacts`, `exclusion`, `citationsInScope` and
   `pulledInBy`; `conflicts`; `unsupported` (`enforcement_point_absent`, `producer_planned`, `retired`;
@@ -214,11 +216,14 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   tools, the task's step and token caps as its rate fields (the tool pipeline does not read them), and at most the
   runtime's one-hour lifetime. The token reaches the `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child
   unsets before anything runs and scrubs from tool output; only the lease id is recorded on the signed task
-  descriptor, once the runtime holds the session's writer claim. Every call binds the lease to its authorization
-  record through the pipeline's own lease verifier (signature, expiry, agent, scope, class, signed revocations), so
-  `identity-binding` admits the call: the record's `delegation.leaseId` names the verified lease, and its principal is
-  the approvers for an approved call (every Studio workspace-tool call is approval-gated) or `lease:<id>` when no
-  approval is named. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
+  descriptor, once the runtime holds the session's writer claim. The lease also names the task's own `users.yaml` user
+  (P1-78). Every call binds the lease to its authorization record through the pipeline's own lease verifier (signature,
+  expiry, agent, workspace, scope, class, signed revocations): the record's `delegation.leaseId` names the verified
+  lease, and its principal is the approvers for an approved call (every Studio workspace-tool call is approval-gated),
+  otherwise the active `users.yaml` user the lease names, read and verified at bind. The lease token's own identity is
+  never a principal: a task started from a workspace-router session or with the bootstrap admin token names no user, so
+  `requirePrincipal` refuses its unapproved calls, and a lease naming a user who is not active in `users.yaml` refuses
+  the call. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
   stops a runtime before its lease expires, shutdown, a failed start or resume, cold verification, a runtime process
   that exited on its own) and at archive; a resumed runtime revokes the previous runtime's lease only after it holds
   the writer claim, so a refused resume leaves another process's live runtime alone. When the active plan does not
