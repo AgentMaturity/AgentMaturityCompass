@@ -317,7 +317,7 @@ function main(argv, root = process.cwd()) {
     return 0;
   }
   if (values.rebaseline) {
-    const dirty = git(root, ["status", "--porcelain"]).split("\n").filter(line => line && line.slice(3) !== BASELINE);
+    const dirty = git(root, ["status", "--porcelain", "--", ".", `:(exclude)${BASELINE}`]).split("\n").filter(Boolean);
     if (dirty.length) throw new Error(`Refusing to rebaseline with ${dirty.length} uncommitted path(s): commit first, so sourceCommit names the scanned tree`);
   }
   const result = scanSourceQuality(scan, root);
