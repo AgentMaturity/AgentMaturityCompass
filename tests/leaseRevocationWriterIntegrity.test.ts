@@ -7,6 +7,9 @@ import { lockVault } from "../src/vault/vault.js";
 import { leaseRevocationPaths, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "../src/leases/leaseStore.js";
 import { ensureLeaseRevocationStore, revokeLeaseForCli, resignLeaseRevocationsForCli } from "../src/leases/leaseCli.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { sign } from "node:crypto";
+import { getPrivateKeyPem } from "../src/crypto/keys.js";
+import { canonicalize } from "../src/utils/json.js";
 
 // A one-shot hook that runs just before the revocations lock is taken: the gap between a caller's unlocked check
 // and the locked publish, where another process can drop a file.
@@ -32,7 +35,7 @@ function workspace(): string {
 }
 function snapshot(root: string) {
   const paths = leaseRevocationPaths(root);
-  return { list: existsSync(paths.file) ? readFileSync(paths.file) : null, signature: existsSync(paths.sig) ? readFileSync(paths.sig) : null };
+  return { list: existsSync(paths.file) ? readFileSync(paths.file) : null, signature: existsSync(paths.legacySig) ? readFileSync(paths.legacySig) : null };
 }
 afterEach(() => {
   for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); }
@@ -55,16 +58,19 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     const root = workspace();
     revokeLease(root, "older-revoked", "must remain revoked");
     const paths = leaseRevocationPaths(root);
-    if (variant === "removed-entry") {
-      const body = JSON.parse(readFileSync(paths.file, "utf8"));
-      writeFileSync(paths.file, JSON.stringify({ ...body, revocations: [] }));
-    } else if (variant === "missing-list") rmSync(paths.file);
-    else if (variant === "missing-signature") rmSync(paths.sig);
-    else if (variant === "invalid-signature") writeFileSync(paths.sig, "{}");
+    // P1-08: one signed file carries the list, its signature and its anchor.
+    const body = JSON.parse(readFileSync(paths.file, "utf8"));
+    const rewrite = (value: unknown) => writeFileSync(paths.file, JSON.stringify(value));
+    if (variant === "removed-entry") rewrite({ ...body, list: { ...body.list, revoked: [] } });
+    else if (variant === "missing-list") rmSync(paths.file);
+    else if (variant === "missing-signature") rewrite({ list: body.list, anchor: body.anchor });
+    else if (variant === "invalid-signature") rewrite({ ...body, signature: { ...body.signature, signature: Buffer.alloc(64).toString("base64") } });
     else if (variant === "invalid-json") writeFileSync(paths.file, "{");
     else {
-      writeFileSync(paths.file, JSON.stringify({ v: 1, updatedTs: Date.now(), revocations: "not-a-list" }));
-      signLeaseRevocations(root, sha256Hex(readFileSync(paths.file))); // deliberate malformed fixture, not an accepted store
+      // Validly signed by the workspace key, but not a revocation list the schema admits.
+      const list = { ...body.list, revoked: "not-a-list" };
+      const signature = sign(null, Buffer.concat([Buffer.from("AMC_REVOCATION_LIST_V1\0", "latin1"), Buffer.from(canonicalize(list))]), getPrivateKeyPem(root, "auditor")).toString("base64");
+      writeFileSync(paths.file, canonicalize({ ...body, list, signature: { ...body.signature, signature } }));
     }
     const before = snapshot(root);
     expect(() => revokeLeaseForCli({ workspace: root, leaseId: "unrelated-new-id", reason: "must not launder" })).toThrow(/revocation store unverifiable/);
@@ -74,7 +80,7 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
   it("keeps a truly absent list and signature eligible for normal first-revocation bootstrap", () => {
     const root = workspace();
     const paths = leaseRevocationPaths(root);
-    rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    rmSync(paths.file, { force: true }); rmSync(paths.legacySig, { force: true });
     expect(revokeLease(root, "first-id", "first revocation").revocations.map(item => item.leaseId)).toEqual(["first-id"]);
     expect(verifyLeaseRevocationsSignature(root).valid).toBe(true);
   });
@@ -88,7 +94,7 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
   it("lease issue bootstrap with the signer unavailable leaves no unsigned store behind (P0-30)", () => {
     const root = workspace();
     const paths = leaseRevocationPaths(root);
-    rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    rmSync(paths.file, { force: true }); rmSync(paths.legacySig, { force: true });
     lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     expect(() => ensureLeaseRevocationStore(root)).toThrow(/locked/i);
     expect(snapshot(root)).toEqual({ list: null, signature: null });
@@ -99,7 +105,7 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     const root = workspace();
     if (variant === "bootstrap") {
       const paths = leaseRevocationPaths(root);
-      rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+      rmSync(paths.file, { force: true }); rmSync(paths.legacySig, { force: true });
     } else revokeLease(root, "older-revoked", "must remain revoked");
     const before = snapshot(root);
     lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); vi.stubEnv("AMC_NO_SIGN", "1"); // ephemeral signer
@@ -127,7 +133,7 @@ describe("revocation bootstrap and repair sign only reviewed bytes (P0-30 follow
   it("bootstrap never signs a list that appeared after its unlocked absence check", () => {
     const root = workspace();
     const paths = leaseRevocationPaths(root);
-    rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    rmSync(paths.file, { force: true }); rmSync(paths.legacySig, { force: true });
     const planted = Buffer.from(JSON.stringify({ v: 1, updatedTs: 1, revocations: [] }));
     beforeLock.next = () => { mkdirSync(dirname(paths.file), { recursive: true }); writeFileSync(paths.file, planted); };
     expect(ensureLeaseRevocationStore(root).signatureValid).toBe(false);

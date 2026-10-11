@@ -29,7 +29,7 @@ const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/);
 /** One spelling per instant: the toISOString form, so a re-spelled time is a different (unsigned) statement. */
 const timeSchema = z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form");
 
-export const keyRotationStatementSchema = z.strictObject({
+const keyRotationStatementSchema = z.strictObject({
   type: z.literal("amc.key-rotation"),
   version: z.literal(1),
   workspaceId: z.string().min(1).max(256),
@@ -52,7 +52,7 @@ const signatureRowSchema = z.strictObject({
 type SignatureRow = z.infer<typeof signatureRowSchema>;
 const rowOrder = (a: SignatureRow, b: SignatureRow) => ROLE_ORDER.indexOf(a.by) - ROLE_ORDER.indexOf(b.by) || a.keyId.localeCompare(b.keyId);
 
-export const signedKeyRotationStatementSchema = z.strictObject({
+const signedKeyRotationStatementSchema = z.strictObject({
   statement: keyRotationStatementSchema,
   signatures: z.array(signatureRowSchema).min(1).max(64).refine(
     rows => rows.every((row, index) => index === 0 || rowOrder(rows[index - 1]!, row) < 0),

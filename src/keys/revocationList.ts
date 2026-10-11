@@ -1,0 +1,94 @@
+/**
+ * Single-file signed revocation lists (P1-08): amc.revocation-list v1, one file per list, written atomically. The
+ * signature (revocation-list purpose) covers the tag AMC_REVOCATION_LIST_V1, one 0x00 byte and canonicalize(list), so it
+ * binds the list id, sequence, previous list digest, issue time and every row. The verifier names the keys it trusts;
+ * a key the file names is only looked up among them. A file exists in exactly one byte encoding (canonical JSON,
+ * canonical base64), and `anchor`, the transparency entry that logged this sequence, sits outside the signature: it is
+ * checked against the log and the machine mark covers the whole file (src/keys/anchors.ts).
+ */
+import { sign, verify } from "node:crypto";
+import { z } from "zod";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { ed25519KeyId } from "../trust/trustList.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
+
+const DOMAIN_TAG = "AMC_REVOCATION_LIST_V1";
+const hexSchema = z.string().regex(/^[0-9a-f]{64}$/);
+const timeSchema = z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form");
+
+const REVOCATION_KINDS = ["lease", "key", "certificate", "passport"] as const;
+
+export const revocationListSchema = z.strictObject({
+  type: z.literal("amc.revocation-list"),
+  version: z.literal(1),
+  /** e.g. "leases:<workspaceId>"; never contains "#", which separates the sequence in transparency ids. */
+  listId: z.string().regex(/^[a-z0-9][a-z0-9:._-]{0,127}$/),
+  sequence: z.number().int().positive().safe(),
+  previousSha256: hexSchema.nullable(),
+  issuedAt: timeSchema,
+  revoked: z.array(z.strictObject({
+    id: z.string().min(1).max(512),
+    kind: z.enum(REVOCATION_KINDS),
+    revokedAt: timeSchema,
+    reason: z.string().min(1).max(4096),
+    /** When the revoked credential expires on its own; a row may be pruned after it. Absent: kept forever. */
+    expiresAt: timeSchema.optional()
+  })).max(1_000_000)
+}).refine(list => new Set(list.revoked.map(row => `${row.kind}:${row.id}`)).size === list.revoked.length, "one row per revoked id");
+
+const signedRevocationListSchema = z.strictObject({
+  list: revocationListSchema,
+  signature: z.strictObject({
+    keyId: hexSchema,
+    signature: z.string().refine(isCanonicalSignatureBase64, "signature must be canonical base64 of 64 bytes")
+  }),
+  anchor: z.strictObject({ transparencyEntryHash: hexSchema }).nullable()
+});
+
+export type RevocationListV1 = z.infer<typeof revocationListSchema>;
+export type SignedRevocationList = z.infer<typeof signedRevocationListSchema>;
+
+function signedBytes(list: RevocationListV1): Buffer {
+  return Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(list), "utf8")]);
+}
+
+/** The list's identity: what the next list's previousSha256 and its transparency entry name. */
+export function revocationListSha256(list: RevocationListV1): string {
+  return sha256Hex(canonicalize(revocationListSchema.parse(list)));
+}
+
+export function signRevocationList(list: RevocationListV1, privateKeyPem: string): SignedRevocationList {
+  const parsed = revocationListSchema.parse(list);
+  const keyId = ed25519KeyId(publicKeyFromPrivate(privateKeyPem));
+  if (keyId === null) throw new Error("revocation lists are signed with Ed25519 keys only");
+  return { list: parsed, signature: { keyId, signature: sign(null, signedBytes(parsed), privateKeyPem).toString("base64") }, anchor: null };
+}
+
+/** The only accepted file form. */
+export function encodeSignedRevocationList(signed: SignedRevocationList): Buffer {
+  return Buffer.from(canonicalize(signedRevocationListSchema.parse(signed)), "utf8");
+}
+
+/**
+ * Parses and verifies one file's bytes: canonical encoding, the expected list id, and a signature by one of
+ * `trustedPublicKeyPems` (the verifier's own key history for the revocation-list purpose). Throws the reason.
+ */
+export function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: string; trustedPublicKeyPems: readonly string[] }): SignedRevocationList {
+  let signed: SignedRevocationList;
+  try {
+    signed = signedRevocationListSchema.parse(parseCanonicalJson(bytes));
+  } catch (error) {
+    const detail = error instanceof z.ZodError ? `${error.issues[0]?.path.join(".")}: ${error.issues[0]?.message}` : error instanceof Error ? error.message : String(error);
+    throw new Error(`not a canonical signed amc.revocation-list (${detail})`);
+  }
+  if (signed.list.listId !== opts.listId) throw new Error(`revocation list is ${signed.list.listId}, not ${opts.listId}`);
+  const key = opts.trustedPublicKeyPems.find(pem => ed25519KeyId(pem) === signed.signature.keyId);
+  if (key === undefined) throw new Error(`revocation list signer ${signed.signature.keyId} is not a trusted revocation-list key`);
+  let valid = false;
+  try {
+    valid = verify(null, signedBytes(signed.list), key, Buffer.from(signed.signature.signature, "base64"));
+  } catch { /* reported below */ }
+  if (!valid) throw new Error("revocation list signature verification failed");
+  return signed;
+}

@@ -1,10 +1,17 @@
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { AntiRollbackError, checkHighWater, highWaterPath, readHighWater, recordHighWater } from "../../src/keys/highWater.js";
 import { loadTrustContext, signTrustList } from "../../src/trust/index.js";
 import { listEntry, testKey, trustList } from "../trust/trustFixtures.js";
+import { existsSync } from "node:fs";
+import { getPrivateKeyPem } from "../../src/crypto/keys.js";
+import { encodeSignedRevocationList, signRevocationList } from "../../src/keys/revocationList.js";
+import { issueLeaseForCli, verifyLeaseForCli } from "../../src/leases/leaseCli.js";
+import { bootstrapLeaseRevocations, leaseRevocationPaths, readVerifiedLeaseRevocations, revokeLease } from "../../src/leases/leaseStore.js";
+import { lockVault } from "../../src/vault/vault.js";
+import { initWorkspace } from "../../src/workspace.js";
 
 const SHA_A = "a".repeat(64);
 const SHA_B = "b".repeat(64);
@@ -78,5 +85,79 @@ describe("high-water marks (P1-08 anti-rollback)", () => {
     } finally {
       chmodSync(state, 0o700);
     }
+  });
+});
+
+describe("lease revocation rollback attacks (P1-08; security review HIGH)", () => {
+  const roots: string[] = [];
+  afterEach(() => {
+    for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); }
+    rmSync(highWaterPath(), { force: true });
+  });
+  function revokedWorkspace(): { root: string; token: string; leaseId: string; older: Buffer } {
+    const root = mkdtempSync(join(tmpdir(), "amc-rollback-"));
+    roots.push(root);
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    revokeLease(root, "lease-earlier", "first revocation");
+    const older = readFileSync(leaseRevocationPaths(root).file);
+    const token = issueLeaseForCli({ workspace: root, agentId: "default", ttl: "1h", scopes: "gateway:llm", routes: "/openai", models: "*", rpm: 10, tpm: 1000 }).token;
+    const leaseId = (verifyLeaseForCli({ workspace: root, token }).payload as { leaseId: string }).leaseId;
+    revokeLease(root, leaseId, "compromised");
+    expect(verifyLeaseForCli({ workspace: root, token }).error).toBe("lease revoked");
+    return { root, token, leaseId, older };
+  }
+  const refusedAndStaysRevoked = (root: string, token: string, reason: RegExp) => {
+    expect(readVerifiedLeaseRevocations(root)).toEqual({ ok: false, reason: expect.stringMatching(reason) });
+    expect(verifyLeaseForCli({ workspace: root, token }).ok).toBe(false);
+    // The next revoke cannot make the rollback permanent.
+    expect(() => revokeLease(root, "lease-later", "after the attack")).toThrow(/unverifiable/);
+  };
+
+  it("replaying the older validly signed list is ROLLBACK_DETECTED and the lease stays revoked", () => {
+    const { root, token, older } = revokedWorkspace();
+    writeFileSync(leaseRevocationPaths(root).file, older);
+    refusedAndStaysRevoked(root, token, /ROLLBACK_DETECTED.*sequence 1 is older than the accepted sequence 2/);
+  });
+
+  it("deleting the store files never reads as an empty bootstrap once a list was anchored", () => {
+    const { root, token } = revokedWorkspace();
+    const paths = leaseRevocationPaths(root);
+    for (const path of [paths.file, paths.legacyFile, paths.legacySig]) rmSync(path, { force: true });
+    refusedAndStaysRevoked(root, token, /ROLLBACK_DETECTED: leases:default is missing, but sequence 2 was accepted before/);
+    expect(() => bootstrapLeaseRevocations(root)).toThrow(/ROLLBACK_DETECTED/);
+    expect(existsSync(paths.file)).toBe(false);
+  });
+
+  it("with the high-water anchor deleted, the transparency log still refuses the older list and the deleted store", () => {
+    const { root, token, older } = revokedWorkspace();
+    rmSync(highWaterPath());
+    writeFileSync(leaseRevocationPaths(root).file, older);
+    refusedAndStaysRevoked(root, token, /ROLLBACK_DETECTED: leases:default in the workspace transparency log sequence 1 is older than the accepted sequence 2/);
+    rmSync(leaseRevocationPaths(root).file);
+    expect(readVerifiedLeaseRevocations(root)).toEqual({ ok: false, reason: expect.stringMatching(/ROLLBACK_DETECTED: leases:default is missing/) });
+  });
+
+  it("a symlinked anchor fails closed, even when it points at a valid mark", () => {
+    const { root, token } = revokedWorkspace();
+    const path = highWaterPath();
+    const copy = join(dirname(path), "copy.json");
+    writeFileSync(copy, readFileSync(path));
+    rmSync(path);
+    symlinkSync(copy, path);
+    refusedAndStaysRevoked(root, token, /anti-rollback state .* is unreadable/);
+  });
+
+  it("another validly signed list at the accepted sequence is FORK_DETECTED", () => {
+    const { root, token } = revokedWorkspace();
+    const path = leaseRevocationPaths(root).file;
+    const { list, anchor } = JSON.parse(readFileSync(path, "utf8"));
+    const forked = signRevocationList({ ...list, revoked: list.revoked.slice(0, 1) }, getPrivateKeyPem(root, "auditor"));
+    writeFileSync(path, encodeSignedRevocationList({ ...forked, anchor }));
+    refusedAndStaysRevoked(root, token, /FORK_DETECTED/);
+    // An altered anchor on the accepted list is a different file at the same sequence too.
+    rmSync(highWaterPath());
+    const original = signRevocationList(list, getPrivateKeyPem(root, "auditor"));
+    writeFileSync(path, encodeSignedRevocationList({ ...original, anchor: { transparencyEntryHash: "0".repeat(64) } }));
+    expect(readVerifiedLeaseRevocations(root)).toEqual({ ok: false, reason: expect.stringMatching(/FORK_DETECTED.*names transparency entry/) });
   });
 });

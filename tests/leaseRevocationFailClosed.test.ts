@@ -28,6 +28,7 @@ import {
   verifyLeaseRevocationsSignature
 } from "../src/leases/leaseStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { highWaterPath } from "../src/keys/highWater.js";
 import { ensureLeaseRevocationStore, issueLeaseForCli, verifyLeaseForCli } from "../src/leases/leaseCli.js";
 
 /**
@@ -62,6 +63,7 @@ function newWorkspace(): string {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  rmSync(highWaterPath(), { force: true }); // the FIFO-anchor case replaces this machine's mark file
   if (originalVaultPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE;
   else process.env.AMC_VAULT_PASSPHRASE = originalVaultPassphrase;
   while (roots.length > 0) {
@@ -70,21 +72,23 @@ afterEach(() => {
   }
 });
 
+/** Empty the signed list's rows beside its old signature (P1-08: one signed file). */
+function emptyRows(path: string): void {
+  const body = JSON.parse(readFileSync(path, "utf8"));
+  writeFileSync(path, JSON.stringify({ ...body, list: { ...body.list, revoked: [] } }));
+}
+
 /** Sign a healthy store holding one revocation, then corrupt the file body. */
 function tamperedStore(workspace: string): void {
   revokeLease(workspace, "lease-gone", "test");
-  const paths = leaseRevocationPaths(workspace);
-  const body = JSON.parse(readFileSync(paths.file, "utf8"));
-  writeFileSync(paths.file, JSON.stringify({ ...body, revocations: [] }, null, 2));
+  emptyRows(leaseRevocationPaths(workspace).file);
 }
 
 const storeTampering = [
   {
     name: "tampered list",
     apply(workspace: string): void {
-      const path = leaseRevocationPaths(workspace).file;
-      const body = JSON.parse(readFileSync(path, "utf8"));
-      writeFileSync(path, JSON.stringify({ ...body, revocations: [] }, null, 2));
+      emptyRows(leaseRevocationPaths(workspace).file);
     }
   },
   {
@@ -132,22 +136,21 @@ describe("revokedLeaseIdSet fails closed", () => {
     expect(() => revokedLeaseIdSet(workspace)).toThrow(/revocation/i);
   });
 
-  test("refuses a deleted list while preserving its surviving signature", () => {
+  test("refuses a deleted list once it was anchored: deleting the store never un-revokes (P1-08)", () => {
     const workspace = newWorkspace();
     revokeLease(workspace, "lease-deleted", "compromised");
     const paths = leaseRevocationPaths(workspace);
-    const signature = readFileSync(paths.sig);
     rmSync(paths.file);
 
     expect(verifyLeaseRevocationsSignature(workspace)).toEqual({
       valid: false,
-      signatureExists: true,
-      reason: "revocation list missing but signature present"
+      signatureExists: false,
+      reason: expect.stringMatching(/ROLLBACK_DETECTED: leases:default is missing, but sequence 1 was accepted before/)
     });
     expect(() => revokedLeaseIdSet(workspace)).toThrow(/revocation store unverifiable/);
     expect(ensureLeaseRevocationStore(workspace).signatureValid).toBe(false);
+    expect(() => bootstrapLeaseRevocations(workspace)).toThrow(/ROLLBACK_DETECTED/);
     expect(existsSync(paths.file)).toBe(false);
-    expect(readFileSync(paths.sig)).toEqual(signature);
   });
 
   test("allows a never-initialised store to bootstrap without inventing revocations", () => {
@@ -167,7 +170,7 @@ describe("a special file in place of the store refuses instead of blocking (P0-3
   const fifo = (path: string) => { execFileSync("mkfifo", [path]); };
   test.each([
     { name: "FIFO list", reason: /not a regular file/, apply: (p: Paths) => replace(p.file, fifo) },
-    { name: "FIFO signature", reason: /not a regular file/, apply: (p: Paths) => replace(p.sig, fifo) },
+    { name: "FIFO anti-rollback anchor", reason: /not a regular file/, apply: (_p: Paths) => replace(highWaterPath(), fifo) },
     { name: "list symlinked to /dev/zero", reason: /ELOOP/, apply: (p: Paths) => replace(p.file, (path) => symlinkSync("/dev/zero", path)) },
     { name: "list over the size cap", reason: /exceeds/, apply: (p: Paths) => truncateSync(p.file, 64 * 1024 * 1024 + 1) }
   ])("$name: every lease is refused", ({ reason, apply }) => {
@@ -230,13 +233,13 @@ describe("ensureLeaseRevocationStore does not launder tampering", () => {
   test("reports a tampered store invalid and leaves the evidence in place", () => {
     const workspace = newWorkspace();
     tamperedStore(workspace);
-    const sigBefore = readFileSync(leaseRevocationPaths(workspace).sig, "utf8");
+    const before = readFileSync(leaseRevocationPaths(workspace).file, "utf8");
 
     const ensured = ensureLeaseRevocationStore(workspace);
     expect(ensured.signatureValid).toBe(false);
     // The stale signature is evidence of what was tampered with; re-signing
     // over it would certify the tampered content as authentic.
-    expect(readFileSync(leaseRevocationPaths(workspace).sig, "utf8")).toBe(sigBefore);
+    expect(readFileSync(leaseRevocationPaths(workspace).file, "utf8")).toBe(before);
   });
 
   test("re-running on a healthy store keeps it valid", () => {
@@ -247,16 +250,28 @@ describe("ensureLeaseRevocationStore does not launder tampering", () => {
 });
 
 describe("resignLeaseRevocationsForCli is the one deliberate repair path", () => {
-  test("re-signing a tampered store restores verification and reports what was vouched for", async () => {
+  test("refuses to re-sign tampered content: repair cannot un-revoke (P1-08)", async () => {
     const { resignLeaseRevocationsForCli } = await import("../src/leases/leaseCli.js");
     const workspace = newWorkspace();
     tamperedStore(workspace);
     const reviewed = sha256Hex(readFileSync(leaseRevocationPaths(workspace).file));
-    const result = resignLeaseRevocationsForCli(workspace, reviewed);
-    expect(result.wasValid).toBe(false);
+    expect(() => resignLeaseRevocationsForCli(workspace, reviewed)).toThrow(/cannot un-revoke/);
+    expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(false);
+  });
+
+  test("re-signs the content this workspace last anchored when only its signature broke, and reports it", async () => {
+    const { resignLeaseRevocationsForCli } = await import("../src/leases/leaseCli.js");
+    const workspace = newWorkspace();
+    revokeLease(workspace, "lease-kept", "test");
+    const path = leaseRevocationPaths(workspace).file;
+    const body = JSON.parse(readFileSync(path, "utf8"));
+    const raw = Buffer.from(body.signature.signature, "base64");
+    raw[0] = raw[0]! ^ 0x01;
+    writeFileSync(path, JSON.stringify({ ...body, signature: { ...body.signature, signature: raw.toString("base64") } }));
+    const result = resignLeaseRevocationsForCli(workspace, sha256Hex(readFileSync(path)));
+    expect(result).toMatchObject({ wasValid: false, revocationCount: 1 });
     expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(true);
-    // The tampered content emptied the list; the report says so.
-    expect(result.revocationCount).toBe(0);
+    expect(revokedLeaseIdSet(workspace)).toEqual(new Set(["lease-kept"]));
   });
 });
 
@@ -312,13 +327,14 @@ describe("managed hooks authenticate the revocation store", () => {
     }
   }
 
-  test("reports signed malformed store data as an invalid lease rather than throwing from status", () => {
+  test("refuses to sign malformed store data, and reports it as an invalid lease rather than throwing from status", () => {
     const workspace = newWorkspace();
     installHookIntegration({ workspace, provider: "claude-code", agentId: "research-agent" });
     const path = leaseRevocationPaths(workspace).file;
     writeFileSync(path, JSON.stringify({ v: 1, updatedTs: Date.now(), revocations: "invalid" }));
-    signLeaseRevocations(workspace, sha256Hex(readFileSync(path)));
-    expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(true);
+    // p0-30f: the deliberate repair used to sign a list that fails the schema.
+    expect(() => signLeaseRevocations(workspace, sha256Hex(readFileSync(path)))).toThrow(/schema/);
+    expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(false);
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" })).toMatchObject({
       state: "invalid", leaseValid: false, manifestValid: true
     });

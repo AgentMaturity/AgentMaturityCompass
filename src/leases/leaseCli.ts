@@ -1,7 +1,7 @@
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
 import { bootstrapLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
-import { leaseRevocationsSchema, type LeaseScope } from "./leaseSchema.js";
+import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
   const text = ttl.trim().toLowerCase();
@@ -138,6 +138,6 @@ export function resignLeaseRevocationsForCli(workspace: string, reviewedDigestSh
   return {
     wasValid: before.valid,
     previousReason: before.reason,
-    revocationCount: leaseRevocationsSchema.parse(JSON.parse(signed.toString("utf8"))).revocations.length
+    revocationCount: signed.revocations.length
   };
 }
