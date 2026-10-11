@@ -18,7 +18,6 @@ import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js"
 import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
 import type { ClaimEnvelope, ClaimEvidenceTier, ClaimKind } from "../claims/eligibility/types.js";
 import { effectiveTrustTier, eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
-import { verifySignedDigest } from "../crypto/signing/signer.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
 import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
@@ -28,7 +27,7 @@ import { canonicalize } from "../utils/json.js";
 import { valueContractSchema } from "../value/valueContracts.js";
 import { createValueReport } from "../value/valueReports.js";
 import { readValueEvents, valueAgentContractPath } from "../value/valueStore.js";
-import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
+import { ledgerRefClaim, resolveLedgerEvent, verifiedA4Digest } from "./a4Evidence.js";
 import { A4_RUNTIME } from "./a4Gates.js";
 import type { MonitorLedgerRef } from "./a4Monitor.js";
 import { readReleaseRecord, recordEnvelope, regularBytes, writeReleaseRecord } from "./a4Package.js";
@@ -231,7 +230,7 @@ function claimRow(store: A4Store, state: A4ReadinessState, link: A4ChainLink, re
   const parsed = a4ValueClaimV1Schema.safeParse(JSON.parse(read.bytes.toString("utf8")));
   if (!parsed.success) return failed("VALUE_CLAIM_INVALID");
   const { envelope, ...body } = parsed.data;
-  const envelopeValid = envelope.digestSha256 === sha256Hex(canonicalize(body)) && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope });
+  const envelopeValid = envelope.digestSha256 === sha256Hex(canonicalize(body)) && verifiedA4Digest(store.workspace, envelope.digestSha256, envelope, "A4_RECORD");
   const recorded = body.observed;
   const untraced = Math.max(0, recorded.danglingRefs - (recorded.evidenceRefs.length - recorded.resolvedRefs));
   const resolution = resolveRefs(store.ledger, recorded.evidenceRefs, recorded.window, state.project.agent_id);

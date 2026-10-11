@@ -12,13 +12,13 @@
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
-import { verifySignedDigest } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
 import { sha256Hex } from "../utils/hash.js";
 import { deploymentBodySchema, deploymentViews, PLAN_PATH, recordDeployment } from "./a4Deploy.js";
 import { verifyBodySchema, verifyDeployment } from "./a4DeployVerify.js";
+import { verifiedA4Digest } from "./a4Evidence.js";
 import { loadA4State } from "./a4Gates.js";
 import { bridgeControls } from "./a4Lifecycle.js";
 import { regularBytes } from "./a4Package.js";
@@ -211,8 +211,8 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     return { ...record, transparencyEntryId: typeof entry?.entryId === "string" ? entry.entryId : null,
       transparency: { reason: entry === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof entry.reason === "string" ? entry.reason : null },
       envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
-      && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
-    // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
+      && verifiedA4Digest(store.workspace, envelope.digestSha256, envelope, "A4_RECORD"),
+    // Checked now under this workspace's keys, or the notary its signed trust config pins (a local audit trail): the plan, the update policy, receipts, rollbacks.
     deployPlan: planView(plan, files),
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
     packageFiles: files,

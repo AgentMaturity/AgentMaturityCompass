@@ -5,8 +5,8 @@
  */
 import YAML from "yaml";
 import { z } from "zod";
-import { verifySignedDigest } from "../crypto/signing/signer.js";
 import { sha256Hex } from "../utils/hash.js";
+import { verifiedA4Digest } from "./a4Evidence.js";
 import type { A4Answer } from "./a4Schema.js";
 import { answerValues, listValue, textValue } from "./spec/aspire.js";
 
@@ -40,8 +40,9 @@ export function updatePolicyOf(answers: readonly A4Answer[]): A4UpdatePolicy {
 export const updatePolicyYaml = (answers: readonly A4Answer[]): Buffer => Buffer.from(YAML.stringify(updatePolicyOf(answers)), "utf8");
 
 /**
- * The packaged policy checked now: its bytes against the signature beside them (this workspace's keys: a local audit
- * trail, never a portable verdict) and against the schema. Anything unreadable is `valid: false` with its reason.
+ * The packaged policy checked now: its bytes against the signature beside them (this workspace's keys, or the notary the
+ * signed trust config pins: a local audit trail, never a portable verdict) and against the schema. Anything unreadable
+ * is `valid: false` with its reason.
  */
 export function verifyUpdatePolicy(workspace: string, yaml: Buffer | null, sig: Buffer | null): { valid: boolean; reason: string | null; policy: A4UpdatePolicy | null } {
   if (yaml === null || sig === null) return { valid: false, reason: yaml === null ? "UPDATE_POLICY_MISSING" : "UPDATE_POLICY_SIGNATURE_MISSING", policy: null };
@@ -49,7 +50,7 @@ export function verifyUpdatePolicy(workspace: string, yaml: Buffer | null, sig: 
     const signed = JSON.parse(sig.toString("utf8")) as { digestSha256?: unknown; signature?: unknown; envelope?: unknown };
     const digest = sha256Hex(yaml);
     if (signed.digestSha256 !== digest || typeof signed.signature !== "string"
-      || !verifySignedDigest({ workspace, digestHex: digest, signed: { signature: signed.signature, envelope: signed.envelope } })) {
+      || !verifiedA4Digest(workspace, digest, { signature: signed.signature, envelope: signed.envelope }, "A4_PACKAGE")) {
       return { valid: false, reason: "UPDATE_POLICY_SIGNATURE_INVALID", policy: null };
     }
     const policy = a4UpdatePolicySchema.safeParse(YAML.parse(yaml.toString("utf8")));

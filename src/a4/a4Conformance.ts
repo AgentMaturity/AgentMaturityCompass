@@ -22,14 +22,12 @@ import { envelopeForAggregate, envelopeForUnverifiedResult, envelopeFromDimensio
 import { claimKindSchema, statusDimensionsSchema } from "../claims/eligibility/schemas.js";
 import type { Applicability } from "../claims/eligibility/types.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
-import { signingRoute, verifySignedDigest } from "../crypto/signing/signer.js";
-import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
-import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
+import { verifySignedDigest } from "../crypto/signing/signer.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { checkDigestSignature, loadTrustContext } from "../trust/index.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
-import { loadTrustConfig } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
+import { pinnedNotarySignature } from "./a4Evidence.js";
 import type { A4ReadinessItem, A4ReadinessState } from "./a4Readiness.js";
 import { a4ConformanceStatementV1Schema, gatePolicyOf, type A4ConformanceStatementV1, type A4Stage } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
@@ -106,19 +104,6 @@ function regularFile(path: string): boolean {
 /** A regular file of a bounded size, read once; null when absent. Anything else throws. */
 const regularBytes = (path: string): Buffer | null => regularFile(path) ? readFileSync(path) : null;
 
-/** Whether `envelope` is the pinned notary's signature over `sha256` (self-consistent, its key the one the signed trust config pins). */
-function pinnedNotarySignature(workspace: string, sha256: string, envelope: unknown): boolean {
-  if ((envelope as { signer?: { type?: unknown } } | null | undefined)?.signer?.type !== "NOTARY") return false;
-  try {
-    if (signingRoute(workspace, "CONTROL_RESULT") !== "notary") return false;
-    const trust = loadTrustConfig(workspace).trust;
-    return trust.mode === "NOTARY" && (envelope as { fingerprint?: unknown }).fingerprint === trust.notary.pinnedPubkeyFingerprint
-      && verifySignatureEnvelope(sha256, envelope as SignatureEnvelope);
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Why a set readSignedControlResults refused is not verified, from the files as they are: only the pinned notary's
  * signature over exactly `sha256` (NOTARY_ROUTE: it does not verify under this workspace's keys) and a workspace key the
@@ -145,7 +130,7 @@ function unverifiedReason(workspace: string, file: string, sha256: string): Cont
   if (sig === null || typeof sig !== "object" || sig.digestSha256 !== sha256 || typeof sig.signature !== "string" || typeof sig.signedTs !== "number") {
     return failed("CONTROL_RESULTS_SIGNATURE_INVALID");
   }
-  if (pinnedNotarySignature(workspace, sha256, sig.envelope)) return { status: "not_evaluated", reason: "NOTARY_ROUTE_NOT_VERIFIED_LOCALLY" };
+  if (pinnedNotarySignature(workspace, sha256, sig.envelope, "CONTROL_RESULT")) return { status: "not_evaluated", reason: "NOTARY_ROUTE_NOT_VERIFIED_LOCALLY" };
   if (!verifySignedDigest({ workspace, digestHex: sha256, signed: { signature: sig.signature, envelope: sig.envelope } })) return failed("CONTROL_RESULTS_SIGNATURE_INVALID");
   // readSignedControlResults' own signer rule: a refused key always fails; an unpinned one fails only under a trust list.
   let admission: ReturnType<typeof checkDigestSignature>["admission"];
