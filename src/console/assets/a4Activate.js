@@ -219,7 +219,7 @@ function renderRollback(ctx) {
   const preview = opened?.releaseId === release.releaseId ? opened.preview : null;
   const [request] = coded(itemOf(ctx, "rollback_effect"), "APPROVAL_REQUEST");
   const attrs = `data-release="${esc(release.releaseId)}" data-project="${esc(ctx.project.projectId)}"`;
-  return `<p class="muted">A rollback restores the previous release's Enforce snapshot (signed receipts), revokes this release's leases and prepares the operator's
+  return `<p class="muted">A rollback restores the Enforce snapshot of the release that ran in production when this one was built (signed receipts), revokes this release's leases and prepares the operator's
       commands; it never moves the lifecycle backwards, and the deployed release changes only when the operator records the rollback row. A high or critical
       risk tier freezes first and holds the project.</p>
     <div class="row wrap"><select name="rollback-environment"><option value="staging">staging</option><option value="production">production</option></select>

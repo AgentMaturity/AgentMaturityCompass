@@ -61,7 +61,7 @@ import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, effectUnsettled, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, rollbackExecutionId, type LeasePlan
+  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rollbackExecutionId, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -510,10 +510,10 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   let release: { releaseId: string; packageDigest: string; packagePath: string; signaturePath: string; tarballPath: string; tarballSha256: string };
   let stagingLease: ReturnType<typeof mintLease>;
   try {
-    const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1)?.body.releaseId;
+    // The prepared rollback re-pins the release running in production now, never merely the previous RELEASE.
     const { files, deploy } = packageInputs(workspace, state, gate.revision_no, bound, activate.answers, { releaseId, projectId, agentId: state.project.agent_id, target,
       destinationRef: proposed!.destinationRef as string, hostHint: typeof proposed!.hostHint === "string" ? proposed!.hostHint : null,
-      previousReleaseId: typeof previous === "string" ? previous : null });
+      rollbackReleaseId: productionReleaseOf(state.chain) });
     for (const file of files) writeFileAtomic(join(staging, file.path), file.bytes, 0o644);
     const scan = scanExtractedReleaseForSecrets(staging);
     if (scan.status !== "PASS") throw coded("SECRET_SCAN_FAILED", [...new Set(scan.findings.filter((row) => row.severity === "HIGH").map((row) => row.type))].join(", "));
@@ -628,8 +628,8 @@ function lineageOf(state: A4ReadinessState, revisionNo: number, approvals: A4Rel
 }
 
 /**
- * The release record (`amc.a4-release/v1`, design §14.1): the eight-surface table, TUNE lineage (previous and base release)
- * and the staging lease; signed with its own A4_RECORD envelope outside the ledger transaction, then RELEASE (step built)
+ * The release record (`amc.a4-release/v1`, design §14.1): the eight-surface table, TUNE lineage (previous and base release),
+ * the rollback target (the release running in production now, productionReleaseOf) and the staging lease; signed with its own A4_RECORD envelope outside the ledger transaction, then RELEASE (step built)
  * with the a4_releases row, refused when this execution's release exists, the stage was redone since the gate was
  * consumed, the step moved, or this attempt was already settled.
  */
@@ -643,8 +643,11 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
   } catch {
     // An unverified policy reads regulated (fail closed).
   }
-  const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1);
-  const previousReleaseId = typeof previous?.body.releaseId === "string" ? previous.body.releaseId : null;
+  const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1)?.body.releaseId;
+  const previousReleaseId = typeof previous === "string" ? previous : null;
+  // The rollback target (the deploy plan's prepared steps name the same): the release running in production, not the previous RELEASE.
+  const rollbackTo = productionReleaseOf(state.chain);
+  const target = state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === rollbackTo);
   const revision = state.revisions.find((row) => row.revision_no === gate.revision_no)!;
   const digests = JSON.parse(revision.resource_digests_json) as Record<string, Record<string, unknown>>;
   const resources = a4ResourceDigestsSchema.parse({ ...digests, enforce: { ...digests.enforce, manifestId: input.snapshotId },
@@ -659,7 +662,7 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
     // The overlay digest is the composeDigest of a Compose release and the valuesDigest of a Helm one (a chart digest is the operator's helm package).
     deploymentTarget: { kind: input.target, sameHost: true, imageDigest: null, chartOrComposeDigest: input.target === "compose" ? input.deploy.overlaySha256 : null,
       valuesDigest: input.target === "helm" ? input.deploy.overlaySha256 : null, hostHint: typeof input.hostHint === "string" ? input.hostHint : null },
-    rollback: { releaseId: previousReleaseId, enforceManifestId: typeof previous?.body.enforceManifestId === "string" ? previous.body.enforceManifestId : null,
+    rollback: { releaseId: rollbackTo, enforceManifestId: typeof target?.body.enforceManifestId === "string" ? target.body.enforceManifestId : null,
       leaseIds: [input.stagingLease.leaseId], preparedCommands: input.deploy.rollbackCommands },
     leases: [{ leaseId: input.stagingLease.leaseId, scope: "staging", scopes: input.stagingLease.projection.scopes, expiresAt: input.stagingLease.expiresAt, status: "active" }],
     // The bridge rows as evidence and where the bridge will move the lifecycle; it runs after RELEASE commits (src/a4/a4Lifecycle.ts).

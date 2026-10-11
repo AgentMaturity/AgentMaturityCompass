@@ -30,7 +30,7 @@ import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, currentRelease, cycleLinks,
-  IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
+  IDENTITY_NOT_EVALUATED, leasePlans, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, type LeasePlan
 } from "../spec/activate.js";
 import { updatePolicyOf } from "../a4UpdatePolicy.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
@@ -224,7 +224,6 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   }
   const resources = RESOURCE_SLOTS["enforce.resourcesSha256"]?.(workspace, project.agent_id) ?? null;
   const snapshot = resources === null ? { error: "ENFORCE_RESOURCES_NOT_PRODUCED" } : enforceSnapshot(workspace, project.agent_id, resources);
-  const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1);
   const kpis = listValue(values.get("businessOutcomes"));
   const proposal = {
     deploymentTarget: { kind: textValue(values.get("target")), sameHost: true, destinationRef: textValue(values.get("destinationRef")), hostHint: textValue(values.get("hostHint")),
@@ -241,10 +240,11 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     monitoringPlan: { expectations: textValue(values.get("monitoringExpectations")), slos: ["readyz", "ledger_verify", "outcome_unknown_open", "backup_age", "gateway_failures"],
       alerts: ["pod not ready", "ledger verify failure", "open outcome_unknown", "stale backup", "gateway failures", "/readyz"].map((rule) => ({ rule, status: "proposal" })),
       killSwitch: "not available in this release (P2-26)" },
-    rollbackPlan: { previousReleaseId: typeof previous?.body.releaseId === "string" ? previous.body.releaseId : null, acceptance: textValue(values.get("rollbackAcceptance")),
+    // The release running in production now (as it stands at Propose; the release record fixes it when the package is built).
+    rollbackPlan: { releaseId: productionReleaseOf(state.chain), acceptance: textValue(values.get("rollbackAcceptance")),
       steps: ["a high or critical risk tier: an incident freeze first, and the project holds", "an owner previews the rollback and opens its DEPLOY engine request (a4.activate.rollback)",
-        "restoreEnforceResourceSnapshot to the previous release's snapshot, confirmed by its exact manifest id", "revoke this release's leases",
-        target(values) === "helm" ? "helm rollback <release> <rev> --wait" : "re-pin the previous release's overlay and docker compose up -d (never down -v)",
+        "restoreEnforceResourceSnapshot to the snapshot of the release running in production when this one is built, confirmed by its exact manifest id", "revoke this release's leases",
+        target(values) === "helm" ? "helm rollback <release> <rev> --wait" : "re-pin that release's overlay and docker compose up -d (never down -v)",
         "the operator records the rollback row; deployed_release_id moves then"], lifecycle: "never moved backwards" },
     valueReportingPlan: { kpis: kpis.map((kpi) => ({ kpi, evidenceSource: null, method: "not_yet_decided" })), sustainability: listValue(values.get("sustainabilityObjectives")),
       social: listValue(values.get("socialObjectives")), claimKind: "self_reported", note: "one amc.a4-value-claim/v1 per value-contract KPI per release, recorded at Review" },

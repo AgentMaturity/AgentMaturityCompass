@@ -61,16 +61,24 @@ function releaseAndGate(state: A4ReadinessState, releaseId: string): { release: 
   return { release, gate: gateRowOf(state, String(started?.body.gateId)) };
 }
 
-/** What a rollback of `releaseId` would do now (design §10.4 Rollback preview); the engine request binds its digest. */
+/**
+ * What a rollback of `releaseId` would do now (design §10.4 Rollback preview); the engine request binds its digest. The
+ * target is the record's rollback block (the release running in production when this one was built), never merely the
+ * previous RELEASE; a target rolled back since is refused (ROLLBACK_TARGET_ROLLED_BACK).
+ */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
   if (state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
-  const toReleaseId = typeof release.body.previousReleaseId === "string" ? release.body.previousReleaseId : null;
+  const row = store.snapshot(state.project.project_id).rows.a4_releases.find((candidate) => candidate.release_id === releaseId);
+  if (row === undefined) throw fail(409, "RELEASE_RECORD_MISSING", `release ${releaseId} has no release record`);
+  const record = a4ReleaseV1Schema.parse({ ...JSON.parse(String(row.surfaces_json)) as Record<string, unknown>, envelope: JSON.parse(String(row.envelope_json)) });
+  const toReleaseId = record.rollback.releaseId;
+  if (toReleaseId !== null && state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === toReleaseId)) {
+    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `release ${toReleaseId}, the rollback target, was itself rolled back`);
+  }
   const to = toReleaseId === null ? undefined : state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === toReleaseId);
   const confirmManifestId = typeof to?.body.enforceManifestId === "string" ? to.body.enforceManifestId : null;
   const minted = mintedLeases(state.chain, releaseId);
-  const row = store.snapshot(state.project.project_id).rows.a4_releases.find((candidate) => candidate.release_id === releaseId);
-  const record = row === undefined ? null : a4ReleaseV1Schema.parse({ ...JSON.parse(String(row.surfaces_json)) as Record<string, unknown>, envelope: JSON.parse(String(row.envelope_json)) });
   let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: "no earlier release: nothing to restore" };
   if (confirmManifestId !== null) {
     try {
@@ -82,7 +90,7 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
     }
   }
   return { schema: "amc.a4-rollback-preview/v1", releaseId, toReleaseId, confirmManifestId, environment, target: release.body.target,
-    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production])], preparedCommands: record?.rollback.preparedCommands ?? [],
+    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production])], preparedCommands: record.rollback.preparedCommands,
     restore, freezeFirst: ["high", "critical"].includes(engineRiskTier(state)),
     lifecycle: "never moved backwards; deployed_release_id moves when the operator records the rollback row" };
 }

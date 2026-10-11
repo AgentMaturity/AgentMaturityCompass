@@ -54,8 +54,8 @@ export interface DeployPlanInput {
   readonly destinationRef: string;
   /** Used only as the Kubernetes namespace, and only when it is a valid DNS label (it is pasted into commands). */
   readonly hostHint: string | null;
-  /** The release a rollback re-applies (its overlay), or null. */
-  readonly previousReleaseId: string | null;
+  /** The release a rollback re-applies (its overlay): the one running in production when this one was built, or null. */
+  readonly rollbackReleaseId: string | null;
 }
 type Step = { readonly phase: "preflight" | "deploy" | "verify" | "rollback"; readonly command: string | null; readonly note: string };
 
@@ -93,7 +93,7 @@ function composeSteps(input: DeployPlanInput): Step[] {
   const name = overlayName("compose", input.releaseId);
   const copy = (releaseId: string): string =>
     `docker compose -f docker-compose.yml cp studio:${inContainer(input, releaseId)} ./${overlayName("compose", releaseId)}`;
-  const previous = input.previousReleaseId;
+  const previous = input.rollbackReleaseId;
   return [
     { phase: "preflight", command: "cd deploy/compose", note: "Run from the AMC checkout on the host that runs this Studio (a same-host restart)." },
     { phase: "preflight", command: copy(input.releaseId), note: "Copy the prepared overlay out of the data volume." },
@@ -104,9 +104,9 @@ function composeSteps(input: DeployPlanInput): Step[] {
     { phase: "verify", command: `docker compose -f docker-compose.yml -f ${name} exec studio amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
     ...(previous === null
-      ? [{ phase: "rollback" as const, command: "docker compose -f docker-compose.yml up -d", note: "No earlier release: back to the base file; never down -v." }]
-      : [{ phase: "rollback" as const, command: copy(previous), note: `The overlay of the previous release ${previous}.` },
-        { phase: "rollback" as const, command: `docker compose -f docker-compose.yml -f ${overlayName("compose", previous)} up -d`, note: "Re-pin the previous release; never down -v." }])
+      ? [{ phase: "rollback" as const, command: "docker compose -f docker-compose.yml up -d", note: "No release ran in production when this one was built: back to the base file; never down -v." }]
+      : [{ phase: "rollback" as const, command: copy(previous), note: `The overlay of release ${previous}, the one running in production when this one was built.` },
+        { phase: "rollback" as const, command: `docker compose -f docker-compose.yml -f ${overlayName("compose", previous)} up -d`, note: `Re-pin release ${previous}; never down -v.` }])
   ];
 }
 
@@ -127,8 +127,9 @@ function helmSteps(input: DeployPlanInput): Step[] {
     { phase: "verify", command: `${exec} amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
     { phase: "verify", command: "helm package deploy/helm/amc", note: "The chart digest (sha256 of the .tgz) for your records; the v1 receipt does not carry it." },
-    { phase: "rollback", command: `helm${ns} history amc`, note: "Find the revision before this release's upgrade." },
-    { phase: "rollback", command: `helm${ns} rollback amc <previous revision> --wait`, note: "Re-pins the previous release." }
+    { phase: "rollback", command: `helm${ns} history amc`, note: input.rollbackReleaseId === null ? "No release ran in production when this one was built: find the revision before this release's upgrade."
+      : `Find the revision that deployed release ${input.rollbackReleaseId}, the one running in production when this one was built.` },
+    { phase: "rollback", command: `helm${ns} rollback amc <that revision> --wait`, note: "Re-pins that release." }
   ];
 }
 

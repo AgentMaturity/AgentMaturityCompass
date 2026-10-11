@@ -279,6 +279,17 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
 /** Whether `releaseId` was rolled back in this cycle (ROLLBACK, src/a4/a4Rollback.ts). */
 export const rolledBack = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
   cycleLinks(chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId);
+/**
+ * The release running in production as the chain records it (any cycle): the newest one with a succeeded production
+ * deploy row that no ROLLBACK names, or null. A release's rollback restores this one, never merely the previous RELEASE,
+ * which may never have reached production (its deployment approval denied) or may have been rolled back itself.
+ */
+export function productionReleaseOf(chain: readonly A4ChainLink[]): string | null {
+  const rolled = new Set(chain.filter((link) => link.kind === "ROLLBACK").map((link) => link.body.releaseId));
+  const id = chain.filter((link) => link.kind === "DEPLOYMENT" && link.body.deploymentKind === "deploy" && link.body.environment === "production"
+    && link.body.recordedStatus === "succeeded" && !rolled.has(link.body.releaseId)).at(-1)?.body.releaseId;
+  return typeof id === "string" ? id : null;
+}
 /** The newest deploy receipt of this cycle's release (DEPLOYMENT, src/a4/a4Deploy.ts): the one the deployment approval binds. */
 export const boundReceipt = (chain: readonly A4ChainLink[], releaseId: string | null): A4ChainLink | undefined => releaseId === null ? undefined
   : cycleLinks(chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId && link.body.deploymentKind === "deploy").at(-1);
