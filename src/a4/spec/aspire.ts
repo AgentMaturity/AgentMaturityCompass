@@ -39,7 +39,7 @@ export const QUESTIONS: A4Question[] = [
 ];
 
 /** The values a choice question takes (archetypeInterest takes a listed archetype id). `riskTier` keeps the context-graph spelling. */
-export const CHOICES: Readonly<Record<string, readonly string[]>> = {
+const CHOICES: Readonly<Record<string, readonly string[]>> = {
   expertise: ["novice", "practitioner", "expert"], riskTier: ["low", "med", "high", "critical"], governance: ["regulated", "standard"]
 };
 

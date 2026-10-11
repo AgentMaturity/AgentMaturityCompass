@@ -35,7 +35,6 @@ export * from "../contracts/v1/a4ValueClaim.js";
 export type A4Stage = (typeof A4_STAGES)[number];
 export type A4Step = (typeof A4_STEPS)[number];
 export type A4Lane = (typeof A4_LANES)[number];
-export type A4GateKind = (typeof A4_GATES)[number];
 
 export const A4_REF_KINDS = [
   "stage_output", "ledger_event", "receipt", "session", "artifact", "approval", "manifest", "plan", "control_result", "package",
@@ -269,7 +268,7 @@ export function mapRiskTier(tier: "low" | "med" | "medium" | "high" | "critical"
   return tier === "med" ? "medium" : tier;
 }
 
-export const a4QuestionSchema = z.strictObject({
+const a4QuestionSchema = z.strictObject({
   id: nonEmpty, stage: z.enum(A4_STAGES), prompt: nonEmpty, dependsOn: z.array(z.string()),
   required: z.boolean(), kind: z.enum(["text", "list", "choice", "fact"])
 });
@@ -321,7 +320,6 @@ export const a4MemberRowSchema = z.object({
   project_id: text, seq: int, event: z.enum(["added", "roles_changed", "removed"]), principal_key: text, auth_source: text, user_id: text,
   username: text, roles_json: text, actor_key: text, evidence_event_id: text, ts: int
 });
-export type A4MemberRow = z.infer<typeof a4MemberRowSchema>;
 export const a4CommentRowSchema = z.object({
   comment_id: text, project_id: text, revision_no: int, stage: text.nullable(), card_id: text, author_key: text, body_sha256: sha256HexSchema,
   blob_ref: sha256HexSchema, in_reply_to: text.nullable(), evidence_event_id: text, ts: int
@@ -364,7 +362,6 @@ export const a4RequestRowSchema = z.object({
   principal_key: text, client_request_id: text, body_hash: text, project_id: text.nullable(), response_json: text,
   redacted: z.union([z.literal(0), z.literal(1)]), ts: int
 });
-export type A4RequestRow = z.infer<typeof a4RequestRowSchema>;
 export const a4EffectRowSchema = z.object({
   effect_id: text, project_id: text, gate_id: text, execution_id: text, approval_request_id: text.nullable(), owner_pid: int,
   owner_host: text, started_ts: int, heartbeat_ts: int, state: z.enum(["running", "finished", "failed"])

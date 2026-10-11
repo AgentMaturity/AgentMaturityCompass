@@ -18,7 +18,7 @@ const question = (id: string, prompt: string, kind: A4Question["kind"], required
 
 /** Aspire answers Assemble carries (Understand records them `source: "carried"`); they are changed only at Aspire. */
 export const CARRIED = ["riskTier", "stations"] as const;
-export const AUTONOMY = ["advise", "act_with_approval"] as const;
+const AUTONOMY = ["advise", "act_with_approval"] as const;
 export const NATIVE_PROVIDERS = ["stub", "openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama"] as const;
 /** A validation check id as Studio's native task start takes it (src/studio/nativeTaskValidation.ts). */
 const CHECK_ID = /^[a-zA-Z0-9_-]{1,64}$/;
@@ -52,7 +52,7 @@ export const APPLY_EFFECT_ID = "a4.assemble.apply";
 /** The EVIDENCE_REF purpose of an outcome_unknown resolution request (src/a4/assembleResolve.ts). */
 export const RESOLUTION_PURPOSE = "outcome_unknown_resolution";
 /** The seam the native task lane owns before composition.compositionDigest and composition.policyDigest can be recomputed per session. */
-export const COMPOSITION_SEAM_KEY = "NATIVE_TASK_COMPOSITION_DIGESTS";
+const COMPOSITION_SEAM_KEY = "NATIVE_TASK_COMPOSITION_DIGESTS";
 /**
  * The seam before Assemble's completion can advance the lifecycle development → testing (design §7 item 9, §10.2): the
  * A4 lifecycle wrapper (a4Lifecycle.advance, planned in P1-62's a4Lifecycle.ts, whose issue bridges only →staging and

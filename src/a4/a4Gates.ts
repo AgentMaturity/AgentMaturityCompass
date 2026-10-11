@@ -197,7 +197,7 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
  * and the signed control results Adapt's Review recorded and the session store backend only at Adapt.
  */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
+function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
   let route: "vault" | "notary" | null;
@@ -367,7 +367,7 @@ const collectRoute = (workspace: string): "vault" | "notary" | null => {
 };
 
 /** What a gate binds, rebuilt from rows (design §6.2, §6.4); `requesterKey` and `specDigest` come from the gate. */
-export function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: "direction" | "completion" | "policy"; revisionNo: number;
+function intentOf(state: A4ReadinessState, gate: { stage: A4Stage; gate: "direction" | "completion" | "policy"; revisionNo: number;
   requesterKey: string; specDigest: string; boundItemIds: readonly string[] }, readiness: A4ReadinessV1): A4IntentV1 {
   const revision = state.revisions.find((row) => row.revision_no === gate.revisionNo) ?? null;
   // A policy gate approves the proposed policy, whose author is its requester, not the head revision (design §5.3).

@@ -42,7 +42,7 @@ import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js
 import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
-export const A4_MIGRATION = 13;
+const A4_MIGRATION = 13;
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 /** Lowest first, as src/a4/a4Evidence.ts ranks them; a missing or unknown tier ranks below all of them. */
 const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
@@ -478,7 +478,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
  * An `amc.a4-record/v1` export, loaded into a temporary ledger of exactly its rows. Trust is the caller's. `bundleAgentId`
  * is the signed manifest's agent when the record came from a bundle (undefined for a record file on its own).
  */
-export function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
+function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
   artifact: VerifierReportV1["artifact"] = { kind: "a4-record", path: record.projectId, sha256: sha256Hex(canonicalize(record)) }, note: string | null = RECORD_NOTE,
   bundleAgentId?: string | null): VerifierReportV1 {
   let materialized: ReturnType<typeof materializeA4Record>;

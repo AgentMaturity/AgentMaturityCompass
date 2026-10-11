@@ -30,12 +30,12 @@ export { A4_BOUND_ITEMS };
 export type BlockerKind = (typeof A4_BLOCKER_KINDS)[number];
 export type A4ReadinessItem = z.infer<typeof a4ReadinessItemSchema>;
 export type A4GateRow = z.infer<typeof a4GateRowSchema>;
-export type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
-export type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
+type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
+type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
 export type A4EffectRow = z.infer<typeof a4EffectRowSchema>;
 export type A4RequiredReview = A4GatePolicyV1["gates"]["policy"]["requiredReviews"][number];
 
-export const A4_ACTIONS = [
+const A4_ACTIONS = [
   "ask", "understand", "explain", "propose", "requestGate", "decide", "requestChanges", "build", "review", "progress", "hold", "resume",
   "reopen", "tune", "retire", "addMember", "changeGatePolicy", "acknowledge", "openEffect", "retryEffect", "release", "recordDeployment",
   "verifyDeployment", "rollback", "observeHypothesis"
@@ -161,7 +161,7 @@ const parseJson = (text: string): unknown => {
     return null;
   }
 };
-export const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
+const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
 const decisionRecordOf = (row: A4DecisionRow): ApprovalDecisionRecord | null => {
   const parsed = approvalDecisionSchema.safeParse(parseJson(row.decision_json));
   return parsed.success ? parsed.data : null;
