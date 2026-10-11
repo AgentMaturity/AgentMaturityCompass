@@ -13,7 +13,7 @@
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import { actionEvidenceCoverage } from "../actions/actionEvidenceCoverage.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
@@ -36,13 +36,11 @@ import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ProducerContext, A4ProducerResult } from "./a4RouterStages.js";
-import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { ASSEMBLE_CLAIM_BOUNDARY, assembleSpecOf, LIFECYCLE_SEAM_KEY, presetIdOf, proposedFor, STUB_WORDING } from "./spec/assemble.js";
 import { answerValues, listValue } from "./spec/aspire.js";
+import { fail, relPath } from "./stages/common.js";
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 /** States in which a session may still change what it did: Review waits for them. */
 const RUNNING = new Set<NativeTaskView["state"]>(["starting", "running", "cancel-requested", "releasing", "verifying"]);
 

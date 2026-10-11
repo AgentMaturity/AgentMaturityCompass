@@ -7,11 +7,11 @@
  */
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { MAX_PLAN_NODES, parseWorkflowPlan, planAgentCount, type WorkflowNode } from "../../workflow/workflowPlan.js";
-import type { A4ReadinessItem, A4ReadinessQuery, A4ReadinessState } from "../a4Readiness.js";
+import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
+import { flatSlots, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { INTEGRATION_PATHS, integrationClaimFor } from "../assemblePaths.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "assemble", prompt, dependsOn, required, kind });
@@ -68,20 +68,13 @@ export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "prop
   .map((step) => ({ id: `assemble.${step}`, step, run: async (ctx) => (await load()).produceAssemble(step, ctx) }));
 
 /** The newest Assemble revision's spec and answers. */
-export function assembleSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "assemble").at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers, revisionNo: revision?.revision_no ?? null };
+export function assembleSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "assemble");
 }
 
 /** The Aspire answers Assemble carries, as the newest Aspire revision records them (absent ones are left out). */
 export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<string, unknown> {
-  const values = answerValues(aspireSpecOf(state).answers);
-  return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+  return carriedValuesOf(state, CARRIED);
 }
 
 /** `stub`, or `provider:model` for a model-requiring provider; null when it names no native provider. */
@@ -144,14 +137,11 @@ export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: Workf
  * Required questions with no answer, answered ones whose dependencies changed since, answers that are not one of their
  * question's values, and carried answers that are missing or no longer Aspire's (fail closed: re-carry at Understand).
  */
-export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
+export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): CarryingAnswerGaps {
   const values = answerValues(answers);
   const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const checks = listValue(values.get("validation"));
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const choice = (id: string, allowed: readonly string[]): boolean => textValue(values.get(id)) !== null && !allowed.includes(textValue(values.get(id))!);
   const invalid = [
     ...(choice("autonomy", AUTONOMY) ? ["autonomy"] : []),
@@ -162,21 +152,14 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
       || !checks.every((id) => CHECK_ID.test(id))) ? ["validation"] : []),
     ...(workflow !== null && "error" in workflow ? ["workflow"] : [])
   ];
-  const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
-    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
-  return { missing, stale, invalid, carried: carriedGaps };
+  return { missing, stale, invalid, carried: carriedGaps(CARRIED, answers, carried) };
 }
 
 /** Whether `spec` is the plan Propose built for exactly these answers. */
 export const proposedFor = (spec: Record<string, unknown>, answers: readonly A4Answer[]): boolean =>
   spec.schema === ASSEMBLE_SPEC_SCHEMA && spec.answersDigest === answersDigestOf(answers);
 
-type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "implementation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("implementation");
 
 /** Whether the project has reached `step` at Assemble (any later stage counts; Aspire has not). */
 function reached(state: A4ReadinessState, step: A4Step): boolean {

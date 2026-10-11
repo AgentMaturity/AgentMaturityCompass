@@ -329,10 +329,19 @@ function decisionEnvelope(decision: A4DecisionRow, regulated: boolean, now: numb
 }
 
 type ItemFields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: ItemFields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "governance", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
+/**
+ * The item builders of one readiness section: `item` (every field not given is its empty default, the item mandatory)
+ * and `waiting`, a WAITING item with evidence missing under `codes`. Each stage's spec module takes the pair for its section.
+ */
+export function readinessItemBuilders(section: A4ReadinessItem["section"]) {
+  const item = (id: string, status: A4ReadinessItem["status"], fields: ItemFields = {}): A4ReadinessItem => ({
+    id, status, kind: null, reasonCodes: [], section, evidence: [], claim: null, report: null, acknowledged: null,
+    nextAction: null, mandatory: true, bound: false, ...fields
+  } as A4ReadinessItem);
+  const waiting = (id: string, codes: string[], fields: ItemFields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+  return { item, waiting };
+}
+const { item } = readinessItemBuilders("governance");
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });
 
