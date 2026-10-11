@@ -18,12 +18,14 @@ import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
 import { initWorkspace } from "../src/workspace.js";
 import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import {
+  bootstrapLeaseRevocations,
   leaseRevocationPaths,
   revokeLease,
   revokedLeaseIdSet,
   signLeaseRevocations,
   verifyLeaseRevocationsSignature
 } from "../src/leases/leaseStore.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { ensureLeaseRevocationStore, issueLeaseForCli, verifyLeaseForCli } from "../src/leases/leaseCli.js";
 
 /**
@@ -217,7 +219,7 @@ describe("ensureLeaseRevocationStore does not launder tampering", () => {
 
   test("re-running on a healthy store keeps it valid", () => {
     const workspace = newWorkspace();
-    signLeaseRevocations(workspace);
+    bootstrapLeaseRevocations(workspace);
     expect(ensureLeaseRevocationStore(workspace).signatureValid).toBe(true);
   });
 });
@@ -227,7 +229,8 @@ describe("resignLeaseRevocationsForCli is the one deliberate repair path", () =>
     const { resignLeaseRevocationsForCli } = await import("../src/leases/leaseCli.js");
     const workspace = newWorkspace();
     tamperedStore(workspace);
-    const result = resignLeaseRevocationsForCli(workspace);
+    const reviewed = sha256Hex(readFileSync(leaseRevocationPaths(workspace).file));
+    const result = resignLeaseRevocationsForCli(workspace, reviewed);
     expect(result.wasValid).toBe(false);
     expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(true);
     // The tampered content emptied the list; the report says so.
@@ -292,7 +295,7 @@ describe("managed hooks authenticate the revocation store", () => {
     installHookIntegration({ workspace, provider: "claude-code", agentId: "research-agent" });
     const path = leaseRevocationPaths(workspace).file;
     writeFileSync(path, JSON.stringify({ v: 1, updatedTs: Date.now(), revocations: "invalid" }));
-    signLeaseRevocations(workspace);
+    signLeaseRevocations(workspace, sha256Hex(readFileSync(path)));
     expect(verifyLeaseRevocationsSignature(workspace).valid).toBe(true);
     expect(getHookIntegrationStatus({ workspace, provider: "claude-code" })).toMatchObject({
       state: "invalid", leaseValid: false, manifestValid: true

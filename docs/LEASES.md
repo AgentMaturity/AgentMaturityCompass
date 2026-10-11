@@ -28,7 +28,8 @@ Signed with Studio lease signing key (Ed25519, vault-backed).
 amc lease issue --agent <id> --ttl 60m --scopes gateway:llm,toolhub:intent --routes /openai --models "gpt-*" --rpm 60 --tpm 200000
 amc lease issue --agent hook-agent --ttl 30m --scopes hook:observe --routes /hooks --models "*" --rpm 60
 amc lease verify <token>
-amc lease revoke <leaseId>
+amc lease revoke --lease-id <leaseId> --reason <reason>
+amc lease resign-revocations --expect-digest <sha256>
 ```
 
 Revocations are stored at:
@@ -42,6 +43,17 @@ repair operation and must not certify altered older revocations. Only a genuinel
 absent list **and** signature use first-store bootstrap behavior.
 
 Review and restore the approved history before using a deliberate repair command.
+`amc lease resign-revocations` signs only the reviewed bytes: copy the list, review
+the copy, and pass its digest (`shasum -a 256 <copy>`) as `--expect-digest`. Under
+the revocations lock the command hashes the list it is about to sign and refuses,
+signing nothing, when the digest differs or the list is missing. To deliberately
+start over with an empty list, move both files aside; the next `amc lease issue`
+bootstraps a new store.
+
+The first-store bootstrap (`amc lease issue`, managed hooks, the demo) publishes only
+the built-in empty list, and only while neither file exists when checked under the
+lock. A list that appears without a signature is never signed by the bootstrap; it is
+reported invalid until reviewed and re-signed as above.
 
 How a list is published (`amc lease revoke`, `amc lease resign-revocations` and the
 first-store bootstrap in `amc lease issue` all use the same path, serialized by one
@@ -57,7 +69,7 @@ lock):
 Two renames are not one atomic step. A crash between them leaves a new list beside
 the old signature. That pair does not verify, so every consumer refuses every lease
 (fail closed; no lease is admitted against an unverified list) until the owner
-reviews the list and runs `amc lease resign-revocations`. Keep the original bytes
+reviews the list and runs `amc lease resign-revocations --expect-digest <sha256>`. Keep the original bytes
 and operator evidence when diagnosing such a failure.
 
 ## Enforcement

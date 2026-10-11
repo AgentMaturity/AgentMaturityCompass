@@ -72,14 +72,34 @@ function publishSignedRevocations(workspace: string, bytes: Buffer): void {
   if (!published.valid) throw new Error(`lease revocation store does not verify after publishing (${published.reason ?? "unknown"})`);
 }
 
-export function signLeaseRevocations(workspace: string): string {
+/**
+ * First-store bootstrap: publish the default empty list, and only while neither file exists. Both checks run under
+ * the lock, so a list dropped after a caller's unlocked check is never signed; returns whether it published.
+ */
+export function bootstrapLeaseRevocations(workspace: string): boolean {
   const paths = leaseRevocationPaths(workspace);
   return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
-    const bytes = pathExists(paths.file)
-      ? readFileSync(paths.file)
-      : Buffer.from(JSON.stringify(defaultLeaseRevocations(), null, 2), "utf8");
+    if (pathExists(paths.file) || pathExists(paths.sig)) return false;
+    publishSignedRevocations(workspace, Buffer.from(JSON.stringify(defaultLeaseRevocations(), null, 2), "utf8"));
+    return true;
+  } });
+}
+
+/**
+ * The deliberate repair: sign the list on disk only if its bytes still have the digest the operator reviewed (checked
+ * under the lock, on the bytes that are signed). Returns those bytes.
+ */
+export function signLeaseRevocations(workspace: string, reviewedDigestSha256: string): Buffer {
+  const paths = leaseRevocationPaths(workspace);
+  return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
+    if (!pathExists(paths.file)) throw new Error("revocation list missing; restore the reviewed list before re-signing. Nothing was signed.");
+    const bytes = readFileSync(paths.file);
+    const digest = sha256Hex(bytes);
+    if (digest !== reviewedDigestSha256.trim().toLowerCase()) {
+      throw new Error(`revocation list sha256 is ${digest}, not the reviewed ${reviewedDigestSha256}; nothing was signed. Review the current list again.`);
+    }
     publishSignedRevocations(workspace, bytes);
-    return paths.sig;
+    return bytes;
   } });
 }
 
