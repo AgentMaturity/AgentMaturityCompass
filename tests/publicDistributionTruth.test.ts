@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
+import { findTruthClaims, findUnknownCommands, loadKnownCommands } from "../scripts/docs-drift-check.mjs";
 
 const root = resolve(process.cwd());
 const temporaryDirectories: string[] = [];
@@ -235,6 +236,33 @@ describe("truthful public distribution and brand contract", () => {
 
     expect(read(".gitignore")).toMatch(/^AMC_OS\/$/m);
     expect(docsDriftCheck).toContain("if (!existsSync(full)) return [];");
+  });
+
+  test("docs-drift fails a banned claim word used as a status and passes a negation, a quote or code (P0-28)", () => {
+    const claims = (text: string) => findTruthClaims("docs/FIXTURE.md", text).map((claim) => claim.match);
+    expect(claims("AMC is certified.")).toEqual(["certified"]);
+    expect(claims("Every agent run here is fully certified.")).toEqual(["certified"]);
+    expect(claims("The agent is EU AI Act compliant.")).toEqual(["compliant"]);
+    expect(claims("Delivery is guaranteed.")).toEqual(["guaranteed"]);
+    expect(claims("AMC does not certify legal compliance.")).toEqual([]);
+    expect(claims("A signed bundle is not certified by anyone.")).toEqual([]);
+    expect(claims("Never print the phrase \"certification ready\".")).toEqual([]);
+    expect(claims("Run `amc certified-thing` in code.")).toEqual([]);
+    expect(findTruthClaims("website/fixture.html", "<p>Fully <b>certified</b> agents.</p>").map((c) => c.match)).toEqual(["certified"]);
+    expect(findTruthClaims("website/fixture.html", "<script>/certified/.test(x)</script>")).toEqual([]);
+  });
+
+  test("docs-drift fails an amc command the CLI inventory does not register (P0-28)", () => {
+    const known = loadKnownCommands(read("docs/CLI_COMMAND_INVENTORY.md"));
+    const unknown = (text: string) => findUnknownCommands("docs/FIXTURE.md", text, known).map((found) => found.command);
+    expect(unknown("```bash\namc trust decay --preset healthcare\n```")).toEqual(["amc trust decay"]);
+    expect(unknown("Run `amc trust graph --show`.")).toEqual(["amc trust graph"]);
+    expect(unknown("Run `amc telemetry on`.")).toEqual(["amc telemetry"]);
+    expect(unknown("```bash\namc fleet trust-graph --format mermaid\n```")).toEqual([]);
+    expect(unknown("Run `amc start` or `amc sector list`.")).toEqual([]);
+    expect(unknown("There is no `amc trust decay` command.")).toEqual([]);
+    expect(findUnknownCommands("website/fixture.html", "<code>amc trust transitive</code>", known).map((f) => f.command))
+      .toEqual(["amc trust transitive"]);
   });
 
   test("pins and verifies release assets before either hosted installer executes them", () => {

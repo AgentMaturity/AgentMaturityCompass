@@ -245,7 +245,7 @@
 
       <!-- RAPID CHECKS -->
       <div class="ns-toggle" id="ns-quickscore" onclick="this.classList.toggle('open')">
-        <h3>Rapid Checks, Badge &amp; Telemetry <span class="cmd-count">8 commands</span></h3>
+        <h3>Rapid Checks &amp; Badge <span class="cmd-count">6 commands</span></h3>
       </div>
       <div class="ns-body">
         <table>
@@ -255,10 +255,8 @@
             <tr><td><code>amc quickscore --rapid</code></td><td>Run the lightweight pulse-check mode explicitly</td></tr>
             <tr><td><code>amc quickscore --json</code></td><td>Machine-readable JSON output</td></tr>
             <tr><td><code>amc compliance report --framework EU_AI_ACT</code></td><td>Generate EU AI Act mapping from evidence</td></tr>
-            <tr><td><code>amc badge</code></td><td>Generate maturity badge (markdown, HTML, or URL)</td></tr>
+            <tr><td><code>amc badge</code></td><td>Generate a self-made badge from the latest local score; it accepts manual <code>--level</code> and <code>--score</code> overrides, so it is not a maturity or certification mark</td></tr>
             <tr><td><code>amc badge --format html</code></td><td>HTML <code>&lt;img&gt;</code> tag output</td></tr>
-            <tr><td><code>amc telemetry on|off</code></td><td>Enable/disable anonymous opt-in telemetry</td></tr>
-            <tr><td><code>amc telemetry status</code></td><td>Show telemetry config</td></tr>
           </tbody>
         </table>
       </div>
@@ -389,8 +387,7 @@
           <tbody>
             <tr><td><code>amc observe timeline</code></td><td>Show maturity progression, evidence volume, and score history</td></tr>
             <tr><td><code>amc observe anomalies</code></td><td>Detect volatility, regressions, and suspicious score movements</td></tr>
-            <tr><td><code>amc observe compare</code></td><td>Compare multiple agents or time windows</td></tr>
-            <tr><td><code>amc correction log</code></td><td>Track human corrections and overrides</td></tr>
+            <tr><td><code>amc correction add</code></td><td>Record a human correction or override for an agent</td></tr>
             <tr><td><code>amc correction report</code></td><td>Summarize correction closure and effectiveness</td></tr>
             <tr><td><code>amc trace list</code></td><td>List recent agent sessions with evidence summary</td></tr>
             <tr><td><code>amc trace inspect</code></td><td>Inspect tool calls, decisions, payloads, and trust tiers</td></tr>
@@ -534,7 +531,7 @@
             <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Write a signed authorization scope for controlled exploit confirmation</td></tr>
             <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Run fail-closed confirmation and emit safe proof without exploit instructions</td></tr>
             <tr><td><code>amc shield confirm proofs|export &lt;proof&gt;</code></td><td>List and export redacted confirmation proof for Vault or Passport evidence</td></tr>
-            <tr><td><code>amc assurance cert issue|verify</code></td><td>Assurance certificates</td></tr>
+            <tr><td><code>amc assurance cert-issue|cert-verify</code></td><td>Assurance certificates</td></tr>
             <tr><td><code>amc assurance scheduler status</code></td><td>Scheduler controls</td></tr>
             <tr><td><code>amc assurance waiver request</code></td><td>Temporary waiver</td></tr>
             <tr><td><code>amc assurance verify-policy</code></td><td>Verify policy signature</td></tr>
@@ -560,10 +557,10 @@
             <tr><td><code>amc domain report --domain &lt;d&gt;</code></td><td>Generate domain report</td></tr>
             <tr><td><code>amc audit init|verify-policy</code></td><td>Initialize audit binder</td></tr>
             <tr><td><code>amc audit binder create|verify</code></td><td>Binder artifact lifecycle</td></tr>
-            <tr><td><code>amc audit binder create --framework eu-ai-act</code></td><td>Export compliance evidence binder</td></tr>
+            <tr><td><code>amc audit binder create --scope workspace --out binder.amcaudit</code></td><td>Export compliance evidence binder</td></tr>
             <tr><td><code>amc audit map list|show|apply</code></td><td>Compliance map operations</td></tr>
             <tr><td><code>amc audit request create|approve</code></td><td>Auditor evidence requests</td></tr>
-            <tr><td><code>amc certification</code></td><td>Issue offline certificate</td></tr>
+            <tr><td><code>amc certify</code></td><td>Issue a signed certificate bundle (signed evidence, not a certification)</td></tr>
             <tr><td><code>amc cert verify|inspect|revoke</code></td><td>Certificate operations</td></tr>
             <tr><td><code>amc passport init|create|verify</code></td><td>Agent Passport credential</td></tr>
           </tbody>
@@ -656,7 +653,6 @@
           <tr><td><code>AMC_STUDIO_PORT</code></td><td>Studio API/dashboard port</td><td><code>3212</code></td></tr>
           <tr><td><code>AMC_GATEWAY_PORT</code></td><td>Gateway proxy port</td><td><code>3210</code></td></tr>
           <tr><td><code>AMC_LOG_LEVEL</code></td><td>Logging verbosity (debug, info, warn, error)</td><td><code>info</code></td></tr>
-          <tr><td><code>AMC_TELEMETRY</code></td><td>Enable/disable anonymous telemetry</td><td><code>off</code></td></tr>
           <tr><td><code>AMC_CI</code></td><td>CI mode (suppresses interactive prompts)</td><td><code>false</code></td></tr>
         </tbody>
       </table>

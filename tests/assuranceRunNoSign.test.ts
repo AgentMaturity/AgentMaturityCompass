@@ -133,8 +133,9 @@ describe("assurance run --all --no-sign", () => {
     expect(docs).toContain("amc setup");
     expect(docs).toContain("amc assurance run --demo --no-sign");
     expect(docs).toContain("amc assurance run --demo");
-    expect(docs).toContain("amc assurance cert issue --run <runId>");
-    expect(docs).toContain("amc assurance cert verify .amc/assurance/certificates/latest.amccert");
+    // P0-28: the registered commands are cert-issue and cert-verify; "cert issue" was never registered.
+    expect(docs).toContain("amc assurance cert-issue --run <runId>");
+    expect(docs).toContain("amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>");
     expect(docs).toContain("## Policy Threshold Tuning");
     expect(docs).toContain("minRiskAssuranceScore");
     expect(docs).toContain("maxCriticalFindings");

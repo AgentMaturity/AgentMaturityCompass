@@ -340,7 +340,7 @@ No network ports are opened. No data leaves your machine. The server reads from 
 Run `amc init` in your project to register an agent first.
 
 **"Could not load agent"**
-Run `amc quickscore` or `amc score run` to generate the first assessment before using MCP tools.
+Run `amc quickscore` or `amc run` to generate the first assessment before using MCP tools.
 
 **IDE not showing AMC tools**
 1. Verify `amc` is in your PATH: `which amc`

@@ -166,7 +166,7 @@ AMC maps one control category to ISO/IEC 42006:2025:
 
 | Mapping ID | Category | Focus |
 |---|---|---|
-| `iso42006_conformity_evidence_package` | Conformity Evidence | Machine-readable, certification-ready audit evidence packages |
+| `iso42006_conformity_evidence_package` | Conformity Evidence | Machine-readable audit evidence packages (evidence of conformity, not a certification) |
 
 Requirements:
 - artifact + audit + test events ≥60% OBSERVED

@@ -48,8 +48,8 @@
 | **Metric** (`AnswerRelevancy`, `Faithfulness`, `Hallucination`) | **Scoring module** | AMC modules cover trust dimensions, not just output quality |
 | **Test case** (`LLMTestCase`) | **Diagnostic question** | AMC questions are structured and scored per-dimension |
 | **Dataset** (`EvaluationDataset`) | **Assurance pack** | Versioned, signed bundles of test scenarios |
-| **Synthesizer** (`Synthesizer().generate()`) | **`amc assurance generate`** | Generate test scenarios from descriptions |
-| **Red teaming** (`RTAdversarialAttack`) | **Adversarial assurance packs** | 85 packs vs. DeepEval's handful of attack types |
+| **Synthesizer** (`Synthesizer().generate()`) | No equivalent | AMC does not generate test scenarios; it runs the assurance packs it ships (`amc assurance list`) |
+| **Red teaming** (`RTAdversarialAttack`) | **Adversarial assurance packs** | `amc assurance list` shows the registered packs |
 | **Confident AI** (cloud dashboard) | **`amc report` + `amc dashboard`** | Self-hosted, no data leaves your infra |
 | **`@pytest.mark.parametrize`** | **Assurance pack iteration** | AMC handles iteration internally |
 | **Custom metric** (`BaseMetric`) | **Custom scoring module** | Extend AMC's scoring with TypeScript modules |
@@ -150,12 +150,13 @@ def test_hallucination():
 # Initialize AMC in your project
 amc init
 
-# AMC's 730+ questions cover relevancy, hallucination, and much more
+# AMC's diagnostic question bank covers relevancy, hallucination, and much more
 # No test code to write — just configure and run
 amc score
 
-# For custom assertions, create an assurance pack
-amc assurance create --name my-agent-tests --from-template qa-accuracy
+# There is no command to author a custom assurance pack; list and run the registered ones
+amc assurance list
+amc assurance run --all
 ```
 
 For custom scoring logic that maps to DeepEval metrics:

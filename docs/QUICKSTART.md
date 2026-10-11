@@ -369,7 +369,7 @@ amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 
 | Goal | Command |
 |------|---------|
-| Deep diagnostic (244 default questions) | `amc diagnostic run` |
+| Deep diagnostic (244 default questions) | `amc run --score-only` |
 | Lifecycle-expanded diagnostic (264 questions) | `amc run --question-set lifecycle` |
 | EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |
