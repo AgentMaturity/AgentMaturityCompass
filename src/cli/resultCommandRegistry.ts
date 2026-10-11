@@ -238,7 +238,7 @@ export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
   non("a4 deploy", GROUP),
   non("a4 guide", "prints the A4 stage model, a project's next action and the pins a gate decision needs; no result"),
   non("a4 deploy prepare", "prints the deployment plan AMC prepared and signed; instructions, never evidence of a deployment"),
-  non("history","lists run IDs, times and signature statuses; no score or level (amc report <runId> labels each run)"),
+  non("history", "lists run IDs, times and signature statuses; no score or level (amc report <runId> labels each run)"),
   non("assurance history", "lists assurance run IDs, modes and signature statuses; no score (amc assurance runs labels them)"),
   non("score lean-profile", "describes AMC's lean module profile; no agent is assessed"),
   non("score evidence-coverage", "counts which AMC questions have automated evidence sources; no agent is assessed"),

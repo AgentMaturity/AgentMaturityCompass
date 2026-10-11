@@ -10,9 +10,9 @@
  * export` scoped to a project's agent. Results print their claim label; a refusal exits 1, verify exits by verdict.
  */
 import { randomBytes } from "node:crypto";
-import { lstatSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { InvalidArgumentError, Option, type Command } from "commander";
 import { A4_API_PREFIX, serveA4, unboundClaim } from "./a4/a4Router.js";
@@ -29,7 +29,7 @@ import { emitClaimResult, printClaimResult, runIdClaim, withClaimFields } from "
 import { openLedger } from "./ledger/ledger.js";
 import { assertOwnerMode } from "./mode/mode.js";
 import { readNativeApprovalActor } from "./setup/nativeApprovalIdentity.js";
-import { containedPath, safeIdSchema } from "./utils/pathSafety.js";
+import { containedPath, isWithin, safeIdSchema } from "./utils/pathSafety.js";
 
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
 const GATE_ID = /^a4gate_[0-9a-f]{32}$/;
@@ -540,6 +540,11 @@ function registerReleases(a4: Command): void {
         // Absent: the export creates it.
       }
       if (link) throw invalid("--out names a symbolic link; name a new or regular file.");
+      // containedPath compares text; a symlinked directory on the way could still lead outside, so the nearest existing
+      // ancestor must resolve inside the workspace too (pathSafety: pass physical forms when symlinks matter).
+      let existing = dirname(outFile);
+      while (!existsSync(existing) && dirname(existing) !== existing) existing = dirname(existing);
+      if (!isWithin(realpathSync(workspace), realpathSync(existing))) throw invalid("--out leads outside the workspace through a symbolic link.");
       // The project route verifies the chain and names the agent; the bundle's A4 slice verifies every project again.
       const agentId = String((await route(undefined, "GET", `/projects/${projectId}`)).agentId);
       const result = exportEvidenceBundle({ workspace, runId: opts.run, outFile, agentId });
