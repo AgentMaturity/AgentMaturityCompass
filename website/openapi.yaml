@@ -14052,11 +14052,12 @@ paths:
         a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
         the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
         TARGET_MISMATCH, DESTINATION_MISMATCH (a deploy row naming another destination than the release was
-        packaged for), RELEASE_ROLLED_BACK (a deploy row for a rolled-back release), and for a rollback row
-        ROLLBACK_ENVIRONMENT_MISMATCH (not the rollback's environment), ROLLBACK_ROW_RECORDED (a succeeded row
-        of it exists) or ROLLBACK_SUPERSEDED (a succeeded production deploy followed it). A rollback row is
-        recordable on a held or frozen project. No lease is issued and no runtime run is created; a succeeded
-        production deploy, or a succeeded production rollback row, moves deployedReleaseId
+        packaged for), RELEASE_ROLLED_BACK (a deploy row for a release rolled back or whose rollback started),
+        and for a rollback row ROLLBACK_ENVIRONMENT_MISMATCH (not the rollback's environment),
+        ROLLBACK_ROW_RECORDED (a succeeded row of it exists) or ROLLBACK_SUPERSEDED (a succeeded production
+        deploy followed it, or, for a production row, the rolled-back release is not the one production ran). A
+        rollback row is recordable on a held or frozen project. No lease is issued and no runtime run is
+        created; a succeeded production deploy, or a succeeded production rollback row, moves deployedReleaseId
       tags:
         - Studio
         - A4 Forge
@@ -14366,9 +14367,11 @@ paths:
   /v1/a4/projects/{projectId}/releases/{releaseId}/rollback/preview:
     post:
       summary: "Preview a rollback (owner, owner mode) and open its effect gate a4.activate.rollback: a DEPLOY
-        engine request binding the preview, decided separately under A4's separation of duties. The target is
-        the release record's rollback block: the release running in production when this one was built (409
-        ROLLBACK_TARGET_ROLLED_BACK when it was rolled back since)"
+        engine request binding the preview, decided separately under A4's separation of duties. Only the release
+        running in the chosen environment rolls back (production: the newest one with a succeeded production
+        deploy not rolled back; staging: this cycle's release; 409 ROLLBACK_RELEASE_NOT_RUNNING otherwise). The
+        target is the release record's rollback block: the release running in production when this one was built
+        (409 ROLLBACK_TARGET_ROLLED_BACK when it was rolled back since)"
       tags:
         - Studio
         - A4 Forge
@@ -14469,15 +14472,16 @@ paths:
   /v1/a4/projects/{projectId}/releases/{releaseId}/rollback:
     post:
       summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound,
-        journaled as an effect (EFFECT_STARTED first, pinned to expectedHeadSeq; 409 EFFECT_RUNNING while
-        another attempt or the deployment approval's production-lease effect runs): the grant consumed (a re-run
-        uses the grant its own execution consumed, never for an approver its quorum counted: 409 SOD_VIOLATION;
-        GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or critical risk tier,
-        the Enforce restore, every lease of the release revoked (read again at execution, and the lease journal
-        once more before it settles), the prepared commands, a signed a4-rollback-receipt, then ROLLBACK with
-        EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code and a replay answers the attempt's
-        outcome; the lifecycle is never moved backwards and deployedReleaseId moves when the operator records a
-        production rollback row"
+        journaled as an effect (EFFECT_STARTED first, pinned to expectedHeadSeq and refused again with
+        ROLLBACK_RELEASE_NOT_RUNNING or ROLLBACK_TARGET_ROLLED_BACK on the rows it reads; 409 EFFECT_RUNNING
+        while another attempt or the deployment approval's production-lease effect runs): the grant consumed (a
+        re-run uses the grant its own execution consumed, never for an approver its quorum counted: 409
+        SOD_VIOLATION; GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or
+        critical risk tier, the Enforce restore, every lease of the release revoked (read again at execution,
+        and the lease journal once more before it settles), the prepared commands, a signed a4-rollback-receipt,
+        then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code and a replay answers
+        the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId moves when the
+        operator records a production rollback row"
       tags:
         - Studio
         - A4 Forge
