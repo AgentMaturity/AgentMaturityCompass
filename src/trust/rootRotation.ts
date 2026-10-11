@@ -30,7 +30,7 @@ const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/);
 const setIdSchema = z.string().regex(/^[a-z0-9][a-z0-9._-]{0,63}$/);
 const rootSet = z.array(keyIdSchema).min(2).max(64).refine(roots => new Set(roots).size === roots.length, "roots must be unique");
 
-export const trustRootsSchema = z.strictObject({
+const trustRootsSchema = z.strictObject({
   type: z.literal("amc.trust-roots"),
   version: z.literal(1),
   roots: z.array(keyIdSchema).min(1).refine(roots => new Set(roots).size === roots.length, "roots must be unique"),
@@ -67,7 +67,7 @@ const signedSchema = z.strictObject({
     "signatures sorted by role then key id, one per key and role")
 });
 export type RootRotationStatement = z.infer<typeof statementSchema>;
-export type SignedRootRotation = z.infer<typeof signedSchema>;
+type SignedRootRotation = z.infer<typeof signedSchema>;
 
 const bytesToSign = (statement: RootRotationStatement) => Buffer.concat([Buffer.from(DOMAIN, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
 const sortedEqual = (a: readonly string[], b: readonly string[]) => a.length === b.length && [...a].sort().every((value, index) => value === [...b].sort()[index]);

@@ -172,7 +172,8 @@ describe("key rotation statements (P1-08)", () => {
 
   it("refuses a trust-list-root key rotation: root sets rotate only with amc.root-rotation", () => {
     const other = pair();
-    const expected = { workspaceId: "trust-roots", purpose: "trust-list-root" } as const;
+    // The type already excludes the purpose; a hand-written statement can still carry it.
+    const expected = { workspaceId: "trust-roots", purpose: "trust-list-root" } as unknown as Parameters<typeof statement>[2];
     expect(() => signRotationStatement(statement(k0, k1, expected), { previous: k0.privatePem, next: k1.privatePem, roots: [other.privatePem] }))
       .toThrow(/amc.root-rotation/);
   });

@@ -52,7 +52,7 @@ export interface TrustVerificationResult {
   trustTier: 'ATTESTED' | 'SELF_REPORTED' | 'UNVERIFIED';
 }
 
-export type ClaimIntegrity = 'shared-secret' | 'ed25519' | 'none';
+type ClaimIntegrity = 'shared-secret' | 'ed25519' | 'none';
 
 export interface TrustPolicyRule {
   minAmcScore?: number;
@@ -78,7 +78,7 @@ export interface ClaimExpectation {
 }
 
 /** Claims live at most this long; an HMAC key's claims cannot outlive it by more. */
-export const MAX_CLAIM_LIFETIME_MS = 24 * 3600_000;
+const MAX_CLAIM_LIFETIME_MS = 24 * 3600_000;
 const DEFAULT_CLAIM_LIFETIME_MS = 3600_000;
 const MAX_CLOCK_SKEW_MS = 60_000;
 const MIN_SECRET_BYTES = 16;

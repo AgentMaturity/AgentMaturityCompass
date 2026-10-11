@@ -263,6 +263,8 @@ describe('Trust API — inherited trust', () => {
     score: 80,
     level: 'L4',
     grantedScopes: ['read', 'write', 'execute', 'delegate'],
+    integrity: 'ed25519',
+    trustTier: 'ATTESTED',
   };
 
   const policy: DelegationPolicy = {
