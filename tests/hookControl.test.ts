@@ -12,13 +12,8 @@ import {
   mapProviderHookEvent,
 } from "../src/adapters/hookIntegration.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
-import {
-  evaluateProviderHookControl,
-  HookControlError,
-  renderProviderControlResponse,
-  validateProviderControlResponse,
-  verifyProviderHookControlResult,
-} from "../src/bridge/hookControl.js";
+import { evaluateProviderHookControl, HookControlError, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
+import { renderProviderControlResponse, validateProviderControlResponse } from "../src/bridge/hookProviders.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { initActionPolicy, defaultActionPolicy } from "../src/governor/actionPolicyEngine.js";

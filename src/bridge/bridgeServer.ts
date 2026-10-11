@@ -33,11 +33,10 @@ import {
 import {
   CONTROL_HOOK_PATH,
   CONTROL_HOOK_ROUTE,
-  HookControlError,
   MAX_CONTROL_HOOK_BODY_BYTES,
-  evaluateProviderHookControl,
-  type HookProvider,
 } from "./hookControl.js";
+import { handleHookControlRequest } from "./hookControlRoute.js";
+import { HookControlError, isHookProvider } from "./hookProviders.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;
@@ -496,7 +495,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     }
     const providerHeader = options.req.headers["x-amc-hook-provider"];
     const provider = Array.isArray(providerHeader) ? providerHeader[0] : providerHeader;
-    if (provider !== "claude-code" && provider !== "gemini-cli") {
+    if (!isHookProvider(provider)) {
       writeControlError(options.res, 400, "supported hook provider header required");
       return true;
     }
@@ -525,10 +524,10 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
-      const controlled = evaluateProviderHookControl({
+      const controlled = handleHookControlRequest({
         workspace: options.workspace,
         authenticatedAgentId: auth.payload.agentId,
-        provider: provider as HookProvider,
+        provider, lease: auth.payload,
         rawInput: rawBody.toString("utf8"),
       });
       writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);

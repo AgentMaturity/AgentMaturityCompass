@@ -91,6 +91,7 @@ import { exportEvidenceBundle } from "../bundles/bundle.js";
 import { exportPolicyPack } from "../exports/policyExport.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import {
   AgentTokenGrantError,
   ensureAgentToken,
@@ -6262,7 +6263,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = JSON.parse(body) as { receipt?: string };
         const receipt = parsed.receipt ?? "";
-        const verification = verifyReceipt(receipt, getPublicKeyHistory(options.workspace, "monitor"));
+        const verification = verifyReceipt(receipt, getPurposeKeyHistory(options.workspace, "receipt"));
         json(res, verification.ok ? 200 : 400, verification);
         return;
       }

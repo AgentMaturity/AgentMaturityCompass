@@ -1,4 +1,4 @@
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { openLedger } from "../ledger/ledger.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 
@@ -19,7 +19,7 @@ export function verifyOpsReceipt(params: {
   ok: boolean;
   error: string | null;
 } {
-  const verify = verifyReceipt(params.receipt, getPublicKeyHistory(params.workspace, "monitor"));
+  const verify = verifyReceipt(params.receipt, getPurposeKeyHistory(params.workspace, "receipt"));
   if (!verify.ok || !verify.payload) {
     return {
       ok: false,
