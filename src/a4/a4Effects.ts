@@ -607,7 +607,10 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
       clearInterval(timer);
     }
   } catch (error) {
-    return failWith(error instanceof Error ? error.message : String(error));
+    // An uncoded vault-locked throw (a lease key, an artifact signature, step 0's grant) is recorded as A4_VAULT_LOCKED, so
+    // the route, a replay and readiness all answer 423 with its code.
+    const text = error instanceof Error ? error.message : String(error);
+    return failWith(!/^[A-Z][A-Z0-9_]{2,63}/.test(text) && /vault locked/i.test(text) ? `A4_VAULT_LOCKED: ${text}` : text);
   }
   const finish = (): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FINISHED", { consumedExecutionId: outcome.consumedExecutionId ?? null,
     receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })),
