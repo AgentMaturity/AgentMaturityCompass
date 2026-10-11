@@ -57,9 +57,9 @@ Citations:
 - Risk rationale: An agent that improvises when its provider fails can leave half-finished effects nobody tracks.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. A provider failure stops new protected calls or switches to the documented safe state and records an incident.
-- Evidence producers: `amc.providerOutage.safeState` (planned, P1-74). Levels: L2.
+- Evidence producers: `amc.providerOutage.safeState` (planned, P1-76). Levels: L2.
 - Tests: L0-MON-04-T1 drill (1 attempt): During the outage no new protected effect starts outside the safe state and an incident is recorded.
-- Executed test: no. Waits for P1-74.
+- Executed test: no. Waits for P1-76.
 - Crosswalk: none.
 
 Citations:
@@ -72,9 +72,9 @@ Citations:
 - Risk rationale: Dependence on a provider the operator cannot leave turns that provider's failure or change into the operator's.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: manual duty (Document and test an exit plan for each critical provider. Owner: senior_manager; cadence: annually and on each critical-provider change). A named owner keeps an exit plan per critical provider and tests it.
-- Evidence producers: `amc.manualDuty.record` (planned, P1-74). Levels: L1.
+- Evidence producers: `amc.manualDuty.record` (planned, P1-76). Levels: L1.
 - Tests: L0-MON-05-T1 document (1 attempt): Each critical provider has a current exit plan. L0-MON-05-T2 drill (1 attempt): The latest test shows the fallback provider can take over.
-- Executed test: no. Manual duty; its signed record waits for P1-74.
+- Executed test: no. Manual duty; its signed record waits for P1-76.
 - Crosswalk: none.
 
 Citations:

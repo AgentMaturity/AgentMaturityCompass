@@ -42,7 +42,7 @@ Citations:
 - Binding: enforcement point approvals. The approval engine refuses a second decision by the same user when the signed policy requires distinct users, and counts only distinct approvers toward the quorum.
 - Evidence producers: `amc.approvals.engine` (available). Levels: L2, L3.
 - Tests: L0-OVS-03-T1 runtime (1 attempt): Two distinct approvers meet the quorum; the same user deciding twice is refused. Today the request records no initiator, so initiator-approver separation is not enforced.
-- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user and counts only distinct approvers. Requests record no initiator, so initiator-approver separation is not enforced (P1-75).
+- Executed test: yes (oversight.test.ts). Partial. The engine refuses a second decision by the same user and counts only distinct approvers. Requests record no initiator, so initiator-approver separation is not enforced (P1-78).
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.APPROVALS (partial).
 
 Citations:
@@ -55,9 +55,9 @@ Citations:
 - Risk rationale: Reviewers who approve everything in seconds give the appearance of oversight without its substance.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point approvals. Each approval decision feeds per-reviewer rates and dwell times; a breach of the profile threshold raises a recorded oversight alert.
-- Evidence producers: `amc.oversight.telemetry` (planned, P1-69). Levels: L2.
+- Evidence producers: `amc.oversight.telemetry` (planned, P1-71). Levels: L2.
 - Tests: L0-OVS-04-T1 runtime (1 attempt): Metrics are computed from the signed records and a threshold breach raises an alert. L0-OVS-04-T2 document (1 attempt): Every alert has a recorded response from a named owner.
-- Executed test: no. Waits for P1-69. analyzeRubberStamping exists but nothing feeds it.
+- Executed test: no. Waits for P1-71. analyzeRubberStamping exists but nothing feeds it.
 - Crosswalk: none.
 
 Citations:

@@ -97,7 +97,7 @@ tests:
       tool body runs, and a call with a verified lease is allowed. The
       no-principal, replayed, contradictory and empty evidence fixtures give
       not_evaluated through the evidence evaluator. A lease counts as a service
-      principal today, so a missing human principal is not refused (P1-75).
+      principal today, so a missing human principal is not refused (P1-78).
     attempts: 1
 evidence:
   - id: L0-IDN-01-E1

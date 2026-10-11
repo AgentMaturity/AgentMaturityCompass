@@ -138,7 +138,7 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
  * catalog to a ready plan, which is signed, approved by two distinct owners and activated; the native toolset pins it
  * and its compiled-policy guard enforces identity-binding. The lease is the agent identity. A lease also counts as the
  * principal (a service principal), so a lease-bound call with no human principal is allowed: that part of the
- * statement is not enforced yet (proposed follow-up P1-75), and no fixture claims it is.
+ * statement is not enforced yet (proposed follow-up P1-78), and no fixture claims it is.
  */
 type IdentitySetup = { profile: unknown; tool: string; args: Record<string, unknown>; lease: "valid" | "none" | "expired" | "signed_by_other_workspace" };
 

@@ -10,9 +10,9 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Risk rationale: An unpinned component can change behaviour under a deployment that was validated against something else.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. Activation compares the running components with the signed version manifest and refuses to start sessions when one is unpinned or differs.
-- Evidence producers: `amc.versionManifest` (planned, P1-73). Levels: L2.
+- Evidence producers: `amc.versionManifest` (planned, P1-75). Levels: L2.
 - Tests: L0-CHG-01-T1 config (1 attempt): The manifest verifies and pins every model, prompt, tool and corpus. L0-CHG-01-T2 runtime (1 attempt): A changed component blocks activation. Today only the compiled plan and catalog lock are pinned.
-- Executed test: no. Waits for P1-73. Only the compiled plan and the catalog lock are pinned today.
+- Executed test: no. Waits for P1-75. Only the compiled plan and the catalog lock are pinned today.
 - Crosswalk: amc-audit-map-v1 CHANGE_MANAGEMENT.POLICY_SIGNING (partial); amc-audit-map-v1 CHANGE_MANAGEMENT.RELEASE_MANIFESTS (partial).
 
 Citations:
@@ -25,9 +25,9 @@ Citations:
 - Risk rationale: A test set the developers can see and tune against stops measuring regressions.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: manual duty (Keep the sequestered set access-controlled and run it before each release. Owner: head_of_qa; cadence: every release). The release gate runs the sequestered regression suite and signs a receipt; a failing or missing receipt blocks release.
-- Evidence producers: `amc.regression.sequestered` (planned, P1-73). Levels: L2.
+- Evidence producers: `amc.regression.sequestered` (planned, P1-75). Levels: L2.
 - Tests: L0-CHG-02-T1 config (1 attempt): The receipt verifies, names the sequestered suite and records a pass. Today AMC's own release gate has no sequestered set.
-- Executed test: no. Waits for P1-73. AMC's own release gate writes a signed receipt but has no sequestered set.
+- Executed test: no. Waits for P1-75. AMC's own release gate writes a signed receipt but has no sequestered set.
 - Crosswalk: amc-audit-map-v1 INCIDENT_RESPONSE_PREPAREDNESS.ASSURANCE_RUNS (partial).
 
 Citations:
@@ -40,9 +40,9 @@ Citations:
 - Risk rationale: Evidence gathered on an earlier version says nothing about the version now running.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: manual duty (Record each version change as an invalidation trigger and re-run the affected tests. Owner: head_of_qa; cadence: on every version change). Version changes are recorded as invalidation triggers; the evidence evaluator rejects items recorded before a trigger for every control that lists it.
-- Evidence producers: `amc.versionManifest` (planned, P1-73). Levels: L2.
+- Evidence producers: `amc.versionManifest` (planned, P1-75). Levels: L2.
 - Tests: L0-CHG-03-T1 runtime (1 attempt): Items recorded before a trigger are rejected as invalidated. The evaluator applies triggers it is given; nothing records them from version changes yet.
-- Executed test: no. Waits for P1-73. P1-11's evaluator rejects items recorded before an invalidation trigger, but nothing records triggers from version changes.
+- Executed test: no. Waits for P1-75. P1-11's evaluator rejects items recorded before an invalidation trigger, but nothing records triggers from version changes.
 - Crosswalk: none.
 
 Citations:
@@ -55,9 +55,9 @@ Citations:
 - Risk rationale: A vendor can change a model or tool under a stable name; an untracked notice leaves the deployment running on something nobody validated.
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: manual duty (Track vendor change notices and start revalidation before each deadline. Owner: head_of_qa; cadence: weekly). A named owner tracks vendor notices, sets a deadline for each and opens a revalidation; an overdue notice raises a finding.
-- Evidence producers: `amc.manualDuty.record` (planned, P1-74). Levels: L1.
+- Evidence producers: `amc.manualDuty.record` (planned, P1-76). Levels: L1.
 - Tests: L0-CHG-04-T1 document (1 attempt): Every notice has a deadline and an outcome; overdue notices have findings.
-- Executed test: no. Manual duty; its signed record waits for P1-74.
+- Executed test: no. Manual duty; its signed record waits for P1-76.
 - Crosswalk: none.
 
 Citations:

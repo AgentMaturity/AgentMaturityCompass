@@ -49,7 +49,7 @@ tests:
         - L0-INV-01/negative/unsigned-entry.json
     passCriteria: >-
       A signed entry verifies; an unsigned, edited or foreign-signed entry does not. Session refusal is
-      not built yet (proposed follow-up P1-68).
+      not built yet (proposed follow-up P1-70).
     attempts: 1
 evidence:
   - id: L0-INV-01-E1

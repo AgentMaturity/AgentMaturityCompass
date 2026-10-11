@@ -1,7 +1,7 @@
 # Admitted evidence producers. `module` paths and `emits` were checked on main at e263c571; P1-14 rows on int at e7123c69.
 # maxClaimKind caps what a producer's evidence can claim; a planned producer gives no evidence until it ships.
 # A planned row's `module` names the code it extends, or "none yet" with its plan key; it is not a finished emitter.
-# P1-68 to P1-75 are follow-up keys that P1-14 proposes; the integrator confirms or renumbers them.
+# P1-70 to P1-76 and P1-78 are follow-up keys P1-14 proposes, not yet in the plan; the integrator confirms them.
 producers:
   - id: amc.leases.issuer
     module: src/leases/leaseSigner.ts
@@ -168,7 +168,7 @@ producers:
     emits: [oversight_metric, oversight_alert]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-69
+    plannedBy: P1-71
   - id: amc.adversarial.observer
     module: src/redteam/runner.ts
     # Today scenarios are graded on the agent's reply; P1-48 adds an external observer of effects.
@@ -177,42 +177,42 @@ producers:
     status: planned
     plannedBy: P1-48
   - id: amc.transparency.outputCheck
-    module: "none yet (P1-70)"
+    module: "none yet (P1-72)"
     emits: [disclosure_check]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-70
+    plannedBy: P1-72
   - id: amc.provenance.c2pa
     module: src/artifact/artifactProvenance.ts
     # Today an AMC-C2PA-INSPIRED/1 manifest, not a C2PA manifest.
     emits: [content_credential]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-70
+    plannedBy: P1-72
   - id: amc.explanation.lineage
-    module: "none yet (P1-71)"
+    module: "none yet (P1-73)"
     emits: [reason_lineage]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-71
+    plannedBy: P1-73
   - id: amc.explanation.notice
-    module: "none yet (P1-71)"
+    module: "none yet (P1-73)"
     emits: [decision_notice]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-71
+    plannedBy: P1-73
   - id: amc.explanation.appeal
-    module: "none yet (P1-71)"
+    module: "none yet (P1-73)"
     emits: [appeal_routing]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-71
+    plannedBy: P1-73
   - id: amc.fairness.harness
-    module: "none yet (P1-72)"
+    module: "none yet (P1-74)"
     emits: [fairness_measurement]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-72
+    plannedBy: P1-74
   - id: amc.evidence.wormExport
     module: "none yet (P2-09)"
     emits: [worm_export_manifest]
@@ -225,21 +225,21 @@ producers:
     emits: [version_manifest, invalidation_trigger]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-73
+    plannedBy: P1-75
   - id: amc.regression.sequestered
     module: scripts/release-gate.mjs
     # AMC's own release gate writes a signed receipt but has no sequestered set.
     emits: [regression_gate_receipt]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-73
+    plannedBy: P1-75
   - id: amc.manualDuty.record
-    module: "none yet (P1-74)"
+    module: "none yet (P1-76)"
     # A named owner's signed statement that a manual duty was performed: self-reported by nature.
     emits: [manual_duty_record]
     maxClaimKind: self_reported
     status: planned
-    plannedBy: P1-74
+    plannedBy: P1-76
   - id: amc.incidents.notices
     module: src/incidents/evidencePacket.ts
     emits: [notice_draft]
@@ -258,4 +258,4 @@ producers:
     emits: [safe_state_record]
     maxClaimKind: observed
     status: planned
-    plannedBy: P1-74
+    plannedBy: P1-76

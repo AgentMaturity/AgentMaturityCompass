@@ -10,9 +10,9 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Risk rationale: People who do not know they are talking to an AI system cannot weigh its statements or ask for a human.
 - Applicability: `{fact: useCases, includesAny: [interacts_with_natural_persons]}`. Applies only where the profile's use cases include direct interaction with people.
 - Binding: manual duty (Configure the first-message disclosure and review the transcript check results. Owner: senior_manager; cadence: monthly). An output check requires the disclosure in the first message of each session and a transcript check confirms it across sessions.
-- Evidence producers: `amc.transparency.outputCheck` (planned, P1-70). Levels: L2.
+- Evidence producers: `amc.transparency.outputCheck` (planned, P1-72). Levels: L2.
 - Tests: L0-TRN-01-T1 runtime (1 attempt): Every session's first agent message carries the disclosure; a session without it fails.
-- Executed test: no. Waits for P1-70. No output check requires a disclosure.
+- Executed test: no. Waits for P1-72. No output check requires a disclosure.
 - Crosswalk: none.
 
 Citations:
@@ -26,9 +26,9 @@ Citations:
 - Risk rationale: A third party who does not know whom the agent acts for cannot judge its offers, its authority or where to complain.
 - Applicability: `{fact: useCases, includesAny: [acts_for_principal_towards_third_parties]}`. Applies only where the profile's use cases include acting for a principal towards third parties.
 - Binding: manual duty (Configure the represented-party statement and review the output check results. Owner: senior_manager; cadence: monthly). An output check requires the represented party in the agent's first message to each third party.
-- Evidence producers: `amc.transparency.outputCheck` (planned, P1-70). Levels: L2.
+- Evidence producers: `amc.transparency.outputCheck` (planned, P1-72). Levels: L2.
 - Tests: L0-TRN-02-T1 runtime (1 attempt): Each first message to a third party names the represented principal.
-- Executed test: no. Waits for P1-70.
+- Executed test: no. Waits for P1-72.
 - Crosswalk: none.
 
 Citations:
@@ -41,9 +41,9 @@ Citations:
 - Risk rationale: Unmarked synthetic content can be passed off as authentic, and the operator cannot show which outputs it produced.
 - Applicability: `{fact: useCases, includesAny: [publishes_synthetic_content]}`. Applies only where the profile's use cases include publishing synthetic media or documents.
 - Binding: enforcement point egress. Publishing channels accept only output whose provenance manifest verifies; unmarked output is refused at egress.
-- Evidence producers: `amc.provenance.c2pa` (planned, P1-70). Levels: L2.
+- Evidence producers: `amc.provenance.c2pa` (planned, P1-72). Levels: L2.
 - Tests: L0-TRN-03-T1 runtime (1 attempt): Marked output is published; unmarked output and output with a failing manifest are refused. Today AMC emits an AMC-C2PA-INSPIRED/1 manifest, not a C2PA manifest, and no channel checks it.
-- Executed test: no. Waits for P1-70. The current manifest is AMC-C2PA-INSPIRED/1, not C2PA, and no channel checks it.
+- Executed test: no. Waits for P1-72. The current manifest is AMC-C2PA-INSPIRED/1, not C2PA, and no channel checks it.
 - Crosswalk: none.
 
 Citations:

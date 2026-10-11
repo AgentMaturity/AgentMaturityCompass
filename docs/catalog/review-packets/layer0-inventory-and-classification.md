@@ -11,8 +11,8 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. The agent's agent.config.yaml carries an auditor signature; a session whose agent entry is missing or does not verify is refused before its first tool call.
 - Evidence producers: `amc.signedConfig.agent` (available). Levels: L2, L3.
-- Tests: L0-INV-01-T1 config (1 attempt): A signed entry verifies; an unsigned, edited or foreign-signed entry does not. Session refusal is not built yet (proposed follow-up P1-68).
-- Executed test: yes (inventory.test.ts). Partial. The signature over agent.config.yaml is checked; nothing refuses a session for an unregistered or unsigned agent (P1-68), and the entry has no owner, stations or version fields.
+- Tests: L0-INV-01-T1 config (1 attempt): A signed entry verifies; an unsigned, edited or foreign-signed entry does not. Session refusal is not built yet (proposed follow-up P1-70).
+- Executed test: yes (inventory.test.ts). Partial. The signature over agent.config.yaml is checked; nothing refuses a session for an unregistered or unsigned agent (P1-70), and the entry has no owner, stations or version fields.
 - Crosswalk: amc-audit-map-v1 CHANGE_MANAGEMENT.POLICY_SIGNING (partial).
 
 Citations:

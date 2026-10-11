@@ -12,7 +12,7 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Binding: enforcement point tool_pipeline, approvals. The native toolset records every tool outcome, allowed, denied or failed, as ledger rows in the session's hash chain.
 - Evidence producers: `amc.ledger` (available). Levels: L2, L3.
 - Tests: L0-LOG-01-T1 runtime (1 attempt): An allowed and a denied call each leave ledger rows naming the session, agent and tool, and the chain verifies. Today rows carry deploymentId "unregistered".
-- Executed test: yes (logging.test.ts). Partial. Allowed and denied calls are hash-chained rows naming the session, agent and tool, and the chain verifies when the session writer records them. Rows carry deploymentId "unregistered", and rows the toolset writes without a session writer reference a session the ledger does not hold, which fails chain verification (P1-75).
+- Executed test: yes (logging.test.ts). Partial. Allowed and denied calls are hash-chained rows naming the session, agent and tool, and the chain verifies when the session writer records them. Rows carry deploymentId "unregistered", and rows the toolset writes without a session writer reference a session the ledger does not hold, which fails chain verification (P1-78).
 - Crosswalk: amc-audit-map-v1 LOGGING_MONITORING.LEDGER_CHAIN (partial).
 
 Citations:

@@ -12,7 +12,7 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Binding: enforcement point tool_pipeline. The tool-allowlist guard reads .amc/tools.yaml and its auditor signature in one read and refuses any tool the verified configuration does not list, and every tool when it does not verify.
 - Evidence producers: `amc.toolPipeline.guard` (available), `amc.signedConfig.tools` (available). Levels: L2, L3.
 - Tests: L0-TOOL-01-T1 runtime (1 attempt): A listed tool runs; an unlisted tool, an edited configuration, a missing signature and a foreign signature are refused by the tool-allowlist guard with a denied receipt and no tool body run.
-- Executed test: yes (tools.test.ts). Partial. Unlisted tools and an edited, unsigned or foreign-signed tools.yaml are refused by the tool-allowlist guard with a denied receipt. A call to a tool name the registry does not know is refused at visibility and leaves no record (P1-75).
+- Executed test: yes (tools.test.ts). Partial. Unlisted tools and an edited, unsigned or foreign-signed tools.yaml are refused by the tool-allowlist guard with a denied receipt. A call to a tool name the registry does not know is refused at visibility and leaves no record (P1-78).
 - Crosswalk: amc-audit-map-v1 SECURE_CONFIGURATION.TOOLS_POLICY (partial); amc-audit-map-v1 MODEL_TOOL_GOVERNANCE.TOOL_BOUNDARY (partial).
 
 Citations:

@@ -10,9 +10,9 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Risk rationale: A plausible reason that does not reflect what drove the decision misleads the person affected and the reviewer alike.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Maintain reason lineage and run the perturbation suite before each release. Owner: senior_manager; cadence: every release). Each decision records reason-to-feature lineage; input perturbation checks that the stated reasons move with the inputs they name.
-- Evidence producers: `amc.explanation.lineage` (planned, P1-71). Levels: L2.
+- Evidence producers: `amc.explanation.lineage` (planned, P1-73). Levels: L2.
 - Tests: L0-EXP-01-T1 adversarial (25 attempts): Across 25 perturbation attempts per task, every stated reason traces to an input whose change moves the outcome.
-- Executed test: no. Waits for P1-71.
+- Executed test: no. Waits for P1-73.
 - Crosswalk: none.
 
 Citations:
@@ -26,9 +26,9 @@ Citations:
 - Risk rationale: A person who is not told a consequential decision was made, or why, cannot contest it.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Keep the notice template aligned with every applicable overlay. Owner: senior_manager; cadence: on every overlay change). Each consequential decision emits a notice built from the overlay's element list; the notice is checked against that list before it is sent.
-- Evidence producers: `amc.explanation.notice` (planned, P1-71). Levels: L2.
+- Evidence producers: `amc.explanation.notice` (planned, P1-73). Levels: L2.
 - Tests: L0-EXP-02-T1 document (1 attempt): Every sampled notice carries every required element. L0-EXP-02-T2 config (1 attempt): The template covers every element of every applicable overlay.
-- Executed test: no. Waits for P1-71; the notice elements come from the overlays.
+- Executed test: no. Waits for P1-73; the notice elements come from the overlays.
 - Crosswalk: none.
 
 Citations:
@@ -44,9 +44,9 @@ Citations:
 - Risk rationale: An appeal that loops back to the same automated system gives the person no real recourse.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Staff the appeal queue and meet the profile deadline. Owner: senior_manager; cadence: continuous, drilled quarterly). Appeals open a case assigned to a named human reviewer with the profile's deadline; the assignment and the decision are recorded.
-- Evidence producers: `amc.explanation.appeal` (planned, P1-71). Levels: L2.
+- Evidence producers: `amc.explanation.appeal` (planned, P1-73). Levels: L2.
 - Tests: L0-EXP-03-T1 drill (1 attempt): A drill appeal reaches a named human within the deadline and the routing is recorded.
-- Executed test: no. Waits for P1-71.
+- Executed test: no. Waits for P1-73.
 - Crosswalk: none.
 
 Citations:

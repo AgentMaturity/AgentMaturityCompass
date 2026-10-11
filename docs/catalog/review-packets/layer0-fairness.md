@@ -10,9 +10,9 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Risk rationale: Outcomes that move with a protected attribute or its proxy are disparate treatment, whatever the model's stated reasons.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Run the paired-case suite before each release and on each model change. Owner: head_of_qa; cadence: every release). A paired-case harness runs the decision service on cases that differ only in a protected attribute or proxy and compares the outcomes.
-- Evidence producers: `amc.fairness.harness` (planned, P1-72). Levels: L2.
+- Evidence producers: `amc.fairness.harness` (planned, P1-74). Levels: L2.
 - Tests: L0-FAI-01-T1 adversarial (25 attempts): Across 25 pairs per attribute, outcome differences stay within the profile's tolerance.
-- Executed test: no. Waits for P1-72. The predicate keeps a reconciliation agent out of scope.
+- Executed test: no. Waits for P1-74. The predicate keeps a reconciliation agent out of scope.
 - Crosswalk: none.
 
 Citations:
@@ -25,9 +25,9 @@ Citations:
 - Risk rationale: Without measured impact ratios, a disparity in outcomes stays invisible until someone affected finds it.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Compute and publish impact ratios on the profile's cadence. Owner: head_of_qa; cadence: quarterly). Impact ratios per group are computed from recorded outcomes and compared with the profile threshold.
-- Evidence producers: `amc.fairness.harness` (planned, P1-72). Levels: L2.
+- Evidence producers: `amc.fairness.harness` (planned, P1-74). Levels: L2.
 - Tests: L0-FAI-02-T1 document (1 attempt): The report covers every group with sample sizes and compares each ratio with the threshold.
-- Executed test: no. Waits for P1-72.
+- Executed test: no. Waits for P1-74.
 - Crosswalk: none.
 
 Citations:
@@ -40,9 +40,9 @@ Citations:
 - Risk rationale: Inputs such as ZIP code or name can carry protected attributes into a decision that never sees them directly.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Screen inputs on each model or feature change and sign each justification. Owner: head_of_qa; cadence: on every model or feature change). Each decision input is screened for proxy risk; a flagged input is removed or kept with a signed justification.
-- Evidence producers: `amc.fairness.harness` (planned, P1-72). Levels: L2.
+- Evidence producers: `amc.fairness.harness` (planned, P1-74). Levels: L2.
 - Tests: L0-FAI-03-T1 config (1 attempt): Every flagged input is blocked or has a signed justification. L0-FAI-03-T2 document (1 attempt): The screening covers every input and its method is stated.
-- Executed test: no. Waits for P1-72.
+- Executed test: no. Waits for P1-74.
 - Crosswalk: none.
 
 Citations:
@@ -56,9 +56,9 @@ Citations:
 - Risk rationale: An average error rate can hide a subgroup for whom the system fails far more often.
 - Applicability: `{fact: useCases, includesAny: [consequential_decision_about_people]}`. Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33). Exclusion: A reconciliation agent that makes no consequential decision about people is out of scope.
 - Binding: manual duty (Report subgroup error rates and track findings to closure. Owner: head_of_qa; cadence: quarterly). Error rates per subgroup are computed with sample sizes and compared with the tolerance; a gap opens a finding.
-- Evidence producers: `amc.fairness.harness` (planned, P1-72). Levels: L2.
+- Evidence producers: `amc.fairness.harness` (planned, P1-74). Levels: L2.
 - Tests: L0-FAI-04-T1 document (1 attempt): Every subgroup is reported with its sample size and every gap beyond tolerance has a finding.
-- Executed test: no. Waits for P1-72.
+- Executed test: no. Waits for P1-74.
 - Crosswalk: none.
 
 Citations:

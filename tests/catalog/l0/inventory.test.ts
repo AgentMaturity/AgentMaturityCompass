@@ -8,7 +8,7 @@ import { newWorkspace } from "./workspaces.js";
 /**
  * L0-INV-01 against the real signed agent registry (P1-14): the auditor signature over agents/<id>/agent.config.yaml,
  * verified by verifyAgentConfigSignature. This covers the configuration check only. Nothing refuses a session for an
- * unregistered or unsigned agent yet (proposed follow-up P1-68), so session refusal is not tested here.
+ * unregistered or unsigned agent yet (proposed follow-up P1-70), so session refusal is not tested here.
  */
 type EntrySetup = { agentId: string; entry: "signed" | "missing" | "signature_removed" | "edited_after_signing" | "signed_by_other_workspace" };
 
