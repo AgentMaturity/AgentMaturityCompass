@@ -117,8 +117,8 @@ cases as the readiness item `adapt.plan.nativeSessionsAllowed` (`PLAN_DENIES_NAT
 
 ## Assemble: building the agent
 
-Assemble turns the approved brief into a built agent. This build covers the native path and the `workflow` executor's
-plan; scaffolding and connecting an external framework and execution phases are not built yet.
+Assemble turns the approved brief into a built agent: the native path through Studio's native tasks, or an external
+framework through a scaffold, connect instructions and a trace import.
 
 - **Ask and Understand.** Assemble asks for capabilities, autonomy (`advise`: no tools; `act_with_approval`: the signed
   workspace tools), tools, MCP connectors, the build provider (`stub`, or `provider:model`), existing systems, budget,
@@ -130,7 +130,8 @@ plan; scaffolding and connecting an external framework and execution phases are 
 - **Paths.** Each path has an IntegrationClaim: which boundary enforces it, what its evidence can reach and what it does
   not cover. Native is `tool_pipeline`; `claude-code` is preview (P1-23, held on D-02); `pi` is unsupported (P1-22, held
   on D-02); the framework paths are gateway-only previews (P1-54). An unsupported path or plan item stays listed with its
-  key, and the stage completes only after an owner acknowledges it out of scope with a reason.
+  key, and the stage completes only after an owner acknowledges it out of scope with a reason. A `tools` answer narrower
+  than the signed scope is listed too (`NATIVE_TASKS_WHOLE_SCOPE`): a native session is granted the whole scope.
 - **Propose** records the plan: the typed graph with the agent's permissions, tasks by executor (`deterministic`,
   `native_turn`, `workflow`, `human`; `human` is a command for you to run, never run by AMC), the preset, the build session, the
   validation plan and the baseline Enforce manifest, which must be ACTIVE: pending Enforce drift is reviewed in Enforce
@@ -146,19 +147,37 @@ plan; scaffolding and connecting an external framework and execution phases are 
 - **Build** (an owner) signs the agent's preset into `.amc/agents.yaml`, writes the typed graph and journals one native
   build session in its revision; Studio starts it after the step is recorded, on its one native task service (the
   four-session limit and its sweeper are shared with every Studio task). Further turns, cancel and resume use the native
-  tasks page as the session's owner.
-- **Review** is run by the session's owner and refuses while a session runs or has failed. AMC's `verifyAgentRun` is an
-  integrity self-check (`workspace-key-consistency`, `SELF_CHECK`) with its verifier report attached. On the stub
-  provider every ref about the agent is `synthetic_example` and the review reads "tool pipeline observed on a stub model;
-  agent behaviour not evaluated"; the agent stays at lifecycle stage `development` (`unit_tests_passing` not evaluated).
+  tasks page as the session's owner; the Build card loads the owner's build log with the same cursor contract.
+- **External path.** After Build and before Review, an owner can write the path's scaffold, the bridge contract tests
+  and the agent's policy pack into a new workspace directory outside `.amc/` (the record binds a manifest of every
+  file's sha256; the files are written after it commits), get connect instructions (the lease token is shown once and
+  never stored; the record keeps the leaseId), and import the agent's traces through the neutral importer (originals
+  retained; imported traces are self-reported). A bounded first task through `createForeignRunner` is not run: a foreign
+  child runs only under `spawnSubagent`, which Studio's native tasks cannot do (`NATIVE_TASKS_NO_DELEGATION`); the plan
+  gives a supervised command for you to run.
+- **Review** is run by the session's owner and refuses a session that is not the start Build journaled
+  (`BUILD_SESSION_MISMATCH`; the prompt itself is not comparable yet and is recorded as not evaluated), or one that runs
+  or has failed. AMC's `verifyAgentRun` is an integrity self-check (`workspace-key-consistency`, `SELF_CHECK`) with its
+  verifier report attached; a session with no head event is not evaluated. Review also records each session's
+  effective-policy receipts and their downgrades, and four execution phases (admission, model completion, side-effect
+  completion, evidence verification). On the stub provider every ref about the agent is `synthetic_example` and the
+  review reads "tool pipeline observed on a stub model; agent behaviour not evaluated"; the agent stays at lifecycle
+  stage `development`. `unit_tests_passing` needs every pinned check executed and passed on a non-stub provider.
+  `composition.compositionDigest` and `composition.policyDigest` are not recomputed per session yet (`composition_bound`
+  is not evaluated); the reviewed receipts are bound through the review.
 - **Completion** runs the effect `a4.assemble.apply`: an owner opens the effect gate once the completion gate has its
   quorum, project approvers decide that second engine request from the A4 card (bound to its request digest), and
   `complete` applies the reviewed Enforce resources as the agent's active manifest with a signed receipt. A failed apply
-  leaves the gate consumed and offers one owner retry.
+  leaves the gate consumed and offers one owner retry. A vote that consumption would refuse (separation of duties, the
+  revision's builders, a host session on a regulated project) is refused when it is cast.
 - **outcome_unknown.** A cancelled or failed journaled call blocks the agent's journaled calls and this stage
   (`no_open_outcome_unknown`). The Outcome unknown card requests a resolution (the operator's statement, an
-  `amc.action.resolve` engine request under the class's dual control), another member decides it from the card, and
-  the resolution is recorded. It is the operator's statement, `self_reported`, never observed.
+  `amc.action.resolve` engine request), another project approver or owner decides it from the card, and the resolution
+  is recorded once A4's dual control holds: approvals bound to the request from members other than the operator, two
+  distinct live-checked identities when the project is regulated. The note is sealed in the project's blob store; the
+  engine request and the action journal carry only a reference naming the sealed blob and the note's sha256. The
+  resolution is the operator's statement, `self_reported`, never observed. A denied or expired request is requested
+  again from the same card.
 
 ## Deployment boundary
 
