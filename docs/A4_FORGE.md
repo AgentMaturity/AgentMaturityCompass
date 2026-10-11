@@ -493,7 +493,9 @@ so the agent stays at staging (P2-40). `assurance_pack_passing` needs an assuran
 Readiness adds these items:
 
 - `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
-  a later receipt stales an open deployment approval.
+  a later receipt stales an open deployment approval. Once this cycle's release is rolled back it is BLOCKED
+  `RELEASE_ROLLED_BACK`, which stales an open deployment approval. A new `deploy` receipt for that release is refused
+  with the same code, and so is its production lease. Reopen or tune Activate to release again.
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
   approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
   later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,

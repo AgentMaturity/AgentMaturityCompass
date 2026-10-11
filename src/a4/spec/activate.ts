@@ -256,6 +256,9 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
     + "Installing a package into another workspace is P2-40." } });
 }
 
+/** Whether `releaseId` was rolled back in this cycle (ROLLBACK, src/a4/a4Rollback.ts). */
+export const rolledBack = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
+  cycleLinks(chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId);
 /** The newest deploy receipt of this cycle's release (DEPLOYMENT, src/a4/a4Deploy.ts): the one the deployment approval binds. */
 export const boundReceipt = (chain: readonly A4ChainLink[], releaseId: string | null): A4ChainLink | undefined => releaseId === null ? undefined
   : cycleLinks(chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId && link.body.deploymentKind === "deploy").at(-1);
@@ -271,6 +274,11 @@ const productionGaps = (state: A4ReadinessState, releaseId: string): string[] =>
  */
 function receiptItem(state: A4ReadinessState, releaseId: string | null): A4ReadinessItem {
   const mandatory = reached(state, "reviewed");
+  // A rolled-back release is terminal for this cycle: no deployment approval may bind it (its leases were revoked).
+  if (releaseId !== null && rolledBack(state.chain, releaseId)) {
+    return item("deployment.receipt", "BLOCKED", { kind: "scope_changed", reasonCodes: ["RELEASE_ROLLED_BACK", `RELEASE:${releaseId}`],
+      nextAction: { label: "This cycle's release was rolled back: reopen or tune Activate, then release again" } });
+  }
   const receipt = boundReceipt(state.chain, releaseId);
   if (receipt === undefined) return waiting("deployment.receipt", ["DEPLOYMENT_NOT_RECORDED"], { mandatory,
     nextAction: { label: "Run the prepared commands (deploy/plan.json in the package), then record the operator's receipt (owner)" } });
