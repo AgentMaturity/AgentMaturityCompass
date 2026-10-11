@@ -14383,7 +14383,7 @@ paths:
         Helm rollback re-pins whatever release its chosen revision deployed; the leases are revoked, and the
         freeze raised for a high or critical risk tier) and its restore note says so; a production preview never
         names none, since such a release never deploys to production. In production the leases include the
-        production lease of this cycle's release built on this one, which can then never deploy"
+        production lease of every release built on this one, in any cycle,, which can then never deploy"
       tags:
         - Studio
         - A4 Forge
@@ -14490,8 +14490,8 @@ paths:
         re-run uses the grant its own execution consumed, never for an approver its quorum counted: 409
         SOD_VIOLATION; GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or
         critical risk tier, the Enforce restore, every lease of the release revoked (read again at execution,
-        and the lease journal once more before it settles; in production also the production lease of this
-        cycle's release whose rollback target this release is), the prepared commands, a signed
+        and the lease journal once more before it settles; in production also the production lease of every
+        release, in any cycle, whose rollback target this release is), the prepared commands, a signed
         a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code
         and a replay answers the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId
         moves when the operator records a production rollback row"

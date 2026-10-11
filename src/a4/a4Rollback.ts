@@ -5,8 +5,8 @@
  * release and Enforce manifest the preview bound and journals the attempt (EFFECT_STARTED); then, after the grant is
  * consumed as step 0: an incident freeze first for a high or critical risk tier, `restoreEnforceResourceSnapshot({ apply:
  * true, confirmManifestId })` (signed restore and lifecycle-rollback receipts), every lease of the release revoked (read
- * again at execution; in production also the production lease of this cycle's release built on it, which can then never
- * deploy), the prepared operator commands, the signed `a4-rollback-receipt`, and ROLLBACK with EFFECT_FINISHED,
+ * again at execution; in production also the production lease of every release built on it, in any cycle, which can
+ * then never deploy), the prepared operator commands, the signed `a4-rollback-receipt`, and ROLLBACK with EFFECT_FINISHED,
  * then the automatic hold. The lifecycle is never moved backwards, no
  * runtime-run event is appended (no run of the deployed runtime was observed), and `deployed_release_id` moves only
  * when the operator records the rollback row (src/a4/a4Deploy.ts). A rollback is allowed on a held or frozen project:
@@ -44,17 +44,18 @@ export const rollbackSchema = z.strictObject({ ...base, reason: reasonSchema,
   toReleaseId: z.string().regex(/^a4r_[0-9a-f]{32}$/).nullable(), confirmManifestId: z.string().regex(/^enforce-resources-[0-9a-f]{16}$/).nullable() });
 
 /**
- * The production lease of this cycle's release built on `releaseId` (its recorded rollback target), which a production
- * rollback of `releaseId` revokes too: that release could never restore its target, so its production deploy row is
- * refused (ROLLBACK_TARGET_ROLLBACK_PENDING, then ROLLBACK_TARGET_ROLLED_BACK; src/a4/a4Deploy.ts) and a lease minted
- * before this rollback started would stay live. No lease is minted for it after this rollback started (rolledBackTarget).
- * Staging rolls back only this cycle's release, which no later release is built on.
+ * The production leases of every release built on `releaseId` (its recorded rollback target), in any cycle, which a
+ * production rollback of `releaseId` revokes too: such a release could never restore its target, so its production
+ * deploy row is refused (ROLLBACK_TARGET_ROLLBACK_PENDING, then ROLLBACK_TARGET_ROLLED_BACK; src/a4/a4Deploy.ts), and a
+ * lease minted before this rollback started would otherwise stay live until it expires. A release already rolled back
+ * had its own leases revoked then. No lease is minted for one after this rollback started (rolledBackTarget). Staging
+ * rolls back only this cycle's release, which no later release is built on.
  */
-function successorProductionLease(chain: readonly A4ChainLink[], releaseId: string, environment: string): string[] {
-  const successor = environment === "production" ? currentRelease(chain) : null;
-  if (successor?.body.rollbackReleaseId !== releaseId) return [];
-  const lease = mintedLeases(chain, String(successor.body.releaseId)).production;
-  return lease === null ? [] : [lease];
+function successorProductionLeases(chain: readonly A4ChainLink[], releaseId: string, environment: string): string[] {
+  if (environment !== "production") return [];
+  return chain.filter((link) => link.kind === "RELEASE" && link.body.rollbackReleaseId === releaseId && link.body.releaseId !== releaseId
+    && !rollbackRecorded(chain, String(link.body.releaseId)))
+    .flatMap((link) => mintedLeases(chain, String(link.body.releaseId), true).production ?? []);
 }
 
 /** A release rolls back once: 409 ROLLBACK_RECORDED once `chain` records its ROLLBACK (any cycle). */
@@ -106,8 +107,8 @@ function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string,
  * since can never be restored (its prepared commands re-pin it), so the preview then names no target: no Enforce restore,
  * Compose's base file as the one prepared command and none on Helm (a Helm rollback re-pins whatever its chosen revision
  * deployed), only the revocations (and the freeze for a high or critical risk tier), and its restore note says why.
- * Production never reaches this: such a release never deploys there (rolledBackTarget). The leases are the release's, and in production the successor's production
- * lease (successorProductionLease). The engine request binds the preview.
+ * Production never reaches this: such a release never deploys there (rolledBackTarget). The leases are the release's, and in production the production leases of the
+ * releases built on it (successorProductionLeases). The engine request binds the preview.
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
@@ -140,7 +141,7 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
   // the base file; a Helm rollback re-pins whatever its chosen revision deployed, so none is prepared.
   const preparedCommands = !targetRolledBack ? record.rollback.preparedCommands : compose ? [COMPOSE_BASE_UP] : [];
   return { schema: "amc.a4-rollback-preview/v1", releaseId, toReleaseId, confirmManifestId, environment, target: release.body.target,
-    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...successorProductionLease(state.chain, releaseId, environment)], preparedCommands,
+    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...successorProductionLeases(state.chain, releaseId, environment)], preparedCommands,
     restore, freezeFirst: ["high", "critical"].includes(engineRiskTier(state)),
     lifecycle: "never moved backwards; deployed_release_id moves when the operator records the rollback row" };
 }
@@ -242,7 +243,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   }
   const minted = mintedLeases(state.chain, releaseId);
   const leaseIds = [...new Set([...preview.leaseIds, ...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...journaled,
-    ...successorProductionLease(state.chain, releaseId, body.environment)])];
+    ...successorProductionLeases(state.chain, releaseId, body.environment)])];
   const attemptId = `a4e_${randomBytes(16).toString("hex")}`;
   const started = store.transition(projectId, principal, ({ ts }) => {
     const chain = store.readChain(projectId);

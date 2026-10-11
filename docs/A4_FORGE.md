@@ -539,8 +539,8 @@ it runs these steps:
 2. An incident freeze, first, for a high or critical risk tier.
 3. `restoreEnforceResourceSnapshot({ apply: true, confirmManifestId })`.
 4. Every lease of the release revoked, read again at this point: the preview's, a production lease minted after the
-   preview, and any lease a failed attempt journaled. A production rollback also revokes the production lease of this
-   cycle's release whose recorded rollback target this release is, which can then never deploy to production. The
+   preview, and any lease a failed attempt journaled. A production rollback also revokes the production lease of every
+   release, in any cycle, whose recorded rollback target this release is, which can then never deploy to production. The
    receipt and `ROLLBACK` list them all.
 5. The prepared operator commands answered.
 6. A signed `a4-rollback-receipt` written, and `ROLLBACK` with `EFFECT_FINISHED` recorded in one transaction. The
