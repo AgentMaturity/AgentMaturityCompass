@@ -65,6 +65,10 @@ describe("deployment pack assets", () => {
     const deployment = read("deploy/helm/amc/templates/deployment.yaml");
     expect(deployment).toContain("- name: amc-home-state\n              mountPath: {{ .Values.amcHomeState.mountPath }}");
     expect(deployment).toContain("claimName: {{ include \"amc.fullname\" . }}-state");
+    // The raw manifests match chart 0.3.0.
+    expect(read("deploy/k8s/pvc.yaml")).toContain("name: amc-home-state");
+    expect(read("deploy/k8s/deployment.yaml")).toContain("- name: amc-home-state\n              mountPath: /home/amc/.config/amc/state");
+    expect(read("deploy/k8s/deployment.yaml")).toContain("claimName: amc-home-state");
   });
 
   it("includes helm chart templates", () => {
