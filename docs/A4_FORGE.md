@@ -502,7 +502,8 @@ rolled back since), its Enforce manifest, the leases, the prepared commands and 
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
 pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a second attempt while one runs is refused
 (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
-to mint (`RELEASE_ROLLED_BACK`) while a rollback attempt has not settled, so no lease is minted beside a rollback. Then
+to mint (`RELEASE_ROLLED_BACK`) once a rollback of the release has started (any attempt, settled or not: a failed one may
+already have consumed its grant and restored the Enforce snapshot), so no lease is minted beside a rollback. Then
 it runs these steps:
 
 1. The engine grant, consumed by this rollback's execution.
@@ -539,7 +540,8 @@ Readiness adds these items:
 - `deployment.receipt`: the newest receipt recorded `succeeded`, its signed file resolving. It is bound with its id, so
   a later receipt stales an open deployment approval. Once this cycle's release is rolled back it is BLOCKED
   `RELEASE_ROLLED_BACK`, which stales an open deployment approval. A new `deploy` receipt for that release is refused
-  with the same code, and so is its production lease. Reopen or tune Activate to release again.
+  with the same code, and so is its production lease, both already once any attempt of its rollback has started (even
+  one that failed). Reopen or tune Activate to release again.
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
   approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
   later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,

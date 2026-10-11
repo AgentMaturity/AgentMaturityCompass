@@ -276,6 +276,13 @@ function sameHostItem(facts: Record<string, unknown> | null, target: string | nu
     + "Installing a package into another workspace is P2-40." } });
 }
 
+/**
+ * Whether a rollback of `releaseId` has started: any attempt (EFFECT_STARTED), running, failed or lost. Its approvers
+ * approved it and it may have consumed its grant and restored the Enforce snapshot, so no lease or deploy row is added
+ * beside it, even before ROLLBACK is recorded.
+ */
+export const rollbackStarted = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
+  chain.some((link) => link.kind === "EFFECT_STARTED" && link.body.executionId === rollbackExecutionId(releaseId));
 /** Whether `releaseId` was rolled back in this cycle (ROLLBACK, src/a4/a4Rollback.ts). */
 export const rolledBack = (chain: readonly A4ChainLink[], releaseId: string): boolean =>
   cycleLinks(chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId);
