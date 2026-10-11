@@ -169,8 +169,8 @@ function revocationList({ sequence = 1, previousSha256 = null } = {}) {
   return { list, signature: { keyId: K.revoker.keyId, signature: b64(signBytes(tagged("AMC_REVOCATION_LIST_V1", canonical(list)), K.revoker)) }, anchor: null };
 }
 const ROTATION_ROLES = ["previous", "next", "root"];
-function keyRotation({ reason = "scheduled", roots = [] } = {}) {
-  const statement = { type: "amc.key-rotation", version: 1, workspaceId: "ws-a", purpose: "artifact-seal", sequence: 1, previousStatementSha256: null,
+function keyRotation({ reason = "scheduled", roots = [], sequence = 1 } = {}) {
+  const statement = { type: "amc.key-rotation", version: 1, workspaceId: "ws-a", purpose: "artifact-seal", sequence, previousStatementSha256: null,
     previousKeyId: K.seal.keyId, nextKeyId: K["next-seal"].keyId, nextPublicKeyPem: K["next-seal"].pem, reason,
     overlap: reason === "key-compromise" ? null : { notBefore: T.statement, notAfter: "2026-09-20T00:00:00.000Z" }, issuedAt: T.statement };
   const bytes = tagged("AMC_KEY_ROTATION_V1", canonical(statement));
@@ -203,9 +203,9 @@ function dims(code) {
 const exitFor = statuses => Object.values(statuses).includes("fail") ? 1 : Object.values(statuses).includes("not-evaluated") ? 3 : 0;
 
 const cases = [];
-function addCase(name, why, { artifact, trust = trustList(), params = PARAMS, evidence = [], verdict, codes = {}, raw = false }) {
+function addCase(name, why, { artifact, trust = trustList(), moreTrust = [], params = PARAMS, evidence = [], verdict, codes = {}, raw = false }) {
   const dimensions = dims(verdict);
-  cases.push({ name, why, artifact, raw, trust, params, evidence, expected: { case: name, normative: true, dimensions, reasonCodes: codes, exitCode: exitFor(dimensions) } });
+  cases.push({ name, why, artifact, raw, trust, moreTrust, params, evidence, expected: { case: name, normative: true, dimensions, reasonCodes: codes, exitCode: exitFor(dimensions) } });
 }
 
 const good = evidenceSet();
@@ -325,15 +325,50 @@ addCase("legacy-receipt", "A receipt whose payload says v 1. This verifier reads
 addCase("trust-list-rollback", "The supplied trust list is sequence 3 while sequence 4 of the same list is already known. An older list could restore a key since revoked, so it admits nobody.",
   { artifact: valid, ...withEvidence, params: { ...PARAMS, knownSequences: { "agent-payments": 7, "fixtures-v1": 4 } }, verdict: "PFNNNN", codes: { issuerAdmission: ["ROLLBACK_DETECTED"] } });
 
+// Review round: lists that undercut each other, self-contradictory control results, a chain head that is not first.
+const ROOTS_1_AND_2 = [K.root.keyId, K.root2.keyId].sort();
+addCase("distrusted-root-in-another-list", "Two roots are pinned, one signature each. One counted list, signed by root 2, distrusts root 1 as compromised; a second list, signed only by root 1, pins an attacker's key. A root that any counted list distrusts signs nothing, so the second list admits nobody.",
+  { artifact: attestation({ signer: K.forger, controlResultsDigest: good.controlResultsDigest }), ...withEvidence,
+    trust: trustList({ entries: [...BASE_ENTRIES, entry(K.forger, ["independent-attestation"])] }),
+    moreTrust: [trustList({ roots: [K.root2], listId: "fixtures-v1-ops", entries: [],
+      distrust: [{ keyId: K.root.keyId, distrustedFrom: null, reason: "key-compromise", note: "TEST ONLY: root 1 is compromised", source: "operator" }] })],
+    params: { ...PARAMS, trustRoots: ROOTS_1_AND_2 }, verdict: "PFNNNN", codes: { issuerAdmission: ["TRUST_LIST_SIGNATURE_INVALID"] } });
+const revokedAttester = BASE_ENTRIES.map(item => (item.keyId === K.attester.keyId ? { ...item, revokedAt: "2026-09-20T00:00:00.000Z", revocationReason: "superseded" } : item));
+addCase("stale-list-beside-newer", "Sequence 3 of a trust list is supplied beside sequence 4 of the same list, which revokes the attester's key. An older list must not shadow the newer one's revocation, so the older one is refused as a rollback.",
+  { artifact: valid, ...withEvidence, moreTrust: [trustList({ sequence: 4, entries: revokedAttester })], verdict: "PFNNNN", codes: { issuerAdmission: ["ROLLBACK_DETECTED"] } });
+addCase("forked-trust-list", "Two different lists are supplied under the same list id and sequence. One of them is not what the root signed for that sequence in any history a verifier can trust, so neither admits anything.",
+  { artifact: valid, ...withEvidence, moreTrust: [trustList({ entries: BASE_ENTRIES.filter(item => item.keyId !== K.seal.keyId) })], verdict: "PFNNNN", codes: { issuerAdmission: ["TRUST_LIST_SIGNATURE_INVALID"] } });
+const rejectedReview = evidenceSet({ controls: refs => [controlResult(refs, { dimensions: { result: "pass", applicability: { state: "applicable" }, evidence: "sufficient", enforcement: { state: "enforced", boundary: "payments-gateway" }, review: "rejected" } })] });
+addCase("review-rejected-pass", "The bound control result declares pass, but its review was rejected. A rejected result is not a pass.",
+  { artifact: attestation({ controlResultsDigest: rejectedReview.controlResultsDigest }), evidence: rejectedReview.evidence, verdict: "PPPPPF", codes: { satisfaction: ["CLAIMED_RESULT_FAILED"] } });
+const pendingIndependent = evidenceSet({ controls: refs => [controlResult(refs, { claimKind: "independently_reviewed", dimensions: { result: "pass", applicability: { state: "applicable" }, evidence: "sufficient", enforcement: { state: "enforced", boundary: "payments-gateway" }, review: "pending" } })] });
+addCase("unreviewed-independent-claim", "The bound control result claims independently_reviewed while its review is still pending. A claim kind that its own review state contradicts cannot be evidence.",
+  { artifact: attestation({ controlResultsDigest: pendingIndependent.controlResultsDigest }), evidence: pendingIndependent.evidence, verdict: "PPPPFN", codes: { completeness: ["CONTRADICTORY_EVIDENCE"] } });
+const lateResult = evidenceSet({ controls: refs => [controlResult(refs, { evaluatedAt: "2026-09-05T00:00:00.000Z" })] });
+addCase("evaluated-after-issuance", "The bound control result says it was evaluated on 2026-09-05, after the attestation that binds it was issued on 2026-09-02. An attestation cannot vouch for a result that did not exist yet.",
+  { artifact: attestation({ controlResultsDigest: lateResult.controlResultsDigest }), evidence: lateResult.evidence, verdict: "PPPPFN", codes: { completeness: ["CONTRADICTORY_EVIDENCE"] } });
+const excluded = evidenceSet({ controls: refs => [controlResult(refs), controlResult(refs, { controlId: "PAY-09",
+  dimensions: { result: "fail", applicability: { state: "applicable" }, evidence: "sufficient", enforcement: { state: "none" }, review: "approved" } })] });
+addCase("excluded-failing-control", "The attestation excludes control PAY-09, with a rationale, and the bound results hold a failing PAY-09. An exclusion is part of the signed statement, so the remaining results pass; the report names every excluded control in a warning so the exclusion is never silent.",
+  { artifact: attestation({ controlResultsDigest: excluded.controlResultsDigest, exclusions: [{ controlId: "PAY-09", rationale: "TEST ONLY: out of this deployment's scope" }] }),
+    evidence: excluded.evidence, verdict: "PPPPPP" });
+addCase("rotation-chain-head-not-first", "A key rotation that names no previous statement yet claims sequence 5. Only the first statement of a chain names no predecessor, so it is refused rather than read as a chain start.",
+  { artifact: keyRotation({ sequence: 5 }), raw: true, params: { asOf: T.asOf, trustRoots: [K.root.keyId] }, verdict: "FNNNNN", codes: { integrity: ["MALFORMED"] } });
+
 // ── Write ──
 const json = value => `${JSON.stringify(value, null, 2)}\n`;
 for (const item of cases) {
   const dir = join(OUT, item.name);
   rmSync(join(dir, "evidence"), { recursive: true, force: true });
+  rmSync(join(dir, "more-trust-lists"), { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   // P1-08 records exist in exactly one byte encoding, so they are written canonical; every other artifact pretty-printed.
   writeFileSync(join(dir, "artifact.json"), item.raw ? canonical(item.artifact) : json(item.artifact));
   writeFileSync(join(dir, "trust-list.json"), json(item.trust));
+  if (item.moreTrust.length > 0) {
+    mkdirSync(join(dir, "more-trust-lists"));
+    item.moreTrust.forEach((list, index) => writeFileSync(join(dir, "more-trust-lists", `${index + 1}.json`), json(list)));
+  }
   writeFileSync(join(dir, "params.json"), json(item.params));
   writeFileSync(join(dir, "expected.json"), json(item.expected));
   writeFileSync(join(dir, "README.md"), `# ${item.name}\n\n${item.why}\n`);

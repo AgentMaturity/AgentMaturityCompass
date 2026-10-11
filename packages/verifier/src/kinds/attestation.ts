@@ -58,6 +58,13 @@ function completeness(attestation: ScopedAttestation, view: EvidenceView) {
   if (controls.length === 0) findings.push({ code: "EMPTY_EVIDENCE", detail: "the attestation covers no control result" });
   for (const control of controls) {
     if (control.evidenceRefs.length === 0) findings.push({ code: "EMPTY_EVIDENCE", detail: `control ${control.controlId} cites no evidence` });
+    // A result contradicts itself when it claims an independent review it does not have, or postdates the attestation.
+    if (control.claimKind === "independently_reviewed" && control.dimensions.review !== "approved") {
+      findings.push({ code: "CONTRADICTORY_EVIDENCE", detail: `control ${control.controlId} claims independently_reviewed with review ${control.dimensions.review}` });
+    }
+    if (Date.parse(control.evaluatedAt) > Date.parse(attestation.issuedAt)) {
+      findings.push({ code: "CONTRADICTORY_EVIDENCE", detail: `control ${control.controlId} was evaluated at ${control.evaluatedAt}, after the attestation was issued` });
+    }
   }
   for (const ref of view.missing) findings.push({ code: "EVIDENCE_MISSING", detail: `evidence ${ref} was not supplied` });
   const executions = new Map<string, Array<[string, ActionReceipt]>>();
@@ -85,10 +92,11 @@ function completeness(attestation: ScopedAttestation, view: EvidenceView) {
  */
 function satisfaction(attestation: ScopedAttestation, view: EvidenceView) {
   const controls = considered(attestation, view.controls ?? []);
-  const failed = controls.filter(control => control.dimensions.result === "fail" || (control.dimensions.result === "pass" && control.claimKind === "synthetic_example"));
+  const failed = controls.filter(control => control.dimensions.result === "fail" || (control.dimensions.result === "pass"
+    && (control.claimKind === "synthetic_example" || control.dimensions.review === "rejected" || control.dimensions.review === "expired")));
   if (failed.length > 0) {
     return result<"satisfaction">(failed.map(control => ({ code: "CLAIMED_RESULT_FAILED",
-      detail: `control ${control.controlId} declares ${control.dimensions.result} (${control.claimKind})` })));
+      detail: `control ${control.controlId} declares ${control.dimensions.result} (${control.claimKind}, review ${control.dimensions.review})` })));
   }
   const open = controls.filter(control => control.dimensions.result !== "pass" || control.claimKind === "self_reported"
     || control.evidenceRefs.some(ref => view.opaque.has(ref)));
@@ -127,7 +135,8 @@ export function evaluateAttestation(value: unknown, env: Env): Evaluation {
     .map(([ref, receipt]): Finding<"scope"> => ({ code: "FOREIGN_EVIDENCE", detail: `evidence ${ref} names workspace ${receipt.workspaceId} and agent ${receipt.agentId}` }));
   return {
     kind: "scoped-attestation", integrity, unverifiable: [], admissions: [admission], admissionFindings: [],
-    anchoring: { status: "not-applicable", detail: null }, claimedAt: attestation.issuedAt, warnings: [],
+    anchoring: { status: "not-applicable", detail: null }, claimedAt: attestation.issuedAt,
+    warnings: attestation.exclusions.map(exclusion => `control ${exclusion.controlId} is excluded by the attestation: ${exclusion.rationale}`),
     scope: () => scopeResult({ tenant: attestation.tenantId, deployment: attestation.deployment.deploymentId,
       subject: attestation.subjectId, profile: attestation.profile.id }, env.expect, foreign),
     freshness: () => {
@@ -135,7 +144,7 @@ export function evaluateAttestation(value: unknown, env: Env): Evaluation {
       const issued = at(attestation.issuedAt);
       if (env.ctx.asOf < issued) findings.push({ code: "NOT_YET_VALID", detail: `issued at ${attestation.issuedAt}, after the as-of time` });
       if (env.ctx.asOf >= at(attestation.expiresAt)) findings.push({ code: "ATTESTATION_EXPIRED", detail: `expired at ${attestation.expiresAt}` });
-      const known = env.ctx.knownSequences[attestation.subjectId];
+      const known = Object.hasOwn(env.ctx.knownSequences, attestation.subjectId) ? env.ctx.knownSequences[attestation.subjectId] : undefined;
       if (known !== undefined && attestation.sequence < known) {
         findings.push({ code: "REPLAYED_OR_SUPERSEDED", detail: `sequence ${attestation.sequence} for ${attestation.subjectId}; ${known} is already known` });
       }

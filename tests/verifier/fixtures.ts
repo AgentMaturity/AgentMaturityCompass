@@ -23,6 +23,12 @@ interface Params {
   knownSequences?: Record<string, number>;
 }
 
+/** Further trust lists a case supplies, in name order, after trust-list.json. */
+export function moreTrustLists(root: string): string[] {
+  const dir = join(root, "more-trust-lists");
+  return existsSync(dir) ? readdirSync(dir).sort().map(name => join(dir, name)) : [];
+}
+
 export function caseNames(dir = FIXTURES): string[] {
   return readdirSync(dir).filter(name => existsSync(join(dir, name, "expected.json"))).sort();
 }
@@ -42,7 +48,7 @@ export function loadCase(name: string, dir = FIXTURES): { bytes: Buffer; options
     expected: json<Expected>(join(root, "expected.json")),
     params,
     options: {
-      trustLists: [json<unknown>(join(root, "trust-list.json"))], trustRoots: params.trustRoots ?? [], rootThreshold: params.rootThreshold,
+      trustLists: [json<unknown>(join(root, "trust-list.json")), ...moreTrustLists(root).map(path => json<unknown>(path))], trustRoots: params.trustRoots ?? [], rootThreshold: params.rootThreshold,
       asOf: params.asOf ? new Date(params.asOf) : undefined, expectScope: params.expect, knownSequences: params.knownSequences, evidence,
       path: `${name}/artifact.json`
     }

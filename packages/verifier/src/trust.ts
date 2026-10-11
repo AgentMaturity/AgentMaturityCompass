@@ -44,6 +44,15 @@ export interface ListFacts {
   rolledBackFrom: number | null;
 }
 
+/** The key id of the first signature row whose key id or signature does not verify; null when every row verifies. */
+function badRow(signed: SignedTrustList): string | null {
+  const bytes = tagged("AMC_TRUST_LIST_V1", canonicalize(signed.list));
+  return signed.signatures.find(row => !same(ed25519KeyId(row.publicKeyPem) ?? "", row.keyId)
+    || !verifyEd25519(bytes, row.publicKeyPem, Buffer.from(row.signature, "base64")))?.keyId ?? null;
+}
+
+const knownSequence = (known: Readonly<Record<string, number>>, id: string) => (Object.hasOwn(known, id) ? known[id] : undefined);
+
 /**
  * `pinnedThreshold` is the verifier's own m-of-n: a list's `rootThreshold` may raise it, never lower it. Distrust of a
  * root is judged as of `asOf`.
@@ -51,12 +60,9 @@ export interface ListFacts {
 export function listFacts(signed: SignedTrustList, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>,
   pinnedThreshold: number, distrust: readonly DistrustEntry[] = BUILT_IN_DISTRUST): ListFacts {
   const { list } = signed;
-  const bytes = tagged("AMC_TRUST_LIST_V1", canonicalize(list));
-  const bad = signed.signatures.find(row => !same(ed25519KeyId(row.publicKeyPem) ?? "", row.keyId)
-    || !verifyEd25519(bytes, row.publicKeyPem, Buffer.from(row.signature, "base64")));
-  const seen = known[list.listId];
+  const seen = knownSequence(known, list.listId);
   return {
-    signed, badSignature: bad?.keyId ?? null,
+    signed, badSignature: badRow(signed),
     pinned: signed.signatures.map(row => row.keyId).filter(keyId => roots.has(keyId) && !distrusted(distrust, keyId, asOf)),
     threshold: Math.max(1, pinnedThreshold, list.rootThreshold ?? 1),
     expired: asOf >= Date.parse(list.expiresAt),
@@ -65,33 +71,66 @@ export function listFacts(signed: SignedTrustList, roots: ReadonlySet<string>, a
 }
 
 /** A supplied trust list's problems; none means it can admit keys. */
-function listProblems(value: unknown, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>, pinnedThreshold: number): { facts: ListFacts | null; problems: Finding<"issuerAdmission">[] } {
-  const parsed = attempt(signedTrustList, value);
-  if (!parsed.ok) return { facts: null, problems: [{ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `not a valid signed trust list (${parsed.error.message})` }] };
-  const facts = listFacts(parsed.value, roots, asOf, known, pinnedThreshold);
-  const id = `list "${parsed.value.list.listId}"`;
+function listProblems(signed: SignedTrustList, roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>, pinnedThreshold: number,
+  rootDistrust: readonly DistrustEntry[]): { facts: ListFacts; problems: Finding<"issuerAdmission">[] } {
+  const facts = listFacts(signed, roots, asOf, known, pinnedThreshold, rootDistrust);
+  const id = `list "${signed.list.listId}"`;
   const problems: Finding<"issuerAdmission">[] = [];
   if (facts.badSignature) problems.push({ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `${id} carries a signature by ${facts.badSignature} that does not verify` });
   if (facts.pinned.length < facts.threshold) {
-    problems.push({ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `${id} has ${facts.pinned.length} signature(s) by pinned roots; ${facts.threshold} required` });
+    problems.push({ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `${id} has ${facts.pinned.length} signature(s) by pinned roots that nothing distrusts; ${facts.threshold} required` });
   }
-  if (facts.expired) problems.push({ code: "TRUST_LIST_EXPIRED", detail: `${id} expired at ${parsed.value.list.expiresAt}` });
-  if (facts.rolledBackFrom !== null) problems.push({ code: "ROLLBACK_DETECTED", detail: `${id} has sequence ${parsed.value.list.sequence}; ${facts.rolledBackFrom} is already known` });
+  if (facts.expired) problems.push({ code: "TRUST_LIST_EXPIRED", detail: `${id} expired at ${signed.list.expiresAt}` });
+  if (facts.rolledBackFrom !== null) problems.push({ code: "ROLLBACK_DETECTED", detail: `${id} has sequence ${signed.list.sequence}; ${facts.rolledBackFrom} is already known` });
   return { facts, problems };
 }
 
-/** Only lists that pass every check contribute entries, distrust or root keys; a list that fails contributes nothing. */
+/**
+ * Lists that undercut each other: of the lists supplied under one list id, any below the highest sequence is a
+ * rollback, and two different lists at the same sequence are a fork (both refused). Identical copies are one list.
+ */
+function siblingProblems(lists: readonly SignedTrustList[]): Map<SignedTrustList, Finding<"issuerAdmission">> {
+  const problems = new Map<SignedTrustList, Finding<"issuerAdmission">>();
+  for (const signed of lists) {
+    const { listId, sequence } = signed.list;
+    const siblings = lists.filter(other => other.list.listId === listId);
+    const highest = Math.max(...siblings.map(other => other.list.sequence));
+    if (sequence < highest) {
+      problems.set(signed, { code: "ROLLBACK_DETECTED", detail: `list "${listId}" sequence ${sequence} was supplied beside sequence ${highest}` });
+    } else if (siblings.some(other => other.list.sequence === sequence && canonicalize(other.list) !== canonicalize(signed.list))) {
+      problems.set(signed, { code: "TRUST_LIST_SIGNATURE_INVALID", detail: `two different lists "${listId}" claim sequence ${sequence}` });
+    }
+  }
+  return problems;
+}
+
+/**
+ * Only lists that pass every check contribute entries, distrust or root keys; a list that fails contributes nothing.
+ * Root distrust is gathered first from every list a pinned root signed and whose signatures verify (expired or not), so
+ * a root one list distrusts counts towards no other list. Over-applying it only refuses more.
+ */
 export function trustContext(lists: readonly unknown[], roots: ReadonlySet<string>, asOf: number, known: Readonly<Record<string, number>>,
   pinnedThreshold: number): TrustContext {
+  const problems: Finding<"issuerAdmission">[] = [];
+  const parsed: SignedTrustList[] = [];
+  for (const value of lists) {
+    const checked = attempt(signedTrustList, value);
+    if (checked.ok) parsed.push(checked.value);
+    else problems.push({ code: "TRUST_LIST_SIGNATURE_INVALID", detail: `not a valid signed trust list (${checked.error.message})` });
+  }
+  const rootDistrust = [...BUILT_IN_DISTRUST, ...parsed
+    .filter(signed => badRow(signed) === null && signed.signatures.some(row => roots.has(row.keyId))).flatMap(signed => signed.list.distrust)];
+  const siblings = siblingProblems(parsed);
   const verified: TrustList[] = [];
   const rootPems = new Map<string, string>();
-  const problems: Finding<"issuerAdmission">[] = [];
-  for (const value of lists) {
-    const checked = listProblems(value, roots, asOf, known, pinnedThreshold);
+  for (const signed of parsed) {
+    const checked = listProblems(signed, roots, asOf, known, pinnedThreshold, rootDistrust);
+    const sibling = siblings.get(signed);
+    if (sibling) checked.problems.push(sibling);
     problems.push(...checked.problems);
-    if (checked.facts && checked.problems.length === 0) {
-      verified.push(checked.facts.signed.list);
-      for (const row of checked.facts.signed.signatures) if (roots.has(row.keyId)) rootPems.set(row.keyId, row.publicKeyPem);
+    if (checked.problems.length === 0) {
+      verified.push(signed.list);
+      for (const row of signed.signatures) if (roots.has(row.keyId)) rootPems.set(row.keyId, row.publicKeyPem);
     }
   }
   return {

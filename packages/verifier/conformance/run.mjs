@@ -41,6 +41,8 @@ function argsFor(dir) {
   const params = JSON.parse(readFileSync(join(dir, "params.json"), "utf8"));
   const args = ["verify", join(dir, "artifact.json")];
   if (existsSync(join(dir, "trust-list.json"))) args.push("--trust-list", join(dir, "trust-list.json"));
+  const more = join(dir, "more-trust-lists");
+  for (const name of existsSync(more) ? readdirSync(more).sort() : []) args.push("--trust-list", join(more, name));
   for (const root of params.trustRoots ?? []) args.push("--trust-root", root);
   if (params.rootThreshold !== undefined) args.push("--root-threshold", String(params.rootThreshold));
   if (params.asOf) args.push("--as-of", params.asOf);

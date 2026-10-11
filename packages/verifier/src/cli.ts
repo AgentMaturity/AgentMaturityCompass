@@ -20,7 +20,7 @@ const USAGE = `usage: amc-verify verify <artifact> [--trust-list <file>]... [--t
 exit codes: 0 all six dimensions pass; 1 any fails; 3 none fails but one is not evaluated; 64 usage error`;
 
 const MiB = 1024 * 1024;
-const LIMITS = { artifact: 16 * MiB, trustList: MiB, evidence: 64 * MiB, evidenceFiles: 4096 };
+const LIMITS = { artifact: 16 * MiB, trustList: MiB, evidence: 64 * MiB, evidenceFiles: 4096, evidenceTotal: 256 * MiB };
 
 class UsageError extends Error {}
 
@@ -28,7 +28,8 @@ class UsageError extends Error {}
 function readBounded(path: string, limit: number): Buffer {
   let fd: number;
   try {
-    fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
+    // O_NONBLOCK: opening a FIFO must not wait for a writer; it is then refused as not a regular file.
+    fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
   } catch (error) {
     throw new UsageError(`${path}: ${error instanceof Error ? error.message : String(error)}`);
   }
@@ -58,17 +59,32 @@ function readEvidenceDir(dir: string): Map<string, Uint8Array> {
   }
   if (names.length > LIMITS.evidenceFiles) throw new UsageError(`--evidence-dir ${dir}: more than ${LIMITS.evidenceFiles} files`);
   const evidence = new Map<string, Uint8Array>();
+  let total = 0;
   for (const name of names) {
     const path = join(dir, name);
-    if (!lstatSync(path).isFile()) throw new UsageError(`--evidence-dir ${dir}: ${name} is not a regular file`);
+    let regular = false;
+    try { regular = lstatSync(path).isFile(); } catch { /* refused below */ }
+    if (!regular) throw new UsageError(`--evidence-dir ${dir}: ${name} is not a regular file`);
     // Items are addressed by the sha256 of their bytes; file names are ignored.
     const bytes = readBounded(path, LIMITS.evidence);
+    total += bytes.length;
+    if (total > LIMITS.evidenceTotal) throw new UsageError(`--evidence-dir ${dir}: more than ${LIMITS.evidenceTotal} bytes in all`);
     evidence.set(sha256Hex(bytes), bytes);
   }
   return evidence;
 }
 
-const RFC3339 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+const RFC3339 = /^(\d{4})-(\d{2})-(\d{2})T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/;
+
+/** An RFC 3339 time whose date is a real calendar date (Date would roll 2026-02-30 over to March). */
+function rfc3339(text: string): Date | null {
+  const match = RFC3339.exec(text);
+  if (!match) return null;
+  const [year, month, day] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  const calendar = new Date(Date.UTC(year, month - 1, day));
+  const date = new Date(text);
+  return calendar.getUTCFullYear() === year && calendar.getUTCMonth() === month - 1 && calendar.getUTCDate() === day && !Number.isNaN(date.getTime()) ? date : null;
+}
 
 function single(values: string[] | undefined, flag: string): string | undefined {
   if (values && values.length > 1) throw new UsageError(`${flag} may be given once`);
@@ -87,8 +103,8 @@ function options(args: string[]) {
   });
   if (positionals.length !== 2 || positionals[0] !== "verify") throw new UsageError("expected: verify <artifact>");
   const asOfText = single(values["as-of"], "--as-of");
-  const asOf = asOfText === undefined ? undefined : new Date(asOfText);
-  if (asOfText !== undefined && (!RFC3339.test(asOfText) || Number.isNaN(asOf!.getTime()))) throw new UsageError(`--as-of ${asOfText} is not an RFC 3339 time`);
+  const asOf = asOfText === undefined ? undefined : rfc3339(asOfText) ?? undefined;
+  if (asOfText !== undefined && asOf === undefined) throw new UsageError(`--as-of ${asOfText} is not an RFC 3339 time`);
   const trustRoots = (values["trust-root"] ?? []).map(root => {
     if (!/^[0-9a-fA-F]{64}$/.test(root)) throw new UsageError(`--trust-root ${root} is not a 64 hex sha256 key id`);
     return root.toLowerCase();
@@ -98,7 +114,8 @@ function options(args: string[]) {
   if (thresholdText !== undefined && (!/^[1-9][0-9]{0,1}$/.test(thresholdText) || rootThreshold! > new Set(trustRoots).size)) {
     throw new UsageError(`--root-threshold ${thresholdText} must be from 1 to the number of --trust-root keys`);
   }
-  const knownSequences: Record<string, number> = {};
+  // No prototype: an id such as "__proto__" is an ordinary key.
+  const knownSequences = Object.create(null) as Record<string, number>;
   for (const pair of values["known-sequence"] ?? []) {
     const at = pair.lastIndexOf("=");
     const id = pair.slice(0, at);

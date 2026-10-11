@@ -122,7 +122,9 @@ schema cannot express (docs/RECEIPTS.md):
 - Issuer admission: the signer is admitted for purpose `receipt`. The receipt names no key, so a verifier searches the
   keys of its pinned trust lists. It is anchored only by the exported ledger row (`evidence-event`) whose `eventHash` is
   `event_hash` and whose `payloadSha256` is `body_sha256`, with a `writerSignature` by a key admitted for `ledger-row`;
-  otherwise `UNANCHORED`. Completeness needs the body `body_sha256` names, naming the same execution, state and agent.
+  otherwise `UNANCHORED`. Only `eventHash` is signed, so the row's other fields are unauthenticated until the export
+  carries a portable pre-image. Completeness needs the body `body_sha256` names, naming the same execution, state and
+  agent.
   A receipt proves that a row was written, not the work's outcome: satisfaction is `NOT_RECOMPUTABLE`
   (docs/STANDALONE_VERIFIER.md).
 
@@ -174,10 +176,11 @@ canonical form of the attestation without `signature`). Rules the schema cannot 
   `expiresAt`; `sequence` is not below the highest one known for `subjectId`; `issuedAt` is not before the key's
   `validFrom`.
 - Completeness: `controlResultsDigest` is the sha256 of a JSON array of control results the verifier holds; every
-  control result not listed in `exclusions` cites at least one item, every cited item is present, and the cited
+  control result not listed in `exclusions` cites at least one item, was evaluated no later than `issuedAt`, claims
+  `independently_reviewed` only with an `approved` review, and every cited item is present; the cited
   `amc.action-receipt/v1` records of one execution agree, end in a terminal state and are marked complete.
 - Satisfaction: the attestation's result is the conjunction of its control results. A declared `fail`, or a `pass` that
-  is `synthetic_example`, fails it; a declared `not_evaluated`, a `self_reported` pass or evidence of an unknown kind
+  is `synthetic_example` or whose review is `rejected` or `expired`, fails it; a declared `not_evaluated`, a `self_reported` pass or evidence of an unknown kind
   is not evaluated (`NOT_RECOMPUTABLE`).
 
 ## trust-list

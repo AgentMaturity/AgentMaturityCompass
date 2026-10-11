@@ -1,9 +1,10 @@
+import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { main } from "../../packages/verifier/src/cli.js";
-import { FIXTURES, loadCase } from "./fixtures.js";
+import { FIXTURES, loadCase, moreTrustLists } from "./fixtures.js";
 
 const scratch = mkdtempSync(join(tmpdir(), "amc-verify-cli-"));
 afterAll(() => rmSync(scratch, { recursive: true, force: true }));
@@ -22,7 +23,8 @@ afterEach(() => vi.restoreAllMocks());
 function argsFor(name: string, extra: string[] = []): string[] {
   const { params } = loadCase(name);
   const dir = join(FIXTURES, name);
-  return ["verify", join(dir, "artifact.json"), "--trust-list", join(dir, "trust-list.json"), ...(params.trustRoots ?? []).flatMap(root => ["--trust-root", root]),
+  return ["verify", join(dir, "artifact.json"), "--trust-list", join(dir, "trust-list.json"), ...moreTrustLists(dir).flatMap(path => ["--trust-list", path]),
+    ...(params.trustRoots ?? []).flatMap(root => ["--trust-root", root]),
     ...(params.rootThreshold === undefined ? [] : ["--root-threshold", String(params.rootThreshold)]),
     ...(params.asOf ? ["--as-of", params.asOf] : []), ...Object.entries(params.expect ?? {}).flatMap(([key, value]) => [`--expect-${key}`, value!]),
     ...Object.entries(params.knownSequences ?? {}).flatMap(([id, sequence]) => ["--known-sequence", `${id}=${sequence}`]),
@@ -65,6 +67,7 @@ describe("amc-verify", () => {
     ["an unknown flag", ["verify", join(dir, "artifact.json"), "--allow-unpinned"]],
     ["a missing artifact", ["verify", join(scratch, "absent.json")]],
     ["a bad --as-of", ["verify", join(dir, "artifact.json"), "--as-of", "yesterday"]],
+    ["an --as-of that is not a calendar date", ["verify", join(dir, "artifact.json"), "--as-of", "2026-02-30T00:00:00Z"]],
     ["two --as-of", ["verify", join(dir, "artifact.json"), "--as-of", "2026-10-01T00:00:00Z", "--as-of", "2026-10-02T00:00:00Z"]],
     ["a short --trust-root", ["verify", join(dir, "artifact.json"), "--trust-root", "abc"]],
     ["a --root-threshold of 0", ["verify", join(dir, "artifact.json"), "--trust-root", "a".repeat(64), "--root-threshold", "0"]],
@@ -87,6 +90,13 @@ describe("amc-verify", () => {
     expect(main(["verify", join(dir, "artifact.json"), "--evidence-dir", evidence])).toBe(64);
     symlinkSync(join(dir, "artifact.json"), join(scratch, "artifact-link.json"));
     expect(main(["verify", join(scratch, "artifact-link.json")])).toBe(64);
+  });
+
+  test("refuses a FIFO as the artifact or a trust list without waiting for a writer", () => {
+    const fifo = join(scratch, "fifo");
+    execFileSync("mkfifo", [fifo]);
+    expect(main(["verify", fifo])).toBe(64);
+    expect(main(["verify", join(dir, "artifact.json"), "--trust-list", fifo])).toBe(64);
   });
 
   test("reads evidence by content: a file's name is ignored", () => {

@@ -156,3 +156,68 @@ describe("the package and AMC agree", () => {
     expect(BUILT_IN_DISTRUST).toEqual(amc.distrust);
   });
 });
+
+describe("the package and AMC share their constants and their verify-level checks", () => {
+  test("purposes, event types, receipt states, rotation reasons, claim kinds and the overlap limit", async () => {
+    const amc = {
+      purposes: (await import("../../src/trust/keyPurposes.js")).KEY_PURPOSES,
+      events: (await import("../../src/contracts/v1/evidenceEvent.js")).EVIDENCE_EVENT_TYPES,
+      states: (await import("../../src/actions/receiptStates.js")).RECEIPT_STATES,
+      rotation: await import("../../src/keys/rotationStatement.js"),
+      claims: (await import("../../src/claims/eligibility/types.js")).CLAIM_KINDS
+    };
+    const ours = { codes: await import("../../packages/verifier/src/codes.js"), evidence: await import("../../packages/verifier/src/records/evidence.js"),
+      statements: await import("../../packages/verifier/src/records/statements.js"), rotation: await import("../../packages/verifier/src/kinds/rotation.js") };
+    expect(ours.codes.KEY_PURPOSES).toEqual(amc.purposes);
+    expect(ours.evidence.EVIDENCE_EVENT_TYPES).toEqual(amc.events);
+    expect(ours.evidence.RECEIPT_STATES).toEqual(amc.states);
+    expect(ours.statements.ROTATION_REASONS).toEqual(amc.rotation.ROTATION_REASONS);
+    expect(ours.evidence.CLAIM_KINDS).toEqual(amc.claims);
+    expect(ours.rotation.MAX_OVERLAP_DAYS).toBe(amc.rotation.DEFAULT_MAX_OVERLAP_DAYS);
+  });
+
+  test("a trust list counts for the package exactly when AMC's verifySignedTrustList accepts it", async () => {
+    const { verifySignedTrustList } = await import("../../src/trust/trustList.js");
+    const { trustContext } = await import("../../packages/verifier/src/trust.js");
+    let compared = 0;
+    for (const name of caseNames()) {
+      const { options, params } = loadCase(name);
+      const asOf = new Date(params.asOf!);
+      for (const list of options.trustLists) {
+        const tampered = structuredClone(list) as { list: { sequence: number } };
+        tampered.list.sequence += 1;
+        for (const candidate of [list, tampered]) {
+          let amc = true;
+          try { verifySignedTrustList(candidate, { pinnedRootKeyIds: options.trustRoots, now: asOf, threshold: options.rootThreshold }); } catch { amc = false; }
+          const ours = trustContext([candidate], new Set(options.trustRoots), asOf.getTime(), {}, options.rootThreshold ?? 1).problems.length === 0;
+          expect(ours, name).toBe(amc);
+          compared += 1;
+        }
+      }
+    }
+    expect(compared).toBeGreaterThan(100);
+  });
+
+  test("an external evidence signature verifies for the package exactly when it does for AMC", async () => {
+    const { verifyExternalEvidence } = await import("../../src/standard/externalEvidenceProfile.js");
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    for (const name of caseNames().filter(item => item.startsWith("valid-external") || item.startsWith("external-evidence"))) {
+      const { bytes, options } = loadCase(name);
+      const profile = JSON.parse(bytes.toString("utf8")) as { source: { producer: string }; provenance: { captureMethod: "producer-callback" }; signature: { authorityId: string; value: string } | null };
+      if (profile.signature === null) continue;
+      const twin = structuredClone(profile);
+      const last = twin.signature!.value.length - 3;
+      twin.signature!.value = `${twin.signature!.value.slice(0, last)}${alphabet[alphabet.indexOf(twin.signature!.value[last]!) ^ 1]}==`;
+      const entry = (options.trustLists[0] as { list: { entries: Array<{ keyId: string; publicKeyPem: string }> } }).list.entries
+        .find(item => item.keyId === profile.signature!.authorityId)!;
+      for (const candidate of [profile, twin]) {
+        // An authority scoped to this producer and capture method, so only the signature decides AMC's answer.
+        const authority = { id: entry.keyId, publicKeyPem: entry.publicKeyPem, maxTrustTier: "OBSERVED" as const,
+          captureMethods: [candidate.provenance.captureMethod], producers: [candidate.source.producer] };
+        const amc = verifyExternalEvidence(candidate, { authorities: [authority] }).signatureVerified;
+        const ours = verifyArtifact(Buffer.from(JSON.stringify(candidate)), options).integrity.status === "pass";
+        expect(ours, `${name}${candidate === twin ? " (non-canonical base64)" : ""}`).toBe(amc);
+      }
+    }
+  });
+});

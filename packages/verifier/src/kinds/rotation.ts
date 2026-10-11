@@ -9,10 +9,10 @@ import type { Finding } from "../codes.js";
 import type { Env, Evaluation } from "../evaluation.js";
 import { signedKeyRotation, signedRootRotation } from "../records/statements.js";
 import { admit, distrustOf, listedPem, rootAdmission, type Admission } from "../trust.js";
-import { parseCanonical, refused, rollback, statementTail } from "./common.js";
+import { chainHead, parseCanonical, refused, rollback, statementTail } from "./common.js";
 
 const DAY_MS = 86_400_000;
-const MAX_OVERLAP_DAYS = 30;
+export const MAX_OVERLAP_DAYS = 30;
 
 const distrusted = (keyId: string, env: Env, role: string): Finding<"issuerAdmission">[] =>
   distrustOf(keyId, env.ctx) ? [{ code: "ISSUER_DISTRUSTED", detail: `the ${role} key ${keyId} is distrusted` }] : [];
@@ -21,7 +21,7 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
   const parsed = parseCanonical(signedKeyRotation, value, bytes);
   if (!parsed.ok) return refused("key-rotation", parsed.finding);
   const { statement, signatures } = parsed.value;
-  const integrity: Finding<"integrity">[] = [];
+  const integrity: Finding<"integrity">[] = chainHead(statement.sequence, statement.previousStatementSha256);
   const unverifiable: string[] = [];
   if (!same(ed25519KeyId(statement.nextPublicKeyPem) ?? "", statement.nextKeyId)) integrity.push({ code: "DIGEST_MISMATCH", detail: "nextKeyId is not the key id of nextPublicKeyPem" });
   const span = statement.overlap === null ? null : Date.parse(statement.overlap.notAfter) - Date.parse(statement.overlap.notBefore);
@@ -82,9 +82,11 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
   const parsed = parseCanonical(signedRootRotation, value, bytes);
   if (!parsed.ok) return refused("root-rotation", parsed.finding);
   const { statement, signatures } = parsed.value;
-  const integrity: Finding<"integrity">[] = [];
+  const integrity: Finding<"integrity">[] = chainHead(statement.sequence, statement.previousSha256);
   const unverifiable: string[] = [];
-  if ((statement.newThreshold < statement.previousThreshold || statement.newRoots.length < statement.previousRoots.length) && !statement.allowDecrease) {
+  // A decrease is judged against the threshold the verifier pinned too, not only the one the statement states.
+  const currentThreshold = Math.max(statement.previousThreshold, env.ctx.rootThreshold);
+  if ((statement.newThreshold < currentThreshold || statement.newRoots.length < statement.previousRoots.length) && !statement.allowDecrease) {
     integrity.push({ code: "MALFORMED", detail: "it lowers the threshold or the set size without allowDecrease" });
   }
   const message = tagged("amc.root-rotation/v1", canonicalize(statement));

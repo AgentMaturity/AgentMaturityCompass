@@ -2,7 +2,7 @@
  * External evidence profile v1, signed by an authority whose key a supplied trust list admits for `evidence-authority`
  * with that entry's `authority` scope (producers, capture methods, highest tier). Never an authority from the profile.
  */
-import { same, verifyEd25519 } from "../bytes.js";
+import { isCanonicalSignatureBase64, same, verifyEd25519 } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
 import { externalEvidence, normalizedDigest, signingBytes, type ExternalEvidence } from "../records/externalEvidence.js";
@@ -59,7 +59,8 @@ export function evaluateExternalEvidence(value: unknown, env: Env): Evaluation {
   const keyId = profile.signature !== null && /^[0-9a-f]{64}$/.test(profile.signature.authorityId) ? profile.signature.authorityId : null;
   const pem = keyId === null ? null : listedPem(env.ctx, keyId);
   if (profile.signature !== null && pem === null) unverifiable.push("signature: the authority key is not in the supplied trust lists");
-  if (profile.signature !== null && pem !== null && !verifyEd25519(signingBytes(profile), pem, Buffer.from(profile.signature.value, "base64"))) {
+  if (profile.signature !== null && pem !== null && (!isCanonicalSignatureBase64(profile.signature.value)
+    || !verifyEd25519(signingBytes(profile), pem, Buffer.from(profile.signature.value, "base64")))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the authority signature does not verify" });
   }
   const claimed = Date.parse(profile.normalization.ingestedAt);

@@ -42,7 +42,7 @@ amc-verify verify attestation.json \
 | `--as-of <RFC 3339>` | Every time comparison is made as of this instant. Default: now. |
 | `--expect-tenant`, `--expect-deployment`, `--expect-subject`, `--expect-profile` | What the record must be about. A record without the field fails scope. |
 | `--known-sequence <id>=<n>` | The highest sequence you already saw for an id (below). Repeatable. |
-| `--evidence-dir <dir>` | Evidence files, addressed by the sha256 of their bytes; file names are ignored. Regular files only, at most 64 MiB each. |
+| `--evidence-dir <dir>` | Evidence files, addressed by the sha256 of their bytes; file names are ignored. Regular files only, at most 4,096 files of 64 MiB each and 256 MiB in all. |
 | `--json` | Print the verifier report instead of the summary. |
 
 Exit codes: **0** every dimension passes; **1** any dimension fails; **3** none fails but at least one is not
@@ -57,9 +57,12 @@ same report. It does no I/O. Bad options (a root that is not 64 hex, an invalid 
 1. You pin root key ids with `--trust-root` and the m-of-n with `--root-threshold`.
 2. A supplied trust list counts only when every signature row on it verifies, at least `max(--root-threshold,
    rootThreshold)` distinct pinned roots that nothing distrusts signed it, it has not expired as of `--as-of`, and its
-   sequence is not below `--known-sequence <listId>=<n>`. A list that fails contributes no entry, distrust or root key,
-   and makes issuer admission fail (`TRUST_LIST_SIGNATURE_INVALID`, `TRUST_LIST_EXPIRED` or `ROLLBACK_DETECTED`), even
-   if another list would admit the key.
+   sequence is not below `--known-sequence <listId>=<n>`. A root that any list signed by a pinned root distrusts counts
+   towards no list. Of several lists with one `listId`, any below the highest supplied sequence is a rollback, and two
+   different lists at one sequence are both refused; identical copies are one list. A list that fails contributes no
+   entry, distrust or root key, and makes issuer admission fail (`TRUST_LIST_SIGNATURE_INVALID`, `TRUST_LIST_EXPIRED` or
+   `ROLLBACK_DETECTED`), even if another list would admit the key. With several roots pinned and no `--root-threshold`,
+   the report warns that one root's signature counts a list.
 3. A key is admitted for a purpose only by an entry of a counted list, judged as of `--as-of`: distrust first (the
    package's built-in list, equal to AMC's `src/trust/amc-distrust.json`, plus every counted list's `distrust`, from its
    `distrustedFrom`), then a `key-compromise` revocation in any list, then the entry's purpose, validity window and any
@@ -117,7 +120,9 @@ The kind is read from the record itself: an object with `type: "amc.scoped-attes
 | Root rotation (`amc.root-rotation`) | P1-08 bytes; `previousRoots` must be the pinned roots and sign `previousThreshold` times; the new set proves possession | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 | Revocation list (`amc.revocation-list`) | P1-08 bytes, by a key admitted for `revocation-list` | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 
-P1-08 records are accepted only in their one canonical byte encoding. A rotation statement or revocation list never
+P1-08 records are accepted only in their one canonical byte encoding, and only the first record of a chain
+(sequence 1) may name no predecessor (`MALFORMED` otherwise). A root rotation lowers the threshold when its new threshold
+is below the higher of its stated and the pinned threshold, which needs `allowDecrease`. A rotation statement or revocation list never
 changes a pin: the trust-list owner publishes a new list. The revocation list's `anchor` names a workspace
 transparency entry and is not checked offline (a warning says so).
 
@@ -132,11 +137,13 @@ result's `evidenceRefs` are sha256 digests of `amc.action-receipt/v1` records (t
 `body_sha256` names). Completeness fails when the array is absent (`EVIDENCE_MISSING`) or covers no control (controls
 in `exclusions` are left out) or a control cites nothing (`EMPTY_EVIDENCE`), a cited item is absent or a receipt marks
 its evidence incomplete (`EVIDENCE_MISSING`), receipts of one execution disagree on its terminal state or repeat a
-sequence number (`CONTRADICTORY_EVIDENCE`), or an execution's last receipt is not terminal (`OUTCOME_UNKNOWN`).
-Malformed bound evidence is an integrity failure.
+sequence number, a control claims `independently_reviewed` without an `approved` review, or a control was evaluated
+after the attestation was issued (`CONTRADICTORY_EVIDENCE`), or an execution's last receipt is not terminal
+(`OUTCOME_UNKNOWN`). Malformed bound evidence is an integrity failure. Every excluded control is named, with its
+rationale, in a warning.
 
 The attestation's result is the conjunction of its control results. Satisfaction fails (`CLAIMED_RESULT_FAILED`) when a
-control declares `fail`, or `pass` as `synthetic_example`. It is `not-evaluated` (`NOT_RECOMPUTABLE`) when a control
+control declares `fail`, or `pass` as `synthetic_example` or with a `rejected` or `expired` review. It is `not-evaluated` (`NOT_RECOMPUTABLE`) when a control
 declares `not_evaluated`, passes only as `self_reported` (no positive status) or cites evidence of a kind v1 cannot read.
 Otherwise it passes: every result is a pass by an observed or independently reviewed claim over evidence completeness
 found present, settled and consistent. It does not re-run the controls.
@@ -146,8 +153,10 @@ found present, settled and consistent. It does not re-run the controls.
 A state receipt is anchored when the supplied evidence holds the exported ledger row (spec/schemas/v1/evidence-event)
 whose `eventHash` is the receipt's `event_hash`, whose `payloadSha256` is its `body_sha256`, and whose
 `writerSignature` (Ed25519 over the 32 bytes of `eventHash`) is by a key admitted for `ledger-row`. Otherwise issuer
-admission fails with `UNANCHORED`: a ledger key the verifier did not pin proves internal consistency only. Legacy v1
-receipts are `UNSUPPORTED_VERSION`.
+admission fails with `UNANCHORED`: a ledger key the verifier did not pin proves internal consistency only. Only
+`eventHash` is signed, and the export carries no pre-image to recompute it (spec/ACCEPTANCE_RULES.md, evidence-event
+rule 3), so the row's other fields are unauthenticated; an anchored report says so in a warning. Legacy v1 receipts are
+`UNSUPPORTED_VERSION`.
 
 ## Normative fixtures and conformance
 

@@ -83,5 +83,8 @@ export function verifyArtifact(bytes: Uint8Array, options: VerifyOptions): Verif
     evaluation = refused("unknown", { code: "MALFORMED", detail: `the artifact is ${error instanceof Error ? error.message : String(error)}` });
   }
   evaluation ??= evaluate(value, bytes, env);
+  if (options.rootThreshold === undefined && ctx.roots.size > 1) {
+    evaluation.warnings.push(`${ctx.roots.size} roots are pinned and no root threshold was given: one pinned root's signature counts a trust list (set --root-threshold)`);
+  }
   return buildReport({ evaluation, path: options.path ?? "<bytes>", sha256: sha256Hex(bytes), asOf, extraIntegrity, ctxProblems: ctx.problems });
 }

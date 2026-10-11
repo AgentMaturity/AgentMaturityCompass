@@ -121,3 +121,61 @@ describe("external evidence authorities", () => {
     expect(report.reasonCodes.issuerAdmission).toEqual(["ISSUER_WRONG_PURPOSE"]);
   });
 });
+
+describe("review round", () => {
+  test("an anchored receipt says that only the ledger row's eventHash is signed", () => {
+    const { bytes, options } = loadCase("valid-receipt");
+    const report = run(bytes, options);
+    expect(report.anchoring.status).toBe("anchored");
+    expect(report.warnings.join("\n")).toMatch(/only its eventHash is signed/);
+  });
+
+  test("an external evidence signature in a non-canonical base64 spelling fails integrity", () => {
+    const { bytes, options } = loadCase("valid-external-evidence-attested");
+    const profile = JSON.parse(bytes.toString("utf8")) as { signature: { value: string } };
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const last = profile.signature.value.length - 3;
+    const twin = alphabet[alphabet.indexOf(profile.signature.value[last]!) ^ 1]!;
+    profile.signature.value = `${profile.signature.value.slice(0, last)}${twin}==`;
+    expect(Buffer.from(profile.signature.value, "base64").toString("base64")).not.toBe(profile.signature.value);
+    expect(run(JSON.stringify(profile), options).reasonCodes.integrity).toEqual(["SIGNATURE_INVALID"]);
+  });
+
+  test("several pinned roots without a threshold say that one root's signature counts a list", () => {
+    const { bytes, options } = loadCase("valid-attestation");
+    const report = run(bytes, { ...options, trustRoots: [...options.trustRoots, "f".repeat(64)] });
+    expect(report.warnings.join("\n")).toMatch(/root-threshold/);
+    expect(run(bytes, { ...options, trustRoots: [...options.trustRoots, "f".repeat(64)], rootThreshold: 1 }).warnings).toEqual([]);
+  });
+
+  test("controls left out by exclusions are named in a warning", () => {
+    const { bytes, options } = loadCase("excluded-failing-control");
+    expect(run(bytes, options).warnings).toEqual([expect.stringMatching(/PAY-09.*out of this deployment's scope/)]);
+    expect(run(loadCase("valid-attestation").bytes, loadCase("valid-attestation").options).warnings).toEqual([]);
+  });
+});
+
+describe("root rotation against the pinned threshold", () => {
+  test("a rotation that keeps its own stated threshold but lowers the pinned one needs allowDecrease", async () => {
+    const { generateKeyPairSync } = await import("node:crypto");
+    const { signRootRotation } = await import("../../src/trust/rootRotation.js");
+    const { ed25519KeyId, signTrustList } = await import("../../src/trust/trustList.js");
+    const key = () => {
+      const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+      const pem = publicKey.export({ format: "pem", type: "spki" }).toString();
+      return { pem, id: ed25519KeyId(pem)!, priv: privateKey.export({ format: "pem", type: "pkcs8" }).toString() };
+    };
+    const current = [key(), key(), key()];
+    const next = [key(), key(), key()];
+    const list = { type: "amc.trust-list" as const, version: 1 as const, listId: "roots", sequence: 1, issuedAt: "2026-09-01T00:00:00.000Z",
+      expiresAt: "2027-09-01T00:00:00.000Z", entries: [], distrust: [] };
+    const signed = { list, signatures: current.map(root => signTrustList(list, root.priv).signatures[0]!) };
+    const statement = signRootRotation({ type: "amc.root-rotation", version: 1, rootSetId: "roots", sequence: 1, previousSha256: null,
+      previousRoots: current.map(root => root.id), previousThreshold: 2, newRoots: next.map(root => root.id), newThreshold: 2,
+      newRootPublicKeyPems: next.map(root => root.pem), allowDecrease: false, issuedAt: "2026-09-10T00:00:00.000Z" },
+    { current: current.map(root => root.priv), next: next.map(root => root.priv) });
+    const options = { trustLists: [signed], trustRoots: current.map(root => root.id), asOf: new Date("2026-10-01T00:00:00.000Z") };
+    expect(run(statement, { ...options, rootThreshold: 2 }).integrity.status).toBe("pass");
+    expect(run(statement, { ...options, rootThreshold: 3 }).reasonCodes.integrity).toEqual(["MALFORMED"]);
+  });
+});

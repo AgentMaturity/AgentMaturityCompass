@@ -6,7 +6,7 @@ import { signedRevocationList } from "../records/statements.js";
 import { signedTrustList } from "../records/trustList.js";
 import { attempt } from "../schema.js";
 import { admit, listFacts, listedPem, rootAdmission } from "../trust.js";
-import { parseCanonical, refused, rollback, statementTail } from "./common.js";
+import { chainHead, parseCanonical, refused, rollback, statementTail } from "./common.js";
 
 export function evaluateTrustList(value: unknown, env: Env): Evaluation {
   const parsed = attempt(signedTrustList, value);
@@ -37,7 +37,7 @@ export function evaluateRevocationList(value: unknown, bytes: Uint8Array, env: E
   const parsed = parseCanonical(signedRevocationList, value, bytes);
   if (!parsed.ok) return refused("revocation-list", parsed.finding);
   const { list, signature, anchor } = parsed.value;
-  const integrity: Finding<"integrity">[] = [];
+  const integrity: Finding<"integrity">[] = chainHead(list.sequence, list.previousSha256);
   const pem = listedPem(env.ctx, signature.keyId);
   if (pem !== null && !verifyEd25519(tagged("AMC_REVOCATION_LIST_V1", canonicalize(list)), pem, Buffer.from(signature.signature, "base64"))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify" });

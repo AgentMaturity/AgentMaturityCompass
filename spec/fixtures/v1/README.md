@@ -16,6 +16,7 @@ Every file is JSON (UTF-8), except evidence items, which are raw bytes.
 | --- | --- |
 | `artifact.json` | The record to verify. A receipt is its token as a JSON string. P1-08 records (rotation statements, revocation lists) are in their one canonical encoding. |
 | `trust-list.json` | One signed trust list (P0-09 format) the verifier is given. |
+| `more-trust-lists/<n>.json` | Optional further trust lists, given after `trust-list.json` in name order. |
 | `params.json` | `asOf` (RFC 3339), `trustRoots` (pinned root key ids), optional `rootThreshold` (the pinned m-of-n), optional `expect` (`tenant`, `deployment`, `subject`, `profile`) and optional `knownSequences` (`{ "<id>": <n> }`). |
 | `evidence/<sha256>` | Optional evidence items, each named by the sha256 of its bytes. |
 | `expected.json` | `case`, `normative`, `dimensions` (the six statuses), `reasonCodes` (per dimension, the codes that must be reported) and `exitCode`. |
@@ -32,7 +33,7 @@ not depend on the order in which a verifier checks.
 node packages/verifier/conformance/run.mjs --cmd "<command>" [--fixtures spec/fixtures/v1] [--out conformance-results.json]
 ```
 
-For each case the runner calls `<command> verify artifact.json --trust-list trust-list.json --trust-root <id>...
+For each case the runner calls `<command> verify artifact.json --trust-list trust-list.json [--trust-list more-trust-lists/<n>.json]... --trust-root <id>...
 [--root-threshold <n>] --as-of <asOf> [--expect-<key> <value>]... [--known-sequence <id>=<n>]... [--evidence-dir evidence] --json` and reads a
 verifier report (spec/schemas/v1/verifier-report.schema.json) from standard output: `<dimension>.status` and
 `reasonCodes.<dimension>`. `<command> --version` names the implementation. The command is split on whitespace and run
@@ -40,7 +41,7 @@ without a shell. Results go to `conformance-results.json`:
 
 ```json
 { "suite": "amc-verifier-fixtures", "version": "v1", "implementation": "<name>@<version>",
-  "ranAt": "<RFC 3339>", "passed": 46, "failed": 0,
+  "ranAt": "<RFC 3339>", "passed": 54, "failed": 0,
   "cases": [{ "case": "cross-tenant", "result": "pass", "diff": null }] }
 ```
 

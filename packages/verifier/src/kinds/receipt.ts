@@ -46,7 +46,7 @@ function anchorOf(payload: ReceiptPayload, env: Env, integrity: Finding<"integri
   if (signer === null) return unanchored("no key in the supplied trust lists signed the ledger row");
   const admission = admit({ signature: "ledger row writerSignature", keyId: signer, purpose: "ledger-row" }, env.ctx);
   if (admission.finding) return unanchored(`the ledger row's signer is not admitted for ledger-row (${admission.record.status})`, admission);
-  return { anchoring: { status: "anchored", detail: `ledger row signed by ${signer}, admitted for ledger-row` }, admission, finding: null };
+  return { anchoring: { status: "anchored", detail: `the ledger key ${signer}, admitted for ledger-row, signed this eventHash` }, admission, finding: null };
 }
 
 function completeness(payload: ReceiptPayload, body: ActionReceipt | null, env: Env) {
@@ -88,7 +88,9 @@ export function evaluateReceipt(token: string, env: Env): Evaluation {
     kind: "receipt", integrity, admissions: [admission, ...(anchor.admission ? [anchor.admission] : [])],
     unverifiable: signer === null ? ["receipt: no key in the supplied trust lists made this signature"] : [],
     admissionFindings: anchor.finding ? [anchor.finding] : [], anchoring: anchor.anchoring,
-    claimedAt: Number.isNaN(new Date(payload.ts).getTime()) ? String(payload.ts) : new Date(payload.ts).toISOString(), warnings: [],
+    claimedAt: Number.isNaN(new Date(payload.ts).getTime()) ? String(payload.ts) : new Date(payload.ts).toISOString(),
+    // Until the export carries a portable pre-image (P1-30), a row's other fields cannot be bound to its signed hash.
+    warnings: anchor.anchoring.status === "anchored" ? ["the ledger row is anchored, but only its eventHash is signed: its other fields (ts, eventType, claimKind, payloadSha256) are unauthenticated"] : [],
     scope: () => scopeResult({ subject: payload.agentId }, env.expect),
     freshness: () => {
       const findings: Finding<"freshness">[] = [];

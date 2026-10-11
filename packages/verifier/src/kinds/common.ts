@@ -44,9 +44,15 @@ export function statementTail(env: Env, issuedAt: string, predecessor: string | 
   };
 }
 
+/** P1-08 chains: only the first record (sequence 1) names no predecessor, and every later one names one. */
+export function chainHead(sequence: number, predecessor: string | null): Finding<"integrity">[] {
+  return (predecessor === null) === (sequence === 1) ? []
+    : [{ code: "MALFORMED", detail: `sequence ${sequence} ${predecessor === null ? "names no predecessor" : "is first but names a predecessor"}` }];
+}
+
 /** P1-08 anti-rollback: a sequence below the highest one the verifier's user already saw for this id. */
 export function rollback(id: string, sequence: number, env: Env): Finding<"issuerAdmission">[] {
-  const known = env.ctx.knownSequences[id];
+  const known = Object.hasOwn(env.ctx.knownSequences, id) ? env.ctx.knownSequences[id] : undefined;
   return known !== undefined && sequence < known
     ? [{ code: "ROLLBACK_DETECTED", detail: `${id} has sequence ${sequence}; ${known} is already known` }] : [];
 }
