@@ -8,6 +8,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { getVaultPrivateKeyPem, lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
 import * as vaultCrypto from "../src/vault/vaultCrypto.js";
 import { readBlobKeyMaterial } from "../src/storage/blobs/blobKeys.js";
+import { publicKeyFromPrivate } from "../src/crypto/keyHistoryEnvelope.js";
 
 /**
  * Unlocking an already-unlocked vault must not re-run the passphrase KDF.
@@ -229,10 +230,61 @@ describe("unlocking an already-unlocked vault", () => {
     delete payload.sessionPrivateKeyPem;
     writeFileSync(path, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
     const before = diskState(dir);
-    expect(() => unlockVault(dir, PASS)).toThrow();
+    // A lease.pub with no lease key behind it cannot be checked, and a new lease key would silently replace it.
+    expect(() => unlockVault(dir, PASS)).toThrow(/lease_ed25519\.pub exists, but this older vault holds no lease private key[\s\S]*move/);
     expect(vaultStatus(dir).unlocked).toBe(false);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
     expect(() => getVaultPrivateKeyPem(dir, "monitor")).toThrow(/Vault locked/);
+    expect(diskState(dir)).toEqual(before);
+  });
+
+  it.each(["wrong-passphrase", "replaced", "corrupt"] as const)("a failed unlock (%s) drops the session it found open (P0-30 review)", (failure) => {
+    const dir = workspace(PASS);
+    unlockVault(dir, PASS);
+    const path = vaultPaths(dir).vaultFile;
+    if (failure === "replaced") copyFileSync(vaultPaths(workspace(OTHER_PASS)).vaultFile, path);
+    if (failure === "corrupt") writeFileSync(path, "not a vault");
+    expect(() => unlockVault(dir, failure === "wrong-passphrase" ? OTHER_PASS : PASS)).toThrow(/Vault unlock failed/);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "monitor"), "the old session's keys must not be served").toThrow(/Vault locked/);
+  });
+
+  it("a legacy vault missing only its session key keeps its lease key and unlocks (P0-30 review)", () => {
+    const dir = workspace(PASS);
+    lockVault(dir);
+    const paths = vaultPaths(dir);
+    const payload = JSON.parse(vaultCrypto.decryptVaultPayload(JSON.parse(readFileSync(paths.vaultFile, "utf8")), PASS).toString("utf8"));
+    delete payload.sessionPrivateKeyPem;
+    writeFileSync(paths.vaultFile, JSON.stringify(vaultCrypto.encryptVaultPayload(Buffer.from(JSON.stringify(payload)), PASS)));
+    rmSync(paths.sessionPublic);
+    rmSync(paths.sessionHistory);
+    const leasePublic = readFileSync(paths.leasePublic, "utf8");
+    const leaseHistory = readFileSync(paths.leaseHistory, "utf8");
+
+    unlockVault(dir, PASS);
+    expect(vaultStatus(dir).unlocked).toBe(true);
+    expect(getVaultPrivateKeyPem(dir, "lease")).toBe(payload.leasePrivateKeyPem);
+    expect(readFileSync(paths.leasePublic, "utf8")).toBe(leasePublic);
+    expect(readFileSync(paths.leaseHistory, "utf8")).toBe(leaseHistory);
+    expect(publicKeyFromPrivate(getVaultPrivateKeyPem(dir, "session"))).toBe(readFileSync(paths.sessionPublic, "utf8"));
+    lockVault(dir);
+    unlockVault(dir, PASS);
+    expect(vaultStatus(dir).unlocked).toBe(true);
+  });
+
+  it.each(["missing", "mismatched"] as const)("unlock refuses a vault whose published auditor key is %s, as an interrupted key write leaves it (P0-30 review)", (state) => {
+    const dir = workspace(PASS);
+    lockVault(dir);
+    const paths = vaultPaths(dir);
+    if (state === "missing") rmSync(paths.auditorPublic);
+    else writeFileSync(paths.auditorPublic, readFileSync(vaultPaths(workspace(OTHER_PASS)).auditorPublic));
+    const before = diskState(dir);
+    expect(() => unlockVault(dir, PASS)).toThrow(state === "missing"
+      ? /auditor_ed25519\.pub is missing\. A key write was interrupted/ : /auditor_ed25519\.pub does not match the vault's auditor key/);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => getVaultPrivateKeyPem(dir, "auditor")).toThrow(/Vault locked/);
     expect(diskState(dir)).toEqual(before);
   });
 });

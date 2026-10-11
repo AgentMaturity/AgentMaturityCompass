@@ -311,6 +311,42 @@ export function unlockVault(workspace: string, passphrase?: string): void {
   if (!phrase || phrase.length === 0) {
     throw new Error("Vault unlock requires passphrase (set AMC_VAULT_PASSPHRASE or use `amc vault unlock`).");
   }
+  try {
+    openVaultSession(workspace, phrase);
+  } catch (error) {
+    // No session survives a failed unlock: not a partial payload, and not one opened from an earlier envelope that a
+    // wrong passphrase, a replaced or corrupted file or a key mismatch now refuses (getVaultPrivateKeyPem would serve it).
+    lockVault(workspace);
+    throw error;
+  }
+}
+
+/**
+ * Every key in the vault must match its published public key file before a session opens. persistVault writes the
+ * envelope before the public keys, so an interrupted write (or a replaced .pub) leaves them disagreeing, and signing
+ * would then produce signatures nothing verifies. A vault from before lease and session keys may lack such a key and
+ * its .pub, and unlock adds the key; a .pub with no key behind it is refused, because a new key would replace it.
+ */
+function assertPublishedKeysMatch(workspace: string, payload: VaultPayload): void {
+  const paths = vaultPaths(workspace);
+  for (const kind of KEY_KINDS) {
+    const file = paths[`${kind}Public`];
+    const published = pathExists(file) ? readUtf8(file) : null;
+    const privateKeyPem = payload[`${kind}PrivateKeyPem`];
+    if (!privateKeyPem && (kind === "lease" || kind === "session")) {
+      if (published === null) continue;
+      throw new Error(`Vault unlock refused: ${file} exists, but this older vault holds no ${kind} private key to match it. `
+        + `To let AMC create a new ${kind} key, move ${file} and ${paths[`${kind}History`]} aside; anything signed `
+        + `with the old ${kind} key will then no longer verify. See "When unlock refuses" in docs/VAULT.md.`);
+    }
+    if (published !== publicKeyFromPrivate(privateKeyPem)) {
+      throw new Error(`Vault unlock refused: ${file} ${published === null ? "is missing" : `does not match the vault's ${kind} key`}. `
+        + `A key write was interrupted or the file was replaced. See "When unlock refuses" in docs/VAULT.md.`);
+    }
+  }
+}
+
+function openVaultSession(workspace: string, phrase: string): void {
   const session = sessionFor(workspace);
   const envelopeRaw = readEnvelopeRaw(workspace);
   const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
@@ -328,34 +364,28 @@ export function unlockVault(workspace: string, passphrase?: string): void {
     /* decryption or parse failed — rethrow with user-friendly message */
     throw new Error("Vault unlock failed: incorrect passphrase or corrupted vault.");
   }
+  assertPublishedKeysMatch(workspace, payload);
   let openedDigest: string | null = envelopeDigest;
   if (!payload.leasePrivateKeyPem || !payload.sessionPrivateKeyPem) {
-    const leasePair = generateKeyPairSync("ed25519");
-    const sessionPair = generateKeyPairSync("ed25519");
-    const leasePrivateKeyPem = leasePair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
-    const leasePublicKeyPem = leasePair.publicKey.export({ format: "pem", type: "spki" }).toString();
-    const sessionPrivateKeyPem = sessionPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
-    const sessionPublicKeyPem = sessionPair.publicKey.export({ format: "pem", type: "spki" }).toString();
-    try {
-      createVault({
-        workspace,
-        passphrase: phrase,
-        monitorPrivateKeyPem: payload.monitorPrivateKeyPem,
-        auditorPrivateKeyPem: payload.auditorPrivateKeyPem,
-        leasePrivateKeyPem,
-        sessionPrivateKeyPem,
-        monitorPublicKeyPem: readUtf8(vaultPaths(workspace).monitorPublic),
-        auditorPublicKeyPem: readUtf8(vaultPaths(workspace).auditorPublic),
-        leasePublicKeyPem,
-        sessionPublicKeyPem,
-        secrets: payload.secrets
-      });
-      payload = parseVaultPayload(decryptVaultPayload(readEnvelope(workspace), phrase).toString("utf8"));
-    } catch (error) {
-      // A failed upgrade leaves no session behind: not this partial payload, not one from an older envelope.
-      lockVault(workspace);
-      throw error;
-    }
+    // Add only the keys the vault lacks; a key it already has (and whose .pub matched above) is kept.
+    const keyFor = (kind: "lease" | "session"): string => payload[`${kind}PrivateKeyPem`]
+      || generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+    const leasePrivateKeyPem = keyFor("lease");
+    const sessionPrivateKeyPem = keyFor("session");
+    createVault({
+      workspace,
+      passphrase: phrase,
+      monitorPrivateKeyPem: payload.monitorPrivateKeyPem,
+      auditorPrivateKeyPem: payload.auditorPrivateKeyPem,
+      leasePrivateKeyPem,
+      sessionPrivateKeyPem,
+      monitorPublicKeyPem: publicKeyFromPrivate(payload.monitorPrivateKeyPem),
+      auditorPublicKeyPem: publicKeyFromPrivate(payload.auditorPrivateKeyPem),
+      leasePublicKeyPem: publicKeyFromPrivate(leasePrivateKeyPem),
+      sessionPublicKeyPem: publicKeyFromPrivate(sessionPrivateKeyPem),
+      secrets: payload.secrets
+    });
+    payload = parseVaultPayload(decryptVaultPayload(readEnvelope(workspace), phrase).toString("utf8"));
     openedDigest = null; // createVault replaced the envelope; the next unlock re-derives from the new bytes
   }
   // Publish the session only once its payload is complete.
