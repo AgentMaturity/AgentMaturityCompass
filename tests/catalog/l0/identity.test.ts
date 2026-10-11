@@ -31,8 +31,9 @@ type DrillSetup = { actionClass: ActionClass; mode: string; boundMs: number };
 const leaseIdOf = (token: string): string =>
   (JSON.parse(Buffer.from(token.split(".")[0]!, "base64url").toString("utf8")) as { leaseId: string }).leaseId;
 
-function issue(ws: string, agentId: string, scopes: string[], ttl = "1h"): string {
-  return issueLeaseForCli({ workspace: ws, agentId, ttl, scopes: scopes.join(","), routes: "/", models: "*", rpm: 1000, tpm: 1_000_000 }).token;
+function issue(ws: string, agentId: string, scopes: string[], ttl = "1h", workspaceId?: string): string {
+  return issueLeaseForCli({ workspace: ws, agentId, ttl, scopes: scopes.join(","), routes: "/", models: "*", rpm: 1000, tpm: 1_000_000,
+    ...(workspaceId ? { workspaceId } : {}) }).token;
 }
 
 function compose(ws: string, actionClass: ActionClass, leaseToken: () => string, approve?: ToolApprovalAsker) {
@@ -74,7 +75,9 @@ describe("L0-IDN-02 short-lived scoped credentials (lease check at the authoriza
       const s = f.envelope.setup as unknown as LeaseSetup;
       const ws = newWorkspace();
       const signer = s.lease.state === "signed_by_other_workspace" ? newWorkspace("amc-l0-other-") : ws;
-      const token = issue(signer, s.lease.agentId, s.lease.scopes, s.lease.state === "expired" ? "60s" : "1h");
+      // Signed by this workspace's own lease key, naming another workspace: only the workspace check refuses it (P1-78).
+      const token = issue(signer, s.lease.agentId, s.lease.scopes, s.lease.state === "expired" ? "60s" : "1h",
+        s.lease.state === "names_other_workspace" ? "other-workspace" : undefined);
       if (s.lease.state === "revoked") revokeLease(ws, leaseIdOf(token), "layer0 fixture");
       if (s.lease.state === "expired") {
         vi.useFakeTimers({ toFake: ["Date"] });

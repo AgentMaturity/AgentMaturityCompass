@@ -165,15 +165,16 @@ const LEASE_ERRORS: Record<string, RecheckFailure> = {
 };
 
 /**
- * The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list.
- * Without an action class it checks everything but the class (the effective-policy receipt, P1-67).
+ * The lease, verified with its signature, expiry, agent, workspace, execute scope and classes, and the signed revocation
+ * list. A lease naming another workspace is refused even when this workspace's key signed it (P1-78). Without an action
+ * class it checks everything but the class (the effective-policy receipt, P1-67).
  */
 export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId"> & { readonly actionClass?: ActionClass },
   token: string): { readonly payload: LeasePayload } | Failed {
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
-      actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {

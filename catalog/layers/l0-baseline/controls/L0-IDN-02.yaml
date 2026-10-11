@@ -24,7 +24,7 @@ binding:
   points: [tool_pipeline]
   mechanism: >-
     The authorization stage verifies the call's lease (signature, expiry, revocation list, agent,
-    execute scope and action classes) before the tool body runs.
+    workspace, execute scope and action classes) before the tool body runs.
   parameters: []
   manualDuty: null
 tests:
@@ -47,11 +47,12 @@ tests:
         - L0-IDN-02/negative/expired-lease.json
         - L0-IDN-02/negative/foreign-signer-lease.json
         - L0-IDN-02/negative/other-agent-lease.json
+        - L0-IDN-02/negative/other-workspace-id-lease.json
         - L0-IDN-02/negative/out-of-scope-lease.json
         - L0-IDN-02/negative/revoked-lease.json
     passCriteria: >-
-      A valid lease is allowed; expired, revoked, out-of-scope and foreign-signed leases are refused at
-      the authorization stage with a denied receipt and no tool body run.
+      A valid lease is allowed; expired, revoked, out-of-scope, foreign-signed and other-workspace
+      leases are refused at the authorization stage with a denied receipt and no tool body run.
     attempts: 1
 evidence:
   - id: L0-IDN-02-E1
