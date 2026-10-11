@@ -39,7 +39,7 @@ import {
 } from "./spec/aspire.js";
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
-import { revokeStagingAfterDeny } from "./a4Package.js";
+import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Package.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 
@@ -522,6 +522,8 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     const verdict = decision[2] as "approve" | "deny";
     let revoked: Record<string, unknown> = {};
     return respond(route, projectId, request, () => {
+      // A DENY of the deployment approval owes the staging lease's revocation: refused while it could not be signed.
+      if (verdict === "deny") assertStagingRevocable(store, projectId, gateId);
       const result = recordDecision(store, projectId, { ...callOf(route, request), gateId, decision: verdict, reason: body.reason,
         expectedRequestDigestSha256: body.expectedRequestDigestSha256, expectedGateSeq: body.expectedGateSeq,
         ...(body.expectedReadinessBindingDigest === undefined ? {} : { expectedReadinessBindingDigest: body.expectedReadinessBindingDigest }) });

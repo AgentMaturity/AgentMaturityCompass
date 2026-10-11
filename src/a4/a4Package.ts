@@ -18,7 +18,7 @@ import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, read
 import { dirname, isAbsolute, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
-import { getPublicKeyPem } from "../crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy, signingRoute, verifySignedDigest } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
@@ -772,18 +772,37 @@ export const PRODUCTION_LEASE_EFFECT: A4EffectDef = {
   run: mintProductionLease
 };
 
+/** The staging lease ids a DENY of `gateId` revokes: this cycle's release's, when it is an Activate completion gate; else null. */
+function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[] | null {
+  const requested = chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
+  const release = currentRelease(chain);
+  if (requested?.body.stage !== "activate" || requested.body.gate !== "completion" || release === null) return null;
+  return (Array.isArray(release.body.leases) ? release.body.leases as Array<{ leaseId?: unknown; scope?: unknown }> : [])
+    .filter((lease) => lease.scope === "staging" && typeof lease.leaseId === "string").map((lease) => String(lease.leaseId));
+}
+
+/**
+ * Before a DENY on an Activate completion gate: the revocation it owes is signed with the vault's auditor key (even in
+ * NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused 423 A4_VAULT_LOCKED while that key
+ * cannot be read, never recorded with the staging lease left live.
+ */
+export function assertStagingRevocable(store: A4Store, projectId: string, gateId: string): void {
+  if ((stagingLeasesOf(store.readChain(projectId), gateId) ?? []).length === 0) return;
+  try {
+    getPrivateKeyPem(store.workspace, "auditor");
+  } catch {
+    throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault: denying the deployment approval revokes the release's staging lease, which signs with the auditor key.");
+  }
+}
+
 /**
  * After a DENY on an unconsumed activate.completion gate (recordDecision refuses one on a consumed gate): revokes this
  * cycle's staging lease (design §6.4 step 7). Expiry needs no sweep: a completion gate lives at least a day and is
  * requested after the release, so the staging lease (24 h) has expired by then. Answers what it revoked.
  */
 export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId: string): Record<string, unknown> {
-  const chain = store.readChain(projectId);
-  const requested = chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
-  const release = currentRelease(chain);
-  if (requested?.body.stage !== "activate" || requested.body.gate !== "completion" || release === null) return {};
-  const ids = (Array.isArray(release.body.leases) ? release.body.leases as Array<{ leaseId?: unknown; scope?: unknown }> : [])
-    .filter((lease) => lease.scope === "staging" && typeof lease.leaseId === "string").map((lease) => String(lease.leaseId));
+  const ids = stagingLeasesOf(store.readChain(projectId), gateId);
+  if (ids === null) return {};
   const revoked: string[] = [];
   const failed: string[] = [];
   for (const leaseId of ids) {
