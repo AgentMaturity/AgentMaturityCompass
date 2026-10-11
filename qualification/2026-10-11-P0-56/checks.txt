@@ -33,3 +33,19 @@ check:duplicates exit 0 1s
 check:dead-code exit 0 3s
 check:qualification exit 1 1s
 check:qualification failed only because this receipt.json did not exist yet; after it was written: "Qualification receipts valid: 15 receipt(s) under qualification."
+
+## Run 3 at bcaac341c (after the P0-62 race fix and the P0-57 change; build ran just before)
+typecheck exit 0 38s
+typecheck:tests exit 0 65s
+lint exit 0 4s
+check:counts exit 0 1s
+check:docs-drift exit 0 1s
+check:freeze exit 0 3s
+check:architecture-boundaries exit 0 3s
+check:gates exit 0 0s
+check:schemas exit 0 1s
+check:api-ref exit 0 1s
+check:threat-model exit 0 0s
+check:duplicates exit 0 1s
+check:dead-code exit 0 7s
+check:qualification exit 0 0s

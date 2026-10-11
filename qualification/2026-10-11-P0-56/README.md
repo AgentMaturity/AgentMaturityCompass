@@ -10,12 +10,12 @@ One receipt for the seven follow-ups in `qualification/2026-10-11-P0-31/follow-u
 | Key | Result | Commit |
 |---|---|---|
 | P0-56 | Fixed. The permission refusal is shown, and the run still exits 1. | `5445d3f53` |
-| P0-57 | Fixture part only. 7 of the 8 previously failing tests now pass; 1 is still open (below). | `6903189e2` |
+| P0-57 | Fixture part, plus the 8th test: it now asserts P0-14's strict rule, and Studio names a released session "not finalized". | `6903189e2`, `bcaac341c` |
 | P0-58 | Refusal chosen: JSONL refuses a second session writer up front with `SESSION_STORE_SINGLE_WRITER`. | `94d88a6b9`, `cfb8f87f9` |
 | P0-59 | Fixed. The code is `AMC_NATIVE_BUDGET_REFUSED`. ACP error data and SDK carry it, and Studio shows it. | `200e6647d` |
 | P0-60 | **Not done, Sid's step.** The cause is confirmed; the VM was not changed. | none |
 | P0-61 | Fixed with tests only. All three `1545-*` mutants are killed. | `f4b4a0380` |
-| P0-62 | **Reproduced 4 of 20** on the RC, with two causes, both fixed. On the branch, `amc up --demo` passed in all 18 runs. A separate Studio race is still open (below). | `2a8051425`, `1679dc686`, `8b0a56c86`, `9239cb96f`, `c6d754537` |
+| P0-62 | **Reproduced 4 of 20** on the RC, with two causes, both fixed. A Studio turn-completion race found while validating is also fixed. Final: 20 of 20 consecutive Studio lanes pass. | `2a8051425`, `1679dc686`, `8b0a56c86`, `9239cb96f`, `c6d754537`, `abdaabb2c`, `a207d1606` |
 
 ## P0-56 · credentials-home permission refusal
 
@@ -49,12 +49,15 @@ One receipt for the seven follow-ups in `qualification/2026-10-11-P0-31/follow-u
   - archive refuses active, foreign, stale, unsealed and uncertain tasks
   - archive authenticates evidence again
   - physical workspace alias
-- **Still failing (1):** "real stub turns are committed once, survive release/restart/resume and cold verify", at `tests/studioNativeTaskService.test.ts:129`.
-  - After `release`, `verify` returns `Cold native verification refused this evidence…` (`src/studio/nativeTaskVerdict.ts:37`, `integrityOk: false`). The test expects `UNTRUSTED: …`.
-  - The verifier's reason is `Session … is not closed and sealed; a verified prefix needs a finalized target`.
-  - That rule came with P0-14 (`8c4bc10ec`, 2026-10-11). The test's `UNTRUSTED` expectation came from P0-51 (`ab600164d`, 2026-10-07).
-  - The line was never reached while the fixture failed at `idle()`.
-  - Not fixed here, because the fix is a source decision, not a fixture change. The question to decide: should a released, intact, unsealed session read as "refused this evidence"?
+- **The 8th (`tests/studioNativeTaskService.test.ts:129`), resolved in `bcaac341c`:**
+  - The test verifies a released task. Before this change, Studio reported `Cold native verification refused this evidence…`; the test expected P0-51's `UNTRUSTED`.
+  - P0-14 (`8c4bc10ec`) made Studio's live-scope verifier refuse a target that is not closed and sealed.
+  - **The real flow does not seal on release:** `release` is `releaseWithoutClosing()`, a writer handoff that the same test (and Studio's Resume) resumes from. Sealing on release would break resume.
+  - So the strict rule stands, and the test now asserts it: `failed`, no scope, "not closed and sealed, so it is not finalized".
+  - **The product defect was the message,** which called an intact released session "refused evidence".
+  - `verifyAgentRun` now reports `targetFinalized` and `intactUnlessUnfinalized` from the same read as its chain verdict, in the live scope.
+  - Studio names "not finalized" only when that is the sole failure; any other failure stays an integrity refusal (`tests/nativeTaskVerdict.test.ts`).
+  - **Open (product choice):** should Verify on a released task re-attach and close it first, as "Close and verify" does for an active one? Not done.
 - **Mutation:** moving the home back inside the workspace is the baseline itself (8 failed).
 
 ## P0-58 · JSONL second session writer: refused, typed
@@ -179,28 +182,35 @@ docker --context colima-amc-s7f run --rm -e STEPS=rows -v <stage>:/stage:ro -v <
 | `p0-62-ab-runs.json`, interleaved with `int` (`3f241d5b6`, its own old harness); host load 5–8 | 6 + 6 | branch 6/6, int 6/6 | all 12 pass (13/13) |
 | `p0-62-ab-stress-runs.json`, interleaved under VM CPU stress (4 busy loops) | 3 + 3 | branch 3/3, **int 1/3** (2 × "failed to start in time") | branch 1 pass and 2 browser fails; int 1 pass |
 
-**New finding, not fixed: a Studio turn-completion race.** Every branch browser failure has the same shape: after a turn, `#nativeTaskState` shows `Evidence unavailable` instead of `Ready for another turn`.
+**A Studio turn-completion race, found while validating; fixed in `abdaabb2c`, then hardened after a security review (TOCTOU) in `a207d1606`.** Every earlier branch browser failure had the same shape: after a turn, `#nativeTaskState` showed `Evidence unavailable` instead of `Ready for another turn`.
 
-- **How it was traced:** an instrumented copy of the branch tarball logged the refresh error (`p0-62-studio-projection-diag.txt`). The only error in the failing run was `SessionHistoryRefused: CHANGED: History or trust changed during loading` from `readNativeTaskProjection`.
-- **Where:** `src/studio/nativeTaskService.ts:390-393` (the same code on `int`, lines 385-388).
-  - After `await turn.result`, Studio makes ONE authenticated read.
-  - The workspace store can still be taking appends at that moment, so the read is refused as `CHANGED`.
-  - The work then throws `No new authenticated turn ending`, and the task becomes `failed`.
-  - The page stops polling a task that is no longer running, so it shows the last `unavailable` history.
-- **Why it shows up now:** under load the RC and `int` usually fail earlier, at `amc up --demo` (int 2/3 under stress). With that fixed, the lane reaches this race.
-- **Why it is not fixed here:** it is outside P0-62's `up --demo` defect and needs its own test.
-- **Suggested fix:** retry the read briefly on `CHANGED` before judging the turn, or leave the task to the next poll.
-- This keeps the "20 consecutive Studio lanes pass" form of P0-62's Done-when unmet. The `amc up --demo` defect itself is diagnosed and fixed.
+- **Trace:** an instrumented tarball logged the refresh error (`p0-62-studio-projection-diag.txt`): `SessionHistoryRefused: CHANGED: History or trust changed during loading`. Another writer had appended while Studio's one-shot read ran.
+  - Either Studio judged the turn from that one read and marked it `failed`,
+  - or a poll returned `unavailable` history on a settled task, and the page stopped polling.
+- **The completion signal** is the turn result (the runtime's ACP response after `turn/end` is committed). A turn does not seal its session, which stays open for the next turn.
+- **Fix:**
+  - **Bounded backoff:** after that signal, and before dispatch, Studio retries a `CHANGED` read with backoff from 25 ms to 1 s. It fails closed after 30 s, naming the cause.
+  - **One snapshot per decision:** each read is one complete authenticated snapshot (`readNativeTaskProjection` refuses a read whose files moved). The outcome is taken only from the snapshot that passed.
+  - **Display only:** the last authenticated snapshot is shown meanwhile. Decisions use fresh reads only.
+  - **Compare-and-set:** dispatch proceeds only if the task's state, session and revision are unchanged after the wait; otherwise `TASK_CHANGED`, and nothing is sent. A turn's outcome is written through the descriptor compare-and-set on its revision, before the in-memory state.
+  - **Verify:** finalization and integrity come from the verifier's own read (P0-57 above). A store head that moved across that read now makes verification `failed`. A later read never softens `failed`.
+- **Tests (`tests/studioNativeTaskService.test.ts`), deterministic:** a hook on `fs.lstatSync` for the ledger makes reads see a moving file, or performs a real append mid-read.
+  1. Reads after the turn result meet a moving store, and a poll during it still shows authenticated history. RED before `abdaabb2c`; removing the display retention is killed.
+  2. A writer appends between the pre-verify read and the verifier → `failed`. RED on `abdaabb2c`.
+  3. A release completes the task while its turn waits for settled history → the release wins, `TASK_CHANGED`, no request sent. RED on `abdaabb2c`; removing the compare-and-set is killed.
+- **Related tests:** 188/188 pass in the 17 files covering the service, the verdict and `verifyAgentRun`.
+
+**Final 20 consecutive Studio lanes** (`p0-62-final-runs.json`; tarball and harness at `bcaac341c`; same image and VM): **20 of 20 passed.** Every run had 13/13 scenarios; 160 cold verifiers were valid in total. The Studio step took 91–180 s, with macOS host load 7–19. P0-62's Done-when ("20 consecutive runs pass") is met on this branch.
 
 ## Checks
 
-Full output: `checks.txt`. Final run at `c6d754537` (code unchanged since, apart from this receipt).
+Full output: `checks.txt`. Final run at `bcaac341c` (build, then the rest), all exit 0.
 
 - **All exit 0:**
   - `build`, `typecheck`, `typecheck:tests` and `lint` (lint includes check-no-fabrication)
   - `check:counts`, `docs-drift`, `freeze`, `architecture-boundaries`, `gates`, `schemas`, `api-ref`, `threat-model`
   - `check:duplicates` (new 0) and `check:dead-code` (new 0, after `cfb8f87f9` removed one unused export)
-- **`check:qualification`:** valid, 15 receipts, once this `receipt.json` existed.
+- **`check:qualification`:** valid.
 - **D-15:** `node $SP/needs-snapshot.mjs int` prints `none`.
 - **Tests:** `npx vitest run` on 75 files (every changed test file, plus every test file naming a changed module).
   - Totals: 1021 tests, 991 passed, 19 failed, 11 skipped.
