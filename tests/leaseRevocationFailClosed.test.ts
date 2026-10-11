@@ -171,7 +171,7 @@ describe("a special file in place of the store refuses instead of blocking (P0-3
   test.each([
     { name: "FIFO list", reason: /not a regular file/, apply: (p: Paths) => replace(p.file, fifo) },
     { name: "FIFO anti-rollback anchor", reason: /not a regular file/, apply: (_p: Paths) => replace(highWaterPath(), fifo) },
-    { name: "list symlinked to /dev/zero", reason: /ELOOP/, apply: (p: Paths) => replace(p.file, (path) => symlinkSync("/dev/zero", path)) },
+    { name: "list symlinked to /dev/zero", reason: /symlink/, apply: (p: Paths) => replace(p.file, (path) => symlinkSync("/dev/zero", path)) },
     { name: "list over the size cap", reason: /exceeds/, apply: (p: Paths) => truncateSync(p.file, 64 * 1024 * 1024 + 1) }
   ])("$name: every lease is refused", ({ reason, apply }) => {
     const workspace = newWorkspace();

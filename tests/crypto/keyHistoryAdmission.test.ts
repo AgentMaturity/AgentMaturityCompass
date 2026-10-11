@@ -16,6 +16,7 @@ import { signDigestWithPolicy } from "../../src/crypto/signing/signer.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../../src/ledger/ledgerVerification.js";
 import * as fileOps from "../../src/utils/fs.js";
+import * as containedFs from "../../src/utils/containedFs.js";
 
 const pair = () => {
   const keys = generateKeyPairSync("ed25519");
@@ -207,10 +208,10 @@ describe("authenticated history admission", () => {
   it("a rotation that fails while staging leaves the previous key set in force (P1-08)", () => {
     const paths = vaultPaths(workspace);
     const oldPrivate = getPrivateKeyPem(workspace, "monitor");
-    const write = fileOps.writeFileAtomic;
-    vi.spyOn(fileOps, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
-      if (path === `${paths.monitorHistory}.keyset-staged`) throw new Error("simulated history staging failure");
-      write(path, bytes, mode);
+    const write = containedFs.writeContained;
+    vi.spyOn(containedFs, "writeContained").mockImplementation((root, rel, bytes, mode) => {
+      if (rel === ".amc/keys/monitor_history.json.keyset-staged") throw new Error("simulated history staging failure");
+      write(root, rel, bytes, mode);
     });
     expect(() => rotateMonitorKeyInVault(workspace, "amc-test-passphrase")).toThrow(/simulated/);
     vi.restoreAllMocks();

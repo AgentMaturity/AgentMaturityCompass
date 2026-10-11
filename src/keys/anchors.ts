@@ -4,9 +4,9 @@
  * list, rotation statement and key-history revision is appended as `<id>#<sequence>`. The log lives in the workspace,
  * so it is not independent of a workspace writer; P1-26 anchors it publicly.
  */
-import { appendTransparencyEntry, transparencyLogPath } from "../transparency/logChain.js";
+import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { transparencyEntrySchema, type TransparencyArtifactKind } from "../transparency/logSchema.js";
-import { pathExists, readUtf8 } from "../utils/fs.js";
+import { readContainedOrNull } from "../utils/containedFs.js";
 import {
   AntiRollbackError, compareHighWater, highWaterKey, readHighWater, recordHighWater, workspaceScope, type HighWaterKind
 } from "./highWater.js";
@@ -39,11 +39,11 @@ function markKey(target: Pick<AnchorTarget, "workspace" | "type" | "id">): strin
 
 /** The highest sequence the workspace transparency log records for `id`, with its sha256. A matching line that does not parse throws. */
 export function loggedAnchor(workspace: string, type: AnchorType, id: string): { sequence: number; sha256: string; entryHash: string } | null {
-  const path = transparencyLogPath(workspace);
-  if (!pathExists(path)) return null;
+  const log = readContainedOrNull(workspace, ".amc/transparency/log.jsonl", 2 * 1024 * 1024 * 1024 - 1);
+  if (log === null) return null;
   const prefix = `${id}#`;
   let best: { sequence: number; sha256: string; entryHash: string } | null = null;
-  for (const line of readUtf8(path).split("\n")) {
+  for (const line of log.toString("utf8").split("\n")) {
     if (!line.includes(type) || !line.includes(prefix)) continue;
     const entry = transparencyEntrySchema.parse(JSON.parse(line));
     if (entry.type !== type || entry.artifact.id === undefined || !entry.artifact.id.startsWith(prefix)) continue;

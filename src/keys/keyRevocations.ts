@@ -5,10 +5,9 @@
  * an unreadable, unverifiable, rolled-back or forked list refuses every key, and a revoked current key refuses itself.
  * Verification trusts the revocation-list key history read from the public files, never a key the list names.
  */
-import { statSync } from "node:fs";
 import { join } from "node:path";
 import { verifyKeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
-import { pathExists, readUtf8 } from "../utils/fs.js";
+import { containedExists, readContainedOrNull, statStamp } from "../utils/containedFs.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { assertNeverAnchored } from "./anchors.js";
 import { highWaterPath } from "./highWater.js";
@@ -22,28 +21,26 @@ function keysDir(workspace: string): string {
   return join(workspace, ".amc", "keys");
 }
 
+const LIST_REL = ".amc/keys/revocations.signed.json";
+const keyFile = (workspace: string, name: string) => readContainedOrNull(workspace, `.amc/keys/${name}`, 1024 * 1024)?.toString("utf8") ?? null;
+
 /** The revocation-list key history from the public files; a history that does not authenticate trusts only the current key. */
 function trustedRevocationKeys(workspace: string): string[] {
-  const dir = keysDir(workspace);
-  if (!pathExists(join(dir, "revocation-list.pub"))) throw new Error("revocation-list.pub is missing; the key revocation list cannot be verified");
-  const current = readUtf8(join(dir, "revocation-list.pub"));
+  const current = keyFile(workspace, "revocation-list.pub");
+  if (current === null) throw new Error("revocation-list.pub is missing; the key revocation list cannot be verified");
   let history: string[] = [];
   try {
-    history = verifyKeyHistoryEnvelope(JSON.parse(readUtf8(join(dir, "revocation-list_history.json"))), "revocation-list", current).envelope?.entries.map(entry => entry.publicKeyPem) ?? [];
+    history = verifyKeyHistoryEnvelope(JSON.parse(keyFile(workspace, "revocation-list_history.json") ?? "null"), "revocation-list", current).envelope?.entries.map(entry => entry.publicKeyPem) ?? [];
   } catch { /* an unauthenticated history adds no keys */ }
   return [...new Set([...history, current])];
 }
 
 /** Where the list lives; `trusted` overrides the keys read from the public files (a writer that holds them already). */
 export function keyRevocationLocation(workspace: string, trusted?: readonly string[]): AnchoredListLocation {
-  return { workspace, path: join(keysDir(workspace), "revocations.signed.json"), listId: `keys:${workspaceIdFromDirectory(workspace)}`,
-    trustedPublicKeyPems: trusted ?? trustedRevocationKeys(workspace) };
+  return { workspace, rel: LIST_REL, listId: `keys:${workspaceIdFromDirectory(workspace)}`, trustedPublicKeyPems: trusted ?? trustedRevocationKeys(workspace) };
 }
 
 const memo = new Map<string, { stamp: string; rows: KeyRevocation[] }>();
-function stamp(paths: readonly string[]): string {
-  return paths.map(path => { try { const s = statSync(path); return `${s.ino}:${s.size}:${s.mtimeMs}`; } catch { return "-"; } }).join("|");
-}
 
 /**
  * The workspace's key revocations from one verified, rollback-checked read. `required` (the workspace has a key set):
@@ -51,10 +48,10 @@ function stamp(paths: readonly string[]): string {
  */
 export function readKeyRevocations(workspace: string, required: boolean): KeyRevocation[] {
   const path = join(keysDir(workspace), "revocations.signed.json");
-  const now = stamp([path, `${path}.pending`, highWaterPath()]);
+  const now = statStamp([path, `${path}.pending`, highWaterPath()]);
   const cached = memo.get(workspace);
   if (cached && cached.stamp === now) return cached.rows;
-  if (!pathExists(path)) {
+  if (!containedExists(workspace, LIST_REL)) {
     if (required) throw new Error(`the workspace key revocation list ${path} is missing; refusing every key until it is restored`);
     // No key set either: a list is absent only if neither anchor ever recorded one.
     assertNeverAnchored(workspace, "REVOCATION_LIST", `keys:${workspaceIdFromDirectory(workspace)}`);
@@ -64,7 +61,7 @@ export function readKeyRevocations(workspace: string, required: boolean): KeyRev
   const signed = readAnchoredRevocationList(location)!;
   // A staged next list (a write in progress, or one a crash interrupted) must verify, and its rows count too: in the
   // conservative direction, any revocation observed is enforced until the next writer completes or discards it.
-  const staged = pathExists(`${path}.pending`) ? readStagedRevocationList(location) : null;
+  const staged = readStagedRevocationList(location);
   const rows = [...signed.list.revoked, ...(staged?.list.revoked ?? [])].filter(row => row.kind === "key").map(row => ({
     keyId: row.id, revokedAt: row.revokedAt,
     reason: KEY_REVOCATION_REASONS.find(reason => row.reason.startsWith(`${reason}:`)) ?? "unspecified"

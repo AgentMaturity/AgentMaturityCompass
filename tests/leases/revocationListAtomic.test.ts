@@ -9,7 +9,7 @@ import {
   leaseRevocationPaths, loadLeaseRevocations, readVerifiedLeaseRevocations, revokeLease, revokedLeaseIdSet, verifyLeaseRevocationsSignature
 } from "../../src/leases/leaseStore.js";
 import * as transparency from "../../src/transparency/logChain.js";
-import * as fileOps from "../../src/utils/fs.js";
+import * as containedFs from "../../src/utils/containedFs.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
@@ -86,10 +86,10 @@ describe("single-file signed lease revocations (P1-08)", () => {
     const root = workspace();
     const paths = leaseRevocationPaths(root);
     revokeLease(root, "lease-a", "first");
-    const write = fileOps.writeFileAtomic;
-    const crashOn = vi.spyOn(fileOps, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
-      if (path === paths.file) throw new Error("simulated crash before the final rename");
-      write(path, bytes, mode);
+    const write = containedFs.writeContained;
+    const crashOn = vi.spyOn(containedFs, "writeContained").mockImplementation((root, rel, bytes, mode) => {
+      if (join(root, rel) === paths.file) throw new Error("simulated crash before the final rename");
+      write(root, rel, bytes, mode);
     });
     expect(() => revokeLease(root, "lease-b", "crashes after its log entry")).toThrow(/simulated/);
     crashOn.mockRestore();

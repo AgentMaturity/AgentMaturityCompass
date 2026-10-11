@@ -11,6 +11,7 @@ import { assertKeysetComplete, commitKeyset, type KeysetWrite } from "../keys/ke
 import { machineMark } from "../keys/anchors.js";
 import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
+import { containedExists } from "../utils/containedFs.js";
 import { canonicalize } from "../utils/json.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
@@ -256,10 +257,10 @@ function publicKeyWrites(workspace: string, payload: VaultPayload, existingVault
 function emptyKeyRevocationList(workspace: string, payload: VaultPayload): KeysetWrite[] {
   const location = keyRevocationLocation(workspace, []);
   const key = payload.keys["revocation-list"];
-  if (pathExists(location.path) || !key) return [];
+  if (containedExists(workspace, location.rel) || !key) return [];
   const sequence = (machineMark(workspace, "REVOCATION_LIST", location.listId)?.sequence ?? 0) + 1;
   const list = { type: "amc.revocation-list" as const, version: 1 as const, listId: location.listId, sequence, previousSha256: null, issuedAt: new Date().toISOString(), revoked: [] };
-  return [{ path: location.path, bytes: encodeSignedRevocationList(signRevocationList(list, key.privateKeyPem)), mode: 0o644 }];
+  return [{ path: join(workspace, location.rel), bytes: encodeSignedRevocationList(signRevocationList(list, key.privateKeyPem)), mode: 0o644 }];
 }
 
 /** Publishes a whole vault (new, migrated or upgraded) as one key-set generation. */

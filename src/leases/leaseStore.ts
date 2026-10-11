@@ -1,4 +1,3 @@
-import { rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { assertNeverAnchored, loggedAnchor } from "../keys/anchors.js";
@@ -7,7 +6,7 @@ import {
   revocationListSchema, revocationListSha256, type AnchoredListLocation, type RevocationListV1, type SignedRevocationList
 } from "../keys/revocationList.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { pathExists, readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
+import { containedExists, ensureContainedDir, readContained, readContainedOrNull, removeContained, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { leaseRevocationsSchema, type LeaseRevocations } from "./leaseSchema.js";
@@ -50,8 +49,19 @@ function trustedKeys(workspace: string): string[] {
   return getPublicKeyHistory(workspace, "auditor");
 }
 
+// Every store file is reached through src/utils/containedFs.ts: real directories below the workspace, no symlink,
+// special file or hard link in a file's place.
+const LEASES = ".amc/studio/leases";
+const REL = {
+  file: `${LEASES}/revocations.signed.json`,
+  pending: `${LEASES}/revocations.signed.json.pending`,
+  legacyFile: `${LEASES}/revocations.json`,
+  legacySig: `${LEASES}/revocations.json.sig`
+} as const;
+const has = (workspace: string, which: keyof typeof REL) => containedExists(workspace, REL[which]);
+
 function location(workspace: string): AnchoredListLocation {
-  return { workspace, path: leaseRevocationPaths(workspace).file, listId: listIdFor(workspace), trustedPublicKeyPems: trustedKeys(workspace) };
+  return { workspace, rel: REL.file, listId: listIdFor(workspace), trustedPublicKeyPems: trustedKeys(workspace) };
 }
 
 function defaultLeaseRevocations(): LeaseRevocations {
@@ -74,11 +84,10 @@ type Current =
 
 /** The 1.x pair, verified and parsed from one read of the list; a tombstone or partial pair throws. */
 function readLegacyPair(workspace: string): { store: LeaseRevocations; digest: string } {
-  const paths = leaseRevocationPaths(workspace);
-  if (!pathExists(paths.legacyFile)) throw new Error("revocation list missing but signature present");
-  if (!pathExists(paths.legacySig)) throw new Error("revocation signature missing");
-  const bytes = readRegularFileNoFollow(paths.legacyFile, MAX_LIST_BYTES);
-  const signed = JSON.parse(readRegularFileNoFollow(paths.legacySig, MAX_SIG_BYTES).toString("utf8")) as LegacySignedDigest;
+  if (!has(workspace, "legacyFile")) throw new Error("revocation list missing but signature present");
+  if (!has(workspace, "legacySig")) throw new Error("revocation signature missing");
+  const bytes = readContained(workspace, REL.legacyFile, MAX_LIST_BYTES);
+  const signed = JSON.parse(readContained(workspace, REL.legacySig, MAX_SIG_BYTES).toString("utf8")) as LegacySignedDigest;
   const digest = sha256Hex(bytes);
   if (signed.digestSha256 !== digest) throw new Error("digest mismatch");
   if (!verifyHexDigestAny(digest, signed.signature, trustedKeys(workspace))) throw new Error("signature verification failed");
@@ -87,21 +96,19 @@ function readLegacyPair(workspace: string): { store: LeaseRevocations; digest: s
 
 /** One verified read; the caller holds the revocations lock or has seen no interrupted write. Throws the reason. */
 function readCurrent(workspace: string): Current {
-  const paths = leaseRevocationPaths(workspace);
-  if (pathExists(paths.file)) return { kind: "signed", signed: readAnchoredRevocationList(location(workspace))! };
+  if (has(workspace, "file")) return { kind: "signed", signed: readAnchoredRevocationList(location(workspace))! };
   // No signed list: the 1.x pair, or nothing, may stand only if no signed list was ever anchored.
   assertNeverAnchored(workspace, ANCHOR, listIdFor(workspace));
-  if (pathExists(paths.legacyFile) || pathExists(paths.legacySig)) return { kind: "legacy", ...readLegacyPair(workspace) };
+  if (has(workspace, "legacyFile") || has(workspace, "legacySig")) return { kind: "legacy", ...readLegacyPair(workspace) };
   return { kind: "empty" };
 }
 
 /** Publishes the next list, then replaces a superseded 1.x pair with a tombstone. Caller holds the revocations lock. */
 function publishLocked(workspace: string, list: RevocationListV1): SignedRevocationList {
-  const paths = leaseRevocationPaths(workspace);
   const published = publishRevocationList(location(workspace), list, getPrivateKeyPem(workspace, "auditor"));
-  if (pathExists(paths.legacyFile) || pathExists(paths.legacySig)) {
-    writeFileAtomic(paths.legacySig, JSON.stringify({ type: "amc.revocation-list-moved", to: "revocations.signed.json", previousSha256: list.previousSha256 }), 0o644);
-    rmSync(paths.legacyFile, { force: true });
+  if (has(workspace, "legacyFile") || has(workspace, "legacySig")) {
+    writeContained(workspace, REL.legacySig, JSON.stringify({ type: "amc.revocation-list-moved", to: "revocations.signed.json", previousSha256: list.previousSha256 }), 0o644);
+    removeContained(workspace, REL.legacyFile);
   }
   return published;
 }
@@ -125,6 +132,7 @@ function currentRows(current: Current): RevocationListV1["revoked"] {
 }
 
 function withRevocationsLock<T>(workspace: string, operation: () => T): T {
+  ensureContainedDir(workspace, LEASES);
   return withControlFileLock({ root: dirname(leaseRevocationPaths(workspace).file), name: "revocations", operation: () => {
     recoverPendingRevocationList(location(workspace));
     return operation();
@@ -133,13 +141,10 @@ function withRevocationsLock<T>(workspace: string, operation: () => T): T {
 
 /** The current store, unverified, in the 1.x shape. Decisions use readVerifiedLeaseRevocations. */
 export function loadLeaseRevocations(workspace: string): LeaseRevocations {
-  const paths = leaseRevocationPaths(workspace);
-  if (pathExists(paths.file)) {
-    const parsed = JSON.parse(readRegularFileNoFollow(paths.file, MAX_LIST_BYTES).toString("utf8")) as { list?: unknown } | null;
-    return legacyView(revocationListSchema.parse(parsed?.list));
-  }
-  if (!pathExists(paths.legacyFile)) return defaultLeaseRevocations();
-  return leaseRevocationsSchema.parse(JSON.parse(readRegularFileNoFollow(paths.legacyFile, MAX_LIST_BYTES).toString("utf8")) as unknown);
+  const signed = readContainedOrNull(workspace, REL.file, MAX_LIST_BYTES);
+  if (signed !== null) return legacyView(revocationListSchema.parse((JSON.parse(signed.toString("utf8")) as { list?: unknown } | null)?.list));
+  const legacy = readContainedOrNull(workspace, REL.legacyFile, MAX_LIST_BYTES);
+  return legacy === null ? defaultLeaseRevocations() : leaseRevocationsSchema.parse(JSON.parse(legacy.toString("utf8")) as unknown);
 }
 
 /**
@@ -148,9 +153,8 @@ export function loadLeaseRevocations(workspace: string): LeaseRevocations {
  * published.
  */
 export function bootstrapLeaseRevocations(workspace: string): boolean {
-  const paths = leaseRevocationPaths(workspace);
   return withRevocationsLock(workspace, () => {
-    if ([paths.file, paths.legacyFile, paths.legacySig].some(pathExists)) return false;
+    if (has(workspace, "file") || has(workspace, "legacyFile") || has(workspace, "legacySig")) return false;
     assertNeverAnchored(workspace, ANCHOR, listIdFor(workspace));
     publishLocked(workspace, nextList(workspace, null, []));
     return true;
@@ -167,15 +171,15 @@ export function signLeaseRevocations(workspace: string, reviewedDigestSha256: st
   const paths = leaseRevocationPaths(workspace);
   const reviewed = reviewedDigestSha256.trim().toLowerCase();
   return withRevocationsLock(workspace, () => {
-    const target = pathExists(paths.file) ? paths.file : pathExists(paths.legacyFile) ? paths.legacyFile : null;
+    const target = has(workspace, "file") ? REL.file : has(workspace, "legacyFile") ? REL.legacyFile : null;
     if (target === null) throw new Error("revocation list missing; restore the reviewed list before re-signing. Nothing was signed.");
-    const bytes = readRegularFileNoFollow(target, MAX_LIST_BYTES);
+    const bytes = readContained(workspace, target, MAX_LIST_BYTES);
     const digest = sha256Hex(bytes);
     if (digest !== reviewed) {
       throw new Error(`revocation list sha256 is ${digest}, not the reviewed ${reviewedDigestSha256}; nothing was signed. Review the current list again.`);
     }
     const listId = listIdFor(workspace);
-    if (target === paths.legacyFile) {
+    if (target === REL.legacyFile) {
       const parsed = leaseRevocationsSchema.safeParse(JSON.parse(bytes.toString("utf8")));
       if (!parsed.success) throw new Error("revocation list does not match the revocation schema; nothing was signed");
       assertNeverAnchored(workspace, ANCHOR, listId);
@@ -196,12 +200,12 @@ export function signLeaseRevocations(workspace: string, reviewedDigestSha256: st
 }
 
 export function verifyLeaseRevocationsSignature(workspace: string): { valid: boolean; signatureExists: boolean; reason: string | null } {
-  const paths = leaseRevocationPaths(workspace);
-  const signatureExists = [paths.file, paths.legacyFile, paths.legacySig, paths.pending].some(pathExists);
+  let signatureExists = true; // something unreadable in a store file's place still is a store
+  try { signatureExists = (["file", "legacyFile", "legacySig", "pending"] as const).some(which => has(workspace, which)); } catch { /* refused by the read below */ }
   const read = readVerifiedLeaseRevocations(workspace);
   if (!read.ok) return { valid: false, signatureExists, reason: read.reason };
   // A 1.x pair restored beside the signed list is ignored for every decision, and said here.
-  const stale = pathExists(paths.file) && pathExists(paths.legacyFile);
+  const stale = has(workspace, "file") && has(workspace, "legacyFile");
   return { valid: true, signatureExists, reason: stale ? "a superseded revocations.json pair is present and ignored" : null };
 }
 
@@ -231,8 +235,7 @@ export function revokeLease(workspace: string, leaseId: string, reason: string, 
 /** The store from ONE verified read, in the 1.x shape, or why that failed. */
 export function readVerifiedLeaseRevocations(workspace: string): { ok: true; store: LeaseRevocations } | { ok: false; reason: string } {
   try {
-    const paths = leaseRevocationPaths(workspace);
-    const current = pathExists(paths.pending) ? withRevocationsLock(workspace, () => readCurrent(workspace)) : readCurrent(workspace);
+    const current = has(workspace, "pending") ? withRevocationsLock(workspace, () => readCurrent(workspace)) : readCurrent(workspace);
     return { ok: true, store: current.kind === "signed" ? legacyView(current.signed.list) : current.kind === "legacy" ? current.store : defaultLeaseRevocations() };
   } catch (error) {
     return { ok: false, reason: error instanceof Error ? error.message : String(error) };

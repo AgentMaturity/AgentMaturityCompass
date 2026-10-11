@@ -1,5 +1,4 @@
 import { generateKeyPairSync } from "node:crypto";
-import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { highWaterPath } from "../../src/keys/highWater.js";
 import { keysetPaths } from "../../src/keys/keyset.js";
@@ -147,7 +146,7 @@ describe("key use refuses revoked keys and unreadable revocation state (P1-08, s
   it("refuses a current key the signed key revocation list names, at use time", () => {
     const root = workspace();
     expect(getSigningKey(root, "artifact-seal")).toBeTruthy();
-    const location = { workspace: root, path: keysList(root), listId: "keys:default", trustedPublicKeyPems: getPurposeKeyHistory(root, "revocation-list") };
+    const location = { workspace: root, rel: ".amc/keys/revocations.signed.json", listId: "keys:default", trustedPublicKeyPems: getPurposeKeyHistory(root, "revocation-list") };
     const current = readAnchoredRevocationList(location)!;
     const keyId = ed25519KeyId(getSigningPublicKeyPem(root, "artifact-seal"))!;
     // A validly signed newer list naming the key in use (written directly; amc keys revoke refuses a key in use).
@@ -166,7 +165,7 @@ describe("key use refuses revoked keys and unreadable revocation state (P1-08, s
       body.list.revoked = [];
       writeFileSync(keysList(root), JSON.stringify(body));
     }],
-    ["replaced by a FIFO", (root: string) => { rmSync(keysList(root)); execFileSync("mkfifo", [keysList(root)]); }],
+    ["replaced by a directory", (root: string) => { rmSync(keysList(root)); mkdirSync(keysList(root)); }],
     ["unparseable", (root: string) => writeFileSync(keysList(root), "{")]
   ])("refuses every key use when the key revocation list is %s", (_name, damage) => {
     const { root } = revokedRotation();
@@ -191,11 +190,11 @@ describe("key use refuses revoked keys and unreadable revocation state (P1-08, s
     expect(getSigningKey(root, "artifact-seal")).toBeTruthy();
     const path = highWaterPath();
     rmSync(path);
-    execFileSync("mkfifo", [path]);
+    mkdirSync(path);
     try {
       expect(() => getSigningKey(root, "artifact-seal")).toThrow(/anti-rollback state/);
     } finally {
-      rmSync(path, { force: true });
+      rmSync(path, { recursive: true, force: true });
     }
   });
 });

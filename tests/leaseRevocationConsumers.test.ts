@@ -35,7 +35,8 @@ const afterVerify = vi.hoisted(() => ({ next: null as null | { digest: string; r
 vi.mock("../src/keys/revocationList.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../src/keys/revocationList.js")>();
   return { ...actual, readAnchoredRevocationList: (location: Parameters<typeof actual.readAnchoredRevocationList>[0]) => {
-    const bytes = existsSync(location.path) ? readFileSync(location.path) : null;
+    const path = join(location.workspace, location.rel);
+    const bytes = existsSync(path) ? readFileSync(path) : null;
     const signed = actual.readAnchoredRevocationList(location);
     const hook = afterVerify.next;
     if (bytes !== null && hook?.digest === sha256Hex(bytes)) { afterVerify.next = null; hook.run(); }

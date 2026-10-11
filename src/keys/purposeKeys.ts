@@ -10,13 +10,12 @@
  * history revision is appended to the transparency log and raises this machine's marks.
  */
 import { generateKeyPairSync, sign, verify } from "node:crypto";
-import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { buildKeyHistoryEntry, type KeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
 import { ed25519KeyId } from "../trust/trustList.js";
-import { pathExists, readRegularFileNoFollow, readUtf8 } from "../utils/fs.js";
+import { listContainedDir, readContained, readContainedOrNull } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
@@ -30,7 +29,7 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertNeverAnchored, assertNotRolledBack, logSequence, machineMark, markSequence } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
-import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFilePath, keysetPaths, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFileRel, keysetPaths, resumeKeyset, type KeysetWrite } from "./keyset.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
@@ -54,25 +53,32 @@ export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
   return getVaultPurposeKeyPem(workspace, assertLocal(purpose));
 }
 
+const KEY_FILE_BYTES = 1024 * 1024;
+/** A key file under `.amc/keys`, read through src/utils/containedFs.ts (no symlink, special file or hard link). */
+const keyFile = (workspace: string, name: string): string | null => readContainedOrNull(workspace, keysetFileRel(`keys/${name}`), KEY_FILE_BYTES)?.toString("utf8") ?? null;
+
 /** The purpose's current public key: `<purpose>.pub`, or its role's key in a workspace not yet migrated. */
 export function getSigningPublicKeyPem(workspace: string, purpose: KeyPurpose): string {
   const local = assertLocal(purpose);
   assertNoPendingKeyset(workspace);
-  const { publicFile } = purposeKeyPaths(workspace, local);
-  if (pathExists(publicFile)) return readUtf8(publicFile);
+  const own = keyFile(workspace, `${local}.pub`);
+  if (own !== null) return own;
   // A workspace with a key set always has purpose files: never fall back to the wider role key there.
-  if (keysetDeclared(workspace)) throw new Error(`${publicFile} is missing from a workspace with a key set; refusing to fall back to the ${roleOfPurpose(local)} role key`);
-  return readUtf8(vaultPaths(workspace)[`${roleOfPurpose(local)}Public`]);
+  if (keysetDeclared(workspace)) throw new Error(`${purposeKeyPaths(workspace, local).publicFile} is missing from a workspace with a key set; refusing to fall back to the ${roleOfPurpose(local)} role key`);
+  const role = keyFile(workspace, `${roleOfPurpose(local)}_ed25519.pub`);
+  if (role === null) throw new Error(`Missing public key: ${vaultPaths(workspace)[`${roleOfPurpose(local)}Public`]}`);
+  return role;
 }
 
-function readHistory(workspace: string, subject: KeyHistorySubject, file: string, currentPublicPem: string): KeyHistoryEnvelope | null {
-  if (!pathExists(file)) return null;
+function readHistory(workspace: string, subject: KeyHistorySubject, currentPublicPem: string): KeyHistoryEnvelope | null {
   try {
-    const envelope = verifyKeyHistoryEnvelope(JSON.parse(readUtf8(file)), subject, currentPublicPem).envelope;
+    const raw = keyFile(workspace, `${subject}_history.json`);
+    if (raw === null) return null;
+    const envelope = verifyKeyHistoryEnvelope(JSON.parse(raw), subject, currentPublicPem).envelope;
     if (envelope) checkHighWater(keyHistoryMarkKey(workspace, subject), envelope.revision, sha256Hex(canonicalize(envelope)));
     return envelope;
   } catch {
-    return null;
+    return null; // an unreadable, unauthenticated or rolled-back history admits no older key (fail closed)
   }
 }
 
@@ -80,11 +86,9 @@ function readHistory(workspace: string, subject: KeyHistorySubject, file: string
 export function getPurposeKeyHistory(workspace: string, purpose: KeyPurpose): string[] {
   const local = assertLocal(purpose);
   const current = getSigningPublicKeyPem(workspace, local);
-  const { publicFile, historyFile } = purposeKeyPaths(workspace, local);
   const role = roleOfPurpose(local);
-  const subject: KeyHistorySubject = pathExists(publicFile) && local !== "lease" && local !== "session" ? local : role;
-  const file = subject === role ? vaultPaths(workspace)[`${role}History`] : historyFile;
-  const history = readHistory(workspace, subject, file, subject === role ? readUtf8(vaultPaths(workspace)[`${role}Public`]) : current);
+  const own = keyFile(workspace, `${local}.pub`) !== null && local !== "lease" && local !== "session";
+  const history = own ? readHistory(workspace, local, current) : readHistory(workspace, role, keyFile(workspace, `${role}_ed25519.pub`) ?? current);
   return [...new Set([...(history?.entries.map(entry => entry.publicKeyPem) ?? []), current])];
 }
 
@@ -92,14 +96,12 @@ function statementDir(workspace: string, purpose: LocalPurpose): string {
   return join(vaultPaths(workspace).keysDir, "statements", purpose);
 }
 
-/** The purpose's statements in sequence order, as stored (canonical bytes). */
+/** The purpose's statements in sequence order, as stored (canonical bytes), each read through the contained helpers. */
 function readStatements(workspace: string, purpose: LocalPurpose): Buffer[] {
-  const dir = statementDir(workspace, purpose);
-  if (!pathExists(dir)) return [];
-  const sequences = readdirSync(dir).flatMap(name => /^[1-9][0-9]{0,15}\.json$/.test(name) ? [Number(name.slice(0, -5))] : []).sort((a, b) => a - b);
+  const sequences = listContainedDir(workspace, `.amc/keys/statements/${purpose}`)
+    .flatMap(name => /^[1-9][0-9]{0,15}\.json$/.test(name) ? [Number(name.slice(0, -5))] : []).sort((a, b) => a - b);
   sequences.forEach((sequence, index) => { if (sequence !== index + 1) throw new Error(`${purpose} rotation statements have a gap before sequence ${sequence}`); });
-  // Each path is allowlisted and checked for symlinked directories before it is read.
-  return sequences.map(sequence => readRegularFileNoFollow(keysetFilePath(workspace, `keys/statements/${purpose}/${sequence}.json`), 64 * 1024));
+  return sequences.map(sequence => readContained(workspace, keysetFileRel(`keys/statements/${purpose}/${sequence}.json`), 64 * 1024));
 }
 
 /** The last statement of a purpose's chain, checked against both anchors so an older chain head is refused. */
@@ -138,8 +140,8 @@ function rebuiltEntries(entries: readonly KeyHistoryEntry[], drop: ReadonlySet<s
   return out;
 }
 
-function authenticated(workspace: string, subject: KeyHistorySubject, file: string, currentPublicPem: string): KeyHistoryEnvelope {
-  const envelope = readHistory(workspace, subject, file, currentPublicPem);
+function authenticated(workspace: string, subject: KeyHistorySubject, currentPublicPem: string): KeyHistoryEnvelope {
+  const envelope = readHistory(workspace, subject, currentPublicPem);
   if (!envelope) throw new Error(`${subject} key history is not authenticated; explicitly migrate reviewed history before rotating`);
   return envelope;
 }
@@ -232,7 +234,7 @@ function resignedKeyRevocations(workspace: string, after: VaultPayloadV2): { wri
   if (current === null && keysetDeclared(workspace)) throw new Error("the workspace key revocation list is missing; restore it before rotating the revocation-list key");
   const list = nextRevocationList(location.listId, current ? { sequence: current.list.sequence, sha256: revocationListSha256(current.list) } : null, current?.list.revoked ?? [], 0);
   const bytes = encodeSignedRevocationList(signRevocationList(list, after.keys["revocation-list"]!.privateKeyPem));
-  return { write: { path: location.path, bytes, mode: 0o644 },
+  return { write: { path: join(workspace, location.rel), bytes, mode: 0o644 },
     anchor: { workspace, type: "REVOCATION_LIST", id: location.listId, sequence: list.sequence, sha256: revocationListSha256(list), fileSha256: sha256Hex(bytes) } };
 }
 
@@ -248,13 +250,13 @@ function rotationWrites(workspace: string, before: VaultPayloadV2, after: VaultP
     const { publicFile, historyFile } = purposeKeyPaths(workspace, purpose);
     writes.push({ path: publicFile, bytes: pem(after, purpose), mode: 0o644 });
     if (purpose === "lease" || purpose === "session") continue; // their history is the role history, rewritten below
-    const prior = authenticated(workspace, purpose, historyFile, pem(before, purpose));
+    const prior = authenticated(workspace, purpose, pem(before, purpose));
     const entries = rebuiltEntries(prior.entries, compromised, [pem(after, purpose)]);
     writes.push({ path: historyFile, bytes: JSON.stringify(sealKeyHistory(purpose, entries, after.keys[purpose]!.privateKeyPem, prior.revision + 1), null, 2), mode: 0o600 });
   }
   for (const role of new Set([...targets].map(roleOfPurpose))) {
     const primary = ROLE_PRIMARY_PURPOSE[role as VaultKeyKind];
-    const prior = authenticated(workspace, role, paths[`${role}History`], pem(before, primary));
+    const prior = authenticated(workspace, role, pem(before, primary));
     const added = LOCAL_PURPOSES.filter(purpose => targets.has(purpose) && roleOfPurpose(purpose) === role).map(purpose => pem(after, purpose));
     const entries = rebuiltEntries(prior.entries, compromised, added);
     writes.push({ path: paths[`${role}Public`], bytes: pem(after, primary), mode: 0o644 });

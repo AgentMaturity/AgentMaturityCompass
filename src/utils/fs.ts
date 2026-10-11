@@ -1,5 +1,5 @@
-import { chmodSync, closeSync, constants, existsSync, fstatSync, mkdirSync, openSync, readFileSync, readSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
 
 export function ensureDir(path: string): void {
@@ -32,21 +32,4 @@ export function writeUtf8(path: string, data: string): void {
 
 export function pathExists(path: string): boolean {
   return existsSync(path);
-}
-
-/**
- * Reads one regular file without following a final symlink or blocking on a FIFO or device. Anything else, or a file
- * over `maxBytes`, throws, so a security store planted as a special file fails closed instead of hanging or redirecting.
- */
-export function readRegularFileNoFollow(path: string, maxBytes: number): Buffer {
-  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
-  try {
-    const stat = fstatSync(fd);
-    if (!stat.isFile()) throw new Error(`${basename(path)} is not a regular file`);
-    if (stat.size > maxBytes) throw new Error(`${basename(path)} exceeds ${maxBytes} bytes`);
-    const bytes = Buffer.alloc(stat.size);
-    return bytes.subarray(0, readSync(fd, bytes, 0, bytes.length, 0));
-  } finally {
-    closeSync(fd);
-  }
 }

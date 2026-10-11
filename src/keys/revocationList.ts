@@ -7,11 +7,10 @@
  * checked against the log and the machine mark covers the whole file (src/keys/anchors.ts).
  */
 import { sign, verify } from "node:crypto";
-import { rmSync } from "node:fs";
 import { z } from "zod";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { ed25519KeyId } from "../trust/trustList.js";
-import { pathExists, readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
+import { readContainedOrNull, removeContained, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
 import { assertNotRolledBack, loggedAnchor, logSequence, markSequence } from "./anchors.js";
@@ -96,10 +95,10 @@ function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: string; 
   return signed;
 }
 
-/** Where one anchored list lives and which keys may sign it (the verifier's own history for the purpose). */
+/** Where one anchored list lives (relative to the workspace) and which keys may sign it (the verifier's own history). */
 export interface AnchoredListLocation {
   workspace: string;
-  path: string;
+  rel: string;
   listId: string;
   trustedPublicKeyPems: readonly string[];
 }
@@ -114,21 +113,22 @@ function anchorOf(location: AnchoredListLocation, signed: SignedRevocationList, 
 
 /** One verified, rollback-checked read; null only when the file does not exist (the caller decides what absence means). */
 export function readAnchoredRevocationList(location: AnchoredListLocation): SignedRevocationList | null {
-  if (!pathExists(location.path)) return null;
-  const bytes = readRegularFileNoFollow(location.path, MAX_REVOCATION_LIST_BYTES);
+  const bytes = readContainedOrNull(location.workspace, location.rel, MAX_REVOCATION_LIST_BYTES);
+  if (bytes === null) return null;
   const signed = verifySignedRevocationListBytes(bytes, location);
   assertNotRolledBack(anchorOf(location, signed, bytes));
   return signed;
 }
 
 /** The staged next list of an in-progress or interrupted write, verified like the list itself (no anchors: it is not final). */
-export function readStagedRevocationList(location: AnchoredListLocation): SignedRevocationList {
-  return verifySignedRevocationListBytes(readRegularFileNoFollow(`${location.path}.pending`, MAX_REVOCATION_LIST_BYTES), location);
+export function readStagedRevocationList(location: AnchoredListLocation): SignedRevocationList | null {
+  const bytes = readContainedOrNull(location.workspace, `${location.rel}.pending`, MAX_REVOCATION_LIST_BYTES);
+  return bytes === null ? null : verifySignedRevocationListBytes(bytes, location);
 }
 
 function writeFinal(location: AnchoredListLocation, signed: SignedRevocationList): void {
   const bytes = encodeSignedRevocationList(signed);
-  writeFileAtomic(location.path, bytes, 0o644);
+  writeContained(location.workspace, location.rel, bytes, 0o644);
   markSequence(anchorOf(location, signed, bytes));
 }
 
@@ -138,14 +138,13 @@ function writeFinal(location: AnchoredListLocation, signed: SignedRevocationList
  * Caller holds the list's lock.
  */
 export function recoverPendingRevocationList(location: AnchoredListLocation): void {
-  const pending = `${location.path}.pending`;
-  if (!pathExists(pending)) return;
-  const staged = verifySignedRevocationListBytes(readRegularFileNoFollow(pending, MAX_REVOCATION_LIST_BYTES), location);
+  const staged = readStagedRevocationList(location);
+  if (staged === null) return;
   const logged = loggedAnchor(location.workspace, ANCHOR, location.listId);
   if (logged !== null && logged.sequence === staged.list.sequence && logged.sha256 === revocationListSha256(staged.list)) {
     writeFinal(location, { ...staged, anchor: { transparencyEntryHash: logged.entryHash } });
   }
-  rmSync(pending, { force: true });
+  removeContained(location.workspace, `${location.rel}.pending`);
 }
 
 /**
@@ -161,12 +160,11 @@ export function publishRevocationList(location: AnchoredListLocation, list: Revo
   } catch (error) {
     throw new Error(`revocation list signature would not verify against the trusted key history; nothing was published (${error instanceof Error ? error.message : String(error)})`);
   }
-  const pending = `${location.path}.pending`;
-  writeFileAtomic(pending, staged, 0o644);
+  writeContained(location.workspace, `${location.rel}.pending`, staged, 0o644);
   const entryHash = logSequence({ workspace: location.workspace, type: ANCHOR, id: list.listId, sequence: list.sequence, sha256: revocationListSha256(signed.list) });
   const published = { ...signed, anchor: { transparencyEntryHash: entryHash } };
   writeFinal(location, published);
-  rmSync(pending, { force: true });
+  removeContained(location.workspace, `${location.rel}.pending`);
   return published;
 }
 

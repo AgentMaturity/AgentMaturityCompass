@@ -10,7 +10,7 @@ import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
+import { ensureContainedDir, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 
@@ -45,8 +45,11 @@ export interface HighWaterOptions {
   env?: NodeJS.ProcessEnv;
 }
 
+const STATE_REL = "state/high-water.json";
+const homeOf = (opts: HighWaterOptions) => opts.amcHome ?? resolveAmcHome({ env: opts.env });
+
 export function highWaterPath(opts: HighWaterOptions = {}): string {
-  return join(opts.amcHome ?? resolveAmcHome({ env: opts.env }), "state", "high-water.json");
+  return join(homeOf(opts), "state", "high-water.json");
 }
 
 /** The machine-local scope of a workspace: a digest of its real path, never an id read from the workspace's own files. */
@@ -74,11 +77,17 @@ function errorCode(error: unknown): string | undefined {
   return (error as NodeJS.ErrnoException | null)?.code;
 }
 
-/** Every entry, or {} when no state file exists. Anything unreadable, malformed or not a regular file throws. */
-function readEntries(path: string): Record<string, HighWaterEntry> {
+/**
+ * Every entry, or {} when no state file exists. Anything unreadable, malformed, symlinked (the file or the state
+ * directory), special or hard-linked throws (src/utils/containedFs.ts).
+ */
+function readEntries(opts: HighWaterOptions): Record<string, HighWaterEntry> {
+  const path = highWaterPath(opts);
   let bytes: Buffer;
   try {
-    bytes = readRegularFileNoFollow(path, MAX_BYTES);
+    const read = readContainedOrNull(homeOf(opts), STATE_REL, MAX_BYTES);
+    if (read === null) return {};
+    bytes = read;
   } catch (error) {
     if (errorCode(error) === "ENOENT") return {};
     throw new Error(`anti-rollback state ${path} is unreadable (${error instanceof Error ? error.message : String(error)}); `
@@ -93,7 +102,7 @@ function readEntries(path: string): Record<string, HighWaterEntry> {
 }
 
 export function readHighWater(key: string, opts: HighWaterOptions = {}): HighWaterEntry | null {
-  return readEntries(highWaterPath(opts))[key] ?? null;
+  return readEntries(opts)[key] ?? null;
 }
 
 /** Throws ROLLBACK_DETECTED for a lower sequence and FORK_DETECTED for the recorded sequence with other bytes. */
@@ -124,13 +133,14 @@ export function recordHighWater(key: string, sequence: number, sha256: string, o
   const seen = checkHighWater(key, sequence, sha256, opts);
   if (seen !== null && seen.sequence >= sequence) return true; // nothing to raise: no lock, no write
   try {
-    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    mkdirSync(homeOf(opts), { recursive: true, mode: 0o700 });
+    ensureContainedDir(homeOf(opts), "state");
     return withControlFileLock({ root: dirname(path), name: "high-water", operation: () => {
-      const entries = readEntries(path);
+      const entries = readEntries(opts);
       compareHighWater(key, entries[key] ?? null, sequence, sha256);
       if (entries[key] && entries[key].sequence >= sequence) return true;
       const next = { type: "amc.high-water", version: 1, entries: { ...entries, [key]: { sequence, sha256, seenAt: new Date().toISOString() } } };
-      writeFileAtomic(path, canonicalize(fileSchema.parse(next)), 0o600);
+      writeContained(homeOf(opts), STATE_REL, canonicalize(fileSchema.parse(next)), 0o600);
       return true;
     } });
   } catch (error) {
