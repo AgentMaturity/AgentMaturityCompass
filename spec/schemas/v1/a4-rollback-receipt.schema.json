@@ -12,6 +12,36 @@
       ],
       "type": "string"
     },
+    "amcSteps": {
+      "additionalProperties": false,
+      "properties": {
+        "freezeIncidentId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "restoreReceiptPath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "restoreReceiptPath",
+        "freezeIncidentId"
+      ],
+      "type": "object"
+    },
     "claimKind": {
       "const": "self_reported",
       "type": "string"
@@ -60,12 +90,19 @@
       "type": "string"
     },
     "recordedStatus": {
-      "enum": [
-        "succeeded",
-        "failed",
-        "partial"
-      ],
-      "type": "string"
+      "anyOf": [
+        {
+          "enum": [
+            "succeeded",
+            "failed",
+            "partial"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "releaseId": {
       "minLength": 1,
@@ -115,6 +152,7 @@
     "leaseIdsRevoked",
     "receiptSha256",
     "recordedStatus",
+    "amcSteps",
     "amcCheckStatus",
     "recordedByKey",
     "claimKind",

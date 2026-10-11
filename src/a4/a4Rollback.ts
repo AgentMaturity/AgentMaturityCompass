@@ -259,8 +259,10 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
       const doc = a4RollbackReceiptV1Schema.parse({ schema: "amc.a4-rollback-receipt/v1", rollbackId, releaseId, toReleaseId: body.toReleaseId, projectId,
         environment: body.environment, target: preview.target, enforceManifestId: body.confirmManifestId, preparedCommands: preview.preparedCommands,
         leaseIdsRevoked: revokedIds, receiptSha256: sha256Hex(canonicalize({ restoreReceipt, leaseIdsRevoked: revokedIds, frozen })),
-        // AMC's own steps (restore, revocations) completed; what the operator then ran is the rollback row they record.
-        recordedStatus: "succeeded", amcCheckStatus: "not_evaluated", recordedByKey: principal.key, claimKind: "self_reported", ts: now });
+        // AMC's own steps (restore, freeze, revocations) are amcSteps and leaseIdsRevoked; the operator's statement of what they
+        // then ran is their rollback row, so this receipt states none (C-35: the two columns never merge).
+        amcSteps: { restoreReceiptPath: restoreReceipt, freezeIncidentId: frozen },
+        recordedStatus: null, amcCheckStatus: "not_evaluated", recordedByKey: principal.key, claimKind: "self_reported", ts: now });
       file = writeReleaseRecord(store.workspace, projectId, "rollbacks", releaseId, rollbackId, doc, "a4-rollback-receipt");
     } catch (error) {
       const code = (error as { code?: unknown }).code;

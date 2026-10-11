@@ -487,7 +487,9 @@ it runs these steps:
 4. Every lease of the release revoked, read again at this point: the preview's, a production lease minted after the
    preview, and any lease a failed attempt journaled. The receipt and `ROLLBACK` list them all.
 5. The prepared operator commands answered.
-6. A signed `a4-rollback-receipt` written, and `ROLLBACK` with `EFFECT_FINISHED` recorded in one transaction. The project
+6. A signed `a4-rollback-receipt` written, and `ROLLBACK` with `EFFECT_FINISHED` recorded in one transaction. The
+   receipt states AMC's own steps (`amcSteps`: the restore receipt and the freeze; `leaseIdsRevoked`), and its
+   `recordedStatus` is null: the operator's statement of what they ran is their rollback row, never AMC's step outcome. The project
    holds when a freeze was raised.
 
 A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt

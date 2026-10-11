@@ -68,7 +68,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-rollback-receipt.schema.json",
       "name": "a4-rollback-receipt.schema.json",
-      "sha256": "7200a1e318ecf2b8521bce0c18d8bde8cddc61aaf0cb6c94fb6c1e3e3ec74bf7"
+      "sha256": "ae6e72c19c3a4b7b54627f984ca16b49e0a28cd4c02cd5bd7bbacb3af996a16c"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
