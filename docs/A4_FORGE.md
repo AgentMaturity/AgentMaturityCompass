@@ -411,9 +411,12 @@ record with its envelope checked now, each lease's live status and a reason for 
 
 The deployment approval is Activate's completion gate. Consuming it runs `a4.activate.production_lease` on its own
 quorum and answers the production lease's token once (the answered scopes, routes and caps). A `DENY` on an unconsumed
-completion gate revokes the staging lease; a decision on a consumed gate is refused (`A4_GATE_STALE: consumed`) and
-revokes nothing. The revocation is signed with the vault's auditor key, even in NOTARY mode, so such a `DENY` is refused
-with 423 `A4_VAULT_LOCKED` while that key cannot be read, rather than recorded with the staging lease left live. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
+completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
+(`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's auditor key, even in NOTARY
+mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read, rather than recorded with the
+staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
+409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success: sending the same request again (same
+`clientRequestId`) retries the revocation, or the operator revokes the lease with `amc lease revoke`. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
 the staging lease has expired before such a gate can.
 
 Readiness at Activate: `ask_complete`, `understanding_confirmed`, `release_proposed`, `package.inputs`,

@@ -12,7 +12,7 @@ import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { z } from "zod";
 import { getPrivateKeyPem } from "../crypto/keys.js";
-import { revokeLease } from "../leases/leaseStore.js";
+import { revokedLeaseIdSet, revokeLease } from "../leases/leaseStore.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -194,12 +194,17 @@ export function mintedLeases(chain: readonly A4ChainLink[], releaseId: string): 
   return { staging, production: typeof production === "string" ? production : null };
 }
 
-/** The staging lease ids a DENY of `gateId` revokes: this cycle's release's, when it is an Activate completion gate; else null. */
+/**
+ * The staging lease ids a DENY of `gateId` revokes: those of the release current when that Activate completion gate was
+ * requested (the release it binds). Null for any other gate, and for a consumed one, whose DENY recordDecision refuses
+ * (A4_GATE_STALE: consumed) before anything here could answer first.
+ */
 function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[] | null {
   const requested = chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
-  const releaseId = currentRelease(chain)?.body.releaseId;
-  if (requested?.body.stage !== "activate" || requested.body.gate !== "completion" || typeof releaseId !== "string") return null;
-  return mintedLeases(chain, releaseId).staging;
+  if (requested?.body.stage !== "activate" || requested.body.gate !== "completion") return null;
+  if (chain.some((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gateId)) return null;
+  const releaseId = currentRelease(chain.filter((link) => link.seq < requested.seq))?.body.releaseId;
+  return typeof releaseId === "string" ? mintedLeases(chain, releaseId).staging : null;
 }
 
 /**
@@ -217,24 +222,34 @@ export function assertStagingRevocable(store: A4Store, projectId: string, gateId
 }
 
 /**
- * After a DENY on an unconsumed activate.completion gate (recordDecision refuses one on a consumed gate): revokes this
- * cycle's staging lease (design §6.4 step 7). Expiry needs no sweep: a completion gate lives at least a day and is
- * requested after the release, so the staging lease (24 h) has expired by then. Answers what it revoked.
+ * After a DENY on an unconsumed activate.completion gate (recordDecision refuses one on a consumed gate), and again on
+ * every replay of that request: revokes the bound release's staging leases not yet revoked (design §6.4 step 7). A lease
+ * it cannot revoke is never swallowed into the DENY's success: the answer is 409 LEASE_REVOKE_FAILED naming the lease ids
+ * (the DENY stands), and the same request sent again retries it. Expiry needs no sweep: a completion gate lives at least
+ * a day and is requested after the release, so the staging lease (24 h) has expired by then. Answers the revoked ids.
  */
 export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId: string): Record<string, unknown> {
   const ids = stagingLeasesOf(store.readChain(projectId), gateId);
   if (ids === null) return {};
-  const revoked: string[] = [];
+  let already: Set<string>;
+  try {
+    already = revokedLeaseIdSet(store.workspace);
+  } catch {
+    already = new Set(); // unverifiable: revoke them all again (revokeLease refuses an unverifiable store, which is a failure here)
+  }
   const failed: string[] = [];
-  for (const leaseId of ids) {
+  for (const leaseId of ids.filter((id) => !already.has(id))) {
     try {
       revokeLease(store.workspace, leaseId, `A4 deployment approval denied on gate ${gateId}`);
-      revoked.push(leaseId);
     } catch {
       failed.push(leaseId);
     }
   }
-  return { stagingLeases: { revoked, failed } };
+  if (failed.length > 0) {
+    throw new A4StoreError(409, "LEASE_REVOKE_FAILED", "The DENY is recorded, but the staging lease it owes is still live: send the same request again "
+      + "(same clientRequestId) to retry the revocation, or revoke it with `amc lease revoke <leaseId>`.", { leaseIds: failed });
+  }
+  return { stagingLeases: { revoked: ids } };
 }
 
 /**

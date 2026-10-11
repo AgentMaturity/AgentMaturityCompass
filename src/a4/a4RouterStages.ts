@@ -520,9 +520,11 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     }
     const { body, request } = await readJson(route, decideSchema);
     const verdict = decision[2] as "approve" | "deny";
+    // A DENY of the deployment approval owes the staging lease's revocation: refused while it could not be signed, and
+    // answered 409 LEASE_REVOKE_FAILED (the DENY stands) while a lease it owes stays live; a replay of the request retries it.
+    if (verdict === "deny" && priorReplay(store, request, projectId) !== null) revokeStagingAfterDeny(store, projectId, gateId);
     let revoked: Record<string, unknown> = {};
     return respond(route, projectId, request, () => {
-      // A DENY of the deployment approval owes the staging lease's revocation: refused while it could not be signed.
       if (verdict === "deny") assertStagingRevocable(store, projectId, gateId);
       const result = recordDecision(store, projectId, { ...callOf(route, request), gateId, decision: verdict, reason: body.reason,
         expectedRequestDigestSha256: body.expectedRequestDigestSha256, expectedGateSeq: body.expectedGateSeq,
@@ -531,7 +533,7 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
       if (!result.replay && head) auditA4(route.workspace, { type: "A4_GATE_DECIDED", agentId: head.agent_id, projectId, username: requirePrincipal(route).username,
         summary: `A4 gate ${verdict === "approve" ? "approved" : "denied"} on ${head.name}`, details: { gateId, decision: verdict, seq: result.seq } });
       // A DENY recorded on an unconsumed Activate completion gate revokes the release's staging lease (design §6.4 step 7).
-      if (!result.replay && verdict === "deny") revoked = revokeStagingAfterDeny(store, projectId, gateId);
+      if (verdict === "deny") revoked = revokeStagingAfterDeny(store, projectId, gateId);
       return result;
     }, 201, () => revoked);
   }
