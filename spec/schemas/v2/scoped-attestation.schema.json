@@ -201,10 +201,6 @@
   "required": [
     "type",
     "version",
-    "tenantId",
-    "workspaceId",
-    "subjectId",
-    "sequence",
     "snapshotDigest",
     "deployment",
     "profile",
@@ -214,7 +210,11 @@
     "issuerKeyId",
     "issuedAt",
     "expiresAt",
-    "signature"
+    "signature",
+    "tenantId",
+    "workspaceId",
+    "subjectId",
+    "sequence"
   ],
   "title": "AMC Scoped Attestation v2",
   "type": "object"

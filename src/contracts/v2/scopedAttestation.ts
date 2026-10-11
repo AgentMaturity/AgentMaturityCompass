@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { signatureEnvelopeSchema } from "../../crypto/signing/signatureEnvelope.js";
-import { isoTimeSchema, nonEmpty, sha256HexSchema } from "../v1/common.js";
+import { nonEmpty } from "../v1/common.js";
+import { scopedAttestationV1Schema } from "../v1/scopedAttestation.js";
 
 /** The signature envelope, refusing unknown members here: none of them is covered by the attestation digest. */
 const strictEnvelopeSchema = z.strictObject({
@@ -17,21 +18,11 @@ const strictEnvelopeSchema = z.strictObject({
  * sha256("AMC_SCOPED_ATTESTATION_V2", 0x00, canonical attestation without `signature`) (spec/ACCEPTANCE_RULES.md).
  */
 export const scopedAttestationV2Schema = z.strictObject({
-  type: z.literal("amc.scoped-attestation"),
+  ...scopedAttestationV1Schema.shape,
   version: z.literal(2),
   tenantId: nonEmpty,
   workspaceId: nonEmpty,
   subjectId: nonEmpty,
   sequence: z.number().int().positive(),
-  snapshotDigest: sha256HexSchema,
-  deployment: z.strictObject({ deploymentId: nonEmpty, deploymentDigest: sha256HexSchema }),
-  profile: z.strictObject({ id: nonEmpty, version: nonEmpty }),
-  window: z.strictObject({ start: isoTimeSchema, end: isoTimeSchema }),
-  exclusions: z.array(z.strictObject({ controlId: nonEmpty, rationale: nonEmpty })),
-  controlResultsDigest: sha256HexSchema,
-  issuerKeyId: sha256HexSchema,
-  issuedAt: isoTimeSchema,
-  expiresAt: isoTimeSchema,
   signature: strictEnvelopeSchema
 });
-export type ScopedAttestationV2 = z.infer<typeof scopedAttestationV2Schema>;

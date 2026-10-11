@@ -188,7 +188,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v2/scoped-attestation.schema.json",
       "name": "v2/scoped-attestation.schema.json",
-      "sha256": "fc18058c21b941bff4a9da07ee968538e14dab68f323aa0fde8bfda060ec7d5a"
+      "sha256": "20243b3b47602bc6346ca0b837b84b576c43d271b9097e4590cca024c6f852fb"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",

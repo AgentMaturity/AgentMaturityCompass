@@ -63,7 +63,7 @@ export { claimEnvelopeSchema as claimEnvelopeV1Schema, signatureEnvelopeSchema a
 export { signedTrustListSchema as trustListV1Schema, verifierReportSchema as verifierReportV1Schema };
 
 export const SPEC_SCHEMA_BASE = "https://agentmaturity.co/spec/schemas/v1/";
-export const SPEC_SCHEMA_BASE_V2 = "https://agentmaturity.co/spec/schemas/v2/";
+const SPEC_SCHEMA_BASE_V2 = "https://agentmaturity.co/spec/schemas/v2/";
 
 export const CONTRACTS = {
   "evidence-event": { title: "AMC Evidence Event", schema: evidenceEventV1Schema },

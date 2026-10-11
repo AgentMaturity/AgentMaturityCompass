@@ -24,7 +24,7 @@ export interface RuleEntry {
 }
 
 /** Constant-time equality of two key ids or digests. */
-export function sameId(a: string, b: string): boolean {
+function sameId(a: string, b: string): boolean {
   const left = Buffer.from(a, "utf8");
   const right = Buffer.from(b, "utf8");
   return left.length === right.length && timingSafeEqual(left, right);
@@ -36,7 +36,7 @@ export function distrustAt<D extends { keyId: string; distrustedFrom: string | n
 }
 
 /** One trust-list entry at `at`: its purpose, its validity window, then any revocation. */
-export function entryAt(entry: RuleEntry, purpose: string, at: number): RuleStatus {
+function entryAt(entry: RuleEntry, purpose: string, at: number): RuleStatus {
   if (!entry.purposes.includes(purpose)) return "wrong-purpose";
   if (at < Date.parse(entry.validFrom)) return "not-yet-valid";
   if (entry.validTo !== null && at >= Date.parse(entry.validTo)) return "expired";
