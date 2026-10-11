@@ -5,11 +5,12 @@
  * it on the project; a second person decides it here, bound to the request digest, as the live-resolved A4 principal
  * (`decideApprovalInStudio` on its strict bound path; never Studio's admission actor); "Resolve" records the operator's
  * statement (`resolveManually`) only once A4's own dual control holds: bound approvals from live project approvers or
- * owners other than the operator, two distinct live-checked keys when regulated. The action journal writes it
- * SELF_REPORTED, so its ref is implementation / self_reported, never observed. The note is sealed in the project's blob
- * store; the engine request and the ledger carry only a reference naming the sealed blob and the note's sha256. The same
- * decide route takes the engine request of an effect gate opened on the project, refused at write when consumption would
- * refuse it. A request no transition of this project names is 404: the card decides nothing else.
+ * owners other than the operator, Assemble's builders and its build sessions' owners, two distinct live-checked keys
+ * when regulated. The action journal writes it SELF_REPORTED, so its ref is implementation / self_reported, never
+ * observed. The note is sealed in the project's blob store; the engine request and the ledger carry only a reference
+ * naming the sealed blob and the note's sha256. The same decide route takes the engine request of an effect gate opened
+ * on the project, refused at write when consumption would refuse it. A request no transition of this project names is
+ * 404: the card decides nothing else.
  */
 import { z } from "zod";
 import { verifyChainIn } from "../actions/actionJournal.js";
@@ -25,10 +26,11 @@ import { getPrivate, putPrivate } from "./a4Blobs.js";
 import { assertEffectVoteAllowed, boundMemberApprovalKeys } from "./a4Effects.js";
 import { assertAllowed, evaluateFor, gateRowOf, livePrincipal, loadA4State, signedA4Floor } from "./a4Gates.js";
 import { assertMember } from "./a4Identity.js";
-import { isRegulated } from "./a4Readiness.js";
+import { isRegulated, type A4ReadinessState } from "./a4Readiness.js";
 // Function declarations only: a4Router.ts imports this module (through a4RouterStages.ts), so nothing here reads its bindings at load time.
 import { a4Fail, assertNoSecrets, callOf, headStage, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import type { A4ChainLink } from "./a4Schema.js";
+import { buildersOf } from "./a4SoD.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { handleConnectRoute } from "./assembleConnect.js";
 import { blockingExecutionsIn } from "./assembleLockout.js";
@@ -111,10 +113,25 @@ const resolutionOf = (chain: readonly A4ChainLink[], executionId: string): A4Cha
   [...chain].reverse().find((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === RESOLUTION && link.body.executionId === executionId);
 
 /**
+ * Who may not approve a resolution (A4's SoD, pending-checks P1-60 #2): the operator who stated it, every principal who
+ * built at Assemble (buildersOf on each Assemble revision) and the owner of every build session an Assemble Build
+ * journaled, whose calls are the ones left outcome_unknown. Conservative: a builder of any Assemble revision is excluded.
+ */
+function resolutionExcludedKeys(state: A4ReadinessState, operatorKey: string): string[] {
+  const assemble = state.revisions.filter((row) => row.stage === "assemble");
+  const owners = assemble.flatMap((row) => {
+    const sessions = (JSON.parse(row.spec_json) as { build?: { sessions?: unknown } }).build?.sessions;
+    return Array.isArray(sessions) ? sessions.map((session: { ownerKey?: unknown }) => session.ownerKey).filter((key): key is string => typeof key === "string") : [];
+  });
+  return [...new Set([operatorKey, ...assemble.flatMap((row) => buildersOf(state.chain, row.revision_no)), ...owners])];
+}
+
+/**
  * A4's dual control on the recorded request, before anything is recorded: the request still binds the digest the
- * project recorded, and enough bound APPROVE_EXECUTE decisions come from live project approvers or owners other than the
- * operator — max(the class rule's requiredApprovals, 1), or 2 distinct live-checked (users.yaml) keys when regulated —
- * else 409 RESOLUTION_QUORUM_INSUFFICIENT.
+ * project recorded, and enough bound APPROVE_EXECUTE decisions come from live project approvers or owners outside
+ * resolutionExcludedKeys (the operator, Assemble's builders and build-session owners) — max(the class rule's
+ * requiredApprovals, 1), or 2 distinct live-checked (users.yaml) keys when regulated — else 409
+ * RESOLUTION_QUORUM_INSUFFICIENT.
  */
 function assertResolutionQuorum(route: A4Route, state: ReturnType<typeof precheck>, link: A4ChainLink): void {
   const approvalRequestId = String(link.body.refId);
@@ -123,11 +140,12 @@ function assertResolutionQuorum(route: A4Route, state: ReturnType<typeof prechec
   const record = loadApprovalRequestRecord({ workspace: route.workspace, agentId: state.project.agent_id, approvalRequestId, requireValidSignature: true });
   if (approvalRequestBindingDigest(record) !== link.body.sha256) throw a4Fail(409, "A4_INTEGRITY_FAILED", "The engine request no longer binds the digest the project recorded.");
   const regulated = isRegulated(state, signedA4Floor(route.workspace));
-  const keys = boundMemberApprovalKeys(route.workspace, state, { approvalRequestId, bindingDigest: link.body.sha256, excludedKeys: [operatorKey], regulated });
+  const keys = boundMemberApprovalKeys(route.workspace, state, { approvalRequestId, bindingDigest: link.body.sha256,
+    excludedKeys: resolutionExcludedKeys(state, operatorKey), regulated });
   const needed = Math.max(record.requiredApprovals, regulated ? 2 : 1);
   if (keys.length < needed) {
-    throw a4Fail(409, "RESOLUTION_QUORUM_INSUFFICIENT", `${keys.length} of ${needed} approval(s) bound to the request from project approvers or owners other than the operator${
-      regulated ? " (distinct live-checked identities: the project is regulated)" : ""}.`);
+    throw a4Fail(409, "RESOLUTION_QUORUM_INSUFFICIENT", `${keys.length} of ${needed} approval(s) bound to the request from project approvers or owners other than the operator, `
+      + `Assemble's builders and its build sessions' owners${regulated ? " (distinct live-checked identities: the project is regulated)" : ""}.`);
   }
 }
 
@@ -183,8 +201,8 @@ async function resolveResolution(route: A4Route, projectId: string, executionId:
 /**
  * POST …/approvals/:approvalRequestId/approve|deny: an engine request this project named (an effect gate it opened, an
  * outcome_unknown resolution it requested), decided by a live project approver or owner, bound to the request digest
- * they reviewed. A regulated project takes decisions from live-checked (users.yaml) identities only; the operator never
- * approves their own resolution; an APPROVE on an effect gate's request is refused when consumption would refuse it (A4's
+ * they reviewed. A regulated project takes decisions from live-checked (users.yaml) identities only; neither the operator
+ * nor Assemble's builders or build-session owners approve a resolution; an APPROVE on an effect gate's request is refused when consumption would refuse it (A4's
  * SoD and membership, the gate's exclusions and the revision's builders). A DENY is always recordable by a member. The
  * engine records the decision; A4 records no transition, and an effect's counted decisions are re-checked at consumption.
  */
@@ -205,8 +223,10 @@ async function decideEngineRequest(route: A4Route, projectId: string, approvalRe
   if (regulated && principal.identityCheck !== "users_yaml") {
     throw a4Fail(403, "IDENTITY_CHECK_LIMITED", "A regulated project takes decisions from live-checked identities only (host sessions wait for P2-33).");
   }
-  if (verb === "approve" && resolution !== undefined && resolution.body.operatorKey === principal.key) {
-    throw a4Fail(400, "SOD_VIOLATION", "requester_not_approver: the operator who stated this resolution cannot approve it.");
+  if (verb === "approve" && resolution !== undefined && typeof resolution.body.operatorKey === "string"
+    && resolutionExcludedKeys(state, resolution.body.operatorKey).includes(principal.key)) {
+    throw a4Fail(400, "SOD_VIOLATION", resolution.body.operatorKey === principal.key ? "requester_not_approver: the operator who stated this resolution cannot approve it."
+      : "builder_not_approver: a principal who built at Assemble or owns its build session cannot approve this resolution.");
   }
   if (verb === "approve" && opened !== undefined) {
     assertEffectVoteAllowed(route.workspace, state, gateRowOf(state, String(opened.body.gateId)), approvalRequestId,
