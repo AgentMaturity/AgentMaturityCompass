@@ -553,6 +553,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
         ? ["A4_DUPLICATE_DECISION"] : []),
       ...(everyPending((gate) => query.now >= gate.row.expires_ts - EXPIRING_GUARD_MS) ? ["GATE_EXPIRING"] : [])
     ],
+    // An acknowledgement is recorded on the head revision and supersedes its gates, and readiness counts it at the
+    // project's own stage: one at any other stage would not count there and would stale the current stage's gates.
+    acknowledge: state.project.stage !== "retired" && query.stage !== state.project.stage ? ["A4_STEP_ORDER"] : [],
     // A retry that cannot sign fails at once and spends the attempt the stage has left before a new revision.
     retryEffect: ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
     progress: [
