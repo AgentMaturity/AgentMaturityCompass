@@ -367,6 +367,13 @@
       "sha256": "51ba7ab24c1d190629f771ebab1e74780fea4b0a3012d26ff49fe1a34f72f24f"
     },
     {
+      "path": "src/pairing/lanMode.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/pairing/lanMode.ts.landed",
+      "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
