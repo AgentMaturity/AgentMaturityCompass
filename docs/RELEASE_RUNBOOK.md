@@ -43,7 +43,7 @@ wait.**
 ### B2 — Release candidate
 
 ```bash
-npm run release:prepare -- <version>    # version, notes, CHANGELOG, version files, checks and dry runs; never publishes
+npm run release:prepare -- <version>    # version, notes, CHANGELOG, version files; packs once and gates that tarball; never publishes
 git rev-parse HEAD                      # the pinned candidate commit, after committing what release:prepare wrote
 pnpm release:gate -- --json --out tmp/release-gate/candidate.json
 pnpm release:prepack-check
@@ -194,8 +194,9 @@ git push origin v<version>
 ```
 
 3. GitHub Actions `Release` workflow runs automatically. Its `release` job waits in the `release` environment:
-   approve it only for the version Sid confirmed. Without the signing key, the committed release public key or an
-   npm credential the job fails; it never skips publishing silently.
+   approve it only for the version Sid confirmed. It publishes only the tarball the `gate` job packed and gated at the
+   commit the tag named (`tmp/npm-release/record.json`), and refuses when the tag moved during the run. Without the
+   signing key, the committed release public key or an npm credential the job fails; it never skips publishing silently.
 
 ---
 

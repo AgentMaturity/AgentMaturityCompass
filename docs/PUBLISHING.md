@@ -20,7 +20,11 @@ npm serves 1.1.1 (published 15 July 2026). Version 1.2.0 was prepared in the rep
 
 ### One publish path
 
-Only the `release` job of `.github/workflows/release.yml` publishes. It runs on a `v*.*.*` tag (or a dispatch naming an existing tag) inside the protected GitHub environment `release`, whose required reviewers approve each run (P0-38). It fails instead of skipping:
+Only the `release` job of `.github/workflows/release.yml` publishes. It runs on a `v*.*.*` tag (or a dispatch naming an existing tag) inside the protected GitHub environment `release`, whose required reviewers approve each run (P0-38).
+
+It publishes exactly the bytes that passed the gate. The `gate` job checks out the tag, records the commit it names, builds and packs the npm tarball once into `tmp/npm-release/`, generates the SBOM, licence inventory and SEA binary there, and writes `record.json` with the tag, the commit and every file's SHA-256 (`scripts/release-record.mjs`). The full release gate, the packed-install and install-persona checks, `check-pack-contents` and `npm publish <tarball> --dry-run` then run against that tarball file, and the files are passed on as the `amc-gated-release` artifact. Every later job checks out that commit by SHA, refuses a tag that moved or was re-pointed, and verifies the record before using a file. The desktop archives wrap the gated tarball, the signed bundle embeds it with the gated SBOM and licence inventory, and the `release` job publishes `npm publish <gated tarball>` after checking the tag and the record once more. That job never installs the workspace, builds or packs: it runs the release tooling from the gated package itself. The Studio image tags are made only from the per-architecture digests the image job qualified.
+
+The `release` job fails instead of skipping:
 
 - no `AMC_RELEASE_SIGNING_KEY` in the environment, or no committed release public key at `trust/amc-release-signing.pub` (P0-37): the job fails before anything is published;
 - no npm credential: `npm publish` fails, and so does the job. The only skip left is "this version is already on npm".
@@ -42,7 +46,7 @@ One command, run on a clean checkout of the release commit:
 npm run release:prepare -- 2.0.0
 ```
 
-It refuses unless the pending changesets give that version from the last published one (`website/publication-status.json`), regenerates `docs/releases/<version>.md` (`npm run release:notes` regenerates its two generated blocks on their own), runs `changeset version` from the published version so it never versions on top of the unpublished 1.2.0, folds 1.2.0 into the release's single CHANGELOG heading, syncs the version-coupled files, then runs `check-release-candidate`, `check-pack-contents`, `npm publish --dry-run` (its `prepack` runs the full release gate) and the packed-install check. It never publishes, tags or commits. Rerunning it is safe: once versioned, nothing is pending, and it repeats the checks and dry runs. Review and commit the result, then follow the [release runbook](RELEASE_RUNBOOK.md).
+It refuses unless the pending changesets give that version from the last published one (`website/publication-status.json`), regenerates `docs/releases/<version>.md` (`npm run release:notes` regenerates its two generated blocks on their own), runs `changeset version` from the published version so it never versions on top of the unpublished 1.2.0, folds 1.2.0 into the release's single CHANGELOG heading, syncs the version-coupled files and runs `check-release-candidate`. It then packs the tarball once into `tmp/npm-release/` and runs the full release gate, `check-pack-contents`, the packed-install check and `npm publish <tarball> --dry-run` against that file, as the `gate` job does, and prints its SHA-256. It never publishes, tags or commits; the tag's own run packs and gates its tarball again at the tagged commit. Rerunning it is safe: once versioned, nothing is pending, and it repeats the checks and dry runs. Review and commit the result, then follow the [release runbook](RELEASE_RUNBOOK.md).
 
 ### Package metadata
 
@@ -61,14 +65,14 @@ git tag -a v<version> -m "AMC v<version>"
 git push origin v<version>
 
 # What CI does:
-# 1. Build native macOS plus Linux and Windows desktop archives on macOS CI, verify them, emit SHA256SUMS + amc-release-manifest.json
-# 2. Build, qualify and push the Studio image per architecture (P0-35)
-# 3. In the release environment (after approval): check the release candidate, run the tests, build, check the version
-#    contract, prepack guardrails and package contents
-# 4. Create the multi-platform image tags from the qualified digests
-# 5. Build the signed .amcrelease and verify it with --pubkey trust/amc-release-signing.pub; fail without the key
-# 6. Publish npm (trusted publishing or NPM_TOKEN); fail without a credential
-# 7. Create the GitHub Release with docs/releases/<version>.md as its body and every asset, failing if one is missing
+# 1. gate: resolve the tag to a commit, check the release candidate, build, pack the npm tarball once, record it,
+#    run the full release gate, the content check and the publish dry run on that file, upload it
+# 2. desktop-assets: wrap the gated tarball in the macOS, Linux and Windows archives; emit SHA256SUMS + manifest
+# 3. image: build, qualify and push the Studio image per architecture at the gated commit (P0-35)
+# 4. release, in the release environment after approval: refuse a moved tag, verify the record, make the image tags
+#    from the qualified digests, sign the bundle around the gated files and verify it with
+#    --pubkey trust/amc-release-signing.pub (fail without the key), publish the gated tarball (fail without a
+#    credential), and create the GitHub Release with docs/releases/<version>.md as its body, failing if an asset is missing
 ```
 
 ---

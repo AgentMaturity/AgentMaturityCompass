@@ -22,7 +22,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
@@ -64,7 +64,8 @@ export function verifyPackedComposition(result, source) {
   } catch { return false; }
 }
 
-export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
+/** `tarball` (or AMC_PACKED_INSTALL_TARBALL) checks that exact file instead of building and packing (P0-34). */
+export function packedInstallCheck({ root = process.cwd(), build = true, keep = false, tarball: given = process.env.AMC_PACKED_INSTALL_TARBALL } = {}) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const work = mkdtempSync(join(tmpdir(), "amc-packed-install-"));
   const home = join(work, "home"); const consumer = join(work, "consumer"); const workspace = join(work, "workspace");
@@ -91,8 +92,13 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 
   let tarball = null;
   const steps = [
-    () => !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
+    () => Boolean(given) || !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
     () => {
+      if (given) {
+        tarball = resolve(given);
+        console.log(`note: checking the given tarball ${tarball}; nothing is built or packed`);
+        return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
+      }
       // --ignore-scripts: the package's `prepack` hook is the RELEASE gate (full
       // test suite, dependency audit, smoke) and measures the working tree. This
       // check measures the artifact; the release gate stays its own explicit
@@ -177,5 +183,7 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep") }) ? 0 : 1);
+  const at = process.argv.indexOf("--tarball");
+  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep"),
+    ...(at > 0 ? { tarball: process.argv[at + 1] } : {}) }) ? 0 : 1);
 }

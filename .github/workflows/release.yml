@@ -24,13 +24,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  desktop-assets:
-    runs-on: macos-15
-    timeout-minutes: 45
+  # P0-34: the gate packs the npm tarball once, at the commit the tag names, and gates that file. Later jobs check
+  # out the same commit, refuse a moved tag, and use only the files this job recorded in record.json.
+  gate:
+    runs-on: ubuntu-latest
+    # Covers install, build, packing and the full release gate (measured in qualification/2026-10-11-P0-34).
+    timeout-minutes: 150
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+      tarball: ${{ steps.pack.outputs.tarball }}
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.AMC_RELEASE_TAG }}
+          fetch-depth: 0
+          ref: refs/tags/${{ env.AMC_RELEASE_TAG }}
 
       - name: Validate release tag input
         run: |
@@ -50,10 +57,122 @@ jobs:
           node-version: "24"
           cache: pnpm
 
+      - name: Resolve the tag to the commit this run gates
+        id: commit
+        run: |
+          set -euo pipefail
+          SHA=$(git rev-parse HEAD)
+          node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$SHA"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build desktop release archives
+      # Version, one CHANGELOG heading, release notes, no pending changesets.
+      - name: Check the release candidate
+        run: node scripts/check-release-candidate.mjs
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify release version contract
+        run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run release:verify-version
+
+      - name: Prepack release guardrails
+        run: npm run release:prepack-check
+
+      - name: Pack the npm tarball once, with its SBOM, licence inventory and SEA binary
+        id: pack
+        env:
+          AMC_RELEASE_COMMIT: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p tmp/npm-release
+          TARBALL=$(npm pack --ignore-scripts --json --pack-destination tmp/npm-release | node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(0, "utf8"))[0].filename)')
+          node dist/cli.js release sbom --out tmp/npm-release/sbom.cdx.json
+          node dist/cli.js release licenses --out tmp/npm-release/licenses.json
+          npm run build:sea
+          cp dist/sea/amc "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}"
+          cp dist/sea/manifest.json "tmp/npm-release/amc-linux-x64-sea-${AMC_RELEASE_TAG#v}.manifest.json"
+          node scripts/release-record.mjs write tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT" --tarball "$TARBALL"
+          cat tmp/npm-release/record.json
+          echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
+
+      # The gate's packed-install and install-persona steps install this tarball; nothing else is packed.
+      - name: Release gate on the packed tarball
+        env:
+          AMC_PACKED_INSTALL_TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: npm run release:gate -- --json --out tmp/release-gate/release.json
+
+      - name: Check the packed tarball's contents and secret-scan it
+        env:
+          TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: node scripts/check-pack-contents.mjs --tarball "$TARBALL"
+
+      - name: Dry-run publishing the packed tarball
+        env:
+          TARBALL: tmp/npm-release/${{ steps.pack.outputs.tarball }}
+        run: npm publish "$TARBALL" --dry-run
+
+      - name: Confirm the gated files did not change during the gate
+        env:
+          AMC_RELEASE_COMMIT: ${{ steps.commit.outputs.sha }}
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Upload the gated release files
+        uses: actions/upload-artifact@v7
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release/
+          if-no-files-found: error
+
+      - name: Upload the release gate receipt
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-gate-receipt
+          path: tmp/release-gate/release.json
+
+  desktop-assets:
+    needs: gate
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.gate.outputs.commit }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
+
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
+
+      - name: Build desktop release archives around the gated tarball
+        env:
+          AMC_DESKTOP_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
         run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run package:desktop
 
       - name: Verify desktop release archives
@@ -78,7 +197,7 @@ jobs:
   # Only the per-architecture tags are pushed here; the release job creates the
   # public multi-platform tags from these digests after its tests pass.
   image:
-    needs: desktop-assets
+    needs: [gate, desktop-assets]
     strategy:
       fail-fast: true
       matrix:
@@ -89,15 +208,20 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ env.AMC_RELEASE_TAG }}
+          ref: ${{ needs.gate.outputs.commit }}
 
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
+
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -166,30 +290,27 @@ jobs:
           path: tmp/image-digest/${{ matrix.arch }}.json
           if-no-files-found: error
 
+  # Publishes only the gated files: it never installs the workspace, builds or packs.
   release:
-    needs: [desktop-assets, image]
+    needs: [gate, desktop-assets, image]
     runs-on: ubuntu-latest
     # P0-34: the only job that publishes. Its secrets live in the protected `release` environment (P0-38).
     environment: release
-    # Covers npm test, the build and the full release gate that npm publish re-runs in prepack (measured in qualification/2026-10-11-P0-34).
-    timeout-minutes: 150
+    timeout-minutes: 30
+    env:
+      AMC_RELEASE_COMMIT: ${{ needs.gate.outputs.commit }}
+      AMC_NPM_TARBALL: tmp/npm-release/${{ needs.gate.outputs.tarball }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ env.AMC_RELEASE_TAG }}
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
+          ref: ${{ needs.gate.outputs.commit }}
 
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-          cache: pnpm
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -201,36 +322,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Refuse a tag that moved since the gate
+        run: node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
 
-      # Version, one CHANGELOG heading, release notes, no pending changesets.
-      - name: Check the release candidate
-        run: node scripts/check-release-candidate.mjs
+      - name: Download the gated release files
+        uses: actions/download-artifact@v8
+        with:
+          name: amc-gated-release
+          path: tmp/npm-release
 
-      - name: Test
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-      - name: Verify release version contract
-        run: env -u GITHUB_REF_NAME AMC_RELEASE_TAG="$AMC_RELEASE_TAG" npm run release:verify-version
-
-      - name: Prepack release guardrails
-        run: npm run release:prepack-check
-
-      - name: Check package contents and secret-scan the packed tarball
-        run: node scripts/check-pack-contents.mjs
-
-      - name: Validate tag version matches package.json
-        run: |
-          TAG="${AMC_RELEASE_TAG#v}"
-          PKG_VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
-          if [ "$TAG" != "$PKG_VERSION" ]; then
-            echo "Tag version ($TAG) does not match package.json ($PKG_VERSION)"
-            exit 1
-          fi
+      - name: Verify the gated release files
+        run: node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
 
       - name: Download checksummed public release assets
         uses: actions/download-artifact@v8
@@ -238,10 +340,11 @@ jobs:
           name: amc-public-release-assets
           path: dist/release-assets
 
-      - name: Verify downloaded public release assets
+      - name: Verify downloaded public release assets carry the gated tarball
         run: |
-          cd dist/release-assets
-          sha256sum -c SHA256SUMS
+          set -euo pipefail
+          (cd dist/release-assets && sha256sum -c SHA256SUMS)
+          cmp "dist/release-assets/$(basename "$AMC_NPM_TARBALL")" "$AMC_NPM_TARBALL"
 
       - name: Resolve lowercase GHCR image repository
         id: image
@@ -284,8 +387,13 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           echo "digest=$INDEX" >> "$GITHUB_OUTPUT"
 
+      # The signing CLI is the gated package itself, installed outside the checkout; nothing is rebuilt.
+      - name: Install the gated package to run its release tooling
+        run: npm install --prefix "$RUNNER_TEMP/amc" --no-audit --no-fund --omit=dev "$AMC_NPM_TARBALL"
+
       # A release tag never ships unsigned, and the bundle is verified only against the release key P0-37 commits,
-      # never against a key the bundle or the signing secret carries.
+      # never against a key the bundle or the signing secret carries. The bundle embeds the gated tarball, SBOM and
+      # licence inventory byte for byte.
       - name: Build and verify the signed release bundle
         env:
           AMC_RELEASE_SIGNING_KEY: ${{ secrets.AMC_RELEASE_SIGNING_KEY }}
@@ -294,8 +402,8 @@ jobs:
           AMC_DOCKER_PLATFORMS: linux/amd64,linux/arm64
         run: |
           set -euo pipefail
-          mkdir -p dist
-          VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
+          VERSION="${AMC_RELEASE_TAG#v}"
+          AMC="$RUNNER_TEMP/amc/node_modules/.bin/amc"
           if [ -z "$AMC_RELEASE_SIGNING_KEY" ]; then
             echo "::error::AMC_RELEASE_SIGNING_KEY is not set in the release environment (P0-38). A release is never published unsigned."
             exit 1
@@ -304,20 +412,19 @@ jobs:
             echo "::error::trust/amc-release-signing.pub is missing (P0-37 commits the release public key). The bundle cannot be verified against a pinned key."
             exit 1
           fi
-          node dist/cli.js release pack --out "dist/amc-${VERSION}.amcrelease"
-          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" --pubkey trust/amc-release-signing.pub | tee dist/release-verify.txt
+          "$AMC" release pack --npm-tarball "$AMC_NPM_TARBALL" --sbom tmp/npm-release/sbom.cdx.json --licenses tmp/npm-release/licenses.json --out "dist/amc-${VERSION}.amcrelease"
+          "$AMC" release verify "dist/amc-${VERSION}.amcrelease" --pubkey trust/amc-release-signing.pub | tee dist/release-verify.txt
           tar -xzf "dist/amc-${VERSION}.amcrelease" -C dist
+          cmp "dist/amc-release/artifacts/npm/$(basename "$AMC_NPM_TARBALL")" "$AMC_NPM_TARBALL"
           cp dist/amc-release/artifacts/sbom/sbom.cdx.json dist/sbom.cdx.json
           cp dist/amc-release/artifacts/licenses/licenses.json dist/licenses.json
           cp dist/amc-release/artifacts/provenance/provenance.json dist/provenance.json
 
-      - name: Build experimental SEA binary artifact
+      - name: Stage the gated experimental SEA binary
         run: |
-          npm run build:sea
-          VERSION=$(node -e 'const pkg=require("./package.json");process.stdout.write(pkg.version)')
+          set -euo pipefail
           mkdir -p dist/release-binaries
-          cp dist/sea/amc "dist/release-binaries/amc-linux-x64-sea-${VERSION}"
-          cp dist/sea/manifest.json "dist/release-binaries/amc-linux-x64-sea-${VERSION}.manifest.json"
+          cp tmp/npm-release/amc-linux-x64-sea-* dist/release-binaries/
 
       # Trusted publishing needs npm 11.5.1 or later; pin the exact CLI the publish step logs.
       - name: Pin the npm CLI
@@ -327,15 +434,18 @@ jobs:
 
       # P0-38 chooses trusted publishing (no token; id-token: write is granted above) or a granular NPM_TOKEN in the
       # release environment. Without either, npm publish fails and so does the job: nothing is skipped silently.
-      - name: Publish the npm package
+      # It publishes the gated tarball file after checking the tag and the record once more.
+      - name: Publish the gated npm tarball
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
           set -euo pipefail
           echo "npm $(npm --version)"
+          node scripts/release-record.mjs tag "$AMC_RELEASE_TAG" "$AMC_RELEASE_COMMIT"
+          node scripts/release-record.mjs verify tmp/npm-release --tag "$AMC_RELEASE_TAG" --commit "$AMC_RELEASE_COMMIT"
           PACKAGE_NAME=$(node -e 'process.stdout.write(require("./package.json").name)')
-          VERSION=$(node -e 'process.stdout.write(require("./package.json").version)')
+          VERSION="${AMC_RELEASE_TAG#v}"
           if npm view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
             echo "${PACKAGE_NAME}@${VERSION} is already on npm; not publishing it again."
             exit 0
@@ -347,7 +457,7 @@ jobs:
             echo "No NPM_TOKEN: publishing through npm trusted publishing (OIDC)."
             unset NODE_AUTH_TOKEN
           fi
-          npm publish --provenance --access public
+          npm publish "$AMC_NPM_TARBALL" --provenance --access public
 
       - name: Build release notes
         run: |

@@ -10,8 +10,8 @@
  *     2. Fold CHANGELOG sections of never-published versions (1.2.0) into the release section: one heading.
  *     3. Sync the version-coupled files (install channel, Helm appVersion, "<version> source" prose, the
  *        changelog page and sbom.json), build, and run check-release-candidate.
- *     4. Dry runs: check-pack-contents (listing and secret scan), `npm publish --dry-run` (its prepack runs the
- *        full release gate) and the packed-install check.
+ *     4. Pack the npm tarball once (tmp/npm-release/), then run the full release gate, check-pack-contents, the
+ *        packed-install check and `npm publish <that tarball> --dry-run` against that one file, as release.yml does.
  *   node scripts/release-prepare.mjs --version-only [X.Y.Z]
  *     Steps 1 to 3 only; npm-publish.yml's version PR runs this.
  *
@@ -19,7 +19,8 @@
  * steps 3 and 4.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isEntrypoint } from "./lib/entrypoint.mjs";
 import { generateReleaseNotes, plannedVersion, publishedVersion, readChangesets } from "./release-notes.mjs";
@@ -75,13 +76,13 @@ function rewrite(root, path, transform) {
 }
 
 function defaultRun(root) {
-  return (command, args) => {
-    const result = spawnSync(command, args, { cwd: root, stdio: "inherit" });
+  return (command, args, env = {}) => {
+    const result = spawnSync(command, args, { cwd: root, stdio: "inherit", env: { ...process.env, ...env } });
     if (result.status !== 0) throw new Error(`${[command, ...args].join(" ")} failed (exit ${result.status ?? result.signal})`);
   };
 }
 
-/** @param {{ root?: string; version?: string; versionOnly?: boolean; run?: (command: string, args: string[]) => void; log?: (line: string) => void }} options */
+/** @param {{ root?: string; version?: string; versionOnly?: boolean; run?: (command: string, args: string[], env?: Record<string, string>) => void; log?: (line: string) => void }} options */
 export function prepareRelease({ root = process.cwd(), version, versionOnly = false, run = defaultRun(root), log = console.log } = {}) {
   const changesets = readChangesets(root);
   const packagePath = join(root, "package.json");
@@ -126,11 +127,22 @@ export function prepareRelease({ root = process.cwd(), version, versionOnly = fa
   node("scripts/check-release-candidate.mjs");
   if (versionOnly) return target;
 
-  node("scripts/check-pack-contents.mjs");
-  run("npm", ["publish", "--dry-run"]);
-  node("scripts/packed-install-check.mjs", "--no-build");
-  log(`Release ${target} is prepared and its dry runs passed. Review and commit the result, then follow docs/RELEASE_RUNBOOK.md;`
-    + ` publishing is the v${target} tag push that runs release.yml (P0-39).`);
+  // One tarball, packed once: every check and the dry run use that file, as release.yml's gate job does.
+  const packDir = "tmp/npm-release";
+  rmSync(join(root, packDir), { recursive: true, force: true });
+  mkdirSync(join(root, packDir), { recursive: true });
+  run("npm", ["pack", "--ignore-scripts", "--pack-destination", packDir]);
+  const tarball = `${packDir}/agent-maturity-compass-${target}.tgz`;
+  if (!existsSync(join(root, tarball))) throw new Error(`npm pack did not write ${tarball}`);
+  const sha256 = createHash("sha256").update(readFileSync(join(root, tarball))).digest("hex");
+  run("npm", ["run", "release:gate", "--", "--json", "--out", "tmp/release-gate/prepare.json"], { AMC_PACKED_INSTALL_TARBALL: tarball });
+  node("scripts/check-pack-contents.mjs", "--tarball", tarball);
+  node("scripts/packed-install-check.mjs", "--tarball", tarball);
+  run("npm", ["publish", tarball, "--dry-run"]);
+  if (createHash("sha256").update(readFileSync(join(root, tarball))).digest("hex") !== sha256) throw new Error(`${tarball} changed during the checks`);
+  log(`Release ${target} is prepared: ${tarball} (sha256 ${sha256}) passed the release gate, the content and packed-install checks`
+    + ` and the publish dry run. Review and commit the result, then follow docs/RELEASE_RUNBOOK.md; publishing is the v${target}`
+    + " tag push that runs release.yml, which packs and gates its own tarball at the tagged commit (P0-39).");
   return target;
 }
 

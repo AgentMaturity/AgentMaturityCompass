@@ -8,6 +8,7 @@ const dirs: string[] = [];
 afterEach(() => { for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
 
 const CHANGELOG = "# Changelog\n\n## 1.2.0\n\n### Minor Changes\n\n- old minor\n\n### Patch Changes\n\n- old patch\n\n## 1.1.1\n\n### Patch Changes\n\n- shipped\n";
+const TGZ = "tmp/npm-release/agent-maturity-compass-2.0.0.tgz";
 const NOTES = "# AMC 2.0.0\n\n<!-- release-notes:breaking -->\n<!-- /release-notes:breaking -->\n\n## Migration from 1.1.1\n\n- Do x. (`drop`)\n\n"
   + "## Other\n\n<!-- release-notes:changes -->\n<!-- /release-notes:changes -->\n";
 const PAGE = (...versions: string[]) => `<main>\n  <div class="changelog-shell">\n${versions.map(v =>
@@ -36,8 +37,15 @@ function fixture(): string {
 /** Stands in for the external tools: `changeset version` as changesets does it, every other command recorded. */
 function fakeRunner(root: string) {
   const calls: string[] = [];
-  const run = (command: string, args: string[]) => {
-    calls.push([command.split("/").pop(), ...args].join(" "));
+  const envs: Record<string, Record<string, string> | undefined> = {};
+  const run = (command: string, args: string[], env?: Record<string, string>) => {
+    const call = [command.split("/").pop(), ...args].join(" ");
+    calls.push(call);
+    envs[call] = env;
+    if (command === "npm" && args[0] === "pack") {
+      mkdirSync(join(root, args[3]), { recursive: true });
+      writeFileSync(join(root, args[3], "agent-maturity-compass-2.0.0.tgz"), "packed once");
+    }
     if (command.endsWith("changeset") && args[0] === "version") {
       const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
       if (pkg.version !== "1.1.1") throw new Error(`changeset version ran on ${pkg.version}`);
@@ -48,7 +56,7 @@ function fakeRunner(root: string) {
       for (const file of readdirSync(join(root, ".changeset"))) if (file.endsWith(".md") && file !== "README.md") unlinkSync(join(root, ".changeset", file));
     }
   };
-  return { calls, run };
+  return { calls, envs, run };
 }
 
 describe("release:prepare (P0-34)", () => {
@@ -83,17 +91,18 @@ describe("release:prepare (P0-34)", () => {
     expect(readFileSync(join(root, "deploy", "helm", "amc", "Chart.yaml"), "utf8")).toBe('version: 0.2.0\nappVersion: "2.0.0"\n');
     expect(readFileSync(join(root, "docs", "INSTALL.md"), "utf8")).toContain("**2.0.0 source**");
     expect(readFileSync(join(root, "website", "changelog.html"), "utf8")).not.toContain("release-1-2-0");
+    const gated = ["npm pack --ignore-scripts --pack-destination tmp/npm-release", "npm run release:gate -- --json --out tmp/release-gate/prepare.json",
+      `node scripts/check-pack-contents.mjs --tarball ${TGZ}`, `node scripts/packed-install-check.mjs --tarball ${TGZ}`, `npm publish ${TGZ} --dry-run`];
     expect(fake.calls).toEqual(["changeset version", "npm run build", "node dist/cli.js release sbom --out sbom.json",
-      "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", "node scripts/check-pack-contents.mjs",
-      "npm publish --dry-run", "node scripts/packed-install-check.mjs --no-build"]);
+      "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", ...gated]);
+    expect(fake.envs["npm run release:gate -- --json --out tmp/release-gate/prepare.json"]).toEqual({ AMC_PACKED_INSTALL_TARBALL: TGZ });
 
     const again = fakeRunner(root);
     const before = readFileSync(join(root, "CHANGELOG.md"), "utf8");
     writeFileSync(join(root, "sbom.json"), JSON.stringify({ metadata: { component: { version: "2.0.0" } } }));
     prepareRelease({ root, version: "2.0.0", run: again.run, log: () => {} });
     expect(readFileSync(join(root, "CHANGELOG.md"), "utf8")).toBe(before);
-    expect(again.calls).toEqual(["npm run build", "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs",
-      "node scripts/check-pack-contents.mjs", "npm publish --dry-run", "node scripts/packed-install-check.mjs --no-build"]);
+    expect(again.calls).toEqual(["npm run build", "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", ...gated]);
   });
 
   test("refuses a target the pending changesets do not give, before writing anything", () => {
