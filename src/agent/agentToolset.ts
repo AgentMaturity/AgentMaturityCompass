@@ -127,19 +127,29 @@ export interface AgentToolsetOptions {
       readonly payload: string;
       readonly meta: Record<string, unknown>;
     }): unknown;
+    /** Throws when the writer can no longer append (e.g. closed); checked before every tool body (P1-78). */
+    assertWritable?(): void;
   };
 }
 
+const UNVERIFIABLE_STATES = {
+  missing: "is not in the ledger and no session writer was passed",
+  sealed: "is already sealed in the ledger and no session writer was passed",
+  writer_unusable: "has a session writer that can no longer append",
+  write_failed: "lost a row: a write failed after a tool body ran, so this toolset refuses every later call"
+} as const;
+
 /**
- * A row a writer-less toolset refused to write (P1-78): its session is not open in the ledger, so the row would reference
- * a missing session, or land after the seal, and fail verification. Pass the session writer, or start the session in the
- * ledger before the toolset records into it and seal it after.
+ * Evidence this toolset cannot write verifiably (P1-78), so the call is refused before its body: a writer-less toolset
+ * whose session the ledger does not hold open, a writer that can no longer append, or, after any failed write, every
+ * later call (an in-flight effect whose row was lost cannot be undone, so the toolset fails instead of continuing).
+ * Pass the session writer, or start the session in the ledger before the toolset records into it and seal it after.
  */
 export class UnverifiableToolEvidence extends Error {
   readonly code = "UNVERIFIABLE_TOOL_EVIDENCE";
-  constructor(readonly sessionId: string, readonly state: "missing" | "sealed") {
-    super(`UNVERIFIABLE_TOOL_EVIDENCE: session ${sessionId} is ${state === "missing" ? "not in the ledger" : "already sealed"}; `
-      + "no session writer was passed, so the row would fail verification and is not written");
+  constructor(readonly sessionId: string, readonly state: keyof typeof UNVERIFIABLE_STATES, cause?: unknown) {
+    super(`UNVERIFIABLE_TOOL_EVIDENCE: session ${sessionId} ${UNVERIFIABLE_STATES[state]}`
+      + `${cause === undefined ? "" : ` (${cause instanceof Error ? cause.message : String(cause)})`}`, cause === undefined ? undefined : { cause });
     this.name = "UnverifiableToolEvidence";
   }
 }
@@ -301,12 +311,36 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     if (!session || session.ended_ts !== null) throw new UnverifiableToolEvidence(options.sessionId, session ? "sealed" : "missing");
     return ledgerHandle;
   };
-  const recordAudit = (receipt: Record<string, unknown>): string | null => {
+  // Never swallowed (P1-78): the first failed write latches, and every later call is refused before its body.
+  let lostRow: UnverifiableToolEvidence | null = null;
+  const writeEvidence = <T>(write: () => T): T => {
+    if (lostRow) throw lostRow;
+    try {
+      return write();
+    } catch (error) {
+      lostRow = error instanceof UnverifiableToolEvidence ? error : new UnverifiableToolEvidence(options.sessionId, "write_failed", error);
+      throw lostRow;
+    }
+  };
+  /** Before any tool body: the rows this call will write can be written verifiably now. */
+  const assertEvidenceWritable = (): void => {
+    if (lostRow) throw lostRow;
+    if (!options.recorder) {
+      rawLedger();
+      return;
+    }
+    try {
+      options.recorder.assertWritable?.();
+    } catch (error) {
+      throw new UnverifiableToolEvidence(options.sessionId, "writer_unusable", error);
+    }
+  };
+  const recordAudit = (receipt: Record<string, unknown>): string | null => writeEvidence(() => {
     const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
     if (!options.recorder) return rawLedger().appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
     const ref = options.recorder.recordProjectedEvidence(row) as { readonly eventId?: unknown } | null | undefined;
     return typeof ref?.eventId === "string" ? ref.eventId : null;
-  };
+  });
   // P1-12: one effective-policy receipt per session and guard set, written before the session's first governed
   // call (the CLI binds its writer after composing). A receipt that cannot be written denies the call.
   let receipt: { readonly key: string; readonly ref: string } | null = null;
@@ -397,6 +431,11 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const policyGuard = compiledPolicyGuard(workspace, compiled);
   registry.guard("compiled-policy", execution => {
     try {
+      assertEvidenceWritable();
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+    try {
       ensureReceipt(registry.guardLabelsFor(execution));
     } catch (error) {
       return `effective-policy receipt could not be recorded: ${error instanceof Error ? error.message : String(error)}`;
@@ -457,29 +496,18 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
         outcome
       );
       const recorder = options.recorder;
-      if (recorder) {
-        // Through the session's own writer, so the rows carry an envelope and
-        // sit in the spine they describe. See `recordProjectedEvidence`.
-        for (const row of evidence) {
-          recorder.recordProjectedEvidence({
-            eventType: row.eventType,
-            payload: row.payload,
-            meta: row.meta
-          });
+      // A failure here latches (writeEvidence): the pipeline keeps the call's real outcome, and every later call is refused.
+      writeEvidence(() => {
+        if (recorder) {
+          // Through the session's own writer, so the rows carry an envelope and
+          // sit in the spine they describe. See `recordProjectedEvidence`.
+          for (const row of evidence) recorder.recordProjectedEvidence({ eventType: row.eventType, payload: row.payload, meta: row.meta });
+          return;
         }
-      } else {
         // One handle for the run, not one per call (opening the ledger costs a third of a governed call); `close()` releases it.
-        rawLedger().appendEvidenceBatch(
-          evidence.map((row) => ({
-            sessionId: options.sessionId,
-            runtime: "amc" as const,
-            eventType: row.eventType,
-            payload: row.payload,
-            payloadExt: "json" as const,
-            meta: row.meta
-          }))
-        );
-      }
+        rawLedger().appendEvidenceBatch(evidence.map((row) => ({ sessionId: options.sessionId, runtime: "amc" as const,
+          eventType: row.eventType, payload: row.payload, payloadExt: "json" as const, meta: row.meta })));
+      });
     }
   });
 

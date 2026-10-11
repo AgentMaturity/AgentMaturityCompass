@@ -128,6 +128,7 @@ export interface ComposedTurnHandle {
 export interface ComposedToolSession {
   readonly sessionId: string;
   readonly recordProjectedEvidence: SessionService["recordProjectedEvidence"];
+  readonly assertWritable: SessionService["assertWritable"];
 }
 
 export interface ComposedTurnOptions {
@@ -455,7 +456,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   try {
     options.bindToolSession?.({
       sessionId,
-      recordProjectedEvidence: (row) => session.recordProjectedEvidence(row)
+      recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
+      assertWritable: () => session.assertWritable()
     });
     const credentialsFiber = ctx.plugin(credentialsServices, options.credentials ?? {});
     await credentialsFiber.await();
