@@ -5,7 +5,8 @@
 import { readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { exportPublicKey, listKeys, resumeKeyRotation, revokeKey, rotatePurposeKeys, type KeyRevocationReason } from "./purposeKeys.js";
-import { restoreCommittedKeyset } from "./keyset.js";
+import { acceptAdoptedKeyset, quarantineUnboundPurposeFiles, restoreCommittedKeyset } from "./keyset.js";
+import { vaultEnvelopeKeyIds } from "../vault/vault.js";
 import { ROTATION_REASONS, type RotationReason } from "./rotationStatement.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { promptPassphrase } from "../vault/vaultCli.js";
@@ -18,13 +19,26 @@ function purposeOption(value: string | undefined): LocalPurpose {
   return value;
 }
 
-interface RotateOptions { purpose?: string; reason?: string; overlapDays?: string; rootKey?: string[]; resume?: boolean; restore?: boolean }
+interface RotateOptions {
+  purpose?: string; reason?: string; overlapDays?: string; rootKey?: string[]; resume?: boolean; restore?: boolean;
+  accept?: string; digest?: string; quarantineUnboundPub?: boolean;
+}
 
 export async function rotateKeysForCli(workspace: string, opts: RotateOptions): Promise<unknown> {
-  if (opts.restore) {
-    if (opts.resume || opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--restore takes no other options");
-    assertOwnerMode(workspace, "keys rotate --restore");
-    return restoreCommittedKeyset(workspace);
+  const repairs = [opts.restore, opts.accept !== undefined, opts.quarantineUnboundPub].filter(Boolean).length;
+  if (repairs > 0) {
+    if (repairs > 1 || opts.resume || opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) {
+      throw new Error("--restore, --accept and --quarantine-unbound-pub each run alone");
+    }
+    assertOwnerMode(workspace, "keys rotate (key-set repair)");
+    if (opts.quarantineUnboundPub) return quarantineUnboundPurposeFiles(workspace);
+    if (opts.accept !== undefined) {
+      if (!/^[1-9][0-9]{0,15}$/.test(opts.accept) || !/^[0-9a-f]{64}$/i.test(opts.digest ?? "")) throw new Error("--accept <generation> needs --digest <sha256>, as `amc keys list` shows it on the committing machine");
+      return acceptAdoptedKeyset(workspace, Number(opts.accept), opts.digest!);
+    }
+    // The vault is checked by its key ids, opened with the owner's passphrase.
+    const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase to check the vault:"));
+    return restoreCommittedKeyset(workspace, { vaultKeyIds: bytes => vaultEnvelopeKeyIds(bytes.toString("utf8"), passphrase) });
   }
   if (opts.resume) {
     if (opts.purpose !== undefined || opts.reason !== undefined || opts.rootKey !== undefined) throw new Error("--resume takes no other options");
@@ -61,6 +75,9 @@ export function registerKeysCommands(program: Command): void {
     .option("--root-key <file...>", "trust-list root private key file(s) held outside AMC; key-compromise needs one")
     .option("--resume", "complete or roll back an interrupted key change")
     .option("--restore", "owner mode: put back the key set this machine committed, from the copies in AMC home")
+    .option("--accept <generation>", "owner mode, on a machine that adopted the key set: accept this newer generation (with --digest)")
+    .option("--digest <sha256>", "with --accept: the key-set digest `amc keys list` shows on the committing machine")
+    .option("--quarantine-unbound-pub", "owner mode, with no keyset.json: move purpose key files no key set binds to .amc/quarantine/keys/")
     .action(async (opts: RotateOptions) => {
       console.log(JSON.stringify(await rotateKeysForCli(process.cwd(), opts), null, 2));
     });

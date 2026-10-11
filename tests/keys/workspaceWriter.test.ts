@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { addPublicKeyToHistory, ensureSigningKeys, getPrivateKeyPem } from "../../src/crypto/keys.js";
-import { keysetAdoptionNotes, keysetAnchoring } from "../../src/keys/keyset.js";
+import { keysetAdoptionNotes, keysetAnchoring, keysetIdentity, keysetRecoveryDir } from "../../src/keys/keyset.js";
 import { rotateKeysForCli } from "../../src/keys/keysCli.js";
 import { ClaimReplayCache, createAgentClaim, verifyAgentClaim, type ClaimExpectation } from "../../src/score/crossAgentTrust.js";
 import { v1Workspace } from "../helpers/legacyVault.js";
@@ -285,7 +285,7 @@ describe("review round 2: a machine that never committed the key set", () => {
     writeFileSync(file, encodeSignedRevocationList({ ...signRevocationList(unrevoked, attacker.privatePem), anchor: null }));
     expect(verifyLeaseForCli({ workspace: root, token }).ok).toBe(false);
     writeFileSync(join(keys, "lease_ed25519.pub"), keyPair().publicPem);
-    expect(() => getSigningPublicKeyPem(root, "lease")).toThrow(/keyset\.json is missing from a workspace with purpose keys/);
+    expect(() => getSigningPublicKeyPem(root, "lease")).toThrow(/keyset\.json is missing from a workspace with purpose key files/);
   });
 
   it("adopts a key set it never committed visibly: it says so, records it, and refuses a later fork", () => {
@@ -319,5 +319,111 @@ describe("review round 2: strict key resolution", () => {
     const result = verifyAgentClaim(claim, { requirePassport: false, requireFreshness: true }, secret, expectation);
     expect(result).toMatchObject({ trusted: false, trustTier: "UNVERIFIED", grantedScopes: [] });
     expect(result.reasons.join(" ")).toMatch(/no grants or no issuerKeyIds/);
+  });
+});
+
+// Round 3 of the independent review: p108-review/repro/{adopted-ratchet,brick,restore-loop}.ts.
+describe("review round 3: a machine that adopted the key set", () => {
+  it("adopted-ratchet: refuses a newer key set it did not commit until the owner accepts the digest the committing machine shows", async () => {
+    const root = workspace();
+    const homeA = process.env.AMC_HOME!;
+    const token = issueLeaseForCli({ workspace: root, agentId: "default", ttl: "1h", scopes: "gateway:llm", routes: "/openai", models: "*", rpm: 10, tpm: 1000 }).token;
+    const leaseId = (verifyLeaseForCli({ workspace: root, token }).payload as { leaseId: string }).leaseId;
+    revokeLease(root, leaseId, "compromised");
+    lockVault(root);
+    const homeB = mkdtempSync(join(tmpdir(), "amc-ws-writer-machine-b-"));
+    vi.stubEnv("AMC_HOME", homeB); // machine B only verifies
+    expect(verifyLeaseForCli({ workspace: root, token }).error).toBe("lease revoked");
+    const keysetFile = join(root, ".amc", "keys", "keyset.json");
+    const genuine = readFileSync(keysetFile);
+    // A writer re-points the lease and revocation-list keys and rewrites keyset.json one generation up.
+    const attacker = keyPair();
+    const keys = join(root, ".amc", "keys");
+    for (const file of ["revocation-list.pub", "lease.pub", "lease_ed25519.pub"]) writeFileSync(join(keys, file), attacker.publicPem);
+    const keyset = JSON.parse(genuine.toString("utf8"));
+    const files = Object.fromEntries(Object.keys(keyset.files).map(rel => [rel, sha256Hex(readFileSync(join(root, ".amc", rel)))]));
+    writeFileSync(keysetFile, canonicalize({ ...keyset, generation: keyset.generation + 1, keys: { ...keyset.keys, "revocation-list": ed25519KeyId(attacker.publicPem), lease: ed25519KeyId(attacker.publicPem) }, files }));
+    expect(() => getSigningPublicKeyPem(root, "lease")).toThrow(/is newer than generation 1, which this machine adopted/);
+    expect(verifyLeaseForCli({ workspace: root, token }).ok).toBe(false);
+    // The owner accepts only the digest the committing machine shows; the writer's is not it.
+    await expect(rotateKeysForCli(root, { accept: "2", digest: "0".repeat(64) })).rejects.toThrow(/nothing was accepted/);
+    // A genuine newer generation, committed on machine A, is accepted on B with A's digest.
+    writeFileSync(keysetFile, genuine);
+    for (const file of ["revocation-list.pub", "lease.pub", "lease_ed25519.pub"]) rmSync(join(keys, file));
+    vi.stubEnv("AMC_HOME", homeA);
+    await rotateKeysForCli(root, { restore: true });
+    unlockVault(root, PASS);
+    rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal"], passphrase: PASS });
+    const shown = keysetIdentity(root)!;
+    lockVault(root);
+    vi.stubEnv("AMC_HOME", homeB);
+    expect(() => getSigningPublicKeyPem(root, "artifact-seal")).toThrow(/is newer than generation 1/);
+    await expect(rotateKeysForCli(root, { accept: String(shown.generation), digest: shown.sha256 })).resolves.toMatchObject({ generation: shown.generation });
+    expect(getSigningPublicKeyPem(root, "artifact-seal")).toBeTruthy();
+    expect(keysetAnchoring(root)).toEqual({ state: "adopted-unanchored", generation: shown.generation });
+  });
+});
+
+describe("review round 3: upgrade availability (brick)", () => {
+  it("a stray purpose key in a 1.x workspace is refused by name, and the owner quarantines it to migrate", async () => {
+    const { root, roles } = v1Workspace(PASS);
+    dirs.push(root);
+    const stray = join(root, ".amc", "keys", "session.pub");
+    writeFileSync(stray, keyPair().publicPem);
+    expect(() => unlockVault(root, PASS)).toThrow(/session\.pub is not this vault's session key and no key set binds it[\s\S]*--quarantine-unbound-pub/);
+    const moved = await rotateKeysForCli(root, { quarantineUnboundPub: true }) as { quarantined: string[]; directory: string };
+    expect(moved.quarantined).toEqual([".amc/keys/session.pub"]);
+    expect(existsSync(join(moved.directory, "session.pub"))).toBe(true);
+    expect(readFileSync(join(process.env.AMC_HOME!, "state", "keyset-recovery", workspaceScope(root), "repairs.jsonl"), "utf8")).toMatch(/"action":"quarantine","file":".amc\/keys\/session.pub"/);
+    unlockVault(root, PASS); // migrates
+    expect(getSigningPublicKeyPem(root, "session")).toBe(roles.session.publicPem);
+  });
+
+  it("a purpose key in a 1.x workspace that is the vault's own is adopted by the migration", () => {
+    const { root, roles } = v1Workspace(PASS);
+    dirs.push(root);
+    writeFileSync(join(root, ".amc", "keys", "session.pub"), roles.session.publicPem);
+    unlockVault(root, PASS);
+    expect(getSigningPublicKeyPem(root, "session")).toBe(roles.session.publicPem);
+  });
+
+  it("on a machine that never committed the key set, a deleted keyset.json names its recovery: copy it from the committing machine", () => {
+    const root = workspace();
+    lockVault(root);
+    const genuine = readFileSync(join(root, ".amc", "keys", "keyset.json"));
+    vi.stubEnv("AMC_HOME", mkdtempSync(join(tmpdir(), "amc-ws-writer-machine-c-")));
+    rmSync(join(root, ".amc", "keys", "keyset.json"));
+    expect(() => getSigningPublicKeyPem(root, "lease")).toThrow(/elsewhere copy keyset\.json from it/);
+    writeFileSync(join(root, ".amc", "keys", "keyset.json"), genuine);
+    expect(getSigningPublicKeyPem(root, "lease")).toBeTruthy();
+  });
+});
+
+describe("review round 3: restore puts back the vault the key set names", () => {
+  it("restore-loop: an older vault swapped in is replaced by the committed copy, and unlock works", async () => {
+    const root = workspace();
+    const amc = join(root, ".amc");
+    const older = readFileSync(join(amc, "vault.amcvault"));
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], reason: "key-compromise", rootPrivateKeyPems: [pinnedRoot()], passphrase: PASS });
+    lockVault(root);
+    writeFileSync(join(amc, "vault.amcvault"), older);
+    rmSync(join(amc, "keys", "keyset.json"));
+    expect(() => unlockVault(root, PASS)).toThrow(/keyset\.json is missing/);
+    await expect(rotateKeysForCli(root, { restore: true })).resolves.toMatchObject({ vault: "restored" });
+    unlockVault(root, PASS);
+    expect(getSigningKey(root, "receipt")).toBeTruthy();
+  });
+
+  it("when no committed copy holds the named keys, restore says so and gives another next step", async () => {
+    const root = workspace();
+    const amc = join(root, ".amc");
+    const older = readFileSync(join(amc, "vault.amcvault"));
+    const rotated = rotatePurposeKeys({ workspace: root, purposes: ["receipt"], reason: "key-compromise", rootPrivateKeyPems: [pinnedRoot()], passphrase: PASS });
+    lockVault(root);
+    writeFileSync(join(amc, "vault.amcvault"), older);
+    rmSync(join(keysetRecoveryDir(root, rotated.generation), "committed", "vault.amcvault"));
+    const refusal = rotateKeysForCli(root, { restore: true });
+    await expect(refusal).rejects.toThrow(/not the ones key set generation \d+ names[\s\S]*restore vault\.amcvault from a backup/);
+    await expect(refusal).rejects.not.toThrow(/amc keys rotate --restore/);
   });
 });

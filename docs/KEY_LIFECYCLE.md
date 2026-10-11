@@ -45,7 +45,13 @@ While a change is pending, signing and verifying refuse with "key set generation
 
 A lost key set is never re-created automatically. Each committed generation also keeps its `keyset.json` and the files it wrote in AMC home (`gen-<N>/committed/`), and `amc keys rotate --restore`, in owner mode, puts back exactly the key set this machine committed. It restores `keyset.json` when its copy matches the mark, and every listed file that is missing or, for a public key or statement, lost its digest. A file it replaces is copied aside first.
 
-A machine that never committed the workspace's key set uses it on trust on first use, and does so visibly. It records the generation it adopted, so an older or forked key set is refused there too. Each process prints, on exit, that the key set was "adopted unanchored (trust on first use)", and `keysetAnchoring()` reports the same state for receipts and reports. A workspace that has purpose key files but no `keyset.json` is refused on any machine. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
+A machine that never committed the workspace's key set uses it on trust on first use, and does so visibly:
+
+- It records the generation it adopted, and refuses an older or forked key set from then on.
+- It also refuses any newer generation it did not commit. The owner must accept that generation explicitly, with the digest `amc keys list` shows on the committing machine.
+- Each process prints, on exit, that the key set was "adopted unanchored (trust on first use)", and `keysetAnchoring()` reports the same state for receipts and reports.
+
+A workspace that has purpose key files but no `keyset.json` is refused on any machine. Released 1.x versions (v1.0.0 to v1.1.1) wrote only `<role>_ed25519.pub` and role histories in `.amc/keys`; a purpose-named file there is a stray. At the 2.0 migration, a stray that is the vault's own key for that purpose is bound by the first generation. One that is not is refused by name. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
 
 `amc keys rotate --resume` rolls a pending generation forward when every staged file is intact. Otherwise it restores the previous bytes. Those copies hold older key material (the previous vault, public keys and histories), so they live in AMC home, under `<AMC home>/state/keyset-recovery/<workspace scope>/gen-<N>/`. Only the manifest, which names the files and their modes, stays in `.amc/keys/rotations/gen-<N>/`. Resume accepts only the generation this workspace would write next, or one this machine already marked before a crash, and only with that manifest; any other pending file is refused for the owner to inspect. Resuming never overwrites or deletes a file: one it would replace is copied to `gen-<N>/discarded/` in AMC home first, under a new name if that name is taken.
 
@@ -133,6 +139,25 @@ Every later read of `trust-roots.json` verifies the stored chain whole (each sta
 
 Identity claims between agents bind the issuing agent, audience, key purpose and key id, issue and expiry times (at most 24 hours), a nonce and the claimed score, level and passport. A verifier passes its expectation: audience, expected issuer, requested scope, its own grants per issuer, the key ids it binds to each issuer (`issuerKeyIds`: an Ed25519 session key id, or `claimHmacKeyId(secret)` for a shared secret) and a replay cache. A claim whose key is not bound to the issuer it names is refused, so one agent's key never speaks for another; so is anything unknown, expired, replayed or not granted, with score 0. A claim proved only by a shared HMAC secret, or by a key issuer admission does not vouch for, is `SELF_REPORTED`: it is reported, never trusted, at most `limited`, and grants no scope. An Ed25519 claim by a session key that issuer admission admits for `session` is `ATTESTED` and can be trusted ([AMC_TRUST_PROTOCOL.md](AMC_TRUST_PROTOCOL.md)).
 
+## When a key set is refused: recovery paths
+
+Every repair below runs in owner mode, and each is logged in `<AMC home>/state/keyset-recovery/<workspace scope>/repairs.jsonl`. Nothing is ever deleted: a file that a repair replaces or moves is kept, either in AMC home or in `.amc/quarantine/keys/`.
+
+| Refusal | Where | Recovery |
+|---|---|---|
+| `keyset.json is missing, but this machine committed generation N` | the committing machine | `amc keys rotate --restore` puts back `keyset.json`, every missing or changed public key and statement, and a vault holding the committed key ids, from AMC home. |
+| `key set generation N was never committed on this machine` / `FORK_DETECTED` / `ROLLBACK_DETECTED` | the committing machine | `amc keys rotate --restore`. |
+| `Vault unlock refused: the vault does not hold the keys key set generation N names` | the committing machine | `amc keys rotate --restore` opens the vault with your passphrase. If its key ids are wrong, it restores the newest committed copy that holds the right ones. If AMC home holds none, it says so: restore `vault.amcvault` from a backup taken after generation N. |
+| `the vault is missing from a workspace whose key set this machine committed` | the committing machine | `amc keys rotate --restore`. |
+| `keyset.json is missing, but this machine adopted generation N` | a machine that adopted the key set | Copy that `keyset.json` back from the committing machine. There, `amc keys rotate --restore` recreates it if needed. |
+| `key set generation N+1 (sha256 D) is newer than generation N, which this machine adopted` | a machine that adopted the key set | Compare `D` with `amc keys list` on the committing machine. If they match, run `amc keys rotate --accept N+1 --digest D`; if not, the workspace was rewritten, so restore it from the committing machine. |
+| `keyset.json is missing from a workspace with purpose key files` | any machine with no record | On the committing machine, `amc keys rotate --restore`. Elsewhere, copy `keyset.json` from it. For strays in a 1.x workspace, `amc keys rotate --quarantine-unbound-pub`. |
+| `Vault unlock refused: <purpose>.pub is not this vault's <purpose> key and no key set binds it` | 1.x upgrade | `amc keys rotate --quarantine-unbound-pub` moves the file to `.amc/quarantine/keys/<time>/`; the next unlock migrates. |
+| `revocations.signed.json ... no key set binds it` | 1.x upgrade or a new vault | `amc keys rotate --quarantine-unbound-pub`. |
+| `key set generation N is incomplete; run amc keys rotate --resume` | any | `amc keys rotate --resume`. |
+| `pending key set generation N is not one this workspace started` | any | Inspect `.amc/keys/keyset.pending.json`. A pending file that resume refuses was not written by AMC on this machine; remove it by hand after review. |
+| a revoked, unverifiable or rolled-back key revocation list | any | Restore the newest list from a backup or the committing machine; AMC refuses an older one. |
+
 ## Commands
 
 ```bash
@@ -140,6 +165,8 @@ amc keys list [--json]
 amc keys rotate --purpose <p> [--reason scheduled|superseded|purpose-split|key-compromise] [--overlap-days <n>] [--root-key <file>...]
 amc keys rotate --resume
 amc keys rotate --restore   # owner mode: put back the key set this machine committed
+amc keys rotate --accept <generation> --digest <sha256>   # owner mode, on a machine that adopted the key set
+amc keys rotate --quarantine-unbound-pub                  # owner mode, with no keyset.json: move unbound purpose files aside
 amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|unspecified
 amc keys export-public --purpose <p>
 ```

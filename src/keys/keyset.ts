@@ -186,33 +186,104 @@ const bound = new Map<string, { stamp: string; keyset: Keyset | null }>();
  * bytes at it FORK_DETECTED, and a newer one was never committed on this machine and is refused. A machine that never
  * changed keys for this workspace has no mark and takes the file as found (portable verdicts need pinned keys).
  */
-export function boundKeyset(workspace: string): Keyset | null {
+export function boundKeyset(workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null {
   assertNoPendingKeyset(workspace);
   const stamp = statStamp([keysetPaths(workspace).keyset, highWaterPath()]);
   const memo = bound.get(workspace);
   if (memo && memo.stamp === stamp) return memo.keyset;
   const keyset = readKeysetFile(workspace, KEYSET_REL);
   const mark = readHighWater(markKey(workspace));
-  const restore = "restore it with `amc keys rotate --restore` (owner mode) on the machine that committed it";
   if (mark !== null) {
-    if (keyset === null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}; ${restore}`);
+    if (keyset === null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine committed generation ${mark.sequence}; run \`amc keys rotate --restore\` (owner mode)`);
     if (keyset.generation > mark.sequence) {
-      throw new AntiRollbackError("FORK_DETECTED", `key set generation ${keyset.generation} was never committed on this machine (it committed ${mark.sequence}); refusing it`);
+      throw new AntiRollbackError("FORK_DETECTED", `key set generation ${keyset.generation} was never committed on this machine (it committed ${mark.sequence}); refusing it. `
+        + "Run `amc keys rotate --restore` (owner mode) to put back the key set this machine committed");
     }
     compareHighWater(markKey(workspace), mark, keyset.generation, sha256Hex(canonicalize(keyset)));
-  } else if (keyset === null) {
-    const adopted = readHighWater(adoptedKey(workspace));
-    if (adopted !== null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine adopted generation ${adopted.sequence}; ${restore}`);
-    // Not memoized: a removed key set is noticed as soon as any purpose file is present.
-    if (PURPOSE_FILES.some(rel => containedExists(workspace, rel))) {
-      throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing from a workspace with purpose keys; refusing every key. ${restore}`);
-    }
-    return null;
   } else {
-    adoptUnanchored(workspace, keyset);
+    const adopted = readHighWater(adoptedKey(workspace));
+    if (keyset === null) {
+      if (adopted !== null) {
+        throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but this machine adopted generation ${adopted.sequence} (sha256 ${adopted.sha256}); `
+          + "copy that keyset.json back from the machine that committed it (there: `amc keys rotate --restore`)");
+      }
+      // Not memoized: a removed key set is noticed as soon as any purpose file is present.
+      const unbound = PURPOSE_FILES.filter(rel => containedExists(workspace, rel));
+      if (unbound.length > 0 && opts.allowUnboundFiles !== true) {
+        throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing from a workspace with purpose key files (${unbound.join(", ")}); refusing every key. `
+          + "On the machine that committed the key set run `amc keys rotate --restore`; elsewhere copy keyset.json from it. Files a 1.x workspace "
+          + "never wrote can be moved aside with `amc keys rotate --quarantine-unbound-pub` (owner mode).");
+      }
+      return null;
+    }
+    const sha256 = sha256Hex(canonicalize(keyset));
+    if (adopted === null) {
+      adoptUnanchored(workspace, keyset);
+    } else if (keyset.generation > adopted.sequence) {
+      // A newer key set this machine never committed is a writer's as much as the owner's: only the owner accepts it.
+      throw new AntiRollbackError("FORK_DETECTED", `key set generation ${keyset.generation} (sha256 ${sha256}) is newer than generation ${adopted.sequence}, which this machine `
+        + "adopted, and was not committed here. Once the committing machine shows that digest (`amc keys list`), accept it with "
+        + `\`amc keys rotate --accept ${keyset.generation} --digest ${sha256}\` (owner mode)`);
+    } else {
+      compareHighWater(adoptedKey(workspace), adopted, keyset.generation, sha256);
+    }
   }
   bound.set(workspace, { stamp: statStamp([keysetPaths(workspace).keyset, highWaterPath()]), keyset });
   return keyset;
+}
+
+/** The workspace key set's generation and digest as found (what the committing machine shows for `--accept`). */
+export function keysetIdentity(workspace: string): { generation: number; sha256: string } | null {
+  const keyset = readKeysetFile(workspace, KEYSET_REL);
+  return keyset === null ? null : { generation: keyset.generation, sha256: sha256Hex(canonicalize(keyset)) };
+}
+
+/**
+ * `amc keys rotate --accept <generation> --digest <sha256>` (owner mode), on a machine that adopted the key set: accepts
+ * one newer generation the committing machine showed, and only when the workspace's keyset.json is exactly it.
+ */
+export function acceptAdoptedKeyset(workspace: string, generation: number, digest: string): { generation: number; sha256: string } {
+  assertNoPendingKeyset(workspace);
+  if (readHighWater(markKey(workspace)) !== null) throw new Error("this machine committed this workspace's key set; it never accepts another one (use `amc keys rotate --restore`)");
+  const found = keysetIdentity(workspace);
+  if (found === null || found.generation !== generation || found.sha256 !== digest.trim().toLowerCase()) {
+    throw new Error(`the workspace's keyset.json is ${found === null ? "missing" : `generation ${found.generation} with sha256 ${found.sha256}`}, `
+      + `not generation ${generation} with sha256 ${digest}; nothing was accepted`);
+  }
+  const adopted = readHighWater(adoptedKey(workspace));
+  if (adopted !== null && generation < adopted.sequence) throw new AntiRollbackError("ROLLBACK_DETECTED", `generation ${generation} is older than the adopted ${adopted.sequence}; nothing was accepted`);
+  recordHighWater(adoptedKey(workspace), generation, found.sha256);
+  logRepair(workspace, { action: "accept", generation, sha256: found.sha256 });
+  return found;
+}
+
+/**
+ * `amc keys rotate --quarantine-unbound-pub` (owner mode): with no keyset.json and no key set committed here, moves the
+ * purpose key files and key revocation list no key set binds (strays a 1.x workspace never wrote) to
+ * `.amc/quarantine/keys/<time>/`, and logs each move in AMC home. Moves, never deletes.
+ */
+export function quarantineUnboundPurposeFiles(workspace: string): { quarantined: string[]; directory: string | null } {
+  assertNoPendingKeyset(workspace);
+  if (readHighWater(markKey(workspace)) !== null) throw new Error("this machine committed this workspace's key set: run `amc keys rotate --restore` instead");
+  if (containedExists(workspace, KEYSET_REL)) throw new Error("keyset.json binds the purpose key files; nothing is unbound");
+  const candidates = [...PURPOSE_FILES, ...LOCAL_PURPOSES.filter(p => p !== "lease" && p !== "session").map(p => `.amc/keys/${p}_history.json`)];
+  const unbound = candidates.filter(rel => containedExists(workspace, rel));
+  if (unbound.length === 0) return { quarantined: [], directory: null };
+  const dir = `.amc/quarantine/keys/${new Date().toISOString().replace(/[:.]/g, "-")}`;
+  for (const rel of unbound) {
+    const bytes = readContained(workspace, rel, MAX_KEY_FILE);
+    renameContained(workspace, rel, `${dir}/${rel.split("/").pop()!}`);
+    logRepair(workspace, { action: "quarantine", file: rel, sha256: sha256Hex(bytes), to: dir });
+  }
+  return { quarantined: unbound, directory: join(workspace, dir) };
+}
+
+/** One line per explicit owner repair, in AMC home (outside the workspace the repair changes). */
+function logRepair(workspace: string, entry: Record<string, unknown>): void {
+  const rel = `state/keyset-recovery/${workspaceScope(workspace)}/repairs.jsonl`;
+  const home = amcHome();
+  const prior = readContainedOrNull(home, rel, MAX_BYTES)?.toString("utf8") ?? "";
+  writeContained(home, rel, `${prior}${JSON.stringify({ ts: new Date().toISOString(), workspace, ...entry })}\n`, 0o600);
 }
 
 /**
@@ -232,8 +303,8 @@ export function assertBoundPublicKey(workspace: string, purpose: LocalPurpose, p
  * Signers: the bound key set (above), after checking that every public key and statement it pins still has its digest.
  * Null for a workspace that has none yet.
  */
-export function assertKeysetComplete(workspace: string): Keyset | null {
-  const keyset = boundKeyset(workspace);
+export function assertKeysetComplete(workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null {
+  const keyset = boundKeyset(workspace, opts);
   if (keyset === null) return null;
   const listed = Object.keys(keyset.files).filter(pinned);
   const now = statStamp([keysetPaths(workspace).keyset, highWaterPath(), ...listed.map(rel => join(amcDir(workspace), rel))]);
@@ -264,7 +335,8 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
     // Refuses a pending change, and, once this machine committed a key set here, a keyset.json that is missing or is not
     // exactly that generation: a lost key set is restored by `amc keys rotate --restore`, never re-created.
-    const current = assertKeysetComplete(workspace);
+    // The first generation binds purpose files that already match what it writes (publicKeyWrites refuses any other).
+    const current = assertKeysetComplete(workspace, { allowUnboundFiles: true });
     const generation = Math.max(current?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
     const rows = change.writes.map(write => ({ rel: relOf(workspace, write.path), write }));
     const written = Object.fromEntries(rows.map(({ rel, write }) => [rel, sha256Hex(Buffer.from(write.bytes))]));
@@ -373,7 +445,9 @@ const restoredMode = (rel: string) => rel.endsWith(".pub") || rel.endsWith(".met
  * missing or, for a public key or statement, lost its digest; a file that is replaced is copied aside first. Nothing is
  * restored automatically, and nothing this machine did not commit.
  */
-export function restoreCommittedKeyset(workspace: string): { generation: number; restored: string[]; missing: string[] } {
+export function restoreCommittedKeyset(workspace: string, opts: { vaultKeyIds?: (envelope: Buffer) => Keyset["keys"] | null } = {}): {
+  generation: number; restored: string[]; missing: string[]; vault: "matches" | "restored" | "unchecked";
+} {
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
     const mark = readHighWater(markKey(workspace));
@@ -402,7 +476,9 @@ export function restoreCommittedKeyset(workspace: string): { generation: number;
       restored.push(rel);
     }
     writeContained(workspace, KEYSET_REL, keysetBytes, 0o600);
-    return { generation: mark.sequence, restored, missing };
+    const vault = restoreVaultHolding(workspace, keyset, mark.sequence, copyOf, opts.vaultKeyIds);
+    if (vault === "restored") restored.push("vault.amcvault");
+    return { generation: mark.sequence, restored, missing, vault };
   } });
 }
 
@@ -411,4 +487,32 @@ export function keepPreviousVault(workspace: string, envelope: string): void {
   const rel = `state/keyset-recovery/${workspaceScope(workspace)}/previous-vault.amcvault`;
   const home = amcHome();
   if (!containedExists(home, rel)) writeContained(home, rel, envelope, 0o600);
+}
+
+const sameKeys = (a: Keyset["keys"], b: Keyset["keys"]) => LOCAL_PURPOSES.every(purpose => a[purpose] === b[purpose]);
+
+/**
+ * A vault that is present with other bytes is not trusted by digest (secret writes change it): opened with the owner's
+ * passphrase, it must hold the key ids the committed key set names. If it does not (an older vault swapped in), the
+ * newest committed copy that does is put back, the replaced one copied aside; if none does, the refusal names the
+ * mismatch and the next step, never the same advice again.
+ */
+function restoreVaultHolding(workspace: string, keyset: Keyset, generation: number, copyOf: (generation: number, name: string) => Buffer | null,
+  vaultKeyIds: ((envelope: Buffer) => Keyset["keys"] | null) | undefined): "matches" | "restored" | "unchecked" {
+  if (vaultKeyIds === undefined) return "unchecked";
+  const present = readContainedOrNull(workspace, ".amc/vault.amcvault", MAX_KEY_FILE);
+  const presentIds = present === null ? null : vaultKeyIds(present);
+  if (presentIds !== null && sameKeys(presentIds, keyset.keys)) return "matches";
+  for (let candidate = generation; candidate >= 1; candidate -= 1) {
+    const copy = copyOf(candidate, recoveryName("vault.amcvault"));
+    const ids = copy === null ? null : vaultKeyIds(copy);
+    if (copy === null || ids === null || !sameKeys(ids, keyset.keys)) continue;
+    if (present !== null) writeContained(amcHome(), `${recoveryRel(workspace, generation)}/discarded/restore-${Date.now()}-vault.amcvault`, present, 0o600);
+    writeContained(workspace, ".amc/vault.amcvault", copy, 0o600);
+    logRepair(workspace, { action: "restore-vault", fromGeneration: candidate });
+    return "restored";
+  }
+  throw new Error(`the vault ${present === null ? "is missing" : presentIds === null ? "does not open with this passphrase" : `holds key ids ${JSON.stringify(presentIds)}`}, `
+    + `not the ones key set generation ${generation} names (${JSON.stringify(keyset.keys)}), and AMC home holds no committed vault copy that does. `
+    + `keyset.json was restored; restore vault.amcvault from a backup taken after generation ${generation}, or check the passphrase.`);
 }

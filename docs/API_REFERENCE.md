@@ -6000,6 +6000,9 @@ Rotate one purpose's key with a signed, chained statement; --resume completes or
 | `--root-key <file...>` | - |
 | `--resume` | - |
 | `--restore` | - |
+| `--accept <generation>` | - |
+| `--digest <sha256>` | - |
+| `--quarantine-unbound-pub` | - |
 
 #### `amc lab-compare`
 

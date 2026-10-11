@@ -34,7 +34,7 @@ import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence } f
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
 import { assertLocal, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
 export { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem } from "./signingKeys.js";
-import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFileRel, keysetPaths, keysetRecoveryDir, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetAnchoring, keysetDeclared, keysetFileRel, keysetIdentity, keysetPaths, keysetRecoveryDir, resumeKeyset, type KeysetWrite } from "./keyset.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
@@ -303,7 +303,7 @@ export function verifyProofOfPossession(exported: { purpose: string; keyId: stri
 }
 
 /** `amc keys list`: public information only, no vault unlock. */
-export function listKeys(workspace: string): { generation: number | null; complete: boolean; detail: string | null; purposes: Array<{ purpose: LocalPurpose; role: string; keyId: string | null; sharedWith: LocalPurpose[]; historyKeys: number; rotations: number }> } {
+export function listKeys(workspace: string): { generation: number | null; digest: string | null; anchoring: ReturnType<typeof keysetAnchoring>["state"]; complete: boolean; detail: string | null; purposes: Array<{ purpose: LocalPurpose; role: string; keyId: string | null; sharedWith: LocalPurpose[]; historyKeys: number; rotations: number }> } {
   let generation: number | null = null;
   let detail: string | null = null;
   try {
@@ -322,7 +322,8 @@ export function listKeys(workspace: string): { generation: number | null; comple
     const keyId = keyIds.get(purpose) ?? null;
     return { purpose, role: roleOfPurpose(purpose), keyId, sharedWith: LOCAL_PURPOSES.filter(other => other !== purpose && keyId !== null && keyIds.get(other) === keyId), historyKeys, rotations };
   });
-  return { generation, complete: detail === null, detail, purposes };
+  // The digest another machine needs for `amc keys rotate --accept`, and how this machine holds the key set.
+  return { generation, digest: keysetIdentity(workspace)?.sha256 ?? null, anchoring: keysetAnchoring(workspace).state, complete: detail === null, detail, purposes };
 }
 
 /**

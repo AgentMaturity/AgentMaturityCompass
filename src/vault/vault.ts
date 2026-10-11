@@ -174,6 +174,13 @@ export function vaultMetaBytes(payload: VaultPayload): string {
   }, null, 2);
 }
 
+/** The key ids a vault envelope holds under `passphrase`, or null when it does not open with it (`amc keys rotate --restore`). */
+export function vaultEnvelopeKeyIds(envelopeRaw: string, passphrase: string): Partial<Record<LocalPurpose, string>> | null {
+  let payload: VaultPayload;
+  try { payload = decodePayload(envelopeRaw, passphrase).payload; } catch { return null; } // "does not open" is the answer here
+  return keyIdsOf(payload);
+}
+
 export function keyIdsOf(payload: VaultPayload): Partial<Record<LocalPurpose, string>> {
   return Object.fromEntries(LOCAL_PURPOSES.flatMap(purpose => payload.keys[purpose] ? [[purpose, payload.keys[purpose]!.keyId]] : []));
 }
@@ -259,7 +266,14 @@ function publicKeyWrites(workspace: string, payload: VaultPayload, existingVault
 function emptyKeyRevocationList(workspace: string, payload: VaultPayload): KeysetWrite[] {
   const location = keyRevocationLocation(workspace, []);
   const key = payload.keys["revocation-list"];
-  if (containedExists(workspace, location.rel) || !key) return [];
+  if (containedExists(workspace, location.rel)) {
+    if (boundKeyset(workspace, { allowUnboundFiles: true }) === null) {
+      throw new Error(`${location.rel} exists, but no key set binds it (a stray in a workspace without one); move it aside with `
+        + "`amc keys rotate --quarantine-unbound-pub` (owner mode) before AMC creates its key set");
+    }
+    return [];
+  }
+  if (!key) return [];
   const sequence = (machineMark(workspace, "REVOCATION_LIST", location.listId)?.sequence ?? 0) + 1;
   const list = { type: "amc.revocation-list" as const, version: 1 as const, listId: location.listId, sequence, previousSha256: null, issuedAt: new Date().toISOString(), revoked: [] };
   return [{ path: join(workspace, location.rel), bytes: encodeSignedRevocationList(signRevocationList(list, key.privateKeyPem)), mode: 0o644 }];
@@ -367,7 +381,7 @@ export function unlockVault(workspace: string, passphrase?: string): void {
  * would then produce signatures nothing verifies. A vault from before lease and session keys may lack such a key and
  * its .pub, and unlock adds the key; a .pub with no key behind it is refused, because a new key would replace it.
  */
-function assertPublishedKeysMatch(workspace: string, payload: VaultPayload): void {
+function assertPublishedKeysMatch(workspace: string, payload: VaultPayload, unbound = false): void {
   const paths = vaultPaths(workspace);
   for (const kind of KEY_KINDS) {
     const file = paths[`${kind}Public`];
@@ -388,8 +402,12 @@ function assertPublishedKeysMatch(workspace: string, payload: VaultPayload): voi
     const key = payload.keys[purpose];
     const { publicFile } = purposeKeyPaths(workspace, purpose);
     if (key && pathExists(publicFile) && readUtf8(publicFile) !== publicKeyFromPrivate(key.privateKeyPem)) {
-      throw new Error(`Vault unlock refused: ${publicFile} does not match the vault's ${purpose} key. A key write was interrupted or the file was replaced. `
-        + "See \"When unlock refuses\" in docs/VAULT.md.");
+      // With no key set, a matching file is adopted by the migration; one that does not match is a stray.
+      throw new Error(unbound
+        ? `Vault unlock refused: ${publicFile} is not this vault's ${purpose} key and no key set binds it. Move it aside with `
+          + "`amc keys rotate --quarantine-unbound-pub` (owner mode), or put back the keyset.json it belongs to."
+        : `Vault unlock refused: ${publicFile} does not match the vault's ${purpose} key. A key write was interrupted or the file was replaced. `
+          + "See \"When unlock refuses\" in docs/VAULT.md.");
     }
   }
 }
@@ -407,7 +425,8 @@ function openVaultSession(workspace: string, phrase: string): void {
   }
   // P1-08: once this machine committed a key set here, keyset.json must be exactly that generation (missing, older,
   // forked or newer is refused) before any vault opens, and the vault must hold the key ids it names.
-  const keyset = boundKeyset(workspace);
+  // Purpose key files with no key set (strays in a 1.x workspace) are checked against the vault below, not refused here.
+  const keyset = boundKeyset(workspace, { allowUnboundFiles: true });
   let decoded: ReturnType<typeof decodePayload>;
   try {
     decoded = decodePayload(envelopeRaw, phrase);
@@ -420,7 +439,11 @@ function openVaultSession(workspace: string, phrase: string): void {
     throw new Error(`Vault unlock refused: the vault does not hold the keys key set generation ${keyset.generation} names (a replaced or restored vault). `
       + "Restore the committed vault with `amc keys rotate --restore`.");
   }
-  assertPublishedKeysMatch(workspace, payload);
+  assertPublishedKeysMatch(workspace, payload, keyset === null);
+  if (keyset === null && decoded.sourceVersion === 1 && containedExists(workspace, ".amc/keys/revocations.signed.json")) {
+    throw new Error("Vault unlock refused: .amc/keys/revocations.signed.json is in a 1.x workspace, which never had one, and no key set binds it. "
+      + "Move it aside with `amc keys rotate --quarantine-unbound-pub` (owner mode).");
+  }
   let openedDigest: string | null = envelopeDigest;
   let migrated: ReturnType<typeof persistVault> = [];
   if (decoded.sourceVersion === 1 || !payload.keys.lease || !payload.keys.session) {
