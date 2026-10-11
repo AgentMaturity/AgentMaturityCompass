@@ -40,12 +40,18 @@ export interface A4EffectContext {
   readonly approvalRequestId: string;
   /** Extra heartbeat for long steps; the runner already beats every 5 s. */
   readonly heartbeat: () => void;
+  /** The live principal whose request runs an `inline` effect's attempt; null for one run after the response. */
+  readonly principal: A4Principal | null;
 }
 export interface A4EffectOutcome {
   /** Recorded on EFFECT_FINISHED as an implementation-lane, self_reported ref. */
   readonly receipt?: { readonly refKind: A4RefKind; readonly refId: string; readonly sha256: string; readonly label: string };
   /** `consumes: "executor"` only: the engine's consumed record's executionId (design §6.1). */
   readonly consumedExecutionId?: string;
+  /** Signed onto EFFECT_FINISHED (an id projection, never a credential). */
+  readonly record?: Record<string, unknown>;
+  /** `inline` effects only: answered once in the response that ran the attempt (a lease token), never stored or journaled. */
+  readonly deliver?: Record<string, unknown>;
 }
 /** One effect a stage lane registers (design §6.1 table). */
 export interface A4EffectDef {
@@ -68,6 +74,12 @@ export interface A4EffectDef {
    * stage's readiness may still require it), and it can no longer be opened on that consumed gate.
    */
   readonly optional?: boolean;
+  /**
+   * Runs inside the request that started the attempt (complete or retry), which answers its `deliver` once, so a
+   * credential it mints is never delivered to nobody; that request's replay row keeps the allowlist projection only
+   * (token: null, TOKEN_ALREADY_DELIVERED). Every other effect runs after the response.
+   */
+  readonly inline?: boolean;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
   readonly executionId: (state: A4ReadinessState, gate: A4GateRow) => string;
   /** The engine intent; the default binds the documentary gate's binding digest and the execution id. */
@@ -91,11 +103,16 @@ const lookupEffect = (id: string): A4EffectDef | undefined => {
   ensureA4Stages();
   return EFFECTS.get(id);
 };
+/** Whether effect `id` runs inline (inside the request that started its attempt; A4EffectDef.inline). */
+export const inlineEffect = (id: string): boolean => lookupEffect(id)?.inline === true;
 const effectDef = (id: string): A4EffectDef => {
   const def = lookupEffect(id);
   if (def === undefined) throw fail(404, "A4_EFFECT_UNKNOWN", `no A4 effect ${id} is registered`);
   return def;
 };
+/** An inline effect's request key stores the credential projection only (src/a4/a4Store.ts dedupeRequest), never its answer. */
+const requestFor = (def: A4EffectDef, request: A4Call["request"]): A4Call["request"] =>
+  def.inline === true && request !== undefined ? { ...request, credential: { releaseId: def.id, leaseIds: [] } } : request;
 const effectIntent = (def: A4EffectDef, state: A4ReadinessState, gate: A4GateRow): Record<string, unknown> =>
   def.intent?.(state, gate) ?? { schema: "amc.a4-effect-intent/v1", projectId: state.project.project_id, gateId: gate.gate_id, effect: def.id,
     bindingDigest: gate.binding_digest, executionId: def.executionId(state, gate) };
@@ -409,7 +426,7 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
-  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
+  const result = consumeGate(store, projectId, { ...input, request: requestFor(def, input.request), response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
     const executionId = def.executionId(state, row);
     // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
     if (def.consumes === "gate") {
@@ -442,7 +459,7 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
   const now = Date.now();
   const attemptId = randomId("a4e");
   const call = withFullIntegrity(store, projectId, input);
-  const result = governed(store, projectId, principal, { ...input, response: { attemptId } }, (ts, load) => {
+  const result = governed(store, projectId, principal, { ...input, request: requestFor(def, input.request), response: { attemptId } }, (ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     if (row.stage !== input.stage) throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
@@ -524,7 +541,8 @@ function settleEffect(store: A4Store, projectId: string, attemptId: string, kind
  * for a transient store error); if that still throws, the attempt stays unsettled and reads as lost (PROCESS_LOST /
  * outcome_unknown), never as a definite failure of an effect that ran.
  */
-export async function runA4Effect(store: A4Store, projectId: string, attemptId: string): Promise<A4TransitionResult> {
+export async function runA4Effect(store: A4Store, projectId: string, attemptId: string, principal: A4Principal | null = null):
+  Promise<A4TransitionResult & { readonly deliver?: Record<string, unknown> }> {
   const { workspace } = store;
   const failWith = (error: string): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FAILED", { error: error.slice(0, 500) });
   let outcome: A4EffectOutcome;
@@ -564,7 +582,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     const timer = setInterval(beat, HEARTBEAT_MS);
     timer.unref();
     try {
-      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat });
+      outcome = await def.run({ workspace, state, gate, executionId, approvalRequestId, heartbeat: beat, principal });
     } finally {
       clearInterval(timer);
     }
@@ -572,14 +590,16 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
     return failWith(error instanceof Error ? error.message : String(error));
   }
   const finish = (): A4TransitionResult => settleEffect(store, projectId, attemptId, "EFFECT_FINISHED", { consumedExecutionId: outcome.consumedExecutionId ?? null,
-    receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })) },
-  outcome.receipt);
+    receipt: outcome.receipt ?? null, slotChecks: Object.entries(bound).filter(([, value]) => value !== null).map(([slot, expected]) => ({ slot, expected, ok: true })),
+    ...(outcome.record === undefined ? {} : { record: outcome.record }) }, outcome.receipt);
+  let settled: A4TransitionResult;
   try {
-    return finish();
+    settled = finish();
   } catch {
     // A second throw propagates and leaves the attempt unsettled (lost), never EFFECT_FAILED.
-    return finish();
+    settled = finish();
   }
+  return outcome.deliver === undefined ? settled : { ...settled, deliver: outcome.deliver };
 }
 
 /**
@@ -618,9 +638,11 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
   const nextAttempt = randomId("a4e");
   // A dead or silent earlier attempt of this execution is settled first, as amc-runtime under the liveness rule, so the
   // retry rule sees its failure; the head the client saw moves by exactly those rows (anything else is still stale).
-  const executionId0 = String(startedLink(store.readChain(projectId), input.attemptId).body.executionId);
+  const started0 = startedLink(store.readChain(projectId), input.attemptId);
+  const executionId0 = String(started0.body.executionId);
   const swept = sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: executionId0 }).length;
-  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts, load) => {
+  const request = requestFor(effectDef(String(started0.body.effect)), input.request);
+  const result = governed(store, projectId, principal, { ...input, request, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts, load) => {
     const state = load(now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));
