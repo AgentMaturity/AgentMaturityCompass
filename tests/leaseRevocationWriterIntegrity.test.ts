@@ -1,11 +1,25 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { leaseRevocationPaths, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "../src/leases/leaseStore.js";
 import { ensureLeaseRevocationStore, revokeLeaseForCli, resignLeaseRevocationsForCli } from "../src/leases/leaseCli.js";
+import { sha256Hex } from "../src/utils/hash.js";
+
+// A one-shot hook that runs just before the revocations lock is taken: the gap between a caller's unlocked check
+// and the locked publish, where another process can drop a file.
+const beforeLock = vi.hoisted(() => ({ next: null as null | (() => void) }));
+vi.mock("../src/lifecycle/controlFileLock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/lifecycle/controlFileLock.js")>();
+  return { ...actual, withControlFileLock: ((input) => {
+    const hook = beforeLock.next;
+    beforeLock.next = null;
+    hook?.();
+    return actual.withControlFileLock(input);
+  }) as typeof actual.withControlFileLock };
+});
 
 // Temporary signed-store fixtures, authored only. No production revocation or
 // repair is performed; future source tests do not constitute installed proof.
@@ -50,7 +64,7 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     else if (variant === "invalid-json") writeFileSync(paths.file, "{");
     else {
       writeFileSync(paths.file, JSON.stringify({ v: 1, updatedTs: Date.now(), revocations: "not-a-list" }));
-      signLeaseRevocations(root); // deliberate malformed fixture, not an accepted store
+      signLeaseRevocations(root, sha256Hex(readFileSync(paths.file))); // deliberate malformed fixture, not an accepted store
     }
     const before = snapshot(root);
     expect(() => revokeLeaseForCli({ workspace: root, leaseId: "unrelated-new-id", reason: "must not launder" })).toThrow(/revocation store unverifiable/);
@@ -90,7 +104,7 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     const before = snapshot(root);
     lockVault(root); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); vi.stubEnv("AMC_NO_SIGN", "1"); // ephemeral signer
     const publish = variant === "revoke" ? () => revokeLease(root, "next-id", "unverifiable signer")
-      : variant === "resign" ? () => resignLeaseRevocationsForCli(root) : () => ensureLeaseRevocationStore(root);
+      : variant === "resign" ? () => resignLeaseRevocationsForCli(root, sha256Hex(before.list!)) : () => ensureLeaseRevocationStore(root);
     expect(publish).toThrow(/would not verify/);
     expect(snapshot(root)).toEqual(before);
     if (variant !== "bootstrap") expect(revokedLeaseIdSet(root)).toEqual(new Set(["older-revoked"]));
@@ -101,10 +115,42 @@ describe("AMC-1542 revocation writer authenticates the prior snapshot", () => {
     const body = JSON.parse(readFileSync(paths.file, "utf8"));
     writeFileSync(paths.file, JSON.stringify({ ...body, updatedTs: body.updatedTs + 1 }));
     expect(() => revokeLease(root, "next-id", "ordinary operation")).toThrow(/revocation store unverifiable/);
-    const repair = resignLeaseRevocationsForCli(root); // explicit fixture-only operator repair
+    const repair = resignLeaseRevocationsForCli(root, sha256Hex(readFileSync(paths.file))); // explicit fixture-only operator repair
     expect(repair.wasValid).toBe(false);
     expect(repair.revocationCount).toBe(1);
     revokeLease(root, "next-id", "after reviewed repair");
     expect(revokedLeaseIdSet(root)).toEqual(new Set(["older-revoked", "next-id"]));
+  });
+});
+
+describe("revocation bootstrap and repair sign only reviewed bytes (P0-30 follow-up)", () => {
+  it("bootstrap never signs a list that appeared after its unlocked absence check", () => {
+    const root = workspace();
+    const paths = leaseRevocationPaths(root);
+    rmSync(paths.file, { force: true }); rmSync(paths.sig, { force: true });
+    const planted = Buffer.from(JSON.stringify({ v: 1, updatedTs: 1, revocations: [] }));
+    beforeLock.next = () => { mkdirSync(dirname(paths.file), { recursive: true }); writeFileSync(paths.file, planted); };
+    expect(ensureLeaseRevocationStore(root).signatureValid).toBe(false);
+    expect(snapshot(root)).toEqual({ list: planted, signature: null });
+  });
+  it("resign refuses a list that is not the one whose digest the operator reviewed", () => {
+    const root = workspace(); revokeLease(root, "older-revoked", "preserve");
+    const paths = leaseRevocationPaths(root);
+    const reviewed = sha256Hex(readFileSync(paths.file));
+    const swapped = Buffer.from(JSON.stringify({ v: 1, updatedTs: 2, revocations: [] }));
+    const signature = snapshot(root).signature;
+    beforeLock.next = () => writeFileSync(paths.file, swapped);
+    expect(() => resignLeaseRevocationsForCli(root, reviewed)).toThrow(/reviewed/);
+    expect(snapshot(root)).toEqual({ list: swapped, signature });
+    expect(() => revokedLeaseIdSet(root)).toThrow();
+  });
+  it("resign refuses a missing list instead of vouching for an empty one", () => {
+    const root = workspace(); revokeLease(root, "older-revoked", "preserve");
+    const paths = leaseRevocationPaths(root);
+    const reviewed = sha256Hex(readFileSync(paths.file));
+    rmSync(paths.file);
+    const before = snapshot(root);
+    expect(() => resignLeaseRevocationsForCli(root, reviewed)).toThrow();
+    expect(snapshot(root)).toEqual(before);
   });
 });

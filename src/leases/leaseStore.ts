@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { closeSync, constants, fstatSync, mkdirSync, openSync, readSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { pathExists } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -22,6 +22,27 @@ export function leaseRevocationPaths(workspace: string): { file: string; sig: st
   };
 }
 
+// ponytail: the list is never pruned, so a workspace with ~500k revocations hits this cap and refuses every lease.
+const MAX_LIST_BYTES = 64 * 1024 * 1024;
+const MAX_SIG_BYTES = 64 * 1024;
+
+/**
+ * Read one store file without following a symlink or blocking on a FIFO or device: anything but a regular file within
+ * `maxBytes` throws, and every caller treats that as an unverifiable store (every lease refused).
+ */
+function readStoreFile(path: string, maxBytes: number): Buffer {
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile()) throw new Error(`${basename(path)} is not a regular file`);
+    if (stat.size > maxBytes) throw new Error(`${basename(path)} exceeds ${maxBytes} bytes`);
+    const bytes = Buffer.alloc(stat.size);
+    return bytes.subarray(0, readSync(fd, bytes, 0, bytes.length, 0));
+  } finally {
+    closeSync(fd);
+  }
+}
+
 function defaultLeaseRevocations(): LeaseRevocations {
   return {
     v: 1,
@@ -35,7 +56,7 @@ export function loadLeaseRevocations(workspace: string): LeaseRevocations {
   if (!pathExists(paths.file)) {
     return defaultLeaseRevocations();
   }
-  return leaseRevocationsSchema.parse(JSON.parse(readFileSync(paths.file, "utf8")) as unknown);
+  return leaseRevocationsSchema.parse(JSON.parse(readStoreFile(paths.file, MAX_LIST_BYTES).toString("utf8")) as unknown);
 }
 
 /**
@@ -72,14 +93,34 @@ function publishSignedRevocations(workspace: string, bytes: Buffer): void {
   if (!published.valid) throw new Error(`lease revocation store does not verify after publishing (${published.reason ?? "unknown"})`);
 }
 
-export function signLeaseRevocations(workspace: string): string {
+/**
+ * First-store bootstrap: publish the default empty list, and only while neither file exists. Both checks run under
+ * the lock, so a list dropped after a caller's unlocked check is never signed; returns whether it published.
+ */
+export function bootstrapLeaseRevocations(workspace: string): boolean {
   const paths = leaseRevocationPaths(workspace);
   return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
-    const bytes = pathExists(paths.file)
-      ? readFileSync(paths.file)
-      : Buffer.from(JSON.stringify(defaultLeaseRevocations(), null, 2), "utf8");
+    if (pathExists(paths.file) || pathExists(paths.sig)) return false;
+    publishSignedRevocations(workspace, Buffer.from(JSON.stringify(defaultLeaseRevocations(), null, 2), "utf8"));
+    return true;
+  } });
+}
+
+/**
+ * The deliberate repair: sign the list on disk only if its bytes still have the digest the operator reviewed (checked
+ * under the lock, on the bytes that are signed). Returns those bytes.
+ */
+export function signLeaseRevocations(workspace: string, reviewedDigestSha256: string): Buffer {
+  const paths = leaseRevocationPaths(workspace);
+  return withControlFileLock({ root: dirname(paths.file), name: "revocations", operation: () => {
+    if (!pathExists(paths.file)) throw new Error("revocation list missing; restore the reviewed list before re-signing. Nothing was signed.");
+    const bytes = readStoreFile(paths.file, MAX_LIST_BYTES);
+    const digest = sha256Hex(bytes);
+    if (digest !== reviewedDigestSha256.trim().toLowerCase()) {
+      throw new Error(`revocation list sha256 is ${digest}, not the reviewed ${reviewedDigestSha256}; nothing was signed. Review the current list again.`);
+    }
     publishSignedRevocations(workspace, bytes);
-    return paths.sig;
+    return bytes;
   } });
 }
 
@@ -100,8 +141,8 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
     return { valid: false, signatureExists: false, reason: "revocation signature missing" };
   }
   try {
-    const payload = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
-    const digest = sha256Hex(readFileSync(paths.file));
+    const payload = JSON.parse(readStoreFile(paths.sig, MAX_SIG_BYTES).toString("utf8")) as SignedDigest;
+    const digest = sha256Hex(readStoreFile(paths.file, MAX_LIST_BYTES));
     if (digest !== payload.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch" };
     }
@@ -129,8 +170,8 @@ function readVerifiedRevocations(workspace: string): LeaseRevocations {
   if (!pathExists(paths.file) && !pathExists(paths.sig)) return defaultLeaseRevocations();
   if (!pathExists(paths.file)) throw new Error("revocation list missing but signature present");
   if (!pathExists(paths.sig)) throw new Error("revocation signature missing");
-  const bytes = readFileSync(paths.file);
-  const signed = JSON.parse(readFileSync(paths.sig, "utf8")) as SignedDigest;
+  const bytes = readStoreFile(paths.file, MAX_LIST_BYTES);
+  const signed = JSON.parse(readStoreFile(paths.sig, MAX_SIG_BYTES).toString("utf8")) as SignedDigest;
   const digest = sha256Hex(bytes);
   if (signed.digestSha256 !== digest) throw new Error("digest mismatch");
   if (!verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"))) throw new Error("signature verification failed");
@@ -169,16 +210,22 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
   } });
 }
 
-/**
- * The revoked lease ids from ONE read of the list, verified and parsed from those same bytes, or why that failed.
- * Every consumer decides on this set: a list swapped on disk after the check is never read.
- */
-export function readRevokedLeaseIds(workspace: string): { ok: true; ids: Set<string> } | { ok: false; reason: string } {
+/** The store from ONE read of the list, verified and parsed from those same bytes, or why that failed. */
+export function readVerifiedLeaseRevocations(workspace: string): { ok: true; store: LeaseRevocations } | { ok: false; reason: string } {
   try {
-    return { ok: true, ids: new Set(readVerifiedRevocations(workspace).revocations.map((row) => row.leaseId)) };
+    return { ok: true, store: readVerifiedRevocations(workspace) };
   } catch (error) {
     return { ok: false, reason: error instanceof Error ? error.message : String(error) };
   }
+}
+
+/**
+ * The revoked lease ids from ONE verified read (`readVerifiedLeaseRevocations`), or why that failed.
+ * Every consumer decides on this set: a list swapped on disk after the check is never read.
+ */
+export function readRevokedLeaseIds(workspace: string): { ok: true; ids: Set<string> } | { ok: false; reason: string } {
+  const read = readVerifiedLeaseRevocations(workspace);
+  return read.ok ? { ok: true, ids: new Set(read.store.revocations.map((row) => row.leaseId)) } : read;
 }
 
 /**

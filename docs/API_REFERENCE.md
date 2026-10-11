@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-10
+> Auto-generated from source on 2026-10-11
 
 ## Table of Contents
 
@@ -637,7 +637,7 @@ AMC provides 1,236 public CLI command paths in the live command inventory.
 | 618 | `amc learn` | Education flow for a specific maturity question |
 | 619 | `amc lease` | Issue/verify/revoke short-lived agent leases |
 | 620 | `amc lease issue` | - |
-| 621 | `amc lease resign-revocations` | Re-sign the lease revocation store, vouching for its CURRENT content as owner |
+| 621 | `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest |
 | 622 | `amc lease revoke` | - |
 | 623 | `amc lease verify` | - |
 | 624 | `amc legal-hold` | Issue or manage legal holds |
@@ -6066,6 +6066,15 @@ Education flow for a specific maturity question
 | `--tpm <tpm>` | - |
 | `--max-cost-usd-per-day <usd>` | - |
 | `--workorder <workOrderId>` | - |
+
+#### `amc lease resign-revocations`
+
+Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest
+
+
+| Option | Description |
+|--------|-------------|
+| `--expect-digest <sha256>` | - |
 
 #### `amc lease revoke`
 

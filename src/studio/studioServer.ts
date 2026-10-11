@@ -104,7 +104,7 @@ import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
 import { issueLeaseForCli } from "../leases/leaseCli.js";
-import { loadLeaseRevocations, readRevokedLeaseIds, revokeLease, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds, readVerifiedLeaseRevocations, revokeLease } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
@@ -5550,13 +5550,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        const verify = verifyLeaseRevocationsSignature(options.workspace);
-        const revocations = loadLeaseRevocations(options.workspace);
+        // One verified read: the count never comes from bytes other than those whose signature verified.
+        const read = readVerifiedLeaseRevocations(options.workspace);
         json(res, 200, {
-          revocationSignatureValid: verify.valid,
-          revocationSignatureReason: verify.reason,
-          revokedLeaseCount: revocations.revocations.length,
-          updatedTs: revocations.updatedTs
+          revocationSignatureValid: read.ok,
+          revocationSignatureReason: read.ok ? null : read.reason,
+          revokedLeaseCount: read.ok ? read.store.revocations.length : null,
+          updatedTs: read.ok ? read.store.updatedTs : null
         });
         return;
       }

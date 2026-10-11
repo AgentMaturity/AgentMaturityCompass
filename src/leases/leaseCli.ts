@@ -1,7 +1,7 @@
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
-import { loadLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
-import type { LeaseScope } from "./leaseSchema.js";
+import { bootstrapLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
+import { leaseRevocationsSchema, type LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
   const text = ttl.trim().toLowerCase();
@@ -113,8 +113,9 @@ export function ensureLeaseRevocationStore(workspace: string): { signatureValid:
     // point -- signing here would launder content nobody has vouched for.
     return { signatureValid: false };
   }
-  // No store yet: bootstrap an empty one and sign it.
-  signLeaseRevocations(workspace);
+  // No store yet: bootstrap an empty one. The bootstrap re-checks absence under the lock and publishes only the
+  // default list, so a file dropped since the check above is left unsigned and reported invalid below.
+  bootstrapLeaseRevocations(workspace);
   return { signatureValid: verifyLeaseRevocationsSignature(workspace).valid };
 }
 
@@ -123,19 +124,20 @@ export function ensureLeaseRevocationStore(workspace: string): { signatureValid:
  *
  * This is the ONE deliberate path that signs over a failing signature --
  * `ensureLeaseRevocationStore` refuses to, precisely so that repair is a
- * reviewed human action rather than a side effect of issuing a lease. The
- * result reports what the operator just vouched for.
+ * reviewed human action rather than a side effect of issuing a lease. It signs
+ * only bytes whose sha256 is `reviewedDigestSha256`, the digest of the list the
+ * operator reviewed, and reports what was vouched for from those same bytes.
  */
-export function resignLeaseRevocationsForCli(workspace: string): {
+export function resignLeaseRevocationsForCli(workspace: string, reviewedDigestSha256: string): {
   wasValid: boolean;
   previousReason: string | null;
   revocationCount: number;
 } {
   const before = verifyLeaseRevocationsSignature(workspace);
-  signLeaseRevocations(workspace);
+  const signed = signLeaseRevocations(workspace, reviewedDigestSha256);
   return {
     wasValid: before.valid,
     previousReason: before.reason,
-    revocationCount: loadLeaseRevocations(workspace).revocations.length
+    revocationCount: leaseRevocationsSchema.parse(JSON.parse(signed.toString("utf8"))).revocations.length
   };
 }
