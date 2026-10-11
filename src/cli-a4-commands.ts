@@ -335,8 +335,8 @@ function registerReads(a4: Command): void {
         report = await verifyA4Bundle(resolve(process.cwd(), target), trust);
       }
       const claim = unboundClaim(PROJECT_ID.test(target) ? target : "record", "verify", false);
-      finishVerify("A4 record", report, { json: opts.json, claim, result: { schema: "amc.a4-verify/v1", target, section: "integrity", report,
-        boundary: "Integrity of bytes under the trust you pinned; not evidence about the agent." }, details: [`integrity: ${report.integrity.status}`] });
+      // --json prints the VerifierReportV1 itself with its claim fields: integrity of bytes under the trust you pinned, not evidence about the agent.
+      finishVerify("A4 record", report, { json: opts.json, claim, details: [`integrity: ${report.integrity.status} (bytes under the trust you pinned; not evidence about the agent)`] });
     }));
 }
 
