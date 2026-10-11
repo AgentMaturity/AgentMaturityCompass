@@ -22,7 +22,8 @@ import { recordEnvelope, vaultLocked, writeReleaseRecord } from "./a4Package.js"
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackStarted, rolledBack } from "./spec/activate.js";
+import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackStarted, rolledBack,
+  rolledBackTarget } from "./spec/activate.js";
 import { fail } from "./stages/common.js";
 
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -33,6 +34,8 @@ const NAMESPACE = /^[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])?$/;
 /** Operator-stated times may run ahead of the server clock by at most this much (the incident-clock skew bound). */
 const SKEW_MS = 5 * 60_000;
 export const PLAN_PATH = "deploy/plan.json";
+/** A Compose rollback that re-pins no release: back to the base file (never down -v). */
+export const COMPOSE_BASE_UP = "docker compose -f docker-compose.yml up -d";
 const CLAIM_BOUNDARY = "Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment: "
   + "a receipt records what the operator stated, and AMC's check what its own probe found.";
 
@@ -104,7 +107,7 @@ function composeSteps(input: DeployPlanInput): Step[] {
     { phase: "verify", command: `docker compose -f docker-compose.yml -f ${name} exec studio amc verify all --json`, note: "Integrity of the workspace records." },
     { phase: "verify", command: `sha256sum ${name}`, note: "The overlayDigest for the receipt." },
     ...(previous === null
-      ? [{ phase: "rollback" as const, command: "docker compose -f docker-compose.yml up -d", note: "No release ran in production when this one was built: back to the base file; never down -v." }]
+      ? [{ phase: "rollback" as const, command: COMPOSE_BASE_UP, note: "No release ran in production when this one was built: back to the base file; never down -v." }]
       : [{ phase: "rollback" as const, command: copy(previous), note: `The overlay of release ${previous}, the one running in production when this one was built.` },
         { phase: "rollback" as const, command: `docker compose -f docker-compose.yml -f ${overlayName("compose", previous)} up -d`, note: `Re-pin release ${previous}; never down -v.` }])
   ];
@@ -186,12 +189,15 @@ export type DeploymentBody = z.infer<typeof deploymentBodySchema>;
 const headStage = (state: A4ReadinessState): A4Stage => state.project.stage === "retired" ? "activate" : state.project.stage;
 const releaseLink = (chain: readonly A4ChainLink[], releaseId: string | null): A4ChainLink | undefined =>
   releaseId === null ? undefined : chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId);
-/** Every lease id the release's effects minted: the staging lease (RELEASE) and the production lease (the deployment approval). */
-export function mintedLeases(chain: readonly A4ChainLink[], releaseId: string): { staging: string[]; production: string | null } {
+/**
+ * Every lease id the release's effects minted: the staging lease (RELEASE) and the production lease (the deployment
+ * approval), this cycle's or, with `anyCycle`, the whole chain's.
+ */
+export function mintedLeases(chain: readonly A4ChainLink[], releaseId: string, anyCycle = false): { staging: string[]; production: string | null } {
   const release = releaseLink(chain, releaseId);
   const staging = (Array.isArray(release?.body.leases) ? release.body.leases as Array<{ leaseId?: unknown; scope?: unknown }> : [])
     .filter((lease) => lease.scope === "staging" && typeof lease.leaseId === "string").map((lease) => String(lease.leaseId));
-  const production = productionLeaseOf(chain, releaseId)?.leaseId;
+  const production = productionLeaseOf(chain, releaseId, anyCycle)?.leaseId;
   return { staging, production: typeof production === "string" ? production : null };
 }
 
@@ -263,9 +269,10 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
 /**
  * The checks a receipt passes on one set of rows (before anything is written, and again on the rows the transaction
  * read): the release and its target, the same-host rule, operator times inside the skew bound, the package digest and
- * the lease ids its effects minted (a rollback row: the release it rolled back to, never one rolled back since, in the
- * rollback's own environment, once, and in production only before any later succeeded production row and while the
- * rolled-back release is the one production ran). Returns where `deployed_release_id` moves, if anywhere (production only).
+ * the lease ids its effects minted (a production deploy row: never for a release whose rollback target was rolled back,
+ * or is being rolled back; a rollback row: the release it rolled back to, in the rollback's own environment, once, and in
+ * production only before any later succeeded production row, while the rolled-back release is the one production ran
+ * and never to a release rolled back since). Returns where `deployed_release_id` moves, if anywhere (production only).
  */
 function deploymentChecks(state: A4ReadinessState, releaseId: string, body: DeploymentBody, now: number): { deployed: string | null | undefined } {
   const release = releaseLink(state.chain, releaseId);
@@ -286,6 +293,13 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     if (currentRelease(state.chain)?.body.releaseId !== releaseId) throw fail(409, "RELEASE_NOT_CURRENT", "Deploy this cycle's release; re-deploying an earlier one is a rollback.");
     if (rolledBack(state.chain, releaseId) || rollbackStarted(state.chain, releaseId)) {
       throw fail(409, "RELEASE_ROLLED_BACK", "This release was rolled back, or a rollback of it started; reopen or tune Activate and release again.");
+    }
+    // A release whose rollback target was rolled back could never restore it, so it never reaches production, even on a
+    // production lease minted before that rollback started (which that rollback revokes). Staging rows move nothing.
+    const target = body.environment === "production" ? rolledBackTarget(state.chain, releaseId) : null;
+    if (target !== null) {
+      throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `Release ${target}, this release's rollback target, was rolled back, or a rollback of it started; `
+        + "this release never deploys to production: reopen or tune Activate and release again.");
     }
     if (body.packageDigest !== release.body.packageDigest) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not this release's package digest.");
     // AMC's check connects only to a receipt's destinationRef, so a deploy receipt names the host the release was packaged and approved for.
@@ -322,13 +336,15 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     throw fail(409, "ROLLBACK_SUPERSEDED", "Another release was deployed to production after the rolled-back one; this row can no longer move the deployed release.");
   }
   const toReleaseId = typeof rollback.body.toReleaseId === "string" ? rollback.body.toReleaseId : null;
-  // assertRollbackCurrent's rule: a release rolled back since (any cycle) is never where deployed_release_id moves.
-  if (toReleaseId !== null && rollbackRecorded(state.chain, toReleaseId)) {
+  // assertRollbackCurrent's rule: a release rolled back since (any cycle) is never where deployed_release_id moves. A
+  // staging row moves nothing, so it records the rollback the operator ran whatever happened to its target since.
+  if (body.environment === "production" && toReleaseId !== null && rollbackRecorded(state.chain, toReleaseId)) {
     throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `Release ${toReleaseId}, the release rolled back to, was itself rolled back since; this row can no longer be recorded.`);
   }
   const to = releaseLink(state.chain, toReleaseId);
   if (body.packageDigest !== (to?.body.packageDigest ?? null)) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not the package of the release rolled back to (null when none).");
-  const minted = toReleaseId === null ? null : mintedLeases(state.chain, toReleaseId);
+  // The release rolled back to was deployed in an earlier cycle, so its production lease is looked up across the chain.
+  const minted = toReleaseId === null ? null : mintedLeases(state.chain, toReleaseId, true);
   if (body.leaseIds.some((id) => minted === null || (id !== minted.production && !minted.staging.includes(id)))) {
     throw fail(409, "LEASE_NOT_OF_RELEASE", "leaseIds of a rollback row name only leases the release rolled back to minted.");
   }

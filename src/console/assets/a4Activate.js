@@ -159,11 +159,19 @@ function renderRelease(ctx) {
       `data-release="${esc(release.releaseId)}" ${project}`)}</div>` : ""}`;
 }
 
-/** The prepared plan (signed a4-deployment-plan), each command with a copy button; the lease secret is a placeholder. */
-function planSteps(plan) {
+/**
+ * The prepared plan (signed a4-deployment-plan), each command with a copy button; the lease secret is a placeholder. Once
+ * the release's recorded rollback target was rolled back, the rollback steps (which re-pin it) are marked superseded and
+ * lose their copy buttons: the rollback preview names the commands to run instead.
+ */
+function planSteps(plan, release) {
   if (!isObject(plan)) return "<p class=\"muted\">The signed plan could not be read.</p>";
+  const superseded = (step) => step.phase === "rollback" && release.rollbackTargetRolledBack === true;
   return `${table(["Phase", "Command", "Note"], list(plan.steps).map((step) => [`<code>${esc(step.phase)}</code>`,
-    step.command ? `<code>${esc(step.command)}</code> ${copyButton(step.command)}` : "<span class=\"muted\">by hand</span>", esc(step.note)]), "No step.")}
+    !step.command ? "<span class=\"muted\">by hand</span>" : superseded(step) ? `<code>${esc(step.command)}</code> <span class="status-bad">superseded</span>`
+      : `<code>${esc(step.command)}</code> ${copyButton(step.command)}`,
+    superseded(step) ? `${esc(step.note)} <span class="muted">Release ${esc(release.rollback?.releaseId)}, the recorded rollback target, was rolled back since:
+      preview the rollback for the commands to run.</span>` : esc(step.note)]), "No step.")}
     <p class="muted">Lease secret file: <code>${esc(SECRET_PLACEHOLDER)}</code>. AMC never writes, reads or stores it.</p>
     <h4>Gaps</h4><ul class="a4-rows">${list(plan.gaps).map((gap) => `<li><code>${esc(gap.reasonCode)}</code> ${esc(gap.note)}</li>`).join("")}</ul>`;
 }
@@ -202,7 +210,7 @@ function renderDeploy(ctx) {
   const check = checks.get(ctx.project.projectId);
   return `<p class="muted">Prepared by AMC; AMC never runs these commands. Instructions are not evidence of an executed deployment. Plan signature
       <code>${plan?.signatureValid === true && plan.reason === null ? "valid under this workspace's keys, listed in the package manifest" : esc(plan?.reason ?? "not checked")}</code>.</p>
-    ${plan?.signatureValid === true && plan.reason === null ? planSteps(plan.plan) : "<p class=\"muted\">The prepared steps are not shown: the plan's signature, or its digest in the package manifest, did not verify.</p>"}${receiptForm(ctx, release)}
+    ${plan?.signatureValid === true && plan.reason === null ? planSteps(plan.plan, release) : "<p class=\"muted\">The prepared steps are not shown: the plan's signature, or its digest in the package manifest, did not verify.</p>"}${receiptForm(ctx, release)}
     <h4>Receipts: recorded by the operator, checked by AMC</h4>
     ${table(["Receipt", "Kind", "Recorded", "AMC check", "Status", "Check detail"], receiptRows(release.deployments), "No receipt recorded.")}
     <h4>AMC's check</h4>
@@ -221,13 +229,18 @@ function renderRollback(ctx) {
   const preview = opened?.releaseId === release.releaseId ? opened.preview : null;
   const [request] = coded(itemOf(ctx, "rollback_effect"), "APPROVAL_REQUEST");
   const attrs = `data-release="${esc(release.releaseId)}" data-project="${esc(ctx.project.projectId)}"`;
-  return `<p class="muted">A rollback restores the Enforce snapshot of the release that ran in production when this one was built (signed receipts), revokes this release's leases and prepares the operator's
+  const target = release.rollback?.releaseId ?? null;
+  const restores = target === null ? "A rollback restores no Enforce snapshot (no release ran in production when this one was built)"
+    : release.rollbackTargetRolledBack === true ? `Release ${target}, the release that ran in production when this one was built, was rolled back since, so a rollback restores no Enforce snapshot and re-pins no release`
+      : `A rollback restores the Enforce snapshot of release ${target}, the one that ran in production when this one was built (signed receipts)`;
+  return `<p class="muted">${esc(restores)}; it revokes this release's leases and prepares the operator's
       commands; it never moves the lifecycle backwards, and the deployed release changes only when the operator records the rollback row. A high or critical
       risk tier freezes first and holds the project.</p>
     <div class="row wrap"><select name="rollback-environment"><option value="staging">staging</option><option value="production">production</option></select>
       ${view.actionButton("Preview the rollback", "rollback-preview", ctx.allowed.rollback, attrs)}</div>
     ${preview ? `<p>To <code>${esc(preview.toReleaseId ?? "none")}</code> · Enforce manifest <code>${esc(preview.confirmManifestId ?? "none")}</code> ·
       freeze first <code>${esc(preview.freezeFirst)}</code> · leases ${codes(preview.leaseIds)}</p>
+      ${preview.restore?.note ? `<p class="muted">${esc(preview.restore.note)}</p>` : ""}
       ${table(["Prepared command"], list(preview.preparedCommands).map((command) => [`<code>${esc(command)}</code> ${copyButton(command)}`]), "No command.")}` : ""}
     ${status(ctx, "rollback_effect")}${decideForm(ctx, request, "rollback-reason-engine")}
     <h4>Confirm with the exact ids the preview bound</h4>

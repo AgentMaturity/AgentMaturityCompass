@@ -30,7 +30,7 @@ import { a4PackageV1Schema, a4ReleaseV1Schema, clientRequestIdSchema, headSeqSch
 import type { A4Store } from "./a4Store.js";
 import { packageEntry, releaseEntries } from "./a4Transparency.js";
 import { UPDATE_POLICY_PATH, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
-import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, effectUnsettled, monitorResolves } from "./spec/activate.js";
+import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, effectUnsettled, monitorResolves, rollbackRecorded } from "./spec/activate.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
 import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, precheck, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
 import { completeAndRun } from "./a4RouterStages.js";
@@ -248,6 +248,8 @@ function releaseViews(store: A4Store, projectId: string, state: A4ReadinessState
     updatePolicy: verifyUpdatePolicy(store.workspace, fileOf(`${dir}/${UPDATE_POLICY_PATH}`), fileOf(`${dir}/${UPDATE_POLICY_PATH}.sig`)),
     packageFiles: files,
     deployments, rollbacks: rollbackViews(chain, record.releaseId), lifecycleBridge: lifecycle, expertReview,
+    // The recorded rollback target rolled back since: the plan's rollback steps re-pin it, so the rollback preview replaces them.
+    rollbackTargetRolledBack: record.rollback.releaseId !== null && rollbackRecorded(chain, record.rollback.releaseId),
     // What the bridge to production reads now (the record's own rows were fixed at release); never typed by a person.
     lifecycleProduction: bridgeControls(state, "production", record.releaseId),
     leases: [...record.leases, ...production.map((lease) => ({ ...lease, status: "active" }))].map((lease) => liveLease(lease, revoked, now)),

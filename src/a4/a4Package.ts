@@ -718,7 +718,8 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
  * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release, neither rolled
  * back nor being rolled back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK once any attempt of its rollback started,
  * settled or not: a failed one may have consumed its grant and restored the Enforce snapshot, so no lease is minted beside
- * it), and its recorded rollback target not rolled back since (ROLLBACK_TARGET_ROLLED_BACK: it could never restore it).
+ * it), and its recorded rollback target neither rolled back nor being rolled back since (ROLLBACK_TARGET_ROLLED_BACK: it
+ * could never restore it).
  * Read from the store, not the executor's preloaded rows.
  */
 function assertProductionCurrent(workspace: string, projectId: string, gate: A4EffectContext["gate"], releaseId: string): void {
@@ -729,7 +730,7 @@ function assertProductionCurrent(workspace: string, projectId: string, gate: A4E
     if (rollbackRecorded(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
     if (rollbackStarted(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `a rollback of release ${releaseId} has started`);
     const target = rolledBackTarget(chain, releaseId);
-    if (target !== null) throw coded("ROLLBACK_TARGET_ROLLED_BACK", `release ${target}, the rollback target of release ${releaseId}, was rolled back since: build the release again`);
+    if (target !== null) throw coded("ROLLBACK_TARGET_ROLLED_BACK", `release ${target}, the rollback target of release ${releaseId}, was rolled back, or a rollback of it started, since: build the release again`);
     const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
     if (consumed === undefined || head?.stage !== "activate" || head.step !== "completion_approved" || head.revision_no !== gate.revision_no
       || currentRelease(chain)?.body.releaseId !== releaseId || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {

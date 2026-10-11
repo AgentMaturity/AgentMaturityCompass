@@ -5,7 +5,8 @@
  * release and Enforce manifest the preview bound and journals the attempt (EFFECT_STARTED); then, after the grant is
  * consumed as step 0: an incident freeze first for a high or critical risk tier, `restoreEnforceResourceSnapshot({ apply:
  * true, confirmManifestId })` (signed restore and lifecycle-rollback receipts), every lease of the release revoked (read
- * again at execution), the prepared operator commands, the signed `a4-rollback-receipt`, and ROLLBACK with EFFECT_FINISHED,
+ * again at execution; in production also the production lease of this cycle's release built on it, which can then never
+ * deploy), the prepared operator commands, the signed `a4-rollback-receipt`, and ROLLBACK with EFFECT_FINISHED,
  * then the automatic hold. The lifecycle is never moved backwards, no
  * runtime-run event is appended (no run of the deployed runtime was observed), and `deployed_release_id` moves only
  * when the operator records the rollback row (src/a4/a4Deploy.ts). A rollback is allowed on a held or frozen project:
@@ -26,7 +27,7 @@ import { assertOwnerMode } from "../mode/mode.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { mintedLeases } from "./a4Deploy.js";
+import { COMPOSE_BASE_UP, mintedLeases } from "./a4Deploy.js";
 import { assertCallerNotCounted, settleEffect, sweepA4Effects, verifyAndConsumeEffect, type A4EffectDef } from "./a4Effects.js";
 import { A4_RUNTIME, assertAllowed, autoHold, engineRiskTier, evaluateFor, gateRowOf, livePrincipal, loadA4State, pendingExecutors, signedA4Floor, type A4Call } from "./a4Gates.js";
 import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
@@ -41,6 +42,20 @@ const base = { environment: z.enum(["staging", "production"]), expectedHeadSeq: 
 export const rollbackPreviewSchema = z.strictObject(base);
 export const rollbackSchema = z.strictObject({ ...base, reason: reasonSchema,
   toReleaseId: z.string().regex(/^a4r_[0-9a-f]{32}$/).nullable(), confirmManifestId: z.string().regex(/^enforce-resources-[0-9a-f]{16}$/).nullable() });
+
+/**
+ * The production lease of this cycle's release built on `releaseId` (its recorded rollback target), which a production
+ * rollback of `releaseId` revokes too: that release could never restore its target, so its production deploy row is
+ * refused (ROLLBACK_TARGET_ROLLED_BACK, src/a4/a4Deploy.ts) and a lease minted before this rollback started would stay
+ * live. No lease is minted for it after this rollback started (rolledBackTarget). Staging rolls back only this cycle's
+ * release, which no later release is built on.
+ */
+function successorProductionLease(chain: readonly A4ChainLink[], releaseId: string, environment: string): string[] {
+  const successor = environment === "production" ? currentRelease(chain) : null;
+  if (successor?.body.rollbackReleaseId !== releaseId) return [];
+  const lease = mintedLeases(chain, String(successor.body.releaseId)).production;
+  return lease === null ? [] : [lease];
+}
 
 /** A release rolls back once: 409 ROLLBACK_RECORDED once `chain` records its ROLLBACK (any cycle). */
 function assertNotRolledBack(chain: readonly A4ChainLink[], releaseId: string): void {
@@ -88,8 +103,11 @@ function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string,
  * What a rollback of `releaseId` would do now (design §10.4 Rollback preview); the engine request binds its digest. The
  * release must be the one running in `environment` (assertRollbackCurrent). The target is the record's rollback block (the
  * release running in production when this one was built), never merely the previous RELEASE. A recorded target rolled back
- * since can never be restored (its prepared commands re-pin it), so the preview then names no target: no Enforce restore
- * and no prepared re-pin, only the revocations and the freeze, and its restore note says why. The engine request binds it.
+ * since can never be restored (its prepared commands re-pin it), so the preview then names no target: no Enforce restore,
+ * prepared commands that re-pin no release (Compose: the base file; Helm's name none), only the revocations (and the
+ * freeze for a high or critical risk tier), and its restore note says why. Production never reaches this: such a release
+ * never deploys there (rolledBackTarget). The leases are the release's, and in production the successor's production
+ * lease (successorProductionLease). The engine request binds the preview.
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
@@ -105,7 +123,8 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
   const confirmManifestId = typeof to?.body.enforceManifestId === "string" ? to.body.enforceManifestId : null;
   const minted = mintedLeases(state.chain, releaseId);
   let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: targetRolledBack
-    ? `release ${recorded}, the recorded rollback target, was itself rolled back: nothing is restored or re-pinned; the release's leases are revoked`
+    ? `release ${recorded}, the recorded rollback target, was itself rolled back: nothing is restored and no release is re-pinned (Compose returns to the base file; `
+      + "Helm, to the revision before this release's upgrade); the release's leases are revoked"
     : "no earlier release: nothing to restore" };
   if (confirmManifestId !== null) {
     try {
@@ -116,8 +135,11 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
         `the Enforce restore cannot be planned: ${(error instanceof Error ? error.message : String(error)).slice(0, 300)}`);
     }
   }
+  // Helm's prepared commands name no release (the operator picks the revision), so they stand; Compose's re-pin the
+  // target's overlay, so they give way to the base file.
+  const preparedCommands = targetRolledBack && record.deploymentTarget.kind === "compose" ? [COMPOSE_BASE_UP] : record.rollback.preparedCommands;
   return { schema: "amc.a4-rollback-preview/v1", releaseId, toReleaseId, confirmManifestId, environment, target: release.body.target,
-    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production])], preparedCommands: targetRolledBack ? [] : record.rollback.preparedCommands,
+    leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...successorProductionLease(state.chain, releaseId, environment)], preparedCommands,
     restore, freezeFirst: ["high", "critical"].includes(engineRiskTier(state)),
     lifecycle: "never moved backwards; deployed_release_id moves when the operator records the rollback row" };
 }
@@ -163,8 +185,9 @@ export function previewRollback(store: A4Store, projectId: string, releaseId: st
  * another attempt runs or the deployment approval's production-lease effect does (409 EFFECT_RUNNING: a lease it minted
  * after this read would outlive the rollback). Only then: the engine grant consumed as step 0, the freeze,
  * the Enforce restore, every lease of the release revoked (read again now: the preview's, a production lease minted after
- * it, and a failed attempt's from the lease journal), and the signed receipt; ROLLBACK and EFFECT_FINISHED settle it in one
- * transaction (its intent binds the preview, so it checks no resource slot). A step that throws is EFFECT_FAILED with its
+ * it, and a failed attempt's from the lease journal; in production also the successor's production lease), and the signed
+ * receipt; ROLLBACK and EFFECT_FINISHED settle it in one transaction (its intent binds the preview, so it checks no
+ * resource slot). A step that throws is EFFECT_FAILED with its
  * code; an outcome that cannot be written leaves the attempt unsettled (process_lost, outcome unknown), never a failure of
  * steps that ran. A new request re-runs it (the grant is consumed by this execution; the restore and the revocations are
  * idempotent) until ROLLBACK is recorded once. A replay of the request answers its attempt (rollbackReplay).
@@ -208,7 +231,8 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   } catch {
     throw fail(423, "A4_VAULT_LOCKED", "Unlock the vault to roll back: every step signs a receipt.");
   }
-  // Every lease the release's effects minted, read now: revoking more than the preview bound only cuts the safe way.
+  // Every lease the release's effects minted, and in production the successor's production lease, read now: revoking more
+  // than the preview bound only cuts the safe way.
   let journaled: string[];
   try {
     journaled = journaledLeaseIds(store.workspace, projectId, releaseId);
@@ -216,7 +240,8 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
     throw fail(409, "LEASE_JOURNAL_UNREADABLE", `the release's lease journal does not read, so its leases cannot all be named: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`);
   }
   const minted = mintedLeases(state.chain, releaseId);
-  const leaseIds = [...new Set([...preview.leaseIds, ...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...journaled])];
+  const leaseIds = [...new Set([...preview.leaseIds, ...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...journaled,
+    ...successorProductionLease(state.chain, releaseId, body.environment)])];
   const attemptId = `a4e_${randomBytes(16).toString("hex")}`;
   const started = store.transition(projectId, principal, ({ ts }) => {
     const chain = store.readChain(projectId);

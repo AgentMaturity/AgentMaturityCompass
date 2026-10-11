@@ -13899,8 +13899,9 @@ paths:
         with a reason for each surface not evaluated, the prepared deployment plan (its steps only while its
         signature verifies now and the verified package manifest lists its digest; plan null with the reason
         otherwise) and update policy with their signatures checked now, the receipts in two columns (recorded by
-        the operator; checked by AMC), the rollbacks, the lifecycle bridge outcomes and the production bridge
-        rows as they stand now"
+        the operator; checked by AMC), the rollbacks, rollbackTargetRolledBack (the record's rollback target was
+        rolled back since, so the plan's rollback steps are superseded by the rollback preview), the lifecycle
+        bridge outcomes and the production bridge rows as they stand now"
       tags:
         - Studio
         - A4 Forge
@@ -14048,18 +14049,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
     post:
-      summary: Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed
+      summary: "Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed
         a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
         the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
         TARGET_MISMATCH, DESTINATION_MISMATCH (a deploy row naming another destination than the release was
         packaged for), RELEASE_ROLLED_BACK (a deploy row for a release rolled back or whose rollback started),
-        and for a rollback row (its rollback found in any cycle) ROLLBACK_ENVIRONMENT_MISMATCH (not the
-        rollback's environment), ROLLBACK_ROW_RECORDED (a succeeded row of it exists),
-        ROLLBACK_TARGET_ROLLED_BACK (the release rolled back to was itself rolled back) or, for a production
-        row, ROLLBACK_SUPERSEDED (a succeeded production deploy or rollback row followed it, or the rolled-back
-        release is not the one production ran). A rollback row is recordable on a held or frozen project. No
-        lease is issued and no runtime run is created; a succeeded production deploy, or a succeeded production
-        rollback row, moves deployedReleaseId
+        ROLLBACK_TARGET_ROLLED_BACK for a production deploy row (the release's recorded rollback target was
+        rolled back, or its rollback started: such a release never reaches production), and for a rollback row
+        (its rollback found in any cycle; its leaseIds name only leases the release rolled back to minted, in
+        any cycle) ROLLBACK_ENVIRONMENT_MISMATCH (not the rollback's environment), ROLLBACK_ROW_RECORDED (a
+        succeeded row of it exists) or, for a production row, ROLLBACK_TARGET_ROLLED_BACK (the release rolled
+        back to was itself rolled back) or ROLLBACK_SUPERSEDED (a succeeded production deploy or rollback row
+        followed it, or the rolled-back release is not the one production ran). A rollback row is recordable on
+        a held or frozen project. No lease is issued and no runtime run is created; a succeeded production
+        deploy, or a succeeded production rollback row, moves deployedReleaseId"
       tags:
         - Studio
         - A4 Forge
@@ -14373,8 +14376,12 @@ paths:
         running in the chosen environment rolls back (production: the newest one with a succeeded production
         deploy not rolled back; staging: this cycle's release; 409 ROLLBACK_RELEASE_NOT_RUNNING otherwise). The
         target is the release record's rollback block: the release running in production when this one was
-        built; when that target was itself rolled back since, the preview names none (no Enforce restore, no
-        prepared re-pin; the leases are revoked and the freeze raised) and its restore note says so"
+        built; when that target was itself rolled back since, the preview names none (no Enforce restore;
+        prepared commands that re-pin no release: Compose's base file, Helm's revision before this release's
+        upgrade; the leases are revoked, and the freeze raised for a high or critical risk tier) and its restore
+        note says so; a production preview never names none, since such a release never deploys to production.
+        In production the leases include the production lease of this cycle's release built on this one, which
+        can then never deploy"
       tags:
         - Studio
         - A4 Forge
@@ -14481,10 +14488,11 @@ paths:
         re-run uses the grant its own execution consumed, never for an approver its quorum counted: 409
         SOD_VIOLATION; GRANT_ALREADY_USED when another execution consumed it), a freeze first for a high or
         critical risk tier, the Enforce restore, every lease of the release revoked (read again at execution,
-        and the lease journal once more before it settles), the prepared commands, a signed a4-rollback-receipt,
-        then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code and a replay answers
-        the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId moves when the
-        operator records a production rollback row"
+        and the lease journal once more before it settles; in production also the production lease of this
+        cycle's release whose rollback target this release is), the prepared commands, a signed
+        a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed step is EFFECT_FAILED with its code
+        and a replay answers the attempt's outcome; the lifecycle is never moved backwards and deployedReleaseId
+        moves when the operator records a production rollback row"
       tags:
         - Studio
         - A4 Forge

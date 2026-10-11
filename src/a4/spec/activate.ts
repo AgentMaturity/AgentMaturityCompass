@@ -211,9 +211,12 @@ export const cycleLinks = (chain: readonly A4ChainLink[], kind: string): A4Chain
 };
 /** The newest RELEASE of this cycle (its body names the release, its package and its staging lease), or null. */
 export const currentRelease = (chain: readonly A4ChainLink[]): A4ChainLink | null => cycleLinks(chain, "RELEASE").at(-1) ?? null;
-/** The production lease the completion effect minted for `releaseId` (EFFECT_FINISHED's record), or null. */
-export const productionLeaseOf = (chain: readonly A4ChainLink[], releaseId: string): Record<string, unknown> | null =>
-  cycleLinks(chain, "EFFECT_FINISHED").map((link) => (link.body.effect === PRODUCTION_LEASE_EFFECT_ID ? (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease : undefined))
+/**
+ * The production lease the completion effect minted for `releaseId` (EFFECT_FINISHED's record), or null: this cycle's
+ * (deploy rows, readiness), or with `anyCycle` the whole chain's (a rollback row's target was deployed in an earlier cycle).
+ */
+export const productionLeaseOf = (chain: readonly A4ChainLink[], releaseId: string, anyCycle = false): Record<string, unknown> | null =>
+  (anyCycle ? chain.filter((link) => link.kind === "EFFECT_FINISHED") : cycleLinks(chain, "EFFECT_FINISHED")).map((link) => (link.body.effect === PRODUCTION_LEASE_EFFECT_ID ? (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease : undefined))
     .filter((lease): lease is Record<string, unknown> => lease !== undefined && lease.releaseId === releaseId).at(-1) ?? null;
 
 const { item, waiting } = readinessItemBuilders("implementation");
@@ -275,12 +278,14 @@ export const rollbackRecorded = (chain: readonly A4ChainLink[], releaseId: strin
   chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId);
 /**
  * The rollback target `releaseId`'s record names (its RELEASE link carries the record's `rollback.releaseId`: the release
- * running in production when it was built) once a ROLLBACK names that target (any cycle), else null. Such a release
- * could never restore its target, so no deployment approval binds it and no production lease is minted for it.
+ * running in production when it was built) once a ROLLBACK names that target or any attempt of its rollback started (any
+ * cycle), else null. Such a release could never restore its target, so no deployment approval binds it, no production
+ * lease is minted for it and no production deploy row records it (src/a4/a4Deploy.ts); a production lease minted before
+ * the target's rollback started is revoked by that rollback (src/a4/a4Rollback.ts). It never reaches production.
  */
 export function rolledBackTarget(chain: readonly A4ChainLink[], releaseId: string): string | null {
   const target = chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId)?.body.rollbackReleaseId;
-  return typeof target === "string" && rollbackRecorded(chain, target) ? target : null;
+  return typeof target === "string" && (rollbackRecorded(chain, target) || rollbackStarted(chain, target)) ? target : null;
 }
 /**
  * The release running in production as the chain records it (any cycle): the newest one with a succeeded production
@@ -305,7 +310,7 @@ const productionGaps = (state: A4ReadinessState, releaseId: string): string[] =>
  * Why no deployment approval may bind this cycle's release, as the production-lease effect and deploy rows refuse it:
  * rolled back (terminal for this cycle; its leases were revoked), a rollback of it started (any attempt, settled or not:
  * one that failed may have consumed its grant and restored the Enforce snapshot), or its recorded rollback target rolled
- * back since (it could never restore it). Null when none applies.
+ * back, or a rollback of it started, since (it could never restore it). Null when none applies.
  */
 function releaseRefusal(chain: readonly A4ChainLink[], releaseId: string): { code: string; codes: string[]; label: string } | null {
   if (rolledBack(chain, releaseId)) return { code: "RELEASE_ROLLED_BACK", codes: [], label: "This cycle's release was rolled back: reopen or tune Activate, then release again" };
@@ -314,7 +319,7 @@ function releaseRefusal(chain: readonly A4ChainLink[], releaseId: string): { cod
   }
   const target = rolledBackTarget(chain, releaseId);
   return target === null ? null : { code: "ROLLBACK_TARGET_ROLLED_BACK", codes: [`ROLLBACK_TARGET:${target}`],
-    label: `Release ${target}, this release's rollback target, was rolled back since: reopen or tune Activate and build the release again` };
+    label: `Release ${target}, this release's rollback target, was rolled back (or its rollback started) since: reopen or tune Activate and build the release again` };
 }
 
 /**
