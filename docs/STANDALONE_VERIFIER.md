@@ -10,19 +10,20 @@ whether a pinned issuer signed the record, whether it is about what you are chec
 evidence it depends on is present and consistent, and whether its declared result follows from that evidence under the
 rules below. It does not re-run a control or check a claim against the world.
 
-Status: the package lives in `packages/verifier` under the working name `@amc/verifier`, marked private. It is not
-published; Sid picks the published name. Interoperability is not claimed until an independently built verifier
+Status: the package is `agent-maturity-compass-verifier` in `packages/verifier` (unscoped, like the main package),
+marked private. It is not published; publishing is Sid's. Interoperability is not claimed until an independently built verifier
 (P3-03) passes the fixtures in `spec/fixtures/v1/`.
 
 ## Install and run
 
-Node 20 or later. The package has no dependencies; its source imports only `node:` built-ins
-(`npm run check:architecture-boundaries` enforces this).
+Node 20 or later. The package has no dependencies; its source imports only `node:` built-ins, its own modules and the
+shared admission rule `src/trust/admissionRule.ts`, which it compiles in and which imports only `node:` built-ins
+(`npm run check:architecture-boundaries` enforces both).
 
 ```bash
 npm run build:verifier                         # tsc -p packages/verifier/tsconfig.json
-cd packages/verifier && npm pack               # amc-verifier-0.1.0.tgz
-npm install --offline ./amc-verifier-0.1.0.tgz # in any directory; nothing else is fetched
+cd packages/verifier && npm pack                                  # agent-maturity-compass-verifier-0.1.0.tgz
+npm install --offline ./agent-maturity-compass-verifier-0.1.0.tgz # in any directory; nothing else is fetched
 ```
 
 ```bash
@@ -71,13 +72,18 @@ same report. It does no I/O. Bad options (a root that is not 64 hex, an invalid 
    revoked, distrusted or past its `validTo` as of `--as-of` is refused even for a record that claims an earlier
    signing time. To judge a record as of an earlier moment, set `--as-of`: the cut-off is the verifier's choice. The
    claimed time feeds freshness only (`timeBasis: "claimed"` until P1-25 adds attested time).
+   This deviates from the P1-06 spec, which expected `revoked-superseded-earlier-claim` to pass with a warning; it is
+   refused (`ISSUER_REVOKED`). Seam: once P1-25 adds RFC 3161 timestamps to these records, a signature that a token
+   from a pinned TSA proves earlier than the revocation becomes a pass with a warning, by passing the attested time to
+   the shared rule instead of `--as-of`.
 5. P1-08 statements are verified as records; none is applied to admission. Only a counted trust list changes what is
    admitted.
 
-Differences from AMC's own admission (src/trust/admission.ts): AMC judges validity and non-compromise revocations at the
-signature's claimed time, so it admits a superseded or expired key for an earlier claim with a warning, and refuses a
-claim before `validFrom` as `not-yet-valid`. `amc-verify` judges all of them as of `--as-of` and reports a claim before
-`validFrom` under freshness (`CLAIMED_TIME_BEFORE_KEY_VALIDITY`).
+AMC's own verifiers and `amc-verify` use one admission rule, `src/trust/admissionRule.ts` (distrust, validity window
+and revocation at the verification time); the package compiles that file, which imports only Node built-ins. The one
+difference: AMC's reports have no freshness result for it, so AMC refuses a claim after the verification time or before
+`validFrom` as `not-yet-valid` in issuer admission, where `amc-verify` reports it under freshness
+(`NOT_YET_VALID`, `CLAIMED_TIME_BEFORE_KEY_VALIDITY`). Both refuse the record.
 
 ## The six results
 
@@ -112,7 +118,7 @@ The kind is read from the record itself: an object with `type: "amc.scoped-attes
 
 | Kind | Signed bytes and issuer | Scope | Freshness | Completeness | Satisfaction |
 | --- | --- | --- | --- | --- | --- |
-| Scoped attestation (spec/schemas/v1/scoped-attestation) | Ed25519 over sha256(`AMC_SCOPED_ATTESTATION_V1`, 0x00, canonical attestation without `signature`), by `issuerKeyId` admitted for `independent-attestation` | tenant `tenantId`, deployment `deployment.deploymentId`, subject `subjectId`, profile `profile.id`; evidence receipts must name `workspaceId` and `subjectId` | `issuedAt`, `expiresAt`, sequence per `subjectId` | the control results `controlResultsDigest` names, each control's cited receipts | below |
+| Scoped attestation v2 (spec/schemas/v2/scoped-attestation; v1 is `UNSUPPORTED_VERSION`) | Ed25519 over sha256(`AMC_SCOPED_ATTESTATION_V2`, 0x00, canonical attestation without `signature`), by `issuerKeyId` admitted for `independent-attestation` | tenant `tenantId`, deployment `deployment.deploymentId`, subject `subjectId`, profile `profile.id`; evidence receipts must name `workspaceId` and `subjectId` | `issuedAt`, `expiresAt`, sequence per `subjectId` | the control results `controlResultsDigest` names, each control's cited receipts | below |
 | State receipt (receipt v2 token, as a JSON string) | Ed25519 over the payload bytes, by a key admitted for `receipt`; anchored by its ledger row | subject `agentId` | `ts` | the body `body_sha256` names | `NOT_RECOMPUTABLE`: a receipt proves a row was written, not the outcome |
 | External evidence profile v1 | docs/EXTERNAL_EVIDENCE_PROFILE.md; authority key admitted for `evidence-authority` within its entry's producers and capture methods | subject `session.id` | `normalization.ingestedAt` | events, original bytes (`source.originalSha256`), tool calls with results | the declared tier must not exceed what the admitted authority supports |
 | Trust list | P0-09 bytes; the issuer is the pinned root set | none | `issuedAt` | the list itself | not evaluated |

@@ -158,12 +158,28 @@ one of `synthetic_example`, `self_reported`, `observed` or `independently_review
 
 ## scoped-attestation
 
-A signed statement about one tenant, workspace, subject, deployment snapshot, profile and window. No AMC command emits
-it yet; the registry (P3-04) issues it and the standalone verifier (`amc-verify`, docs/STANDALONE_VERIFIER.md) checks
-it. P1-06 finalized this contract-only record before any attestation was issued: it added `tenantId`, `workspaceId`,
-`subjectId` and `sequence`, made the signature envelope refuse unknown members, and fixed the signed bytes. The
-envelope's `sigB64` is Ed25519 over the 32 bytes of sha256(`"AMC_SCOPED_ATTESTATION_V1"` (ASCII), one `0x00` byte, the
-canonical form of the attestation without `signature`). Rules the schema cannot express:
+A signed statement about one deployment snapshot, one profile and one window. Contract only: no AMC command emits it
+yet; the registry (P3-04) issues it and the standalone verifier (P1-06) checks it. The schema's `signature` is the
+reused signature envelope below. Proposed signed bytes, to be fixed by P1-06 before any attestation is issued: the
+sha256 digest of the canonical form of the attestation without `signature`. Rules the schema cannot express:
+
+- `window.start` < `window.end` ≤ `issuedAt` < `expiresAt`.
+- `issuerKeyId` equals `signature.fingerprint` and is admitted for purpose `independent-attestation`. The workspace's
+  own keys are never admitted for it.
+- Scope: `deployment` and `snapshotDigest` match what the verifier is checking. Freshness: `asOf` < `expiresAt`.
+- `controlResultsDigest` equals the digest of the control results the verifier holds; otherwise completeness fails.
+- P1-06 left v1 as published and defined the verifiable record as `scoped-attestation` v2 (below). The standalone
+  verifier refuses v1 as `UNSUPPORTED_VERSION`: it names no tenant, subject or sequence to judge scope or replay by.
+
+## scoped-attestation v2
+
+`spec/schemas/v2/scoped-attestation.schema.json` (`version: 2`): a signed statement about one tenant, workspace,
+subject, deployment snapshot, profile and window. No AMC command emits it yet; the registry (P3-04) issues it and the
+standalone verifier (`amc-verify`, docs/STANDALONE_VERIFIER.md) checks it. P1-06 defined it as v2 so that v1 keeps its
+meaning: it adds `tenantId`, `workspaceId`, `subjectId` and `sequence`, its signature envelope refuses unknown members,
+and its signed bytes are fixed. The envelope's `sigB64` is Ed25519 over the 32 bytes of
+sha256(`"AMC_SCOPED_ATTESTATION_V2"` (ASCII), one `0x00` byte, the canonical form of the attestation without
+`signature`). Rules the schema cannot express:
 
 - `window.start` < `window.end` ≤ `issuedAt` < `expiresAt`, and `signature.signedTs` is `issuedAt` in epoch
   milliseconds.

@@ -41,7 +41,7 @@ without a shell. Results go to `conformance-results.json`:
 
 ```json
 { "suite": "amc-verifier-fixtures", "version": "v1", "implementation": "<name>@<version>",
-  "ranAt": "<RFC 3339>", "passed": 54, "failed": 0,
+  "ranAt": "<RFC 3339>", "passed": 55, "failed": 0,
   "cases": [{ "case": "cross-tenant", "result": "pass", "diff": null }] }
 ```
 
@@ -67,4 +67,7 @@ The 19 cases P1-06 names: `valid-attestation`, `valid-external-evidence-attested
 `unanchored`, `backdated`, `tampered` and `rollback-revocation-list`. The others give every reason code and every record
 kind at least one case. The spec expected `revoked-superseded-earlier-claim` to pass with a claimed-time warning; it is
 refused here (`ISSUER_REVOKED`) because a claimed time is not a trusted timestamp, and
-`revoked-superseded-as-of-before-revocation` shows the cut-off the verifier's user sets with `--as-of`. Do not claim interoperability until an independently built verifier (P3-03) passes them all.
+`revoked-superseded-as-of-before-revocation` shows the cut-off the verifier's user sets with `--as-of`. Once P1-25 adds
+RFC 3161 timestamps to these records, a signature a pinned TSA proves earlier than the revocation becomes a pass with a
+warning; that case will be a new fixture. Scoped attestations here are v2 (`spec/schemas/v2/scoped-attestation`);
+`scoped-attestation-v1` shows that v1 is not a supported version. Do not claim interoperability until an independently built verifier (P3-03) passes them all.

@@ -1,6 +1,6 @@
 {
   "type": "amc.scoped-attestation",
-  "version": 1,
+  "version": 2,
   "tenantId": "tenant-a",
   "workspaceId": "ws-a",
   "subjectId": "agent-payments",
@@ -28,7 +28,7 @@
     "alg": "ed25519",
     "pubkeyB64": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQXRhajJqKzlwZENEQjlqbzA1SGhVKzRjU0hiak9FTG9ua3V4Yk9JbGpjTEU9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=",
     "fingerprint": "f5075494148c4cfc47013e0ab39d768ed9f17b6aaa5832bff82725b88ba7a51c",
-    "sigB64": "6x8LkqyONp9XXWThLGRA5K/auJ0Nf+R19qGiVGc5R85TQ38us3xI+zVFcckyK7w3sURLJa4n0DIuRFIbOharBw==",
+    "sigB64": "zyD5NaQyxFhpd2O7TOa+DQVKfTOy8DW9sQr2iyB3LBTOIkMyMmbgI/F1TdT7DLvq9QU6TnaH7ZLZ+h39u94SDQ==",
     "signedTs": 1788307200000,
     "signer": {
       "type": "VAULT",

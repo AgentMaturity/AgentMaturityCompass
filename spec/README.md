@@ -25,7 +25,8 @@ true; the acceptance rules cover those checks.
 | `authorization-record` | Who authorized which effect, bound at the enforcement point | Contract only; P1-02 emits it |
 | `control-result` | One control's five status dimensions, claim kind and evidence | Contract only; P1-11 emits it |
 | `claim-envelope` | What a result may claim (docs/CLAIM_KINDS.md) | Emitted |
-| `scoped-attestation` | A signed statement about one tenant, subject, deployment, profile and window | Contract only; the registry (P3-04) issues it; `amc-verify` (P1-06) checks it |
+| `scoped-attestation` | A signed statement about one deployment, profile and window | Contract only; the registry (P3-04) issues it |
+| `v2/scoped-attestation` | Version 2 of it: also one tenant, workspace, subject and sequence, with fixed signed bytes | Contract only; `amc-verify` (P1-06) checks it |
 | `trust-list` | A signed list of pinned keys and their purposes (docs/TRUST_LIST.md) | Read by every verifier |
 | `verifier-report` | The separate results of one verification | Emitted by the verify commands and `amc-verify` with `--json` |
 | `signature-envelope` | The Ed25519 envelope AMC artifacts carry | Emitted |

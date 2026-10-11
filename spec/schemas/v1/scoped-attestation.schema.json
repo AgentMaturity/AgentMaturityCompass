@@ -78,13 +78,7 @@
       ],
       "type": "object"
     },
-    "sequence": {
-      "exclusiveMinimum": 0,
-      "maximum": 9007199254740991,
-      "type": "integer"
-    },
     "signature": {
-      "additionalProperties": false,
       "properties": {
         "alg": {
           "const": "ed25519",
@@ -109,7 +103,6 @@
           "type": "integer"
         },
         "signer": {
-          "additionalProperties": false,
           "properties": {
             "attestationLevel": {
               "enum": [
@@ -157,14 +150,6 @@
       "pattern": "^[0-9a-f]{64}$",
       "type": "string"
     },
-    "subjectId": {
-      "minLength": 1,
-      "type": "string"
-    },
-    "tenantId": {
-      "minLength": 1,
-      "type": "string"
-    },
     "type": {
       "const": "amc.scoped-attestation",
       "type": "string"
@@ -192,19 +177,11 @@
         "end"
       ],
       "type": "object"
-    },
-    "workspaceId": {
-      "minLength": 1,
-      "type": "string"
     }
   },
   "required": [
     "type",
     "version",
-    "tenantId",
-    "workspaceId",
-    "subjectId",
-    "sequence",
     "snapshotDigest",
     "deployment",
     "profile",

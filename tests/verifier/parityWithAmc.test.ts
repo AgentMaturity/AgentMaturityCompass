@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import type { z } from "zod";
 import { actionReceiptV1Schema } from "../../src/actions/receiptStates.js";
-import { controlResultV1Schema, evidenceEventV1Schema, receiptV2Schema, scopedAttestationV1Schema } from "../../src/contracts/index.js";
+import { controlResultV1Schema, evidenceEventV1Schema, receiptV2Schema, scopedAttestationV2Schema } from "../../src/contracts/index.js";
 import { signedRevocationListSchema } from "../../src/keys/revocationList.js";
 import { signedKeyRotationStatementSchema } from "../../src/keys/rotationStatement.js";
 import { validateExternalEvidenceProfile } from "../../src/standard/externalEvidenceProfile.js";
@@ -18,7 +18,7 @@ import { caseNames, loadCase } from "./fixtures.js";
 
 const ZOD: Record<Exclude<RecordKind, "external-evidence">, z.ZodType> = {
   "trust-list": signedTrustListSchema,
-  "scoped-attestation": scopedAttestationV1Schema,
+  "scoped-attestation": scopedAttestationV2Schema,
   "receipt-payload": receiptV2Schema,
   "action-receipt": actionReceiptV1Schema,
   "control-result": controlResultV1Schema,
@@ -28,18 +28,8 @@ const ZOD: Record<Exclude<RecordKind, "external-evidence">, z.ZodType> = {
   "revocation-list": signedRevocationListSchema
 };
 
-/**
- * AMC's verdict. P1-08's time refinement (`new Date(value).toISOString() === value`) runs even after the datetime check
- * failed and throws RangeError on an invalid date; AMC's callers wrap those parses in try/catch, so a throw is a refusal.
- */
-function amcAccepts(kind: RecordKind, value: unknown): boolean {
-  try {
-    return kind === "external-evidence" ? validateExternalEvidenceProfile(value).length === 0 : ZOD[kind].safeParse(value).success;
-  } catch (error) {
-    if (error instanceof RangeError) return false;
-    throw error;
-  }
-}
+const amcAccepts = (kind: RecordKind, value: unknown) =>
+  kind === "external-evidence" ? validateExternalEvidenceProfile(value).length === 0 : ZOD[kind].safeParse(value).success;
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 const isObject = (value: unknown): value is Record<string, Json> => value !== null && typeof value === "object" && !Array.isArray(value);

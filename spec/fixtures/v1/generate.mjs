@@ -114,11 +114,11 @@ function evidenceSet({ receipts = [actionReceipt("exec-1"), actionReceipt("exec-
 
 // ── Scoped attestation ──
 function attestation({ signer = K.attester, controlResultsDigest, ...overrides }) {
-  const body = { type: "amc.scoped-attestation", version: 1, tenantId: "tenant-a", workspaceId: "ws-a", subjectId: "agent-payments", sequence: 7,
+  const body = { type: "amc.scoped-attestation", version: 2, tenantId: "tenant-a", workspaceId: "ws-a", subjectId: "agent-payments", sequence: 7,
     snapshotDigest: label("snapshot"), deployment: { deploymentId: "payments-prod", deploymentDigest: label("deployment") },
     profile: { id: "finance-ops", version: "1.0.0" }, window: { start: T.windowStart, end: T.windowEnd }, exclusions: [],
     controlResultsDigest, issuerKeyId: signer.keyId, issuedAt: T.issued, expiresAt: T.expires, ...overrides };
-  const digest = createHash("sha256").update(tagged("AMC_SCOPED_ATTESTATION_V1", canonical(body))).digest();
+  const digest = createHash("sha256").update(tagged("AMC_SCOPED_ATTESTATION_V2", canonical(body))).digest();
   return { ...body, signature: { v: 1, alg: "ed25519", pubkeyB64: b64(signer.pem), fingerprint: signer.keyId, sigB64: b64(signBytes(digest, signer)),
     signedTs: Date.parse(body.issuedAt), signer: { type: "VAULT", attestationLevel: "SOFTWARE" } } };
 }
@@ -292,8 +292,11 @@ addCase("malformed", "The signature envelope is missing. A record that is not th
   { artifact: unsigned, ...withEvidence, verdict: "FNNNNN", codes: { integrity: ["MALFORMED"] } });
 addCase("unknown-field", "A field the v1 schema does not define was added at the top level. Unknown fields are refused: an unsigned or unrecognized member could carry a claim no rule checks.",
   { artifact: { ...valid, assuranceLevel: "L5" }, ...withEvidence, verdict: "FNNNNN", codes: { integrity: ["UNKNOWN_FIELD"] } });
-addCase("unsupported-version", "A scoped attestation that says version 2. A v1 verifier must refuse versions it does not know rather than read them as v1.",
-  { artifact: { ...valid, version: 2 }, ...withEvidence, verdict: "FNNNNN", codes: { integrity: ["UNSUPPORTED_VERSION"] } });
+addCase("unsupported-version", "A scoped attestation that says version 3. A verifier must refuse versions it does not know rather than read them as the one it knows.",
+  { artifact: { ...valid, version: 3 }, ...withEvidence, verdict: "FNNNNN", codes: { integrity: ["UNSUPPORTED_VERSION"] } });
+const { tenantId: _t, workspaceId: _w, subjectId: _s, sequence: _q, signature: _v2sig, ...v1Body } = valid;
+addCase("scoped-attestation-v1", "A scoped attestation v1, the contract-only record that names no tenant, workspace, subject or sequence. Without them no scope or replay verdict is possible, so v1 is not a version this verifier supports.",
+  { artifact: { ...v1Body, version: 1, signature: valid.signature }, ...withEvidence, verdict: "FNNNNN", codes: { integrity: ["UNSUPPORTED_VERSION"] } });
 addCase("valid-receipt", "A state receipt by a key admitted for receipt, its body supplied, and its ledger row signed by a key admitted for ledger-row (anchored). A receipt proves that a row was written, not the outcome of the work, so satisfaction is not evaluated (exit 3).",
   { artifact: anchoredReceipt.artifact, evidence: anchoredReceipt.evidence, params: RECEIPT_PARAMS, verdict: "PPPPPN", codes: { satisfaction: ["NOT_RECOMPUTABLE"] } });
 addCase("external-evidence-tier-inflated", "The profile declares OBSERVED, but its authority is admitted for producer-callback capture, which supports ATTESTED at most. A declaration above what the admitted authority supports fails.",

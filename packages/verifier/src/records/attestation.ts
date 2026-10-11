@@ -1,4 +1,7 @@
-/** The scoped attestation (spec/schemas/v1/scoped-attestation, as finalized by P1-06). Mirrors src/contracts/v1/scopedAttestation.ts. */
+/**
+ * The scoped attestation v2 (spec/schemas/v2/scoped-attestation). Mirrors src/contracts/v2/scopedAttestation.ts. v1 lacks
+ * the tenant, workspace, subject and sequence a verdict needs, so it is UNSUPPORTED_VERSION here.
+ */
 import { arr, int, isoTime, lit, nonEmpty, obj, oneOf, opt, sha256, str } from "../schema.js";
 
 /** The signature envelope AMC artifacts carry, refusing unknown members here: none of them is signed. */
@@ -18,7 +21,7 @@ const signatureEnvelope = obj({
 
 export const scopedAttestation = obj({
   type: lit("amc.scoped-attestation"),
-  version: lit(1, "UNSUPPORTED_VERSION"),
+  version: lit(2, "UNSUPPORTED_VERSION"),
   tenantId: nonEmpty,
   workspaceId: nonEmpty,
   subjectId: nonEmpty,
@@ -37,4 +40,4 @@ export const scopedAttestation = obj({
 export type ScopedAttestation = ReturnType<typeof scopedAttestation>;
 
 /** The domain tag of the attestation digest: sha256(tag, 0x00, canonical attestation without `signature`). */
-export const ATTESTATION_DIGEST_TAG = "AMC_SCOPED_ATTESTATION_V1";
+export const ATTESTATION_DIGEST_TAG = "AMC_SCOPED_ATTESTATION_V2";
