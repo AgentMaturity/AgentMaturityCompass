@@ -66,7 +66,11 @@ export const approvalRequestSchema = z.object({
   }),
   // The authorization intent an approver reviewed (P1-02): protected facts and digests, never raw arguments.
   // Its hash is `boundHashes.intentHash`, so a recheck can name which fact changed.
-  authorizationIntent: z.record(z.string(), z.unknown()).optional()
+  authorizationIntent: z.record(z.string(), z.unknown()).optional(),
+  // Who raised the request (P1-78): a principal key as A4 keys one (`<plane>:<userId>`) or a user id, supplied by the
+  // server-side caller from its authenticated principal. The engine refuses that principal's approval and the quorum never
+  // counts it. Absent on records written before P1-78 and by callers that name no initiator.
+  initiator: z.string().min(1).optional()
 });
 
 export const approvalDecisionSchema = z.object({
@@ -99,9 +103,13 @@ export type ApprovalConsumedRecord = z.infer<typeof approvalConsumedSchema>;
 export type ApprovalRequestStatus = z.infer<typeof approvalRequestStatusSchema>;
 export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
 
-/** Status evolves; every other request field is part of the reviewed authority. */
+/**
+ * Status evolves; every other request field is part of the reviewed authority, except `initiator` (P1-78): it is kept out
+ * so every record digests the same under every AMC version, including verifiers that predate it (a4Verify recomputes this
+ * offline). The request file's signature still covers it.
+ */
 export function approvalRequestBindingDigest(request: ApprovalRequestRecord): string {
-  return sha256Hex(canonicalize({ ...request, status: "PENDING" }));
+  return sha256Hex(canonicalize({ ...request, status: "PENDING", initiator: undefined }));
 }
 
 export interface ApprovalChainIntegrity {
@@ -234,6 +242,7 @@ export function createApprovalRequestRecord(input: {
     leaseConstraintsHash: string;
   };
   authorizationIntent?: Record<string, unknown>;
+  initiator?: string;
 }): { request: ApprovalRequestRecord; path: string; sigPath: string } {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   ensureDirs(input.workspace, agentId);
@@ -263,7 +272,8 @@ export function createApprovalRequestRecord(input: {
       budgetsHash: input.boundHashes.budgetsHash,
       leaseConstraintsHash: input.boundHashes.leaseConstraintsHash
     },
-    ...(input.authorizationIntent === undefined ? {} : { authorizationIntent: input.authorizationIntent })
+    ...(input.authorizationIntent === undefined ? {} : { authorizationIntent: input.authorizationIntent }),
+    ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   const path = requestPath(input.workspace, agentId, request.approvalRequestId);
   writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
@@ -474,11 +484,18 @@ export function listApprovalRequests(params: {
       continue;
     }
     const path = join(dir, file);
-    if (!verifyArtifact(params.workspace, path).valid) {
+    // One read: the bytes verified are the bytes parsed (P1-78; this list feeds quorum decisions).
+    let bytes: Buffer;
+    try {
+      bytes = readFileSync(path);
+    } catch {
+      continue;
+    }
+    if (!verifyArtifact(params.workspace, path, bytes).valid) {
       continue;
     }
     try {
-      out.push(approvalRequestSchema.parse(JSON.parse(readUtf8(path)) as unknown));
+      out.push(approvalRequestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown));
     } catch {
       continue;
     }

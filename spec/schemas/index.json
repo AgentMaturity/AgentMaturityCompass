@@ -23,7 +23,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-gate.schema.json",
       "name": "a4-gate.schema.json",
-      "sha256": "8b4bebab787e3b58d3abf770746f7b2652bd43158950b1819abd227975276bd0"
+      "sha256": "ad8466afdb87b4f0d3160feb0f876c0a043cff59a6b48eaacad8ecf3de298da8"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",

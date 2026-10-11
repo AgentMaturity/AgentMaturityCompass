@@ -113,6 +113,8 @@ export interface SignPlanInput {
   reviewAgentId?: string | null;
   /** Passed to that request; it may only raise the signed rule (A4 regulated plan activation, design §5.3). */
   quorumFloor?: ApprovalRequestInput["quorumFloor"];
+  /** Who raises that request (P1-78); `amc catalog compile` passes the CLI's OS user. Optional: A4 names none. */
+  initiator?: string;
 }
 
 export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings: string[] } {
@@ -134,7 +136,7 @@ export function signPlan(input: SignPlanInput): { signed: SignedPlan; weakenings
   const signature = signDigestWithPolicy({ workspace, kind: "CONTROL_PLAN", digestHex: hexOf(input.plan.digest) });
   const approvalRequestId = input.reviewAgentId
     ? createApprovalForIntent({
-      workspace, agentId: input.reviewAgentId, ...planReviewIntent(input.plan),
+      workspace, agentId: input.reviewAgentId, ...planReviewIntent(input.plan), ...(input.initiator === undefined ? {} : { initiator: input.initiator }),
       requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
       leaseConstraints: { scopes: [], routeAllowlist: [], modelAllowlist: [] }, quorumFloor: input.quorumFloor
     }).approval.approvalRequestId

@@ -174,6 +174,15 @@ export function listVerifiedUsers(workspace: string): { users: UserRecord[]; sig
   return { users: config.users.slice().sort((a, b) => a.username.localeCompare(b.username)), signerFingerprint: sha256Hex(Buffer.from(signerPem!, "utf8")) };
 }
 
+/**
+ * The active user `userId` of the signed users.yaml, from one verified read, or null when no active user has that id
+ * (P1-78: a lease's principal and a native task's lease issuer resolve through this). Throws when users.yaml is missing
+ * or does not verify.
+ */
+export function activeUserRecord(workspace: string, userId: string): UserRecord | null {
+  return listVerifiedUsers(workspace).users.find((user) => user.userId === userId && user.status === "ACTIVE") ?? null;
+}
+
 export function addUser(params: {
   workspace: string;
   username: string;

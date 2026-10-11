@@ -343,6 +343,29 @@ describe("P3.3 — a genuine quorum grant survives the seam", () => {
     fixture.finish();
   });
 
+  test("records the session's initiator, whose own approval then never counts toward a distinct-user quorum (P1-78)", async () => {
+    const fixture = newFixture();
+    let refused = "";
+    const seam = new ApprovalSeam({
+      session: fixture.session,
+      workspace: fixture.workspace,
+      agentId: "default",
+      initiator: "LOCAL_USER:ada",
+      runtime: decidingRuntime(fixture.workspace, (requestId) => {
+        try { approveAs(fixture.workspace, requestId, "ada"); } catch (error) { refused = String(error); }
+        approveAs(fixture.workspace, requestId, "grace");
+        approveAs(fixture.workspace, requestId, "hopper");
+      })
+    });
+
+    const decision = await seam.request(ASK);
+
+    expect(refused, "WRITE_HIGH requires distinct users, so the initiator cannot approve").toMatch(/initiator cannot approve/);
+    expect(decision.answer, "two approvers other than the initiator meet the quorum").toBe("allow");
+    expect(listApprovalRequests({ workspace: fixture.workspace, agentId: "default" })[0]?.initiator).toBe("LOCAL_USER:ada");
+    fixture.finish();
+  });
+
   test("an action class the policy needs no approvers for does not block", async () => {
     const fixture = newFixture();
     const seam = new ApprovalSeam({

@@ -79,7 +79,7 @@ export interface DriverRunnerInit {
   /** Same per-turn ceilings as the parent; no independent child defaults. */
   readonly config?: Partial<AgentLoopConfig>;
   /** Existing policy and answerers, rebound to each actual child session. */
-  readonly approvalGate?: ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised">;
+  readonly approvalGate?: ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised" | "initiator">;
   /**
    * The parent loop's hook CONTROL, inherited by every child this runner builds
    * (IMPL-3).
@@ -162,7 +162,7 @@ interface HookControlRecordInput {
   readonly session: SessionService;
   readonly ctx: SubagentRunContext;
   readonly inherited: readonly string[];
-  readonly gate: (ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised">) | undefined;
+  readonly gate: (ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised" | "initiator">) | undefined;
   readonly scope: readonly ActionClass[] | undefined;
   readonly descendantScope: readonly ActionClass[] | undefined;
   readonly descendantStops: readonly string[] | undefined;
@@ -296,7 +296,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       const approval = gate === undefined ? undefined : new ApprovalSeam({ session, workspace: init.workspace,
         agentId: ctx.toolsetAgentId,
         ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
-        ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }) });
+        ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }),
+        ...(gate.initiator === undefined ? {} : { initiator: gate.initiator }) });
       // Inherited control, recorded before the driver exists so no turn can
       // precede the row that says what governed it. See `childHooks`.
       const { hooks, inherited } = childHooks(control);

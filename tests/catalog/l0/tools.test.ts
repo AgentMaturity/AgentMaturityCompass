@@ -17,7 +17,7 @@ import { newWorkspace } from "./workspaces.js";
  * temp workspace; the call runs through a journaled ToolPipeline with the real guard. The oracle is the denial, the
  * TOOL_CALL_DENIED record, the monitor-signed action_state receipt chain and whether the body ran, never agent text.
  */
-type AllowlistSetup = { tool: string; actionClass: ActionClass; listed: string[]; config: string };
+type AllowlistSetup = { tool: string; actionClass: ActionClass; listed: string[]; config: string; registered?: false };
 type EgressSetup = { tool: string; allowHosts: string[]; url?: string };
 
 /** Adds tools to the signed allowlist of `ws`. */
@@ -90,6 +90,24 @@ function assertOutcome(f: L0Fixture, guardLabel: string, r: Awaited<ReturnType<t
   expect(denied?.meta?.denialGuard).toBe(guardLabel);
 }
 
+/**
+ * A name the registry does not hold, even though the signed allowlist lists it: refused at visibility before any guard or
+ * journal sees it. The oracle is the TOOL_CALL_DENIED record the refusal still leaves (P1-78).
+ */
+async function runUnregistered(f: L0Fixture, ws: string, s: AllowlistSetup): Promise<void> {
+  const records: ReturnType<typeof toolEvidenceFor> = [];
+  const registry = new ToolRegistry();
+  registry.guard("tool-allowlist", toolhubAllowlistGuard(ws));
+  const pipeline = new ToolPipeline({ registry, workspace: ws, journal: () => openActionJournal(ws),
+    record: (execution, outcome) => records.push(...toolEvidenceFor(execution, outcome)) });
+  const outcome = await pipeline.execute({ name: s.tool, agentId: "default", arguments: {}, requestedMode: "EXECUTE", callId: "l0-unregistered" });
+  expect(outcome.ok).toBe(false);
+  expect(outcome.action, "nothing was journaled for a call that resolved to no tool").toBeUndefined();
+  const denied = records.find((row) => row.meta?.auditType === "TOOL_CALL_DENIED");
+  expect(denied?.meta).toMatchObject({ toolName: s.tool, agentId: "default", callId: "l0-unregistered", actionClass: null, denialStage: "visibility" });
+  expect(`${String(denied?.meta?.denialStage)}_denied`).toBe(f.envelope.expected.reasonCode);
+}
+
 describe("L0-TOOL-01 signed tool allowlist (tool-allowlist guard)", () => {
   const fixtures = fixturesFor("tool_allowlist", "L0-TOOL-01");
   it("has fixtures", () => expect(fixtures.length).toBeGreaterThan(1));
@@ -99,6 +117,7 @@ describe("L0-TOOL-01 signed tool allowlist (tool-allowlist guard)", () => {
       const ws = newWorkspace();
       signTools(ws, s.listed.map((name) => ({ name, actionClass: s.actionClass })));
       corrupt(ws, s.config);
+      if (s.registered === false) return runUnregistered(f, ws, s);
       const r = await run(f, ws, "tool-allowlist", toolhubAllowlistGuard(ws), { name: s.tool, actionClass: s.actionClass }, {});
       assertOutcome(f, "tool-allowlist", r);
     });

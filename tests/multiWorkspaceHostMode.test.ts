@@ -281,6 +281,7 @@ describe("multi-workspace host mode", () => {
   test("workspace proxy preserves viewer RBAC and logout revokes the tracked session", async () => {
     const { hostDir, workspaceB } = setupHostWithTwoWorkspaces();
     const intent = new ToolHubService(workspaceB).createIntent({
+      initiator: "test-operator",
       agentId: "default",
       toolName: "process.spawn",
       args: { binary: "node", argv: ["-v"] },

@@ -482,6 +482,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     writeFileSync(join(workspace, "workspace", "output", "seed.txt"), "seed");
 
     const intentA = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "fs.write",
@@ -493,6 +494,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     expect(first.effectiveMode).toBe("EXECUTE");
 
     const intentB = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "fs.write",

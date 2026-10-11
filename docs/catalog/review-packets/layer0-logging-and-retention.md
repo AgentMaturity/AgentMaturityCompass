@@ -11,8 +11,8 @@ control's `review` fields and, for AI-drafted content, `provenance.approvedBy`. 
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline, approvals. The native toolset records every tool outcome, allowed, denied or failed, as ledger rows in the session's hash chain.
 - Evidence producers: `amc.ledger` (available). Levels: L2, L3.
-- Tests: L0-LOG-01-T1 runtime (1 attempt): An allowed and a denied call each leave ledger rows naming the session, agent and tool, and the chain verifies. Today rows carry deploymentId "unregistered".
-- Executed test: yes (logging.test.ts). Partial. Allowed and denied calls are hash-chained rows naming the session, agent and tool, and the chain verifies when the session writer records them. Rows carry deploymentId "unregistered", and rows the toolset writes without a session writer reference a session the ledger does not hold, which fails chain verification (P1-78).
+- Tests: L0-LOG-01-T1 runtime (1 attempt): An allowed and a denied call each leave ledger rows naming the session, agent and tool, and the chain verifies, whether the session writer records them or a writer-less toolset records into a session the ledger holds open. A writer-less toolset whose session the ledger does not hold refuses the call and writes no row (UNVERIFIABLE_TOOL_EVIDENCE), so the chain still verifies.
+- Executed test: yes (logging.test.ts). Partial. Allowed and denied calls are hash-chained rows naming the session, agent and tool, and the chain verifies. Authorization records bind the active plan's tenant and deployment, or say deploymentId not_bound when no plan names one. A toolset never writes a row its session cannot verify: a call whose rows cannot be written is refused before its body, and a row lost after a body ran refuses every later call. Model calls and approvals are not driven here.
 - Crosswalk: amc-audit-map-v1 LOGGING_MONITORING.LEDGER_CHAIN (partial).
 
 Citations:

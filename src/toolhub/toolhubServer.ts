@@ -53,6 +53,8 @@ import {
 
 export interface ToolIntentRequest {
   agentId: string;
+  /** Who raises an approval this intent needs (P1-78): the authenticated caller. */
+  initiator: string;
   workOrderId?: string;
   toolName: string;
   args: Record<string, unknown>;
@@ -403,6 +405,7 @@ export class ToolHubService {
     if (approvalRequired) {
       const approval = createApprovalForIntent({
         workspace: this.workspace,
+        initiator: input.initiator,
         agentId: input.agentId,
         intentId,
         toolName: input.toolName,

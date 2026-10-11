@@ -164,6 +164,13 @@
       "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f"
     },
     {
+      "path": "src/bridge/hookActionIdentity.ts",
+      "issue": "P1-22",
+      "baseCommit": "e7123c69a2d9de7cacec9e552f4b431f9f825766",
+      "archivePath": "unused-code/plan-edits/P1-22/src/bridge/hookActionIdentity.ts.landed",
+      "sha256": "7d1770ee582af5fa127fcc9831c204c9ad779abc185c8051d5bde208357f2d3c"
+    },
+    {
       "path": "src/casebooks/casebookStore.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
