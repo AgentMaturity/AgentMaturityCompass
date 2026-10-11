@@ -77,6 +77,20 @@ describe("loadTrustContext", () => {
     expect(admitKey({ publicKeyPem: auditor.publicKeyPem, purpose: "artifact-seal", signature: "s", context }).status).toBe("admitted");
   });
 
+  it("needs threshold signatures from the roots trust-roots.json pins (P1-08 m-of-n)", () => {
+    const amcHome = home();
+    const second = testKey();
+    const list = trustList([listEntry(auditor)]);
+    put(join(amcHome, "trust", "trust-roots.json"), { ...roots(root.keyId, second.keyId), threshold: 2 });
+    const one = signTrustList(list, root.privateKeyPem);
+    put(join(amcHome, "trust", "amc-trust-list.json"), one);
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_SIGNATURE_INVALID");
+    put(join(amcHome, "trust", "amc-trust-list.json"), { list, signatures: [...one.signatures, ...signTrustList(list, second.privateKeyPem).signatures] });
+    expect(loadTrustContext({ amcHome, now: NOW }).lists).toEqual([list]);
+    put(join(amcHome, "trust", "trust-roots.json"), { ...roots(root.keyId), threshold: 2 });
+    expect(codeOf(() => loadTrustContext({ amcHome, now: NOW }))).toBe("TRUST_LIST_INVALID");
+  });
+
   it("uses --trust-list and --trust-root instead of the defaults", () => {
     const amcHome = home();
     put(join(amcHome, "trust", "amc-trust-list.json"), signTrustList(trustList([]), testKey().privateKeyPem));

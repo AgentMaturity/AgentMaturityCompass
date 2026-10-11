@@ -3,10 +3,11 @@ import { z } from "zod";
 import { assertNoteKey } from "../transparency/checkpointNote.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
+import { assertNoDuplicateJsonKeys, canonicalize, isCanonicalSignatureBase64 } from "../utils/json.js";
 import { KEY_PURPOSES } from "./keyPurposes.js";
 
-export type TrustListErrorCode = "TRUST_LIST_INVALID" | "TRUST_LIST_SIGNATURE_INVALID" | "TRUST_LIST_EXPIRED";
+export type TrustListErrorCode = "TRUST_LIST_INVALID" | "TRUST_LIST_SIGNATURE_INVALID" | "TRUST_LIST_EXPIRED"
+  | "ROLLBACK_DETECTED" | "FORK_DETECTED";
 
 export class TrustListError extends Error {
   constructor(readonly code: TrustListErrorCode, message: string) {
@@ -129,9 +130,14 @@ export const trustListSchema = z.strictObject({
     .optional()
 });
 
+/** One row per root key, each in its one canonical base64 spelling, so a list has no second encoding of the same signatures. */
 export const signedTrustListSchema = z.strictObject({
   list: trustListSchema,
-  signatures: z.array(z.strictObject({ keyId: keyIdSchema, publicKeyPem: z.string().min(1).max(4096), signature: z.string().min(1) }))
+  signatures: z.array(z.strictObject({
+    keyId: keyIdSchema,
+    publicKeyPem: z.string().min(1).max(4096),
+    signature: z.string().refine(isCanonicalSignatureBase64, "signature must be canonical base64 of 64 bytes")
+  })).max(64).refine(rows => new Set(rows.map(row => row.keyId)).size === rows.length, "one signature per root key")
 });
 
 export type TrustListEntry = z.infer<typeof trustListEntrySchema>;
@@ -164,21 +170,27 @@ export function signTrustList(list: TrustList, rootPrivateKeyPem: string): Signe
   return { list: parsed, signatures: [{ keyId, publicKeyPem, signature: sign(null, signedBytes(parsed), rootPrivateKeyPem).toString("base64") }] };
 }
 
-/** Returns the list when one signature verifies under a pinned root and the list has not expired; throws otherwise. */
-export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds: readonly string[]; now: Date }): TrustList {
+/**
+ * Returns the list when `threshold` (default 1) distinct pinned roots signed it and it has not expired; throws otherwise.
+ * Every signature row must verify under the key it names, pinned or not, so a list carries no unverifiable extra rows.
+ */
+export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds: readonly string[]; now: Date; threshold?: number }): TrustList {
   const { list, signatures } = parseTrustValue(signedTrustListSchema, signed, "signed trust list");
   const bytes = signedBytes(list);
-  const valid = signatures.some(({ keyId, publicKeyPem, signature }) => {
-    if (!opts.pinnedRootKeyIds.includes(keyId) || ed25519KeyId(publicKeyPem) !== keyId) return false;
+  const threshold = Math.max(1, opts.threshold ?? 1);
+  const bad = signatures.find(({ keyId, publicKeyPem, signature }) => {
+    if (ed25519KeyId(publicKeyPem) !== keyId) return true;
     try {
-      return verify(null, bytes, publicKeyPem, Buffer.from(signature, "base64"));
+      return !verify(null, bytes, publicKeyPem, Buffer.from(signature, "base64"));
     } catch {
-      return false;
+      return true;
     }
   });
-  if (!valid) {
+  if (bad) throw new TrustListError("TRUST_LIST_SIGNATURE_INVALID", `list "${list.listId}" carries a signature by ${bad.keyId} that does not verify`);
+  const pinned = signatures.filter(({ keyId }) => opts.pinnedRootKeyIds.includes(keyId)).length;
+  if (pinned < threshold) {
     throw new TrustListError("TRUST_LIST_SIGNATURE_INVALID",
-      `list "${list.listId}" has no valid signature by a pinned root (${opts.pinnedRootKeyIds.length} pinned)`);
+      `list "${list.listId}" has ${pinned} valid signature(s) by pinned roots; ${threshold} required (${opts.pinnedRootKeyIds.length} pinned)`);
   }
   if (opts.now.getTime() >= Date.parse(list.expiresAt)) {
     throw new TrustListError("TRUST_LIST_EXPIRED", `list "${list.listId}" expired at ${list.expiresAt}`);
@@ -188,14 +200,18 @@ export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds:
 
 /**
  * Reads a JSON file of at most 1 MiB without following a final symlink. A "__proto__" key is refused: the strict
- * schemas would silently drop it, so a signed file could carry it without breaking its signature.
+ * schemas would silently drop it, so a signed file could carry it without breaking its signature. A repeated key is
+ * refused too: JSON.parse keeps the last one, and another verifier's parser may keep the first.
  */
 export function readSignedTrustListFile(path: string): unknown {
   try {
-    return JSON.parse(boundedFile(path, TRUST_LIST_MAX_BYTES).toString("utf8"), (key, value: unknown) => {
+    const text = boundedFile(path, TRUST_LIST_MAX_BYTES).toString("utf8");
+    const value = JSON.parse(text, (key, value: unknown) => {
       if (key === "__proto__") throw new Error("unknown field __proto__");
       return value;
     }) as unknown;
+    assertNoDuplicateJsonKeys(text);
+    return value;
   } catch (error) {
     throw new TrustListError("TRUST_LIST_INVALID", `${path}: ${error instanceof Error ? error.message : String(error)}`);
   }

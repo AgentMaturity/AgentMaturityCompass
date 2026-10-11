@@ -3,7 +3,10 @@ import { join } from "node:path";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
+import { AntiRollbackError, highWaterKey, recordHighWater } from "../keys/highWater.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 import {
   distrustEntrySchema, ed25519KeyId, parseTrustValue, readSignedTrustListFile, TrustListError, verifySignedTrustList,
@@ -39,11 +42,13 @@ export interface LoadTrustContextOptions {
   now?: Date;
 }
 
+/** P1-08: `threshold` (default 1) distinct pinned roots must sign each list (m-of-n). */
 const trustRootsSchema = z.strictObject({
   type: z.literal("amc.trust-roots"),
   version: z.literal(1),
-  roots: z.array(z.string().regex(/^[0-9a-f]{64}$/)).min(1)
-});
+  roots: z.array(z.string().regex(/^[0-9a-f]{64}$/)).min(1).refine(roots => new Set(roots).size === roots.length, "roots must be unique"),
+  threshold: z.number().int().positive().optional()
+}).refine(file => (file.threshold ?? 1) <= file.roots.length, "threshold cannot exceed the number of roots");
 const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySchema) });
 
 /** Shipped with the package; no flag or environment variable disables it, and it beats any pin. */
@@ -76,19 +81,37 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   const defaultList = join(trustDir, "amc-trust-list.json");
   const listPaths = opts.trustLists?.length ? opts.trustLists : existsSync(defaultList) ? [defaultList] : [];
   const rootsFile = join(trustDir, "trust-roots.json");
-  const roots = opts.trustRoots?.length
-    ? opts.trustRoots.map(root => fingerprint(root, "--trust-root"))
-    : listPaths.length && existsSync(rootsFile) ? parseTrustValue(trustRootsSchema, readSignedTrustListFile(rootsFile), rootsFile).roots : [];
+  const pinnedRoots = opts.trustRoots?.length
+    ? { roots: opts.trustRoots.map(root => fingerprint(root, "--trust-root")), threshold: 1 }
+    : listPaths.length && existsSync(rootsFile) ? parseTrustValue(trustRootsSchema, readSignedTrustListFile(rootsFile), rootsFile) : { roots: [] as string[], threshold: 1 };
+  const roots = pinnedRoots.roots;
   const now = opts.now ?? new Date();
   const lists = listPaths.map(path => {
     if (!roots.length) throw new TrustListError("TRUST_LIST_SIGNATURE_INVALID", `${path}: no trust-list root is pinned (--trust-root or ${rootsFile})`);
-    return verifySignedTrustList(readSignedTrustListFile(path), { pinnedRootKeyIds: roots, now });
+    const list = verifySignedTrustList(readSignedTrustListFile(path), { pinnedRootKeyIds: roots, now, threshold: pinnedRoots.threshold });
+    acceptTrustListSequence(list, roots, opts.amcHome, env);
+    return list;
   });
   return {
     mode: "pinned", asOf: now, lists, explicitPins,
     distrust: [...builtInDistrust(), ...lists.flatMap(list => list.distrust)],
     allowUnpinned: opts.allowUnpinned === true, allowUnanchored: opts.allowUnanchored === true
   };
+}
+
+/**
+ * Anti-rollback (P1-08): a list older than the highest sequence this machine accepted for its listId under the same
+ * pinned roots is ROLLBACK_DETECTED, and the same sequence with other content is FORK_DETECTED. Accepting a newer list
+ * raises the mark. Pinning other roots is a deliberate trust change, so it starts another mark.
+ */
+function acceptTrustListSequence(list: TrustList, roots: readonly string[], amcHome: string | undefined, env: NodeJS.ProcessEnv): void {
+  const rootSet = sha256Hex([...roots].sort().join(",")).slice(0, 16);
+  try {
+    recordHighWater(highWaterKey("trust-list", `${list.listId}@${rootSet}`), list.sequence, sha256Hex(canonicalize(list)), { amcHome, env });
+  } catch (error) {
+    if (error instanceof AntiRollbackError) throw new TrustListError(error.code, `list "${list.listId}": ${error.message}`);
+    throw error;
+  }
 }
 
 /**

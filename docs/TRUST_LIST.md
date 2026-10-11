@@ -49,7 +49,7 @@ The AMC home is `$AMC_HOME`, or `~/.config/amc` when it is unset. A trust list i
 
 ## Format
 
-A trust-list file holds the list and one or more root signatures. Unknown fields, including `__proto__`, are refused everywhere, and files over 1 MiB, symbolic links and lists with more than 4,096 entries are refused.
+A trust-list file holds the list and one or more root signatures. Unknown fields, including `__proto__`, are refused everywhere, and files over 1 MiB, symbolic links and lists with more than 4,096 entries are refused. Since P1-08 a repeated JSON key anywhere in the file is refused (`JSON.parse` keeps the last one and another parser may keep the first), each root key may sign once, every signature row must verify under the key it names, and a signature must be in its one canonical base64 spelling.
 
 ```json
 {
@@ -109,7 +109,7 @@ export function signList(list, rootPrivateKeyPem) {
 }
 ```
 
-The package exports the same operation as `signTrustList(list, rootPrivateKeyPem)`, and `verifySignedTrustList(signed, { pinnedRootKeyIds, now })` accepts a list only when one signature verifies under a pinned root and the list has not expired.
+The package exports the same operation as `signTrustList(list, rootPrivateKeyPem)`, and `verifySignedTrustList(signed, { pinnedRootKeyIds, now, threshold })` accepts a list only when `threshold` (default 1) distinct pinned roots signed it and the list has not expired.
 
 ## Where pins come from
 
@@ -119,7 +119,7 @@ The package exports the same operation as `signTrustList(list, rootPrivateKeyPem
 2. `--expect-monitor <sha256>`, else `AMC_EXPECTED_MONITOR_FINGERPRINT`: pins the monitor key for `ledger-row`. (`domain pack verify` likewise pins `AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY` for the license signature.)
 3. `--trust-list <file>` (repeatable), else `<AMC home>/trust/amc-trust-list.json` when it exists.
 
-Lists are checked against `--trust-root <sha256>` (repeatable), else `<AMC home>/trust/trust-roots.json`. A list with no valid signature by a pinned root fails with `TRUST_LIST_SIGNATURE_INVALID`; an expired list fails with `TRUST_LIST_EXPIRED`; a malformed or unreadable file fails with `TRUST_LIST_INVALID`. A failing list is never skipped.
+Lists are checked against `--trust-root <sha256>` (repeatable), else `<AMC home>/trust/trust-roots.json`. Since P1-08 that file may set `"threshold": <n>` (default 1, at most the number of roots): a list then needs valid signatures from `n` distinct pinned roots (m-of-n). `--trust-root` flags use a threshold of 1. A list with too few valid signatures by pinned roots fails with `TRUST_LIST_SIGNATURE_INVALID`; an expired list fails with `TRUST_LIST_EXPIRED`; a malformed or unreadable file fails with `TRUST_LIST_INVALID`. Each accepted list raises this machine's anti-rollback mark for its `listId` ([KEY_LIFECYCLE.md](KEY_LIFECYCLE.md)): a lower `sequence` fails with `ROLLBACK_DETECTED`, and the same sequence with other content fails with `FORK_DETECTED`, so publish every changed list with a higher sequence. A failing list is never skipped.
 
 ## How a key is admitted
 
@@ -183,4 +183,4 @@ A bundle or certificate carries its own ledger, so it is anchored only when its 
 
 ## Maintainer tool
 
-`scripts/trust-list.mjs` is not shipped in the npm package. Its subcommands are `keygen`, `init`, `add`, `distrust`, `sign` and `verify`; run `node scripts/trust-list.mjs --help` (or `npm run trust-list -- --help`). `add` and `distrust` validate the list before writing and remove existing signatures, so sign again after every edit.
+`scripts/trust-list.mjs` is not shipped in the npm package. Its subcommands are `keygen`, `init`, `add`, `distrust`, `sign` and `verify`; run `node scripts/trust-list.mjs --help` (or `npm run trust-list -- --help`). `add` and `distrust` validate the list before writing and remove existing signatures, so sign again after every edit. The first edit after a signed version also raises `sequence` by one, because verifiers refuse other content at a sequence they already accepted. `sign` adds or replaces one root's signature, so roots of an m-of-n set sign the same file in turn.

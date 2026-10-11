@@ -40,3 +40,30 @@ export function parseCanonicalJson(bytes: Buffer): unknown {
 export function isCanonicalSignatureBase64(text: string): boolean {
   return /^[A-Za-z0-9+/]{86}==$/.test(text) && Buffer.from(text, "base64").toString("base64") === text;
 }
+
+/**
+ * Refuses text whose objects repeat a key (compared after unescaping). Call it on text JSON.parse already accepted:
+ * JSON.parse silently keeps the last of two equal keys, and another parser of the same signed file may keep the first.
+ */
+export function assertNoDuplicateJsonKeys(text: string): void {
+  const open: Array<Set<string> | null> = [];
+  for (let at = 0; at < text.length; at += 1) {
+    const char = text[at];
+    if (char === "{") open.push(new Set());
+    else if (char === "[") open.push(null);
+    else if (char === "}" || char === "]") open.pop();
+    else if (char === '"') {
+      let end = at + 1;
+      while (text[end] !== '"') end += text[end] === "\\" ? 2 : 1;
+      let next = end + 1;
+      while (text[next] === " " || text[next] === "\t" || text[next] === "\n" || text[next] === "\r") next += 1;
+      const keys = open[open.length - 1];
+      if (text[next] === ":" && keys) {
+        const key = JSON.parse(text.slice(at, end + 1)) as string;
+        if (keys.has(key)) throw new Error(`duplicate key ${JSON.stringify(key)}`);
+        keys.add(key);
+      }
+      at = end;
+    }
+  }
+}

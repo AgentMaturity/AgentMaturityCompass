@@ -53,7 +53,10 @@ const writeJson = (path, value, flag = "w") => writeFileSync(path, JSON.stringif
 async function editList(values, edit) {
   const { trustListSchema, TrustListError } = await trust();
   const path = required(values, "list");
-  const list = edit(readJson(path).list);
+  const current = readJson(path);
+  // A verifier refuses other content at a sequence it already accepted (P1-08), so the first edit after signing bumps it.
+  const signed = (current.signatures ?? []).length > 0;
+  const list = edit({ ...current.list, sequence: current.list.sequence + (signed ? 1 : 0) });
   const parsed = trustListSchema.safeParse(list);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];

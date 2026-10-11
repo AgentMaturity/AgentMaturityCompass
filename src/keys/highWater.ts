@@ -12,6 +12,7 @@ import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 
 export type HighWaterKind = "trust-list" | "revocation-list" | "key-history" | "rotation" | "keyset";
 export type AntiRollbackCode = "ROLLBACK_DETECTED" | "FORK_DETECTED";
@@ -73,8 +74,9 @@ function readEntries(path: string): Record<string, HighWaterEntry> {
     throw new Error(`anti-rollback state ${path} is unreadable (${error instanceof Error ? error.message : String(error)}); `
       + "refusing to decide on rollback until it is restored or removed by the machine owner");
   }
+  // Written canonically, so a duplicated or re-spelled key never reads as a different mark than the one written.
   let value: unknown = null;
-  try { value = JSON.parse(bytes.toString("utf8")); } catch { /* reported as invalid below */ }
+  try { value = parseCanonicalJson(bytes); } catch { /* reported as invalid below */ }
   const parsed = fileSchema.safeParse(value);
   if (!parsed.success) throw new Error(`anti-rollback state ${path} is not a valid amc.high-water file; refusing to decide on rollback`);
   return parsed.data.entries;
@@ -109,6 +111,8 @@ export function checkHighWater(key: string, sequence: number, sha256: string, op
  */
 export function recordHighWater(key: string, sequence: number, sha256: string, opts: HighWaterOptions = {}): boolean {
   const path = highWaterPath(opts);
+  const seen = checkHighWater(key, sequence, sha256, opts);
+  if (seen !== null && seen.sequence >= sequence) return true; // nothing to raise: no lock, no write
   try {
     mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     return withControlFileLock({ root: dirname(path), name: "high-water", operation: () => {
@@ -116,7 +120,7 @@ export function recordHighWater(key: string, sequence: number, sha256: string, o
       compareHighWater(key, entries[key] ?? null, sequence, sha256);
       if (entries[key] && entries[key].sequence >= sequence) return true;
       const next = { type: "amc.high-water", version: 1, entries: { ...entries, [key]: { sequence, sha256, seenAt: new Date().toISOString() } } };
-      writeFileAtomic(path, `${JSON.stringify(fileSchema.parse(next), null, 2)}\n`, 0o600);
+      writeFileAtomic(path, canonicalize(fileSchema.parse(next)), 0o600);
       return true;
     } });
   } catch (error) {
