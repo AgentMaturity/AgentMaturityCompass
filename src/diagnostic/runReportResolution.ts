@@ -126,3 +126,34 @@ export function resolveRunReport(workspace: string, runId: string, agentId?: str
     throw new Error(`No runId found matching "${requestedRunId}".`);
   }
 }
+
+/** The newest run file in the agent's runs directory, for the "Latest run" lines and `--run latest`. */
+export function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
+  const runsDir = getAgentPaths(workspace, agentId).runsDir;
+  if (!pathExists(runsDir)) {
+    return null;
+  }
+  const files = readdirSync(runsDir)
+    .filter((name) => name.endsWith(".json"))
+    .sort((a, b) => a.localeCompare(b));
+  if (files.length === 0) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
+      runId?: string;
+      integrityIndex?: number;
+      trustLabel?: string;
+    };
+    if (!parsed.runId) {
+      return null;
+    }
+    return {
+      runId: parsed.runId,
+      integrityIndex: Number(parsed.integrityIndex ?? 0),
+      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
+    };
+  } catch {
+    return null;
+  }
+}

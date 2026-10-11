@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { resolveRunReport, runDiagnostic } from "../src/diagnostic/runner.js";
+import { latestRunSummary } from "../src/diagnostic/runReportResolution.js";
 import {
   aliasesForRun,
   listRunAliases,
@@ -69,5 +70,14 @@ describe("diagnostic run aliases", () => {
 
     expect(removeRunAlias(ws, "q1-client-assessment", "default")).toBe(true);
     expect(resolveRunAlias(ws, "q1-client-assessment", "default")).toBeNull();
+  });
+
+  // P0-28: `amc up` looked in .amc/agents/default/runs, found nothing and reran the baseline on every start.
+  test("latestRunSummary finds a run where the runner wrote it, so amc up does not rerun the baseline", async () => {
+    const ws = workspace();
+    expect(latestRunSummary(ws, "default")).toBeNull();
+    const report = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default",
+      claimMode: "auto", noSign: true });
+    expect(latestRunSummary(ws, "default")?.runId).toBe(report.runId);
   });
 });

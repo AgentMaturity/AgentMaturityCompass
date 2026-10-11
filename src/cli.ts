@@ -286,6 +286,7 @@ import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js"
 import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
+import { latestRunSummary } from "./diagnostic/runReportResolution.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
 import { registerHookIntegrationCommands } from "./adapters/hookIntegrationCli.js";
 import { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
@@ -1199,36 +1200,6 @@ function findImmediatePackDirectories(parentDir: string): string[] {
     }
   }
   return out.sort((a, b) => a.localeCompare(b));
-}
-
-function latestRunSummary(workspace: string, agentId: string): { runId: string; integrityIndex: number; trustLabel: string } | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(join(runsDir, files[files.length - 1]!))) as {
-      runId?: string;
-      integrityIndex?: number;
-      trustLabel?: string;
-    };
-    if (!parsed.runId) {
-      return null;
-    }
-    return {
-      runId: parsed.runId,
-      integrityIndex: Number(parsed.integrityIndex ?? 0),
-      trustLabel: String(parsed.trustLabel ?? "UNKNOWN")
-    };
-  } catch {
-    return null;
-  }
 }
 
 function readCurrentAgentScore(workspace: string, agentId: string): { score0to1: number; source: string } | null {
