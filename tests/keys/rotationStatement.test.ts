@@ -185,3 +185,20 @@ describe("key rotation statements (P1-08)", () => {
     expect(() => addRotationSignature(first, "root", k0.privatePem)).toThrow(/root other than/);
   });
 });
+
+describe("invalid times are schema errors, never exceptions (P1-06)", () => {
+  it("refuses an impossible or empty time with a typed issue in each P1-08 statement schema", async () => {
+    const { signedKeyRotationStatementSchema } = await import("../../src/keys/rotationStatement.js");
+    const { signedRevocationListSchema } = await import("../../src/keys/revocationList.js");
+    const { signedRootRotationSchema } = await import("../../src/trust/rootRotation.js");
+    for (const bad of ["", "2026-02-30T00:00:00.000Z", "not a time"]) {
+      const rotation = signedKeyRotationStatementSchema.safeParse({ statement: { issuedAt: bad }, signatures: [] });
+      const revocation = signedRevocationListSchema.safeParse({ list: { issuedAt: bad, revoked: [] }, signature: {}, anchor: null });
+      const root = signedRootRotationSchema.safeParse({ statement: { issuedAt: bad }, signatures: [] });
+      for (const [name, parsed] of [["rotation", rotation], ["revocation", revocation], ["root", root]] as const) {
+        expect(parsed.success, `${name} ${bad}`).toBe(false);
+        expect(parsed.error?.issues.some(issue => issue.path.includes("issuedAt")), `${name} ${bad}`).toBe(true);
+      }
+    }
+  });
+});

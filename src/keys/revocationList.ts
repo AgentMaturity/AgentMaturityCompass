@@ -12,12 +12,13 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { ed25519KeyId } from "../trust/trustList.js";
 import { readContainedOrNull, removeContained, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { isExactIsoTime } from "../utils/time.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
 import { assertNotRolledBack, loggedAnchor, markSequence, type AnchorTarget } from "./anchors.js";
 
 const DOMAIN_TAG = "AMC_REVOCATION_LIST_V1";
 const hexSchema = z.string().regex(/^[0-9a-f]{64}$/);
-const timeSchema = z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form");
+const timeSchema = z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form");
 
 const REVOCATION_KINDS = ["lease", "key", "certificate", "passport"] as const;
 

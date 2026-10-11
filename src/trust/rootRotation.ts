@@ -22,6 +22,7 @@ import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { carryHighWaterMarks, compareHighWater, highWaterIds, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
 import { containedExists, listContainedDir, readContained, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { isExactIsoTime } from "../utils/time.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
 import { canonicalEd25519Pem, ed25519KeyId, parseTrustJson, parseTrustValue, TrustListError } from "./trustList.js";
 
@@ -53,7 +54,7 @@ const statementSchema = z.strictObject({
   newThreshold: z.number().int().min(2, "a root set needs a threshold of at least 2").max(64),
   newRootPublicKeyPems: z.array(z.string().min(1).max(4096).refine(pem => canonicalEd25519Pem(pem) === pem, "canonical Ed25519 SPKI PEM")).max(64),
   allowDecrease: z.boolean(),
-  issuedAt: z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form")
+  issuedAt: z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form")
 }).refine(statement => statement.newThreshold <= statement.newRoots.length, "newThreshold cannot exceed the number of new roots")
   .refine(statement => statement.newRootPublicKeyPems.length === statement.newRoots.length
     && statement.newRootPublicKeyPems.every((pem, index) => ed25519KeyId(pem) === statement.newRoots[index]), "newRootPublicKeyPems must be the new roots' keys, in order");

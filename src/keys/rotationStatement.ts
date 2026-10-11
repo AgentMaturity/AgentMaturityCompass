@@ -15,6 +15,7 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
 import { canonicalEd25519Pem, ed25519KeyId } from "../trust/trustList.js";
 import { sha256Hex } from "../utils/hash.js";
+import { isExactIsoTime } from "../utils/time.js";
 import { canonicalize, isCanonicalSignatureBase64, parseCanonicalJson } from "../utils/json.js";
 
 export const ROTATION_REASONS = ["scheduled", "superseded", "purpose-split", "key-compromise"] as const;
@@ -27,7 +28,7 @@ const ROLE_ORDER = ["previous", "next", "root"] as const;
 
 const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/);
 /** One spelling per instant: the toISOString form, so a re-spelled time is a different (unsigned) statement. */
-const timeSchema = z.iso.datetime().refine(value => new Date(value).toISOString() === value, "time must be in toISOString form");
+const timeSchema = z.iso.datetime().refine(isExactIsoTime, "time must be in toISOString form");
 
 const keyRotationStatementSchema = z.strictObject({
   type: z.literal("amc.key-rotation"),

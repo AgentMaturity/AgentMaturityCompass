@@ -23,3 +23,12 @@ export function dayKey(ts: number): string {
   const date = new Date(ts);
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
 }
+
+/**
+ * True when `value` is exactly the toISOString spelling of a real instant: one spelling per instant. False, never an
+ * exception, for an impossible date such as 2026-02-30, so a schema refinement built on it reports an issue.
+ */
+export function isExactIsoTime(value: string): boolean {
+  const date = new Date(value);
+  return !Number.isNaN(date.getTime()) && date.toISOString() === value;
+}
