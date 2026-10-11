@@ -7,7 +7,7 @@ approvers decided on. A4 produces signed, `self_reported` records of how the age
 statement that the agent is safe, correct or lawful.
 
 Status: preview. Every A4 route and Studio page is absent unless the operator sets `AMC_A4_PREVIEW=1` in the Studio
-process environment (D-20). The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
+process environment (D-20), and every `amc a4` command refuses without it in its own environment. The spine (store, gates, readiness, verification, Studio shell) has landed; each stage's
 producers land with its own plan item (Aspire P1-59, Assemble P1-60, Adapt P1-61, Activate P1-62), and until then a
 stage records human-authored content through the "no producer registered" path, labelled as such. The decisions behind
 the design are in `docs/adr/013-a4-forge-spine.md`; the verifier rules are in `spec/ACCEPTANCE_RULES.md`
@@ -719,8 +719,8 @@ destruction is effective only after every backup, WORM segment or mirror older t
   certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
-  trust list admits them. It is a library function for now: the CLI entry point is `amc a4 verify --trust-list`
-  (P1-65). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
+  trust list admits them. Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
+  integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,
@@ -729,6 +729,38 @@ destruction is effective only after every backup, WORM segment or mirror older t
   ref id (a file name, a receipt or external id) is hashed with its kind. The slice is scanned for personal data and
   key material, then staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
   function for now, absent without `AMC_A4_PREVIEW=1` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
+
+## The `amc a4` command line
+
+`amc a4` (P1-65) runs the same routes as the API, in process: the same body schemas, refusals, gate functions,
+separation of duties, quorum, request deduplication, audits and effects. Without `AMC_A4_PREVIEW=1` every command is
+refused with `A4_PREVIEW_DISABLED` and exit code 1. Projects are created and stages are built in Studio; the command line
+reads them, decides gates, completes them and runs the release, deployment and rollback steps.
+
+- **Who acts.** Writes need `--session-token-file`, the file `amc approvals login` wrote: a regular, private (0600)
+  file, never a symbolic link. Its user is re-read from the signed `users.yaml` and recorded with admission
+  `native_login_token` and identity check `users_yaml`. A user who is no longer ACTIVE is refused, and so is a token
+  holding a role `users.yaml` no longer grants. `--username`, `--roles` and `--user-id` are refused. Reads without a
+  token answer as the admin token does: every project, reads only. Writes are refused while the workspace is read-only,
+  and `amc mode agent` blocks the owner-gated commands.
+- **Reading.** `amc a4 list`, `amc a4 show <projectId>` and `amc a4 readiness <projectId> [--stage <stage>]` print the
+  API's answer with its claim label (`--json` adds `claimKind`, `statusDimensions` and `claimLabel`). `amc a4 guide
+  [projectId]` prints the stage model, the project's next action and, for every open gate, the decision command with
+  the gate's pins. Text output prints a control character in a name, reason or refusal as `\uXXXX`, so a project
+  name cannot print a line beside the claim label; the API refuses a project name that holds one.
+- **Deciding.** `amc a4 approve|deny|request-changes --gate <id> --reason <text> --expect-binding-digest <sha256>
+  --expect-gate-seq <n>` binds the decision to the gate you reviewed. Approve and deny also take
+  `--expect-readiness-digest`.
+- **Progressing.** `amc a4 complete`, `hold`, `resume`, `reopen`, `tune`, `retire`, `members` and `gate-policy` take
+  `--expect-head-seq`, the head you reviewed. `amc a4 release` consumes Activate's release approval and prints the
+  staging lease token once. `amc a4 deploy prepare` prints the signed plan; `deploy record --receipt <file>` records the
+  operator's receipt (the plan's `receiptForm` body); `deploy verify` runs AMC's own check; `amc a4 rollback --preview`
+  then `amc a4 rollback --reason …` rolls a release back. An effect left running finishes before the command returns,
+  and one that fails exits 1. A retry with the same `--request-id` looks that attempt's outcome up on the chain and
+  exits 1 too when the attempt failed or was lost.
+- **Verifying and exporting.** `amc a4 verify <projectId|file>` checks a chain or an export under your own
+  `--trust-list`, the only A4 surface where the caller names a trust list. `amc a4 export <projectId> --run <runId>
+  --out <file>` is `amc bundle export` for the project's agent; `--out` must lie inside the workspace.
 
 ## Using the API before the Studio pages
 
