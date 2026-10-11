@@ -325,12 +325,18 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   }
   const capabilities = listValue(values.get("capabilities"));
   const scopeTools = config?.scope.tools ?? [];
-  const checkIds = listValue(values.get("validation"));
+  const askedChecks = listValue(values.get("validation"));
+  // Checks run as public checks with the signed workspace bash: without it, or absent from the operator's config, a check
+  // is listed unsupported and left out of the plan, so an acknowledged one is really skipped (never a start Studio refuses).
+  const bash = scopeTools.some((tool) => tool.name === "bash");
+  const checkIds = askedChecks.filter((id) => bash && (config?.validation.checks ?? []).includes(id));
   const limits = config?.limits ?? null;
   const brief = (aspireSpecOf(ctx.state).spec.brief ?? {}) as { agentName?: unknown };
   const agentName = typeof brief.agentName === "string" ? brief.agentName : agentId;
-  const prompt = [`You are ${agentName}, an agent being assembled in AMC.`, "Show, step by step, how you would do each of these, using only the tools you are given:",
-    ...capabilities.map((capability) => `- ${capability}`)].join("\n").slice(0, 4000);
+  // Control characters out (Studio refuses them in a prompt), lone surrogates made U+FFFD, cut by code point.
+  const promptText = (text: string): string => Buffer.from(text.replace(/[\x00-\x1f\x7f]/g, " "), "utf8").toString("utf8");
+  const prompt = Array.from([`You are ${promptText(agentName)}, an agent being assembled in AMC.`, "Show, step by step, how you would do each of these, using only the tools you are given:",
+    ...capabilities.map((capability) => `- ${promptText(capability)}`)].join("\n")).slice(0, 4000).join("");
   const declared = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
   const workflow = declared === null || "error" in declared ? null : workflowTask(declared, facts.workflowTool, native);
   const chosenTools = listValue(values.get("tools"));
@@ -346,7 +352,8 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
     ...(tools === "workspace" && chosenTools.length > 0 && scopeTools.some((tool) => !chosenTools.includes(tool.name))
       ? [{ id: "tool-subset", what: `the listed tools (${chosenTools.length}) are not enforced as a subset: the graph's permissions and the build session take all ${scopeTools.length} tools of the signed scope`,
         key: "NATIVE_TASKS_WHOLE_SCOPE" }] : []),
-    ...checkIds.filter((id) => !(config?.validation.checks ?? []).includes(id)).map((id) => ({ id: `check:${id.slice(0, 64)}`, what: `validation check ${id}`, key: "NOT_IN_VALIDATION_CONFIG" })),
+    ...askedChecks.filter((id) => !checkIds.includes(id)).map((id) => ({ id: `check:${id.slice(0, 64)}`, what: `validation check ${id}`,
+      key: (config?.validation.checks ?? []).includes(id) ? "VALIDATION_SCOPE_REQUIRED" : "NOT_IN_VALIDATION_CONFIG" })),
     ...(workflow === null ? [] : [{ id: "workflow", what: `workflow ${workflow.plan.id} (${workflow.agents} delegated task(s))`, key: workflow.key }])
   ];
   const plan = [

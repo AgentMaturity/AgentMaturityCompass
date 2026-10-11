@@ -12,23 +12,27 @@
  * limitations, and the agent's lifecycle stage as recorded (Assemble advances none: LIFECYCLE_SEAM_KEY).
  */
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { actionEvidenceCoverage } from "../actions/actionEvidenceCoverage.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
+import { readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
 import { lifecyclePath, lifecycleStages } from "../lifecycle/lifecycle.js";
 import { evaluateEnforceResourceLifecycle, projectEnforceResourceLifecycleStatus, proposeEnforceResourceLifecycle } from "../enforce/resourceManifest.js";
 import { writeTypedMultiAgentGraph } from "../fleet/typedGraph.js";
+import { openLedger } from "../ledger/ledger.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readPresets, savePresets } from "../presets/agentPresets.js";
 import { assertNativeExecutionIdentity, NativeAdmissionError } from "../studio/nativeAdmission.js";
 import { nativeTaskId } from "../studio/nativeTaskDescriptors.js";
+import { nativeTaskStartSchema } from "../studio/nativeTaskInput.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskStartRequest, type NativeTaskView } from "../studio/nativeTaskTypes.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { buildVerifierReport } from "../trust/verifierReport.js";
+import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { A4ProducerContext, A4ProducerResult } from "./a4RouterStages.js";
@@ -96,11 +100,25 @@ async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unkno
   if (plan.checkIds.length > 0 && (!config.validation.ready || config.validation.configSha256 !== plan.configSha256)) {
     throw fail(409, "A4_NOT_READY", "The validation config is not ready or changed since the plan was approved; propose again.", { reasonCodes: ["VALIDATION_CONFIG_CHANGED"] });
   }
+  // Every check must be one the operator's config offers, and checks run with the signed workspace bash (the service's own refusals).
+  if (plan.checkIds.some((id) => !config.validation.checks.some((check) => check.id === id))
+    || (plan.checkIds.length > 0 && !config.scope.tools.some((tool) => tool.name === "bash"))) {
+    throw fail(409, "A4_NOT_READY", "A selected validation check is not in the operator's config, or checks are selected without the signed workspace bash; change the validation answer.",
+      { reasonCodes: ["ANSWER_INVALID:validation"] });
+  }
   const clientRequestId = randomUUID();
   const start: NativeTaskStartRequest = { clientRequestId, agentId, provider: session.provider, ...(session.model === null ? {} : { model: session.model }),
     tools: session.tools, ...(session.tools === "workspace" ? { toolsDigest: session.toolsDigest! } : {}),
     ...(plan.checkIds.length > 0 ? { validation: { configSha256: plan.configSha256!, checkIds: plan.checkIds } } : {}),
     prompt: task.prompt, maxSteps: Math.min(session.maxSteps, config.limits.maxSteps), maxTokens: Math.min(session.maxTokens, config.limits.maxTokens) };
+  // The body Studio's service parses: one it would refuse is never journaled (Review could never pass on it).
+  const parsed = nativeTaskStartSchema.safeParse(start);
+  if (!parsed.success) {
+    const fields = new Set(parsed.error.issues.map((issue) => String(issue.path[0] ?? "")));
+    throw fail(409, "A4_NOT_READY", "The approved plan's build session is not a body Studio's native tasks accept; change the answers and propose again.",
+      { reasonCodes: [...(fields.has("validation") ? ["ANSWER_INVALID:validation"] : []), ...(fields.has("prompt") ? ["ANSWER_INVALID:capabilities"] : []),
+        ...(fields.has("validation") || fields.has("prompt") ? [] : ["NATIVE_INPUT_INVALID"])] });
+  }
   return { planTaskId: task.id, taskId: nativeTaskId(native.principalId, clientRequestId), ownerKey: ctx.principal.key, ownerUsername: ctx.principal.username, start };
 }
 
@@ -189,53 +207,60 @@ async function sessionIntegrity(workspace: string, sessionId: string, headEventH
   return { integrityOk: verification.integrityOk, ok: verification.ok, anchored, report, notEvaluated: null };
 }
 
-type ReceiptFields = { sessionId?: unknown; receiptId?: unknown; compiledPolicy?: { digest?: unknown } | null; downgrades?: unknown };
-/** At most this many effective-policy receipt files are read per session (Review refuses to guess past it). */
-const RECEIPT_SCAN_LIMIT = 4096;
+type ReceiptMeta = { auditType?: unknown; receiptId?: unknown; artifactSha256?: unknown; compiledPolicy?: { digest?: unknown } | null; downgrades?: unknown };
+type PolicyReceipt = { receiptId: string; sha256: string; policyDigest: string | null; downgrades: string[] };
+const metaOf = (row: EvidenceEvent): ReceiptMeta => {
+  try {
+    const meta: unknown = JSON.parse(row.meta_json);
+    return typeof meta === "object" && meta !== null ? meta as ReceiptMeta : {};
+  } catch {
+    return {};
+  }
+};
 
 /**
- * The session's effective-policy receipts (src/policy/effectivePolicyReceipt.ts): every `.amc/effective-policy/*.json`
- * naming the session, read once with its artifact signature verified on those bytes. Each gives its sha256, the compiled
- * policy digest and its `downgrades`; an unverifiable candidate is counted, never read for a field.
+ * The session's effective-policy receipts (src/policy/effectivePolicyReceipt.ts), listed from its signed, chained
+ * `EFFECTIVE_POLICY` ledger rows (every row re-verified, readBudgetEvents), never from the editable receipt directory.
+ * Each row's receipt file must be there with a valid artifact signature over bytes whose sha256 is the row's
+ * `artifactSha256`; a missing or mismatched one makes the whole record unverified (RECEIPT_MISSING, never absent). The
+ * downgrades are the ledger rows'.
  */
-function effectivePolicyOf(workspace: string, sessionId: string) {
-  const dir = join(workspace, ".amc", "effective-policy");
-  let names: string[];
+function effectivePolicyOf(workspace: string, sessionId: string): { status: "evaluated" | "not_evaluated" | "unverified"; reason: string | null;
+  receipts: PolicyReceipt[]; downgrades: string[]; unverified: number } {
+  const unverified = (reason: string, receipts: PolicyReceipt[] = [], downgrades: string[] = [], problems = 1) =>
+    ({ status: "unverified" as const, reason, receipts, downgrades, unverified: problems });
+  if (!existsSync(join(workspace, ".amc", "evidence.sqlite"))) return { status: "not_evaluated", reason: "NO_EFFECTIVE_POLICY_RECEIPT", receipts: [], downgrades: [], unverified: 0 };
+  let rows: EvidenceEvent[];
+  const ledger = openLedger(workspace, { readonly: true });
   try {
-    names = readdirSync(dir).filter((name) => /^epr_[0-9a-f-]{36}\.json$/.test(name));
+    ledger.db.exec("BEGIN");
+    rows = readBudgetEvents(workspace, ledger);
   } catch {
-    names = [];
+    return unverified("LEDGER_UNVERIFIED");
+  } finally {
+    if (ledger.db.inTransaction) ledger.db.exec("COMMIT");
+    ledger.close();
   }
-  if (names.length > RECEIPT_SCAN_LIMIT) return { status: "not_evaluated", reason: "TOO_MANY_RECEIPTS", receipts: [], downgrades: [], unverified: 0 };
-  const receipts: Array<{ receiptId: string; sha256: string; policyDigest: string | null; downgrades: string[] }> = [];
-  let unverified = 0;
-  for (const name of names) {
-    const path = join(dir, name);
-    let text: string;
-    try {
-      text = readFileSync(path, "utf8");
-    } catch {
+  const metas = rows.filter((row) => row.session_id === sessionId && row.event_type === "audit").map(metaOf).filter((meta) => meta.auditType === "EFFECTIVE_POLICY");
+  const receipts: PolicyReceipt[] = [];
+  const problems: string[] = [];
+  for (const meta of metas) {
+    const receiptId = typeof meta.receiptId === "string" && /^epr_[0-9a-f-]{36}$/.test(meta.receiptId) ? meta.receiptId : null;
+    const sha256 = typeof meta.artifactSha256 === "string" ? meta.artifactSha256 : null;
+    receipts.push({ receiptId: String(meta.receiptId), sha256: String(meta.artifactSha256),
+      policyDigest: typeof meta.compiledPolicy?.digest === "string" ? meta.compiledPolicy.digest : null, downgrades: listValue(meta.downgrades) });
+    if (receiptId === null || sha256 === null) {
+      problems.push("RECEIPT_ROW_INVALID");
       continue;
     }
-    if (!text.includes(JSON.stringify(sessionId))) continue;
-    const checked = readAndVerifyArtifactFileSignature({ workspace, path, artifactKind: "effective-policy-receipt", maxArtifactBytes: 1 << 20 });
-    let receipt: ReceiptFields | null;
-    try {
-      receipt = checked.valid && checked.artifactBytes !== null ? JSON.parse(checked.artifactBytes.toString("utf8")) as ReceiptFields : null;
-    } catch {
-      receipt = null;
-    }
-    if (receipt === null) {
-      unverified += 1;
-      continue;
-    }
-    if (receipt.sessionId !== sessionId) continue;
-    receipts.push({ receiptId: String(receipt.receiptId), sha256: sha256Hex(checked.artifactBytes!),
-      policyDigest: typeof receipt.compiledPolicy?.digest === "string" ? receipt.compiledPolicy.digest : null, downgrades: listValue(receipt.downgrades) });
+    const checked = readAndVerifyArtifactFileSignature({ workspace, path: join(workspace, ".amc", "effective-policy", `${receiptId}.json`),
+      artifactKind: "effective-policy-receipt", maxArtifactBytes: 1 << 20 });
+    if (!checked.valid || checked.artifactBytes === null) problems.push(checked.reason === "artifact missing" ? "RECEIPT_MISSING" : "RECEIPT_SIGNATURE_INVALID");
+    else if (sha256Hex(checked.artifactBytes) !== sha256) problems.push("RECEIPT_MISMATCH");
   }
   const downgrades = [...new Set(receipts.flatMap((receipt) => receipt.downgrades))].sort();
-  return { status: unverified > 0 ? "unverified" : receipts.length === 0 ? "not_evaluated" : "evaluated",
-    reason: unverified > 0 ? "RECEIPT_SIGNATURE_INVALID" : receipts.length === 0 ? "NO_EFFECTIVE_POLICY_RECEIPT" : null, receipts, downgrades, unverified };
+  if (problems.length > 0) return unverified(problems[0]!, receipts, downgrades, problems.length);
+  return { status: receipts.length === 0 ? "not_evaluated" : "evaluated", reason: receipts.length === 0 ? "NO_EFFECTIVE_POLICY_RECEIPT" : null, receipts, downgrades, unverified: 0 };
 }
 
 /**
@@ -276,7 +301,8 @@ export const PROMPT_BINDING = "not_evaluated (the native task view exposes no su
 
 /**
  * One build session as its owner reads it now; refuses one that is not the journaled start (409 BUILD_SESSION_MISMATCH),
- * refuses while it runs, and names the way on when it failed or never started.
+ * refuses while it runs or is still open (BUILD_SESSION_OPEN: Review takes closed sessions only), and names the way on
+ * when it failed or never started.
  */
 function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTaskView {
   const native = requireNative(ctx);
@@ -302,6 +328,12 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
   if (view.state === "failed" || view.sessionId === null) {
     throw fail(409, "A4_NOT_READY", view.canResume ? `The build session failed; resume it (POST /api/v1/native-tasks/${planned.taskId}/resume) and review once it settles.`
       : "The build session failed and cannot be resumed; request changes and build again.", { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
+  }
+  // An idle or released session can still take turns (a released one is resumed first), and nothing re-reads its head
+  // after Review: only a closed session (no turn, no resume) is the state approvers approve.
+  if (view.state !== "closed") {
+    throw fail(409, "A4_NOT_READY", `Close the build session before Review: verify it (POST /api/v1/native-tasks/${planned.taskId}/verify; resume a released one first), `
+      + "which closes it, so it takes no turn after what is reviewed.", { reasonCodes: ["BUILD_SESSION_OPEN", `TASK:${planned.taskId}`, `STATE:${view.state}`] });
   }
   return view;
 }
@@ -380,9 +412,9 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
   // An external path's build is what the owner recorded at this revision (src/a4/assembleConnect.ts): built, never observed.
   const external = spec.path === "native" ? null : Object.fromEntries(["scaffold", "connect", "import"].map((what) => [what, ctx.state.chain
     .filter((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === `assemble_${what}` && link.revisionNo === ctx.state.project.revision_no).length]));
-  const capabilities = listValue(answerValues(answers).get("capabilities")).map((capability) => ({ capability,
-    status: anyStub || sessions.length === 0 ? "not_evaluated" : "self_reported", reason: anyStub ? "stub provider"
-      : sessions.length === 0 ? external === null ? "no native build session" : "external path: AMC sees only what the gateway observes" : "listed in the build prompt; not evaluated" }));
+  // Nothing maps a check or a session output to a capability: each one is not evaluated, whatever the provider.
+  const capabilities = listValue(answerValues(answers).get("capabilities")).map((capability) => ({ capability, status: "not_evaluated", reason: anyStub ? "stub provider"
+    : sessions.length === 0 ? external === null ? "no native build session" : "external path: AMC sees only what the gateway observes" : "listed in the build prompt; no check evaluated it" }));
   const limitations = [...(spec.unsupported as Array<{ id: string; what: string; key: string }>).map((entry) => `${entry.what} (${entry.key})`),
     ...((spec.claim as { notCovered?: string[] } | undefined)?.notCovered ?? []),
     ...sessions.flatMap((session) => ((session.effectivePolicy as { downgrades: string[] }).downgrades)

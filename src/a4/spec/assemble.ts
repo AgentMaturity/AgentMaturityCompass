@@ -20,6 +20,8 @@ const question = (id: string, prompt: string, kind: A4Question["kind"], required
 export const CARRIED = ["riskTier", "stations"] as const;
 export const AUTONOMY = ["advise", "act_with_approval"] as const;
 export const NATIVE_PROVIDERS = ["stub", "openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama"] as const;
+/** A validation check id as Studio's native task start takes it (src/studio/nativeTaskValidation.ts). */
+const CHECK_ID = /^[a-zA-Z0-9_-]{1,64}$/;
 
 /** The Assemble question bank (design §10.2 Ask). */
 export const QUESTIONS: A4Question[] = [
@@ -145,6 +147,7 @@ export function workflowPlanOf(value: unknown, autonomy: unknown): { plan: Workf
 export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
   const values = answerValues(answers);
   const workflow = workflowPlanOf(values.get("workflow"), values.get("autonomy"));
+  const checks = listValue(values.get("validation"));
   const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
   const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
   const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
@@ -154,8 +157,9 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
     ...(choice("autonomy", AUTONOMY) ? ["autonomy"] : []),
     ...(choice("path", INTEGRATION_PATHS) ? ["path"] : []),
     ...(textValue(values.get("providers")) !== null && parseProvider(values.get("providers")) === null ? ["providers"] : []),
-    // Validation runs as public checks in the session, which needs the signed workspace tools.
-    ...(listValue(values.get("validation")).length > 0 && textValue(values.get("autonomy")) !== "act_with_approval" ? ["validation"] : []),
+    // Validation runs as public checks in the session, which needs the signed workspace tools; Studio takes 1 to 8 distinct check ids.
+    ...(checks.length > 0 && (textValue(values.get("autonomy")) !== "act_with_approval" || checks.length > 8 || new Set(checks).size !== checks.length
+      || !checks.every((id) => CHECK_ID.test(id))) ? ["validation"] : []),
     ...(workflow !== null && "error" in workflow ? ["workflow"] : [])
   ];
   const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
