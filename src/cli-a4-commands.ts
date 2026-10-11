@@ -194,9 +194,12 @@ async function write(name: string, opts: Write, path: string, body: Data): Promi
   return data;
 }
 
-/** An effect the route started and left running: its recorded outcome, or why it is not a success. */
+/**
+ * An effect the route started and left running: its recorded outcome, or why it is not a success. A replay is looked up
+ * too: its stored row names the attempt and seq, and the server checks only an inline effect's outcome on replay.
+ */
 async function effectFailure(opts: Write, projectId: string, data: Data): Promise<string | null> {
-  if (typeof data.attemptId !== "string" || data.effect !== undefined || data.replay === true) return null;
+  if (typeof data.attemptId !== "string" || data.effect !== undefined) return null;
   const { transitions } = await route(opts.sessionTokenFile, "GET", `/projects/${projectId}/transitions`, undefined, { cursor: String(data.seq ?? 0) });
   const outcome = (transitions as Array<{ kind: string; body: Data }>).find((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED")
     && link.body.effectId === data.attemptId);
@@ -220,7 +223,8 @@ async function finishWrite(opts: Write, projectId: string, data: Data, print: ()
   print();
   const failure = await effectFailure(opts, projectId, data);
   if (failure === null) return;
-  console.error(`The effect of attempt ${String(data.attemptId)} did not finish: ${failure}. The gate stays consumed; retry the effect from Studio.`);
+  console.error(`The effect of attempt ${String(data.attemptId)} did not finish: ${failure}. The gate stays consumed; retry the effect from Studio`
+    + `${data.replay === true ? " (a retry records its own attempt id, so this request keeps answering this attempt)" : ""}.`);
   process.exitCode = 1;
 }
 

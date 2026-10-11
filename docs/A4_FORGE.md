@@ -755,7 +755,8 @@ reads them, decides gates, completes them and runs the release, deployment and r
   staging lease token once. `amc a4 deploy prepare` prints the signed plan; `deploy record --receipt <file>` records the
   operator's receipt (the plan's `receiptForm` body); `deploy verify` runs AMC's own check; `amc a4 rollback --preview`
   then `amc a4 rollback --reason …` rolls a release back. An effect left running finishes before the command returns,
-  and one that fails exits 1.
+  and one that fails exits 1. A retry with the same `--request-id` looks that attempt's outcome up on the chain and
+  exits 1 too when the attempt failed or was lost.
 - **Verifying and exporting.** `amc a4 verify <projectId|file>` checks a chain or an export under your own
   `--trust-list`, the only A4 surface where the caller names a trust list. `amc a4 export <projectId> --run <runId>
   --out <file>` is `amc bundle export` for the project's agent; `--out` must lie inside the workspace.
