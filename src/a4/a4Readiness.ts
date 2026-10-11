@@ -126,6 +126,8 @@ export interface A4LiveFacts {
   readonly sessionStore?: "sqlite" | "jsonl";
   /** Activate only: who signs A4_PACKAGE (null: the trust config does not verify); absent when not read. */
   readonly packageSigningRoute?: "vault" | "notary" | null;
+  /** Activate only: each release's transparency entry in the log now (release id → entry hash, null for none); null when the log does not read. */
+  readonly packageTransparency?: Readonly<Record<string, string | null>> | null;
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;

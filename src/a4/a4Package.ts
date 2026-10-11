@@ -35,7 +35,6 @@ import { scanExtractedReleaseForSecrets } from "../release/releaseSecretScan.js"
 import { releasePublicKeyFingerprint } from "../release/releaseSigner.js";
 import { runTarCreate, writeShaFile } from "../release/releaseUtils.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
-import { appendTransparencyEntry, readTransparencyEntries } from "../transparency/logChain.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -55,6 +54,7 @@ import { A4StoreError, openA4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { deploymentPlan, PLAN_PATH } from "./a4Deploy.js";
 import { advance, recordControls, releaseBridge, type BridgeOutcome } from "./a4Lifecycle.js";
+import { packageEntry } from "./a4Transparency.js";
 import { UPDATE_POLICY_PATH, updatePolicyYaml } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
@@ -439,28 +439,6 @@ function withChain<T>(workspace: string, projectId: string, read: (chain: A4Chai
     return read(store.readChain(projectId), store.readHead(projectId));
   } finally {
     store.close();
-  }
-}
-
-/**
- * The package's transparency entry, appended only once RELEASE committed (a refused release attests nothing in the
- * append-only log); a retry, or a line that landed before its seal or Merkle update failed, reuses the entry of this
- * exact release and package. Never throws: a release without its entry says why, and its record names no entry.
- */
-function packageEntry(workspace: string, agentId: string, releaseId: string, packageDigest: string): { releaseId: string; entryId: string | null; reason: string | null } {
-  const find = (): string | null => readTransparencyEntries(workspace).find((row) => row.artifact.kind === "a4-package" && row.artifact.id === releaseId
-    && row.artifact.sha256 === packageDigest)?.hash ?? null;
-  try {
-    return { releaseId, entryId: find() ?? appendTransparencyEntry({ workspace, type: "A4_PACKAGE_SIGNED", agentId, artifact: { kind: "a4-package", sha256: packageDigest, id: releaseId } }).hash,
-      reason: null };
-  } catch (error) {
-    let landed: string | null = null;
-    try {
-      landed = find();
-    } catch {
-      // An unreadable log names no entry.
-    }
-    return { releaseId, entryId: landed, reason: `${landed === null ? "TRANSPARENCY_NOT_APPENDED" : "TRANSPARENCY_SEAL_LAGGING"}: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}` };
   }
 }
 

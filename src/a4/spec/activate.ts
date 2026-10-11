@@ -371,6 +371,23 @@ function lifecycleItem(state: A4ReadinessState, releaseId: string | null): A4Rea
       nextAction: { label: "The deployment approval may proceed; the lifecycle stays at staging until every production control has evidence (two need P2-40)" } });
 }
 
+/**
+ * The current release's transparency entry, as the log reads now (src/a4/a4Transparency.ts): BLOCKED, mandatory and bound,
+ * while no entry names its exact package digest or the log does not read, so no deployment approval or production lease
+ * rests on a package that was never anchored. The release effect appends it after RELEASE commits; when that failed,
+ * POST …/releases/:rid/transparency (owner) appends it (idempotent).
+ */
+function transparencyItem(projectId: string, release: A4ChainLink | null, entries: A4ReadinessQuery["live"]["packageTransparency"]): A4ReadinessItem {
+  if (release === null) return waiting("package.transparency", ["NO_RELEASE"], { mandatory: false });
+  const releaseId = String(release.body.releaseId);
+  if (entries === undefined) return item("package.transparency", "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["TRANSPARENCY_NOT_READ"] });
+  const entry = entries?.[releaseId] ?? null;
+  return entry !== null ? item("package.transparency", "READY", { reasonCodes: [`ENTRY:${entry}`] })
+    : item("package.transparency", "BLOCKED", { kind: "evidence_missing", reasonCodes: [entries === null ? "TRANSPARENCY_LOG_UNREADABLE" : "TRANSPARENCY_NOT_APPENDED", `RELEASE:${releaseId}`],
+      nextAction: { label: "The signed package has no transparency entry: an owner appends it (idempotent), then the deployment approval may be requested",
+        route: `POST /api/v1/a4/projects/${projectId}/releases/${releaseId}/transparency` } });
+}
+
 /** Which of the release's leases is live as recorded (staging from the release effect, production from the deployment approval). */
 function leaseScopeItem(release: A4ChainLink | null, production: Record<string, unknown> | null): A4ReadinessItem {
   if (release === null) return waiting("lease.scope", ["LEASE_NOT_MINTED"], { mandatory: false, section: "governance" });
@@ -454,6 +471,7 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     proposed ? item("release_proposed", "READY", { section: "recommendation" })
       : waiting("release_proposed", [spec.schema === ACTIVATE_SPEC_SCHEMA ? "PROPOSAL_STALE" : "NOT_PROPOSED"], { section: "recommendation", nextAction: { label: "Propose the release" } }),
     packageInputsItem(state, spec, proposed),
+    transparencyItem(state.project.project_id, release, query.live.packageTransparency),
     sameHostItem(facts, target),
     // D-03 is open: a Helm target is recordable, its topology undecided (WAITING, never BLOCKED; C8).
     target === "helm" ? waiting("deployment.topology", ["TOPOLOGY_UNDECIDED", "KEY:D-03"], { kind: "review_pending", mandatory: false })

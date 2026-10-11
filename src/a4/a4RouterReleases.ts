@@ -7,11 +7,13 @@
  * envelope checked now, the leases' live status, the eight-surface table, the prepared plan, the receipts in two
  * columns and the rollbacks. Slice B (owner, owner mode): POST …/releases/:rid/deployments records the operator's
  * receipt, …/verify runs AMC's token-less check of the receipt's destination, and …/rollback/preview then …/rollback roll
- * the release back through its own effect gate.
+ * the release back through its own effect gate. POST …/releases/:rid/transparency (owner) appends the package's
+ * transparency entry when the release effect could not (idempotent; readiness blocks the deployment approval until then).
  */
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { apiSuccess } from "../api/apiHelpers.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
@@ -26,19 +28,44 @@ import type { A4ReadinessState } from "./a4Readiness.js";
 import { previewRollback, rollbackPreviewSchema, rollbackRelease, rollbackReplay, rollbackSchema, rollbackViews } from "./a4Rollback.js";
 import { a4PackageV1Schema, a4ReleaseV1Schema } from "./a4Schema.js";
 import type { A4Store } from "./a4Store.js";
+import { packageEntry, releaseEntries } from "./a4Transparency.js";
 import { UPDATE_POLICY_PATH, verifyUpdatePolicy } from "./a4UpdatePolicy.js";
-import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, monitorResolves } from "./spec/activate.js";
+import { ACTIVATE_CLAIM_BOUNDARY, cycleLinks, effectUnsettled, monitorResolves } from "./spec/activate.js";
 // Function declarations only: a4Router.ts imports this module, so nothing here may read its bindings at load time.
-import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
+import { a4Fail, assertNoSecrets, assertQuery, assertVisible, callOf, mutationResult, precheck, priorReplay, readJson, unboundClaim, type A4Route } from "./a4Router.js";
 import { completeAndRun } from "./a4RouterStages.js";
 
 const releaseSchema = z.strictObject({ gateId: z.string().regex(/^a4gate_[0-9a-f]{32}$/), expectedHeadSeq: z.number().int().min(0),
   clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -") });
-const RELEASE_ACTION = /^\/releases\/(a4r_[0-9a-f]{32})\/(deployments|verify|rollback\/preview|rollback)$/;
+const RELEASE_ACTION = /^\/releases\/(a4r_[0-9a-f]{32})\/(deployments|verify|rollback\/preview|rollback|transparency)$/;
+const transparencySchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0) });
+
+/**
+ * POST …/releases/:rid/transparency (owner, owner mode): the package's transparency entry, appended when the release
+ * effect could not (packageEntry reuses an entry of this exact release and package, so it never appends twice), and
+ * refused while that effect is still running (it appends itself). The log is the record; readiness reads it.
+ */
+async function appendReleaseEntry(route: A4Route, projectId: string, releaseId: string): Promise<true> {
+  const { body } = await readJson(route, transparencySchema);
+  assertOwnerMode(route.workspace, "a4 release");
+  const state = precheck(route, projectId, "release", body.expectedHeadSeq);
+  const release = state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId);
+  if (release === undefined) throw a4Fail(404, "A4_RELEASE_NOT_FOUND", `no release ${releaseId} on this project`);
+  if (effectUnsettled(state.chain, (started) => started.executionId === release.body.executionId)) {
+    throw a4Fail(409, "EFFECT_RUNNING", "The release effect is still running; it appends the entry itself.");
+  }
+  const entry = packageEntry(route.workspace, state.project.agent_id, releaseId, String(release.body.packageDigest));
+  if (entry.entryId === null) {
+    throw a4Fail(/vault locked/i.test(String(entry.reason)) ? 423 : 409, /vault locked/i.test(String(entry.reason)) ? "A4_VAULT_LOCKED" : "TRANSPARENCY_NOT_APPENDED", String(entry.reason));
+  }
+  apiSuccess(route.res, { projectId, ...entry, claim: unboundClaim(projectId, `releases:${releaseId}:transparency`, false) }, 201);
+  return true;
+}
 
 /** POST …/releases/:rid/<action>: a replay answers what the request answered, before any check could refuse it. */
 async function releaseAction(route: A4Route, projectId: string, releaseId: string, action: string): Promise<true> {
   const { store } = route;
+  if (action === "transparency") return appendReleaseEntry(route, projectId, releaseId);
   if (action === "deployments") {
     const { body, request } = await readJson(route, deploymentBodySchema);
     const replay = priorReplay(store, request, projectId);
@@ -172,6 +199,7 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     revoked = null;
   }
   const { rows } = store.snapshot(projectId);
+  const entries = releaseEntries(store.workspace, chain);
   const outcomes: Array<Record<string, unknown>> = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => ({ effect: link.body.effect,
     ...(link.body.record as { lifecycle?: Record<string, unknown> } | undefined)?.lifecycle }));
   const fileOf = (path: string): Buffer | null => {
@@ -204,12 +232,15 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
       maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
     const files = packageFiles(fileOf(record.packagePath), record.packageDigest);
-    // The transparency entry the release effect appended once RELEASE committed (its EFFECT_FINISHED record), or why none.
-    const entry = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
-      ? (link.body.record as { transparency?: { releaseId?: unknown; entryId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
+    // The package's transparency entry as the log reads now (the release effect appends it once RELEASE committed; POST
+    // …/transparency repairs a missing one), or why none: the log unreadable, or the effect's own reason.
+    const entryId = entries?.[record.releaseId] ?? null;
+    const recorded = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
+      ? (link.body.record as { transparency?: { releaseId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
       .find((candidate) => candidate?.releaseId === record.releaseId);
-    return { ...record, transparencyEntryId: typeof entry?.entryId === "string" ? entry.entryId : null,
-      transparency: { reason: entry === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof entry.reason === "string" ? entry.reason : null },
+    return { ...record, transparencyEntryId: entryId,
+      transparency: { reason: entryId !== null ? null : entries === null ? "TRANSPARENCY_LOG_UNREADABLE"
+        : recorded === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof recorded.reason === "string" ? recorded.reason : "TRANSPARENCY_NOT_APPENDED" },
       envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
       && verifiedA4Digest(store.workspace, envelope.digestSha256, envelope, "A4_RECORD"),
     // Checked now under this workspace's keys, or the notary its signed trust config pins (a local audit trail): the plan, the update policy, receipts, rollbacks.
