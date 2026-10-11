@@ -1,0 +1,15 @@
+     × refuses a current key the signed key revocation list names, at use time 289ms
+     × refuses every key use when the key revocation list is deleted after it existed 320ms
+     × refuses every key use when the key revocation list is with a bad signature 300ms
+     × refuses every key use when the key revocation list is replaced by a FIFO 315ms
+     × refuses every key use when the key revocation list is unparseable 299ms
+     × refuses every key use when an older key revocation list is replayed 365ms
+     × refuses key use when the anti-rollback state turns unreadable after a successful use 191ms
+     × resume refuses a pending key set naming "../outside.txt" and touches nothing outside 177ms
+     × resume refuses a pending key set naming "keys/../../outside.txt" and touches nothing outside 177ms
+     × resume refuses a pending key set naming "/etc/hosts" and touches nothing outside 174ms
+     × resume refuses a pending key set naming "keys/statements/receipt/../../../../outside.txt" and touches nothing outside 226ms
+     × a rollback manifest naming a path outside .amc is refused 249ms
+     × refuses a statements directory that is a symlink out of the keys directory 321ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  13 failed | 3 passed | 7 skipped (23)

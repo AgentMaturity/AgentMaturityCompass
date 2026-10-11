@@ -1,0 +1,19 @@
+     × an HMAC-verified claim never exceeds SELF_REPORTED, even at full score 3ms
+     × an Ed25519 claim from an admitted session key is ATTESTED; from an unpinned key only SELF_REPORTED 2ms
+     × a claim minted for agent A or audience X fails for B or Y, and identity comes only from the verified payload 0ms
+     × the MAC binds the score 0ms
+     × the MAC binds the level 0ms
+     × the MAC binds the passport 0ms
+     × the MAC binds the nonce 0ms
+     × the MAC binds the expiry 0ms
+     × the MAC binds the issue time 0ms
+     × the MAC binds the key id 0ms
+     × the MAC binds the key purpose 0ms
+     × the MAC binds the workspace 0ms
+     × refuses an unknown issuer, an ungranted scope and a missing expectation 0ms
+     × refuses a missing, short or signing-key secret, a revoked key and a claim naming another key 0ms
+     × enforces expiry with bounded clock skew and refuses a claim issued in the future 0ms
+     × refuses a replayed claim, a full cache and a key past its use cap 0ms
+     × refuses a 1.x claim without binding fields and a malformed signature without throwing 0ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  17 failed (17)

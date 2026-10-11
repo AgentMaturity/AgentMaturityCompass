@@ -1,0 +1,77 @@
+P1-08 mutation checks (local, macOS arm64, Node from the worktree; not CI)
+1. src/keys/rotationStatement.ts key-compromise branch: accept `rootAuthority || seen.previous`.
+   Failed: tests/keys/rotationStatement.test.ts > key-compromise signed only by the previous key is invalid, and valid with a pinned root. Restored.
+Security review fixes (coordinator, 2026-10-11). RED first against c005789b5 (P1-08-red-statement.txt): 4/4 attack tests failed
+(first-key forgery signed by the new key only accepted; cross-purpose statement accepted; duplicate JSON keys accepted;
+non-canonical base64 signature accepted).
+2. src/keys/rotationStatement.ts bindingProblem: removed `previousKeyId !== trustedId` refusal.
+   Failed: "refuses a forged statement signed by the new key only", "refuses a statement signed by a key the statement itself names as previous". Restored.
+3. src/utils/json.ts parseCanonicalJson: removed the canonical-equality refusal.
+   Failed: "refuses reordered keys, duplicated keys, whitespace and re-spelled values". Restored.
+Trust list (security review item 3). RED first against 8f6f7bc19 (P1-08-red-trust.txt): 6/6 new tests failed.
+4. src/trust/trustList.ts verifySignedTrustList: `pinned < threshold` -> `pinned < 1`.
+   Failed: "needs threshold distinct pinned roots; an unpinned signer never counts", "needs threshold signatures from the roots trust-roots.json pins (P1-08 m-of-n)". Restored.
+5. src/trust/trustList.ts readSignedTrustListFile: removed assertNoDuplicateJsonKeys(text).
+   Failed: "refuses a duplicated JSON key, which JSON.parse would collapse to its last value (P1-08)". Restored.
+Lease revocations. RED on int (P1-08-red-lease.txt): replaying the older signed pair un-revoked the lease; deleting both files read as an empty set.
+6. src/keys/highWater.ts compareHighWater made a no-op.
+   Failed: 5 tests in tests/keys/antiRollback.test.ts incl. "replaying the older validly signed list is ROLLBACK_DETECTED and the lease stays revoked",
+   "with the high-water anchor deleted, the transparency log still refuses ...", "another validly signed list at the accepted sequence is FORK_DETECTED",
+   "refuses trust list sequence 6 after 7 ...". Restored.
+7. src/keys/anchors.ts assertNotRolledBack: removed both compare calls (mark and log); recordHighWater's own check still caught the replay,
+   but "with the high-water anchor deleted ..." and "... FORK_DETECTED" failed. Restored.
+8. src/keys/keyset.ts assertKeysetComplete: skipped the per-file digest check.
+   Failed: tests/keys/atomicRotation.test.ts "a public key that lost the digest its generation recorded refuses signing, even with the pending marker deleted". Restored.
+Security review round 2 (coordinator). RED first against d7303b7b8: P1-08-red-downgrade.txt (5/5 failed),
+P1-08-red-revocation-paths.txt (13 failed; 3 path cases were already refused by the old schema regex).
+9. src/trust/trustContext.ts: `--trust-root` flags reset the threshold to 1 (the original bug).
+   Failed: "--trust-root flags never lower the threshold trust-roots.json declares". Restored.
+10. src/keys/keyRevocations.ts assertKeyNotRevoked: skipped reading the key revocation list.
+   Failed: 6 tests "refuses a current key ... at use time", "... deleted after it existed", "... bad signature", "... FIFO",
+   "... unparseable", "... older key revocation list is replayed". Restored.
+11. src/keys/keyset.ts: keysetFilePath returned a bare join and the schemas accepted any string.
+   Failed: 7 path tests (6 resume variants, symlinked statements dir). Restored.
+Containment (coordinator round 3). RED first against 8842bf2d6 (P1-08-red-containment.txt): 5 of 7 failed
+(symlinked .amc parent, symlinked and dangling key-set file, hard link, symlinked lease dir, symlinked staging name);
+the symlinked keys dir was already refused and the swap case already hit O_NOFOLLOW once the memo was bypassed.
+12. src/utils/containedFs.ts directoryChain: removed the symlinked-directory refusal.
+   Failed: "refuses a keys directory that is a symlink ...", "refuses a symlinked parent (.amc) ...", "refuses a symlinked lease revocations directory". Restored.
+13. src/score/crossAgentTrust.ts verifyAgentClaim: HMAC result tier ATTESTED instead of SELF_REPORTED.
+   Failed: tests/score/crossAgentTrustHmac.test.ts "an HMAC-verified claim never exceeds SELF_REPORTED, even at full score". Restored.
+Cross-agent claims (coordinator round 4). RED first against 4b7ee10aa (P1-08-red-crossagent.txt): 17/17 new tests failed.
+14. bindingProblems: removed the issuer-equals-expected check. Failed: "a claim minted for agent A or audience X fails for B or Y ...". Restored.
+15. bindingProblems/finish: an issuer without a grant passed with its level's scopes. Failed: "refuses an unknown issuer, an ungranted scope and a missing expectation". Restored.
+16. finish: ignored the replay cache's refusal. Failed: "refuses a replayed claim, a full cache and a key past its use cap". Restored.
+17. src/trust/rootRotation.ts: skipped carrying trust-list marks to the new root set.
+   Failed: tests/trust/rootRotation.test.ts "an older list signed by roots that survive the rotation stays refused after it". Restored.
+
+
+
+# root rotation rework (2026-10-11)
+KILLED  authorization-downgrade: one current signature suffices  Tests  1 failed | 10 passed (11)
+KILLED  authorization-downgrade: decrease without allowDecrease  Tests  1 failed | 10 passed (11)
+KILLED  authorization-downgrade: new-set keys count as current authority  Tests  1 failed | 10 passed (11)
+KILLED  replay: no previousSha256 check  Tests  1 failed | 10 passed (11)
+KILLED  replay: no sequence check  Tests  1 failed | 10 passed (11)
+KILLED  replay: no rootSetId check  Tests  1 failed | 10 passed (11)
+KILLED  replay: duplicate signature rows accepted  Tests  1 failed | 10 passed (11)
+KILLED  high-water: edited trust-roots.json accepted  Tests  2 failed | 9 passed (11)
+KILLED  high-water: dropped rootSetId accepted  Tests  1 failed | 10 passed (11)
+KILLED  high-water: stored chain trusted without signatures  Tests  1 failed | 10 passed (11)
+KILLED  high-water: leftover overwritten  Tests  1 failed | 10 passed (11)
+KILLED  interrupted: finish without re-checking authority  Tests  1 failed | 10 passed (11)
+KILLED  domain separation: trust-list-root amc.key-rotation accepted  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 14 passed (15)
+
+# self-audit fixes (2026-10-11), RED: P1-08-red-selfaudit.txt (8/8 new tests failed on d760cb392)
+KILLED  #3 pins: no carried pins  Tests  1 failed | 58 passed (59)
+SURVIVED  #2 resume: any generation  Tests  59 passed (59)  (the gen+5 case also lacked a manifest; test now plants one)
+KILLED  #2 resume: any generation (rerun after the test plants a manifest)  Tests  1 failed (atomicRotation "resume refuses a pending ...")
+KILLED  #2 resume: no manifest required  Tests  1 failed | 58 passed (59)
+KILLED  #2 roll-forward overwrites  Tests  1 failed | 58 passed (59)
+KILLED  #13 discarded overwritten  Tests  1 failed | 58 passed (59)
+KILLED  #4 no mark raised on read  Tests  1 failed | 58 passed (59)
+KILLED  #5 lease signers: auditor role  Tests  1 failed | 58 passed (59)
+KILLED  #6 no scrub of other histories  Tests  1 failed | 58 passed (59)
+KILLED  #7 root set id not deduped  Tests  1 failed | 58 passed (59)
+KILLED  #11 default list by existsSync  Tests  1 failed | 58 passed (59)

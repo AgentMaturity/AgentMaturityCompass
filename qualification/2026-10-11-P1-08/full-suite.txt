@@ -1,0 +1,23 @@
+Full suite at 11e9fb9e568ce5c6d484ad7b1e464c74642daee1, local macOS arm64, Node v22.23.0, load average 15-17 during the run (not CI).
+ Test Files  17 failed | 1623 passed (1640)
+      Tests  41 failed | 23377 passed | 10 skipped (23428)
+   Duration  1245.49s (transform 170.17s, setup 59.49s, import 1178.03s, tests 12208.88s, environment 178ms)
+
+Failing files and tests:
+  19  FAIL  tests/jsonlWriterResume.test.ts
+   8  FAIL  tests/sessionStoreConformance.test.ts
+   2  FAIL  tests/assuranceLabV2.test.ts
+   1  FAIL  tests/studioNativeTaskService.test.ts [ tests/studioNativeTaskService.test.ts ]
+   1  FAIL  tests/releaseSecretScanCoverage.test.ts
+   1  FAIL  tests/releaseEngineeringPack.test.ts
+   1  FAIL  tests/publicDocsGraph.test.ts
+   1  FAIL  tests/publicDocsArtifact.test.ts
+   1  FAIL  tests/privateModuleHelperVisibility.test.ts
+   1  FAIL  tests/performance/sessionSpine.performance.test.ts
+   1  FAIL  tests/nativeManagedRecovery.test.ts
+   1  FAIL  tests/llmResponsesCapabilities.test.ts
+   1  FAIL  tests/leaseRevocationConsumers.test.ts
+   1  FAIL  tests/keys/atomicRotation.test.ts
+   1  FAIL  tests/compliance/evidenceBinding.test.ts
+   1  FAIL  tests/compliance/dataResidencyPersistence.test.ts
+   1  FAIL  tests/assuranceRunNoSign.test.ts
