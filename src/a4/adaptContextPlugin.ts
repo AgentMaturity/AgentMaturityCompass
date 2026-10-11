@@ -6,12 +6,13 @@
  * `extraContextPlugins` of an in-process `runComposedTurn` (the CLI's agent-loop run): a Studio native task's ACP child
  * loads only the instructions file and the time plugin, and nothing loads this plugin into it or into a deployed agent,
  * so `context.native_delivery` stays not_evaluated naming P2-37. The probe is one bounded in-process turn on the stub
- * provider (no network, no credential): its session's EFFECTIVE_POLICY row, written by the session writer before the
- * turn, is the observed ref that the policy reached the runtime (the receipt carries no context-plugin field). The frame
- * is shown by the run's signed `user/message` row carrying the plugin's exact text: the probe checks it when it runs and
- * Review checks it again (the row carries no agent id, so it cannot be an A4 ref of its own; that check is AMC's, not an
- * observed ref). Delivery to a model is not evaluated on the stub provider, and a probe whose turn did not end `complete`
- * (blocked, error, cancelled, max steps) or whose row lacks the text never satisfies `context_reaches_runtime_frame`.
+ * provider (no network, no credential) that A4 composes and writes nothing into: its ref is the session's own signed
+ * `session/open` row, recorded self_reported because A4 ran the turn (never observed). The probe writes no
+ * effective-policy receipt: the runtime writes one only before a governed tool call (agentToolset), and a tool-less turn
+ * makes none, so the probe has none to cite. The frame is shown by the run's signed `user/message` row carrying the
+ * plugin's exact text: the probe checks it when it runs and Review checks it again; that check is AMC's, and it is what
+ * `context_reaches_runtime_frame` stands on. Delivery to a model is not evaluated on the stub provider, and a probe whose
+ * turn did not end `complete` (blocked, error, cancelled, max steps) or whose row lacks the text never satisfies it.
  */
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -19,13 +20,12 @@ import { basename, dirname, join, relative, sep } from "node:path";
 import { z } from "zod";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../agent/stubProvider.js";
 import { apiSuccess } from "../api/apiHelpers.js";
-import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { CLOCK_REVIEW_STATUS } from "../incidents/regulatoryClocks.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
@@ -108,18 +108,22 @@ export function contextPluginSha256(workspace: string, agentId: string): string 
   }
 }
 
-/** Build's write: the literal as a file, and what the build records about it. */
-export function writeContextPlugin(input: { workspace: string; agentId: string; projectId: string; revisionNo: number; answers: readonly A4Answer[];
-  clocks: ReadonlyArray<{ clockId: string }> }): NonNullable<AdaptBuild["context"]> {
+/** Build's literal as file bytes, and what the build records about it; nothing is written here (writeContextPlugin writes it). */
+export function contextPluginDraft(input: { workspace: string; agentId: string; projectId: string; revisionNo: number; answers: readonly A4Answer[];
+  clocks: ReadonlyArray<{ clockId: string }> }): { path: string; bytes: string; record: NonNullable<AdaptBuild["context"]> } {
   const text = contextPluginText(input);
   const plugin: AdaptContextPlugin = pluginFileSchema.parse({ schema: CONTEXT_PLUGIN_SCHEMA, name: "a4:context", order: A4_CONTEXT_ORDER,
     source: `a4:${input.projectId}@r${input.revisionNo}`, sha256: sha256Hex(text), text });
   const path = contextPluginPath(input.workspace, input.agentId);
   const bytes = `${JSON.stringify(plugin, null, 2)}\n`;
-  ensureDir(dirname(path));
-  writeFileAtomic(path, bytes, 0o644);
-  return { path: relative(input.workspace, path).split(sep).join("/"), fileSha256: sha256Hex(bytes), sha256: plugin.sha256, name: plugin.name, order: plugin.order,
-    source: plugin.source };
+  return { path, bytes, record: { path: relative(input.workspace, path).split(sep).join("/"), fileSha256: sha256Hex(bytes), sha256: plugin.sha256, name: plugin.name,
+    order: plugin.order, source: plugin.source } };
+}
+
+/** Build's write of a draft contextPluginDraft made. */
+export function writeContextPlugin(draft: { path: string; bytes: string }): void {
+  ensureDir(dirname(draft.path));
+  writeFileAtomic(draft.path, draft.bytes, 0o644);
 }
 
 /** The file Build wrote, from one read: other bytes than the build recorded are RESOURCE_DRIFTED, a body whose text is not its sha256 is A4_INTEGRITY_FAILED. */
@@ -200,8 +204,8 @@ export interface ContextProbeOutcome {
   readonly turnStatus: string;
   /** The driver's terminal state (idle, failed): `idle` also follows a blocked or errored turn, so it decides nothing. */
   readonly driverStatus: string;
-  readonly receipt: { readonly eventId: string; readonly sha256: string; readonly receiptId: string; readonly compiledPolicyDigest: string | null;
-    readonly downgrades: readonly string[] };
+  /** The session's signed `session/open` row (it names the agent): the probe's ref, self_reported. */
+  readonly openRow: { readonly eventId: string; readonly sha256: string };
   /** The signed user/message row whose payload holds the plugin's exact text, verified now (and its event hash); null when none does. */
   readonly snapshotEventId: string | null;
   readonly snapshotSha256: string | null;
@@ -251,55 +255,46 @@ export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unkn
 
 /**
  * One bounded in-process turn on the stub provider with the plugin as an extra context (never `contextPlugins`, which
- * would drop the workspace's own AGENTS.md), and the session's effective-policy receipt written through its own writer
- * before the turn (as agentToolset writes it before a session's first governed call). A receipt that cannot be written
- * fails the probe; a compiled plan that does not verify refuses it, as agentToolset refuses the session.
+ * would drop the workspace's own AGENTS.md). A4 composes the turn and writes nothing into its session: no tools, no
+ * receipt of its own. A compiled plan that does not verify refuses it, as agentToolset refuses a session.
  */
 export async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
-  let policy: ActiveCompiledPolicy | null;
   try {
-    policy = loadActiveCompiledPolicy(input.workspace);
+    loadActiveCompiledPolicy(input.workspace);
   } catch (error) {
     throw fail(409, errorCodeOf(error, "COMPILED_POLICY_UNREADABLE"), "The active compiled policy cannot be verified, so a session would be refused; restore or reactivate it.");
   }
   const runner = await composedRunner();
   const plugin: ContextPlugin = { name: input.plugin.name, order: input.plugin.order, collect: async () => input.plugin.text };
-  let receipt: { eventId: string | null; receiptId: string; compiledPolicyDigest: string | null; downgrades: string[] } | null = null;
   let outcome: Awaited<ReturnType<typeof runner.runComposedTurn>>;
   try {
     outcome = await runner.runComposedTurn({
       workspace: input.workspace, agentId: input.agentId, prompt: PROBE_PROMPT,
       promptProfile: { extraContextPlugins: [plugin] },
       route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: {} }, routes: [stubProviderRoute()], transport: stubProviderTransport(),
-      config: { maxStepsPerTurn: 1 }, credentials: { watch: false },
-      bindToolSession: (session) => {
-        const written = writeEffectivePolicyReceipt({ workspace: input.workspace, sessionId: session.sessionId, agentId: input.agentId, policy, guardLabels: [],
-          record: (row) => session.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(row), meta: row }).eventId });
-        receipt = { eventId: written.evidenceRef.startsWith("effective-policy-receipt:") ? null : written.evidenceRef, receiptId: written.receipt.receiptId,
-          compiledPolicyDigest: written.receipt.compiledPolicy?.digest ?? null, downgrades: [...written.receipt.downgrades] };
-      }
+      config: { maxStepsPerTurn: 1 }, credentials: { watch: false }
     });
   } catch (error) {
-    throw fail(409, errorCodeOf(error, "PROBE_FAILED"), "The probe turn did not run (the session, the receipt or the composition refused it).");
+    throw fail(409, errorCodeOf(error, "PROBE_FAILED"), "The probe turn did not run (the session or the composition refused it).");
   }
-  const written = receipt as { eventId: string | null; receiptId: string; compiledPolicyDigest: string | null; downgrades: string[] } | null;
-  const row = written?.eventId == null ? null : input.ledger.getEventById(written.eventId);
-  // A session store other than the ledger (JSONL) has no row an A4 ref can name: refused, never recorded as observed.
-  if (written === null || row === null) throw fail(409, "PROBE_NOT_RECORDED", "The probe's effective-policy receipt has no ledger row (a JSONL session store, or no writer event id).");
+  // A session store other than the ledger (JSONL) has no row an A4 ref can name: refused, never recorded.
+  const open = (input.ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? AND event_type = 'session/open' ORDER BY rowid")
+    .all(outcome.sessionId) as EvidenceEvent[]).at(0);
+  if (open === undefined) throw fail(409, "PROBE_NOT_RECORDED", "The probe's session has no ledger row (a JSONL session store).");
   const snapshotEventId = snapshotRowOf(input.ledger, outcome.sessionId, input.plugin.text);
   return { sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, turnStatus: turnEndOf(input.ledger, outcome.sessionId),
-    driverStatus: outcome.status,
-    receipt: { eventId: row.id, sha256: row.event_hash, receiptId: written.receiptId, compiledPolicyDigest: written.compiledPolicyDigest, downgrades: written.downgrades },
+    driverStatus: outcome.status, openRow: { eventId: open.id, sha256: open.event_hash },
     snapshotEventId, snapshotSha256: snapshotEventId === null ? null : input.ledger.getEventById(snapshotEventId)?.event_hash ?? null };
 }
 
 const probeSchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
 
 /**
- * POST …/stages/adapt/probe (after Build, before completion; builder or owner, owner mode): the probe turn on the plugin
- * Build wrote, read back against the bytes Build recorded, then its receipt row recorded as a ledger_event ref
- * (observed when the row earns it) with what the probe saw beside it. The project head is pinned: a project that moved
- * while the turn ran is 409 A4_STALE_HEAD, and the stub session stays in the ledger unreferenced (harmless).
+ * POST …/stages/adapt/probe (after Build, before completion; owner, owner mode, as Build): the probe turn on the plugin
+ * Build wrote, read back against the bytes Build recorded, then the session's `session/open` row recorded as a
+ * self_reported ledger_event ref (A4 ran the turn: never observed) with what AMC's check of the frame row found beside
+ * it. The project head is pinned: a project that moved while the turn ran is 409 A4_STALE_HEAD, and the stub session
+ * stays in the ledger unreferenced (harmless).
  */
 async function probe(route: A4Route, projectId: string): Promise<true> {
   const principal = requirePrincipal(route);
@@ -317,16 +312,15 @@ async function probe(route: A4Route, projectId: string): Promise<true> {
   const plugin = readContextPlugin(route.workspace, state.project.agent_id, context.fileSha256);
   const outcome = await runContextProbe({ workspace: route.workspace, agentId: state.project.agent_id, plugin, ledger: route.store.ledger });
   const inFrame = outcome.snapshotEventId !== null && outcome.snapshotSha256 !== null && outcome.turnStatus === "complete";
-  const result = route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: outcome.receipt.eventId, sha256: outcome.receipt.sha256,
-    claimKind: "observed", method: "runtime_observation", column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request,
-    label: `adapt context probe: the effective-policy receipt of in-process session ${outcome.sessionId}, the policy reaching the runtime (stub provider; ${PROBE_LIMITATION})`,
+  const result = route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: outcome.openRow.eventId, sha256: outcome.openRow.sha256,
+    claimKind: "self_reported", method: null, column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request,
+    label: `adapt context probe: in-process session ${outcome.sessionId} that A4 ran on the stub provider (its session/open row; self_reported; ${PROBE_LIMITATION})`,
     note: { purpose: PROBE_PURPOSE, sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, snapshotEventId: outcome.snapshotEventId,
       snapshotSha256: outcome.snapshotSha256, contextPluginSha256: plugin.sha256, contextPluginFileSha256: context.fileSha256, inFrame, turnStatus: outcome.turnStatus,
-      driverStatus: outcome.driverStatus, provider: STUB_PROVIDER_ID,
-      receiptId: outcome.receipt.receiptId, compiledPolicyDigest: outcome.receipt.compiledPolicyDigest, downgrades: outcome.receipt.downgrades,
+      driverStatus: outcome.driverStatus, provider: STUB_PROVIDER_ID, effectivePolicyReceipt: "none: the turn made no governed tool call",
       modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated", limitation: PROBE_LIMITATION } });
   apiSuccess(route.res, mutationResult(result, { probe: { sessionId: outcome.sessionId, inFrame, turnStatus: outcome.turnStatus, snapshotEventId: outcome.snapshotEventId,
-    receiptEventId: outcome.receipt.eventId, downgrades: outcome.receipt.downgrades } }), 201);
+    openEventId: outcome.openRow.eventId } }), 201);
   return true;
 }
 
@@ -352,13 +346,14 @@ function probeOf(state: A4ReadinessState, context: NonNullable<AdaptBuild["conte
 }
 
 /**
- * The context items (design §10.3 Readiness): `prompts_attributed`, `context_reaches_runtime_frame` (observed only from
- * the probe's receipt row, never from a failed turn or a snapshot without the text) and its two not-evaluated
+ * The context items (design §10.3 Readiness): `prompts_attributed`, `context_reaches_runtime_frame` (AMC's check of the
+ * probe session's signed user/message row, at the probe and again at Review, behind a self_reported ref to that
+ * session; never from a failed turn or a row without the text, and never the observed lane) and its two not-evaluated
  * deliveries. Pure: the chain, the resolved refs and the build record only.
  */
 export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   const { spec, answers } = adaptSpecOf(state);
-  const reviewed = (spec.review as { probe?: { receiptEventId?: unknown; frame?: unknown } } | undefined)?.probe;
+  const reviewed = (spec.review as { probe?: { refEventId?: unknown; frame?: unknown } } | undefined)?.probe;
   const build = proposedFor(spec, answers) ? buildOf(spec) : null;
   const context = build?.context;
   const built = reached(state, "built");
@@ -379,30 +374,29 @@ export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   const { link, ref } = probeOf(state, context);
   const route = `POST /api/v1/a4/projects/${state.project.project_id}/stages/adapt/probe`;
   // Review's re-check of the frame row applies to the probe it read; a probe run after it stands on its own check.
-  const recheck = link !== undefined && reviewed !== undefined && reviewed.receiptEventId === link.body.refId ? reviewed.frame : undefined;
+  const recheck = link !== undefined && reviewed !== undefined && reviewed.refEventId === link.body.refId ? reviewed.frame : undefined;
   const frame = link === undefined
     ? item("context_reaches_runtime_frame", "WAITING", { kind: "evidence_missing", reasonCodes: ["CONTEXT_PROBE_NOT_RUN"],
-      nextAction: { label: "Run the context probe: one in-process turn on the stub provider that records the runtime's effective-policy receipt", route } })
+      nextAction: { label: "Run the context probe: one in-process turn on the stub provider; AMC checks its signed user/message row for the plugin's text", route } })
     : link.body.turnStatus !== "complete" || link.body.inFrame !== true
       ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory",
         reasonCodes: [link.body.turnStatus !== "complete" ? "PROBE_DENIED" : "CONTEXT_NOT_IN_FRAME", `TURN_END:${String(link.body.turnStatus)}`, `SESSION:${String(link.body.sessionId)}`],
         nextAction: { label: "The probe's turn did not complete, or its session does not show the plugin in its frame: build again, then probe again", route } })
-      : ref === undefined || ref.lane !== "observed"
-        ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["PROBE_REF_NOT_OBSERVED", ...(ref?.reasonCodes ?? ["REF_DANGLING"])],
-          nextAction: { label: "The probe's receipt row no longer earns observed (missing, changed or unsigned): probe again", route } })
+      : ref === undefined || (ref.status !== "resolved" && ref.status !== "payload_pruned")
+        ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["PROBE_REF_UNRESOLVED", ...(ref?.reasonCodes ?? ["REF_DANGLING"])],
+          nextAction: { label: "The probe session's row is missing, changed or unsigned: probe again", route } })
         : recheck !== undefined && recheck !== "resolved"
           ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: [typeof recheck === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(recheck)
             ? recheck : "FRAME_ROW_NOT_RECHECKED", `SNAPSHOT:${String(link.body.snapshotEventId)}`],
             nextAction: { label: "At Review the probe's user/message row no longer showed the plugin's text (gone, changed or unverified): probe again, then review again", route } })
-          // The frame is AMC's check of the signed user/message row (at the probe, and again at Review): implementation, not the observed lane.
+          // AMC's check of the signed user/message row (at the probe, and again at Review) behind A4's self_reported ref: never the observed lane.
           : item("context_reaches_runtime_frame", "READY", { reasonCodes: ["CONTEXT_IN_RUNTIME_FRAME", recheck === "resolved" ? "FRAME_ROW_RECHECKED_AT_REVIEW" : "FRAME_ROW_CHECKED_AT_PROBE",
-            `SNAPSHOT:${String(link.body.snapshotEventId)}`, "POLICY_REACHED_RUNTIME", "OBSERVED_IN_PROCESS", `SESSION:${String(link.body.sessionId)}`,
-            ...(Array.isArray(link.body.downgrades) ? link.body.downgrades.map((code) => `DOWNGRADE:${String(code)}`) : [])],
+            `SNAPSHOT:${String(link.body.snapshotEventId)}`, "PROBE_SELF_REPORTED", "NO_EFFECTIVE_POLICY_RECEIPT", "IN_PROCESS_ONLY", `SESSION:${String(link.body.sessionId)}`],
           evidence: [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: ref.trustTier, reasonCodes: ref.reasonCodes,
-            lane: "observed", claimKind: "observed" }],
+            lane: "implementation", claimKind: "self_reported" }],
           nextAction: { label: `The plugin's exact text is in the session's signed user/message row ${String(link.body.snapshotEventId)} (AMC's check `
-            + `${recheck === "resolved" ? "at the probe and again at Review" : "at the probe"}); the EFFECTIVE_POLICY row is the observed ref that the policy reached the `
-            + `runtime; ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
+            + `${recheck === "resolved" ? "at the probe and again at Review" : "at the probe"}). A4 ran this turn, so its ref is self_reported, and the runtime wrote no `
+            + `effective-policy receipt (it writes one only before a governed tool call); ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
   return [
     item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
       "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),

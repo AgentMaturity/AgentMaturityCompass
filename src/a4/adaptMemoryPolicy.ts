@@ -107,11 +107,12 @@ export function memoryPolicySha256(workspace: string, agentId: string): string |
 }
 
 /**
- * Build's write: the policy from the proposal's answers, checked against its schema before it is written. A spill cap
- * that cannot be read (an ops policy that does not verify) refuses Build with its code rather than writing a guess.
+ * Build's policy from the proposal's answers, checked against its schema, and the bytes Build writes (writeMemoryPolicy);
+ * nothing is written here. A spill cap that cannot be read (an ops policy that does not verify) refuses Build with its
+ * code rather than writing a guess.
  */
-export function writeMemoryPolicy(input: { workspace: string; agentId: string; source: string; values: ReadonlyMap<string, unknown> }): { path: string; sha256: string;
-  policy: A4MemoryPolicy } {
+export function memoryPolicyDraft(input: { workspace: string; agentId: string; source: string; values: ReadonlyMap<string, unknown> }): { path: string; text: string;
+  sha256: string; policy: A4MemoryPolicy } {
   const { fields, invalid } = memoryPolicyFields(input.values);
   if (invalid.length > 0) throw new A4StoreError(409, "A4_NOT_READY", "The memory answers are not values the policy accepts.", { reasonCodes: invalid.map((id) => `ANSWER_INVALID:${id}`) });
   let spillCapBytes: number;
@@ -123,11 +124,14 @@ export function writeMemoryPolicy(input: { workspace: string; agentId: string; s
   const compaction: CompactionConfig = { ...DEFAULT_COMPACTION };
   const policy = a4MemoryPolicySchema.parse({ schema: MEMORY_POLICY_SCHEMA, agentId: input.agentId, source: input.source, ...fields, compaction, spillCapBytes,
     redaction: { secrets: true, workspacePaths: true }, enforcement: "advisory", enforcementNote: MEMORY_ENFORCEMENT_NOTE });
-  const path = memoryPolicyPath(input.workspace, input.agentId);
   const text = `${JSON.stringify(policy, null, 2)}\n`;
-  ensureDir(dirname(path));
-  writeFileAtomic(path, text, 0o644);
-  return { path, sha256: sha256Hex(text), policy };
+  return { path: memoryPolicyPath(input.workspace, input.agentId), text, sha256: sha256Hex(text), policy };
+}
+
+/** Build's write of a draft memoryPolicyDraft made. */
+export function writeMemoryPolicy(draft: { path: string; text: string }): void {
+  ensureDir(dirname(draft.path));
+  writeFileAtomic(draft.path, draft.text, 0o644);
 }
 
 /**

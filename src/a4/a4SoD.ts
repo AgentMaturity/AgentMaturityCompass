@@ -32,8 +32,8 @@ const cycleStart = (transitions: readonly A4ChainLink[], revisionNo: number): nu
   && link.body.gate === "direction" && link.revisionNo <= revisionNo).at(-1)?.revisionNo ?? revisionNo;
 
 /**
- * EVIDENCE_REF purposes that record build work (src/a4/assembleConnect.ts; Adapt's context probe, whose observed ref
- * satisfies a mandatory item, src/a4/adaptContextPlugin.ts): their actors built what Review counts.
+ * EVIDENCE_REF purposes that record build work (src/a4/assembleConnect.ts; Adapt's context probe, whose ref and frame
+ * check satisfy a mandatory item, src/a4/adaptContextPlugin.ts): their actors built what Review counts.
  */
 const BUILD_REF_PURPOSES: ReadonlySet<unknown> = new Set(["assemble_scaffold", "assemble_connect", "assemble_import", "adapt_context_probe"]);
 

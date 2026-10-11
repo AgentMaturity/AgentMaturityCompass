@@ -6,19 +6,21 @@
  * signed control results (src/a4/a4Conformance.ts). Completion of a regulated project runs a4.adapt.activate_plan, whose
  * executor activateControlPlan consumes the plan review's grant itself; a non-regulated project completes with the plan
  * signed and not activated, and an owner may still open that effect. Slice B adds the operating-profile dry run and the
- * prompt pack at Understand, the memory policy and the context plugin at Build (the probe that observes the plugin in an
+ * prompt pack at Understand, the memory policy and the context plugin at Build (the probe that checks the plugin in an
  * in-process frame is src/a4/adaptContextPlugin.ts), and their re-checks at Review. Everything A4 writes here is self_reported.
  */
-import { relative, sep } from "node:path";
+import { existsSync, lstatSync, readFileSync, rmdirSync, rmSync } from "node:fs";
+import { dirname, relative, sep } from "node:path";
 import { loadCatalog } from "../../catalog/loader.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
 import { latestEnforceResourceManifestPath, verifyEnforceResourceManifest, writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
+import { artifactSigPath } from "../../lifecycle/artifactSignature.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
 import { openLedger } from "../../ledger/ledger.js";
 import { assertOwnerMode } from "../../mode/mode.js";
-import { pathExists } from "../../utils/fs.js";
+import { pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
@@ -27,12 +29,14 @@ import { driftedSlots, RESOURCE_SLOTS, signedA4Floor } from "../a4Gates.js";
 import { isRegulated } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { flatSlots, gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.js";
+import { assertNoSecrets } from "../a4Router.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
-import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
+import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyDraft, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
-  contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin, writeContextPlugin
+  contextItems, contextPluginDraft, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
+  writeContextPlugin
 } from "../adaptContextPlugin.js";
 import {
   operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
@@ -48,6 +52,11 @@ import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, 
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
+/** The largest proposal Propose records: Build's record (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB. */
+const SPEC_ROOM_FOR_BUILD = 240 * 1024; // ponytail: Build's record is ~3 KiB plus the signed plan diff; Build checks the exact record before it writes
+const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicalize(spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
+/** Build keeps the bytes it replaces (memory policy, context plugin, the Enforce manifest and its signature) to put them back. */
+const MAX_KEPT_BYTES = 4 * 1024 * 1024;
 
 /**
  * Readiness items, the plan slots and the activation effect. `plan.journalEntrySha256` is the active compiled-plan
@@ -199,18 +208,19 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         : `The ${String(permissions.station)} station's profile, built in memory (no file, no signature): ${permissions.widenings.length} widening(s)`
           + `${permissions.widenings.length === 0 ? "" : `: ${permissions.widenings.slice(0, 5).join("; ")}`}. A4 never passes allowWidening and never signs or activates a profile: `
           + "an owner emits, reviews and signs it (amc domain apply --sign-profile), then activates it (--activate-profile).",
-      expert: permissions === null ? "permissionsDryRun not run." : `planActivation(workspace, buildOperatingProfile(...), agentId) on profile sha256 ${permissions.profileSha256 ?? "none"}: `
+      expert: permissions === null ? "permissionsDryRun not run." : `planActivationWidenings(workspace, buildOperatingProfile(...), agentId) on profile sha256 ${permissions.profileSha256 ?? "none"}: `
         + `widenings sha256 ${permissions.wideningsSha256 ?? "none"}; configs ${permissions.configs.map((entry) => `${entry.config}=${entry.sha256 ?? "stamped at write"}`).join(", ") || "none"}; `
         + `error ${permissions.error ?? "none"}. Not built yet: the effect a4.adapt.activate_profile, per-agent gatePolicy.json and lease caps, the prompt-pack build (A4_PROFILE_EFFECT).` },
     { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
       novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
         + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
       practitioner: "Build writes <agent>/a4/context-plugin.json (order 160, attributed to this project's revision). The probe runs one in-process turn on the stub provider "
-        + `and records that session's EFFECTIVE_POLICY row as the observed ref that the policy reached the runtime; the frame is the session's signed user/message row `
-        + `holding the plugin's text, which AMC checks at the probe and again at Review (${PROBE_LIMITATION}). Delivery to a model is not evaluated on the stub provider; `
-        + "delivery to native tasks and to a deployed agent is not evaluated (P2-37).",
+        + `and records that session as a self-reported ref (A4 ran it, so it is never observed); the frame is the session's signed user/message row holding the `
+        + `plugin's text, which AMC checks at the probe and again at Review (${PROBE_LIMITATION}). The turn makes no tool call, so the runtime writes no `
+        + "effective-policy receipt for it. Delivery to a model is not evaluated on the stub provider; delivery to native tasks and to a deployed agent is not evaluated (P2-37).",
       expert: "ContextPlugin { name: \"a4:context\", order: 160 } through runComposedTurn({ promptProfile: { extraContextPlugins } }) (never contextPlugins, which drops AGENTS.md); "
-        + "the receipt via writeEffectivePolicyReceipt on the session writer (bindToolSession); the user/message snapshot row must carry the frame's exact text." },
+        + "no tools and no bindToolSession, so nothing A4 authors enters the session; the ref is its session/open row (claimKind self_reported, method null); "
+        + "the user/message snapshot row must carry the frame's exact text." },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
       novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, what the agent may remember, and which incident reporting deadlines apply.",
       practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
@@ -261,16 +271,19 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   const fact = (name: Parameters<typeof factAnswer>[1]) => factList(factAnswer(answers, name)?.value);
   const diff = proposalDiff(ctx.state, plan);
   const { build: _build, review: _review, ...carried } = spec;
+  const next = { ...carried, answers, schema: ADAPT_SPEC_SCHEMA, answersDigest: answersDigestOf(answers), profile: facts.profile, plan, diff,
+    operatingScope: { stations: fact("stations"), jurisdictions: fact("jurisdictions"), audiences: listValue(values.get("audiences")),
+      languages: listValue(values.get("languages")), dataClasses: fact("dataClasses"), activities: fact("useCases"), excludedUses: listValue(values.get("excludedUses")),
+      deploymentNeeds: textValue(values.get("deploymentNeeds")) },
+    dataHandling: { dataClasses: fact("dataClasses"), residency: textValue(values.get("dataResidency")), retention: textValue(values.get("dataRetention")),
+      processors: listValue(values.get("processors")), enforcement: "none", keys: ["P2-01", "P2-02"] },
+    claimBoundary: ADAPT_CLAIM_BOUNDARY };
+  // Build would otherwise be refused only by the router's size check (its record joins this specification).
+  if (tooLargeForBuild(next)) throw fail(413, "INPUT_TOO_LARGE", "The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.");
   return {
     outputs: [{ output: "plan", label: "adapt propose: the compiled plan and the operating scope (AMC's draft from your answers; experimental catalog, D-08)",
       lane: "recommendation", method: null, body: { planDigest: plan.digest, status: plan.status, diff: diff === null ? null : renderPlanDiffMarkdown(diff) } }],
-    spec: { ...carried, answers, schema: ADAPT_SPEC_SCHEMA, answersDigest: answersDigestOf(answers), profile: facts.profile, plan, diff,
-      operatingScope: { stations: fact("stations"), jurisdictions: fact("jurisdictions"), audiences: listValue(values.get("audiences")),
-        languages: listValue(values.get("languages")), dataClasses: fact("dataClasses"), activities: fact("useCases"), excludedUses: listValue(values.get("excludedUses")),
-        deploymentNeeds: textValue(values.get("deploymentNeeds")) },
-      dataHandling: { dataClasses: fact("dataClasses"), residency: textValue(values.get("dataResidency")), retention: textValue(values.get("dataRetention")),
-        processors: listValue(values.get("processors")), enforcement: "none", keys: ["P2-01", "P2-02"] },
-      claimBoundary: ADAPT_CLAIM_BOUNDARY }
+    spec: next
   };
 }
 
@@ -319,31 +332,90 @@ function enforceSnapshot(workspace: string, agentId: string): NonNullable<AdaptB
 }
 
 /**
+ * The bytes now at `paths` (each a regular file or absent; anything else refuses Build before it writes, 409
+ * RESOURCE_UNREADABLE) and the parent directories that do not exist yet, and the function that puts them back: a file
+ * that was absent is removed and a directory Build created is removed once empty. Restoring is best effort, as Enforce's
+ * own publication rollback is: a file it cannot put back reads as drift (Enforce DRIFTED, RESOURCE_DRIFTED), never as Build's.
+ */
+function keptBytes(paths: readonly string[]): () => void {
+  const kept = paths.map((path) => {
+    let stat: ReturnType<typeof lstatSync> | null = null;
+    try {
+      stat = lstatSync(path);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw fail(409, "RESOURCE_UNREADABLE", "A file Build replaces could not be read; nothing was written.");
+    }
+    if (stat !== null && (!stat.isFile() || stat.size > MAX_KEPT_BYTES)) {
+      throw fail(409, "RESOURCE_UNREADABLE", "A file Build replaces is not a regular file of a bounded size; nothing was written.");
+    }
+    return { path, bytes: stat === null ? null : readFileSync(path) };
+  });
+  const created = [...new Set(paths.map((path) => dirname(path)))].filter((dir) => !existsSync(dir)).sort((a, b) => b.length - a.length);
+  return () => {
+    for (const { path, bytes } of kept) {
+      try {
+        if (bytes === null) rmSync(path, { force: true });
+        else writeFileAtomic(path, bytes, 0o644);
+      } catch {
+        // Left as it is: the bound slots and Enforce read it as drift.
+      }
+    }
+    for (const dir of created) {
+      try {
+        rmdirSync(dir);
+      } catch {
+        // Not empty, or gone: kept.
+      }
+    }
+  };
+}
+
+/**
  * Build: the proposed plan signed (CONTROL_PLAN, a local audit trail under this workspace's keys; its review is filed at
  * the effect gate), then the memory policy written under the agent's memory resource, the attributed context plugin
  * beside the agent's files, and the Enforce manifest re-written.
  * Build is an owner's (it signs workspace artifacts: roleRefusals and the A4 access policy). Every refusal (agent mode,
- * invalid memory answers, Enforce drift, a weakening, the signing key, the spill cap) comes before the writes; the
- * Enforce manifest is re-written only when the writes moved nothing but the agent's memory directory.
+ * invalid memory answers, Enforce drift, a weakening, the signing key, the spill cap, and the router's own size and
+ * secret checks of the produced specification, run here on the record Build will make) comes before the writes; the
+ * Enforce manifest is re-written only when the writes moved nothing but the agent's memory directory. A write that
+ * fails puts back the bytes Build replaced, and so does the router (`rollback`) when it then refuses the step (a moved
+ * head, the transition): no write stays behind that no revision records.
  */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
   const { workspace } = ctx;
   const project = ctx.state.project;
+  if (tooLargeForBuild(spec)) throw fail(413, "INPUT_TOO_LARGE", "The proposal leaves Build no room under the 256 KiB specification limit; propose it again with shorter answers.");
   assertOwnerMode(workspace, "snapshot");
-  const values = answerValues(adaptSpecOf(ctx.state).answers);
+  const answers = adaptSpecOf(ctx.state).answers;
+  const values = answerValues(answers);
   const invalid = memoryPolicyFields(values).invalid;
   if (invalid.length > 0) throw fail(409, "A4_NOT_READY", "The memory answers are not values the policy accepts.", { reasonCodes: invalid.map((id) => `ANSWER_INVALID:${id}`) });
   assertEnforceCurrent(workspace, project.agent_id);
   const signed = signAdaptPlan(workspace, ctx.state, plan);
   const source = `a4:${project.project_id}@r${project.revision_no}`;
-  const memory = writeMemoryPolicy({ workspace, agentId: project.agent_id, source, values });
-  const context = writeContextPlugin({ workspace, agentId: project.agent_id, projectId: project.project_id, revisionNo: project.revision_no,
-    answers: adaptSpecOf(ctx.state).answers, clocks: understandingOf(spec)?.facts.clocks ?? [] });
-  assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
-  const manifest = enforceSnapshot(workspace, project.agent_id);
-  const built: AdaptBuild = { ...signed, memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context, manifest };
+  const memory = memoryPolicyDraft({ workspace, agentId: project.agent_id, source, values });
+  const context = contextPluginDraft({ workspace, agentId: project.agent_id, projectId: project.project_id, revisionNo: project.revision_no,
+    answers, clocks: understandingOf(spec)?.facts.clocks ?? [] });
+  const manifestPath = latestEnforceResourceManifestPath(workspace, project.agent_id);
+  const record = (manifest: NonNullable<AdaptBuild["manifest"]>): AdaptBuild => ({ ...signed,
+    memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context: context.record, manifest });
+  // The router checks the produced specification (256 KiB, credentials) only after Build returns: the same check, first.
+  assertNoSecrets({ ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }, "The produced specification");
+  const restore = keptBytes([memory.path, context.path, manifestPath, artifactSigPath(manifestPath)]);
+  let manifest: NonNullable<AdaptBuild["manifest"]>;
+  try {
+    writeMemoryPolicy(memory);
+    writeContextPlugin(context);
+    assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
+    manifest = enforceSnapshot(workspace, project.agent_id);
+  } catch (error) {
+    restore();
+    throw error;
+  }
+  const built = record(manifest);
   return {
+    rollback: restore,
     outputs: [
       { output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
         lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
@@ -351,7 +423,7 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
       { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
         lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } },
       { output: "build", label: "adapt build: the attributed A4 context plugin (order 160; delivered only to an in-process run; native tasks and a deployed agent do not load it, P2-37)",
-        lane: "implementation", method: null, body: context }
+        lane: "implementation", method: null, body: context.record }
     ],
     spec: { ...spec, build: built }
   };
@@ -394,9 +466,10 @@ function recheckFrame(ctx: A4ProducerContext, probe: Record<string, unknown>, fi
 }
 
 /**
- * Review: the active compiled plan's head against the proposal, the plan diff, and the conformance statement's control
- * results (evaluated, written signed and read back verified). The context probe that observes the runtime frame is slice
- * B's, so `reviewed` carries the explicit not_evaluated output.
+ * Review (an owner's: it signs the control results with the workspace auditor key): the active compiled plan's head
+ * against the proposal, the plan diff, the conformance statement's control results (evaluated, written signed and read
+ * back), and the re-checks of what Build wrote and of the probe's frame row. Nothing here is observed, so `reviewed`
+ * carries the explicit not_evaluated output.
  */
 function review(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
@@ -439,10 +512,9 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const probeLink = context === undefined ? undefined : [...ctx.state.chain].reverse().find((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === PROBE_PURPOSE
     && link.body.contextPluginSha256 === context.sha256 && link.body.contextPluginFileSha256 === context.fileSha256);
   const probe = probeLink === undefined || context === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
-    : { status: "recorded", receiptEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
-      snapshotEventId: probeLink.body.snapshotEventId, frame: recheckFrame(ctx, probeLink.body, context.fileSha256),
-      compiledPolicyDigest: probeLink.body.compiledPolicyDigest, downgrades: probeLink.body.downgrades, modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated",
-      limitation: PROBE_LIMITATION };
+    : { status: "recorded", refEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
+      snapshotEventId: probeLink.body.snapshotEventId, frame: recheckFrame(ctx, probeLink.body, context.fileSha256), claimKind: "self_reported",
+      effectivePolicyReceipt: "none: the turn made no governed tool call", modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated", limitation: PROBE_LIMITATION };
   const promptPack = promptPackStatus(ctx.workspace, project.agent_id);
   return {
     outputs: [
@@ -451,13 +523,13 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
       { output: "review", label: "adapt review: the active compiled plan's head against the proposal", lane: "implementation", method: null, body: head },
       { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) },
       { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy },
-      { output: "review", label: "adapt review: the context probe's effective-policy receipt and downgrades (stub provider; the observed ref is the receipt row itself)",
+      { output: "review", label: "adapt review: the context probe's frame row re-checked (stub provider; A4 ran the turn, so its ref is self_reported; no effective-policy receipt)",
         lane: "implementation", method: null, body: probe },
       { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; the runtime does not load it)",
         lane: "implementation", method: null, body: promptPack }
     ],
-    // The probe's observed ref sits on the revision it was recorded on; this review's own revision has none.
-    notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_OBSERVED_ON_EARLIER_REVISION"],
+    // Nothing in Adapt is observed: the probe's ref is self_reported (A4 ran the turn) and no runtime receipt exists for it.
+    notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_SELF_REPORTED"],
     spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }

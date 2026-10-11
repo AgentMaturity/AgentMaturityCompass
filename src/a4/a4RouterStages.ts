@@ -82,6 +82,12 @@ export interface A4ProducerResult {
    * on a replay or a refused transition; its answer joins the response and is not stored for replays.
    */
   readonly afterCommit?: () => Promise<Record<string, unknown>>;
+  /**
+   * Undoes the producer's own workspace writes when the step is not recorded after it returned (the produced
+   * specification refused, the head moved, the transition refused, or a replay answered instead): the replaced bytes are
+   * put back, so no change stays behind that no revision records (Adapt's Build). Never called after this run committed.
+   */
+  readonly rollback?: () => void;
 }
 /** A stage producer (src/a4/spec/<stage>.ts PRODUCERS) for one step route. */
 export interface A4Producer {
@@ -238,68 +244,78 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   }
   const produced = producer === undefined ? null : await producer.run({ workspace: route.workspace, state: checked, principal, now, native: route.native,
     ...(fields.level !== undefined ? { level: fields.level } : {}), ...(fields.spec !== undefined ? { spec: fields.spec } : {}) });
-  // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
-  if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
-  const outputs = [
-    ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
-    ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
-      label: producer === undefined ? `${stage} ${def.output} (no producer registered; human-authored)` : `${stage} ${def.output}: the member's own statement (human-authored)`,
-      ...writeStageOutput(route, projectId, fields.content) }] : [])
-  ];
-  const result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request,
-    ...(produced?.response === undefined ? {} : { response: produced.response }) }, (ts, load) => {
-    const state = load(now);
-    const readiness = check(state);
-    const project = state.project;
-    const specs: A4ChangeSpec[] = [];
-    const { spec, answers } = stageSpec(state, stage);
-    if (kind === "answers") {
-      const revisionNo = project.revision_no + 1;
-      const bank = STAGE_QUESTIONS[stage];
-      const merged = new Map(answers.map((answer) => [answer.questionId, answer]));
-      for (const answer of fields.answers!) {
-        if (bank.length > 0 && !bank.some((question) => question.id === answer.questionId)) throw a4Fail(400, "A4_UNKNOWN_QUESTION", `no question ${answer.questionId} at ${stage}`);
-        merged.set(answer.questionId, { questionId: answer.questionId, value: answer.value ?? null, source: "user", answeredAtRevision: revisionNo, dependencyDigest: "" });
+  // Anything that refuses the step from here on (the produced specification, a moved head, the transition) puts back
+  // what the producer wrote; once the transition committed nothing is undone.
+  let result: ReturnType<typeof governed>;
+  try {
+    // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
+    if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
+    const outputs = [
+      ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
+      ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
+        label: producer === undefined ? `${stage} ${def.output} (no producer registered; human-authored)` : `${stage} ${def.output}: the member's own statement (human-authored)`,
+        ...writeStageOutput(route, projectId, fields.content) }] : [])
+    ];
+    result = governed(route.store, projectId, principal, { expectedHeadSeq: fields.expectedHeadSeq, request,
+      ...(produced?.response === undefined ? {} : { response: produced.response }) }, (ts, load) => {
+      const state = load(now);
+      const readiness = check(state);
+      const project = state.project;
+      const specs: A4ChangeSpec[] = [];
+      const { spec, answers } = stageSpec(state, stage);
+      if (kind === "answers") {
+        const revisionNo = project.revision_no + 1;
+        const bank = STAGE_QUESTIONS[stage];
+        const merged = new Map(answers.map((answer) => [answer.questionId, answer]));
+        for (const answer of fields.answers!) {
+          if (bank.length > 0 && !bank.some((question) => question.id === answer.questionId)) throw a4Fail(400, "A4_UNKNOWN_QUESTION", `no question ${answer.questionId} at ${stage}`);
+          merged.set(answer.questionId, { questionId: answer.questionId, value: answer.value ?? null, source: "user", answeredAtRevision: revisionNo, dependencyDigest: "" });
+        }
+        // dependencyDigest = sha256(canonical answers of dependsOn), recomputed for the answers given now (design §9.2).
+        for (const answer of fields.answers!) {
+          const dependsOn = bank.find((question) => question.id === answer.questionId)?.dependsOn ?? [];
+          merged.set(answer.questionId, { ...merged.get(answer.questionId)!,
+            dependencyDigest: sha256Hex(canonicalize(dependsOn.map((id) => [id, merged.get(id)?.value ?? null]))) });
+        }
+        specs.push(revisionSpec(route.workspace, state, stage, { ...spec, answers: [...merged.values()].sort((a, b) => a.questionId.localeCompare(b.questionId)) },
+          principal.key, ts));
       }
-      // dependencyDigest = sha256(canonical answers of dependsOn), recomputed for the answers given now (design §9.2).
-      for (const answer of fields.answers!) {
-        const dependsOn = bank.find((question) => question.id === answer.questionId)?.dependsOn ?? [];
-        merged.set(answer.questionId, { ...merged.get(answer.questionId)!,
-          dependencyDigest: sha256Hex(canonicalize(dependsOn.map((id) => [id, merged.get(id)?.value ?? null]))) });
+      if (kind === "propose" && producer === undefined) specs.push(revisionSpec(route.workspace, state, stage, { ...fields.spec, answers }, principal.key, ts));
+      if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
+      // A revision recorded here comes first, so the outputs and the step land on it.
+      const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
+      for (const entry of outputs) {
+        const claimKind = "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" : "self_reported";
+        specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
+          claimKind, output: entry.output, producer: entry.producer },
+          sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
+            lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: claimKind, trust_tier: null,
+            method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
       }
-      specs.push(revisionSpec(route.workspace, state, stage, { ...spec, answers: [...merged.values()].sort((a, b) => a.questionId.localeCompare(b.questionId)) },
-        principal.key, ts));
-    }
-    if (kind === "propose" && producer === undefined) specs.push(revisionSpec(route.workspace, state, stage, { ...fields.spec, answers }, principal.key, ts));
-    if (produced?.spec !== undefined) specs.push(revisionSpec(route.workspace, state, stage, produced.spec, principal.key, ts));
-    // A revision recorded here comes first, so the outputs and the step land on it.
-    const revisionNo = project.revision_no + (specs.length > 0 ? 1 : 0);
-    for (const entry of outputs) {
-      const claimKind = "claimKind" in entry && entry.claimKind === "synthetic_example" ? "synthetic_example" : "self_reported";
-      specs.push({ kind: "EVIDENCE_REF", stage, payload: { refKind: "stage_output", refId: entry.refId, sha256: entry.sha256, lane: entry.lane,
-        claimKind, output: entry.output, producer: entry.producer },
-        sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq: project.head_seq + 1 + specs.length, revision_no: revisionNo, stage,
-          lane: entry.lane, ref_kind: "stage_output", ref_id: entry.refId, sha256: entry.sha256, claim_kind: claimKind, trust_tier: null,
-          method: entry.method, label: entry.label, actor_key: principal.key, ts } }] });
-    }
-    if (def.to !== null && def.to !== project.step) {
-      // A hypothesis observation is the PMF evidence of a later stage, never this review's observation.
-      const hypothesisRefs = new Set(state.chain.filter((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId !== undefined)
-        .map((link) => `${String(link.body.refId)}:${String(link.body.sha256)}`));
-      const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed" && !hypothesisRefs.has(`${ref.refId}:${ref.sha256}`));
-      const notEvaluated = producer === undefined ? [NO_PRODUCER] : [...(produced?.notEvaluated ?? [])];
-      // A producer that ran and named no reason still observed nothing: never labelled as if none were registered.
-      if (notEvaluated.length === 0) notEvaluated.push("NO_OBSERVED_REF");
-      specs.push({ kind: "STEP", stage, payload: { ...(produced?.record ?? {}), from: project.step, to: def.to, claimKind: "self_reported", producer: producer?.id ?? null,
-        ...(def.output !== null && producer === undefined ? { reasonCodes: [NO_PRODUCER] } : {}),
-        ...(fields.level !== undefined ? { level: fields.level } : {}),
-        // `reviewed` needs an observed ref or an explicit not_evaluated output with its reason (design §9.1).
-        ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: notEvaluated } } : {}) },
-        head: { step: def.to } });
-    }
-    if (specs.length === 0) throw a4Fail(409, "A4_STEP_ORDER", "Nothing to record.");
-    return { readiness, specs };
-  });
+      if (def.to !== null && def.to !== project.step) {
+        // A hypothesis observation is the PMF evidence of a later stage, never this review's observation.
+        const hypothesisRefs = new Set(state.chain.filter((link) => link.kind === "EVIDENCE_REF" && link.body.hypothesisId !== undefined)
+          .map((link) => `${String(link.body.refId)}:${String(link.body.sha256)}`));
+        const observed = state.refs.some((ref) => ref.revisionNo === revisionNo && ref.lane === "observed" && !hypothesisRefs.has(`${ref.refId}:${ref.sha256}`));
+        const notEvaluated = producer === undefined ? [NO_PRODUCER] : [...(produced?.notEvaluated ?? [])];
+        // A producer that ran and named no reason still observed nothing: never labelled as if none were registered.
+        if (notEvaluated.length === 0) notEvaluated.push("NO_OBSERVED_REF");
+        specs.push({ kind: "STEP", stage, payload: { ...(produced?.record ?? {}), from: project.step, to: def.to, claimKind: "self_reported", producer: producer?.id ?? null,
+          ...(def.output !== null && producer === undefined ? { reasonCodes: [NO_PRODUCER] } : {}),
+          ...(fields.level !== undefined ? { level: fields.level } : {}),
+          // `reviewed` needs an observed ref or an explicit not_evaluated output with its reason (design §9.1).
+          ...(kind === "review" ? { observed: observed ? "present" : { status: "not_evaluated", reasonCodes: notEvaluated } } : {}) },
+          head: { step: def.to } });
+      }
+      if (specs.length === 0) throw a4Fail(409, "A4_STEP_ORDER", "Nothing to record.");
+      return { readiness, specs };
+    });
+  } catch (error) {
+    produced?.rollback?.();
+    throw error;
+  }
+  // A replay recorded an earlier run of this request: what this run wrote over it is put back too.
+  if (result.replay) produced?.rollback?.();
   const after = result.replay || produced?.afterCommit === undefined ? {} : await produced.afterCommit();
   apiSuccess(route.res, mutationResult(result, { ...(produced?.response ?? {}), ...after }), 201);
   return true;
