@@ -92,8 +92,9 @@ function renderActivation(ctx) {
   return `<p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
     that an owner opens once the completion gate has its quorum; project approvers decide it here (two distinct people when regulated), and completing
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
-    not activated unless an owner opens it. Once a plan is active the project is regulated, and a workspace has one active plan for every agent: a plan
-    weaker than the active one (another agent's) is refused before the review is filed.</p>
+    not activated unless an owner opens it before completing (once the gate is consumed without it, it can no longer be opened there). Once a plan is
+    active the project is regulated, and a workspace has one active plan for every agent: a plan weaker than the active one (another agent's) is
+    refused before the review is filed, and while another profile's plan is active this project completes with its plan signed, not activated.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
       native tasks with workspace tools started after activation run under a lease Studio mints (P1-67); tasks started before it, CLI agent sessions
       and delegated children carry none and are denied. A non-regulated project therefore completes with the plan signed and not activated.</p>
@@ -135,11 +136,13 @@ function renderContext(ctx) {
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
       context plugin (order 160). Only an in-process run loads it: a Studio native task started now shows no A4 context plugin in its frame, and a deployed
       agent does not load it either (P2-37). The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
-      plugin's text. A4 ran the turn, so the probe is self-reported, never observed, and the runtime writes no effective-policy receipt for a turn with no tool call.</p>
+      plugin's text. A4 ran the turn on the stub provider, so the probe's ref is a synthetic example, never observed, and the runtime writes no
+      effective-policy receipt for a turn with no tool call. A workspace on the JSONL session store cannot record the probe: an owner acknowledges that instead.</p>
     ${isObject(context) ? `<p class="muted">Plugin <code>${esc(context.name)}</code> · sha256 <code>${esc(context.sha256)}</code> · source <code>${esc(context.source)}</code>
       · file <code>${esc(context.path)}</code></p>` : "<p class=\"muted\">No context plugin built yet.</p>"}
     <div class="row wrap">${view.actionButton("Run the context probe", "probe", isObject(context) ? probeOffer : view.held("Build writes the context plugin first"))}</div>
-    ${["prompts_attributed", "context_reaches_runtime_frame", "model_delivery", "context.native_delivery", "adapt.prompt_pack_signature"].map((id) => status(ctx, id)).join("")}
+    ${["prompts_attributed", "context_reaches_runtime_frame", "context_probe_unavailable", "model_delivery", "context.native_delivery", "adapt.prompt_pack_signature"]
+    .map((id) => status(ctx, id)).join("")}
     <p class="muted">A prompt pack is a signed Score resource; the runtime does not load it into a model's prompt.</p>`;
 }
 
