@@ -210,19 +210,27 @@ function baselineItem(state: A4ReadinessState, spec: Record<string, unknown>): A
  * The outcome_unknown lockout (design §10.2 Explain): an open one blocks the agent's journaled calls and this stage. Each
  * open execution is named, with the resolution this project requested for it (`RESOLUTION_REQUESTED:<execution>:<engine
  * request>:<request digest>:<engine status>`, the digest an approver binds to from the card; a DENIED, EXPIRED or
- * CANCELLED request is requested again).
+ * CANCELLED request is requested again). A resolution the journal settled under this project's request that the project
+ * never recorded (`RESOLUTION_UNRECORDED:<execution>:<engine request>`) keeps the item BLOCKED until it is recorded.
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem {
   const open = query.live.blockingExecutions;
-  if (open === null) return item("no_open_outcome_unknown", "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: ["ACTION_JOURNAL_UNREADABLE"] });
-  if (open.length === 0) return item("no_open_outcome_unknown", "READY");
+  const unrecorded = query.live.unrecordedResolutions;
+  if (open === null || unrecorded === null) return item("no_open_outcome_unknown", "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: ["ACTION_JOURNAL_UNREADABLE"] });
+  const unrecordedCodes = unrecorded.map((id) => `RESOLUTION_UNRECORDED:${id}`);
+  if (open.length === 0 && unrecorded.length === 0) return item("no_open_outcome_unknown", "READY");
+  if (open.length === 0) {
+    return item("no_open_outcome_unknown", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["RESOLUTION_UNRECORDED", ...unrecordedCodes],
+      nextAction: { label: "The journal settled a resolution this project requested, but the project has no record of it: record the resolution (self-reported)" } });
+  }
   const requested = open.slice(0, 16).flatMap((id) => {
     const link = [...state.chain].reverse().find((candidate) => candidate.kind === "EVIDENCE_REF" && candidate.body.purpose === RESOLUTION_PURPOSE
       && candidate.body.executionId === id);
     const status = link === undefined ? null : query.live.engineRequests?.[String(link.body.refId)] ?? "UNREAD";
     return link === undefined ? [] : [`RESOLUTION_REQUESTED:${id}:${String(link.body.refId)}:${String(link.body.sha256)}:${status}`];
   });
-  return item("no_open_outcome_unknown", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["OUTCOME_UNKNOWN_OPEN", ...open.slice(0, 16).map((id) => `EXECUTION:${id}`), ...requested],
+  return item("no_open_outcome_unknown", "BLOCKED", { kind: "outcome_unknown", reasonCodes: ["OUTCOME_UNKNOWN_OPEN", ...open.slice(0, 16).map((id) => `EXECUTION:${id}`), ...requested,
+    ...unrecordedCodes],
     nextAction: { label: "Request a resolution on the outcome_unknown card; a second person approves it, then it is recorded (self-reported)" } });
 }
 

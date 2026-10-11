@@ -23,7 +23,7 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
-import { blockingExecutionsIn, engineRequestStatusesIn } from "./assembleLockout.js";
+import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -181,6 +181,14 @@ function blockingExecutionsOf(store: A4Store, agentId: string): string[] | null 
     return null;
   }
 }
+/** unrecordedResolutionsIn on the store's own connection; null when the lockout is unread or a chain does not verify (fail closed). */
+function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"], blocking: readonly string[] | null): string[] | null {
+  try {
+    return blocking === null ? null : unrecordedResolutionsIn(store.ledger, chain, blocking);
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
@@ -212,6 +220,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
+    unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null
   };
 }

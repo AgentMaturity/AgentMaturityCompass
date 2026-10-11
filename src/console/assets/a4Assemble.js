@@ -180,7 +180,8 @@ function renderReview(ctx) {
     `<code>${esc(session.effectivePolicy?.status)}</code> ${codes(session.effectivePolicy?.downgrades)}`]);
   const phases = list(review?.sessions).flatMap((session) => list(session.phases).map((phase) => [`<code>${esc(session.sessionId)}</code>`, esc(phase.phase),
     `<code>${esc(phase.status)}</code>`, esc(phase.source)]));
-  return `<p class="muted">Review reads each build session through its owner and refuses while one runs or has failed. AMC's verifyAgentRun
+  return `<p class="muted">Review reads each build session through its owner and refuses while one runs, has failed or is still open: verify
+    the session on the native tasks page first, which closes it, so it takes no turn after what is reviewed. AMC's verifyAgentRun
     is an integrity self-check under this workspace's keys (the Integrity panel), never a claim about the agent.</p>
     ${review?.wording ? `<p><strong>${esc(review.wording)}</strong></p>` : ""}
     ${table(["Session", "Provider", "Validation", "Action evidence", "Integrity", "Effective policy (downgrades)"], sessions, "Not reviewed yet.")}
@@ -219,7 +220,7 @@ function renderOutcomeUnknown(ctx) {
   const item = itemOf(ctx, "no_open_outcome_unknown");
   const open = coded(item, "EXECUTION").map(([id]) => id);
   const requested = new Map(coded(item, "RESOLUTION_REQUESTED").map(([id, approval, digest, state]) => [id, { approval, digest, state }]));
-  const rows = open.map((id) => {
+  const openRows = open.map((id) => {
     const asked = requested.get(id);
     const live = asked && LIVE_REQUEST.has(asked.state);
     return `<li data-execution="${esc(id)}"><p><code>${esc(id)}</code></p>${live ? `<p class="muted">Resolution requested: engine request <code>${esc(asked.approval)}</code>
@@ -228,6 +229,10 @@ function renderOutcomeUnknown(ctx) {
         "resolve-outcome", ctx.allowed.review, `data-execution="${esc(id)}"`)}</div>`
       : `${asked ? `<p class="muted">The last request <code>${esc(asked.approval)}</code> is <code>${esc(asked.state)}</code>: request a resolution again.</p>` : ""}${requestForm(ctx, id)}`}</li>`;
   });
+  // Settled by the journal under this project's request, but not recorded on the project (the record was refused): record it.
+  const rows = [...openRows, ...coded(item, "RESOLUTION_UNRECORDED").map(([id, approval]) => `<li data-execution="${esc(id)}"><p><code>${esc(id)}</code></p>
+    <p class="muted">The journal settled this execution under engine request <code>${esc(approval)}</code>, but the project has no record of it yet.</p>
+    <div class="row wrap">${view.actionButton("Record the resolution", "resolve-outcome", ctx.allowed.review, `data-execution="${esc(id)}"`)}</div></li>`)];
   return `<p class="muted">A cancelled or failed action leaves its outcome unknown, and the agent's journaled actions stay blocked until a person
     states what happened and someone else approves that statement (dual control per the approval policy). The statement is recorded as
     self-reported: AMC did not observe it.</p>${status(ctx, "no_open_outcome_unknown")}

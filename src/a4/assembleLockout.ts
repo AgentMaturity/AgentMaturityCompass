@@ -8,7 +8,7 @@
  * export the journal's read-only rule and call it instead once that module is open for an edit.
  */
 import type Database from "better-sqlite3";
-import { ownerAlive } from "../actions/actionJournal.js";
+import { ownerAlive, verifyChainIn } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
 import { approvalStatusPayload } from "../approvals/approvalEngine.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -28,6 +28,28 @@ export function blockingExecutionsIn(db: Database.Database, workspace: string, a
       headComplete: number; pid: number | null; host: string | null; heartbeat: number | null }>;
   return [...new Set(rows.filter((row) => row.indexState === "outcome_unknown" || row.headState === "outcome_unknown" || row.indexComplete === 0
     || row.headComplete === 0 || row.heartbeat === null || row.heartbeat < staleBefore || ownerAlive(row.pid, row.host) === false).map((row) => row.id))];
+}
+
+/**
+ * Resolutions the action journal settled under this project's request but the project never recorded (the A4 record
+ * was refused after resolveManually ran), as `<executionId>:<approvalRequestId>`: the newest resolution request of an
+ * execution that no longer blocks, with no `outcome_unknown_resolved` link, whose verified chain ends in the operator
+ * resolution of that request. A chain that does not verify throws (readiness reads the lockout as unreadable).
+ */
+export function unrecordedResolutionsIn(ledger: { readonly workspace: string; readonly db: Database.Database }, chain: readonly A4ChainLink[],
+  blocking: readonly string[]): string[] {
+  const newest = new Map<unknown, A4ChainLink>();
+  for (const link of chain) if (link.kind === "EVIDENCE_REF" && link.body.purpose === RESOLUTION_PURPOSE) newest.set(link.body.executionId, link);
+  const recorded = new Set(chain.filter((link) => link.kind === "EVIDENCE_REF" && link.body.purpose === "outcome_unknown_resolved")
+    .map((link) => `${String(link.body.executionId)}:${String(link.body.approvalRequestId)}`));
+  return [...newest.values()].flatMap((link) => {
+    const id = `${String(link.body.executionId)}:${String(link.body.refId)}`;
+    if (typeof link.body.executionId !== "string" || blocking.includes(link.body.executionId) || recorded.has(id)) return [];
+    const verified = verifyChainIn(ledger, link.body.executionId);
+    if (!verified.ok) throw new Error(`action chain ${link.body.executionId} does not verify`);
+    const head = verified.receipts.at(-1);
+    return head?.resolution === "operator" && head.reasonCode === `operator_resolved:${String(link.body.refId)}` ? [id] : [];
+  }).slice(0, 16);
 }
 
 /**

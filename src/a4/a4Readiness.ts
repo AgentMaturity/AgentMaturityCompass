@@ -88,6 +88,8 @@ export interface A4LiveFacts {
   readonly lostEffects: readonly string[];
   /** The agent's outcome_unknown executions blocking its journaled calls (read at Assemble only); null when unread or unreadable. */
   readonly blockingExecutions: readonly string[] | null;
+  /** Resolutions the journal settled under this project's request that the project never recorded, `<execution>:<request>` (Assemble only); null when unread or unreadable. */
+  readonly unrecordedResolutions: readonly string[] | null;
   /** The engine status of the effect gates' requests and the open executions' resolution requests, by request id (read at Assemble only); null when unread. */
   readonly engineRequests: Readonly<Record<string, string>> | null;
 }
