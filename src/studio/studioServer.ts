@@ -2246,7 +2246,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         allowedOrigins: nativeAllowedBrowserOrigins(options.host, (server.address() as { port?: number } | null)?.port ?? options.port,
           [...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? [])]), readOnly: requiresReadOnlyMode(options.workspace) })) return;
 
-      // Bind the authenticated request context once; each route retains its role list.
+      // Bind the authenticated request context once; each route retains its role list. P1-78: approvals record who raised them.
+      const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
 
@@ -4186,7 +4187,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const out = assuranceWaiverRequestForApi({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId: resolveAgentId(options.workspace),
           reason: parsed.reason.trim(),
           hours: Number.isFinite(Number(parsed.hours)) ? Number(parsed.hours) : 24
@@ -4474,7 +4475,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         if (externalShare) {
           const requested = auditBinderExportRequestForApi({
-            workspace: options.workspace,
+            workspace: options.workspace, initiator,
             agentId: resolveAgentId(options.workspace, auth.agentId ?? "default"),
             scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
@@ -5176,7 +5177,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         if (parsed.externalShare === true) {
           const requested = passportExportRequestForApi({
-            workspace: options.workspace,
+            workspace: options.workspace, initiator,
             agentId: resolveAgentId(options.workspace, auth.agentId ?? "default"),
             scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
@@ -6341,7 +6342,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const response = toolhub.createIntent({
-          agentId,
+          agentId, initiator,
           workOrderId: parsed.workOrderId,
           toolName: parsed.toolName,
           args: parsed.args ?? {},
@@ -7654,7 +7655,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const requested = benchPublishRequestForApi({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId: parsed.agentId ? resolveAgentId(options.workspace, parsed.agentId) : "default",
           file: parsed.file,
           registryDir: parsed.registryDir,
@@ -8329,7 +8330,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = await requestPluginInstall({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           registryId: parsed.registryId,
           pluginRef: parsed.pluginRef,
@@ -8369,7 +8370,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = await requestPluginInstall({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           registryId: parsed.registryId,
           pluginRef: `${parsed.pluginId}@${parsed.to ?? "latest"}`,
@@ -8408,7 +8409,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, parsed.agentId ?? "default");
         const requested = requestPluginRemove({
-          workspace: options.workspace,
+          workspace: options.workspace, initiator,
           agentId,
           pluginId: parsed.pluginId
         });

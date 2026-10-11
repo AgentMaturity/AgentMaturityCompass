@@ -368,6 +368,8 @@ export function passportExportsForApi(workspace: string) {
 export function passportExportRequestForApi(params: {
   workspace: string;
   agentId: string;
+  /** Who raises the approval request (P1-78): the authenticated principal, or the CLI's self-reported OS user. */
+  initiator: string;
   scopeType?: string | null;
   scopeId?: string | null;
   outFile?: string | null;
@@ -390,6 +392,7 @@ export function passportExportRequestForApi(params: {
   const intentId = `passport-export-${requestId}`;
   const approval = createApprovalForIntent({
     workspace: params.workspace,
+    initiator: params.initiator,
     agentId: params.agentId,
     intentId,
     toolName: "passport.export",

@@ -162,6 +162,7 @@ function createProtectedIntent(workspace: string): {
 } {
   const service = new ToolHubService(workspace);
   const intent = service.createIntent({
+    initiator: "test-operator",
     agentId: "default",
     toolName: "process.spawn",
     args: {

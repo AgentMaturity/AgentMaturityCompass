@@ -8,11 +8,10 @@
  */
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { userInfo } from "node:os";
 import { join } from "node:path";
 import { intersectDelegationScopes } from "../agent/delegationScope.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
-import { consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { cliInitiator, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
 import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
@@ -217,14 +216,6 @@ function leasePrincipal(workspace: string, payload: LeasePayload):
 /** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
 const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
 
-function osUser(): string {
-  try {
-    return userInfo().username || "unknown";
-  } catch {
-    return process.env.USER ?? "unknown";
-  }
-}
-
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
   const facts = actionFacts(execution, ctx.compiledPolicy);
@@ -258,7 +249,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       // An approval names who authorized the effect; a lease, the principal its issuer named (never the lease itself,
       // P1-78); otherwise the CLI user, self-reported, which identity-binding refuses.
       principal: approverIds.length > 0 ? { principalId: approverIds.join(","), kind: "human", authenticatedVia: "approval-engine" }
-        : named?.principal ?? { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
+        : named?.principal ?? { principalId: cliInitiator(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
         leaseId: lease?.payload.leaseId ?? null },

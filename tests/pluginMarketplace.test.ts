@@ -285,6 +285,7 @@ describe("plugin marketplace", () => {
 
     await expect(
       requestPluginInstall({
+        initiator: "test-operator",
         workspace: ws,
         agentId: "default",
         registryId: "local",
@@ -338,6 +339,7 @@ describe("plugin marketplace", () => {
     });
 
     const requested = await requestPluginInstall({
+      initiator: "test-operator",
       workspace: ws,
       agentId: "default",
       registryId: "local",
@@ -441,6 +443,7 @@ describe("plugin marketplace", () => {
     });
 
     const requested = await requestPluginInstall({
+      initiator: "test-operator",
       workspace: ws,
       agentId: "default",
       registryId: "local",

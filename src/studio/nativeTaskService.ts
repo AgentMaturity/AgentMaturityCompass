@@ -26,7 +26,7 @@ import { isActionClass } from "../governor/actionCatalog.js";
 import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
@@ -366,7 +366,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     // The lifetime clock starts no later than the lease, so the sweeper stops the runtime before the lease expires.
     entry.runtimeStartedAt = Date.now();
     const lease = runtimeLease(entry, config.scope);
-    entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}) }, provider: d.provider,
+    entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}),
+      // P1-78: the task's Studio principal raises its runtime's approvals (`LOCAL_USER:<id>`, `WORKSPACE_ROUTER:<id>`, or the admin token).
+      [NATIVE_TASK_INITIATOR_ENV]: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : d.principalId }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,
       ...(credentialed(d.provider) ? { credential: REFS[d.provider] } : {}),
       ...(d.tools === "workspace" ? { approveTools: "WRITE_HIGH", approveRisk: "high" as const } : {}),

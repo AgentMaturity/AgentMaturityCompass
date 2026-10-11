@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
@@ -124,6 +125,7 @@ export function auditBinderExportRequestCli(params: {
 }) {
   return auditBinderExportRequestForApi({
     workspace: params.workspace,
+    initiator: cliInitiator(),
     agentId: params.agentId,
     scopeType: params.scope.toUpperCase(),
     scopeId: params.id,
