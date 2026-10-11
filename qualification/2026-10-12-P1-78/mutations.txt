@@ -1,0 +1,55 @@
+P1-78 mutation checks (local macOS arm64, not CI). Each mutated file was read into memory, mutated, tested and written back;
+the script compared the restored bytes with the original. One mutation per guard; every one was caught.
+
+M1a. gap 1: accept a lease-named user the signed users.yaml does not hold (principal from the lease claim) (src/actions/authorize.ts): caught
+    × L0-IDN-02/negative/unregistered-principal-lease.json: deny authorization_denied:principal_unresolved 545ms
+    × L0-IDN-01/negative/lease-unregistered-principal.json: deny IDENTITY_UNRESOLVED 1023ms
+    Test Files  1 failed (1)
+    Tests  2 failed | 20 passed (22)
+M1b. gap 1: a lease naming nobody counts as the principal again (lease:<id>, service) (src/actions/authorize.ts): caught
+    × L0-IDN-01/negative/lease-without-principal.json: deny PRINCIPAL_UNRESOLVED 957ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 21 passed (22)
+M2. gap 2: checkLease passes no workspace id (src/actions/authorize.ts): caught
+    × L0-IDN-02/negative/other-workspace-id-lease.json: deny authorization_denied:scope_widened 602ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 21 passed (22)
+M3. gap 3: a visibility refusal is not recorded (src/tools/toolPipeline.ts): caught
+    × records the visibility refusal of an unknown tool, with no class, exactly once (P1-78) 5ms
+    × records the collapsed call's refusal under the tool's own class (P1-78) 5ms
+    × L0-TOOL-01/negative/unregistered-tool.json: deny visibility_denied 509ms
+    Test Files  3 failed (3)
+    Tests  3 failed | 54 passed (57)
+M4a. gap 4: the engine accepts the initiator's approval (src/approvals/approvalEngine.ts): caught
+    × L0-OVS-03/negative/initiator-approves.json: fail initiator_cannot_approve 579ms
+    Test Files  1 failed | 1 passed (2)
+    Tests  1 failed | 21 passed (22)
+M4b. gap 4: the quorum counts the initiator's approval (src/approvals/approvalQuorum.ts): caught
+    × does not count the initiator's approval, matched by the user id an A4 key names (constraint 5); its DENY still denies 5ms
+    × L0-OVS-03/negative/initiator-decision-written-directly.json: fail quorum_not_met 536ms
+    Test Files  2 failed (2)
+    Tests  2 failed | 20 passed (22)
+M4c. gap 4 (A4 constraint 4): the initiator enters the binding digest (src/approvals/approvalChainStore.ts): caught
+    × parses under the strict schema and digests exactly as it would without an initiator (constraint 4) 3ms
+    × does not count the initiator's approval, matched by the user id an A4 key names (constraint 5); its DENY still denies 3ms
+    Test Files  1 failed (1)
+    Tests  2 failed | 3 passed (5)
+M5. gap 5: the record ignores the plan's deployment (src/actions/authorize.ts): caught
+    × L0-IDN-01/positive/lease-and-principal.json: allow  958ms
+    × L0-IDN-01/positive/lease-registered-service.json: allow  976ms
+    Test Files  1 failed (1)
+    Tests  2 failed | 20 passed (22)
+M6. gap 6: a writer-less toolset writes into a session the ledger does not hold open (src/agent/agentToolset.ts): caught
+    × refuses, and writes nothing, for a tool call recorded against a session nobody started 891ms
+    × refuses, and writes nothing, for a tool call recorded against a session already sealed 880ms
+    × L0-LOG-01/negative/writerless-unopened-session.json: deny UNVERIFIABLE_TOOL_EVIDENCE 623ms
+    Test Files  2 failed (2)
+    Tests  3 failed | 14 passed (17)
+M6b. gap 6 (fail-closed): no writability probe before the body (src/agent/agentToolset.ts): caught
+    × refuses the next call once the writer is closed mid-session, and nothing happens 943ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 5 passed (6)
+M6c. gap 6 (fail-closed): a lost row does not refuse later calls (src/agent/agentToolset.ts): caught
+    × refuses every later call once a row is lost after a body ran 620ms
+    Test Files  1 failed (1)
+    Tests  1 failed | 5 passed (6)

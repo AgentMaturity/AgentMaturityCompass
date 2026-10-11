@@ -1,0 +1,118 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-78",
+ "date": "2026-10-12",
+ "commit": "820e1f3a02115c54e7b373b50e5be1cd3451d80e",
+ "branch": "rtd/p1-78-layer0-enforcement-gaps",
+ "node": "v25.5.0",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 45058
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 93947
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 63234
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 88982
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 19422
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 10326
+  },
+  {
+   "cmd": "npm run -s check:freeze",
+   "exit": 0,
+   "durationMs": 60400
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 69768
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 9740
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 18419
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 6386
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 5991
+  },
+  {
+   "cmd": "npm run -s check:qualification",
+   "exit": 0,
+   "durationMs": 13363
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 25354
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 49802
+  },
+  {
+   "cmd": "npx vitest run <the 141 files in related-tests.txt>",
+   "exit": 1,
+   "durationMs": 1019766
+  }
+ ],
+ "tests": {
+  "total": 1874,
+  "passed": 1848,
+  "failed": 26,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "red.txt",
+   "sha256": "f3aa14985ab30857e6ec5c502fc696966d62f00d3ffc7dca49be98c9a083e3be"
+  },
+  {
+   "path": "mutations.txt",
+   "sha256": "37293ec4c58ee1c16dd749d4ceaf1af3cb4114a3756089388375896b86624171"
+  },
+  {
+   "path": "checks.json",
+   "sha256": "4ec4c79af8a8802165ad4f86d895fcd5acaa98c19c33e35e079d6b475e075f60"
+  },
+  {
+   "path": "related-tests.txt",
+   "sha256": "d7ec11b471885c9530ec2ef8706dbc436f2081ccdf818f5e2c1cfe5ed05c1c20"
+  }
+ ],
+ "notes": "Every test file that imports a module P1-78 changed, plus every test file it changed (related-tests.txt), at this commit; int (8d1e8e7d7) did not move, so the merge was a no-op. 26 failures in 7 files, none from P1-78: llmResponsesCapabilities (1) and jsonlWriterResume (19, EgressBlocked active_policy_unverifiable in SessionService.open) fail the same way on a git archive of int; amc1471ApprovalDelivery (1), nativeShellComposition (1), sessionSpillCommitment (1) and nativeValidationOutcomeSurfaces (2) pass when run alone; performance/sessionSpine (1) is a timing ratio that passes alone on the int archive and failed one of its two cases per run on the branch while other sessions' suites ran on this machine (P1-78 adds one method to SessionSpine and nothing on the append path). The full suite was not run. All 15 checks exit 0 (checks.json). red.txt: each gap's tests failing before its fix; mutations.txt: 11 mutations, all caught. Local run on macOS arm64, not CI; no network."
+}

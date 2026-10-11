@@ -1,0 +1,86 @@
+P1-78 RED runs (local macOS arm64, not CI). Each block ran before its fix; 'swap' means the new tests ran against the previous commit's source, copied in and restored.
+
+== gap1
+npx vitest run tests/catalog/l0/identity.test.ts -t L0-IDN-01 (before the lease-principal fix)
+     × L0-IDN-01/positive/lease-and-principal.json: allow  979ms
+     × L0-IDN-01/positive/lease-registered-service.json: allow  934ms
+     × L0-IDN-01/negative/lease-without-principal.json: deny PRINCIPAL_UNRESOLVED 991ms
+     × L0-IDN-01/negative/lease-unregistered-service.json: deny PRINCIPAL_UNRESOLVED 919ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  4 failed | 4 passed | 12 skipped (20)
+
+== gap1-review
+swap: 6 src files at 5a143d734 (pre-review); npx vitest run tests/catalog/l0/identity.test.ts
+     × L0-IDN-02/negative/unregistered-principal-lease.json: deny authorization_denied:principal_unresolved 955ms
+     × a native task's lease names its users.yaml user; a host-router session and the admin token name nobody (P1-78) 3ms
+     × L0-IDN-01/positive/lease-and-principal.json: allow  1583ms
+     × L0-IDN-01/positive/lease-registered-service.json: allow  1398ms
+     × L0-IDN-01/negative/lease-unregistered-principal.json: deny IDENTITY_UNRESOLVED 1106ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  5 failed | 17 passed (22)
+
+== gap2
+npx vitest run tests/catalog/l0/identity.test.ts -t other-workspace-id (call was allowed)
+AssertionError: expected true to be false // Object.is equality
+
+== gap3
+npx vitest run tests/catalog/l0/tools.test.ts tests/toolPipeline.test.ts tests/codeMode.test.ts
+     × records the visibility refusal of an unknown tool, with no class, exactly once (P1-78) 4ms
+     × records the collapsed call's refusal under the tool's own class (P1-78) 4ms
+     × L0-TOOL-01/negative/unregistered-tool.json: deny visibility_denied 493ms
+AssertionError: expected [] to deeply equal [ [ 'echo', 'READ_ONLY', …(1) ] ]
+AssertionError: expected [] to deeply equal [ { name: 'nope', …(3) } ]
+AssertionError: expected undefined to match object { …(5) }
+
+== gap4
+npx vitest run tests/catalog/l0/oversight.test.ts; npx vitest run tests/approvalRecordCompatibility.test.ts
+     × L0-OVS-03/negative/initiator-approves.json: fail initiator_cannot_approve 601ms
+     × L0-OVS-03/negative/initiator-decision-written-directly.json: fail quorum_not_met 570ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  2 failed | 15 passed (17)
+     × parses under the strict schema and digests exactly as it would without an initiator (constraint 4) 2ms
+     × does not count the initiator's approval, matched by the user id an A4 key names (constraint 5); its DENY still denies 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+
+== gap5
+npx vitest run tests/catalog/l0/identity.test.ts -t L0-IDN-01
+ FAIL  tests/catalog/l0/identity.test.ts > L0-IDN-01 unique agent identity under an active compiled plan (compiled-policy identity-binding) > L0-IDN-01/positive/lease-and-principal.json: allow 
+AssertionError: expected { workspaceId: 'default', …(3) } to match object { tenantId: 'tenant-a', …(1) }
+(2 matching properties omitted from actual)
+- Expected
++ Received
+  {
+-   "deploymentId": "dep-a",
+-   "tenantId": "tenant-a",
++   "deploymentId": "unregistered",
++   "tenantId": null,
+  }
+ ❯ tests/catalog/l0/identity.test.ts:206:60
+
+== gap6
+npx vitest run tests/agentToolsetSession.test.ts; then swap: src/agent/agentToolset.ts from d178df746 (pre-fix), with tests/catalog/l0/logging.test.ts
+     × refuses, and writes nothing, for a tool call recorded against a session nobody started 2725ms
+     × refuses, and writes nothing, for a tool call recorded against a session already sealed 4189ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+     × refuses, and writes nothing, for a tool call recorded against a session nobody started 821ms
+     × refuses, and writes nothing, for a tool call recorded against a session already sealed 919ms
+     × L0-LOG-01/negative/writerless-unopened-session.json: deny UNVERIFIABLE_TOOL_EVIDENCE 588ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  2 failed (2)
+      Tests  3 failed | 14 passed (17)
+
+== gap6-failclosed
+npx vitest run tests/agentToolsetSession.test.ts (fail-closed writer cases, before the fix)
+     × refuses the call when the writer throws on append, and nothing happens 840ms
+     × refuses the next call once the writer is closed mid-session, and nothing happens 1012ms
+     × refuses every later call once a row is lost after a body ran 842ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  3 failed | 3 passed (6)
