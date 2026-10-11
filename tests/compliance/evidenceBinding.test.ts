@@ -36,7 +36,7 @@ describe("evidenceProducer", () => {
     [{ source: "dogfood-maturity" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
-    ...["manual", "operator", "feedback.ingest", "user", "inferred", "numeric_self_answer", "default"]
+    ...["manual", "operator", "feedback.ingest", "user", "inferred", "carried", "numeric_self_answer", "default"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],

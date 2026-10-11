@@ -35,6 +35,7 @@ export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProduce
   // an evidence source today; mapped so that any future row carrying one can never count as AMC runtime evidence.
   user: "manual",
   inferred: "manual",
+  carried: "manual",
   numeric_self_answer: "manual",
   default: "manual"
 });
