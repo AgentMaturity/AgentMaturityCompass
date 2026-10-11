@@ -1,0 +1,173 @@
+{
+  "list": {
+    "type": "amc.trust-list",
+    "version": 1,
+    "listId": "fixtures-v1",
+    "sequence": 3,
+    "issuedAt": "2026-09-01T00:00:00.000Z",
+    "expiresAt": "2027-09-01T00:00:00.000Z",
+    "entries": [
+      {
+        "keyId": "1e58b4022cf9034c2324f9ed1921919b8026b9a12f799d0b9c3a000aed08a83f",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAROfFZFp0rDcMqVaAPg17tciL7/66ooXms0Mlm05WMIU=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY attester key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "9fdd063b94b38ecc325c781518956db1b5cf08be394c33efdf702b8eea791cfc",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAft+G2Jb1dU1A8GJ+ip3jQynrWNET82zyE81kTgTW1CM=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "artifact-seal"
+        ],
+        "subject": "TEST ONLY seal key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "f5075494148c4cfc47013e0ab39d768ed9f17b6aaa5832bff82725b88ba7a51c",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtaj2j+9pdCDB9jo05HhU+4cSHbjOELonkuxbOIljcLE=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY compromised key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator",
+        "revokedAt": "2026-09-15T00:00:00.000Z",
+        "revocationReason": "key-compromise"
+      },
+      {
+        "keyId": "395892a5e40b41ecd4b66b7b65d950fab6ccb51ebe82d4ddd266cc3e425339ae",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAvrlOQ8H8iW5LImbjCex3oTSBfgFLOFnTMMjTd9CoB6s=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY superseded key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator",
+        "revokedAt": "2026-09-15T00:00:00.000Z",
+        "revocationReason": "superseded"
+      },
+      {
+        "keyId": "2c7e92bff3621f4003650ffdcbeaf247bd4e21e549a9c9e39436dcb5ab926f41",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAIGtWPbmX7igkoRJd/fYVkG4mtHgUbvPKlEJm9Bu2uvM=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY distrusted key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "03c7aa10e81e87eb656d04e9502141afc09fc255b1b8cc201fdabf209fb387cf",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAps2dScb9DeA0cyQOnD6bkg6KitMygklLsjIS3ZmqfU8=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY late key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-09-10T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "c9436523f04525f4d39910e0afba324ee05f38bcabf1fd7583b351252e43c03c",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA/9F831Ti18PgVmy/KxZr/6ul42pktdixknTfQqdyWKQ=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "independent-attestation"
+        ],
+        "subject": "TEST ONLY expired key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2026-09-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "d578b9d007fa5abbe9451622cb234fa1cd2fa7b77591fd18936c22e953746cdd",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAWqHrcGAtCcEJY3eoYVSqaNhARCd+1HOlBEZ1D2nG/KA=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "receipt"
+        ],
+        "subject": "TEST ONLY receipt key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "f0752101e92d2ae267dc608981949f1d37436633eababc2ee8aca1de80e119ed",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtvbUIZOU4DxLk/DElmX2WZ4nhf/VWaeuFjtzYNYVQPc=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "ledger-row"
+        ],
+        "subject": "TEST ONLY ledger key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      },
+      {
+        "keyId": "43985d6868178b4fad2cb158bdd559b2eb5ed8533bedaa010f75dd87eaa4cd11",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAS42WTu81SUwGxx447ZTafihfUdHWSRFJz3IE/4pldXQ=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "evidence-authority"
+        ],
+        "subject": "TEST ONLY authority key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator",
+        "authority": {
+          "producers": [
+            "pi-callback"
+          ],
+          "captureMethods": [
+            "producer-callback"
+          ],
+          "maxTrustTier": "ATTESTED"
+        }
+      },
+      {
+        "keyId": "ebeca5e51138eb7060637444c2495ccfeadaf81952e3cba3aa99bc5fc2c17cd4",
+        "algorithm": "ed25519",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEALLlHIVjJjRsVosA5oOgjqahfFlryZKbRWBxwpZoDKrQ=\n-----END PUBLIC KEY-----\n",
+        "purposes": [
+          "revocation-list"
+        ],
+        "subject": "TEST ONLY revoker key (amc-verifier-fixtures v1)",
+        "validFrom": "2026-01-01T00:00:00.000Z",
+        "validTo": "2028-01-01T00:00:00.000Z",
+        "source": "operator"
+      }
+    ],
+    "distrust": [
+      {
+        "keyId": "2c7e92bff3621f4003650ffdcbeaf247bd4e21e549a9c9e39436dcb5ab926f41",
+        "distrustedFrom": null,
+        "reason": "exposed-in-public-history",
+        "note": "TEST ONLY: this fixture key's seed is published",
+        "source": "operator"
+      }
+    ]
+  },
+  "signatures": [
+    {
+      "keyId": "7284d995184959356042352b876f5eb02b11b250dc7bdd99f58a584e70a1390c",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+RvnJ7Y9OxXFAueT8a4qeRLWVRGGzTFOY0fMeuhkXtk=\n-----END PUBLIC KEY-----\n",
+      "signature": "AhzMjnZdCvbGdxIcikNQBqGt6FbCHdyFDAnlWqRKNCO2PoA2P7gDNqVSs2TWZx++0Ju/q3D/S4g1qFuR03hoAw=="
+    }
+  ]
+}
