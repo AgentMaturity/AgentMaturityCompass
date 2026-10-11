@@ -447,12 +447,14 @@ a rollback), `environment`, `target`, `packageDigest`, `imageDigest`, `overlayDi
 `helmRevision` (a Helm target only), `leaseIds`, `destinationRef` and `operatorStated.status`. It lists what changed and
 nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unless this Studio runs under the target, and
 with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
-production lease) or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
+production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
+or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succeeded production receipt
 moves the project's `deployedReleaseId`; a succeeded rollback row moves it to the release rolled back to.
 
 `POST …/releases/:rid/verify { environment }` (owner, owner mode) is AMC's own check of the newest receipt's
-`destinationRef`. It sends no credential, and a body naming a URL is 400. A receipt whose destination is not the declared
-`destinationRef` fails at once (`DESTINATION_MISMATCH`). The host goes through `resolveAndCheck`: a destination that
+`destinationRef`. It sends no credential, and a body naming a URL is 400. A receipt whose destination is not the one the
+release was packaged for (its own revision's proposal, which the signed `deploy/plan.json` records; never a later
+revision's answers) fails at once (`DESTINATION_MISMATCH`). The host goes through `resolveAndCheck`: a destination that
 resolves to a private, link-local or mapped address is refused (409 `VERIFY_EGRESS_REFUSED`, naming the address), and
 nothing is recorded. AMC lists no private address, and no signed opt-in exists in v1. The connection is pinned to the
 checked address. TLS verifies against the system CA set, any 3xx fails, and the check is bounded at 5 s and 256 KiB.

@@ -26,8 +26,7 @@ import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { activateSpecOf, cycleLinks, IDENTITY_NOT_EVALUATED } from "./spec/activate.js";
-import { answerValues, textValue } from "./spec/aspire.js";
+import { cycleLinks, IDENTITY_NOT_EVALUATED, releaseDestination } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const TIMEOUT_MS = 5_000;
@@ -140,14 +139,17 @@ export async function probeDestination(destinationRef: string, egress: EgressChe
 const receiptOf = (state: A4ReadinessState, releaseId: string, environment: string): A4ChainLink | undefined =>
   cycleLinks(state.chain, "DEPLOYMENT").filter((link) => link.body.releaseId === releaseId && link.body.environment === environment).at(-1);
 
-/** The rows a check is pinned to: the release, its newest receipt in `environment` and the destination the Activate answers declared. */
+/**
+ * The rows a check is pinned to: the release, its newest receipt in `environment` and the destination the release's own
+ * revision proposed (what its signed deploy/plan.json records), never a later revision's answers.
+ */
 function checkInputs(state: A4ReadinessState, releaseId: string, environment: string): { receipt: A4ChainLink; declared: string | null } {
   if (!state.chain.some((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId)) throw fail(404, "A4_RELEASE_NOT_FOUND", `no release ${releaseId} on this project`);
   const receipt = receiptOf(state, releaseId, environment);
   if (receipt === undefined) {
     throw fail(409, "DESTINATION_MISMATCH", `No ${environment} receipt is recorded for this release: AMC checks only the destination a receipt names.`, { amcCheckStatus: "not_evaluated" });
   }
-  return { receipt, declared: textValue(answerValues(activateSpecOf(state).answers).get("destinationRef")) };
+  return { receipt, declared: releaseDestination(state, releaseId) };
 }
 
 /**
@@ -171,7 +173,7 @@ export async function verifyDeployment(store: A4Store, projectId: string, releas
   const destination = String(receipt.body.destinationRef);
   let probed: ProbeResult;
   if (declared === null || destination !== declared) {
-    probed = { checks: [{ name: "destination", status: "failed", detail: `the receipt names ${destination}; the Activate answers declare ${declared ?? "none"}` }],
+    probed = { checks: [{ name: "destination", status: "failed", detail: `the receipt names ${destination}; the release was packaged for ${declared ?? "none"}` }],
       amcCheckStatus: "failed", reasonCodes: ["DESTINATION_MISMATCH"], resolvedAddress: null, responseSha256: null };
   } else {
     const host = destination.split(":")[0]!;

@@ -78,15 +78,27 @@ const load = () => import("../stages/activate.js");
 export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "propose", "review"] as const)
   .map((step) => ({ id: `activate.${step}`, step, run: async (ctx) => (await load()).produceActivate(step, ctx) }));
 
-/** The newest Activate revision's spec and answers. */
-export function activateSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "activate").at(-1);
+/** The newest Activate revision's spec and answers, or those of Activate revision `revisionNo` (none when it is not one). */
+export function activateSpecOf(state: Pick<A4ReadinessState, "revisions">, revisionNo?: number): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
+  const revisions = state.revisions.filter((row) => row.stage === "activate");
+  const revision = revisionNo === undefined ? revisions.at(-1) : revisions.find((row) => row.revision_no === revisionNo);
   const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
   const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
     const parsed = a4AnswerSchema.safeParse(answer);
     return parsed.success ? [parsed.data] : [];
   }) : [];
   return { spec, answers, revisionNo: revision?.revision_no ?? null };
+}
+
+/**
+ * The destination the release's own Activate revision proposed (the one its signed deploy/plan.json records), never a
+ * later revision's answers; null when the release or its proposal is not found.
+ */
+export function releaseDestination(state: Pick<A4ReadinessState, "revisions" | "chain">, releaseId: string): string | null {
+  const release = state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId);
+  const proposal = release === undefined ? undefined
+    : activateSpecOf(state, release.revisionNo).spec.proposal as { deploymentTarget?: { destinationRef?: unknown } } | undefined;
+  return typeof proposal?.deploymentTarget?.destinationRef === "string" ? proposal.deploymentTarget.destinationRef : null;
 }
 
 /** The Adapt answers Activate carries, as the newest Adapt revision records them (absent ones are left out). */

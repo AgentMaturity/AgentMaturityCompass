@@ -22,7 +22,7 @@ import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, rolledBack } from "./spec/activate.js";
+import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, releaseDestination, rolledBack } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -262,6 +262,10 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     if (currentRelease(state.chain)?.body.releaseId !== releaseId) throw fail(409, "RELEASE_NOT_CURRENT", "Deploy this cycle's release; re-deploying an earlier one is a rollback.");
     if (rolledBack(state.chain, releaseId)) throw fail(409, "RELEASE_ROLLED_BACK", "This release was rolled back; reopen or tune Activate and release again.");
     if (body.packageDigest !== release.body.packageDigest) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not this release's package digest.");
+    // AMC's check connects only to a receipt's destinationRef, so a deploy receipt names the host the release was packaged and approved for.
+    if (body.destinationRef !== releaseDestination(state, releaseId)) {
+      throw fail(409, "DESTINATION_MISMATCH", "destinationRef is not the destination this release was packaged for (deploy/plan.json).");
+    }
     const minted = mintedLeases(state.chain, releaseId);
     const required = body.environment === "staging" ? minted.staging.at(-1) ?? null : minted.production;
     if (required === null) throw fail(409, "PRODUCTION_LEASE_NOT_MINTED", "A production deployment uses the production lease the deployment approval mints.");
