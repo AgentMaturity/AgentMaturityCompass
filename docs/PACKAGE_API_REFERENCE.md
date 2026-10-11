@@ -9,6 +9,7 @@ The generated reference is not part of the published documentation site: it has 
 | `agent-maturity-compass` | `src/index.ts` | Public library exports |
 | `agent-maturity-compass/sdk/native` | `src/sdk/nativeAgentClient.ts` | Native AMC agent sessions, turns and recorded updates |
 | `agent-maturity-compass/sdk/mobile-fetch` | `src/sdk/mobileFetch.ts` | Fetch-based client helpers |
+| `agent-maturity-compass/pi` | `src/adapters/pi/amcPiExtension.ts` | Pi extension that sends Pi tool calls to AMC's hook control path ([Pi tool_call control](adapters/pi.md)) |
 | `agent-maturity-compass/standard/external-evidence` | `src/standard/externalEvidenceProfile.ts` | Standalone external-evidence profile and verification |
 | `agent-maturity-compass/telemetry/pi` | `src/importers/piTelemetryCallbacks.ts` | Optional producer telemetry callbacks with explicit self-reported provenance |
 | `agent-maturity-compass/trust` | `src/trust/index.ts` | Signed trust lists, issuer admission, the built-in distrust list and `VerifierReportV1`; no verify command uses them yet |

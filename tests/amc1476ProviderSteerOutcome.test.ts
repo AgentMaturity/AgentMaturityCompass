@@ -6,14 +6,13 @@ import YAML from "yaml";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { builtInAdapterCapabilities } from "../src/adapters/adapterCapabilities.js";
 import { mapProviderHookEvent } from "../src/adapters/hookIntegration.js";
+import { evaluateProviderHookControl, verifyProviderHookControlResult } from "../src/bridge/hookControl.js";
 import {
-  evaluateProviderHookControl,
   HookControlError,
   renderProviderControlResponse,
   serializeProviderControlResponse,
   validateProviderControlResponse,
-  verifyProviderHookControlResult,
-} from "../src/bridge/hookControl.js";
+} from "../src/bridge/hookProviders.js";
 import {
   ingestObservedAepHookEvent,
   resolveUnmatchedObservedHookAction,

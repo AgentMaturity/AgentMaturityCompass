@@ -1,7 +1,7 @@
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
+import type { HookProvider } from "./hookProviders.js";
 
-export type HookActionProvider = "claude-code" | "gemini-cli";
 export type HookActionIdentitySource = "provider-call-id" | "derived-request-id";
 
 export interface ProviderHookActionIdentity {
@@ -20,7 +20,7 @@ export function isSafeProviderActionId(value: unknown): value is string {
 }
 
 function providerHookCorrelationSha256(input: {
-  provider: HookActionProvider;
+  provider: HookProvider;
   sessionId?: string | null;
   toolName: string;
   toolInput?: unknown;
@@ -37,7 +37,7 @@ function providerHookCorrelationSha256(input: {
 }
 
 export function resolveProviderHookRequestIdentity(input: {
-  provider: HookActionProvider;
+  provider: HookProvider;
   providerActionId?: string | null;
   sessionId?: string | null;
   timestamp?: string | null;

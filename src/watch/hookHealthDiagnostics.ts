@@ -48,6 +48,8 @@ export interface HookHealthDiagnostic {
     manifestValid: boolean;
     leaseValid: boolean;
     expiresAt: string | null;
+    /** Pi only: the claim AMC may make, from verified session registrations. */
+    governance?: HookIntegrationStatus["governance"];
   };
   evidence: {
     state: "missing" | "verified" | "invalid" | "unavailable";
@@ -137,6 +139,7 @@ function baseDiagnostic(status: HookIntegrationStatus): Omit<HookHealthDiagnosti
       manifestValid: status.manifestValid,
       leaseValid: status.leaseValid,
       expiresAt: status.expiresTs === null ? null : new Date(status.expiresTs).toISOString(),
+      ...(status.governance ? { governance: status.governance } : {}),
     },
     derivedDiagnostic: true,
     recorded: false,

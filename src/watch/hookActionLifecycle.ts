@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { providerSchema, type HookProvider } from "../bridge/hookProviders.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import type { EvidenceEvent } from "../types.js";
 
-export type HookActionLifecycleProvider = "claude-code" | "gemini-cli";
+export type HookActionLifecycleProvider = HookProvider;
 export type HookActionLifecycleStatus = "requested" | "awaiting_terminal" | "completed" | "failed" | "denied" | "steered" | "fail_closed";
 export type HookActionLifecycleReasonCode =
   | "ACTION_ID_COLLISION"
@@ -69,7 +70,7 @@ export const hookActionEvidenceMetaSchema = z.object({
   sourceEventType: z.enum(["action.requested", "action.completed", "action.failed", "action.denied"]),
   actionId: z.string().min(1),
   actionStatus: z.enum(["success", "failure", "timeout", "cancelled"]).nullable().optional(),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   providerCorrelationSha256: z.string().regex(/^[a-f0-9]{64}$/).nullable().optional(),
   rawPayloadStored: z.literal(false),
   receipt_id: z.string().min(1),
@@ -79,7 +80,7 @@ export const hookActionEvidenceMetaSchema = z.object({
 const decisionMetaBaseSchema = z.object({
   trustTier: z.literal("OBSERVED"),
   agentId: z.string().min(1),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   actionId: z.string().min(1),
   decision: z.enum(["allow", "deny", "ask"]),
   rawPayloadStored: z.literal(false),
@@ -121,7 +122,7 @@ const decisionMetaV2Schema = decisionMetaBaseSchema.extend({
     && value.effectiveOutcome === "steer"
     && !value.capabilityLossy;
   const fallback = value.providerMapping === "fail_closed_deny"
-    && value.provider === "gemini-cli"
+    && value.provider !== "claude-code"
     && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
     && value.decision === "deny"
     && value.effectiveOutcome === "deny"
