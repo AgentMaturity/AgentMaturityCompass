@@ -1,0 +1,492 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T03:08:17.460Z",
+  "targetPlatform": "linux",
+  "hostPlatform": "darwin",
+  "dockerEngine": {
+    "os": "linux",
+    "architecture": "aarch64",
+    "serverVersion": "29.5.2"
+  },
+  "requestedStudioImage": "amc-p035-studio:arm64",
+  "requestedRunnerImage": "amc-p035-runner:arm64",
+  "studioImage": "sha256:d73e66e20c7f76ee6877a0868d9cf566a8d7a43a99e2ad1eae0fac6df82ef770",
+  "runnerImage": "sha256:b1740027b79493cf16f9ee236f14e72139b069efcc9fe0eb5e1c6ac1428416e6",
+  "checks": [
+    {
+      "name": "Docker daemon is Linux",
+      "passed": true,
+      "architecture": "aarch64",
+      "serverVersion": "29.5.2"
+    },
+    {
+      "name": "image amc-p035-studio:arm64",
+      "passed": true,
+      "id": "sha256:d73e66e20c7f76ee6877a0868d9cf566a8d7a43a99e2ad1eae0fac6df82ef770",
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    {
+      "name": "image amc-p035-runner:arm64",
+      "passed": true,
+      "id": "sha256:b1740027b79493cf16f9ee236f14e72139b069efcc9fe0eb5e1c6ac1428416e6",
+      "architecture": "arm64",
+      "os": "linux"
+    },
+    {
+      "name": "studio: default entrypoint reaches readiness",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /healthz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /readyz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /console",
+      "passed": true
+    },
+    {
+      "name": "studio: non-root installed artifact, SQLite and bundle notices",
+      "passed": true
+    },
+    {
+      "name": "studio: anonymous refusal and authenticated access",
+      "passed": true
+    },
+    {
+      "name": "studio: keyless turn and cold signed verification after graceful shutdown",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /healthz",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /readyz",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /console",
+      "passed": true
+    },
+    {
+      "name": "studio: restart preserves authenticated access",
+      "passed": true
+    },
+    {
+      "name": "studio: both cold verifiers preserve the signed session after restart",
+      "passed": true
+    },
+    {
+      "name": "studio: interrupted gateway is refused by both cold verifiers",
+      "passed": true
+    },
+    {
+      "name": "runner: non-root installed artifact, SQLite and bundle notices",
+      "passed": true,
+      "uid": 10001,
+      "bundledPackages": 17,
+      "version": "1.2.0"
+    },
+    {
+      "name": "runner: default CLI entrypoint",
+      "passed": true
+    },
+    {
+      "name": "runner: Python, Git and jq available",
+      "passed": true
+    },
+    {
+      "name": "runner across separate containers: keyless turn and cold signed verification",
+      "passed": true
+    },
+    {
+      "name": "amc-smoke-335d56f3-0ecf-4458-bbca-1ef553452e39-studio: runtime secret values absent from logs",
+      "passed": true
+    }
+  ],
+  "verificationResults": [
+    {
+      "phase": "first shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "23d6d79e-4ef5-4268-949c-80ef3b3605d0"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": ""
+    },
+    {
+      "phase": "first shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "sessionId": "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "ok": true,
+        "prefixVerified": false,
+        "integrityOk": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "50832ae9-3b41-4c52-ba83-3e0fa45ffe5b",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "4b9998c7-99cb-478d-b47b-28748c5984b2",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": ""
+    },
+    {
+      "phase": "restart shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "23d6d79e-4ef5-4268-949c-80ef3b3605d0"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": ""
+    },
+    {
+      "phase": "restart shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "sessionId": "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "ok": true,
+        "prefixVerified": false,
+        "integrityOk": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "50832ae9-3b41-4c52-ba83-3e0fa45ffe5b",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "4b9998c7-99cb-478d-b47b-28748c5984b2",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": ""
+    },
+    {
+      "phase": "abrupt shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": false,
+      "exitCode": 1,
+      "report": {
+        "ok": false,
+        "errors": [
+          "Session 16dc6ee1-c0f1-49a6-84cf-115e94f35d11 missing seal"
+        ],
+        "chain": {
+          "ok": false,
+          "errors": [
+            "Session 16dc6ee1-c0f1-49a6-84cf-115e94f35d11 missing seal"
+          ]
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "23d6d79e-4ef5-4268-949c-80ef3b3605d0"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": ""
+    },
+    {
+      "phase": "abrupt shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "--json",
+        "--expect-monitor",
+        "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023"
+      ],
+      "processOk": false,
+      "exitCode": 1,
+      "report": {
+        "sessionId": "23d6d79e-4ef5-4268-949c-80ef3b3605d0",
+        "ok": false,
+        "prefixVerified": false,
+        "integrityOk": false,
+        "ledgerOk": false,
+        "ledgerErrors": [
+          "Session 16dc6ee1-c0f1-49a6-84cf-115e94f35d11 missing seal"
+        ],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "50832ae9-3b41-4c52-ba83-3e0fa45ffe5b",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "4b9998c7-99cb-478d-b47b-28748c5984b2",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "682ec5e54da3ddd0c99509b3f0988e0ef647df46e4ad12dd7e079bfe42c17023",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": ""
+    }
+  ],
+  "cleanupResults": [
+    {
+      "resource": "container",
+      "name": "amc-smoke-335d56f3-0ecf-4458-bbca-1ef553452e39-studio",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-335d56f3-0ecf-4458-bbca-1ef553452e39-studio-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-335d56f3-0ecf-4458-bbca-1ef553452e39-runner-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "secret files",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-35-tmp/amc-container-secrets-p8HEQj",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "finishedAt": "2026-10-11T03:08:58.576Z"
+}

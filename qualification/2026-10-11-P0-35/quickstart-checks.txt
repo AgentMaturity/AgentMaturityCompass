@@ -1,0 +1,2 @@
+arm64: --version 1.1.1; id uid=10001(amc) gid=10001(amc) groups=10001(amc); sqlite {"sqlite":"ok","arch":"arm64","node":"v22.23.3","uid":10001}
+amd64: --version 1.1.1; id uid=10001(amc) gid=10001(amc) groups=10001(amc); sqlite {"sqlite":"ok","arch":"x64","node":"v22.23.3","uid":10001}
