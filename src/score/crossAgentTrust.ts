@@ -7,7 +7,12 @@
  * AMC-native agent-to-agent trust verification protocol.
  */
 
-import { createHash, createHmac } from 'node:crypto';
+import { createHash, createHmac, sign, verify } from 'node:crypto';
+import { publicKeyFromPrivate } from '../crypto/keyHistoryEnvelope.js';
+import { admitKey, type IssuerAdmission } from '../trust/admission.js';
+import type { TrustContext } from '../trust/trustContext.js';
+import { ed25519KeyId } from '../trust/trustList.js';
+import { canonicalize } from '../utils/json.js';
 import { type MaturityLevel } from './formalSpec.js';
 import { scoreToLevel, toDisplayScore } from './scoringScale.js';
 
@@ -31,7 +36,16 @@ export interface TrustVerificationResult {
   level: MaturityLevel;    // L0–L5 derived from score
   grantedScopes: string[]; // what this agent is allowed to do
   requiredActions?: string[];
+  /**
+   * P1-08 (G6-10): what proved the claim. "shared-secret" is an HMAC any holder of the secret, every verifier included,
+   * can forge; "ed25519" is a signature by the agent's session key; "none" did not verify.
+   */
+  integrity: ClaimIntegrity;
+  /** Never above SELF_REPORTED for a shared secret; ATTESTED only for an Ed25519 session key admitted for `session`. */
+  trustTier: 'ATTESTED' | 'SELF_REPORTED' | 'UNVERIFIED';
 }
+
+export type ClaimIntegrity = 'shared-secret' | 'ed25519' | 'none';
 
 export interface TrustPolicyRule {
   minAmcScore?: number;
@@ -47,18 +61,70 @@ function levelToNum(level: string): number {
   return LEVEL_ORDER.indexOf(level);
 }
 
+/** HMAC claims: integrity "shared-secret", capped at SELF_REPORTED whatever the score (G6-10). */
 export function verifyAgentClaim(
   claim: AgentIdentityClaim,
   policy: TrustPolicyRule,
   sharedSecret: string,
 ): TrustVerificationResult {
+  const payload = `${claim.agentId}:${claim.publicKeyHash}:${claim.issuingWorkspace}:${claim.issuedAt.toISOString()}`;
+  const expectedSig = createHmac('sha256', sharedSecret).update(payload).digest('hex');
+  const sigValid = claim.signature === expectedSig;
+  return { ...scoreClaim(claim, policy, sigValid), integrity: sigValid ? 'shared-secret' : 'none', trustTier: sigValid ? 'SELF_REPORTED' : 'UNVERIFIED' };
+}
+
+const CLAIM_TAG = 'AMC_AGENT_CLAIM_V1';
+
+/** Every claim field except the signature, canonical, after the tag and one 0x00 byte: score and level are signed too. */
+function signedClaimBytes(claim: AgentIdentityClaim): Buffer {
+  const body = {
+    agentId: claim.agentId, publicKeyHash: claim.publicKeyHash, issuingWorkspace: claim.issuingWorkspace,
+    issuedAt: claim.issuedAt.toISOString(), expiresAt: claim.expiresAt?.toISOString() ?? null,
+    amcScore: claim.amcScore ?? null, amcLevel: claim.amcLevel ?? null, amcPassportId: claim.amcPassportId ?? null
+  };
+  return Buffer.concat([Buffer.from(CLAIM_TAG, 'ascii'), Buffer.from([0]), Buffer.from(canonicalize(body), 'utf8')]);
+}
+
+/** P1-08: a claim signed with the agent's Ed25519 session key; publicKeyHash is that key's id. */
+export function createSignedAgentClaim(
+  agentId: string,
+  sessionPrivateKeyPem: string,
+  issuingWorkspace: string,
+  opts?: { amcScore?: number; amcLevel?: string; amcPassportId?: string; ttlHours?: number },
+): AgentIdentityClaim {
+  const issuedAt = new Date();
+  const claim: AgentIdentityClaim = {
+    agentId, publicKeyHash: ed25519KeyId(publicKeyFromPrivate(sessionPrivateKeyPem)) ?? '', issuingWorkspace, issuedAt,
+    expiresAt: opts?.ttlHours ? new Date(issuedAt.getTime() + opts.ttlHours * 3600000) : undefined,
+    amcScore: opts?.amcScore, amcLevel: opts?.amcLevel, amcPassportId: opts?.amcPassportId, signature: '',
+  };
+  return { ...claim, signature: sign(null, signedClaimBytes(claim), sessionPrivateKeyPem).toString('base64') };
+}
+
+/**
+ * Verifies an Ed25519 claim with the session public key the verifier located, bound by publicKeyHash. The result is
+ * ATTESTED only when issuer admission (P0-09) admits that key for `session` in `context`; otherwise SELF_REPORTED.
+ */
+export function verifySignedAgentClaim(
+  claim: AgentIdentityClaim,
+  policy: TrustPolicyRule,
+  input: { publicKeyPem: string; context: TrustContext },
+): TrustVerificationResult & { admission: IssuerAdmission } {
+  let sigValid = false;
+  try {
+    sigValid = ed25519KeyId(input.publicKeyPem) === claim.publicKeyHash
+      && verify(null, signedClaimBytes(claim), input.publicKeyPem, Buffer.from(claim.signature, 'base64'));
+  } catch { /* reported as an invalid signature */ }
+  const admission = admitKey({ publicKeyPem: input.publicKeyPem, purpose: 'session', signature: 'agent identity claim', context: input.context, claimedSignedAt: claim.issuedAt });
+  const trustTier = !sigValid ? 'UNVERIFIED' : admission.status === 'admitted' ? 'ATTESTED' : 'SELF_REPORTED';
+  return { ...scoreClaim(claim, policy, sigValid), integrity: sigValid ? 'ed25519' : 'none', trustTier, admission };
+}
+
+function scoreClaim(claim: AgentIdentityClaim, policy: TrustPolicyRule, sigValid: boolean): Omit<TrustVerificationResult, 'integrity' | 'trustTier'> {
   const reasons: string[] = [];
   let score = 0;
 
   // 1. Signature check (0.30)
-  const payload = `${claim.agentId}:${claim.publicKeyHash}:${claim.issuingWorkspace}:${claim.issuedAt.toISOString()}`;
-  const expectedSig = createHmac('sha256', sharedSecret).update(payload).digest('hex');
-  const sigValid = claim.signature === expectedSig;
   if (sigValid) { score += 0.30; reasons.push('Signature valid'); }
   else { reasons.push('SIGNATURE INVALID — claim may be forged'); }
 
