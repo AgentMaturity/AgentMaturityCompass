@@ -162,7 +162,7 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       novice: "AMC gives the operator a short-lived staging key when the release is built, and the production key only when the deployment is approved. Each key is shown once.",
       practitioner: "Staging lease: WRITE_LOW at most, the staging routes, 24 hours, minted inside the consumed release effect. Production lease: the answered scopes, routes and caps, "
         + "minted by the deployment approval. Tokens are answered once and never stored; a DENY of the deployment approval revokes the staging lease.",
-      expert: "issueLeaseToken({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h }); a4_requests keeps the projection; a replay answers token: null, TOKEN_ALREADY_DELIVERED." },
+      expert: "issueLeaseToken({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h }); a4_requests keeps the attempt id only; a replay answers token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
       practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated, `

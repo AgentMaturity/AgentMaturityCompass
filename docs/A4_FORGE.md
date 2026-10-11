@@ -398,8 +398,9 @@ clientRequestId }` (owner) consumes the release approval and runs the effect ins
    Comply, Fleet, Passport; Passport reads `not_evaluated` until P0-55), the previous and base release (TUNE lineage),
    the staging lease id and its own `A4_RECORD` envelope.
 
-The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the projection,
-and a replay answers `token: null` with `TOKEN_ALREADY_DELIVERED`. A failed attempt revokes the lease it minted, and a
+The response carries the staging token once. AMC stores it nowhere: the request's replay row keeps only the attempt id,
+and a replay answers from the chain: `token: null` with `TOKEN_ALREADY_DELIVERED` once that attempt finished, the
+attempt's own failure code when it failed, and `EFFECT_NOT_SETTLED` while it has not settled. A failed attempt revokes the lease it minted, and a
 retry revokes every lease an earlier attempt of the release minted before minting again. `GET …/releases/:rid` shows the
 record with its envelope checked now, each lease's live status and a reason for every surface not evaluated.
 

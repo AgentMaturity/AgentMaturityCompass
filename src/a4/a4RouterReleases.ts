@@ -1,7 +1,8 @@
 /**
  * The A4 release routes (P1-62; design §12.1, §14). POST …/releases (owner) consumes the release approval (Activate's
  * direction gate) and runs the opened a4.activate.release effect inside the request: the response carries the staging
- * lease token once, and the request's replay row keeps the projection only (token: null, TOKEN_ALREADY_DELIVERED).
+ * lease token once; the request's replay row keeps the attempt id only, and a replay answers that attempt's outcome
+ * (token: null, TOKEN_ALREADY_DELIVERED once it finished; its failure code otherwise).
  * GET …/releases and …/releases/:rid read the release records (chain-named a4_releases rows) with their A4_RECORD
  * envelope checked now, the leases' live status, the eight-surface table, the prepared plan, the receipts in two
  * columns and the rollbacks. Slice B (owner, owner mode): POST …/releases/:rid/deployments records the operator's

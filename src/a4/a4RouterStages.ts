@@ -30,7 +30,7 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import { flatSlots,
-  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4Principal, type A4Question, type A4Stage, type A4Step
+  a4AnswerSchema, a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Answer, type A4ChainLink, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
@@ -372,23 +372,46 @@ async function runEffect(route: A4Route, projectId: string, attemptId: string): 
     pendingExecutors.delete(attemptId);
   }
   if (!settled.replay && settled.kind === "EFFECT_FINISHED") return { attemptId, effect: { status: "finished", seq: settled.seq }, ...settled.deliver };
-  const error = settled.replay ? "EFFECT_NOT_SETTLED" : String(route.store.readChain(projectId).find((link) => link.seq === settled.seq)?.body.error ?? "EFFECT_FAILED");
+  throw effectFailure(projectId, started, attemptId,
+    settled.replay ? "EFFECT_NOT_SETTLED" : String(route.store.readChain(projectId).find((link) => link.seq === settled.seq)?.body.error ?? "EFFECT_FAILED"));
+}
+
+/** An inline effect's failure as its request answers it: its own code (423 for a locked vault, else 409) and the retry route. */
+function effectFailure(projectId: string, started: A4ChainLink | undefined, attemptId: string, error: string): Error {
+  const effect = String(started?.body.effect);
   const code = /^[A-Z][A-Z0-9_]{2,63}/.exec(error)?.[0] ?? "EFFECT_FAILED";
-  throw a4Fail(code === "A4_VAULT_LOCKED" ? 423 : 409, code, `The ${effect} effect failed after the gate was consumed: ${error}`,
+  return a4Fail(code === "A4_VAULT_LOCKED" ? 423 : 409, code, `The ${effect} effect failed after the gate was consumed: ${error}`,
     { attemptId, retry: `POST /api/v1/a4/projects/${projectId}/stages/${String(started?.body.stage)}/effects/${effect}/retry` });
 }
 
 /**
+ * What a replay of a request that started an inline effect's attempt answers, from the chain and never from a delivery
+ * claim: once that attempt finished, its stored answer with token null (TOKEN_ALREADY_DELIVERED); a failed attempt, its
+ * failure as the request answered it; one not settled yet, 409 EFFECT_NOT_SETTLED. Any other replay answers as stored.
+ */
+function attemptReplay(route: A4Route, projectId: string, replay: Record<string, unknown>): Record<string, unknown> {
+  const attemptId = replay.attemptId;
+  if (typeof attemptId !== "string") return replay;
+  const chain = route.store.readChain(projectId);
+  const started = chain.find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === attemptId);
+  if (started === undefined || !inlineEffect(String(started.body.effect))) return replay;
+  const outcome = chain.find((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.effectId === attemptId);
+  if (outcome?.kind === "EFFECT_FINISHED") return { ...replay, effect: { status: "finished", seq: outcome.seq }, token: null, reasonCode: "TOKEN_ALREADY_DELIVERED" };
+  throw effectFailure(projectId, started, attemptId, outcome === undefined ? "EFFECT_NOT_SETTLED" : String(outcome.body.error ?? "EFFECT_FAILED"));
+}
+
+/**
  * `complete` (design §6.5; POST …/releases runs it on Activate's direction gate): consumes the gate and runs the effect
- * it starts, an inline one before answering (runEffect).
+ * it starts, an inline one before answering (runEffect). A replay answers the attempt's outcome (attemptReplay).
  */
 export async function completeAndRun(route: A4Route, projectId: string, stage: A4Stage, body: { gateId: string; expectedHeadSeq: number },
   request: A4RequestKey | undefined): Promise<true> {
   const replay = priorReplay(route.store, request, projectId);
-  if (replay) return (apiSuccess(route.res, replay), true);
+  if (replay) return (apiSuccess(route.res, attemptReplay(route, projectId, replay)), true);
   // complete evaluates integrity in full (verifyA4Chain), as GET and verify do (design §7); the effect comes from the chain.
   const started = completeStage(route.store, projectId, { ...callOf(route, request, true), stage, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
-  const ran = started.attemptId === null || started.result.replay ? {} : { attemptId: started.attemptId, ...await runEffect(route, projectId, started.attemptId) };
+  if (started.result.replay) return (apiSuccess(route.res, attemptReplay(route, projectId, mutationResult(started.result))), true);
+  const ran = started.attemptId === null ? {} : { attemptId: started.attemptId, ...await runEffect(route, projectId, started.attemptId) };
   apiSuccess(route.res, mutationResult(started.result, ran));
   return true;
 }
@@ -527,12 +550,12 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     }
     const { body, request } = await readJson(route, z.strictObject({ ...base, attemptId: z.string().regex(/^a4e_[0-9a-f]{32}$/) }));
     const replay = priorReplay(store, request, projectId);
-    if (replay) return (apiSuccess(route.res, replay), true);
+    if (replay) return (apiSuccess(route.res, attemptReplay(route, projectId, replay)), true);
     const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === body.attemptId);
     if (started?.body.effect !== effectId) throw a4Fail(404, "A4_EFFECT_NOT_FOUND", `no attempt ${body.attemptId} of effect ${effectId}`);
     const retried = retryEffect(store, projectId, { ...callOf(route, request), attemptId: body.attemptId, expectedHeadSeq: body.expectedHeadSeq });
-    const ran = retried.result.replay ? {} : { attemptId: retried.attemptId, ...await runEffect(route, projectId, retried.attemptId) };
-    apiSuccess(route.res, mutationResult(retried.result, ran), 201);
+    if (retried.result.replay) return (apiSuccess(route.res, attemptReplay(route, projectId, mutationResult(retried.result))), true);
+    apiSuccess(route.res, mutationResult(retried.result, { attemptId: retried.attemptId, ...await runEffect(route, projectId, retried.attemptId) }), 201);
     return true;
   }
   const observe = /^\/hypotheses\/([A-Za-z0-9_.-]{1,128})\/observe$/.exec(tail);

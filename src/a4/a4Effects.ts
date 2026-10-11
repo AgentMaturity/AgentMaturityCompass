@@ -76,8 +76,9 @@ export interface A4EffectDef {
   readonly optional?: boolean;
   /**
    * Runs inside the request that started the attempt (complete or retry), which answers its `deliver` once, so a
-   * credential it mints is never delivered to nobody; that request's replay row keeps the allowlist projection only
-   * (token: null, TOKEN_ALREADY_DELIVERED). Every other effect runs after the response.
+   * credential it mints is never delivered to nobody. That request's replay row keeps the attempt id only (the store
+   * never sees the delivery), and a replay answers the attempt's outcome from the chain (src/a4/a4RouterStages.ts): token
+   * null with TOKEN_ALREADY_DELIVERED once it finished, its failure code otherwise. Every other effect runs after the response.
    */
   readonly inline?: boolean;
   /** Deterministic from the rows, e.g. `a4-apply-<manifestId>`. */
@@ -110,9 +111,6 @@ const effectDef = (id: string): A4EffectDef => {
   if (def === undefined) throw fail(404, "A4_EFFECT_UNKNOWN", `no A4 effect ${id} is registered`);
   return def;
 };
-/** An inline effect's request key stores the credential projection only (src/a4/a4Store.ts dedupeRequest), never its answer. */
-const requestFor = (def: A4EffectDef, request: A4Call["request"]): A4Call["request"] =>
-  def.inline === true && request !== undefined ? { ...request, credential: { releaseId: def.id, leaseIds: [] } } : request;
 const effectIntent = (def: A4EffectDef, state: A4ReadinessState, gate: A4GateRow): Record<string, unknown> =>
   def.intent?.(state, gate) ?? { schema: "amc.a4-effect-intent/v1", projectId: state.project.project_id, gateId: gate.gate_id, effect: def.id,
     bindingDigest: gate.binding_digest, executionId: def.executionId(state, gate) };
@@ -426,7 +424,7 @@ export function completeWithEffect(store: A4Store, projectId: string, input: A4C
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
-  const result = consumeGate(store, projectId, { ...input, request: requestFor(def, input.request), response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
+  const result = consumeGate(store, projectId, { ...input, response: { attemptId } }, ({ state, row, principal, regulated, ts }) => {
     const executionId = def.executionId(state, row);
     // A gate-quorum effect is authorized by the GATE_CONSUMED this transaction writes; it has no engine request.
     if (def.consumes === "gate") {
@@ -459,7 +457,7 @@ function rerunExecutorEffect(store: A4Store, projectId: string, def: A4EffectDef
   const now = Date.now();
   const attemptId = randomId("a4e");
   const call = withFullIntegrity(store, projectId, input);
-  const result = governed(store, projectId, principal, { ...input, request: requestFor(def, input.request), response: { attemptId } }, (ts, load) => {
+  const result = governed(store, projectId, principal, { ...input, response: { attemptId } }, (ts, load) => {
     const state = load(now);
     const row = gateRowOf(state, input.gateId);
     if (row.stage !== input.stage) throw fail(409, "A4_STEP_ORDER", "That gate does not complete this stage.");
@@ -638,11 +636,9 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
   const nextAttempt = randomId("a4e");
   // A dead or silent earlier attempt of this execution is settled first, as amc-runtime under the liveness rule, so the
   // retry rule sees its failure; the head the client saw moves by exactly those rows (anything else is still stale).
-  const started0 = startedLink(store.readChain(projectId), input.attemptId);
-  const executionId0 = String(started0.body.executionId);
+  const executionId0 = String(startedLink(store.readChain(projectId), input.attemptId).body.executionId);
   const swept = sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: executionId0 }).length;
-  const request = requestFor(effectDef(String(started0.body.effect)), input.request);
-  const result = governed(store, projectId, principal, { ...input, request, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts, load) => {
+  const result = governed(store, projectId, principal, { ...input, expectedHeadSeq: input.expectedHeadSeq + swept, response: { attemptId: nextAttempt } }, (ts, load) => {
     const state = load(now);
     const started = startedLink(state.chain, input.attemptId);
     const def = effectDef(String(started.body.effect));
