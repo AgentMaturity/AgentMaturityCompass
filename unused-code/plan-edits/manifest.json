@@ -124,7 +124,7 @@
     {
       "path": "src/auth/humanLog.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/auth/humanLog.ts.landed",
       "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
     },
@@ -159,7 +159,7 @@
     {
       "path": "src/casebooks/casebookStore.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/casebooks/casebookStore.ts.landed",
       "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
     },
@@ -180,7 +180,7 @@
     {
       "path": "src/corrections/lessonStore.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/corrections/lessonStore.ts.landed",
       "sha256": "86b7e1fdc0fead2c917dcfa83f22e8804550f1c901ae5080d7f1ff2c52478469"
     },
@@ -278,7 +278,7 @@
     {
       "path": "src/governor/policyDebt.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/governor/policyDebt.ts.landed",
       "sha256": "65cca06ec04b9f961ebfecb66f4e8c807817188c0235bcc0b4f4472ed1841cf8"
     },
@@ -348,7 +348,7 @@
     {
       "path": "src/ops/retention/retentionArchive.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/ops/retention/retentionArchive.ts.landed",
       "sha256": "5b0f86069ea1a4efe7f0810274ee9701c91f1a4d664da490caf82d308a423445"
     },
@@ -362,14 +362,14 @@
     {
       "path": "src/outcomes/outcomeContractEngine.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/outcomes/outcomeContractEngine.ts.landed",
       "sha256": "51ba7ab24c1d190629f771ebab1e74780fea4b0a3012d26ff49fe1a34f72f24f"
     },
     {
       "path": "src/pairing/lanMode.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/pairing/lanMode.ts.landed",
       "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
     },
@@ -418,7 +418,7 @@
     {
       "path": "src/storage/blobs/blobStore.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/storage/blobs/blobStore.ts.landed",
       "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
     },
@@ -460,7 +460,7 @@
     {
       "path": "src/workorders/workorderEngine.ts",
       "issue": "P1-08",
-      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/workorders/workorderEngine.ts.landed",
       "sha256": "ced036fc4c9be0c9e2ca531200eb74b4b824610659eeb0547475ef7d6b3ac38f"
     },
