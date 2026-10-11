@@ -67,7 +67,8 @@ export function assertNotRolledBack(target: AnchorTarget): void {
   if (recorded !== null && recorded.sequence === target.sequence) return;
   const logged = loggedAnchor(target.workspace, target.type, target.id);
   compareHighWater(`${target.id} in the workspace transparency log`, logged, target.sequence, target.sha256);
-  if (target.entryHash !== undefined && logged !== null && logged.sequence === target.sequence && target.entryHash !== logged.entryHash) {
+  // A null anchor is a file written inside a key-set commit and logged after it; its content is still bound by the log.
+  if (target.entryHash != null && logged !== null && logged.sequence === target.sequence && target.entryHash !== logged.entryHash) {
     throw new AntiRollbackError("FORK_DETECTED", `${target.id}#${target.sequence} names transparency entry ${target.entryHash ?? "none"}, not the logged ${logged.entryHash}`);
   }
   recordHighWater(key, target.sequence, identity);

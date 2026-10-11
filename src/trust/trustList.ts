@@ -127,7 +127,9 @@ export const trustListSchema = z.strictObject({
     .optional(),
   transparencyLogs: z.array(transparencyLogSchema).max(64)
     .refine(logs => new Set(logs.map(log => log.logId)).size === logs.length, "duplicate logId")
-    .optional()
+    .optional(),
+  /** P1-08: the list's own m-of-n floor. Verifiers need this many distinct pinned roots whatever their local policy says. */
+  rootThreshold: z.number().int().positive().max(64).optional()
 });
 
 /** One row per root key, each in its one canonical base64 spelling, so a list has no second encoding of the same signatures. */
@@ -177,7 +179,8 @@ export function signTrustList(list: TrustList, rootPrivateKeyPem: string): Signe
 export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds: readonly string[]; now: Date; threshold?: number }): TrustList {
   const { list, signatures } = parseTrustValue(signedTrustListSchema, signed, "signed trust list");
   const bytes = signedBytes(list);
-  const threshold = Math.max(1, opts.threshold ?? 1);
+  // Never below the floor the signed list declares: a weaker local policy cannot downgrade m-of-n.
+  const threshold = Math.max(1, opts.threshold ?? 1, list.rootThreshold ?? 1);
   const bad = signatures.find(({ keyId, publicKeyPem, signature }) => {
     if (ed25519KeyId(publicKeyPem) !== keyId) return true;
     try {

@@ -8,6 +8,9 @@ import { buildKeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import { keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
 import { assertKeysetComplete, commitKeyset, type KeysetWrite } from "../keys/keyset.js";
+import { machineMark } from "../keys/anchors.js";
+import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
+import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
 import { canonicalize } from "../utils/json.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
@@ -246,6 +249,19 @@ function publicKeyWrites(workspace: string, payload: VaultPayload, existingVault
   return writes;
 }
 
+/**
+ * Every key set carries the workspace key revocation list, so a missing list is refused rather than read as empty. A
+ * new key set starts it empty, above any sequence this machine accepted for the list; an existing one is kept.
+ */
+function emptyKeyRevocationList(workspace: string, payload: VaultPayload): KeysetWrite[] {
+  const location = keyRevocationLocation(workspace, []);
+  const key = payload.keys["revocation-list"];
+  if (pathExists(location.path) || !key) return [];
+  const sequence = (machineMark(workspace, "REVOCATION_LIST", location.listId)?.sequence ?? 0) + 1;
+  const list = { type: "amc.revocation-list" as const, version: 1 as const, listId: location.listId, sequence, previousSha256: null, issuedAt: new Date().toISOString(), revoked: [] };
+  return [{ path: location.path, bytes: encodeSignedRevocationList(signRevocationList(list, key.privateKeyPem)), mode: 0o644 }];
+}
+
 /** Publishes a whole vault (new, migrated or upgraded) as one key-set generation. */
 function persistVault(workspace: string, payload: VaultPayload, passphrase: string, extra: readonly KeysetWrite[] = []): void {
   const paths = vaultPaths(workspace);
@@ -255,7 +271,8 @@ function persistVault(workspace: string, payload: VaultPayload, passphrase: stri
     ...extra,
     { path: paths.vaultFile, bytes: encryptedVaultBytes(payload, passphrase), mode: 0o600 },
     { path: paths.metaFile, bytes: vaultMetaBytes(payload), mode: 0o644 },
-    ...publicKeyWrites(workspace, payload, existingVault)
+    ...publicKeyWrites(workspace, payload, existingVault),
+    ...emptyKeyRevocationList(workspace, payload)
   ];
   commitKeyset(workspace, { keys: keyIdsOf(payload), writes });
   markWrittenHistories(workspace, writes);
@@ -451,7 +468,7 @@ function generateEphemeralKey(kind: string): string {
  * The unlocked payload whose keys the committed key set names, or null in no-sign mode. A key set that is incomplete
  * refuses to sign; a session opened before another process committed a new generation re-reads the vault once.
  */
-function signingPayload(workspace: string): VaultPayload | null {
+function signingPayload(workspace: string): { payload: VaultPayload; keysetPresent: boolean } | null {
   const session = sessionFor(workspace);
   if (!session.unlocked || !session.payload) {
     const fromEnv = process.env.AMC_VAULT_PASSPHRASE;
@@ -466,26 +483,37 @@ function signingPayload(workspace: string): VaultPayload | null {
     if (process.env.AMC_NO_SIGN === "1") return null;
     throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
   }
+  // Unlocking writes a key set (creation and the v1 migration both commit one), so an unlocked vault without one lost it:
+  // refuse rather than sign with nothing binding the vault's keys, their revocations or this machine's marks.
   const keyset = assertKeysetComplete(workspace);
-  const matches = (payload: VaultPayload) => keyset === null || LOCAL_PURPOSES.every(purpose => keyset.keys[purpose] === undefined || keyset.keys[purpose] === payload.keys[purpose]?.keyId);
-  if (matches(refreshed.payload)) return refreshed.payload;
+  if (keyset === null) throw new Error("🔐 This vault has no key set (.amc/keys/keyset.json); refusing to sign. Restore it with the vault, or run `amc keys rotate --resume`.");
+  const matches = (payload: VaultPayload) => LOCAL_PURPOSES.every(purpose => keyset.keys[purpose] === undefined || keyset.keys[purpose] === payload.keys[purpose]?.keyId);
+  if (matches(refreshed.payload)) return { payload: refreshed.payload, keysetPresent: true };
   const payload = requireUnlockedPayload(workspace);
-  if (!matches(payload)) throw new Error(`🔐 The unlocked vault does not hold the keys key set generation ${keyset!.generation} names; refusing to sign.`);
-  return payload;
+  if (!matches(payload)) throw new Error(`🔐 The unlocked vault does not hold the keys key set generation ${keyset.generation} names; refusing to sign.`);
+  return { payload, keysetPresent: true };
+}
+
+/** P1-08: a key is resolved only when the workspace key revocation list, read now, does not name it. */
+function usableKey(workspace: string, resolved: { payload: VaultPayload; keysetPresent: boolean }, purpose: LocalPurpose): string {
+  const key = resolved.payload.keys[purpose];
+  if (!key) return "";
+  assertKeyNotRevoked(workspace, resolved.keysetPresent, key.keyId, purpose);
+  return key.privateKeyPem;
 }
 
 export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): string {
-  const payload = signingPayload(workspace);
-  return payload === null ? generateEphemeralKey(kind) : roleKeyPem(payload, kind);
+  const resolved = signingPayload(workspace);
+  return resolved === null ? generateEphemeralKey(kind) : usableKey(workspace, resolved, ROLE_PRIMARY_PURPOSE[kind]);
 }
 
 /** P1-08: the private key for one local signing purpose (src/keys/purposeKeys.ts getSigningKey). */
 export function getVaultPurposeKeyPem(workspace: string, purpose: LocalPurpose): string {
-  const payload = signingPayload(workspace);
-  if (payload === null) return generateEphemeralKey(`purpose:${purpose}`);
-  const key = payload.keys[purpose];
-  if (!key) throw new Error(`The vault holds no ${purpose} key.`);
-  return key.privateKeyPem;
+  const resolved = signingPayload(workspace);
+  if (resolved === null) return generateEphemeralKey(`purpose:${purpose}`);
+  const pem = usableKey(workspace, resolved, purpose);
+  if (!pem) throw new Error(`The vault holds no ${purpose} key.`);
+  return pem;
 }
 
 /** Unlocks with `passphrase` and returns the payload for a key change (rotation); never served in no-sign mode. */

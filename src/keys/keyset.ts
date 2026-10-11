@@ -12,26 +12,39 @@
  * `amc keys rotate --resume`". The vault, its meta and the histories it lists may change later on their own (a secret
  * write, an explicit history admission) and are authenticated by the vault and their signatures instead. Resume rolls
  * forward when every staged file is intact, else rolls back from `.amc/keys/rotations/gen-<N>/`, which holds the bytes
- * of every file the generation replaced (none for a new vault, whose rollback removes what it created).
+ * of every file the generation replaced; what the generation had written is kept in `gen-<N>/discarded/`, never deleted.
  */
-import { renameSync, rmSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { lstatSync, realpathSync, renameSync, rmSync, statSync } from "node:fs";
+import { dirname, join, relative, sep } from "node:path";
 import { z } from "zod";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { ensureDir, pathExists, readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
-import { AntiRollbackError, checkHighWater, highWaterKey, readHighWater, recordHighWater, workspaceScope } from "./highWater.js";
+import { AntiRollbackError, checkHighWater, highWaterKey, highWaterPath, readHighWater, recordHighWater, workspaceScope } from "./highWater.js";
 
+/**
+ * The only files a key set may name, relative to `.amc`: the vault and its meta, key files, history backups, the key
+ * revocation list and rotation statements. Anything else (`..`, an absolute path, a separator or NUL inside a name, a
+ * look-alike Unicode slash) never reaches a filesystem call.
+ */
+const KEYSET_FILE = /^(?:vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json))$/;
+const relSchema = z.string().regex(KEYSET_FILE, "not a key-set file");
 const hex = z.string().regex(/^[0-9a-f]{64}$/);
 const keysetSchema = z.strictObject({
   type: z.literal("amc.keyset"),
   version: z.literal(1),
   generation: z.number().int().positive().safe(),
   keys: z.partialRecord(z.enum(LOCAL_PURPOSES), hex),
-  files: z.record(z.string().regex(/^[A-Za-z0-9._/-]+$/), hex),
+  files: z.record(relSchema, hex),
   statements: z.array(hex)
+});
+const manifestSchema = z.strictObject({
+  generation: z.number().int().positive().safe(),
+  previousGeneration: z.number().int().positive().safe().nullable(),
+  files: z.array(z.strictObject({ rel: relSchema, existed: z.boolean(), mode: z.number().int().min(0).max(0o777) }))
 });
 export type Keyset = z.infer<typeof keysetSchema>;
 
@@ -56,9 +69,48 @@ export function keysetPaths(workspace: string): { keyset: string; pending: strin
   return { keyset: join(keys, "keyset.json"), pending: join(keys, "keyset.pending.json"), rotations: join(keys, "rotations") };
 }
 
+/**
+ * The absolute path of one key-set file: allowlisted, resolved under `.amc`, and with every existing directory between
+ * `.amc` and the file a real directory (no symlink can carry a write, rename or delete elsewhere).
+ */
+export function keysetFilePath(workspace: string, rel: string): string {
+  relSchema.parse(rel);
+  const path = containedPath(amcDir(workspace), ".amc", rel);
+  assertRealDirectories(workspace, dirname(path), rel);
+  return path;
+}
+
+/** Every existing directory from `dir` up to `.amc` is a real directory inside `.amc`, never a symlink. */
+function assertRealDirectories(workspace: string, dir: string, what: string): void {
+  const root = amcDir(workspace);
+  for (let current = dir; current.length > root.length; current = dirname(current)) {
+    try {
+      if (lstatSync(current).isSymbolicLink()) throw new Error(`key-set path ${what} passes through a symlink`);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+  if (pathExists(dir)) {
+    const real = realpathSync(dir);
+    const realRoot = realpathSync(root);
+    if (real !== realRoot && !real.startsWith(`${realRoot}${sep}`)) throw new Error(`key-set path ${what} resolves outside .amc`);
+  }
+}
+
+function relOf(workspace: string, path: string): string {
+  const rel = relative(amcDir(workspace), path).split(sep).join("/");
+  keysetFilePath(workspace, rel);
+  return rel;
+}
+
 function readKeysetFile(path: string): Keyset | null {
   if (!pathExists(path)) return null;
-  return keysetSchema.parse(parseCanonicalJson(readRegularFileNoFollow(path, MAX_BYTES)));
+  const parsed = keysetSchema.safeParse((() => { try { return parseCanonicalJson(readRegularFileNoFollow(path, MAX_BYTES)); } catch { return null; } })());
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    throw new Error(`key set ${path} is not a valid amc.keyset (${issue ? `${issue.path.join(".")}: ${issue.message}` : "unreadable"}); refusing to sign`);
+  }
+  return parsed.data;
 }
 
 const fileSha = (path: string): string | null => pathExists(path) ? sha256Hex(readRegularFileNoFollow(path, 256 * 1024 * 1024)) : null;
@@ -69,6 +121,12 @@ const markKey = (workspace: string) => highWaterKey("keyset", workspaceScope(wor
 const checked = new Map<string, { stamp: string; keyset: Keyset | null }>();
 function stamp(paths: readonly string[]): string {
   return paths.map(path => { try { const s = statSync(path); return `${s.ino}:${s.size}:${s.mtimeMs}`; } catch { return "-"; } }).join("|");
+}
+
+/** Whether this workspace has, or this machine accepted, a key set: P1-08 purpose files must then exist. */
+export function keysetDeclared(workspace: string): boolean {
+  const paths = keysetPaths(workspace);
+  return pathExists(paths.keyset) || pathExists(paths.pending) || readHighWater(markKey(workspace)) !== null;
 }
 
 /**
@@ -97,13 +155,13 @@ export function assertKeysetComplete(workspace: string): Keyset | null {
     if (accepted !== null) throw new AntiRollbackError("ROLLBACK_DETECTED", `keyset.json is missing, but generation ${accepted.sequence} was accepted on this machine`);
     return null;
   }
-  const listed = Object.keys(keyset.files).filter(pinned).map(rel => join(amcDir(workspace), rel));
-  const now = stamp([paths.keyset, ...listed]);
+  const listed = Object.keys(keyset.files).filter(pinned).map(rel => keysetFilePath(workspace, rel));
+  const now = stamp([paths.keyset, highWaterPath(), ...listed]);
   const memo = checked.get(workspace);
   if (memo && memo.stamp === now) return memo.keyset;
   for (const [rel, digest] of Object.entries(keyset.files)) {
     if (!pinned(rel)) continue;
-    if (fileSha(join(amcDir(workspace), rel)) !== digest) throw new KeysetIncompleteError(keyset.generation, `${rel} does not have the digest generation ${keyset.generation} recorded`);
+    if (fileSha(keysetFilePath(workspace, rel)) !== digest) throw new KeysetIncompleteError(keyset.generation, `${rel} does not have the digest generation ${keyset.generation} recorded`);
   }
   checkHighWater(markKey(workspace), keyset.generation, sha256Hex(canonicalize(keyset)));
   checked.set(workspace, { stamp: now, keyset });
@@ -131,18 +189,20 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
     // A key set re-created after its files were removed continues past the generation this machine accepted.
     const current = pathExists(paths.keyset) ? assertKeysetComplete(workspace) : null;
     const generation = Math.max(current?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
-    const files = Object.fromEntries(change.writes.map(write => [relative(amcDir(workspace), write.path), sha256Hex(Buffer.from(write.bytes))]));
+    const files = Object.fromEntries(change.writes.map(write => [relOf(workspace, write.path), sha256Hex(Buffer.from(write.bytes))]));
+    for (const write of change.writes) ensureDir(dirname(write.path)); // only after every path was checked
     const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])] });
     const manifest = change.writes.map(write => ({
-      rel: relative(amcDir(workspace), write.path),
+      rel: relOf(workspace, write.path),
       existed: pathExists(write.path),
       mode: pathExists(write.path) ? statSync(write.path).mode & 0o777 : write.mode
     }));
     if (manifest.some(row => row.existed)) {
       const recovery = join(paths.rotations, `gen-${generation}`);
+      assertRealDirectories(workspace, recovery, `rotations/gen-${generation}`);
       ensureDir(recovery);
       for (const row of manifest) {
-        if (row.existed) writeFileAtomic(join(recovery, recoveryName(row.rel)), readRegularFileNoFollow(join(amcDir(workspace), row.rel), 256 * 1024 * 1024), 0o600);
+        if (row.existed) writeFileAtomic(join(recovery, recoveryName(row.rel)), readRegularFileNoFollow(keysetFilePath(workspace, row.rel), 256 * 1024 * 1024), 0o600);
       }
       writeFileAtomic(join(recovery, "manifest.json"), JSON.stringify({ generation, previousGeneration: current?.generation ?? null, files: manifest }, null, 2), 0o600);
     }
@@ -172,7 +232,7 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
     if (!pathExists(paths.pending)) return { action: "nothing-pending" as const, generation: null };
     const pending = readKeysetFile(paths.pending)!;
-    const entries = Object.entries(pending.files).map(([rel, digest]) => ({ rel, digest, target: join(amcDir(workspace), rel) }));
+    const entries = Object.entries(pending.files).map(([rel, digest]) => ({ rel, digest, target: keysetFilePath(workspace, rel) }));
     const ready = entries.every(({ target, digest }) => fileSha(`${target}${STAGED}`) === digest || fileSha(target) === digest);
     if (ready) {
       for (const { target } of entries) if (pathExists(`${target}${STAGED}`)) renameSync(`${target}${STAGED}`, target);
@@ -182,15 +242,20 @@ export function resumeKeyset(workspace: string): { action: "nothing-pending" | "
       return { action: "completed" as const, generation: pending.generation };
     }
     const recovery = join(paths.rotations, `gen-${pending.generation}`);
+    assertRealDirectories(workspace, recovery, `rotations/gen-${pending.generation}`);
     // No manifest: the generation replaced nothing, so rolling back removes everything it was creating.
     const manifest = pathExists(join(recovery, "manifest.json"))
-      ? JSON.parse(readRegularFileNoFollow(join(recovery, "manifest.json"), MAX_BYTES).toString("utf8")) as { files: Array<{ rel: string; existed: boolean; mode: number }> }
+      ? manifestSchema.parse(JSON.parse(readRegularFileNoFollow(join(recovery, "manifest.json"), MAX_BYTES).toString("utf8")))
       : { files: Object.keys(pending.files).map(rel => ({ rel, existed: false, mode: 0o600 })) };
+    if (manifest.files.some(row => !Object.hasOwn(pending.files, row.rel))) throw new Error(`key set generation ${pending.generation}: its recovery manifest names files the generation did not write`);
+    // Rolling back never deletes key material: whatever the generation had put in place moves to discarded/ first.
+    const discarded = join(recovery, "discarded");
+    ensureDir(discarded);
     for (const { rel, existed, mode } of manifest.files) {
-      const target = join(amcDir(workspace), rel);
+      const target = keysetFilePath(workspace, rel);
+      if (pathExists(target)) renameSync(target, join(discarded, recoveryName(rel)));
       if (existed) writeFileAtomic(target, readRegularFileNoFollow(join(recovery, recoveryName(rel)), 256 * 1024 * 1024), mode);
-      else rmSync(target, { force: true });
-      rmSync(`${target}${STAGED}`, { force: true });
+      if (pathExists(`${target}${STAGED}`)) renameSync(`${target}${STAGED}`, join(discarded, `${recoveryName(rel)}${STAGED}`));
     }
     rmSync(paths.pending, { force: true });
     return { action: "rolled-back" as const, generation: pending.generation };

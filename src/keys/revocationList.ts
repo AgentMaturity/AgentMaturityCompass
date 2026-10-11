@@ -121,6 +121,11 @@ export function readAnchoredRevocationList(location: AnchoredListLocation): Sign
   return signed;
 }
 
+/** The staged next list of an in-progress or interrupted write, verified like the list itself (no anchors: it is not final). */
+export function readStagedRevocationList(location: AnchoredListLocation): SignedRevocationList {
+  return verifySignedRevocationListBytes(readRegularFileNoFollow(`${location.path}.pending`, MAX_REVOCATION_LIST_BYTES), location);
+}
+
 function writeFinal(location: AnchoredListLocation, signed: SignedRevocationList): void {
   const bytes = encodeSignedRevocationList(signed);
   writeFileAtomic(location.path, bytes, 0o644);

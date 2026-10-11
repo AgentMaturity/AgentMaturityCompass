@@ -14,7 +14,7 @@ import { readRegularFileNoFollow, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 
-export type HighWaterKind = "trust-list" | "revocation-list" | "key-history" | "rotation" | "keyset";
+export type HighWaterKind = "trust-list" | "trust-list-version" | "trust-list-threshold" | "revocation-list" | "key-history" | "rotation" | "keyset";
 export type AntiRollbackCode = "ROLLBACK_DETECTED" | "FORK_DETECTED";
 
 export class AntiRollbackError extends Error {

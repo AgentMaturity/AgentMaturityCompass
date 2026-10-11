@@ -30,9 +30,12 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertNeverAnchored, assertNotRolledBack, logSequence, machineMark, markSequence } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
-import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetPaths, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFilePath, keysetPaths, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
+export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
-  nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256, type AnchoredListLocation
+  encodeSignedRevocationList, nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256,
+  signRevocationList
 } from "./revocationList.js";
 import {
   DEFAULT_MAX_OVERLAP_DAYS, encodeRotationStatement, parseRotationStatement, rotationStatementSha256, signRotationStatement,
@@ -56,7 +59,10 @@ export function getSigningPublicKeyPem(workspace: string, purpose: KeyPurpose): 
   const local = assertLocal(purpose);
   assertNoPendingKeyset(workspace);
   const { publicFile } = purposeKeyPaths(workspace, local);
-  return readUtf8(pathExists(publicFile) ? publicFile : vaultPaths(workspace)[`${roleOfPurpose(local)}Public`]);
+  if (pathExists(publicFile)) return readUtf8(publicFile);
+  // A workspace with a key set always has purpose files: never fall back to the wider role key there.
+  if (keysetDeclared(workspace)) throw new Error(`${publicFile} is missing from a workspace with a key set; refusing to fall back to the ${roleOfPurpose(local)} role key`);
+  return readUtf8(vaultPaths(workspace)[`${roleOfPurpose(local)}Public`]);
 }
 
 function readHistory(workspace: string, subject: KeyHistorySubject, file: string, currentPublicPem: string): KeyHistoryEnvelope | null {
@@ -90,9 +96,10 @@ function statementDir(workspace: string, purpose: LocalPurpose): string {
 function readStatements(workspace: string, purpose: LocalPurpose): Buffer[] {
   const dir = statementDir(workspace, purpose);
   if (!pathExists(dir)) return [];
-  const sequences = readdirSync(dir).flatMap(name => /^([1-9][0-9]*)\.json$/.exec(name) ? [Number(name.slice(0, -5))] : []).sort((a, b) => a - b);
+  const sequences = readdirSync(dir).flatMap(name => /^[1-9][0-9]{0,15}\.json$/.test(name) ? [Number(name.slice(0, -5))] : []).sort((a, b) => a - b);
   sequences.forEach((sequence, index) => { if (sequence !== index + 1) throw new Error(`${purpose} rotation statements have a gap before sequence ${sequence}`); });
-  return sequences.map(sequence => readRegularFileNoFollow(join(dir, `${sequence}.json`), 64 * 1024));
+  // Each path is allowlisted and checked for symlinked directories before it is read.
+  return sequences.map(sequence => readRegularFileNoFollow(keysetFilePath(workspace, `keys/statements/${purpose}/${sequence}.json`), 64 * 1024));
 }
 
 /** The last statement of a purpose's chain, checked against both anchors so an older chain head is refused. */
@@ -195,16 +202,38 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   const nextPayload: VaultPayloadV2 = { ...payload, keys: nextKeys };
   const writes = rotationWrites(workspace, payload, nextPayload, targets, compromised, passphrase);
   writes.push(...statements.map(row => ({ path: row.path, bytes: row.bytes, mode: 0o644 })));
-  const keyset = commitKeyset(workspace, { keys: keyIdsOf(nextPayload), writes, statements: statements.map(row => row.sha256) });
-  forgetVaultEnvelope(workspace);
-  unlockVault(workspace, passphrase);
-  markWrittenHistories(workspace, writes);
-  anchorRotation(workspace, statements, writes);
+  // Serialized with amc keys revoke: a new revocation-list key re-signs the key revocation list in the same generation,
+  // so the list never stands signed only by a key the rotation dropped.
+  const keyset = withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
+    const resigned = targets.has("revocation-list") ? resignedKeyRevocations(workspace, nextPayload) : null;
+    if (resigned) writes.push(resigned.write);
+    const committed = commitKeyset(workspace, { keys: keyIdsOf(nextPayload), writes, statements: statements.map(row => row.sha256) });
+    forgetVaultEnvelope(workspace);
+    unlockVault(workspace, passphrase);
+    markWrittenHistories(workspace, writes);
+    anchorRotation(workspace, statements, writes);
+    if (resigned) {
+      logSequence(resigned.anchor);
+      markSequence(resigned.anchor);
+    }
+    return committed;
+  } });
   return {
     generation: keyset.generation,
     recoveryDirectory: join(keysetPaths(workspace).rotations, `gen-${keyset.generation}`),
     rotated: statements.map(row => ({ purpose: row.purpose, previousKeyId: row.previousKeyId, nextKeyId: nextKeys[row.purpose]!.keyId, reason: row.reason, statementPath: row.path }))
   };
+}
+
+/** The key revocation list's next sequence, same rows, signed by the rotation's new revocation-list key. */
+function resignedKeyRevocations(workspace: string, after: VaultPayloadV2): { write: KeysetWrite; anchor: Parameters<typeof markSequence>[0] } {
+  const location = keyRevocationLocation(workspace);
+  const current = readAnchoredRevocationList(location);
+  if (current === null && keysetDeclared(workspace)) throw new Error("the workspace key revocation list is missing; restore it before rotating the revocation-list key");
+  const list = nextRevocationList(location.listId, current ? { sequence: current.list.sequence, sha256: revocationListSha256(current.list) } : null, current?.list.revoked ?? [], 0);
+  const bytes = encodeSignedRevocationList(signRevocationList(list, after.keys["revocation-list"]!.privateKeyPem));
+  return { write: { path: location.path, bytes, mode: 0o644 },
+    anchor: { workspace, type: "REVOCATION_LIST", id: location.listId, sequence: list.sequence, sha256: revocationListSha256(list), fileSha256: sha256Hex(bytes) } };
 }
 
 /** The vault, its meta and every public file and history the rotation changes. */
@@ -321,30 +350,6 @@ export function listKeys(workspace: string): { generation: number | null; comple
   return { generation, complete: detail === null, detail, purposes };
 }
 
-const KEY_REVOCATION_REASONS = ["key-compromise", "superseded", "unspecified"] as const;
-export type KeyRevocationReason = (typeof KEY_REVOCATION_REASONS)[number];
-
-function keyRevocationLocation(workspace: string): AnchoredListLocation {
-  return { workspace, path: join(vaultPaths(workspace).keysDir, "revocations.signed.json"), listId: `keys:${workspaceIdFromDirectory(workspace)}`,
-    trustedPublicKeyPems: getPurposeKeyHistory(workspace, "revocation-list") };
-}
-
-/** The workspace's key revocations from one verified, rollback-checked read (none before the first revocation). */
-export function workspaceKeyRevocations(workspace: string): Array<{ keyId: string; revokedAt: string; reason: KeyRevocationReason }> {
-  const path = join(vaultPaths(workspace).keysDir, "revocations.signed.json");
-  // Absent file: this machine's mark alone answers whether a list existed (the self-check stays cheap on exports).
-  if (!pathExists(path)) {
-    if (machineMark(workspace, "REVOCATION_LIST", `keys:${workspaceIdFromDirectory(workspace)}`) !== null) {
-      throw new Error("ROLLBACK_DETECTED: the workspace key revocation list is missing, but this machine accepted one");
-    }
-    return [];
-  }
-  const signed = readAnchoredRevocationList(keyRevocationLocation(workspace));
-  return (signed?.list.revoked ?? []).filter(row => row.kind === "key").map(row => ({
-    keyId: row.id, revokedAt: row.revokedAt, reason: (KEY_REVOCATION_REASONS as readonly string[]).find(reason => row.reason.startsWith(`${reason}:`)) as KeyRevocationReason ?? "unspecified"
-  }));
-}
-
 /**
  * `amc keys revoke`: records that a retired key of `purpose` must no longer be admitted, in the workspace's signed,
  * sequenced and anchored key revocation list (`.amc/keys/revocations.signed.json`, revocation-list purpose). A key a
@@ -363,7 +368,10 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
     const location = keyRevocationLocation(workspace);
     recoverPendingRevocationList(location);
     const current = readAnchoredRevocationList(location);
-    if (current === null) assertNeverAnchored(workspace, "REVOCATION_LIST", location.listId);
+    if (current === null) {
+      if (keysetDeclared(workspace)) throw new Error("the workspace key revocation list is missing; restore it before revoking");
+      assertNeverAnchored(workspace, "REVOCATION_LIST", location.listId);
+    }
     const rows = [...(current?.list.revoked ?? []).filter(row => row.id !== keyId),
       { id: keyId, kind: "key" as const, revokedAt: new Date().toISOString(), reason: `${reason}: ${local}` }];
     const previous = current ? { sequence: current.list.sequence, sha256: revocationListSha256(current.list) } : null;

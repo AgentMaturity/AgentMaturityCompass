@@ -1,12 +1,17 @@
 import { generateKeyPairSync } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { highWaterPath } from "../../src/keys/highWater.js";
+import { keysetPaths } from "../../src/keys/keyset.js";
+import { encodeSignedRevocationList, nextRevocationList, readAnchoredRevocationList, revocationListSha256, signRevocationList } from "../../src/keys/revocationList.js";
+import { canonicalize } from "../../src/utils/json.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createKeyRotationReceipt, verifyKeyRotationReceipt } from "../../src/crypto/keyRotationReceipt.js";
 import { getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
 import {
-  exportPublicKey, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, listKeys, revokeKey, rotatePurposeKeys, verifyProofOfPossession
+  exportPublicKey, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, listKeys, resumeKeyRotation, revokeKey, rotatePurposeKeys, verifyProofOfPossession
 } from "../../src/keys/purposeKeys.js";
 import { verifyRotationStatement } from "../../src/keys/rotationStatement.js";
 import { admitKey, ed25519KeyId, workspaceSelfTrust } from "../../src/trust/index.js";
@@ -95,7 +100,8 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const old = getSigningPublicKeyPem(root, "artifact-seal");
     expect(() => revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "superseded")).toThrow(/rotate it first/);
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
-    expect(revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toMatchObject({ listId: "keys:default", sequence: 1 });
+    // Sequence 1 at creation, 2 when the rotated revocation-list key re-signed it, 3 for this revocation.
+    expect(revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toMatchObject({ listId: "keys:default", sequence: 3 });
     expect(admitKey({ publicKeyPem: old, purpose: "artifact-seal", signature: "s", context: workspaceSelfTrust(root) }).status).toBe("distrusted");
     expect(() => revokeKey(root, "artifact-seal", "0".repeat(64), "superseded")).toThrow(/not in the artifact-seal key history/);
   });
@@ -125,5 +131,138 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const next = pem();
     const receipt = createKeyRotationReceipt({ previousPrivateKeyPem: previous.privatePem, nextPublicKeyPem: next.publicPem, previousHistorySha256: "a".repeat(64), nextHistorySha256: "b".repeat(64) });
     expect(verifyKeyRotationReceipt(receipt, sha256Hex(Buffer.from(previous.publicPem, "utf8")))).toBe(true);
+  });
+});
+
+describe("key use refuses revoked keys and unreadable revocation state (P1-08, security review)", () => {
+  const keysList = (root: string) => join(root, ".amc", "keys", "revocations.signed.json");
+  const revokedRotation = (): { root: string; old: string } => {
+    const root = workspace();
+    const old = getSigningPublicKeyPem(root, "artifact-seal");
+    rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
+    revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "superseded");
+    return { root, old };
+  };
+
+  it("refuses a current key the signed key revocation list names, at use time", () => {
+    const root = workspace();
+    expect(getSigningKey(root, "artifact-seal")).toBeTruthy();
+    const location = { workspace: root, path: keysList(root), listId: "keys:default", trustedPublicKeyPems: getPurposeKeyHistory(root, "revocation-list") };
+    const current = readAnchoredRevocationList(location)!;
+    const keyId = ed25519KeyId(getSigningPublicKeyPem(root, "artifact-seal"))!;
+    // A validly signed newer list naming the key in use (written directly; amc keys revoke refuses a key in use).
+    const list = nextRevocationList("keys:default", { sequence: current.list.sequence, sha256: revocationListSha256(current.list) },
+      [{ id: keyId, kind: "key", revokedAt: new Date().toISOString(), reason: "key-compromise: artifact-seal" }], 0);
+    writeFileSync(keysList(root), encodeSignedRevocationList(signRevocationList(list, getSigningKey(root, "revocation-list"))));
+    expect(() => getSigningKey(root, "artifact-seal")).toThrow(/revoked/);
+    expect(() => getPrivateKeyPem(root, "auditor")).toThrow(/revoked/);
+    expect(getSigningKey(root, "lease")).toBeTruthy();
+  });
+
+  it.each([
+    ["deleted after it existed", (root: string) => rmSync(keysList(root))],
+    ["with a bad signature", (root: string) => {
+      const body = JSON.parse(readFileSync(keysList(root), "utf8"));
+      body.list.revoked = [];
+      writeFileSync(keysList(root), JSON.stringify(body));
+    }],
+    ["replaced by a FIFO", (root: string) => { rmSync(keysList(root)); execFileSync("mkfifo", [keysList(root)]); }],
+    ["unparseable", (root: string) => writeFileSync(keysList(root), "{")]
+  ])("refuses every key use when the key revocation list is %s", (_name, damage) => {
+    const { root } = revokedRotation();
+    expect(getSigningKey(root, "receipt")).toBeTruthy();
+    damage(root);
+    expect(() => getSigningKey(root, "receipt")).toThrow();
+    expect(() => getPrivateKeyPem(root, "monitor")).toThrow();
+  });
+
+  it("refuses every key use when an older key revocation list is replayed", () => {
+    const { root } = revokedRotation();
+    const older = readFileSync(keysList(root));
+    const retired = getSigningPublicKeyPem(root, "config-signature");
+    rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
+    revokeKey(root, "config-signature", ed25519KeyId(retired)!, "superseded");
+    writeFileSync(keysList(root), older);
+    expect(() => getSigningKey(root, "receipt")).toThrow(/ROLLBACK_DETECTED/);
+  });
+
+  it("refuses key use when the anti-rollback state turns unreadable after a successful use", () => {
+    const root = workspace();
+    expect(getSigningKey(root, "artifact-seal")).toBeTruthy();
+    const path = highWaterPath();
+    rmSync(path);
+    execFileSync("mkfifo", [path]);
+    try {
+      expect(() => getSigningKey(root, "artifact-seal")).toThrow(/anti-rollback state/);
+    } finally {
+      rmSync(path, { force: true });
+    }
+  });
+});
+
+describe("self-audit: no downgrade to a pre-P1-08 workspace (P1-08, security review)", () => {
+  it("an unlocked v2 vault whose key set was deleted refuses to sign, even on a machine with no marks", () => {
+    const root = workspace();
+    expect(getSigningKey(root, "receipt")).toBeTruthy();
+    rmSync(keysetPaths(root).keyset);
+    rmSync(highWaterPath(), { force: true });
+    expect(() => getSigningKey(root, "receipt")).toThrow(/no key set/);
+    expect(() => getPrivateKeyPem(root, "monitor")).toThrow(/no key set/);
+  });
+
+  it("a recovery directory planted as a symlink is refused before anything is copied into it", () => {
+    const root = workspace();
+    const elsewhere = mkdtempSync(join(tmpdir(), "amc-elsewhere-"));
+    roots.push(elsewhere);
+    symlinkSync(elsewhere, keysetPaths(root).rotations);
+    expect(() => rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS })).toThrow(/symlink|outside/);
+    expect(existsSync(keysetPaths(root).pending)).toBe(false);
+    expect(readdirSync(elsewhere)).toEqual([]);
+  });
+});
+
+describe("key-set paths stay inside the keys directory (P1-08, security review)", () => {
+  it.each(["../outside.txt", "keys/../../outside.txt", "/etc/hosts", "keys/statements/receipt/../../../../outside.txt", "keys/a∕b.pub", "keys/a\u0000.pub"])(
+    "resume refuses a pending key set naming %j and touches nothing outside", (rel) => {
+      const root = workspace();
+      const outside = join(root, "outside.txt");
+      writeFileSync(outside, "keep me");
+      const keyset = JSON.parse(readFileSync(keysetPaths(root).keyset, "utf8"));
+      writeFileSync(keysetPaths(root).pending, JSON.stringify({ ...keyset, generation: keyset.generation + 1, files: { [rel]: "0".repeat(64) } }));
+      expect(() => resumeKeyRotation(root)).toThrow();
+      expect(readFileSync(outside, "utf8")).toBe("keep me");
+    });
+
+  it("a rollback manifest naming a path outside .amc is refused", () => {
+    const root = workspace();
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    const outside = join(root, "outside.txt");
+    writeFileSync(outside, "keep me");
+    const keyset = JSON.parse(readFileSync(keysetPaths(root).keyset, "utf8"));
+    const generation = keyset.generation + 1;
+    const recovery = join(keysetPaths(root).rotations, `gen-${generation}`);
+    mkdirSync(recovery, { recursive: true });
+    writeFileSync(join(recovery, "manifest.json"), JSON.stringify({ generation, files: [{ rel: "../outside.txt", existed: false, mode: 384 }] }));
+    writeFileSync(keysetPaths(root).pending, JSON.stringify({ ...keyset, generation, files: { "keys/receipt.pub": "0".repeat(64) } }));
+    expect(() => resumeKeyRotation(root)).toThrow();
+    expect(readFileSync(outside, "utf8")).toBe("keep me");
+  });
+
+  it("a committed key set naming a path outside .amc refuses to sign", () => {
+    const root = workspace();
+    const keyset = JSON.parse(readFileSync(keysetPaths(root).keyset, "utf8"));
+    writeFileSync(keysetPaths(root).keyset, canonicalize({ ...keyset, files: { ...keyset.files, "../outside.pub": "0".repeat(64) } }));
+    expect(() => getSigningKey(root, "artifact-seal")).toThrow(/key set/);
+  });
+
+  it("refuses a statements directory that is a symlink out of the keys directory", () => {
+    const root = workspace();
+    rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
+    const elsewhere = mkdtempSync(join(tmpdir(), "amc-elsewhere-"));
+    roots.push(elsewhere);
+    const dir = join(root, ".amc", "keys", "statements", "receipt");
+    renameSync(dir, join(elsewhere, "receipt"));
+    symlinkSync(join(elsewhere, "receipt"), dir);
+    expect(() => rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS })).toThrow(/outside|symlink/);
   });
 });
