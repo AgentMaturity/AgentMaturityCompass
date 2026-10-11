@@ -96,8 +96,14 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
       [path("hypothesisId")], "201") },
     [`${p}/outcome-unknown/{executionId}/request`]: { post: write("Request a resolution of an outcome_unknown execution blocking the project's agent: the operator's statement as an amc.action.resolve engine request (self_reported)",
       "A4OutcomeRequest", [path("executionId")], "201") },
-    [`${p}/outcome-unknown/{executionId}/resolve`]: { post: write("Record the approved resolution (resolveManually); its receipt is an implementation ref, self_reported, never observed",
-      "A4Control", [path("executionId")], "201") }
+    [`${p}/outcome-unknown/{executionId}/resolve`]: { post: write("Record the approved resolution (resolveManually) once A4's dual control holds (bound approvals from project approvers or owners other than the operator; two live-checked keys when regulated; else 409 RESOLUTION_QUORUM_INSUFFICIENT); its ACTION_STATE row is a ledger_event ref, self_reported, never observed",
+      "A4Control", [path("executionId")], "201") },
+    [`${p}/stages/assemble/scaffold`]: { post: write("External path, after Build (owner, owner mode): the path's scaffold, contract tests and policy pack into a new workspace directory outside .amc/, written after a manifest ref (self_reported) binding every file's sha256 is recorded",
+      "A4AssembleScaffold", [], "201") },
+    [`${p}/stages/assemble/connect`]: { post: write("External path, after Build (owner, owner mode): connect instructions with a lease whose token is in this response once and never stored; the record keeps the leaseId (a replay answers token: null)",
+      "A4AssembleConnect", [], "201") },
+    [`${p}/stages/assemble/import`]: { post: write("External path, after Build (owner, owner mode): the neutral importer over a workspace file or directory, originals retained; its manifest is a self_reported ref, and a refused record rolls the import back",
+      "A4AssembleImport", [], "201") }
   };
   for (const verdict of ["approve", "deny"]) {
     paths[`${p}/approvals/{approvalRequestId}/${verdict}`] = { post: operation(`${verdict === "approve" ? "Approve" : "Deny"} an engine request this project named (an effect gate it opened, an outcome_unknown resolution it requested), as a live project approver or owner, bound to the request digest`,
@@ -168,7 +174,10 @@ export function a4Schemas(): Record<string, unknown> {
     A4EffectRetry: control({ attemptId: string }),
     A4Observe: control({ verdict: { type: "string", enum: ["observed", "refuted"] }, evidenceRef: object({ refId: string, sha256: digest }) }),
     A4OutcomeRequest: control({ effect: { type: "string", enum: ["applied", "not_applied"] }, externalRef: { type: ["string", "null"], maxLength: 512 },
-      note: { type: "string", minLength: 1, maxLength: 4000, description: "Sealed in the project's encrypted blob store; the ledger keeps its sha256." } }),
+      note: { type: "string", minLength: 1, maxLength: 4000, description: "Scanned for secrets, then sealed in the project's encrypted blob store; the engine request and the action journal carry only a reference naming the sealed blob and the note's sha256." } }),
+    A4AssembleScaffold: control({ directory: { type: "string", minLength: 1, maxLength: 200, description: "Workspace-relative; plain names without a leading dot; must not exist yet." } }),
+    A4AssembleConnect: control({ mode: { type: "string", enum: ["supervise", "sandbox"] }, adapterId: { type: ["string", "null"], pattern: "^[a-z0-9][a-z0-9._-]{0,63}$" } }, ["mode"]),
+    A4AssembleImport: control({ inputPath: { type: "string", minLength: 1, maxLength: 512, description: "A workspace file or directory (not a symbolic link, not under .amc/)." } }),
     A4EngineDecision: object({ reason: { type: "string", minLength: 1, maxLength: 1000 }, expectedRequestDigestSha256: digest })
   };
 }

@@ -30,6 +30,7 @@ import { isRegulated } from "./a4Readiness.js";
 import { a4Fail, assertNoSecrets, callOf, headStage, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import type { A4ChainLink } from "./a4Schema.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
+import { handleConnectRoute } from "./assembleConnect.js";
 import { blockingExecutionsIn } from "./assembleLockout.js";
 import { RESOLUTION_PURPOSE } from "./spec/assemble.js";
 
@@ -236,5 +237,5 @@ export async function handleAssembleRoute(route: A4Route, projectId: string, tai
   if (outcome !== null) return outcome[2] === "request" ? requestResolution(route, projectId, outcome[1]!) : resolveResolution(route, projectId, outcome[1]!);
   const decision = /^\/approvals\/(apprreq_[a-f0-9]{32})\/(approve|deny)$/.exec(tail);
   if (decision !== null) return decideEngineRequest(route, projectId, decision[1]!, decision[2] as "approve" | "deny");
-  return false;
+  return handleConnectRoute(route, projectId, tail);
 }
