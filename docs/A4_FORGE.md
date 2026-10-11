@@ -105,8 +105,9 @@ An owner may acknowledge some WAITING items (for example `sod.self_provisioned`)
 never cleared. A BLOCKED item cannot be acknowledged. Acknowledge before requesting the gate: an acknowledgement
 supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope; never on a regulated
 project, `409 A4_NOT_ACKNOWLEDGEABLE`, and one recorded earlier does not count there), `regulatory_sources_status`,
-`context_probe_unavailable` (a JSONL session store) and `plan_activated` (only while its activation is deferred,
-`PLAN_ACTIVATION_DEFERRED`; in any other state `409 A4_NOT_ACKNOWLEDGEABLE`) are not in Adapt's bound set yet, so their
+`context_probe_unavailable` (a JSONL session store) and `plan_activated` (only from Review on while its activation is
+deferred, `PLAN_ACTIVATION_DEFERRED`: each step before Review records a new revision, and an acknowledgement counts only
+on its own; before Review or in any other state `409 A4_NOT_ACKNOWLEDGEABLE`) are not in Adapt's bound set yet, so their
 acknowledgements are on the chain but not in the gate's intent (a change to the bound set needs a versioned intent;
 requested).
 
@@ -324,8 +325,11 @@ the agent's prompt pack.
   percentage. `GET /api/v1/a4/projects/:id/conformance?stage=` and the `amc_a4_conformance` MCP tool return it: Adapt's
   from the results its newest Review recorded, with the results file checked again (one that no longer verifies reads
   `not_evaluated` with its reason), and with the owner's out-of-scope settlement, the sources acknowledgement and the
-  deferred-activation acknowledgement (`activationAcknowledgement`) recorded on that Adapt revision; once its completion gate is consumed, the acknowledgement in force then stays on the statement
-  after it expires and after Activate records new revisions. Every other stage, and Adapt before its Review, carries no
+  deferred-activation acknowledgement (`activationAcknowledgement`) on that Adapt revision as readiness counts them (one
+  readiness ignores, such as `plan_unresolved`'s on a regulated project or `plan_activated`'s while activation is due,
+  is not listed); once its completion gate is consumed, the acknowledgement in force then stays on the statement after
+  it expires and after Activate records new revisions. Review's own record of the statement carries none of them: no
+  acknowledgement that counts on the revision Review records exists yet. Every other stage, and Adapt before its Review, carries no
   plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
   `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays
   unresolved in the counts with `OWNER_OUT_OF_SCOPE` and `OWNER_ACKNOWLEDGED` (a true exception is P2-24). A regulated
@@ -345,12 +349,13 @@ the agent's prompt pack.
   activating replaces it, and `activateControlPlan` refuses a plan weaker than the active one. Each project's plan
   carries its own agent's budgets, so another agent's active plan makes this one weaker (`PLAN_WEAKENS_ACTIVE_PLAN`) and
   opening the review is refused before any gate is consumed. Understand and Review record the active plan's profile:
-  only when another profile's plan is active and this plan weakens it (activation is then certain to be refused) is a
-  regulated project's activation deferred. `plan_activated` then waits with `PLAN_ACTIVATION_DEFERRED`,
+  only when another profile's plan is active and this plan weakens it (activation is then certain to be refused), as
+  read at the plan journal head the head revision binds (`plan.journalEntrySha256`) and unmoved since (until the
+  completion gate is consumed), is a regulated project's activation deferred. `plan_activated` then waits with `PLAN_ACTIVATION_DEFERRED`,
   `ACTIVE_PLAN_OF_ANOTHER_PROFILE`, `REPLACES_ACTIVE_PLAN`, `PLAN_WEAKENS_ACTIVE_PLAN` and `WEAKENINGS:<n>`, mandatory
-  from Review on, until an owner acknowledges it with a reason (before requesting the completion gate); the conformance
+  from Review on, until an owner acknowledges it with a reason (after Review, before requesting the completion gate); the conformance
   statement records that acknowledgement, and the project completes with its plan signed, not activated, until per-agent
-  plans exist. Another profile's plan this one does not weaken (or weakenings not recorded) leaves activation due, and a
+  plans exist. Another profile's plan this one does not weaken (or weakenings not recorded, or recorded at another journal head) leaves activation due, and a
   regulated project's plan that is not ready reads `PLAN_BLOCKED` either way. A non-regulated project completes with the plan signed and not activated
   (`PLAN_SIGNED_NOT_ACTIVATED` once Build signed it); an owner may still open the effect, before completing: once the
   completion gate is consumed without it, it cannot be opened there. An activation that started and has not finished
