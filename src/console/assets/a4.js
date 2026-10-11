@@ -469,13 +469,15 @@ function mountProject(projectId, options) {
         return post("Comment", projectPath("/comments"), { cardId: `${stage}:${card}`, body, clientRequestId: uuid() }, [`${card}:comment`]);
       }
       default: {
-        // A stage lane's own action (registerStageAction): only this project's routes or a native task route.
+        // A stage lane's own action (registerStageAction): only this project's routes or a native task route, or a local
+        // one (`local: true`, e.g. a read the card shows) that sends nothing here and re-renders once its `pending` settles.
         const custom = stageAction(stage, name)?.({ button, value, headBinding, uuid, projectPath });
         if (!custom) throw new Error(`Unknown A4 action ${name}.`);
+        if (custom.local === true) return custom;
         if (typeof custom.path !== "string" || !(custom.path.startsWith(`${projectPath("")}/`) || /^\/api\/v1\/native-tasks(?:\/|$)/.test(custom.path))) {
           throw new Error(`The ${name} action names a route outside this project. Nothing was sent.`);
         }
-        return post(custom.label, custom.path, custom.body, custom.clears ?? []);
+        return post(custom.label, custom.path, custom.body, custom.clears ?? [], typeof custom.got === "function" ? custom.got : undefined);
       }
     }
   }
@@ -564,7 +566,12 @@ function mountProject(projectId, options) {
       conflict = null;
       return run(specAction(merged, base));
     }
-    return run(actionFor(name, button));
+    const action = actionFor(name, button);
+    if (action.local === true) {
+      await action.pending;
+      return render();
+    }
+    return run(action);
   }
 
   function focusCard(card) {
