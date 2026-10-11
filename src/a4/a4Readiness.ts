@@ -30,12 +30,12 @@ export { A4_BOUND_ITEMS };
 export type BlockerKind = (typeof A4_BLOCKER_KINDS)[number];
 export type A4ReadinessItem = z.infer<typeof a4ReadinessItemSchema>;
 export type A4GateRow = z.infer<typeof a4GateRowSchema>;
-export type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
-export type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
+type A4DecisionRow = z.infer<typeof a4DecisionRowSchema>;
+type A4RevisionRow = z.infer<typeof a4RevisionRowSchema>;
 export type A4EffectRow = z.infer<typeof a4EffectRowSchema>;
 export type A4RequiredReview = A4GatePolicyV1["gates"]["policy"]["requiredReviews"][number];
 
-export const A4_ACTIONS = [
+const A4_ACTIONS = [
   "ask", "understand", "explain", "propose", "requestGate", "decide", "requestChanges", "build", "review", "progress", "hold", "resume",
   "reopen", "tune", "retire", "addMember", "changeGatePolicy", "acknowledge", "openEffect", "retryEffect", "release", "recordDeployment",
   "verifyDeployment", "rollback", "observeHypothesis"
@@ -161,7 +161,7 @@ const parseJson = (text: string): unknown => {
     return null;
   }
 };
-export const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
+const gateRequestOf = (row: A4GateRow): ApprovalRequestRecord => approvalRequestSchema.parse(JSON.parse(row.request_json));
 const decisionRecordOf = (row: A4DecisionRow): ApprovalDecisionRecord | null => {
   const parsed = approvalDecisionSchema.safeParse(parseJson(row.decision_json));
   return parsed.success ? parsed.data : null;
@@ -553,6 +553,9 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
         ? ["A4_DUPLICATE_DECISION"] : []),
       ...(everyPending((gate) => query.now >= gate.row.expires_ts - EXPIRING_GUARD_MS) ? ["GATE_EXPIRING"] : [])
     ],
+    // An acknowledgement is recorded on the head revision and supersedes its gates, and readiness counts it at the
+    // project's own stage: one at any other stage would not count there and would stale the current stage's gates.
+    acknowledge: state.project.stage !== "retired" && query.stage !== state.project.stage ? ["A4_STEP_ORDER"] : [],
     // A retry that cannot sign fails at once and spends the attempt the stage has left before a new revision.
     retryEffect: ids((candidate) => (candidate.id === "signing.available" || candidate.id === "signing.notary_reachable") && candidate.status !== "READY"),
     progress: [

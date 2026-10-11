@@ -76,7 +76,7 @@ const headSeqSchema = z.number().int().min(0);
 const reasonSchema = z.string().trim().min(1).max(2000);
 
 /** Every supported query parameter, once; anything else is 400 (proxies and the server must read one URL alike). */
-export function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
+function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
   if ([...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1)) {
     throw a4Fail(400, "QUERY_INVALID", `Supply each supported query parameter once${allowed.length > 0 ? ` (${allowed.join(", ")})` : "; this route takes none"}.`);
   }
@@ -86,7 +86,7 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
  * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
  */
-export function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
+function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issue = parsed.error.issues[0];
@@ -194,7 +194,7 @@ export function requirePrincipal(route: A4Route): A4Principal {
 }
 
 /** Project reads: members, workspace OWNERs and AUDITORs (implicit owner and reviewer), and the read-only admin token. */
-export function assertVisible(route: A4Route, members: readonly A4Member[]): void {
+function assertVisible(route: A4Route, members: readonly A4Member[]): void {
   const principal = route.principal;
   if (principal === null || principal.roles.includes("OWNER") || principal.roles.includes("AUDITOR")) return;
   if (!members.some((member) => member.principalKey === principal.key)) throw a4Fail(403, "A4_NOT_A_MEMBER", "You are not a member of this project.");
@@ -256,7 +256,7 @@ function sendError(res: ServerResponse, error: unknown, projectId: string | null
 }
 
 /** A result body that claims nothing: its own unbound envelope, so the wrapper repeats it (one claim per result). */
-export function unboundClaim(projectId: string, what: string, regulated: boolean) {
+function unboundClaim(projectId: string, what: string, regulated: boolean) {
   return envelopeForUnboundResult({ producer: `a4:${projectId}:${what}`, method: "human_review", regulated, now: Date.now() });
 }
 

@@ -19,7 +19,7 @@ import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { listValue, textValue } from "./spec/aspire.js";
 
-export const MEMORY_POLICY_SCHEMA = "amc.a4-memory-policy/v1";
+const MEMORY_POLICY_SCHEMA = "amc.a4-memory-policy/v1";
 export const MEMORY_ENFORCEMENT_NOTE = "advisory: the reasoning-memory writer does not read this policy yet, so it limits nothing AMC stores";
 const PRIVACY: readonly ReasoningMemoryPrivacyClass[] = ["public", "internal", "restricted"];
 const CONSUMERS: readonly ReasoningMemoryConsumer[] = ["score", "recommendation", "fixer", "studio"];
@@ -31,7 +31,7 @@ const compactionSchema = z.strictObject({
   contextWindowTokens: z.number().int().positive().nullable(), threshold: z.number(), keepRecentSteps: z.number().int(), pruneMinBytes: z.number().int(),
   summarize: z.boolean(), maxPerTurn: z.number().int()
 });
-export const a4MemoryPolicySchema = z.strictObject({
+const a4MemoryPolicySchema = z.strictObject({
   schema: z.literal(MEMORY_POLICY_SCHEMA),
   agentId: z.string().min(1),
   /** a4:<projectId>@r<n>: the revision whose answers this policy was built from. */
@@ -93,7 +93,7 @@ export function memoryPolicyFields(values: ReadonlyMap<string, unknown>): { fiel
 }
 
 /** `<agent>/memory/policy.json`: inside the agent's `memory` Enforce resource (src/enforce/resourceManifest.ts). */
-export const memoryPolicyPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "memory", "policy.json");
+const memoryPolicyPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "memory", "policy.json");
 
 /** The `context.memoryPolicySha256` slot: the file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
 export function memoryPolicySha256(workspace: string, agentId: string): string | null {

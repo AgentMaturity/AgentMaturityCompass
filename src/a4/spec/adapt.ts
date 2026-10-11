@@ -238,7 +238,7 @@ export function ownerOutOfScope(plan: CompiledPlan | null, ack: { by: string; ts
 }
 
 /** One lifecycle-bridge row (design §7 item 9): the control, whether A4 evidence satisfies it, the ref and why. */
-export interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
+interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
   readonly evidenceRef: string | null; readonly claimKind: string | null; readonly reason: string; readonly satisfiedBy: string }
 
 /**
@@ -249,7 +249,7 @@ export interface BridgeRow { readonly target: "staging"; readonly controlId: str
  * an admitted external record (a role vote is an acknowledgement, never a review); `deployment_plan_approved` the
  * consumed Activate direction gate.
  */
-export function stagingBridge(state: A4ReadinessState): BridgeRow[] {
+function stagingBridge(state: A4ReadinessState): BridgeRow[] {
   const row = (controlId: string, evidenceRef: string | null, claimKind: string | null, reason: string): BridgeRow => ({ target: "staging", controlId,
     status: evidenceRef === null ? "not_evaluated" : "satisfied", evidenceRef, claimKind, reason,
     satisfiedBy: LIFECYCLE_BRIDGE.find((entry) => entry.controlId === controlId)?.satisfiedBy ?? "" });

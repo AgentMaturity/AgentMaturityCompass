@@ -38,7 +38,7 @@ import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
 /** The MCP server config's env entry naming the `amc approvals login` token file; its path is never printed. */
-export const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
+const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
 
 const TOOLS = [
   { name: "amc_a4_list_projects", description: "List the A4 Forge projects this identity may read (read-only)", input: "{ workspace?: string }" },

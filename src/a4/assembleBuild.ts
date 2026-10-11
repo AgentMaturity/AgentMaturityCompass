@@ -297,7 +297,7 @@ function bindingMismatch(view: NativeTaskView, start: NativeTaskStartRequest): s
   return Object.keys(expected).filter((key) => expected[key] !== actual[key]);
 }
 /** What Review records about the prompt binding until the native task lane exposes the first submission's bodyHash. */
-export const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
+const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
 
 /**
  * One build session as its owner reads it now; refuses one that is not the journaled start (409 BUILD_SESSION_MISMATCH),

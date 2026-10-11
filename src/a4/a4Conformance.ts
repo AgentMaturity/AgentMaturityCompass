@@ -48,7 +48,7 @@ const storedControlSchema = z.strictObject({
   planApplicability: z.enum(["applicable", "not_applicable", "unresolved"]), dimensions: statusDimensionsSchema, claimKind: claimKindSchema,
   evidenceRefs: z.array(z.string().min(1)), notEvaluatedReason: z.string().min(1).nullable()
 });
-export type StoredControl = z.infer<typeof storedControlSchema>;
+type StoredControl = z.infer<typeof storedControlSchema>;
 /** A read-back's verdict: `verified`, a local limit (`not_evaluated`), or an integrity failure (`failed`); `reason` is a code. */
 export interface ControlResultsCheck {
   readonly status: "verified" | "not_evaluated" | "failed";
@@ -169,7 +169,7 @@ function unverifiedReason(workspace: string, file: string, sha256: string): Cont
  * the parsed value, or why not (see unverifiedReason). The file and its signature must be regular files under plain
  * directories: a link, a FIFO or a device on the way is a failure, never a read.
  */
-export function checkControlResults(workspace: string, path: string, sha256: string): ControlResultsCheck & { value?: unknown } {
+function checkControlResults(workspace: string, path: string, sha256: string): ControlResultsCheck & { value?: unknown } {
   const segments = path.split("/");
   try {
     plainPath(workspace, segments.slice(0, -1), false);
@@ -263,7 +263,7 @@ export function recordControlResults(input: { workspace: string; projectId: stri
  * verified one whose file no longer verifies has every control not_evaluated with the reason, and the set reads as a
  * local limit or a failure as the read classified it. Counts follow.
  */
-export function recheckedConformance(stored: StoredConformance, now: ControlResultsCheck): StoredConformance {
+function recheckedConformance(stored: StoredConformance, now: ControlResultsCheck): StoredConformance {
   if (stored.status !== "verified" || now.status === "verified") return stored;
   const reason = now.reason ?? "CONTROL_RESULTS_NOT_VERIFIED_LOCALLY";
   const controls = stored.controls.map((control) => control.notEvaluatedReason?.startsWith("CONTROL_NOT_IN_SHIPPED_CATALOG") === true ? control

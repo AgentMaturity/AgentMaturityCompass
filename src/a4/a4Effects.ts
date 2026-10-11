@@ -376,7 +376,7 @@ function effectApprovalOf(workspace: string, state: A4ReadinessState, gate: A4Ga
  * two distinct keys in one plane (else 409 EFFECT_QUORUM_INSUFFICIENT) and takes LOCAL_USER decisions only (else 403
  * IDENTITY_CHECK_LIMITED, as on documentary gates). Returns the counted keys.
  */
-export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, input: { def: A4EffectDef; gate: A4GateRow; approvalRequestId: string;
+function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, input: { def: A4EffectDef; gate: A4GateRow; approvalRequestId: string;
   callerKey: string; regulated: boolean }): string[] {
   const { workspace } = store;
   const agentId = state.project.agent_id;
@@ -405,7 +405,7 @@ export function verifyAndConsumeEffect(store: A4Store, state: A4ReadinessState, 
  * approver keys) + EFFECT_STARTED (owner pid/host, heartbeat, engine request id, execution id) + the a4_effects row, in
  * one transaction. The caller then runs `runA4Effect(store, projectId, attemptId)` after the response, outside the lock.
  */
-export function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
+function completeWithEffect(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; effectId: string;
   expectedHeadSeq: number }): { result: A4TransitionResult; attemptId: string } {
   const def = effectDef(input.effectId);
   const attemptId = randomId("a4e");
@@ -589,7 +589,7 @@ export async function runA4Effect(store: A4Store, projectId: string, attemptId: 
  * process_lost. A pending executor is never swept, however long a synchronous step keeps its heartbeat from firing.
  * Returns the swept attempt ids.
  */
-export function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS, only?: { projectId: string; executionId: string }): string[] {
+function sweepA4Effects(store: A4Store, staleAfterMs = DEFAULT_ACTION_STALE_AFTER_MS, only?: { projectId: string; executionId: string }): string[] {
   const staleBefore = Date.now() - staleAfterMs;
   return store.runningEffects().filter((row) => (only === undefined || (row.project_id === only.projectId && row.execution_id === only.executionId))
     && effectOwnerLost(row, staleBefore)).flatMap((row) => {
