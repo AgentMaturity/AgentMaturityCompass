@@ -7,10 +7,10 @@
  * configs Propose copied into `a4-projects/<projectId>/<revisionNo>/<sha256>`, each asserted equal to its bound slot —
  * scans it (PASS required), mints the narrowed staging lease (WRITE_LOW at most, the staging routes, 24 h, work order =
  * the release), signs the manifest (`A4_PACKAGE`), the update policy (`A4_PACKAGE`), the prepared deployment plan
- * (`a4-deployment-plan`, slice B) and the tarball (`a4-package`), appends the transparency entry and records the release
- * (`amc.a4-release/v1`, its own `A4_RECORD` envelope) with a RELEASE transition, after which the lifecycle bridge may move
- * the agent to testing and staging. The staging token is answered once in the response that ran the effect and stored nowhere. The
- * production lease is the deployment approval's own effect (`a4.activate.production_lease`, on activate.completion's
+ * (`a4-deployment-plan`, slice B) and the tarball (`a4-package`), and records the release (`amc.a4-release/v1`, its own
+ * `A4_RECORD` envelope) with a RELEASE transition; RELEASE's refusals are checked before anything is minted or signed.
+ * Only after RELEASE commits does it append the transparency entry and run the lifecycle bridge to testing and staging.
+ * The staging token is answered once in the response that ran the effect and stored nowhere. The production lease is the deployment approval's own effect (`a4.activate.production_lease`, on activate.completion's
  * quorum), followed by the bridge to production. AMC never deploys: the package is the signed provenance record of what
  * this workspace holds at the release digest (v1 is a same-host restart, D-18).
  */
@@ -48,7 +48,8 @@ import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "./a4Effects.
 import { A4_RUNTIME, signedA4Floor } from "./a4Gates.js";
 import { isRegulated, redoneStages, type A4ReadinessState } from "./a4Readiness.js";
 import {
-  a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ReleaseV1
+  a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
+  type A4ReleaseV1
 } from "./a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
@@ -408,9 +409,61 @@ const receiptOf = (release: Record<string, unknown>): NonNullable<A4EffectOutcom
   sha256: String(release.tarballSha256), label: `activate release ${String(release.releaseId)}: the signed package (a4-package), self_reported` });
 
 /**
- * The release effect's executor (design §10.4 Build). Writes nothing outside its release directory, the lease journal,
- * the tarball and the transparency log until RELEASE commits; a failure revokes the lease it minted and removes its
- * staging directory. A RELEASE already recorded for this execution (the attempt was lost after it) is answered as is.
+ * RELEASE's own refusals on a chain and head read now (createRelease applies them before anything is minted or signed,
+ * recordRelease again inside its transaction): this execution's release exists, Activate was redone since the release
+ * approval was consumed, the step moved off direction_approved, or this attempt was settled while it ran.
+ */
+function assertReleasable(chain: readonly A4ChainLink[], head: Pick<A4ProjectRow, "stage" | "step"> | null | undefined, gateId: string, executionId: string,
+  releaseId: string): void {
+  if (chain.some((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId)) throw coded("RELEASE_RECORDED", releaseId);
+  const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gateId);
+  if (consumed === undefined || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {
+    throw coded("RELEASE_STAGE_REDONE", "Activate was redone since the release approval was consumed");
+  }
+  if (head?.stage !== "activate" || head.step !== "direction_approved") throw coded("RELEASE_STEP_MOVED", `the project is at ${String(head?.stage)} ${String(head?.step)}`);
+  const started = chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.executionId === executionId).at(-1);
+  if (started === undefined || chain.some((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.effectId === started.body.effectId)) {
+    throw coded("RELEASE_ATTEMPT_SETTLED", "this attempt was settled while it ran");
+  }
+}
+/** The store's rows now, read through one handle: assertReleasable before anything is minted or signed, or whether RELEASE landed. */
+function withChain<T>(workspace: string, projectId: string, read: (chain: A4ChainLink[], head: A4ProjectRow | null) => T): T {
+  const store = openA4Store(workspace);
+  try {
+    return read(store.readChain(projectId), store.readHead(projectId));
+  } finally {
+    store.close();
+  }
+}
+
+/**
+ * The package's transparency entry, appended only once RELEASE committed (a refused release attests nothing in the
+ * append-only log); a retry, or a line that landed before its seal or Merkle update failed, reuses the entry of this
+ * exact release and package. Never throws: a release without its entry says why, and its record names no entry.
+ */
+function packageEntry(workspace: string, agentId: string, releaseId: string, packageDigest: string): { releaseId: string; entryId: string | null; reason: string | null } {
+  const find = (): string | null => readTransparencyEntries(workspace).find((row) => row.artifact.kind === "a4-package" && row.artifact.id === releaseId
+    && row.artifact.sha256 === packageDigest)?.hash ?? null;
+  try {
+    return { releaseId, entryId: find() ?? appendTransparencyEntry({ workspace, type: "A4_PACKAGE_SIGNED", agentId, artifact: { kind: "a4-package", sha256: packageDigest, id: releaseId } }).hash,
+      reason: null };
+  } catch (error) {
+    let landed: string | null = null;
+    try {
+      landed = find();
+    } catch {
+      // An unreadable log names no entry.
+    }
+    return { releaseId, entryId: landed, reason: `${landed === null ? "TRANSPARENCY_NOT_APPENDED" : "TRANSPARENCY_SEAL_LAGGING"}: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}` };
+  }
+}
+
+/**
+ * The release effect's executor (design §10.4 Build). RELEASE's own refusals are checked on the rows read now before
+ * anything is minted or signed; until RELEASE commits it writes nothing outside its release directory, its tarball
+ * files and the lease journal, and a failure revokes the lease it minted and removes them all. The transparency entry
+ * and the lifecycle bridge follow the commit. A RELEASE already recorded for this execution (the attempt was lost after
+ * it) is answered as is, its entry appended or reused.
  */
 async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const { workspace, state, gate, executionId } = ctx;
@@ -422,9 +475,12 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const releaseId = releaseIdFor(executionId);
   const recorded = state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId);
   if (recorded !== undefined) {
-    return { receipt: receiptOf(recorded.body), record: { lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) }, deliver: { release: { releaseId, packageDigest: recorded.body.packageDigest }, staging: { token: null,
+    return { receipt: receiptOf(recorded.body), record: { transparency: packageEntry(workspace, state.project.agent_id, releaseId, String(recorded.body.packageDigest)),
+      lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) },
+    deliver: { release: { releaseId, packageDigest: recorded.body.packageDigest }, staging: { token: null,
       reasonCode: "TOKEN_DELIVERY_UNKNOWN", note: "An earlier attempt recorded this release and answered its staging token then, if at all; revoke it if it was lost." } } };
   }
+  withChain(workspace, projectId, (chain, head) => assertReleasable(chain, head, gate.gate_id, executionId, releaseId));
   const revision = state.revisions.find((row) => row.revision_no === gate.revision_no && row.stage === "activate");
   const activate = activateSpecOf({ revisions: revision === undefined ? [] : [revision] });
   const plans = leasePlans(activate.answers);
@@ -443,7 +499,10 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   const projectDir = realDir(join(realDir(a4ReleasesRoot(workspace)), projectId));
   const staging = mkdtempSync(join(projectDir, ".staging-"));
   const finalDir = join(projectDir, releaseId);
+  const tarPath = `${finalDir}.tar.gz`;
   let minted: string | null = null;
+  let release: { releaseId: string; packageDigest: string; packagePath: string; signaturePath: string; tarballPath: string; tarballSha256: string };
+  let stagingLease: ReturnType<typeof mintLease>;
   try {
     const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1)?.body.releaseId;
     const { files, deploy } = packageInputs(workspace, state, gate.revision_no, bound, activate.answers, { releaseId, projectId, agentId: state.project.agent_id, target,
@@ -453,7 +512,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
     const scan = scanExtractedReleaseForSecrets(staging);
     if (scan.status !== "PASS") throw coded("SECRET_SCAN_FAILED", [...new Set(scan.findings.filter((row) => row.severity === "HIGH").map((row) => row.type))].join(", "));
     // Minted only after the scan passed and inside the consumed effect: a refused package mints nothing.
-    const stagingLease = mintLease(workspace, state, releaseId, plans.staging);
+    stagingLease = mintLease(workspace, state, releaseId, plans.staging);
     minted = stagingLease.leaseId;
     const add = (path: string, bytes: Buffer, kind: string): string => {
       files.push({ path, bytes, kind });
@@ -501,32 +560,39 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
     writeFileAtomic(join(staging, "manifest.sig"), json(signed), 0o644);
     if (pathExists(finalDir)) rmSync(finalDir, { recursive: true, force: true }); // an earlier attempt's directory, which no RELEASE names
     renameSync(staging, finalDir);
-    const tarPath = `${finalDir}.tar.gz`;
     runTarCreate(finalDir, tarPath);
     const tarball = readFileSync(tarPath);
     writeShaFile(`${tarPath}.sha256`, tarball);
     signArtifactFile({ workspace, path: tarPath, artifactKind: "a4-package", bytes: tarball });
-    // A retry whose package bytes are identical reuses its entry.
-    const entry = readTransparencyEntries(workspace).find((row) => row.artifact.kind === "a4-package" && row.artifact.id === releaseId && row.artifact.sha256 === packageDigest)
-      ?? appendTransparencyEntry({ workspace, type: "A4_PACKAGE_SIGNED", agentId: state.project.agent_id, artifact: { kind: "a4-package", sha256: packageDigest, id: releaseId } });
-    const release = { releaseId, packageDigest, packagePath: relPath(workspace, join(finalDir, "manifest.json")), signaturePath: relPath(workspace, join(finalDir, "manifest.sig")),
-      tarballPath: relPath(workspace, tarPath), tarballSha256: sha256Hex(tarball), transparencyEntryId: entry.hash };
+    release = { releaseId, packageDigest, packagePath: relPath(workspace, join(finalDir, "manifest.json")), signaturePath: relPath(workspace, join(finalDir, "manifest.sig")),
+      tarballPath: relPath(workspace, tarPath), tarballSha256: sha256Hex(tarball) };
     recordRelease(ctx, { ...release, revisionDigest: revision.spec_digest, version: manifest.package.version, snapshotId, target, hostHint: proposed!.hostHint ?? null,
       integration, quality: quality.data, approvals: manifest.approvals, updatePolicySha256: manifest.artifacts.updatePolicySha256,
       conformanceSha256: shaOf("conformance/adapt.json")!, stagingLease, signingRoute: signer.route, principal: ctx.principal, deploy,
       lifecycle: releaseBridge(workspace, state, releaseId, false) });
-    // The lifecycle bridge runs after RELEASE commits (a refused record moves no lifecycle); its outcome is EFFECT_FINISHED's record.
-    return { receipt: receiptOf(release), record: { lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) }, deliver: { release, staging: { leaseId: stagingLease.leaseId, token: stagingLease.token, expiresAt: stagingLease.expiresAt,
-      scope: "staging", tokenNotice: TOKEN_NOTICE } } };
   } catch (error) {
-    if (minted !== null) revokeQuietly(workspace, minted, "A4 release attempt failed before its release was recorded; the token was never delivered");
+    // Unless RELEASE landed after all (then the files and the lease are its own), nothing of this attempt stays live or on disk.
+    const landed = (() => {
+      try {
+        return withChain(workspace, projectId, (chain) => chain.some((link) => link.kind === "RELEASE" && link.body.releaseId === releaseId));
+      } catch {
+        return true; // unreadable: keep the files (nothing names them), never delete a recorded package
+      }
+    })();
+    if (minted !== null && !landed) revokeQuietly(workspace, minted, "A4 release attempt failed before its release was recorded; the token was never delivered");
     rmSync(staging, { recursive: true, force: true });
+    if (!landed) for (const path of [finalDir, tarPath, `${tarPath}.sig`, `${tarPath}.sha256`]) rmSync(path, { recursive: true, force: true });
     throw error;
   }
+  // After RELEASE commits (a refused record attests and moves nothing): the transparency entry and the lifecycle bridge,
+  // both EFFECT_FINISHED's record.
+  return { receipt: receiptOf(release), record: { transparency: packageEntry(workspace, state.project.agent_id, releaseId, release.packageDigest),
+    lifecycle: lifecycleRecord(releaseId, releaseBridge(workspace, state, releaseId, true)) },
+  deliver: { release, staging: { leaseId: stagingLease.leaseId, token: stagingLease.token, expiresAt: stagingLease.expiresAt, scope: "staging", tokenNotice: TOKEN_NOTICE } } };
 }
 
 type RecordInput = {
-  releaseId: string; packageDigest: string; packagePath: string; signaturePath: string; tarballPath: string; tarballSha256: string; transparencyEntryId: string;
+  releaseId: string; packageDigest: string; packagePath: string; signaturePath: string; tarballPath: string; tarballSha256: string;
   revisionDigest: string; version: string; snapshotId: string; target: "compose" | "helm"; hostHint: unknown; integration: A4ReleaseV1["integration"];
   quality: A4ReleaseV1["quality"]; approvals: A4ReleaseV1["approvals"]; updatePolicySha256: string; conformanceSha256: string;
   stagingLease: ReturnType<typeof mintLease>; signingRoute: "vault" | "notary"; principal: A4Principal;
@@ -571,7 +637,8 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
   const adapt = adaptSpecOf(state).spec;
   const body = {
     schema: "amc.a4-release/v1", releaseId: input.releaseId, projectId, revisionNo: gate.revision_no, revisionDigest: input.revisionDigest, version: input.version,
-    packageDigest: input.packageDigest, packagePath: input.packagePath, signaturePath: input.signaturePath, transparencyEntryId: input.transparencyEntryId,
+    // The transparency entry is appended once RELEASE commits (EFFECT_FINISHED's record names it), so the record names none.
+    packageDigest: input.packageDigest, packagePath: input.packagePath, signaturePath: input.signaturePath, transparencyEntryId: null,
     previousReleaseId, baseReleaseId: state.project.base_release_id, resources, approvals: input.approvals, integration: input.integration, quality: input.quality,
     updatePolicySha256: input.updatePolicySha256,
     // The overlay digest is the composeDigest of a Compose release and the valuesDigest of a Helm one (a chart digest is the operator's helm package).
@@ -610,24 +677,14 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
   const store = openA4Store(workspace);
   try {
     store.transition(projectId, A4_RUNTIME, ({ head, ts }) => {
-      const chain = store.readChain(projectId);
-      if (chain.some((link) => link.kind === "RELEASE" && link.body.releaseId === input.releaseId)) throw coded("RELEASE_RECORDED", input.releaseId);
-      const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
-      if (consumed === undefined || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {
-        throw coded("RELEASE_STAGE_REDONE", "Activate was redone since the release approval was consumed");
-      }
-      if (head?.stage !== "activate" || head.step !== "direction_approved") throw coded("RELEASE_STEP_MOVED", `the project is at ${String(head?.stage)} ${String(head?.step)}`);
-      const started = chain.filter((link) => link.kind === "EFFECT_STARTED" && link.body.executionId === executionId).at(-1);
-      if (started === undefined || chain.some((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.effectId === started.body.effectId)) {
-        throw coded("RELEASE_ATTEMPT_SETTLED", "this attempt was settled while it ran");
-      }
+      assertReleasable(store.readChain(projectId), head, gate.gate_id, executionId, input.releaseId);
       return { kind: "RELEASE", stage: "activate", revisionNo: gate.revision_no, head: { step: "built" },
         payload: { releaseId: input.releaseId, executionId, packageDigest: input.packageDigest, packagePath: input.packagePath, tarballPath: input.tarballPath,
-          tarballSha256: input.tarballSha256, transparencyEntryId: input.transparencyEntryId, target: input.target, enforceManifestId: input.snapshotId,
+          tarballSha256: input.tarballSha256, transparencyEntryId: null, target: input.target, enforceManifestId: input.snapshotId,
           previousReleaseId, baseReleaseId: state.project.base_release_id, recordSha256: envelope.digestSha256,
           leases: [{ leaseId: input.stagingLease.leaseId, scope: "staging", expiresAt: input.stagingLease.expiresAt }] },
         sideRows: [{ table: "a4_releases", values: { release_id: input.releaseId, project_id: projectId, revision_no: gate.revision_no, package_digest: input.packageDigest,
-          package_path: input.packagePath, signature_path: input.signaturePath, transparency_entry_id: input.transparencyEntryId, previous_release_id: previousReleaseId,
+          package_path: input.packagePath, signature_path: input.signaturePath, transparency_entry_id: null, previous_release_id: previousReleaseId,
           base_release_id: state.project.base_release_id, target: input.target, surfaces_json: bodyJson, envelope_json: JSON.stringify(envelope), actor_key: A4_RUNTIME.key, ts } }] };
     });
   } catch (error) {
@@ -791,7 +848,13 @@ export function releaseViews(store: A4Store, projectId: string, state: A4Readine
     const plan = readAndVerifyArtifactFileSignature({ workspace: store.workspace, path: join(store.workspace, dir, PLAN_PATH), artifactKind: "a4-deployment-plan",
       maxArtifactBytes: 1024 * 1024, maxSignatureBytes: 64 * 1024 });
     const parsedPlan = plan.artifactBytes === null ? null : JSON.parse(plan.artifactBytes.toString("utf8")) as unknown;
-    return { ...record, envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
+    // The transparency entry the release effect appended once RELEASE committed (its EFFECT_FINISHED record), or why none.
+    const entry = [...chain].reverse().map((link) => link.kind === "EFFECT_FINISHED"
+      ? (link.body.record as { transparency?: { releaseId?: unknown; entryId?: unknown; reason?: unknown } } | undefined)?.transparency : undefined)
+      .find((candidate) => candidate?.releaseId === record.releaseId);
+    return { ...record, transparencyEntryId: typeof entry?.entryId === "string" ? entry.entryId : null,
+      transparency: { reason: entry === undefined ? "TRANSPARENCY_PENDING: the release effect has not finished" : typeof entry.reason === "string" ? entry.reason : null },
+      envelopeValid: envelope !== null && envelope.digestSha256 === sha256Hex(bytes)
       && verifySignedDigest({ workspace: store.workspace, digestHex: envelope.digestSha256, signed: envelope }),
     // Checked now under this workspace's keys (a local audit trail): the prepared plan, the update policy, the receipts and rollbacks.
     deployPlan: { signatureValid: plan.valid, reason: plan.reason, plan: parsedPlan },

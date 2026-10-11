@@ -102,7 +102,7 @@ function releaseRecord(release) {
     `<code>${esc(row.claimKind ?? "none")}</code>`, `<code>${esc(row.satisfiedBy ?? "none")}</code>`, esc(row.reason ?? "")]);
   return `<h4>Release record <code>${esc(release.releaseId)}</code></h4>
     <p class="muted">Version ${esc(release.version)} · package <code>${esc(release.packageDigest)}</code> · record envelope
-      <code>${release.envelopeValid ? "valid under this workspace's keys" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId)}</code>
+      <code>${release.envelopeValid ? "valid under this workspace's keys" : "does not verify"}</code> · transparency entry <code>${esc(release.transparencyEntryId ?? release.transparency?.reason ?? "none")}</code>
       · previous <code>${esc(release.previousReleaseId ?? "none")}</code> · base <code>${esc(release.baseReleaseId ?? "none")}</code></p>
     <h4>Eight surfaces</h4>${table(["Surface", "Status", "Reason", "Values"], list(release.surfaceTable).map((row) => [`<code>${esc(row.surface)}</code>`,
       `<code>${esc(row.status)}</code>`, esc(row.reason ?? ""), json(row.values)]), "No surface table.")}
