@@ -1,0 +1,16 @@
+Linux qualify:platform repack versus the release candidate (2026-10-11, colima amc-s7f, node:22-bookworm@sha256:0e5f9065...)
+
+scripts/qualify-platform.mjs packs its own root and takes no tarball, so the Linux cells ran it with the extracted RC as root.
+The compressed bytes differ because the container's Node zlib produces a different gzip stream. The uncompressed tar is identical.
+
+RC tarball (npm pack, macOS, Node 22.22.0 / npm 10.9.4 and Node 24.21.0 / npm 11.19.0, identical): 21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340
+macOS repack of the extracted RC (npm 10.9.4):                                          21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340
+Linux repack of the extracted RC (both containers, packageSha256 in qualify-report.json): 6b6a970319c7d4a61e2082f2cfe430c06dcaca210822ed770eca3ba6cf9423e3
+sha256 of `gzip -dc` of the RC tarball (macOS and Linux):                               50a9679b601d5a92b1ddbdab08cf2c8bf2abc4389dbec3d5623f2c42b64c789f
+sha256 of `gzip -dc` of the Linux repack:                                               50a9679b601d5a92b1ddbdab08cf2c8bf2abc4389dbec3d5623f2c42b64c789f
+Entry list: same set, same order (diff of `tar -tzf` outputs empty).
+
+Commands (as user node in the container):
+  tar -xzf /stage/rc.tgz -C /tmp/p && cd /tmp/p/package && npm pack --ignore-scripts --pack-destination /tmp --json
+  gzip -dc /tmp/agent-maturity-compass-1.2.0.tgz | sha256sum ; gzip -dc /stage/rc.tgz | sha256sum
+Every other Linux lane (packed-install, crash recovery, Studio browser, installed rows) installed /stage/rc.tgz itself and checked its sha256.

@@ -1,0 +1,472 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-31",
+  "date": "2026-10-11",
+  "commit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "branch": "rtd/p0-31b-installed-acceptance",
+  "node": "v22.22.0, v24.21.0 (macOS); v22.23.3, v24.21.0 (Linux containers); v25.5.0 (repository checks)",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2) host; Debian 12 bookworm containers on Linux 6.8.0-117-generic (colima amc-s7f)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "(RC clone, Node 22.22.0) pnpm install --frozen-lockfile && pnpm run build && npm pack --ignore-scripts (duration not timed; recorded as 0)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "[macos-arm64-node22] node scripts/packed-install-check.mjs --tarball rc.tgz",
+      "exit": 0,
+      "durationMs": 21000
+    },
+    {
+      "cmd": "[macos-arm64-node22] npm run qualify:platform -- --out <new>/report.json",
+      "exit": 0,
+      "durationMs": 22000
+    },
+    {
+      "cmd": "[macos-arm64-node22] node scripts/installed-crash-recovery-check.mjs --artifact rc.tgz --artifact-sha256 21190c7da41e\u2026 --cli-sha256 8b9ec22158bc\u2026 --source 756bd6977dce\u2026 --source-tree <fresh clone> --out <new>",
+      "exit": 0,
+      "durationMs": 29000
+    },
+    {
+      "cmd": "[macos-arm64-node22] python3 scripts/installed-studio-browser-check.py (pinned node, npm, chrome-headless-shell 151.0.7922.34, Playwright 1.62.1)",
+      "exit": 0,
+      "durationMs": 65000
+    },
+    {
+      "cmd": "[macos-arm64-node22] node qualification/2026-10-11-P0-31/harness/run-rows.mjs --tarball rc.tgz --out <new>",
+      "exit": 0,
+      "durationMs": 166000
+    },
+    {
+      "cmd": "[macos-arm64-node24] node scripts/packed-install-check.mjs --tarball rc.tgz",
+      "exit": 0,
+      "durationMs": 20000
+    },
+    {
+      "cmd": "[macos-arm64-node24] npm run qualify:platform -- --out <new>/report.json",
+      "exit": 0,
+      "durationMs": 22000
+    },
+    {
+      "cmd": "[macos-arm64-node24] node scripts/installed-crash-recovery-check.mjs --artifact rc.tgz --artifact-sha256 21190c7da41e\u2026 --cli-sha256 8b9ec22158bc\u2026 --source 756bd6977dce\u2026 --source-tree <fresh clone> --out <new>",
+      "exit": 0,
+      "durationMs": 27000
+    },
+    {
+      "cmd": "[macos-arm64-node24] python3 scripts/installed-studio-browser-check.py (pinned node, npm, chrome-headless-shell 151.0.7922.34, Playwright 1.62.1)",
+      "exit": 0,
+      "durationMs": 70000
+    },
+    {
+      "cmd": "[macos-arm64-node24] node qualification/2026-10-11-P0-31/harness/run-rows.mjs --tarball rc.tgz --out <new>",
+      "exit": 0,
+      "durationMs": 153000
+    },
+    {
+      "cmd": "[macos-arm64 python] bash qualification/2026-10-11-P0-31/harness/python-lane.sh <clone> <new> python3 (3.14.7)",
+      "exit": 0,
+      "durationMs": 18000
+    },
+    {
+      "cmd": "[linux-arm64-node22] docker run node@sha256:0e5f9065\u2026 linux-cell.sh: packed-install-check --tarball",
+      "exit": 0,
+      "durationMs": 56000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh: qualify-platform.mjs (root = extracted RC)",
+      "exit": 0,
+      "durationMs": 50000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh: installed-crash-recovery-check.mjs",
+      "exit": 0,
+      "durationMs": 59000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh: installed-studio-browser-check.py (attempt 1)",
+      "exit": 2,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh STEPS=studio: installed-studio-browser-check.py (attempt 2, fresh container)",
+      "exit": 0,
+      "durationMs": 81000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh STEPS=rows: run-rows.mjs (fresh container)",
+      "exit": 0,
+      "durationMs": 372000
+    },
+    {
+      "cmd": "[linux-arm64-node22] linux-cell.sh: python-lane.sh (Python 3.11.2)",
+      "exit": 0,
+      "durationMs": 23000
+    },
+    {
+      "cmd": "[linux-arm64-node24] docker run node@sha256:3d27e5c1\u2026 linux-cell.sh: packed-install-check --tarball",
+      "exit": 0,
+      "durationMs": 89000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh: qualify-platform.mjs (root = extracted RC)",
+      "exit": 0,
+      "durationMs": 46000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh: installed-crash-recovery-check.mjs",
+      "exit": 0,
+      "durationMs": 77000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh: installed-studio-browser-check.py (attempt 1)",
+      "exit": 1,
+      "durationMs": 74000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh STEPS=studio: installed-studio-browser-check.py (attempt 2, fresh container)",
+      "exit": 0,
+      "durationMs": 98000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh STEPS=rows: run-rows.mjs (fresh container)",
+      "exit": 0,
+      "durationMs": 549000
+    },
+    {
+      "cmd": "[linux-arm64-node24] linux-cell.sh: python-lane.sh (Python 3.11.2)",
+      "exit": 0,
+      "durationMs": 54000
+    },
+    {
+      "cmd": "(RC clone, Node 22.22.0) node scripts/mutation-batch.mjs --batch mutations.batch.json --out mutations.json",
+      "exit": 1,
+      "durationMs": 176000
+    },
+    {
+      "cmd": "python3 dist-mutate (mutations-dist.json: 5 dist guard mutations, restored byte for byte)",
+      "exit": 0,
+      "durationMs": 144000
+    },
+    {
+      "cmd": "npx vitest run tests/qualificationNodeVersions.test.ts (before the pattern change: node-versions-red.txt)",
+      "exit": 1,
+      "durationMs": 199
+    },
+    {
+      "cmd": "npx vitest run tests/qualificationNodeVersions.test.ts tests/studioNativeTaskArchiveNegatives.test.ts tests/dshRunnerReverify.test.ts tests/nativeRecoveryControl.test.ts tests/nativeManagedRecovery.test.ts tests/studioNativeTaskService.test.ts",
+      "exit": 1,
+      "durationMs": 47000
+    }
+  ],
+  "tests": {
+    "total": 58,
+    "passed": 50,
+    "failed": 8,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "44b6a4ec16146b838fcd6ff82b07fb80178a90b0667ead4f02f4205dd39ea744"
+    },
+    {
+      "path": "cells/linux-arm64-node22/crash-receipt.json",
+      "sha256": "6ad7e1c391713dbea078f12b91f702c00943c7165c8ee7e034c184240ba428ef"
+    },
+    {
+      "path": "cells/linux-arm64-node22/environment.txt",
+      "sha256": "8d2af4e680bc39414ccfb1b81707a9aa6006a955daa02abf82c6e9cf63684cd1"
+    },
+    {
+      "path": "cells/linux-arm64-node22/packed-install.txt",
+      "sha256": "d8ba60620f2f8380904dec6b2e80902af9b72a603fbdb1a21758080e575fe6a8"
+    },
+    {
+      "path": "cells/linux-arm64-node22/python-lane.txt",
+      "sha256": "7525fecf60733228d2f5fca71fb7db289cd46feba03c0d10d72fb64fc487af61"
+    },
+    {
+      "path": "cells/linux-arm64-node22/qualify-report.json",
+      "sha256": "b3609d182ae499c76e6f9ab563150d618380b0e7729ab1a9e70766eb1e9f4f2c"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1513.json",
+      "sha256": "fcb3f59e8dacb256aebd36c0678aa9c95d0fc263454fda9cfb613c6f2a4eb140"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1515-1535.json",
+      "sha256": "663d25c30588a7eece6701c41d41b0aa9fc3acdebd34283e0f2a5aa25f9214f5"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1520.json",
+      "sha256": "3acfe27bc8926ced044e871dcc07fc778d1bdb2bc2b0352f624a044d136f82a2"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1523.json",
+      "sha256": "c35577090a01b3e4f1501d37e23ac16161552f2fd64c5b28424feeec3809f2f5"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1532.json",
+      "sha256": "4f1fc13435f36594ea644ad6b7be1f08eb228d9782c08eb646ae076497ba0801"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1533.json",
+      "sha256": "c18a9c2df8a761441d4a43f9b319f24ea71c9dce4ec11006be3f14eb62c1eb30"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows/AMC-1545.json",
+      "sha256": "1f522cf23cb5bffc4e5f2105ccd00bfec6ff9d1d660bd0c2b4bed24fc82662da"
+    },
+    {
+      "path": "cells/linux-arm64-node22/rows-summary.json",
+      "sha256": "54810071dafb1ccc5d065b4c4b4426ead1fa4afaedb346070cfb9894d44eaa56"
+    },
+    {
+      "path": "cells/linux-arm64-node22/studio-browser-receipt.json",
+      "sha256": "ff0c48ca8619cd4af90f3c47743ffa6738aa82a599925bfaa6336d93d9de954b"
+    },
+    {
+      "path": "cells/linux-arm64-node22/studio-run-receipt.json",
+      "sha256": "e67219160db0ed2c9a51b5b02da6e6fc826109934e70cfaa02f0a4fe7a28d7c1"
+    },
+    {
+      "path": "cells/linux-arm64-node24/crash-receipt.json",
+      "sha256": "6f49502c0a04b014fd5d26cb510eb400ad18852ff08b0cf86e4d90b011e1ee13"
+    },
+    {
+      "path": "cells/linux-arm64-node24/environment.txt",
+      "sha256": "0a8d445fe752112e2c51584bc2174669ef26f3325f09ff72f6a9b55ad1d9483f"
+    },
+    {
+      "path": "cells/linux-arm64-node24/packed-install.txt",
+      "sha256": "c6175d5d8a609b2cb159f3769d12809be163fef7b9fbfa6b8f04eb98205d7764"
+    },
+    {
+      "path": "cells/linux-arm64-node24/python-lane.txt",
+      "sha256": "44334c1b58ea83e805a3ca75ea23ed41b34a861f3591bd5e673359e56624653e"
+    },
+    {
+      "path": "cells/linux-arm64-node24/qualify-report.json",
+      "sha256": "26d32f3beb911653b6fad62e03162816b77febae062558184cb8e4851e539ae6"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1513.json",
+      "sha256": "33a372549c4069e9f977842f6f58f2d1c281f01949988405d2c53013ed634cea"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1515-1535.json",
+      "sha256": "51d4e4c6433635e64605bc73ff6aa75c66fb0c909929b6c973fe7b129c76aeef"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1520.json",
+      "sha256": "4d0332c46ebba25cc3762e08e03249a72d2c229d9bad81da686c6b3ad417dc84"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1523.json",
+      "sha256": "93ba039f8f5981e1b795208f836e9f48da46e1af95204b4680c416726b9f0511"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1532.json",
+      "sha256": "9c54ccca6732b026ca73bfbf58cbe70ec1434a512dfd13596e419e0e63f3b439"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1533.json",
+      "sha256": "74f6c2fb54c2ccb28eeeefb03163726ec2c9e1399d6262cbaf1d1493d771ed8a"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows/AMC-1545.json",
+      "sha256": "7a14bbc90b1fda0d24cc5f7014daa0533ea6a2d857b1743bf38150060be8ea5d"
+    },
+    {
+      "path": "cells/linux-arm64-node24/rows-summary.json",
+      "sha256": "703431a345bfdd922f84f73955e76db9f16f892f296c90994954347b55cc55a4"
+    },
+    {
+      "path": "cells/linux-arm64-node24/studio-attempt1-run-receipt.json",
+      "sha256": "0397f25953671af64a0a341acd03de496b6e84cba703782d5493e883a8d3ecc2"
+    },
+    {
+      "path": "cells/linux-arm64-node24/studio-browser-receipt.json",
+      "sha256": "217e3ba520558420214d477fff910c95378e5fd2cdc256859ce09dbc14e72817"
+    },
+    {
+      "path": "cells/linux-arm64-node24/studio-run-receipt.json",
+      "sha256": "a61520c879ae6aa7a713457e7cb48dfe44574da3e1021ce60846c484e53c4712"
+    },
+    {
+      "path": "cells/macos-arm64-node22/crash-receipt.json",
+      "sha256": "0fe5f506ec4f794c83a0b689f7c4457319ccdf4079b21035284c5b8c3240b7ea"
+    },
+    {
+      "path": "cells/macos-arm64-node22/environment.json",
+      "sha256": "2db0e44fad98434eee0289a876918de3f120948b33a370a060d351a0e36e6b03"
+    },
+    {
+      "path": "cells/macos-arm64-node22/packed-install.txt",
+      "sha256": "6e932a9efdcd24be60027c3f5d04cefc174d11ce16f9505fa531fe31befcd9ea"
+    },
+    {
+      "path": "cells/macos-arm64-node22/python-lane.txt",
+      "sha256": "8746f279d3ac18d986eb9344224c7b5812c02cd4faedfa54d3bca49a491cda5b"
+    },
+    {
+      "path": "cells/macos-arm64-node22/qualify-report.json",
+      "sha256": "3d6bb69676b6634c40308eec4c571c3e3c4286c7e3290457d8fb08b4995e92e9"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1513.json",
+      "sha256": "9e2bb5e05b5ec4b91f0c5dfcacd032b85942903a96a3b2400fa0b8314a6cbe13"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1515-1535.json",
+      "sha256": "cbb1ee5ddbf6848c15b3dbff3eea8c59f2336a2dade4e980817c337b040f2189"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1520.json",
+      "sha256": "bc9baf70303a67806baab1a4d0a5ec82f68c84efe14039a748cf0bda08dfebad"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1523.json",
+      "sha256": "fc3b3365ce1aa5b6c19d971f440a875f98e18bcda995157672ff52d70ae4d7d0"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1532.json",
+      "sha256": "83f876e2a07bc29607589d6b2d5ff5f6d82fbaa98d4effb4523f69292cd69bd1"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1533.json",
+      "sha256": "cfe169051b2dabf4c9a9589344b136320dd27085f9f6a06a3d135b45d2c75186"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows/AMC-1545.json",
+      "sha256": "6092466dc4c41086a9aeb8a3a1895539b0260cc3cc0d3f36ca28e66d3bcda68b"
+    },
+    {
+      "path": "cells/macos-arm64-node22/rows-summary.json",
+      "sha256": "f5d10967f9078cd5dfe206e52bba0d5af1c4805d48788532a83e394fc03fef7e"
+    },
+    {
+      "path": "cells/macos-arm64-node22/studio-browser-receipt.json",
+      "sha256": "cce37b1a28600493a01fafc31774bf0a033c5d27985046138575e5ff1243c6c8"
+    },
+    {
+      "path": "cells/macos-arm64-node22/studio-run-receipt.json",
+      "sha256": "71795f151ba7fb0a5ee640ef85c189a07c89735167a5ac684bc2406c60657cab"
+    },
+    {
+      "path": "cells/macos-arm64-node24/crash-receipt.json",
+      "sha256": "6604be71537197c02bed9a24ef2f86989d1a9891447a14a03b28ee48a5583a37"
+    },
+    {
+      "path": "cells/macos-arm64-node24/environment.json",
+      "sha256": "f2fe2a7138ca4179d1ffcac11a08395283fcb3951037e6b046da24139b5e38e6"
+    },
+    {
+      "path": "cells/macos-arm64-node24/packed-install.txt",
+      "sha256": "78fdf88840c194eda4b03e14b49435a755bd4fcd4ee185e38ba4b585d2ec36e4"
+    },
+    {
+      "path": "cells/macos-arm64-node24/python-lane.txt",
+      "sha256": "8746f279d3ac18d986eb9344224c7b5812c02cd4faedfa54d3bca49a491cda5b"
+    },
+    {
+      "path": "cells/macos-arm64-node24/qualify-report.json",
+      "sha256": "9c86d0ece630a5abeed9d121d8c6fe985a4f1afec191431b6e0791db2cd3f945"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1513.json",
+      "sha256": "a725811d934ff49ccc203511d1ec2b47c1a5d0d706d6b0a0e03c34bc63f689f3"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1515-1535.json",
+      "sha256": "d0d84f7de9877472417495cc5c415802ffeb18fca25e5885f31cfc73bd9213fb"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1520.json",
+      "sha256": "2428ec9e07feef1d584d34583d9c58542677776ff1dadc99f5d9785ec7345590"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1523.json",
+      "sha256": "1aba13dc492800873ed70ee171c38f54756eb4e0df3668c4ac34890cad543b43"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1532.json",
+      "sha256": "a36e11693dc86aebc52d152ee8cec377b171a469c1d9ee7aaba5cada8249d664"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1533.json",
+      "sha256": "3452903ccd31385de437f91d4b68f1e45293f771c49a3cc27cb595f52af26074"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows/AMC-1545.json",
+      "sha256": "6ea997d9eeec91bae09cb19af07f03c3a9c5d16578cdd63d6ee61575a5fab7bb"
+    },
+    {
+      "path": "cells/macos-arm64-node24/rows-summary.json",
+      "sha256": "694cbf73907a60ce027402ec3efb17789f901f3d04830887be89774fec97998d"
+    },
+    {
+      "path": "cells/macos-arm64-node24/studio-browser-receipt.json",
+      "sha256": "f35729c06562416342d32a4afc484dea84b6b17f58aa037e572a047c4358c810"
+    },
+    {
+      "path": "cells/macos-arm64-node24/studio-run-receipt.json",
+      "sha256": "c884746e76dc297e10f43ec4bcbec58d1cd0988d7d000d58f6293e7036079543"
+    },
+    {
+      "path": "follow-ups.md",
+      "sha256": "5bef1f72649f68c0e41d51280f2453fefafeb550f041f5fbda39a56a4cfc55ac"
+    },
+    {
+      "path": "harness/chat-pty.py",
+      "sha256": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+    },
+    {
+      "path": "harness/fixtures.mjs",
+      "sha256": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd"
+    },
+    {
+      "path": "harness/linux-cell.sh",
+      "sha256": "ecfbebf815f9309863277d4a90e64238d3a58675e9551fc0970b343b1650b5eb"
+    },
+    {
+      "path": "harness/mcp-stdio-fixture.mjs",
+      "sha256": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc"
+    },
+    {
+      "path": "harness/python-lane.sh",
+      "sha256": "0c1c3201ade4db08c3ecf23762c198a9eb6cd8e94931213c74dd073e196b4151"
+    },
+    {
+      "path": "harness/run-rows.mjs",
+      "sha256": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768"
+    },
+    {
+      "path": "mutations-dist.json",
+      "sha256": "499b4a1734bd292af886f69d4fa9d751b2c977897689c4b51640d37134efec5a"
+    },
+    {
+      "path": "mutations.batch.json",
+      "sha256": "d812d61979e7b50e8e9a4cc693789a4d7ca9dfc2e2d871b057c4c73a0863ffea"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "5b91e541007cca1174a60135711858d423d1d73ddd74b31b1554f66af2012cd2"
+    },
+    {
+      "path": "node-versions-red.txt",
+      "sha256": "be34a1487e44d1c2db16765caf2d6acc29a422ebf63ac1903824b4dd1881c3a9"
+    },
+    {
+      "path": "outcomes.json",
+      "sha256": "d57a9da557099578d22c9e8101eb0881acd11389bed6c75e11c47d359138ecd1"
+    },
+    {
+      "path": "rc-tar-identity.txt",
+      "sha256": "6564d9b408c561be51d394992902fa0ed8ec5c2f923d7862edff37a130bc1a2d"
+    }
+  ],
+  "notes": "Release candidate: commit 756bd6977dce19f4ef781bdb492c38d6777964f7; npm pack tarball agent-maturity-compass-1.2.0.tgz sha256 21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340 (release 2.0.0 not yet versioned, D-12); installed dist/cli.js sha256 8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165. Every cell installed that tarball; the Linux qualify:platform lane repacked the extracted RC (gzip differs, uncompressed tar identical: rc-tar-identity.txt). Local runs on macOS arm64 (this host) and colima amc-s7f Linux arm64 containers, not CI. Non-zero exits: linux-arm64-node22 Studio attempt 1 exit 2 = harness wrapper bug (headless shell path in linux-cell.sh), rerun passed 13/13; linux-arm64-node24 Studio attempt 1 exit 1 at amc up --demo (P0-62), rerun passed 13/13; mutation batch exit 1 = 5 survivors (three 1511-* handed to P2-12 with this evidence, two 1545-* opened as P0-61); the first qualificationNodeVersions run is the intended red run; focused vitest exit 1 = 8 pre-existing failures in tests/studioNativeTaskService.test.ts (HOME inside the workspace, P0-57), all other files pass. Follow-ups blocking P0-39: P0-56, P0-57, P0-58, P0-59, P0-60 (Sid), P0-61, P0-62 (follow-ups.md). Node: macOS cells Homebrew node@22 22.22.0 and node@24 24.21.0; Linux cells node:22-bookworm (22.23.3) and node:24-bookworm (24.21.0) pinned by digest; repository checks ran under Node 25.5.0."
+}

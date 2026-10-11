@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "amc-installed-crash-recovery/v1",
+  "ok": true,
+  "startedAt": "2026-10-11T08:23:18.740Z",
+  "runId": "6b6117d5-f2c5-4687-802b-46e2057b1538",
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "sourceFiles": {
+    "scripts/installed-crash-recovery-check.mjs": "777c26d2c68ad15f85f6df4815ffe549fca4d8d8d6a9fb726b4aa09bf26fbf7f",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+  },
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "expectedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "runtime": {
+    "node": "v24.21.0",
+    "executable": "/usr/local/bin/node",
+    "nodeSha256": "0f8949d1028f6d61506b2d5bc57e7e6fe893d7b1997509b7847294fc9c616584",
+    "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "platform": "linux",
+    "arch": "arm64"
+  },
+  "checks": [
+    {
+      "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+      "ok": true,
+      "sessionId": "ce26f38c-e1e8-4633-b7d8-8bcbff10f718",
+      "approvalId": "apprreq_6c2381d6a1514bf29f0ab4c376e6d1ff",
+      "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+      "callId": "stub-call-1",
+      "killedPid": 791,
+      "effects": 1,
+      "toolResultsBeforeKill": 0,
+      "originalPrefixSha256": "3c2ed8a938cfa66e6e0e76ffa6913d0a1c4e50e1f09c5acff27274fb1c7f9e6a",
+      "effectSha256": "d5d83318a44860f10c266c62f407f3de02ca5eaae25f6fa9b31e549c79285b14",
+      "pendingWriteLow": 1
+    },
+    {
+      "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+      "ok": true,
+      "unknownToolOutcomes": 1,
+      "automaticModelCalls": 0,
+      "effectCount": 1
+    },
+    {
+      "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+      "ok": true,
+      "finalModelCalls": 2,
+      "finalToolCalls": 1,
+      "effectCount": 1,
+      "pendingWriteLow": 1,
+      "payloads": "verified",
+      "historySha256": "4495e2c388cd525a52dd8abf6710a05d72eac49cb4bbda05f796371fad6412b1"
+    }
+  ],
+  "commands": [
+    {
+      "label": "00-install",
+      "args": [
+        "/usr/local/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--loglevel=error",
+        "/stage/rc.tgz"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 694
+    },
+    {
+      "label": "01-bootstrap",
+      "args": [
+        "bootstrap"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 728
+    },
+    {
+      "label": "02-initialize",
+      "args": [
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 736
+    },
+    {
+      "label": "03-firewall",
+      "args": [
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 744
+    },
+    {
+      "label": "04-budget-sign",
+      "args": [
+        "budgets",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 752
+    },
+    {
+      "label": "05-owner-login",
+      "args": [
+        "approvals",
+        "login",
+        "--username",
+        "crash-owner",
+        "--token-file",
+        "/work/out/crash/private/approval-token",
+        "--password-stdin",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 760
+    },
+    {
+      "label": "06-mcp-catalog",
+      "args": [
+        "agent-loop",
+        "mcp-catalog",
+        "--config",
+        "/work/out/crash/private/mcp.json",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 768
+    },
+    {
+      "label": "07-tools-sign",
+      "args": [
+        "tools",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 783
+    },
+    {
+      "label": "08-pending-1",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 806
+    },
+    {
+      "label": "09-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_6c2381d6a1514bf29f0ab4c376e6d1ff"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 814
+    },
+    {
+      "label": "10-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_6c2381d6a1514bf29f0ab4c376e6d1ff",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "e42f5cb2-6348-48d6-a757-55ed95789ffd",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "/work/out/crash/private/approval-token",
+        "--expect-request-digest",
+        "2cbf416349f9363aa49fdf5e2260f31d9bbc7dbd7a98451d105a75eaf7ba4d59"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 822
+    },
+    {
+      "label": "11-budget-before-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 830
+    },
+    {
+      "label": "12-budget-after-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 853
+    },
+    {
+      "label": "13-cold-native-verification",
+      "args": [
+        "agent-loop",
+        "verify",
+        "ce26f38c-e1e8-4633-b7d8-8bcbff10f718",
+        "--json",
+        "--expect-monitor",
+        "f5dd69b409d37b932e41154523bca882fccd6fbd402b079ee777a1fedd9c9a52"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 869
+    },
+    {
+      "label": "14-cold-ledger-verification",
+      "args": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "f5dd69b409d37b932e41154523bca882fccd6fbd402b079ee777a1fedd9c9a52"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 877
+    },
+    {
+      "label": "15-final-budget",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 885
+    }
+  ],
+  "limits": [
+    "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+    "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+    "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."
+  ],
+  "installed": {
+    "publicNativeExport": "/work/out/crash/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+    "publicNativeExportSha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1",
+    "cliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165"
+  },
+  "preExecutionMonitorSha256": "f5dd69b409d37b932e41154523bca882fccd6fbd402b079ee777a1fedd9c9a52",
+  "closedProcesses": {
+    "writerPids": [
+      838
+    ],
+    "helperPids": [
+      776,
+      799,
+      846
+    ],
+    "allObservedGone": true
+  },
+  "endedAt": "2026-10-11T08:24:35.604Z"
+}

@@ -1,0 +1,42 @@
+== python Python 3.14.7
+== build venv
+packaging==26.3
+setuptools==84.0.0
+wheel==0.48.0
+== runner venv
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.6.0
+Pygments==2.21.0
+pytest==9.1.1
+== consumer venv
+amc-sdk @ file:///Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-python/wheel/amc_sdk-0.2.0-py3-none-any.whl#sha256=429163a9f53b733f9af469776a636645f693c18d491585783b4a1116bb06b0b7
+== wheel
+429163a9f53b733f9af469776a636645f693c18d491585783b4a1116bb06b0b7  wheel/amc_sdk-0.2.0-py3-none-any.whl
+.....................s                                                   [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[not-requested]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[pending]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[passed]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[failed]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[unavailable]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result0]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result1]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result2]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result3]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[None]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[True]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid2]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid3]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid4]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid5]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid6]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid7]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid8]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid9]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid10]
+PASSED ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid11]
+SKIPPED [1] ../../P0-31b-rc/src/sdk/python/tests/test_validation_installed.py:224: native signed fixtures not supplied; wire checks do not replace installed native acceptance
+21 passed, 1 skipped in 1.92s
+exit 0 duration 18s

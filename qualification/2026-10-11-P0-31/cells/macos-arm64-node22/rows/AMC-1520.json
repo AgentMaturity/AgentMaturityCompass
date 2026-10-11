@@ -1,0 +1,40 @@
+{
+  "schema": "p031-installed-rows/v1",
+  "startedAt": "2026-10-11T10:42:07.379Z",
+  "node": "v22.22.0",
+  "npm": "10.9.4",
+  "platform": "darwin",
+  "arch": "arm64",
+  "osRelease": "25.6.0",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "harnessSha256": {
+    "run-rows.mjs": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768",
+    "fixtures.mjs": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd",
+    "mcp-stdio-fixture.mjs": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc",
+    "chat-pty.py": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+  },
+  "row": "AMC-1520",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "approved launch files spawn the runtime",
+      "ok": true,
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "name": "a changed approved file is refused before spawn",
+      "ok": true,
+      "exit": 1,
+      "message": "DSH approved launch artifact changed; review and reconfigure its signed hash before running.\n"
+    },
+    {
+      "name": "ledger verifies after the refusal",
+      "ok": true,
+      "exit": 0
+    }
+  ],
+  "note": "Installed check of the launch pin. The spawn-site re-hash itself (between preparation and spawn) is not reachable from outside the process; tests/dshRunnerReverify.test.ts covers it and the P0-31 mutation batch removes the call.",
+  "durationMs": 8341
+}
