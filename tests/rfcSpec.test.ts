@@ -29,6 +29,7 @@ import {
   INDUSTRY_DECAY_PRESETS,
   verifyAgentClaim,
   createAgentClaim,
+  ClaimReplayCache,
   type TrustPolicyRule,
 } from "../src/score/crossAgentTrust.js";
 import { LEGACY_V1_PACK_IDS, assurancePackIdSchema } from "../src/assurance/assuranceSchema.js";
@@ -337,14 +338,14 @@ describe("Trust Protocol — Trust Level Computation", () => {
       "abc123def456",
       "test-workspace",
       sharedSecret,
-      { amcScore: 80, amcLevel: "L4", ttlHours: 24 }
+      { audience: "agent-peer", amcScore: 80, amcLevel: "L4", ttlHours: 24 }
     );
     const policy: TrustPolicyRule = {
       requirePassport: false,
       requireFreshness: false,
       // No minAmcScore or minAmcLevel constraints to isolate signature/freshness checks
     };
-    const result = verifyAgentClaim(claim, policy, sharedSecret);
+    const result = verifyAgentClaim(claim, policy, sharedSecret, { audience: "agent-peer", issuer: claim.agentId, requestedScope: "read", grants: { [claim.agentId]: ["read", "write", "execute", "delegate"] }, replay: new ClaimReplayCache() });
     // With valid sig (0.30) + fresh (0.15) + no score req (0.20) + no level req (0.15) + no passport (0.10) + no workspace (0.10) = 1.0
     expect(result.trustLevel).toBe("full");
     expect(result.trusted).toBe(true);
@@ -358,12 +359,12 @@ describe("Trust Protocol — Trust Level Computation", () => {
       "abc123def456",
       "test-workspace",
       sharedSecret,
-      { amcScore: 95, amcLevel: "L5" }
+      { audience: "agent-peer", amcScore: 95, amcLevel: "L5" }
     );
     // Tamper with the signature
     const tamperedClaim = { ...claim, signature: "0000000000000000000000000000000000000000000000000000000000000000" };
     const policy: TrustPolicyRule = { requirePassport: false, requireFreshness: false };
-    const result = verifyAgentClaim(tamperedClaim, policy, sharedSecret);
+    const result = verifyAgentClaim(tamperedClaim, policy, sharedSecret, { audience: "agent-peer", issuer: tamperedClaim.agentId, requestedScope: "read", grants: { [tamperedClaim.agentId]: ["read", "write", "execute", "delegate"] }, replay: new ClaimReplayCache() });
     expect(result.trustLevel).toBe("untrusted");
     expect(result.trusted).toBe(false);
     expect(result.grantedScopes).toHaveLength(0);
@@ -375,7 +376,7 @@ describe("Trust Protocol — Trust Level Computation", () => {
       "abc123def456",
       "test-workspace",
       sharedSecret,
-      { amcScore: 20, amcLevel: "L1" }
+      { audience: "agent-peer", amcScore: 20, amcLevel: "L1" }
     );
     const strictPolicy: TrustPolicyRule = {
       minAmcScore: 70,

@@ -7,7 +7,7 @@
  * AMC-native agent-to-agent trust verification protocol.
  */
 
-import { createHash, createHmac, sign, verify } from 'node:crypto';
+import { createHash, createHmac, randomBytes, sign, timingSafeEqual, verify } from 'node:crypto';
 import { publicKeyFromPrivate } from '../crypto/keyHistoryEnvelope.js';
 import { admitKey, type IssuerAdmission } from '../trust/admission.js';
 import type { TrustContext } from '../trust/trustContext.js';
@@ -17,7 +17,7 @@ import { type MaturityLevel } from './formalSpec.js';
 import { scoreToLevel, toDisplayScore } from './scoringScale.js';
 
 export interface AgentIdentityClaim {
-  agentId: string;
+  agentId: string;                 // the issuing agent
   publicKeyHash: string;           // SHA-256 of agent's public signing key
   amcPassportId?: string;          // Agent Passport ID (if issued)
   amcScore?: number;               // Last known AMC score
@@ -25,7 +25,14 @@ export interface AgentIdentityClaim {
   issuingWorkspace: string;        // AMC workspace that issued this identity
   issuedAt: Date;
   expiresAt?: Date;
-  signature: string;               // HMAC-SHA256 of claim fields
+  signature: string;               // HMAC (hex) or Ed25519 (base64) over every field below, never over a subset
+  /** P1-08: who the claim is for (the receiving agent or workspace); verified against the verifier's expectation. */
+  audience?: string;
+  /** P1-08: single-use value; a verifier's replay cache refuses it a second time. */
+  nonce?: string;
+  /** P1-08: the key that proved the claim and its purpose; an HMAC key never doubles as a signing key. */
+  keyId?: string;
+  keyPurpose?: 'agent-claim-hmac' | 'session';
 }
 
 export interface TrustVerificationResult {
@@ -55,10 +62,130 @@ export interface TrustPolicyRule {
   allowedWorkspaces?: string[];    // whitelist of trusted workspaces
 }
 
+/**
+ * What the verifier expects and allows (P1-08). The identity comes from the verified claim and must equal `issuer`;
+ * `audience` must name this verifier; the issuer must be granted `requestedScope` by `grants` (the verifier's signed
+ * policy: issuer agent id to allowed scopes). An unknown issuer or scope, or no expectation at all, refuses.
+ */
+export interface ClaimExpectation {
+  audience: string;
+  issuer: string;
+  requestedScope: string;
+  grants: Readonly<Record<string, readonly string[]>>;
+  replay: ClaimReplayCache;
+  revokedKeyIds?: readonly string[];
+  now?: Date;
+}
+
+/** Claims live at most this long; an HMAC key's claims cannot outlive it by more. */
+export const MAX_CLAIM_LIFETIME_MS = 24 * 3600_000;
+const DEFAULT_CLAIM_LIFETIME_MS = 3600_000;
+const MAX_CLOCK_SKEW_MS = 60_000;
+const MIN_SECRET_BYTES = 16;
+
+/**
+ * Replay protection for verified claims: each (key id, nonce) is admitted once until its claim expires, and each key at
+ * most `maxUsesPerKey` times. A full cache refuses rather than forgets.
+ * ponytail: in-memory per process; a restart forgets nonces of claims still valid (at most MAX_CLAIM_LIFETIME_MS); a
+ * shared store is the upgrade when verifiers run as several processes.
+ */
+export class ClaimReplayCache {
+  private readonly seen = new Map<string, number>();
+  private readonly uses = new Map<string, number>();
+  constructor(private readonly maxEntries = 100_000, private readonly maxUsesPerKey = 10_000) {}
+
+  admit(keyId: string, nonce: string, expiresMs: number, nowMs: number): 'ok' | 'replay' | 'full' | 'key-exhausted' {
+    for (const [entry, until] of this.seen) if (until < nowMs - MAX_CLOCK_SKEW_MS) this.seen.delete(entry);
+    const entry = `${keyId}:${nonce}`;
+    if (this.seen.has(entry)) return 'replay';
+    if (this.seen.size >= this.maxEntries) return 'full';
+    const used = this.uses.get(keyId) ?? 0;
+    if (used >= this.maxUsesPerKey) return 'key-exhausted';
+    this.seen.set(entry, expiresMs);
+    this.uses.set(keyId, used + 1);
+    return 'ok';
+  }
+}
+
 const LEVEL_ORDER = ['L1', 'L2', 'L3', 'L4', 'L5'];
 
 function levelToNum(level: string): number {
   return LEVEL_ORDER.indexOf(level);
+}
+
+const HMAC_TAG = 'AMC_AGENT_CLAIM_HMAC_V2';
+const SIGNED_TAG = 'AMC_AGENT_CLAIM_V2';
+
+/** The purpose-bound MAC key: derived from the shared secret, so the secret itself never keys anything else. */
+function claimMacKey(sharedSecret: string): Buffer {
+  if (typeof sharedSecret !== 'string' || Buffer.byteLength(sharedSecret, 'utf8') < MIN_SECRET_BYTES) {
+    throw new Error(`the claim secret must be at least ${MIN_SECRET_BYTES} bytes`);
+  }
+  if (/PRIVATE KEY/.test(sharedSecret)) throw new Error('a signing key never doubles as a claim HMAC secret');
+  return createHmac('sha256', sharedSecret).update(`${HMAC_TAG} key`).digest();
+}
+
+/** The id of an HMAC claim key, which names it without revealing it. */
+export function claimHmacKeyId(sharedSecret: string): string {
+  return createHmac('sha256', claimMacKey(sharedSecret)).update('key id').digest('hex');
+}
+
+/** Every bound field, canonical: issuer, audience, key purpose and id, times, nonce, and the claimed score and level. */
+function claimBody(claim: AgentIdentityClaim): string {
+  return canonicalize({
+    v: 2, keyPurpose: claim.keyPurpose ?? null, keyId: claim.keyId ?? null, agentId: claim.agentId, audience: claim.audience ?? null,
+    issuingWorkspace: claim.issuingWorkspace, publicKeyHash: claim.publicKeyHash,
+    issuedAt: claim.issuedAt.toISOString(), expiresAt: claim.expiresAt?.toISOString() ?? null, nonce: claim.nonce ?? null,
+    amcScore: claim.amcScore ?? null, amcLevel: claim.amcLevel ?? null, amcPassportId: claim.amcPassportId ?? null
+  });
+}
+
+function hmacOf(claim: AgentIdentityClaim, sharedSecret: string): Buffer {
+  return createHmac('sha256', claimMacKey(sharedSecret)).update(`${HMAC_TAG}\0`).update(claimBody(claim)).digest();
+}
+
+function signedClaimBytes(claim: AgentIdentityClaim): Buffer {
+  return Buffer.from(`${SIGNED_TAG}\0${claimBody(claim)}`, 'utf8');
+}
+
+type ClaimOptions = { audience?: string; amcScore?: number; amcLevel?: string; amcPassportId?: string; ttlHours?: number };
+
+function unsignedClaim(agentId: string, publicKeyHash: string, issuingWorkspace: string, opts: ClaimOptions | undefined,
+  key: { keyId: string; keyPurpose: 'agent-claim-hmac' | 'session' }): AgentIdentityClaim {
+  if (!opts?.audience) throw new Error('a claim needs an audience: the agent or workspace it is for');
+  const lifetime = opts.ttlHours === undefined ? DEFAULT_CLAIM_LIFETIME_MS : opts.ttlHours * 3600_000;
+  if (!(lifetime > 0) || lifetime > MAX_CLAIM_LIFETIME_MS) throw new Error(`ttlHours must be above 0 and at most ${MAX_CLAIM_LIFETIME_MS / 3600_000}`);
+  const issuedAt = new Date();
+  return {
+    agentId, publicKeyHash, issuingWorkspace, issuedAt, expiresAt: new Date(issuedAt.getTime() + lifetime), signature: '',
+    amcScore: opts.amcScore, amcLevel: opts.amcLevel, amcPassportId: opts.amcPassportId,
+    audience: opts.audience, nonce: randomBytes(16).toString('hex'), ...key
+  };
+}
+
+const refused = (integrity: ClaimIntegrity, reasons: string[]): TrustVerificationResult => ({
+  trusted: false, trustLevel: 'untrusted', reasons, score: 0, level: scoreToLevel(0), grantedScopes: [], integrity, trustTier: 'UNVERIFIED'
+});
+
+/** Binding, lifetime, revocation, replay and authorization checks shared by both claim kinds; null when all pass. */
+function bindingProblems(claim: AgentIdentityClaim, expected: ClaimExpectation | undefined, keyPurpose: 'agent-claim-hmac' | 'session', keyId: string): string[] | null {
+  if (expected === undefined) return ['no verifier expectation (audience, issuer, scope, grants, replay cache): refusing'];
+  const problems: string[] = [];
+  const now = (expected.now ?? new Date()).getTime();
+  if (claim.keyPurpose !== keyPurpose || claim.keyId !== keyId) problems.push('claim names another key or key purpose');
+  if (expected.revokedKeyIds?.includes(keyId)) problems.push(`key ${keyId} is revoked`);
+  if (claim.agentId !== expected.issuer) problems.push(`claim is from ${claim.agentId}, not the expected ${expected.issuer}`);
+  if (claim.audience !== expected.audience) problems.push(`claim is for ${claim.audience ?? 'no audience'}, not ${expected.audience}`);
+  const issued = claim.issuedAt instanceof Date ? claim.issuedAt.getTime() : Number.NaN;
+  const expires = claim.expiresAt instanceof Date ? claim.expiresAt.getTime() : Number.NaN;
+  if (!Number.isFinite(issued) || !Number.isFinite(expires) || expires <= issued || expires - issued > MAX_CLAIM_LIFETIME_MS) problems.push('claim lifetime is missing or longer than allowed');
+  else if (issued > now + MAX_CLOCK_SKEW_MS) problems.push('claim is issued in the future');
+  else if (now > expires + MAX_CLOCK_SKEW_MS) problems.push('claim expired');
+  if (!claim.nonce || !/^[0-9a-f]{32}$/.test(claim.nonce)) problems.push('claim carries no nonce');
+  const allowed = Object.hasOwn(expected.grants, expected.issuer) ? expected.grants[expected.issuer] : undefined;
+  if (allowed === undefined) problems.push(`issuer ${expected.issuer} has no grant in the verifier's policy`);
+  else if (!allowed.includes(expected.requestedScope)) problems.push(`issuer ${expected.issuer} is not granted ${expected.requestedScope}`);
+  return problems.length ? problems : null;
 }
 
 /** HMAC claims: integrity "shared-secret", capped at SELF_REPORTED whatever the score (G6-10). */
@@ -66,58 +193,69 @@ export function verifyAgentClaim(
   claim: AgentIdentityClaim,
   policy: TrustPolicyRule,
   sharedSecret: string,
+  expected?: ClaimExpectation,
 ): TrustVerificationResult {
-  const payload = `${claim.agentId}:${claim.publicKeyHash}:${claim.issuingWorkspace}:${claim.issuedAt.toISOString()}`;
-  const expectedSig = createHmac('sha256', sharedSecret).update(payload).digest('hex');
-  const sigValid = claim.signature === expectedSig;
-  return { ...scoreClaim(claim, policy, sigValid), integrity: sigValid ? 'shared-secret' : 'none', trustTier: sigValid ? 'SELF_REPORTED' : 'UNVERIFIED' };
+  let keyId: string;
+  let sigValid = false;
+  try {
+    keyId = claimHmacKeyId(sharedSecret);
+    const presented = Buffer.from(typeof claim.signature === 'string' ? claim.signature : '', 'hex');
+    const mac = hmacOf(claim, sharedSecret);
+    sigValid = presented.length === mac.length && timingSafeEqual(presented, mac);
+  } catch (error) {
+    return refused('none', [`claim cannot be verified: ${error instanceof Error ? error.message : String(error)}`]);
+  }
+  if (!sigValid) return refused('none', ['SIGNATURE INVALID — claim may be forged']);
+  const problems = bindingProblems(claim, expected, 'agent-claim-hmac', keyId);
+  if (problems) return refused('shared-secret', problems);
+  return finish(scoreClaim(claim, policy, true), expected!, claim, keyId, 'shared-secret', 'SELF_REPORTED');
 }
 
-const CLAIM_TAG = 'AMC_AGENT_CLAIM_V1';
-
-/** Every claim field except the signature, canonical, after the tag and one 0x00 byte: score and level are signed too. */
-function signedClaimBytes(claim: AgentIdentityClaim): Buffer {
-  const body = {
-    agentId: claim.agentId, publicKeyHash: claim.publicKeyHash, issuingWorkspace: claim.issuingWorkspace,
-    issuedAt: claim.issuedAt.toISOString(), expiresAt: claim.expiresAt?.toISOString() ?? null,
-    amcScore: claim.amcScore ?? null, amcLevel: claim.amcLevel ?? null, amcPassportId: claim.amcPassportId ?? null
-  };
-  return Buffer.concat([Buffer.from(CLAIM_TAG, 'ascii'), Buffer.from([0]), Buffer.from(canonicalize(body), 'utf8')]);
+/** Grants only scopes the policy allows the issuer, consumes the nonce last, and fails closed when the cache refuses it. */
+function finish(scored: Omit<TrustVerificationResult, 'integrity' | 'trustTier'>, expected: ClaimExpectation, claim: AgentIdentityClaim, keyId: string,
+  integrity: ClaimIntegrity, trustTier: TrustVerificationResult['trustTier']): TrustVerificationResult {
+  const admitted = expected.replay.admit(keyId, claim.nonce!, claim.expiresAt!.getTime(), (expected.now ?? new Date()).getTime());
+  if (admitted !== 'ok') return refused(integrity, [`claim refused by the replay cache: ${admitted}`]);
+  const allowed = expected.grants[expected.issuer]!;
+  const grantedScopes = scored.grantedScopes.filter(scope => allowed.includes(scope));
+  const trusted = scored.trusted && grantedScopes.includes(expected.requestedScope);
+  return { ...scored, trusted, grantedScopes, integrity, trustTier };
 }
 
-/** P1-08: a claim signed with the agent's Ed25519 session key; publicKeyHash is that key's id. */
+/** P1-08: a claim signed with the agent's Ed25519 session key; publicKeyHash and keyId are that key's id. */
 export function createSignedAgentClaim(
   agentId: string,
   sessionPrivateKeyPem: string,
   issuingWorkspace: string,
-  opts?: { amcScore?: number; amcLevel?: string; amcPassportId?: string; ttlHours?: number },
+  opts?: ClaimOptions,
 ): AgentIdentityClaim {
-  const issuedAt = new Date();
-  const claim: AgentIdentityClaim = {
-    agentId, publicKeyHash: ed25519KeyId(publicKeyFromPrivate(sessionPrivateKeyPem)) ?? '', issuingWorkspace, issuedAt,
-    expiresAt: opts?.ttlHours ? new Date(issuedAt.getTime() + opts.ttlHours * 3600000) : undefined,
-    amcScore: opts?.amcScore, amcLevel: opts?.amcLevel, amcPassportId: opts?.amcPassportId, signature: '',
-  };
+  const keyId = ed25519KeyId(publicKeyFromPrivate(sessionPrivateKeyPem)) ?? '';
+  const claim = unsignedClaim(agentId, keyId, issuingWorkspace, opts, { keyId, keyPurpose: 'session' });
   return { ...claim, signature: sign(null, signedClaimBytes(claim), sessionPrivateKeyPem).toString('base64') };
 }
 
 /**
- * Verifies an Ed25519 claim with the session public key the verifier located, bound by publicKeyHash. The result is
- * ATTESTED only when issuer admission (P0-09) admits that key for `session` in `context`; otherwise SELF_REPORTED.
+ * Verifies an Ed25519 claim with the session public key the verifier located, bound by keyId and publicKeyHash. The
+ * result is ATTESTED only when issuer admission (P0-09) admits that key for `session` in `context`; otherwise
+ * SELF_REPORTED.
  */
 export function verifySignedAgentClaim(
   claim: AgentIdentityClaim,
   policy: TrustPolicyRule,
   input: { publicKeyPem: string; context: TrustContext },
-): TrustVerificationResult & { admission: IssuerAdmission } {
+  expected?: ClaimExpectation,
+): TrustVerificationResult & { admission: IssuerAdmission | null } {
+  const keyId = ed25519KeyId(input.publicKeyPem);
   let sigValid = false;
   try {
-    sigValid = ed25519KeyId(input.publicKeyPem) === claim.publicKeyHash
+    sigValid = keyId !== null && keyId === claim.publicKeyHash
       && verify(null, signedClaimBytes(claim), input.publicKeyPem, Buffer.from(claim.signature, 'base64'));
   } catch { /* reported as an invalid signature */ }
+  if (!sigValid) return { ...refused('none', ['SIGNATURE INVALID — claim may be forged']), admission: null };
+  const problems = bindingProblems(claim, expected, 'session', keyId!);
+  if (problems) return { ...refused('ed25519', problems), admission: null };
   const admission = admitKey({ publicKeyPem: input.publicKeyPem, purpose: 'session', signature: 'agent identity claim', context: input.context, claimedSignedAt: claim.issuedAt });
-  const trustTier = !sigValid ? 'UNVERIFIED' : admission.status === 'admitted' ? 'ATTESTED' : 'SELF_REPORTED';
-  return { ...scoreClaim(claim, policy, sigValid), integrity: sigValid ? 'ed25519' : 'none', trustTier, admission };
+  return { ...finish(scoreClaim(claim, policy, true), expected!, claim, keyId!, 'ed25519', admission.status === 'admitted' ? 'ATTESTED' : 'SELF_REPORTED'), admission };
 }
 
 function scoreClaim(claim: AgentIdentityClaim, policy: TrustPolicyRule, sigValid: boolean): Omit<TrustVerificationResult, 'integrity' | 'trustTier'> {
@@ -453,22 +591,14 @@ export function computeInheritedTrust(
   };
 }
 
+/** An HMAC claim bound to its audience, key, nonce and lifetime (at most 24 hours; 1 hour by default). */
 export function createAgentClaim(
   agentId: string,
   publicKeyHash: string,
   issuingWorkspace: string,
   sharedSecret: string,
-  opts?: { amcScore?: number; amcLevel?: string; amcPassportId?: string; ttlHours?: number },
+  opts?: ClaimOptions,
 ): AgentIdentityClaim {
-  const issuedAt = new Date();
-  const expiresAt = opts?.ttlHours ? new Date(issuedAt.getTime() + opts.ttlHours * 3600000) : undefined;
-  const payload = `${agentId}:${publicKeyHash}:${issuingWorkspace}:${issuedAt.toISOString()}`;
-  const signature = createHmac('sha256', sharedSecret).update(payload).digest('hex');
-
-  return {
-    agentId, publicKeyHash, issuingWorkspace, issuedAt, expiresAt, signature,
-    amcScore: opts?.amcScore,
-    amcLevel: opts?.amcLevel,
-    amcPassportId: opts?.amcPassportId,
-  };
+  const claim = unsignedClaim(agentId, publicKeyHash, issuingWorkspace, opts, { keyId: claimHmacKeyId(sharedSecret), keyPurpose: 'agent-claim-hmac' });
+  return { ...claim, signature: hmacOf(claim, sharedSecret).toString('hex') };
 }
