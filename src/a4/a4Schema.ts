@@ -268,6 +268,11 @@ export function mapRiskTier(tier: "low" | "med" | "medium" | "high" | "critical"
   return tier === "med" ? "medium" : tier;
 }
 
+/** The routers' request fields (src/a4/a4Router.ts, src/a4/a4RouterStages.ts): a client request id, an expected sequence, a stated reason. */
+export const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
+export const headSeqSchema = z.number().int().min(0);
+export const reasonSchema = z.string().trim().min(1).max(2000);
+
 const a4QuestionSchema = z.strictObject({
   id: nonEmpty, stage: z.enum(A4_STAGES), prompt: nonEmpty, dependsOn: z.array(z.string()),
   required: z.boolean(), kind: z.enum(["text", "list", "choice", "fact"])

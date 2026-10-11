@@ -30,7 +30,7 @@ import {
   a4Fail, assertNoSecrets, callOf, mutationResult, precheck, priorReplay, readJson, requirePrincipal, stageInput, type A4Route
 } from "./a4Router.js";
 import { flatSlots,
-  a4ResourceDigestsSchema, gatePolicyDigestOf, type A4Principal, type A4Question, type A4Stage, type A4Step
+  a4ResourceDigestsSchema, clientRequestIdSchema, gatePolicyDigestOf, headSeqSchema, reasonSchema, type A4Principal, type A4Question, type A4Stage, type A4Step
 } from "./a4Schema.js";
 import { PRODUCERS as ACTIVATE_PRODUCERS, QUESTIONS as ACTIVATE_QUESTIONS } from "./spec/activate.js";
 import { PRODUCERS as ADAPT_PRODUCERS, QUESTIONS as ADAPT_QUESTIONS } from "./spec/adapt.js";
@@ -112,9 +112,6 @@ const STEP_ROUTES: Record<StepRoute, { action: A4Action; from: readonly A4Step[]
   review: { action: "review", from: ["built"], to: "reviewed", output: "review" }
 };
 const UNDERSTANDING_STEPS: ReadonlySet<StepRoute> = new Set(["confirm-understanding", "explain", "propose"]);
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
 const base = { expectedHeadSeq: headSeqSchema, clientRequestId: clientRequestIdSchema };
 // Required on the no-producer path (stageStep); beside a producer it is the member's own statement, recorded next to AMC's.
 const content = z.string().trim().min(1).max(65_536).optional();
