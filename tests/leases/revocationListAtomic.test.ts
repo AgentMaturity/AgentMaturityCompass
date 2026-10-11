@@ -4,7 +4,8 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPrivateKeyPem, signHexDigest } from "../../src/crypto/keys.js";
 import { loggedAnchor } from "../../src/keys/anchors.js";
-import { revocationListSha256 } from "../../src/keys/revocationList.js";
+import { getSigningKey, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
+import { encodeSignedRevocationList, nextRevocationList, revocationListSha256, signRevocationList } from "../../src/keys/revocationList.js";
 import {
   leaseRevocationPaths, loadLeaseRevocations, readVerifiedLeaseRevocations, revokeLease, revokedLeaseIdSet, verifyLeaseRevocationsSignature
 } from "../../src/leases/leaseStore.js";
@@ -117,5 +118,17 @@ describe("single-file signed lease revocations (P1-08)", () => {
     expect(list.sequence).toBe(3);
     expect(list.revoked.map((row: { id: string }) => row.id)).toEqual(["lease-live", "lease-forever"]);
     expect(list.revoked[0].expiresAt).toMatch(/Z$/);
+  });
+
+  it("refuses a list signed by another auditor purpose's key after a purpose split (self-audit)", () => {
+    const root = workspace();
+    revokeLease(root, "lease-a", "revoked");
+    rotatePurposeKeys({ workspace: root, purposes: ["config-signature"], passphrase: "amc-test-passphrase" });
+    const { list } = signedList(root);
+    const unrevoked = nextRevocationList(list.listId, { sequence: list.sequence, sha256: revocationListSha256(list) }, [], 0);
+    const file = leaseRevocationPaths(root).file;
+    rmSync(file);
+    writeFileSync(file, encodeSignedRevocationList(signRevocationList(unrevoked, getSigningKey(root, "config-signature"))));
+    expect(readVerifiedLeaseRevocations(root)).toMatchObject({ ok: false });
   });
 });

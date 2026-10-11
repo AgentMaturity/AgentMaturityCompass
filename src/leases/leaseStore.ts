@@ -1,6 +1,7 @@
 import { dirname, join } from "node:path";
-import { getSigningKey, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
 import { logSequence } from "../keys/anchorLog.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { assertNeverAnchored, loggedAnchor } from "../keys/anchors.js";
 import {
   MAX_REVOCATION_LIST_BYTES, nextRevocationList, publishRevocationList, readAnchoredRevocationList, recoverPendingRevocationList,
@@ -46,8 +47,9 @@ function listIdFor(workspace: string): string {
   return `leases:${workspaceIdFromDirectory(workspace)}`;
 }
 
+/** The revocation-list purpose's admitted keys (the auditor role's before migration), never another auditor purpose's. */
 function trustedKeys(workspace: string): string[] {
-  return getPublicKeyHistory(workspace, "auditor");
+  return getPurposeKeyHistory(workspace, "revocation-list");
 }
 
 // Every store file is reached through src/utils/containedFs.ts: real directories below the workspace, no symlink,
