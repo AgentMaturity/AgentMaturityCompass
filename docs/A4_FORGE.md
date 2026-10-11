@@ -469,7 +469,9 @@ separation of duties. The preview names the previous release, its Enforce manife
 and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
 pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a second attempt while one runs is refused
-(`EFFECT_RUNNING`). Then it runs these steps:
+(`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
+to mint (`RELEASE_ROLLED_BACK`) while a rollback attempt has not settled, so no lease is minted beside a rollback. Then
+it runs these steps:
 
 1. The engine grant, consumed by this rollback's execution.
 2. An incident freeze, first, for a high or critical risk tier.
@@ -482,7 +484,9 @@ pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a secon
 
 A step that throws is `EFFECT_FAILED` with its code, and readiness names the rollback route to run it again. An attempt
 whose outcome could not be written reads as lost (`PROCESS_LOST`). The next request settles it first, then re-runs the
-steps; the restore and the revocations are idempotent. A replay of the request answers that attempt's outcome. A
+steps on the grant this rollback's execution already consumed, whose quorum is not asked again (a grant another
+execution consumed is refused `GRANT_ALREADY_USED`); the restore and the revocations are idempotent. Before it settles,
+the rollback reads the lease journal again and revokes any lease minted after its first read. A replay of the request answers that attempt's outcome. A
 rollback may run on a held or frozen project, and the operator's rollback row after it may be recorded there too. The lifecycle is never moved backwards. The project's
 `deployedReleaseId` moves only when the operator records the rollback row.
 

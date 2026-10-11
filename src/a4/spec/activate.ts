@@ -62,6 +62,13 @@ export const ACTIVATE_CLAIM_BOUNDARY = "Deployment is recorded from the operator
 export const RELEASE_EFFECT_ID = "a4.activate.release";
 export const PRODUCTION_LEASE_EFFECT_ID = "a4.activate.production_lease";
 export const ROLLBACK_EFFECT_ID = "a4.activate.rollback";
+/** The rollback's execution id: one per release, so every attempt of it shares the grant and the liveness rule. */
+export const rollbackExecutionId = (releaseId: string): string => `a4-rollback-${releaseId}`;
+/** Whether an attempt EFFECT_STARTED names (as `match` reads its body) has neither finished nor failed on `chain`: running, or lost and not yet swept. */
+export function effectUnsettled(chain: readonly A4ChainLink[], match: (body: Record<string, unknown>) => boolean): boolean {
+  const settled = new Set(chain.filter((link) => link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED").map((link) => link.body.effectId));
+  return chain.some((link) => link.kind === "EFFECT_STARTED" && match(link.body) && !settled.has(link.body.effectId));
+}
 export const STAGING_LEASE_TTL_MS = 24 * 60 * 60 * 1000;
 /** No unauthenticated digest source exists at a destination until P2-40 (D-18 option 1). */
 export const IDENTITY_NOT_EVALUATED = "no unauthenticated digest source at the destination (P2-40)";

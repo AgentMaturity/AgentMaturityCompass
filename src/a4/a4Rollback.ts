@@ -33,7 +33,7 @@ import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { ROLLBACK_EFFECT_ID } from "./spec/activate.js";
+import { effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, ROLLBACK_EFFECT_ID, rollbackExecutionId } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const FROZEN_CLASSES: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
@@ -117,14 +117,14 @@ export function previewRollback(store: A4Store, projectId: string, releaseId: st
   return { result, preview, approvalRequestId };
 }
 
-/** The rollback's execution id: one per release, so every attempt of it shares the grant and the liveness rule. */
-export const rollbackExecutionId = (releaseId: string): string => `a4-rollback-${releaseId}`;
-
 /**
  * POST …/releases/:rid/rollback (owner): the exact-id confirmation of the opened preview, then the effect, journaled as
- * every A4 effect is (plan §7 rule 9). The checks run on rows read now (a lost earlier attempt settled first, as
- * process_lost); EFFECT_STARTED (owner pid and host, heartbeat) and its liveness row commit pinned to `expectedHeadSeq`,
- * refused while another attempt runs (409 EFFECT_RUNNING). Only then: the engine grant consumed as step 0, the freeze,
+ * every A4 effect is (plan §7 rule 9). The checks run on rows read now (a lost earlier attempt, and a lost production-lease
+ * effect, settled first as process_lost); the grant's quorum is verified only while it is unconsumed (one this rollback's
+ * own execution consumed already proved it, as retryEffect treats it; one another execution consumed is GRANT_ALREADY_USED);
+ * EFFECT_STARTED (owner pid and host, heartbeat) and its liveness row commit pinned to `expectedHeadSeq`, refused while
+ * another attempt runs or the deployment approval's production-lease effect does (409 EFFECT_RUNNING: a lease it minted
+ * after this read would outlive the rollback). Only then: the engine grant consumed as step 0, the freeze,
  * the Enforce restore, every lease of the release revoked (read again now: the preview's, a production lease minted after
  * it, and a failed attempt's from the lease journal), and the signed receipt; ROLLBACK and EFFECT_FINISHED settle it in one
  * transaction (its intent binds the preview, so it checks no resource slot). A step that throws is EFFECT_FAILED with its
@@ -138,8 +138,11 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   const { body } = input;
   const now = Date.now();
   const executionId = rollbackExecutionId(releaseId);
-  // A lost earlier attempt is settled first, so it never holds the rollback shut; the head the client saw moves by exactly those rows.
-  const expectedHeadSeq = body.expectedHeadSeq + sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId }).length;
+  // A lost earlier attempt, and a lost production-lease effect, are settled first, so neither holds the rollback shut; the
+  // head the client saw moves by exactly those rows.
+  const lost = new Set([executionId, ...store.readChain(projectId).filter((link) => link.kind === "EFFECT_STARTED" && link.body.effect === PRODUCTION_LEASE_EFFECT_ID)
+    .map((link) => String(link.body.executionId))]);
+  const expectedHeadSeq = body.expectedHeadSeq + [...lost].reduce((count, id) => count + sweepA4Effects(store, DEFAULT_ACTION_STALE_AFTER_MS, { projectId, executionId: id }).length, 0);
   const { state, principal } = rollbackState(store, projectId, input, expectedHeadSeq, now);
   const opened = [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.effect === ROLLBACK_EFFECT_ID
     && (link.body.intent as { releaseId?: unknown } | undefined)?.releaseId === releaseId);
@@ -153,7 +156,13 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   if (state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
   const { gate } = releaseAndGate(state, releaseId);
   const approvalRequestId = String(opened.body.approvalRequestId);
-  verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
+  // An earlier attempt that ran step 0 consumed the grant for this execution, which proved its quorum (retryEffect's rule):
+  // it is re-run on that grant. A grant another execution consumed is refused; only an unconsumed one is verified now.
+  const consumed = loadApprovalConsumed({ workspace: store.workspace, agentId: state.project.agent_id, approvalRequestId });
+  if (consumed !== null && consumed.executionId !== executionId) throw fail(409, "GRANT_ALREADY_USED", "The rollback's engine grant was consumed by another execution.");
+  if (consumed === null) {
+    verifyAndConsumeEffect(store, state, { def: effectDef(intent), gate, approvalRequestId, callerKey: principal.key, regulated: isRegulated(state, signedA4Floor(store.workspace)) });
+  }
   // Signing keys first: every later step signs, and none may run when the record of it could not be written.
   try {
     getPrivateKeyPem(store.workspace, "auditor");
@@ -173,10 +182,13 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   const started = store.transition(projectId, principal, ({ ts }) => {
     const chain = store.readChain(projectId);
     if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
-    const settled = new Set(chain.filter((link) => (link.kind === "EFFECT_FINISHED" || link.kind === "EFFECT_FAILED") && link.body.executionId === executionId)
-      .map((link) => link.body.effectId));
-    if (chain.some((link) => link.kind === "EFFECT_STARTED" && link.body.executionId === executionId && !settled.has(link.body.effectId))) {
+    if (effectUnsettled(chain, (started) => started.executionId === executionId)) {
       throw fail(409, "EFFECT_RUNNING", "Another attempt of this rollback is still running; retry once it has settled.");
+    }
+    // The production-lease effect checks for this rollback before it mints (assertProductionCurrent); one already past that
+    // check is still running here, and its lease would outlive the rollback.
+    if (effectUnsettled(chain, (started) => started.effect === PRODUCTION_LEASE_EFFECT_ID)) {
+      throw fail(409, "EFFECT_RUNNING", "The deployment approval's production-lease effect is still running; roll back once it has settled.");
     }
     return { kind: "EFFECT_STARTED", stage: gate.stage, revisionNo: gate.revision_no, payload: { effectId: attemptId, effect: ROLLBACK_EFFECT_ID, gateId: gate.gate_id, executionId,
       approvalRequestId, releaseId, ownerPid: process.pid, ownerHost: hostname(), heartbeatTs: ts },
@@ -190,6 +202,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   try {
     let file: { path: string; sha256: string };
     let restoreReceipt: string | null = null;
+    let revokedIds = leaseIds;
     try {
       // Step 0: the engine grant, consumed by this execution (a replay by it is this rollback's own retry).
       const grant = consumeApprovedExecution({ workspace: store.workspace, approvalId: approvalRequestId, expectedAgentId: agentId, executionId });
@@ -223,16 +236,29 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
           return new Set<string>();
         }
       })();
-      for (const leaseId of leaseIds.filter((id) => !revoked.has(id))) {
-        try {
-          revokeLease(store.workspace, leaseId, `A4 rollback of release ${releaseId}`);
-        } catch (error) {
-          throw fail(409, "LEASE_REVOKE_FAILED", `${leaseId}: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`, { frozen, restoreReceipt });
+      const revokeEach = (ids: readonly string[]): void => {
+        for (const leaseId of ids.filter((id) => !revoked.has(id))) {
+          try {
+            revokeLease(store.workspace, leaseId, `A4 rollback of release ${releaseId}`);
+          } catch (error) {
+            throw fail(409, "LEASE_REVOKE_FAILED", `${leaseId}: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`, { frozen, restoreReceipt });
+          }
         }
+      };
+      revokeEach(leaseIds);
+      // The lease journal read again: a lease minted after the first read (nothing should, with the production effect refused
+      // beside this one) is revoked before the rollback settles, never left live on a rolled-back release.
+      let late: string[];
+      try {
+        late = journaledLeaseIds(store.workspace, projectId, releaseId).filter((id) => !leaseIds.includes(id));
+      } catch (error) {
+        throw fail(409, "LEASE_JOURNAL_UNREADABLE", `the release's lease journal does not read again: ${(error instanceof Error ? error.message : String(error)).slice(0, 200)}`, { frozen, restoreReceipt });
       }
+      revokeEach(late);
+      revokedIds = [...leaseIds, ...late];
       const doc = a4RollbackReceiptV1Schema.parse({ schema: "amc.a4-rollback-receipt/v1", rollbackId, releaseId, toReleaseId: body.toReleaseId, projectId,
         environment: body.environment, target: preview.target, enforceManifestId: body.confirmManifestId, preparedCommands: preview.preparedCommands,
-        leaseIdsRevoked: leaseIds, receiptSha256: sha256Hex(canonicalize({ restoreReceipt, leaseIdsRevoked: leaseIds, frozen })),
+        leaseIdsRevoked: revokedIds, receiptSha256: sha256Hex(canonicalize({ restoreReceipt, leaseIdsRevoked: revokedIds, frozen })),
         // AMC's own steps (restore, revocations) completed; what the operator then ran is the rollback row they record.
         recordedStatus: "succeeded", amcCheckStatus: "not_evaluated", recordedByKey: principal.key, claimKind: "self_reported", ts: now });
       file = writeReleaseRecord(store.workspace, projectId, "rollbacks", releaseId, rollbackId, doc, "a4-rollback-receipt");
@@ -256,13 +282,13 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
       }
       return [{ kind: "ROLLBACK", stage: head!.stage, payload: { rollbackId, releaseId, toReleaseId: body.toReleaseId, environment: body.environment, approvalRequestId,
         executionId, attemptId, confirmedByKey: principal.key, receiptPath: file.path, receiptFileSha256: file.sha256, enforceManifestId: body.confirmManifestId,
-        restoreReceiptPath: restoreReceipt, leaseIdsRevoked: leaseIds, freezeIncidentId: frozen, reason: body.reason, lifecycle: "not moved (never backwards)",
+        restoreReceiptPath: restoreReceipt, leaseIdsRevoked: revokedIds, freezeIncidentId: frozen, reason: body.reason, lifecycle: "not moved (never backwards)",
         runtimeRunEvent: "not appended: no run of the deployed runtime was observed", claimKind: "self_reported" },
       sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage,
         lane: "implementation", ref_kind: "rollback_receipt", ref_id: file.path, sha256: file.sha256, claim_kind: "self_reported", trust_tier: null, method: null,
         label: `rollback ${rollbackId} of ${releaseId}: AMC restored and revoked; the operator's run is their rollback row (self_reported)`, actor_key: A4_RUNTIME.key, ts } }] },
       { kind: "EFFECT_FINISHED", stage: gate.stage, revisionNo: gate.revision_no, payload: { effectId: attemptId, effect: ROLLBACK_EFFECT_ID, executionId, approvalRequestId,
-        consumedExecutionId: null, receipt: null, slotChecks: [], record: { rollbackId, releaseId, leaseIdsRevoked: leaseIds } },
+        consumedExecutionId: null, receipt: null, slotChecks: [], record: { rollbackId, releaseId, leaseIdsRevoked: revokedIds } },
       settleEffect: { effectId: attemptId, state: "finished" as const } }];
     }));
     let result: A4TransitionResult;
@@ -274,7 +300,7 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
       result = settle();
     }
     if (frozen !== null) autoHold(store, projectId, [frozen]);
-    return { result, attemptId, rollbackId, receiptPath: file.path, leaseIdsRevoked: leaseIds, preparedCommands: preview.preparedCommands, frozen };
+    return { result, attemptId, rollbackId, receiptPath: file.path, leaseIdsRevoked: revokedIds, preparedCommands: preview.preparedCommands, frozen };
   } finally {
     pendingExecutors.delete(attemptId);
   }

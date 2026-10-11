@@ -60,8 +60,8 @@ import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, type LeasePlan
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, effectUnsettled, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
+  PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, rollbackExecutionId, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -702,8 +702,9 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
 
 /**
  * The project read now still stands where the consumed deployment approval left it: Activate at completion_approved on
- * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release and not rolled
- * back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK). Read from the store, not the executor's preloaded rows.
+ * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release, neither rolled
+ * back nor being rolled back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK: a rollback attempt that has not settled
+ * revokes only the leases it read, so no lease is minted beside it). Read from the store, not the executor's preloaded rows.
  */
 function assertProductionCurrent(workspace: string, projectId: string, gate: A4EffectContext["gate"], releaseId: string): void {
   const store = openA4Store(workspace);
@@ -711,6 +712,9 @@ function assertProductionCurrent(workspace: string, projectId: string, gate: A4E
     const head = store.readHead(projectId);
     const chain = store.readChain(projectId);
     if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
+    if (effectUnsettled(chain, (started) => started.executionId === rollbackExecutionId(releaseId))) {
+      throw coded("RELEASE_ROLLED_BACK", `a rollback of release ${releaseId} is running or did not settle`);
+    }
     const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
     if (consumed === undefined || head?.stage !== "activate" || head.step !== "completion_approved" || head.revision_no !== gate.revision_no
       || currentRelease(chain)?.body.releaseId !== releaseId || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {
