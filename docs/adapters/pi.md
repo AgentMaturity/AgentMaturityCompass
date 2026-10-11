@@ -75,6 +75,7 @@ What a registration is: registration made with the session lease and matching on
 
 - A call in a Pi session without a verified registration under the current installation is denied: the session is not governed, and nothing reads "enforced".
 - A call naming another Pi version than its session registered is denied.
+- Every call rechecks the installed `.pi/extensions/amc.js`, AMC's extension module and the bound Pi install against what the session registered, through a digest cache keyed on each file's device, inode, size and ctime. After a swap the call is denied as not governed, with an advisory receipt, never one marked enforced.
 - A registration whose ledger row or receipt fails verification counts as none: the call is denied and `status` reports the workspace invalid.
 - `amc connect hooks status|health --provider pi` derive the claim from registrations under the current manifest: `enforced_at_pi_tool_call` when the installation's status is `installed` and at least one such session runs a qualified Pi, otherwise `not_governed` (observe installations read `observed`). A drifted, expired or invalid installation, or a reinstall no session has registered under yet, reads `not_governed`. They always add: AMC cannot see sessions where Pi did not load the extension; they are reported as not governed.
 
@@ -122,7 +123,7 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 `tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-12-P1-22/pi-conformance.json`, hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-11T22:15:30.550Z on local macOS arm64 (not CI), AMC commit `7b0978ca7a7d`.
+Run 2026-10-11T22:29:46.215Z on local macOS arm64 (not CI), AMC commit `e4240280fe58`.
 
 | Case | Pi 1.0.2 | Pi 1.0.4 |
 |---|---|---|
@@ -138,7 +139,7 @@ Run 2026-10-11T22:15:30.550Z on local macOS arm64 (not CI), AMC commit `7b0978ca
 | Bridge stopped: tool ran | no | no |
 | Decision receipts verified cold | 117 verified, 0 failed | 117 verified, 0 failed |
 | Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
-| Decision latency p50 / p95 (ms, n) | 60.3 / 81.9 (100) | 60.8 / 74.5 (100) |
+| Decision latency p50 / p95 (ms, n) | 60 / 101.8 (100) | 66.5 / 99.6 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).

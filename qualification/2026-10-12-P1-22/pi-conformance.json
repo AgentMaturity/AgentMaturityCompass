@@ -1,8 +1,8 @@
 {
   "schema": "amc.pi-conformance/v1",
   "key": "P1-22",
-  "amcCommit": "7b0978ca7a7dd9c51845e9a1ce49674e1362542e",
-  "recordedAt": "2026-10-11T22:15:30.550Z",
+  "amcCommit": "e4240280fe580c7fc442c6d95870bb003823ef5b",
+  "recordedAt": "2026-10-11T22:29:46.215Z",
   "recordedAtSource": "this machine's clock when the record was written, after the runs",
   "environment": {
     "label": "local macOS arm64 (not CI)",
@@ -99,8 +99,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 60.3,
-          "p95": 81.9,
+          "p50": 60,
+          "p95": 101.8,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
@@ -204,8 +204,8 @@
         },
         "latencyMs": {
           "n": 100,
-          "p50": 60.8,
-          "p95": 74.5,
+          "p50": 66.5,
+          "p95": 99.6,
           "measured": "extension tool_call handler to its result: requested observation, control decision, receipt check; loopback Bridge"
         },
         "receiptsVerified": {
@@ -224,7 +224,7 @@
     "@earendil-works/pi-coding-agent 1.1.0 (2026-10-07): not run; AMC denies it (AMC has not qualified Pi 1.1.0).",
     "Pi embedded through its SDK: it resolves @earendil-works/pi-agent-core from node_modules (1.1.0 here) and reports mode print; not run."
   ],
-  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured above it here.",
+  "latencyTarget": "The overhead gate allows 50 ms p95 for local authorization (P1-22 risks); both versions measured above it here, with a load average near 13 on the machine. The per-call disk recheck alone (extension file, AMC module, Pi bundle through the stat-keyed cache) measured p50 0.49 ms and p95 0.95 ms warm (200 runs, Pi 1.0.4 bundle).",
   "mutations": [
     {
       "mutation": "S1 binding: client skips the request digest check",
@@ -345,6 +345,10 @@
     {
       "mutation": "review K1 pins: ops receipt verification accepts the monitor role history",
       "result": "RED Tests  1 failed (1) :: ops receipt verification accepts a receipt-purpose signature and refuses a ledger-row one"
+    },
+    {
+      "mutation": "review D1 per-call: a swapped extension or Pi on disk is not rechecked at each call",
+      "result": "RED Tests  1 failed | 7 passed (8) :: every call rechecks the extension and Pi on disk: after a swap the call is denied as not governed, never receipted enforced"
     }
   ],
   "codeArtifacts": {
