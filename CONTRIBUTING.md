@@ -66,7 +66,7 @@ All tests must pass before submitting a PR.
   ```bash
   npm run quality:baseline -- dead-code --accept <id> --reason "why this finding stays, and who owns it"
   ```
-  Run one `--accept` per new finding in the PR that adds it. Renaming or moving a file makes its duplicate pairs new; accept them in the refactor PR the same way.
+  Run one `--accept` per new finding in the PR that adds it. Renaming or moving a file makes its duplicate pairs new; accept them in the refactor PR the same way. jscpd reports each copied fragment against one partner file, so adding or removing a copy can move an existing clone to another pair: that shows as one new and one stale entry. Shrink, then accept the re-paired finding with a reason that names the move.
 - an entry is **stale** (its finding is gone, including an accepted one). After you pay down debt, shrink the baseline and commit it. `--shrink` only removes entries; it never adds one:
   ```bash
   npm run quality:baseline -- duplicates --shrink
