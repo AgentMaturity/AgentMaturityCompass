@@ -32,3 +32,12 @@ byte-for-byte from a copy (cmp confirmed).
    b. an unreadable base returns exit 0 instead of failing closed
       -> the same test fails.
    The script was restored from a copy (cmp confirmed).
+
+7. Rebaseline-record rule (coordinator decision; the temp-git-repo test asserts each failure path:
+   no record, a record from other values, a wrong count, a short reason or empty author (parse),
+   no real version/hash change, an added entry not produced by the scan):
+   a. the record match ignores toolFrom/toolTo (`scan === scan || ...`)
+      -> "refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)" fails.
+   b. the real-change requirement is disabled (`if (false)`)
+      -> the same test fails.
+   The script was restored from a copy (cmp confirmed).

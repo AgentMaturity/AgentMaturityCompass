@@ -8,8 +8,9 @@ Environment: local macOS arm64 (Darwin 25.6.0, macOS 26.6.2), Node v25.5.0, pnpm
 
 ## Baseline
 
-- Generated with `node scripts/source-quality.mjs <scan> --rebaseline --reason "initial baseline (D-11)"` for both scans on a clean tree at `35c193fdc550f9786424d18fd447902db19572de`. That commit is `int` at `a1aef9d69` (P0-14 landed) merged with this branch's code. The baseline was committed in `0a3fbad7c`. Later commits change only `CONTRIBUTING.md`, `.github/workflows/ci.yml`, `scripts/source-quality.mjs` (the base check), `tests/sourceQualityRatchet.test.ts` and this folder. Both checks still report 0 new and 0 stale at `13828fbdf` (`checks.json`).
-- Counts: 1,254 duplicate findings and 2,787 dead-code findings (types 1,552, exports 1,177, files 51, binaries 5, devDependencies 1, duplicate exports 1), with 0 accepted. The file is 586,489 bytes. Tools: jscpd 5.4.0 and knip 6.39.0. Config SHA-256 values: `.jscpd.json` `b0b0290e…e209`, `knip.json` `43edb97d…82c1`.
+- First generated with `node scripts/source-quality.mjs <scan> --rebaseline --reason "initial baseline (D-11)"` for both scans on a clean tree at `35c193fdc` (`int` at `a1aef9d69`, where P0-14 landed, merged with this branch's code), and committed in `0a3fbad7c`.
+- Regenerated from scratch the same way at `279eb4cb6` (committed in `b87664e4a`), so the file carries the two bootstrap `rebaselines` records. The arrays, tools and config are identical to the first run. Both checks report 0 new and 0 stale at `b87664e4a` (`checks.json`).
+- Counts: 1,254 duplicate findings and 2,787 dead-code findings (types 1,552, exports 1,177, files 51, binaries 5, devDependencies 1, duplicate exports 1), with 0 accepted. The file is 587,016 bytes. Tools: jscpd 5.4.0 and knip 6.39.0. Config SHA-256 values: `.jscpd.json` `b0b0290e…e209`, `knip.json` `43edb97d…82c1`.
 - P0-14: dead-code was 2,781 at `e1e1a1bb5` and is 2,787 after the merge of `int` `a1aef9d69`. P0-14's six findings are therefore in the generated baseline, with no hand edit.
 - Duplicate ids: jscpd reports 108 repeats of an identical identity (the same normalised fragment twice in one file pair). The k-th repeat's id is the SHA-256 of `<identity>#k`, so a further copy is still new.
 
@@ -31,7 +32,7 @@ Lines 69–200 of `src/a4/a4Router.ts` were copied into an untracked `src/p152Fi
 
 - Mutations: see `mutations.txt`. Both spec mutations, plus the reason, drift, committed-baseline and base-check guards, each failed at least one test.
 - Release gate: `releaseGate()` from `scripts/release-gate.mjs` ran with an executor that executed only `source-duplicates` and `source-dead-code`, and both passed (`release-gate-source-steps.json`). The other 19 registered steps were not run, and the full `npm run release:gate` was not evaluated.
-- First trend row (header in CONTRIBUTING.md): `| 2026-10-11 | 13828fbdff6f | 1254 / 2787 | 1254 / 2787 | 0 / 0 | 0 / 0 | 0 / 0 |`
+- First trend row (header in CONTRIBUTING.md): `| 2026-10-11 | b87664e4a3af | 1254 / 2787 | 1254 / 2787 | 0 / 0 | 0 / 0 | 0 / 0 |`
 
 ## Base-branch subset check (added after review)
 
@@ -40,8 +41,12 @@ A branch could hand-add its own new findings to the `duplicates` or `deadCode` a
 - Removals always pass. A new finding enters only through `--accept` with a reason.
 - A base with no baseline file is the one-time bootstrap. This branch runs on that path: neither `origin/main` (`cc063bdac`) nor `int` (`a1aef9d69`) has a baseline.
 - Any other unreadable base fails closed unless `--allow-missing-base` is passed.
-- A scan whose tool version or config hash changed since the base may add entries. That is the reviewed `--rebaseline` path; without it, a tool upgrade could never land.
+- A rebaseline may add entries only when all three hold (coordinator decision). Each failure path has a test, and mutations are recorded in `mutations.txt`:
+    - (a) the baseline's `rebaselines` record, written by `--rebaseline`, goes from the base's tool version and config hash to the current ones, counts exactly the added entries, and carries a 20+ character reason, `git config user.name` and the date;
+    - (b) the version or hash really differs from the base's;
+    - (c) every added entry is a current finding.
 - Real-repo demonstration (`base-check-hand-add.log`): a dead file's entry, hand-added with `--base HEAD`, passes the ratchet (0 new) but fails the base check, exit 1.
+- Found while regenerating: the `--rebaseline` dirty-tree guard parsed trimmed `git status` output, so its own modified or deleted baseline counted as dirty. It now excludes the baseline by pathspec (`279eb4cb6`). An unrelated untracked file is still refused, as checked by hand.
 - The gate's `source-duplicates` and `source-dead-code` steps already run these npm scripts, so they include the check with the default base.
 
 ## Top candidates (listed only; nothing was deleted)

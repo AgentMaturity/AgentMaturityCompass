@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P1-52",
   "date": "2026-10-11",
-  "commit": "13828fbdff6f01822cc1260ccab2c843bdef00c0",
+  "commit": "b87664e4a3af3e26ad9c3f53e05be5d3ce39e1d4",
   "branch": "rtd/p1-52-source-quality-ratchet",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -95,89 +95,114 @@
       "durationMs": 0
     },
     {
+      "cmd": "npx vitest run tests/sourceQualityRatchet.test.ts before the rebaseline-record rule (RED: 2 failed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "2 mutation runs of the rebaseline-record rule (each expected to fail; see mutations.txt)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs duplicates --rebaseline (baseline deleted, before the guard fix: refused as dirty)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "rm baseline; node scripts/source-quality.mjs duplicates|dead-code --rebaseline --reason \"initial baseline (D-11)\" (at 279eb4cb6)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "touch src/p152Dirty.ts; node scripts/source-quality.mjs dead-code --rebaseline --reason ... (expect 1, refused)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
       "cmd": "npm run -s build",
       "exit": 0,
-      "durationMs": 41570
+      "durationMs": 40879
     },
     {
       "cmd": "npm run -s typecheck",
       "exit": 0,
-      "durationMs": 32603
+      "durationMs": 28785
     },
     {
       "cmd": "npm run -s typecheck:tests",
       "exit": 0,
-      "durationMs": 57814
+      "durationMs": 47897
     },
     {
       "cmd": "npm run -s lint",
       "exit": 0,
-      "durationMs": 3322
+      "durationMs": 2904
     },
     {
       "cmd": "npx vitest run tests/sourceQualityRatchet.test.ts tests/sourceQuality.test.ts tests/releaseGateExecution.test.ts",
       "exit": 0,
-      "durationMs": 3000
+      "durationMs": 2647
     },
     {
       "cmd": "npm run -s check:duplicates",
       "exit": 0,
-      "durationMs": 824
+      "durationMs": 862
     },
     {
       "cmd": "npm run -s check:dead-code",
       "exit": 0,
-      "durationMs": 3811
+      "durationMs": 3183
     },
     {
       "cmd": "node scripts/source-quality.mjs trend",
       "exit": 0,
-      "durationMs": 2869
+      "durationMs": 3334
     },
     {
       "cmd": "npm run -s check:counts",
       "exit": 0,
-      "durationMs": 396
+      "durationMs": 401
     },
     {
       "cmd": "npm run -s check:docs-drift",
       "exit": 0,
-      "durationMs": 301
+      "durationMs": 309
     },
     {
       "cmd": "npm run -s check:freeze",
       "exit": 0,
-      "durationMs": 1620
+      "durationMs": 1549
     },
     {
       "cmd": "npm run -s check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1520
+      "durationMs": 2018
     },
     {
       "cmd": "npm run -s check:gates",
       "exit": 0,
-      "durationMs": 295
+      "durationMs": 311
     },
     {
       "cmd": "npm run -s check:schemas",
       "exit": 0,
-      "durationMs": 580
+      "durationMs": 617
     },
     {
       "cmd": "npm run -s check:api-ref",
       "exit": 0,
-      "durationMs": 191
+      "durationMs": 207
     },
     {
       "cmd": "npm run -s check:threat-model",
       "exit": 0,
-      "durationMs": 221
+      "durationMs": 235
     },
     {
       "cmd": "npm run -s check:qualification",
       "exit": 0,
-      "durationMs": 233
+      "durationMs": 250
     }
   ],
   "tests": {
@@ -193,7 +218,7 @@
     },
     {
       "path": "checks.json",
-      "sha256": "cb109203e1ceaefbe0908d6b0f8d1cd1c133386f7bec8550572e6d2e88d86f9c"
+      "sha256": "765e1c7c79fb73850170b10755401dd62e51d5fd6d2fcb6fcbf29cadda0b3fe5"
     },
     {
       "path": "fixture-pr.log",
@@ -201,12 +226,12 @@
     },
     {
       "path": "mutations.txt",
-      "sha256": "1a306896b95119b0af96f3a37bb11f1b3cf5e22299f54daa7b0dfd5899709e62"
+      "sha256": "82642711f3a096d9423f5d7473b5e25dcb90228afd7386e632d525e244c4206d"
     },
     {
       "path": "release-gate-source-steps.json",
       "sha256": "df943f0c7ae2b8fa0202e4d04bff2fce424f4b740dc7fd2422600fb074892d93"
     }
   ],
-  "notes": "tests = npx vitest run tests/sourceQualityRatchet.test.ts tests/sourceQuality.test.ts tests/releaseGateExecution.test.ts at 13828fbdf (3 files). The 33 related test files (ci.yml, source-quality, CONTRIBUTING, D-15 manifest, release gate) ran 311/311 passed. durationMs 0 means the command was not timed. Non-zero exits are expected: the fixture-PR steps that must fail (new duplicate and dead-code findings, a short --reason, a stale accepted entry) and the deliberate mutation runs, the RED run before baseCheck existed, the hand-added-entry demo and the unreadable --base. Baseline: 1,254 duplicate and 2,787 dead-code findings, 0 accepted, 586,489 bytes, jscpd 5.4.0, knip 6.39.0, sourceCommit 35c193fdc. Not evaluated: Linux CI, the full npm run release:gate. release-gate-source-steps.json ran at 0e9f383da, before the base check existed."
+  "notes": "tests = npx vitest run tests/sourceQualityRatchet.test.ts tests/sourceQuality.test.ts tests/releaseGateExecution.test.ts at b87664e4a (3 files). The 33 related test files (ci.yml, source-quality, CONTRIBUTING, D-15 manifest, release gate) ran 311/311 passed. durationMs 0 means the command was not timed. Non-zero exits are expected: the fixture-PR steps that must fail (new duplicate and dead-code findings, a short --reason, a stale accepted entry) and the deliberate mutation runs, the RED run before baseCheck existed, the hand-added-entry demo, the unreadable --base, the pre-fix dirty-guard refusal and the dirty-tree probe. Baseline: 1,254 duplicate and 2,787 dead-code findings, 0 accepted, 2 bootstrap rebaselines records, 587,016 bytes, jscpd 5.4.0, knip 6.39.0, sourceCommit 279eb4cb6 (first generated at 35c193fdc). Not evaluated: Linux CI, the full npm run release:gate. release-gate-source-steps.json ran at 0e9f383da, before the base check existed."
 }
