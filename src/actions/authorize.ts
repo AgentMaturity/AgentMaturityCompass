@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { intersectDelegationScopes } from "../agent/delegationScope.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
-import { listVerifiedUsers } from "../auth/authApi.js";
+import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
@@ -195,22 +195,27 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
  * The accountable principal of a lease-bound call (P1-78), from authenticated server state only: the lease names a user
  * id, and the principal is that user's record in the signed users.yaml, read and verified here. A lease naming nobody
  * contributes no principal (identity-binding then refuses the call); one naming a user that is not active there, or a
- * users.yaml that does not verify, refuses the bind. The lease token's own identity is never a principal. A user whose
- * only role is AGENT is a registered service; any other user is a human.
+ * users.yaml that does not verify, refuses. The lease token's own identity is never a principal. A user whose only role
+ * is AGENT is a registered service; any other user is a human. `state` is the user record's digest, which the recheck
+ * compares, so a principal deactivated or demoted between bind and execution is refused.
  */
-function leasePrincipal(workspace: string, payload: LeasePayload): AuthorizationRecordV1["principal"] | null | Failed {
+function leasePrincipal(workspace: string, payload: LeasePayload):
+  { readonly principal: AuthorizationRecordV1["principal"]; readonly state: string } | null | Failed {
   const named = payload.principal;
   if (!named) return null;
-  let users: ReturnType<typeof listVerifiedUsers>["users"];
+  let user: ReturnType<typeof activeUserRecord>;
   try {
-    users = listVerifiedUsers(workspace).users;
+    user = activeUserRecord(workspace, named.userId);
   } catch (error) {
     return failed("authority_store_unavailable", `the lease names user ${named.userId}, and users.yaml could not be verified: ${message(error)}`);
   }
-  const user = users.find((candidate) => candidate.userId === named.userId && candidate.status === "ACTIVE");
   if (!user) return failed("principal_unresolved", `the lease names user ${named.userId}, who is not an active user of the signed users.yaml`);
-  return { principalId: user.userId, kind: user.roles.every((role) => role === "AGENT") ? "service" : "human", authenticatedVia: "lease" };
+  return { principal: { principalId: user.userId, kind: user.roles.every((role) => role === "AGENT") ? "service" : "human", authenticatedVia: "lease" },
+    state: sha256Hex(canonicalize({ userId: user.userId, status: user.status, roles: [...user.roles].sort() })) };
 }
+
+/** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
+const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
 
 function osUser(): string {
   try {
@@ -253,7 +258,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       // An approval names who authorized the effect; a lease, the principal its issuer named (never the lease itself,
       // P1-78); otherwise the CLI user, self-reported, which identity-binding refuses.
       principal: approverIds.length > 0 ? { principalId: approverIds.join(","), kind: "human", authenticatedVia: "approval-engine" }
-        : named ?? { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
+        : named?.principal ?? { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
         leaseId: lease?.payload.leaseId ?? null },
@@ -270,6 +275,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       evidenceRefs: [...(ctx.evidenceRefs ?? [])],
       ...(facts.facts.agentSuppliedMetadata === null ? {} : { agentSuppliedMetadata: facts.facts.agentSuppliedMetadata })
     });
+    if (named !== null && record.principal.authenticatedVia === "lease") boundPrincipalState.set(record, named.state);
     return { ok: true, record, digest: authorizationRecordDigest(record), effects: facts.facts.effects };
   } catch (error) {
     return failed("authority_store_unavailable", `the authorization record could not be built: ${message(error)}`);
@@ -340,6 +346,12 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
       : checkLease(execution, ctx.leaseToken);
     if ("ok" in lease) add(...lease.failures);
     else if (lease.payload.leaseId !== record.delegation.leaseId) add("scope_widened");
+    else if (record.principal.authenticatedVia === "lease") {
+      // The principal again, from the signed users.yaml in this read: deactivated, demoted or changed since bind refuses.
+      const now = leasePrincipal(execution.workspace, lease.payload);
+      if (now !== null && "ok" in now) add(...now.failures);
+      else if (now === null || now.state !== boundPrincipalState.get(record) || now.principal.principalId !== record.principal.principalId) add("principal_unresolved");
+    }
   }
   try {
     const freeze = activeFreezeStatus(execution.workspace, execution.agentId);

@@ -10,7 +10,7 @@ import { activateControlPlan, loadActiveCompiledPolicy } from "../../../src/cata
 import { compilePlan, parseDeploymentProfile } from "../../../src/catalog/compiler/compile.js";
 import { signPlan } from "../../../src/catalog/compiler/sign.js";
 import { writeRuntimeFirewallPolicy } from "../../../src/runtime/firewall.js";
-import { addUser, initUsersConfig } from "../../../src/auth/authApi.js";
+import { addUser, initUsersConfig, revokeUser, setUserRoles } from "../../../src/auth/authApi.js";
 import { parseLeaseTtlToMs } from "../../../src/leases/leaseCli.js";
 import type { LeasePayload, LeaseScope } from "../../../src/leases/leaseSchema.js";
 import { issueLeaseToken } from "../../../src/leases/leaseSigner.js";
@@ -128,14 +128,25 @@ describe("L0-IDN-04 revocation takes effect (drill)", () => {
         return;
       }
       let approve: ToolApprovalAsker | undefined;
-      if (s.mode === "revoke_during_approval") {
+      let principalToken: string | undefined;
+      if (s.mode === "deactivate_principal_during_approval" || s.mode === "demote_principal_during_approval") {
+        // The lease names an active OPERATOR; while the call waits for approval an owner deactivates or demotes them (P1-78).
+        initUsersConfig({ workspace: ws, username: "layer0-owner", password: "layer0-fixture-password" });
+        const user = addUser({ workspace: ws, username: "layer0-operator", roles: ["OPERATOR"], password: "layer0-fixture-password" });
+        principalToken = issue(ws, "default", ["toolhub:execute"], "1h", undefined, { userId: user.userId });
+        approve = async () => {
+          if (s.mode === "deactivate_principal_during_approval") revokeUser({ workspace: ws, username: "layer0-operator" });
+          else setUserRoles({ workspace: ws, username: "layer0-operator", roles: ["VIEWER"] });
+          return "allow";
+        };
+      } else if (s.mode === "revoke_during_approval") {
         approve = async () => { revokeLease(ws, leaseIdOf(token), "layer0 drill, in flight"); return "allow"; };
       } else if (s.mode === "revocation_list_tampered") {
         revokeLease(ws, "lease-unrelated", "seed the signed list");
         const { file } = leaseRevocationPaths(ws);
         writeFileSync(file, readFileSync(file, "utf8").replace("lease-unrelated", "lease-renamed"));
       } else throw new Error(`unknown drill mode ${s.mode}`);
-      const h = compose(ws, s.actionClass, () => token, approve);
+      const h = compose(ws, s.actionClass, () => principalToken ?? token, approve);
       const r = await h.call();
       h.close();
       expectRefused(f, r);
