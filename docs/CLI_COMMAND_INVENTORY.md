@@ -735,16 +735,6 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc native-extension install` | Copy an already signed extension into the local plugin store without activation | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy | `--expect-digest <sha256>`<br>`--json` | - |
-| `amc native-schedule` | Manage signed native goals and explicitly own one due pass or a foreground polling lifecycle | - | - |
-| `amc native-schedule disable` | Prevent future claims; does not pretend to cancel an already running owner | `--expect-digest <digest>` | - |
-| `amc native-schedule enable` | Explicitly enable a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule inspect-file` | Preview an operator JSON definition and hash its exact bytes; does not sign or activate it | - | - |
-| `amc native-schedule list` | Read signed configuration, its digest and operational due/in-flight status without running jobs | - | - |
-| `amc native-schedule put` | Add or replace one reviewed definition using the existing workspace signer; does not start a runner | `--expect-input-sha256 <digest>`<br>`--expect-digest <digest>` | - |
-| `amc native-schedule remove` | Explicitly remove a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule reset-failures` | Explicitly reset-failures a schedule without discarding its cadence or claim history | `--expect-digest <digest>` | - |
-| `amc native-schedule run-due` | Execute the currently due signed goals once through the native composed runtime | `--agent <id>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <origin>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--expect-digest <digest>`<br>`--expect-tools-digest <digest>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>` | - |
-| `amc native-schedule watch` | Own foreground serial due passes until Ctrl-C/SIGTERM; never daemonizes or installs OS tasks | `--agent <id>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <origin>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--expect-digest <digest>`<br>`--expect-tools-digest <digest>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>`<br>`--poll-ms <ms>` | - |
 | `amc notary` | AMC Notary signing boundary operations | - | - |
 | `amc notary attest` | Generate signed notary runtime attestation bundle (.amcattest) | `--out <file>`<br>`--notary-dir <dir>`<br>`--workspace <dir>` | - |
 | `amc notary init` | Initialize AMC Notary config and signing backend | `--notary-dir <dir>`<br>`--external-command <cmd>`<br>`--external-args <args...>` | - |

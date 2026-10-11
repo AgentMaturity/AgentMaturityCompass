@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "freezeActive": true,
-  "measuredAt": "2026-10-08T14:40:10.605Z",
-  "measuredOn": "6f347b05d5c2d365b3d645344bec228660c3c5d8",
+  "measuredAt": "2026-10-11T05:02:36.625Z",
+  "measuredOn": "69f2251b3e184a97093658e79a097e943c1dae05",
   "counts": {
-    "cliCommandPaths": 1236,
-    "cliInventoryPaths": 1236,
+    "cliCommandPaths": 1226,
+    "cliInventoryPaths": 1226,
     "stationPacks": 41,
     "stationPackQuestions": 632
   },

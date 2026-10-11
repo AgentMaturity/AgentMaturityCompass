@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
+import { buildCommandInventory } from "../src/cliUx.js";
 import { readSchedules, saveSchedules, schedulesPath, scheduleStatus } from "../src/autonomy/scheduleStore.js";
 import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { stubProviderRoute, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
@@ -50,6 +51,16 @@ describe("the native public management contract", () => {
     expect(program.commands.find(command => command.name() === "native-schedule")?.commands.map(command => command.name()))
       .toEqual(expect.arrayContaining(["list", "inspect-file", "put", "enable", "disable", "remove", "reset-failures", "run-due", "watch"]));
     expect(timer).not.toHaveBeenCalled(); expect(output.log).not.toHaveBeenCalled();
+  });
+
+  it("is hidden from help and the command inventory, labelled experimental and not qualified (D-12)", () => {
+    const program = new Command();
+    registerAgentCommands(program, io());
+    const group = program.commands.find(command => command.name() === "native-schedule");
+    expect(group?.description()).toMatch(/^Experimental, not qualified: /);
+    expect(program.helpInformation()).not.toContain("native-schedule");
+    expect(buildCommandInventory(program).map(entry => entry.path).filter(path => path.startsWith("native-schedule"))).toEqual([]);
+    expect(buildCommandInventory(program, { includeInternal: true }).map(entry => entry.path)).toContain("native-schedule list");
   });
 
   it("previews, signs a disabled definition, enables, disables and removes through current digest pins", async () => {
