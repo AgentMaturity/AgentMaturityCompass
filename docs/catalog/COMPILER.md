@@ -221,9 +221,10 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   expiry, agent, workspace, scope, class, signed revocations): the record's `delegation.leaseId` names the verified
   lease, and its principal is the approvers for an approved call (every Studio workspace-tool call is approval-gated),
   otherwise the active `users.yaml` user the lease names, read and verified at bind. The lease token's own identity is
-  never a principal: a task started from a workspace-router session or with the bootstrap admin token names no user, so
-  `requirePrincipal` refuses its unapproved calls, and a lease naming a user who is not active in `users.yaml` refuses
-  the call. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
+  never a principal. Studio mints through `issueLeaseForPrincipal`: under a plan whose `identity-binding` requires a
+  principal (`planRequiresPrincipal`), a task started from a workspace-router session or with the bootstrap admin token,
+  or by a user who is not active in `users.yaml`, is not started (`NATIVE_PRINCIPAL_UNRESOLVED`) instead of minting a
+  lease every call would refuse; the recheck refuses a principal deactivated or demoted after bind. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
   stops a runtime before its lease expires, shutdown, a failed start or resume, cold verification, a runtime process
   that exited on its own) and at archive; a resumed runtime revokes the previous runtime's lease only after it holds
   the writer claim, so a refused resume leaves another process's live runtime alone. When the active plan does not

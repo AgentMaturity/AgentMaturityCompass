@@ -52,7 +52,9 @@ Every call in an authorized class (by default every class except `READ_ONLY` and
   signed `users.yaml` the lease names (`LeasePayload.principal.userId`, read and verified at bind; a user whose only
   role is `AGENT` is a registered service); otherwise the OS user, self-reported (`cli-os-user`). The lease token's own
   identity is never a principal. A lease naming a user who is not active in `users.yaml` denies `principal_unresolved`;
-  an unverifiable `users.yaml` denies `authority_store_unavailable`. Identity-binding refuses `cli-os-user`.
+  an unverifiable `users.yaml` denies `authority_store_unavailable`. Identity-binding refuses `cli-os-user`. The recheck
+  resolves the principal again in its own verified read and denies `principal_unresolved` when the user is no longer
+  active or their record (status, roles) changed since bind.
 - **Workspace (P1-78).** The lease check passes the workspace id the lease issuers use (`workspaceIdFromDirectory`);
   a lease naming another workspace denies `scope_widened` even when this workspace's key signed it.
 - **Deployment (P1-78).** `scope.tenantId` and `scope.deploymentId` come from the verified active plan, whose profile

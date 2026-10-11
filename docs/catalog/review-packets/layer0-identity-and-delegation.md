@@ -57,8 +57,8 @@ Citations:
 - Applicability: `{always: true}`. Layer 0 applies to every agent deployment in every station.
 - Binding: enforcement point tool_pipeline. The signed revocation list is read again at every bind and recheck; a revoked lease is refused on the next call.
 - Evidence producers: `amc.leases.issuer` (available), `amc.toolPipeline.receipt` (available). Levels: L2, L3.
-- Tests: L0-IDN-04-T1 drill (1 attempt): A call allowed before revocation is refused on the next call after it, with lease_revoked; the drill records the time to effect.
-- Executed test: yes (identity.test.ts). Full. The drill revokes a lease and the next call is refused (lease_revoked); a revocation during an approval wait is refused at the recheck; an unverifiable revocation list refuses every lease.
+- Tests: L0-IDN-04-T1 drill (1 attempt): A call allowed before revocation is refused on the next call after it, with lease_revoked; the drill records the time to effect. A lease's principal deactivated or demoted in the signed users.yaml while the call waits for approval is refused at the recheck before the body (principal_unresolved).
+- Executed test: yes (identity.test.ts). Full. The drill revokes a lease and the next call is refused (lease_revoked); a revocation during an approval wait is refused at the recheck; an unverifiable revocation list refuses every lease; a lease's principal deactivated or demoted in the signed users.yaml during the wait is refused at the recheck (principal_unresolved).
 - Crosswalk: amc-audit-map-v1 ACCESS_CONTROL.LEASE_SCOPING (partial).
 
 Citations:

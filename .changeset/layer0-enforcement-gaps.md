@@ -14,7 +14,15 @@ Calls that now refuse:
   - every call after any evidence write failed. A row lost to an effect that already ran fails the toolset instead of being skipped.
   
   Every AMC surface passes a session writer, so only direct `agentToolset` callers without one see this. They must start the ledger session before the toolset records into it, and seal it afterwards.
-- **An approval by a request's recorded initiator is refused** ("initiator cannot approve their own request"), and the quorum never counts one. `createApprovalForIntent` takes an optional `initiator`: a principal key such as `LOCAL_USER:<userId>`, or a user id. Requests that name none are unchanged, and no AMC surface names one yet. The binding digest leaves the initiator out, so every request digests as before. Records written before this release parse and digest unchanged.
+- **The initiator cannot approve their own request where the class requires distinct users.** Every approval request raised outside A4 now records its initiator: the authenticated Studio user (`agent:<id>` for an agent token), the API caller, a native task's session principal, an operator resolution's operator, or an audit evidence request's requester (as an id hash). A CLI command records the OS user, which is self-reported and can only refuse that same user id's approval.
+  
+  Where the signed request or the signed approval policy requires distinct users for the class, the engine refuses the initiator's approval ("initiator cannot approve their own request") and the quorum never counts one. The initiator's denial still denies. A single-user class still counts the initiator.
+  
+  The initiator is read only from the signed request: `listApprovalRequests` now verifies and parses the same bytes. `createApprovalForIntent({ initiator })` stays optional, and A4 call sites are unchanged. The binding digest leaves the initiator out, so records written before this release, and new ones, parse and digest unchanged.
+- **A principal is rechecked at execution.** A lease's principal who is deactivated or demoted in `users.yaml` after the call bound is refused at the recheck (`principal_unresolved`).
+- **A failed evidence record stops the pipeline.** Once a record fails, every later tool-pipeline call is refused before any stage runs (`EVIDENCE_RECORDER_FAILED`). This applies to kernel hosts too. The call in flight keeps its real outcome.
+- **Studio refuses native tasks with no resolvable principal.** Under a plan that requires a principal, Studio does not start such a task (`NATIVE_PRINCIPAL_UNRESOLVED`). This covers tasks started from a workspace-router session, with the admin token, or by a user who is not active in `users.yaml`.
+- **New exports.** `planRequiresPrincipal(workspace)` reports whether the verified active plan's identity-binding requires a principal, and an unverifiable plan reads as requiring one. `issueLeaseForPrincipal({ ...IssueLeaseInput, principalKey })` mints a lease naming an active `users.yaml` user, or refuses with `LeasePrincipalRefused` (`PRINCIPAL_UNRESOLVED`) under such a plan. `issueLeaseToken` is unchanged.
 
 Other changes:
 
