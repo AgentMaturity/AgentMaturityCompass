@@ -73,7 +73,9 @@ export function addPublicKeyToHistory(
   workspace: string,
   kind: KeyHistoryRole,
   publicPem: string,
-  source: "local" | "notary" | "imported" = "local"
+  source: "local" | "notary" | "imported" = "local",
+  /** false only where the transparency seal's signer is the key being admitted (enabling notary trust). */
+  opts: { logRevision?: boolean } = {}
 ): void {
   if (process.env.AMC_NO_SIGN === "1") throw new Error("Key admission is unavailable in no-sign mode");
   const current = getPublicKeyPem(workspace, kind);
@@ -88,7 +90,7 @@ export function addPublicKeyToHistory(
   const envelope = sealKeyHistory(kind, next, privateKey, prior.revision + 1);
   writeFileAtomic(historyPath(workspace, kind), JSON.stringify(envelope, null, 2), 0o600);
   recordKeyHistoryMark(workspace, kind, envelope);
-  logHistoryRevisions(workspace, [{ subject: kind, envelope }]);
+  if (opts.logRevision !== false) logHistoryRevisions(workspace, [{ subject: kind, envelope }]);
   if (source !== "local") console.warn(`[amc] Explicit ${source} admission expanded the ${kind} signing role (${next[next.length - 1]!.fingerprint}).`);
 }
 
