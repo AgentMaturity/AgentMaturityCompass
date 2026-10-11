@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-10
+> Auto-generated from source on 2026-10-11
 
 ## Table of Contents
 
@@ -337,10 +337,10 @@ AMC provides 1,236 public CLI command paths in the live command inventory.
 | 318 | `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) |
 | 319 | `amc demo share` | Generate a static client-facing prospect demo bundle |
 | 320 | `amc diagnostic` | Diagnostic bank/render operations |
-| 321 | `amc diagnostic bank` | Signed diagnostic 126-question bank operations |
+| 321 | `amc diagnostic bank` | Signed default diagnostic question bank operations |
 | 322 | `amc diagnostic bank init` | Create and sign .amc/diagnostic/bank/bank.yaml |
 | 323 | `amc diagnostic bank verify` | Verify diagnostic bank signature |
-| 324 | `amc diagnostic render` | Render contextualized 126-question diagnostic for an agent |
+| 324 | `amc diagnostic render` | Render the contextualized default diagnostic question bank for an agent |
 | 325 | `amc dlp` | DLP scanner for PII and secrets |
 | 326 | `amc dlp scan` | Scan text for PII and secrets |
 | 327 | `amc doctor` | Check runtime availability and wrap readiness |
@@ -2828,7 +2828,7 @@ Simulate risk propagation from a source node
 
 One-liner CI gate: quickscore + threshold check (exit 1 if below)
 
-Alias: `amc gate`
+Alias: `amc ci gate`
 
 | Option | Description |
 |--------|-------------|
@@ -3671,7 +3671,7 @@ Generate a static client-facing prospect demo bundle
 
 #### `amc diagnostic render`
 
-Render contextualized 126-question diagnostic for an agent
+Render the contextualized default diagnostic question bank for an agent
 
 
 | Option | Description |
@@ -3836,7 +3836,7 @@ Alias: `amc sector pack`
 
 Show Industry Packs entitlement and public-checkout readiness
 
-Alias: `amc subscribe`, `amc sector pack access`
+Alias: `amc domain pack subscribe`, `amc sector pack access`
 
 | Option | Description |
 |--------|-------------|
@@ -4050,7 +4050,7 @@ Validate a numeric value within bounds
 
 Accept current resources as the new signed manifest; dry-run unless --yes is set
 
-Alias: `amc activate`
+Alias: `amc enforce resources activate`
 
 | Option | Description |
 |--------|-------------|
@@ -8247,7 +8247,7 @@ Generate data residency compliance report for a tenant
 
 Accept current resources as the new signed manifest; dry-run unless --yes is set
 
-Alias: `amc activate`
+Alias: `amc resource activate`
 
 | Option | Description |
 |--------|-------------|
@@ -8293,7 +8293,7 @@ Evaluate a resource proposal against Enforce gates
 
 Inspect one resource in an Enforce resource manifest
 
-Alias: `amc inspect`
+Alias: `amc resource inspect`
 
 | Option | Description |
 |--------|-------------|
@@ -8452,7 +8452,7 @@ Alias: `amc run-name list`
 
 Remove a diagnostic run alias
 
-Alias: `amc rm`, `amc run-name remove`
+Alias: `amc run-alias rm`, `amc run-name remove`
 
 | Option | Description |
 |--------|-------------|
@@ -10625,7 +10625,7 @@ export interface StudioRuntimeConfig {
 
 ## Assurance Packs
 
-AMC includes 149 assurance packs for comprehensive agent evaluation.
+This table lists <!-- amc:count:assurancePackFiles -->149<!-- /amc:count --> assurance pack source files in `src/assurance/packs/`. Registered packs (returned by `listAssurancePacks()`) can differ in number; the README states the registered count.
 
 | # | Pack ID | Name | Category | Assertions |
 |---|---------|------|----------|------------|

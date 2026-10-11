@@ -132,6 +132,15 @@ const PUBLIC_SURFACES = new Set([
   "docs/internal/competitive-landscape.md",
   "docs/internal/mirofish-simulation-council.md",
   "whitepaper/AMC_WHITEPAPER_v1.md",
+  // P0-28: every surface that states an assurance-pack count carries a marker.
+  "docs/EXECUTIVE_OVERVIEW.md",
+  "docs/RELEASE_HIGHLIGHTS.md",
+  "website/executive.html",
+  "website/methodology.html",
+  "website/playground.html",
+  "website/vs-promptfoo.html",
+  "website/docs/compliance.html",
+  "website/blog/langchain-scoring-tutorial.html",
   ...CLI_COUNT_SURFACES
 ]);
 const failures = [];

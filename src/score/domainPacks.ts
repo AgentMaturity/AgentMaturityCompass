@@ -1,7 +1,7 @@
 /**
  * Domain-Specific AMC Rubric Packs
  *
- * Vertical extensions of the base 126-question AMC rubric.
+ * Vertical extensions of the default diagnostic question bank.
  * Every pack is additive and domain-specific.
  */
 

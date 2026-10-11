@@ -23,7 +23,7 @@ describe("executive and board-facing path", () => {
     const combined = `${page}\n${docs}`;
 
     expect(combined).toContain("244");
-    expect(combined).toContain("142");
+    expect(combined).toContain("<!-- amc:count:assurancePacksRegistered -->");
     expect(combined).toContain("41");
     expect(combined).toContain("632 sector");
     expect(docs).toContain("**Mobility** | 6");

@@ -9083,7 +9083,7 @@ standard
     console.log(JSON.stringify(standardListCli(process.cwd()), null, 2));
   });
 
-const diagnosticBank = diagnostic.command("bank").description("Signed diagnostic 126-question bank operations");
+const diagnosticBank = diagnostic.command("bank").description("Signed default diagnostic question bank operations");
 
 diagnosticBank
   .command("init")
@@ -9114,7 +9114,7 @@ diagnosticBank
 
 diagnostic
   .command("render")
-  .description("Render contextualized 126-question diagnostic for an agent")
+  .description("Render the contextualized default diagnostic question bank for an agent")
   .requiredOption("--agent <agentId>", "agent id")
   .option("--format <format>", "md|json", "json")
   .option("--out <file>", "output file")
@@ -24270,7 +24270,7 @@ program
     for (const line of result.roadmap) { console.log(chalk.hex('#4AEF79')(`  ${line}`)); }
 
     console.log(chalk.bold.hex('#4AEF79')("\n📋  Next Steps:"));
-    console.log("  amc score tier --tier standard   Full 126-question assessment");
+    console.log("  amc score tier --tier standard   Full default diagnostic question bank assessment");
     console.log("  amc scan --local .               Scan your codebase");
     console.log("  amc dashboard open               Open web dashboard");
     console.log("  amc playground run               Run scenario tests");

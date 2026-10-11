@@ -324,10 +324,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
 | `amc demo share` | Generate a static client-facing prospect demo bundle | `--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
 | `amc diagnostic` | Diagnostic bank/render operations | - | - |
-| `amc diagnostic bank` | Signed diagnostic 126-question bank operations | - | - |
+| `amc diagnostic bank` | Signed default diagnostic question bank operations | - | - |
 | `amc diagnostic bank init` | Create and sign .amc/diagnostic/bank/bank.yaml | - | - |
 | `amc diagnostic bank verify` | Verify diagnostic bank signature | - | - |
-| `amc diagnostic render` | Render contextualized 126-question diagnostic for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
+| `amc diagnostic render` | Render the contextualized default diagnostic question bank for an agent | `--agent <agentId>`<br>`--format <format>`<br>`--out <file>` | - |
 | `amc dlp` | DLP scanner for PII and secrets | - | - |
 | `amc dlp scan` | Scan text for PII and secrets | `--json`<br>`--redact` | - |
 | `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict`<br>`--live-probes` | - |
