@@ -33,7 +33,7 @@ export type HookAuthorization =
  * `bindAuthorization` (signed tools config, policy files, AMC's clock); the principal and delegation come from the
  * verified hook lease; the idempotency key is the provider's call id and the execution id is AMC's action id.
  */
-export function bindHookAuthorization(input: {
+function bindHookAuthorization(input: {
   workspace: string;
   agentId: string;
   provider: HookProvider;

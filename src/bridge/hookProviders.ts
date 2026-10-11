@@ -14,7 +14,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
 
-export const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
+const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi"] as const;
 export type HookProvider = (typeof HOOK_PROVIDERS)[number];
 export type HookControlDecision = "allow" | "deny" | "ask";
 export type HookControlOutcome = HookControlDecision | "steer";
@@ -98,12 +98,12 @@ export function piControlContext(provider: HookProvider, input: Record<string, u
 }
 
 /** Claude Code can put an ask to a person; Pi only in its interactive terminal UI, never print, JSON, RPC or the SDK. */
-export function supportsNativeAsk(provider: HookProvider, pi: PiControlContext | null): boolean {
+function supportsNativeAsk(provider: HookProvider, pi: PiControlContext | null): boolean {
   return provider === "claude-code" || (pi !== null && pi.mode === "tui" && pi.hasUI);
 }
 
 /** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
-export function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider, pi: PiControlContext | null): string {
+function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider, pi: PiControlContext | null): string {
   if (provider === "pi") {
     return outcome === "ask"
       ? `Pi ${pi?.mode ?? "unknown"} mode has no interactive confirmation, so AMC denied the action.`
@@ -168,7 +168,7 @@ export function parseProvider(provider: unknown): HookProvider {
   return parsed.data;
 }
 
-export function cleanReason(reason: string): string {
+function cleanReason(reason: string): string {
   const cleaned = redactBridgeText(reason).replace(/\s+/g, " ").trim().slice(0, 1_024);
   return cleaned || "AMC denied the provider tool request.";
 }
