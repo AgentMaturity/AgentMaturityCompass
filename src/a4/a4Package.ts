@@ -562,8 +562,17 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
     writeFileAtomic(join(staging, "manifest.sig"), json(signed), 0o644);
     if (pathExists(finalDir)) rmSync(finalDir, { recursive: true, force: true }); // an earlier attempt's directory, which no RELEASE names
     renameSync(staging, finalDir);
-    runTarCreate(finalDir, tarPath);
-    const tarball = readFileSync(tarPath);
+    // tar opens its output O_CREAT|O_TRUNC and follows a link planted at the predictable tarball path, so it writes into a
+    // fresh private directory; the bytes are read there, and rename then replaces whatever is at tarPath, never following it.
+    const tarDir = mkdtempSync(join(projectDir, ".tar-"));
+    let tarball: Buffer;
+    try {
+      runTarCreate(finalDir, join(tarDir, "package.tar.gz"));
+      tarball = readFileSync(join(tarDir, "package.tar.gz"));
+      renameSync(join(tarDir, "package.tar.gz"), tarPath);
+    } finally {
+      rmSync(tarDir, { recursive: true, force: true });
+    }
     writeShaFile(`${tarPath}.sha256`, tarball);
     signArtifactFile({ workspace, path: tarPath, artifactKind: "a4-package", bytes: tarball });
     release = { releaseId, packageDigest, packagePath: relPath(workspace, join(finalDir, "manifest.json")), signaturePath: relPath(workspace, join(finalDir, "manifest.sig")),
