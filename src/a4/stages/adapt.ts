@@ -200,11 +200,14 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       expert: `gatePolicyOf(chain).gates["adapt.completion"].requiredReviews = ${canonicalize(reviews)}` },
     { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY], dataStatus: null,
       novice: activation === "regulated" ? "Because this project is regulated, completing Adapt switches the plan on for the whole workspace, after a second, separate approval."
-        : activation === "active_elsewhere" ? "Another plan is already switched on for this workspace, and a workspace has one plan for every agent, so this plan is signed but not switched on."
+        : activation === "active_elsewhere" ? "Another plan is already switched on for this workspace, a workspace has one plan for every agent, and this plan would weaken it, "
+          + "so it cannot be switched on: it stays signed but not switched on, and a project owner records that, with a reason, before completing."
           : "The plan is signed but not switched on by default. Switching it on is a separate owner step and affects every agent in the workspace.",
-      practitioner: `${activation === "regulated" ? "Regulated: completion runs"
-        : activation === "active_elsewhere" ? "Regulated, but another profile's plan is active (one active plan for every agent; activation would replace it and is refused as a weakening): completion leaves this plan signed, not activated; an owner may still open"
-          : "Not regulated: completion leaves the plan signed, not activated; an owner may open"} ${ACTIVATE_PLAN_EFFECT_ID} before completing. `
+      practitioner: `${activation === "regulated" ? `Regulated: completion runs ${ACTIVATE_PLAN_EFFECT_ID}, which an owner opens before completing. `
+        : activation === "active_elsewhere" ? `Regulated, but another profile's plan is active and this plan weakens it (one active plan for every agent), so ${ACTIVATE_PLAN_EFFECT_ID} `
+          + "is refused: plan_activated waits (PLAN_ACTIVATION_DEFERRED) until an owner acknowledges it with a reason, recorded on the conformance statement, and "
+          + "completion then leaves this plan signed, not activated. "
+          : `Not regulated: completion leaves the plan signed, not activated; an owner may open ${ACTIVATE_PLAN_EFFECT_ID} before completing. `}`
         + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67); tasks started before it, CLI agent sessions and delegated children do not and are denied.",
       expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's." },
     { id: "memory", sources: ["src/a4/adaptMemoryPolicy.ts", "ReasoningMemoryItem (src/learning/reasoningMemory.ts)"], dataStatus: null,
@@ -248,8 +251,11 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const level: A4ExplainLevel = ctx.level ?? "practitioner";
   const { spec, answers } = adaptSpecOf(ctx.state);
   assertUnderstood(spec, answers);
-  const activeProfile = (understandingOf(spec)?.facts.activePlan as { profileId?: unknown } | null | undefined)?.profileId;
-  const elsewhere = typeof activeProfile === "string" && activeProfile !== profileIdOf(ctx.state.project.project_id);
+  // Readiness's deferral (spec/adapt.ts signingItems) as Understand saw it: another profile's active plan that this plan weakens.
+  const understood = understandingOf(spec)?.facts;
+  const activeProfile = (understood?.activePlan as { profileId?: unknown } | null | undefined)?.profileId;
+  const weakens = understood?.activationWeakenings;
+  const elsewhere = typeof activeProfile === "string" && activeProfile !== profileIdOf(ctx.state.project.project_id) && Array.isArray(weakens) && weakens.length > 0;
   const facts = adaptFacts(spec, answers, ctx.state.chain, !regulatedNow(ctx) ? "not_regulated" : elsewhere ? "active_elsewhere" : "regulated");
   const items = explain(facts, level);
   return { outputs: [{ output: "explanation", label: `adapt explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
@@ -509,7 +515,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
     expertReview: { required: rule.requiredReviews.some((entry) => entry.kind === "review_record"),
       records: ctx.state.refs.filter((ref) => ref.revisionNo === project.revision_no && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
       acknowledgement: acknowledgementOf(ctx.state, "regulatory_sources_status", ctx.now) },
-    claimBoundary: ADAPT_CLAIM_BOUNDARY, now: ctx.now });
+    activationAcknowledgement: acknowledgementOf(ctx.state, "plan_activated", ctx.now), claimBoundary: ADAPT_CLAIM_BOUNDARY, now: ctx.now });
   let head: Record<string, unknown>;
   try {
     const active = activePlanRecord(ctx.workspace);

@@ -3,6 +3,43 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
+    "activationAcknowledgement": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "by": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "expiresTs": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            },
+            "reason": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "ts": {
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "by",
+            "ts",
+            "expiresTs",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "claim": {
       "additionalProperties": false,
       "properties": {
@@ -854,6 +891,7 @@
     "unsupported",
     "missingFacts",
     "expertReview",
+    "activationAcknowledgement",
     "claim",
     "claimBoundary"
   ],

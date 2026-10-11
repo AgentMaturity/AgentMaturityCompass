@@ -94,7 +94,9 @@ function renderActivation(ctx) {
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
     not activated unless an owner opens it before completing (once the gate is consumed without it, it can no longer be opened there). Once a plan is
     active the project is regulated, and a workspace has one active plan for every agent: a plan weaker than the active one (another agent's) is
-    refused before the review is filed, and while another profile's plan is active this project completes with its plan signed, not activated.</p>
+    refused before the review is filed. While another profile's active plan refuses it, a regulated project completes with its plan signed, not
+    activated, only once an owner acknowledges <code>plan_activated</code> with a reason (<code>PLAN_ACTIVATION_DEFERRED</code>); the conformance
+    statement records that acknowledgement.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
       native tasks with workspace tools started after activation run under a lease Studio mints (P1-67); tasks started before it, CLI agent sessions
       and delegated children carry none and are denied. A non-regulated project therefore completes with the plan signed and not activated.</p>
@@ -114,6 +116,7 @@ function renderConformance(ctx) {
   const conformance = specOf(ctx).review?.conformance;
   if (!isObject(conformance)) return `<p class="muted">Review records the control results.</p>${status(ctx, "conformance_statement")}`;
   const settled = itemOf(ctx, "plan_unresolved")?.acknowledged;
+  const deferred = itemOf(ctx, "plan_activated")?.acknowledged;
   const rows = list(conformance.controls).map((control) => [`<code>${esc(control.controlId)}</code>`, `<code>${esc(control.planApplicability)}</code>`,
     `<code>${esc(control.dimensions?.evidence)}</code>`, `<code>${esc(control.dimensions?.result)}</code>`, `<code>${esc(control.dimensions?.enforcement?.state)}</code>`,
     `<code>${esc(control.dimensions?.review)}</code>`, `<code>${esc(control.claimKind)}</code>`, esc(control.notEvaluatedReason ?? "")]);
@@ -123,6 +126,8 @@ function renderConformance(ctx) {
     ${table(["Control", "Applicability", "Evidence", "Result", "Enforcement", "Review", "Claim", "Not evaluated because"], rows, "No control.")}
     ${settled ? `<p class="muted">Owner out of scope (still unresolved): ${codes(coded(itemOf(ctx, "plan_unresolved"), "UNRESOLVED").map(([id]) => id))} by
       <code>${esc(settled.by)}</code>: ${esc(settled.reason)}</p>` : ""}
+    ${deferred ? `<p class="muted">Activation deferred (another profile's active plan refuses it), acknowledged by <code>${esc(deferred.by)}</code>:
+      ${esc(deferred.reason)}; the plan stays signed, not activated.</p>` : ""}
     ${["conformance_statement", "adapt.control_results_signature", "required_entries_satisfied"].map((id) => status(ctx, id)).join("")}`;
 }
 

@@ -12,7 +12,7 @@ import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { STATIONS } from "../../domains/stations.js";
 import {
-  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState
+  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState
 } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
@@ -297,9 +297,10 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
     conflicts.length === 0 ? item("plan_conflicts_resolved", "READY")
       : item("plan_conflicts_resolved", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: ["PLAN_BLOCKED", ...conflicts.slice(0, 16).map((conflict) => `CONFLICT:${conflict.parameter}`)] }),
     mandatory.length === 0 ? item("plan_unresolved", "READY", { reasonCodes: unresolved.map((row) => `UNRESOLVED_OPTIONAL:${row.controlId}`) })
-      // Never READY while one stays unresolved: an owner's out_of_scope is an acknowledgement (OWNER_ACKNOWLEDGED), not a decision.
+      // Never READY while one stays unresolved: an owner's out_of_scope is an acknowledgement (OWNER_ACKNOWLEDGED), not a decision,
+      // and a regulated project takes none (a4Readiness.acknowledgeable): it activates only a ready plan.
       : waiting("plan_unresolved", ["PLAN_MISSING_FACTS", ...mandatory.slice(0, 32).map((row) => `UNRESOLVED:${row.controlId}`),
-        ...(settled.length > 0 ? ["OWNER_OUT_OF_SCOPE", "KEY:P2-24"] : [])], { kind: "review_pending",
+        ...(regulated ? ["REGULATED_READY_PLAN_ONLY"] : settled.length > 0 ? ["OWNER_OUT_OF_SCOPE", "KEY:P2-24"] : [])], { kind: "review_pending",
         nextAction: { label: regulated ? "A regulated project activates only a ready plan: answer the missing facts"
           : "Answer the missing facts, or an owner records the unresolved requirements out of scope with a reason (Acknowledge); they stay unresolved (a true exception is P2-24)" } }),
     lockMoved ? item("plan_lock_drift", "BLOCKED", { kind: "scope_changed", reasonCodes: ["PLAN_LOCK_DRIFT", "RESOURCE_DRIFTED"],
@@ -317,11 +318,14 @@ export const profileIdOf = (projectId: string): string => `a4-${projectId}`;
  * Review on (it never holds the direction gate), until an owner opens it on this cycle's completion gate before
  * completing (complete then runs it; consumeGate refuses a plain consumption while it is open). A non-regulated project
  * completes with the plan signed and not activated (PLAN_SIGNED_NOT_ACTIVATED, once Build signed it); an owner may still
- * open the effect before completing. So does a regulated project while another profile's plan is active: the workspace
- * has one active plan for every agent, and activating this one would replace it (activateControlPlan refuses it as a
- * weakening while each plan carries one agent's budgets). Whenever activation is due or opened, a plan
- * activateControlPlan is certain to refuse reads BLOCKED from Review on, before any gate is consumed (before Review, a
- * WAITING item that is not mandatory, so it never holds the direction gate): a blocked plan, or one weaker than the
+ * open the effect before completing. A regulated project's activation is deferred only when activateControlPlan is
+ * certain to refuse it as a weakening of another profile's active plan (the workspace has one active plan for every
+ * agent): `plan_activated` then waits with PLAN_ACTIVATION_DEFERRED, mandatory from Review on, until an owner
+ * acknowledges it with a reason (the only state of it an owner acknowledges, recorded on the conformance statement).
+ * Another profile's plan this one does not weaken, or weakenings not known, leave activation due. Whenever activation is
+ * due, deferred or opened, a plan activateControlPlan is certain to refuse reads BLOCKED from Review on, before any gate
+ * is consumed (before Review, a WAITING item that is not mandatory, so it never holds the direction gate): a blocked
+ * plan (the ready-plan floor holds for every regulated project), or, when due or opened, one weaker than the
  * workspace's active plan (Review's check of this build, else Understand's). An open made after the gate was consumed
  * counts only once an attempt follows it (rerunExecutorEffect).
  */
@@ -353,26 +357,26 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
   const facts = understandingOf(spec)?.facts;
   const active = (review?.head !== undefined ? review.head.activePlan : facts?.activePlan) as { planDigest?: unknown; profileId?: unknown } | null | undefined;
   const otherProfile = typeof active?.profileId === "string" && active.profileId !== profileIdOf(state.project.project_id);
-  const replaces = typeof active?.planDigest === "string" && active.planDigest !== plan?.digest
-    ? ["REPLACES_ACTIVE_PLAN", ...(otherProfile ? ["ACTIVE_PLAN_OF_ANOTHER_PROFILE"] : [])] : [];
+  const replaces = [...(typeof active?.planDigest === "string" && active.planDigest !== plan?.digest ? ["REPLACES_ACTIVE_PLAN"] : []),
+    ...(otherProfile ? ["ACTIVE_PLAN_OF_ANOTHER_PROFILE"] : [])];
   const weakens = review?.head?.weakensActive ?? (plan === null ? undefined : facts?.activationWeakenings);
   const refusal = Array.isArray(weakens) ? (weakens.length === 0 ? null : ["PLAN_WEAKENS_ACTIVE_PLAN", `WEAKENINGS:${weakens.length}`])
     : weakens === undefined || weakens === null ? null : ["ACTIVE_PLAN_UNREADABLE"];
-  const due = (regulated && !otherProfile) || opened !== undefined;
-  const blocker: Fields | null = !due || finished ? null
-    : plan !== null && plan.status !== "ready" ? { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
+  // Deferred only for a certain refusal: another profile's plan this one weakens. With none recorded, or an unreadable
+  // journal, activation stays due (and BLOCKED when it is certain to fail for another reason).
+  const deferred = regulated && otherProfile && refusal?.[0] === "PLAN_WEAKENS_ACTIVE_PLAN";
+  const due = (regulated && !deferred) || opened !== undefined;
+  const blocker: Fields | null = finished ? null
+    : (regulated || opened !== undefined) && plan !== null && plan.status !== "ready" ? { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
       nextAction: { label: "Only a ready plan activates (activateControlPlan refuses any other): resolve every mandatory requirement" } }
-      : refusal === null ? null : { kind: refusal[0] === "ACTIVE_PLAN_UNREADABLE" ? "source_unavailable" : "scope_changed", reasonCodes: [...refusal, ...replaces],
+      : !due || refusal === null ? null : { kind: refusal[0] === "ACTIVE_PLAN_UNREADABLE" ? "source_unavailable" : "scope_changed", reasonCodes: [...refusal, ...replaces],
         nextAction: { label: refusal[0] === "ACTIVE_PLAN_UNREADABLE"
           ? "The workspace's active compiled plan does not verify, so activation would be refused: restore it, then run Understand or Review again"
           : "Activation would weaken the workspace's active plan, and activateControlPlan refuses that. A workspace has one active plan for every agent, so "
             + "a plan compiled for this agent cannot replace another agent's active plan until per-agent plans exist" } };
-  const signedNotActivated = otherProfile
-    ? "Plan signed, not activated: another profile's plan is active in this workspace, and a workspace has one active plan for every agent. Activating "
-      + "this one would replace it (activateControlPlan refuses that as a weakening until per-agent plans exist), so this project completes with its plan signed"
-    : "Plan signed, not activated (the default for a non-regulated project). Activation is an explicit owner effect: open "
-      + `${ACTIVATE_PLAN_EFFECT_ID} on the completion gate before completing; once it finishes this project is regulated, and so is every project whose `
-      + "next revision records the active plan";
+  const signedNotActivated = "Plan signed, not activated (the default for a non-regulated project). Activation is an explicit owner effect: open "
+    + `${ACTIVATE_PLAN_EFFECT_ID} on the completion gate before completing${otherProfile ? " (it replaces another profile's plan: a workspace has one active plan for every agent)" : ""}; `
+    + "once it finishes this project is regulated, and so is every project whose next revision records the active plan";
   const items = [
     build !== null ? item("plan_signed", "READY", { section: "implementation", reasonCodes: ["CONTROL_PLAN_SIGNED", "WORKSPACE_KEYS_ONLY"] })
       : waiting("plan_signed", ["PRODUCED_AT_BUILD"], { section: "implementation", mandatory: reached(state, "direction_approved") }),
@@ -392,10 +396,14 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
           nextAction: { label: `The activation complete started has not finished (effects.failed says why): after a failure an owner re-opens ${ACTIVATE_PLAN_EFFECT_ID}, then complete runs it again` } }))
         : due ? waiting("plan_activated", ["PLAN_NOT_ACTIVATED", ...replaces], { kind: "review_pending", mandatory: reached(state, "reviewed"),
           nextAction: { label: `A regulated project activates its plan at completion: once the completion gate has its quorum, an owner opens ${ACTIVATE_PLAN_EFFECT_ID}` } })
-          : build === null ? waiting("plan_activated", ["PRODUCED_AT_BUILD", ...replaces], { mandatory: false,
-            nextAction: { label: "Build signs the plan; this project then completes with it signed, not activated, unless an owner opens the activation" } })
-            // Another profile's plan is never this plan (the profile id is part of the plan), so `replaces` names it.
-            : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: signedNotActivated } })
+          // Never READY: a regulated project completes unactivated only on an owner's acknowledgement (OWNER_ACKNOWLEDGED), on the record.
+          : deferred ? waiting("plan_activated", [PLAN_ACTIVATION_DEFERRED, ...replaces, ...refusal!], { kind: "review_pending", mandatory: reached(state, "reviewed"),
+            nextAction: { label: "Another profile's plan is active, and this one would weaken it, so activateControlPlan refuses it (a workspace has one active plan for "
+              + "every agent until per-agent plans exist). A regulated project completes with its plan signed, not activated, only once an owner acknowledges this "
+              + "item with a reason (Acknowledge, before requesting the completion gate); the conformance statement records it" } })
+            : build === null ? waiting("plan_activated", ["PRODUCED_AT_BUILD", ...replaces], { mandatory: false,
+              nextAction: { label: "Build signs the plan; this project then completes with it signed, not activated, unless an owner opens the activation" } })
+              : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: signedNotActivated } })
   ];
   // AMC's own CONTROL_RESULT signature check, as Review recorded it and as the file reads now (live): integrity of bytes
   // under this workspace's keys, never a lane, never a claim. Only a notary-route signature or an unpinned issuer is a

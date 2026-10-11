@@ -279,7 +279,8 @@ export function recheckedConformance(stored: StoredConformance, now: ControlResu
 export function conformanceStatement(input: {
   stage: A4Stage; revisionDigest: string; stored: StoredConformance | null; evaluatedAt: string;
   ownerOutOfScope: A4ConformanceStatementV1["ownerOutOfScope"]; unsupported: readonly string[]; missingFacts: readonly string[];
-  expertReview: A4ConformanceStatementV1["expertReview"]; claimBoundary: string; now: number;
+  expertReview: A4ConformanceStatementV1["expertReview"]; activationAcknowledgement: A4ConformanceStatementV1["activationAcknowledgement"];
+  claimBoundary: string; now: number;
 }): A4ConformanceStatementV1 {
   const stored = input.stored;
   const producer = `a4-conformance:${input.stage}`;
@@ -294,7 +295,7 @@ export function conformanceStatement(input: {
       ...(control.notEvaluatedReason === null ? {} : { notEvaluatedReason: control.notEvaluatedReason }) })),
     counts: stored?.counts ?? { pass: 0, fail: 0, not_evaluated: 0, not_applicable: 0, unresolved: 0 },
     ownerOutOfScope: input.ownerOutOfScope, unsupported: [...input.unsupported], missingFacts: [...input.missingFacts],
-    expertReview: input.expertReview, claim, claimBoundary: input.claimBoundary
+    expertReview: input.expertReview, activationAcknowledgement: input.activationAcknowledgement, claim, claimBoundary: input.claimBoundary
   });
 }
 
@@ -332,8 +333,8 @@ export function controlResultsNow(workspace: string, state: Pick<A4ReadinessStat
 /**
  * GET …/conformance (design §10.5): the stage's statement. Adapt's is rebuilt from the control results its newest
  * revision's Review recorded, with the results file checked again now (a file edited, deleted or no longer verifying
- * reads not_evaluated with its reason), and with the owner's out-of-scope settlements and the sources acknowledgement
- * recorded on that revision (kept as the completion gate consumed them, even once they expire). A record that does not
+ * reads not_evaluated with its reason), and with the owner's out-of-scope settlements, the sources acknowledgement and
+ * the deferred-activation acknowledgement recorded on that revision (kept as the completion gate consumed them, even once they expire). A record that does not
  * parse counts as none. Every other stage, and Adapt before its Review, carries no plan and says not_evaluated
  * (Activate's own statement is P1-62's).
  */
@@ -353,5 +354,6 @@ export function conformanceView(workspace: string, state: A4ReadinessState, stag
     expertReview: { required: stage === "adapt" && required,
       records: stored === null ? [] : state.refs.filter((ref) => ref.revisionNo === revisionNo && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
       acknowledgement: stage === "adapt" ? acknowledgementOf(state, "regulatory_sources_status", now, revisionNo) : null },
+    activationAcknowledgement: stage === "adapt" ? acknowledgementOf(state, "plan_activated", now, revisionNo) : null,
     claimBoundary: stored === null ? NO_PLAN_BOUNDARY : ADAPT_CLAIM_BOUNDARY, now });
 }

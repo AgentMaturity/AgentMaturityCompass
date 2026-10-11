@@ -48,8 +48,25 @@ export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_ap
   // Assemble (P1-60): an unsupported path or plan item stays listed; the owner records it out of scope with a reason (design §13).
   "path_supported", "unsupported_acknowledged",
   // Adapt (P1-61): only on a JSONL session store, where the context probe cannot be recorded (src/a4/adaptContextPlugin.ts).
-  "context_probe_unavailable"];
+  "context_probe_unavailable",
+  // Adapt (P1-61): only while it carries PLAN_ACTIVATION_DEFERRED (acknowledgeable below), never while activation is due.
+  "plan_activated"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+/**
+ * Adapt's plan_activated code for a regulated project whose activation activateControlPlan is certain to refuse as a
+ * weakening of another profile's active plan: the one state of that item an owner acknowledges (src/a4/spec/adapt.ts).
+ */
+export const PLAN_ACTIVATION_DEFERRED = "PLAN_ACTIVATION_DEFERRED";
+
+/**
+ * Whether an owner acknowledgement counts for `candidate` as evaluated now (and may be recorded): a WAITING item of
+ * ACKNOWLEDGEABLE_ITEMS, except `plan_unresolved` while the project is regulated (it activates only a ready plan) and
+ * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED. The evaluator and acknowledgeItem both decide by it.
+ */
+export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes">, regulated: boolean): boolean {
+  return candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id) && !(regulated && candidate.id === "plan_unresolved")
+    && (candidate.id !== "plan_activated" || candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED));
+}
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
 const EXPIRING_GUARD_MS = 60_000;
@@ -585,7 +602,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
     return built.map((candidate) => {
       const ack = acks.get(candidate.id);
-      const acknowledged = ack !== undefined && candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id);
+      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated);
       return { ...candidate, bound: boundIds.includes(candidate.id),
         ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
     });

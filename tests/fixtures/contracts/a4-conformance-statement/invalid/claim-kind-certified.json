@@ -39,6 +39,7 @@
     "records": [],
     "acknowledgement": null
   },
+  "activationAcknowledgement": null,
   "claim": {
     "claimKind": "self_reported",
     "statusDimensions": {
