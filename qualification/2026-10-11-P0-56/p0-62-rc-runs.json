@@ -1,0 +1,651 @@
+{
+ "label": "RC Studio lane x20 (P0-31's studio step, fresh container per run)",
+ "environment": "local colima amc-s7f (Ubuntu 24.04, 6.8.0-117-generic, 4 vCPU) on macOS arm64; not CI",
+ "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0 + baked bubblewrap, python3-venv, Playwright 1.62.1, Chromium (local tag amc-p062-studio:arm64)",
+ "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+ "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+ "runs": [
+  {
+   "run": "run-01",
+   "loadavgBefore": "1.77",
+   "studioStepExit": 0,
+   "studioStepSeconds": 100,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-02",
+   "loadavgBefore": "1.38",
+   "studioStepExit": 0,
+   "studioStepSeconds": 101,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-03",
+   "loadavgBefore": "1.48",
+   "studioStepExit": 0,
+   "studioStepSeconds": 104,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-04",
+   "loadavgBefore": "1.52",
+   "studioStepExit": 1,
+   "studioStepSeconds": 67,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Sent SIGTERM to studio pid 148",
+   "demoDaemonLog": "",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  },
+  {
+   "run": "run-05",
+   "loadavgBefore": "1.81",
+   "studioStepExit": 0,
+   "studioStepSeconds": 138,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-06",
+   "loadavgBefore": "1.61",
+   "studioStepExit": 0,
+   "studioStepSeconds": 167,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-07",
+   "loadavgBefore": "1.71",
+   "studioStepExit": 0,
+   "studioStepSeconds": 95,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-08",
+   "loadavgBefore": "1.39",
+   "studioStepExit": 0,
+   "studioStepSeconds": 97,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-09",
+   "loadavgBefore": "1.89",
+   "studioStepExit": 0,
+   "studioStepSeconds": 108,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-10",
+   "loadavgBefore": "2.21",
+   "studioStepExit": 1,
+   "studioStepSeconds": 48,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Sent SIGTERM to studio pid 148",
+   "demoDaemonLog": "",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  },
+  {
+   "run": "run-11",
+   "loadavgBefore": "1.51",
+   "studioStepExit": 0,
+   "studioStepSeconds": 99,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-12",
+   "loadavgBefore": "1.88",
+   "studioStepExit": 0,
+   "studioStepSeconds": 95,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-13",
+   "loadavgBefore": "1.26",
+   "studioStepExit": 0,
+   "studioStepSeconds": 111,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-14",
+   "loadavgBefore": "1.68",
+   "studioStepExit": 1,
+   "studioStepSeconds": 35,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Studio is not running.",
+   "demoDaemonLog": "listen EADDRINUSE: address already in use 127.0.0.1:44467",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  },
+  {
+   "run": "run-15",
+   "loadavgBefore": "1.37",
+   "studioStepExit": 0,
+   "studioStepSeconds": 118,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-16",
+   "loadavgBefore": "1.37",
+   "studioStepExit": 0,
+   "studioStepSeconds": 122,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-17",
+   "loadavgBefore": "2.25",
+   "studioStepExit": 0,
+   "studioStepSeconds": 103,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-18",
+   "loadavgBefore": "1.86",
+   "studioStepExit": 0,
+   "studioStepSeconds": 102,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  },
+  {
+   "run": "run-19",
+   "loadavgBefore": "1.39",
+   "studioStepExit": 1,
+   "studioStepSeconds": 54,
+   "ok": false,
+   "error": "RuntimeError: Public command 6 failed or cleanup incomplete, see /work/out/studio/command-06.log",
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0
+   ],
+   "coldVerifiersValid": 0,
+   "upDemoOutput": "Studio daemon failed to start in time. Check `amc logs`.",
+   "downOutput": "Studio is not running.",
+   "demoDaemonLog": "",
+   "demoDaemonCleanup": [
+    {
+     "resource": "owned demo daemon",
+     "ok": false,
+     "error": "'NoneType' object cannot be interpreted as an integer"
+    }
+   ]
+  },
+  {
+   "run": "run-20",
+   "loadavgBefore": "1.28",
+   "studioStepExit": 0,
+   "studioStepSeconds": 97,
+   "ok": true,
+   "error": null,
+   "publicCommandExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "browserCounts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+   },
+   "coldVerifiersValid": 8
+  }
+ ],
+ "passed": 16,
+ "failed": 4
+}

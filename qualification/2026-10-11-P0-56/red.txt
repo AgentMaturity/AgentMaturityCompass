@@ -1,0 +1,1 @@
+P0-56 RED (before fix): tests/cliAgentLoopCommands.test.ts -t P0-56 -> 1 failed: expected Error "composition did not provide amcCredentials; the fiber booted but registered no service" to match { name: "CredentialsFilePermissionsError", kind: "directory", mode: 493, fixCommand: "chmod 700 <home>" }

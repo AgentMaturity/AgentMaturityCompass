@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-56",
+  "date": "2026-10-11",
+  "commit": "c6d75453784c610ccd21537090918bd456a40707",
+  "branch": "rtd/p0-56-acceptance-followups",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS) arm64 for the checks, tests and mutations; Linux arm64 rows in a local colima VM amc-s7f (Ubuntu 24.04, 6.8.0-117-generic, Docker 29.5.2, node:24-bookworm Node 24.21.0). Local, not CI.",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 50000
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 37000
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 54000
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 1,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npx vitest run tests/cliAgentLoopCommands.test.ts -t P0-56 (before the fix: RED, see red.txt)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/studioNativeTaskService.test.ts (int fixture: 8 failed, 2 passed; after P0-57 fixture: 1 failed, 10 passed incl. the new P0-59 test)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/kernelDelegationGrant.test.ts tests/acpAgentServer.test.ts -t P0-58 (before: 2 failed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/nativeBudgets.test.ts tests/agentSessionMultiTurn.test.ts tests/acpAgentServer.test.ts tests/studioNativeTaskService.test.ts -t P0-59 (before: 4 failed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/upDemoMode.test.ts -t P0-62 (before: 2 failed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "one guard mutation per key (P0-56 await, P0-58 both guards, P0-59 QUOTA label, P0-62 exit check and 6 s bound): each killed",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run mutation:batch -- --batch p0-61-mutations.batch.json --out p0-61-mutations.json (3 killed, 0 survived)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "P0-62: 20 x Studio lane on the RC in fresh node:24-bookworm containers (16 passed, 4 failed at amc up --demo; p0-62-rc-runs.json)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <75 test files covering the changed modules> (19 failures all in tests/jsonlWriterResume.test.ts, also failing in P0-31's full suite; 11 skipped: studioNativeTaskService beforeAll timed out under the parallel load, 10/11 pass alone)",
+      "exit": 1,
+      "durationMs": 153000
+    },
+    {
+      "cmd": "P0-62: branch Studio lanes (9 sequential, 6+6 interleaved with int, 3+3 under VM stress) and one instrumented diagnosis run; amc up --demo exit 0 in all 18 branch runs; separate Studio race open (README)",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 1021,
+    "passed": 991,
+    "failed": 19,
+    "skipped": 11
+  },
+  "artifacts": [
+    {
+      "path": "checks.txt",
+      "sha256": "7d391cdbf850fc62b3fc6846cc165a3c487a791ccd072a622a183edf4e5ac658"
+    },
+    {
+      "path": "harness/P0-62-ab-loop.sh",
+      "sha256": "7c6d3c2eb457d60f82cd147c212b571075d30363489e048c832e4e503b961cce"
+    },
+    {
+      "path": "harness/P0-62-ab-stress-loop.sh",
+      "sha256": "4c9dbce6b36992b040698e98b6e19c742720a8a9885dbfd2d7c321112c1148f4"
+    },
+    {
+      "path": "harness/P0-62-branch-loop.sh",
+      "sha256": "6b90ea4010f9352022bafa852f1eb2d2ac25c6cfa894456a9632cec5632ade03"
+    },
+    {
+      "path": "harness/P0-62-diag-loop.sh",
+      "sha256": "9d7eb2634ed80e93a7999237ff12bdcd114aab594fac61aa177ea1b66d320312"
+    },
+    {
+      "path": "harness/P0-62-loop.sh",
+      "sha256": "ea6a98fd61adfad9822d350940459031d26dd2cdb44cc78780622415959c5a15"
+    },
+    {
+      "path": "harness/P0-62-summarize.py",
+      "sha256": "41b692c2839cd6cb97f5a7c035f50955c5297c1d60a644cfc2e768408f4946ff"
+    },
+    {
+      "path": "harness/p0-62-studio-once.sh",
+      "sha256": "a2d6dc8467073d1d653284e61f70eae0bb2f93722ddcd6fc4327a6120b02a4d5"
+    },
+    {
+      "path": "harness/updemo-ab.sh",
+      "sha256": "52e6aafe7c3a68fc91a70af194b96fa5afbae73f034d9fcd0ce203f18e6c6567"
+    },
+    {
+      "path": "p0-56-cli-repro.txt",
+      "sha256": "bbf5b35ba6bb18b452b4ccccea49a1781e4f7edfa8f7cdc9de1b40746d3aa256"
+    },
+    {
+      "path": "p0-58-installed-checks.txt",
+      "sha256": "9f8469d339284ea638256dddaa265664b4f2dec4561c18d9a5398652695ec29d"
+    },
+    {
+      "path": "p0-61-mutation-batch.log",
+      "sha256": "2ce8f6b6dee921dea95b0296a551a272a050e5fa1457c73adb6d58b2d2994178"
+    },
+    {
+      "path": "p0-61-mutations.batch.json",
+      "sha256": "edf16f43e6923efd39e947e8fb84fe924f28a58c36b4f52f49cc091eac2564ab"
+    },
+    {
+      "path": "p0-61-mutations.json",
+      "sha256": "8de3495211a2fa1fb4d5ce024aa9a41b90ef5d9606c990112cc60efdd5ece264"
+    },
+    {
+      "path": "p0-62-ab-runs.json",
+      "sha256": "5d4b68aba9eeabd3940eae14b0a0af98cc37a60c44a57ef06edf941fc9d46d79"
+    },
+    {
+      "path": "p0-62-ab-stress-runs.json",
+      "sha256": "65bbe2fcdaab0875bbddef2f3ae11da23cf1ebaab7dd48adcefaf20f208b425d"
+    },
+    {
+      "path": "p0-62-branch-runs.json",
+      "sha256": "3bd586cc0d2f91de41136a636767418b1887faeaabef6f51271f7375c221b158"
+    },
+    {
+      "path": "p0-62-rc-runs.json",
+      "sha256": "5df5c3259d78bbb8a06a2add8415f388c40e4e489ee20a5a3d12ef8d1bed8106"
+    },
+    {
+      "path": "p0-62-studio-projection-diag.txt",
+      "sha256": "c4d83ac372e44700bdd7b302b5154ffd04d8e744823ee25d57a600cb947ed3e9"
+    },
+    {
+      "path": "p0-62-updemo-timing.txt",
+      "sha256": "eec368b38a4594eac460c4f3a74b662c01df77ee30c9f0add6009134740250c4"
+    },
+    {
+      "path": "red.txt",
+      "sha256": "c44269220c3db0c47260e34c2b8f8fbc6e1fdfaa1d574e307861d19e3d4377cd"
+    }
+  ],
+  "notes": "One receipt for P0-56..P0-62 (see README.md). P0-60 not done: needs a VM security-setting change that is Sid's. P0-57: fixture part only; 1 of the 8 previously failing tests still fails (README). P0-62 reproduced on the RC (4/20: 3 x 6 s daemon wait, 1 x EADDRINUSE on a harness-picked port) and both fixed; amc up --demo passed in all 18 branch runs; a separate Studio turn-completion race (SessionHistoryRefused CHANGED after turn.result, src/studio/nativeTaskService.ts:390-393) is open. Tarballs (not in this folder): RC agent-maturity-compass-1.2.0.tgz sha256 21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340; branch tarball packed at cfb8f87f9 sha256 b6a15334544d4bbe0de43607d9143e17c1f61e96e9e654e3aa21d4aba870de5c; int tarball packed at 3f241d5b6 sha256 55f3483266613045bf3bcc190424b75680c0b705c835bd68d358dc4e5c696f9d."
+}

@@ -1,0 +1,11 @@
+# P0-56 installed-CLI repro on this branch build (macOS arm64, node v25.5.0, dist/cli.js from this worktree; not the RC tarball)
+$ chmod 755 $HOME/.config/amc; amc agent-loop run --json hello
+exit 1, stdout 0 bytes, stderr:
+credentials directory <HOME>/.config/amc is mode 0755, which grants access to group or other. It holds API keys, so it must be reachable by its owner alone. AMC refuses to read it rather than repairing it silently: until this is fixed the keys in it must be treated as exposed. Fix: chmod 700 <HOME>/.config/amc
+$ chmod 700 $HOME/.config/amc; amc agent-loop run --json hello
+exit 0
+
+# Other surfaces, same 0755 home. They build LocalCredentialsService directly, not through the changed group plugin:
+$ amc acp --provider stub   (the SDK spawns this)
+exit 2, stderr: amc acp: credentials directory <HOME>/.config/amc is mode 0755, which grants access to group or other. It holds API keys, so it must be reachable by its owner alone. AMC refuses to read it rather than repairing it silently: until this is fixed the keys in it must be treated as exposed. Fix: chmod 700 <HOME>/.config/amc
+Studio: tests/nativeValidationOutcomeSurfaces.test.ts "Studio refuses a non-private operator credential directory…" (configuration rejects with CredentialsFilePermissionsError)

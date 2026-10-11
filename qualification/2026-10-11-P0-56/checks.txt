@@ -1,0 +1,35 @@
+# Checks, darwin arm64, node v25.5.0, local (not CI)
+## Run 1 at 1679dc686
+build exit 0 44s
+typecheck exit 0 46s
+typecheck:tests exit 0 65s
+lint exit 0 5s
+check:counts exit 0 1s
+check:docs-drift exit 0 1s
+check:freeze exit 0 2s
+check:architecture-boundaries exit 0 2s
+check:gates exit 0 1s
+check:schemas exit 0 1s
+check:api-ref exit 0 0s
+check:threat-model exit 0 1s
+check:duplicates exit 0 2s
+check:dead-code exit 1 7s
+check:dead-code: 1 new finding (unused export SESSION_STORE_SINGLE_WRITER), fixed in cfb8f87f9
+
+## Run 2 at c6d754537 (final code)
+build exit 0 50s
+typecheck exit 0 37s
+typecheck:tests exit 0 54s
+lint exit 0 3s
+check:counts exit 0 1s
+check:docs-drift exit 0 1s
+check:freeze exit 0 2s
+check:architecture-boundaries exit 0 2s
+check:gates exit 0 0s
+check:schemas exit 0 1s
+check:api-ref exit 0 1s
+check:threat-model exit 0 0s
+check:duplicates exit 0 1s
+check:dead-code exit 0 3s
+check:qualification exit 1 1s
+check:qualification failed only because this receipt.json did not exist yet; after it was written: "Qualification receipts valid: 15 receipt(s) under qualification."
