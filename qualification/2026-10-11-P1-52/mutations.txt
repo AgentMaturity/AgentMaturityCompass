@@ -25,3 +25,10 @@ byte-for-byte from a copy (cmp confirmed).
    b. an accepted entry with reason "ok" added by hand
       -> the same test fails with "has no valid recorded reason".
    The baseline was restored from a copy; `git status` showed it unchanged.
+
+6. Base-branch subset check (added after the coordinator's review; 16 tests in the file):
+   a. baseCheck ignores additions (`filter(() => false)`)
+      -> "refuses baseline entries missing from the base branch's baseline unless accepted (temp git repo)" fails.
+   b. an unreadable base returns exit 0 instead of failing closed
+      -> the same test fails.
+   The script was restored from a copy (cmp confirmed).
