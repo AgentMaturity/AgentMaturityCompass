@@ -24,6 +24,8 @@ import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
+import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
+import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -133,6 +135,35 @@ export function readContextPlugin(workspace: string, agentId: string, fileSha256
   }
   if (sha256Hex(plugin.text) !== plugin.sha256) throw fail(409, "A4_INTEGRITY_FAILED", "the context plugin's text does not match its sha256");
   return plugin;
+}
+
+/**
+ * The agent's latest prompt pack (Score's signed `.amcprompt`), checked with this workspace's own keys: a self-check of
+ * bytes, never evidence about the agent, and never a prompt the runtime loads (the card says so). Absent is absent.
+ */
+export function promptPackStatus(workspace: string, agentId: string): { present: boolean; sha256: string | null; packId: string | null; verified: boolean | null;
+  problems: number } {
+  const path = promptLatestPackPath(workspace, agentId);
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(path);
+  } catch (error) {
+    return (error as NodeJS.ErrnoException).code === "ENOENT" ? { present: false, sha256: null, packId: null, verified: null, problems: 0 }
+      : { present: true, sha256: null, packId: null, verified: false, problems: 1 };
+  }
+  const checked = verifyWorkspacePromptPack(workspace, path);
+  return { present: true, sha256: sha256Hex(bytes), packId: checked.packId, verified: checked.ok, problems: checked.errors.length };
+}
+
+/** The `context.promptPackSha256` slot: the latest pack's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
+export function promptPackSha256(workspace: string, agentId: string): string | null {
+  try {
+    return sha256Hex(readFileSync(promptLatestPackPath(workspace, agentId)));
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return null;
+    throw fail(409, "RESOURCE_UNREADABLE", `context.promptPackSha256 (the agent's prompt pack) could not be read (${code ?? "unknown error"})`);
+  }
 }
 
 export interface ContextProbeOutcome {
@@ -308,6 +339,17 @@ export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   return [
     item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
       "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),
-    frame, ...deliveries
+    frame, ...deliveries, ...promptPackItem(spec)
   ];
+}
+
+/** Review's re-check of the agent's prompt pack: integrity of bytes under this workspace's keys (no lane, no claim); informational. */
+function promptPackItem(spec: Record<string, unknown>): A4ReadinessItem[] {
+  const pack = (spec.review as { promptPack?: { present?: unknown; verified?: unknown } } | undefined)?.promptPack;
+  if (pack === undefined) return [];
+  const integrity = { section: "integrity" as const, mandatory: false, evidence: [], claim: null };
+  return [pack.present !== true ? item("adapt.prompt_pack_signature", "NOT_EVALUATED", { ...integrity, kind: "not_evaluated", reasonCodes: ["NO_PROMPT_PACK"] })
+    : pack.verified === true ? item("adapt.prompt_pack_signature", "READY", { ...integrity, reasonCodes: ["SELF_CHECK", "UNANCHORED", "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] })
+      : item("adapt.prompt_pack_signature", "BLOCKED", { ...integrity, kind: "evidence_untrusted", reasonCodes: ["PROMPT_PACK_UNVERIFIED"],
+        nextAction: { label: "The agent's prompt pack does not verify under this workspace's keys: rebuild it (amc prompt pack build), then review again" } })];
 }

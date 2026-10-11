@@ -27,7 +27,9 @@ import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
-import { contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, writeContextPlugin } from "../adaptContextPlugin.js";
+import {
+  contextItems, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, promptPackSha256, promptPackStatus, writeContextPlugin
+} from "../adaptContextPlugin.js";
 import {
   operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
 } from "../adaptPermissions.js";
@@ -60,6 +62,7 @@ export function register(registry: A4StageRegistry): void {
   RESOURCE_SLOTS["plan.lockDigest"] = () => shippedLockDigest();
   RESOURCE_SLOTS["context.memoryPolicySha256"] = memoryPolicySha256;
   RESOURCE_SLOTS["context.contextPluginSha256"] = contextPluginSha256;
+  RESOURCE_SLOTS["context.promptPackSha256"] = promptPackSha256;
   RESOURCE_SLOTS["operatingProfile.sha256"] = operatingProfileSha256;
   RESOURCE_SLOTS["operatingProfile.activationSha256"] = operatingProfileActivationSha256;
   registry.items.push(contextItems, permissionItems);
@@ -112,7 +115,8 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
   const facts = { ...understandAdapt({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
     answers: merged, now: ctx.now }),
   // The station's operating profile, dry-run against the current verified configs (A4's own proposal file; nothing under .amc/).
-  permissions: permissionsDryRun({ workspace: ctx.workspace, agentId: project.agent_id, station: profileStation(merged), generatedAt: profileGeneratedAt(ctx.state) }) };
+  permissions: permissionsDryRun({ workspace: ctx.workspace, agentId: project.agent_id, station: profileStation(merged), generatedAt: profileGeneratedAt(ctx.state) }),
+  promptPack: promptPackStatus(ctx.workspace, project.agent_id) };
   const understanding = { answersDigest: answersDigestOf(merged), carried: [...carried.keys()], facts };
   const plan = facts.plan;
   const output = (label: string, body: unknown, lane: "implementation" | "recommendation" = "recommendation") =>
@@ -126,7 +130,8 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
       output("register entries of the stations, with verified as recorded", facts.register),
       output("reporting-clock candidates (each needs classification)", { reviewStatus: CLOCK_REVIEW_STATUS, clocks: facts.clocks }),
       output("signed configs and the active compiled plan", { configs: facts.configs, activePlan: facts.activePlan }, "implementation"),
-      output("the station operating profile's dry run: widenings activateOperatingProfile({ allowWidening: false }) refuses", facts.permissions, "implementation")
+      output("the station operating profile's dry run: widenings activateOperatingProfile({ allowWidening: false }) refuses", facts.permissions, "implementation"),
+      output("the agent's existing prompt pack (a signed Score resource; the runtime does not load it)", facts.promptPack, "implementation")
     ],
     spec: { ...spec, answers: merged, understanding },
     response: { understanding: { answersDigest: understanding.answersDigest, carried: understanding.carried, planDigest: plan?.digest ?? null,
@@ -357,6 +362,7 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
     : { status: "recorded", receiptEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
       compiledPolicyDigest: probeLink.body.compiledPolicyDigest, downgrades: probeLink.body.downgrades, modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated",
       limitation: PROBE_LIMITATION };
+  const promptPack = promptPackStatus(ctx.workspace, project.agent_id);
   return {
     outputs: [
       { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
@@ -365,10 +371,12 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
       { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) },
       { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy },
       { output: "review", label: "adapt review: the context probe's effective-policy receipt and downgrades (stub provider; the observed ref is the receipt row itself)",
-        lane: "implementation", method: null, body: probe }
+        lane: "implementation", method: null, body: probe },
+      { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; the runtime does not load it)",
+        lane: "implementation", method: null, body: promptPack }
     ],
     // The probe's observed ref sits on the revision it was recorded on; this review's own revision has none.
     notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_OBSERVED_ON_EARLIER_REVISION"],
-    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }
