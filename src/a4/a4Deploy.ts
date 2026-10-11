@@ -83,7 +83,8 @@ function helmOverlay(input: DeployPlanInput): string {
   return [...header(input),
     "# TOPOLOGY_UNDECIDED until D-03. The chart has no image.digest field yet (P0-14) and mounts one volume, the workspace,",
     "# so AMC_CONTROL_CHECKPOINT_DIR is not set here. Secrets are named only; the chart's change-me-* defaults are never copied.",
-    "image:", "  repository: amc-studio", `  tag: "${IMAGE_TAG}"`, "env:", '  AMC_A4_PREVIEW: "1"', ""].join("\n");
+    "# A4_PREVIEW_NOT_SET_BY_CHART: the chart renders a fixed env list, so no values key sets AMC_A4_PREVIEW=1; see deploy/plan.json.",
+    "image:", "  repository: amc-studio", `  tag: "${IMAGE_TAG}"`, ""].join("\n");
 }
 
 function composeSteps(input: DeployPlanInput): Step[] {
@@ -117,6 +118,8 @@ function helmSteps(input: DeployPlanInput): Step[] {
       note: "Write the lease token (shown once by AMC) to that file first, mode 0600, and delete it afterwards. The chart does not mount this secret yet; it is for the agent's gateway client." },
     { phase: "preflight", command: `${exec} amc doctor --strict --json`, note: "Pre-flight on the running Studio." },
     { phase: "deploy", command: `helm${ns} upgrade --install amc deploy/helm/amc -f ${name} --atomic --wait`, note: "Restarts the hosted Studio." },
+    { phase: "deploy", command: `kubectl${ns} set env deploy/amc-amc -c amc-studio AMC_A4_PREVIEW=1`,
+      note: "A4_PREVIEW_NOT_SET_BY_CHART: the chart cannot set the A4 preview flag, so set it on the Studio container after each upgrade (this restarts it once more); without it A4 answers 404 and the receipt cannot be recorded." },
     { phase: "verify", command: `helm${ns} history amc`, note: "The revision this upgrade made is the receipt's helmRevision." },
     { phase: "verify", command: `curl -fsS https://${input.destinationRef}/readyz`, note: "Reachability only; release identity is not evaluated at the destination (P2-40)." },
     { phase: "verify", command: `${exec} amc verify all --json`, note: "Integrity of the workspace records." },
@@ -156,6 +159,7 @@ export function deploymentPlan(input: DeployPlanInput): { files: Array<{ path: s
       ...(helm ? [
         { reasonCode: "TOPOLOGY_UNDECIDED", note: "D-03 is open; a Helm receipt is recordable. WAITING, never BLOCKED." },
         { reasonCode: "CHECKPOINT_DIR_NOT_SET", note: "The chart mounts one volume (the workspace), so the signed-journal checkpoint root stays in the home directory." },
+        { reasonCode: "A4_PREVIEW_NOT_SET_BY_CHART", note: "The chart renders a fixed env list, so the values overlay cannot set AMC_A4_PREVIEW=1; set it on the Studio container out of band (the deploy step names one way). A chart values key is a later item." },
         { reasonCode: "EGRESS_CIDRS_NOT_SET", note: "networkPolicy.allowedEgressCidrs stays the chart's: no Adapt answer carries CIDRs." }] : [])
     ],
     claimBoundary: CLAIM_BOUNDARY

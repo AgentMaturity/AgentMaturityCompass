@@ -65,13 +65,14 @@ The example under `deploy/pulumi/helm-release/` deploys this chart with Pulumi's
 
 With `AMC_A4_PREVIEW=1`, an A4 project's Activate stage signs an agent package and records the release; AMC never runs `helm` or `kubectl`. In v1 a deployment is a same-host restart with a pinned image: the values overlay restarts this hosted Studio, the one that built the agent, whose volume holds the agent's resources. A deployment receipt can be recorded against `target: helm` only for an agent built in this hosted Studio; an agent built elsewhere has no v1 deployment path (`DEPLOYMENT_NOT_SAME_HOST`), and installing a package into another workspace is P2-40.
 
-The package's `deploy/` directory holds the prepared `values.a4-<releaseId>.yaml` and `deploy/plan.json` (steps, receipt form, gaps; signed `a4-deployment-plan`). The overlay sets `image.repository`, `image.tag` and `AMC_A4_PREVIEW=1`, and names secrets only; the chart's `change-me-*` defaults are never copied. The steps, with `-n <namespace>` when the release answered a valid namespace hint:
+The package's `deploy/` directory holds the prepared `values.a4-<releaseId>.yaml` and `deploy/plan.json` (steps, receipt form, gaps; signed `a4-deployment-plan`). The overlay sets `image.repository` and `image.tag`, and names secrets only; the chart's `change-me-*` defaults are never copied. The steps, with `-n <namespace>` when the release answered a valid namespace hint:
 
 ```bash
 kubectl exec deploy/amc-amc -c amc-studio -- cat /data/amc/a4-releases/<projectId>/<releaseId>/deploy/values.a4-<releaseId>.yaml > values.a4-<releaseId>.yaml
 kubectl create secret generic amc-a4-lease-<id> --from-file=token=./amc_a4_lease_<releaseId>.txt
 kubectl exec deploy/amc-amc -c amc-studio -- amc doctor --strict --json
 helm upgrade --install amc deploy/helm/amc -f values.a4-<releaseId>.yaml --atomic --wait
+kubectl set env deploy/amc-amc -c amc-studio AMC_A4_PREVIEW=1
 helm history amc
 ```
 
@@ -80,6 +81,10 @@ Known gaps, each a WAITING item or a note in the plan, never a blocker:
 - The chart has no `image.digest` field yet, so the image stays pinned by tag (`IMAGE_TAG_ONLY`).
 - The topology stays undecided until D-03 (`TOPOLOGY_UNDECIDED`).
 - The chart mounts one volume (the workspace), so `AMC_CONTROL_CHECKPOINT_DIR` is not set.
+- The chart renders a fixed environment list, so the values overlay cannot set `AMC_A4_PREVIEW=1`
+  (`A4_PREVIEW_NOT_SET_BY_CHART`). Set it on the Studio container yourself after each upgrade, for example with the
+  `kubectl set env` step above, which restarts the Studio once more. Without it A4 answers 404 and the receipt cannot be
+  recorded. A chart values key is a later item.
 - The chart does not mount the lease secret; it is for the agent's gateway client.
 - `networkPolicy.allowedEgressCidrs` stays as configured here.
 

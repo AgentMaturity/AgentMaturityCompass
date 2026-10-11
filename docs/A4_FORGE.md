@@ -434,7 +434,9 @@ the steps (pre-flight `amc doctor --strict --json`, deploy, verification, rollba
 is signed `a4-deployment-plan`. AMC never runs these commands. Both targets are recordable in v1. The image is pinned by
 tag (`IMAGE_TAG_ONLY`, until D-03 and P0-14), and a Helm topology is undecided (`TOPOLOGY_UNDECIDED`, until D-03). Both are
 WAITING items, never blockers. The Compose overlay sets `AMC_CONTROL_CHECKPOINT_DIR` on its own named volume outside the
-workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The lease token is mounted
+workspace; the chart mounts only the workspace, so the Helm overlay cannot and the plan says so. The chart also renders
+a fixed environment list, so the Helm overlay cannot set `AMC_A4_PREVIEW=1` (`A4_PREVIEW_NOT_SET_BY_CHART`): the plan's
+deploy step sets it on the Studio container after the upgrade. The lease token is mounted
 as an operator-supplied secret file. The update policy is `update-policy.yaml`, signed beside it (`A4_PACKAGE`); nothing
 enforces it yet (P2-34).
 
