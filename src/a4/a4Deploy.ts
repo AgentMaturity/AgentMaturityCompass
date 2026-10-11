@@ -255,8 +255,8 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
 /**
  * The checks a receipt passes on one set of rows (before anything is written, and again on the rows the transaction
  * read): the release and its target, the same-host rule, operator times inside the skew bound, the package digest and
- * the lease ids its effects minted (a rollback row: the release it rolled back to). Returns where `deployed_release_id`
- * moves, if anywhere.
+ * the lease ids its effects minted (a rollback row: the release it rolled back to, in the rollback's own environment,
+ * once, before any later production deploy). Returns where `deployed_release_id` moves, if anywhere (production only).
  */
 function deploymentChecks(state: A4ReadinessState, releaseId: string, body: DeploymentBody, now: number): { deployed: string | null | undefined } {
   const release = releaseLink(state.chain, releaseId);
@@ -291,6 +291,18 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
   }
   const rollback = cycleLinks(state.chain, "ROLLBACK").filter((link) => link.body.releaseId === releaseId).at(-1);
   if (rollback === undefined) throw fail(409, "ROLLBACK_NOT_RECORDED", "Roll back through POST …/rollback first; this row records what the operator then ran.");
+  // The row records the one rollback the approvers approved: its environment, until a row of it succeeded, and never once a
+  // production deploy followed it (a later row would move deployed_release_id back past that deploy).
+  if (body.environment !== rollback.body.environment) {
+    throw fail(409, "ROLLBACK_ENVIRONMENT_MISMATCH", `The rollback was approved for ${String(rollback.body.environment)}; record its row there.`);
+  }
+  const since = state.chain.filter((link) => link.kind === "DEPLOYMENT" && link.seq > rollback.seq && link.body.recordedStatus === "succeeded");
+  if (since.some((link) => link.body.deploymentKind === "rollback" && link.body.releaseId === releaseId)) {
+    throw fail(409, "ROLLBACK_ROW_RECORDED", "A succeeded row of this rollback is already recorded.");
+  }
+  if (since.some((link) => link.body.deploymentKind === "deploy" && link.body.environment === "production")) {
+    throw fail(409, "ROLLBACK_SUPERSEDED", "A production deployment was recorded after this rollback; its row can no longer move the deployed release.");
+  }
   const toReleaseId = typeof rollback.body.toReleaseId === "string" ? rollback.body.toReleaseId : null;
   const to = releaseLink(state.chain, toReleaseId);
   if (body.packageDigest !== (to?.body.packageDigest ?? null)) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not the package of the release rolled back to (null when none).");
@@ -298,7 +310,7 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
   if (body.leaseIds.some((id) => minted === null || (id !== minted.production && !minted.staging.includes(id)))) {
     throw fail(409, "LEASE_NOT_OF_RELEASE", "leaseIds of a rollback row name only leases the release rolled back to minted.");
   }
-  return { deployed: succeeded ? toReleaseId : undefined };
+  return { deployed: succeeded && body.environment === "production" ? toReleaseId : undefined };
 }
 
 /** The operator's status and AMC's check, composed and never merged (C-35). */
@@ -313,7 +325,7 @@ export function statusText(recorded: string, check: string, reasonCodes: readonl
  * its A4_RECORD envelope are written before the transaction (a refused write leaves a file nothing names), then
  * DEPLOYMENT on rows re-checked inside it, pinned to `expectedHeadSeq`, with the a4_deployments row and the receipt as
  * an implementation-lane ref (self_reported). A succeeded production deploy moves `deployed_release_id` to the release;
- * a succeeded rollback row to the release rolled back to.
+ * a succeeded production rollback row to the release rolled back to.
  */
 export function recordDeployment(store: A4Store, projectId: string, releaseId: string, input: A4Call & { body: DeploymentBody }):
   { result: A4TransitionResult; deploymentId: string; receiptPath: string; statusText: string } {
