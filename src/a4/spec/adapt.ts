@@ -16,6 +16,7 @@ import {
 import type { A4Producer } from "../a4RouterStages.js";
 import { a4AnswerSchema, flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { LIFECYCLE_SEAM_KEY } from "./assemble.js";
+import { memoryPolicyFields } from "../adaptMemoryPolicy.js";
 import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
@@ -53,7 +54,12 @@ export const QUESTIONS: A4Question[] = [
   question("dataResidency", "Where must the data stay (residency)? In your words.", "text", false),
   question("dataRetention", "How long is data kept (retention)? In your words.", "text", false),
   question("processors", "Third parties that process the data. One per line.", "list", false),
-  question("deploymentNeeds", "Deployment needs (environments, availability, integrations), in your words.", "text", false)
+  question("deploymentNeeds", "Deployment needs (environments, availability, integrations), in your words.", "text", false),
+  // The memory policy (slice B): an empty answer takes the stated default, labelled `default` in the policy.
+  question("memoryPrivacyClass", "Privacy class of what the agent may remember: public, internal or restricted. Leave empty for restricted.", "text", false),
+  question("memoryRetentionDays", "How many days may a remembered item be kept? A whole number from 1 to 3650; leave empty for 90.", "text", false),
+  question("memoryReviewDays", "After how many days must a remembered item be reviewed? A whole number up to the retention; leave empty for 30.", "text", false),
+  question("memoryConsumers", "Which AMC consumers may read the agent's memory (score, recommendation, fixer, studio)? One per line; leave empty for all four.", "list", false)
 ];
 
 export const ADAPT_SPEC_SCHEMA = "amc.a4-adapt-spec/v1";
@@ -118,13 +124,14 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
   const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
   const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
     && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
-  const invalid = (Object.keys(FACTS) as AdaptFact[]).filter((fact) => {
+  const invalid: string[] = (Object.keys(FACTS) as AdaptFact[]).filter((fact) => {
     const value = factAnswer(answers, fact)?.value;
     const terms = FACTS[fact] === "list" ? factList(value) ?? [] : [factTerm(value)].filter((term): term is string => term !== null);
     if (terms.length > MAX_TERMS || terms.some((term) => !TERM.test(term))) return true;
     if (fact === "stations") return terms.some((term) => !(STATIONS as readonly string[]).includes(term));
     return fact === "primaryStation" && terms.length > 0 && !(factList(values.get("stations")) ?? []).includes(terms[0]!);
   });
+  invalid.push(...memoryPolicyFields(values).invalid);
   const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
     : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
   return { missing, stale, invalid, carried: carriedGaps };
@@ -156,7 +163,13 @@ export function currentPlan(spec: Record<string, unknown>, answers: readonly A4A
 }
 /** Build's record of the signed plan. */
 export interface AdaptBuild { readonly planDigest: string; readonly signature: unknown; readonly compiledAt: string; readonly previousPlanDigest: string | null;
-  readonly diff: PlanDiff | null }
+  readonly diff: PlanDiff | null;
+  /** Slice B: the memory policy Build wrote (workspace-relative path, file sha256, the policy). */
+  readonly memoryPolicy?: { readonly path: string; readonly sha256: string; readonly policy: Record<string, unknown> };
+  /** Slice B: the context plugin Build wrote (file sha256; `sha256` is the frame text's, the one a probe looks for). */
+  readonly context?: { readonly path: string; readonly fileSha256: string; readonly sha256: string; readonly name: string; readonly order: number; readonly source: string };
+  /** Slice B: the Enforce manifest Build wrote after them, or the refusal's code. */
+  readonly manifest?: { readonly manifestId: string; readonly path: string } | { readonly error: string } }
 export const buildOf = (spec: Record<string, unknown>): AdaptBuild | null => {
   const build = (spec.build ?? null) as AdaptBuild | null;
   return build !== null && build.planDigest === proposedPlan(spec)?.digest ? build : null;
@@ -170,7 +183,7 @@ const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}
 const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
 
 /** Whether the project has reached `step` at Adapt (any later stage counts; an earlier one has not). */
-function reached(state: A4ReadinessState, step: A4Step): boolean {
+export function reached(state: A4ReadinessState, step: A4Step): boolean {
   if (state.project.stage !== "adapt") return state.project.stage === "activate";
   return A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
@@ -329,19 +342,55 @@ function signingItems(state: A4ReadinessState, spec: Record<string, unknown>, an
 
 /**
  * The lockout (design §7 item 10, C-11): an active plan with L0-IDN-01 denies every native tool call without a verified
- * lease. Since P1-67 a Studio workspace-tools task started or resumed after activation runs under a lease Studio mints,
- * so the item is READY and names who is still denied rather than hiding them.
+ * lease. Since P1-67 a Studio workspace-tools task started or resumed after activation runs under a lease Studio mints
+ * with the workspace's lease key, so the item is READY through P1-67 and names who is still denied rather than hiding
+ * them. Studio refuses to start such a task when no lease can be minted (LEASE_UNAVAILABLE), so a locked vault keeps the
+ * item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY.
  */
-function lockoutItem(state: A4ReadinessState, regulated: boolean): A4ReadinessItem {
+function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated: boolean): A4ReadinessItem {
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const head = revision === undefined ? null : flatSlots(JSON.parse(revision.resource_digests_json))["plan.journalEntrySha256"] ?? null;
   const active = head !== null || state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID);
   if (!active && !regulated) return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, reasonCodes: ["NO_ACTIVE_PLAN"] });
-  return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session",
-    reasonCodes: [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
-      "PRE_ACTIVATION_SESSIONS_DENIED", "CLI_AGENT_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED"],
-    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67); "
-      + "tasks started before it, CLI agent sessions and delegated children carry none and are denied every call" } });
+  const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
+    "PRE_ACTIVATION_SESSIONS_DENIED", "CLI_AGENT_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED"];
+  const denied = "tasks started before it, CLI agent sessions and delegated children carry none and are denied every call";
+  const vault = query.live.vaultUnlocked;
+  if (active && vault !== true) {
+    return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
+      kind: vault === null ? "source_unavailable" : "plan_denies_native_session", reasonCodes: [...codes, "LEASE_NOT_ISSUED", "VAULT_LOCKED"],
+      nextAction: { label: `Studio mints a native task's lease with the workspace lease key, which the vault holds: unlock it, or every native start is refused; ${denied}` } });
+  }
+  return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
+    nextAction: { label: `Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67); ${denied}` } });
+}
+
+/**
+ * The memory policy (slice B, src/a4/adaptMemoryPolicy.ts): Build writes it, Review re-reads it (the bytes Build wrote,
+ * parsing as the policy). Enforcement is advisory: the item says so and never claims a limit is in force.
+ */
+function memoryItem(state: A4ReadinessState, spec: Record<string, unknown>, answers: readonly A4Answer[]): A4ReadinessItem {
+  const build = proposedFor(spec, answers) ? buildOf(spec) : null;
+  const written = build?.memoryPolicy;
+  if (written === undefined) {
+    return waiting("memory_policy_present", ["PRODUCED_AT_BUILD", "ENFORCEMENT:advisory"], { section: "implementation", mandatory: reached(state, "built"),
+      nextAction: { label: reached(state, "built") ? "This Build wrote no memory policy: build again" : "Build writes the memory policy from your answers" } });
+  }
+  const checked = (spec.review as { memoryPolicy?: { parses?: unknown; reason?: unknown } } | undefined)?.memoryPolicy ?? null;
+  const policy = written.policy as { privacyClass?: unknown; retentionTag?: unknown };
+  const facts = ["ENFORCEMENT:advisory", `PRIVACY:${String(policy.privacyClass)}`, `RETENTION:${String(policy.retentionTag)}`];
+  if (checked !== null && checked.parses !== true) {
+    return item("memory_policy_present", "BLOCKED", { section: "implementation", kind: "evidence_contradictory",
+      reasonCodes: [typeof checked.reason === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(checked.reason) ? checked.reason : "MEMORY_POLICY_INVALID", ...facts],
+      nextAction: { label: "The memory policy on disk is not the one Build wrote: build again" } });
+  }
+  // The memory resource changed: without a new signed Enforce manifest the agent reads DRIFTED in Enforce.
+  const manifest = build?.manifest;
+  if (manifest === undefined || "error" in manifest) {
+    return waiting("memory_policy_present", [`ENFORCE_MANIFEST_NOT_WRITTEN:${manifest === undefined ? "UNKNOWN" : manifest.error}`, ...facts], { section: "implementation",
+      nextAction: { label: "Build wrote the memory policy but no signed Enforce manifest after it, so the agent reads DRIFTED in Enforce: build again" } });
+  }
+  return item("memory_policy_present", "READY", { section: "implementation", reasonCodes: [...facts, checked === null ? "CHECKED_AT_REVIEW" : "MEMORY_POLICY_PARSES"] });
 }
 
 /** Informational items: clocks to classify, the completion rule's required reviews by kind, the sources' status, data handling. */
@@ -404,7 +453,8 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
       : waiting("plan_proposed", [spec.schema === ADAPT_SPEC_SCHEMA ? "PLAN_STALE" : "NOT_PROPOSED"], { nextAction: { label: "Propose the plan" } }),
     ...planItems(state, query, spec, answers, regulated),
     ...signingItems(state, spec, answers, revisionNo, regulated),
-    lockoutItem(state, regulated),
+    lockoutItem(state, query, regulated),
+    memoryItem(state, spec, answers),
     ...contextItems(state, query, answers, understanding)
   ];
 }

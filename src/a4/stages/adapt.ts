@@ -7,11 +7,14 @@
  * executor activateControlPlan consumes the plan review's grant itself; a non-regulated project completes with the plan
  * signed and not activated, and an owner may still open that effect. Everything A4 writes here is self_reported.
  */
+import { relative, sep } from "node:path";
 import { loadCatalog } from "../../catalog/loader.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import { renderPlanDiffMarkdown } from "../../catalog/compiler/diff.js";
 import { CONTROL_PLAN_REVIEW_TOOL, planReviewIntent } from "../../catalog/compiler/sign.js";
+import { writeEnforceResourceManifest } from "../../enforce/resourceManifest.js";
 import { CLOCK_REVIEW_STATUS } from "../../incidents/regulatoryClocks.js";
+import { assertOwnerMode } from "../../mode/mode.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { A4EffectDef } from "../a4Effects.js";
@@ -23,16 +26,18 @@ import { gatePolicyOf, type A4Answer, type A4StageRegistry } from "../a4Schema.j
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
+import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
   activateBoundPlan, activationExecutionId, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan, understandAdapt
 } from "../adaptPolicy.js";
 import {
   ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, acknowledgementOf, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, adaptItems, adaptSpecOf, answerGaps,
-  buildOf, carriedValues, currentPlan, factAnswer, factList, ownerOutOfScope, proposedFor, proposedPlan, understandingOf
+  buildOf, carriedValues, currentPlan, factAnswer, factList, ownerOutOfScope, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
+const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 
 /**
  * Readiness items, the plan slots and the activation effect. `plan.journalEntrySha256` is the active compiled-plan
@@ -49,6 +54,7 @@ export function register(registry: A4StageRegistry): void {
     }
   };
   RESOURCE_SLOTS["plan.lockDigest"] = () => shippedLockDigest();
+  RESOURCE_SLOTS["context.memoryPolicySha256"] = memoryPolicySha256;
   registry.registerEffect(ACTIVATE_PLAN_EFFECT);
 }
 
@@ -128,6 +134,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
   const register = (Array.isArray(facts?.register) ? facts.register : []) as Array<{ id: string; verified: boolean }>;
   const clocks = facts?.clocks ?? [];
   const jurisdictions = factList(factAnswer(answers, "jurisdictions")?.value);
+  const memory = memoryPolicyFields(answerValues(answers)).fields;
   return [
     { id: "applicability", sources: ["compilePlan", "evaluatePredicate", "catalog/"], dataStatus: "experimental",
       novice: plan === null ? "AMC could not work out yet which requirements apply: the answers did not compile into a plan."
@@ -155,10 +162,16 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
       practitioner: `${regulated ? "Regulated: completion runs" : "Not regulated: completion leaves the plan signed, not activated; an owner may open"} ${ACTIVATE_PLAN_EFFECT_ID}. `
         + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67); tasks started before it, CLI agent sessions and delegated children do not and are denied.",
       expert: "signPlan({ reviewAgentId, quorumFloor }) files the SECURITY review when the effect gate opens; activateControlPlan verifies it and consumes it as activate-<digest32>; compiledPolicyGuard denies any session whose pinned head differs from the journal's." },
+    { id: "memory", sources: ["src/a4/adaptMemoryPolicy.ts", "ReasoningMemoryItem (src/learning/reasoningMemory.ts)"], dataStatus: null,
+      novice: `The agent may remember items classed ${memory.privacyClass} for up to ${memory.expiresAfterDays} days, reviewed after ${memory.reviewAfterDays}, `
+        + `read by ${memory.allowedConsumers.join(", ")}. AMC records this policy but does not enforce it yet.`,
+      practitioner: `Build writes <agent>/memory/policy.json: retentionTag ${memory.retentionTag}, consumers ${memory.allowedConsumers.join(", ")}`
+        + ` (${Object.entries(memory.sources).map(([field, from]) => `${field} ${from}`).join(", ")}). Enforcement ${MEMORY_ENFORCEMENT_NOTE}.`,
+      expert: `amc.a4-memory-policy/v1 ${canonicalize(memory)}; enforcement: advisory (no reader of the file in src/learning).` },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
-      novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, and which incident reporting deadlines apply.",
-      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
-      expert: `enforcement: none for data handling; clocks: ${clocks.map((clock) => clock.clockId).join(", ") || "none"}, each NEEDS_CLASSIFICATION; ${CLOCK_REVIEW_STATUS}.` }
+      novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, what the agent may remember, and which incident reporting deadlines apply.",
+      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
+      expert: `enforcement: none for data handling; advisory for the memory policy; clocks: ${clocks.map((clock) => clock.clockId).join(", ") || "none"}, each NEEDS_CLASSIFICATION; ${CLOCK_REVIEW_STATUS}.` }
   ];
 }
 
@@ -226,15 +239,45 @@ function proposalOf(ctx: A4ProducerContext) {
   return { spec, plan };
 }
 
-/** Build: the proposed plan signed (CONTROL_PLAN, a local audit trail under this workspace's keys); its review is filed at the effect gate. */
+/** The Enforce manifest after Build's writes (the agent stays ACTIVE, not DRIFTED), or the refusal's code; never a path in an error. */
+function enforceSnapshot(workspace: string, agentId: string): NonNullable<AdaptBuild["manifest"]> {
+  try {
+    const written = writeEnforceResourceManifest({ workspace, agentId });
+    // The writer publishes a manifest it could not sign (its signing errors are swallowed); Enforce's loader refuses it.
+    return written.manifestSigPath === null || written.snapshotSigPath === null ? { error: "MANIFEST_UNSIGNED" }
+      : { manifestId: written.manifest.manifestId, path: relPath(workspace, written.manifestPath) };
+  } catch (error) {
+    return { error: errorCodeOf(error, "ENFORCE_MANIFEST_REFUSED") };
+  }
+}
+
+/**
+ * Build: the proposed plan signed (CONTROL_PLAN, a local audit trail under this workspace's keys; its review is filed at
+ * the effect gate), then the memory policy written under the agent's memory resource and the Enforce manifest re-written.
+ * Every refusal (agent mode, invalid memory answers, a weakening, the signing key, the spill cap) comes before the writes.
+ */
 function build(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, plan } = proposalOf(ctx);
-  const signed = signAdaptPlan(ctx.workspace, ctx.state, plan);
+  const { workspace } = ctx;
+  const project = ctx.state.project;
+  assertOwnerMode(workspace, "snapshot");
+  const values = answerValues(adaptSpecOf(ctx.state).answers);
+  const invalid = memoryPolicyFields(values).invalid;
+  if (invalid.length > 0) throw fail(409, "A4_NOT_READY", "The memory answers are not values the policy accepts.", { reasonCodes: invalid.map((id) => `ANSWER_INVALID:${id}`) });
+  const signed = signAdaptPlan(workspace, ctx.state, plan);
+  const source = `a4:${project.project_id}@r${project.revision_no}`;
+  const memory = writeMemoryPolicy({ workspace, agentId: project.agent_id, source, values });
+  const manifest = enforceSnapshot(workspace, project.agent_id);
+  const built: AdaptBuild = { ...signed, memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, manifest };
   return {
-    outputs: [{ output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
-      lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
-        diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } }],
-    spec: { ...spec, build: signed }
+    outputs: [
+      { output: "build", label: "adapt build: the compiled plan signed (CONTROL_PLAN; checked against this workspace's own keys, a local audit trail)",
+        lane: "implementation", method: null, body: { planDigest: signed.planDigest, compiledAt: signed.compiledAt, previousPlanDigest: signed.previousPlanDigest,
+          diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
+      { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
+        lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } }
+    ],
+    spec: { ...spec, build: built }
   };
 }
 
@@ -270,14 +313,18 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
     head = { activePlan: { error: errorCodeOf(error, "COMPILED_POLICY_UNREADABLE") }, sameAsProposal: false, samePolicy: false };
   }
   const diff = (spec.diff ?? null) as Parameters<typeof renderPlanDiffMarkdown>[0];
+  const written = buildOf(spec)?.memoryPolicy;
+  const memoryPolicy = written === undefined ? { parses: false, sameBytes: false, reason: "MEMORY_POLICY_NOT_BUILT" }
+    : checkMemoryPolicy(ctx.workspace, project.agent_id, written.sha256);
   return {
     outputs: [
       { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
         lane: "recommendation", method: null, body: { statement, resultsPath: conformance.resultsPath, verified: conformance.verified } },
       { output: "review", label: "adapt review: the active compiled plan's head against the proposal", lane: "implementation", method: null, body: head },
-      { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) }
+      { output: "review", label: "adapt review: the plan diff against this project's previous proposal", lane: "recommendation", method: null, body: renderPlanDiffMarkdown(diff) },
+      { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy }
     ],
     notEvaluated: ["NO_OBSERVED_REF", "CONTEXT_PROBE_NOT_RUN"],
-    spec: { ...spec, review: { conformance, statement, head, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }
