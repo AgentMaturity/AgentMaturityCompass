@@ -29,7 +29,7 @@ import { emitClaimResult, printClaimResult, runIdClaim, withClaimFields } from "
 import { openLedger } from "./ledger/ledger.js";
 import { assertOwnerMode } from "./mode/mode.js";
 import { readNativeApprovalActor } from "./setup/nativeApprovalIdentity.js";
-import { containedPath } from "./utils/pathSafety.js";
+import { containedPath, safeIdSchema } from "./utils/pathSafety.js";
 
 const PROJECT_ID = /^a4p_[0-9a-f]{32}$/;
 const GATE_ID = /^a4gate_[0-9a-f]{32}$/;
@@ -65,6 +65,11 @@ const projectArg = idArg(PROJECT_ID, "an A4 project id (a4p_ and 32 hex characte
 const gateArg = idArg(GATE_ID, "an A4 gate id (a4gate_ and 32 hex characters)");
 const releaseArg = idArg(RELEASE_ID, "an A4 release id (a4r_ and 32 hex characters)");
 const shaArg = idArg(SHA256, "a sha256 (64 lowercase hex characters)");
+/** A run id names a file under the agent's runs directory: one safe path segment. */
+const runArg = (value: string): string => {
+  if (!safeIdSchema.safeParse(value).success) throw new InvalidArgumentError("Expected a run id (one path segment of letters, digits, dot, _ or -).");
+  return value;
+};
 const choice = (values: readonly string[]) => (value: string): string => {
   if (!values.includes(value)) throw new InvalidArgumentError(`Choose one of ${values.join(", ")}.`);
   return value;
@@ -516,7 +521,7 @@ function registerReleases(a4: Command): void {
 
   leaf(a4, "export", "Export the run bundle of a project's agent with its A4 records (amc bundle export, scoped to the project)")
     .argument("<projectId>", "an A4 project id", projectArg)
-    .requiredOption("--run <runId>", "the diagnostic run the bundle carries")
+    .requiredOption("--run <runId>", "the diagnostic run the bundle carries", runArg)
     .requiredOption("--out <file>", "output .amcbundle file inside this workspace")
     .action((projectId: string, opts: Base & { run: string; out: string }) => run("export", opts, async () => {
       const workspace = process.cwd();
