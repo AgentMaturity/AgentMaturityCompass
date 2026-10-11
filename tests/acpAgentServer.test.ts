@@ -261,6 +261,16 @@ describe("session/prompt and cancellation", () => {
     expect(h.cancels).toEqual([]);
   });
 
+  it("names AMC's own budget refusal in the error data of a failed turn (P0-59)", async () => {
+    const { h, sessionId } = await promptingHarness();
+    h.send({ jsonrpc: "2.0", id: 2, method: "session/prompt", params: { sessionId, prompt: [{ type: "text", text: "hi" }] } });
+    await settle();
+    h.finish({ ok: false, reason: "signed turn 1 ended error; idle is not successful completion", failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] });
+    await replied(h, 2);
+    expect(replyTo(h.sent, 2)?.["error"]).toMatchObject({ code: -32603, message: "the turn did not complete",
+      data: { reason: expect.stringContaining("ended error"), failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] } });
+  });
+
   it("refuses a second prompt on a session already running one", async () => {
     const { h, sessionId } = await promptingHarness();
     const body = { sessionId, prompt: [{ type: "text", text: "x" }] };

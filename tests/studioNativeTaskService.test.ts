@@ -7,7 +7,8 @@ import { pathToFileURL } from "node:url";
 import { afterEach, beforeAll, beforeEach, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
-import { initBudgets } from "../src/budgets/budgets.js";
+import { budgetsPath, initBudgets, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import YAML from "yaml";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
@@ -195,6 +196,21 @@ test("JSONL managed task cold inspection, verification and archive retain actual
   expect(loadSessionEventHistory({ workspace: root, sessionId: task.sessionId! }).events).toEqual(before.events);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 60_000);
+
+test("a turn AMC's own budget refused says so instead of a generic failure, and names no provider quota (P0-59)", async () => {
+  const config = loadBudgetsConfig(root); config.budgets.perAgent.default!.daily.maxLlmRequests = 1;
+  writeFileSync(budgetsPath(root), YAML.stringify(config)); signBudgetsConfig(root);
+  const s = service();
+  const task = await idle(s, (await s.start(actor, input("Synthetic budget turn one."))).taskId);
+  await s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic budget turn two." });
+  const deadline = Date.now() + 25_000;
+  let current = s.poll(actor, task.taskId).task;
+  while (current.state === "running" && Date.now() < deadline) { await new Promise(done => setTimeout(done, 50)); current = s.poll(actor, task.taskId).task; }
+  expect(current.state).toBe("failed");
+  expect(current.error).toContain("Signed native budget admission refused this dispatch.");
+  expect(current.error).not.toMatch(/provider reported|quota/i);
+  expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(2);
+});
 
 test("archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart", async () => {
   const s = service(), request = input("Archive first recorded turn.");

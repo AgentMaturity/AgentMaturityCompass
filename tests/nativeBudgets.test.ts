@@ -24,6 +24,7 @@ import { budgetGuard } from "../src/tools/guards/policyGuards.js";
 import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { liveNativeFailureGuidance, projectNativeRunDiagnostics } from "../src/agent/nativeFailureGuidance.js";
 
 let workspace: string;
 const sessions: SessionService[] = [];
@@ -121,6 +122,27 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     await drain(llm.stream(spec)); await expect(drain(llm.stream(spec))).rejects.toThrow("request budget exhausted");
     expect(upstream.sent).toHaveLength(1);
     expect(budgetUsageSnapshot(workspace, "default").daily.llmRequests).toBe(1);
+  });
+
+  test("labels AMC's own budget refusals AMC_NATIVE_BUDGET_REFUSED, never provider QUOTA (P0-59)", async () => {
+    const refusalCode = (value: SessionService) => value.readEvents().filter(row => row.event_type === "request/failure")
+      .map(row => JSON.parse(row.meta_json) as { failure: { code: string }; dispatchAttempted?: boolean }).at(-1)!;
+    // The daily request budget.
+    limits(config => { config.budgets.perAgent.default!.daily.maxLlmRequests = 1; });
+    const exhausted = session(); const upstream = stubUpstream([response]); const llm = runtime(exhausted.value, upstream);
+    await drain(llm.stream(exhausted.spec));
+    const refused = await drain(llm.stream(exhausted.spec)).then(() => null, (error: unknown) => error);
+    expect(liveNativeFailureGuidance(refused).code).toBe("AMC_NATIVE_BUDGET_REFUSED");
+    expect(refusalCode(exhausted.value)).toMatchObject({ failure: { code: "AMC_NATIVE_BUDGET_REFUSED" }, dispatchAttempted: false });
+    const diagnostics = projectNativeRunDiagnostics(exhausted.value.readEvents(), exhausted.value.sessionId);
+    expect(diagnostics.map(row => row.guidance.code)).toEqual(["AMC_NATIVE_BUDGET_REFUSED"]);
+    expect(diagnostics[0]!.guidance.summary).not.toMatch(/provider/i);
+    // Unknown token usage from an earlier failed dispatch.
+    limits(config => { config.budgets.perAgent.default!.daily.maxLlmRequests = 100; });
+    const unknown = session(); const failing = runtime(unknown.value, refusingUpstream(new Error("socket failed")));
+    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow();
+    await expect(drain(failing.stream(unknown.spec))).rejects.toThrow("token usage is unknown");
+    expect(refusalCode(unknown.value)).toMatchObject({ failure: { code: "AMC_NATIVE_BUDGET_REFUSED" }, dispatchAttempted: false });
   });
 
   test("blocks the next provider dispatch at the known token threshold and leaves unpriced cost explicit", async () => {

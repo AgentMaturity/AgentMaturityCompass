@@ -137,7 +137,7 @@ Each block names the threat, the control today and the gap. "Not applicable" car
 - Tampering: usage or cost figures are edited after the fact. Control: signed request and settlement rows; budget reservations are chained. Gap: none known.
 - Repudiation: a model call with no record. Control: the signed `request/header` row precedes dispatch. Gap: none known.
 - Information disclosure: protected data sent to a provider in a region it may not leave. Control: none at the route. Gap: residency (P2-01); `bridgeResidencyHook` is unused.
-- Denial of service: spend exhaustion. Control: `reserveNativeModelBudget` refuses before dispatch when the budget or its ledger cannot be read; a ledger that fails verification is reported as `AMC_EVIDENCE_INTEGRITY`, not QUOTA (P0-27). Gap: none known.
+- Denial of service: spend exhaustion. Control: `reserveNativeModelBudget` refuses before dispatch when the budget or its ledger cannot be read; a ledger that fails verification is reported as `AMC_EVIDENCE_INTEGRITY`, not QUOTA (P0-27), and a budget refusal as `AMC_NATIVE_BUDGET_REFUSED`, never provider QUOTA (P0-59). Gap: none known.
 - Elevation of privilege: a request uses a capability the provider route was not admitted for. Control: `assertRequestCapabilities`. Gap: none known.
 
 ### Imports

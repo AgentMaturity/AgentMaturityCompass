@@ -6,7 +6,8 @@ import { encodeNativeAudioInput } from "../attachments/nativeAudioInput.js";
 import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { AMCNativeClient, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
+import { AMCNativeClient, AMCNativeRefusedError, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
+import { nativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { credentialRef } from "../credentials/credentialRef.js";
@@ -41,6 +42,10 @@ type CredentialedProvider = typeof CREDENTIALED[number];
 const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is CredentialedProvider => (CREDENTIALED as readonly string[]).includes(provider);
 const SWEEP_MS = 10_000;
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
+/** AMC's own budget refused the turn's next model request, as the runtime's ACP error data names it (P0-59). */
+const BUDGET_GUIDANCE = nativeFailureGuidance("AMC_NATIVE_BUDGET_REFUSED");
+const budgetRefused = (error: unknown): boolean => error instanceof AMCNativeRefusedError
+  && ((error.data as { failureCodes?: unknown } | undefined)?.failureCodes as unknown[] | undefined)?.includes(BUDGET_GUIDANCE.code) === true;
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
   client?: AMCNativeClient; session?: AMCNativeSession; turn?: AMCNativeTurn; work?: Promise<void>;
@@ -389,7 +394,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.state = reason === "error" || reason === "interrupted" ? "failed" : "idle";
         entry.error = reason === "error" || reason === "interrupted" ? `The signed native turn ended with ${reason}; no successful task is claimed.` : null;
         persist(entry, { pendingTurn: false });
-      } catch { entry.state = "failed"; entry.error = "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent."; }
+      } catch (error) {
+        entry.state = "failed";
+        entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
+          : "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent.";
+      }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
     })();
   }

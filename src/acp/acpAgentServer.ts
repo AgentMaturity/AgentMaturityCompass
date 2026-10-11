@@ -466,7 +466,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // Already delivered updates remain distinct from the failed turn result.
       if (!outcome.ok) {
         flush(entry, request.sessionId, false);
-        throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason });
+        throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason,
+          ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}) });
       }
 
       // `PromptResponse` has no content field, so anything not sent as a
