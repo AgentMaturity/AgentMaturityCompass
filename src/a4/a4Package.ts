@@ -334,7 +334,7 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
 function assertLeaseKeys(workspace: string, what: string): void {
   try {
     getPrivateKeyPem(workspace, "lease");
-    getPrivateKeyPem(workspace, "auditor");
+    getPrivateKeyPem(workspace, "revocation-list"); // P1-08: the key revokeLease signs the lease revocation list with
   } catch (error) {
     if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to ${what}`);
     throw error;

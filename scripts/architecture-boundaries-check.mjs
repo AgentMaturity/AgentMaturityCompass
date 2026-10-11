@@ -178,11 +178,13 @@ for (const file of walkSources("src")) {
 //
 // getPrivateKeyPem( and getVaultPrivateKeyPem( hand out a role's key; every signing call site takes its key per
 // purpose through getSigningKey(workspace, purpose) instead, so one purpose's leak or rotation never moves another's.
-// Only the key modules may call the role-level functions. The four src/a4 call sites belong to another lane and are
-// listed by name until it moves them, so no new call can appear unnoticed.
+// Only the key modules may call the role-level functions. The seven src/a4 call sites belong to another lane and are
+// listed by name until it moves them, so no new call can appear unnoticed; each is a fail-early probe that names the
+// purpose its later signer uses (getPrivateKeyPem's purpose form resolves exactly as getSigningKey does).
 const ROLE_KEY_CALL = /\bget(?:Vault)?PrivateKeyPem\(/;
 const ROLE_KEY_ALLOWED = [/^src\/keys\//, /^src\/vault\//, /^src\/crypto\/keys\.ts$/];
-const ROLE_KEY_PENDING_LANE = new Set(["src/a4/a4Gates.ts", "src/a4/a4Store.ts", "src/a4/assembleBuild.ts", "src/a4/stages/aspire.ts"]);
+const ROLE_KEY_PENDING_LANE = new Set(["src/a4/a4Gates.ts", "src/a4/a4Store.ts", "src/a4/assembleBuild.ts", "src/a4/stages/aspire.ts",
+  "src/a4/a4Package.ts", "src/a4/a4Deploy.ts", "src/a4/a4Rollback.ts"]);
 for (const file of walkSources("src")) {
   if (ROLE_KEY_ALLOWED.some((allowed) => allowed.test(file)) || ROLE_KEY_PENDING_LANE.has(file)) continue;
   const source = readFileSync(join(root, file), "utf8");
