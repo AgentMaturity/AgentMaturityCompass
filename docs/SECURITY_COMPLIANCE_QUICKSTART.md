@@ -19,7 +19,7 @@ Understand whether AMC produces evidence and control surfaces strong enough for 
 ```bash
 amc doctor
 amc assurance run --all
-amc audit binder create --framework eu-ai-act
+amc audit binder create --scope workspace --out binder.amcaudit
 amc compliance report --framework iso-42001
 ```
 

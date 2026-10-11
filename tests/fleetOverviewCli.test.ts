@@ -60,7 +60,7 @@ describe("fleet overview executive summary", () => {
   });
 
   test("keeps the UX audit aligned with fleet overview behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R18 — fleet overview gives executives a one-shot summary");
     expect(audit).toContain("`amc fleet overview` prints verdict, coverage, drift, weakest agents, and next actions");

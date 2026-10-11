@@ -5,7 +5,7 @@ AMC includes built-in runtime integrations for:
 - Claude CLI (`claude`)
 - Gemini CLI (`gemini`)
 - OpenClaw CLI (`openclaw`)
-- Generic process wrap (`amc wrap any`)
+- Generic process capture (`amc adapters run --adapter generic-cli`)
 - Universal HTTP provider routing via AMC gateway (`amc gateway start`)
 
 ## Detection and Doctor
@@ -53,14 +53,16 @@ supervise:
 
 Use `argsTemplate` for harness mode if discovery fails in your environment.
 
-## Wrap Mode Examples
+## Adapter Run Examples
 
 ```bash
-amc wrap claude -- chat
-amc wrap gemini -- prompt "hello"
-amc wrap openclaw -- run
-amc wrap any -- python my_agent.py
+amc adapters run --agent my-agent --adapter claude-cli -- claude
+amc adapters run --agent my-agent --adapter gemini-cli -- gemini --model gemini-flash
+amc adapters run --agent my-agent --adapter openclaw-cli -- openclaw run
+amc adapters run --agent my-agent --adapter generic-cli -- python my_agent.py
 ```
+
+`amc wrap claude|gemini|openclaw|any` still runs these runtimes but is deprecated and prints a warning; use `amc adapters run` (see [ADAPTERS](ADAPTERS.md)).
 
 ## Gateway Mode Examples
 

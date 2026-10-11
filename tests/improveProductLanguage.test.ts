@@ -31,7 +31,7 @@ describe("improve product-language roadmap", () => {
   });
 
   test("keeps the UX audit aligned with the PM-readable improve flow", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R24 — improve roadmap explains L3 in product language");
     expect(audit).toContain("`amc improve` now explains what L3 means for the product");

@@ -1,0 +1,47 @@
+[
+  {
+    "cmd": "amc up --no-open --no-remember",
+    "exit": 0,
+    "durationMs": 10655
+  },
+  {
+    "cmd": "amc down",
+    "exit": 0,
+    "durationMs": 3586
+  },
+  {
+    "cmd": "amc up --no-open --no-remember",
+    "exit": 0,
+    "durationMs": 8828
+  },
+  {
+    "cmd": "amc down",
+    "exit": 0,
+    "durationMs": 3232
+  },
+  {
+    "cmd": "amc compliance report --framework iso-42001",
+    "exit": 0,
+    "durationMs": 3008
+  },
+  {
+    "cmd": "amc domain conformance --station health --agent default --max-evidence-age 30d",
+    "exit": 0,
+    "durationMs": 4150
+  },
+  {
+    "cmd": "amc domain conformance --station wealth --agent default --max-evidence-age 30d",
+    "exit": 0,
+    "durationMs": 3116
+  },
+  {
+    "cmd": "amc domain assess --agent default --domain health",
+    "exit": 1,
+    "durationMs": 3870
+  },
+  {
+    "cmd": "amc audit binder create --scope workspace --out binder.amcaudit",
+    "exit": 0,
+    "durationMs": 3844
+  }
+]

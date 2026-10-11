@@ -11,7 +11,7 @@ The planned commercial surface is **Industry Packs** — 41 sector-specific doma
 Everything except Industry Packs:
 
 - **Score** — full evidence-weighted trust scoring, gap analysis, maturity diagnostics
-- **Shield** — all 142 adversarial assurance packs
+- **Shield** — all <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered adversarial assurance packs
 - **Enforce** — policy controls, approval workflows, scoped actions, governance
 - **Vault** — Ed25519 signatures, Merkle chains, tamper-evident proof infrastructure
 - **Watch** — traces, anomalies, timelines, monitoring, operational drift detection

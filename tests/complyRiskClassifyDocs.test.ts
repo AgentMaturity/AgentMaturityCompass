@@ -39,7 +39,7 @@ describe("comply risk-classify command surface", () => {
   });
 
   test("active Batch 5 audit no longer says the command is missing", () => {
-    const audit = readProjectFile("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = readProjectFile("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(audit).toContain("`amc comply risk-classify` is resolved");
     expect(audit).toContain("The compiled CLI exposes `amc compliance risk-classify`");

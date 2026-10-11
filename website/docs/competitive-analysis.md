@@ -411,7 +411,7 @@ The AI evaluation, security, and governance landscape has exploded into a fragme
 - Trace everything (prompts, responses, tool calls)
 - Eval with LLMs, code, or humans
 - Catch regressions in CI
-- SOC 2 Type II, GDPR, HIPAA compliant
+- SOC 2 Type II, GDPR and HIPAA claims (vendor-stated; not checked by AMC)
 - SSO, RBAC, hybrid deployment
 - Custom-built trace database (Brainstore)
 

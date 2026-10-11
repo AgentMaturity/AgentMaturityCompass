@@ -64,7 +64,7 @@ describe("compare badge DevRel docs", () => {
     expect(read("README.md")).not.toContain("model-compare-badge.svg");
     expect(read("docs/GETTING_STARTED.md")).toContain("Compare scored runs and write a comparison SVG badge");
     expect(read("docs/QUICKSTART.md")).toContain("Compare scored runs with badge output");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("compare-badge docs/runtime behavior are resolved");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("compare-badge docs/runtime behavior are resolved");
   });
 
   test("compare --badge writes an SVG for two-run comparisons", () => {

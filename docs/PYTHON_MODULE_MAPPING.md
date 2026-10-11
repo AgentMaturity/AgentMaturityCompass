@@ -119,7 +119,7 @@ Every Python module from `platform/python/amc/` is mapped to its TypeScript AMC 
 | Python Module | TypeScript AMC Equivalent | Status |
 |---|---|---|
 | `dimensions` — 7-dim scoring engine | `src/diagnostic/` (AMC-1.x to AMC-x.x, 138 questions) | 🟢 Native TS (superior — evidence-gated) |
-| `questionnaire` — 126-question engine | `src/diagnostic/questionBank.ts` | 🟢 Native TS |
+| `questionnaire` — default diagnostic question bank engine | `src/diagnostic/questionBank.ts` | 🟢 Native TS |
 | `evidence` — Evidence artifacts | `src/ledger/` + `src/receipts/` + `src/transparency/` | 🟢 Native TS (superior — signed Merkle) |
 | `evidence_collector` — Trust scoring | `src/assurance/scorers.ts` | 🟢 Native TS |
 | `formal_spec` — M(a,d,t) formula | `src/diagnostic/` (evidence-gated, superior model) | 🟢 Native TS (superior) |

@@ -114,6 +114,6 @@ describe("startup guidance", () => {
     expect(read("README.md")).toContain("amc quickstart --startup-plan --answers-out amc-startup-answers.json");
     expect(read("docs/QUICKSTART.md")).toContain("amc quickstart --what-broken");
     expect(read("docs/GETTING_STARTED.md")).toContain("amc quickstart --startup-plan --role cto");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("Startup guidance and what-broken mode — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("Startup guidance and what-broken mode — ✅ Resolved 2026-06-16");
   });
 });

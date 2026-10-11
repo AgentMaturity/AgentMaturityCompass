@@ -86,16 +86,16 @@ Show details of a specific run.
 amc assurance show <runId>
 ```
 
-### `amc assurance cert issue`
+### `amc assurance cert-issue`
 Issue a signed certificate from an assurance run.
 ```bash
-amc assurance cert issue --run <runId>
+amc assurance cert-issue --run <runId>
 ```
 
-### `amc assurance cert verify`
+### `amc assurance cert-verify`
 Verify an assurance certificate offline.
 ```bash
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 ```
 
 ### `amc assurance scheduler status|run-now|enable|disable`
