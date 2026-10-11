@@ -276,6 +276,13 @@
       "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e"
     },
     {
+      "path": "src/governor/policyDebt.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/governor/policyDebt.ts.landed",
+      "sha256": "65cca06ec04b9f961ebfecb66f4e8c807817188c0235bcc0b4f4472ed1841cf8"
+    },
+    {
       "path": "src/identity/hostVault.ts",
       "issue": "P0-37",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
