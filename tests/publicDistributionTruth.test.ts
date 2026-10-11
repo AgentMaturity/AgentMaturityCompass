@@ -287,14 +287,16 @@ describe("truthful public distribution and brand contract", () => {
     expect(workflow).toContain("actions/download-artifact@v8");
     expect(workflow).not.toContain("actions/upload-artifact@v4");
     expect(workflow).not.toContain("actions/download-artifact@v4");
-    expect(workflow).toContain("workflow_dispatch:");
-    expect(workflow).toContain('AMC_RELEASE_TAG: ${{ github.event_name');
+    // P0-34: a tag push is the only trigger; no dispatch input may choose what is released.
+    expect(workflow).not.toContain("workflow_dispatch:");
+    expect(workflow).toContain("AMC_RELEASE_TAG: ${{ github.ref_name }}");
     expect(workflow.match(/env -u GITHUB_REF_NAME/g)).toHaveLength(2);
     expect(workflow).toContain("tr '[:upper:]' '[:lower:]'");
-    expect(workflow).toContain("tag_name: ${{ env.AMC_RELEASE_TAG }}");
+    expect(workflow).toContain('gh release create "$AMC_RELEASE_TAG" --verify-tag');
     expect(workflow).not.toContain("ghcr.io/${{ github.repository_owner }}/amc-studio");
     expect(workflow).toContain("secrets.NPM_TOKEN");
-    expect(workflow).toMatch(/if \[ -z "\$NODE_AUTH_TOKEN" \]/);
+    // P0-34: a missing credential fails the publish; tests/releaseWorkflowContract.test.ts owns that contract.
+    expect(workflow).not.toContain("Skipping npm publish");
   });
 
   test("keeps every pending changeset on the canonical package name", () => {

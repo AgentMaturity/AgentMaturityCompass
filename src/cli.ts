@@ -18485,13 +18485,17 @@ release
   .requiredOption("--out <file>", "output .amcrelease file")
   .option("--private-key <path>", "release signing private key path override")
   .option("--skip-install-build", "use current built artifacts without frozen source install/build", false)
-  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean }) => {
+  .option("--npm-tarball <file>", "embed this gated npm tarball as is; nothing is installed, built or packed")
+  .option("--sbom <file>", "embed this gated CycloneDX SBOM instead of regenerating it")
+  .option("--licenses <file>", "embed this gated licence inventory instead of regenerating it")
+  .action((opts: { out: string; privateKey?: string; skipInstallBuild?: boolean; npmTarball?: string; sbom?: string; licenses?: string }) => {
     assertOwnerMode(process.cwd(), "release pack");
     const out = releasePackCli({
       workspace: process.cwd(),
       outFile: resolve(process.cwd(), opts.out),
       privateKeyPath: opts.privateKey,
-      skipInstallBuild: opts.skipInstallBuild
+      skipInstallBuild: opts.skipInstallBuild,
+      npmTarball: opts.npmTarball, sbomFile: opts.sbom, licensesFile: opts.licenses
     });
     console.log(chalk.green("Release bundle created"));
     console.log(`File: ${out.outFile}`);

@@ -515,8 +515,12 @@ function main() {
 
   try {
     const packStarted = Date.now();
-    setupSteps.push(stepWithDuration("package-pack", requirePassed(
-      run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", tmp], { cwd: root, env: qaEnv, timeoutMs: 120_000 }),
+    // P0-34: with AMC_PACKED_INSTALL_TARBALL the personas install that gated file; nothing is packed.
+    const gated = process.env.AMC_PACKED_INSTALL_TARBALL;
+    setupSteps.push(stepWithDuration("package-pack", requirePassed(gated
+      ? run(process.execPath, ["-e", "require('node:fs').copyFileSync(process.argv[1], process.argv[2])", resolve(gated),
+        join(tmp, "gated-package.tgz")], { cwd: root, env: qaEnv })
+      : run("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", tmp], { cwd: root, env: qaEnv, timeoutMs: 120_000 }),
       "Could not pack the built AMC package."
     ), packStarted));
     if (setupSteps[0].status === "passed") {

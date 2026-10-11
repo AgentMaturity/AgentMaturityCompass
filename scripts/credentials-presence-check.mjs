@@ -28,28 +28,28 @@ const GH_SECRET = "GitHub repo secret (Settings > Secrets and variables > Action
 export const CREDENTIALS = {
   NPM_TOKEN: {
     actions: ["publish"],
-    requiredFor: "B3 publish: npm-publish.yml and release.yml pass it as NODE_AUTH_TOKEN to the npm registry publish step",
-    configureAt: `${GH_SECRET}; an npm granular access token with publish rights from npmjs.com`
+    requiredFor: "B3 publish: release.yml's publish step, the only publisher, reads it from the `release` environment when P0-38 picks token publishing; trusted publishing needs no token",
+    configureAt: "GitHub environment secret of `release` (`gh secret set NPM_TOKEN --env release`); an npm granular access token limited to agent-maturity-compass"
   },
   CHANGESETS_GITHUB_TOKEN: {
     actions: ["publish"],
-    requiredFor: "B3 publish: npm-publish.yml gives it to changesets/action as GITHUB_TOKEN (opens the version PR)",
+    requiredFor: "Version PRs: npm-publish.yml gives it to changesets/action as GITHUB_TOKEN to open the version PR; that workflow never publishes",
     configureAt: `${GH_SECRET}; a GitHub token allowed to push branches and open pull requests`
   },
   NPMRC_AUTH_TOKEN_LINE: {
     actions: ["publish-local"],
-    requiredFor: "B3 publish from this shell: `pnpm release` (changeset publish) authenticates to npm through ~/.npmrc",
+    requiredFor: "P0-38 identity checks from this shell (`npm whoami`, `npm owner ls`) authenticate through ~/.npmrc; nothing publishes from a shell (`pnpm release` refuses)",
     configureAt: "$HOME/.npmrc line `//registry.npmjs.org/:_authToken=...` (written by `npm login`)",
     source: "npmrc"
   },
   AMC_RELEASE_SIGNING_KEY: {
     actions: ["sign-release"],
-    requiredFor: "B2 signed artifact: release.yml signs the .amcrelease bundle (skipped when absent)",
-    configureAt: GH_SECRET
+    requiredFor: "B2 signed artifact: release.yml signs the .amcrelease bundle and fails the release when it is absent",
+    configureAt: "GitHub environment secret of `release` (`gh secret set AMC_RELEASE_SIGNING_KEY --env release`)"
   },
   HOMEBREW_TAP_TOKEN: {
     actions: ["homebrew"],
-    requiredFor: "B3 Homebrew tap update in release.yml (skipped when absent)",
+    requiredFor: "B3 Homebrew tap update in release.yml's homebrew job, which runs only with the repository variable AMC_HOMEBREW_TAP=enabled and then fails without it",
     configureAt: `${GH_SECRET}; a GitHub token with write access to the tap repository`
   },
   GHCR_TOKEN: {

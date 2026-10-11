@@ -1,0 +1,114 @@
+{
+  "qualification": "failed",
+  "summary": "18/19 executed checks passed; 1 failed; 2 skipped. Acceptance is incomplete: per-file-coverage, live-deploy-health.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "status": "passed",
+      "seconds": 0
+    },
+    {
+      "id": "openapi-parse",
+      "status": "passed",
+      "seconds": 0
+    },
+    {
+      "id": "typecheck",
+      "status": "passed",
+      "seconds": 31
+    },
+    {
+      "id": "typecheck-tests",
+      "status": "passed",
+      "seconds": 55
+    },
+    {
+      "id": "build",
+      "status": "passed",
+      "seconds": 41
+    },
+    {
+      "id": "lint",
+      "status": "passed",
+      "seconds": 5
+    },
+    {
+      "id": "source-duplicates",
+      "status": "passed",
+      "seconds": 2
+    },
+    {
+      "id": "source-dead-code",
+      "status": "passed",
+      "seconds": 4
+    },
+    {
+      "id": "package-lint",
+      "status": "passed",
+      "seconds": 4
+    },
+    {
+      "id": "citations",
+      "status": "passed",
+      "seconds": 0
+    },
+    {
+      "id": "packed-install",
+      "status": "passed",
+      "seconds": 18
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "status": "passed",
+      "seconds": 4
+    },
+    {
+      "id": "full-test-suite",
+      "status": "failed",
+      "seconds": 900,
+      "reason": " any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0). TimeoutError: process tree exceeded 900000ms and was terminated."
+    },
+    {
+      "id": "per-file-coverage",
+      "status": "skipped",
+      "seconds": 0,
+      "reason": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check."
+    },
+    {
+      "id": "command-inventory",
+      "status": "passed",
+      "seconds": 1
+    },
+    {
+      "id": "architecture-boundaries",
+      "status": "passed",
+      "seconds": 2
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "status": "passed",
+      "seconds": 0
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "status": "passed",
+      "seconds": 1
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "status": "passed",
+      "seconds": 2
+    },
+    {
+      "id": "install-persona-qa",
+      "status": "passed",
+      "seconds": 144
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "seconds": 0,
+      "reason": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ]
+}

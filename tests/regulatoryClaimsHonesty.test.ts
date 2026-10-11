@@ -58,4 +58,11 @@ describe("regulatory artifacts do not claim studies that never happened", () => 
       vi.useRealTimers();
     }
   });
+
+  it("is no longer exported from the package root (D-12: unreviewed regulatory content)", async () => {
+    const root: Record<string, unknown> = await import("../src/index.js");
+    for (const name of ["FEDRAMP_MODERATE_FAMILIES", "GLOBAL_FRAMEWORKS", "generateEvidencePackage", "classifyEuAiActRisk", "EU_AI_ACT_RISK_MATRIX",
+      "CONSTRUCT_VALIDITY_DATA"]) expect(name in root, name).toBe(false);
+    expect(readFileSync(new URL("../src/index.ts", import.meta.url), "utf8")).not.toContain("compliance/globalRegulatory");
+  });
 });

@@ -41,8 +41,9 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
     io.error(error instanceof Error ? error.message : "Native schedule operation failed; no successful closure is claimed.");
     io.fail();
   };
-  const group = program.command("native-schedule")
-    .description("Manage signed native goals and explicitly own one due pass or a foreground polling lifecycle");
+  // D-12: never qualified (AMC-1548), so hidden from help and the inventory; the commands still parse.
+  const group = program.command("native-schedule", { hidden: true })
+    .description("Experimental, not qualified: manage signed native goals and explicitly own one due pass or a foreground polling lifecycle");
   group.command("list").description("Read signed configuration, its digest and operational due/in-flight status without running jobs")
     .action(() => {
       try {
