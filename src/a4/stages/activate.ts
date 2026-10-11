@@ -165,8 +165,9 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       expert: "issueLeaseToken({ workspaceId, agentId, workOrderId: releaseId, executeActionClasses ⊆ {READ_ONLY, WRITE_LOW}, ttlMs ≤ 24 h }); a4_requests keeps the attempt id only; a replay answers token: null, TOKEN_ALREADY_DELIVERED once that attempt finished, its failure code otherwise." },
     { id: "lifecycle", sources: ["LIFECYCLE_BRIDGE", "requiredControlsForStage"], dataStatus: null,
       novice: `The agent's lifecycle stage is ${String(lifecycle.currentStage ?? "unknown")}. AMC only moves it when A4 evidence backs each control; otherwise the control stays not evaluated.`,
-      practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated, `
-        + "operator_handoff_acknowledged and monitoring_slo_enabled stay not evaluated in v1 (AMC's check reaches reachability only).",
+      practitioner: `Production requires ${Array.isArray(lifecycle.requiredForProduction) ? lifecycle.requiredForProduction.join(", ") : "(unread)"}. rollback_plan_validated and `
+        + "operator_handoff_acknowledged stay not evaluated until P2-40 (AMC's check reaches reachability only); monitoring_slo_enabled is satisfied self_reported "
+        + "once a monitor ref carries an SLO measurement (in-process, unsigned).",
       expert: "a4Lifecycle.advance computes controlsSatisfied from LIFECYCLE_BRIDGE only, testing → staging after RELEASE and staging → production after the deployment approval; advanceLifecycleStage is never called backwards." },
     { id: "receipts", sources: ["design §10.4 Record deployment", "D-18 option 1"], dataStatus: null,
       novice: "Each deployment has two columns: what the operator says happened, and what AMC's own check found. They are never merged.",
