@@ -7,7 +7,7 @@ for name in ['artifact','artifact-sha256','source','source-tree','shared-checkou
 a=p.parse_args()
 sha=lambda path:hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
 assert re.fullmatch('[a-f0-9]{40}',a.source)
-assert re.fullmatch(r'v22\.\d+\.\d+',a.node_version)
+assert re.fullmatch(r'v2[24]\.\d+\.\d+',a.node_version)
 for path,expected in [(a.artifact,a.artifact_sha256),(a.node,a.node_sha256),(a.npm,a.npm_sha256),(a.browser_executable,a.browser_sha256)]:
  assert re.fullmatch('[a-f0-9]{64}',expected) and sha(path)==expected, 'Input digest mismatch'
 shared_root=pathlib.Path(a.shared_checkout).resolve(strict=True)
