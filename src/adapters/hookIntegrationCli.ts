@@ -16,7 +16,7 @@ import {
   type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
-import { serializeProviderControlResponse } from "../bridge/hookControl.js";
+import { serializeProviderControlResponse } from "../bridge/hookProviders.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
 import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";

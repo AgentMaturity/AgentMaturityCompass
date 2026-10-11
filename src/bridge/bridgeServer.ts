@@ -33,11 +33,10 @@ import {
 import {
   CONTROL_HOOK_PATH,
   CONTROL_HOOK_ROUTE,
-  HookControlError,
   MAX_CONTROL_HOOK_BODY_BYTES,
   evaluateProviderHookControl,
-  type HookProvider,
 } from "./hookControl.js";
+import { HookControlError, type HookProvider } from "./hookProviders.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;

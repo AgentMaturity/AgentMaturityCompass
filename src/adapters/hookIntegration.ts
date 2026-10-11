@@ -22,12 +22,10 @@ import {
 import {
   CONTROL_HOOK_PATH,
   CONTROL_HOOK_ROUTE,
-  renderProviderControlResponse,
   verifyProviderHookControlResult,
-  type HookControlDecision,
-  type ProviderControlResponse,
   type ProviderHookControlResult,
 } from "../bridge/hookControl.js";
+import { renderProviderControlResponse, type HookControlDecision, type ProviderControlResponse } from "../bridge/hookProviders.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { boundedFetchSignal, CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import {
