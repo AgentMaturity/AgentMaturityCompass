@@ -18,11 +18,22 @@ Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md
 
 ```bash
 helm install amc ./deploy/helm/amc \
-  --set image.repository=ghcr.io/your-org/amc-studio \
+  --set image.repository=ghcr.io/agentmaturity/amc-studio \
   --set image.tag=latest
 ```
 
 Pin the image with `--set image.digest=sha256:<64 hex>` (wins over the tag; `image.requireDigest=true` refuses a render without it). After install, `helm test amc --logs` runs one governed native turn and verifies its evidence.
+
+Deploy by digest in production:
+
+```bash
+helm install amc ./deploy/helm/amc \
+  --set image.repository=ghcr.io/agentmaturity/amc-studio \
+  --set image.digest=sha256:<64 hex> \
+  --set image.requireDigest=true
+```
+
+The release workflow is prepared to publish `ghcr.io/agentmaturity/amc-studio` as one multi-platform tag (linux/amd64 and linux/arm64) and to attach `image-digests.json` to the GitHub release; use its `indexDigest`, or a per-platform `digest` to pin one architecture. Registry publication is not yet verified (`website/publication-status.json`); until it is, build the image locally (`docker/README.md`) and deploy that image's digest from your own registry.
 
 Production guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 
