@@ -273,7 +273,7 @@ export const projectView = (row: A4ProjectRow, members: readonly A4Member[], rea
 
 const createSchema = z.strictObject({
   clientRequestId: clientRequestIdSchema,
-  name: z.string().trim().min(1).max(200),
+  name: z.string().trim().min(1).max(200).refine((value) => !/[\x00-\x1f\x7f-\x9f]/.test(value), "The project name cannot contain control characters."),
   agentId: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,127}$/, "Choose a valid agent ID.").optional(),
   archetype: z.string().trim().min(1).max(128).optional(),
   expertise: z.enum(["novice", "practitioner", "expert"])

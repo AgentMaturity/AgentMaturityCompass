@@ -746,7 +746,8 @@ reads them, decides gates, completes them and runs the release, deployment and r
 - **Reading.** `amc a4 list`, `amc a4 show <projectId>` and `amc a4 readiness <projectId> [--stage <stage>]` print the
   API's answer with its claim label (`--json` adds `claimKind`, `statusDimensions` and `claimLabel`). `amc a4 guide
   [projectId]` prints the stage model, the project's next action and, for every open gate, the decision command with
-  the gate's pins.
+  the gate's pins. Text output prints a control character in a name, reason or refusal as `\uXXXX`, so a project
+  name cannot print a line beside the claim label; the API refuses a project name that holds one.
 - **Deciding.** `amc a4 approve|deny|request-changes --gate <id> --reason <text> --expect-binding-digest <sha256>
   --expect-gate-seq <n>` binds the decision to the gate you reviewed. Approve and deny also take
   `--expect-readiness-digest`.

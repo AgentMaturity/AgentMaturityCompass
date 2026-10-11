@@ -75,6 +75,8 @@ const choice = (values: readonly string[]) => (value: string): string => {
   return value;
 };
 const collect = (value: string, previous: string[] = []): string[] => [...previous, value];
+/** Text someone wrote (a project name, a hold reason, an error), kept on its line: a control character prints as \uXXXX. */
+const safe = (value: unknown): string => String(value).replace(/[\x00-\x1f\x7f-\x9f]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
 /** A local regular file the operator names (never a symbolic link), at most 256 KiB of JSON object. */
 function readJsonFile(path: string, what: string): Data {
@@ -149,7 +151,7 @@ function refused(name: string, error: unknown, json: boolean): void {
   const code = typeof tagged?.code === "string" && /^[A-Z][A-Z0-9_]{1,63}$/.test(tagged.code) ? tagged.code : "A4_CLI_FAILED";
   const message = error instanceof Error ? error.message : String(error);
   if (json) console.log(JSON.stringify({ ok: false, error: message, code, ...(tagged?.detail === undefined ? {} : { detail: tagged.detail }) }, null, 2));
-  else console.error(`amc a4 ${name} refused${status}: ${message.startsWith(`${code}: `) ? message : `${code}: ${message}`}`);
+  else console.error(`amc a4 ${name} refused${status}: ${safe(message.startsWith(`${code}: `) ? message : `${code}: ${message}`)}`);
   process.exitCode = 1;
 }
 
@@ -214,7 +216,7 @@ function printWrite(data: Data, json: boolean): void {
   const { projectId, seq, kind, bodyDigest: _bodyDigest, replay, ...rest } = data;
   console.log(`Recorded ${String(kind)} on ${String(projectId)} at seq ${String(seq)}${replay === true ? " (the answer to an earlier request with this request id)" : ""}.`);
   for (const [key, value] of Object.entries(rest)) {
-    console.log(`  ${key}: ${typeof value === "string" ? value : JSON.stringify(value)}${key === "token" && typeof value === "string" ? "  (shown once; AMC keeps no copy)" : ""}`);
+    console.log(`  ${key}: ${typeof value === "string" ? safe(value) : JSON.stringify(value)}${key === "token" && typeof value === "string" ? "  (shown once; AMC keeps no copy)" : ""}`);
   }
 }
 
@@ -223,7 +225,7 @@ async function finishWrite(opts: Write, projectId: string, data: Data, print: ()
   print();
   const failure = await effectFailure(opts, projectId, data);
   if (failure === null) return;
-  console.error(`The effect of attempt ${String(data.attemptId)} did not finish: ${failure}. The gate stays consumed; retry the effect from Studio`
+  console.error(`The effect of attempt ${String(data.attemptId)} did not finish: ${safe(failure)}. The gate stays consumed; retry the effect from Studio`
     + `${data.replay === true ? " (a retry records its own attempt id, so this request keeps answering this attempt)" : ""}.`);
   process.exitCode = 1;
 }
@@ -235,7 +237,7 @@ function printOpenItems(readiness: Data): void {
   for (const item of open.slice(0, TEXT_ROWS)) console.log(`- ${item.id}: ${item.status}${item.reasonCodes.length > 0 ? ` (${item.reasonCodes.join(", ")})` : ""}`);
   if (open.length > TEXT_ROWS) console.log(`… ${open.length - TEXT_ROWS} more (--json prints them all)`);
   const next = readiness.nextAction as { label?: string } | null | undefined;
-  if (next?.label) console.log(`Next: ${next.label}`);
+  if (next?.label) console.log(`Next: ${safe(next.label)}`);
 }
 
 /**
@@ -279,10 +281,10 @@ function registerReads(a4: Command): void {
           hold: project.hold }, nextAction, openGates }, null, 2));
         return;
       }
-      console.log(`A4 project ${String(project.name)} (${projectId}): ${String(project.stage)}, step ${String(project.step)}, head seq ${String(project.headSeq)}`
+      console.log(`A4 project ${safe(project.name)} (${projectId}): ${String(project.stage)}, step ${String(project.step)}, head seq ${String(project.headSeq)}`
         + `${project.hold === true ? ", on hold" : ""}`);
       console.log(`Stages: ${A4_STAGES.join(" → ")}; steps: ${A4_STEPS.join(" → ")}`);
-      console.log(`Next: ${(nextAction as { label?: string } | null)?.label ?? "nothing is waiting on this stage"}`);
+      console.log(`Next: ${safe((nextAction as { label?: string } | null)?.label ?? "nothing is waiting on this stage")}`);
       for (const gate of openGates) {
         console.log(`Open ${gate.stage} ${gate.gate} gate ${gate.gateId}. To decide it after reviewing it:\n  amc a4 approve --gate ${gate.gateId}`
           + ` --expect-gate-seq ${gate.expectedGateSeq ?? "<not found>"} --expect-binding-digest ${gate.expectedBindingDigest}`
@@ -296,7 +298,7 @@ function registerReads(a4: Command): void {
       const projects = (await route(opts.sessionTokenFile, "GET", "/projects")).projects as Array<{ projectId: string; name: string; stage: string; step: string; hold: boolean }>;
       const claim = envelopeForUnboundResult({ producer: "a4:list", method: "human_review", regulated: false, now: Date.now() });
       if (emitClaimResult(`A4 projects: ${projects.length}`, { projects }, claim, opts)) return;
-      for (const p of projects.slice(0, TEXT_ROWS * 4)) console.log(`- ${p.name} (${p.projectId}): ${p.stage}, ${p.step}${p.hold ? ", on hold" : ""}`);
+      for (const p of projects.slice(0, TEXT_ROWS * 4)) console.log(`- ${safe(p.name)} (${p.projectId}): ${p.stage}, ${p.step}${p.hold ? ", on hold" : ""}`);
       if (projects.length > TEXT_ROWS * 4) console.log(`… ${projects.length - TEXT_ROWS * 4} more (--json prints them all)`);
     }));
 
@@ -305,9 +307,9 @@ function registerReads(a4: Command): void {
     .action((projectId: string, opts: Base) => run("show", opts, async () => {
       const data = await route(opts.sessionTokenFile, "GET", `/projects/${projectId}`);
       const readiness = data.readiness as { status?: string } | null;
-      if (emitClaimResult(`A4 project ${String(data.name)} (${projectId})`, data, data.claim as ClaimEnvelope, opts)) return;
+      if (emitClaimResult(`A4 project ${safe(data.name)} (${projectId})`, data, data.claim as ClaimEnvelope, opts)) return;
       console.log(`Stage ${String(data.stage)}, step ${String(data.step)}; revision ${String(data.revisionNo)}; head seq ${String(data.headSeq)}`
-        + `${data.hold === true ? `; on hold (${String(data.holdReason)})` : ""}`);
+        + `${data.hold === true ? `; on hold (${safe(data.holdReason)})` : ""}`);
       console.log(`Readiness: ${readiness?.status ?? "not_evaluated"}; members: ${(data.members as unknown[]).length}`);
       for (const view of Object.values(data.gates as Record<string, Data | null>)) {
         if (view) console.log(`Gate ${String(view.gate)} ${String(view.gateId)}: ${String(view.status)}, ${String(view.approvals)}/${String(view.required)} approvals, requested at seq ${String(view.requestedSeq)}`);
@@ -484,7 +486,7 @@ function registerReleases(a4: Command): void {
         return;
       }
       console.log(`Deployment plan for release ${releaseId} (signature verified now; AMC never runs these commands):`);
-      for (const step of (prepared.plan.steps ?? []).slice(0, TEXT_ROWS)) console.log(`- [${step.phase}] ${step.command ?? "(no command)"}  # ${step.note}`);
+      for (const step of (prepared.plan.steps ?? []).slice(0, TEXT_ROWS)) console.log(`- [${safe(step.phase)}] ${safe(step.command ?? "(no command)")}  # ${safe(step.note)}`);
       console.log("Then record the operator's receipt: amc a4 deploy record <projectId> <releaseId> --receipt <file> (the plan's receiptForm body).");
     }));
 
