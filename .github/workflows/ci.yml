@@ -306,25 +306,75 @@ jobs:
       - name: Packed-install check
         run: node scripts/packed-install-check.mjs
 
+  # P0-35: every image is built and qualified natively on each published
+  # architecture (GitHub-hosted arm64 Linux runner for public repositories).
   docker-smoke:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
+      - name: Base images are pinned by digest
+        run: node scripts/check-image-pins.mjs
       - name: Build source image targets
         run: |
           docker build --target studio -t amc-studio:ci .
           docker build --target runner -t amc-runner:ci .
       - name: Qualify installed container runtime
         run: node scripts/container-smoke.mjs --studio-image amc-studio:ci --runner-image amc-runner:ci --out tmp/container-smoke.json
+      - name: Build the quickstart and check its version, user and native SQLite
+        run: |
+          docker build -f docker/Dockerfile.quickstart -t amc-quickstart:ci .
+          expected=$(sed -n 's/^ARG AMC_VERSION=//p' docker/Dockerfile.quickstart)
+          actual=$(docker run --rm amc-quickstart:ci --version)
+          echo "quickstart --version: $actual (pinned $expected)"
+          [ "$actual" = "$expected" ]
+          [ "$(docker run --rm --entrypoint id amc-quickstart:ci -u)" = "10001" ]
+          docker run --rm --entrypoint node amc-quickstart:ci -e 'const r = require("node:module").createRequire("/usr/local/lib/node_modules/agent-maturity-compass/package.json"); new (r("better-sqlite3"))(":memory:").close()'
+      - name: Quickstart refuses a wrong tarball hash
+        run: |
+          mkdir -p tmp
+          if docker build -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256="$(printf '0%.0s' $(seq 64))" . > tmp/quickstart-wrong-hash.log 2>&1; then
+            echo "quickstart built with a wrong tarball hash"; exit 1
+          fi
+          grep -q '/tmp/amc.tgz: FAILED' tmp/quickstart-wrong-hash.log
+      - name: Record image IDs for this architecture
+        env:
+          AMC_ARCH: ${{ matrix.arch }}
+          AMC_RUNNER: ${{ matrix.runner }}
+        run: |
+          node -e '
+            const { execFileSync } = require("node:child_process");
+            const docker = (...args) => execFileSync("docker", args, { encoding: "utf8" }).trim();
+            const images = {};
+            for (const ref of ["amc-studio:ci", "amc-runner:ci", "amc-quickstart:ci"]) {
+              const [image] = JSON.parse(docker("image", "inspect", ref));
+              if (image.Architecture !== process.env.AMC_ARCH) throw Error(`${ref} is ${image.Architecture}, expected ${process.env.AMC_ARCH}`);
+              images[ref] = { id: image.Id, os: image.Os, architecture: image.Architecture };
+            }
+            const receipt = { arch: process.env.AMC_ARCH, runner: process.env.AMC_RUNNER, docker: docker("version", "--format", "{{.Server.Version}}"),
+              buildx: docker("buildx", "version"), images };
+            require("node:fs").writeFileSync("tmp/image-ids.json", JSON.stringify(receipt, null, 2) + "\n");
+            console.log(JSON.stringify(receipt, null, 2));
+          '
       - name: Upload docker smoke artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: docker-smoke
-          path: tmp/container-smoke.json
+          name: docker-smoke-${{ matrix.arch }}
+          path: |
+            tmp/container-smoke.json
+            tmp/image-ids.json
+            tmp/quickstart-wrong-hash.log
 
   helm-lint-template:
     runs-on: ubuntu-latest

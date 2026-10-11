@@ -1,0 +1,14 @@
+# M1: scripts/check-image-pins.mjs PINNED = /(@sha256:[a-f0-9]{64}|:[\w.-]+)$/ (also accepts tags); npx vitest run tests/checkImagePins.test.ts
+     × a FROM on a floating tag fails 6ms
+     × FROM ${VAR} fails when the ARG default is a floating tag 1ms
+     × a short or tag-only digest and an unpinned syntax frontend fail 2ms
+     × scans docker/*Dockerfile* and deploy/**/Dockerfile*, joining continuation lines 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  4 failed | 5 passed (9)
+
+# M2: quickstart sha256sum -c finding disabled (if (false && ...)); npx vitest run tests/checkImagePins.test.ts
+     × a quickstart without a sha256sum -c tarball check fails, also when it is only in a comment 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 8 passed (9)
+
+# Both restored; tests/checkImagePins.test.ts 9 of 9 pass.

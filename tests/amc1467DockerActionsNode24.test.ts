@@ -28,11 +28,13 @@ describe("AMC-1467 Docker action Node 24 migration", () => {
     const buildx = references.filter((uses) => uses.startsWith("docker/setup-buildx-action@"));
     const metadata = references.filter((uses) => uses.startsWith("docker/metadata-action@"));
 
+    // P0-35: release.yml has a per-architecture image job; docker-runner.yml a manifest job.
     expect(buildx).toEqual([
       "docker/setup-buildx-action@v4",
       "docker/setup-buildx-action@v4",
+      "docker/setup-buildx-action@v4",
     ]);
-    expect(metadata).toEqual(["docker/metadata-action@v6"]);
+    expect(metadata).toEqual(["docker/metadata-action@v6", "docker/metadata-action@v6"]);
     expect(references).not.toContain("docker/setup-buildx-action@v3");
     expect(references).not.toContain("docker/metadata-action@v5");
   });
@@ -61,10 +63,13 @@ describe("AMC-1467 Docker action Node 24 migration", () => {
         context: ".",
         file: "Dockerfile",
         target: "runner",
-        tags: "${{ steps.meta.outputs.tags }}",
+        tags: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-${{ matrix.arch }}",
         labels: "${{ steps.meta.outputs.labels }}",
       },
     });
+    const manifest = (workflow.jobs.manifest.steps as any[]).find((step) => step.name === "Docker metadata");
+    expect(manifest.with.tags).toContain("type=sha,prefix=");
+    expect(manifest.with.tags).toContain("type=raw,value=latest,enable={{is_default_branch}}");
   });
 
   test("records the upstream runtime and no-product-change boundary", () => {

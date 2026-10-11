@@ -37,7 +37,7 @@ variable "values_files" {
 variable "image_repository" {
   type        = string
   description = "AMC container image repository."
-  default     = "ghcr.io/your-org/amc-studio"
+  default     = "ghcr.io/agentmaturity/amc-studio"
 }
 
 variable "image_tag" {

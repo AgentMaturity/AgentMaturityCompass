@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T03:09:01.002Z",
+  "targetPlatform": "linux",
+  "hostPlatform": "darwin",
+  "dockerEngine": {
+    "os": "linux",
+    "architecture": "aarch64",
+    "serverVersion": "29.5.2"
+  },
+  "requestedStudioImage": "amc-p035-studio:amd64",
+  "requestedRunnerImage": "amc-p035-runner:amd64",
+  "studioImage": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+  "runnerImage": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+  "checks": [
+    {
+      "name": "Docker daemon is Linux",
+      "passed": true,
+      "architecture": "aarch64",
+      "serverVersion": "29.5.2"
+    },
+    {
+      "name": "image amc-p035-studio:amd64",
+      "passed": true,
+      "id": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "image amc-p035-runner:amd64",
+      "passed": true,
+      "id": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "studio: default entrypoint reaches readiness",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /healthz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /readyz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /console",
+      "passed": true
+    },
+    {
+      "name": "studio: non-root installed artifact, SQLite and bundle notices",
+      "passed": true
+    },
+    {
+      "name": "studio: anonymous refusal and authenticated access",
+      "passed": true
+    },
+    {
+      "name": "studio: keyless turn and cold signed verification after graceful shutdown",
+      "passed": true
+    },
+    {
+      "name": "amc-smoke-0c1fbf19-8737-4a8a-bf47-e99eb6a8e593-studio: runtime secret values absent from logs",
+      "passed": true
+    }
+  ],
+  "verificationResults": [
+    {
+      "phase": "first shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e",
+          "expectedFingerprint": "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "f714154e-5551-4077-ae74-8e840e77a7e7"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "first shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "f714154e-5551-4077-ae74-8e840e77a7e7",
+        "--json",
+        "--expect-monitor",
+        "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "sessionId": "f714154e-5551-4077-ae74-8e840e77a7e7",
+        "ok": true,
+        "prefixVerified": false,
+        "integrityOk": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "8488b196-073c-41ff-9cc9-397bb84c298b",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "6d424056-85a5-4953-b9fd-7f764dd19faf",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "b09a53f3cace10207aafb5ebb0046556467f1a45c1d41519b7e87c8f6911f98e",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    }
+  ],
+  "cleanupResults": [
+    {
+      "resource": "container",
+      "name": "amc-smoke-0c1fbf19-8737-4a8a-bf47-e99eb6a8e593-studio",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-0c1fbf19-8737-4a8a-bf47-e99eb6a8e593-studio-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "secret files",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-35-tmp/amc-container-secrets-WouBru",
+      "ok": true
+    }
+  ],
+  "ok": false,
+  "error": "Studio readiness timed out",
+  "finishedAt": "2026-10-11T03:13:59.147Z"
+}

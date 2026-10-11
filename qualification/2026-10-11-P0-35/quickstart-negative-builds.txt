@@ -1,0 +1,10 @@
+# docker build --progress=plain --platform linux/arm64 -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256=<64 zeros> .
+#5 97.86 /tmp/amc.tgz: FAILED
+#5 97.87 sha256sum: WARNING: 1 computed checksum did NOT match
+97.86 /tmp/amc.tgz: FAILED
+97.87 sha256sum: WARNING: 1 computed checksum did NOT match
+ERROR: failed to build: failed to solve: process "/bin/sh -c test -n \"${AMC_TGZ_SHA256}\" || { echo \"AMC_TGZ_SHA256 is empty; refusing an unverified tarball\" >&2; exit 1; }     && apt-get update     && apt-get install -y --no-install-recommends curl ca-certificates     && rm -rf /var/lib/apt/lists/*     && curl -fsSL -o /tmp/amc.tgz        \"https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${AMC_VERSION}/agent-maturity-compass-${AMC_VERSION}.tgz\"     && echo \"${AMC_TGZ_SHA256}  /tmp/amc.tgz\" | sha256sum -c -     && npm i -g /tmp/amc.tgz     && rm -f /tmp/amc.tgz     && npm cache clean --force" did not complete successfully: exit code: 1
+
+# docker build --progress=plain --platform linux/arm64 -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256= .
+#5 1.897 AMC_TGZ_SHA256 is empty; refusing an unverified tarball
+ERROR: failed to build: failed to solve: process "/bin/sh -c test -n \"${AMC_TGZ_SHA256}\" || { echo \"AMC_TGZ_SHA256 is empty; refusing an unverified tarball\" >&2; exit 1; }     && apt-get update     && apt-get install -y --no-install-recommends curl ca-certificates     && rm -rf /var/lib/apt/lists/*     && curl -fsSL -o /tmp/amc.tgz        \"https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${AMC_VERSION}/agent-maturity-compass-${AMC_VERSION}.tgz\"     && echo \"${AMC_TGZ_SHA256}  /tmp/amc.tgz\" | sha256sum -c -     && npm i -g /tmp/amc.tgz     && rm -f /tmp/amc.tgz     && npm cache clean --force" did not complete successfully: exit code: 1

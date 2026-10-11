@@ -1,0 +1,492 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T03:24:52.144Z",
+  "targetPlatform": "linux",
+  "hostPlatform": "darwin",
+  "dockerEngine": {
+    "os": "linux",
+    "architecture": "aarch64",
+    "serverVersion": "29.5.2"
+  },
+  "requestedStudioImage": "amc-p035-studio:amd64",
+  "requestedRunnerImage": "amc-p035-runner:amd64",
+  "studioImage": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+  "runnerImage": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+  "checks": [
+    {
+      "name": "Docker daemon is Linux",
+      "passed": true,
+      "architecture": "aarch64",
+      "serverVersion": "29.5.2"
+    },
+    {
+      "name": "image amc-p035-studio:amd64",
+      "passed": true,
+      "id": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "image amc-p035-runner:amd64",
+      "passed": true,
+      "id": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "studio: default entrypoint reaches readiness",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /healthz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /readyz",
+      "passed": true
+    },
+    {
+      "name": "studio: published port /console",
+      "passed": true
+    },
+    {
+      "name": "studio: non-root installed artifact, SQLite and bundle notices",
+      "passed": true
+    },
+    {
+      "name": "studio: anonymous refusal and authenticated access",
+      "passed": true
+    },
+    {
+      "name": "studio: keyless turn and cold signed verification after graceful shutdown",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /healthz",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /readyz",
+      "passed": true
+    },
+    {
+      "name": "studio after restart: published port /console",
+      "passed": true
+    },
+    {
+      "name": "studio: restart preserves authenticated access",
+      "passed": true
+    },
+    {
+      "name": "studio: both cold verifiers preserve the signed session after restart",
+      "passed": true
+    },
+    {
+      "name": "studio: interrupted gateway is refused by both cold verifiers",
+      "passed": true
+    },
+    {
+      "name": "runner: non-root installed artifact, SQLite and bundle notices",
+      "passed": true,
+      "uid": 10001,
+      "bundledPackages": 17,
+      "version": "1.2.0"
+    },
+    {
+      "name": "runner: default CLI entrypoint",
+      "passed": true
+    },
+    {
+      "name": "runner: Python, Git and jq available",
+      "passed": true
+    },
+    {
+      "name": "runner across separate containers: keyless turn and cold signed verification",
+      "passed": true
+    },
+    {
+      "name": "amc-smoke-7b0fbc2a-08bd-441c-a1ae-77c771e8af5c-studio: runtime secret values absent from logs",
+      "passed": true
+    }
+  ],
+  "verificationResults": [
+    {
+      "phase": "first shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "03335715-2be7-4196-ba80-30be9b45a77b"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "first shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "03335715-2be7-4196-ba80-30be9b45a77b",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "sessionId": "03335715-2be7-4196-ba80-30be9b45a77b",
+        "ok": true,
+        "prefixVerified": false,
+        "integrityOk": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "aa5e2ca5-3654-4107-9b91-81f1ac3e6051",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "c3241c96-4555-4253-a228-2b718a1d7ad3",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "restart shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "03335715-2be7-4196-ba80-30be9b45a77b"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "restart shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "03335715-2be7-4196-ba80-30be9b45a77b",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": true,
+      "exitCode": 0,
+      "report": {
+        "sessionId": "03335715-2be7-4196-ba80-30be9b45a77b",
+        "ok": true,
+        "prefixVerified": false,
+        "integrityOk": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "aa5e2ca5-3654-4107-9b91-81f1ac3e6051",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "c3241c96-4555-4253-a228-2b718a1d7ad3",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "abrupt shutdown",
+      "command": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": false,
+      "exitCode": 1,
+      "report": {
+        "ok": false,
+        "errors": [
+          "Session ebcb1f71-f689-4f77-a583-a051876dec28 missing seal"
+        ],
+        "chain": {
+          "ok": false,
+          "errors": [
+            "Session ebcb1f71-f689-4f77-a583-a051876dec28 missing seal"
+          ]
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        },
+        "sessions": {
+          "open": [],
+          "released": [],
+          "interrupted": [],
+          "closed": [
+            "03335715-2be7-4196-ba80-30be9b45a77b"
+          ]
+        },
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "applicable"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable"
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    },
+    {
+      "phase": "abrupt shutdown",
+      "command": [
+        "agent-loop",
+        "verify",
+        "03335715-2be7-4196-ba80-30be9b45a77b",
+        "--json",
+        "--expect-monitor",
+        "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0"
+      ],
+      "processOk": false,
+      "exitCode": 1,
+      "report": {
+        "sessionId": "03335715-2be7-4196-ba80-30be9b45a77b",
+        "ok": false,
+        "prefixVerified": false,
+        "integrityOk": false,
+        "ledgerOk": false,
+        "ledgerErrors": [
+          "Session ebcb1f71-f689-4f77-a583-a051876dec28 missing seal"
+        ],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "aa5e2ca5-3654-4107-9b91-81f1ac3e6051",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "c3241c96-4555-4253-a228-2b718a1d7ad3",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "scope": "complete-ledger",
+        "unfinalizedSessions": [],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+          "expectedFingerprint": null,
+          "monitorAdmission": {
+            "signature": "ledger monitor key",
+            "purpose": "ledger-row",
+            "keyId": "348803cae20d2bf8e30257f53251e9c964f11e887906edd87d8ed1e9e96012a0",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        }
+      },
+      "stderr": "WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested\n"
+    }
+  ],
+  "cleanupResults": [
+    {
+      "resource": "container",
+      "name": "amc-smoke-7b0fbc2a-08bd-441c-a1ae-77c771e8af5c-studio",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-7b0fbc2a-08bd-441c-a1ae-77c771e8af5c-studio-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-7b0fbc2a-08bd-441c-a1ae-77c771e8af5c-runner-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "secret files",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-35-tmp/amc-container-secrets-7SOhC7",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "finishedAt": "2026-10-11T03:30:23.361Z"
+}

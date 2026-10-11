@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T03:16:59.115Z",
+  "targetPlatform": "linux",
+  "hostPlatform": "darwin",
+  "dockerEngine": {
+    "os": "linux",
+    "architecture": "aarch64",
+    "serverVersion": "29.5.2"
+  },
+  "requestedStudioImage": "amc-p035-studio:amd64",
+  "requestedRunnerImage": "amc-p035-runner:amd64",
+  "studioImage": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+  "runnerImage": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+  "checks": [
+    {
+      "name": "Docker daemon is Linux",
+      "passed": true,
+      "architecture": "aarch64",
+      "serverVersion": "29.5.2"
+    },
+    {
+      "name": "image amc-p035-studio:amd64",
+      "passed": true,
+      "id": "sha256:46acdf938b501c1cad4e122120c736a7e7033a06a37ed457e43bdb6fd80ae41d",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "image amc-p035-runner:amd64",
+      "passed": true,
+      "id": "sha256:170c211bc27eae56d43f369ceba98f5d19c36b267ef2864c43e3bd75921766d7",
+      "architecture": "amd64",
+      "os": "linux"
+    },
+    {
+      "name": "amc-smoke-068d556a-bd88-48fb-91ba-153dbf404d3b-studio: runtime secret values absent from logs",
+      "passed": true
+    }
+  ],
+  "verificationResults": [],
+  "cleanupResults": [
+    {
+      "resource": "container",
+      "name": "amc-smoke-068d556a-bd88-48fb-91ba-153dbf404d3b-studio",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "volume",
+      "name": "amc-smoke-068d556a-bd88-48fb-91ba-153dbf404d3b-studio-data",
+      "ok": true,
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "resource": "secret files",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-35-tmp/amc-container-secrets-KaFRCA",
+      "ok": true
+    }
+  ],
+  "ok": false,
+  "error": "Studio readiness timed out",
+  "finishedAt": "2026-10-11T03:20:22.496Z"
+}
