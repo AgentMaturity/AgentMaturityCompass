@@ -480,7 +480,8 @@ nothing more. It is refused with `DEPLOYMENT_NOT_SAME_HOST` (naming P2-40) unles
 with `PACKAGE_DIGEST_MISMATCH`, `LEASE_NOT_OF_RELEASE` (a staging receipt names the staging lease, a production receipt the
 production lease), `DESTINATION_MISMATCH` (a deploy receipt names another destination than the release was packaged for)
 or `TARGET_MISMATCH`. A production deploy receipt is also refused `ROLLBACK_TARGET_ROLLED_BACK` once the release's
-recorded rollback target was rolled back or a rollback of it started (see Rollback below). No lease is issued and no runtime run is created. A succeeded production receipt
+recorded rollback target was rolled back, and `ROLLBACK_TARGET_ROLLBACK_PENDING` while a production rollback of that
+target has started and is not recorded (see Rollback below). No lease is issued and no runtime run is created. A succeeded production receipt
 moves the project's `deployedReleaseId`; a succeeded production rollback row moves it to the release rolled back to. A
 rollback row records the one rollback the approvers approved, found in any cycle (a reopen or tune recorded after the
 rollback leaves its row recordable): it names that rollback's environment (`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise),
@@ -515,15 +516,18 @@ with a succeeded production deploy that was not rolled back, in staging this cyc
 preview names the rollback target from the release record (the release that ran in production when this one was built,
 never merely the previous release), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. A
 recorded target that was itself rolled back since can never be restored, and its prepared commands would re-pin it, so
-the preview then names no target: no Enforce manifest, and prepared commands that re-pin no release (Compose returns to
-the base file; Helm's commands name none, so the operator picks the revision before this release's upgrade), only the
-revocations (and the freeze for a high or critical risk tier), with a restore note naming the recorded target and saying
-it was rolled back. Studio shows that note and marks the plan's own rollback steps superseded. The engine request binds
+the preview then names no target: no Enforce manifest, Compose's base file as its one prepared command (it re-pins no
+release) and no command on Helm (a Helm rollback re-pins whatever release its chosen revision deployed, and the revision
+before this release's upgrade normally deployed the rolled-back target), only the revocations (and the freeze for a high
+or critical risk tier), with a restore note naming the recorded target, saying it was rolled back and saying the same. Studio shows that note and marks the plan's own rollback steps superseded. The engine request binds
 that preview, so its approvers see it. A target rolled back after the preview refuses the confirmation (409
 `ROLLBACK_TARGET_ROLLED_BACK`); preview again. Such a release never reaches production, so only a staging preview names
-no target: once a rollback of its target has started, its deployment approval is BLOCKED, and its production lease and a
-production deploy receipt are refused (`ROLLBACK_TARGET_ROLLED_BACK`, `deployment.receipt` below); a production lease
-minted before that is revoked by the target's production rollback (step 4 below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+no target: once its target was rolled back its deployment approval is BLOCKED, and its production lease and a production
+deploy receipt are refused (`ROLLBACK_TARGET_ROLLED_BACK`, `deployment.receipt` below), and so they are while a
+production rollback of its target has started and is not recorded (`ROLLBACK_TARGET_ROLLBACK_PENDING`: a release built
+then names the same target, so that rollback is finished first, run again in production if it failed). A staging attempt
+of the target's rollback does not bar the release. A production lease minted before the target's production rollback started is
+revoked by it (step 4 below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
 pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, on rows that still pass both preview refusals
 above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
@@ -571,9 +575,11 @@ Readiness adds these items:
   any attempt of its rollback has started (even one that failed), so the deployment approval is refused before it is
   consumed. A new `deploy` receipt for that release is refused with `RELEASE_ROLLED_BACK`, and so is its production lease,
   both already once a rollback attempt started. It is also BLOCKED `ROLLBACK_TARGET_ROLLED_BACK` (naming
-  `ROLLBACK_TARGET:<id>`) once the release's recorded rollback target was rolled back or a rollback of it started: the
-  release could never restore it, so the production-lease effect and a production deploy receipt refuse it with the same
-  code. Reopen or tune Activate to release again.
+  `ROLLBACK_TARGET:<id>`) once the release's recorded rollback target was rolled back, and BLOCKED
+  `ROLLBACK_TARGET_ROLLBACK_PENDING` (naming the target and the route that runs its rollback again) while a production
+  rollback of that target has started and is not recorded: the release could never restore it, so the production-lease
+  effect and a production deploy receipt refuse it with the same code. Reopen or tune Activate to release again, once a
+  pending rollback of the target is recorded (a release built before that names the same target).
 - `deployment.amc_check`: bound to the receipt and its newest check (`CHECK:none` before one). A later check stales the
   approval. It is BLOCKED while the release's newest check `failed`: a newer receipt alone does not clear it, only a
   later check that does not fail. It is WAITING `DEPLOYMENT_UNCHECKED` or `DEPLOYMENT_IDENTITY_NOT_EVALUATED` otherwise,
@@ -671,7 +677,7 @@ The Studio cards on the Activate page:
 - The prepared plan, with a copy button for each command (the lease secret is a placeholder), the receipt form for
   either target, and AMC's check beside the operator's status. Once the release's recorded rollback target was rolled
   back (`rollbackTargetRolledBack` on `GET …/releases/:rid`), the plan's rollback steps read superseded, without copy
-  buttons: the rollback preview names the commands to run.
+  buttons: the rollback preview says what runs instead (Compose's base file; no Helm command).
 - The rollback preview, with its restore note, and its confirmation.
 - The monitor tiles.
 - The four-column value table and the hypotheses, with the observe form.

@@ -22,8 +22,8 @@ import { recordEnvelope, vaultLocked, writeReleaseRecord } from "./a4Package.js"
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackStarted, rolledBack,
-  rolledBackTarget } from "./spec/activate.js";
+import { currentRelease, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackRecorded, rollbackRoute, rollbackStarted,
+  rolledBack, rolledBackTarget } from "./spec/activate.js";
 import { fail } from "./stages/common.js";
 
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -270,7 +270,7 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
  * The checks a receipt passes on one set of rows (before anything is written, and again on the rows the transaction
  * read): the release and its target, the same-host rule, operator times inside the skew bound, the package digest and
  * the lease ids its effects minted (a production deploy row: never for a release whose rollback target was rolled back,
- * or is being rolled back; a rollback row: the release it rolled back to, in the rollback's own environment, once, and in
+ * or is being rolled back in production; a rollback row: the release it rolled back to, in the rollback's own environment, once, and in
  * production only before any later succeeded production row, while the rolled-back release is the one production ran
  * and never to a release rolled back since). Returns where `deployed_release_id` moves, if anywhere (production only).
  */
@@ -294,12 +294,18 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
     if (rolledBack(state.chain, releaseId) || rollbackStarted(state.chain, releaseId)) {
       throw fail(409, "RELEASE_ROLLED_BACK", "This release was rolled back, or a rollback of it started; reopen or tune Activate and release again.");
     }
-    // A release whose rollback target was rolled back could never restore it, so it never reaches production, even on a
-    // production lease minted before that rollback started (which that rollback revokes). Staging rows move nothing.
+    // A release whose rollback target was rolled back, or is being rolled back in production, could never restore it, so it
+    // never reaches production, even on a production lease minted before that rollback started (which that rollback
+    // revokes). Staging rows move nothing.
     const target = body.environment === "production" ? rolledBackTarget(state.chain, releaseId) : null;
+    if (target?.code === "ROLLBACK_TARGET_ROLLBACK_PENDING") {
+      throw fail(409, target.code, `A production rollback of release ${target.releaseId}, this release's rollback target, has started but is not recorded; this release never `
+        + `deploys to production, and a release built now would name it again: finish that rollback first (${rollbackRoute(state.project.project_id, target.releaseId)}, `
+        + "in production), then reopen or tune Activate and release again.");
+    }
     if (target !== null) {
-      throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `Release ${target}, this release's rollback target, was rolled back, or a rollback of it started; `
-        + "this release never deploys to production: reopen or tune Activate and release again.");
+      throw fail(409, target.code, `Release ${target.releaseId}, this release's rollback target, was rolled back; this release never deploys to production: `
+        + "reopen or tune Activate and release again.");
     }
     if (body.packageDigest !== release.body.packageDigest) throw fail(409, "PACKAGE_DIGEST_MISMATCH", "packageDigest is not this release's package digest.");
     // AMC's check connects only to a receipt's destinationRef, so a deploy receipt names the host the release was packaged and approved for.

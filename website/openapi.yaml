@@ -14055,14 +14055,16 @@ paths:
         TARGET_MISMATCH, DESTINATION_MISMATCH (a deploy row naming another destination than the release was
         packaged for), RELEASE_ROLLED_BACK (a deploy row for a release rolled back or whose rollback started),
         ROLLBACK_TARGET_ROLLED_BACK for a production deploy row (the release's recorded rollback target was
-        rolled back, or its rollback started: such a release never reaches production), and for a rollback row
-        (its rollback found in any cycle; its leaseIds name only leases the release rolled back to minted, in
-        any cycle) ROLLBACK_ENVIRONMENT_MISMATCH (not the rollback's environment), ROLLBACK_ROW_RECORDED (a
-        succeeded row of it exists) or, for a production row, ROLLBACK_TARGET_ROLLED_BACK (the release rolled
-        back to was itself rolled back) or ROLLBACK_SUPERSEDED (a succeeded production deploy or rollback row
-        followed it, or the rolled-back release is not the one production ran). A rollback row is recordable on
-        a held or frozen project. No lease is issued and no runtime run is created; a succeeded production
-        deploy, or a succeeded production rollback row, moves deployedReleaseId"
+        rolled back: such a release never reaches production), ROLLBACK_TARGET_ROLLBACK_PENDING for one while a
+        production rollback of that target has started and is not recorded (finish it first: a release built
+        then names the same target), and for a rollback row (its rollback found in any cycle; its leaseIds name
+        only leases the release rolled back to minted, in any cycle) ROLLBACK_ENVIRONMENT_MISMATCH (not the
+        rollback's environment), ROLLBACK_ROW_RECORDED (a succeeded row of it exists) or, for a production row,
+        ROLLBACK_TARGET_ROLLED_BACK (the release rolled back to was itself rolled back) or ROLLBACK_SUPERSEDED
+        (a succeeded production deploy or rollback row followed it, or the rolled-back release is not the one
+        production ran). A rollback row is recordable on a held or frozen project. No lease is issued and no
+        runtime run is created; a succeeded production deploy, or a succeeded production rollback row, moves
+        deployedReleaseId"
       tags:
         - Studio
         - A4 Forge
@@ -14377,11 +14379,11 @@ paths:
         deploy not rolled back; staging: this cycle's release; 409 ROLLBACK_RELEASE_NOT_RUNNING otherwise). The
         target is the release record's rollback block: the release running in production when this one was
         built; when that target was itself rolled back since, the preview names none (no Enforce restore;
-        prepared commands that re-pin no release: Compose's base file, Helm's revision before this release's
-        upgrade; the leases are revoked, and the freeze raised for a high or critical risk tier) and its restore
-        note says so; a production preview never names none, since such a release never deploys to production.
-        In production the leases include the production lease of this cycle's release built on this one, which
-        can then never deploy"
+        Compose's one prepared command is the base file, which re-pins no release, and Helm gets none, since a
+        Helm rollback re-pins whatever release its chosen revision deployed; the leases are revoked, and the
+        freeze raised for a high or critical risk tier) and its restore note says so; a production preview never
+        names none, since such a release never deploys to production. In production the leases include the
+        production lease of this cycle's release built on this one, which can then never deploy"
       tags:
         - Studio
         - A4 Forge

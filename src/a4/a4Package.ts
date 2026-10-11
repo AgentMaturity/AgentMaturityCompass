@@ -61,7 +61,7 @@ import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, leasePlans,
-  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackStarted, type LeasePlan
+  PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackRoute, rollbackStarted, type LeasePlan
 } from "./spec/activate.js";
 import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./spec/adapt.js";
 import { aspireSpecOf } from "./spec/aspire.js";
@@ -718,8 +718,8 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
  * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release, neither rolled
  * back nor being rolled back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK once any attempt of its rollback started,
  * settled or not: a failed one may have consumed its grant and restored the Enforce snapshot, so no lease is minted beside
- * it), and its recorded rollback target neither rolled back nor being rolled back since (ROLLBACK_TARGET_ROLLED_BACK: it
- * could never restore it).
+ * it), and its recorded rollback target neither rolled back since (ROLLBACK_TARGET_ROLLED_BACK) nor being rolled back
+ * in production (ROLLBACK_TARGET_ROLLBACK_PENDING, until that rollback is recorded): it could never restore it.
  * Read from the store, not the executor's preloaded rows.
  */
 function assertProductionCurrent(workspace: string, projectId: string, gate: A4EffectContext["gate"], releaseId: string): void {
@@ -730,7 +730,11 @@ function assertProductionCurrent(workspace: string, projectId: string, gate: A4E
     if (rollbackRecorded(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
     if (rollbackStarted(chain, releaseId)) throw coded("RELEASE_ROLLED_BACK", `a rollback of release ${releaseId} has started`);
     const target = rolledBackTarget(chain, releaseId);
-    if (target !== null) throw coded("ROLLBACK_TARGET_ROLLED_BACK", `release ${target}, the rollback target of release ${releaseId}, was rolled back, or a rollback of it started, since: build the release again`);
+    if (target?.code === "ROLLBACK_TARGET_ROLLBACK_PENDING") {
+      throw coded(target.code, `a production rollback of release ${target.releaseId}, the rollback target of release ${releaseId}, has started but is not recorded: `
+        + `finish it first (${rollbackRoute(projectId, target.releaseId)}, in production), then build the release again`);
+    }
+    if (target !== null) throw coded(target.code, `release ${target.releaseId}, the rollback target of release ${releaseId}, was rolled back since: build the release again`);
     const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
     if (consumed === undefined || head?.stage !== "activate" || head.step !== "completion_approved" || head.revision_no !== gate.revision_no
       || currentRelease(chain)?.body.releaseId !== releaseId || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {

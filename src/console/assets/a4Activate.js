@@ -162,7 +162,7 @@ function renderRelease(ctx) {
 /**
  * The prepared plan (signed a4-deployment-plan), each command with a copy button; the lease secret is a placeholder. Once
  * the release's recorded rollback target was rolled back, the rollback steps (which re-pin it) are marked superseded and
- * lose their copy buttons: the rollback preview names the commands to run instead.
+ * lose their copy buttons: the rollback preview says what runs instead (Compose's base file; no Helm command).
  */
 function planSteps(plan, release) {
   if (!isObject(plan)) return "<p class=\"muted\">The signed plan could not be read.</p>";
@@ -171,7 +171,7 @@ function planSteps(plan, release) {
     !step.command ? "<span class=\"muted\">by hand</span>" : superseded(step) ? `<code>${esc(step.command)}</code> <span class="status-bad">superseded</span>`
       : `<code>${esc(step.command)}</code> ${copyButton(step.command)}`,
     superseded(step) ? `${esc(step.note)} <span class="muted">Release ${esc(release.rollback?.releaseId)}, the recorded rollback target, was rolled back since:
-      preview the rollback for the commands to run.</span>` : esc(step.note)]), "No step.")}
+      preview the rollback for what runs instead.</span>` : esc(step.note)]), "No step.")}
     <p class="muted">Lease secret file: <code>${esc(SECRET_PLACEHOLDER)}</code>. AMC never writes, reads or stores it.</p>
     <h4>Gaps</h4><ul class="a4-rows">${list(plan.gaps).map((gap) => `<li><code>${esc(gap.reasonCode)}</code> ${esc(gap.note)}</li>`).join("")}</ul>`;
 }
@@ -230,11 +230,13 @@ function renderRollback(ctx) {
   const [request] = coded(itemOf(ctx, "rollback_effect"), "APPROVAL_REQUEST");
   const attrs = `data-release="${esc(release.releaseId)}" data-project="${esc(ctx.project.projectId)}"`;
   const target = release.rollback?.releaseId ?? null;
-  const restores = target === null ? "A rollback restores no Enforce snapshot (no release ran in production when this one was built)"
-    : release.rollbackTargetRolledBack === true ? `Release ${target}, the release that ran in production when this one was built, was rolled back since, so a rollback restores no Enforce snapshot and re-pins no release`
-      : `A rollback restores the Enforce snapshot of release ${target}, the one that ran in production when this one was built (signed receipts)`;
-  return `<p class="muted">${esc(restores)}; it revokes this release's leases and prepares the operator's
-      commands; it never moves the lifecycle backwards, and the deployed release changes only when the operator records the rollback row. A high or critical
+  // A Helm rollback re-pins whatever its chosen revision deployed, so with the target rolled back AMC prepares no Helm command.
+  const repin = release.deploymentTarget?.kind === "compose" ? "its one prepared command returns to the base file, which re-pins no release"
+    : "AMC prepares no command: a Helm rollback re-pins whatever release its chosen revision deployed";
+  const restores = target === null ? "A rollback restores no Enforce snapshot (no release ran in production when this one was built); it revokes this release's leases and prepares the operator's commands"
+    : release.rollbackTargetRolledBack === true ? `Release ${target}, the release that ran in production when this one was built, was rolled back since, so a rollback restores no Enforce snapshot; it revokes this release's leases, and ${repin}`
+      : `A rollback restores the Enforce snapshot of release ${target}, the one that ran in production when this one was built (signed receipts); it revokes this release's leases and prepares the operator's commands`;
+  return `<p class="muted">${esc(restores)}; it never moves the lifecycle backwards, and the deployed release changes only when the operator records the rollback row. A high or critical
       risk tier freezes first and holds the project.</p>
     <div class="row wrap"><select name="rollback-environment"><option value="staging">staging</option><option value="production">production</option></select>
       ${view.actionButton("Preview the rollback", "rollback-preview", ctx.allowed.rollback, attrs)}</div>

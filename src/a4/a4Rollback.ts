@@ -46,9 +46,9 @@ export const rollbackSchema = z.strictObject({ ...base, reason: reasonSchema,
 /**
  * The production lease of this cycle's release built on `releaseId` (its recorded rollback target), which a production
  * rollback of `releaseId` revokes too: that release could never restore its target, so its production deploy row is
- * refused (ROLLBACK_TARGET_ROLLED_BACK, src/a4/a4Deploy.ts) and a lease minted before this rollback started would stay
- * live. No lease is minted for it after this rollback started (rolledBackTarget). Staging rolls back only this cycle's
- * release, which no later release is built on.
+ * refused (ROLLBACK_TARGET_ROLLBACK_PENDING, then ROLLBACK_TARGET_ROLLED_BACK; src/a4/a4Deploy.ts) and a lease minted
+ * before this rollback started would stay live. No lease is minted for it after this rollback started (rolledBackTarget).
+ * Staging rolls back only this cycle's release, which no later release is built on.
  */
 function successorProductionLease(chain: readonly A4ChainLink[], releaseId: string, environment: string): string[] {
   const successor = environment === "production" ? currentRelease(chain) : null;
@@ -104,9 +104,9 @@ function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string,
  * release must be the one running in `environment` (assertRollbackCurrent). The target is the record's rollback block (the
  * release running in production when this one was built), never merely the previous RELEASE. A recorded target rolled back
  * since can never be restored (its prepared commands re-pin it), so the preview then names no target: no Enforce restore,
- * prepared commands that re-pin no release (Compose: the base file; Helm's name none), only the revocations (and the
- * freeze for a high or critical risk tier), and its restore note says why. Production never reaches this: such a release
- * never deploys there (rolledBackTarget). The leases are the release's, and in production the successor's production
+ * Compose's base file as the one prepared command and none on Helm (a Helm rollback re-pins whatever its chosen revision
+ * deployed), only the revocations (and the freeze for a high or critical risk tier), and its restore note says why.
+ * Production never reaches this: such a release never deploys there (rolledBackTarget). The leases are the release's, and in production the successor's production
  * lease (successorProductionLease). The engine request binds the preview.
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
@@ -122,10 +122,11 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
   const to = toReleaseId === null ? undefined : state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === toReleaseId);
   const confirmManifestId = typeof to?.body.enforceManifestId === "string" ? to.body.enforceManifestId : null;
   const minted = mintedLeases(state.chain, releaseId);
-  let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: targetRolledBack
-    ? `release ${recorded}, the recorded rollback target, was itself rolled back: nothing is restored and no release is re-pinned (Compose returns to the base file; `
-      + "Helm, to the revision before this release's upgrade); the release's leases are revoked"
-    : "no earlier release: nothing to restore" };
+  const compose = record.deploymentTarget.kind === "compose";
+  let restore: Record<string, unknown> = { manifestId: null, entries: 0, note: !targetRolledBack ? "no earlier release: nothing to restore"
+    : `release ${recorded}, the recorded rollback target, was itself rolled back: no Enforce snapshot is restored and the release's leases are revoked; `
+      + (compose ? "Compose returns to the base file, which re-pins no release"
+        : `no Helm command is prepared: a helm rollback re-pins whatever release its chosen revision deployed, and the revision before this release's upgrade normally deployed release ${recorded}`) };
   if (confirmManifestId !== null) {
     try {
       const plan = restoreEnforceResourceSnapshot({ workspace: store.workspace, agentId: state.project.agent_id, manifestPath: snapshotPath(store.workspace, state.project.agent_id, confirmManifestId) });
@@ -135,9 +136,9 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
         `the Enforce restore cannot be planned: ${(error instanceof Error ? error.message : String(error)).slice(0, 300)}`);
     }
   }
-  // Helm's prepared commands name no release (the operator picks the revision), so they stand; Compose's re-pin the
-  // target's overlay, so they give way to the base file.
-  const preparedCommands = targetRolledBack && record.deploymentTarget.kind === "compose" ? [COMPOSE_BASE_UP] : record.rollback.preparedCommands;
+  // The record's commands re-pin the target (Compose its overlay; Helm the revision that deployed it). Compose gives way to
+  // the base file; a Helm rollback re-pins whatever its chosen revision deployed, so none is prepared.
+  const preparedCommands = !targetRolledBack ? record.rollback.preparedCommands : compose ? [COMPOSE_BASE_UP] : [];
   return { schema: "amc.a4-rollback-preview/v1", releaseId, toReleaseId, confirmManifestId, environment, target: release.body.target,
     leaseIds: [...minted.staging, ...(minted.production === null ? [] : [minted.production]), ...successorProductionLease(state.chain, releaseId, environment)], preparedCommands,
     restore, freezeFirst: ["high", "critical"].includes(engineRiskTier(state)),
