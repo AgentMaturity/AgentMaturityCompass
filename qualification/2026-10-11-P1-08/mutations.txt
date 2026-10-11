@@ -131,3 +131,8 @@ KILLED  authz quarantine guard  Tests  1 failed | 2 passed | 24 skipped (27)
 KILLED  authz commit guard  Tests  1 failed | 2 passed | 24 skipped (27)
 KILLED  authz rotate guard (rerun: the test now proves the check runs first)  Tests  1 failed | 2 passed | 24 skipped (27)
 (the first rotate-guard run survived because commitKeyset's own guard refused later; the test now uses a wrong passphrase so only the first check can pass it)
+
+# final review: resume (2026-10-12), RED: red/resume.txt (3/3 new tests failed on 9cc30ed9f)
+KILLED  final: resume without the write-ahead record  Tests  1 failed | 2 passed | 27 skipped (30)
+KILLED  final: resume ignores the vault's key ids  Tests  1 failed | 2 passed | 27 skipped (30)
+KILLED  final low: quarantine ignores an adopted mark  Tests  1 failed | 2 passed | 27 skipped (30)
