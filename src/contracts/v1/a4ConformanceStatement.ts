@@ -34,6 +34,11 @@ export const a4ConformanceStatementV1Schema = z.strictObject({
   missingFacts: z.array(nonEmpty),
   /** review_record refs only; a role vote is never an expert review. */
   expertReview: z.strictObject({ required: z.boolean(), records: z.array(nonEmpty), acknowledgement: acknowledgementSchema.nullable() }),
+  /**
+   * Adapt: the owner's acknowledgement that a regulated project completes with its plan signed, not activated, because
+   * another profile's active plan refuses the activation (`plan_activated`, PLAN_ACTIVATION_DEFERRED); null otherwise.
+   */
+  activationAcknowledgement: acknowledgementSchema.nullable(),
   claim: claimEnvelopeSchema,
   claimBoundary: nonEmpty
 });

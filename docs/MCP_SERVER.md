@@ -118,7 +118,7 @@ The same fields are in `structuredContent`: `{ claimKind, statusDimensions, clai
 | `amc_list_agents`, `amc_list_evidence` | The listing itself is not evaluated; each agent shows its latest run's claim kind, and each evidence event shows the kind of its effective trust tier |
 | `amc_incident_clocks` | A regulated listing that is not evaluated: deadlines run from operator-recorded trigger and notice times, and applicability is unresolved |
 | `amc_a4_project`, `amc_a4_readiness` (A4 preview) | The readiness evaluator's own envelope (`claim` of `amc.a4-readiness/v1`), never one composed by the tool; it is evaluated in the MCP process, where `signing.available` reads `WAITING` (see A4 Forge tools) |
-| `amc_a4_conformance` (A4 preview) | A regulated result that is not evaluated (`NO_PRODUCER_REGISTERED`) until Adapt registers its producer, as the API answers |
+| `amc_a4_conformance` (A4 preview) | The stage's conformance statement as the API answers it: the statement's own claim envelope, built from Adapt's verified control results (counts, never a percentage); a stage without a reviewed plan is not evaluated |
 | `amc_a4_list_projects`, `amc_a4_comment` (A4 preview) | The listing or the recorded comment itself is not evaluated (self-reported) |
 
 AMC output is evidence of conformity. No tool prints "certified".

@@ -18,18 +18,20 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { assertOwnerMode } from "../mode/mode.js";
+import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
+import { controlResultsNow } from "./a4Conformance.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
 import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
-  A4_BOUND_ITEMS, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, readinessBindingDigest,
-  readinessMoved, riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
+  A4_BOUND_ITEMS, acknowledgeable, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
+  readinessBindingDigest, readinessMoved, riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
@@ -192,7 +194,8 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
- * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble.
+ * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
+ * and the signed control results Adapt's Review recorded and the session store backend only at Adapt.
  */
 export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
   const workspace = store.workspace;
@@ -221,7 +224,8 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
-    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null
+    engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {})
   };
 }
 
@@ -657,16 +661,16 @@ export function changeGatePolicy(store: A4Store, projectId: string, input: A4Cal
 
 /** One plain owner (or reviewer) transition on the head, readiness-gated, with its owner-mode command path. */
 function headTransition(store: A4Store, projectId: string, input: A4Call & { expectedHeadSeq: number; stage?: A4Stage }, action: A4Action,
-  build: (state: A4ReadinessState, readiness: A4ReadinessV1, ts: number) => A4ChangeSpec, commandPath?: string): A4TransitionResult {
+  build: (state: A4ReadinessState, readiness: A4ReadinessV1, ts: number, query: A4ReadinessQuery) => A4ChangeSpec, commandPath?: string): A4TransitionResult {
   const principal = livePrincipal(store, input);
   if (commandPath) assertOwnerMode(store.workspace, commandPath);
   const now = Date.now();
   return governed(store, projectId, principal, input, (ts, load) => {
     const state = load(now);
     const stage = input.stage ?? (state.project.stage === "retired" ? "activate" : state.project.stage);
-    const { readiness } = evaluateFor(store, state, principal, input, stage, now);
+    const { readiness, query } = evaluateFor(store, state, principal, input, stage, now);
     assertAllowed(readiness, action);
-    return { readiness, specs: build(state, readiness, ts) };
+    return { readiness, specs: build(state, readiness, ts, query) };
   });
 }
 
@@ -761,13 +765,23 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
 /**
  * ACKNOWLEDGED (owner; D-21, design §7 item 6): an acknowledgeable WAITING item stays WAITING with OWNER_ACKNOWLEDGED for
  * 90 days and is bound into the next gate's intent; a BLOCKED item is never acknowledged. Record it before the request.
+ * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, and `plan_activated`
+ * only from Review on while its activation is deferred (PLAN_ACTIVATION_DEFERRED), so no acknowledgement is recorded
+ * that would not count.
  */
 export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; itemId: string; reason: string; expectedHeadSeq: number }): A4TransitionResult {
   if (!ACKNOWLEDGEABLE_ITEMS.includes(input.itemId)) throw fail(400, "INPUT_INVALID", `${input.itemId} cannot be acknowledged`);
   if (input.reason.trim().length === 0) throw fail(400, "INPUT_INVALID", "An acknowledgement needs a reason.");
-  return headTransition(store, projectId, input, "acknowledge", (_state, readiness, ts) => {
+  return headTransition(store, projectId, input, "acknowledge", (state, readiness, ts, query) => {
     const target = readiness.items.find((entry) => entry.id === input.itemId);
     if (target?.status !== "WAITING") throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", `${input.itemId} is ${target?.status ?? "absent"}; only a WAITING item is acknowledged`);
+    if (!acknowledgeable(target, isRegulated(state, query.floor))) {
+      throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", input.itemId === "plan_unresolved"
+        ? "A regulated project activates only a ready plan: answer the missing facts; an owner's out-of-scope does not settle them."
+        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)
+          ? `${input.itemId} is acknowledged after Review: every step before it records a new revision, and an acknowledgement counts only on its own.`
+          : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
+    }
     return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS } };
   }, "a4 acknowledge");
 }

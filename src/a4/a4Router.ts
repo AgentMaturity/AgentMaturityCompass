@@ -27,6 +27,7 @@ import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
+import { conformanceView } from "./a4Conformance.js";
 import { A4BlobError, getPrivate } from "./a4Blobs.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
@@ -620,11 +621,18 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       sha256: ref.sha256, status: ref.status, trustTier: ref.trustTier, reasonCodes: ref.reasonCodes, lane: ref.lane, claimKind: ref.claimKind })) });
     return true;
   }
-  const unproduced = /^\/(value|monitor|conformance)$/.exec(rest)?.[1];
+  if (rest === "/conformance") {
+    assertQuery(params, params.has("stage") ? ["stage"] : []);
+    const stage = params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project);
+    // Adapt's acknowledgements as readiness counts them, evaluated only when the statement reads them live.
+    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt("adapt").items);
+    apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
+    return true;
+  }
+  const unproduced = /^\/(value|monitor)$/.exec(rest)?.[1];
   if (unproduced !== undefined) {
-    // The producers land with Adapt (P1-61, conformance) and Activate (P1-62, value and monitor); until then nothing is evaluated.
-    assertQuery(params, unproduced === "conformance" && params.has("stage") ? ["stage"] : []);
-    if (params.has("stage")) stageInput(params.get("stage"));
+    // The producers land with Activate (P1-62, value and monitor); until then nothing is evaluated.
+    assertQuery(params, []);
     apiSuccess(route.res, { projectId, view: unproduced, status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
       claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
     return true;

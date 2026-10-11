@@ -46,8 +46,28 @@ export type A4Action = (typeof A4_ACTIONS)[number];
 export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status",
   "deployment.amc_check", "plan_unresolved",
   // Assemble (P1-60): an unsupported path or plan item stays listed; the owner records it out of scope with a reason (design §13).
-  "path_supported", "unsupported_acknowledged"];
+  "path_supported", "unsupported_acknowledged",
+  // Adapt (P1-61): only on a JSONL session store, where the context probe cannot be recorded (src/a4/adaptContextPlugin.ts).
+  "context_probe_unavailable",
+  // Adapt (P1-61): only from Review on while it carries PLAN_ACTIVATION_DEFERRED (acknowledgeable below), never while activation is due.
+  "plan_activated"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+/**
+ * Adapt's plan_activated code for a regulated project whose activation activateControlPlan is certain to refuse as a
+ * weakening of another profile's active plan: the one state of that item an owner acknowledges (src/a4/spec/adapt.ts).
+ */
+export const PLAN_ACTIVATION_DEFERRED = "PLAN_ACTIVATION_DEFERRED";
+
+/**
+ * Whether an owner acknowledgement counts for `candidate` as evaluated now (and may be recorded): a WAITING item of
+ * ACKNOWLEDGEABLE_ITEMS, except `plan_unresolved` while the project is regulated (it activates only a ready plan) and
+ * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED while mandatory (from Review on: every earlier step records
+ * a new revision, and an acknowledgement counts only on its own). The evaluator and acknowledgeItem both decide by it.
+ */
+export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean): boolean {
+  return candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id) && !(regulated && candidate.id === "plan_unresolved")
+    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)));
+}
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
 const EXPIRING_GUARD_MS = 60_000;
@@ -92,6 +112,13 @@ export interface A4LiveFacts {
   readonly unrecordedResolutions: readonly string[] | null;
   /** The engine status of the effect gates' requests and the open executions' resolution requests, by request id (read at Assemble only); null when unread. */
   readonly engineRequests: Readonly<Record<string, string>> | null;
+  /**
+   * Adapt only: the newest Adapt revision's signed control results checked again now (a4Conformance.controlResultsNow);
+   * null when Review recorded none, absent when not read (the item then says not re-checked, never verified).
+   */
+  readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
+  /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
+  readonly sessionStore?: "sqlite" | "jsonl";
 }
 export interface A4ReadinessQuery {
   readonly stage: A4Stage;
@@ -209,12 +236,17 @@ export function riskTierOf(state: A4ReadinessState): string | null {
 
 /** Risk tiers by rank, in every spelling A4 meets (C-25); a tier not listed ranks as high (unknown risk is not low risk). */
 export const TIER_RANK: Readonly<Record<string, number>> = { low: 0, med: 1, medium: 1, high: 2, critical: 3 };
+/** Adapt's plan activation (src/a4/stages/adapt.ts): its finish makes the project regulated (isRegulated). */
+const ACTIVATE_PLAN_EFFECT = "a4.adapt.activate_plan";
 
 /**
  * D-21 default, re-evaluated per decision: the workspace `a4.regulated` floor, a brief risk tier other than low or
  * medium (an unstated, unknown or differently spelled tier counts: unknown risk is not low risk, as engineRiskTier maps
  * it to high), a brief tier below the agent's own tier before it (`brief.priorRiskTier`, recorded by Aspire's Propose:
- * a lowering is decided under the rules of the tier it lowers), or a head Adapt revision carrying an activated plan.
+ * a lowering is decided under the rules of the tier it lowers), or an active compiled plan: any active plan makes the
+ * workspace regulated, so a revision of any stage that records the plan journal's head (every revision binds that slot)
+ * counts, and so does this project's own activation (EFFECT_FINISHED of Adapt's a4.adapt.activate_plan), whose Adapt
+ * revisions all predate it. A plan is never deactivated, so once either holds it holds for good.
  */
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
@@ -223,9 +255,11 @@ export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): bo
   const brief = latestRevision(state, "aspire");
   const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
   if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
-  const adapt = latestRevision(state, "adapt");
-  const digests = adapt ? parseJson(adapt.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null : null;
-  return typeof digests?.plan?.journalEntrySha256 === "string";
+  if (state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT)) return true;
+  return state.revisions.some((revision) => {
+    const digests = parseJson(revision.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null;
+    return typeof digests?.plan?.journalEntrySha256 === "string";
+  });
 }
 
 /**
@@ -470,14 +504,17 @@ const ACTION_CLASS: Record<A4Action, keyof typeof ROLE_CLASSES> = {
 /**
  * The who-may-act refusals of `action` at `stage` for a principal on its live roles: the workspace role class, then the
  * project role (workspace OWNERs are implicit project owners and AUDITORs implicit reviewers). Progress at Adapt and
- * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, and at
- * Assemble, which signs the workspace presets file and starts native build sessions.
+ * Activate takes an owner, and so does Build at Aspire, which signs the agent's config and target profile, at
+ * Assemble, which signs the workspace presets file and starts native build sessions, and at Adapt, which signs the
+ * compiled plan (CONTROL_PLAN) and re-signs the agent's Enforce manifest; so does Review at Adapt, which signs the
+ * control results with the workspace auditor key (CONTROL_RESULT).
  */
 export function roleRefusals(state: A4ReadinessState, stage: A4Stage, action: A4Action, principal: Pick<A4Principal, "key" | "roles">): string[] {
   const held = new Set<string>(state.members.find((member) => member.principalKey === principal.key)?.roles ?? []);
   if (principal.roles.includes("OWNER")) held.add("owner");
   if (principal.roles.includes("AUDITOR")) held.add("reviewer");
-  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble"));
+  const owner = (action === "progress" && (stage === "adapt" || stage === "activate")) || (action === "build" && (stage === "aspire" || stage === "assemble" || stage === "adapt"))
+    || (action === "review" && stage === "adapt");
   const [projectRoles, workspaceRoles] = owner ? ROLE_CLASSES.owner : ROLE_CLASSES[ACTION_CLASS[action]];
   return [...(principal.roles.some((role) => (workspaceRoles as readonly string[]).includes(role)) ? [] : ["PRINCIPAL_ROLE_INSUFFICIENT"]),
     ...(projectRoles.some((role) => held.has(role)) ? [] : ["PRINCIPAL_NOT_MEMBER"])];
@@ -566,7 +603,7 @@ export function evaluateA4Readiness(state: A4ReadinessState, query: A4ReadinessQ
     for (const id of boundIds) if (!built.some((candidate) => candidate.id === id)) built.push(item(id, "NOT_EVALUATED", { kind: "not_evaluated", reasonCodes: ["ITEM_NOT_PRODUCED"] }));
     return built.map((candidate) => {
       const ack = acks.get(candidate.id);
-      const acknowledged = ack !== undefined && candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id);
+      const acknowledged = ack !== undefined && acknowledgeable(candidate, regulated);
       return { ...candidate, bound: boundIds.includes(candidate.id),
         ...(acknowledged ? { acknowledged: ack, reasonCodes: [...candidate.reasonCodes, "OWNER_ACKNOWLEDGED"] } : {}) } as A4ReadinessItem;
     });

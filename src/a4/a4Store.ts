@@ -37,7 +37,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
-import { resolveLedgerEvent } from "./a4Evidence.js";
+import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, A4_STAGE_STATES, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
@@ -771,7 +771,7 @@ function createStore(workspace: string, ledger: Ledger) {
       note?: Record<string, unknown> }): A4TransitionResult {
       if (!/^[0-9a-f]{64}$/.test(input.sha256)) throw new A4StoreError(400, "INPUT_INVALID", "sha256 must be 64 lowercase hex characters.");
       return commit(projectId, input.actor, ({ head, seq, ts }) => {
-        let trustTier: string | null = null;
+        let claim = { claimKind: input.claimKind, method: input.method, trustTier: null as string | null };
         if (input.refKind === "ledger_event") {
           const resolved = resolveLedgerEvent(ledger, input.refId, input.sha256, readerTrustFor(workspace), []);
           if (!resolved.found) throw new A4StoreError(409, "EVIDENCE_REF_DANGLING", `no ledger row ${input.refId}`);
@@ -781,12 +781,12 @@ function createStore(workspace: string, ledger: Ledger) {
           if ((meta.agentId ?? meta.agent_id) !== head!.agent_id) {
             throw new A4StoreError(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${input.refId} is not a row of agent ${head!.agent_id}`);
           }
-          trustTier = resolved.tier;
+          claim = ledgerRefClaim(ledger.getEventById(input.refId)!, input.claimKind, input.method, resolved.tier);
         }
-        const derived = laneForClaimKind(input.claimKind, trustTier, input.method, input.column);
+        const derived = laneForClaimKind(claim.claimKind, claim.trustTier, claim.method, input.column);
         return { kind: "EVIDENCE_REF", payload: { ...input.note, refKind: input.refKind, refId: input.refId, sha256: input.sha256, lane: derived.lane, claimKind: derived.claimKind },
           sideRows: [{ table: "a4_evidence_refs", values: { project_id: projectId, seq, revision_no: head!.revision_no, stage: head!.stage, lane: derived.lane,
-            ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: trustTier, method: input.method,
+            ref_kind: input.refKind, ref_id: input.refId, sha256: input.sha256, claim_kind: derived.claimKind, trust_tier: claim.trustTier, method: claim.method,
             label: input.label, actor_key: input.actor.key, ts } }] };
       }, { expectedHeadSeq: input.expectedHeadSeq, request: input.request }, null);
     },

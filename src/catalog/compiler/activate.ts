@@ -80,6 +80,14 @@ export function activeControlPlanHead(workspace: string): string | null {
 }
 
 /**
+ * The active plan itself (verified journal, digest and signature, in one read), or null when no plan was ever activated:
+ * the baseline activateControlPlan checks weakenings against. Throws on any integrity failure.
+ */
+export function activeControlPlan(workspace: string): CompiledPlan | null {
+  return readJournal(workspace).payload?.plan ?? null;
+}
+
+/**
  * The active compiled policy, or null when no plan was ever activated. Throws when the journal, the plan's signature
  * or digest, or the shipped catalog against the plan's lockfile does not verify: the caller refuses the session.
  */
