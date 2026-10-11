@@ -175,13 +175,18 @@ const refused = (integrity: ClaimIntegrity, reasons: string[]): TrustVerificatio
 /** Binding, lifetime, revocation, replay and authorization checks shared by both claim kinds; null when all pass. */
 function bindingProblems(claim: AgentIdentityClaim, expected: ClaimExpectation | undefined, keyPurpose: 'agent-claim-hmac' | 'session', keyId: string): string[] | null {
   if (expected === undefined) return ['no verifier expectation (audience, issuer, scope, grants, replay cache): refusing'];
+  // A JavaScript caller can omit the maps the type requires; that is a refusal, never a TypeError.
+  if (expected.grants == null || typeof expected.grants !== 'object' || expected.issuerKeyIds == null || typeof expected.issuerKeyIds !== 'object') {
+    return ['the verifier expectation names no grants or no issuerKeyIds: refusing'];
+  }
+  if (!(expected.replay instanceof ClaimReplayCache)) return ['the verifier expectation has no replay cache: refusing'];
   const problems: string[] = [];
   const now = (expected.now ?? new Date()).getTime();
   if (claim.keyPurpose !== keyPurpose || claim.keyId !== keyId) problems.push('claim names another key or key purpose');
   if (expected.revokedKeyIds?.includes(keyId)) problems.push(`key ${keyId} is revoked`);
   if (claim.agentId !== expected.issuer) problems.push(`claim is from ${claim.agentId}, not the expected ${expected.issuer}`);
   const boundKeys = Object.hasOwn(expected.issuerKeyIds, expected.issuer) ? expected.issuerKeyIds[expected.issuer] : undefined;
-  if (!boundKeys?.includes(keyId)) problems.push(`key ${keyId} is not bound to issuer ${expected.issuer}`);
+  if (!Array.isArray(boundKeys) || !boundKeys.includes(keyId)) problems.push(`key ${keyId} is not bound to issuer ${expected.issuer}`);
   if (claim.audience !== expected.audience) problems.push(`claim is for ${claim.audience ?? 'no audience'}, not ${expected.audience}`);
   const issued = claim.issuedAt instanceof Date ? claim.issuedAt.getTime() : Number.NaN;
   const expires = claim.expiresAt instanceof Date ? claim.expiresAt.getTime() : Number.NaN;
@@ -190,7 +195,7 @@ function bindingProblems(claim: AgentIdentityClaim, expected: ClaimExpectation |
   else if (now > expires + MAX_CLOCK_SKEW_MS) problems.push('claim expired');
   if (!claim.nonce || !/^[0-9a-f]{32}$/.test(claim.nonce)) problems.push('claim carries no nonce');
   const allowed = Object.hasOwn(expected.grants, expected.issuer) ? expected.grants[expected.issuer] : undefined;
-  if (allowed === undefined) problems.push(`issuer ${expected.issuer} has no grant in the verifier's policy`);
+  if (!Array.isArray(allowed)) problems.push(`issuer ${expected.issuer} has no grant in the verifier's policy`);
   else if (!allowed.includes(expected.requestedScope)) problems.push(`issuer ${expected.issuer} is not granted ${expected.requestedScope}`);
   return problems.length ? problems : null;
 }
