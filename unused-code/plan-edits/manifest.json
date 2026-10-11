@@ -458,6 +458,13 @@
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
     },
     {
+      "path": "src/workorders/workorderEngine.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/workorders/workorderEngine.ts.landed",
+      "sha256": "ced036fc4c9be0c9e2ca531200eb74b4b824610659eeb0547475ef7d6b3ac38f"
+    },
+    {
       "path": "src/workspace.ts",
       "issue": "P1-25",
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
