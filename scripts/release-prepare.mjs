@@ -9,8 +9,8 @@
  *        section in changesets' default format, and the consumed changesets removed. The changesets CLI cannot do
  *        this here: pnpm-workspace.yaml lists only vendor/* and packages/*, so it never sees the root package.
  *     2. Fold CHANGELOG sections of never-published versions (1.2.0) into the release section: one heading.
- *     3. Sync the version-coupled files (install channel, Helm appVersion, "<version> source" prose, the
- *        changelog page and sbom.json), build, and run check-release-candidate.
+ *     3. Sync the version-coupled files (install channel, Helm appVersion, "<version> source" prose, the action and
+ *        workflow version defaults, the changelog page and sbom.json), build, and run check-release-candidate.
  *     4. Pack the npm tarball once (tmp/npm-release/), then run the full release gate, check-pack-contents, the
  *        packed-install check and `npm publish <that tarball> --dry-run` against that one file, as release.yml does.
  *   node scripts/release-prepare.mjs --version-only [X.Y.Z]
@@ -60,7 +60,9 @@ function applyChangesets(root, version, changesets, commitOf) {
   rewrite(root, "package.json", (text) => text.replace(/("version":\s*")[^"]+(")/, `$1${version}$2`));
   for (const changeset of changesets) unlinkSync(join(root, ".changeset", `${changeset.slug}.md`));
 }
-const SOURCE_PROSE = ["docs/GETTING_STARTED.md", "docs/INSTALL.md", "docs/NATIVE_AGENT_WORKFLOW.md", "website/install-channel.json"];
+export const SOURCE_PROSE = ["docs/GETTING_STARTED.md", "docs/INSTALL.md", "docs/NATIVE_AGENT_WORKFLOW.md", "website/install-channel.json"];
+/** Action and workflow defaults that name the release they install. */
+export const VERSION_DEFAULTS = ["action.yml", "amc-action/action.yml", "amc-action/README.md", ".github/workflows/amc-score.yml"];
 
 const headingOf = (part) => /^## \[?([^\]\s]+)/.exec(part)?.[1];
 
@@ -92,6 +94,16 @@ export function foldChangelog(text, target, published) {
 /** Prose that names the source version ("**1.2.0 source**", "current 1.2.0 source package") follows the release. */
 export function syncVersionText(text, version) {
   return text.replace(/\b\d+\.\d+\.\d+(?=(?:\*\*)? source\b)/g, version);
+}
+
+/** The release version an action or workflow defaults to: VERSION="X", default: 'X', its description, case label and table row. */
+export function syncVersionDefaults(text, version) {
+  return text.replace(/(VERSION=")\d+\.\d+\.\d+(")/g, `$1${version}$2`)
+    .replace(/(default: ')\d+\.\d+\.\d+(')/g, `$1${version}$2`)
+    .replace(/(currently ")\d+\.\d+\.\d+(")/g, `$1${version}$2`)
+    .replace(/^(\s+)\d+\.\d+\.\d+\)$/gm, `$1${version})`)
+    .replace(/(verifies only )\d+\.\d+\.\d+( or local)/g, `$1${version}$2`)
+    .replace(/(\| `amc-version` \| `)\d+\.\d+\.\d+(`)/g, `$1${version}$2`);
 }
 
 /** Changelog page entries for versions CHANGELOG.md no longer lists (folded, never published) are removed. */
@@ -151,6 +163,7 @@ export function prepareRelease({ root = process.cwd(), version, versionOnly = fa
   rewrite(root, "website/install-channel.json", (text) => text.replace(/("packageVersion":\s*")[^"]+(")/, `$1${target}$2`));
   rewrite(root, "deploy/helm/amc/Chart.yaml", (text) => text.replace(/^appVersion: .*$/m, `appVersion: "${target}"`));
   for (const path of SOURCE_PROSE) rewrite(root, path, (text) => syncVersionText(text, target));
+  for (const path of VERSION_DEFAULTS) rewrite(root, path, (text) => syncVersionDefaults(text, target));
 
   run("npm", ["run", "build"]);
   const sbomPath = join(root, "sbom.json");

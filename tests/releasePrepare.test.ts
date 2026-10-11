@@ -1,8 +1,9 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { changelogEntry, dropUnlistedPageEntries, foldChangelog, prepareRelease, syncVersionText } from "../scripts/release-prepare.mjs";
+import { changelogEntry, dropUnlistedPageEntries, foldChangelog, prepareRelease, SOURCE_PROSE, syncVersionText, VERSION_DEFAULTS }
+  from "../scripts/release-prepare.mjs";
 
 const dirs: string[] = [];
 afterEach(() => { for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -101,6 +102,23 @@ describe("release:prepare (P0-34)", () => {
     prepareRelease({ root, version: "2.0.0", run: again.run, log: () => {}, commitOf });
     expect(readFileSync(join(root, "CHANGELOG.md"), "utf8")).toBe(before);
     expect(again.calls).toEqual(["npm run build", "node scripts/gen-changelog-page.mjs", "node scripts/check-release-candidate.mjs", ...gated]);
+  });
+
+  test("after a prepare run on temp copies of the real files, no version default names a never-published version", () => {
+    const root = fixture();
+    const unpublished = JSON.parse(readFileSync("package.json", "utf8")).version;
+    for (const path of [...VERSION_DEFAULTS, ...SOURCE_PROSE]) {
+      mkdirSync(dirname(join(root, path)), { recursive: true });
+      writeFileSync(join(root, path), readFileSync(path, "utf8"));
+    }
+    prepareRelease({ root, version: "2.0.0", run: fakeRunner(root).run, log: () => {}, commitOf });
+    const defaults = /VERSION="([\d.]+)"|default: '(\d+\.\d+\.\d+)'|currently "([\d.]+)"|^\s+(\d+\.\d+\.\d+)\)$|verifies only ([\d.]+) or|`amc-version` \| `([\d.]+)`/gm;
+    for (const path of [...VERSION_DEFAULTS, ...SOURCE_PROSE]) {
+      const text = readFileSync(join(root, path), "utf8");
+      for (const match of text.matchAll(defaults)) expect(match.slice(1).find(Boolean), path).toBe("2.0.0");
+      for (const stale of new Set(["1.2.0", unpublished].filter(version => version !== "2.0.0"))) expect(text, path).not.toContain(stale);
+    }
+    expect(readFileSync(join(root, "amc-action/action.yml"), "utf8")).toContain("default: '2.0.0'");
   });
 
   test("refuses a target the pending changesets do not give, before writing anything", () => {
