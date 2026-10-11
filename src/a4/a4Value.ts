@@ -57,6 +57,8 @@ const agentOf = (row: Pick<EvidenceEvent, "meta_json">): unknown => eventMeta(ro
  * Each `ledger:<eventHash>` ref against the ledger rows of its window: resolved when a row of this agent carries that hash
  * and the chain verifies up to the newest such row (one walk covers every row before it); dangling otherwise, with the
  * reason. A row of a turn A4 ran itself carries no tier (ledgerRefClaim), so it never makes a claim observed.
+ * ponytail: reads the window's rows (no event_hash index) and walks the chain once per claim; index event_hash and share
+ * the walk across claims if a large ledger makes GET …/value slow.
  */
 function resolveRefs(ledger: Ledger, refs: readonly string[], window: Window, agentId: string): Resolution {
   const rows = new Map((ledger.db.prepare(`SELECT rowid AS row_id, id, ts, event_hash, payload_sha256, meta_json, writer_sig, session_id
