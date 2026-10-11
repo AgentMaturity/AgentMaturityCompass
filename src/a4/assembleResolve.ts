@@ -18,6 +18,7 @@ import { receiptDigest, type ActionReceiptV1 } from "../actions/receiptStates.js
 import { requestManualResolution, resolveManually } from "../actions/reconcile.js";
 import { apiSuccess } from "../api/apiHelpers.js";
 import { approvalRequestBindingDigest, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
+import { appendHumanActionEvent } from "../auth/humanLog.js";
 import { ApprovalStudioError, decideApprovalInStudio } from "../approvals/approvalStudioService.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
@@ -239,8 +240,16 @@ async function decideEngineRequest(route: A4Route, projectId: string, approvalRe
       input: { decision: verb === "approve" ? "APPROVE_EXECUTE" : "DENY", reason: body.reason }, requireExplicitDecision: true,
       expectedRequestDigestSha256: body.expectedRequestDigestSha256,
       writeAudit: (entry) => {
-        const written = appendOpsAuditEvent({ workspace: route.workspace, auditType: entry.auditType, severity: entry.severity,
-          payload: { ...entry.payload, agentId: entry.agentId, via: "a4", projectId } });
+        const payload = { ...entry.payload, agentId: entry.agentId, via: "a4", projectId };
+        const written = appendOpsAuditEvent({ workspace: route.workspace, auditType: entry.auditType, severity: entry.severity, payload });
+        // Mirrored to the human action log as Studio's /approvals path does (writeStudioAuditEvent); best effort, as a4Audit is.
+        if (entry.auditType === "APPROVAL_DECIDED" || entry.auditType === "CONSOLE_APPROVAL_DECIDED") {
+          try {
+            appendHumanActionEvent({ workspace: route.workspace, type: "HUMAN_APPROVAL_DECISION", agentId: entry.agentId ?? null, username: principal.username, payload });
+          } catch {
+            // The ops audit row is the record; the human log is a mirror.
+          }
+        }
         return { eventId: written.eventId, receiptId: written.eventId };
       } });
   } catch (error) {
