@@ -91,10 +91,13 @@ async function requestResolution(route: A4Route, projectId: string, executionId:
   if (typeof keySha256 !== "string") throw a4Fail(409, "A4_INTEGRITY_FAILED", "The CREATED record names no project key.");
   const sealed = putPrivate(route.workspace, projectId, Buffer.from(body.note, "utf8"), keySha256);
   const noteSha256 = sha256Hex(body.note);
+  // The engine request carries A4's floor (as openEffectGate does): the engine stops taking decisions at its own quorum,
+  // so a request below assertResolutionQuorum's max(rule, regulated ? 2 : 1) could never be resolved from Studio.
+  const regulated = isRegulated(state, signedA4Floor(route.workspace));
   let requested: ReturnType<typeof requestManualResolution>;
   try {
     requested = requestManualResolution(executionId, { workspace: route.workspace, effect: body.effect, externalRef: body.externalRef, operatorId: principal.userId,
-      note: sealedNoteRef(projectId, sealed.blobRef, noteSha256) });
+      note: sealedNoteRef(projectId, sealed.blobRef, noteSha256) }, { requiredApprovals: regulated ? 2 : 1, requireDistinctUsers: regulated || undefined });
   } catch (error) {
     throw refused(error);
   }

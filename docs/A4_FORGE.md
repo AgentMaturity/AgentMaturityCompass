@@ -192,7 +192,9 @@ framework through a scaffold, connect instructions and a trace import.
   `amc.action.resolve` engine request), another project approver or owner decides it from the card, and the resolution
   is recorded once A4's dual control holds: approvals bound to the request from members other than the operator, the
   principals who built at Assemble and the owners of its build sessions, two distinct live-checked identities when the
-  project is regulated. The note is sealed in the project's blob store; the
+  project is regulated. The engine request is filed at that floor (at least 1 approval, 2 distinct users when regulated)
+  even when the action class's rule asks for fewer, so it stays open until A4's quorum can be met. The note is sealed in
+  the project's blob store; the
   engine request and the action journal carry only a reference naming the sealed blob and the note's sha256. The
   resolution is the operator's statement, `self_reported`, never observed. A denied or expired request is requested
   again from the same card. If the journal settled a resolution but its project record was refused, the item stays
