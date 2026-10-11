@@ -122,6 +122,13 @@
       "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df"
     },
     {
+      "path": "src/auth/humanLog.ts",
+      "issue": "P1-08",
+      "baseCommit": "69f2251b3e184a97093658e79a097e943c1dae05",
+      "archivePath": "unused-code/plan-edits/P1-08/src/auth/humanLog.ts.landed",
+      "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
+    },
+    {
       "path": "src/bench/benchRegistryClient.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
