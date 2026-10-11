@@ -102,11 +102,18 @@ def run(args,cwd,child_env=env,timeout=180,checked=True):
  return subprocess.CompletedProcess(args,child.returncode,stdout,stderr)
 
 def ports(count):
- # Every socket stays bound until all are chosen, so no two picks (owner's or demo's) can be the same port (P0-62).
+ # P0-62: every socket stays bound until all are chosen, so no two picks (owner's or demo's) are the same port; and
+ # picks come from 20000-31999, below the OS ephemeral range (Linux 32768+, macOS 49152+), so an outbound connection
+ # cannot take a picked port before its server binds it (P0-62 run 14: the demo daemon died on EADDRINUSE).
  held=[]
  try:
-  for i in range(count):
-   s=socket.socket();held.append(s);s.bind(('127.0.0.1',0))
+  for attempt in range(2000):
+   if len(held)==count:break
+   s=socket.socket()
+   try:s.bind(('127.0.0.1',20000+secrets.randbelow(12000)))
+   except OSError:s.close();continue
+   held.append(s)
+  if len(held)!=count:raise RuntimeError('Could not reserve fixture ports below the ephemeral range')
   return [s.getsockname()[1] for s in held]
  finally:
   for s in held:s.close()
