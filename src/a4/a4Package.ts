@@ -18,7 +18,7 @@ import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, read
 import { dirname, isAbsolute, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
-import { getPublicKeyPem } from "../crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy, signingRoute } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
@@ -70,6 +70,8 @@ import { relPath } from "./stages/common.js";
 
 /** A coded failure: the effect runner records the message, whose first word is the code the route answers. */
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
+/** The vault's own refusal ("🔐 Vault locked…"), which every step that signs with a vault key throws uncoded. */
+const vaultLocked = (error: unknown): boolean => /vault locked/i.test(error instanceof Error ? error.message : String(error));
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // ponytail: one input file; raise it if an agent's resources outgrow it
 const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace held at the release digest (v1: a same-host restart of the hosted Studio "
   + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is P2-40.";
@@ -245,7 +247,7 @@ function signDigest(workspace: string, kind: "A4_PACKAGE" | "A4_RECORD", digestH
     return signDigestWithPolicy({ workspace, kind, digestHex });
   } catch (error) {
     const text = error instanceof Error ? error.message : String(error);
-    if (/vault locked/i.test(text)) throw coded("A4_VAULT_LOCKED", `unlock the vault to sign ${kind}`);
+    if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to sign ${kind}`);
     throw coded(signerOf(workspace, kind).route === "notary" ? "NOTARY_UNREACHABLE" : "SIGNING_FAILED", `${kind}: ${text.slice(0, 200)}`);
   }
 }
@@ -268,7 +270,7 @@ function artifactSignature(workspace: string, artifactKind: ArtifactSignature["a
     return signArtifactBytes({ workspace, artifactKind, bytes });
   } catch (error) {
     const text = error instanceof Error ? error.message : String(error);
-    throw /vault locked/i.test(text) ? coded("A4_VAULT_LOCKED", `unlock the vault to sign ${artifactKind}`) : coded("SIGNING_FAILED", `${artifactKind}: ${text.slice(0, 200)}`);
+    throw vaultLocked(error) ? coded("A4_VAULT_LOCKED", `unlock the vault to sign ${artifactKind}`) : coded("SIGNING_FAILED", `${artifactKind}: ${text.slice(0, 200)}`);
   }
 }
 /**
@@ -319,8 +321,23 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
     try {
       revokeLease(workspace, entry.leaseId, `A4 ${scope} lease of an earlier ${releaseId} attempt that did not finish`);
     } catch (error) {
+      if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to revoke ${entry.leaseId} (an earlier ${releaseId} attempt's ${scope} lease)`);
       throw coded("LEASE_REVOKE_FAILED", `${entry.leaseId}: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`);
     }
+  }
+}
+/**
+ * The vault keys a lease step signs with, in any signing mode (the lease key mints a lease, the auditor key revokes one),
+ * read before an effect's first side effect, so a locked vault answers A4_VAULT_LOCKED (423) before anything is revoked,
+ * written, minted or signed, never part-way through.
+ */
+function assertLeaseKeys(workspace: string, what: string): void {
+  try {
+    getPrivateKeyPem(workspace, "lease");
+    getPrivateKeyPem(workspace, "auditor");
+  } catch (error) {
+    if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to ${what}`);
+    throw error;
   }
 }
 /** Mints one lease of the plan bound to the project's workspace, agent and release; its id is journaled before the token is returned. */
@@ -479,6 +496,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   if (!quality.success) throw coded("QUALITY_SPEC_MISSING", "the Aspire brief carries no quality specification");
   const integration = integrationClaimFor(assembleSpecOf(state).spec.path);
   if (integration === null) throw coded("INTEGRATION_PATH_UNKNOWN", "Assemble recorded no integration path");
+  assertLeaseKeys(workspace, "mint the release's staging lease");
   revokeJournaled(workspace, projectId, releaseId, "staging");
   const projectDir = realDir(join(realDir(a4ReleasesRoot(workspace)), projectId));
   const staging = mkdtempSync(join(projectDir, ".staging-"));
@@ -746,6 +764,7 @@ async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcom
   }
   const acknowledgement = acknowledgementOf(state, EXPERT_REVIEW_ITEM, Date.now(), gate.revision_no, "activate");
   if (regulated && acknowledgement === null) throw coded("EXPERT_REVIEW_PENDING", "a regulated deployment approval needs the owner's acknowledgement of the pending expert review (D-21)");
+  assertLeaseKeys(workspace, "mint the production lease");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
   const lease = mintLease(workspace, state, releaseId, plans.production);
   // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).

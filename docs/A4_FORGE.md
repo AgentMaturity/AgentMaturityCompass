@@ -430,7 +430,11 @@ quorum and answers the production lease's token once (the answered scopes, route
 caller, so an owner that gate's quorum counted cannot complete it (409 `SOD_VIOLATION`): an effect's quorum excludes its
 caller, as the release effect's engine request already does. A retry of a failed effect applies the same rule against
 the keys its consumed grant or gate quorum counted. An effect step that finds the vault locked (the lease key, an
-artifact signature) answers 423 `A4_VAULT_LOCKED`. A `DENY` on an unconsumed
+artifact signature) answers 423 `A4_VAULT_LOCKED`. Both effects read the vault's lease and auditor keys before their first
+side effect (a revocation, a file, a lease or a signature), so a locked vault fails them before the effect itself
+changes anything, and revoking an earlier attempt's lease with the vault locked answers the same code rather than `LEASE_REVOKE_FAILED`.
+A vault that is already locked when `complete`, `POST …/releases` or a retry is sent is refused before anything is
+consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
 (`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's auditor key, even in NOTARY
 mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read, rather than recorded with the
