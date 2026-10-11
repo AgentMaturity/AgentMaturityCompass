@@ -98,14 +98,8 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
     result = "not_evaluated";
     reasons.push("UNBOUND_EVIDENCE");
   }
-  // 8. Kind for everything else. Evidence is sufficient only when it is verified: observed by AMC or approved by a
-  // pinned independent reviewer. Self-reported, legacy and unchecked records read incomplete however many there are,
-  // and a regulated pass needs sufficient evidence (control-result v1), so theirs is not evaluated. The proposed result
-  // decides the reason, so the clock (rule 6) cannot change it.
+  // 8. Kind for everything else.
   if (kind === null) kind = decideKind(input, reasons);
-  if (kind !== "observed" && kind !== "independently_reviewed") evidence = worse(evidence, "incomplete");
-  if (regulated && kind === "self_reported" && input.proposed.result === "pass" && ev.eventCount > 0
-    && !reasons.includes("SELF_REPORTED_NO_POSITIVE_STATUS")) blockPass("SELF_REPORTED_NO_POSITIVE_STATUS");
   // 9. Applicability. Truth rule 2: unknown applicability means not evaluated, so an unresolved
   // result cannot pass (APPLICABILITY_UNRESOLVED goes beyond the issue's 14 codes; see D-03).
   const applicability: Applicability = input.applicability
@@ -116,6 +110,12 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
   } else if (applicability.state === "unresolved") {
     blockPass("APPLICABILITY_UNRESOLVED");
   }
+  // 10. Evidence is sufficient only when it is verified: observed by AMC or approved by a pinned independent reviewer.
+  // Self-reported, legacy and unchecked records read incomplete however many there are, except under D-03: a regulated
+  // self-reported pass that every rule above let through (so its records exist, rule 3) keeps the sufficient evidence
+  // control-result v1 requires for a pass. Its kind stays self_reported and its label says so (render.ts).
+  const d03Pass = regulated && kind === "self_reported" && result === "pass";
+  if (kind !== "observed" && kind !== "independently_reviewed" && !d03Pass) evidence = worse(evidence, "incomplete");
 
   return {
     claimKind: kind,

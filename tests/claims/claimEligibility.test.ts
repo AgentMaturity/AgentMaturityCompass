@@ -178,10 +178,20 @@ const rows: Row[] = [
     kind: "self_reported", result: "pass", evidence: "incomplete"
   },
   {
-    // D-03 allows "pass" here, but control-result v1 needs sufficient evidence for a pass and has no state for it.
+    // D-03: a regulated self-reported result with evidence provided may show pass, with the sufficient evidence v1 requires.
     name: "self-reported records, regulated pass with evidence provided (D-03)",
     input: withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED", "ATTESTED"] }, { regulated: true, applicability: applicable }),
-    kind: "self_reported", result: "not_evaluated", evidence: "incomplete", reason: "SELF_REPORTED_NO_POSITIVE_STATUS"
+    kind: "self_reported", result: "pass", evidence: "sufficient"
+  },
+  {
+    name: "self-reported, regulated pass with no evidence provided (D-03)",
+    input: withEvidence({ eventCount: 0, tiers: ["SELF_REPORTED"] }, { regulated: true, applicability: applicable }),
+    kind: "self_reported", result: "not_evaluated", evidence: "incomplete", reason: "EMPTY_EVIDENCE"
+  },
+  {
+    name: "legacy 1.1.1, regulated pass",
+    input: input({ regulated: true, applicability: applicable, legacy: { version: "1.1.1" } }),
+    kind: "self_reported", result: "pass", evidence: "sufficient", reason: "LEGACY_1X_UNVERIFIED"
   },
   {
     name: "observed tier from a method that does not observe",
@@ -243,32 +253,43 @@ describe("evaluateClaimEligibility", () => {
     expect(empty.eligibleLevel).toBeNull();
   });
 
-  test("evidence is sufficient only when it is verified: observed by AMC or approved by a pinned independent reviewer", () => {
+  test("evidence is sufficient only when it is verified, or for a D-03 regulated self-reported pass with evidence", () => {
     for (const row of rows) {
       const envelope = evaluateClaimEligibility(row.input);
-      if (envelope.statusDimensions.evidence === "sufficient") {
+      if (envelope.statusDimensions.evidence !== "sufficient") continue;
+      expect(row.input.evidence.eventCount, row.name).toBeGreaterThan(0);
+      if (envelope.claimKind === "self_reported") {
+        expect(row.input.regulated && envelope.statusDimensions.result === "pass", row.name).toBe(true);
+      } else {
         expect(["observed", "independently_reviewed"], row.name).toContain(envelope.claimKind);
-        expect(row.input.evidence.eventCount, row.name).toBeGreaterThan(0);
       }
     }
   });
 
-  test("a regulated result is emitted only in a shape control-result v1 accepts", () => {
+  test("a regulated result is emitted only in a shape control-result v1 accepts (D-03)", () => {
     const v1 = (envelope: ClaimEnvelope) => controlResultV1Schema.safeParse({ type: "amc.control-result", version: 1,
       controlId: "test.control", controlVersion: "1", evaluatedAt: new Date(NOW).toISOString(),
       dimensions: envelope.statusDimensions, claimKind: envelope.claimKind, evidenceRefs: ["ref-1"], exceptions: [] });
     const regulated = { regulated: true, applicability: applicable } as const;
-    const selfReported = evaluateClaimEligibility(withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED"] }, regulated));
-    expect(selfReported.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
-    expect(v1(selfReported).success).toBe(true);
+    // (a) self-reported with evidence: a v1-valid pass that stays self-reported in the record and the label.
+    const withRecords = evaluateClaimEligibility(withEvidence({ eventCount: 3, tiers: ["SELF_REPORTED"] }, regulated));
+    expect(withRecords.claimKind).toBe("self_reported");
+    expect(withRecords.statusDimensions).toMatchObject({ result: "pass", evidence: "sufficient" });
+    expect(v1(withRecords).success).toBe(true);
+    expect(renderClaimLabel(withRecords).line).toMatch(
+      /^Claim: Self-reported · Result: pass \(self-reported, evidence attached, not independently verified\) · Evidence: sufficient · /);
+    // (b) self-reported without evidence: no pass, and v1 accepts the not-evaluated result.
+    const withoutRecords = evaluateClaimEligibility(withEvidence({ eventCount: 0, tiers: ["SELF_REPORTED"] }, regulated));
+    expect(withoutRecords.statusDimensions).toMatchObject({ result: "not_evaluated", evidence: "incomplete" });
+    expect(v1(withoutRecords).success).toBe(true);
+    // (c) observed: unchanged, a plain pass.
     const observed = evaluateClaimEligibility(input(regulated));
     expect(observed.statusDimensions).toMatchObject({ result: "pass", evidence: "sufficient" });
     expect(v1(observed).success).toBe(true);
-    // The shape this rule prevents: v1 refuses a pass on unverified evidence.
-    expect(v1({ ...selfReported, statusDimensions: { ...selfReported.statusDimensions, result: "pass" } }).success).toBe(false);
+    expect(renderClaimLabel(observed).line).toContain("Claim: Observed · Result: pass · Evidence: sufficient · ");
     for (const row of rows.filter((candidate) => candidate.input.regulated)) {
       const envelope = evaluateClaimEligibility(row.input);
-      if (envelope.statusDimensions.result === "pass") expect(envelope.statusDimensions.evidence, row.name).toBe("sufficient");
+      expect(v1(envelope).success || envelope.statusDimensions.applicability.state !== "applicable", row.name).toBe(true);
     }
   });
 

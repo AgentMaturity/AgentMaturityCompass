@@ -19,7 +19,7 @@ export function claimKindLabel(kind: ClaimKind): string {
 
 export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   SYNTHETIC_VALUES: "synthetic example values are not evidence",
-  SELF_REPORTED_NO_POSITIVE_STATUS: "self-reported answers or records cannot pass a regulated control",
+  SELF_REPORTED_NO_POSITIVE_STATUS: "self-reported answers cannot pass a regulated control",
   SELF_REPORTED_LEVEL_CAP: "self-reported answers cannot support a level above 1",
   WEAK_METHOD: "keyword matches, unkeyed checksums and path checks cannot pass a regulated control or support a level above 1",
   EMPTY_EVIDENCE: "no evidence events were recorded",
@@ -46,7 +46,11 @@ type DimensionName = "result" | "evidence" | "enforcement" | "review" | "applica
 export interface ClaimLabel { kindLabel: string; line: string; dimensions: Record<DimensionName, string> }
 export type ClaimLabelSurface = "cli" | "mcp" | "api" | "studio" | "report";
 
-function resultText(dimensions: StatusDimensions, reasons: readonly ClaimReasonCode[]): string {
+/** D-03: the only self-reported result whose evidence reads sufficient is a regulated pass with records attached. */
+const SELF_REPORTED_PASS_TEXT = "pass (self-reported, evidence attached, not independently verified)";
+
+function resultText(kind: ClaimKind, dimensions: StatusDimensions, reasons: readonly ClaimReasonCode[]): string {
+  if (dimensions.result === "pass" && kind === "self_reported" && dimensions.evidence === "sufficient") return SELF_REPORTED_PASS_TEXT;
   if (dimensions.result !== "not_evaluated") return dimensions.result;
   const why = reasons.find((code) => !NON_RESULT_REASONS.has(code));
   return why ? `not evaluated (${REASON_TEXT[why]})` : "not evaluated";
@@ -65,7 +69,7 @@ export function renderClaimLabel(envelope: ClaimEnvelope): ClaimLabel {
   const kindLabel = legacyLabel === undefined ? KIND_LABELS[envelope.claimKind]
     : legacy?.notice ? `${legacyLabel} (notice ${legacy.notice})` : legacyLabel;
   const dimensions: ClaimLabel["dimensions"] = {
-    result: resultText(s, envelope.reasons),
+    result: resultText(envelope.claimKind, s, envelope.reasons),
     evidence: s.evidence,
     enforcement: s.enforcement.state === "enforced" ? `enforced at ${s.enforcement.boundary}` : s.enforcement.state,
     review: s.review,
