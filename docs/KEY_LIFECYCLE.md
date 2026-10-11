@@ -2,7 +2,9 @@
 
 AMC signs with one key per purpose, rotates and revokes keys with signed, chained records, and refuses older copies of anything it signs or accepts. This page covers what P1-08 added: purpose keys, rotation statements, the key set, revocation lists, anti-rollback, trust roots and the `amc keys` commands.
 
-Workspace signatures are a local audit trail. They show that this workspace's keys signed a record and that it has not changed since. A portable verdict needs keys a verifier pinned: a trust list, `--pubkey` or `--expect-monitor` ([TRUST_LIST.md](TRUST_LIST.md)).
+Workspace keys are not only an audit trail: live authorization checks verify against them, among them lease verification, execution tickets, approvals and policy guards. On a machine that committed a key set, every public key AMC reads must be the key that key set names, and the key set must be the exact generation this machine committed (its mark in AMC home). A writer that can change only the workspace therefore cannot swap a public key, restore older keys or roll the key set back.
+
+That binding lives in AMC home. Under `trustBoundaryMode: shared`, an agent that can also write AMC home can rewrite the marks and defeats it. The remedy is the `isolated` mode, which keeps agents out of AMC home, or keys a verifier pinned: a trust list, `--pubkey` or `--expect-monitor` ([TRUST_LIST.md](TRUST_LIST.md)). A portable verdict, on any machine, always needs pinned keys.
 
 ## Purposes
 
@@ -37,9 +39,11 @@ Creating a vault, the v1 migration and every rotation are one key-set generation
   "statements": ["<sha256>"] }
 ```
 
-While a change is pending, signing and verifying refuse with "key set generation N is incomplete; run `amc keys rotate --resume`". `files` lists what the generation wrote plus every public key and statement still in force. Signers also refuse when one of those public keys or statements lost its digest, when the unlocked vault does not hold the key ids the key set names, and when the key set is older than this machine accepted; reading a generation raises this machine's mark to it. A missing `keyset.json` in a workspace that had one refuses too. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
+While a change is pending, signing and verifying refuse with "key set generation N is incomplete; run `amc keys rotate --resume`". `files` lists what the generation wrote plus every public key and statement still in force. Signers also refuse when one of those public keys or statements lost its digest, and when the unlocked vault does not hold exactly the key ids the key set names.
 
-`amc keys rotate --resume` rolls a pending generation forward when every staged file is intact, otherwise it restores the previous bytes from `.amc/keys/rotations/gen-<N>/`. It resumes only the generation this workspace would write next, with the recovery manifest every generation writes first; any other pending file is refused for the owner to inspect. Resuming never overwrites or deletes a file: one it would replace moves to `gen-<N>/discarded/` first, under a new name if that name is taken.
+`keyset.json` is unsigned, so it never vouches for itself. This machine's mark (`<AMC home>/state/high-water.json`) records the generation and digest of the key set it committed, and is raised only when this machine commits or resumes a generation, never when it reads one. Once a mark exists, signers and verifiers accept only that exact key set. They refuse an older generation (`ROLLBACK_DETECTED`), other bytes at the same generation (`FORK_DETECTED`), a newer generation this machine never committed, and a missing `keyset.json`. A machine that never changed keys for the workspace has no mark and takes the key set as found. `keys` binds key ids rather than vault bytes, so writing a vault secret does not open a generation.
+
+`amc keys rotate --resume` rolls a pending generation forward when every staged file is intact. Otherwise it restores the previous bytes. Those copies hold older key material (the previous vault, public keys and histories), so they live in AMC home, under `<AMC home>/state/keyset-recovery/<workspace scope>/gen-<N>/`. Only the manifest, which names the files and their modes, stays in `.amc/keys/rotations/gen-<N>/`. Resume accepts only the generation this workspace would write next, or one this machine already marked before a crash, and only with that manifest; any other pending file is refused for the owner to inspect. Resuming never overwrites or deletes a file: one it would replace is copied to `gen-<N>/discarded/` in AMC home first, under a new name if that name is taken.
 
 Key, history, statement, revocation and anti-rollback files are read and written through `src/utils/containedFs.ts`: every directory below the workspace (or AMC home) must be a real directory, a file must be a regular file with one link opened without following a symlink, and writes go through a fresh temporary file that is fsynced and renamed. Node has no `openat`, so a directory swapped and swapped back between the check and the read is outside what AMC can see; a lasting swap is refused.
 
@@ -60,7 +64,7 @@ The signed bytes are `AMC_KEY_ROTATION_V1`, one 0x00 byte and the canonical stat
 Authority never comes from the statement's own fields. The verifier names the chain (workspace and purpose) and the key it already trusts for that purpose; `previousKeyId` must be that key, and the `previous` signature is checked against it. The `next` signature only proves possession of the new key.
 
 - `scheduled`, `superseded` and `purpose-split` need valid `previous` and `next` signatures.
-- `key-compromise` gives the previous key no authority: it needs `next` and at least one pinned trust-list root (`--root-key <file>`, a key held outside AMC). It has no overlap. AMC also moves every purpose that shares the compromised key and drops that key from every history, including the history of a purpose that split off it earlier.
+- `key-compromise` gives the previous key no authority: it needs `next` and signatures from this machine's pinned trust-list roots (`--root-key <file>`, keys held outside AMC). The roots and their threshold come from `<AMC home>/trust/trust-roots.json`, never from the keys handed in, and a `--root-key` that is not pinned there is refused. It has no overlap. AMC also moves every purpose that shares the compromised key and drops that key from every history, including the history of a purpose that split off it earlier.
 - A purpose's first key, likewise, needs a root.
 - Overlap is at most 30 days (`keys.maxOverlapDays`); `--overlap-days` defaults to 7.
 - A sequence gap or a wrong `previousStatementSha256` is refused.
@@ -90,7 +94,9 @@ The signature (revocation-list purpose) covers `AMC_REVOCATION_LIST_V1`, 0x00 an
 
 `<AMC home>/state/high-water.json` (mode 0600, canonical JSON, atomic writes) keeps, outside every workspace, the highest accepted sequence and its sha256 for each trust list, revocation list, key history, rotation chain, key set and trust-list root set. A lower sequence is `ROLLBACK_DETECTED`; the same sequence with other bytes is `FORK_DETECTED`. A symlinked, malformed or unreadable file refuses every decision that needs it. When AMC home is read-only (a container with a read-only root), AMC warns once and keeps deciding on the workspace transparency log.
 
-Each revocation list, rotation statement and history revision is also appended to the workspace transparency log, and an older file than the latest logged sequence is refused even after the high-water file is lost. A missing list is never read as empty once either anchor recorded it.
+Deployments must keep `<AMC home>/state` on persistent storage. The compose files mount a named volume at `/home/amc/.config/amc/state`, and the Helm chart a PersistentVolumeClaim (`amcHomeState` in `values.yaml`). On a temporary filesystem every restart forgets the marks, and an older list, history or key set is then judged only by the workspace log.
+
+Each revocation list, rotation statement and key-history revision is also appended to the workspace transparency log, including the history revisions vault creation, the v1 migration and an explicit key admission write. An older file than the latest logged sequence is refused even after the high-water file is lost; a key history is checked against the log whenever this machine has no mark at its revision. A missing list is never read as empty once either anchor recorded it.
 
 Limits: the high-water file is per machine, so a fresh verifier starts at zero; the transparency log lives in the workspace, so someone who can rewrite both the workspace and AMC home can still roll back. P1-26 anchors the log publicly. Restoring an older backup over a newer workspace at the same path on the same machine is refused as a rollback; restore to a new path, or have the machine owner remove the affected marks deliberately.
 
@@ -121,7 +127,7 @@ Every later read of `trust-roots.json` verifies the stored chain whole (each sta
 
 ## Cross-agent claims
 
-Identity claims between agents bind the issuing agent, audience, key purpose and key id, issue and expiry times (at most 24 hours), a nonce and the claimed score, level and passport. A verifier passes its expectation (audience, expected issuer, requested scope, its own grants per issuer and a replay cache); anything unknown, expired, replayed or not granted is refused with score 0. A claim proved only by a shared HMAC secret is `integrity: "shared-secret"` and never above `SELF_REPORTED`; an Ed25519 claim by a session key that issuer admission admits for `session` can be `ATTESTED` ([AMC_TRUST_PROTOCOL.md](AMC_TRUST_PROTOCOL.md)).
+Identity claims between agents bind the issuing agent, audience, key purpose and key id, issue and expiry times (at most 24 hours), a nonce and the claimed score, level and passport. A verifier passes its expectation: audience, expected issuer, requested scope, its own grants per issuer, the key ids it binds to each issuer (`issuerKeyIds`: an Ed25519 session key id, or `claimHmacKeyId(secret)` for a shared secret) and a replay cache. A claim whose key is not bound to the issuer it names is refused, so one agent's key never speaks for another; so is anything unknown, expired, replayed or not granted, with score 0. A claim proved only by a shared HMAC secret, or by a key issuer admission does not vouch for, is `SELF_REPORTED`: it is reported, never trusted, at most `limited`, and grants no scope. An Ed25519 claim by a session key that issuer admission admits for `session` is `ATTESTED` and can be trusted ([AMC_TRUST_PROTOCOL.md](AMC_TRUST_PROTOCOL.md)).
 
 ## Commands
 

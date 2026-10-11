@@ -6132,6 +6132,7 @@ Re-sign the lease revocation store as owner, only if its sha256 is the reviewed 
 |--------|-------------|
 | `--lease-id <id>` | - |
 | `--reason <reason>` | - |
+| `--token <lease>` | - |
 
 #### `amc legal-hold`
 

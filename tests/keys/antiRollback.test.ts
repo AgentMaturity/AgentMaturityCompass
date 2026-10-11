@@ -110,7 +110,8 @@ describe("lease revocation rollback attacks (P1-08; security review HIGH)", () =
     expect(readVerifiedLeaseRevocations(root)).toEqual({ ok: false, reason: expect.stringMatching(reason) });
     expect(verifyLeaseForCli({ workspace: root, token }).ok).toBe(false);
     // The next revoke cannot make the rollback permanent.
-    expect(() => revokeLease(root, "lease-later", "after the attack")).toThrow(/unverifiable/);
+    // Refused at the revocation list, or earlier, at the signing key, when the attack also broke this machine's marks.
+    expect(() => revokeLease(root, "lease-later", "after the attack")).toThrow(/unverifiable|anti-rollback state/);
   };
 
   it("replaying the older validly signed list is ROLLBACK_DETECTED and the lease stays revoked", () => {

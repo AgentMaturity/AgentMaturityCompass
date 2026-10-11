@@ -28,7 +28,7 @@ Signed with Studio lease signing key (Ed25519, vault-backed).
 amc lease issue --agent <id> --ttl 60m --scopes gateway:llm,toolhub:intent --routes /openai --models "gpt-*" --rpm 60 --tpm 200000
 amc lease issue --agent hook-agent --ttl 30m --scopes hook:observe --routes /hooks --models "*" --rpm 60
 amc lease verify <token>
-amc lease revoke --lease-id <leaseId> --reason <reason>
+amc lease revoke --lease-id <leaseId> --reason <reason> [--token <lease>]
 amc lease resign-revocations --expect-digest <sha256>
 ```
 
@@ -52,8 +52,9 @@ list or the signature missing) with no new file refuses every lease. Downgrading
 
 Ordinary `amc lease revoke` authenticates the exact existing list before appending an ID. A tampered, unsigned,
 malformed, rolled-back or partially missing store is refused without rewriting its evidence; revoking another lease is
-not a repair. `revokeLease` takes an optional `expiresTs` from the verified lease payload; the next write prunes rows
-whose lease expired more than five minutes ago, so the list stays below its 64 MiB cap. Rows without one are kept.
+not a repair. `revokeLease` takes an optional `expiresTs` from the verified lease payload, and `amc lease revoke --token`
+passes the lease's own signed expiry; the next write prunes rows whose lease expired more than five minutes ago, so the
+list stays below its 64 MiB cap. Rows without an expiry are kept.
 
 Store files are reached only through real directories below the workspace, without following a symbolic link, and must
 be regular files with one link (at most 64 MiB for a list). A symlink, FIFO, device, hard link or oversized file in their

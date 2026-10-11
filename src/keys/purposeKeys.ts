@@ -26,13 +26,15 @@ import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, purposeKey, roleOfPurpose, type LocalPurpose, type VaultPayloadV2
 } from "../vault/vaultPayload.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
+import { resolveAmcHome } from "../credentials/credentialsPaths.js";
+import { readPinnedTrustRoots } from "../trust/rootRotation.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { logSequence } from "./anchorLog.js";
 import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
 import { assertLocal, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
 export { getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem } from "./signingKeys.js";
-import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFileRel, keysetPaths, resumeKeyset, type KeysetWrite } from "./keyset.js";
+import { assertKeysetComplete, assertNoPendingKeyset, commitKeyset, keysetDeclared, keysetFileRel, keysetPaths, keysetRecoveryDir, resumeKeyset, type KeysetWrite } from "./keyset.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
@@ -64,7 +66,8 @@ function chainHead(workspace: string, purpose: LocalPurpose): SignedKeyRotationS
   const last = statements.at(-1);
   if (last === undefined) return null;
   const signed = parseRotationStatement(last);
-  assertNotRolledBack({ workspace, type: "KEY_ROTATION", id: `${workspaceIdFromDirectory(workspace)}:${purpose}`, sequence: signed.statement.sequence, sha256: sha256Hex(last) });
+  // Compare only: this statement's signatures are not checked here, so it never raises this machine's mark.
+  assertNotRolledBack({ workspace, type: "KEY_ROTATION", id: `${workspaceIdFromDirectory(workspace)}:${purpose}`, sequence: signed.statement.sequence, sha256: sha256Hex(last) }, { record: false });
   return signed;
 }
 
@@ -122,8 +125,15 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   for (const purpose of LOCAL_PURPOSES) if (payload.keys[purpose] && compromised.has(payload.keys[purpose]!.keyId)) targets.add(purpose);
   const overlapDays = input.overlapDays ?? 7;
   if (!Number.isFinite(overlapDays) || overlapDays < 0 || overlapDays > DEFAULT_MAX_OVERLAP_DAYS) throw new Error(`--overlap-days must be between 0 and ${DEFAULT_MAX_OVERLAP_DAYS}`);
+  // Root authority comes from this machine's pinned trust-list roots and threshold, never from the keys handed in.
   const rootPems = (input.rootPrivateKeyPems ?? []).map(pem => ({ privatePem: pem, publicPem: publicKeyFromPrivate(pem) }));
-  if (compromised.size > 0 && rootPems.length === 0) throw new Error("A key-compromise rotation needs a trust-list root signature (--root-key): the compromised key has no authority over its replacement.");
+  const pinned = rootPems.length > 0 || compromised.size > 0 ? readPinnedTrustRoots(resolveAmcHome({ env: process.env })) : null;
+  const unpinned = rootPems.filter(root => !pinned?.roots.includes(ed25519KeyId(root.publicPem) ?? ""));
+  if (unpinned.length > 0) throw new Error(`--root-key ${ed25519KeyId(unpinned[0]!.publicPem)} is not a pinned trust-list root (<AMC home>/trust/trust-roots.json); refusing it`);
+  const rootThreshold = pinned?.threshold ?? 1;
+  if (compromised.size > 0 && new Set(rootPems.map(root => root.publicPem)).size < rootThreshold) {
+    throw new Error(`A key-compromise rotation needs ${rootThreshold} pinned trust-list root signature(s) (--root-key): the compromised key has no authority over its replacement.`);
+  }
 
   // One new key per group of target purposes that share a key today.
   const fresh = new Map<string, string>();
@@ -151,7 +161,7 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
     }, { next: nextPem, previous: reason === "key-compromise" ? null : old.privateKeyPem, roots: rootPems.map(root => root.privatePem) });
     const bytes = encodeRotationStatement(signed);
     const verdict = verifyRotationStatement(bytes, { expected: { workspaceId, purpose }, trustedCurrentPublicKeyPem: publicKeyFromPrivate(old.privateKeyPem),
-      previous: head, roots: { publicKeyPems: rootPems.map(root => root.publicPem) } });
+      previous: head, roots: { publicKeyPems: rootPems.map(root => root.publicPem), threshold: rootThreshold } });
     if (!verdict.valid) throw new Error(`${purpose} rotation statement does not verify: ${verdict.reason}`);
     statements.push({ purpose, previousKeyId: old.keyId, reason, bytes, sha256: sha256Hex(bytes), path: join(statementDir(workspace, purpose), `${signed.statement.sequence}.json`) });
   }
@@ -176,7 +186,7 @@ export function rotatePurposeKeys(input: RotatePurposeKeysInput): RotationResult
   } });
   return {
     generation: keyset.generation,
-    recoveryDirectory: join(keysetPaths(workspace).rotations, `gen-${keyset.generation}`),
+    recoveryDirectory: keysetRecoveryDir(workspace, keyset.generation),
     rotated: statements.map(row => ({ purpose: row.purpose, previousKeyId: row.previousKeyId, nextKeyId: nextKeys[row.purpose]!.keyId, reason: row.reason, statementPath: row.path }))
   };
 }

@@ -147,9 +147,9 @@ export function listContainedDir(root: string, rel: string): string[] {
 }
 
 /**
- * A stamp of the files' identities (inode, size, mtime; "-" when absent) for memoizing a verified read: an atomic write
- * always replaces the inode, so a changed file always changes the stamp.
+ * A stamp of the files' identities (device, inode, size, ctime; "-" when absent) for memoizing a verified read. An atomic
+ * write replaces the inode, and any in-place write changes ctime, which (unlike mtime) cannot be set back by utimes.
  */
 export function statStamp(paths: readonly string[]): string {
-  return paths.map(path => { try { const s = statSync(path); return `${s.ino}:${s.size}:${s.mtimeMs}`; } catch { return "-"; } }).join("|");
+  return paths.map(path => { try { const s = statSync(path); return `${s.dev}:${s.ino}:${s.size}:${s.ctimeMs}`; } catch { return "-"; } }).join("|");
 }

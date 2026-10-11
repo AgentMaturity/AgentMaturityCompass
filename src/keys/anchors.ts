@@ -6,6 +6,9 @@
  */
 import { transparencyEntrySchema, type TransparencyArtifactKind } from "../transparency/logSchema.js";
 import { readContainedOrNull } from "../utils/containedFs.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   AntiRollbackError, compareHighWater, highWaterKey, readHighWater, recordHighWater, workspaceScope, type HighWaterKind
 } from "./highWater.js";
@@ -58,7 +61,7 @@ export function loggedAnchor(workspace: string, type: AnchorType, id: string): {
  * bytes (FORK_DETECTED). The log is read only when this machine's mark is missing or behind, so the steady state costs
  * one small file read; an accepted higher sequence then raises the mark.
  */
-export function assertNotRolledBack(target: AnchorTarget): void {
+export function assertNotRolledBack(target: AnchorTarget, opts: { record?: boolean } = {}): void {
   const key = markKey(target);
   const identity = target.fileSha256 ?? target.sha256;
   const recorded = readHighWater(key);
@@ -70,7 +73,8 @@ export function assertNotRolledBack(target: AnchorTarget): void {
   if (target.entryHash != null && logged !== null && logged.sequence === target.sequence && target.entryHash !== logged.entryHash) {
     throw new AntiRollbackError("FORK_DETECTED", `${target.id}#${target.sequence} names transparency entry ${target.entryHash ?? "none"}, not the logged ${logged.entryHash}`);
   }
-  recordHighWater(key, target.sequence, identity);
+  // A caller that has not verified the file's signatures (a chain head before its statement is checked) only compares.
+  if (opts.record !== false) recordHighWater(key, target.sequence, identity);
 }
 
 /** This machine's mark for `id` alone (no log scan). */
@@ -95,4 +99,29 @@ export function anchorArtifact(target: Omit<AnchorTarget, "fileSha256" | "entryH
 /** Raises this machine's mark to the final file (refusing a lower or forked one). */
 export function markSequence(target: AnchorTarget): void {
   recordHighWater(markKey(target), target.sequence, target.fileSha256 ?? target.sha256);
+}
+
+/** The log id of a workspace key history: `<workspaceId>:<subject>`. */
+export function historyLogId(workspace: string, subject: string): string {
+  return `${workspaceIdFromDirectory(workspace)}:${subject}`;
+}
+
+type LogWriter = (target: Omit<AnchorTarget, "fileSha256" | "entryHash">) => string;
+let logWriter: LogWriter | null = null;
+
+/** src/keys/anchorLog.ts registers the transparency-log writer when it loads; key reads never import it (import cycle). */
+export function registerAnchorLogWriter(writer: LogWriter): void {
+  logWriter = writer;
+}
+
+/**
+ * Appends key-history revisions to the workspace transparency log, where readers use them as a floor once this
+ * machine's marks are gone. Every CLI, server and package entry point loads the writer; a process that never did logs
+ * nothing, and its revisions are still marked on this machine.
+ */
+export function logHistoryRevisions(workspace: string, written: ReadonlyArray<{ subject: string; envelope: { revision: number } }>): void {
+  if (logWriter === null) return;
+  for (const { subject, envelope } of written) {
+    logWriter({ workspace, type: "KEY_HISTORY_REVISION", id: historyLogId(workspace, subject), sequence: envelope.revision, sha256: sha256Hex(canonicalize(envelope)) });
+  }
 }

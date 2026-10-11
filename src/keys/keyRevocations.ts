@@ -11,6 +11,7 @@ import { containedExists, readContainedOrNull, statStamp } from "../utils/contai
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { assertNeverAnchored } from "./anchors.js";
 import { highWaterPath } from "./highWater.js";
+import { assertBoundPublicKey } from "./keyset.js";
 import { readAnchoredRevocationList, readStagedRevocationList, type AnchoredListLocation } from "./revocationList.js";
 
 export const KEY_REVOCATION_REASONS = ["key-compromise", "superseded", "unspecified"] as const;
@@ -28,6 +29,7 @@ const keyFile = (workspace: string, name: string) => readContainedOrNull(workspa
 function trustedRevocationKeys(workspace: string): string[] {
   const current = keyFile(workspace, "revocation-list.pub");
   if (current === null) throw new Error("revocation-list.pub is missing; the key revocation list cannot be verified");
+  assertBoundPublicKey(workspace, "revocation-list", current);
   let history: string[] = [];
   try {
     history = verifyKeyHistoryEnvelope(JSON.parse(keyFile(workspace, "revocation-list_history.json") ?? "null"), "revocation-list", current).envelope?.entries.map(entry => entry.publicKeyPem) ?? [];

@@ -8,7 +8,7 @@ import { buildKeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import { keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
 import { assertKeysetComplete, commitKeyset, type KeysetWrite } from "../keys/keyset.js";
-import { machineMark } from "../keys/anchors.js";
+import { logHistoryRevisions, machineMark } from "../keys/anchors.js";
 import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
 import { containedExists } from "../utils/containedFs.js";
@@ -183,15 +183,18 @@ function sealedHistory(workspace: string, subject: KeyHistorySubject, entries: R
   return JSON.stringify(sealKeyHistory(subject, entries, privateKeyPem, nextKeyHistoryRevision(workspace, subject)), null, 2);
 }
 
-/** After a commit: raise the mark of every history it wrote. */
-export function markWrittenHistories(workspace: string, writes: readonly KeysetWrite[]): void {
+/** After a commit: raise the mark of every history it wrote; returns them for the transparency log. */
+export function markWrittenHistories(workspace: string, writes: readonly KeysetWrite[]): Array<{ subject: string; envelope: { revision: number } }> {
   const keysDir = vaultPaths(workspace).keysDir;
+  const written: Array<{ subject: string; envelope: { revision: number } }> = [];
   for (const write of writes) {
     const match = dirname(write.path) === keysDir ? /^([a-z-]+)_history\.json$/.exec(basename(write.path)) : null;
     if (!match) continue;
     const envelope = JSON.parse(write.bytes.toString()) as { revision: number };
     recordHighWater(keyHistoryMarkKey(workspace, match[1]!), envelope.revision, sha256Hex(canonicalize(envelope)));
+    written.push({ subject: match[1]!, envelope });
   }
+  return written;
 }
 
 /** A history file to write, keeping a backup of untrusted bytes it replaces (they are never imported). */
@@ -262,8 +265,11 @@ function emptyKeyRevocationList(workspace: string, payload: VaultPayload): Keyse
   return [{ path: join(workspace, location.rel), bytes: encodeSignedRevocationList(signRevocationList(list, key.privateKeyPem)), mode: 0o644 }];
 }
 
-/** Publishes a whole vault (new, migrated or upgraded) as one key-set generation. */
-function persistVault(workspace: string, payload: VaultPayload, passphrase: string, extra: readonly KeysetWrite[] = []): void {
+/**
+ * Publishes a whole vault (new, migrated or upgraded) as one key-set generation. Returns the histories it wrote, which
+ * the caller logs once the vault is unlocked (appending to the log signs its seal).
+ */
+function persistVault(workspace: string, payload: VaultPayload, passphrase: string, extra: readonly KeysetWrite[] = []): ReturnType<typeof markWrittenHistories> {
   const paths = vaultPaths(workspace);
   ensureDir(join(workspace, ".amc"));
   const existingVault = pathExists(paths.vaultFile);
@@ -275,12 +281,13 @@ function persistVault(workspace: string, payload: VaultPayload, passphrase: stri
     ...emptyKeyRevocationList(workspace, payload)
   ];
   commitKeyset(workspace, { keys: keyIdsOf(payload), writes });
-  markWrittenHistories(workspace, writes);
+  const written = markWrittenHistories(workspace, writes);
   // The envelope on disk just changed, so any session opened from the previous one must derive again.
   sessionFor(workspace).envelopeDigest = null;
   // Always remove legacy unencrypted private key files.
   if (pathExists(paths.legacyMonitorPrivate)) rmSync(paths.legacyMonitorPrivate, { force: true });
   if (pathExists(paths.legacyAuditorPrivate)) rmSync(paths.legacyAuditorPrivate, { force: true });
+  return written;
 }
 
 function sessionFor(workspace: string): VaultSession {
@@ -330,8 +337,9 @@ export function createVault(params: CreateVaultParams): { vaultFile: string; met
   const payload = payloadFromRoleKeys({
     monitor: params.monitorPrivateKeyPem, auditor: params.auditorPrivateKeyPem, lease: params.leasePrivateKeyPem, session: params.sessionPrivateKeyPem
   }, params.secrets ?? (Object.create(null) as Record<string, string>), Date.now());
-  persistVault(params.workspace, payload, passphrase);
+  const written = persistVault(params.workspace, payload, passphrase);
   unlockVault(params.workspace, passphrase);
+  logHistoryRevisions(params.workspace, written);
   const paths = vaultPaths(params.workspace);
   return { vaultFile: paths.vaultFile, metaFile: paths.metaFile };
 }
@@ -405,6 +413,7 @@ function openVaultSession(workspace: string, phrase: string): void {
   let payload = decoded.payload;
   assertPublishedKeysMatch(workspace, payload);
   let openedDigest: string | null = envelopeDigest;
+  let migrated: ReturnType<typeof persistVault> = [];
   if (decoded.sourceVersion === 1 || !payload.keys.lease || !payload.keys.session) {
     // P1-08 migration: v1 roles become v2 purposes with the same key bytes, written atomically with the purpose files;
     // the v1 envelope is kept as previous-vault.amcvault. A vault without lease or session keys gains them here, and
@@ -413,7 +422,7 @@ function openVaultSession(workspace: string, phrase: string): void {
     const fresh = () => purposeKey(generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString(), created);
     payload = { ...payload, keys: { ...payload.keys, lease: payload.keys.lease ?? fresh(), session: payload.keys.session ?? fresh() } };
     const previous = vaultPaths(workspace).previousVaultFile;
-    persistVault(workspace, payload, phrase, decoded.sourceVersion === 1 && !pathExists(previous) ? [{ path: previous, bytes: envelopeRaw, mode: 0o600 }] : []);
+    migrated = persistVault(workspace, payload, phrase, decoded.sourceVersion === 1 && !pathExists(previous) ? [{ path: previous, bytes: envelopeRaw, mode: 0o600 }] : []);
     payload = decodePayload(readEnvelopeRaw(workspace), phrase).payload;
     openedDigest = null; // the envelope was replaced; the next unlock re-derives from the new bytes
   }
@@ -423,6 +432,7 @@ function openVaultSession(workspace: string, phrase: string): void {
   session.lastUnlockedTs = Date.now();
   session.passphrase = phrase;
   session.envelopeDigest = openedDigest;
+  logHistoryRevisions(workspace, migrated);
 }
 
 export function lockVault(workspace: string): void {
@@ -487,7 +497,8 @@ function signingPayload(workspace: string): { payload: VaultPayload; keysetPrese
   // refuse rather than sign with nothing binding the vault's keys, their revocations or this machine's marks.
   const keyset = assertKeysetComplete(workspace);
   if (keyset === null) throw new Error("🔐 This vault has no key set (.amc/keys/keyset.json); refusing to sign. Restore it with the vault, or run `amc keys rotate --resume`.");
-  const matches = (payload: VaultPayload) => LOCAL_PURPOSES.every(purpose => keyset.keys[purpose] === undefined || keyset.keys[purpose] === payload.keys[purpose]?.keyId);
+  // Every purpose either side names must match: a key the key set omits is not bound, so it never signs.
+  const matches = (payload: VaultPayload) => LOCAL_PURPOSES.every(purpose => keyset.keys[purpose] === payload.keys[purpose]?.keyId);
   if (matches(refreshed.payload)) return { payload: refreshed.payload, keysetPresent: true };
   const payload = requireUnlockedPayload(workspace);
   if (!matches(payload)) throw new Error(`🔐 The unlocked vault does not hold the keys key set generation ${keyset.generation} names; refusing to sign.`);

@@ -25,7 +25,10 @@ import { context, listEntry } from "../trust/trustFixtures.js";
 
 const PASS = "amc-test-passphrase";
 const roots: string[] = [];
-afterEach(() => { for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
+afterEach(() => {
+  for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); }
+  rmSync(join(process.env.AMC_HOME!, "trust", "trust-roots.json"), { force: true });
+});
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-purpose-keys-"));
@@ -34,6 +37,13 @@ function workspace(): string {
   return root;
 }
 
+/** Pins a key as this machine's trust-list root (<AMC home>/trust/trust-roots.json), as a key-compromise rotation needs. */
+const pinned = <T extends { publicPem: string }>(key: T): T => {
+  const file = join(process.env.AMC_HOME!, "trust", "trust-roots.json");
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [ed25519KeyId(key.publicPem)] }));
+  return key;
+};
 const pem = () => {
   const keys = generateKeyPairSync("ed25519");
   return { privatePem: keys.privateKey.export({ format: "pem", type: "pkcs8" }).toString(), publicPem: keys.publicKey.export({ format: "pem", type: "spki" }).toString() };
@@ -137,7 +147,7 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const root = workspace();
     const old = getSigningPublicKeyPem(root, "receipt");
     expect(() => rotatePurposeKeys({ workspace: root, purposes: ["receipt"], reason: "key-compromise", passphrase: PASS })).toThrow(/root signature/);
-    const orgRoot = pem();
+    const orgRoot = pinned(pem());
     const result = rotatePurposeKeys({ workspace: root, purposes: ["receipt"], reason: "key-compromise", rootPrivateKeyPems: [orgRoot.privatePem], passphrase: PASS });
     // The compromised monitor key also signed ledger rows, so both purposes moved.
     expect(result.rotated.map(row => row.purpose).sort()).toEqual(["ledger-row", "receipt"]);
@@ -151,7 +161,7 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const shared = getSigningPublicKeyPem(root, "ledger-row");
     rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS }); // purpose-split: receipt's history keeps the shared key
     expect(getPurposeKeyHistory(root, "receipt")).toContain(shared);
-    rotatePurposeKeys({ workspace: root, purposes: ["ledger-row"], reason: "key-compromise", rootPrivateKeyPems: [pem().privatePem], passphrase: PASS });
+    rotatePurposeKeys({ workspace: root, purposes: ["ledger-row"], reason: "key-compromise", rootPrivateKeyPems: [pinned(pem()).privatePem], passphrase: PASS });
     expect(getPurposeKeyHistory(root, "ledger-row")).not.toContain(shared);
     expect(getPurposeKeyHistory(root, "receipt")).not.toContain(shared);
   });

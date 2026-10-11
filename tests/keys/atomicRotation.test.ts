@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getPrivateKeyPem, getPublicKeyHistory, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../../src/crypto/keys.js";
 import { highWaterPath } from "../../src/keys/highWater.js";
-import { keysetPaths } from "../../src/keys/keyset.js";
+import { keysetPaths, keysetRecoveryDir } from "../../src/keys/keyset.js";
 import { getSigningKey, getSigningPublicKeyPem, resumeKeyRotation, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
 import { lockVault, unlockVault, vaultPaths } from "../../src/vault/vault.js";
 import { decryptVaultPayload } from "../../src/vault/vaultCrypto.js";
@@ -182,10 +182,10 @@ describe("key-set hardening (P1-08 self-audit)", () => {
       if (existsSync(target)) rmSync(target);
       writeFileSync(target, "a file this generation did not write");
       const generation = JSON.parse(readFileSync(keysetPaths(root).pending, "utf8")).generation;
-      const discarded = join(keysetPaths(root).rotations, `gen-${generation}`, "discarded");
+      const discarded = join(keysetRecoveryDir(root, generation), "discarded");
       const name = target.slice(join(root, ".amc").length + 1).replace(/\//g, "__");
-      cpSync(target, join(discarded, name)); // an earlier rollback's copy under the same name
-      writeFileSync(join(discarded, name), "an earlier discarded copy");
+      mkdirSync(discarded, { recursive: true });
+      writeFileSync(join(discarded, name), "an earlier discarded copy"); // an earlier rollback's copy under the same name
       expect(resumeKeyRotation(root)).toMatchObject({ action: "completed" });
       const kept = filesUnder(discarded).map(path => readFileSync(path, "utf8"));
       expect(kept).toEqual(expect.arrayContaining(["a file this generation did not write", "an earlier discarded copy"]));
@@ -194,14 +194,12 @@ describe("key-set hardening (P1-08 self-audit)", () => {
     expect.unreachable("no crash point left a staged file to roll forward");
   }, 240_000);
 
-  it("raises the key-set mark when it reads a generation, so a restored older key set is refused", () => {
+  it("a restored older key set is refused once this machine committed a newer one", () => {
     const root = workspace();
     const backup = mkdtempSync(join(tmpdir(), "amc-keys-backup-"));
     roots.push(backup);
     cpSync(join(root, ".amc"), join(backup, ".amc"), { recursive: true });
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal"], passphrase: PASS });
-    rmSync(highWaterPath()); // this machine lost its marks, or the commit crashed before raising its own
-    getSigningKey(root, "artifact-seal");
     lockVault(root);
     rmSync(join(root, ".amc"), { recursive: true });
     cpSync(join(backup, ".amc"), join(root, ".amc"), { recursive: true });

@@ -91,8 +91,18 @@ export function revokeLeaseForCli(params: {
   workspace: string;
   leaseId: string;
   reason: string;
+  /** The lease itself: its signed expiry lets a later write prune the revocation once the lease has lapsed. */
+  token?: string;
 }): { leaseId: string } {
-  revokeLease(params.workspace, params.leaseId, params.reason);
+  let expiresTs: number | undefined;
+  if (params.token !== undefined) {
+    // Only a payload whose signature verified carries a usable expiry; an expired or already revoked lease still does.
+    const verified = verifyLeaseToken({ workspace: params.workspace, token: params.token });
+    if (!verified.ok && verified.error !== "lease expired" && verified.error !== "lease revoked") throw new Error(`--token does not verify: ${verified.error}`);
+    if (verified.payload?.leaseId !== params.leaseId) throw new Error("--token is not the lease named by --lease-id");
+    expiresTs = verified.payload.expiresTs;
+  }
+  revokeLease(params.workspace, params.leaseId, params.reason, { expiresTs });
   return {
     leaseId: params.leaseId
   };

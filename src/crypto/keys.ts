@@ -2,7 +2,10 @@ import { sign, verify, type KeyObject } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { AntiRollbackError, checkHighWater, keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
-import { assertNoPendingKeyset } from "../keys/keyset.js";
+import { logHistoryRevisions } from "../keys/anchors.js";
+import { assertBoundPublicKey, assertNoPendingKeyset } from "../keys/keyset.js";
+import { getSigningKey } from "../keys/signingKeys.js";
+import { isLocalPurpose, ROLE_PRIMARY_PURPOSE, type LocalPurpose } from "../vault/vaultPayload.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -85,6 +88,7 @@ export function addPublicKeyToHistory(
   const envelope = sealKeyHistory(kind, next, privateKey, prior.revision + 1);
   writeFileAtomic(historyPath(workspace, kind), JSON.stringify(envelope, null, 2), 0o600);
   recordKeyHistoryMark(workspace, kind, envelope);
+  logHistoryRevisions(workspace, [{ subject: kind, envelope }]);
   if (source !== "local") console.warn(`[amc] Explicit ${source} admission expanded the ${kind} signing role (${next[next.length - 1]!.fingerprint}).`);
 }
 
@@ -125,6 +129,7 @@ export function migratePublicKeyHistory(params: {
   writeFileAtomic(backupPath, original, 0o600);
   writeFileAtomic(file, JSON.stringify(envelope, null, 2), 0o600);
   recordKeyHistoryMark(params.workspace, params.kind, envelope);
+  logHistoryRevisions(params.workspace, [{ subject: params.kind, envelope }]);
   return { path: file, backupPath, admittedFingerprints: entries.map((entry) => entry.fingerprint) };
 }
 
@@ -134,8 +139,12 @@ export function ensureSigningKeys(workspace: string): void {
   ensureVaultAndPublicKeys(workspace);
 }
 
-export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session"): string {
-  return getVaultPrivateKeyPem(workspace, kind);
+/**
+ * A role's private key (key modules only), or, given a local purpose, that purpose's key exactly as getSigningKey
+ * resolves it, so a fail-early probe can check the very key its later signer uses.
+ */
+export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session" | LocalPurpose): string {
+  return isLocalPurpose(kind) ? getSigningKey(workspace, kind) : getVaultPrivateKeyPem(workspace, kind);
 }
 
 /** The role's current public key; refused while a key change is pending (P1-08 key set). */
@@ -145,7 +154,10 @@ export function getPublicKeyPem(workspace: string, kind: "monitor" | "auditor" |
   if (!pathExists(p)) {
     throw new Error(`Missing public key: ${p}`);
   }
-  return readFileSync(p, "utf8");
+  const pem = readFileSync(p, "utf8");
+  // P1-08: a role's file names its primary purpose's key, which the mark-bound key set names.
+  assertBoundPublicKey(workspace, ROLE_PRIMARY_PURPOSE[kind], pem);
+  return pem;
 }
 
 export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): string[] {

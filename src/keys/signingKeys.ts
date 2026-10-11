@@ -10,8 +10,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getVaultPurposeKeyPem, purposeKeyPaths, vaultPaths } from "../vault/vault.js";
 import { isLocalPurpose, roleOfPurpose, type LocalPurpose } from "../vault/vaultPayload.js";
-import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
-import { assertNoPendingKeyset, keysetDeclared, keysetFileRel } from "./keyset.js";
+import { historyLogId, loggedAnchor } from "./anchors.js";
+import { checkHighWater, compareHighWater, keyHistoryMarkKey } from "./highWater.js";
+import { assertBoundPublicKey, assertNoPendingKeyset, keysetDeclared, keysetFileRel } from "./keyset.js";
 
 export function assertLocal(purpose: KeyPurpose): LocalPurpose {
   if (!isLocalPurpose(purpose)) throw new Error(`${purpose} keys never live in a workspace vault; sign with the key its owner holds`);
@@ -32,7 +33,10 @@ export function getSigningPublicKeyPem(workspace: string, purpose: KeyPurpose): 
   const local = assertLocal(purpose);
   assertNoPendingKeyset(workspace);
   const own = keyFile(workspace, `${local}.pub`);
-  if (own !== null) return own;
+  if (own !== null) {
+    assertBoundPublicKey(workspace, local, own);
+    return own;
+  }
   // A workspace with a key set always has purpose files: never fall back to the wider role key there.
   if (keysetDeclared(workspace)) throw new Error(`${purposeKeyPaths(workspace, local).publicFile} is missing from a workspace with a key set; refusing to fall back to the ${roleOfPurpose(local)} role key`);
   const role = keyFile(workspace, `${roleOfPurpose(local)}_ed25519.pub`);
@@ -45,7 +49,14 @@ export function readHistory(workspace: string, subject: KeyHistorySubject, curre
     const raw = keyFile(workspace, `${subject}_history.json`);
     if (raw === null) return null;
     const envelope = verifyKeyHistoryEnvelope(JSON.parse(raw), subject, currentPublicPem).envelope;
-    if (envelope) checkHighWater(keyHistoryMarkKey(workspace, subject), envelope.revision, sha256Hex(canonicalize(envelope)));
+    if (envelope) {
+      const sha256 = sha256Hex(canonicalize(envelope));
+      const marked = checkHighWater(keyHistoryMarkKey(workspace, subject), envelope.revision, sha256);
+      // Without this machine's mark at this revision (a fresh verifier, a lost AMC home), the workspace log is the floor.
+      if (marked?.sequence !== envelope.revision) {
+        compareHighWater(`${subject} key history in the workspace transparency log`, loggedAnchor(workspace, "KEY_HISTORY_REVISION", historyLogId(workspace, subject)), envelope.revision, sha256);
+      }
+    }
     return envelope;
   } catch {
     return null; // an unreadable, unauthenticated or rolled-back history admits no older key (fail closed)
