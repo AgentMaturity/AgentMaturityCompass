@@ -69,8 +69,8 @@
     "id": "P30-1542-empty-set",
     "oldIssue": "AMC-1542",
     "file": "src/leases/leaseStore.ts",
-    "find": "    throw new Error(\n      `lease revocation store unverifiable (${error instanceof Error ? error.message : String(error)}); refusing to treat it as empty`\n    );",
-    "replace": "    return new Set<string>();",
+    "find": "  if (!read.ok) throw new Error(`lease revocation store unverifiable (${read.reason}); refusing to treat it as empty`);",
+    "replace": "  if (!read.ok) return new Set<string>();",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts",
       "tests/leaseRevocationFailClosed.test.ts",
@@ -107,65 +107,65 @@
     "id": "P30-1542-consumer-bridge",
     "oldIssue": "AMC-1542",
     "file": "src/bridge/bridgeAuth.ts",
-    "find": "if (!revocation.valid) {",
-    "replace": "if (false) {",
+    "find": "= readRevokedLeaseIds(params.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(params.workspace));",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts",
       "tests/leaseRevocationFailClosed.test.ts"
     ],
     "expect": "killed",
-    "note": "bridgeAuth admits leases against an unverified list."
+    "note": "bridgeAuth treats an unverifiable list as empty (fail open)."
   },
   {
     "id": "P30-1542-consumer-gateway",
     "oldIssue": "AMC-1542",
     "file": "src/gateway/server.ts",
-    "find": "if (!revocationSig.valid) {",
-    "replace": "if (false) {",
+    "find": "= readRevokedLeaseIds(input.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(input.workspace));",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts",
       "tests/leaseRevocationFailClosed.test.ts"
     ],
     "expect": "killed",
-    "note": "gateway admits leases against an unverified list."
+    "note": "gateway treats an unverifiable list as empty (fail open)."
   },
   {
     "id": "P30-1542-consumer-router",
     "oldIssue": "AMC-1542",
     "file": "src/workspaces/workspaceRouter.ts",
-    "find": "if (!revocationSig.valid) {",
-    "replace": "if (false) {",
+    "find": "= readRevokedLeaseIds(context.workspaceDir);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(context.workspaceDir));",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts",
       "tests/leaseRevocationFailClosed.test.ts"
     ],
     "expect": "killed",
-    "note": "workspaceRouter admits leases against an unverified list (the workspace's own agent auth still refuses: defence in depth)."
+    "note": "workspaceRouter treats an unverifiable list as empty (fail open) (the workspace's own agent auth still refuses: defence in depth)."
   },
   {
     "id": "P30-1542-consumer-studio",
     "oldIssue": "AMC-1542",
     "file": "src/studio/studioServer.ts",
-    "find": "if (!revocationSig.valid) {",
-    "replace": "if (false) {",
+    "find": "= readRevokedLeaseIds(params.workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(params.workspace));",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts"
     ],
     "expect": "killed",
-    "note": "studioServer verifyLeaseForScope admits leases against an unverified list."
+    "note": "studioServer verifyLeaseForScope treats an unverifiable list as empty (fail open)."
   },
   {
     "id": "P30-1542-consumer-wire",
     "oldIssue": "AMC-1542",
     "file": "src/wire/wireDispatcher.ts",
-    "find": "if (!signature.valid) return null;",
-    "replace": "if (false) return null;",
+    "find": "= readRevokedLeaseIds(workspace);",
+    "replace": "= ((r) => r.ok ? r : { ok: true as const, ids: new Set<string>() })(readRevokedLeaseIds(workspace));",
     "tests": [
       "tests/leaseRevocationConsumers.test.ts",
       "tests/wireDispatcher.test.ts"
     ],
     "expect": "killed",
-    "note": "wireDispatcher admits leases against an unverified list."
+    "note": "wireDispatcher treats an unverifiable list as empty (fail open)."
   },
   {
     "id": "P30-1546-mixed-credentials",
@@ -333,6 +333,67 @@
     ],
     "expect": "killed",
     "note": "Erase outside the requested scope."
+  },
+  {
+    "id": "P30-1542-reread-after-verify",
+    "oldIssue": "AMC-1542",
+    "file": "src/leases/leaseStore.ts",
+    "find": "    return { ok: true, ids: new Set(readVerifiedRevocations(workspace).revocations.map((row) => row.leaseId)) };",
+    "replace": "    readVerifiedRevocations(workspace);\n    return { ok: true, ids: new Set(loadLeaseRevocations(workspace).revocations.map((row) => row.leaseId)) };",
+    "tests": [
+      "tests/leaseRevocationConsumers.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Verify the list, then build the revoked set from a second read of the file (the TOCTOU fixed in 8d9077a4)."
+  },
+  {
+    "id": "P30-1525-vault-unlock-partial",
+    "oldIssue": "AMC-1525",
+    "file": "src/vault/vault.ts",
+    "find": "      // A failed upgrade leaves no session behind: not this partial payload, not one from an older envelope.\n      lockVault(workspace);\n",
+    "replace": "",
+    "tests": [
+      "tests/vaultUnlockCaching.test.ts"
+    ],
+    "expect": "killed",
+    "note": "A failed legacy key upgrade in unlockVault leaves the session unlocked (fixed in 34e7dbb7)."
+  },
+  {
+    "id": "P30-1525-vault-unlock-publish-early",
+    "oldIssue": "AMC-1525",
+    "file": "src/vault/vault.ts",
+    "find": "  let openedDigest: string | null = envelopeDigest;\n",
+    "replace": "  let openedDigest: string | null = envelopeDigest;\n  session.unlocked = true;\n  session.payload = payload;\n",
+    "tests": [
+      "tests/vaultUnlockCaching.test.ts"
+    ],
+    "expect": "equivalent",
+    "note": "Publish the session before the upgrade. Equivalent: the upgrade's catch locks the vault, so a throw still leaves it locked; the late publish is defence in depth."
+  },
+  {
+    "id": "P30-1547-store-root",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillStore.ts",
+    "find": "  if (!suffix || suffix === \"..\" || suffix.startsWith(`..${sep}`) || suffix.startsWith(sep)) {",
+    "replace": "  if (!suffix) {",
+    "tests": [
+      "tests/spillLifecycle.test.ts"
+    ],
+    "expect": "killed",
+    "note": "Allow a spill root outside the workspace (spillStore.ts storageRoot)."
+  },
+  {
+    "id": "P30-1547-transport-dotdot",
+    "oldIssue": "AMC-1547",
+    "file": "src/session/spill/spillLifecycle.ts",
+    "find": "  if (isAbsolute(suffix) || suffix === \"..\" || suffix.startsWith(`..${sep}`)) throw new Error(\"Spill transport path escaped its selected root\");",
+    "replace": "  if (false) throw new Error(\"Spill transport path escaped its selected root\");",
+    "tests": [
+      "tests/spillLifecycle.test.ts",
+      "tests/sessionSpill.test.ts"
+    ],
+    "expect": "equivalent",
+    "note": "Drop the transport `..` check in spillLifecycle.ts transportDirectory. Equivalent through the public API: parseIndex pins every exported object file to objects/<sha256>.blob before any transport read, and the root is the realpath of the selected directory."
   },
   {
     "id": "P30-1534-no-transaction",
