@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { realpathSync } from "node:fs";
 import type { AgentPromptResult, AgentSession } from "../agent/agentSession.js";
 import { SessionResumeRefused } from "../session/sessionResume.js";
+import { assertSecondSessionWriter, SessionStoreSingleWriterError } from "../persistence/openSessionEventStore.js";
 import { amcVersion } from "../version.js";
 import { createAcpConnection, type AcpConnection, type AcpSink } from "./acpConnection.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
@@ -233,6 +234,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     const request = params as { cwd: string; mcpServers: readonly unknown[]; additionalDirectories?: readonly string[] };
     assertSessionScope(request);
     if (closing || signal.aborted) throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or the agent is shutting down");
+    admitAnotherWriter("A second ACP session");
     const sessionId = randomUUID();
     const session = await init.sessionFactory({ sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
     if (closing || signal.aborted || session.sessionId !== sessionId || sessionIdentityReserved(sessionId)) {
@@ -243,6 +245,15 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     }
     sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, projectionFailed: false, running: false, releasing: false });
     return { sessionId };
+  }
+
+  /** Up front, before any factory runs: JSONL admits one session writer per workspace (P0-58). */
+  function admitAnotherWriter(needs: string): void {
+    if (sessions.size + loading.size + cleanupPending.size === 0) return;
+    try { assertSecondSessionWriter(init.workspace, needs); } catch (error) {
+      if (error instanceof SessionStoreSingleWriterError) throw new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code });
+      throw error;
+    }
   }
 
   function assertSessionScope(request: { cwd: string; mcpServers?: readonly unknown[]; additionalDirectories?: readonly string[] }): void {
@@ -271,6 +282,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       throw new AcpFailure(ACP_ERROR.invalidParams, "session cleanup remains unresolved; close the connection and inspect its ownership before loading again");
     }
     if (closing || signal.aborted || sessions.has(request.sessionId) || loading.has(request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "session is already loaded, cancelled or the agent is shutting down");
+    admitAnotherWriter("Loading another ACP session");
     loading.add(request.sessionId);
     let session: AgentSession;
     try {
@@ -338,6 +350,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       assertSessionScope(request);
       if (closing || signal.aborted || loading.has(request.sessionId)
           || [...cleanupPending].some(session => session.sessionId === request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "fork was cancelled or its source is still loading or awaiting cleanup");
+      admitAnotherWriter("An ACP session fork");
       child = await init.forkSessionFactory({ parentSessionId: request.sessionId, workspace: init.workspace,
         agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
       if (closing || signal.aborted || child.sessionId === request.sessionId || sessionIdentityReserved(child.sessionId)) {
