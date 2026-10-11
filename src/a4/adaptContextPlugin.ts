@@ -7,12 +7,15 @@
  * loads only the instructions file and the time plugin, and nothing loads this plugin into it or into a deployed agent,
  * so `context.native_delivery` stays not_evaluated naming P2-37. The probe is one bounded in-process turn on the stub
  * provider (no network, no credential): its session's EFFECTIVE_POLICY row, written by the session writer before the
- * turn, is the observed ref, and the run's signed `user/message` snapshot row carrying the plugin's exact text is
- * checked and named beside it. Delivery to a model is not evaluated on the stub provider, and a probe whose turn failed or
- * whose snapshot lacks the text never satisfies `context_reaches_runtime_frame`.
+ * turn, is the observed ref that the policy reached the runtime (the receipt carries no context-plugin field). The frame
+ * is shown by the run's signed `user/message` row carrying the plugin's exact text: the probe checks it when it runs and
+ * Review checks it again (the row carries no agent id, so it cannot be an A4 ref of its own; that check is AMC's, not an
+ * observed ref). Delivery to a model is not evaluated on the stub provider, and a probe whose turn did not end `complete`
+ * (blocked, error, cancelled, max steps) or whose row lacks the text never satisfies `context_reaches_runtime_frame`.
  */
-import { readFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { basename, dirname, join, relative, sep } from "node:path";
 import { z } from "zod";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../agent/stubProvider.js";
 import { apiSuccess } from "../api/apiHelpers.js";
@@ -27,6 +30,7 @@ import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
 import { readEventPayload } from "../session/eventPayload.js";
+import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -151,8 +155,31 @@ export function promptPackStatus(workspace: string, agentId: string): { present:
     return (error as NodeJS.ErrnoException).code === "ENOENT" ? { present: false, sha256: null, packId: null, verified: null, problems: 0 }
       : { present: true, sha256: null, packId: null, verified: false, problems: 1 };
   }
-  const checked = verifyWorkspacePromptPack(workspace, path);
+  let sidecar: Buffer | null;
+  try {
+    sidecar = readFileSync(`${path}.sha256`);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") return { present: true, sha256: sha256Hex(bytes), packId: null, verified: false, problems: 1 };
+    sidecar = null;
+  }
+  const checked = verifyPackBytes(workspace, basename(path), bytes, sidecar);
   return { present: true, sha256: sha256Hex(bytes), packId: checked.packId, verified: checked.ok, problems: checked.errors.length };
+}
+
+/**
+ * verifyWorkspacePromptPack over exactly `bytes` and the `.sha256` sidecar read beside them (a private copy), so the
+ * verdict and the recorded sha256 describe the same bytes.
+ */
+function verifyPackBytes(workspace: string, name: string, bytes: Buffer, sidecar: Buffer | null): ReturnType<typeof verifyWorkspacePromptPack> {
+  const dir = mkdtempSync(join(tmpdir(), "amc-a4-pack-"));
+  try {
+    const file = join(dir, name);
+    writeFileSync(file, bytes, { mode: 0o600 });
+    if (sidecar !== null) writeFileSync(`${file}.sha256`, sidecar, { mode: 0o600 });
+    return verifyWorkspacePromptPack(workspace, file);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 /** The `context.promptPackSha256` slot: the latest pack's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
@@ -169,11 +196,15 @@ export function promptPackSha256(workspace: string, agentId: string): string | n
 export interface ContextProbeOutcome {
   readonly sessionId: string;
   readonly systemPromptEventId: string;
+  /** The reason on the session's signed turn/end row (`complete`, `blocked`, `error`, ...), `unknown` when none verifies. */
   readonly turnStatus: string;
+  /** The driver's terminal state (idle, failed): `idle` also follows a blocked or errored turn, so it decides nothing. */
+  readonly driverStatus: string;
   readonly receipt: { readonly eventId: string; readonly sha256: string; readonly receiptId: string; readonly compiledPolicyDigest: string | null;
     readonly downgrades: readonly string[] };
-  /** The signed user/message row whose payload holds the plugin's exact text, verified now; null when none does. */
+  /** The signed user/message row whose payload holds the plugin's exact text, verified now (and its event hash); null when none does. */
   readonly snapshotEventId: string | null;
+  readonly snapshotSha256: string | null;
 }
 
 /** The kernel, loaded on demand: a package without the vendored runtime refuses the probe (409), never fakes it. */
@@ -194,6 +225,28 @@ function snapshotRowOf(ledger: Ledger, sessionId: string, text: string): string 
     if (row.writer_sig !== "unsigned" && verifyEvidenceEventIntegrity({ ledger, eventId: row.id }).ok) return row.id;
   }
   return null;
+}
+
+/** The reason on the session's last turn/end row, when that row is signed and verifies; `unknown` otherwise (never complete by default). */
+function turnEndOf(ledger: Ledger, sessionId: string): string {
+  const row = (ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? AND event_type = 'turn/end' ORDER BY rowid").all(sessionId) as EvidenceEvent[]).at(-1);
+  if (row === undefined || row.writer_sig === "unsigned" || !verifyEvidenceEventIntegrity({ ledger, eventId: row.id }).ok) return "unknown";
+  return readTurnEndMeta(row.meta_json)?.reason ?? "unknown";
+}
+
+/**
+ * The probe's frame row as it reads now (Review's re-check): the user/message row the probe named, by id and event hash,
+ * still signed and verifying, in the probe's session, its payload holding the plugin's exact text. Anything else names why.
+ */
+export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unknown; snapshotSha256?: unknown; sessionId?: unknown }, text: string): string {
+  if (typeof probe.snapshotEventId !== "string" || typeof probe.snapshotSha256 !== "string") return "FRAME_ROW_NOT_RECORDED";
+  const row = ledger.getEventById(probe.snapshotEventId);
+  if (!row) return "FRAME_ROW_DANGLING";
+  if (row.event_hash !== probe.snapshotSha256 || row.session_id !== probe.sessionId) return "FRAME_ROW_CHANGED";
+  if (row.writer_sig === "unsigned" || !verifyEvidenceEventIntegrity({ ledger, eventId: row.id }).ok) return "FRAME_ROW_UNVERIFIED";
+  const payload = readEventPayload(ledger.workspace, row);
+  if (payload.status !== "ok" || sha256Hex(payload.bytes) !== row.payload_sha256) return "FRAME_ROW_PAYLOAD_UNAVAILABLE";
+  return payload.bytes.toString("utf8").includes(text) ? "resolved" : "FRAME_ROW_WITHOUT_TEXT";
 }
 
 /**
@@ -233,9 +286,11 @@ export async function runContextProbe(input: { workspace: string; agentId: strin
   const row = written?.eventId == null ? null : input.ledger.getEventById(written.eventId);
   // A session store other than the ledger (JSONL) has no row an A4 ref can name: refused, never recorded as observed.
   if (written === null || row === null) throw fail(409, "PROBE_NOT_RECORDED", "The probe's effective-policy receipt has no ledger row (a JSONL session store, or no writer event id).");
-  return { sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, turnStatus: outcome.status,
+  const snapshotEventId = snapshotRowOf(input.ledger, outcome.sessionId, input.plugin.text);
+  return { sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, turnStatus: turnEndOf(input.ledger, outcome.sessionId),
+    driverStatus: outcome.status,
     receipt: { eventId: row.id, sha256: row.event_hash, receiptId: written.receiptId, compiledPolicyDigest: written.compiledPolicyDigest, downgrades: written.downgrades },
-    snapshotEventId: snapshotRowOf(input.ledger, outcome.sessionId, input.plugin.text) };
+    snapshotEventId, snapshotSha256: snapshotEventId === null ? null : input.ledger.getEventById(snapshotEventId)?.event_hash ?? null };
 }
 
 const probeSchema = z.strictObject({ expectedHeadSeq: z.number().int().min(0), clientRequestId: z.string().regex(/^[A-Za-z0-9_-]{8,128}$/) });
@@ -261,12 +316,13 @@ async function probe(route: A4Route, projectId: string): Promise<true> {
   if (context === undefined) throw a4Fail(409, "A4_NOT_READY", "This Build wrote no context plugin; build again.", { reasonCodes: ["CONTEXT_PLUGIN_NOT_BUILT"] });
   const plugin = readContextPlugin(route.workspace, state.project.agent_id, context.fileSha256);
   const outcome = await runContextProbe({ workspace: route.workspace, agentId: state.project.agent_id, plugin, ledger: route.store.ledger });
-  const inFrame = outcome.snapshotEventId !== null && outcome.turnStatus !== "failed";
+  const inFrame = outcome.snapshotEventId !== null && outcome.snapshotSha256 !== null && outcome.turnStatus === "complete";
   const result = route.store.addEvidenceRef(projectId, { actor: principal, refKind: "ledger_event", refId: outcome.receipt.eventId, sha256: outcome.receipt.sha256,
     claimKind: "observed", method: "runtime_observation", column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request,
-    label: `adapt context probe: the effective-policy receipt of in-process session ${outcome.sessionId} (stub provider; ${PROBE_LIMITATION})`,
+    label: `adapt context probe: the effective-policy receipt of in-process session ${outcome.sessionId}, the policy reaching the runtime (stub provider; ${PROBE_LIMITATION})`,
     note: { purpose: PROBE_PURPOSE, sessionId: outcome.sessionId, systemPromptEventId: outcome.systemPromptEventId, snapshotEventId: outcome.snapshotEventId,
-      contextPluginSha256: plugin.sha256, contextPluginFileSha256: context.fileSha256, inFrame, turnStatus: outcome.turnStatus, provider: STUB_PROVIDER_ID,
+      snapshotSha256: outcome.snapshotSha256, contextPluginSha256: plugin.sha256, contextPluginFileSha256: context.fileSha256, inFrame, turnStatus: outcome.turnStatus,
+      driverStatus: outcome.driverStatus, provider: STUB_PROVIDER_ID,
       receiptId: outcome.receipt.receiptId, compiledPolicyDigest: outcome.receipt.compiledPolicyDigest, downgrades: outcome.receipt.downgrades,
       modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated", limitation: PROBE_LIMITATION } });
   apiSuccess(route.res, mutationResult(result, { probe: { sessionId: outcome.sessionId, inFrame, turnStatus: outcome.turnStatus, snapshotEventId: outcome.snapshotEventId,
@@ -302,6 +358,7 @@ function probeOf(state: A4ReadinessState, context: NonNullable<AdaptBuild["conte
  */
 export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   const { spec, answers } = adaptSpecOf(state);
+  const reviewed = (spec.review as { probe?: { receiptEventId?: unknown; frame?: unknown } } | undefined)?.probe;
   const build = proposedFor(spec, answers) ? buildOf(spec) : null;
   const context = build?.context;
   const built = reached(state, "built");
@@ -321,21 +378,31 @@ export function contextItems(state: A4ReadinessState): A4ReadinessItem[] {
   }
   const { link, ref } = probeOf(state, context);
   const route = `POST /api/v1/a4/projects/${state.project.project_id}/stages/adapt/probe`;
+  // Review's re-check of the frame row applies to the probe it read; a probe run after it stands on its own check.
+  const recheck = link !== undefined && reviewed !== undefined && reviewed.receiptEventId === link.body.refId ? reviewed.frame : undefined;
   const frame = link === undefined
     ? item("context_reaches_runtime_frame", "WAITING", { kind: "evidence_missing", reasonCodes: ["CONTEXT_PROBE_NOT_RUN"],
       nextAction: { label: "Run the context probe: one in-process turn on the stub provider that records the runtime's effective-policy receipt", route } })
-    : link.body.turnStatus === "failed" || link.body.inFrame !== true
+    : link.body.turnStatus !== "complete" || link.body.inFrame !== true
       ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory",
-        reasonCodes: [link.body.turnStatus === "failed" ? "PROBE_DENIED" : "CONTEXT_NOT_IN_FRAME", `SESSION:${String(link.body.sessionId)}`],
-        nextAction: { label: "The probe's session does not show the plugin in its frame: build again, then probe again", route } })
+        reasonCodes: [link.body.turnStatus !== "complete" ? "PROBE_DENIED" : "CONTEXT_NOT_IN_FRAME", `TURN_END:${String(link.body.turnStatus)}`, `SESSION:${String(link.body.sessionId)}`],
+        nextAction: { label: "The probe's turn did not complete, or its session does not show the plugin in its frame: build again, then probe again", route } })
       : ref === undefined || ref.lane !== "observed"
         ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["PROBE_REF_NOT_OBSERVED", ...(ref?.reasonCodes ?? ["REF_DANGLING"])],
           nextAction: { label: "The probe's receipt row no longer earns observed (missing, changed or unsigned): probe again", route } })
-        : item("context_reaches_runtime_frame", "READY", { section: "observed", reasonCodes: ["CONTEXT_IN_RUNTIME_FRAME", "EFFECTIVE_POLICY_RECEIPT",
-          "OBSERVED_IN_PROCESS", `SESSION:${String(link.body.sessionId)}`, ...(Array.isArray(link.body.downgrades) ? link.body.downgrades.map((code) => `DOWNGRADE:${String(code)}`) : [])],
+        : recheck !== undefined && recheck !== "resolved"
+          ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: [typeof recheck === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(recheck)
+            ? recheck : "FRAME_ROW_NOT_RECHECKED", `SNAPSHOT:${String(link.body.snapshotEventId)}`],
+            nextAction: { label: "At Review the probe's user/message row no longer showed the plugin's text (gone, changed or unverified): probe again, then review again", route } })
+          // The frame is AMC's check of the signed user/message row (at the probe, and again at Review): implementation, not the observed lane.
+          : item("context_reaches_runtime_frame", "READY", { reasonCodes: ["CONTEXT_IN_RUNTIME_FRAME", recheck === "resolved" ? "FRAME_ROW_RECHECKED_AT_REVIEW" : "FRAME_ROW_CHECKED_AT_PROBE",
+            `SNAPSHOT:${String(link.body.snapshotEventId)}`, "POLICY_REACHED_RUNTIME", "OBSERVED_IN_PROCESS", `SESSION:${String(link.body.sessionId)}`,
+            ...(Array.isArray(link.body.downgrades) ? link.body.downgrades.map((code) => `DOWNGRADE:${String(code)}`) : [])],
           evidence: [{ refKind: ref.refKind, refId: ref.refId, sha256: ref.sha256, status: ref.status, trustTier: ref.trustTier, reasonCodes: ref.reasonCodes,
             lane: "observed", claimKind: "observed" }],
-          nextAction: { label: `Context plugin sha256 present in the runtime's frame (observed from the EFFECTIVE_POLICY row); ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
+          nextAction: { label: `The plugin's exact text is in the session's signed user/message row ${String(link.body.snapshotEventId)} (AMC's check `
+            + `${recheck === "resolved" ? "at the probe and again at Review" : "at the probe"}); the EFFECTIVE_POLICY row is the observed ref that the policy reached the `
+            + `runtime; ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
   return [
     item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
       "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),
