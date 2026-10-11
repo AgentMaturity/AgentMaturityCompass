@@ -766,7 +766,8 @@ export function retireProject(store: A4Store, projectId: string, input: A4Call &
  * ACKNOWLEDGED (owner; D-21, design §7 item 6): an acknowledgeable WAITING item stays WAITING with OWNER_ACKNOWLEDGED for
  * 90 days and is bound into the next gate's intent; a BLOCKED item is never acknowledged. Record it before the request.
  * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, and `plan_activated`
- * only while its activation is deferred (PLAN_ACTIVATION_DEFERRED), so no acknowledgement is recorded that would not count.
+ * only from Review on while its activation is deferred (PLAN_ACTIVATION_DEFERRED), so no acknowledgement is recorded
+ * that would not count.
  */
 export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; itemId: string; reason: string; expectedHeadSeq: number }): A4TransitionResult {
   if (!ACKNOWLEDGEABLE_ITEMS.includes(input.itemId)) throw fail(400, "INPUT_INVALID", `${input.itemId} cannot be acknowledged`);
@@ -777,7 +778,9 @@ export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call
     if (!acknowledgeable(target, isRegulated(state, query.floor))) {
       throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", input.itemId === "plan_unresolved"
         ? "A regulated project activates only a ready plan: answer the missing facts; an owner's out-of-scope does not settle them."
-        : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
+        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)
+          ? `${input.itemId} is acknowledged after Review: every step before it records a new revision, and an acknowledgement counts only on its own.`
+          : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
     }
     return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS } };
   }, "a4 acknowledge");

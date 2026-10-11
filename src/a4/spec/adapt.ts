@@ -202,16 +202,22 @@ export function reached(state: A4ReadinessState, step: A4Step): boolean {
   return A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
 
+/** The consumption of an Adapt completion gate on `revisionNo`, or undefined while none is consumed. */
+export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: number): A4ReadinessState["chain"][number] | undefined {
+  const gateIds = new Set(state.gates.filter((row) => row.stage === "adapt" && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
+  return state.chain.find((link) => link.kind === "GATE_CONSUMED" && typeof link.body.gateId === "string" && gateIds.has(link.body.gateId));
+}
+
 /**
- * The owner acknowledgement of `itemId` on `revisionNo` (the head by default): the newest one, unexpired at `now`, as the
- * evaluator reads it. Once an Adapt completion gate on that revision is consumed, the one in force at the consumption
- * (recorded before it, unexpired then) stays the record, after it expires and after the head moves on (the conformance
- * statement P1-62 binds). Null when none.
+ * The owner acknowledgement of `itemId` on `revisionNo` (the head by default). Once an Adapt completion gate on that
+ * revision is consumed, the one in force at the consumption (recorded before it, unexpired then) stays the record, after
+ * it expires and after the head moves on (the conformance statement P1-62 binds). Before that, the newest one unexpired at
+ * `now`, whether or not the evaluator counts it (acknowledgeable): conformanceView reads the evaluated item's
+ * `acknowledged` there instead. Null when none.
  */
 export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no):
   { by: string; ts: number; reason: string; expiresTs: number } | null {
-  const gateIds = new Set(state.gates.filter((row) => row.stage === "adapt" && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
-  const consumed = state.chain.find((link) => link.kind === "GATE_CONSUMED" && typeof link.body.gateId === "string" && gateIds.has(link.body.gateId));
+  const consumed = adaptCompletionConsumed(state, revisionNo);
   const asOf = consumed === undefined ? now : typeof consumed.body.ts === "number" ? consumed.body.ts : Number.POSITIVE_INFINITY;
   const link = [...state.chain].reverse().find((candidate) => candidate.kind === "ACKNOWLEDGED" && candidate.body.itemId === itemId
     && candidate.revisionNo === revisionNo && (consumed === undefined || candidate.seq < consumed.seq));
@@ -222,12 +228,11 @@ export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: 
 
 /**
  * The owner-settled requirements (design §10.3 Exceptions): each mandatory requirement the plan leaves unresolved, under
- * the owner's acknowledgement of `plan_unresolved` on `revisionNo` (acknowledgementOf). They stay `unresolved` in the
- * plan and in every count; P2-24 owns a true exception.
+ * `ack`, the owner's acknowledgement of `plan_unresolved`. They stay `unresolved` in the plan and in every count; P2-24
+ * owns a true exception.
  */
-export function ownerOutOfScope(state: A4ReadinessState, plan: CompiledPlan | null, now: number, revisionNo = state.project.revision_no):
+export function ownerOutOfScope(plan: CompiledPlan | null, ack: { by: string; ts: number; reason: string } | null):
   Array<{ controlId: string; by: string; ts: number; reason: string }> {
-  const ack = acknowledgementOf(state, "plan_unresolved", now, revisionNo);
   if (ack === null || plan === null) return [];
   return plan.requirements.filter((row) => row.mandatory && row.applicability === "unresolved").map((row) => ({ controlId: row.controlId, by: ack.by, ts: ack.ts, reason: ack.reason }));
 }
@@ -284,7 +289,7 @@ function planItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Recor
   const missingFacts = [...new Set(plan.requirements.flatMap((row) => row.missingFacts))].sort();
   const mandatory = unresolved.filter((row) => row.mandatory);
   const conflicts = plan.conflicts.filter((conflict) => conflict.resolution === "unresolved");
-  const settled = ownerOutOfScope(state, plan, query.now);
+  const settled = ownerOutOfScope(plan, acknowledgementOf(state, "plan_unresolved", query.now));
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const boundLock = revision === undefined ? null : flatSlots(JSON.parse(revision.resource_digests_json))["plan.lockDigest"] ?? null;
   const lockMoved = query.live.driftedSlots?.includes("plan.lockDigest") === true || (boundLock !== null && boundLock !== lockDigestOf(plan.lock));
@@ -320,9 +325,11 @@ export const profileIdOf = (projectId: string): string => `a4-${projectId}`;
  * completes with the plan signed and not activated (PLAN_SIGNED_NOT_ACTIVATED, once Build signed it); an owner may still
  * open the effect before completing. A regulated project's activation is deferred only when activateControlPlan is
  * certain to refuse it as a weakening of another profile's active plan (the workspace has one active plan for every
- * agent): `plan_activated` then waits with PLAN_ACTIVATION_DEFERRED, mandatory from Review on, until an owner
- * acknowledges it with a reason (the only state of it an owner acknowledges, recorded on the conformance statement).
- * Another profile's plan this one does not weaken, or weakenings not known, leave activation due. Whenever activation is
+ * agent), as read at the journal head the head revision binds, unmoved since (until this cycle's completion gate is
+ * consumed): `plan_activated` then waits with PLAN_ACTIVATION_DEFERRED, mandatory from Review on, until an owner
+ * acknowledges it with a reason (the only state of it an owner acknowledges, and only from Review on; recorded on the
+ * conformance statement). Another profile's plan this one does not weaken, weakenings not known, or a read at another
+ * head leave activation due. Whenever activation is
  * due, deferred or opened, a plan activateControlPlan is certain to refuse reads BLOCKED from Review on, before any gate
  * is consumed (before Review, a WAITING item that is not mandatory, so it never holds the direction gate): a blocked
  * plan (the ready-plan floor holds for every regulated project), or, when due or opened, one weaker than the
@@ -355,16 +362,26 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
   // a plan weaker than it (Adapt never passes allowWeakening), so another profile's active plan is named up front.
   // Review's read of this build, else Understand's; an unknown profile (unreadable, not recorded) counts as this project's.
   const facts = understandingOf(spec)?.facts;
-  const active = (review?.head !== undefined ? review.head.activePlan : facts?.activePlan) as { planDigest?: unknown; profileId?: unknown } | null | undefined;
+  const active = (review?.head !== undefined ? review.head.activePlan : facts?.activePlan) as { planDigest?: unknown; profileId?: unknown; entrySha256?: unknown }
+    | null | undefined;
   const otherProfile = typeof active?.profileId === "string" && active.profileId !== profileIdOf(state.project.project_id);
   const replaces = [...(typeof active?.planDigest === "string" && active.planDigest !== plan?.digest ? ["REPLACES_ACTIVE_PLAN"] : []),
     ...(otherProfile ? ["ACTIVE_PLAN_OF_ANOTHER_PROFILE"] : [])];
   const weakens = review?.head?.weakensActive ?? (plan === null ? undefined : facts?.activationWeakenings);
   const refusal = Array.isArray(weakens) ? (weakens.length === 0 ? null : ["PLAN_WEAKENS_ACTIVE_PLAN", `WEAKENINGS:${weakens.length}`])
     : weakens === undefined || weakens === null ? null : ["ACTIVE_PLAN_UNREADABLE"];
-  // Deferred only for a certain refusal: another profile's plan this one weakens. With none recorded, or an unreadable
-  // journal, activation stays due (and BLOCKED when it is certain to fail for another reason).
-  const deferred = regulated && otherProfile && refusal?.[0] === "PLAN_WEAKENS_ACTIVE_PLAN";
+  // Deferred only for a certain refusal: another profile's plan this one weakens, read at the journal head the head
+  // revision binds (the record is read before the transaction that binds the slot) and unmoved since; drift not read is
+  // not certain. With none recorded, another head, or an unreadable journal, activation stays due (and BLOCKED when it
+  // is certain to fail for another reason). Once this cycle's completion gate is consumed the head check no longer
+  // applies: complete read this item under it, and a head that moves later (any activation in the workspace) does not
+  // turn a settled stage BLOCKED.
+  const headRevision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
+  const boundHead = headRevision === undefined ? null : flatSlots(JSON.parse(headRevision.resource_digests_json))["plan.journalEntrySha256"] ?? null;
+  const drifted = query.live.driftedSlots;
+  const atBoundHead = typeof active?.entrySha256 === "string" && active.entrySha256 === boundHead && drifted !== null
+    && !drifted.includes("plan.journalEntrySha256");
+  const deferred = regulated && otherProfile && refusal?.[0] === "PLAN_WEAKENS_ACTIVE_PLAN" && (atBoundHead || consumed !== undefined);
   const due = (regulated && !deferred) || opened !== undefined;
   const blocker: Fields | null = finished ? null
     : (regulated || opened !== undefined) && plan !== null && plan.status !== "ready" ? { kind: "evidence_missing", reasonCodes: ["PLAN_BLOCKED", `PLAN_STATUS:${plan.status}`],
@@ -400,7 +417,9 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
           : deferred ? waiting("plan_activated", [PLAN_ACTIVATION_DEFERRED, ...replaces, ...refusal!], { kind: "review_pending", mandatory: reached(state, "reviewed"),
             nextAction: { label: "Another profile's plan is active, and this one would weaken it, so activateControlPlan refuses it (a workspace has one active plan for "
               + "every agent until per-agent plans exist). A regulated project completes with its plan signed, not activated, only once an owner acknowledges this "
-              + "item with a reason (Acknowledge, before requesting the completion gate); the conformance statement records it" } })
+              + (reached(state, "reviewed") ? "item with a reason (Acknowledge, before requesting the completion gate)"
+                : "item with a reason after Review (each step before it records a new revision, and an acknowledgement counts only on its own), before requesting the completion gate")
+              + "; the conformance statement records it" } })
             : build === null ? waiting("plan_activated", ["PRODUCED_AT_BUILD", ...replaces], { mandatory: false,
               nextAction: { label: "Build signs the plan; this project then completes with it signed, not activated, unless an owner opens the activation" } })
               : item("plan_activated", "READY", { reasonCodes: ["PLAN_SIGNED_NOT_ACTIVATED", ...replaces], nextAction: { label: signedNotActivated } })

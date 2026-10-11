@@ -293,9 +293,12 @@ function nextActionHtml(next) {
 /** The items Studio's acknowledgeItem accepts (ACKNOWLEDGEABLE_ITEMS, src/a4/a4Readiness.ts); any other is 400 INPUT_INVALID. */
 const ACKNOWLEDGEABLE = new Set(["lineage.independent_approvals", "sod.self_provisioned", "regulatory_sources_status", "deployment.amc_check",
   "plan_unresolved", "path_supported", "unsupported_acknowledged", "context_probe_unavailable", "plan_activated"]);
-/** acknowledgeable (src/a4/a4Readiness.ts) as the item's codes show it: plan_activated only when deferred, plan_unresolved never when regulated. */
+/**
+ * acknowledgeable (src/a4/a4Readiness.ts) as the item shows it: plan_activated only when deferred and mandatory (from Review on),
+ * plan_unresolved never when regulated.
+ */
 const acknowledgeable = (item) => ACKNOWLEDGEABLE.has(item.id) && !item.reasonCodes.includes("REGULATED_READY_PLAN_ONLY")
-  && (item.id !== "plan_activated" || item.reasonCodes.includes("PLAN_ACTIVATION_DEFERRED"));
+  && (item.id !== "plan_activated" || (item.mandatory === true && item.reasonCodes.includes("PLAN_ACTIVATION_DEFERRED")));
 
 /** A failed or lost effect's retry (readiness names the attempt and the route); disabled, with Studio's reasons, for anyone but an owner. */
 function retryButton(item, allowed) {

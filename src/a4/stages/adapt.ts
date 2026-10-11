@@ -47,8 +47,8 @@ import {
   understandAdapt
 } from "../adaptPolicy.js";
 import {
-  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, acknowledgementOf, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, adaptItems, adaptSpecOf,
-  answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, ownerOutOfScope, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
+  ACTIVATE_PLAN_EFFECT_ID, ADAPT_CLAIM_BOUNDARY, ADAPT_SPEC_SCHEMA, CARRIED, CATALOG_EXPERIMENTAL_NOTICE, NATIVE_LEASE_KEY, QUESTIONS, adaptItems, adaptSpecOf,
+  answerGaps, buildOf, carriedValues, currentPlan, factAnswer, factList, profileIdOf, proposedFor, proposedPlan, understandingOf, type AdaptBuild
 } from "../spec/adapt.js";
 import { answersDigestOf, answerValues, dependencyDigest, listValue, textValue, understandingCurrent } from "../spec/aspire.js";
 
@@ -201,11 +201,11 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
     { id: "activation", sources: ["activateControlPlan", "compiledPolicyGuard", NATIVE_LEASE_KEY], dataStatus: null,
       novice: activation === "regulated" ? "Because this project is regulated, completing Adapt switches the plan on for the whole workspace, after a second, separate approval."
         : activation === "active_elsewhere" ? "Another plan is already switched on for this workspace, a workspace has one plan for every agent, and this plan would weaken it, "
-          + "so it cannot be switched on: it stays signed but not switched on, and a project owner records that, with a reason, before completing."
+          + "so it cannot be switched on: it stays signed but not switched on, and a project owner records that, with a reason, after Review and before completing."
           : "The plan is signed but not switched on by default. Switching it on is a separate owner step and affects every agent in the workspace.",
       practitioner: `${activation === "regulated" ? `Regulated: completion runs ${ACTIVATE_PLAN_EFFECT_ID}, which an owner opens before completing. `
         : activation === "active_elsewhere" ? `Regulated, but another profile's plan is active and this plan weakens it (one active plan for every agent), so ${ACTIVATE_PLAN_EFFECT_ID} `
-          + "is refused: plan_activated waits (PLAN_ACTIVATION_DEFERRED) until an owner acknowledges it with a reason, recorded on the conformance statement, and "
+          + "is refused: plan_activated waits (PLAN_ACTIVATION_DEFERRED) until an owner acknowledges it with a reason after Review, recorded on the conformance statement, and "
           + "completion then leaves this plan signed, not activated. "
           : `Not regulated: completion leaves the plan signed, not activated; an owner may open ${ACTIVATE_PLAN_EFFECT_ID} before completing. `}`
         + "Under an active plan with L0-IDN-01 every native tool call needs a verified lease: Studio native tasks with workspace tools started after activation get one (P1-67); tasks started before it, CLI agent sessions and delegated children do not and are denied.",
@@ -506,16 +506,18 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const created = ctx.state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const conformance = recordControlResults({ workspace: ctx.workspace, projectId: project.project_id, workspaceId: project.workspace_id, agentId: project.agent_id,
     plan, catalog: loadCatalog(), windowStartTs: typeof created === "number" ? created : project.created_ts, now: ctx.now });
-  // As of this review: an owner's out_of_scope recorded later on the reviewed revision is read live by readiness and the cards.
+  // Review records a new revision, and an acknowledgement counts only on its own: none that counts on the reviewed
+  // revision exists yet, so the owner's out-of-scope and the two acknowledgements are left empty here; the conformance
+  // view fills them live from that revision (conformanceView), never from this record.
   const reviewed = ctx.state.revisions.find((row) => row.revision_no === project.revision_no);
   const rule = gatePolicyOf(ctx.state.chain).gates["adapt.completion"];
   const statement = conformanceStatement({ stage: "adapt", revisionDigest: reviewed?.spec_digest ?? sha256Hex(canonicalize(spec)), stored: conformance,
-    evaluatedAt: new Date(ctx.now).toISOString(), ownerOutOfScope: ownerOutOfScope(ctx.state, plan, ctx.now),
+    evaluatedAt: new Date(ctx.now).toISOString(), ownerOutOfScope: [],
     unsupported: plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`), missingFacts: [...(understandingOf(spec)?.facts.followUps ?? [])],
     expertReview: { required: rule.requiredReviews.some((entry) => entry.kind === "review_record"),
       records: ctx.state.refs.filter((ref) => ref.revisionNo === project.revision_no && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
-      acknowledgement: acknowledgementOf(ctx.state, "regulatory_sources_status", ctx.now) },
-    activationAcknowledgement: acknowledgementOf(ctx.state, "plan_activated", ctx.now), claimBoundary: ADAPT_CLAIM_BOUNDARY, now: ctx.now });
+      acknowledgement: null },
+    activationAcknowledgement: null, claimBoundary: ADAPT_CLAIM_BOUNDARY, now: ctx.now });
   let head: Record<string, unknown>;
   try {
     const active = activePlanRecord(ctx.workspace);

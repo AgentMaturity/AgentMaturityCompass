@@ -30,12 +30,12 @@ import { checkDigestSignature, loadTrustContext } from "../trust/index.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
-import type { A4ReadinessState } from "./a4Readiness.js";
+import type { A4ReadinessItem, A4ReadinessState } from "./a4Readiness.js";
 import { a4ConformanceStatementV1Schema, gatePolicyOf, type A4ConformanceStatementV1, type A4Stage } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
 import { errorCodeOf } from "./aspireUnderstand.js";
 import { plainPath } from "./assembleConnect.js";
-import { acknowledgementOf, ADAPT_CLAIM_BOUNDARY, ownerOutOfScope, proposedPlan, understandingOf } from "./spec/adapt.js";
+import { acknowledgementOf, adaptCompletionConsumed, ADAPT_CLAIM_BOUNDARY, ownerOutOfScope, proposedPlan, understandingOf } from "./spec/adapt.js";
 
 const NO_LOADER = "NO_EVIDENCE_LOADER: no A4 loader binds runtime rows to this control's evidence contracts yet";
 const NOT_IN_CATALOG = "CONTROL_NOT_IN_SHIPPED_CATALOG: the shipped catalog has no record of this control at this version";
@@ -334,11 +334,14 @@ export function controlResultsNow(workspace: string, state: Pick<A4ReadinessStat
  * GET …/conformance (design §10.5): the stage's statement. Adapt's is rebuilt from the control results its newest
  * revision's Review recorded, with the results file checked again now (a file edited, deleted or no longer verifying
  * reads not_evaluated with its reason), and with the owner's out-of-scope settlements, the sources acknowledgement and
- * the deferred-activation acknowledgement recorded on that revision (kept as the completion gate consumed them, even once they expire). A record that does not
- * parse counts as none. Every other stage, and Adapt before its Review, carries no plan and says not_evaluated
- * (Activate's own statement is P1-62's).
+ * the deferred-activation acknowledgement on that revision: while it is the head and its completion gate is not
+ * consumed, only those the readiness evaluator counts (`counted`, Adapt's evaluated items: acknowledgeable decides);
+ * once that gate is consumed, or the head moved past it, the ones in force at the consumption, even once they expire
+ * (acknowledgementOf). Review stores none of them. A record that does not parse counts as none. Every other stage, and
+ * Adapt before its Review, carries no plan and says not_evaluated (Activate's own statement is P1-62's).
  */
-export function conformanceView(workspace: string, state: A4ReadinessState, stage: A4Stage, now: number): A4ConformanceStatementV1 {
+export function conformanceView(workspace: string, state: A4ReadinessState, stage: A4Stage, now: number,
+  counted: () => readonly Pick<A4ReadinessItem, "id" | "acknowledged">[]): A4ConformanceStatementV1 {
   const revision = state.revisions.filter((row) => row.stage === stage).at(-1) ?? state.revisions.at(-1);
   const revisionDigest = revision?.spec_digest ?? sha256Hex("");
   const spec = revision === undefined ? {} : JSON.parse(revision.spec_json) as Record<string, unknown>;
@@ -347,13 +350,16 @@ export function conformanceView(workspace: string, state: A4ReadinessState, stag
   const plan = stage === "adapt" ? proposedPlan(spec) : null;
   const revisionNo = revision?.revision_no ?? state.project.revision_no;
   const required = gatePolicyOf(state.chain).gates["adapt.completion"].requiredReviews.some((entry) => entry.kind === "review_record");
+  const items = stage === "adapt" && revisionNo === state.project.revision_no && adaptCompletionConsumed(state, revisionNo) === undefined ? counted() : null;
+  const ackOf = (itemId: string) => stage !== "adapt" ? null
+    : items === null ? acknowledgementOf(state, itemId, now, revisionNo) : items.find((entry) => entry.id === itemId)?.acknowledged ?? null;
   return conformanceStatement({ stage, revisionDigest, stored, evaluatedAt: new Date(now).toISOString(),
-    ownerOutOfScope: stored === null ? [] : ownerOutOfScope(state, plan, now, revisionNo),
+    ownerOutOfScope: stored === null ? [] : ownerOutOfScope(plan, ackOf("plan_unresolved")),
     unsupported: stored === null || plan === null ? [] : plan.unsupported.map((row) => `${row.controlId}: ${row.reason}`),
     missingFacts: stored === null ? [] : [...(understandingOf(spec)?.facts.followUps ?? [])],
     expertReview: { required: stage === "adapt" && required,
       records: stored === null ? [] : state.refs.filter((ref) => ref.revisionNo === revisionNo && ref.lane === "verified").map((ref) => `${ref.refKind}:${ref.refId}`),
-      acknowledgement: stage === "adapt" ? acknowledgementOf(state, "regulatory_sources_status", now, revisionNo) : null },
-    activationAcknowledgement: stage === "adapt" ? acknowledgementOf(state, "plan_activated", now, revisionNo) : null,
+      acknowledgement: ackOf("regulatory_sources_status") },
+    activationAcknowledgement: ackOf("plan_activated"),
     claimBoundary: stored === null ? NO_PLAN_BOUNDARY : ADAPT_CLAIM_BOUNDARY, now });
 }

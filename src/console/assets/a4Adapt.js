@@ -95,7 +95,7 @@ function renderActivation(ctx) {
     not activated unless an owner opens it before completing (once the gate is consumed without it, it can no longer be opened there). Once a plan is
     active the project is regulated, and a workspace has one active plan for every agent: a plan weaker than the active one (another agent's) is
     refused before the review is filed. While another profile's active plan refuses it, a regulated project completes with its plan signed, not
-    activated, only once an owner acknowledges <code>plan_activated</code> with a reason (<code>PLAN_ACTIVATION_DEFERRED</code>); the conformance
+    activated, only once an owner acknowledges <code>plan_activated</code> with a reason after Review (<code>PLAN_ACTIVATION_DEFERRED</code>); the conformance
     statement records that acknowledgement.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
       native tasks with workspace tools started after activation run under a lease Studio mints (P1-67); tasks started before it, CLI agent sessions

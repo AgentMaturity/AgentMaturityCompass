@@ -49,7 +49,7 @@ export const ACKNOWLEDGEABLE_ITEMS: readonly string[] = ["lineage.independent_ap
   "path_supported", "unsupported_acknowledged",
   // Adapt (P1-61): only on a JSONL session store, where the context probe cannot be recorded (src/a4/adaptContextPlugin.ts).
   "context_probe_unavailable",
-  // Adapt (P1-61): only while it carries PLAN_ACTIVATION_DEFERRED (acknowledgeable below), never while activation is due.
+  // Adapt (P1-61): only from Review on while it carries PLAN_ACTIVATION_DEFERRED (acknowledgeable below), never while activation is due.
   "plan_activated"];
 export const ACKNOWLEDGEMENT_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 /**
@@ -61,11 +61,12 @@ export const PLAN_ACTIVATION_DEFERRED = "PLAN_ACTIVATION_DEFERRED";
 /**
  * Whether an owner acknowledgement counts for `candidate` as evaluated now (and may be recorded): a WAITING item of
  * ACKNOWLEDGEABLE_ITEMS, except `plan_unresolved` while the project is regulated (it activates only a ready plan) and
- * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED. The evaluator and acknowledgeItem both decide by it.
+ * `plan_activated` in any state but PLAN_ACTIVATION_DEFERRED while mandatory (from Review on: every earlier step records
+ * a new revision, and an acknowledgement counts only on its own). The evaluator and acknowledgeItem both decide by it.
  */
-export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes">, regulated: boolean): boolean {
+export function acknowledgeable(candidate: Pick<A4ReadinessItem, "id" | "status" | "reasonCodes" | "mandatory">, regulated: boolean): boolean {
   return candidate.status === "WAITING" && ACKNOWLEDGEABLE_ITEMS.includes(candidate.id) && !(regulated && candidate.id === "plan_unresolved")
-    && (candidate.id !== "plan_activated" || candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED));
+    && (candidate.id !== "plan_activated" || (candidate.mandatory && candidate.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)));
 }
 /** Decided by this gate's own votes; never bound (design §7 item 7), so a first APPROVE never stales the second. */
 const GATE_DERIVED = new Set(["gate.direction", "gate.completion", "gate.required_reviews", "approvals.fresh", "sod"]);
