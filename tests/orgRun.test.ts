@@ -1,13 +1,15 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { mkdtempSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { handleApiRoute } from "../src/api/index.js";
 import { loadEpisodeRecord } from "../src/lifecycle/episodeRecord.js";
 import { loadLifecycleRunArtifact } from "../src/lifecycle/lifecycleRunArtifact.js";
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, parseOrgRoleList, redactOrgRunArtifact, runOrg } from "../src/org/orgRun.js";
+import { lockVault } from "../src/vault/vault.js";
+import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
 
@@ -56,6 +58,7 @@ async function callApi(params: {
 }
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   while (roots.length > 0) {
     const dir = roots.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -63,6 +66,30 @@ afterEach(() => {
 });
 
 describe("autonomous org runner", () => {
+  // The Vault surface used to say "signed" whenever AMC_VAULT_PASSPHRASE was set, before any signing call ran.
+  test.each(["signed", "signing fails"] as const)("the Vault surface reports only signatures the signing calls returned (%s)", (outcome) => {
+    const ws = workspace();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "org-run-vault-passphrase");
+    initWorkspace({ workspacePath: ws, trustBoundaryMode: "isolated" });
+    if (outcome === "signing fails") {
+      lockVault(ws);
+      vi.stubEnv("AMC_VAULT_PASSPHRASE", "not-this-vaults-passphrase"); // set, so a guess from the env says "signed"
+    }
+    const out = runOrg({ workspace: ws, orgRunId: "org-vault-surface", roles: parseOrgRoleList("REV_QA_LEAD"),
+      goal: "Check the signing claim.", heartbeatPolicy: { intervalMinutes: 5, maxStaleMinutes: 15, plateauAfterHeartbeats: 1 } });
+    const vault = out.artifact.surfaces.Vault;
+    for (const ref of vault.refs) expect(existsSync(ref), ref).toBe(true);
+    if (outcome === "signed") {
+      expect(out.signaturePath).toBeTruthy();
+      expect(vault.status).toBe("complete");
+      expect(vault.refs).toEqual([out.artifact.roles[0]!.lifecycleArtifactRef.signaturePath, out.artifact.parentLifecycleArtifactRef.signaturePath]);
+    } else {
+      expect(out.signaturePath).toBeNull();
+      expect(existsSync(`${out.artifactPath}.sig`)).toBe(false);
+      expect(vault).toMatchObject({ status: "degraded", refs: [] });
+    }
+  });
+
   test("creates isolated role workspaces with parent and child lifecycle evidence", () => {
     const ws = workspace();
     const out = runOrg({
