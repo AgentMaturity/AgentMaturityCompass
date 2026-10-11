@@ -33,7 +33,7 @@ import { journaledLeaseIds, writeReleaseRecord } from "./a4Package.js";
 import { isRegulated, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import { a4ReleaseV1Schema, a4RollbackReceiptV1Schema, type A4ChainLink } from "./a4Schema.js";
 import { A4StoreError, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, ROLLBACK_EFFECT_ID, rollbackExecutionId } from "./spec/activate.js";
+import { currentRelease, effectUnsettled, PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, ROLLBACK_EFFECT_ID, rollbackExecutionId } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const FROZEN_CLASSES: ActionClass[] = ["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
@@ -62,9 +62,26 @@ function releaseAndGate(state: A4ReadinessState, releaseId: string): { release: 
 }
 
 /**
+ * A rollback names the release running in its environment on `chain` (409 ROLLBACK_RELEASE_NOT_RUNNING otherwise): in
+ * production the one productionReleaseOf names, in staging this cycle's release. A release a later one superseded would
+ * restore a snapshot older than what runs, and its operator row would move deployed_release_id backwards. Its target
+ * rolled back since is refused too (ROLLBACK_TARGET_ROLLED_BACK). Checked at the preview and again as the attempt starts.
+ */
+function assertRollbackCurrent(chain: readonly A4ChainLink[], releaseId: string, toReleaseId: string | null, environment: string): void {
+  const running = environment === "production" ? productionReleaseOf(chain) : currentRelease(chain)?.body.releaseId ?? null;
+  if (running !== releaseId) {
+    throw fail(409, "ROLLBACK_RELEASE_NOT_RUNNING", `release ${releaseId} is not the release running in ${environment}; only that one rolls back there`, { running });
+  }
+  if (toReleaseId !== null && chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === toReleaseId)) {
+    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `release ${toReleaseId}, the rollback target, was itself rolled back`);
+  }
+}
+
+/**
  * What a rollback of `releaseId` would do now (design §10.4 Rollback preview); the engine request binds its digest. The
- * target is the record's rollback block (the release running in production when this one was built), never merely the
- * previous RELEASE; a target rolled back since is refused (ROLLBACK_TARGET_ROLLED_BACK).
+ * release must be the one running in `environment` (assertRollbackCurrent). The target is the record's rollback block (the
+ * release running in production when this one was built), never merely the previous RELEASE; a target rolled back since
+ * is refused (ROLLBACK_TARGET_ROLLED_BACK).
  */
 function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, environment: string): Record<string, unknown> {
   const { release } = releaseAndGate(state, releaseId);
@@ -73,9 +90,7 @@ function previewOf(store: A4Store, state: A4ReadinessState, releaseId: string, e
   if (row === undefined) throw fail(409, "RELEASE_RECORD_MISSING", `release ${releaseId} has no release record`);
   const record = a4ReleaseV1Schema.parse({ ...JSON.parse(String(row.surfaces_json)) as Record<string, unknown>, envelope: JSON.parse(String(row.envelope_json)) });
   const toReleaseId = record.rollback.releaseId;
-  if (toReleaseId !== null && state.chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === toReleaseId)) {
-    throw fail(409, "ROLLBACK_TARGET_ROLLED_BACK", `release ${toReleaseId}, the rollback target, was itself rolled back`);
-  }
+  assertRollbackCurrent(state.chain, releaseId, toReleaseId, environment);
   const to = toReleaseId === null ? undefined : state.chain.find((link) => link.kind === "RELEASE" && link.body.releaseId === toReleaseId);
   const confirmManifestId = typeof to?.body.enforceManifestId === "string" ? to.body.enforceManifestId : null;
   const minted = mintedLeases(state.chain, releaseId);
@@ -131,7 +146,8 @@ export function previewRollback(store: A4Store, projectId: string, releaseId: st
  * effect, settled first as process_lost); the grant's quorum is verified only while it is unconsumed and its counted keys
  * recorded on EFFECT_STARTED (one this rollback's own execution consumed already proved it, as retryEffect treats it, and
  * a confirmer it counted is 409 SOD_VIOLATION; one another execution consumed is GRANT_ALREADY_USED);
- * EFFECT_STARTED (owner pid and host, heartbeat) and its liveness row commit pinned to `expectedHeadSeq`, refused while
+ * EFFECT_STARTED (owner pid and host, heartbeat) and its liveness row commit pinned to `expectedHeadSeq`, refused unless the
+ * release still runs in the confirmed environment and its target was not rolled back (assertRollbackCurrent), and while
  * another attempt runs or the deployment approval's production-lease effect does (409 EFFECT_RUNNING: a lease it minted
  * after this read would outlive the rollback). Only then: the engine grant consumed as step 0, the freeze,
  * the Enforce restore, every lease of the release revoked (read again now: the preview's, a production lease minted after
@@ -193,6 +209,9 @@ export function rollbackRelease(store: A4Store, projectId: string, releaseId: st
   const started = store.transition(projectId, principal, ({ ts }) => {
     const chain = store.readChain(projectId);
     if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw fail(409, "ROLLBACK_RECORDED", `release ${releaseId} was already rolled back`);
+    // The preview's checks again on the rows this transaction reads: a production deploy of a later release since then
+    // superseded this one, and its target may have been rolled back since.
+    assertRollbackCurrent(chain, releaseId, body.toReleaseId, body.environment);
     if (effectUnsettled(chain, (started) => started.executionId === executionId)) {
       throw fail(409, "EFFECT_RUNNING", "Another attempt of this rollback is still running; retry once it has settled.");
     }

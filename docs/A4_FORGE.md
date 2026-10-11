@@ -476,7 +476,9 @@ or `TARGET_MISMATCH`. No lease is issued and no runtime run is created. A succee
 moves the project's `deployedReleaseId`; a succeeded production rollback row moves it to the release rolled back to. A
 rollback row records the one rollback the approvers approved: it names that rollback's environment
 (`ROLLBACK_ENVIRONMENT_MISMATCH` otherwise), and it is refused once a succeeded row of that rollback is recorded
-(`ROLLBACK_ROW_RECORDED`) or a succeeded production deploy followed the rollback (`ROLLBACK_SUPERSEDED`). Whoever
+(`ROLLBACK_ROW_RECORDED`) or a succeeded production deploy followed the rollback (`ROLLBACK_SUPERSEDED`). A production
+rollback row is also `ROLLBACK_SUPERSEDED` unless the rolled-back release is the one production ran (read without that
+rollback), so it never moves `deployedReleaseId` back past a later release's production deploy. Whoever
 records a deploy receipt counts as a builder of the revision: the deployment approval rests on their statement, so they
 cannot approve it (`builder_not_completion_approver`) and are among its excluded keys.
 
@@ -496,12 +498,14 @@ columns, for example "recorded: succeeded; AMC check: reachable, release identit
 
 Rollback is its own effect gate. `POST …/releases/:rid/rollback/preview { environment }` (owner) previews it and opens
 `a4.activate.rollback`, a DEPLOY engine request on the release's direction gate that approvers decide under A4's
-separation of duties. The preview names the rollback target from the release record (the release that ran in
-production when this one was built, never merely the previous release; 409 `ROLLBACK_TARGET_ROLLED_BACK` when it was
-rolled back since), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
+separation of duties. Only the release running in the chosen environment rolls back: in production the newest one
+with a succeeded production deploy that was not rolled back, in staging this cycle's release (409
+`ROLLBACK_RELEASE_NOT_RUNNING` otherwise, so a release a later one superseded never restores an older snapshot). The
+preview names the rollback target from the release record (the release that ran in production when this one was built,
+never merely the previous release; 409 `ROLLBACK_TARGET_ROLLED_BACK` when it was rolled back since), its Enforce manifest, the leases, the prepared commands and whether a freeze comes first. `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
-pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, and a second attempt while one runs is refused
-(`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
+pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, on rows that still pass both preview refusals
+above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
 to mint (`RELEASE_ROLLED_BACK`) once a rollback of the release has started (any attempt, settled or not: a failed one may
 already have consumed its grant and restored the Enforce snapshot), so no lease is minted beside a rollback. Then
 it runs these steps:

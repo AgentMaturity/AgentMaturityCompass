@@ -22,7 +22,7 @@ import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
-import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, releaseDestination, rollbackStarted, rolledBack } from "./spec/activate.js";
+import { currentRelease, cycleLinks, DESTINATION_REF, IDENTITY_NOT_EVALUATED, productionLeaseOf, productionReleaseOf, releaseDestination, rollbackStarted, rolledBack } from "./spec/activate.js";
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 const json = (value: unknown): Buffer => Buffer.from(`${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -257,7 +257,8 @@ export function revokeStagingAfterDeny(store: A4Store, projectId: string, gateId
  * The checks a receipt passes on one set of rows (before anything is written, and again on the rows the transaction
  * read): the release and its target, the same-host rule, operator times inside the skew bound, the package digest and
  * the lease ids its effects minted (a rollback row: the release it rolled back to, in the rollback's own environment,
- * once, before any later production deploy). Returns where `deployed_release_id` moves, if anywhere (production only).
+ * once, before any later production deploy, and in production only while the rolled-back release is the one production
+ * ran). Returns where `deployed_release_id` moves, if anywhere (production only).
  */
 function deploymentChecks(state: A4ReadinessState, releaseId: string, body: DeploymentBody, now: number): { deployed: string | null | undefined } {
   const release = releaseLink(state.chain, releaseId);
@@ -305,6 +306,11 @@ function deploymentChecks(state: A4ReadinessState, releaseId: string, body: Depl
   }
   if (since.some((link) => link.body.deploymentKind === "deploy" && link.body.environment === "production")) {
     throw fail(409, "ROLLBACK_SUPERSEDED", "A production deployment was recorded after this rollback; its row can no longer move the deployed release.");
+  }
+  // A production row moves deployed_release_id only while the rolled-back release is the one production ran, as the chain
+  // read without this ROLLBACK names it: another release's production deploy recorded before the rollback superseded it too.
+  if (body.environment === "production" && productionReleaseOf(state.chain.filter((link) => link.seq !== rollback.seq)) !== releaseId) {
+    throw fail(409, "ROLLBACK_SUPERSEDED", "Another release was deployed to production after the rolled-back one; this row can no longer move the deployed release.");
   }
   const toReleaseId = typeof rollback.body.toReleaseId === "string" ? rollback.body.toReleaseId : null;
   const to = releaseLink(state.chain, toReleaseId);
