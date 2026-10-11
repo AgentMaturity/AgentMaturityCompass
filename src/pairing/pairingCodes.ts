@@ -1,6 +1,6 @@
 import { randomInt, randomUUID, sign, verify } from "node:crypto";
 import { join } from "node:path";
-import { getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseCookieHeader } from "../auth/sessionTokens.js";
@@ -121,7 +121,7 @@ export function claimPairingCode(params: {
     nonce: randomUUID().replace(/-/g, "")
   };
   const payloadBytes = Buffer.from(JSON.stringify(payload), "utf8");
-  const signature = sign(null, payloadBytes, getPrivateKeyPem(params.workspace, "session"));
+  const signature = sign(null, payloadBytes, getSigningKey(params.workspace, "session"));
   return {
     ok: true,
     token: `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`,
