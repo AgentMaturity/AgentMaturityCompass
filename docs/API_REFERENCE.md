@@ -8068,6 +8068,9 @@ Build a signed .amcrelease bundle
 | `--out <file>` | - |
 | `--private-key <path>` | - |
 | `--skip-install-build` | - |
+| `--npm-tarball <file>` | - |
+| `--sbom <file>` | - |
+| `--licenses <file>` | - |
 
 #### `amc release provenance`
 

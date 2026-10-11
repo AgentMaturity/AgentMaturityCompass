@@ -925,7 +925,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
 | `amc release licenses` | Generate dependency license inventory | `--out <file>` | - |
-| `amc release pack` | Build a signed .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build` | - |
+| `amc release pack` | Build a signed .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build`<br>`--npm-tarball <file>`<br>`--sbom <file>`<br>`--licenses <file>` | - |
 | `amc release print` | Print release bundle manifest summary | - | - |
 | `amc release provenance` | Generate AMC provenance record | `--out <file>` | - |
 | `amc release sbom` | Generate deterministic CycloneDX SBOM | `--out <file>` | - |
