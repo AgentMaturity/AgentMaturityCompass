@@ -21,7 +21,7 @@ import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
-import { measurePiInstall } from "../pi/piInstall.js";
+import { clearPiDigestCache, measurePiInstall } from "../pi/piInstall.js";
 import { QUALIFIED_PI_VERSIONS } from "../pi/piVersions.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, controlApprovalPolicy, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID,
@@ -147,6 +147,7 @@ export function installPiHook(options: InstallHookIntegrationOptions, modulePath
   assertAllPathsSafe(workspace, Object.values(paths));
 
   const execute = (): HookMutationResult => {
+    clearPiDigestCache();
     const existing = loadManifest(workspace, paths);
     const extensionBytes = Buffer.from(extensionSource(workspace, mode, modulePath), "utf8");
     const currentSha = fileSha(paths.extension);
@@ -296,6 +297,7 @@ export function removePiHook(options: RemoveHookIntegrationOptions): HookMutatio
   assertAllPathsSafe(workspace, Object.values(paths));
   const dryRun = options.dryRun === true;
   const execute = (): HookMutationResult => {
+    clearPiDigestCache();
     const manifest = loadManifest(workspace, paths);
     if (!manifest) {
       if (existsSync(paths.extension)) throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "refusing to remove .pi/extensions/amc.js without a signed manifest");

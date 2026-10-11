@@ -1,4 +1,4 @@
-import { appendFileSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
@@ -149,6 +149,40 @@ describe("Pi session registration (a lease-holder attestation checked against di
 
     appendFileSync(join(piPackage, "dist", "bundle", "chunks", "runtime.js"), "export const patched = true;\n");
     expect(enforcement("patched-pi")).toEqual({ decision: "deny", reason: expect.stringContaining("not governed"), level: "advisory" });
+  });
+
+  test("the per-call recheck fails closed: same-size rewrite, rename-swap, symlink swap, unreadable file, stat error, deleted file", () => {
+    const workspace = installed();
+    route(workspace, registration());
+    const extensionFile = join(workspace, ".pi", "extensions", "amc.js");
+    const original = readFileSync(extensionFile);
+    let id = 0;
+    const level = () => {
+      const decision = route(workspace, piEnvelope("read", { path: readPath(workspace) }, { toolCallId: `c${(id += 1)}` })) as unknown as { decision: string; receipt: string };
+      const payload = verifyReceipt(decision.receipt, getPurposeKeyHistory(workspace, "receipt")).payload as { enforcement: { level: string } };
+      return `${decision.decision}/${payload.enforcement.level}`;
+    };
+    const restore = () => {
+      rmSync(extensionFile, { force: true });
+      writeFileSync(extensionFile, original);
+      expect(level()).toBe("allow/enforced");
+    };
+    expect(level()).toBe("allow/enforced");
+    // Permission errors cannot be produced as root.
+    const asUser = process.getuid?.() !== 0;
+    const cases: Array<[string, () => void]> = [
+      ...(asUser ? [["unreadable file", () => chmodSync(extensionFile, 0o000)], ["stat error", () => chmodSync(join(workspace, ".pi", "extensions"), 0o000)]] as Array<[string, () => void]> : []),
+      ["same-size rewrite", () => writeFileSync(extensionFile, Buffer.from(original.toString("utf8").replace("Do not edit", "Do NOT edt"), "utf8"))],
+      ["rename-swap", () => { writeFileSync(`${extensionFile}.new`, `${original.toString("utf8").slice(0, -1)} `); renameSync(`${extensionFile}.new`, extensionFile); }],
+      ["symlink swap to identical bytes", () => { writeFileSync(join(workspace, "amc-copy.js"), original); rmSync(extensionFile); symlinkSync(join(workspace, "amc-copy.js"), extensionFile); }],
+      ["deleted file", () => rmSync(extensionFile)],
+    ];
+    for (const [label, swap] of cases) {
+      swap();
+      expect(level(), label).toBe("deny/advisory");
+      chmodSync(join(workspace, ".pi", "extensions"), 0o755);
+      restore();
+    }
   });
 
   test("tampered registrations are refused: a foreign extension digest, a conflicting re-registration, an altered ledger row", () => {

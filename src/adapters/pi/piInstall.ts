@@ -5,7 +5,7 @@
  * package.json and every file in that directory at install, and measures them again when a Pi session registers and
  * when status runs. It is a check that the bound Pi on disk is unchanged, not proof that a session ran it.
  */
-import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { closeSync, constants, existsSync, fstatSync, openSync, readdirSync, readFileSync, realpathSync, type BigIntStats } from "node:fs";
 import { delimiter, dirname, join, relative } from "node:path";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -18,27 +18,61 @@ export interface PiInstall {
   readonly sha256: string;
 }
 
+/** Per process, no expiry: a digest is reused only for a file whose descriptor shows exactly the key it was read under. */
 const digests = new Map<string, { key: string; sha256: string }>();
 
+/** Forget every cached digest (a reinstall or a new registration). */
+export function clearPiDigestCache(): void {
+  digests.clear();
+}
+
+const fileKey = (stat: BigIntStats) => `${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeNs}:${stat.ctimeNs}`;
+
 /**
- * The SHA-256 of `path`, re-read only when its (dev, ino, size, ctime) changes, so a check on every call stays cheap;
- * null when it cannot be read. Any write, rename or replacement changes ctime, which a process cannot set back.
+ * Runs `use` on a descriptor for `path` opened without following a final symlink (and without blocking on a FIFO),
+ * with that descriptor's own stat, only when it is a regular file. Null on any error, a symlink or any other file type.
  */
-export function cachedFileSha256(path: string): string | null {
+function regularFile<T>(path: string, use: (fd: number, stat: BigIntStats) => T | null): T | null {
+  if (constants.O_NOFOLLOW === undefined) return null;
+  let fd: number | undefined;
   try {
-    const stat = statSync(path, { bigint: true });
-    const key = `${stat.dev}:${stat.ino}:${stat.size}:${stat.ctimeNs}`;
-    const cached = digests.get(path);
-    if (cached?.key === key) return cached.sha256;
-    const sha256 = sha256Hex(readFileSync(path));
-    digests.set(path, { key, sha256 });
-    return sha256;
+    fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    const stat = fstatSync(fd, { bigint: true });
+    return stat.isFile() ? use(fd, stat) : null;
   } catch {
     return null;
+  } finally {
+    if (fd !== undefined) closeSync(fd);
   }
 }
 
-/** Every file under `dir`, relative to `root`, with its SHA-256, in path order; symlinks are read through. */
+/** All bytes of the open file, or null when its stat changed while it was read (the key would not describe them). */
+function readUnchanged(fd: number, stat: BigIntStats): Buffer | null {
+  const bytes = readFileSync(fd);
+  return BigInt(bytes.length) === stat.size && fileKey(fstatSync(fd, { bigint: true })) === fileKey(stat) ? bytes : null;
+}
+
+/**
+ * The SHA-256 of the regular file at `path`, so a check on every call stays cheap. The key is the descriptor's
+ * (dev, ino, size, mtime, ctime) in nanoseconds; a cached digest is reused only for exactly that key, and only a
+ * successful read is cached. Any error, a missing file, a symlink or another file type is null and drops the entry.
+ */
+export function cachedFileSha256(path: string): string | null {
+  const sha256 = regularFile(path, (fd, stat) => {
+    const key = fileKey(stat);
+    const cached = digests.get(path);
+    if (cached?.key === key) return cached.sha256;
+    const bytes = readUnchanged(fd, stat);
+    if (!bytes) return null;
+    const digest = sha256Hex(bytes);
+    digests.set(path, { key, sha256: digest });
+    return digest;
+  });
+  if (sha256 === null) digests.delete(path);
+  return sha256;
+}
+
+/** Every file under `dir`, relative to `root`, with its SHA-256, in path order; a symlink or other non-regular entry throws. */
 function files(root: string, dir: string): Array<[string, string]> {
   return readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1)).flatMap((entry) => {
     const path = join(dir, entry.name);
@@ -52,7 +86,8 @@ function files(root: string, dir: string): Array<[string, string]> {
 /** Pi's version and digest as installed at `packageDir` now, or null when it is not a readable Pi package. */
 export function measurePiInstall(packageDir: string): PiInstall | null {
   try {
-    const manifestBytes = readFileSync(join(packageDir, "package.json"));
+    const manifestBytes = regularFile(join(packageDir, "package.json"), readUnchanged);
+    if (!manifestBytes) return null;
     const manifest = JSON.parse(manifestBytes.toString("utf8")) as { name?: unknown; version?: unknown; bin?: { pi?: unknown } };
     if (manifest.name !== PI_PACKAGE || typeof manifest.version !== "string" || typeof manifest.bin?.pi !== "string") return null;
     const runtime = dirname(join(packageDir, manifest.bin.pi));

@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { piSessionSha256 } from "../adapters/pi/piIdentity.js";
-import { cachedFileSha256, measurePiInstall, type PiInstall } from "../adapters/pi/piInstall.js";
+import { cachedFileSha256, clearPiDigestCache, measurePiInstall, type PiInstall } from "../adapters/pi/piInstall.js";
 import { isQualifiedPiVersion } from "../adapters/pi/piVersions.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
@@ -180,6 +180,8 @@ export function registerPiSession(input: { workspace: string; authenticatedAgent
   } catch {
     throw invalid("Pi session registration does not match its schema");
   }
+  // A registration measures everything afresh.
+  clearPiDigestCache();
   const manifest = signedControlManifest(input.workspace);
   if (manifest.agentId !== input.authenticatedAgentId) throw invalid("Pi session registration is for another agent's installation");
   if (manifest.moduleSha256 !== parsed.pi.extensionSha256) throw invalid("the running Pi extension is not the module the signed installation bound");
