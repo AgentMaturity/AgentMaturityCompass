@@ -100,6 +100,7 @@
     "check:package": "node scripts/package-lint.mjs",
     "check:duplicates": "node scripts/source-quality.mjs duplicates",
     "check:dead-code": "node scripts/source-quality.mjs dead-code",
+    "quality:baseline": "node scripts/source-quality.mjs",
     "check:coverage": "node scripts/per-file-coverage.mjs",
     "check:deploy-pack": "node scripts/deploy/deploy-pack-check.mjs",
     "deploy:rollback-drill": "node scripts/deploy/rollback-drill.mjs",
