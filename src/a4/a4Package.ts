@@ -55,7 +55,7 @@ import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
 import { integrationClaimFor } from "./assemblePaths.js";
 import {
-  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, cycleLinks, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
+  ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, IDENTITY_NOT_EVALUATED, leasePlans,
   PRODUCTION_LEASE_EFFECT_ID, proposedFor, RELEASE_EFFECT_ID, updatePolicyOf, type LeasePlan
 } from "./spec/activate.js";
 import { adaptSpecOf, lockDigestOf, proposedPlan, stagingBridge } from "./spec/adapt.js";
@@ -662,7 +662,7 @@ export function releaseViews(store: A4Store, projectId: string, chain: readonly 
     const bytes = String(row.surfaces_json);
     const envelope = JSON.parse(String(row.envelope_json ?? "null")) as SignedDigest | null;
     const record = a4ReleaseV1Schema.parse({ ...JSON.parse(bytes) as Record<string, unknown>, envelope });
-    const production = cycleLinks(chain, "EFFECT_FINISHED").map((link) => (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease)
+    const production = chain.filter((link) => link.kind === "EFFECT_FINISHED").map((link) => (link.body.record as { lease?: Record<string, unknown> } | undefined)?.lease)
       .filter((lease): lease is Record<string, unknown> => lease?.releaseId === record.releaseId && lease.scope === "production");
     const notEvaluated = (reason: string) => ({ status: "not_evaluated", reason });
     const recordedIf = (present: boolean, reason: string) => present ? { status: "recorded", reason: null } : notEvaluated(reason);

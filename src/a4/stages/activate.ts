@@ -20,6 +20,7 @@ import { AMC_ROOT, captureInputs, enforceSnapshot, lifecycleStageNow, PRODUCTION
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { A4StoreError } from "../a4Store.js";
+import { errorCodeOf } from "../aspireUnderstand.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, ACTIVATE_SPEC_SCHEMA, activateItems, activateSpecOf, answerGaps, CAPTURED_SLOTS, CARRIED, carriedValues, IDENTITY_NOT_EVALUATED, leasePlans,
   PRODUCTION_LEASE_EFFECT_ID, QUESTIONS, RELEASE_EFFECT_ID, understandingOf, updatePolicyOf, type LeasePlan
@@ -200,7 +201,13 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
   if (plans === null) throw fail(409, "A4_NOT_READY", "The lease answers do not give a lease plan.", { reasonCodes: ["LEASE_PLAN_INVALID"] });
   const values = answerValues(answers);
   const project = state.project;
-  const captured = captureInputs(workspace, project.project_id, project.agent_id, project.revision_no + 1);
+  let captured: Record<string, string | null>;
+  try {
+    captured = captureInputs(workspace, project.project_id, project.agent_id, project.revision_no + 1);
+  } catch (error) {
+    // A source that is a link, not a regular file, too large or unreadable is refused, never copied or guessed.
+    throw fail(409, errorCodeOf(error, "INPUT_UNREADABLE"), error instanceof Error ? error.message : String(error));
+  }
   const resources = RESOURCE_SLOTS["enforce.resourcesSha256"]?.(workspace, project.agent_id) ?? null;
   const snapshot = resources === null ? { error: "ENFORCE_RESOURCES_NOT_PRODUCED" } : enforceSnapshot(workspace, project.agent_id, resources);
   const previous = state.chain.filter((link) => link.kind === "RELEASE").at(-1);
