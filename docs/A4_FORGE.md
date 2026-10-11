@@ -101,8 +101,11 @@ self-approved decision is recorded with `self_approved = 1` and its facts, and a
 ### Acknowledged items
 
 An owner may acknowledge some WAITING items (for example `sod.self_provisioned`). The item stays WAITING with
-`OWNER_ACKNOWLEDGED`, is bound into the next gate, lapses after 90 days and is never cleared. A BLOCKED item cannot be
-acknowledged. Acknowledge before requesting the gate: an acknowledgement supersedes an open gate on the same revision.
+`OWNER_ACKNOWLEDGED`, is bound into the next gate when it is one of the stage's bound items, lapses after 90 days and is
+never cleared. A BLOCKED item cannot be acknowledged. Acknowledge before requesting the gate: an acknowledgement
+supersedes an open gate on the same revision. Adapt's `plan_unresolved` (an owner's out of scope) and
+`regulatory_sources_status` are not in Adapt's bound set yet, so their acknowledgements are on the chain but not in the
+gate's intent (a change to the bound set needs a versioned intent; requested).
 
 ## Resources, the catalog lock and the compiled-plan lockout
 
@@ -118,8 +121,10 @@ Every revision now binds `plan.journalEntrySha256` (the active compiled-plan jou
 from the CLI, makes an open gate `RESOURCE_DRIFTED`) and `plan.lockDigest` (the shipped catalog's lock). A revision
 recorded before these slots existed binds them as null, so its open gates read `RESOURCE_DRIFTED` once: record a new
 revision. The same holds for the context slots (`context.contextPluginSha256`, `context.memoryPolicySha256`,
-`context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, A4's own profile proposals for the
-agent; `operatingProfile.activationSha256`, every activation record of the agent). A prompt pack rebuilt by the prompt
+`context.promptPackSha256`) and the operating-profile slots (`operatingProfile.sha256`, the agent's
+`amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` files; `operatingProfile.activationSha256`, every
+activation record of the agent). Those files sit outside `.amc/`: an entry that is not a regular file (a link, a FIFO)
+or a profile directory that is a link reads `RESOURCE_UNREADABLE`. A prompt pack rebuilt by the prompt
 scheduler moves `context.promptPackSha256`, so an open gate reads `RESOURCE_DRIFTED` until it is requested again.
 Under an active plan, Studio mints a native task's lease with the workspace lease key, which the vault holds: while the
 vault is locked, `adapt.plan.nativeSessionsAllowed` reads WAITING (`LEASE_NOT_ISSUED`, `VAULT_LOCKED`).
@@ -233,8 +238,12 @@ the agent's prompt pack.
   enforced (data handling: P2-01, P2-02; reporting clocks: P3-23).
 - **Propose** freezes the profile, the plan, the diff against this project's previous proposal, the operating scope
   and the declared data handling (`enforcement: none`). **Build** signs the plan (`CONTROL_PLAN`, checked against this
-  workspace's keys: a local audit trail). A plan weaker than the plan this project put in force is refused
-  (`POLICY_WIDENING_REFUSED`). **Review** evaluates every requirement with `evaluateControl` (no loader binds runtime
+  workspace's keys: a local audit trail). Build is an owner's, as at Aspire and Assemble: it signs the plan and re-signs
+  the agent's Enforce manifest. Before it writes, the agent's resources must match its signed Enforce manifest (else
+  `409 ENFORCE_DRIFTED`: review the drift in Enforce and re-baseline it there), and it re-writes the manifest only when
+  its own writes moved nothing but the agent's memory directory. A plan weaker than the plan this project put in force
+  is refused (`POLICY_WIDENING_REFUSED`). **Review** refuses with `409 RESOURCE_DRIFTED` when the memory policy, the
+  context plugin or the agent's Enforce resources moved since Build, then evaluates every requirement with `evaluateControl` (no loader binds runtime
   rows to catalog evidence contracts yet, so each reads `not_evaluated`), writes the set signed (`CONTROL_RESULT`) under
   `a4-projects/<projectId>/control-results/` and reads it back verified. A set that does not verify locally, such as a
   notary-route signature, is `not_evaluated`. Review's own revision carries no observed ref; the probe's ref sits on the
@@ -249,10 +258,14 @@ the agent's prompt pack.
 - **Context probe.** `POST /api/v1/a4/projects/:id/stages/adapt/probe` (after Build; builder or owner; owner mode) runs
   one in-process turn on the stub provider, with no network and no credential, with the plugin as an extra context. The
   session writer records the session's effective-policy receipt before the turn, and the probe checks that the run's
-  signed `user/message` snapshot carries the plugin's exact text. The receipt row becomes a `ledger_event` ref, observed
-  when the row earns it, with the session, the snapshot row and the receipt's `downgrades` beside it.
-  `context_reaches_runtime_frame` is READY only from that ref ("observed in-process, not in a Studio native session");
-  a failed turn (`PROBE_DENIED`) or a snapshot without the text (`CONTEXT_NOT_IN_FRAME`) never satisfies it. Delivery
+  signed `user/message` row carries the plugin's exact text and reads the turn's signed `turn/end` reason. The receipt
+  row becomes a `ledger_event` ref, observed when the row earns it: it shows that the policy reached the runtime (the
+  receipt has no context-plugin field). The frame is shown by the `user/message` row, which carries no agent id and so
+  is not an A4 ref of its own: the probe checks it, Review checks it again, and `context_reaches_runtime_frame` names it
+  (`SNAPSHOT:<row>`) as AMC's check, in the implementation section ("observed in-process, not in a Studio native
+  session"). A turn that did not end `complete` (blocked, error, cancelled, max steps: `PROBE_DENIED`), a row without
+  the text (`CONTEXT_NOT_IN_FRAME`), or a row Review finds gone or changed never satisfies it. Whoever runs the probe
+  counts as a builder of the revision, so they cannot approve the completion gate or the activation. Delivery
   to a model (`model_delivery`) is `not_evaluated` on the stub provider. The item is mandatory once Adapt is built, so a
   regulated project's plan is activated only after the probe. A workspace whose session store is JSONL has no ledger row
   for the ref, and the probe is refused (`PROBE_NOT_RECORDED`).
@@ -260,16 +273,19 @@ the agent's prompt pack.
   `amc.a4-memory-policy/v1` with `ReasoningMemoryItem`'s field names. An empty answer takes the stated default
   (restricted, 90 days, 30 days, every consumer), labelled `default`. Build writes it to `<agent>/memory/policy.json`,
   inside the agent's `memory` Enforce resource, and re-writes the signed Enforce manifest after it; Review re-reads the
-  bytes Build wrote. Enforcement is `advisory`: the reasoning-memory writer does not read the file yet.
-- **Permissions.** Understand emits the primary station's operating profile to A4's own proposal file,
-  `amc-operating-profiles/<agent>/a4-<station>.operating-profile.json` (deterministic bytes; the operator's own
-  default-path profile is never touched), signs it as `domain apply --sign-profile` does, and dry-runs
-  `activateOperatingProfile` against the current verified configs. `profile_no_widening` lists each widening as
+  bytes Build wrote, and other bytes, even ones that parse, read BLOCKED (`MEMORY_POLICY_CHANGED`). Enforcement is
+  `advisory`: the reasoning-memory writer does not read the file yet.
+- **Permissions.** Understand builds the primary station's operating profile in memory (deterministic bytes) and
+  compares it with the current verified configs through `planActivation`, the comparison `activateOperatingProfile`
+  runs. It writes no file and signs nothing: the auditor signature that makes a profile activatable stays the owner's
+  `amc domain apply --sign-profile` on a profile they emitted and reviewed. `profile_no_widening` lists each widening as
   `scope_changed` (`POLICY_WIDENING_REFUSED`) until a project owner's revision answers `acceptWidenings` with exactly
   their digest. A4 never passes `allowWidening` and never activates a profile: activation stays the owner's
-  `amc domain apply --activate-profile` after review. Per-agent `gatePolicy.json` and lease caps are not proposed yet.
+  `amc domain apply --activate-profile` after review. Not built yet (`KEY:A4_PROFILE_EFFECT`): the effect
+  `a4.adapt.activate_profile` (design §6.1), the per-agent `gatePolicy.json` and lease-cap proposal, and building a
+  prompt pack.
 - **Prompt pack.** Understand and Review record the agent's latest signed prompt pack and whether it verifies under this
-  workspace's own keys (`adapt.prompt_pack_signature`, an integrity item: no lane, no claim). A prompt pack is a signed
+  workspace's own keys, over exactly the bytes they hashed (`adapt.prompt_pack_signature`, an integrity item: no lane, no claim). A prompt pack is a signed
   Score resource; the runtime does not load it into a model's prompt, and Adapt does not build one.
 - **Conformance statement** (`amc.a4-conformance-statement/v1`): five dimensions per control and counts, never a
   percentage. `GET /api/v1/a4/projects/:id/conformance?stage=` and the `amc_a4_conformance` MCP tool return it: Adapt's
@@ -277,16 +293,22 @@ the agent's prompt pack.
   Review, carries no plan and says `not_evaluated`. `not_applicable` comes only from the plan. A mandatory requirement left unresolved keeps
   `plan_unresolved` WAITING; an owner may record it out of scope with a reason (Acknowledge), and it then stays
   unresolved in the counts with `OWNER_OUT_OF_SCOPE` and `OWNER_ACKNOWLEDGED` (a true exception is P2-24).
-- **Completion.** A regulated project activates its plan at completion through the effect `a4.adapt.activate_plan`.
-  Once the completion gate has its quorum, an owner opens it: `signPlan` files the plan review (`SECURITY`, two distinct
-  people when regulated) and approvers decide it from the A4 card. `complete` verifies that grant and re-checks
-  separation of duties and membership; `activateControlPlan` then consumes it itself (`activate-<digest32>`, recorded on
-  `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the effect gate. Only a ready plan activates
-  (`plan_activated` is BLOCKED with `PLAN_BLOCKED` otherwise). A workspace has one active plan for every agent:
-  activating replaces it, and a plan weaker than the active one is refused (`REPLACES_ACTIVE_PLAN` names an active plan
-  of another profile). A non-regulated project completes with the plan signed
-  and not activated (`PLAN_SIGNED_NOT_ACTIVATED`); an owner may still open the effect, which makes the workspace
-  regulated. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
+- **Completion.** A regulated project activates its plan at completion through the effect `a4.adapt.activate_plan`
+  (`plan_activated` waits from Review on; it never holds the direction gate). Once the completion gate has its quorum,
+  an owner opens it: who may open it and that quorum are checked before anything is filed; then `signPlan` files the
+  plan review (`SECURITY`, two distinct people when regulated) and approvers decide it from the A4 card. `complete`
+  verifies that grant and re-checks separation of duties and membership; `activateControlPlan` then consumes it itself
+  (`activate-<digest32>`, recorded on `EFFECT_FINISHED`). A failed activation is not retried in place: re-open the
+  effect gate. Only a ready plan activates: opening the review on a blocked plan is `409 PLAN_BLOCKED`, and
+  `plan_activated` is BLOCKED with `PLAN_BLOCKED` whenever activation is due or opened. A workspace has one active plan
+  for every agent: activating replaces it, and `activateControlPlan` refuses a plan weaker than the active one. Each
+  project's plan carries its own agent's budgets, so another agent's active plan makes this one weaker
+  (`PLAN_WEAKENS_ACTIVE_PLAN`): `plan_activated` reads BLOCKED (`scope_changed`, from Understand's check and again
+  Review's) and opening the review is refused, before any gate is consumed. Until per-agent plans exist, a second
+  agent's plan cannot replace another agent's active plan (`REPLACES_ACTIVE_PLAN` names it). A non-regulated project
+  completes with the plan signed and not activated (`PLAN_SIGNED_NOT_ACTIVATED`); an owner may still open the effect.
+  Any active plan makes a project regulated: its own activation (`EFFECT_FINISHED`) does at once, and every project's
+  next revision in the workspace records the active plan's head. Under an active plan, Studio native tasks with workspace tools started after activation run under a lease
   (P1-67); tasks started before it, CLI agent sessions and delegated children are denied every call.
 - **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
   `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`

@@ -85,18 +85,19 @@ const decideButtons = (ctx, approvalRequestId, digest) => `${view.actionButton("
 
 /** The plan's signing and activation: the effect gate, its engine request, the lockout notice and the lifecycle-bridge rows. */
 function renderActivation(ctx) {
-  const item = itemOf(ctx, "plan_review_quorum");
+  const item = itemOf(ctx, "plan_review_opened");
   const [request] = coded(item, "APPROVAL_REQUEST");
   const completion = ctx.readiness?.gates?.completion;
   const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The completion gate has no quorum yet");
   return `<p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
     that an owner opens once the completion gate has its quorum; project approvers decide it here (two distinct people when regulated), and completing
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
-    not activated unless an owner opens it.</p>
+    not activated unless an owner opens it. Once a plan is active the project is regulated, and a workspace has one active plan for every agent: a plan
+    weaker than the active one (another agent's) is refused before the review is filed.</p>
     <p><strong>Lockout.</strong> An active compiled plan with <code>L0-IDN-01</code> denies every native tool call that carries no verified lease. Studio
       native tasks with workspace tools started after activation run under a lease Studio mints (P1-67); tasks started before it, CLI agent sessions
       and delegated children carry none and are denied. A non-regulated project therefore completes with the plan signed and not activated.</p>
-    ${["plan_signed", "plan_activated", "plan_review_quorum", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
+    ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
     <div class="row wrap">${view.actionButton(request ? "Re-open the plan review" : "Open the plan review", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code></p><label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label>
@@ -159,9 +160,9 @@ function renderMemory(ctx) {
 function renderPermissions(ctx) {
   const permissions = factsOf(ctx)?.permissions;
   if (!isObject(permissions)) return `<p class="muted">Understand compares the station's operating profile with your signed configs.</p>${status(ctx, "profile_no_widening")}`;
-  return `<p class="muted">Station <code>${esc(permissions.station ?? "unknown")}</code>${permissions.profilePath ? ` · proposal <code>${esc(permissions.profilePath)}</code>` : ""}${
-    permissions.error ? ` · <code>${esc(permissions.error)}</code>` : ""}. A4 never activates a profile that widens a config; activation stays the owner's
-      <code>amc domain apply --activate-profile</code> after review.</p>
+  return `<p class="muted">Station <code>${esc(permissions.station ?? "unknown")}</code>${permissions.profileSha256 ? ` · profile compared <code>${esc(permissions.profileSha256)}</code>` : ""}${
+    permissions.error ? ` · <code>${esc(permissions.error)}</code>` : ""}. A4 compares the station's profile in memory: it writes, signs and activates none. An owner
+      emits and reviews the profile, signs it (<code>amc domain apply --sign-profile</code>) and activates it (<code>--activate-profile</code>).</p>
     ${table(["Widening (activateOperatingProfile refuses it)"], list(permissions.widenings).map((entry) => [`<code>${esc(entry)}</code>`]), "No widening.")}
     ${permissions.wideningsSha256 && list(permissions.widenings).length > 0 ? `<p class="muted">To accept exactly these, a project owner answers
       <code>acceptWidenings</code> with <code>${esc(permissions.wideningsSha256)}</code>.</p>` : ""}
