@@ -642,20 +642,45 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
 }
 
 /**
- * The deployment approval's effect (design §10.4 Completion): the production lease (scopes, routes, classes and caps from
- * the Ask answers, work order = the release), minted only once activate.completion is consumed, its token answered once.
- * Then the lifecycle bridge to production (src/a4/a4Lifecycle.ts), which advances only with every production control
- * evidenced and otherwise records the missing ones.
+ * The project read now still stands where the consumed deployment approval left it: Activate at completion_approved on
+ * the gate's revision, nothing redone since the consumption, and `releaseId` still this cycle's release and not rolled
+ * back (409 PRODUCTION_LEASE_STALE, RELEASE_ROLLED_BACK). Read from the store, not the executor's preloaded rows.
+ */
+function assertProductionCurrent(workspace: string, projectId: string, gate: A4EffectContext["gate"], releaseId: string): void {
+  const store = openA4Store(workspace);
+  try {
+    const head = store.readHead(projectId);
+    const chain = store.readChain(projectId);
+    if (chain.some((link) => link.kind === "ROLLBACK" && link.body.releaseId === releaseId)) throw coded("RELEASE_ROLLED_BACK", `release ${releaseId} was rolled back`);
+    const consumed = chain.find((link) => link.kind === "GATE_CONSUMED" && link.body.gateId === gate.gate_id);
+    if (consumed === undefined || head?.stage !== "activate" || head.step !== "completion_approved" || head.revision_no !== gate.revision_no
+      || currentRelease(chain)?.body.releaseId !== releaseId || chain.some((link) => link.seq > consumed.seq && redoneStages(link)?.("activate") === true)) {
+      throw coded("PRODUCTION_LEASE_STALE", "the project moved since the deployment approval was consumed (revision, step or release)");
+    }
+  } finally {
+    store.close();
+  }
+}
+
+/**
+ * The deployment approval's effect (design §10.4 Completion): the production lease, minted only once activate.completion
+ * is consumed and only from what that gate bound — the scopes, routes, classes and caps of its own revision's answers, and
+ * the release recorded before it was requested (work order = that release) — its token answered once. Then the lifecycle
+ * bridge to production (src/a4/a4Lifecycle.ts), which advances only with every production control evidenced and
+ * otherwise records the missing ones.
  */
 async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
-  const { workspace, state } = ctx;
+  const { workspace, state, gate } = ctx;
   assertOwnerMode(workspace, "a4 complete");
   if (ctx.principal === null) throw coded("PRODUCTION_LEASE_INLINE_ONLY", "the production lease is minted inside complete, which delivers its token");
-  const release = currentRelease(state.chain);
+  const requested = state.chain.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gate.gate_id);
+  const release = requested === undefined ? null : currentRelease(state.chain.filter((link) => link.seq < requested.seq));
   const releaseId = typeof release?.body.releaseId === "string" ? release.body.releaseId : null;
-  if (releaseId === null) throw coded("NO_RELEASE", "this Activate cycle recorded no release");
-  const plans = leasePlans(activateSpecOf(state).answers);
-  if (plans === null) throw coded("LEASE_PLAN_INVALID", "the Activate answers no longer give a lease plan");
+  if (releaseId === null) throw coded("NO_RELEASE", "the deployment approval binds no release of this cycle");
+  assertProductionCurrent(workspace, state.project.project_id, gate, releaseId);
+  const revision = state.revisions.find((row) => row.revision_no === gate.revision_no && row.stage === "activate");
+  const plans = revision === undefined ? null : leasePlans(activateSpecOf({ revisions: [revision] }).answers);
+  if (plans === null) throw coded("LEASE_PLAN_INVALID", "the deployment approval's revision gives no lease plan");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
   const lease = mintLease(workspace, state, releaseId, plans.production);
   // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).
