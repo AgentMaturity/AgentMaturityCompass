@@ -30,6 +30,8 @@ export AMC_VAULT_PASSPHRASE='<passphrase>'
 
 AMC never writes the passphrase to disk and never prints it.
 
+AMC has no default passphrase. `NODE_ENV=test`, `VITEST` and other test-runner variables never supply one, so a vault is never sealed with a passphrase written in AMC's source. AMC's own test suite sets `AMC_VAULT_PASSPHRASE` in `tests/setup/vaultPassphrase.ts`.
+
 ## Rotation
 
 `amc vault rotate-keys` rotates monitor signing key and updates public-key history so old artifacts remain verifiable.

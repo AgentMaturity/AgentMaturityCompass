@@ -127,20 +127,12 @@ function defaultPassphrase(): string {
   if (process.env.AMC_VAULT_PASSPHRASE && process.env.AMC_VAULT_PASSPHRASE.length > 0) {
     return process.env.AMC_VAULT_PASSPHRASE;
   }
-  // Only the test runner, never NODE_ENV.
-  //
-  // This passphrase is published in this file, so a vault sealed with it can be
-  // opened by anyone holding the file — private monitor and auditor signing
-  // keys included. NODE_ENV=test is set routinely by CI images and application
-  // frameworks, so `amc init` in such an environment used to mint a real
-  // workspace whose keys were recoverable. VITEST is set by the runner itself
-  // and does not leak into deployed environments.
-  if (process.env.VITEST === "true" || process.env.VITEST === "1") {
-    return "amc-test-passphrase";
-  }
+  // No fallback, ever. A passphrase written in this file is public, so a vault sealed with it opens for anyone,
+  // private signing keys included; and NODE_ENV or VITEST is set by whoever controls the environment of a
+  // production run. Tests inject their passphrase through tests/setup/vaultPassphrase.ts.
   throw new Error(
-    "AMC_VAULT_PASSPHRASE environment variable is required. " +
-    "Set it before using vault operations: export AMC_VAULT_PASSPHRASE='your-secure-passphrase'"
+    "AMC_VAULT_PASSPHRASE environment variable is required: AMC has no default vault passphrase, and NODE_ENV or " +
+    "test-runner variables never supply one. Set it before using vault operations: export AMC_VAULT_PASSPHRASE='your-secure-passphrase'"
   );
 }
 
@@ -455,8 +447,9 @@ export function ensureVaultAndPublicKeys(workspace: string): void {
   const sessionPublicExisting = pathExists(paths.sessionPublic) ? readUtf8(paths.sessionPublic) : null;
 
   if (vaultExists(workspace)) {
-    const testEnv = process.env.NODE_ENV === "test" || process.env.VITEST === "true" || process.env.VITEST === "1";
-    const unlockPhrase = process.env.AMC_VAULT_PASSPHRASE ?? (testEnv ? defaultPassphrase() : undefined);
+    // Only the operator's passphrase unlocks here. Without one the vault stays locked, under NODE_ENV=test as anywhere:
+    // the command that needs a key then says the vault is locked, instead of this read demanding a passphrase.
+    const unlockPhrase = process.env.AMC_VAULT_PASSPHRASE;
     if (unlockPhrase) {
       try {
         unlockVault(workspace, unlockPhrase);

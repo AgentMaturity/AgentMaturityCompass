@@ -687,11 +687,9 @@ function buildSurfaces(input: {
   };
 }
 
+// A test signal never counts: NODE_ENV=test used to mark an unsigned artifact signed.
 function orgRunSigningExpected(): boolean {
-  return Boolean(process.env.AMC_VAULT_PASSPHRASE)
-    || process.env.NODE_ENV === "test"
-    || process.env.VITEST === "true"
-    || process.env.VITEST === "1";
+  return Boolean(process.env.AMC_VAULT_PASSPHRASE);
 }
 
 function roleWorkspacePath(workspace: string, orgRunId: string, roleId: string): string {

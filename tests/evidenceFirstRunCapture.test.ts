@@ -12,10 +12,14 @@ function workspace(): string {
   return dir;
 }
 
+/** A first-run user has no vault passphrase: the suite's own (tests/setup/vaultPassphrase.ts) is removed. */
 function runCli(cwd: string, args: string[]) {
+  const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
+  delete env.AMC_VAULT_PASSPHRASE;
+  delete env.AMC_VAULT_PASSPHRASE_FILE;
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {
     cwd,
-    env: { ...process.env, NO_COLOR: "1" },
+    env,
     encoding: "utf8"
   });
 }
