@@ -3,6 +3,7 @@ import { same } from "./bytes.js";
 import { scopedAttestation } from "./records/attestation.js";
 import { actionReceipt, controlResult, evidenceEvent, receiptPayload } from "./records/evidence.js";
 import { externalEvidence, normalizedDigest } from "./records/externalEvidence.js";
+import { intotoStatement } from "./records/intoto.js";
 import { signedKeyRotation, signedRevocationList, signedRootRotation } from "./records/statements.js";
 import { signedTrustList } from "./records/trustList.js";
 import { attempt, type Check, type ShapeCode } from "./schema.js";
@@ -17,7 +18,8 @@ const CHECKS = {
   "key-rotation": signedKeyRotation,
   "root-rotation": signedRootRotation,
   "revocation-list": signedRevocationList,
-  "external-evidence": externalEvidence
+  "external-evidence": externalEvidence,
+  "intoto-statement": intotoStatement
 } satisfies Record<string, Check<unknown>>;
 export type RecordKind = keyof typeof CHECKS;
 export const RECORD_KINDS = Object.keys(CHECKS) as RecordKind[];

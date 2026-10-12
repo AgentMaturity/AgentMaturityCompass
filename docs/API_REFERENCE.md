@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-11
+> Auto-generated from source on 2026-10-12
 
 ## Table of Contents
 
@@ -2770,6 +2770,7 @@ Export a portable, signed evidence bundle for a run
 | `--run <runId>` | - |
 | `--out <file>` | - |
 | `--agent <agentId>` | - |
+| `--attest` | - |
 
 #### `amc bundle verify`
 

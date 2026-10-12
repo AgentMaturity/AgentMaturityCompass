@@ -1,0 +1,12 @@
+{
+  "tools": {
+    "npm": "11.10.1",
+    "@sigstore/sign": "4.1.0",
+    "@sigstore/bundle": "4.0.0",
+    "@sigstore/verify": "3.1.0"
+  },
+  "sameBundleJsonAsDSSEBundleBuilder": true,
+  "sigstoreVerifyWithPublicKey": "verified",
+  "sigstoreVerifyChangedPayload": "refused: SIGNATURE_ERROR signature verification failed",
+  "network": "none (no witnesses, no TUF, thresholds 0)"
+}

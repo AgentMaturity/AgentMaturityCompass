@@ -114,7 +114,8 @@ refused. Digests and key ids are compared in constant time.
 ## Record kinds (v1)
 
 The kind is read from the record itself: an object with `type: "amc.scoped-attestation"`, `profile:
-"amc.external-evidence"`, `list.type` or `statement.type`, or a JSON string (a receipt token).
+"amc.external-evidence"`, `list.type` or `statement.type`, an object with `dsseEnvelope` or `payloadType` (a DSSE
+envelope, bare or in a Sigstore bundle), or a JSON string (a receipt token).
 
 | Kind | Signed bytes and issuer | Scope | Freshness | Completeness | Satisfaction |
 | --- | --- | --- | --- | --- | --- |
@@ -125,6 +126,7 @@ The kind is read from the record itself: an object with `type: "amc.scoped-attes
 | Key rotation (`amc.key-rotation`) | P1-08 bytes; authorized by the previous key as a counted list admits it for the purpose, or by pinned roots for `key-compromise` and a first key; `next` proves possession | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 | Root rotation (`amc.root-rotation`) | P1-08 bytes; `previousRoots` must be the pinned roots and sign `previousThreshold` times; the new set proves possession | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 | Revocation list (`amc.revocation-list`) | P1-08 bytes, by a key admitted for `revocation-list` | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
+| DSSE in-toto statement (`dsse-intoto`, [ATTESTATIONS.md](ATTESTATIONS.md)) | Ed25519 over the DSSE v1.0 PAE of `application/vnd.in-toto+json` and the payload, by the key the trust lists hold for the signature's `keyid`, admitted for `artifact-seal` (`independent-attestation` when `claimKind` is `independently_reviewed`) | tenant `scope.tenant`, deployment `scope.deployment`, subject `scope.agent`, profile `scope.profile` | `issuedAt`, `expiresAt` | every subject digest and every `evidence` digest among the supplied bytes; no cited evidence is `EMPTY_EVIDENCE` | `CLAIMED_RESULT_FAILED` when a control declares `fail`, otherwise `NOT_RECOMPUTABLE` |
 
 P1-08 records are accepted only in their one canonical byte encoding, and only the first record of a chain
 (sequence 1) may name no predecessor (`MALFORMED` otherwise). A root rotation lowers the threshold when its new threshold
@@ -154,6 +156,20 @@ declares `not_evaluated`, passes only as `self_reported` (no positive status) or
 Otherwise it passes: every result is a pass by an observed or independently reviewed claim over evidence completeness
 found present, settled and consistent. It does not re-run the controls.
 
+### DSSE in-toto statements
+
+The artifact is a key-based Sigstore bundle v0.3 (a public-key hint, no log entries, no timestamps, one DSSE signature
+whose `keyid` equals the hint) or a bare DSSE envelope with one signature. A keyless bundle (certificate material) is
+refused here; verify it with Sigstore tooling. A `payloadType` other than `application/vnd.in-toto+json` is
+`UNSUPPORTED_VERSION`, as is a statement whose `_type` is not in-toto Statement v1 or whose `predicateType` is not
+`https://agentmaturity.co/attestations/control-results/v0.1`. The `keyid` only selects among keys the supplied trust
+lists hold: a key no list holds leaves integrity not evaluated and fails issuer admission (`ISSUER_NOT_PINNED`).
+
+Supply the attested bytes with `--evidence-dir`: the AIBOM, the run report and the ledger slice the statement cites.
+Evidence is addressed by digest, so a changed AIBOM matches no subject and completeness fails with `EVIDENCE_MISSING`.
+The statement has no sequence number, so freshness is its expiry only. Satisfaction is never a pass: a declared result
+cannot be recomputed from these bytes, so a valid statement exits 3.
+
 ### Receipt anchoring
 
 A state receipt is anchored when the supplied evidence holds the exported ledger row (spec/schemas/v1/evidence-event)
@@ -182,7 +198,7 @@ dependency and run it against the fixtures on Node 20, 22 and 24.
 
 - `.amcbundle` archives carry a SQLite ledger, which a zero-dependency verifier cannot read on Node 20; verify them with
   `amc bundle verify` (P0-09). `amc-verify` refuses them as malformed rather than read part of them.
-- Not yet: DSSE and in-toto envelopes (P1-27), RFC 3161 timestamp tokens (P1-25; a trust list's
+- Not yet: keyless Sigstore bundles and transparency-log entries (P1-27 verifies key-based DSSE bundles only), RFC 3161 timestamp tokens (P1-25; a trust list's
   `timestampAuthorities` are validated but unused), Merkle inclusion proofs and public-log receipts (P1-26),
   conformance classes (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`.
 - A chain predecessor (`previousSha256`, `previousStatementSha256`) is not fetched or checked; `--known-sequence` gives

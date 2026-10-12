@@ -5,7 +5,7 @@ AMC bundles are portable `.amcbundle` TAR.GZ archives that can be verified offli
 ## Commands
 
 ```bash
-amc bundle export --agent <agentId> --run <runId> --out .amc/agents/<agentId>/bundles/<runId>.amcbundle
+amc bundle export --agent <agentId> --run <runId> --out .amc/agents/<agentId>/bundles/<runId>.amcbundle [--attest]
 amc bundle verify .amc/agents/<agentId>/bundles/<runId>.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 amc bundle inspect .amc/agents/<agentId>/bundles/<runId>.amcbundle
 amc bundle diff <bundleA> <bundleB>
@@ -35,6 +35,11 @@ the records with every other file. A project is the agent's by the receipt signe
 editable column. `evidence/evidence.sqlite` is unchanged by the slice; with the flag set, `amc certify`'s internal
 bundle carries it too, so a project that does not verify also refuses certification. A4 rules and the offline A4
 verifier are described in `docs/A4_FORGE.md`; `amc bundle verify` does not check the A4 rules.
+
+With `--attest`, the bundle also holds `attestations/aibom.cdx.json` (the agent's CycloneDX AIBOM, [AIBOM.md](AIBOM.md))
+and `attestations/control-results.sigstore.json` (an in-toto statement about the run, DSSE-signed with the
+`artifact-seal` key in a Sigstore bundle, [ATTESTATIONS.md](ATTESTATIONS.md)). Both are written before the manifest is
+gathered, so `manifest.json` lists them and the manifest signature covers them.
 
 ## Verification Checks
 

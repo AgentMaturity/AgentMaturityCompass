@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
-import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
+  type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadDestinationRegistrySnapshot, loadPinnedResidencyProfile } from "./destinationRegistry.js";
@@ -11,15 +12,20 @@ type Accepted = Exclude<EgressDecision, Blocked>;
 export class EgressBlocked extends Error {
   readonly decision: Blocked;
   readonly controlResult: ResidencyControlResult;
-  constructor(decision: Blocked, controlResult: ResidencyControlResult) {
+  constructor(decision: Blocked, controlResult: ResidencyControlResult, cause?: string) {
     super(`Residency egress blocked: ${decision.reason}${decision.detail ? ` (${decision.detail})` : ""}; `
-      + `destination=${decision.destinationId ?? "unregistered"}; rules=${decision.ruleIds.slice(0, 8).join(",") || "none"}`);
+      + `destination=${decision.destinationId ?? "unregistered"}; rules=${decision.ruleIds.slice(0, 8).join(",") || "none"}${cause ? `. ${cause}` : ""}`);
     this.name = "EgressBlocked";
     this.decision = Object.freeze({ ...decision, ruleIds: Object.freeze([...decision.ruleIds]) });
     this.controlResult = Object.freeze({ ...controlResult, controlIds: Object.freeze([...controlResult.controlIds]) });
   }
 }
-function block(input: CheckEgressInput, reason: Blocked["reason"], detail: string, rules: readonly ResidencyRuleV1[] = [], destinationId?: string): never {
+/**
+ * `cause` is appended to the EgressBlocked message only. That message leaves the process: the gateway returns it in its
+ * HTTP error body, LlmRuntime records it as the request failure, and tool and MCP refusals carry it. So `cause` is fixed
+ * text with no host path. The decision, control result and guard event keep only the fixed `reason` and `detail` codes.
+ */
+function block(input: CheckEgressInput, reason: Blocked["reason"], detail: string, rules: readonly ResidencyRuleV1[] = [], destinationId?: string, cause?: string): never {
   const decision: Blocked = { verdict: "blocked", reason, detail, ruleIds: rules.map(rule => rule.ruleId), ...(destinationId ? { destinationId } : {}) };
   const controlResult: ResidencyControlResult = { status: "not_evaluated", controlIds: [...new Set(rules.map(rule => rule.controlId))], reason };
   let routeHash: string | null = null;
@@ -30,17 +36,30 @@ function block(input: CheckEgressInput, reason: Blocked["reason"], detail: strin
         channel: input.channel, destinationId: destinationId ?? null, routeHash, ruleIds: decision.ruleIds, controlResult,
         purposeDeclared: typeof input.purpose === "string" && input.purpose.length > 0 } });
   } catch { /* Audit storage failure never permits the egress or replaces its typed denial. */ }
-  throw new EgressBlocked(decision, controlResult);
+  throw new EgressBlocked(decision, controlResult, cause);
 }
 interface Context {
   readonly active: ActiveCompiledPolicy | null;
   readonly registry: DestinationRegistryV1 | null;
   readonly facts: { readonly dataClasses: readonly string[] | null; readonly jurisdictions: readonly string[] | null; readonly storageUrl: string } | null;
 }
+/**
+ * The verified active plan, or null when none is active. A workspace that contains the control checkpoint root (HOME as
+ * the workspace, P0-57) is refused by name (ControlCheckpointRootInWorkspaceError, fail closed: no plan there can be told
+ * apart from a deleted one), never reported as active_policy_unverifiable.
+ */
+function activePolicy(input: CheckEgressInput): ActiveCompiledPolicy | null {
+  try {
+    return loadActiveCompiledPolicy(input.workspace);
+  } catch (error) {
+    return error instanceof ControlCheckpointRootInWorkspaceError
+      ? block(input, "registry_unverifiable", "control_checkpoint_root_in_workspace", [], undefined, error.message)
+      : block(input, "registry_unverifiable", "active_policy_unverifiable");
+  }
+}
 function context(input: CheckEgressInput, cwdFallback: boolean): Context {
-  let active: ActiveCompiledPolicy | null;
-  try { active = loadActiveCompiledPolicy(input.workspace); } catch { return block(input, "registry_unverifiable", "active_policy_unverifiable"); }
   const snapshot = loadDestinationRegistrySnapshot(input.workspace);
+  const active = activePolicy(input);
   if (cwdFallback && (active || snapshot.state !== "missing")) return block(input, "registry_unverifiable", "workspace_scope_required");
   if (snapshot.state === "invalid") return block(input, "registry_unverifiable", snapshot.reason);
   if (snapshot.state === "missing") {
@@ -119,7 +138,10 @@ export async function residencyFetch(workspace: string | undefined, channel: Egr
   checkScopedEgress(workspace, channel, url);
   return fetch(url, { ...init, redirect: init.redirect === "error" ? "error" : "manual", signal: init.signal ?? AbortSignal.timeout(30_000) });
 }
-/** Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable rule. */
+/**
+ * Refuses regulated session admission unless the pinned profile's declared storage destination passes every applicable
+ * rule. Opt-in: a workspace with no active plan and no destination registry returns no_rule, whatever its checkpoint root.
+ */
 export function assertStorageAdmission(workspace: string): Accepted {
   if (typeof workspace !== "string" || !workspace.trim()) return block({ workspace, channel: "storage", url: "" }, "registry_unverifiable", "workspace_scope_required");
   const input: CheckEgressInput = { workspace: resolve(workspace), channel: "storage", url: "" };

@@ -4,6 +4,7 @@ import type { Finding } from "./codes.js";
 import { EvidenceStore, type Env, type Evaluation, type ScopeExpectation } from "./evaluation.js";
 import { evaluateAttestation } from "./kinds/attestation.js";
 import { refused } from "./kinds/common.js";
+import { evaluateDsseIntoto } from "./kinds/dsseIntoto.js";
 import { evaluateExternalEvidence } from "./kinds/externalEvidence.js";
 import { evaluateReceipt } from "./kinds/receipt.js";
 import { evaluateRevocationList, evaluateTrustList } from "./kinds/lists.js";
@@ -60,6 +61,7 @@ function evaluate(value: unknown, bytes: Uint8Array, env: Env): Evaluation {
   if (nestedType("list") === "amc.revocation-list") return evaluateRevocationList(value, bytes, env);
   if (nestedType("statement") === "amc.key-rotation") return evaluateKeyRotation(value, bytes, env);
   if (nestedType("statement") === "amc.root-rotation") return evaluateRootRotation(value, bytes, env);
+  if ("dsseEnvelope" in value || "payloadType" in value) return evaluateDsseIntoto(value, env);
   return refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "not a record type this verifier supports (v1)" });
 }
 
