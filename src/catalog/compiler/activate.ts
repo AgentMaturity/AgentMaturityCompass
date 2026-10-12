@@ -7,10 +7,12 @@
  * profile: one that does not verify refuses the session. Signatures checked against the workspace's own keys are a
  * local audit trail, not portable trust (P0-09).
  */
+import { lstatSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { consumeApprovedExecution, verifyApprovalForExecution } from "../../approvals/approvalEngine.js";
 import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
-import { appendSignedControlJournal, readSignedControlJournal, type SignedControlJournalSnapshot } from "../../lifecycle/signedControlJournal.js";
+import { appendSignedControlJournal, controlCheckpointDir, readSignedControlJournal, SignedControlJournalError,
+  type SignedControlJournalSnapshot } from "../../lifecycle/signedControlJournal.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -74,9 +76,42 @@ function readJournal(workspace: string, recover = false): SignedControlJournalSn
     parsePayload: (payload) => verifiedActivation(workspace, payload), recoverPendingPublication: recover });
 }
 
+/**
+ * P0-57: the workspace contains the host-local control checkpoint root (the default under HOME, when HOME is the
+ * workspace or inside it), so no plan in it can be verified. Its own refusal, never "restore the plan". The message names
+ * the variable and the condition but no host path: callers return it in API responses and model-visible tool denials.
+ */
+export class ControlCheckpointRootInWorkspaceError extends Error {
+  readonly code = "CONTROL_CHECKPOINT_ROOT_IN_WORKSPACE" as const;
+  constructor() {
+    super("The control checkpoint root (AMC_CONTROL_CHECKPOINT_DIR, default ~/.amc/control-checkpoints) is inside this workspace, "
+      + "so its compiled control plan cannot be verified. Set AMC_CONTROL_CHECKPOINT_DIR to a directory outside the workspace.");
+    this.name = "ControlCheckpointRootInWorkspaceError";
+  }
+}
+
+/** Whether the workspace contains the control checkpoint root, where no signed control journal can be read or written. */
+export function checkpointRootInWorkspace(workspace: string): boolean {
+  try { controlCheckpointDir(workspace, KIND); return false; } catch (error) { if (error instanceof SignedControlJournalError) return true; throw error; }
+}
+
+/**
+ * True when no plan can be active because the checkpoint root sits inside the workspace and `.amc/control-plan/` does not
+ * exist: activation never ran here, so the workspace has not opted in. With that directory present (or uninspectable)
+ * it opted in and is refused as ControlCheckpointRootInWorkspaceError. False when the root is outside the workspace: the
+ * journal is verified as before, so a deleted journal behind host checkpoints stays an integrity failure.
+ */
+function planlessUnderWorkspaceRoot(workspace: string): boolean {
+  if (!checkpointRootInWorkspace(workspace)) return false;
+  let opted: boolean;
+  try { opted = lstatSync(root(workspace), { throwIfNoEntry: false }) !== undefined; } catch { opted = true; }
+  if (opted) throw new ControlCheckpointRootInWorkspaceError();
+  return true;
+}
+
 /** Identity of the active journal head, or null when no plan was ever activated. Throws on any integrity failure. */
 export function activeControlPlanHead(workspace: string): string | null {
-  return readJournal(workspace).entrySha256;
+  return planlessUnderWorkspaceRoot(workspace) ? null : readJournal(workspace).entrySha256;
 }
 
 /**
@@ -84,7 +119,7 @@ export function activeControlPlanHead(workspace: string): string | null {
  * the baseline activateControlPlan checks weakenings against. Throws on any integrity failure.
  */
 export function activeControlPlan(workspace: string): CompiledPlan | null {
-  return readJournal(workspace).payload?.plan ?? null;
+  return planlessUnderWorkspaceRoot(workspace) ? null : readJournal(workspace).payload?.plan ?? null;
 }
 
 /**
@@ -92,6 +127,7 @@ export function activeControlPlan(workspace: string): CompiledPlan | null {
  * or digest, or the shipped catalog against the plan's lockfile does not verify: the caller refuses the session.
  */
 export function loadActiveCompiledPolicy(workspace: string): ActiveCompiledPolicy | null {
+  if (planlessUnderWorkspaceRoot(workspace)) return null;
   const journal = readJournal(workspace);
   if (journal.integrity === "uninitialized" || !journal.payload) return null;
   const { plan } = journal.payload;

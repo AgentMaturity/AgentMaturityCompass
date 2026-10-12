@@ -1,8 +1,7 @@
-import { lstatSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { resolve } from "node:path";
+import { checkpointRootInWorkspace, ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
+  type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
-import { controlCheckpointDir, SignedControlJournalError } from "../lifecycle/signedControlJournal.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadDestinationRegistrySnapshot, loadPinnedResidencyProfile } from "./destinationRegistry.js";
 import { EGRESS_CHANNELS, type CheckEgressInput, type DestinationRecordV1, type DestinationRegistryV1, type EgressChannel,
@@ -21,7 +20,11 @@ export class EgressBlocked extends Error {
     this.controlResult = Object.freeze({ ...controlResult, controlIds: Object.freeze([...controlResult.controlIds]) });
   }
 }
-/** `cause` reaches the operator through the error message only; the audit row keeps the fixed `detail` code. */
+/**
+ * `cause` is appended to the EgressBlocked message only. That message leaves the process: the gateway returns it in its
+ * HTTP error body, LlmRuntime records it as the request failure, and tool and MCP refusals carry it. So `cause` is fixed
+ * text with no host path. The decision, control result and guard event keep only the fixed `reason` and `detail` codes.
+ */
 function block(input: CheckEgressInput, reason: Blocked["reason"], detail: string, rules: readonly ResidencyRuleV1[] = [], destinationId?: string, cause?: string): never {
   const decision: Blocked = { verdict: "blocked", reason, detail, ruleIds: rules.map(rule => rule.ruleId), ...(destinationId ? { destinationId } : {}) };
   const controlResult: ResidencyControlResult = { status: "not_evaluated", controlIds: [...new Set(rules.map(rule => rule.controlId))], reason };
@@ -40,30 +43,21 @@ interface Context {
   readonly registry: DestinationRegistryV1 | null;
   readonly facts: { readonly dataClasses: readonly string[] | null; readonly jurisdictions: readonly string[] | null; readonly storageUrl: string } | null;
 }
-/** The control checkpoint root's configuration error for this workspace, or null when the root is outside it. */
-function checkpointRootError(workspace: string): string | null {
-  try { controlCheckpointDir(workspace, "compiled-control-plan"); return null; }
-  catch (error) { return error instanceof SignedControlJournalError ? error.message : null; }
-}
-/** Any trace of `.amc/control-plan/` (activate.ts's journal root), or one that cannot be inspected, counts as opted in. */
-function planJournalPresent(workspace: string): boolean {
-  try { return lstatSync(join(workspace, ".amc", "control-plan"), { throwIfNoEntry: false }) !== undefined; } catch { return true; }
-}
 /**
- * The verified active plan, or null when none is active. A control checkpoint root inside the workspace (HOME as the
- * workspace, P0-57) is a configuration error, refused under its own name, never as active_policy_unverifiable. No plan
- * can be activated under that root, so a workspace with no plan journal and no destination registry has not opted in
- * (the P2-02 posture) and keeps the unregulated no_rule path.
- * ponytail: a plan activated under another AMC_CONTROL_CHECKPOINT_DIR whose journal was then deleted reads as not opted
- * in here, as it already does with that variable unset; the checkpoint store is host configuration this gate trusts.
+ * The verified active plan, or null when none is active. activate.ts reads a workspace that contains the control
+ * checkpoint root (HOME as the workspace, P0-57) as having no plan unless `.amc/control-plan/` exists, and refuses it
+ * as ControlCheckpointRootInWorkspaceError when it does. A destination registry opts such a workspace in as well, so it
+ * gets the same refusal. That refusal is never reported as active_policy_unverifiable.
  */
 function activePolicy(input: CheckEgressInput, registryPresent: boolean): ActiveCompiledPolicy | null {
-  const rootError = checkpointRootError(input.workspace);
-  if (rootError) {
-    if (!registryPresent && !planJournalPresent(input.workspace)) return null;
-    return block(input, "registry_unverifiable", "control_checkpoint_root_in_workspace", [], undefined, rootError);
+  try {
+    if (registryPresent && checkpointRootInWorkspace(input.workspace)) throw new ControlCheckpointRootInWorkspaceError();
+    return loadActiveCompiledPolicy(input.workspace);
+  } catch (error) {
+    return error instanceof ControlCheckpointRootInWorkspaceError
+      ? block(input, "registry_unverifiable", "control_checkpoint_root_in_workspace", [], undefined, error.message)
+      : block(input, "registry_unverifiable", "active_policy_unverifiable");
   }
-  try { return loadActiveCompiledPolicy(input.workspace); } catch { return block(input, "registry_unverifiable", "active_policy_unverifiable"); }
 }
 function context(input: CheckEgressInput, cwdFallback: boolean): Context {
   const snapshot = loadDestinationRegistrySnapshot(input.workspace);

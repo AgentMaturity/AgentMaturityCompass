@@ -18,7 +18,7 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
-import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
@@ -188,7 +188,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (d.tools !== "workspace") return null;
     let plan: ReturnType<typeof loadActiveCompiledPolicy>;
     try { plan = loadActiveCompiledPolicy(workspace); }
-    catch (error) { throw new NativeTaskServiceError("POLICY_UNVERIFIED", 409, `The active compiled policy cannot be verified (${reasonOf(error)}). Nothing was started. Restore .amc/control-plan/ from backup, or recompile and reactivate.`); }
+    catch (error) {
+      if (error instanceof ControlCheckpointRootInWorkspaceError) throw new NativeTaskServiceError(error.code, 409, `${error.message} Nothing was started.`);
+      throw new NativeTaskServiceError("POLICY_UNVERIFIED", 409, `The active compiled policy cannot be verified (${reasonOf(error)}). Nothing was started. Restore .amc/control-plan/ from backup, or recompile and reactivate.`);
+    }
     if (!planRequiresAgentLease(plan)) return null;
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
