@@ -1,0 +1,94 @@
+name: Post-publish verify
+
+# P1-41: read-only checks after every Release run, from public endpoints, with no secret and no write permission.
+#   verify:       npm version, integrity, provenance and latest; the GitHub release assets; anonymous pull of the Studio
+#                 image tag (scripts/check-published-release.mjs). P0-40 adds the install smoke on clean machines here.
+#   distribution: the weekly distribution figure for P0-41's Monday status (scripts/distribution-metrics.mjs).
+# Results are workflow artifacts; copy them into qualification/<YYYY-MM-DD>-release-<version>/ (docs/RELEASE_RUNBOOK.md).
+# A figure or check whose endpoint cannot be read is recorded as "not measured" and fails the job.
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published version to check (X.Y.Z)"
+        required: true
+        type: string
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  # Only after a successful Release run from a tag push in this repository, or a manual dispatch.
+  verify:
+    if: >-
+      github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run'
+      && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+      && github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P1-41 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      # The script refuses anything but X.Y.Z before any request.
+      - name: Check the published release
+        env:
+          DISPATCH_VERSION: ${{ inputs.version }}
+          RELEASE_TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          VERSION="${DISPATCH_VERSION:-${RELEASE_TAG#v}}"
+          node scripts/check-published-release.mjs "$VERSION" --out tmp/post-publish/check-published-release.json
+
+      - name: Upload the post-publish receipt
+        if: always()
+        uses: actions/upload-artifact@v7 # TODO(P1-41 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: post-publish-receipt
+          path: tmp/post-publish/
+          if-no-files-found: error
+
+  distribution:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6 # TODO(P1-41 follow-up): pin actions/checkout@v6 by full commit SHA
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v6 # TODO(P1-41 follow-up): pin actions/setup-node@v6 by full commit SHA
+        with:
+          node-version: "24"
+
+      # --write appends to this checkout's docs/program/distribution-metrics.json, which is uploaded, never committed.
+      - name: Record the distribution figure
+        run: |
+          set -euo pipefail
+          mkdir -p tmp/distribution
+          node scripts/distribution-metrics.mjs --write | tee tmp/distribution/row.md
+
+      - name: Upload the distribution figure
+        if: always()
+        uses: actions/upload-artifact@v7 # TODO(P1-41 follow-up): pin actions/upload-artifact@v7 by full commit SHA
+        with:
+          name: distribution-metrics
+          path: |
+            tmp/distribution/row.md
+            docs/program/distribution-metrics.json
+          if-no-files-found: error

@@ -73,6 +73,10 @@ jobs:
       - name: No fabricated results
         run: npm run check:no-fabrication
 
+      # P1-41: published release notes never use a banned claim word, even negated (docs/RELEASE_RUNBOOK.md).
+      - name: Release notes claim words
+        run: node scripts/check-release-notes.mjs docs/releases/*.md
+
       # P0-11: every enforcement point, test and owner the channel map cites
       # exists (docs/security/THREAT_MODEL.md).
       - name: Threat model channel map
