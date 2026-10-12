@@ -11,14 +11,14 @@
 import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { z } from "zod";
-import { getPrivateKeyPem } from "../crypto/keys.js";
 import { revokedLeaseIdSet, revokeLease } from "../leases/leaseStore.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { amcVersion } from "../version.js";
 import { assertAllowed, evaluateFor, governed, livePrincipal, loadA4State, type A4Call } from "./a4Gates.js";
-import { recordEnvelope, vaultLocked, writeReleaseRecord } from "./a4Package.js";
+import { recordEnvelope, writeReleaseRecord } from "./a4Package.js";
+import { assertPurposeKeys, vaultLocked } from "./a4Preflight.js";
 import type { A4ReadinessState } from "./a4Readiness.js";
 import { a4DeploymentReceiptV1Schema, headSeqSchema, type A4ChainLink, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, type A4ChangeSpec, type A4Store, type A4TransitionResult } from "./a4Store.js";
@@ -216,16 +216,14 @@ function stagingLeasesOf(chain: readonly A4ChainLink[], gateId: string): string[
 
 /**
  * Before a DENY on an Activate completion gate: the revocation it owes is signed with the vault's auditor key (even in
- * NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused 423 A4_VAULT_LOCKED while that key
- * cannot be read, never recorded with the staging lease left live.
+ * NOTARY mode, where the DENY's own envelope is the notary's), so a DENY is refused while that key cannot sign (423
+ * A4_VAULT_LOCKED while the vault is locked, 409 A4_KEY_REVOKED once the key is revoked), never recorded with the
+ * staging lease left live.
  */
 export function assertStagingRevocable(store: A4Store, projectId: string, gateId: string): void {
   if ((stagingLeasesOf(store.readChain(projectId), gateId) ?? []).length === 0) return;
-  try {
-    getPrivateKeyPem(store.workspace, "revocation-list"); // P1-08: the key revokeLease signs the lease revocation list with
-  } catch {
-    throw new A4StoreError(423, "A4_VAULT_LOCKED", "Unlock the vault: denying the deployment approval revokes the release's staging lease, which signs with the auditor key.");
-  }
+  // P1-08: the key revokeLease signs the lease revocation list with.
+  assertPurposeKeys(store.workspace, ["revocation-list"], "deny the deployment approval, which revokes the release's staging lease with the revocation-list key");
 }
 
 /**

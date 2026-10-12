@@ -18,7 +18,7 @@ import { closeSync, constants, fstatSync, lstatSync, mkdtempSync, openSync, read
 import { dirname, isAbsolute, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
-import { getPrivateKeyPem, getPublicKeyPem } from "../crypto/keys.js";
+import { getPublicKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy, signingRoute } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
 import { latestEnforceResourceManifestPath, loadCanonicalEnforceResourceManifest, type EnforceResource } from "../enforce/resourceManifest.js";
@@ -45,7 +45,7 @@ import { a4ProjectsRoot } from "./a4Blobs.js";
 import { conformanceView } from "./a4Conformance.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "./a4Effects.js";
 import { A4_RUNTIME, signedA4Floor } from "./a4Gates.js";
-import { asLeasePrincipal } from "./a4Preflight.js";
+import { asLeasePrincipal, assertPurposeKeys, vaultLocked } from "./a4Preflight.js";
 import { isRegulated, redoneStages, type A4ReadinessState } from "./a4Readiness.js";
 import {
   a4PackageV1Schema, a4PrincipalSchema, a4QualitySpecSchema, a4ReleaseV1Schema, a4ResourceDigestsSchema, type A4ChainLink, type A4PackageV1, type A4Principal, type A4ProjectRow,
@@ -71,8 +71,6 @@ import { relPath } from "./stages/common.js";
 
 /** A coded failure: the effect runner records the message, whose first word is the code the route answers. */
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
-/** The vault's own refusal ("🔐 Vault locked…"), which every step that signs with a vault key throws uncoded. */
-export const vaultLocked = (error: unknown): boolean => /vault locked/i.test(error instanceof Error ? error.message : String(error));
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // ponytail: one input file; raise it if an agent's resources outgrow it
 const PACKAGE_BOUNDARY = "The signed provenance record of what this workspace held at the release digest (v1: a same-host restart of the hosted Studio "
   + "that built the agent, D-18). AMC prepared and signed it; it never deployed it. Installing it into another workspace is P2-40.";
@@ -329,16 +327,10 @@ function revokeJournaled(workspace: string, projectId: string, releaseId: string
 }
 /**
  * Before an effect's first side effect: the vault keys a lease step signs with, in any signing mode (the lease key mints a lease, the auditor key revokes
- * one; a locked vault answers A4_VAULT_LOCKED, 423), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
+ * one; a locked vault answers 423 A4_VAULT_LOCKED, a revoked key 409 A4_KEY_REVOKED), then the principal the lease will name (P1-78, src/a4/a4Preflight.ts), so a refusal leaves nothing revoked, written, minted or signed.
  */
 function assertLeaseKeys(workspace: string, principal: A4Principal, what: string): void {
-  try {
-    getPrivateKeyPem(workspace, "lease");
-    getPrivateKeyPem(workspace, "revocation-list"); // P1-08: the key revokeLease signs the lease revocation list with
-  } catch (error) {
-    if (vaultLocked(error)) throw coded("A4_VAULT_LOCKED", `unlock the vault to ${what}`);
-    throw error;
-  }
+  assertPurposeKeys(workspace, ["lease", "revocation-list"], what); // P1-08: revokeLease signs the lease revocation list with the revocation-list key
   asLeasePrincipal(principal, (principalKey) => resolveLeasePrincipal(workspace, principalKey));
 }
 /** Mints one lease of the plan bound to the project's workspace, agent and release, naming `principal` (resolved again); its id is journaled before the token is returned. */

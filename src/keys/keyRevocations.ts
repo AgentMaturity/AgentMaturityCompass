@@ -72,8 +72,17 @@ export function readKeyRevocations(workspace: string, required: boolean): KeyRev
   return rows;
 }
 
-/** Throws when `keyId` is revoked; the use-time check behind every signing key. */
+/** A signing key the workspace key revocation list names: a caller tells it from a locked vault or an unreadable list by type. */
+export class KeyRevokedError extends Error {
+  readonly code = "KEY_REVOKED";
+  constructor(readonly purpose: string, readonly keyId: string, revoked: KeyRevocation) {
+    super(`the ${purpose} key ${keyId} was revoked at ${revoked.revokedAt} (${revoked.reason}); rotate it with amc keys rotate --purpose ${purpose}`);
+    this.name = "KeyRevokedError";
+  }
+}
+
+/** Throws KeyRevokedError when `keyId` is revoked; the use-time check behind every signing key. */
 export function assertKeyNotRevoked(workspace: string, required: boolean, keyId: string, purpose: string): void {
   const revoked = readKeyRevocations(workspace, required).find(row => row.keyId === keyId);
-  if (revoked) throw new Error(`the ${purpose} key ${keyId} was revoked at ${revoked.revokedAt} (${revoked.reason}); rotate it with amc keys rotate --purpose ${purpose}`);
+  if (revoked) throw new KeyRevokedError(purpose, keyId, revoked);
 }

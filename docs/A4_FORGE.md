@@ -439,8 +439,11 @@ caller, so an owner that gate's quorum counted cannot complete it (409 `SOD_VIOL
 caller, as the release effect's engine request already does. A retry of a failed effect applies the same rule against
 the keys its consumed grant or gate quorum counted. An effect step that finds the vault locked (the lease key, an
 artifact signature) answers 423 `A4_VAULT_LOCKED`. Both effects read the vault's `lease` and `revocation-list` purpose keys (P1-08)
-before their first side effect (a revocation, a file, a lease or a signature), so a locked vault or a revoked key fails
+before their first side effect (a revocation, a file, a lease or a signature), so a locked vault (423 `A4_VAULT_LOCKED`) or a
+revoked key (409 `A4_KEY_REVOKED`, naming the purpose and the recovery, `amc keys rotate --purpose <purpose>`) fails
 them before the effect itself changes anything, and revoking an earlier attempt's lease with the vault locked answers the same code rather than `LEASE_REVOKE_FAILED`.
+Any other failure to read those keys (an unreadable or unverifiable key revocation list, an incomplete key set) is 409
+`SIGNING_FAILED` with its reason.
 The same pre-flight resolves the principal each lease names (P1-78): the owner who ran the effect, keyed as A4 keys
 its principals and never read from a body. Layer 0's mandatory `L0-IDN-01` makes every plan Adapt activates require a
 principal for every tool call, and a call under a lease that names no active `users.yaml` user is refused; so under
@@ -456,8 +459,8 @@ A vault that is already locked when `complete`, `POST …/releases` or a retry i
 consumed: readiness reads `signing.available` WAITING `VAULT_LOCKED` (409 `A4_NOT_READY`). A `DENY` on an unconsumed
 completion gate revokes the staging lease of the release that gate binds; a decision on a consumed gate is refused
 (`A4_GATE_STALE: consumed`) and revokes nothing. The revocation is signed with the vault's `revocation-list` key, even in
-NOTARY mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while that key cannot be read or is revoked, rather than recorded with the
-staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
+NOTARY mode, so such a `DENY` is refused with 423 `A4_VAULT_LOCKED` while the vault is locked and 409 `A4_KEY_REVOKED`
+while that key is revoked, rather than recorded with the staging lease left live. If a revocation still fails after the `DENY` is recorded, the `DENY` stands and the answer is
 409 `LEASE_REVOKE_FAILED` naming the lease ids, never a success (423 `A4_VAULT_LOCKED`, also naming them, when the vault
 locked meanwhile, and on a replay sent while it is locked): sending the same request again (same
 `clientRequestId`) retries the revocation, or the operator revokes the lease with `amc lease revoke`. The staging lease lasts 24 hours and a completion gate lasts at least a day after it is requested, so
@@ -548,7 +551,8 @@ then names the same target, so that rollback is finished first, run again in pro
 of the target's rollback does not bar the release. A production lease minted before the target's production rollback started is
 revoked by it (step 4 below). `POST …/releases/:rid/rollback { environment, toReleaseId, confirmManifestId, reason }`
 then confirms the exact ids the preview bound. The rollback is journaled like every A4 effect: `EFFECT_STARTED` (owner
-pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, on rows that still pass both preview refusals
+pid and host, heartbeat) commits first, pinned to `expectedHeadSeq`, once the vault's `artifact-seal` and
+`revocation-list` keys read (423 `A4_VAULT_LOCKED` while it is locked, 409 `A4_KEY_REVOKED` for a revoked one, before anything), on rows that still pass both preview refusals
 above, and a second attempt while one runs is refused (`EFFECT_RUNNING`). So is a rollback while the deployment approval's production-lease effect runs, and that effect refuses
 to mint (`RELEASE_ROLLED_BACK`) once a rollback of the release has started (any attempt, settled or not: a failed one may
 already have consumed its grant and restored the Enforce snapshot), so no lease is minted beside a rollback. Then
